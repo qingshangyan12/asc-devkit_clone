@@ -98,9 +98,7 @@ def softmax_flash_v3(
         shiftPrev = (inmean - x_mean) * scalar
         x_max = shiftCurr + maxTmp
         maxTmp = shiftPrev + inmax
-        x_max = np.max(
-            np.concatenate((x_max, maxTmp), axis=(-1)), axis=(-1), keepdims=True
-        )
+        x_max = np.max(np.concatenate((x_max, maxTmp), axis=(-1)), axis=(-1), keepdims=True)
 
     if update == False:
         maxTmp = x_max - shiftCurr

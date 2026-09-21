@@ -186,9 +186,7 @@ class PackKernel:
                 for pair_addr in soc_syms:
                     pair_addr1 = ["&" + s for s in pair_addr]
                     op_syms += pair_addr
-                    soc_pairs.append(
-                        "    {{ {} }} ".format(", \\\n      ".join(pair_addr1))
-                    )
+                    soc_pairs.append("    {{ {} }} ".format(", \\\n      ".join(pair_addr1)))
                 soc_res += ", \\\n        ".join(soc_pairs)
                 soc_res += " } }"
                 socs_res.append(soc_res)
@@ -197,20 +195,12 @@ class PackKernel:
             macro_str = '#define {}_RESOURCES {{{{"{}", {}}}}}'.format(
                 op_type, op_type, "{}_OP_RESOURCES".format(op_type)
             )
-            var_str = (
-                "extern gert::OpImplRegisterV2 op_impl_register_optiling_{};\n".format(
-                    op_type
-                )
-            )
+            var_str = "extern gert::OpImplRegisterV2 op_impl_register_optiling_{};\n".format(op_type)
             if len(op_syms) > 0:
-                var_str += (
-                    "extern uint8_t " + ";\nextern uint8_t ".join(op_syms) + ";\n"
-                )
+                var_str += "extern uint8_t " + ";\nextern uint8_t ".join(op_syms) + ";\n"
             head_file = os.path.join(self.out_path, "{}_op_resource.h".format(op_type))
             try:
-                with os.fdopen(
-                    os.open(head_file, const_var.WFLAGS, const_var.WMODES), "w"
-                ) as fd:
+                with os.fdopen(os.open(head_file, const_var.WFLAGS, const_var.WMODES), "w") as fd:
                     fd.write("#include <stdint.h>\n")
                     fd.write("#include <map>\n")
                     fd.write("#include <tuple>\n")
@@ -256,12 +246,8 @@ class PackKernel:
 
 def args_parse():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-i", "--input-path", nargs="?", help="Input path of compile result."
-    )
-    parser.add_argument(
-        "-o", "--output-path", nargs="?", help="Output path of compile result."
-    )
+    parser.add_argument("-i", "--input-path", nargs="?", help="Input path of compile result.")
+    parser.add_argument("-o", "--output-path", nargs="?", help="Output path of compile result.")
     parser.add_argument(
         "-l",
         "--enable-library",

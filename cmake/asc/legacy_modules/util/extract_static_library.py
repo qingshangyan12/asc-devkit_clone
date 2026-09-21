@@ -77,9 +77,7 @@ def main(argv):
 
     objects = get_objects_in_archive(args.archive)
 
-    cmake_config_content = generate_cmake_config_content(
-        args.target, args.dst_dir, objects
-    )
+    cmake_config_content = generate_cmake_config_content(args.target, args.dst_dir, objects)
 
     save_file(os.path.join(args.dst_dir, args.cmake), cmake_config_content)
 

@@ -33,9 +33,7 @@ TILING_KEY_MACRO = "TILING_KEY_VAR"
 DEFAULT_TILING_KEY = "0"
 COMPILE_INFO_KEY = "compileInfo"
 GEN_PLACE_HOLDER_STR = "gen_placeholder"
-TILING_KEY_SEARCH_KEYWORD = (
-    "Contents of section"  # used in new tiling to search tiling section lines
-)
+TILING_KEY_SEARCH_KEYWORD = "Contents of section"  # used in new tiling to search tiling section lines
 
 
 INPUT_OUTPUT_DTYPE_LEN = {

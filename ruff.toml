@@ -8,6 +8,10 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
+# ruff 的默认值是 88(沿用 Black 的约定)。88 列会把多参数调用强制拆成逐参数一行,
+# 显著抬高"平均文件代码行"这项质量门禁的统计值,故显式放宽到 120。
+line-length = 120
+
 target-version = "py37"
 
 [per-file-target-version]

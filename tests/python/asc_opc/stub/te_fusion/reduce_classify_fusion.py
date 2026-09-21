@@ -183,33 +183,21 @@ class ReduceClassifyFusion:
                 # axis is placeholder
                 for _idx, _var in enumerate(self.placeholder_op.value):
                     if _var.get("output_desc")[0].get("name").lower() == axis_name:
+                        self.placeholder_op.value[_idx]["output_desc"][0].update({"rel_pos_to_reduce": "axis"})
                         self.placeholder_op.value[_idx]["output_desc"][0].update(
-                            {"rel_pos_to_reduce": "axis"}
-                        )
-                        self.placeholder_op.value[_idx]["output_desc"][0].update(
-                            {
-                                "dtype": self.placeholder_op.value[_idx]["output_desc"][
-                                    0
-                                ].get("data_type")
-                            }
+                            {"dtype": self.placeholder_op.value[_idx]["output_desc"][0].get("data_type")}
                         )
                         self.axis_idx = _idx
                         break
                     if _idx == len(self.placeholder_op.value) - 1:
-                        raise RuntimeError(
-                            "Axis is belong to placeholder, but not find in placeholder_op"
-                        )
-                inputs_desc = [
-                    x.get("output_desc")[0] for x in self.placeholder_op.value
-                ]
+                        raise RuntimeError("Axis is belong to placeholder, but not find in placeholder_op")
+                inputs_desc = [x.get("output_desc")[0] for x in self.placeholder_op.value]
                 ReduceClassifyFusion._handle_input_range(inputs_desc)
                 self.ins_list = classify(inputs_desc, self.pattern, extra_params)
             else:
                 # axis is not in placeholder
                 dict_axis.update({"rel_pos_to_reduce": "axis"})
-                inputs_desc = [
-                    x.get("output_desc")[0] for x in self.placeholder_op.value
-                ]
+                inputs_desc = [x.get("output_desc")[0] for x in self.placeholder_op.value]
                 inputs_desc.append(dict_axis)
                 ReduceClassifyFusion._handle_input_range(inputs_desc)
                 self.axis_idx = len(inputs_desc) - 1

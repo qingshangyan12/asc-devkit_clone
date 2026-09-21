@@ -151,9 +151,7 @@ def register_op_compute(op_type, op_mode="dynamic", support_fusion=True, **kwarg
         decorator to return output_tensor
     """
 
-    return operation_func_mgr.register_op_compute(
-        op_type, op_mode, support_fusion, **kwargs
-    )
+    return operation_func_mgr.register_op_compute(op_type, op_mode, support_fusion, **kwargs)
 
 
 def get_op_compute(op_type, op_mode="dynamic"):

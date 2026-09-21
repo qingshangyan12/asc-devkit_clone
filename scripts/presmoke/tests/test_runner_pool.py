@@ -36,14 +36,10 @@ def cell(tmp: Path, name: str, mode: str = "npu", commands=None) -> Cell:
     return Cell(spec, "dav-2201", mode, commands or [], spec.path / f"build_{mode}")
 
 
-def source_cell(
-    tmp: Path, source: str, name: str, mode: str = "npu", commands=None
-) -> Cell:
+def source_cell(tmp: Path, source: str, name: str, mode: str = "npu", commands=None) -> Cell:
     source_path = tmp / source
     source_path.mkdir(parents=True, exist_ok=True)
-    spec = ExampleSpec(
-        source_path, name, commands or [], ["dav-2201"], [mode], "case-runner"
-    )
+    spec = ExampleSpec(source_path, name, commands or [], ["dav-2201"], [mode], "case-runner")
     return Cell(spec, "dav-2201", mode, commands or [], source_path / f"build_{mode}")
 
 
@@ -73,9 +69,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [static_lib, custom_op],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
 
         by_name = {result.example: result for result in run.results}
@@ -107,9 +101,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [custom_op, aclnn],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
 
         by_name = {result.example: result for result in run.results}
@@ -133,18 +125,14 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [custom_op, tiling_sink],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
             dependent_was_started = dependent_started.exists()
 
         by_name = {result.example: result for result in run.results}
         self.assertEqual(by_name[custom_op.example.rel_path].status, "FAIL")
         self.assertEqual(by_name[tiling_sink.example.rel_path].status, "SKIP")
-        self.assertIn(
-            "prerequisite failed", by_name[tiling_sink.example.rel_path].reason
-        )
+        self.assertIn("prerequisite failed", by_name[tiling_sink.example.rel_path].reason)
         self.assertFalse(dependent_was_started)
 
     def test_parallel_package_runs_after_failed_dependents_are_skipped(self) -> None:
@@ -172,9 +160,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [parallel_ops, aclnn, custom_op],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=3, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=3, npu_slots=1),
             )
             parallel_was_started = parallel_started.exists()
 
@@ -227,9 +213,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [parallel_ops, dependent, unrelated],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
 
         by_name = {result.example: result for result in run.results}
@@ -264,9 +248,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [parallel_ops, custom_op],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
 
         self.assertEqual([result.status for result in run.results], ["PASS", "PASS"])
@@ -304,9 +286,7 @@ class RunnerPoolTest(unittest.TestCase):
     def test_runner_timeout(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             c = cell(Path(tmp), "x", commands=[Command("sleep 2", "run")])
-            result = run_cell_with_options(
-                c, RunOptions(Path(tmp) / "logs", timeout=1, keep_artifacts=True)
-            )
+            result = run_cell_with_options(c, RunOptions(Path(tmp) / "logs", timeout=1, keep_artifacts=True))
         self.assertEqual(result.status, "FAIL")
         self.assertEqual(result.rc, 124)
 
@@ -321,9 +301,7 @@ class RunnerPoolTest(unittest.TestCase):
                     Command("sleep 1.2", "verify"),
                 ],
             )
-            result = run_cell_with_options(
-                c, RunOptions(Path(tmp) / "logs", timeout=1, keep_artifacts=True)
-            )
+            result = run_cell_with_options(c, RunOptions(Path(tmp) / "logs", timeout=1, keep_artifacts=True))
 
         self.assertEqual(result.status, "PASS")
         self.assertEqual([step.rc for step in result.steps], [0, 0, 0])
@@ -356,9 +334,7 @@ class RunnerPoolTest(unittest.TestCase):
     def test_cpu_run_stage_uses_timeout(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             c = cell(Path(tmp), "x", mode="cpu", commands=[Command("sleep 2", "run")])
-            result = run_cell_with_options(
-                c, RunOptions(Path(tmp) / "logs", timeout=1, keep_artifacts=True)
-            )
+            result = run_cell_with_options(c, RunOptions(Path(tmp) / "logs", timeout=1, keep_artifacts=True))
 
         self.assertEqual(result.status, "PASS")
         self.assertEqual(result.rc, 0)
@@ -424,9 +400,7 @@ class RunnerPoolTest(unittest.TestCase):
             )
             cells, suggestions, skipped = build_case_runner_cells_with_skips(
                 root,
-                CaseRunnerOptions(
-                    arch="dav-2201", modes=["npu"], includes=[], excludes=[]
-                ),
+                CaseRunnerOptions(arch="dav-2201", modes=["npu"], includes=[], excludes=[]),
             )
         self.assertEqual(cells, [])
         self.assertEqual(len(skipped), 1)
@@ -448,9 +422,7 @@ class RunnerPoolTest(unittest.TestCase):
             )
             cells, suggestions, skipped = build_case_runner_cells_with_skips(
                 root,
-                CaseRunnerOptions(
-                    arch="dav-2201", modes=["npu"], includes=[], excludes=[]
-                ),
+                CaseRunnerOptions(arch="dav-2201", modes=["npu"], includes=[], excludes=[]),
             )
         self.assertEqual(cells, [])
         self.assertEqual(skipped, [])
@@ -512,9 +484,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             cells, _, _ = build_case_runner_cells_with_skips(
                 root,
-                CaseRunnerOptions(
-                    arch="dav-2201", modes=["npu"], includes=[], excludes=[]
-                ),
+                CaseRunnerOptions(arch="dav-2201", modes=["npu"], includes=[], excludes=[]),
             )
 
         self.assertEqual(cells[0].example.rel_path, case)
@@ -535,9 +505,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             cells, _, _ = build_case_runner_cells_with_skips(
                 root,
-                CaseRunnerOptions(
-                    arch="dav-2201", modes=["npu"], includes=[], excludes=[]
-                ),
+                CaseRunnerOptions(arch="dav-2201", modes=["npu"], includes=[], excludes=[]),
             )
 
         self.assertEqual(
@@ -559,9 +527,7 @@ class RunnerPoolTest(unittest.TestCase):
             c.build_dir.mkdir()
             (c.build_dir / "stale").write_text("old", encoding="utf-8")
 
-            result = run_cell_with_options(
-                c, RunOptions(Path(tmp) / "logs", timeout=1, keep_artifacts=True)
-            )
+            result = run_cell_with_options(c, RunOptions(Path(tmp) / "logs", timeout=1, keep_artifacts=True))
 
         self.assertEqual(result.status, "PASS")
 
@@ -583,9 +549,7 @@ class RunnerPoolTest(unittest.TestCase):
                 ],
             )
 
-            result = run_cell_with_options(
-                c, RunOptions(root / "logs", timeout=1, keep_artifacts=False)
-            )
+            result = run_cell_with_options(c, RunOptions(root / "logs", timeout=1, keep_artifacts=False))
 
             self.assertEqual(result.status, "PASS")
             self.assertTrue((c.build_dir / "custom_opp_test.run").exists())
@@ -607,9 +571,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             result = run_cells_pipeline_with_options(
                 [c],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1),
             )
 
             self.assertEqual(result.results[0].status, "PASS")
@@ -632,9 +594,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             result = run_cells_pipeline_with_options(
                 [c],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=False, jobs=1, npu_slots=1),
             )
 
             self.assertEqual(result.results[0].status, "FAIL")
@@ -732,9 +692,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 cells,
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
 
         self.assertEqual([result.status for result in run.results], ["PASS", "PASS"])
@@ -750,9 +708,7 @@ class RunnerPoolTest(unittest.TestCase):
                     commands=[
                         Command(":", "build"),
                         Command("sleep 0.01", "run"),
-                        Command(
-                            f"while [ ! -f {marker} ]; do sleep 0.02; done", "verify"
-                        ),
+                        Command(f"while [ ! -f {marker} ]; do sleep 0.02; done", "verify"),
                     ],
                 ),
                 cell(
@@ -876,13 +832,9 @@ class RunnerPoolTest(unittest.TestCase):
             ]
             run = run_cells_pipeline_with_options(
                 cells,
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
-            report = RunReport(
-                "dav-2201", ["npu"], "start", "finish", run.results, [], run.npu_stats
-            )
+            report = RunReport("dav-2201", ["npu"], "start", "finish", run.results, [], run.npu_stats)
             json_path = root / "report.json"
             md_path = root / "report.md"
 
@@ -915,13 +867,9 @@ class RunnerPoolTest(unittest.TestCase):
             ]
             run = run_cells_pipeline_with_options(
                 cells,
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
-            report = RunReport(
-                "dav-2201", ["cpu"], "start", "finish", run.results, [], run.npu_stats
-            )
+            report = RunReport("dav-2201", ["cpu"], "start", "finish", run.results, [], run.npu_stats)
             md_path = root / "report.md"
 
             write_markdown(report, md_path)
@@ -946,9 +894,7 @@ class RunnerPoolTest(unittest.TestCase):
 
             run = run_cells_pipeline_with_options(
                 [c],
-                PipelineOptions(
-                    root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1
-                ),
+                PipelineOptions(root / "logs", timeout=1, keep_artifacts=True, jobs=2, npu_slots=1),
             )
             result = run.results[0]
 

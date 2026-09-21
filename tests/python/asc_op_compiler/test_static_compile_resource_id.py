@@ -35,11 +35,7 @@ class TestStaticCompileResourceId(unittest.TestCase):
         Path(self.object_path).write_bytes(b"original object")
 
     def assert_no_resource_id_temporary_files(self):
-        temporary_files = [
-            name
-            for name in os.listdir(self.temp_dir.name)
-            if name.startswith(".resource_id.")
-        ]
+        temporary_files = [name for name in os.listdir(self.temp_dir.name) if name.startswith(".resource_id.")]
         self.assertEqual(temporary_files, [])
 
     def test_invalid_inputs_do_not_modify_object(self):
@@ -78,9 +74,7 @@ class TestStaticCompileResourceId(unittest.TestCase):
         self.assertEqual(len(commands), 1)
         self.assertIn("--add-section", commands[0])
         self.assertEqual(payloads, [b"a" * 64])
-        self.assertEqual(
-            Path(self.object_path).read_bytes(), b"object with resource id"
-        )
+        self.assertEqual(Path(self.object_path).read_bytes(), b"object with resource id")
         self.assert_no_resource_id_temporary_files()
 
     def test_write_failures_preserve_original_and_clean_temporary_files(self):
@@ -94,9 +88,7 @@ class TestStaticCompileResourceId(unittest.TestCase):
                     "_run_tool",
                     side_effect=MODULE.ResourceIdError("objcopy failed"),
                 ):
-                    with self.assertRaisesRegex(
-                        MODULE.ResourceIdError, "objcopy failed"
-                    ):
+                    with self.assertRaisesRegex(MODULE.ResourceIdError, "objcopy failed"):
                         MODULE.write_resource_id_section(self.object_path, resource_id)
             self.assertEqual(Path(self.object_path).read_bytes(), original)
             self.assert_no_resource_id_temporary_files()
@@ -110,9 +102,7 @@ class TestStaticCompileResourceId(unittest.TestCase):
                         side_effect=OSError("replace failed"),
                     ):
                         with self.assertRaisesRegex(OSError, "replace failed"):
-                            MODULE.write_resource_id_section(
-                                self.object_path, resource_id
-                            )
+                            MODULE.write_resource_id_section(self.object_path, resource_id)
             self.assertEqual(Path(self.object_path).read_bytes(), original)
             self.assert_no_resource_id_temporary_files()
 

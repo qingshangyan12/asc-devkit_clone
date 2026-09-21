@@ -2587,20 +2587,14 @@ _ATTRDEF_LISTVALUE.fields_by_name["td"].message_type = _TENSORDESCRIPTOR
 _ATTRDEF_LISTVALUE.fields_by_name["t"].message_type = _TENSORDEF
 _ATTRDEF_LISTVALUE.fields_by_name["g"].message_type = _GRAPHDEF
 _ATTRDEF_LISTVALUE.fields_by_name["na"].message_type = _NAMEDATTRS
-_ATTRDEF_LISTVALUE.fields_by_name[
-    "val_type"
-].enum_type = _ATTRDEF_LISTVALUE_LISTVALUETYPE
+_ATTRDEF_LISTVALUE.fields_by_name["val_type"].enum_type = _ATTRDEF_LISTVALUE_LISTVALUETYPE
 _ATTRDEF_LISTVALUE.containing_type = _ATTRDEF
 _ATTRDEF_LISTVALUE_LISTVALUETYPE.containing_type = _ATTRDEF_LISTVALUE
 _ATTRDEF_LISTLISTINT_LISTINT.containing_type = _ATTRDEF_LISTLISTINT
-_ATTRDEF_LISTLISTINT.fields_by_name[
-    "list_list_i"
-].message_type = _ATTRDEF_LISTLISTINT_LISTINT
+_ATTRDEF_LISTLISTINT.fields_by_name["list_list_i"].message_type = _ATTRDEF_LISTLISTINT_LISTINT
 _ATTRDEF_LISTLISTINT.containing_type = _ATTRDEF
 _ATTRDEF_LISTLISTFLOAT_LISTFLOAT.containing_type = _ATTRDEF_LISTLISTFLOAT
-_ATTRDEF_LISTLISTFLOAT.fields_by_name[
-    "list_list_f"
-].message_type = _ATTRDEF_LISTLISTFLOAT_LISTFLOAT
+_ATTRDEF_LISTLISTFLOAT.fields_by_name["list_list_f"].message_type = _ATTRDEF_LISTLISTFLOAT_LISTFLOAT
 _ATTRDEF_LISTLISTFLOAT.containing_type = _ATTRDEF
 _ATTRDEF.fields_by_name["list"].message_type = _ATTRDEF_LISTVALUE
 _ATTRDEF.fields_by_name["func"].message_type = _NAMEDATTRS
@@ -2630,17 +2624,11 @@ _ATTRDEF.fields_by_name["t"].containing_oneof = _ATTRDEF.oneofs_by_name["value"]
 _ATTRDEF.oneofs_by_name["value"].fields.append(_ATTRDEF.fields_by_name["g"])
 _ATTRDEF.fields_by_name["g"].containing_oneof = _ATTRDEF.oneofs_by_name["value"]
 _ATTRDEF.oneofs_by_name["value"].fields.append(_ATTRDEF.fields_by_name["list_list_int"])
-_ATTRDEF.fields_by_name["list_list_int"].containing_oneof = _ATTRDEF.oneofs_by_name[
-    "value"
-]
+_ATTRDEF.fields_by_name["list_list_int"].containing_oneof = _ATTRDEF.oneofs_by_name["value"]
 _ATTRDEF.oneofs_by_name["value"].fields.append(_ATTRDEF.fields_by_name["dt"])
 _ATTRDEF.fields_by_name["dt"].containing_oneof = _ATTRDEF.oneofs_by_name["value"]
-_ATTRDEF.oneofs_by_name["value"].fields.append(
-    _ATTRDEF.fields_by_name["list_list_float"]
-)
-_ATTRDEF.fields_by_name["list_list_float"].containing_oneof = _ATTRDEF.oneofs_by_name[
-    "value"
-]
+_ATTRDEF.oneofs_by_name["value"].fields.append(_ATTRDEF.fields_by_name["list_list_float"])
+_ATTRDEF.fields_by_name["list_list_float"].containing_oneof = _ATTRDEF.oneofs_by_name["value"]
 _NAMEDATTRS_ATTRENTRY.fields_by_name["value"].message_type = _ATTRDEF
 _NAMEDATTRS_ATTRENTRY.containing_type = _NAMEDATTRS
 _NAMEDATTRS.fields_by_name["attr"].message_type = _NAMEDATTRS_ATTRENTRY

@@ -261,9 +261,7 @@ def check_op_params(*type_args, **type_kwargs):
         _check_input_output_key(op_param, param_name, op_name)
         check_shape(op_param[OpParamInfoKey.SHAPE.value], param_name=param_name)
         check_shape(op_param[OpParamInfoKey.ORI_SHAPE.value], param_name=param_name)
-        if in_dynamic() and DYNAMIC_SHAPE_FLAG in op_param.get(
-            OpParamInfoKey.ORI_SHAPE.value
-        ):
+        if in_dynamic() and DYNAMIC_SHAPE_FLAG in op_param.get(OpParamInfoKey.ORI_SHAPE.value):
             _check_range(
                 op_param[OpParamInfoKey.SHAPE.value],
                 op_param[OpParamInfoKey.RANGE.value],
@@ -401,8 +399,7 @@ def check_op_params(*type_args, **type_kwargs):
                 }
                 raise RuntimeError(
                     error_info,
-                    "In op[%s], the mandatory parameter[%s] is missed."
-                    % (op_name, param_name),
+                    "In op[%s], the mandatory parameter[%s] is missed." % (op_name, param_name),
                 )
             for one_input in op_param:
                 _check_input_output_dict(one_input, param_name, op_name)
@@ -417,8 +414,7 @@ def check_op_params(*type_args, **type_kwargs):
                 }
                 raise RuntimeError(
                     error_info,
-                    "In op[%s], the mandatory parameter[%s] is missed."
-                    % (op_name, param_name),
+                    "In op[%s], the mandatory parameter[%s] is missed." % (op_name, param_name),
                 )
 
             _check_input_output_dict(op_param, param_name, op_name)
@@ -453,8 +449,7 @@ def check_op_params(*type_args, **type_kwargs):
                 }
                 raise RuntimeError(
                     error_info,
-                    "In op[%s], the mandatory  parameter[%s] is missed."
-                    % (op_name, param_name),
+                    "In op[%s], the mandatory  parameter[%s] is missed." % (op_name, param_name),
                 )
             for one_input in op_param:
                 _check_input_output_dict(one_input, param_name, op_name)
@@ -547,8 +542,7 @@ def check_op_params(*type_args, **type_kwargs):
             }
             raise RuntimeError(
                 error_info,
-                "In op[%s], the mandatory parameter[%s] is missed."
-                % (op_name, param_name),
+                "In op[%s], the mandatory parameter[%s] is missed." % (op_name, param_name),
             )
         if not op_param:
             return
@@ -641,8 +635,7 @@ def check_op_params(*type_args, **type_kwargs):
             raise RuntimeError(
                 error_info,
                 "In op[%s],kernel_name can only contain letters, numbers and "
-                "underscores, and begin with underscores or letters"
-                % (error_info["op_name"]),
+                "underscores, and begin with underscores or letters" % (error_info["op_name"]),
             )
 
     def _check_one_op_param(op_param, param_name, param_type, op_name=OP_NAME):
@@ -678,9 +671,7 @@ def check_op_params(*type_args, **type_kwargs):
                 op_name = func.__name__
                 for name_type in formal_parameter_list:
                     if arg_key == name_type[0]:
-                        _check_one_op_param(
-                            kwargs[arg_key], arg_key, name_type[1], op_name
-                        )
+                        _check_one_op_param(kwargs[arg_key], arg_key, name_type[1], op_name)
                         break
 
             return func(*args, **kwargs)
@@ -742,15 +733,10 @@ def _check_range(
             }
             raise RuntimeError(
                 error_info,
-                "In op[%s],the length of each element in the range must be two"
-                % (error_info.get("op_name")),
+                "In op[%s],the length of each element in the range must be two" % (error_info.get("op_name")),
             )
 
-        if (
-            (range_i[1] is None)
-            and isinstance(range_i[0], int)
-            and 0 <= range_i[0] <= max_shape_num
-        ):
+        if (range_i[1] is None) and isinstance(range_i[0], int) and 0 <= range_i[0] <= max_shape_num:
             continue
         if not isinstance(range_i[0], int):
             error_info = {
@@ -816,9 +802,7 @@ def _check_range(
             )
 
 
-def _check_dynamic_shape(
-    shape, max_dim=DIM_LIMIT_INT64, max_rank=RANK_LIMIT, param_name=PARAM_NAME
-):
+def _check_dynamic_shape(shape, max_dim=DIM_LIMIT_INT64, max_rank=RANK_LIMIT, param_name=PARAM_NAME):
     _check_shape_range(max_rank, MIN_UNKNOWN_SHAPE_RANK, param_name, shape)
     for _, dim in enumerate(shape):
         valid_dim = -2 <= dim <= max_dim
@@ -945,6 +929,5 @@ def _check_shape_range(max_rank, min_rank, param_name, shape):
         raise RuntimeError(
             error_info,
             "In op, the num of dimensions of input/output[%s] should be in "
-            "the range of [%s, %s], but actually is [%s]."
-            % (error_info["param_name"], min_rank, max_rank, len(shape)),
+            "the range of [%s, %s], but actually is [%s]." % (error_info["param_name"], min_rank, max_rank, len(shape)),
         )

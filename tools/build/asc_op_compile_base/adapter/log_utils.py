@@ -97,9 +97,7 @@ class LogUtil:
                 f.write(" ".join(str(cmd) for cmd in compile_cmd))
                 f.write("\n\n")
         except Exception as err:
-            raise_tbe_python_err(
-                TBE_DEFAULT_PYTHON_ERROR_CODE, ("write log failed, reason:", err)
-            )
+            raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write log failed, reason:", err))
 
     @staticmethod
     def set_soc_version(soc_version):
@@ -117,9 +115,7 @@ class LogUtil:
                 f.write(f"{level} {log_str}")
                 f.write("\n\n")
         except Exception as err:
-            raise_tbe_python_err(
-                TBE_DEFAULT_PYTHON_ERROR_CODE, ("write log failed, reason:", err)
-            )
+            raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write log failed, reason:", err))
 
     # print log with level judge
     @staticmethod
@@ -139,11 +135,7 @@ class LogUtil:
         LogUtil.plog_print(kernel_name, msg_info, log_level, option)
         if plog_switch is None and log_level.value < default_log_level:
             return
-        if (
-            plog_switch is not None
-            and int(plog_switch) == 0
-            and log_level.value < default_log_level
-        ):
+        if plog_switch is not None and int(plog_switch) == 0 and log_level.value < default_log_level:
             return
         LogUtil.log_print(kernel_name, msg_info, log_level, option)
         return

@@ -109,9 +109,7 @@ class TestCompileOp(unittest.TestCase):
             extract_template_tiling_info(declare_param_str, select_param_str)
         self.assertEqual(
             e.exception.args,
-            (
-                "There is duplicated number in ASCENDC_TPL_DECL_UINT Z! Duplicated List: [0, 1, 2, 3, 4, 3, 6].",
-            ),
+            ("There is duplicated number in ASCENDC_TPL_DECL_UINT Z! Duplicated List: [0, 1, 2, 3, 4, 3, 6].",),
         )
 
         declare_param_str = "@@structFlashAttentionScore@@ =@@ASCENDC_TPL_ARGS_DECL_FlashAttentionScore@@ = {@@ASCENDC_TPL_DTYPE_DECL_X@@ = { 10, 30, 20},@@ASCENDC_TPL_FORMAT_DECL_Y@@ = {15, 25},@@ASCENDC_TPL_UINT_DECL_Z@@ = {8, 2, 2, 0, 2, 3, 4, 5, 6},@@ASCENDC_TPL_BOOL_DECL_S@@ = {0, 1}, };"
@@ -122,9 +120,7 @@ class TestCompileOp(unittest.TestCase):
         with self.assertRaises(RuntimeError) as e:
             extract_template_tiling_info(declare_param_str, select_param_str)
             result = decode_tiling()
-        self.assertEqual(
-            e.exception.args, ("ASCENDC_TPL_SELECT has duplicated definitions!",)
-        )
+        self.assertEqual(e.exception.args, ("ASCENDC_TPL_SELECT has duplicated definitions!",))
 
     def test_template_tiling_name(self):
         declare_param_str = "@@structFlashAttentionScore@@ =@@ASCENDC_TPL_ARGS_DECL_FlashAttentionScore@@ = {@@ASCENDC_TPL_DTYPE_DECL_X@@ = { 10, 30, 20},@@ASCENDC_TPL_FORMAT_DECL_Y@@ = {15, 25},@@ASCENDC_TPL_UINT_DECL_Z@@ = {8, 2, 2, 0, 2, 3, 4, 5, 6},@@ASCENDC_TPL_BOOL_DECL_S@@ = {0, 1}, };"
@@ -144,9 +140,7 @@ class TestCompileOp(unittest.TestCase):
         )
         with self.assertRaises(RuntimeError) as e:
             extract_template_tiling_info(declare_param_str, select_param_str)
-        self.assertEqual(
-            e.exception.args, ("Length of ASCENDC_TPL_UINT_SEL Z is too short.",)
-        )
+        self.assertEqual(e.exception.args, ("Length of ASCENDC_TPL_UINT_SEL Z is too short.",))
 
         select_param_str = (
             "@@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_DTYPE_SEL_X@@ = { 10, 30},@@ASCENDC_TPL_FORMAT_SEL_Y@@ = { 15},@@ASCENDC_TPL_UINT_SEL_Z@@ = {1, 4, 6},@@ASCENDC_TPL_BOOL_SEL_S@@ = {0, 1}},"
@@ -154,9 +148,7 @@ class TestCompileOp(unittest.TestCase):
         )
         with self.assertRaises(RuntimeError) as e:
             extract_template_tiling_info(declare_param_str, select_param_str)
-        self.assertEqual(
-            e.exception.args, ("values of ASCENDC_TPL_FORMAT_SEL Y is empty!",)
-        )
+        self.assertEqual(e.exception.args, ("values of ASCENDC_TPL_FORMAT_SEL Y is empty!",))
         select_param_str = (
             "@@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_DTYPE_SEL_X@@ = { 10, 30},@@ASCENDC_TPL_FORMAT_SEL_Y@@ = { 15},@@ASCENDC_TPL_UINT_SEL_Z@@ = {1, 4, 6},@@ASCENDC_TPL_BOOL_SEL_S@@ = {0, 1}},"
             "@@{@@ASCENDC_TPL_DTYPE_SEL_X@@ = { 10, 30},@@ASCENDC_TPL_FORMAT_SEL_Y@@ = {15},@@ASCENDC_TPL_UINT_SEL_Z@@ = {1,4, 6},@@ASCENDC_TPL_BOOL_SEL_S@@ = {3, 1}}, };"
@@ -165,9 +157,7 @@ class TestCompileOp(unittest.TestCase):
             extract_template_tiling_info(declare_param_str, select_param_str)
         self.assertEqual(
             e.exception.args,
-            (
-                "There is invalid number in ASCENDC_TPL_BOOL_SEL S! Value should only be in [0, 1].",
-            ),
+            ("There is invalid number in ASCENDC_TPL_BOOL_SEL S! Value should only be in [0, 1].",),
         )
         declare_param_str = "@@structFlashAttentionScore@@ =@@ASCENDC_TPL_ARGS_DECL_FlashAttentionScore@@ = {@@ASCENDC_TPL_DTYPE_DECL_X@@ = { 10, 30, 20},@@ASCENDC_TPL_FORMAT_DECL_Y@@ = {15, 25},@@ASCENDC_TPL_UINT_DECL_Z@@ = {1, 2, 2, 0, 2, 3, 4, 5, 6},@@ASCENDC_TPL_BOOL_DECL_S@@ = {0, 1}, };"
         with self.assertRaises(RuntimeError) as e:
@@ -194,9 +184,7 @@ class TestCompileOp(unittest.TestCase):
             extract_template_tiling_info(declare_param_str, select_param_str)
         self.assertEqual(
             e.exception.args,
-            (
-                "S has different type in ASCENDC_TPL_FORMAT_SEL and ASCENDC_TPL_BOOL_DECL.",
-            ),
+            ("S has different type in ASCENDC_TPL_FORMAT_SEL and ASCENDC_TPL_BOOL_DECL.",),
         )
         select_param_str = (
             "@@ASCENDC_TPL_LISTS@@ = {@@{@@ASCENDC_TPL_DTYPE_SEL_X@@ = { 10, 30},@@ASCENDC_TPL_FORMAT_SEL_Y@@ = { 15},@@ASCENDC_TPL_UINT_SEL_Z@@ = {1, 4, 6},@@ASCENDC_TPL_BOOL_SEL_S@@ = {0, 1}},@@ASCENDC_TPL_BOOL_SEL_XXX@@ = {0, 1}},"
@@ -253,18 +241,14 @@ class TestCompileOp(unittest.TestCase):
         )
 
         with tbe.common.context.op_context.OpContext():
-            with mock.patch.object(
-                tbe.common.context.get_context(), "get_addition", return_value=""
-            ):
+            with mock.patch.object(tbe.common.context.get_context(), "get_addition", return_value=""):
                 with mock.patch.object(
                     template_tiling,
                     "safe_parse_value",
                     wraps=template_tiling.safe_parse_value,
                 ) as mock_safe_parse_value:
                     extract_template_tiling_info(declare_param_str, select_param_str)
-                    dtype_options, dtype_select_indexes = extract_decl_param_options(
-                        op_info, "dtype"
-                    )
+                    dtype_options, dtype_select_indexes = extract_decl_param_options(op_info, "dtype")
                     result = decode_tiling()
 
         self.assertIn(mock.call("C_DT_BF16"), mock_safe_parse_value.call_args_list)
@@ -314,13 +298,13 @@ class TestCompileOp(unittest.TestCase):
         )
 
     def test_template_tiling_datatype_invalid_parse_value(self):
-        declare_param_str = "@@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DATATYPE_DECL_D_T_X@@ = {C_DT_UNKNOWN},};"
+        declare_param_str = (
+            "@@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DATATYPE_DECL_D_T_X@@ = {C_DT_UNKNOWN},};"
+        )
 
         with self.assertRaises(RuntimeError) as e:
             extract_template_tiling_info(declare_param_str, "")
-        self.assertEqual(
-            e.exception.args, ("values of ASCENDC_TPL_DATATYPE_DECL D_T_X is empty!",)
-        )
+        self.assertEqual(e.exception.args, ("values of ASCENDC_TPL_DATATYPE_DECL D_T_X is empty!",))
 
     def test_template_tiling_deterministic(self):
         declare_param_str = "@@structFlashAttentionScore@@ =@@ASCENDC_TPL_ARGS_DECL_FlashAttentionScore@@ = {@@ASCENDC_TPL_DTYPE_DECL_X@@ = { 10, 30, 20},@@ASCENDC_TPL_FORMAT_DECL_Y@@ = {15, 25},@@ASCENDC_TPL_UINT_DECL_Z@@ = {8, 2, 2, 0, 2, 3, 4, 5, 6},@@ASCENDC_TPL_BOOL_DECL_S@@ = {0, 1}, };"

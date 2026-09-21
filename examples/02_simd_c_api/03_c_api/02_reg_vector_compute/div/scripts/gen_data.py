@@ -34,9 +34,7 @@ def gen_golden_data():
             np.power(2.0, -140),
         ]
     )
-    y_small = np.array(
-        [4.0, np.power(2.0, -127), 2.0, np.power(2.0, -20), np.power(2.0, -145)]
-    )
+    y_small = np.array([4.0, np.power(2.0, -127), 2.0, np.power(2.0, -20), np.power(2.0, -145)])
     reps = int(np.ceil(total_length / len(x_small)))
     x = (np.tile(x_small, reps)[:total_length]).astype(np.float32)
     y = (np.tile(y_small, reps)[:total_length]).astype(np.float32)

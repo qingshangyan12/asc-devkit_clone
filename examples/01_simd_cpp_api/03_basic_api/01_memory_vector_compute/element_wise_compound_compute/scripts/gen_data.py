@@ -56,9 +56,7 @@ def gen_golden_data(scenario=1):
     input1.tofile("./input/input1.bin")
     golden.tofile("./output/golden.bin")
 
-    print(
-        f"Generated data for scenario {scenario}: input0 shape={input0.shape}, dtype={input0.dtype}"
-    )
+    print(f"Generated data for scenario {scenario}: input0 shape={input0.shape}, dtype={input0.dtype}")
 
 
 if __name__ == "__main__":

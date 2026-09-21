@@ -120,9 +120,7 @@ def gen_golden_data_simple():
     row = 32
     column = 32
 
-    golden = philox_random_with_stride(10, counter, key, stride, row, column).astype(
-        np.uint32
-    )
+    golden = philox_random_with_stride(10, counter, key, stride, row, column).astype(np.uint32)
     if dtype == np.float32:
         golden = uint2float(golden)
     else:

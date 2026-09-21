@@ -19,9 +19,7 @@ import json
 from tbe.common.utils.errormgr import get_error_message
 
 
-def check_op_cap(
-    check_type: str, optype: str, inputs: list, outputs: list, attrs: list = None
-):
+def check_op_cap(check_type: str, optype: str, inputs: list, outputs: list, attrs: list = None):
     """Check whether an operator has a certain capability based on the operator type / inputs / outputs information.
 
     Args:

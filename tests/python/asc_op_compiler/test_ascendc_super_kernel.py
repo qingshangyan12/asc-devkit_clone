@@ -52,9 +52,7 @@ from asc_op_compile_base.asc_op_compiler.global_storage import global_var_storag
 
 def SetCurrentSocInfo(soc: str):
     set_current_compile_soc_info(soc)
-    global_var_storage.set_variable(
-        "ascendc_short_soc_version", get_soc_spec("SHORT_SOC_VERSION")
-    )
+    global_var_storage.set_variable("ascendc_short_soc_version", get_soc_spec("SHORT_SOC_VERSION"))
 
 
 op_json = {
@@ -447,9 +445,7 @@ class TestAscendSuperKernel(unittest.TestCase):
         # when SuperOperatorInfos inits, dir kernel_meta and follow files/dirs will be created
         # SuperOperatorInfos.init_sub_operators() create dir "kernel_meta/{threading.get_ident()}"
         # "super_kernel{tag}_kernel.cpp" and "super_kernel{tag}.log" (tag is CommonUtility.get_kernel_meta_dir())
-        generated_file_path = os.path.join(
-            os.path.abspath(os.path.dirname(__file__)), "../../../kernel_meta"
-        )
+        generated_file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../../../kernel_meta")
         if os.path.isdir(generated_file_path):
             shutil.rmtree(generated_file_path)
 
@@ -567,9 +563,7 @@ class TestAscendSuperKernel(unittest.TestCase):
         sub_op.gen_notify_wait_from_outside(set(), False)
 
         self.assertIn("ev=10, param_offset=1", sub_op.notify_before_call_block)
-        self.assertIn(
-            "NotifyFunc<false>(param_base[1])", sub_op.notify_before_call_block
-        )
+        self.assertIn("NotifyFunc<false>(param_base[1])", sub_op.notify_before_call_block)
         self.assertIn("ev=11, param_offset=10", sub_op.notify_block)
         self.assertIn("NotifyFunc<false>(param_base[10])", sub_op.notify_block)
         self.assertIn("ev=12, param_offset=11", sub_op.wait_block)
@@ -608,9 +602,7 @@ class TestAscendSuperKernel(unittest.TestCase):
             ]
         }
         with (
-            mock.patch(
-                "builtins.open", new_callable=mock.mock_open, read_data="{}"
-            ) as json_open,
+            mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as json_open,
             mock.patch("json.load", return_value=op_json),
             mock.patch.object(CommonUtility, "dump_compile_log"),
             mock.patch.object(SubOperatorInfos, "extract_sub_op_bin_files"),
@@ -671,9 +663,7 @@ class TestAscendSuperKernel(unittest.TestCase):
         sub_op.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
         sub_op.gen_notify_wait_from_outside(set(), False)
 
-        self.assertIn(
-            "NotifyFunc<false>(param_base[1])", sub_op.notify_before_call_block
-        )
+        self.assertIn("NotifyFunc<false>(param_base[1])", sub_op.notify_before_call_block)
         self.assertIn("NotifyFunc<false>(param_base[13])", sub_op.notify_block)
         self.assertIn("WaitFunc<false>(param_base[14])", sub_op.wait_block)
         self.assertEqual(
@@ -742,13 +732,9 @@ class TestAscendSuperKernel(unittest.TestCase):
             super_op = SuperOperatorInfos(kernel_infos, "super_kernel")
 
         self.assertEqual(super_op.compile_info["send_event_list"], [[11], []])
-        self.assertEqual(
-            super_op.compile_info["notify_before_call_event_list"], [[10], []]
-        )
+        self.assertEqual(super_op.compile_info["notify_before_call_event_list"], [[10], []])
         self.assertEqual(super_op.compile_info["notify_param_offset"], [10, 19])
-        self.assertEqual(
-            super_op.compile_info["notify_before_call_param_offset"], [1, 0]
-        )
+        self.assertEqual(super_op.compile_info["notify_before_call_param_offset"], [1, 0])
         self.assertEqual(super_op.compile_info["param_offset"], [2, 11])
         self.assertEqual(
             super_op.super_kernel_params[:2],
@@ -778,16 +764,10 @@ class TestAscendSuperKernel(unittest.TestCase):
         self.assertIn("NotifyFunc<false>(param_base[10])", source)
 
     def test_ascendc_super_kernel_plus(self):
-        with mock.patch(
-            "asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"
-        ):
-            with mock.patch(
-                "builtins.open", new_callable=mock.mock_open, read_data="{}"
-            ) as mock_open:
+        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"):
+            with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
                 with mock.patch("json.load", return_value=op_json):
-                    with mock.patch.object(
-                        CommonUtility, "is_support_super_kernel", return_value=True
-                    ):
+                    with mock.patch.object(CommonUtility, "is_support_super_kernel", return_value=True):
                         ascendc_super_kernel_plus(
                             {
                                 "op_list": [
@@ -800,16 +780,10 @@ class TestAscendSuperKernel(unittest.TestCase):
                             },
                             "super_kernel",
                         )
-        with mock.patch(
-            "asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"
-        ):
-            with mock.patch(
-                "builtins.open", new_callable=mock.mock_open, read_data="{}"
-            ) as mock_open:
+        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"):
+            with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
                 with mock.patch("json.load", return_value=op_json1):
-                    with mock.patch.object(
-                        CommonUtility, "is_support_super_kernel", return_value=True
-                    ):
+                    with mock.patch.object(CommonUtility, "is_support_super_kernel", return_value=True):
                         ascendc_super_kernel_plus(
                             {
                                 "op_list": [
@@ -844,9 +818,7 @@ class TestAscendSuperKernel(unittest.TestCase):
         }
         compile_log_path = "./tmp/"
         with (
-            mock.patch(
-                "asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"
-            ),
+            mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"),
             mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}"),
             mock.patch("json.load", return_value=op_json),
             mock.patch("os.fdopen"),
@@ -881,9 +853,7 @@ class TestAscendSuperKernel(unittest.TestCase):
         }
         compile_log_path = "./tmp/"
         with (
-            mock.patch(
-                "asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"
-            ),
+            mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"),
             mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}"),
             mock.patch("json.load", return_value=op_json1),
             mock.patch("os.fdopen"),
@@ -916,19 +886,13 @@ class TestAscendSuperKernel(unittest.TestCase):
                         tmp.sub_kernel_names = []
                         tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                         tmp.gen_sub_kernel_declare_and_call_func()
-                        self.assertEqual(
-                            tmp.sub_kernel_names, ["test_mix_aic", "test_mix_aiv"]
-                        )
+                        self.assertEqual(tmp.sub_kernel_names, ["test_mix_aic", "test_mix_aiv"])
                         tmp.sub_kernel_names = []
                         tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                         tmp.gen_sub_kernel_declare_and_call_func()
-                        self.assertEqual(
-                            tmp.sub_kernel_names, ["test_mix_aic", "test_mix_aiv"]
-                        )
+                        self.assertEqual(tmp.sub_kernel_names, ["test_mix_aic", "test_mix_aiv"])
                         tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MAX
-                        self.assertRaises(
-                            Exception, tmp.gen_sub_kernel_declare_and_call_func
-                        )
+                        self.assertRaises(Exception, tmp.gen_sub_kernel_declare_and_call_func)
 
     def test_get_summary_type_and_options(self):
         op_options = {
@@ -936,9 +900,7 @@ class TestAscendSuperKernel(unittest.TestCase):
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SuperOperatorInfos(
                     {
@@ -984,33 +946,23 @@ class TestAscendSuperKernel(unittest.TestCase):
 
                 sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
                 tmp.get_summary_type_and_options()
-                self.assertEqual(
-                    tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
-                )
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0)
 
                 sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
                 tmp.get_summary_type_and_options()
-                self.assertEqual(
-                    tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
-                )
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0)
 
                 sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                 tmp.get_summary_type_and_options()
-                self.assertEqual(
-                    tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
-                )
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0)
 
                 sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 tmp.get_summary_type_and_options()
-                self.assertEqual(
-                    tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-                )
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1)
 
                 sub_tmp1.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_2
                 tmp.get_summary_type_and_options()
-                self.assertEqual(
-                    tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-                )
+                self.assertEqual(tmp.kernel_type, SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1)
 
     def test_get_text_section_size(self):
         op_options = {
@@ -1044,9 +996,7 @@ Idx Name                              Size     VMA              Type
                 self.stdout = text_section_value
 
         result = ReturnResult()
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SubOperatorInfos(
                     0,
@@ -1072,9 +1022,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SubOperatorInfos(
                     0,
@@ -1100,12 +1048,8 @@ Idx Name                              Size     VMA              Type
 
     def test_gen_super_kernel_file(self):
         SetCurrentSocInfo("Ascend950PR_9599")
-        with mock.patch(
-            "asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"
-        ):
-            with mock.patch(
-                "builtins.open", new_callable=mock.mock_open, read_data="{}"
-            ) as mock_open:
+        with mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"):
+            with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
                 with mock.patch("json.load", return_value=op_json):
                     with mock.patch("os.fdopen") as mock_fdopen:
                         super_operator = SuperOperatorInfos(
@@ -1120,26 +1064,16 @@ Idx Name                              Size     VMA              Type
                             },
                             "super_kernel",
                         )
-                        super_operator.datacache_mpde = (
-                            SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
-                        )
-                        super_operator.preload_mode = (
-                            SuperKernelPreLoadMode.PreLoadByWhole
-                        )
-                        super_operator.datacache_mode = (
-                            SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
-                        )
+                        super_operator.datacache_mpde = SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
+                        super_operator.preload_mode = SuperKernelPreLoadMode.PreLoadByWhole
+                        super_operator.datacache_mode = SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
                         super_operator.timestamp_option = True
                         mock_fdopen.side_effect = Exception("error")
-                        self.assertRaises(
-                            Exception, gen_super_kernel_file, super_operator
-                        )
+                        self.assertRaises(Exception, gen_super_kernel_file, super_operator)
 
     def test_ascendc_super_kernel_plus_multi_ops(self):
         with (
-            mock.patch(
-                "asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"
-            ),
+            mock.patch("asc_op_compile_base.asc_op_compiler.super_kernel.compile_super_kernel"),
             mock.patch.object(SubOperatorInfos, "extract_sub_bin_file_of_mix_kernel"),
         ):
             mock_returns = [
@@ -1154,12 +1088,8 @@ Idx Name                              Size     VMA              Type
                 J_op_json,
                 K_op_json,
             ]
-            with mock.patch(
-                "builtins.open", new_callable=mock.mock_open, read_data="{}"
-            ) as mock_open:
-                with mock.patch.object(
-                    CommonUtility, "is_support_super_kernel", return_value=True
-                ):
+            with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
+                with mock.patch.object(CommonUtility, "is_support_super_kernel", return_value=True):
                     with mock.patch("json.load", side_effect=mock_returns):
                         ascendc_super_kernel_plus(
                             {
@@ -1223,9 +1153,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch.object(CommonUtility, "dump_compile_log"),
@@ -1265,9 +1193,7 @@ Idx Name                              Size     VMA              Type
             "workspace": {"num": 1, "size": [32], "type": [0]},
             "sub_operator_params": ["x_in__"],
             "sub_operator_kernel_type": "KERNEL_TYPE_AIV_ONLY",
-            "sub_operator_kernel_name": {
-                "AiCore": {"func_name": "test", "obj_files": "test.o"}
-            },
+            "sub_operator_kernel_name": {"AiCore": {"func_name": "test", "obj_files": "test.o"}},
             "split_mode": 4,
             "sub_operator_early_start_set_flag": True,
             "sub_operator_early_start_wait_flag": False,
@@ -1278,9 +1204,7 @@ Idx Name                              Size     VMA              Type
             "early-start": SuperKernelEarlyStartMode.EarlyStartDisable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json_early_start):
                 tmp = SubOperatorInfos(
                     0,
@@ -1299,9 +1223,7 @@ Idx Name                              Size     VMA              Type
                 )
                 self.assertRaises(Exception, tmp.init_of_sub_operator_info)
         op_json_early_start["sub_operator_early_start_set_flag"] = False
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json_early_start):
                 tmp = SubOperatorInfos(
                     0,
@@ -1319,9 +1241,7 @@ Idx Name                              Size     VMA              Type
                     compile_log_path,
                 )
                 self.assertRaises(Exception, tmp.init_of_sub_operator_info)
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json_early_start):
                 mock_open.side_effect = RuntimeError()
                 tmp = SubOperatorInfos(
@@ -1349,9 +1269,7 @@ Idx Name                              Size     VMA              Type
             "early-start": SuperKernelEarlyStartMode.EarlyStartDisable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SubOperatorInfos(
                     0,
@@ -1377,21 +1295,13 @@ Idx Name                              Size     VMA              Type
                 }
                 tiling_key = 1
                 kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
-                tmp.gen_switch_case_block_of_dynamic_op(
-                    kernel_info_of_tiling_key, tiling_key, kernel_type
-                )
+                tmp.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type)
                 kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIV_1_0
-                tmp.gen_switch_case_block_of_dynamic_op(
-                    kernel_info_of_tiling_key, tiling_key, kernel_type
-                )
+                tmp.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type)
                 kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
-                tmp.gen_switch_case_block_of_dynamic_op(
-                    kernel_info_of_tiling_key, tiling_key, kernel_type
-                )
+                tmp.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type)
                 kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-                tmp.gen_switch_case_block_of_dynamic_op(
-                    kernel_info_of_tiling_key, tiling_key, kernel_type
-                )
+                tmp.gen_switch_case_block_of_dynamic_op(kernel_info_of_tiling_key, tiling_key, kernel_type)
                 kernel_type = SuperKernelKernelType.KERNEL_TYPE_MAX
                 self.assertRaises(
                     Exception,
@@ -1404,9 +1314,7 @@ Idx Name                              Size     VMA              Type
     def test_dynamic_gen_split_call_code(self):
         op_options = {}
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SubOperatorInfos(
                     0,
@@ -1435,9 +1343,7 @@ Idx Name                              Size     VMA              Type
             "early-start": SuperKernelEarlyStartMode.EarlyStartDisable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=F_op_json):
                 tmp = SubOperatorInfos(
                     0,
@@ -1473,9 +1379,7 @@ Idx Name                              Size     VMA              Type
             "early-start": SuperKernelEarlyStartMode.EarlyStartDisable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=F_op_json),
                 mock.patch("os.chdir"),
@@ -1528,9 +1432,7 @@ Idx Name                              Size     VMA              Type
             "early-start": SuperKernelEarlyStartMode.EarlyStartEnableV1,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=F_op_json),
                 mock.patch("os.chdir"),
@@ -1550,9 +1452,7 @@ Idx Name                              Size     VMA              Type
                     op_options,
                     compile_log_path,
                 )
-                res = tmp.gen_early_start_complement_func(
-                    "ASCEND_IS_AIV", "block_idx < blockDim", True
-                )
+                res = tmp.gen_early_start_complement_func("ASCEND_IS_AIV", "block_idx < blockDim", True)
                 self.assertIn("AscendC::SetNextTaskStart();", res)
 
     def test_get_task_type(self):
@@ -1561,9 +1461,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SuperOperatorInfos(
                     {
@@ -1621,9 +1519,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SuperOperatorInfos(
                     {
@@ -1669,9 +1565,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 with mock.patch.object(SuperOperatorInfos, "get_idx") as mock_idx:
                     mock_idx.side_effect = [0, 4, 1, 3]
@@ -1703,9 +1597,7 @@ Idx Name                              Size     VMA              Type
                     tmp.vec_op_list = [sub_tmp1, sub_tmp1, sub_tmp1, sub_tmp1, sub_tmp1]
                     res = tmp.judge_remove("op1", "op2", True)
                     self.assertEqual(res, True)
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 with mock.patch.object(SuperOperatorInfos, "get_idx") as mock_idx:
                     mock_idx.side_effect = [0, 4, 1, 3]
@@ -1744,13 +1636,9 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
-                with mock.patch.object(
-                    SuperOperatorInfos, "judge_remove", return_value=True
-                ):
+                with mock.patch.object(SuperOperatorInfos, "judge_remove", return_value=True):
                     tmp = SuperOperatorInfos(
                         {
                             "op_list": [
@@ -1788,9 +1676,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 with mock.patch.object(SuperOperatorInfos, "get_idx") as mock_idx:
                     mock_idx.side_effect = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -1838,9 +1724,7 @@ Idx Name                              Size     VMA              Type
         super_kernel_op_infos_module = importlib.import_module(
             "asc_op_compile_base.asc_op_compiler.super_kernel_op_infos"
         )
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 with mock.patch.object(
                     super_kernel_op_infos_module,
@@ -1885,9 +1769,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SuperOperatorInfos(
                     {
@@ -1937,9 +1819,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 super_op = SuperOperatorInfos(
                     {
@@ -1981,9 +1861,7 @@ Idx Name                              Size     VMA              Type
                     ) as mock_print_compile_log:
                         super_op.info_base = []
                         # create sub op list
-                        for sub_op_idx, call_dcci_disable_on_kernel in enumerate(
-                            op_seq["sub_op_seq"]
-                        ):
+                        for sub_op_idx, call_dcci_disable_on_kernel in enumerate(op_seq["sub_op_seq"]):
                             sub_op = SubOperatorInfos(
                                 0,
                                 {
@@ -1997,9 +1875,7 @@ Idx Name                              Size     VMA              Type
                             )
                             sub_op.kernel_name = f"sub_op_{sub_op_idx}"
                             sub_op.call_dcci_before_kernel_start = False
-                            sub_op.call_dcci_disable_on_kernel = (
-                                call_dcci_disable_on_kernel
-                            )
+                            sub_op.call_dcci_disable_on_kernel = call_dcci_disable_on_kernel
                             sub_op.call_dcci_after_kernel_end = False
                             super_op.info_base.append(sub_op)
 
@@ -2014,26 +1890,18 @@ Idx Name                              Size     VMA              Type
                         for exp_op_seq in op_seq["exp_res"]:
                             for expected_sub_op_id in exp_op_seq:
                                 mock_log_id += 1
-                                expected_warning_op_name = (
-                                    f"sub_op_{expected_sub_op_id}"
-                                )
+                                expected_warning_op_name = f"sub_op_{expected_sub_op_id}"
                                 self.assertIn(
                                     expected_warning_op_name,
-                                    mock_print_compile_log.call_args_list[
-                                        mock_log_id
-                                    ].args[1],
+                                    mock_print_compile_log.call_args_list[mock_log_id].args[1],
                                 )
                                 self.assertEqual(
                                     expected_log_level,
-                                    mock_print_compile_log.call_args_list[
-                                        mock_log_id
-                                    ].args[2],
+                                    mock_print_compile_log.call_args_list[mock_log_id].args[2],
                                 )
 
     def test_check_debug_aic_aiv_num_ratio(self):
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 super_op = SuperOperatorInfos(
                     {
@@ -2083,9 +1951,7 @@ Idx Name                              Size     VMA              Type
                     self.assertRaises(Exception, super_op.check_debug_aic_aiv_num_ratio)
 
     def test_check_debug_aic_aiv_num_exceed_platform_num_blocks(self):
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 super_op = SuperOperatorInfos(
                     {
@@ -2162,9 +2028,7 @@ Idx Name                              Size     VMA              Type
                         )
 
     def test_check_debug_aic_aiv_num_exceed_sub_op_aic_aiv_num(self):
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 super_op = SuperOperatorInfos(
                     {
@@ -2234,9 +2098,7 @@ Idx Name                              Size     VMA              Type
                     )
 
     def test_update_superkernel_blocknum_by_debug_options(self):
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 super_op = SuperOperatorInfos(
                     {
@@ -2269,9 +2131,7 @@ Idx Name                              Size     VMA              Type
                 ) in failed_debug_aic_aiv_num_pairs:
 
                     def mock_get_soc_spec(input_str: str):
-                        return {"ai_core_cnt": 24, "vector_core_cnt": 48}.get(
-                            input_str, 0
-                        )
+                        return {"ai_core_cnt": 24, "vector_core_cnt": 48}.get(input_str, 0)
 
                     with mock.patch(
                         "asc_op_compile_base.asc_op_compiler.super_kernel_op_infos.get_soc_spec",
@@ -2292,9 +2152,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SuperOperatorInfos(
                     {
@@ -2318,9 +2176,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2339,9 +2195,7 @@ Idx Name                              Size     VMA              Type
                         "super_kernel",
                     )
                     mock_run.side_effect = RuntimeError()
-                    self.assertRaises(
-                        Exception, tmp.split_o_in_super_kernel, "./op.bin", "op1", 0
-                    )
+                    self.assertRaises(Exception, tmp.split_o_in_super_kernel, "./op.bin", "op1", 0)
 
     def test_gen_compile_info(self):
         op_options = {
@@ -2349,9 +2203,7 @@ Idx Name                              Size     VMA              Type
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 with mock.patch("os.remove"):
                     tmp = SuperOperatorInfos(
@@ -2453,9 +2305,7 @@ Idx Name                              Size     VMA              Type
         self.assertRaises(Exception, gen_early_start_config, sub_tmp1, sub_tmp2)
 
     def test_gen_inter_ops_barrier(self):
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2508,14 +2358,10 @@ Idx Name                              Size     VMA              Type
                         "ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));",
                         res,
                     )
-                    self.assertIn(
-                        f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}", res
-                    )
+                    self.assertIn(f"{get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}", res)
 
     def test_gen_op_end_dcci_all(self):
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2535,9 +2381,7 @@ Idx Name                              Size     VMA              Type
                     )
                     res = gen_op_end_debug_dcci_all(tmp)
                     self.assertEqual(res, "")
-                    tmp.debug_dcci_all_mode = (
-                        SuperKernelDebugDcciAllMode.DebugDcciAllEnable
-                    )
+                    tmp.debug_dcci_all_mode = SuperKernelDebugDcciAllMode.DebugDcciAllEnable
                     res = gen_op_end_debug_dcci_all(tmp)
                     self.assertIn("pipe_barrier(PIPE_ALL);", res)
                     self.assertIn(
@@ -2547,9 +2391,7 @@ Idx Name                              Size     VMA              Type
 
     def test_gen_op_end_sync_all(self):
         SetCurrentSocInfo("Ascend910B1")
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=B_op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2569,16 +2411,12 @@ Idx Name                              Size     VMA              Type
                     )
                     res = gen_op_end_debug_sync_all(tmp)
                     self.assertEqual(res, "")
-                    tmp.debug_sync_all_mode = (
-                        SuperKernelDebugSyncAllMode.DebugSyncAllEnable
-                    )
+                    tmp.debug_sync_all_mode = SuperKernelDebugSyncAllMode.DebugSyncAllEnable
                     res = gen_op_end_debug_sync_all(tmp)
                     self.assertIn("AscendC::SyncAll<false>();", res)
 
     def test_gen_2_real_stream_op_end_sync_all_by_arch(self):
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2598,9 +2436,7 @@ Idx Name                              Size     VMA              Type
                     )
                     res = gen_2_real_stream_op_end_debug_sync_all_by_arch(tmp, "aic")
                     self.assertEqual(res, "")
-                    tmp.debug_sync_all_mode = (
-                        SuperKernelDebugSyncAllMode.DebugSyncAllEnable
-                    )
+                    tmp.debug_sync_all_mode = SuperKernelDebugSyncAllMode.DebugSyncAllEnable
                     res = gen_2_real_stream_op_end_debug_sync_all_by_arch(tmp, "aic")
                     self.assertIn(
                         f"pipe_barrier(PIPE_ALL);\n\
@@ -2652,9 +2488,7 @@ ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2688,9 +2522,7 @@ ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_
                     sub_tmp1.recv_event_list = [10]
                     tmp.info_base = [sub_tmp1]
                     res = gen_clear_wait_sync_addr_code(tmp)
-                    self.assertIn(
-                        "*(reinterpret_cast<__gm__ uint64_t*>(param_base[0])) = 0", res
-                    )
+                    self.assertIn("*(reinterpret_cast<__gm__ uint64_t*>(param_base[0])) = 0", res)
 
     def test_gen_2_real_stream_send_code(self):
         op_options = {
@@ -2698,9 +2530,7 @@ ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2767,9 +2597,7 @@ ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2787,9 +2615,7 @@ ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_
                         },
                         "super_kernel",
                     )
-                    tmp.datacache_mode = (
-                        SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
-                    )
+                    tmp.datacache_mode = SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
                     tmp.preload_mode = SuperKernelPreLoadMode.PreLoadByWhole
                     tmp.profiling_mode = SuperKernelProfilingMode.ProfilingEnable
                     sub_tmp1 = SubOperatorInfos(
@@ -2808,43 +2634,29 @@ ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_
                     sub_ops = [sub_tmp1, sub_tmp1, sub_tmp1]
                     tmp.timestamp_option = True
                     gen_2_real_stream_super_kernel_file(tmp)
-                    res = gen_2_real_stream_code_by_arch(
-                        tmp, "aic", "x, y, z", False, sub_ops
-                    )
+                    res = gen_2_real_stream_code_by_arch(tmp, "aic", "x, y, z", False, sub_ops)
                     self.assertIn("AscendC::PreLoad(8);", res)
                     tmp.preload_mode = SuperKernelPreLoadMode.PreLoadStepByStep
-                    res = gen_2_real_stream_code_by_arch(
-                        tmp, "aic", "x, y, z", False, sub_ops
-                    )
+                    res = gen_2_real_stream_code_by_arch(tmp, "aic", "x, y, z", False, sub_ops)
                     self.assertIn("auto_gen_super_kernel_kernel_aic", res)
 
                     # test sync all option in two real stream case
-                    tmp.debug_sync_all_mode = (
-                        SuperKernelDebugSyncAllMode.DebugSyncAllEnable
-                    )
-                    res = gen_2_real_stream_code_by_arch(
-                        tmp, "aic", "x, y, z", False, sub_ops
-                    )
+                    tmp.debug_sync_all_mode = SuperKernelDebugSyncAllMode.DebugSyncAllEnable
+                    res = gen_2_real_stream_code_by_arch(tmp, "aic", "x, y, z", False, sub_ops)
                     golden = f"pipe_barrier(PIPE_ALL);\n\
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIC_FLAG));\n\
 {get_wait_flag_for_chip('AscendC::SYNC_AIC_FLAG')}"
                     self.assertEqual(res.count(indent_code_func(golden)), 3)
 
-                    res = gen_2_real_stream_code_by_arch(
-                        tmp, "aiv", "x, y, z", False, sub_ops
-                    )
+                    res = gen_2_real_stream_code_by_arch(tmp, "aiv", "x, y, z", False, sub_ops)
                     golden = f"pipe_barrier(PIPE_ALL);\n\
 ffts_cross_core_sync(PIPE_MTE3, AscendC::GetffstMsg(0x0, AscendC::SYNC_AIV_ONLY_ALL));\n\
 {get_wait_flag_for_chip('AscendC::SYNC_AIV_ONLY_ALL')}"
                     self.assertEqual(res.count(indent_code_func(golden)), 3)
 
                     # test dcci all option in two real stream case
-                    tmp.debug_dcci_all_mode = (
-                        SuperKernelDebugDcciAllMode.DebugDcciAllEnable
-                    )
-                    res = gen_2_real_stream_code_by_arch(
-                        tmp, "aic", "x, y, z", False, sub_ops
-                    )
+                    tmp.debug_dcci_all_mode = SuperKernelDebugDcciAllMode.DebugDcciAllEnable
+                    res = gen_2_real_stream_code_by_arch(tmp, "aic", "x, y, z", False, sub_ops)
                     golden = "pipe_barrier(PIPE_ALL);\n\
 dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);"
                     self.assertEqual(res.count(indent_code_func(golden)), 3)
@@ -2856,9 +2668,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -2876,9 +2686,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                         },
                         "super_kernel",
                     )
-                    tmp.datacache_mode = (
-                        SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
-                    )
+                    tmp.datacache_mode = SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
                     tmp.preload_mode = SuperKernelPreLoadMode.PreLoadByWhole
                     sub_tmp1 = SubOperatorInfos(
                         0,
@@ -2942,9 +2750,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SuperOperatorInfos(
                     {
@@ -3008,9 +2814,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "early-start": SuperKernelEarlyStartMode.EarlyStartDisable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=F_op_json),
                 mock.patch("os.chdir"),
@@ -3033,12 +2837,8 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     compile_log_path,
                 )
                 tmp.feed_sync_all_mode = SuperKernelFeedSyncAllMode.FeedSyncAllEnable
-                tmp.gen_call_func_with_syncall(
-                    ["test_code"], "ASCEND_IS_AIC", "get_block_idx()"
-                )
-                tmp.gen_call_func_with_syncall(
-                    ["test_code", "test_code1"], "ASCEND_IS_AIC", "get_block_idx()"
-                )
+                tmp.gen_call_func_with_syncall(["test_code"], "ASCEND_IS_AIC", "get_block_idx()")
+                tmp.gen_call_func_with_syncall(["test_code", "test_code1"], "ASCEND_IS_AIC", "get_block_idx()")
 
     def test_feed_sync_all_for_double_stream(self):
         op_options = {
@@ -3046,9 +2846,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -3066,9 +2864,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                         },
                         "super_kernel",
                     )
-                    tmp.datacache_mode = (
-                        SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
-                    )
+                    tmp.datacache_mode = SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
                     tmp.preload_mode = SuperKernelPreLoadMode.PreLoadByWhole
                     sub_tmp1 = SubOperatorInfos(
                         0,
@@ -3094,18 +2890,12 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     tmp.timestamp_option = False
                     gen_2_real_stream_super_kernel_file(tmp)
                     tmp.timestamp_option = True
-                    tmp.feed_sync_all_mode = (
-                        SuperKernelFeedSyncAllMode.FeedSyncAllEnable
-                    )
+                    tmp.feed_sync_all_mode = SuperKernelFeedSyncAllMode.FeedSyncAllEnable
                     gen_2_real_stream_super_kernel_file(tmp)
-                    res = gen_2_real_stream_code_by_arch(
-                        tmp, "aic", "x, y, z", False, sub_ops
-                    )
+                    res = gen_2_real_stream_code_by_arch(tmp, "aic", "x, y, z", False, sub_ops)
                     self.assertIn("AscendC::PreLoad(8);", res)
                     tmp.preload_mode = SuperKernelPreLoadMode.PreLoadStepByStep
-                    res = gen_2_real_stream_code_by_arch(
-                        tmp, "aic", "x, y, z", False, sub_ops
-                    )
+                    res = gen_2_real_stream_code_by_arch(tmp, "aic", "x, y, z", False, sub_ops)
                     self.assertIn("auto_gen_super_kernel_kernel_aic", res)
 
                     sub_tmp1.with_sync_all = False
@@ -3142,9 +2932,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -3164,9 +2952,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     )
                     code = gen_clear_syncall_worskspace(tmp)
                     self.assertEqual(code, "")
-                    tmp.feed_sync_all_mode = (
-                        SuperKernelFeedSyncAllMode.FeedSyncAllEnable
-                    )
+                    tmp.feed_sync_all_mode = SuperKernelFeedSyncAllMode.FeedSyncAllEnable
                     tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_0
                     code = gen_clear_syncall_worskspace(tmp)
                     self.assertIn("copy_cbuf_to_gm", code)
@@ -3186,9 +2972,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -3207,9 +2991,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                         "super_kernel",
                     )
                     tmp.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-                    tmp.feed_sync_all_mode = (
-                        SuperKernelFeedSyncAllMode.FeedSyncAllEnable
-                    )
+                    tmp.feed_sync_all_mode = SuperKernelFeedSyncAllMode.FeedSyncAllEnable
                     tmp.block_num = 1
                     tmp.calc_workspace_size()
                     self.assertEqual(tmp.workspace_size, 512)
@@ -3223,9 +3005,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "stream-fusion": SuperKernelStreamFusionMode.StreamFusionEnable,
         }
         compile_log_path = "./tmp/"
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with (
                 mock.patch("json.load", return_value=op_json),
                 mock.patch("os.path.exists", return_value=True),
@@ -3260,9 +3040,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
     def test_gen_sync_and_event_code(self):
         compile_log_path = "./tmp/"
         op_options = {"split-mode": 4}
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SuperOperatorInfos(
                     {
@@ -3307,29 +3085,21 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                 sub_tmp2.wait_block = "2"
                 sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
                 sync_and_event_code = gen_sync_and_event_code(tmp, sub_tmp1, sub_tmp2)
-                self.assertIn(
-                    "for continues notify/wait event", sync_and_event_code.strip()
-                )
+                self.assertIn("for continues notify/wait event", sync_and_event_code.strip())
 
                 sub_tmp1.notify_block = {"aiv": "3", "aic": "4"}
                 sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-                sync_and_event_code = gen_sync_and_event_code_for_two_stream(
-                    tmp, sub_tmp1, sub_tmp2, "aic"
-                )
+                sync_and_event_code = gen_sync_and_event_code_for_two_stream(tmp, sub_tmp1, sub_tmp2, "aic")
                 self.assertIn("SyncAll", sync_and_event_code.strip())
 
                 sub_tmp2.kernel_type = SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
-                sync_and_event_code = gen_sync_and_event_code_for_two_stream(
-                    tmp, sub_tmp1, sub_tmp2, "aiv"
-                )
+                sync_and_event_code = gen_sync_and_event_code_for_two_stream(tmp, sub_tmp1, sub_tmp2, "aiv")
                 self.assertIn("SYNC_AIC_FLAG", sync_and_event_code.strip())
 
     def test_gen_wait_block_extra_sync(self):
         compile_log_path = "./tmp/"
         op_options = {"split-mode": 4}
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 super_op = SuperOperatorInfos(
                     {
@@ -3399,9 +3169,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                 ) in wait_block_extra_sync_aic_to_aiv_pairs:
                     sub_op1.kernel_type = sub_op1_type
                     sub_op2.kernel_type = sub_op2_type
-                    sync_and_event_code = gen_sync_and_event_code(
-                        super_op, sub_op1, sub_op2
-                    )
+                    sync_and_event_code = gen_sync_and_event_code(super_op, sub_op1, sub_op2)
                     self.assertIn(golden_extra_aiv_sync_code, sync_and_event_code)
 
                 # wait block extra sync case: aic to mix, need extra aiv sync
@@ -3430,9 +3198,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                 ) in wait_block_extra_sync_aic_to_mix_pairs:
                     sub_op1.kernel_type = sub_op1_type
                     sub_op2.kernel_type = sub_op2_type
-                    sync_and_event_code = gen_sync_and_event_code(
-                        super_op, sub_op1, sub_op2
-                    )
+                    sync_and_event_code = gen_sync_and_event_code(super_op, sub_op1, sub_op2)
                     self.assertIn(golden_extra_aiv_sync_code, sync_and_event_code)
 
                 # wait block extra sync case: aiv to aic, need extra aic sync
@@ -3468,9 +3234,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                 ) in wait_block_extra_sync_aiv_to_aic_pairs:
                     sub_op1.kernel_type = sub_op1_type
                     sub_op2.kernel_type = sub_op2_type
-                    sync_and_event_code = gen_sync_and_event_code(
-                        super_op, sub_op1, sub_op2
-                    )
+                    sync_and_event_code = gen_sync_and_event_code(super_op, sub_op1, sub_op2)
                     self.assertIn(golden_extra_aic_sync_code, sync_and_event_code)
 
                 # wait block extra sync case: else, no extra sync
@@ -3504,37 +3268,25 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                 for sub_op1_type, sub_op2_type in wait_block_extra_no_sync_pairs:
                     sub_op1.kernel_type = sub_op1_type
                     sub_op2.kernel_type = sub_op2_type
-                    sync_and_event_code = gen_sync_and_event_code(
-                        super_op, sub_op1, sub_op2
-                    )
-                    self.assertNotIn(
-                        "// extra sync for wait event", sync_and_event_code
-                    )
+                    sync_and_event_code = gen_sync_and_event_code(super_op, sub_op1, sub_op2)
+                    self.assertNotIn("// extra sync for wait event", sync_and_event_code)
                     self.assertNotIn("AscendC::SyncAll<true>();", sync_and_event_code)
                     self.assertNotIn("ffts_cross_core_sync", sync_and_event_code)
                     self.assertNotIn("wait_flag_dev", sync_and_event_code)
 
     def test_get_sync_code_by_kernel_type(self):
-        sync_code = get_sync_code_by_kernel_type(
-            SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1
-        )
+        sync_code = get_sync_code_by_kernel_type(SuperKernelKernelType.KERNEL_TYPE_MIX_AIC_1_1)
         self.assertIn("SyncAll", sync_code.strip())
-        sync_code = get_sync_code_by_kernel_type(
-            SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY
-        )
+        sync_code = get_sync_code_by_kernel_type(SuperKernelKernelType.KERNEL_TYPE_AIC_ONLY)
         self.assertIn("SYNC_AIC_FLAG", sync_code.strip())
-        sync_code = get_sync_code_by_kernel_type(
-            SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY
-        )
+        sync_code = get_sync_code_by_kernel_type(SuperKernelKernelType.KERNEL_TYPE_AIV_ONLY)
         self.assertIn("SYNC_AIV_ONLY_ALL", sync_code.strip())
 
     def test_gen_super_kernel_link_obj_sequence(self):
         compile_info = CompileInfo()
         compile_log_path = "./tmp/"
         op_options = {"split-mode": 4}
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 tmp = SuperOperatorInfos(
                     {
@@ -3669,9 +3421,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "blockDim": 1,
             "sub_operator_params": [],
             "sub_operator_kernel_type": "KERNEL_TYPE_AIV_ONLY",
-            "sub_operator_kernel_name": {
-                "AiCore": {"func_name": "test_func", "obj_files": "test.o"}
-            },
+            "sub_operator_kernel_name": {"AiCore": {"func_name": "test_func", "obj_files": "test.o"}},
             "sub_operator_early_start_set_flag": False,
             "sub_operator_early_start_wait_flag": False,
             "sub_operator_call_dcci_before_kernel_start": False,
@@ -3694,9 +3444,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     compile_log_path,
                 )
                 sub_op1.sub_op_task_type = SubOperatorType.DYNAMIC_OP
-                self.assertEqual(
-                    sub_op1.dcci_before_kernel_start_op_list, ["Add", "MatMul"]
-                )
+                self.assertEqual(sub_op1.dcci_before_kernel_start_op_list, ["Add", "MatMul"])
                 sub_op1.init_of_sub_operator_info()
                 self.assertTrue(sub_op1.call_dcci_before_kernel_start)
 
@@ -3708,9 +3456,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "blockDim": 1,
             "sub_operator_params": [],
             "sub_operator_kernel_type": "KERNEL_TYPE_AIV_ONLY",
-            "sub_operator_kernel_name": {
-                "AiCore": {"func_name": "test_func", "obj_files": "test.o"}
-            },
+            "sub_operator_kernel_name": {"AiCore": {"func_name": "test_func", "obj_files": "test.o"}},
             "sub_operator_early_start_set_flag": False,
             "sub_operator_early_start_wait_flag": False,
             "sub_operator_call_dcci_before_kernel_start": False,
@@ -3733,9 +3479,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     compile_log_path,
                 )
                 sub_op2.sub_op_task_type = SubOperatorType.DYNAMIC_OP
-                self.assertEqual(
-                    sub_op2.dcci_after_kernel_end_op_list, ["Conv", "MatMul"]
-                )
+                self.assertEqual(sub_op2.dcci_after_kernel_end_op_list, ["Conv", "MatMul"])
                 sub_op2.init_of_sub_operator_info()
                 self.assertTrue(sub_op2.call_dcci_after_kernel_end)
 
@@ -3747,9 +3491,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "blockDim": 1,
             "sub_operator_params": [],
             "sub_operator_kernel_type": "KERNEL_TYPE_AIV_ONLY",
-            "sub_operator_kernel_name": {
-                "AiCore": {"func_name": "test_func", "obj_files": "test.o"}
-            },
+            "sub_operator_kernel_name": {"AiCore": {"func_name": "test_func", "obj_files": "test.o"}},
             "sub_operator_early_start_set_flag": False,
             "sub_operator_early_start_wait_flag": False,
             "sub_operator_call_dcci_before_kernel_start": False,
@@ -3772,9 +3514,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     compile_log_path,
                 )
                 sub_op3.sub_op_task_type = SubOperatorType.DYNAMIC_OP
-                self.assertEqual(
-                    sub_op3.dcci_disable_on_kernel_op_list, ["Transpose", "Softmax"]
-                )
+                self.assertEqual(sub_op3.dcci_disable_on_kernel_op_list, ["Transpose", "Softmax"])
                 sub_op3.init_of_sub_operator_info()
                 self.assertTrue(sub_op3.call_dcci_disable_on_kernel)
 
@@ -3791,9 +3531,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "blockDim": 1,
             "sub_operator_params": [],
             "sub_operator_kernel_type": "KERNEL_TYPE_AIV_ONLY",
-            "sub_operator_kernel_name": {
-                "AiCore": {"func_name": "test_func", "obj_files": "test.o"}
-            },
+            "sub_operator_kernel_name": {"AiCore": {"func_name": "test_func", "obj_files": "test.o"}},
             "sub_operator_early_start_set_flag": False,
             "sub_operator_early_start_wait_flag": False,
             "sub_operator_call_dcci_before_kernel_start": False,
@@ -3833,9 +3571,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "blockDim": 1,
             "sub_operator_params": [],
             "sub_operator_kernel_type": "KERNEL_TYPE_AIV_ONLY",
-            "sub_operator_kernel_name": {
-                "AiCore": {"func_name": "test_func", "obj_files": "test.o"}
-            },
+            "sub_operator_kernel_name": {"AiCore": {"func_name": "test_func", "obj_files": "test.o"}},
             "sub_operator_early_start_set_flag": False,
             "sub_operator_early_start_wait_flag": False,
             "sub_operator_call_dcci_before_kernel_start": False,
@@ -3876,9 +3612,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "dcci-after-kernel-end": "",
             "dcci-disable-on-kernel": "",
         }
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 sub_op1 = SubOperatorInfos(
                     0,
@@ -3900,9 +3634,7 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
             "split-mode": 4,
             "dcci-before-kernel-start": "Add, , MatMul,",
         }
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 sub_op2 = SubOperatorInfos(
                     0,
@@ -3915,17 +3647,13 @@ dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE
                     op_options2,
                     compile_log_path,
                 )
-                self.assertEqual(
-                    sub_op2.dcci_before_kernel_start_op_list, ["Add", "MatMul"]
-                )
+                self.assertEqual(sub_op2.dcci_before_kernel_start_op_list, ["Add", "MatMul"])
 
         # Test case 3: Option not present (default to empty list)
         op_options3 = {
             "split-mode": 4,
         }
-        with mock.patch(
-            "builtins.open", new_callable=mock.mock_open, read_data="{}"
-        ) as mock_open:
+        with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
             with mock.patch("json.load", return_value=op_json):
                 sub_op3 = SubOperatorInfos(
                     0,

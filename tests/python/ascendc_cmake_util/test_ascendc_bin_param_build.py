@@ -69,9 +69,7 @@ def test_op_specific_config_overrides_all_config(tmp_path, monkeypatch):
         lambda *_args, **_kwargs: [op_desc],
     )
 
-    ascendc_bin_param_build.gen_bin_param_file(
-        str(cfg_file), str(tmp_path), "ascend910b", str(opc_file)
-    )
+    ascendc_bin_param_build.gen_bin_param_file(str(cfg_file), str(tmp_path), "ascend910b", str(opc_file))
 
     assert op_desc.final_json_file == "/op.json"
     assert op_desc.simplified_key_mode == 1
@@ -91,16 +89,12 @@ def test_build_command_passes_default_numeric_mode(tmp_path):
         str(tmp_path),
     )
 
-    command = (tmp_path / "AddCustomTemplate-add_custom_template-0.sh").read_text(
-        encoding="utf-8"
-    )
+    command = (tmp_path / "AddCustomTemplate-add_custom_template-0.sh").read_text(encoding="utf-8")
     assert "--simplified_key_mode=0" in command
     assert "--simplified_key_mode=None" not in command
 
 
-def test_kernel_json_without_simplified_key_keeps_legacy_behavior(
-    tmp_path, monkeypatch
-):
+def test_kernel_json_without_simplified_key_keeps_legacy_behavior(tmp_path, monkeypatch):
     json_file = tmp_path / "legacy.json"
     json_file.write_text(
         json.dumps(

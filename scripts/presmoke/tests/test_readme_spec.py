@@ -151,9 +151,7 @@ cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;
             ex = root / "x"
             ex.mkdir(parents=True)
             (ex / "README.md").write_text(text, encoding="utf-8")
-            (ex / "CMakeLists.txt").write_text(
-                "add_executable(demo main.cpp)", encoding="utf-8"
-            )
+            (ex / "CMakeLists.txt").write_text("add_executable(demo main.cpp)", encoding="utf-8")
             spec = parse_readme(ex, root)
         self.assertIn("cmake", " ".join(c.raw for c in spec.commands))
         self.assertNotIn("-lfoo", " ".join(c.raw for c in spec.commands))

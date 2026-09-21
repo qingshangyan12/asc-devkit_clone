@@ -104,9 +104,7 @@ def build_runtime_config(args: argparse.Namespace) -> RuntimeConfig:
         results_dir=results_dir,
         log_dir=Path(args.log_dir).resolve() if args.log_dir else results_dir / "logs",
         started_at=now_iso(),
-        parallel_config=parallel_config(
-            args, jobs, make_jobs, cpu_run_slots, cpu_run_timeout
-        ),
+        parallel_config=parallel_config(args, jobs, make_jobs, cpu_run_slots, cpu_run_timeout),
     )
 
 
@@ -142,9 +140,7 @@ def collect_cases(args: argparse.Namespace, config: RuntimeConfig) -> CaseSelect
     return CaseSelection(cells, dedupe_suggestions(suggestions), skipped_results)
 
 
-def schedule_selected_cases(
-    selected: CaseSelection, args: argparse.Namespace, config: RuntimeConfig
-) -> list:
+def schedule_selected_cases(selected: CaseSelection, args: argparse.Namespace, config: RuntimeConfig) -> list:
     schedule_file = resolve_schedule_file(
         config.project_root,
         config.host_arch,
@@ -157,9 +153,7 @@ def schedule_selected_cases(
         selected.cells,
         ScheduleOptions(
             schedule=args.schedule,
-            schedule_report=Path(args.schedule_report).resolve()
-            if args.schedule_report
-            else None,
+            schedule_report=Path(args.schedule_report).resolve() if args.schedule_report else None,
             schedule_file=schedule_file,
             frontload_count=args.schedule_frontload_count,
             jobs=config.jobs,
@@ -184,25 +178,17 @@ def validate_fixed_schedule_coverage(
 
     schedule_only = sorted(schedule_names - planned_names)
     planned_only = sorted(planned_names - schedule_names)
-    duplicates = sorted(
-        {name for name in schedule_order if schedule_order.count(name) > 1}
-    )
+    duplicates = sorted({name for name in schedule_order if schedule_order.count(name) > 1})
     if not schedule_only and not planned_only and not duplicates:
         return
 
     lines = [f"fixed schedule coverage mismatch: {schedule_file}"]
     if schedule_only:
-        lines.append(
-            f"  schedule-only cases ({len(schedule_only)}): {', '.join(schedule_only)}"
-        )
+        lines.append(f"  schedule-only cases ({len(schedule_only)}): {', '.join(schedule_only)}")
     if planned_only:
-        lines.append(
-            f"  unscheduled planned cases ({len(planned_only)}): {', '.join(planned_only)}"
-        )
+        lines.append(f"  unscheduled planned cases ({len(planned_only)}): {', '.join(planned_only)}")
     if duplicates:
-        lines.append(
-            f"  duplicate schedule cases ({len(duplicates)}): {', '.join(duplicates)}"
-        )
+        lines.append(f"  duplicate schedule cases ({len(duplicates)}): {', '.join(duplicates)}")
     message = "\n".join(lines)
     if args.strict_schedule:
         raise ValueError(message)
@@ -334,15 +320,11 @@ def resolve_schedule_file(
     if schedule != "fixed":
         return None
     mode = modes[0] if modes else "npu"
-    schedule_file = (
-        project_root / "scripts" / "presmoke" / "schedules" / f"{host_arch}_{mode}.txt"
-    )
+    schedule_file = project_root / "scripts" / "presmoke" / "schedules" / f"{host_arch}_{mode}.txt"
     return schedule_file if schedule_file.exists() else None
 
 
-def resolve_jobs(
-    value: str | int, cpu_count: int | None = None, modes: List[str] | None = None
-) -> int:
+def resolve_jobs(value: str | int, cpu_count: int | None = None, modes: List[str] | None = None) -> int:
     if isinstance(value, int):
         return max(value, 1)
     if value != "auto":
@@ -374,9 +356,7 @@ def resolve_cpu_run_slots(value: str | int, cpu_count: int | None = None) -> int
     return max(cpus, 1)
 
 
-def resolve_make_jobs(
-    value: str | int, build_jobs: int, cpu_count: int | None = None
-) -> int:
+def resolve_make_jobs(value: str | int, build_jobs: int, cpu_count: int | None = None) -> int:
     if isinstance(value, int):
         return max(value, 1)
     if value != "auto":
@@ -431,9 +411,7 @@ def parse_modes(value: str) -> List[str]:
     return modes or ["npu"]
 
 
-def emit_reports(
-    report: RunReport, args: argparse.Namespace, results_dir: Path
-) -> None:
+def emit_reports(report: RunReport, args: argparse.Namespace, results_dir: Path) -> None:
     results_dir.mkdir(parents=True, exist_ok=True)
     fmt = args.report_format
     if fmt in ("console", "all"):
