@@ -25,8 +25,8 @@
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_INTERFACE_
 
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #include "../../impl/basic_api/kernel_macros.h"
 #include "../../impl/basic_api/common_types.h"
 #include "../../impl/basic_api/kernel_operator_macro_base_impl.h"

@@ -24,8 +24,8 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_BITMODE_INTERFACE_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_BITMODE_INTERFACE_H
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #include "kernel_struct_macro.h"
 #include "../../impl/basic_api/kernel_operator_macro_bitmode_struct.h"
 

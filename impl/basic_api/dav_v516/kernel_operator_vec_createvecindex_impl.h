@@ -129,6 +129,7 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> dstLocal, const T first
     uint32_t sreg = (uint32_t)calCount;
     uint32_t sregLower = (uint32_t)(VECTOR_REG_WIDTH / sizeof(T));
     uint16_t repeatTime = CeilDivision(calCount, sregLower);
+    int64_t i64SregLower = static_cast<int64_t>(sregLower);
 
     __VEC_SCOPE__
     {
@@ -138,7 +139,7 @@ __aicore__ inline void CreateVecIndexCalc(LocalTensor<T> dstLocal, const T first
         for (uint16_t i = 0; i < (uint16_t)repeatTime; ++i) {
             preg = Reg::UpdateMask<T>(sreg);
             Reg::StoreAlign(dstLocalAddr + i * sregLower, vreg0, preg);
-            Reg::Adds(vreg0, vreg0, sregLower, preg);
+            Reg::Adds(vreg0, vreg0, i64SregLower, preg);
         }
     }
 }
