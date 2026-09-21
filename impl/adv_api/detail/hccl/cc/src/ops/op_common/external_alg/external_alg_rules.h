@@ -15,28 +15,26 @@
 
 namespace mc2_ops_hccl {
 
-// ② 变体条件槽位 ID（AlgMeta::variantCondId 取值）。-1 = 无条件。
+// AlgMeta::variantCondId 取值；-1 = 无条件
 enum VariantCondId {
     COND_NONE = -1,
-    COND_Z_AXIS = 0, // A1: 两层网 + (2P大数据 ∥ 总量超阈值) -> ZAxisDetour 候选
-    COND_PEER_ONLY,  // A2: rankSize==2 且对端仅 1 条链路 -> PeerOnly 候选
-    COND_SPECIAL_DT, // A3/A4: 64bit dtype ∥ PROD -> soft_reduce(AicpuReduce) 候选
+    COND_Z_AXIS = 0, // 两层网且(2P 大数据或总量超阈值) -> ZAxisDetour 候选
+    COND_PEER_ONLY,  // rankSize==2 且对端仅 1 条链路 -> PeerOnly 候选
+    COND_SPECIAL_DT, // 64bit dtype 或 PROD 归约 -> soft_reduce(AicpuReduce) 候选
     VARIANT_COND_COUNT
 };
 
-// ②' 机型 flag 槽位 ID（AlgMeta::machineFlagId 取值）。-1 = 无机型要求。
+// AlgMeta::machineFlagId 取值；-1 = 无机型要求
 enum MachineFlagId {
     FLAG_NONE = -1,
-    FLAG_PCIE_MIX = 0, // B 族: MESH_1D_CLOS + pcieMix + level0 非全互联
-    FLAG_UBX,          // B 族: MESH_1D_CLOS 且非 pcieMix
-    FLAG_MULTI_LEVEL,  // B 族: 多层 + level0Topo==MESH_1D
-    FLAG_FLAT_1D,      // B4: level0Topo != MESH_1D_CLOS（A2A 裸名专用）
+    FLAG_PCIE_MIX = 0, // level0 为 MESH_1D_CLOS 且 pcie 混插且非全互联
+    FLAG_UBX,          // level0 为 MESH_1D_CLOS 且非 pcie 混插
+    FLAG_MULTI_LEVEL,  // 多层网且 level0 为 MESH_1D
+    FLAG_FLAT_1D,      // level0 非 MESH_1D_CLOS（A2A 裸名专用）
     MACHINE_FLAG_COUNT
 };
 
-// ---- ② 变体条件谓词（蓝本对齐 hccl，见 .cc 逐条注释）----
 using VariantCond = bool (*)(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam);
-// ---- ②' 机型 flag 谓词 ----
 using MachineFlag = bool (*)(const TopoInfoWithNetLayerDetails* topo);
 
 bool CondZAxis(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam);
@@ -47,7 +45,6 @@ bool FlagUbx(const TopoInfoWithNetLayerDetails* topo);
 bool FlagMultiLevel(const TopoInfoWithNetLayerDetails* topo);
 bool FlagFlat1D(const TopoInfoWithNetLayerDetails* topo);
 
-// ① 引擎匹配（蓝本 auto_selector_base.cc:25-65 引擎分叉语义）
 bool EngineMatch(AlgEngine candEngine, const OpParam& opParam);
 
 // enum 下标函数指针表（规则两层结构：候选只带 ID，ID->函数绑定集中于此）
