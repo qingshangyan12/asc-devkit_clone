@@ -154,7 +154,7 @@ void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTempl
     tempAlgParamsInter0.buffInfo.inBuffBaseOff =
         scratchOffVec[0] + rankIdxLevel0_ * dataCountPerLoopAixs0 * dataTypeSize_;
     tempAlgParamsInter0.buffInfo.outBuffBaseOff = dataOffset;
-    tempAlgParamsInter0.buffInfo.hcclBuffBaseOff = scratchOffVec[2];
+    tempAlgParamsInter0.buffInfo.hcclBuffBaseOff = tempAlgParamsInter0.buffInfo.inBuffBaseOff;
     tempAlgParamsInter0.sliceSize = dataCountPerLoopAixs0 * dataTypeSize_;
     tempAlgParamsInter0.tailSize = tempAlgParamsInter0.sliceSize;
     tempAlgParamsInter0.count = dataCountPerLoopAixs0;
@@ -229,9 +229,15 @@ template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTempla
 void InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1>::GetParallelDataSplit(
     std::vector<float>& splitDataSize) const
 {
-    double splitData = 0.5;
-    splitDataSize.push_back(splitData);
-    splitDataSize.push_back(splitData);
+    double ratio = multipleDimensionSplitRatio_;
+    if (multipleDimensionSplitRatioSource_ == MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
+        ratio = 0.5;
+    }
+    splitDataSize.push_back(ratio);
+    splitDataSize.push_back(1.0 - ratio);
+    HCCL_INFO(
+        "[InsReduceScatterParallelExecutor] meshFirstRatio[%f], closFirstRatio[%f], ratioSource[%u]", splitDataSize[0],
+        splitDataSize[1], static_cast<u32>(multipleDimensionSplitRatioSource_));
     return;
 }
 
@@ -353,6 +359,8 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
     HCCL_INFO("[InsReduceScatterParallelExecutor][OrchestrateLoop] Start");
     HCCL_INFO("[InsReduceScatterParallelExecutor] AlgTemplate inter server is [%s]", tempAlgIntra.Describe().c_str());
     HCCL_INFO("[InsReduceScatterParallelExecutor] AlgTemplate intra server is [%s]", tempAlgInter.Describe().c_str());
+    multipleDimensionSplitRatio_ = param.opConfig.multipleDimensionSplitRatio;
+    multipleDimensionSplitRatioSource_ = param.opConfig.multipleDimensionSplitRatioSource;
     std::vector<float> dataSplitSize;
     GetParallelDataSplit(dataSplitSize);
     u64 alignedSize = PARALLEL_DATA_ALIGN_SIZE;
