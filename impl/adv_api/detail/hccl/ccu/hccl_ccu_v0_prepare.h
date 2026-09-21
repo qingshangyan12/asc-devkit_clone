@@ -56,9 +56,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     // ccu xn5
     AssembleHcclMsgExtForCCU(ccuParam_, commParam, allToAllVParam);
 
-    uint64_t loopCount = 8;
+    constexpr uint64_t loopCount = 8;
     auto dataSlice = ((allToAllVParam->sendCounts[ccuParam_.rankId]) * dataSize) % CCU_MAX_COMM_DATA;
-    CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5]);
+    CalcGoSize(dataSlice, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[5], ccuProtocolVersion_);
     xnData_[9] = reinterpret_cast<uint64_t>(ccuParam_.ccuMsgExt) + CCU_MSG_EXT_RANK_OFFSET * ccuParam_.alltoallvCnt;
     KERNEL_LOG(
         KERNEL_INFO,
@@ -85,7 +85,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[5] = 0;
     xnData_[6] = strideSize * ccuParam_.rankId;
     uint64_t loopCount = 8;
-    CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[7]);
+    CalcGoSize(sliceSizeAlltoall, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[7], ccuProtocolVersion_);
     return;
 }
 
@@ -129,7 +129,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     uint64_t sliceSize = commParam->count;
 
     xnData_[3] = commParam->wParamExt.sendOffsets; // 3 is index of xnData
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[4]);
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[4], ccuProtocolVersion_);
 }
 
 template <const auto& config>
@@ -159,7 +159,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
                      (commParam->strideCount * dataSize * ccuParam_.rankId); // 3 is index of xnData
     xnData_[4] = loopSize * m;                                               // 4 is index of xnData
     xnData_[5] = m;                                                          // 5 is index of xnData
-    CalcLoopGroupParam(xnData_, m, n, p);
+    CalcLoopGroupParam(xnData_, m, n, p, ccuProtocolVersion_);
 }
 
 template <const auto& config>
@@ -188,7 +188,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
                      (commParam->strideCount * dataSize * ccuParam_.rankId); // 3 is index of xnData
     xnData_[4] = loopSize * m;                                               // 4 is index of xnData
     xnData_[5] = m;                                                          // 5 is index of xnData
-    CalcLoopGroupParam(xnData_, m, n, p);
+    CalcLoopGroupParam(xnData_, m, n, p, ccuProtocolVersion_);
 }
 
 template <const auto& config>
@@ -244,9 +244,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[9] = ccuParam_.rankId * normalSliceSize;
     xnData_[10] = 0; // input output not equals
     if (ccuParam_.rankId == ccuParam_.rankNum - 1) {
-        CalcGoSize(lastSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
+        CalcGoSize(lastSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11], ccuProtocolVersion_);
     } else {
-        CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11]);
+        CalcGoSize(normalSliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[11], ccuProtocolVersion_);
     }
 
     constexpr uint64_t arScratchSize = 128 * 1024 * 1024; // 与 host 侧 alloc_ctx_res.cc 对齐（双端契约）
@@ -259,8 +259,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[15] = chunkSize;
     xnData_[16] = tailSize;
     xnData_[17] = UINT64_MAX - chunkCount;
-    CalcGoSize(chunkSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[18]);
-    CalcGoSize(tailSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[22]);
+    CalcGoSize(chunkSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[18], ccuProtocolVersion_);
+    CalcGoSize(tailSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[22], ccuProtocolVersion_);
     KERNEL_LOG(
         KERNEL_INFO, "AR chunk debug: mySlice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n",
         mySliceSize, chunkSize, fullChunkCount, tailSize, xnData_[17]);
@@ -283,7 +283,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] =
         ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
     xnData_[KFC_CONCURRENT_AG_MESH_SLICE_SIZE] = sliceSize;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0]);
+    CalcGoSize(
+        sliceSize, loopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0], ccuProtocolVersion_);
     xnData_[KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV] = UINT64_MAX - 1U;
     xnData_[KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE] = 0U;
@@ -320,7 +321,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT] = outputBase;
     xnData_[KFC_CONCURRENT_AG_MESH_OUTPUT_OFFSET] = outputStride * ccuParam_.rankId;
     xnData_[KFC_CONCURRENT_AG_MESH_SLICE_SIZE] = meshSize;
-    CalcGoSize(meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0]);
+    CalcGoSize(
+        meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_MESH_GO_SIZE_0],
+        ccuProtocolVersion_);
     xnData_[KFC_CONCURRENT_AG_MESH_CURRENT_RANK_SLICE_INPUT_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_AG_MESH_REPEAT_NUM_INV] = UINT64_MAX - 1U;
     xnData_[KFC_CONCURRENT_AG_MESH_INPUT_REPEAT_STRIDE] = 0U;
@@ -344,7 +347,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
          xnData_[KFC_CONCURRENT_AG_NHR_OUTPUT] + outputStride * ccuParam_.rankId) ?
             1U :
             0U;
-    CalcGoSize(nhrSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_NHR_GO_SIZE_0]);
+    CalcGoSize(
+        nhrSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_AG_NHR_GO_SIZE_0],
+        ccuProtocolVersion_);
 }
 
 template <const auto& config>
@@ -447,7 +452,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[6] = 0;
     xnData_[7] = sliceSize;
     xnData_[8] = UINT64_MAX - 1;
-    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9]);
+    CalcGoSize(sliceSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[9], ccuProtocolVersion_);
     // KFC-specific parameters at [13..23] (homm template ignores these, uses templateDataParams).
     constexpr uint64_t scratchSize = 64 * 1024 * 1024; // 调试: 16MB->64MB，需与host侧alloc_ctx_res.cc对齐
     constexpr uint64_t minSliceAlign = 128;
@@ -458,8 +463,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[13] = chunkSize;
     xnData_[14] = UINT64_MAX - chunkCount;
     xnData_[15] = tailSize;
-    CalcGoSize(chunkSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[16]);
-    CalcGoSize(tailSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[20]);
+    CalcGoSize(chunkSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[16], ccuProtocolVersion_);
+    CalcGoSize(tailSize, loopCount, CCU_MEMSLICE_SIZE, &xnData_[20], ccuProtocolVersion_);
     KERNEL_LOG(
         KERNEL_INFO, "RS chunk debug: slice=0x%llx, chunk=0x%llx, full=0x%llx, tail=0x%llx, loop=0x%llx\n", sliceSize,
         chunkSize, fullChunkCount, xnData_[15], xnData_[14]);
