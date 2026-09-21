@@ -97,6 +97,7 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/ccu_log.cc
     ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/ccu_res_dl.cc
     ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/hccl_ccu_res_dl.cc
+    ${UTILS_DIR}/hccl_proxy/hcomm_dlsym_stub.cc
 )
 
 add_executable(
