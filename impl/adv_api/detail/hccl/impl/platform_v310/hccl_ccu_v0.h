@@ -218,6 +218,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         const Mc2InitTilingInner* tilingInner = static_cast<const Mc2InitTilingInner*>(initTiling);
         if (tilingInner->version == INIT_TILING_CCU_NEW_VERSION) {
             newCcuFlag_ = true;
+            if (tilingInner->devType == HCCL_CCU_DEV_TYPE_A5) {
+                ccuProtocolVersion_ = CcuProtocolVersion::CCU_V1;
+            } else if (tilingInner->devType == HCCL_CCU_DEV_TYPE_A6) {
+                ccuProtocolVersion_ = CcuProtocolVersion::CCU_V2;
+            } else {
+                ccuProtocolVersion_ = CcuProtocolVersion::INVALID;
+                KERNEL_LOG(KERNEL_ERROR, "ApiClient InitV2 invalid CCU devType:%d", tilingInner->devType);
+            }
         }
     } else if (context != nullptr) {
         __gm__ const HcclApi::OpResCtx* opResCtx = reinterpret_cast<__gm__ const HcclApi::OpResCtx*>(context);
@@ -398,6 +406,10 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
     ASCENDC_HCCL_API_ASSERT(
         isInited_, { return INVALID_HANDLE_ID; },
         "Call Prepare failed, please ensure Hccl::Init func has been called successfully already!");
+    if (unlikely(ccuProtocolVersion_ == CcuProtocolVersion::INVALID)) {
+        KERNEL_LOG(KERNEL_ERROR, "Call Prepare failed, invalid CCU protocol version.");
+        return INVALID_HANDLE_ID;
+    }
     if (unlikely(commonPrepareParam.repeat == 0U)) {
         return INVALID_HANDLE_ID;
     }
