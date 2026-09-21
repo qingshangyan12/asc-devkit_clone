@@ -536,6 +536,33 @@ def gen_tiling_struct_size_for_group_key(
     return source
 
 
+def _gen_static_dfx_by_kernel_type(
+    source, compile_info, tiling_key, tiling_info, tiling_key_struct_size_map
+):
+    kernel_type = compile_info.tiling_key_kernel_type[str(tiling_key)]
+    if kernel_type in [
+        KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1,
+        KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2,
+    ]:
+        cube_marker = "_mix_aic"
+        kernel_name = compile_info.kernel_name + cube_marker
+        source += DFXSectionGenerator().generate_dfx_section_without_tiling_register(
+            tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name
+        )
+        vec_marker = "_mix_aiv"
+        kernel_name = compile_info.kernel_name + vec_marker
+        source += DFXSectionGenerator().generate_dfx_section_without_tiling_register(
+            tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name
+        )
+    else:
+        current_kernel_name = compile_info.get_kernel_func_name()
+        kernel_name = current_kernel_name
+        source += DFXSectionGenerator().generate_dfx_section_without_tiling_register(
+            tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name
+        )
+    return source
+
+
 def gen_dfx_section_for_one_tiling_key_static(
     compile_info: CompileInfo,
     tiling_key,
@@ -544,33 +571,9 @@ def gen_dfx_section_for_one_tiling_key_static(
 ):
     source = ""
     if compile_info.no_set_kernel_type is False:
-        kernel_type = compile_info.tiling_key_kernel_type[str(tiling_key)]
-        if kernel_type in [
-            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1,
-            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2,
-        ]:
-            cube_marker = "_mix_aic"
-            kernel_name = compile_info.kernel_name + cube_marker
-            source += (
-                DFXSectionGenerator().generate_dfx_section_without_tiling_register(
-                    tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name
-                )
-            )
-            vec_marker = "_mix_aiv"
-            kernel_name = compile_info.kernel_name + vec_marker
-            source += (
-                DFXSectionGenerator().generate_dfx_section_without_tiling_register(
-                    tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name
-                )
-            )
-        else:
-            current_kernel_name = compile_info.get_kernel_func_name()
-            kernel_name = current_kernel_name
-            source += (
-                DFXSectionGenerator().generate_dfx_section_without_tiling_register(
-                    tiling_key, tiling_info, tiling_key_struct_size_map, kernel_name
-                )
-            )
+        source = _gen_static_dfx_by_kernel_type(
+            source, compile_info, tiling_key, tiling_info, tiling_key_struct_size_map
+        )
     else:
         if compile_info.code_channel == CORE_TYPE_MIX:
             cube_marker = "_mix_aic"
@@ -1310,6 +1313,48 @@ def gen_kernel_fun_with_tiling_key_slave(
     return source
 
 
+def _gen_dfx_sections_static(
+    source, compile_info, tiling_info, tiling_key_struct_size_map
+):
+    source += gen_dfx_section_for_one_tiling_key_static(
+        compile_info,
+        tiling_info.tiling_key,
+        tiling_info,
+        tiling_key_struct_size_map,
+    )
+    if compile_info.tiling_key_group_map is not None:
+        if tiling_info.tiling_key in compile_info.tiling_key_group_map.keys():
+            for tiling_key_slave in compile_info.tiling_key_group_map[
+                tiling_info.tiling_key
+            ]:
+                source += gen_dfx_section_for_one_tiling_key_static(
+                    compile_info,
+                    tiling_key_slave,
+                    tiling_info,
+                    tiling_key_struct_size_map,
+                )
+    return source
+
+
+def _gen_dfx_sections_dynamic(
+    source, compile_info, tiling_info, tiling_key_struct_size_map
+):
+    for tiling_key in compile_info.tiling_key_list:
+        source += gen_dfx_section_for_one_tiling_key_dynamic(
+            compile_info, tiling_key, tiling_info, tiling_key_struct_size_map
+        )
+        if compile_info.tiling_key_group_map is not None:
+            if tiling_key in compile_info.tiling_key_group_map.keys():
+                for tiling_key_slave in compile_info.tiling_key_group_map[tiling_key]:
+                    source += gen_dfx_section_for_one_tiling_key_dynamic(
+                        compile_info,
+                        tiling_key_slave,
+                        tiling_info,
+                        tiling_key_struct_size_map,
+                    )
+    return source
+
+
 def gen_tiling_struct_size_and_dfx_section_file(
     compile_info: CompileInfo, tiling_info: TilingInfo, tiling_key_struct_size_map: dict
 ):
@@ -1320,39 +1365,13 @@ def gen_tiling_struct_size_and_dfx_section_file(
     )
 
     if tiling_info.static_shape_flag:
-        source += gen_dfx_section_for_one_tiling_key_static(
-            compile_info,
-            tiling_info.tiling_key,
-            tiling_info,
-            tiling_key_struct_size_map,
+        source = _gen_dfx_sections_static(
+            source, compile_info, tiling_info, tiling_key_struct_size_map
         )
-        if compile_info.tiling_key_group_map is not None:
-            if tiling_info.tiling_key in compile_info.tiling_key_group_map.keys():
-                for tiling_key_slave in compile_info.tiling_key_group_map[
-                    tiling_info.tiling_key
-                ]:
-                    source += gen_dfx_section_for_one_tiling_key_static(
-                        compile_info,
-                        tiling_key_slave,
-                        tiling_info,
-                        tiling_key_struct_size_map,
-                    )
     else:
-        for tiling_key in compile_info.tiling_key_list:
-            source += gen_dfx_section_for_one_tiling_key_dynamic(
-                compile_info, tiling_key, tiling_info, tiling_key_struct_size_map
-            )
-            if compile_info.tiling_key_group_map is not None:
-                if tiling_key in compile_info.tiling_key_group_map.keys():
-                    for tiling_key_slave in compile_info.tiling_key_group_map[
-                        tiling_key
-                    ]:
-                        source += gen_dfx_section_for_one_tiling_key_dynamic(
-                            compile_info,
-                            tiling_key_slave,
-                            tiling_info,
-                            tiling_key_struct_size_map,
-                        )
+        source = _gen_dfx_sections_dynamic(
+            source, compile_info, tiling_info, tiling_key_struct_size_map
+        )
 
     try:
         with os.fdopen(
@@ -1371,13 +1390,9 @@ def gen_tiling_struct_size_and_dfx_section_file(
         )
 
 
-def _get_tiling_struct_size(compile_info):
-    tiling_struct_set = set()
-    tiling_struct_size_map = {}
-    max_tiling_size = 0
-    for _, tiling_struct in compile_info.tiling_key_struct_map.items():
-        tiling_struct_set.add(tiling_struct)
-
+def _scan_tiling_struct_sizes(
+    tiling_struct_set, tiling_struct_size_map, max_tiling_size, compile_info
+):
     for tiling_struct in tiling_struct_set:
         objdump_cmd = [
             "llvm-objdump",
@@ -1405,6 +1420,19 @@ def _get_tiling_struct_size(compile_info):
             dec_data = struct.unpack(">Q", bytes_data)[0]
             tiling_struct_size_map[tiling_struct] = dec_data
             max_tiling_size = max(max_tiling_size, dec_data)
+    return tiling_struct_size_map, max_tiling_size
+
+
+def _get_tiling_struct_size(compile_info):
+    tiling_struct_set = set()
+    tiling_struct_size_map = {}
+    max_tiling_size = 0
+    for _, tiling_struct in compile_info.tiling_key_struct_map.items():
+        tiling_struct_set.add(tiling_struct)
+
+    tiling_struct_size_map, max_tiling_size = _scan_tiling_struct_sizes(
+        tiling_struct_set, tiling_struct_size_map, max_tiling_size, compile_info
+    )
 
     # Preserve exact per-key sizes for Manifest constants before removing sections.
     compile_info.compiled_tiling_key_data_size_map = {
@@ -1439,31 +1467,9 @@ def _get_tiling_struct_size(compile_info):
     return max_tiling_size
 
 
-def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
-    section_name_set = set()
-    tiling_key_struct_size_map = {}  # tiling_key -> (tiling_struct, struct_size)
-    max_tiling_size = 0
-    objdump_cmd = ["llvm-objdump", "-s", f"{compile_info.dst_file}"]
-    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=None)
-    (out, _) = proc.communicate()
-    tiling_str_info = out.decode("utf-8")
-    tiling_lines = [
-        line for line in tiling_str_info.splitlines() if ".ascendc_tiling" in line
-    ]
-    pattern = re.compile(r"\.ascendc_tiling\.[^\s]+")
-
-    for line in tiling_lines:
-        for match in pattern.findall(line):
-            # match eg. ".ascendc_tiling.optiling::TilingData1_2UL.0"
-            match = match.rstrip(":;,")
-            section_name_set.add(match)
-            name_part = match.split(".ascendc_tiling.", 1)[1]
-            name_part = name_part.rsplit(".", 1)[0]
-
-            tiling_key_struct_size_map = get_tiling_key_struct_size_map(
-                tiling_key_struct_size_map, name_part, compile_info, 0
-            )
-
+def _scan_tiling_sections_for_size(
+    section_name_set, tiling_key_struct_size_map, max_tiling_size, compile_info
+):
     for section_name in section_name_set:
         objdump_cmd = [
             "llvm-objdump",
@@ -1489,6 +1495,37 @@ def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
                 tiling_key_struct_size_map, name_part, compile_info, dec_data
             )
             max_tiling_size = max(max_tiling_size, dec_data)
+    return tiling_key_struct_size_map, max_tiling_size
+
+
+def _get_tiling_struct_without_register_size(compile_info: CompileInfo):
+    section_name_set = set()
+    tiling_key_struct_size_map = {}  # tiling_key -> (tiling_struct, struct_size)
+    max_tiling_size = 0
+    objdump_cmd = ["llvm-objdump", "-s", f"{compile_info.dst_file}"]
+    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=None)
+    (out, _) = proc.communicate()
+    tiling_str_info = out.decode("utf-8")
+    tiling_lines = [
+        line for line in tiling_str_info.splitlines() if ".ascendc_tiling" in line
+    ]
+    pattern = re.compile(r"\.ascendc_tiling\.[^\s]+")
+
+    for line in tiling_lines:
+        for match in pattern.findall(line):
+            # match eg. ".ascendc_tiling.optiling::TilingData1_2UL.0"
+            match = match.rstrip(":;,")
+            section_name_set.add(match)
+            name_part = match.split(".ascendc_tiling.", 1)[1]
+            name_part = name_part.rsplit(".", 1)[0]
+
+            tiling_key_struct_size_map = get_tiling_key_struct_size_map(
+                tiling_key_struct_size_map, name_part, compile_info, 0
+            )
+
+    tiling_key_struct_size_map, max_tiling_size = _scan_tiling_sections_for_size(
+        section_name_set, tiling_key_struct_size_map, max_tiling_size, compile_info
+    )
     compile_info.max_tiling_size = max_tiling_size
     # REGISTER_NONE_TILING sections encode both the struct name and byte size.
     compile_info.compiled_tiling_key_data_size_map = {
