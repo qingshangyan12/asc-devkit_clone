@@ -54,8 +54,8 @@ __aicore__ inline void set_dump_tlv_info(
     asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dumpTlv));
 }
 
-__aicore__ inline void set_dump_shape_info(
-    __gm__ DumpTensorTlv* dumpTlv, const uint32_t shapeDim, const uint32_t* shape)
+template <typename Tlv>
+__aicore__ inline void set_dump_shape_info(__gm__ Tlv* dumpTlv, const uint32_t shapeDim, const uint32_t* shape)
 {
     if (shapeDim <= 0 || shapeDim > K_MAX_SHAPE_DIM || shape == nullptr) {
         return;
@@ -67,9 +67,9 @@ __aicore__ inline void set_dump_shape_info(
     asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dumpTlv));
 }
 
-template <AscendC::Hardware hardware, typename T, typename U>
+template <AscendC::Hardware hardware, typename T, typename U, typename Tlv>
 __aicore__ inline uint32_t set_dump_tlv_data(
-    U src, __gm__ DumpTensorTlv* dumpTlv, uint32_t alignDumpLen, uint32_t dump_size)
+    U src, __gm__ Tlv* dumpTlv, uint32_t alignDumpLen, uint32_t dump_size)
 {
     __gm__ T* dumpDstAddr = reinterpret_cast<__gm__ T*>(dumpTlv + 1);
 
@@ -107,126 +107,116 @@ __aicore__ inline uint32_t set_dump_tlv_data(
     return ret;
 }
 
-template <AscendC::Hardware hardware, typename T, typename U>
-__aicore__ inline uint32_t copy_super_tensor_data(__gm__ uint8_t* dst, U src, uint32_t bytes)
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline bool is_super_tensor_hardware_supported()
 {
-    if constexpr (hardware == AscendC::Hardware::GM) {
-        return mem_copy_gm_to_gm(dst, reinterpret_cast<__gm__ const uint8_t*>(src), bytes);
-    } else if constexpr (hardware == AscendC::Hardware::UB) {
-        const uint32_t aligned = bytes / 32 * 32;
-        if (aligned != 0 && mem_copy_ub_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, aligned / 32) != 0) {
-            return 1;
-        }
-        sync_all();
-        // Scalar tail loads avoid reading beyond a byte-sized LocalTensor view.
-        auto source = reinterpret_cast<__ubuf__ uint8_t*>(src);
-        for (uint32_t i = aligned; i < bytes; ++i) {
-            dst[i] = source[i];
-        }
-        asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dst));
-        return 0;
-    } else if constexpr (hardware == AscendC::Hardware::L1) {
-#if __NPU_ARCH__ == 2201
-        // copy_cbuf_to_gm uses 32-byte blocks on this architecture.
-        return mem_copy_l1buf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes / 32);
-#else
-        return mem_copy_l1buf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
-#endif
-    } else if constexpr (hardware == AscendC::Hardware::L0C) {
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 5102
-        // These matrix helpers take a count of 32-bit accumulator elements.
-        return mem_copy_cbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes / sizeof(uint32_t));
-#else
-        return mem_copy_cbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
-#endif
-    } else if constexpr (hardware == AscendC::Hardware::L0A) {
-        return mem_copy_abuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
-    } else if constexpr (hardware == AscendC::Hardware::L0B) {
-        return mem_copy_bbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
-    } else if constexpr (hardware == AscendC::Hardware::BIAS) {
-        return mem_copy_biasbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
-    } else if constexpr (hardware == AscendC::Hardware::FIXBUF) {
-        return mem_copy_fbuf_to_gm_impl(reinterpret_cast<__gm__ T*>(dst), src, bytes);
+    return hardware == AscendC::Hardware::GM || hardware == AscendC::Hardware::UB ||
+           hardware == AscendC::Hardware::L1 || hardware == AscendC::Hardware::L0C;
+}
+
+template <AscendC::Hardware hardware>
+__aicore__ constexpr inline uint32_t get_super_tensor_payload_alignment()
+{
+    if constexpr (hardware == AscendC::Hardware::L0C) {
+        return 16U * 16U * sizeof(uint32_t);
     }
-    return 1;
+    return ASC_ONE_DATABLOCK_SIZE;
+}
+
+template <AscendC::Hardware hardware>
+__aicore__ inline uint32_t get_super_tensor_payload_capacity(uint32_t ringBufLen, uint32_t headerLen)
+{
+    constexpr uint32_t payloadAlignment = get_super_tensor_payload_alignment<hardware>();
+    if (ringBufLen <= headerLen) {
+        return 0U;
+    }
+    return ((ringBufLen - headerLen) / payloadAlignment) * payloadAlignment;
 }
 
 template <AscendC::Hardware hardware, typename T, typename U>
-__aicore__ inline void asc_dump_super_tensor(
-    __gm__ DebugBlockHeadInfo* blockInfo, U src, uint32_t desc, uint64_t total, const uint32_t* shape,
-    uint32_t shapeDim)
+__aicore__ inline void set_super_tensor_tlv_info(
+    U src, __gm__ DumpSuperTensorTlv* dumpTlv, uint32_t alignDumpLen, uint32_t desc, uint64_t tensorLength,
+    uint32_t dumpSize, const uint32_t* shape, uint32_t shapeDim)
 {
-    constexpr bool isGm = hardware == AscendC::Hardware::GM;
-    constexpr uint32_t copyAlign = hardware == AscendC::Hardware::L0C ? 1024 : 32;
-    constexpr uint32_t copies = isGm ? 1 : 2;
-    for (uint64_t offset = 0; offset < total;) {
-        const uint32_t header = offset == 0 ? sizeof(DumpSuperTensorTlv) : sizeof(DumpSuperTensorBodyTlv);
-        // Extra 32 bytes allow absolute alignment of the private DMA destination.
-        const uint32_t overhead = align_up(header, 32) + (isGm ? 0 : 32) + 1;
-        if (blockInfo->ringBufLen <= overhead) {
+    dumpTlv->type = static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR);
+    dumpTlv->length = sizeof(DumpSuperTensorTlv) - sizeof(uint32_t[2]) + alignDumpLen;
+    dumpTlv->tensorAddr = static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src));
+    dumpTlv->dataType = static_cast<uint32_t>(get_dump_datatype<T>());
+    dumpTlv->desc = desc;
+    dumpTlv->bufferId = 0U;
+    dumpTlv->position = static_cast<uint16_t>(hardware);
+    dumpTlv->blockIdx = static_cast<uint16_t>(asc_debug_get_block_idx());
+    dumpTlv->dim = 0U;
+    for (uint32_t i = 0; i < K_MAX_SHAPE_DIM; ++i) {
+        dumpTlv->shape[i] = 0U;
+    }
+    dumpTlv->resv = 0U;
+    dumpTlv->tensorLength = tensorLength;
+    dumpTlv->tensorOffset = 0U;
+    dumpTlv->dumpSize = dumpSize;
+    set_dump_shape_info(dumpTlv, shapeDim, shape);
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dumpTlv));
+}
+
+__aicore__ inline void set_super_tensor_body_tlv_info(
+    __gm__ DumpSuperTensorBodyTlv* dumpTlv, uint32_t alignDumpLen, uint64_t tensorLength, uint64_t tensorOffset,
+    uint32_t dumpSize)
+{
+    dumpTlv->type = static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR_BODY);
+    dumpTlv->length = sizeof(DumpSuperTensorBodyTlv) - sizeof(uint32_t[2]) + alignDumpLen;
+    dumpTlv->resv1 = 0U;
+    dumpTlv->resv2 = 0U;
+    dumpTlv->tensorLength = tensorLength;
+    dumpTlv->tensorOffset = tensorOffset;
+    dumpTlv->dumpSize = dumpSize;
+    asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(dumpTlv));
+}
+
+template <AscendC::Hardware hardware, typename T, typename U>
+__aicore__ inline void asc_dump_super_tensor_impl(
+    U src, uint32_t desc, uint64_t tensorLength, const uint32_t* shape, uint32_t shapeDim,
+    __gm__ DebugBlockHeadInfo* blockInfo)
+{
+    constexpr uint32_t payloadAlignment = get_super_tensor_payload_alignment<hardware>();
+    uint64_t tensorOffset = 0U;
+    bool isFirst = true;
+    while (tensorOffset < tensorLength) {
+        const uint32_t headerLen = isFirst ? sizeof(DumpSuperTensorTlv) : sizeof(DumpSuperTensorBodyTlv);
+        const uint32_t payloadCapacity = get_super_tensor_payload_capacity<hardware>(blockInfo->ringBufLen, headerLen);
+        if (payloadCapacity == 0U) {
             return;
         }
-        uint32_t capacity = (blockInfo->ringBufLen - overhead) / copies / copyAlign * copyAlign;
-        capacity = capacity > 16384 ? 16384 : capacity;
-        if (capacity == 0) {
+        const uint64_t remaining = tensorLength - tensorOffset;
+        const uint32_t dumpSize =
+            remaining > payloadCapacity ? payloadCapacity : static_cast<uint32_t>(remaining);
+        const uint32_t alignDumpLen = align_up(dumpSize, payloadAlignment);
+        const uint32_t tlvLen = headerLen + alignDumpLen;
+        if (!check_ringbuf_space(blockInfo, tlvLen)) {
             return;
         }
-        const uint32_t size = total - offset < capacity ? static_cast<uint32_t>(total - offset) : capacity;
-        const uint32_t span = align_up(header + size, 32);
-        const uint32_t copySize = align_up(size, copyAlign);
-        const uint32_t reserve = span + (isGm ? 0 : 32 + copySize);
-        auto writeInfo = get_block_write_info(blockInfo);
-        if (writeInfo->bufOffset > blockInfo->ringBufLen || reserve > blockInfo->ringBufLen) {
-            return;
-        }
-        if (!check_ringbuf_space(blockInfo, reserve)) {
-            return;
-        }
-        auto record = get_ringbuf_tlv_addr(blockInfo);
-        set_super_tensor_header(
-            record, total, offset, size, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(src)),
-            static_cast<uint32_t>(get_dump_datatype<T>()), desc, static_cast<uint16_t>(hardware),
-            static_cast<uint16_t>(asc_debug_get_block_idx()), shape, shapeDim);
-        sync_all();
-        asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(record));
-        uint32_t ret;
-        if constexpr (isGm) {
-            ret = copy_super_tensor_data<hardware, T>(record + header, src + offset / sizeof(T), size);
+
+        __gm__ uint8_t* tlvAddr = get_ringbuf_tlv_addr(blockInfo);
+        U chunkSrc = src + tensorOffset / sizeof(T);
+        if (isFirst) {
+            auto* dumpTlv = reinterpret_cast<__gm__ DumpSuperTensorTlv*>(tlvAddr);
+            set_super_tensor_tlv_info<hardware, T>(
+                src, dumpTlv, alignDumpLen, desc, tensorLength, dumpSize, shape, shapeDim);
+            if (set_dump_tlv_data<hardware, T>(chunkSrc, dumpTlv, alignDumpLen, dumpSize / sizeof(T)) != 0U) {
+                return;
+            }
         } else {
-            // Do not DMA into the unaligned wire payload. Scratch is reserved but never published.
-            auto scratch =
-                reinterpret_cast<__gm__ uint8_t*>((reinterpret_cast<uintptr_t>(record + span) + 31) / 32 * 32);
-            ret = copy_super_tensor_data<hardware, T>(
-                scratch, src + offset / sizeof(T), hardware == AscendC::Hardware::UB ? size : copySize);
-            sync_all();
-            if (ret == 0) {
-                asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(scratch));
-                ret = mem_copy_gm_to_gm(record + header, scratch, size);
+            auto* dumpTlv = reinterpret_cast<__gm__ DumpSuperTensorBodyTlv*>(tlvAddr);
+            set_super_tensor_body_tlv_info(dumpTlv, alignDumpLen, tensorLength, tensorOffset, dumpSize);
+            if (set_dump_tlv_data<hardware, T>(chunkSrc, dumpTlv, alignDumpLen, dumpSize / sizeof(T)) != 0U) {
+                return;
             }
         }
-        if (ret != 0) {
-            return;
-        }
-        sync_all();
-        asc_entire_dcci(reinterpret_cast<__gm__ uint64_t*>(record));
-        update_write_info(get_block_write_info(blockInfo), span);
-        offset += size;
-    }
-}
 
-// Validate a LocalTensor view before its capacity information is lost at the raw-pointer boundary.
-__aicore__ inline bool check_super_tensor_local_range(
-    AscendC::Hardware position, uint64_t total, uint64_t available)
-{
-    auto blockInfo = get_block_info();
-    const uint64_t ordinarySpan = sizeof(DumpTensorTlv) + ((total + 31) / 32) * 32;
-    if (blockInfo == nullptr || (ordinarySpan <= blockInfo->ringBufLen && ordinarySpan <= UINT32_MAX)) {
-        return true;
+        __gm__ DebugBlockWriteInfo* writeInfo = get_block_write_info(blockInfo);
+        update_write_info(writeInfo, tlvLen);
+        tensorOffset += dumpSize;
+        isFirst = false;
     }
-    const uint32_t sourceAlign =
-        position == AscendC::Hardware::L0C ? 1024 : (position == AscendC::Hardware::UB ? 1 : 32);
-    const uint64_t required = (total + sourceAlign - 1) / sourceAlign * sourceAlign;
-    return required <= available;
 }
 
 template <AscendC::Hardware hardware, typename T, typename U>
@@ -238,15 +228,20 @@ __aicore__ inline void asc_dump_impl(
     if (dump_size <= 0 || blockInfo == nullptr) {
         return;
     }
-    const uint64_t total = static_cast<uint64_t>(dump_size) * sizeof(T);
-    const uint64_t ordinarySpan = sizeof(DumpTensorTlv) + ((total + 31) / 32) * 32;
-    if (ordinarySpan > blockInfo->ringBufLen || ordinarySpan > UINT32_MAX) {
-        asc_dump_super_tensor<hardware, T>(blockInfo, src, desc, total, shape, shapeDim);
+    constexpr uint32_t dataBlockSize = 32U;
+    const uint64_t tensorLength = static_cast<uint64_t>(dump_size) * sizeof(T);
+    const uint64_t alignDumpLen64 = ((tensorLength + dataBlockSize - 1U) / dataBlockSize) * dataBlockSize;
+    const uint64_t tlvLen64 = sizeof(DumpTensorTlv) + alignDumpLen64;
+    if (tlvLen64 > blockInfo->ringBufLen) {
+#if __NPU_ARCH__ == 3510
+        if constexpr (is_super_tensor_hardware_supported<hardware>()) {
+            asc_dump_super_tensor_impl<hardware, T>(src, desc, tensorLength, shape, shapeDim, blockInfo);
+        }
+#endif
         return;
     }
-    constexpr uint16_t dataBlockSize = 32;
-    uint32_t alignDumpLen = align_up(dump_size * sizeof(T), dataBlockSize);
-    uint32_t tlvLen = sizeof(DumpTensorTlv) + alignDumpLen;
+    const uint32_t alignDumpLen = static_cast<uint32_t>(alignDumpLen64);
+    const uint32_t tlvLen = static_cast<uint32_t>(tlvLen64);
     if (!check_ringbuf_space(blockInfo, tlvLen)) {
         return;
     }
