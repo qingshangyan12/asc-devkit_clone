@@ -391,22 +391,19 @@ bool HcclIsCcuAlgorithmRegistered(uint32_t opType, const char* algName)
 }
 
 namespace {
-// 闸门 B 逐 tiling 判定（存在性，不定名——真定名在 SelectCcuAlgorithm→GetForcedAlgName）：
-// NONE/LEGACY 拒（mc2_client 仅支持已注册强制名）；裸名过双名单；EXTERNAL 的全部 CCU 候选
-// 都必须过双名单——闸门 C 漏斗（②变体条件/②′机型flag）可能选中任何一个，校验范围必须覆盖
-// 选择范围（D8：闭环"B查X/C选Y"缺口），候选漂移首个未过者点名拒绝。
+// 全部 CCU 候选都须过双名单：漏斗（闸门 C）可能选中任何一个，校验范围必须覆盖选择范围
 bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
 {
     std::string algName;
     ExternalAlgSpec extSpec;
     std::string extParseErrMsg;
     const ForcedAlgKind kind = ClassifyForcedAlg(ccTiling, algName, extSpec, extParseErrMsg);
-    if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) { // 现状拒绝（旧 :402-405）
+    if (kind == ForcedAlgKind::NONE || kind == ForcedAlgKind::LEGACY) {
         HCCL_WARNING("[AllocComResourceByTilingCcu] algName[%s] is not supported in mc2_client.", algName.c_str());
         return false;
     }
     if (kind == ForcedAlgKind::BARE_NAME) {
-        if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) { // 现状双名单（旧 :406-411）
+        if (!HcclIsCcuAlgorithmRegistered(ccTiling->opType, algName.c_str())) {
             HCCL_WARNING(
                 "[AllocComResourceByTilingCcu] algorithm[%s] is not registered in mc2_client for opType[%u].",
                 algName.c_str(), ccTiling->opType);
@@ -414,7 +411,6 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
         }
         return true;
     }
-    // EXTERNAL：解析失败 / 无 CCU 候选 / 任一候选未过双名单 → 拒（HCCL_E_ALG_NOT_SUPPORTED 语义不变）
     if (!extParseErrMsg.empty()) {
         HCCL_WARNING(
             "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], opType[%u], reason[%s].", ccTiling->algConfig,
@@ -437,7 +433,7 @@ bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
             return false;
         }
     }
-    if (ccuCount == 0U) { // 空集 ≠ 全过，仍拒
+    if (ccuCount == 0U) {
         HCCL_WARNING(
             "[MC2_EXT_ALG] ccu gate rejected, algConfig[%s], opType[%u], ccuCandidates[0] "
             "(external name has no CCU candidate).",

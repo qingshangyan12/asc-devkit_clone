@@ -145,7 +145,7 @@ ResolveStatus ResolveExternalAlg(
         return ResolveStatus::RESOLVED;
     }
 
-    // 报错三要素随 errMsg 返回，由调用方按链语义打日志（AICPU 链 WARNING+回退，闸门 B 自行拒绝）
+    // errMsg 随返回值交调用方打日志（AICPU 链为 WARNING+回退）
     const std::string reason =
         candidates.empty() ?
             "(no candidate registered in this build for engine " + std::string(EngineName(opParam.engine)) + ")" :

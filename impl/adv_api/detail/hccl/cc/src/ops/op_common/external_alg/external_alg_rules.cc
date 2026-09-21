@@ -15,8 +15,7 @@
 
 namespace mc2_ops_hccl {
 
-// 零侵入复用 AutoSelectorBase 的 IsTwoLevelNetLayer / IsLayerAllConnetedWithTopo
-// （const 成员函数，类无状态，单实例即可；spec 开放项 3 起步方案，抽自由函数随改名批次）
+// 零侵入复用 AutoSelectorBase 的 const 成员函数（类无状态，单实例安全）
 namespace {
 const AutoSelectorBase kRuleSelectorBase;
 
