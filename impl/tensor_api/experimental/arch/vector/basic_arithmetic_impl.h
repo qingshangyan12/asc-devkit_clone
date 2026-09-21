@@ -17,6 +17,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "impl/tensor_api/experimental/arch/vector/precision_math_impl.h"
 
 namespace asc {
 namespace te {
@@ -172,14 +173,16 @@ __simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src)
     return dst;
 }
 
-template <typename T>
+template <const sqrt_options& opt, typename T>
 __simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src)
 {
-    static_assert(detail::supports_float_math_v<T>, "sqrt supports half and float");
-    reg_tensor<T> dst;
-    asc_sqrt(dst.reg, src.reg, src.mask);
-    dst.mask = src.mask;
-    return dst;
+    return detail::sqrt_dispatch<opt, T>(src);
+}
+
+template <const rsqrt_options& opt, typename T>
+__simd_callee__ inline reg_tensor<T> rsqrt(const reg_tensor<T>& src)
+{
+    return detail::rsqrt_dispatch<opt, T>(src);
 }
 
 template <typename T>
@@ -310,17 +313,20 @@ __simd_callee__ inline reg_tensor<T> mull(
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b)
 {
+    return div<default_div_ops>(a, b);
+}
+
+template <const div_options& opt, typename T, typename U>
+__simd_callee__ inline decltype(auto) div(const T& a, const U& b)
+{
     using elem_type = detail::binary_elem_t<T, U>;
     detail::check_binary_reg_types<T, U>();
-    static_assert(detail::supports_div_v<elem_type>, "operator/ does not support this element type");
+    static_assert(detail::supports_div_v<elem_type>, "div does not support this element type");
 
     vector_bool mask = detail::binary_mask(a, b);
     auto left = detail::make_reg_operand<elem_type>(a, mask);
     auto right = detail::make_reg_operand<elem_type>(b, mask);
-    reg_tensor<elem_type> dst;
-    asc_div(dst.reg, left.reg, right.reg, mask);
-    dst.mask = mask;
-    return dst;
+    return detail::div_dispatch<opt>(left, right);
 }
 
 template <merge_mode Mode, typename T, typename U>

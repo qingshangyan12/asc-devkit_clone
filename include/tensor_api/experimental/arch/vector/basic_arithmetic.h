@@ -82,8 +82,19 @@ __simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src);
 template <typename T>
 __simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src);
 
-template <typename T>
+/**
+ * @brief Element-wise sqrt with configurable precision / Subnormal policy.
+ * @tparam opt Aligned with basic_api SqrtSpecificMode / SqrtConfig.
+ */
+template <const sqrt_options& opt = default_sqrt_ops, typename T>
 __simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src);
+
+/**
+ * @brief Element-wise rsqrt (1/sqrt) with configurable precision / Subnormal policy.
+ * @tparam opt Aligned with basic_api RsqrtConfig; implemented as composed sqrt+div like RegRsqrt.
+ */
+template <const rsqrt_options& opt = default_rsqrt_ops, typename T>
+__simd_callee__ inline reg_tensor<T> rsqrt(const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src);
@@ -124,6 +135,14 @@ __simd_callee__ inline reg_tensor<T> mull(
 
 template <typename T, typename U>
 __simd_callee__ inline decltype(auto) operator/(const T& a, const U& b);
+
+/**
+ * @brief Element-wise div with configurable precision / Subnormal policy.
+ * @tparam opt Aligned with basic_api DivSpecificMode / DivConfig.
+ * @note @c operator/ keeps the default intrinsic path; use @c div when selecting algo.
+ */
+template <const div_options& opt = default_div_ops, typename T, typename U>
+__simd_callee__ inline decltype(auto) div(const T& a, const U& b);
 
 /**
  * @brief Element-wise min with configurable mask merge mode.
