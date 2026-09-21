@@ -20,6 +20,12 @@
 
 using namespace hcomm::CcuRep;
 
+namespace mc2_ops_hccl {
+bool g_stubHcommCcuV2Supported = true;
+}
+
+extern "C" bool HcommIsSupportCcuV2(void) { return mc2_ops_hccl::g_stubHcommCcuV2Supported; }
+
 namespace hcomm {
 
 CcuKernel::CcuKernel(const CcuKernelArg& arg) {}
