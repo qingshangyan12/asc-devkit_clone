@@ -66,7 +66,7 @@ __aicore__ inline void asc_bitsort(__ubuf__ float* dst, __ubuf__ float* src0, __
 | --- | --- | --- |
 | dst | 输出 | 目的操作数在UB中的起始地址。 |
 | src0 | 输入 | score在UB中的起始地址。 |
-| src1 | 输入 | Index在UB中的起始地址。 |
+| src1 | 输入 | index在UB中的起始地址。 |
 | repeat | 输入 | 迭代次数，取值范围为[0, 255]。每次迭代处理32个元素；下次迭代时，`src0`和`src1`各跳过32个元素，`dst`跳过256字节。不同迭代之间不进行排序。 |
 
 ## 返回值说明
@@ -84,7 +84,7 @@ PIPE_V
 
 ## 调用示例
 
-以下示例使用float重载，将32个score及其Index排序，并与预期结果比较。将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -130,7 +130,6 @@ __global__ __vector__ void bitsort_kernel(__gm__ float* dst, __gm__ float* src0,
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_bitsort(sorted, scores, indices, 1);
-    // 排序输出每对占8字节，须在UB到GM搬运前完成计算
     asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
     asc_copy_ub2gm_align(dst, sorted, OUTPUT_BYTES);
@@ -175,7 +174,6 @@ int main()
     if (ok) {
         for (uint32_t i = 0; i < ELEMENT_COUNT; ++i) {
             output_scores[i] = result[2 * i];
-            // 每个8字节结果的高4字节存储Index，不应按float数值转换。
             std::memcpy(&output_indices[i], &result[2 * i + 1], sizeof(uint32_t));
         }
     }
@@ -196,5 +194,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-预期输出包含`[Success] asc_bitsort passed.`。
