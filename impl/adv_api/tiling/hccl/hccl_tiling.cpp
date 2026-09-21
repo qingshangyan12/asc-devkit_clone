@@ -30,6 +30,10 @@ using namespace HcclApi;
 namespace AscendC {
 namespace {
 
+constexpr uint8_t DEV_TYPE_A2 = 1U;
+constexpr uint8_t DEV_TYPE_A5 = 6U;
+constexpr uint8_t DEV_TYPE_A6 = 8U;
+
 static const std::set<std::string> REGISTERED_CCU_ALGORITHMS = {
     "CcuSchedAllGatherSoleMesh",
     "CcuSchedAllGatherConcurMeshNHRMultiLink",
@@ -43,6 +47,26 @@ static const std::set<std::string> REGISTERED_CCU_ALGORITHMS = {
     "CcuSchedReduceScatterSoleNHRMultiLink",
     "CcuSchedAllToAllSoleMeshConcurrent",
     "CcuSchedReduceScatterConcurMeshNHRMultiLink"};
+
+uint8_t ResolveDevType(const std::string& socVersion)
+{
+    if (socVersion.empty()) {
+        return UINT8_MAX;
+    }
+    const std::string socVersionStr(socVersion);
+    if (socVersionStr.find("Ascend910B") != std::string::npos) {
+        return DEV_TYPE_A2;
+    }
+    if (socVersionStr.find("Ascend950") != std::string::npos) {
+        return DEV_TYPE_A5;
+    }
+    if (socVersionStr.find("Ascend910_96") != std::string::npos ||
+        socVersionStr.find("ascend910_96") != std::string::npos ||
+        socVersionStr.find("Ascend960") != std::string::npos || socVersionStr.find("ascend960") != std::string::npos) {
+        return DEV_TYPE_A6;
+    }
+    return UINT8_MAX;
+}
 
 bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
 {
@@ -85,6 +109,10 @@ void PrintMc2CcTiling(const Mc2CcTilingInner& tiling)
     TILING_LOG_DEBUG("Mc2CcTiling msg end.");
 }
 
+} // namespace
+
+namespace {
+
 uint32_t SetDevType(Mc2InitTilingInner* tilingInner)
 {
     ASCENDC_HOST_ASSERT(tilingInner != nullptr, return EXIT_FAILURE, "tilingInner must not be nullptr.");
@@ -93,17 +121,13 @@ uint32_t SetDevType(Mc2InitTilingInner* tilingInner)
         (homePath != nullptr && homePath[0] != '\0'), return EXIT_FAILURE, "ASCEND_HOME_PATH is not set or empty.");
     std::string pathName(homePath);
     pathName += "/lib64/";
-    auto getSocVerFunc =
-        HcclSymbolLoader::GetInstance().Load<void (*)(char*, uint32_t)>("libruntime.so", "rtGetSocVersion", pathName);
+    auto getSocVerFunc = HcclSymbolLoader::GetInstance().Load<int32_t (*)(char*, uint32_t)>(
+        "libruntime.so", "rtGetSocVersion", pathName);
     ASCENDC_HOST_ASSERT(getSocVerFunc != nullptr, return EXIT_FAILURE, "Failed to get soc version.");
     char socVersion[50];
     getSocVerFunc(socVersion, sizeof(socVersion));
     std::string devType = std::string(socVersion);
-    if (devType.find("Ascend910B") != std::string::npos) {
-        tilingInner->devType = static_cast<uint8_t>(platform_ascendc::SocVersion::ASCEND910B);
-    } else {
-        tilingInner->devType = UINT8_MAX;
-    }
+    tilingInner->devType = ResolveDevType(socVersion);
     return EXIT_SUCCESS;
 }
 
