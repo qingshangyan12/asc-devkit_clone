@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/vector_compute/compute/vector_permute_sel.h"`。
 
-数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。本接口单次Repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置（比如数据类型为half时，单次Repeat可完成16*16大小的矩阵转置），同时还可以支持多次Repeat操作。
+[数据格式](../../../../../guide/technical_appendix/concepts_and_terms/neural_networks_and_operators/data_layout.md)转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。本接口单次Repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置（比如数据类型为half时，单次Repeat可完成16*16大小的矩阵转置），同时还可以支持多次Repeat操作。
 
 单次repeat内转换规则如下：
 
@@ -91,13 +91,32 @@ PIPE_V
 - 操作数地址对齐约束请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
 - 操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。
 - `dst`和`src`不能传入相同的地址寄存器起始位置，即目的地址寄存器对和源地址寄存器对不能重叠。
-- 为获得更优性能，建议`dst`、`src`、`dst_high_half`和`src_high_half`传入编译期常量，例如直接传入VA0、VA2、true或false，或传入由这些常量初始化的局部变量。`dst`和`src`仅支持VA0、VA2、VA4、VA6，且不能相同，配置方式请参考[asc_set_va_reg](./asc_set_va_reg.md)；每个地址寄存器存储8个地址，接口会将传入的起始寄存器与相邻寄存器组成一组，处理16个地址。传入运行时变量时，编译器会保留地址寄存器或布尔参数的分支判断，影响性能。
-- 进行NCHW格式到NC1HWC0格式的转换时，一般用法是将src/dst中的每个元素配置为每个HW平面的起点。
-- 为了性能更优，数据类型位宽为8位时建议先固定dst_high_half/src_high_half，再HW方向Repeat后，再改变dst_high_half/src_high_half。
+- `dst`和`src`仅支持`VA0`、`VA2`、`VA4`、`VA6`，且二者不能相同，配置方式请参考[asc_set_va_reg](./asc_set_va_reg.md)。每个地址寄存器存储8个地址，接口会将传入的起始寄存器与相邻寄存器组成一组，处理16个地址。
+- 为获得更优性能，建议`dst`、`src`、`dst_high_half`和`src_high_half`传入编译期常量，例如直接传入`VA0`、`VA2`、`true`或`false`，或传入由这些常量初始化的局部变量。若传入运行时变量，编译器会保留地址寄存器或布尔参数的分支判断，影响性能。
+- 进行NCHW格式到NC1HWC0格式的转换时，一般用法是将`src`和`dst`中的每个元素配置为每个HW平面的起点。
+- 数据类型位宽为8位时，建议先固定`dst_high_half`和`src_high_half`，沿HW方向完成Repeat处理后，再修改`dst_high_half`和`src_high_half`，以获得更优性能。
 
 ## 调用示例
 
-将以下代码保存为`example.asc`，在Ascend 2201架构上执行`bisheng example.asc -o main --npu-arch=dav-2201`编译，再执行`./main`。一次运行会分别验证下面两个场景。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。一次运行会分别验证下面两个场景。
+
+<!-- npu="950" id8 -->
+以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
+```
+
+<!-- end id8 -->
+
+<!-- npu="A3,910b" id9 -->
+以Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品（对应NPU架构为`dav-2201`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-2201 && ./main
+```
+
+<!-- end id9 -->
 
 示例一展示单次Repeat的矩阵转置。输入是一块按行连续存放的16×16矩阵，每行恰好占用一个16位数据类型的DataBlock。代码将每行的起始地址写入`src_list`，并将目的矩阵每行的起始地址写入`dst_list`；两组地址分别通过`asc_set_va_reg`关联到相邻的地址寄存器。调用`asc_transto5hd_b16`时设置`repeat=1`、`dst_stride=0`、`src_stride=0`，完成一次转置，最终逐元素检查输出第`col`行、第`row`列是否等于输入第`row`行、第`col`列。
 
