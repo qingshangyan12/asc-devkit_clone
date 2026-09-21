@@ -40,7 +40,7 @@
 
 - 计算规则：
 
-  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算（避免溢出），并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。
+  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算，并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。
 
 - 样例规格：
 
@@ -64,9 +64,9 @@
 | ---- | ----------------------------------- | ------------------ | ----------------------------------------- | -------------------------------------------------------------------- |
 | 0    | softmax_gm_kernel   | 根据数据量动态计算 | 32 × warps_per_block，随rows自适应，最多2048 | SIMT VF直接读GM，一个Warp处理一行，Warp归约完成行内max和sum          |
 | 1    | softmax_ub_kernel | 根据数据量动态计算 | 32 × rows_per_tile，随rows和UB容量自适应，最多2048 | 输入经MTE搬入UB中转，双份tile缓冲区轮换，搬运与计算重叠              |
-| 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值以定长数组驻留寄存器；UB按bucket宽度padding |
+| 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值以定长数组驻留寄存器；UB按bucket宽度补齐 |
 
-其中线程块数量在Host侧根据数据量动态计算：先通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)` 查询硬件AIV核数，再取AIV核数与rows的较小值作为线程块数量。一个Warp处理一行：Case 0和Case 1中每个Thread Block实际启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行；Case 2中每个Thread Block按固定行数处理数据，rows较小时部分Thread Block无行可处理、直接退出。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
+其中线程块数量在Host侧根据数据量动态计算：先通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)` 查询硬件AIV核数，再取AIV核数与rows的较小值作为线程块数量。一个Warp处理一行：Case 0和Case 1中每个Thread Block实际启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行；Case 2的UB缓冲区为静态数组，维度由线程数与bucket容量共同决定，必须编译期确定，因此线程数只能取512/1024/2048固定档位、实际启动的线程数与档位一致，不能随rows任意变化，每个Thread Block按固定行数处理数据，rows较小时部分Thread Block无行可处理、直接退出。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
 
 ### 性能指标说明
 
@@ -140,7 +140,7 @@ Case 0的 `aiv_vec_ratio` 达到0.960，耗时集中在SIMT线程的GM读写和�
 
 **核心实现**：
 
-- 每个Thread Block按tile处理行数据。tile内的行数决定一次VF调用启动的Warp数量（一个Warp处理一行），该行数取以下三者中的最小值：本Thread Block分到的行数、UB容量内四份tile缓冲区可容纳的行数、单次VF调用线程数上限对应的64行。
+- 每个Thread Block按tile处理行数据。tile内的行数决定一次VF调用启动的Warp数量（一个Warp处理一行），该行数取以下三者中的最小值：本Thread Block分到的行数、UB容量内四份tile缓冲区可容纳的行数、一个Thread Block最多启动2048个线程（64个Warp）对应的64行。
 - kernel将动态UB划分为双份输入tile缓冲区与双份输出tile缓冲区，两组缓冲区随tile交替使用，各自的生命周期由独立的事件管理。
 - MTE2使用 `asc_copy_gm2ub_align` 二维搬运，按真实cols把GM每行搬入UB；MTE3按同样方式把结果搬回GM。
 - SIMT VF仍按一个Warp一行的方式在UB上完成max、exp/sum和归一化三轮循环。
@@ -207,7 +207,7 @@ Case 1的计算耗时主要集中在行内计算的组织方式上：行内计�
 
 ### Case 2：编译期bucket与动态线程选择
 
-**优化目标**：消除Case 1行内计算对输入行的重复读取和对 `exp` 的重复计算。第一步先引入静态数组，把整行元素从UB缓存下来，一次读入完成max、exp/sum和归一化；第二步再设法让数组驻留寄存器，进一步降低访存开销。为此将实现收敛为编译期bucket模板：按cols上界64/128/256/384/512生成特化kernel，使定长数组 `elements[kWarpIterations]` 驻留寄存器；Host侧按shape动态选择线程数。
+**优化目标**：消除Case 1行内计算对输入行的重复读取和对 `exp` 的重复计算。第一步先引入静态数组，把整行元素从UB缓存下来，一次读入完成max、exp/sum和归一化；第二步再设法让数组驻留寄存器，进一步降低访存开销。为此将实现收敛为编译期bucket：按cols上界64/128/256/384/512分成五档，每档生成定长特化kernel，使整行中间值驻留寄存器；Host侧按shape动态选择线程数。
 
 **核心实现**：
 
@@ -218,7 +218,7 @@ Case 1的计算耗时主要集中在行内计算的组织方式上：行内计�
 
 - 动态线程选择：Host按每核行数选择线程数，512/1024/2048线程对应每个tile最多处理16/32/64行；`cols > 256` 时考虑寄存器压力，最多启动1024个线程。
 
-SIMT VF将整行元素读入定长数组，在寄存器中完成全部计算：
+SIMT VF将线程分到的元素读入定长数组，在寄存器中完成全部计算：
 
 ```cpp
 template <uint32_t kThreadCount, uint32_t kBucketCols>
