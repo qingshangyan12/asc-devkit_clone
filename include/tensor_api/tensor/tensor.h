@@ -30,7 +30,13 @@ enum class cache_mode : uint8_t { normal = 0, disable = 4, last = 5, persistent 
 
 #include "tensor_api/tensor/layout_interface.h"
 #include "tensor_api/tensor/pointer.h"
-#include "impl/tensor_api/tensor/tuple_impl.h"
+#include "impl/tensor_api/tensor/tensor_tuple_impl.h"
+
+#if !defined(ASC_DEPRECATED)
+#define ASC_DEPRECATED(version, removal_date, replacement)                                                  \
+    [[deprecated("Deprecated since " #version ", Will be removed after " removal_date ", Use " #replacement \
+                 " instead.")]]
+#endif
 
 namespace asc {
 namespace te {
@@ -50,8 +56,8 @@ struct base_tensor {
 
     static constexpr int rank = LayoutT::rank_size;
 
-    __aicore__ inline base_tensor();
-    __aicore__ inline base_tensor(const EngineT& engine, const LayoutT& layout);
+    __aicore__ inline constexpr base_tensor();
+    __aicore__ inline constexpr base_tensor(const EngineT& engine, const LayoutT& layout);
 
     __aicore__ inline constexpr decltype(auto) tensor() const;
     __aicore__ inline constexpr decltype(auto) engine() const;
@@ -71,44 +77,55 @@ struct base_tensor {
     __aicore__ inline constexpr decltype(auto) operator[](const Coord& coord) const;
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord);
+    __aicore__ inline decltype(auto) operator()(const Coord& coord);
 
     template <typename Coord>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord& coord) const;
+    __aicore__ inline decltype(auto) operator()(const Coord& coord) const;
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
+    __aicore__ inline decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs);
 
     template <typename Coord0, typename Coord1, typename... Coords>
-    __aicore__ inline constexpr decltype(auto) operator()(
-        const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
+    __aicore__ inline decltype(auto) operator()(const Coord0& c0, const Coord1& c1, const Coords&... cs) const;
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info);
+    __aicore__ inline decltype(auto) slice(const Coord& coord, const Info& info);
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) slice(const Coord& coord, const Info& info) const;
+    __aicore__ inline decltype(auto) slice(const Coord& coord, const Info& info) const;
 
+    ASC_DEPRECATED(9.2.0, "2027/09/07", tensor)
     __aicore__ inline constexpr decltype(auto) Tensor() const;
+    ASC_DEPRECATED(9.2.0, "2027/09/07", engine)
     __aicore__ inline constexpr decltype(auto) Engine() const;
+    ASC_DEPRECATED(9.2.0, "2027/09/07", engine)
     __aicore__ inline constexpr decltype(auto) Engine();
+    ASC_DEPRECATED(9.2.0, "2027/09/07", layout)
     __aicore__ inline constexpr decltype(auto) Layout() const;
+    ASC_DEPRECATED(9.2.0, "2027/09/07", data)
     __aicore__ inline constexpr decltype(auto) Data() const;
+    ASC_DEPRECATED(9.2.0, "2027/09/07", data)
     __aicore__ inline constexpr decltype(auto) Data();
+    ASC_DEPRECATED(9.2.0, "2027/09/07", shape)
     __aicore__ inline constexpr decltype(auto) Shape() const;
+    ASC_DEPRECATED(9.2.0, "2027/09/07", stride)
     __aicore__ inline constexpr decltype(auto) Stride() const;
+    ASC_DEPRECATED(9.2.0, "2027/09/07", size)
     __aicore__ inline constexpr auto Size() const;
+    ASC_DEPRECATED(9.2.0, "2027/09/07", capacity)
     __aicore__ inline constexpr auto Capacity() const;
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info);
+    ASC_DEPRECATED(9.2.0, "2027/09/07", slice)
+    __aicore__ inline decltype(auto) Slice(const Coord& coord, const Info& info);
 
     template <typename Coord, typename Info>
-    __aicore__ inline constexpr decltype(auto) Slice(const Coord& coord, const Info& info) const;
+    ASC_DEPRECATED(9.2.0, "2027/09/07", slice)
+    __aicore__ inline decltype(auto) Slice(const Coord& coord, const Info& info) const;
 
 private:
     template <typename SliceEngine, typename SliceLayout>
-    __aicore__ inline static constexpr decltype(auto) make_sub_tensor(
+    __aicore__ inline static decltype(auto) make_sub_tensor(
         const SliceEngine& slice_engine, const SliceLayout& slice_layout);
 
     Std::tuple<layout_type, engine_type> rep;
@@ -120,9 +137,10 @@ struct global_tensor : public base_tensor<EngineT, LayoutT> {
     using layoutType = typename tensor_api_base::layout_type;
     using tensor_api_base::tensor_api_base;
 
-    __aicore__ inline global_tensor();
+    __aicore__ inline constexpr global_tensor();
     __aicore__ inline constexpr cache_mode get_cache_mode() const;
     __aicore__ inline constexpr void set_l2_cache_hint(cache_mode mode);
+    ASC_DEPRECATED(9.2.0, "2027/09/07", set_l2_cache_hint)
     __aicore__ inline constexpr void SetL2CacheHint(AscendC::Te::CacheMode mode);
 };
 
@@ -137,13 +155,13 @@ namespace asc {
 namespace te {
 
 template <typename Iterator, typename... Args>
-__aicore__ inline constexpr auto make_tensor(const Iterator& iter, const Args&... args);
+__aicore__ inline auto make_tensor(const Iterator& iter, const Args&... args);
 
 template <size_t... SqueezeDims, typename Input, typename Enable>
-__aicore__ inline constexpr auto squeeze(const Input& x);
+__aicore__ inline auto squeeze(const Input& x);
 
 template <typename Pattern, typename Input, typename Enable>
-__aicore__ inline constexpr auto squeeze(const Input& x, const Pattern& pattern);
+__aicore__ inline auto squeeze(const Input& x, const Pattern& pattern);
 
 } // namespace te
 } // namespace asc
