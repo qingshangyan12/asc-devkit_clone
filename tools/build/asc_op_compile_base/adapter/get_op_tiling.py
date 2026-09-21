@@ -595,6 +595,33 @@ def gen_all_dynamic_struct_def_except_self(is_optype_self, tiling_key, tiling_ke
     return codes
 
 
+def _gen_tiling_macros_default(class_body, tiling_struct, tiling_size, tiling_arr_data_str):
+    tiling_assign_str = f"    const uint8_t __ascendc_arr_##%s[{tiling_size}] = {{{tiling_arr_data_str}}};"
+    if global_var_storage.get_variable("ascendc_tiling_no_register"):
+        class_body += "#define GET_TILING_DATA(tiling_data, tiling_arg)                                         \n"
+    else:
+        class_body += "#define GET_TILING_DATA(tiling_data, tiling_arg)                                           \\\n"
+        class_body += (
+            f"    const uint8_t __ascendc_arr_##tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};   \\\n"
+        )
+        class_body += f"    static constexpr {tiling_struct} tiling_data = "
+        class_body += f"convert_from_bytes<{tiling_struct}>(__ascendc_arr_##tiling_data);\n\n"
+
+    class_body += "#define GET_TILING_DATA_WITH_STRUCT(tiling_struct, tiling_data, tiling_arg)                \\\n"
+    class_body += "    REGISTER_TILINGDATA_SIZE(tiling_struct, __COUNTER__);                                  \\\n"
+    class_body += f"    const uint8_t __ascendc_arr_##tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};    \\\n"
+    class_body += "    static constexpr tiling_struct tiling_data = "
+    class_body += "convert_from_bytes<tiling_struct>(__ascendc_arr_##tiling_data); \n\n"
+
+    class_body += "#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling)                            \\\n"
+    class_body += "    REGISTER_TILINGDATA_SIZE(tiling_type, __COUNTER__);                                  \\\n"
+    class_body += f"    const uint8_t __ascendc_arr_##var[{tiling_size}] = {{{tiling_arr_data_str}}}; \\\n"
+    class_body += "    static constexpr tiling_type __ascendc_point##var = "
+    class_body += "convert_from_bytes<tiling_type>(__ascendc_arr_##var);\\\n"
+    class_body += "    auto& var = __ascendc_point##var.member;\n\n"
+    return class_body, tiling_assign_str
+
+
 def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
     tiling_size = len(tiling_raw_data)
     tiling_format = {"tiling": [tiling_size, "uint8"]}
@@ -627,33 +654,9 @@ def gen_micro_assign_value_of_tiling(tiling_struct: str, tiling_raw_data: str):
         class_body += "    tiling_type __ascendc_point##var = convert_from_bytes<tiling_type>(__ascendc_arr_##var);\\\n"
         class_body += "    auto& var = __ascendc_point##var.member;\n\n"
     else:
-        tiling_assign_str = f"    const uint8_t __ascendc_arr_##%s[{tiling_size}] = {{{tiling_arr_data_str}}};"
-        if global_var_storage.get_variable("ascendc_tiling_no_register"):
-            class_body += "#define GET_TILING_DATA(tiling_data, tiling_arg)                                         \n"
-        else:
-            class_body += (
-                "#define GET_TILING_DATA(tiling_data, tiling_arg)                                           \\\n"
-            )
-            class_body += (
-                f"    const uint8_t __ascendc_arr_##tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};   \\\n"
-            )
-            class_body += f"    static constexpr {tiling_struct} tiling_data = "
-            class_body += f"convert_from_bytes<{tiling_struct}>(__ascendc_arr_##tiling_data);\n\n"
-
-        class_body += "#define GET_TILING_DATA_WITH_STRUCT(tiling_struct, tiling_data, tiling_arg)                \\\n"
-        class_body += "    REGISTER_TILINGDATA_SIZE(tiling_struct, __COUNTER__);                                  \\\n"
-        class_body += (
-            f"    const uint8_t __ascendc_arr_##tiling_data[{tiling_size}] = {{{tiling_arr_data_str}}};    \\\n"
+        class_body, tiling_assign_str = _gen_tiling_macros_default(
+            class_body, tiling_struct, tiling_size, tiling_arr_data_str
         )
-        class_body += "    static constexpr tiling_struct tiling_data = "
-        class_body += "convert_from_bytes<tiling_struct>(__ascendc_arr_##tiling_data); \n\n"
-
-        class_body += "#define GET_TILING_DATA_MEMBER(tiling_type, member, var, tiling)                            \\\n"
-        class_body += "    REGISTER_TILINGDATA_SIZE(tiling_type, __COUNTER__);                                  \\\n"
-        class_body += f"    const uint8_t __ascendc_arr_##var[{tiling_size}] = {{{tiling_arr_data_str}}}; \\\n"
-        class_body += "    static constexpr tiling_type __ascendc_point##var = "
-        class_body += "convert_from_bytes<tiling_type>(__ascendc_arr_##var);\\\n"
-        class_body += "    auto& var = __ascendc_point##var.member;\n\n"
     return class_body, tiling_assign_str
 
 
@@ -715,6 +718,30 @@ def gen_micro_assign_value_of_tiling_force_constexpr(tiling_struct: str):
     return class_body
 
 
+def _gen_static_main_class_body(class_body, class_name, field_list, struct_tiling_def_base):
+    class_body += f"class {class_name}\n"
+    class_body += "{\n"
+    class_body += "public:\n"
+    has_arr = False
+    for field in field_list:
+        if field.class_type == 0:
+            class_body += f"    static constexpr {field.dtype} {field.name} = __ascendc_tiling_aux.{field.name};\n"
+        elif field.class_type == 1:
+            has_arr = True
+            class_body += (
+                f"    static constexpr std::array<{field.dtype}, {field.arr_size}> {field.name} = "
+                f"__ascendc_tiling_aux.{field.name};\n"
+            )
+        elif field.class_type == 2:
+            has_arr |= is_struct_have_arr(struct_tiling_def_base[field.struct_type], has_arr, struct_tiling_def_base)
+            # if struct is from api, add a namespace
+            class_body += "static constexpr "
+            if struct_tiling_def_base[field.struct_type].is_api:
+                class_body += f"{_TILING_NAMESPACE}::"
+            class_body += f"{field.struct_type} {field.name} = __ascendc_tiling_aux.{field.name};\n"
+    return class_body, has_arr
+
+
 def gen_static_struct_body_v1_force_constexpr(class_name, field_list, tiling_raw_data, struct_tiling_def_base):
     tiling_size = len(tiling_raw_data)
     tiling_format = {"tiling": [tiling_size, "uint8"]}
@@ -754,26 +781,7 @@ def gen_static_struct_body_v1_force_constexpr(class_name, field_list, tiling_raw
     )
 
     # the only one top-level struct of static-shape one itself
-    class_body += f"class {class_name}\n"
-    class_body += "{\n"
-    class_body += "public:\n"
-    has_arr = False
-    for field in field_list:
-        if field.class_type == 0:
-            class_body += f"    static constexpr {field.dtype} {field.name} = __ascendc_tiling_aux.{field.name};\n"
-        elif field.class_type == 1:
-            has_arr = True
-            class_body += (
-                f"    static constexpr std::array<{field.dtype}, {field.arr_size}> {field.name} = "
-                f"__ascendc_tiling_aux.{field.name};\n"
-            )
-        elif field.class_type == 2:
-            has_arr |= is_struct_have_arr(struct_tiling_def_base[field.struct_type], has_arr, struct_tiling_def_base)
-            # if struct is from api, add a namespace
-            class_body += "static constexpr "
-            if struct_tiling_def_base[field.struct_type].is_api:
-                class_body += f"{_TILING_NAMESPACE}::"
-            class_body += f"{field.struct_type} {field.name} = __ascendc_tiling_aux.{field.name};\n"
+    class_body, has_arr = _gen_static_main_class_body(class_body, class_name, field_list, struct_tiling_def_base)
 
     class_body += "};\n\n"
     body = gen_micro_assign_value_of_tiling_force_constexpr(class_name)
