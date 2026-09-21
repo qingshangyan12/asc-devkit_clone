@@ -145,14 +145,13 @@ ResolveStatus ResolveExternalAlg(
         return ResolveStatus::RESOLVED;
     }
 
-    // 报错三要素：外部名原文 / 候选列表 / 失败原因
+    // 报错三要素随 errMsg 返回，由调用方按链语义打日志（AICPU 链 WARNING+回退，闸门 B 自行拒绝）
     const std::string reason =
         candidates.empty() ?
             "(no candidate registered in this build for engine " + std::string(EngineName(opParam.engine)) + ")" :
             "(all candidates rejected by rules for engine " + std::string(EngineName(opParam.engine)) + ")";
     errMsg = "resolve failed, ext=\"" + key + "\" op=" + std::to_string(static_cast<u32>(opParam.opType)) +
              ", candidates=[" + DescribeCandidates(candidates) + "] " + reason;
-    HCCL_ERROR("[MC2_EXT_ALG] ERROR: %s", errMsg.c_str());
     return ResolveStatus::ERROR_INVALID;
 }
 } // namespace mc2_ops_hccl
