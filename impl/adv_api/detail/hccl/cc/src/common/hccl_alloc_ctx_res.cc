@@ -695,7 +695,8 @@ ForcedAlgKind ClassifyForcedAlg(
     const ForcedAlgKind kind = ClassifyForcedAlgConfig(algConfig, algName, extSpec, extParseErrMsg);
     if (kind == ForcedAlgKind::LEGACY) {
         HCCL_INFO(
-            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str()); // 需求前日志，逐字保留
+            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.",
+            algConfig.c_str()); // 老路径日志，文本保持原样
     }
     return kind;
 }
@@ -711,7 +712,8 @@ bool GetForcedAlgName(
     std::string algConfig(ccTiling->algConfig);
     if (algConfig.find('=') != std::string::npos) {
         HCCL_INFO(
-            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str()); // 需求前日志，逐字保留
+            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.",
+            algConfig.c_str()); // 老路径日志，文本保持原样
         return false;
     }
     if (algConfig.find('[') == std::string::npos) {
@@ -991,8 +993,7 @@ HcclResult GetOpParam(
     void* resCtxSequence = nullptr;
     HcclResult resRet = GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence);
     if (resRet != HCCL_SUCCESS && forcedAlgAccepted && resCtxSequence == nullptr) {
-        // 强制算法资源失败回退默认 selector（裸名/外部名同策略，D7）；
-        // 外部名的 algConfig→algName 映射见定名时的 [MC2_EXT_ALG] accepted 日志
+        // 外部名场景 algConfig→algName 对应关系见定名时的 [MC2_EXT_ALG] accepted 日志
         HCCL_WARNING(
             "[MC2_FORCE_ALG] fallback to default selector after resource failure, algName[%s], ret[%d].",
             algName.c_str(), static_cast<int>(resRet));
@@ -1058,10 +1059,8 @@ HcclResult FillCcuAlgTypeAndName(
     return HCCL_SUCCESS;
 }
 
-// 选择CCU算法并回填algorithmType与opParam.algName。
-// onlyCheck为true时（校验路径）：强制算法 + 预检失败回退默认selector（探测与正式选名一致）；
-// 分配路径（需求前 if/else 形状回归）：定名成功直接 PrepareEngineForAlg（裸名/外部名同路，无预检，
-// topo 已在 GetForcedAlgName 内备好），无强制 / 外部名坏（WARNING 已打，D7）走默认 selector。
+// 选择CCU算法并回填 algorithmType 与 opParam.algName。
+// onlyCheck=true 为探测路径：与正式选名同一逻辑，强制算法失败同样回退默认 selector。
 HcclResult SelectCcuAlgorithm(
     HcclComm comm, void* stream, const std::string& topoTag, const Mc2CcTilingInner* ccTiling, uint32_t tilingIndex,
     OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo,

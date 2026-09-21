@@ -16,14 +16,13 @@
 
 namespace mc2_ops_hccl {
 
-// 外部算法名文法（词表权威源 growthring/notes/meetings/algname.md 第 1/7 章）:
+// 外部算法名文法:
 //   external := executor '[' layer (',' layer)* ']' ('[order.strong]')?
 //   executor := sole | sequence | parallel | concur | pipeline
 //   layer    := atom ('.' attr)*
 //   atom     := mesh | nhr
 //   attr     := chunk | one_shot | two_shot | multi_channel | single_channel
-//   （multi_channel：原始需求文档曾误写 muti_channel，2026-09-20 纠正——hccl/devkit
-//    内部注册名（MultiJetty/MultiLink）从来都是正确拼写，勘误记录见设计文档 §6）
+//   （multi_channel：原始需求文档误写为 muti_channel；hccl/devkit 注册名从来都是 Multi 拼写）
 // 约束:
 //   - 空格/制表符全部忽略
 //   - 层数 1~3（系统最大 3 层物理拓扑，超过即语法错）
@@ -70,7 +69,7 @@ struct ExternalAlgSpec {
     }
 };
 
-// tiling algConfig 四态识别（纯函数，改造点①的底座；tiling 闸门 A 与 mc2 侧共用）:
+// tiling algConfig 四态识别（纯函数；tiling 侧与 mc2 侧共用）:
 //   空串 -> NONE
 //   含 '=' -> LEGACY（HCCL_ALGO 老语法，保持现状拒绝语义，由调用方走默认 selector）
 //   含 '[' -> EXTERNAL（解析成功: spec 有效/errMsg 空; 解析失败: errMsg 给出词法错误；ParseExternalAlg 失败时
@@ -208,7 +207,7 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
     return true;
 }
 
-// 四态分类（供改造点①与闸门 A/B 复用；语义见 ForcedAlgKind 注释）
+// 四态分类（语义见 ForcedAlgKind 注释）
 inline ForcedAlgKind ClassifyForcedAlgConfig(
     const std::string& algConfig, std::string& bareName, ExternalAlgSpec& spec, std::string& errMsg)
 {

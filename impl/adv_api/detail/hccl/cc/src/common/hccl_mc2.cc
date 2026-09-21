@@ -391,7 +391,7 @@ bool HcclIsCcuAlgorithmRegistered(uint32_t opType, const char* algName)
 }
 
 namespace {
-// 全部 CCU 候选都须过双名单：漏斗（闸门 C）可能选中任何一个，校验范围必须覆盖选择范围
+// 全部 CCU 候选都须过双名单：定名时 ResolveExternalAlg 按引擎/条件/机型筛选，任何一个都可能被选中
 bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
 {
     std::string algName;

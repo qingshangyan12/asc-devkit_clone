@@ -44,13 +44,9 @@ static const std::set<std::string> REGISTERED_CCU_ALGORITHMS = {
     "CcuSchedAllToAllSoleMeshConcurrent",
     "CcuSchedReduceScatterConcurMeshNHRMultiLink"};
 
-// 闸门 A（设计 §11，2026-09-20 简化为纯语法开关）:
-// ① commEngine ∈ {5,6}（CCU 系）前置
-// ② algConfig 裸名且在 REGISTERED_CCU_ALGORITHMS 白名单 → true（现状）
-// ③ 含 '[' 即外部名 → true——不再预判有无 CCU 候选：精确判断在闸门 B
-//    （CheckCcuAlgorithmsRegistered，排在 version 校验之前），候选为空/语法错由闸门 B
-//    三要素报错，信息比 version 校验更详细。AICPU 外部名由 ① 挡住不设 101
-//    （version=101 消费点仅在 CCU 链）。
+// 外部名（含 '['）在此宽松放行：精确判断在 mc2 侧 CheckCcuAlgorithmsRegistered
+// （排在 version 校验之前），语法错/无候选由其三要素报错，信息更详细。
+// commEngine 非 CCU 系直接 false——version=101 仅 CCU 链消费。
 bool IsCcuAlgorithmRegistered(const std::string& algConfig, uint8_t commEngine)
 {
     if (commEngine != 5U && commEngine != 6U) {

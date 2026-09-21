@@ -276,23 +276,22 @@ TEST_F(TestHcclTilingCcuKfc, ReduceScatterSoleNhrMultiLinkCcuSchedUsesCcuNewVers
         INIT_TILING_CCU_NEW_VERSION);
 }
 
-// 闸门 A 三段判定③: 外部名 (opType, canonical) 命中镜像对表 → CCU 新版本
+// 外部名 + CCU 引擎 → CCU 新版本
 TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameCcuCandidateUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "sole[mesh]", 6U, INIT_TILING_CCU_NEW_VERSION);
 }
 
-// 闸门 A ③（2026-09-20 简化为纯语法开关）: 外部名 + CCU 引擎即设 101——
-// 不再预判有无 CCU 候选（含 AICPU-only 外部名/opType 维度），精确判断在闸门 B
-// （三要素报错）。此用例钉住宽松放行行为：AICPU-only 外部名同样设 101。
+// 外部名 + CCU 引擎即设 101：tiling 侧不预判有无 CCU 候选，精确判断在
+// mc2 侧 CheckCcuAlgorithmsRegistered（三要素报错）。此用例钉住 AICPU-only 外部名同样设 101。
 TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameAicpuOnlyAlsoUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(
         static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER), "pipeline[mesh,nhr]", 6U, INIT_TILING_CCU_NEW_VERSION);
 }
 
-// 语法错的外部名 + CCU 引擎：同样设 101（真报错在闸门 B，带具体词法错误）
+// 语法错的外部名 + CCU 引擎：同样设 101（真报错在 mc2 侧，带具体词法错误）
 TEST_F(TestHcclTilingCcuKfc, ExternalAlgNameBadSyntaxStillUsesCcuNewVersion)
 {
     ExpectInitTilingVersion(

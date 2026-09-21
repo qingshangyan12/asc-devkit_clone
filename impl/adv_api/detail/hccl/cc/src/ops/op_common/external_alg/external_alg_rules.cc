@@ -25,10 +25,9 @@ constexpr u64 RS_2P_DETOUR_DATA_SIZE = 4ULL * 1024 * 1024;                 // 4M
 constexpr u64 RS_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD = 1536ULL * 1024 * 1024; // 1536MB
 } // namespace
 
-// A1 蓝本（hccl 对齐，用户拍板）:
+// A1 蓝本（hccl 对齐）:
 //   hccl reduce_scatter_auto_selector.cc:483-485（SelectMeshAlgoAicpuForMesh1D）
 //   hccl all_gather_auto_selector.cc:360-362（SelectMeshAlgoAicpu）
-//   growthring/notes/meetings/algname.md §1.6
 // AG 两层阈值是 1GB（AG_AICPU_1D_TWO_LEVEL_DATA_SIZE_THRESHOLD）与 RS 1536MB 不同；
 // COND_Z_AXIS 仅 RS 候选消费，统一取 RS 阈值。devkit RS:343-345 现状缺 2P 分支，按 hccl 补全。
 bool CondZAxis(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)

@@ -191,7 +191,7 @@ HcclResult CheckForcedAlgResource(
     HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
 
 // algConfig 四态识别（NONE/LEGACY/EXTERNAL/BARE_NAME；EXTERNAL 解析失败时 spec 复位无效、extParseErrMsg
-// 非空）。仅闸门 B（hccl_mc2.cc）使用；定名请走 GetForcedAlgName。
+// 非空）。仅供 hccl_mc2.cc 候选存在性检查；定名请走 GetForcedAlgName。
 ForcedAlgKind ClassifyForcedAlg(
     const Mc2CcTilingInner* ccTiling, std::string& algName, ExternalAlgSpec& extSpec, std::string& extParseErrMsg);
 

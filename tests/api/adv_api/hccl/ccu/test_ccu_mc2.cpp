@@ -43,20 +43,18 @@ extern bool g_stubHcommCcuKernelLaunchFail;
 extern uint32_t g_stubHcommCcuKernelLaunchCallCount;
 } // namespace mc2_ops_hccl
 
-// 夹具：ccu_mc2 目标不编 executor 文件，且 -DAICPU_COMPILE 使产品侧 CCU sidecar 注册行
-// （ins_v2_all_gather_sole_executor.cc 的 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU 块）
-// 无法生效，AlgMetaRegistry 无 (ALLGATHER, sole[mesh]) 的 CCU 行，resolver 无候选。
-// 按产品现场同款注册，供 EXTERNAL 用例使用：CCU 行服务闸门 C 成功链路；
-// AICPU 行服务 GetOpParam（AICPU 链）的外部名定名与资源回退用例。
+// 夹具：本目标不编 executor 文件（-DAICPU_COMPILE 裁掉产品 CCU sidecar 注册行），
+// 按产品现场同款注册供 EXTERNAL 用例使用：CCU 行服务定名成功链路；
+// AICPU 行服务 GetOpParam 的外部名定名与资源回退用例。
 namespace mc2_ops_hccl {
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
-// D8 漂移探针夹具：(AR, sole[mesh]) 键注入一好一坏两个 CCU 候选——
+// 漂移探针夹具：(AR, sole[mesh]) 键注入一好一坏两个 CCU 候选——
 // CcuSchedAllReduceSoleMesh（algorithmMap 真身 + V2 stub 恒真 → 双名单过）+
 // UtDriftProbeCcuFake（不在 algorithmMap → 双名单不过，模拟 sidecar 与 build 漂移）。
-// 闸门 B 全量校验（校验范围须覆盖闸门 C 漏斗的选择范围）下该键整体拒绝；
+// CheckCcuAlgorithmsRegistered 校验全部候选，该键整体拒绝；
 // GateBRejectsDriftedExternalCandidate 用例钉住此行为。无其它用例使用 (AR, sole[mesh]) 键。
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, CcuSchedAllReduceSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
@@ -64,7 +62,7 @@ REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLREDUCE, UtDriftProbeCcuFake, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 } // namespace mc2_ops_hccl
 
-// hccl_mc2.cc 闸门 B 入口（非 static 自由函数，符号可见；须在全局作用域声明）
+// hccl_mc2.cc 的 CheckCcuAlgorithmsRegistered（非 static 自由函数，须在全局作用域声明）
 bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum);
 
 namespace {
@@ -293,8 +291,8 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_AllGather)
     EXPECT_EQ(resCtx.algorithmType[0], static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleMesh));
 }
 
-// EXTERNAL 通道端到端（闸门 C 成功链路）：合法外部名经 tiling algConfig 进入，
-// resolver 定名 CcuSchedAllGatherSoleMesh，algorithmType 回填正确（KFC 衔接证明）
+// EXTERNAL 通道端到端：合法外部名经 tiling algConfig 进入，resolver 定名
+// CcuSchedAllGatherSoleMesh，algorithmType 回填正确
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ExternalNameAccepted)
 {
     SetCommEngineEnv(COMM_ENGINE_CCU);
@@ -664,8 +662,6 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_ReduceScatterCcuPath)
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1D));
 }
 
-// algConfig为合法强制算法名时：先尝试强制算法（注册/层级/资源计算校验），
-// 强制算法不可用或校验失败则回退到默认selector，由调用方重新选择算法得到algName。
 TEST_F(CcuMc2TestSuite, CcuSelectAlg_ForcedAlgFallbackToSelector)
 {
     SetCommEngineEnv(COMM_ENGINE_CCU);
@@ -676,10 +672,8 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ForcedAlgFallbackToSelector)
     ccTiling.srcDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.dstDataType = HCCL_DATA_TYPE_FP16;
     ccTiling.reduceType = HCCL_REDUCE_SUM;
-    // 合法强制算法名（已注册且可校验通过）
     strcpy(ccTiling.algConfig, "CcuAllGatherMesh1DMem2Mem");
 
-    // 场景1：强制算法执行器不可用 → CheckForcedAlgResource校验失败 → 回退到默认selector
     mc2_ops_hccl::g_stubCcuAlgExecNull = true;
     OpParam opParam{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "allgather_tag", &ccTiling, opParam), HCCL_SUCCESS);
@@ -687,12 +681,10 @@ TEST_F(CcuMc2TestSuite, CcuSelectAlg_ForcedAlgFallbackToSelector)
     auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     bool forcedAlgAccepted = true;
     HcclResult ret = TryForcedAlgAndPrepareEngine(comm_, &ccTiling, opParam, algName, topoInfo, forcedAlgAccepted);
-    // 强制算法失败后回退，不向上报错，由调用方走默认selector重新选择
     EXPECT_EQ(ret, HCCL_SUCCESS);
     EXPECT_FALSE(forcedAlgAccepted);
     EXPECT_TRUE(algName.empty());
 
-    // 场景2：强制算法可用 → 接受强制算法
     mc2_ops_hccl::g_stubCcuAlgExecNull = false;
     OpParam opParam2{};
     ASSERT_EQ(InitOpParamByTiling(comm_, stream_, "allgather_tag", &ccTiling, opParam2), HCCL_SUCCESS);
@@ -774,7 +766,7 @@ TEST_F(CcuMc2TestSuite, AutomaticAndLegacyConfigSkipForcedBridgePrecheck)
     }
 }
 
-// EXTERNAL 坏配置（D7：与裸名未注册同链同终态，设计 §10）：WARNING + false → 调用方走默认 selector
+// EXTERNAL 坏配置：与裸名未注册同路——WARNING + false，调用方走默认 selector
 TEST_F(CcuMc2TestSuite, TryForcedAlgExternalParseFailFallsBackToSelector)
 {
     // 语法错：不报错中止，回退 selector
@@ -807,16 +799,14 @@ TEST_F(CcuMc2TestSuite, TryForcedAlgExternalResolveFailFallsBackToSelector)
     EXPECT_EQ(TryForcedAlgAndPrepareEngine(comm_, &tiling, opParam, algName, topoInfo, accepted), HCCL_SUCCESS);
     EXPECT_FALSE(accepted);
     EXPECT_TRUE(algName.empty());
-    // resolve 失败后 opParam 复位到入口现场：hcclComm 入口为 nullptr，PrepareTopoInfoForOp
-    // 会改写为 comm，复位断言钉住 GetForcedAlgName 内 opParam = opParamBackup 真正生效
-    // （engine 全程未变，弱断言仅留作旁证）
+    // hcclComm 入口为 nullptr 而 PrepareTopoInfoForOp 会改写为 comm，
+    // 此断言钉住失败路径 opParam 复位真正生效
     EXPECT_EQ(opParam.hcclComm, nullptr);
     EXPECT_EQ(opParam.engine, CommEngine::COMM_ENGINE_AICPU_TS);
 }
 
-// D8 全量校验：(AR, sole[mesh]) 候选集 = 真身（双名单过）+ 漂移探针（未注册）→ 整体拒绝。
-// 旧">=1 即放行"语义下真身命中会放行——本用例区分新旧语义：
-// 闸门 C 漏斗可能选中候选集中的任何一个，校验范围必须覆盖选择范围（闭环"B查X/C选Y"缺口）。
+// (AR, sole[mesh]) 候选集含未注册的漂移探针 → 整体拒绝：
+// 漏斗可能选中其中任何一个，校验必须覆盖全部候选而非找到一个过就放行
 TEST_F(CcuMc2TestSuite, GateBRejectsDriftedExternalCandidate)
 {
     Mc2CcTilingInner tiling{};
@@ -827,10 +817,8 @@ TEST_F(CcuMc2TestSuite, GateBRejectsDriftedExternalCandidate)
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(ccTilingList, 1U));
 }
 
-// EXTERNAL 资源失败回退（2026-09-19 决策：与裸名既有两级回退行为统一）：
-// 外部名定名成功 → GetOpParamResCtx 资源失败（按名桩限定定名算法）→
-// 回退默认 selector 重选（stub 指定回退算法）→ 二次资源申请成功 → GetOpParam 整体 SUCCESS。
-// 对应 GetOpParam 回退分支的 [MC2_EXT_ALG] fallback WARNING（三要素：外部名/定名/原因）。
+// EXTERNAL 资源失败回退（与裸名同路）：定名成功 → 资源失败（按名桩限定）→
+// 回退默认 selector 重选 → 二次资源申请成功 → GetOpParam 整体 SUCCESS
 TEST_F(CcuMc2TestSuite, GetOpParam_ExternalNameResourceFallbackToSelector)
 {
     Mc2CcTilingInner tiling{};
@@ -1020,17 +1008,12 @@ TEST_F(CcuMc2TestSuite, GetCcuOpParamResCtx_AllGatherMesh1D_KfcServerArgs)
     ASSERT_EQ(resourceCtx.kfcServerArgs.size(), 6U);
     EXPECT_EQ(resourceCtx.kfcServerArgSize, 6U);
 
-    // xnAddr
     EXPECT_EQ(resourceCtx.kfcServerArgs[0], opResCtx.xnAddr);
-    // ckeAddr
     EXPECT_EQ(resourceCtx.kfcServerArgs[1], opResCtx.ckeAddr);
-    // dieNum = 1
     EXPECT_EQ(resourceCtx.kfcServerArgs[2], 1U);
-    // missionNum = 1
     EXPECT_EQ(resourceCtx.kfcServerArgs[3], 1U);
-    // missionIndex = 0
     EXPECT_EQ(resourceCtx.kfcServerArgs[4], 0U);
-    // token (由GetTokenFromBuffInfo获取，stub返回基于CCL buffer地址的非零值)
+    // token: stub 的 GetTokenFromBuffInfo 返回 CCL buffer 地址 + 偏移
     uint64_t expectedToken = cclBufferAddr + 0x1234;
     EXPECT_EQ(resourceCtx.kfcServerArgs[5], expectedToken);
 }

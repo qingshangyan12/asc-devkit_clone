@@ -32,9 +32,7 @@ Mc2CcTilingInner MakeTiling(const char* algConfig, uint32_t opType = 6U /*ALLGAT
 }
 } // namespace
 
-// 设计不变量 1（spec §14/§21.1）：CCU 候选 ⊆ algorithmMap（三名单一致性：
-// sidecar 注册表 / tiling 白名单 / algorithmMap——前两者由 GateA 镜像断言与
-// tiling 行为用例分别守护，此处锚定第三份名单）
+// CCU 候选 ⊆ algorithmMap（三名单一致性：sidecar 注册表 / tiling 白名单 / algorithmMap）
 TEST(ExtAlgFull, CcuCandidatesAreInAlgorithmMap)
 {
     for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
@@ -46,7 +44,7 @@ TEST(ExtAlgFull, CcuCandidatesAreInAlgorithmMap)
     }
 }
 
-// 改造点①: 四态识别（P4 兼容性: NONE/LEGACY/BARE_NAME 行为与旧两态强制名接口逐字节等价）
+// 四态识别：NONE/LEGACY/BARE_NAME 行为与旧两态强制名接口等价
 TEST(ExtAlgForced, FourStateClassification)
 {
     std::string algName;
@@ -83,7 +81,7 @@ TEST(ExtAlgForced, FourStateClassification)
 // hccl_mc2.cc 内部自由函数，专属目标已编入该翻译单元，符号可见
 bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum);
 
-// 闸门 B: 外部名按 CCU 候选子集过双名单；AICPU-only 外部名被拒
+// CheckCcuAlgorithmsRegistered：外部名须有 CCU 候选且全部过双名单；AICPU-only 外部名被拒
 TEST(ExtAlgGateB, ExternalNameGate)
 {
     // sole[mesh] AG 有 CCU 候选 CcuSchedAllGatherSoleMesh（algorithmMap + V2 注册表均在）→ 过
@@ -113,14 +111,9 @@ TEST(ExtAlgGateB, ExternalNameGate)
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(legacyList, 1U));
 }
 
-// （2026-09-20 变体2）闸门 A 简化为纯语法开关后，镜像对表已删除——本用例随之退役。
-// CCU 候选存在性的精确判断由闸门 B 用 sidecar 真身数据完成（ExtAlgGateB/ExtAlgFailure 覆盖）。
-
-// 失败路径三要素（设计 §10/§12）：报错必须含 algConfig 原文/候选或定名/原因。
-// 闸门 B 行为层：语法错 / AICPU-only 候选 → 拒；errMsg 内容层：外部名原文必在。
+// 失败路径三要素：报错必须含 algConfig 原文/候选或定名/原因（语法错与无候选/规则全灭分叉）。
 TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
 {
-    // 闸门 B 行为断言
     Mc2CcTilingInner rsMeshChunk = MakeTiling("sole[mesh.chunk]", 7U); // RS: AICPU-only 候选
     const void* badList[] = {&rsMeshChunk};
     EXPECT_FALSE(CheckCcuAlgorithmsRegistered(badList, 1U));
@@ -151,8 +144,7 @@ TEST(ExtAlgFailure, ErrorMessagesCarryThreeElements)
     EXPECT_EQ(ResolveExternalAlg(op, &flat, okSpec, resolvedName, errMsg), ResolveStatus::ERROR_INVALID);
     EXPECT_NE(errMsg.find("all candidates rejected by rules"), std::string::npos); // 全灭分叉文案
 
-    // [order.strong] 收编进 canonical 主键：devkit 无保序注册行，带后缀输入查表无候选
-    // （ERROR_INVALID 而非静默忽略；hccl 平移注册保序行后即命中，零机制改动）
+    // [order.strong] 在 canonical 主键内：devkit 无保序注册行，带后缀输入查表无候选（而非静默忽略）
     ExternalAlgSpec strongSpec;
     ASSERT_TRUE(ParseExternalAlg("sole[mesh] [order.strong]", strongSpec, parseErr));
     EXPECT_EQ(strongSpec.canonical(), "sole[mesh][order.strong]");

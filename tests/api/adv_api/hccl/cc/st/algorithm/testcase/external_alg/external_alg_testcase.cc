@@ -85,7 +85,7 @@ TEST(ExtAlgParser, OrderStrongIsPartOfCanonical)
     std::string errMsg;
     ASSERT_TRUE(ParseExternalAlg("sole[mesh] [order.strong]", spec, errMsg));
     EXPECT_TRUE(spec.orderStrong);
-    EXPECT_EQ(spec.canonical(), "sole[mesh][order.strong]"); // 后缀是主键身份的一部分
+    EXPECT_EQ(spec.canonical(), "sole[mesh][order.strong]");
 }
 
 TEST(ExtAlgParser, IllegalNamesAreRejectedWithReason)
@@ -99,7 +99,7 @@ TEST(ExtAlgParser, IllegalNamesAreRejectedWithReason)
         {"ring[mesh]", "executor"},
         {"sole[ring]", "atom"},
         {"sole[mesh.bigstep]", "attribute"},
-        {"sole[mesh.muti_channel]", "attribute"}, // 旧拼写（需求文档笔误，2026-09-20 已纠正为 multi_channel）
+        {"sole[mesh.muti_channel]", "attribute"}, // 需求文档笔误的旧拼写
         {"sole[mesh", "missing"},
         {"sole[]", "layer"},
         {"sole[mesh,]", "layer"},
@@ -161,7 +161,7 @@ TEST(ExtAlgV2Registry, EnumerateRegisteredTags)
 
 TEST(ExtAlgMetaRegistry, RegisterAndQuery)
 {
-    // 用本目标已注册的 sidecar 行验证（Task 4 之前表为空则此用例先红）
+    // 用本目标已注册的 sidecar 行验证
     const AlgMeta* meta =
         AlgMetaRegistry::Instance().Get(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterMesh1D");
     ASSERT_NE(meta, nullptr);
@@ -176,7 +176,7 @@ const HcclCMDType COLL_CMDS[] = {
 };
 } // namespace
 
-// 设计不变量 1（spec §14）：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
+// 设计不变量 1：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
 // （15 个 executor 文件，-DMC2_CLIENT_ENABLE_CCU=1 且无 AICPU_COMPILE 守卫裁剪），可见全部
 // 46 行 sidecar——按 cmd 分布：AG 12 / RS 16 / AR 8 / A2A 7 / A2AV 3。
 TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
@@ -318,7 +318,7 @@ OpParam MakeOpParam(
 
 TEST(ExtAlgRules, CondZAxisAlignsWithHccl)
 {
-    // hccl RS selector:483-485 / AG selector:338 / algname.md §1.6:
+    // hccl RS selector:483-485 / AG selector:338:
     // IsTwoLevelNetLayer && (2P 且 dataSize>=4MB ∥ dataSize*rankSize>1536MB)
     // dataSize = count × dtypeSize（hccl RS:508 同款公式），FP32 为 4B/元素
     TopoInfoWithNetLayerDetails twoLevel = MakeTwoLevelNetLayerTopo();
@@ -376,7 +376,6 @@ TEST(ExtAlgRules, MachineFlagsAreMutuallyExclusive)
 
     EXPECT_TRUE(FlagMultiLevel(&multi));
     EXPECT_FALSE(FlagUbx(&multi));
-    // multi 的 level0Topo=MESH_1D != MESH_1D_CLOS，按 FlagFlat1D 谓词语义应为 true
     EXPECT_TRUE(FlagFlat1D(&multi));
 }
 
@@ -409,9 +408,8 @@ OpParam MakeResolveParam(HcclCMDType cmd, CommEngine engine)
 }
 } // namespace
 
-// golden：36 个非空 (引擎xopx外部名) 组合的定名全覆盖（专属目标全量编译 46 行 sidecar，
-// 无 AIC 目标截断问题——全表照跑）。期望值与注册现场 sidecar 表逐行核对：
-// AG 12 / RS 16 / AR 8 / A2A 7 / A2AV 3 行（grep REGISTER_ALG_META 可现场复核）。
+// golden：36 个 (引擎×op×外部名) 组合的定名全覆盖，期望值与注册现场 sidecar 表逐行核对
+// （grep REGISTER_ALG_META 可复核）
 TEST(ExtAlgResolver, GoldenAllEngines)
 {
     struct Case {
@@ -667,7 +665,7 @@ REGISTER_ALG_META(
 
 // 三键排序语义（specificity 降序 > priority 降序 > name 字典序）——纯函数构建器直接验证，
 // 测试内构造行（KFC cmd）+ 逆序传入（同时验证顺序无关性）。
-// 当前产品 46 行全 0（本用例回归意义：全 0 下三键退化双键，见 SpecificityOrdering/Determinism）。
+// 产品行 priority 全 0 时三键退化为双键，此用例钉住非 0 语义
 TEST(ExtAlgResolver, PriorityOrdering)
 {
     // 宏注册行可查且 priority 落库
@@ -704,7 +702,7 @@ TEST(ExtAlgResolver, PriorityOrdering)
     EXPECT_EQ(cands[4].registeredName, "TestBareName");
 }
 
-// 评审备忘闭环：extern 表转发初始化器的运行时绑定断言
+// extern 表转发初始化器的运行时绑定断言
 TEST(ExtAlgResolver, RuleTableBinding)
 {
     EXPECT_EQ(VARIANT_COND_TABLE[COND_Z_AXIS], &CondZAxis);
