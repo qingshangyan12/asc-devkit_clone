@@ -22,6 +22,7 @@
 
 #include "tensor_api/utils/utils.h"
 #include "impl/tensor_api/experimental/arch/vector/type_get.h"
+#include "tensor_api/experimental/arch/vector/complex_types.h"
 
 namespace asc {
 namespace te {
@@ -61,6 +62,65 @@ struct reg_tensor {
     /** @brief Predicate selecting the active register lanes. */
     vector_bool mask;
 };
+
+/**
+ * @brief Specialize @c reg_tensor for complex tags: separate real/imag vector regs.
+ * @note Soft-emulated; chip has no complex ISA. @c TAG is @c complex_half / @c complex_float.
+ */
+#define DEFINE_REG_TENSOR_COMPLEX(TAG, VEC_TYPE, ELEM_TYPE)                                         \
+    template <>                                                                                     \
+    struct reg_tensor<TAG> {                                                                        \
+        using elem_type = TAG;                                                                      \
+        using real_elem_type = ELEM_TYPE;                                                           \
+        using reg_type = VEC_TYPE;                                                                  \
+                                                                                                    \
+        __simd_callee__ reg_tensor() = default;                                                     \
+                                                                                                    \
+        __simd_callee__ reg_tensor(const vector_bool& maskValue) : mask(maskValue) {}               \
+                                                                                                    \
+        __simd_callee__ reg_tensor(VEC_TYPE real, VEC_TYPE imag, const vector_bool& maskValue = {})  \
+            : real_(real), imag_(imag), mask(maskValue)                                             \
+        {}                                                                                          \
+                                                                                                    \
+        __simd_callee__ reg_tensor(                                                                 \
+            const reg_tensor<ELEM_TYPE>& real, const reg_tensor<ELEM_TYPE>& imag)                   \
+            : real_(real.reg), imag_(imag.reg), mask(real.mask)                                     \
+        {}                                                                                          \
+                                                                                                    \
+        __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg);               \
+                                                                                                    \
+        __simd_callee__ inline reg_tensor<ELEM_TYPE> real() const                                   \
+        {                                                                                           \
+            reg_tensor<ELEM_TYPE> out;                                                              \
+            out.reg = real_;                                                                        \
+            out.mask = mask;                                                                        \
+            return out;                                                                             \
+        }                                                                                           \
+                                                                                                    \
+        __simd_callee__ inline reg_tensor<ELEM_TYPE> imag() const                                   \
+        {                                                                                           \
+            reg_tensor<ELEM_TYPE> out;                                                              \
+            out.reg = imag_;                                                                        \
+            out.mask = mask;                                                                        \
+            return out;                                                                             \
+        }                                                                                           \
+                                                                                                    \
+        VEC_TYPE real_;                                                                             \
+        VEC_TYPE imag_;                                                                             \
+        vector_bool mask;                                                                           \
+    }
+
+DEFINE_REG_TENSOR_COMPLEX(complex_half, vector_half, half);
+DEFINE_REG_TENSOR_COMPLEX(complex_float, vector_float, float);
+
+#undef DEFINE_REG_TENSOR_COMPLEX
+
+/**
+ * @brief Alias: @c complex<half> / @c complex<float> → specialized reg_tensor.
+ * @tparam T @c half or @c float.
+ */
+template <typename T>
+using complex = reg_tensor<typename complex_map<T>::type>;
 
 /**
  * @brief Indicates whether a type is a reg_tensor specialization.

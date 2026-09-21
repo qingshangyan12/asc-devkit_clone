@@ -58,6 +58,15 @@ struct unalign_load {
     template <typename Tensor>
     __simd_callee__ inline auto load(const Tensor& src_tile);
 
+    /**
+     * @brief Unaligned complex load: two unalign beats + software deinterleave.
+     * @tparam Tensor UB tensor with @c half or @c float element type (interleaved complex).
+     * @return @c complex<half> or @c complex<float>.
+     * @note Corresponds to basic_api continuous LoadUnAlign for complex32/64 (RegTraitNumTwo).
+     */
+    template <typename Tensor>
+    __simd_callee__ inline auto load_complex(const Tensor& src_tile);
+
 private:
     vector_load_unalign ureg_;
 };
@@ -81,6 +90,12 @@ struct unalign_store {
     __simd_callee__ inline void store(Tensor& dst_tile, const reg_tensor<DataType>& reg);
 
     /**
+     * @brief Unaligned complex store: software interleave + two unalign stores.
+     */
+    template <typename Tensor, typename Elem>
+    __simd_callee__ inline void store_complex(Tensor& dst_tile, const complex<Elem>& reg);
+
+    /**
      * @brief Commits the session (hardware post) with segment start base + accumulated count.
      * @param dst_base Start address of the first store in this segment.
      */
@@ -89,6 +104,7 @@ struct unalign_store {
 
 private:
     vector_store_unalign ureg_;
+    uint32_t count_ = 0;
 };
 
 } // namespace experimental

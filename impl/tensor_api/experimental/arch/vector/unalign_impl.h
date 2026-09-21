@@ -17,6 +17,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_UNALIGN_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "impl/tensor_api/experimental/arch/vector/complex_ops_impl.h"
 #include "tensor_api/tensor/tensor.h"
 
 namespace asc {
@@ -46,6 +47,39 @@ __simd_callee__ inline auto unalign_load::load(const Tensor& src_tile)
     return reg;
 }
 
+template <typename Tensor>
+__simd_callee__ inline auto unalign_load::load_complex(const Tensor& src_tile)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_load::load_complex only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<data_type, half> || Std::is_same_v<data_type, float>,
+        "unalign_load::load_complex requires half or float tensor element type");
+
+    // Two unalign beats of interleaved elements, then software deinterleave (basic_api pattern).
+    reg_tensor<data_type> tmp0;
+    reg_tensor<data_type> tmp1;
+    auto* ptr = src_tile.engine().begin().get();
+    asc_loadunalign(tmp0.reg, ureg_, ptr);
+    constexpr uint32_t vf_bytes = 256;
+    constexpr uint32_t elem_per_reg = vf_bytes / sizeof(data_type);
+    asc_loadunalign(tmp1.reg, ureg_, ptr + elem_per_reg);
+
+    using Tag = typename complex_map<data_type>::type;
+    typename reg_tensor<Tag>::reg_type real;
+    typename reg_tensor<Tag>::reg_type imag;
+    asc_deintlv(real, imag, tmp0.reg, tmp1.reg);
+    vector_bool mask;
+    if constexpr (Std::is_same_v<data_type, half>) {
+        mask = asc_create_mask_b16(PAT_ALL);
+    } else {
+        mask = asc_create_mask_b32(PAT_ALL);
+    }
+    return detail::make_complex<Tag>(real, imag, mask);
+}
 
 template <typename Tensor, typename DataType>
 __simd_callee__ inline void unalign_store::store(Tensor& dst_tile, const reg_tensor<DataType>& reg)
@@ -59,6 +93,30 @@ __simd_callee__ inline void unalign_store::store(Tensor& dst_tile, const reg_ten
         Std::is_same_v<data_type, DataType>, "unalign_store::store tensor and register element types must match");
     const uint32_t vl = static_cast<uint32_t>(dst_tile.size());
     asc_storeunalign(dst_tile.engine().begin().get(), ureg_, reg.reg, vl);
+    count_ += vl;
+}
+
+template <typename Tensor, typename Elem>
+__simd_callee__ inline void unalign_store::store_complex(Tensor& dst_tile, const complex<Elem>& reg)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store::store_complex only supports tensors located in UB");
+    static_assert(Std::is_same_v<data_type, Elem>, "unalign_store::store_complex element type mismatch");
+
+    typename reg_tensor<Elem>::reg_type v0;
+    typename reg_tensor<Elem>::reg_type v1;
+    asc_intlv(v0, v1, reg.real_, reg.imag_);
+    auto* ptr = dst_tile.engine().begin().get();
+    constexpr uint32_t vf_bytes = 256;
+    constexpr uint32_t elem_per_reg = vf_bytes / sizeof(Elem);
+    const uint32_t vl = static_cast<uint32_t>(dst_tile.size());
+    // Store two interleaved half-registers; accumulate complex element count.
+    asc_storeunalign(ptr, ureg_, v0, elem_per_reg);
+    asc_storeunalign(ptr + elem_per_reg, ureg_, v1, elem_per_reg);
+    count_ += vl;
 }
 
 template <typename Tensor>

@@ -29,6 +29,20 @@ __simd_callee__ inline reg_tensor<DataType>& reg_tensor<DataType>::with_mask(con
     return *this;
 }
 
+__simd_callee__ inline reg_tensor<complex_half>& reg_tensor<complex_half>::with_mask(
+    const reg_tensor<bool>& maskReg)
+{
+    mask = maskReg.reg;
+    return *this;
+}
+
+__simd_callee__ inline reg_tensor<complex_float>& reg_tensor<complex_float>::with_mask(
+    const reg_tensor<bool>& maskReg)
+{
+    mask = maskReg.reg;
+    return *this;
+}
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

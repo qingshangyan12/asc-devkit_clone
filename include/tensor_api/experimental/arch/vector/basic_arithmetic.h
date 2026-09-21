@@ -77,7 +77,23 @@ template <merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src);
+__simd_callee__ inline auto abs(const reg_tensor<T>& src);
+
+template <typename T, Std::enable_if_t<is_complex_tag_v<T>, int> = 0>
+__simd_callee__ inline reg_tensor<T> operator+(
+    const reg_tensor<T>& src, const complex_scalar<complex_elem_t<T>>& scalar);
+
+template <typename T, Std::enable_if_t<is_complex_tag_v<T>, int> = 0>
+__simd_callee__ inline reg_tensor<T> operator+(
+    const complex_scalar<complex_elem_t<T>>& scalar, const reg_tensor<T>& src);
+
+template <typename T, Std::enable_if_t<is_complex_tag_v<T>, int> = 0>
+__simd_callee__ inline reg_tensor<T> operator*(
+    const reg_tensor<T>& src, const complex_scalar<complex_elem_t<T>>& scalar);
+
+template <typename T, Std::enable_if_t<is_complex_tag_v<T>, int> = 0>
+__simd_callee__ inline reg_tensor<T> operator*(
+    const complex_scalar<complex_elem_t<T>>& scalar, const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src);

@@ -39,6 +39,16 @@ template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = all_mask<T>());
 
 /**
+ * @brief Fills a complex register tensor from a complex scalar (Duplicate).
+ * @tparam N Number of register tensors to fill. Only 1 is supported.
+ * @tparam Mode zeroing only for complex.
+ * @tparam Elem @c half or @c float.
+ */
+template <size_t N = 1, merge_mode Mode = merge_mode::zeroing, typename Elem>
+__simd_callee__ inline complex<Elem> fill(
+    const complex_scalar<Elem>& value, const reg_tensor<bool>& mask = all_mask<Elem>());
+
+/**
  * @brief Copies masked elements from a register tensor.
  * @tparam N Number of register tensors to fill. Only 1 is supported.
  * @tparam Mode zeroing (default) or merging (soft-emulated like basic_api Duplicate).
