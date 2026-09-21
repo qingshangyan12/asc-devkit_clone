@@ -171,10 +171,25 @@ __aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParams
 
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams, uint8_t cacheMode)
+{
+    FixpipeL0C2GMImpl<T, U, config>(dst, src, intriParams, cacheMode);
+}
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
     __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
     const FixpipeParamsArch3510<config.format>& intriParams)
 {
     const uint8_t cacheMode = ExtractCacheMode(dst);
+    FixpipeL0C2GMImpl<T, U, config>(dst, src, cbufWorkspace, intriParams, cacheMode);
+}
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams, uint8_t cacheMode)
+{
     FixpipeL0C2GMImpl<T, U, config>(dst, src, cbufWorkspace, intriParams, cacheMode);
 }
 #endif

@@ -361,6 +361,13 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams, uint8_t cacheMode)
+{
+    LoadData2DGM2L1Cal(dst, src, loadDataParams, cacheMode);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
     __ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
 {
     LoadData2DGM2L0ACal(dst, src, loadDataParams);
@@ -378,6 +385,13 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams)
 {
     LoadData2DGM2L1Cal(dst, src, loadDataParams);
+}
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams, uint8_t cacheMode)
+{
+    LoadData2DGM2L1Cal(dst, src, loadDataParams, cacheMode);
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
