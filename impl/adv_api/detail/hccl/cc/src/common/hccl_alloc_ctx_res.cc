@@ -692,13 +692,10 @@ bool GetForcedAlgName(
     }
     std::string algConfig(ccTiling->algConfig);
     if (algConfig.find('=') != std::string::npos) {
-        HCCL_INFO(
-            "[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.",
-            algConfig.c_str()); // 老路径日志，文本保持原样
+        HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig.c_str());
         return false;
     }
     if (algConfig.find('[') == std::string::npos) {
-        // 须显式比较而非 CHK_RET：bool 函数中 return hcclRet 会把非零错误码隐式转 true
         OpParam opParamBackup = opParam;
         if (PrepareTopoInfoForOp(comm, opParam, topoInfo) != HCCL_SUCCESS) {
             opParam = opParamBackup;
@@ -974,7 +971,6 @@ HcclResult GetOpParam(
     void* resCtxSequence = nullptr;
     HcclResult resRet = GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence);
     if (resRet != HCCL_SUCCESS && forcedAlgAccepted && resCtxSequence == nullptr) {
-        // 外部名场景 algConfig→algName 对应关系见定名时的 [MC2_EXT_ALG] accepted 日志
         HCCL_WARNING(
             "[MC2_FORCE_ALG] fallback to default selector after resource failure, algName[%s], ret[%d].",
             algName.c_str(), static_cast<int>(resRet));

@@ -391,7 +391,6 @@ bool HcclIsCcuAlgorithmRegistered(uint32_t opType, const char* algName)
 }
 
 namespace {
-// 全部 CCU 候选都须过双名单：定名时 ResolveExternalAlg 按引擎/条件/机型筛选，任何一个都可能被选中
 bool IsCcuForcedAlgUsable(const Mc2CcTilingInner* ccTiling)
 {
     if (ccTiling == nullptr) {
@@ -461,7 +460,7 @@ bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum
     }
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        if (!IsCcuForcedAlgUsable(ccTiling)) { // 拒绝原因已在函数内 WARNING
+        if (!IsCcuForcedAlgUsable(ccTiling)) {
             return false;
         }
     }

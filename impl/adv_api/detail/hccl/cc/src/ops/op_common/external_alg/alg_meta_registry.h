@@ -24,8 +24,6 @@ namespace mc2_ops_hccl {
 // AICPU sequence 编排 + DPU 卸载）。扩展位：CcuMS、AIV（hccl 平移时加枚举值）。
 enum class AlgEngine { AICPU, CCU, DPU };
 
-// 注册现场的 sidecar 元数据。variantCondId/machineFlagId 取值是 external_alg_rules.h 的
-// VariantCondId/MachineFlagId 枚举；-1（*_NONE）表示该槽位无条件（裸名兜底候选）。
 struct AlgMeta {
     AlgEngine engine = AlgEngine::AICPU;
     const char* externalName = ""; // 规范化外部名（与 parser 产出同构），如 "sole[mesh]"
@@ -34,7 +32,6 @@ struct AlgMeta {
     int priority = 0; // 同键定序第二级（specificity > priority > name，见 BuildCandidateTable）
 };
 
-// 一行 sidecar 记录（枚举接口用）
 struct AlgMetaRow {
     HcclCMDType cmd;
     std::string registeredName;
@@ -44,11 +41,8 @@ struct AlgMetaRow {
 class AlgMetaRegistry {
 public:
     static AlgMetaRegistry& Instance();
-
-    // 返回 HCCL_SUCCESS / HCCL_E_PARA(重复注册)。static-init 期间由 REGISTER_ALG_META 调用。
     HcclResult Register(HcclCMDType cmd, const std::string& registeredName, const AlgMeta& meta);
     const AlgMeta* Get(HcclCMDType cmd, const std::string& registeredName) const;
-    // 全量快照（UT 满射断言 / 消歧器聚合用）
     std::vector<AlgMetaRow> GetAll() const;
 
 private:

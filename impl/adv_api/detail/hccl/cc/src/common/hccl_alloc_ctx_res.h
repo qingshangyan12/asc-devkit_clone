@@ -190,8 +190,6 @@ std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, cons
 HcclResult CheckForcedAlgResource(
     HcclComm comm, const OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo, const std::string& algName);
 
-// algConfig → 注册名。true = 已定名且 topoInfo 已备好，调用方接着 PrepareEngineForAlg；
-// false = 无强制 / legacy / 外部名坏 / topo 准备失败，opParam/topoInfo 与进入时一致。
 bool GetForcedAlgName(
     HcclComm comm, const Mc2CcTilingInner* ccTiling, OpParam& opParam,
     std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo, std::string& algName);

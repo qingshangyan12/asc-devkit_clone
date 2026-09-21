@@ -27,8 +27,6 @@ namespace mc2_ops_hccl {
 //   - 空格/制表符全部忽略
 //   - 层数 1~3（系统最大 3 层物理拓扑，超过即语法错）
 //   - 仅词法/结构校验；语义合法性（候选是否存在）由消歧器查表负责
-//   - 本头文件被 tiling 目标 / mc2_client / mc2_server / UT 多目标直接包含，
-//     必须保持 C++14 兼容且不得引入 ops 内部头文件依赖
 
 enum class ExternalExecutor { SOLE = 0, SEQUENCE, PARALLEL, CONCUR, PIPELINE };
 
@@ -72,8 +70,8 @@ struct ExternalAlgSpec {
 // tiling algConfig 四态识别（纯函数；tiling 侧与 mc2 侧共用）:
 //   空串 -> NONE
 //   含 '=' -> LEGACY（HCCL_ALGO 老语法，保持现状拒绝语义，由调用方走默认 selector）
-//   含 '[' -> EXTERNAL（解析成功: spec 有效/errMsg 空; 解析失败: errMsg 给出词法错误；ParseExternalAlg 失败时
-//   spec 为部分解析残留（调用方不得使用），ClassifyForcedAlgConfig 层面已保证失败时 spec 复位无效）
+//   含 '[' -> EXTERNAL（解析成功: spec 有效/errMsg 空; 解析失败: errMsg 给出词法错误，
+//   spec 已复位为默认值——但默认值 canonical() 为 "sole[]" 并非失败标记，失败判据只能是 errMsg 非空）
 //   其余 -> BARE_NAME（裸注册名，现状语义逐字节保留）
 enum class ForcedAlgKind { NONE, LEGACY, EXTERNAL, BARE_NAME };
 
@@ -89,6 +87,9 @@ inline bool WordInTable(const std::string& word, const char* const* table, size_
 }
 } // namespace external_alg_internal
 
+// 外部名词法解析（纯函数）。成功: spec 有效/errMsg 空; 失败: errMsg 给出词法错误原因。
+// 失败路径不清场——spec 为部分解析残留（边解析边写，中途出错即返回），调用方不得使用;
+// 需要失败态干净的 spec 请走 ClassifyForcedAlgConfig（其失败时已做复位兜底）。
 inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec, std::string& errMsg)
 {
     spec = ExternalAlgSpec();
@@ -207,7 +208,6 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
     return true;
 }
 
-// 四态分类（语义见 ForcedAlgKind 注释）
 inline ForcedAlgKind ClassifyForcedAlgConfig(
     const std::string& algConfig, std::string& bareName, ExternalAlgSpec& spec, std::string& errMsg)
 {
@@ -222,7 +222,7 @@ inline ForcedAlgKind ClassifyForcedAlgConfig(
     }
     if (algConfig.find('[') != std::string::npos) {
         if (!ParseExternalAlg(algConfig, spec, errMsg)) {
-            spec = ExternalAlgSpec(); // 失败时保证 spec 无效，调用方不得使用
+            spec = ExternalAlgSpec();
         }
         return ForcedAlgKind::EXTERNAL;
     }

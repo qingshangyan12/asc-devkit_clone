@@ -103,7 +103,6 @@ std::map<ExtAlgKey, std::vector<AlgCandidate>> BuildCandidateTable(const std::ve
 
 const std::vector<AlgCandidate>& GetExternalCandidates(HcclCMDType cmd, const std::string& canonicalExtName)
 {
-    // 函数级 static：免疫跨编译单元 static-init 顺序的理论风险
     static const std::vector<AlgCandidate> kEmpty;
     const auto& table = CandidateTable();
     const auto it = table.find(std::make_pair(cmd, canonicalExtName));
