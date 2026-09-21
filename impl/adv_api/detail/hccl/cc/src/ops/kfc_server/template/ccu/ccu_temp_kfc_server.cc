@@ -112,8 +112,8 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->opParam = param;
         kfcArg->subCommRanks = subCommRanks;
     } else {
-        HCCL_WARNING(
-            "[InheritKfcServerKernelArg] unknown src kernel type[%s], no attributes inherited", srcName.c_str());
+        HCCL_ERROR("[InheritKfcServerKernelArg] unknown src kernel type[%s]", srcName.c_str());
+        return HCCL_E_NOT_SUPPORT;
     }
 
     dstKernel.setKernelArg(kfcArg);
