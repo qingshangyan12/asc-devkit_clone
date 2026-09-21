@@ -13,8 +13,6 @@
 #include <cstdint>
 
 #include "c_api/asc_simd.h"
-#include "kernel_operator.h"
-#include "simt_api/asc_fp16.h"
 #include "simt_api/asc_simt.h"
 #include "simt_api/device_warp_functions.h"
 #include "simt_api/math_constants.h"
