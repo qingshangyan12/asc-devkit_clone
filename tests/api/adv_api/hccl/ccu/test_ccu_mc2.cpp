@@ -19,6 +19,7 @@
 #include "include/adv_api/hccl/internal/hccl_msg.h"
 #include "hccl_alloc_ctx_res.h"
 #include "kfc_server_protocol.h"
+#include "ccu_kernel_utils.h"
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "topo_model.h"
@@ -39,6 +40,7 @@ extern HcclResult g_stubHcomCheckDataTypeResult;
 extern HcclResult g_stubHcomCheckReductionOpResult;
 extern bool g_stubHcommCcuKernelLaunchFail;
 extern uint32_t g_stubHcommCcuKernelLaunchCallCount;
+extern bool g_stubHcommCcuV2Supported;
 } // namespace mc2_ops_hccl
 
 namespace {
@@ -74,6 +76,7 @@ static void StubCleanup()
     mc2_ops_hccl::g_stubHcomCheckReductionOpResult = HCCL_SUCCESS;
     mc2_ops_hccl::g_stubHcommCcuKernelLaunchFail = false;
     mc2_ops_hccl::g_stubHcommCcuKernelLaunchCallCount = 0U;
+    mc2_ops_hccl::g_stubHcommCcuV2Supported = true;
     unsetenv("HCCL_OP_EXPANSION_MODE");
 }
 
@@ -475,6 +478,30 @@ TEST_F(CcuMc2TestSuite, CheckCcuKfcFlow_RejectsPeerOnlyOutsideTp2)
     EXPECT_EQ(CheckCcuKfcFlow(&initTiling, ccTilingList, 1U, 8U), HCCL_E_NOT_SUPPORT);
 }
 
+TEST_F(CcuMc2TestSuite, GetCcuVersion_UsesRuntimeDeviceAndRejectsUnavailableV2)
+{
+    auto& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(g_stubRankId);
+    simNpu.SetDevType(DevType::DEV_TYPE_950);
+    EXPECT_EQ(GetCcuVersion(), CcuVersion::CCU_V1);
+
+    simNpu.SetDevType(DevType::DEV_TYPE_960);
+    EXPECT_EQ(GetCcuVersion(), CcuVersion::CCU_V2);
+
+    mc2_ops_hccl::g_stubHcommCcuV2Supported = false;
+    EXPECT_EQ(GetCcuVersion(), CcuVersion::INVALID);
+}
+
+TEST_F(CcuMc2TestSuite, GetParallelParam_V1V2GoldenValues)
+{
+    EXPECT_EQ(
+        GetParallelParam(1U, 2U, 3U, CcuVersion::CCU_V1),
+        (uint64_t(1) << 55U) | (uint64_t(2) << 48U) | (uint64_t(3) << 41U));
+    EXPECT_EQ(
+        GetParallelParam(1U, 2U, 3U, CcuVersion::CCU_V2), (uint64_t(1) << 19U) | (uint64_t(2) << 10U) | uint64_t(3));
+    EXPECT_EQ(GetParallelParam(0x1ffU, 0x1ffU, 0x3ffU, CcuVersion::CCU_V2), 0x0fffffffULL);
+    EXPECT_EQ(GetParallelParam(1U, 1U, 1U, CcuVersion::INVALID), 0U);
+}
+
 TEST_F(CcuMc2TestSuite, ObtainCommEngine_AllCcu)
 {
     Mc2CcTilingInner t0{}, t1{};
@@ -583,6 +610,19 @@ TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPath)
     EXPECT_NE(ctx->ckeAddr, 0U);
     EXPECT_EQ(ctx->opType[0], static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER));
     EXPECT_EQ(ctx->algorithmType[0], static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleMesh));
+}
+
+TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuPathRejectsUnavailableV2)
+{
+    auto& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(g_stubRankId);
+    simNpu.SetDevType(DevType::DEV_TYPE_960);
+    mc2_ops_hccl::g_stubHcommCcuV2Supported = false;
+    uint32_t opTypes[] = {static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER)};
+    Mc2TilingTestData tiling = BuildMc2Tiling(1, static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED), opTypes, nullptr);
+    void* opResCtx = nullptr;
+
+    EXPECT_EQ(HcclAllocComResourceByTiling(comm_, stream_, &tiling, &opResCtx), HCCL_E_NOT_SUPPORT);
+    EXPECT_EQ(opResCtx, nullptr);
 }
 
 TEST_F(CcuMc2TestSuite, HcclAllocComResourceByTiling_CcuAlgorithmNotRegistered)

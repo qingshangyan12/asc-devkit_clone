@@ -28,7 +28,6 @@ using namespace mc2_ops_hccl;
 thread_local uint32_t curr_dev_id = UINT32_MAX;
 
 namespace mc2_ops_hccl {
-extern DevType g_stubDeviceType;
 bool g_stubAclrtMemcpyFail = false;
 uint32_t g_stubAclrtMemcpyCallCount = 0U;
 uint32_t g_stubAclrtMemcpyFailOnCall = 0U;
@@ -134,7 +133,7 @@ const char* aclrtGetSocName()
 
 HcclResult hrtGetDeviceType(DevType& devType)
 {
-    devType = mc2_ops_hccl::g_stubDeviceType;
+    devType = HcclSim::SimWorld::Global()->GetSimNpuByRankId(curr_dev_id).GetDevType();
     return HCCL_SUCCESS;
 }
 
