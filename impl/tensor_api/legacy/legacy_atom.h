@@ -13,6 +13,12 @@
 
 #include "impl/tensor_api/legacy/legacy_type.h"
 
+#if !defined(ASC_DEPRECATED)
+#define ASC_DEPRECATED(version, removal_date, replacement)                                                  \
+    [[deprecated("Deprecated since " #version ", Will be removed after " removal_date ", Use " #replacement \
+                 " instead.")]]
+#endif
+
 namespace AscendC {
 namespace Te {
 
@@ -275,6 +281,7 @@ struct CopyTraits<CopyOp, Traits, CopyOpWith, TraitsWith> {
     }
 
     template <const TraitType& trait = defaultTrait, typename... Args>
+    ASC_DEPRECATED(9.2.0, "2027/09/07", copy_unpack)
     __aicore__ inline void CopyUnpack(const Args&... args) const
     {
         using normalized_t = Std::remove_cvref_t<decltype(normalize_copy_trait(Traits::value))>;
@@ -307,6 +314,7 @@ struct CopyTraitsWithParams {
     __aicore__ inline constexpr CopyTraitsWithParams(Params params) : params(params) {}
 
     template <const TraitType& trait = defaultTrait, typename... Args>
+    ASC_DEPRECATED(9.2.0, "2027/09/07", copy_unpack)
     __aicore__ inline void CopyUnpack(const Args&... args) const
     {
         using normalized_t = Std::remove_cvref_t<decltype(normalize_copy_trait(Traits::value))>;
@@ -434,6 +442,7 @@ struct CopyAtom<CopyOperation> : public CopyTraits<CopyOperation> {
     static constexpr const TraitType defaultTrait = copy_trait_type::defaultTrait;
 
     template <const TraitType& trait = defaultTrait, typename... Params>
+    ASC_DEPRECATED(9.2.0, "2027/09/07", call)
     __aicore__ inline void Call(const Params&... params) const
     {
         using traits_type = copy_trait_type;
@@ -456,6 +465,7 @@ struct CopyAtom<CopyTraits<Args...>> : public CopyTraits<Args...> {
     static constexpr const TraitType defaultTrait = copy_trait_type::defaultTrait;
 
     template <const TraitType& trait = defaultTrait, typename... Params>
+    ASC_DEPRECATED(9.2.0, "2027/09/07", call)
     __aicore__ inline void Call(const Params&... params) const
     {
         using traits_type = copy_trait_type;
@@ -479,6 +489,7 @@ struct CopyAtom<copy_traits<CopyOperation>> : public copy_traits<CopyOperation> 
     static constexpr const TraitType defaultTrait = copy_trait_type::default_trait;
 
     template <const TraitType& trait = defaultTrait, typename... Params>
+    ASC_DEPRECATED(9.2.0, "2027/09/07", call)
     __aicore__ inline void Call(const Params&... params) const
     {
         static_cast<const copy_trait_type&>(*this).template copy_unpack<trait, Params...>(params...);
@@ -502,6 +513,7 @@ struct CopyAtom<copy_traits<Args...>> : public copy_traits<Args...> {
     static constexpr const TraitType defaultTrait = copy_trait_type::default_trait;
 
     template <const TraitType& trait = defaultTrait, typename... Params>
+    ASC_DEPRECATED(9.2.0, "2027/09/07", call)
     __aicore__ inline void Call(const Params&... params) const
     {
         static_cast<const copy_trait_type&>(*this).template copy_unpack<trait, Params...>(params...);
@@ -518,6 +530,7 @@ struct CopyAtom<copy_traits<Args...>> : public copy_traits<Args...> {
 
 // Copy / MakeCopy: PascalCase 接口
 template <typename AtomType, typename DstTensor, typename SrcTensor>
+ASC_DEPRECATED(9.2.0, "2027/09/07", copy)
 __aicore__ inline void Copy(const AtomType& atom, const DstTensor& dst, const SrcTensor& src)
 {
     atom.Call(dst, src);
@@ -526,12 +539,14 @@ __aicore__ inline void Copy(const AtomType& atom, const DstTensor& dst, const Sr
 template <
     typename AtomType, typename DstTensor, typename SrcTensor, typename Quant,
     Std::enable_if_t<is_valid_quant_v<Quant>, int> = 0>
+ASC_DEPRECATED(9.2.0, "2027/09/07", copy)
 __aicore__ inline void Copy(const AtomType& atom, const DstTensor& dst, const SrcTensor& src, const Quant& quant)
 {
     atom.Call(dst, src, quant);
 }
 
 template <typename CopyOperationType>
+ASC_DEPRECATED(9.2.0, "2027/09/07", make_copy)
 __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copy_operation)
 {
     if constexpr (has_copy_traits<CopyOperationType>::value) {
@@ -542,6 +557,7 @@ __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copy_operatio
 }
 
 template <typename CopyOperationType, typename CopyTraitType>
+ASC_DEPRECATED(9.2.0, "2027/09/07", make_copy)
 __aicore__ inline constexpr auto MakeCopy(const CopyOperationType& copy_operation, const CopyTraitType& copy_trait)
 {
     if constexpr (has_copy_traits<CopyOperationType, CopyTraitType>::value) {

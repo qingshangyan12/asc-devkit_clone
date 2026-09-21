@@ -9,22 +9,22 @@
     \_\_NPU\_ARCH\_\_是Device侧AI Core代码中的预处理宏，用于标识AI处理器的架构版本。通过该宏，开发者可以针对不同AI处理器，差异化进行代码适配和优化。产品型号和NPU架构版本的对应关系如下：
 
     <!-- npu="950" id1 -->
-    - Ascend 950PR/Ascend 950DT：3510
+    - Ascend 950PR&950DT系列产品：3510
     <!-- end id1 -->
     <!-- npu="A3" id2 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：2201
+    - Atlas A3系列产品：2201
     <!-- end id2 -->
     <!-- npu="910b" id3 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：2201
+    - Atlas A2系列产品：2201
     <!-- end id3 -->
     <!-- npu="310b" id4 -->
-    - Atlas 200I/500 A2 推理产品：3002
+    - Atlas 200I/500 A2推理产品：3002
     <!-- end id4 -->
     <!-- npu="310p" id5 -->
     - Atlas 推理系列产品：2002
     <!-- end id5 -->
     <!-- npu="910" id6 -->
-    - Atlas 训练系列产品：1001
+    - Atlas训练系列产品：1001
     <!-- end id6 -->
 
     以下为通过\_\_NPU\_ARCH\_\_控制在不同AI处理器上算子输出值舍入模式的示例。
@@ -142,7 +142,7 @@
     // 仅可由具有相同执行空间类型的Device函数调用
     __aicore__ void bar() {}
 
-    // 定义在AI Core上执行的核函数
+    // 定义在AI Core上执行的核函数（Kernel）
     __global__ __aicore__ void foo() {
       bar(); // 正确
     }
@@ -184,7 +184,7 @@
     -   调用\_\_global\_\_修饰的函数是异步操作，即调用会在函数于Device侧执行完成前返回。如果需要同步，可调用Runtime同步接口显式同步，如**aclrtSynchronizeStream**接口。
 
     ```
-    // 在AI CPU Device文件中定义AI CPU核函数。
+    // 在AI CPU Device文件中定义AI CPU核函数（Kernel）。
     __aicpu__ void foo() {} // 错误，仅使用__aicpu__标识符，缺少__global__标识符
     __global__ void foo() {} // 错误，仅使用__global__标识符，缺少__aicpu__标识符
     __global__ __aicpu__  void foo() {} // 错误，返回类型为void
@@ -194,7 +194,7 @@
     ```
 
     ```
-    // 在.asc文件中声明AI CPU核函数。
+    // 在.asc文件中声明AI CPU核函数（Kernel）。
     extern __global__ __aicpu__ uint32_t hello_world(void *args); // 正确
     ```
 
@@ -317,6 +317,21 @@
     -   标识Device侧函数强制内联，可以减少函数频繁调用产生的指令压栈、出栈的开销，但可能会导致算子二进制增加。
     -   和C++函数修饰符inline的主要区别是Device侧\_\_inline\_\_是强制内联，C++的inline则是根据编译器优化选择性内联。
     -   AI Core对函数嵌套深度有限制，一般推荐嵌套深度不超过4层。使用强制内联可以减少调用层次。
+
+## 函数参数标记<a name="function-parameter-annotations"></a>
+
+-   \_\_kfc\_workspace\_\_
+
+    KFC（Kernel Function Call）表示核间通信调用。在使用Matmul高阶API的mix算子中，Vector核向Cube核发起通信时，需要使用KFC系统workspace。`__kfc_workspace__`用于修饰核函数（Kernel）入口的workspace指针参数，供编译器识别并初始化KFC系统workspace地址。使用示例如下：
+
+    ```cpp
+    extern "C" __global__ __mix__(1, 2) void batch_matmul_custom(
+        __gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* c, __kfc_workspace__ __gm__ uint8_t* workspace,
+        __gm__ uint8_t* tilingGm);
+    ```
+
+    -   workspace参数使用`__kfc_workspace__`修饰，表示Host侧申请并传入的系统workspace。Kernel侧注册Matmul对象时，通过`GetSysWorkSpacePtr()`将该workspace传递给`REGIST_MATMUL_OBJ`。
+    -   `__kfc_workspace__`仅适用于使用Matmul高阶API的场景，且通过`__mix__(1, 2)`或`__mix__(1, 1)`声明的算子，即Cube核与Vector核的比例为1:2或1:1。
 
 ## 地址空间限定符<a name="section1624210295308"></a>
 
@@ -454,7 +469,7 @@ __ubuf__ int * __gm__ ptr;
 
 ## 内置变量<a name="section199434523343"></a>
 
-内置变量由框架自动设置，可在Device侧代码中直接引用，用于多核逻辑控制和数据分片。在Mix执行场景（本节指核函数使用`__mix__(1, 1)`或`__mix__(1, 2)`函数执行空间限定符）下，还需与部分非内置变量组合使用，各变量的说明及获取方式如下：
+内置变量由框架自动设置，可在Device侧代码中直接引用，用于多核逻辑控制和数据分片。在Mix执行场景（本节指核函数（Kernel）使用`__mix__(1, 1)`或`__mix__(1, 2)`函数执行空间限定符）下，还需与部分非内置变量组合使用，各变量的说明及获取方式如下：
 
 **表3**  内置变量
 
