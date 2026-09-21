@@ -27,6 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "../../impl/basic_api/kernel_reg.h"
+#include "../../impl/basic_api/utils/kernel_ptr_utils.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -43,14 +44,51 @@ class LocalTensor;
 template <typename T>
 __aicore__ inline void DataCachePreload(const GlobalTensor<uint64_t>& src, const T cacheOffset);
 
+/*!
+ * \brief Pointer overload of DataCachePreload. data cache preload only ever addresses GM, so a raw
+ *        __gm__ uint64_t* is the equivalent pointer form of GlobalTensor<uint64_t>. Keeping it as a separate
+ *        overload (instead of generically replacing the Tensor parameter) leaves every existing explicit
+ *        template argument usage resolving exactly as before.
+ */
+template <typename T>
+__aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset);
+
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
 
 template <typename T, CacheLine entireType, DcciDst dcciDst>
 __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
 
+/*!
+ * \brief Pointer overload of DataCacheCleanAndInvalid, "entireType + dcciDst" form. GM or UB.
+ *
+ *        Both spaces are accepted because both have a three-argument implementation to dispatch to
+ *        (`DcciGMImpl` / `DcciUBImpl`): this is the overload that carries the `dcciDst` choice, and UB is one of
+ *        its documented values (`CACHELINE_UB`). The operand must therefore be an explicitly qualified pointer.
+ *
+ *        There is deliberately no fallback for an operand whose address space cannot be determined: on this
+ *        toolchain `__gm__` is the *default* address space, so a bare `T*` is indistinguishable from
+ *        `__gm__ T*`, and accepting it would silently assume GM. Such an operand is rejected by SFINAE.
+ */
+template <
+    typename T, CacheLine entireType, DcciDst dcciDst,
+    typename Std::enable_if<
+        DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kGm || DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kUb, bool>::type =
+        true>
+__aicore__ inline void DataCacheCleanAndInvalid(const T* dst);
+
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
+
+/*!
+ * \brief Pointer overload of DataCacheCleanAndInvalid, "entireType" form. GM ONLY -- see the overload above.
+ *        The two-argument UB call does not exist, so a UB operand is rejected by SFINAE rather than turned into
+ *        a silent no-op.
+ */
+template <
+    typename T, CacheLine entireType,
+    typename Std::enable_if<DmaAddrSpaceOfV<const T*> == DmaAddrSpace::kGm, bool>::type = true>
+__aicore__ inline void DataCacheCleanAndInvalid(const T* dst);
 
 __aicore__ inline void ICachePreLoad(const int64_t preFetchLen);
 
