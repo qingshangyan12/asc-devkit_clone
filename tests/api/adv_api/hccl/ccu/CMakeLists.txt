@@ -49,6 +49,7 @@ set(CCU_INCLUDE_LIST
     ${HCCL_CC_SRC_DIR}
     ${HCCL_CC_SRC_DIR}/common
     ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym
+    ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/ccu
     ${HCCL_CC_SRC_DIR}/ops
     ${HCCL_CC_SRC_DIR}/ops/op_common
     ${HCCL_CC_SRC_DIR}/ops/op_common/inc
