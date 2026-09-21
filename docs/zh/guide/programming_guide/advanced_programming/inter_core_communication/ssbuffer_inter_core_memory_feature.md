@@ -95,21 +95,13 @@ SSBuffer适用于同一AI Core内的小数据量通信，常见场景如下。
 
 使用[函数执行空间限定符](../../language_extension/simd_builtin_keywords.md#section1074418132518)明确核函数的执行方式。`__mix__(1, 2)`表示每组AIC/AIV按1:2配比运行，多组执行时，各组访问其各自的SSBuffer。工程化算子应配置与`__mix__(1, 2)`对应的[核函数类型](../../../../api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)，即`KERNEL_TYPE_MIX_AIC_1_2`。
 
-编译宏[ENABLE_CV_COMM_VIA_SSBUF](../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#section57020345148)默认关闭。在上述1:2混合核函数配置下，将该宏设置为`true`具有以下作用：
-
-- 对于Matmul高阶API，将AIV向AIC发送调用消息的存储空间由GM切换为SSBuffer，消息空间由Matmul框架管理。
-- 对于基础API中UB到L1 Buffer的DataCopy和DataCopyPad，将经GM中转的软件仿真搬运切换为UB到L1 Buffer的硬通道搬运。
-
-编译配置示意如下：
+对于Matmul高阶API，若要将AIV向AIC发送调用消息的存储空间由GM切换为SSBuffer，则需设置编译宏[ENABLE_CV_COMM_VIA_SSBUF](../../compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#section57020345148)为`true`（默认为`false`），编译配置示意如下：
 
 ```bash
 bisheng <source_file>.asc -o <output_file> --npu-arch=dav-3510 -DENABLE_CV_COMM_VIA_SSBUF=true
 ```
 
-需要注意：
-
-- `ENABLE_CV_COMM_VIA_SSBUF`不负责设置核函数类型，也不会为自定义消息划分空间、清理状态或插入收发同步。
-- C API的[asc_copy_ub2l1](../../../../api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md)直接使用硬件通道，该宏对其无效。
+需要注意，`ENABLE_CV_COMM_VIA_SSBUF`不负责设置核函数类型，也不会为自定义消息划分空间、清理状态或插入收发同步。
 
 版本差异及数据通路的选择请参见[3510新特性使用说明](../../../cross_gen_migration_guide/instructions_for_new_features/3510_new_features.md#section_ssbuf)。
 
