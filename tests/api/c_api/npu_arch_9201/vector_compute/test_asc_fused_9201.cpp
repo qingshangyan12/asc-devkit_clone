@@ -8,50 +8,24 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include <gtest/gtest.h>
-#include <mockcpp/mockcpp.hpp>
-#include "tests/api/c_api/stub/cce_stub.h"
-#include "c_api/asc_simd.h"
+#include "tests/api/c_api/npu_arch_3510/utils/test_binary_instr_utils.h"
 
-#define TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(class_name, c_api_name, cce_name, data_type) \
-                                                                                                   \
-    namespace {                                                                                    \
-    void cce_name##_##data_type##_FusedRetStub(                                                    \
-        data_type& dst, data_type src0, data_type src1, vector_bool mask, Literal mode)            \
-    {}                                                                                             \
-    }                                                                                              \
-                                                                                                   \
-    TEST(TestFusedReturn##class_name##_##data_type##_CApi, c_api_name##_return_##data_type##_Succ) \
-    {                                                                                              \
-        data_type src0;                                                                            \
-        data_type src1;                                                                            \
-        vector_bool mask;                                                                          \
-                                                                                                   \
-        MOCKER_CPP(cce_name, void(data_type&, data_type, data_type, vector_bool, Literal))         \
-            .times(1)                                                                              \
-            .will(invoke(cce_name##_##data_type##_FusedRetStub));                                  \
-                                                                                                   \
-        data_type result = c_api_name(src0, src1, mask);                                           \
-        (void)result;                                                                              \
-        GlobalMockObject::verify();                                                                \
-    }
+// ==========asc_fma (9201 vfma 实现)==========
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFma, asc_fma, vfma, vector_half);
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFma, asc_fma, vfma, vector_bfloat16_t);
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFma, asc_fma, vfma, vector_float);
 
-// ==========asc_fma ==========
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFma, asc_fma, vfma, vector_half);
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFma, asc_fma, vfma, vector_bfloat16_t);
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFma, asc_fma, vfma, vector_float);
+// ==========asc_fms==========
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFms, asc_fms, vfnms, vector_half);
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFms, asc_fms, vfnms, vector_bfloat16_t);
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFms, asc_fms, vfnms, vector_float);
 
-// ==========asc_fms ==========
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFms, asc_fms, vfnms, vector_half);
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFms, asc_fms, vfnms, vector_bfloat16_t);
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFms, asc_fms, vfnms, vector_float);
+// ==========asc_fnma==========
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFnma, asc_fnma, vfms, vector_half);
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFnma, asc_fnma, vfms, vector_bfloat16_t);
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFnma, asc_fnma, vfms, vector_float);
 
-// ==========asc_fnma ==========
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFnma, asc_fnma, vfms, vector_half);
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFnma, asc_fnma, vfms, vector_bfloat16_t);
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFnma, asc_fnma, vfms, vector_float);
-
-// ==========asc_fnms ==========
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFnms, asc_fnms, vfnma, vector_half);
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFnms, asc_fnms, vfnma, vector_bfloat16_t);
-TEST_VECTOR_COMPUTE_BINARY_RETURN_INSTR_FUSED(AscFnms, asc_fnms, vfnma, vector_float);
+// ==========asc_fnms==========
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFnms, asc_fnms, vfnma, vector_half);
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFnms, asc_fnms, vfnma, vector_bfloat16_t);
+TEST_VECTOR_COMPUTE_TERNARY_RET_INSTR(AscFnms, asc_fnms, vfnma, vector_float);
