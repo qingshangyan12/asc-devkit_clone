@@ -29,7 +29,7 @@ def test_sender(tmp_path):
     functions = [function(utils, name) for name in ['set_super_tensor_header']]
     functions += [function(dump, name) for name in [
         'set_dump_tlv_info', 'set_dump_shape_info', 'set_dump_tlv_data',
-        'copy_super_tensor_data', 'asc_dump_super_tensor', 'asc_dump_impl']]
+        'copy_super_tensor_data', 'asc_dump_super_tensor', 'check_super_tensor_local_range', 'asc_dump_impl']]
     code = r'''
 #include <cassert>
 #include <cstdint>
@@ -128,14 +128,37 @@ int main(int argc,char** argv) {
             verify(input,size>limit);
             if (size>limit && capacity>=512) {
                 setup(capacity);
-                asc_dump_impl<AscendC::Hardware::UB,uint8_t>(input.data(),7,size,shape,2,size);
+                assert(check_super_tensor_local_range(AscendC::Hardware::UB,size,size));
+                assert(!check_super_tensor_local_range(AscendC::Hardware::UB,size,size-1));
+                asc_dump_impl<AscendC::Hardware::UB,uint8_t>(input.data(),7,size,shape,2);
                 verify(input,true);
             }
         }
     }
     setup(4096); std::vector<uint8_t> data(32785,19); sourceBegin=data.data();sourceEnd=data.data()+data.size();
-    asc_dump_impl<AscendC::Hardware::L1,uint8_t>(data.data(),7,data.size(),shape,2,data.size());
+    if (check_super_tensor_local_range(AscendC::Hardware::L1,data.size(),data.size())) {
+        asc_dump_impl<AscendC::Hardware::L1,uint8_t>(data.data(),7,data.size(),shape,2);
+    }
     assert(packets.empty()); // reject unprovable aligned local read before publishing the first packet
+    for (auto position: {AscendC::Hardware::L1, AscendC::Hardware::L0C}) {
+        setup(4096);
+        const uint32_t alignment = position == AscendC::Hardware::L0C ? 1024 : 32;
+        const uint32_t capacity = align_up(data.size(),alignment);
+        assert(!check_super_tensor_local_range(position,data.size(),capacity-1));
+        assert(check_super_tensor_local_range(position,data.size(),capacity));
+        std::vector<uint8_t> storage(capacity,19);
+        sourceBegin=storage.data(); sourceEnd=storage.data()+storage.size();
+        if (position == AscendC::Hardware::L1) {
+            asc_dump_impl<AscendC::Hardware::L1,uint8_t>(storage.data(),7,data.size(),shape,2);
+        } else {
+            asc_dump_impl<AscendC::Hardware::L0C,uint8_t>(storage.data(),7,data.size(),shape,2);
+        }
+        verify(data,true);
+    }
+    setup(4096);
+    // Ordinary requests retain the existing behavior; this guard only handles oversized requests.
+    assert(check_super_tensor_local_range(AscendC::Hardware::L1,16,16));
+    sourceBegin=data.data();sourceEnd=data.data()+data.size();
     reject=true;
     asc_dump_impl<AscendC::Hardware::GM,uint8_t>(data.data(),7,data.size(),shape,2);
     assert(packets.empty()); // failed reservation must not advance/publish a fragment
