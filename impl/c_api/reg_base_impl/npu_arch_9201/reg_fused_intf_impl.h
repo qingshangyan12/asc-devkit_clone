@@ -20,112 +20,104 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-__simd_callee__ inline vector_half asc_fma(vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline vector_half asc_fma(vector_half src0, vector_half src1, vector_half src2, vector_bool mask)
 {
-    vector_half dst;
     if ASC_IS_AIV {
-        vfma(dst, src0, src1, mask, MODE_ZEROING);
+        vfma(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_bfloat16_t asc_fma(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+__simd_callee__ inline vector_bfloat16_t asc_fma(
+    vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
 {
-    vector_bfloat16_t dst;
     if ASC_IS_AIV {
-        vfma(dst, src0, src1, mask, MODE_ZEROING);
+        vfma(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
 {
-    vector_float dst;
     if ASC_IS_AIV {
-        vfma(dst, src0, src1, mask, MODE_ZEROING);
+        vfma(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_half asc_fms(vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline vector_half asc_fms(vector_half src0, vector_half src1, vector_half src2, vector_bool mask)
 {
-    vector_half dst;
     if ASC_IS_AIV {
-        vfnms(dst, src0, src1, mask, MODE_ZEROING);
+        vfnms(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_bfloat16_t asc_fms(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+__simd_callee__ inline vector_bfloat16_t asc_fms(
+    vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
 {
-    vector_bfloat16_t dst;
     if ASC_IS_AIV {
-        vfnms(dst, src0, src1, mask, MODE_ZEROING);
+        vfnms(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_float asc_fms(vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline vector_float asc_fms(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
 {
-    vector_float dst;
     if ASC_IS_AIV {
-        vfnms(dst, src0, src1, mask, MODE_ZEROING);
+        vfnms(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_half asc_fnma(vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline vector_half asc_fnma(vector_half src0, vector_half src1, vector_half src2, vector_bool mask)
 {
-    vector_half dst;
     if ASC_IS_AIV {
-        vfms(dst, src0, src1, mask, MODE_ZEROING);
+        vfms(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_bfloat16_t asc_fnma(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+__simd_callee__ inline vector_bfloat16_t asc_fnma(
+    vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
 {
-    vector_bfloat16_t dst;
     if ASC_IS_AIV {
-        vfms(dst, src0, src1, mask, MODE_ZEROING);
+        vfms(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_float asc_fnma(vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline vector_float asc_fnma(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
 {
-    vector_float dst;
     if ASC_IS_AIV {
-        vfms(dst, src0, src1, mask, MODE_ZEROING);
+        vfms(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_half asc_fnms(vector_half src0, vector_half src1, vector_bool mask)
+__simd_callee__ inline vector_half asc_fnms(vector_half src0, vector_half src1, vector_half src2, vector_bool mask)
 {
-    vector_half dst;
     if ASC_IS_AIV {
-        vfnma(dst, src0, src1, mask, MODE_ZEROING);
+        vfnma(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_bfloat16_t asc_fnms(vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bool mask)
+__simd_callee__ inline vector_bfloat16_t asc_fnms(
+    vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
 {
-    vector_bfloat16_t dst;
     if ASC_IS_AIV {
-        vfnma(dst, src0, src1, mask, MODE_ZEROING);
+        vfnma(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
-__simd_callee__ inline vector_float asc_fnms(vector_float src0, vector_float src1, vector_bool mask)
+__simd_callee__ inline vector_float asc_fnms(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
 {
-    vector_float dst;
     if ASC_IS_AIV {
-        vfnma(dst, src0, src1, mask, MODE_ZEROING);
+        vfnma(src2, src0, src1, mask, MODE_ZEROING);
     }
-    return dst;
+    return src2;
 }
 
 #endif
