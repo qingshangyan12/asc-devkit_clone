@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_STORE_STOREALIGN_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/storealign_intf_impl.h"
 #endif
 
@@ -50,6 +50,8 @@ __simd_callee__ inline void asc_storealign(__ubuf__ hifloat8_t* dst, vector_hifl
 __simd_callee__ inline void asc_storealign(__ubuf__ fp8_e5m2_t* dst, vector_fp8_e5m2_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_storealign(__ubuf__ fp8_e8m0_t* dst, vector_fp8_e8m0_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_storealign(__ubuf__ fp8_e6m2_t* dst, vector_fp8_e6m2_t src, vector_bool mask);
 
 __simd_callee__ inline void asc_storealign(__ubuf__ fp4x2_e2m1_t* dst, vector_fp4x2_e2m1_t src, vector_bool mask);
 

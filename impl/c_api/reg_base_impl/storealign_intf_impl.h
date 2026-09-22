@@ -24,6 +24,10 @@
 #include "impl/c_api/reg_base_impl/npu_arch_3510/storealign_intf_impl.h"
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/storealign_intf_impl.h"
+#endif
+
 union asc_store_align_config {
     int32_t config;
     struct {

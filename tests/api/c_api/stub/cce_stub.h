@@ -33,6 +33,8 @@ inline void vcvt_bf162e6m2(
 inline void vcvt_bf162e8m0(
     vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
+inline void vlds(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* base, int32_t offset, Literal dist) {}
+inline void vsts(vector_f8e6m2 data, __ubuf__ fp8_e6m2_t* base, int32_t offset, Literal dist, vector_bool mask) {}
 
 template <typename C, typename A, typename B>
 inline void mad(

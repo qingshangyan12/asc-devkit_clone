@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_LOAD_LOADALIGN_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/loadalign_intf_impl.h"
 #endif
 
@@ -45,6 +45,8 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign(__ubuf__ fp8_e8m0_t* src)
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign(__ubuf__ fp8_e5m2_t* src);
 
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign(__ubuf__ fp8_e4m3fn_t* src);
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_loadalign(__ubuf__ fp8_e6m2_t* src);
 
 __simd_callee__ inline vector_int16_t asc_loadalign(__ubuf__ int16_t* src);
 
@@ -318,6 +320,8 @@ __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
 
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
+
+__simd_callee__ inline void asc_loadalign(vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src);
 
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 
