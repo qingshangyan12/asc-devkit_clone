@@ -146,7 +146,7 @@ Case 0的 `aiv_vec_ratio` 达到0.946，耗时集中在SIMT线程的GM读写和�
 
 - 每个Thread Block按tile处理行数据。tile内的行数决定一次VF调用启动的Warp数量（一个Warp处理一行），行数取以下三者的最小值：本Thread Block分到的行数、UB容量内四份tile缓冲区可容纳的行数、一个Thread Block最多启动2048个线程（64个Warp）对应的64行。
 - kernel将动态UB划分为双份输入tile缓冲区与双份输出tile缓冲区，两组缓冲区随tile交替使用，各自的生命周期由独立的事件管理。
-- MTE2使用 `asc_copy_gm2ub_align` 二维搬运，按真实cols把GM每行搬入UB；MTE3按同样方式把结果搬回GM。
+- MTE2按真实cols把GM每行搬入UB；MTE3按同样方式把结果搬回GM。
 - SIMT VF仍按一个Warp一行的方式完成max、exp/sum和归一化三轮循环，行内处理逻辑与Case 0相同，输入来自UB。
 
 ```cpp
