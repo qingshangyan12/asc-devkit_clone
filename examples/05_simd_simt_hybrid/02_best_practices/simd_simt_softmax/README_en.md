@@ -173,7 +173,8 @@ for (uint32_t row_base = first_row_base; row_base < rows; row_base += tile_strid
         __ubuf__ half* next_input_tile_ub = next_slot == 0 ? input_tile_ub0 : input_tile_ub1;
 
         asc_sync_wait(PIPE_V, PIPE_MTE2, next_event_id);
-        asc_copy_gm2ub_align(next_input_tile_ub, mutable_gm_ptr(input + next_row_base * cols),
+        asc_copy_gm2ub_align(
+            next_input_tile_ub, mutable_gm_ptr(input + next_row_base * cols),
             static_cast<uint16_t>(next_rows_in_tile), row_bytes, 0, 0, false,
             asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
         asc_sync_notify(PIPE_MTE2, PIPE_V, next_event_id);
@@ -186,8 +187,9 @@ for (uint32_t row_base = first_row_base; row_base < rows; row_base += tile_strid
 
     asc_sync_notify(PIPE_V, PIPE_MTE3, event_id);
     asc_sync_wait(PIPE_V, PIPE_MTE3, event_id);
-    asc_copy_ub2gm_align(output + row_base * cols, output_tile_ub, static_cast<uint16_t>(rows_in_tile),
-        row_bytes, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
+    asc_copy_ub2gm_align(
+        output + row_base * cols, output_tile_ub, static_cast<uint16_t>(rows_in_tile), row_bytes,
+        asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
     asc_sync_notify(PIPE_MTE3, PIPE_V, event_id);
     ++tile_idx;
 }
