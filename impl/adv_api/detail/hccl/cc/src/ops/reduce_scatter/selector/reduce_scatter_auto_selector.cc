@@ -189,28 +189,29 @@ SelectorStatus ReduceScatterAutoSelector::SelectCcuScheduleUBXAlgo(
 SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoCcuSchedule(
     const TopoInfoWithNetLayerDetails* topoInfo, const OpParam& opParam, std::string& selectAlgName) const
 {
-    u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
-    u64 dataSize = opParam.DataDes.count * perDataSize;
-    if (topoInfo->level0Topo == Level0Shape::MESH_1D && topoInfo->level0MeshType == Level0MeshType::SINGLE_DIE) {
-        double ratio; // 以8卡为基线确定ratio，用来表示不同卡数对下发的影响系数
-        if (topoInfo->userRankSize == 0) {
-            HCCL_WARNING("[ReduceScatterAutoSelector]the selector is not set topoInfo->userRankSize]");
-            ratio = 1;
-        } else {
-            ratio = DEFAULT_RANK_SIZE / topoInfo->userRankSize;
-        }
-        if (dataSize * ratio >= RS_M2M_1D_MAX_DATA_SIZE) {
-            HCCL_DEBUG(
-                "[ReduceScatterAutoSelector] dataSize[%lu] * ratio[%f] >= MAX_DATA_SIZE[%lu].", dataSize, ratio,
-                RS_M2M_1D_MAX_DATA_SIZE);
-            return SelectorStatus::NOT_MATCH;
-        }
-        selectAlgName = "CcuSchedReduceScatterSoleMesh";
-    } else {
-        HCCL_DEBUG("[ReduceScatterAutoSelector] only single-die MESH_1D matches the KFC path.");
-        return SelectorStatus::NOT_MATCH;
-    }
-    HCCL_DEBUG("[ReduceScatterAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+    // u64 perDataSize = DATATYPE_SIZE_TABLE[opParam.DataDes.dataType];
+    // u64 dataSize = opParam.DataDes.count * perDataSize;
+    // if (topoInfo->level0Topo == Level0Shape::MESH_1D && topoInfo->level0MeshType == Level0MeshType::SINGLE_DIE) {
+    //     double ratio;
+    //     if (topoInfo->userRankSize == 0) {
+    //         HCCL_WARNING("[ReduceScatterAutoSelector]the selector is not set topoInfo->userRankSize]");
+    //         ratio = 1;
+    //     } else {
+    //         ratio = DEFAULT_RANK_SIZE / topoInfo->userRankSize;
+    //     }
+    //     if (dataSize * ratio >= RS_M2M_1D_MAX_DATA_SIZE) {
+    //         HCCL_DEBUG("[ReduceScatterAutoSelector] dataSize[%lu] * ratio[%f] >= MAX_DATA_SIZE[%lu].", dataSize,
+    //             ratio, RS_M2M_1D_MAX_DATA_SIZE);
+    //         return SelectorStatus::NOT_MATCH;
+    //     }
+    //     selectAlgName = "CcuSchedReduceScatterSoleMesh";
+    // } else {
+    //     HCCL_DEBUG("[ReduceScatterAutoSelector] only single-die MESH_1D matches the KFC path.");
+    //     return SelectorStatus::NOT_MATCH;
+    // }
+    // HCCL_DEBUG("[ReduceScatterAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
+
+    selectAlgName = "CcuSchedReduceScatterSoleMesh";
     return SelectorStatus::MATCH;
 }
 

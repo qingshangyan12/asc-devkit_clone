@@ -98,6 +98,10 @@ private:
     void PostSync();
     void DoRepeatReduceScatter();
     void DoReduceScatter();
+    void DoReduceScatterReadBuf(std::vector<CcuRep::LocalAddr>& buf, CcuRep::CompletedEvent& evt);
+    void DoReduceScatterBuf(std::vector<CcuRep::LocalAddr>& buf, CcuRep::LocalAddr& src,
+                            CcuRep::CompletedEvent& evt);
+    void InitReduceScatterAddrDoubleBuffer();
 
     std::string GetLoopBlockTag(std::string loopType, int32_t index);
     void CreateReduceLoop(uint32_t size, HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType);
@@ -129,7 +133,11 @@ private:
     CcuRep::LocalAddr myInput_;
     std::vector<CcuRep::RemoteAddr> remoteInput_;
     std::vector<CcuRep::LocalAddr> scratchMem_;
+    std::vector<CcuRep::LocalAddr> scratchMemB_;
+    CcuRep::LocalAddr myInputReduce_;
     CcuRep::CompletedEvent event_;
+    CcuRep::CompletedEvent eventB_;
+    CcuRep::Variable toggleTmp_;
     CcuRep::Variable flag_; // 用以判断是否是第一次重复
 };
 

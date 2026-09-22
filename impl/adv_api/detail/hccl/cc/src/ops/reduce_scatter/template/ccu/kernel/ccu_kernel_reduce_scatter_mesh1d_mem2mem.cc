@@ -88,10 +88,13 @@ HcclResult CcuKernelReduceScatterMesh1DMem2Mem::InitResource()
     allBit_ = ((1 << rankSize_) - 1) & (~(1 << rankId_)); // 仅rankid位为0，其他位为1，代表远端准备好了
     remoteInput_.reserve(rankSize_);
     scratchMem_.reserve(rankSize_);
+    scratchMemB_.reserve(rankSize_);
     for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
         scratchMem_.push_back(CreateLocalAddr());
+        scratchMemB_.push_back(CreateLocalAddr());
         if (rankIdx == rankId_) {
             myInput_ = CreateLocalAddr();
+            myInputReduce_ = CreateLocalAddr();
             remoteInput_.push_back({});
         } else {
             remoteInput_.push_back(CreateRemoteAddr());
@@ -99,6 +102,8 @@ HcclResult CcuKernelReduceScatterMesh1DMem2Mem::InitResource()
     }
 
     event_ = CreateCompletedEvent();
+    eventB_ = CreateCompletedEvent();
+    toggleTmp_ = CreateVariable();
     return HcclResult::HCCL_SUCCESS;
 }
 
@@ -148,6 +153,46 @@ void CcuKernelReduceScatterMesh1DMem2Mem::PostSync()
     }
 }
 
+void CcuKernelReduceScatterMesh1DMem2Mem::DoReduceScatterReadBuf(
+    std::vector<CcuRep::LocalAddr>& buf, CcuRep::CompletedEvent& evt)
+{
+    uint32_t channelId = 0;
+    CcuRep::Variable sliceSize = CreateVariable();
+    sliceSize = (rankId_ == (rankSize_ - 1)) ? lastSliceSize_ : normalSliceSize_;
+
+    CCU_IF(sliceSize != 0)
+    {
+        for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
+            evt.SetMask(1 << rankIdx);
+            if (rankIdx == rankId_) {
+                RecordEvent(evt);
+            } else {
+                ReadNb(channels_[channelId], buf[rankIdx], remoteInput_[rankIdx], sliceSize, evt);
+                channelId++;
+            }
+        }
+    }
+}
+
+void CcuKernelReduceScatterMesh1DMem2Mem::DoReduceScatterBuf(
+    std::vector<CcuRep::LocalAddr>& buf, CcuRep::LocalAddr& src, CcuRep::CompletedEvent& evt)
+{
+    CcuRep::LocalAddr myOutput = CreateLocalAddr();
+    myOutput.addr = output_;
+    myOutput.addr += currentRankSliceOutputOffset_;
+    myOutput.token = token_[rankId_];
+
+    CcuRep::Variable sliceSize = CreateVariable();
+    sliceSize = (rankId_ == (rankSize_ - 1)) ? lastSliceSize_ : normalSliceSize_;
+
+    CCU_IF(sliceSize != 0)
+    {
+        evt.SetMask((1 << rankSize_) - 1);
+        WaitEvent(evt);
+        ReduceLoopGroup(myOutput, src, buf, GoSize_, dataType_, outputDataType_, reduceOp_);
+    }
+}
+
 void CcuKernelReduceScatterMesh1DMem2Mem::DoReduceScatter()
 {
     uint32_t channelId = 0;
@@ -181,48 +226,104 @@ void CcuKernelReduceScatterMesh1DMem2Mem::DoReduceScatter()
     }
 }
 
-void CcuKernelReduceScatterMesh1DMem2Mem::DoRepeatReduceScatter()
+void CcuKernelReduceScatterMesh1DMem2Mem::InitReduceScatterAddrDoubleBuffer()
 {
-    CcuRep::Variable scratchOffset = CreateVariable();
-    scratchOffset = 0;
+    CcuRep::Variable scratchOffsetA = CreateVariable();
+    CcuRep::Variable scratchOffsetB = CreateVariable();
+    scratchOffsetA = 0;
+    scratchOffsetB = 0;
+    for (uint32_t i = 0; i < rankSize_; i++) {
+        scratchOffsetB += normalSliceSize_;
+    }
+
+    myInput_.addr = input_[rankId_];
+    myInput_.addr += currentRankSliceInputOffset_;
+    myInput_.token = token_[rankId_];
+    myInputReduce_.addr = input_[rankId_];
+    myInputReduce_.addr += currentRankSliceInputOffset_;
+    myInputReduce_.token = token_[rankId_];
 
     for (uint32_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
-        if (rankIdx == rankId_) {
-            myInput_.addr = input_[rankIdx];
-            myInput_.addr += currentRankSliceInputOffset_;
-            myInput_.token = token_[rankIdx];
-        } else {
+        if (rankIdx != rankId_) {
             remoteInput_[rankIdx].addr = input_[rankIdx];
             remoteInput_[rankIdx].addr += currentRankSliceInputOffset_;
             remoteInput_[rankIdx].token = token_[rankIdx];
         }
-
         scratchMem_[rankIdx].addr = scratch_[rankId_];
-        scratchMem_[rankIdx].addr += scratchOffset;
-        scratchOffset += normalSliceSize_;
+        scratchMem_[rankIdx].addr += scratchOffsetA;
         scratchMem_[rankIdx].token = token_[rankId_];
+
+        scratchMemB_[rankIdx].addr = scratch_[rankId_];
+        scratchMemB_[rankIdx].addr += scratchOffsetB;
+        scratchMemB_[rankIdx].token = token_[rankId_];
+
+        scratchOffsetA += normalSliceSize_;
+        scratchOffsetB += normalSliceSize_;
     }
+}
+
+void CcuKernelReduceScatterMesh1DMem2Mem::DoRepeatReduceScatter()
+{
+    InitReduceScatterAddrDoubleBuffer();
 
     CcuRep::Variable repeatNumAdd = CreateVariable();
     repeatNumAdd = 1;
+
+    // Phase 1: issue Read(0) into buffer A
+    DoReduceScatterReadBuf(scratchMem_, event_);
+    repeatNum_ += repeatNumAdd;
+
     flag_ = 0;
+
     CCU_WHILE(repeatNum_ != UINT64_MAX)
     {
         repeatNum_ += repeatNumAdd;
-        CCU_IF(flag_ == 1)
-        {
-            //  非第一轮执行时，src 和 dst 已经初始化，需要添加偏移量
-            for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
-                if (rankIdx == rankId_) {
-                    myInput_.addr += inputRepeatStride_;
-                } else {
-                    remoteInput_[rankIdx].addr += inputRepeatStride_;
-                }
+
+        // Step read-path addresses for the next chunk
+        for (uint64_t rankIdx = 0; rankIdx < rankSize_; rankIdx++) {
+            if (rankIdx != rankId_) {
+                remoteInput_[rankIdx].addr += inputRepeatStride_;
             }
-            output_ += outputRepeatStride_;
         }
-        DoReduceScatter();
-        flag_ = 1;
+
+        // Read(k) into B if flag_==0, into A if flag_!=0
+        CCU_IF(flag_ == 0)
+        {
+            DoReduceScatterReadBuf(scratchMemB_, eventB_);
+        }
+        CCU_IF(flag_ != 0)
+        {
+            DoReduceScatterReadBuf(scratchMem_, event_);
+        }
+
+        // Wait(k-1) + Reduce(k-1) from the other buffer
+        CCU_IF(flag_ == 0)
+        {
+            DoReduceScatterBuf(scratchMem_, myInputReduce_, event_);
+        }
+        CCU_IF(flag_ != 0)
+        {
+            DoReduceScatterBuf(scratchMemB_, myInputReduce_, eventB_);
+        }
+
+        // Step reduce-path addresses
+        myInputReduce_.addr += inputRepeatStride_;
+        output_ += outputRepeatStride_;
+
+        // Toggle flag_ (no operator-, use temp)
+        toggleTmp_ = 0;
+        CCU_IF(flag_ == 0) { toggleTmp_ = 1; }
+        flag_ = toggleTmp_;
+    }
+
+    // Tail: Wait(last) + Reduce(last) from the buffer that was read last
+    CCU_IF(flag_ == 0)
+    {
+        DoReduceScatterBuf(scratchMem_, myInputReduce_, event_);
+    }
+    CCU_IF(flag_ != 0)
+    {
+        DoReduceScatterBuf(scratchMemB_, myInputReduce_, eventB_);
     }
 }
 
