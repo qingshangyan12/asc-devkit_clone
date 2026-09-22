@@ -65,7 +65,8 @@ enum class DataFormat : uint8_t {
 #define CANN_ASC_ENABLE_FIX_SHIFT
 #endif
 
-#if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+#if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+    (__NPU_ARCH__ == 5162)
 #define CANN_ASC_ENABLE_POST_PROC_BUF
 #define CANN_ASC_ENABLE_SID
 #endif
@@ -85,7 +86,7 @@ struct DataCopyParams {
 #endif
     {}
     __aicore__ inline void SetBlockCount(const uint16_t blockCount_) {
-        blockCount = blockCount_t;
+        blockCount = blockCount_;
     }
 
     __aicore__ inline void SetBlockLen(const uint16_t blockLen_) 
@@ -117,7 +118,6 @@ struct DataCopyParams {
 
     uint16_t blockCount = DEFAULT_DATA_COPY_NBURST;
     uint16_t blockLen = 0;
-    uint16_t sid = 0;
     // srcStride and dstStride will be deprecated, use srcGap and dstGap instead.
     union {
         uint16_t srcGap = 0;
@@ -337,7 +337,7 @@ struct Nd2NzParams {
     __aicore__ Nd2NzParams(
         const uint16_t ndNumIn, const uint16_t nValueIn, const uint32_t dValueIn, const uint64_t srcNdMatrixStrideIn,
         const uint64_t srcDValueIn, const uint16_t dstNzC0StrideIn, const uint16_t dstNzNStrideIn,
-        const uint32_t dstNzMatrixStrideIn)
+        const uint32_t dstNzMatrixStrideIn, const uint8_t sidIn = 0)
         : ndNum(ndNumIn),
           nValue(nValueIn),
           dValue(dValueIn),
@@ -365,7 +365,7 @@ struct Nd2NzParams {
 
     __aicore__ inline void SetSrcNdMatrixStride(const uint32_t srcNdMatrixStride_)
     {
-        srcNdMatrixStride = srcNdMatrixStride__;
+        srcNdMatrixStride = srcNdMatrixStride_;
     }
 
     __aicore__ inline void SetSrcDValue(const uint64_t srcDValue_)
