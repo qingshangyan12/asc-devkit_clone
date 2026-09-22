@@ -116,8 +116,11 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
                 "[%s] 1DMESH instance containing rank[%u] not found on pcie mix topo.", __func__,
                 topoInfo->userRank),
             HcclResult::HCCL_E_PARA);
+        // 框间组遍历全 rank 空间推导：infos[0][0] 只含本 rank 所在实例的成员
+        //（GetTopoInstsByLayer 仅返回当前 rank 的实例），与 hccl
+        // BuildRepresentativeGroup（offset + i*step 纯算术）等价。
         std::vector<u32> interRanks;
-        for (u32 rank : algHierarchyInfo.infos[0][0]) {
+        for (u32 rank = 0; rank < topoInfo->userRankSize; ++rank) {
             if (rank % meshGroupSize == topoInfo->userRank % meshGroupSize) {
                 interRanks.push_back(rank);
             }
