@@ -20,6 +20,9 @@
 
 extern HcclResult LaunchOpenOpParamDataImpl(
     std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+extern HcclResult LaunchOpenOpParamDataImpl(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::TurnPolicy& policy);
 
 namespace {
 u64 GetDataTypeSize(HcclDataType dataType)
@@ -54,7 +57,8 @@ u64 GetDataTypeSize(HcclDataType dataType)
 } // namespace
 
 HcclResult LoadOpenOpParamData(
-    uint64_t opParamKey, uint64_t opParamSize, std::string& commName, std::vector<uint8_t>& opParam)
+    uint64_t opParamKey, uint64_t opParamSize, std::string& commName, std::vector<uint8_t>& opParam,
+    mc2_boundary::Config* boundary)
 {
     if (opParamKey == 0U) {
         HCCL_ERROR("Invalid opParamKey %#llx.", opParamKey);
@@ -67,14 +71,28 @@ HcclResult LoadOpenOpParamData(
 
     const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(opParamKey);
     const size_t serializedSize = static_cast<size_t>(opParamSize);
-    if (param->varMemSize != serializedSize - sizeof(mc2_ops_hccl::OpParam)) {
+    if (param->varMemSize > serializedSize - sizeof(mc2_ops_hccl::OpParam)) {
         HCCL_ERROR(
             "OpParam variable memory size %llu does not match serialized size %zu.",
             static_cast<unsigned long long>(param->varMemSize), serializedSize);
         return HCCL_E_PARA;
     }
     const auto* begin = reinterpret_cast<const uint8_t*>(param);
-    opParam.assign(begin, begin + serializedSize);
+    const size_t baseSize = sizeof(mc2_ops_hccl::OpParam) + param->varMemSize;
+    const size_t extraSize = serializedSize - baseSize;
+    mc2_boundary::Config decoded;
+    if (extraSize != 0U &&
+        (extraSize != sizeof(decoded) || !mc2_boundary::Decode(begin + baseSize, extraSize, decoded, true))) {
+        HCCL_ERROR("Invalid MC2 boundary parameter extension.");
+        return HCCL_E_PARA;
+    }
+    if (boundary != nullptr) {
+        *boundary = decoded;
+    } else if (decoded.mode != 0U) {
+        HCCL_ERROR("Enabled boundary policy requires the matching MC2 server.");
+        return HCCL_E_NOT_SUPPORT;
+    }
+    opParam.assign(begin, begin + baseSize);
     commName.assign(param->commName);
     HCCL_INFO(
         "[MC2_OPEN_DIAG][LoadOpenOpParamData] file[%s:%d], key %#llx, sizeof(OpParam) %zu, "
@@ -293,4 +311,14 @@ HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, const mc2_ops_hc
         return HCCL_E_PARA;
     }
     return LaunchOpenOpParamDataImpl(opParam, resCtx);
+}
+
+HcclResult LaunchOpenOpParamData(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::TurnPolicy& policy)
+{
+    if (opParam.empty()) {
+        return HCCL_E_PARA;
+    }
+    return LaunchOpenOpParamDataImpl(opParam, resCtx, policy);
 }

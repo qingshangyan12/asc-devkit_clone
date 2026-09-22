@@ -71,6 +71,31 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_normal)
     EXPECT_EQ(ccTilingConfig.GetTiling(ccTilingInner), EXIT_SUCCESS);
 }
 
+TEST_F(TestHcclTiling, AlgorithmBoundarySyncWireAndDisable)
+{
+    Mc2CcTilingConfig config("test", 1U, "fullmesh");
+    ::Mc2InitTiling init{};
+    ::Mc2CcTiling tiling{};
+    ASSERT_EQ(config.GetTiling(init), EXIT_SUCCESS);
+    EXPECT_EQ(config.SetAlgorithmBoundarySync(
+        static_cast<Mc2AlgorithmBoundarySyncMode>(3U), 1U, 2U), EXIT_FAILURE);
+    EXPECT_EQ(config.SetAlgorithmBoundarySync(
+        Mc2AlgorithmBoundarySyncMode::INPUT_READY_GROUP, 1U, 0U), EXIT_FAILURE);
+    ASSERT_EQ(config.SetAlgorithmBoundarySync(
+        Mc2AlgorithmBoundarySyncMode::INPUT_READY_GROUP, 42U, 3U), EXIT_SUCCESS);
+    ASSERT_EQ(config.GetTiling(tiling), EXIT_SUCCESS);
+    const auto* inner = reinterpret_cast<const Mc2CcTilingInner*>(&tiling);
+    mc2_boundary::Config decoded;
+    ASSERT_TRUE(mc2_boundary::Decode(inner->reserved2, sizeof(inner->reserved2), decoded, true));
+    EXPECT_EQ(decoded.groupId, 42U);
+    EXPECT_EQ(decoded.totalTurns, 3U);
+    ASSERT_EQ(config.SetAlgorithmBoundarySync(
+        Mc2AlgorithmBoundarySyncMode::DISABLED, 0U, 0U), EXIT_SUCCESS);
+    ASSERT_EQ(config.GetTiling(tiling), EXIT_SUCCESS);
+    ASSERT_TRUE(mc2_boundary::Decode(inner->reserved2, sizeof(inner->reserved2), decoded));
+    EXPECT_EQ(decoded.mode, 0U);
+}
+
 TEST_F(TestHcclTiling, Mc2CcTilingConfig_failed1)
 {
     // member variable boundary value validation use case

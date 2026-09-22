@@ -8,6 +8,11 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <cstddef>
+#include <limits>
+#include "comm_kfc_open_kernel_adapter.h"
+#include "ins_v2_all_gather_sole_executor.h"
+#include "ins_temp_all_gather_nhr.h"
+#include "topo_match_1d.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -123,8 +128,78 @@ HcclResult RestoreVarDataIfNeeded(mc2_ops_hccl::OpParam& param, const mc2_ops_hc
 
 } // namespace
 
+namespace {
+bool DisjointBuffers(const void* a, uint64_t aSize, const void* b, uint64_t bSize)
+{
+    const auto x = reinterpret_cast<uintptr_t>(a);
+    const auto y = reinterpret_cast<uintptr_t>(b);
+    if (x == 0U || y == 0U || aSize > UINTPTR_MAX - x || bSize > UINTPTR_MAX - y) {
+        return false;
+    }
+    return x + aSize <= y || y + bSize <= x;
+}
+} // namespace
+
+bool PrepareOpenBoundaryPolicy(
+    const std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::Config& config, uint32_t turn, mc2_boundary::TurnPolicy& policy)
+{
+    policy = mc2_boundary::TurnPolicy{};
+    if (opParam.size() < sizeof(mc2_ops_hccl::OpParam) || config.mode != 1U ||
+        config.totalTurns <= 1U || turn >= config.totalTurns || resCtx.threads.size() != 2U) {
+        return false;
+    }
+    const auto& param = *reinterpret_cast<const mc2_ops_hccl::OpParam*>(opParam.data());
+    if (param.opType != HCCL_CMD_ALLGATHER || param.engine != COMM_ENGINE_AICPU_TS ||
+        std::string(param.algName) != "AicpuAllGatherSoleNHR" || param.supportSymmetricMemory ||
+        param.opMode != mc2_ops_hccl::OpMode::OPBASE) {
+        return false;
+    }
+    const uint64_t element = GetDataTypeSize(param.DataDes.dataType);
+    const uint64_t count = param.DataDes.count;
+    const uint64_t stride = param.DataDes.strideCount == 0U ? count : param.DataDes.strideCount;
+    const uint64_t ranks = resCtx.topoInfo.userRankSize;
+    if (element == 0U || count == 0U || stride < count || ranks <= 1U ||
+        count > UINT64_MAX / element || stride > (UINT64_MAX / element - count) / (ranks - 1U)) {
+        return false;
+    }
+    const uint64_t inputSize = count * element;
+    const uint64_t outputSize = (stride * (ranks - 1U) + count) * element;
+    if (!DisjointBuffers(param.inputPtr, inputSize, param.outputPtr, outputSize) ||
+        !DisjointBuffers(param.inputPtr, inputSize, resCtx.cclMem.addr, resCtx.cclMem.size) ||
+        !DisjointBuffers(param.outputPtr, outputSize, resCtx.cclMem.addr, resCtx.cclMem.size)) {
+        return false;
+    }
+    uint32_t base = resCtx.notifyNumOnMainThread;
+    for (const auto value : resCtx.notifyNumPerThread) {
+        base = std::max(base, value);
+    }
+    if (base >= mc2_boundary::NOTIFY_LIMIT - 1U ||
+        config.totalTurns > mc2_boundary::NOTIFY_LIMIT - base - 1U) {
+        return false;
+    }
+    // The only slave is a post-copy thread: its existing POST_COPY_NOTIFY_IDX wait
+    // follows the main-thread producer. Retained per-turn exits protect scratch reuse.
+    // No communication primitive can execute on this slave before that internal wait.
+    policy.enabled = true;
+    policy.skipEntry = turn != 0U;
+    policy.exitNotify = base + 1U + turn;
+    return true;
+}
+
+HcclResult LaunchOpenOpParamDataImpl(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::TurnPolicy& policy);
+
 HcclResult LaunchOpenOpParamDataImpl(
     std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx)
+{
+    return LaunchOpenOpParamDataImpl(opParam, resCtx, mc2_boundary::TurnPolicy{});
+}
+
+HcclResult LaunchOpenOpParamDataImpl(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::TurnPolicy& policy)
 {
     auto* param = AsOpenOpParam(opParam);
     CHK_PTR_NULL(param);
@@ -191,6 +266,17 @@ HcclResult LaunchOpenOpParamDataImpl(
         return HCCL_SUCCESS;
     }
 
+    if (policy.enabled) {
+        using NhrExecutor = mc2_ops_hccl::InsV2AllGatherSoleExecutor<
+            mc2_ops_hccl::TopoMatch1D, mc2_ops_hccl::InsTempAllGatherNHR>;
+        NhrExecutor nhrExecutor;
+        CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
+        const std::string boundaryTag = ":mb1:" + std::to_string(policy.skipEntry) + ":" +
+                                        std::to_string(policy.exitNotify);
+        return mc2_ops_hccl::RunWithMc2TaskCache(
+            *param, resCtx, [&]() { return nhrExecutor.OrchestrateBoundary(*param, resCtx, policy); },
+            mc2_ops_hccl::Mc2AicpuTaskCacheManager::Instance(), boundaryTag);
+    }
     auto executor =
         mc2_ops_hccl::CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, std::string(param->algName));
     CHK_SMART_PTR_NULL(executor);
