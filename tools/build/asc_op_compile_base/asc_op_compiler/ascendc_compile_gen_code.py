@@ -318,12 +318,8 @@ def set_workspace_param(opinfo: OpInfo, tiling_info: TilingInfo):
             output_shape_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
             source += "    AscendC::OOMCheckAddrRange(__ascendc_output_shape, {});\n".format(output_shape_len)
             source += "    tmpTilingSizeForOOM += 8;\n"
-        workspace_len = (
-            "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
-        )
-        source += "    AscendC::OOMCheckAddrRange(workspace, {});\n".format(
-            workspace_len
-        )
+        workspace_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
+        source += "    AscendC::OOMCheckAddrRange(workspace, {});\n".format(workspace_len)
     return source
 
 
@@ -348,17 +344,10 @@ def add_op_param_to_workspace(
     source += skip_mc2_context_size(opinfo)
 
     if not tiling_info.static_shape_flag:
-        legacy_len_count = (
-            len([item for item in input_output_info if item is not None]) + 1
-        )
-        if (
-            opinfo.output_shape_depend_on_compute is not None
-            and len(opinfo.output_shape_depend_on_compute) > 0
-        ):
+        legacy_len_count = len([item for item in input_output_info if item is not None]) + 1
+        if opinfo.output_shape_depend_on_compute is not None and len(opinfo.output_shape_depend_on_compute) > 0:
             legacy_len_count += 1
-        source += OOM_STORAGE_SHAPE_INIT_PATTERN.format(
-            legacy_len_offset=8 * legacy_len_count
-        )
+        source += OOM_STORAGE_SHAPE_INIT_PATTERN.format(legacy_len_offset=8 * legacy_len_count)
 
     for io_index, op_param in enumerate(input_output_info):
         if op_param is None:
@@ -371,14 +360,13 @@ def add_op_param_to_workspace(
                     )
                 else:
                     source += OOM_TENSOR_LIST_REGISTER_PATTERN.format(
-                        param_name=op_param.get("param_name"),
-                        element_size=dtype_int[io_index],
+                        param_name=op_param.get("param_name"), element_size=dtype_int[io_index]
                     )
         else:
             if tiling_info.static_shape_flag:
-                input_shape_len = reduce(
-                    lambda x, y: x * y, op_param.get("shape")
-                ) * INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"))
+                input_shape_len = reduce(lambda x, y: x * y, op_param.get("shape")) * INPUT_OUTPUT_DTYPE_LEN.get(
+                    op_param.get("dtype")
+                )
                 input_shape_len = math.ceil(input_shape_len)
                 input_shape_len = (input_shape_len + 32 - 1) // 32 * 32
                 source += "    AscendC::OOMCheckAddrRange({}, {});\n".format(
@@ -388,9 +376,7 @@ def add_op_param_to_workspace(
                 input_shape_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
                 element_size = INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"), 0)
                 source += OOM_TENSOR_REGISTER_PATTERN.format(
-                    param_name=op_param.get("param_name"),
-                    element_size=element_size,
-                    input_shape_len=input_shape_len,
+                    param_name=op_param.get("param_name"), element_size=element_size, input_shape_len=input_shape_len
                 )
         source += "    tmpTilingSizeForOOM += 8;\n"
         count = count + 1
