@@ -897,9 +897,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
     float ax = __fabsf(x);
     // Summing the magnitudes tests both arguments for NaN at once and propagates it as the result.
     float sum = ax + ay;
-    if (__isnan(sum)) {
-        return sum;
-    }
 
     // Order the magnitudes so the ratio lo / hi never exceeds 1, which is the polynomial's valid range.
     bool y_gt_x = ay > ax;
@@ -944,9 +941,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
         // Both arguments are zero. Sign of x picks pi or 0, matching atan2(+-0, -0) == +-pi.
         a = signbit(x) ? 3.14159274101257324219f : 0.0f;
     }
-
+    float result = signbit(y) ? -a : a;
+    if (__isnan(sum)) {
+        result = sum;
+    }
     // atan2 is odd in y, so the sign of y (including -0.0) is reapplied last.
-    return signbit(y) ? -a : a;
+    return result;
 }
 
 /**
@@ -2947,7 +2947,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
         return ASCRT_PIO2_F - dst;
     }
     if (fabsf(x) > 1) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+        return ASCRT_NAN_F;
     }
 }
 
