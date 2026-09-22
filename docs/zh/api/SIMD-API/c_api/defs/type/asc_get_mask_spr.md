@@ -52,7 +52,7 @@ vector_bool，掩码寄存器。
 
 ## 约束说明
 
-- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- Reg矢量计算C API通用约束请参见[通用约束](../../reg_compute/overview.md#通用约束)。
 - 本接口需在Vector Function（`__simd_vf__`标记的函数）内调用。
 
 ## 调用示例
