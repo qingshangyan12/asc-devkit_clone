@@ -69,7 +69,6 @@ enum class DPLATFORM {
     KIRIN_DEV_0002,
     KIRIN_DEV_0003,
     MC62,
-    MC32DM11A,
     DEFAULT_CURRENT
 };
 
