@@ -83,7 +83,6 @@ __simd_callee__ inline reg_tensor<DataType> reduce_min(const reg_tensor<DataType
 ## 约束说明
 
 - `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与归约的元素位置错误。
-- `scope`仅支持`reduce_scope::element`和`reduce_scope::datablock`。配置为其他取值时会产生编译期错误。
 - 未被`src.mask`选中的元素被视为对应数据类型的最大值，浮点数类型的最大值为`+inf`。
 - `scope`为`reduce_scope::element`时，若`src.mask`全为0，则将对应数据类型的最大值写入返回值`reg`的第0个元素，并将其余元素置0。
 - `scope`为`reduce_scope::datablock`时，若某个`DataBlock`内的元素均不参与计算，则将对应数据类型的最大值写入返回值`reg`的对应位置。

@@ -99,8 +99,6 @@ __simd_callee__ inline reg_tensor<DstType> reduce_sum(const reg_tensor<SrcType>&
 ## 约束说明
 
 - `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与归约的元素位置错误。
-- `scope`为`reduce_scope::pair`时，`SrcType`与`DstType`必须保持一致，且仅支持`half`和`float`。
-- 对于输入为`int16_t`或`uint16_t`类型的情况，会提升精度到`int32_t`或`uint32_t`进行计算。
 - `scope`为`reduce_scope::element`时，若`src.mask`全为0，则将0写入返回值`reg`的第0个元素；对于浮点数类型，写入+0。
 - `scope`为`reduce_scope::datablock`时，若某个`DataBlock`内的元素均不参与计算，则将0写入返回值`reg`的对应位置；对于浮点数类型，写入+0。
 - `scope`为`reduce_scope::pair`时，未被`src.mask`选中的元素被视为0参与相邻元素求和。
