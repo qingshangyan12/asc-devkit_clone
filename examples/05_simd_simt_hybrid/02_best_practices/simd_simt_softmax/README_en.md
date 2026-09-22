@@ -64,7 +64,7 @@ This sample constructs an optimization path through three cases. The kernel, Thr
 | ---- | ------ | ------------------ | ------------------------ | ------------------------------- |
 | 0 | softmax_gm_kernel | Dynamically calculated based on the data size | 32 x warps_per_block, adaptive to rows, up to 2048 | The SIMT VF reads GM directly. One Warp processes one row, and Warp reduction completes the in-row max and sum |
 | 1 | softmax_ub_kernel | Dynamically calculated based on the data size | 32 x rows_per_tile, adaptive to rows and UB capacity, up to 2048 | Input is moved to UB through MTE for staging. Double tile buffers are used in rotation so that movement and computation overlap |
-| 2 | softmax_bucket_kernel | Dynamically calculated based on the data size | 512/1024/2048 (dynamically selected based on the shape) | The compile-time bucket keeps intermediate values in fixed-length arrays in registers. UB is padded to the bucket width |
+| 2 | softmax_bucket_kernel | Dynamically calculated based on the data size | 512/1024/2048 (dynamically selected based on the shape) | The compile-time bucket keeps intermediate values in registers. UB is padded to the bucket width |
 
 The Thread Block count is dynamically calculated on the Host side based on the data size: the hardware AIV core count is first queried through `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`, and the smaller value between the AIV core count and rows is used as the Thread Block count. One Warp processes one row. In Case 0 and Case 1, the number of Warps actually launched per Thread Block adapts to rows: when rows are fewer than the AIV core count, each Thread Block processes only one row. In Case 2, the UB buffers are static arrays whose dimensions are determined by the thread count and the bucket capacity, so they must be determined at compile time. Therefore, the thread count can only take the fixed levels 512/1024/2048, and the actually launched thread count equals the selected level; it cannot vary arbitrarily with rows. Each Thread Block processes a fixed number of rows: when rows are small, some Thread Blocks have no rows to process and exit directly. The three cases are selected through the build option `SCENARIO_NUM`, where 0, 1, and 2 correspond to Case 0, Case 1, and Case 2 respectively. The default value is 2.
 
@@ -209,18 +209,18 @@ The computation time of Case 1 is mainly spent on how the in-row computation is 
 
 ### Case 2: Compile-Time Bucket and Dynamic Thread Selection
 
-**Optimization Goal**: Eliminate the repeated reads of the input row and the repeated computation of `exp` in the Case 1 in-row computation. The first step is to introduce a static array that caches the whole row from UB, so that one read completes the max, exp/sum, and normalization. The second step is to make the array stay in registers to further reduce the memory access overhead. To this end, the implementation converges to compile-time buckets: cols upper bounds 64/128/256/384/512 are divided into five levels, a fixed-length specialized kernel is generated for each level so that all in-row intermediate values stay in registers, and the Host side dynamically selects the thread count based on the shape.
+**Optimization Goal**: Eliminate the repeated reads of the input row and the repeated computation of `exp` in the Case 1 in-row computation. The first step is to introduce a static array that caches the whole row from UB, so that one read completes the max, exp/sum, and normalization. The second step is to make the array stay in registers to further reduce the memory access overhead. To this end, the implementation converges to compile-time buckets: cols upper bounds 64/128/256/384/512 are divided into five levels, a specialized kernel is generated for each level so that all in-row intermediate values stay in registers, and the Host side dynamically selects the thread count based on the shape.
 
 **Core Implementation**:
 
-- Compile-time bucket: The cols covered by this sample does not exceed 512, and each thread is assigned at most 512/32 = 16 elements, which fits directly in registers. However, the loop that traverses the array is bounded by cols: cols is a runtime parameter, so neither the number of iterations nor the array indices accessed in each iteration can be determined at compile time. The compiler cannot unroll the loop, and an array with dynamic indices can only be allocated in stack space, whose access efficiency is lower than that of registers. Therefore, cols is divided into five buckets by the upper bounds 64/128/256/384/512, and a specialized kernel is instantiated per bucket: the bucket capacity is a compile-time constant, both the iteration count and the indices are constants, the array-access loops can be fully expanded, and the static array `elements[kWarpIterations]` stays in registers. Invalid tail columns are masked with `-ASCRT_INF_F` and excluded from the reduction and normalization.
+- Compile-time bucket: The cols covered by this sample does not exceed 512, and each thread is assigned at most 512/32 = 16 elements, which fits directly in registers. However, the for loop that traverses the array takes cols as its condition: cols is a runtime parameter, so neither the number of iterations nor the array indices accessed in each iteration can be determined at compile time. The compiler cannot unroll the loop, and the array can only be allocated in stack space, whose access efficiency is lower than that of registers. Therefore, cols is divided into five buckets by the upper bounds 64/128/256/384/512, and a specialized kernel is instantiated per bucket: the bucket capacity is a compile-time constant, the for loop condition is a constant, the loop can be fully expanded, and `elements[kWarpIterations]` can stay in registers. Invalid tail columns are masked with `-ASCRT_INF_F` and excluded from the reduction and normalization.
 - UB layout: tile buffers are allocated by the bucket capacity `kBucketCols`. MTE moves each row based on the real cols at runtime, and the space after the real elements is left unused. The SIMT VF computes on the padded UB, and MTE3 moves the result back to GM by the real cols. The bucket classification and UB layout are shown in the following figure.
 
   <img src="./figures/case2.png">
 
 - Dynamic thread selection: the Host selects the thread count based on the rows per core. 512/1024/2048 threads correspond to at most 16/32/64 rows per tile. When `cols > 256`, considering register pressure, at most 1024 threads are launched.
 
-The SIMT VF reads the elements assigned to each thread into a fixed-length array and completes all computation in registers:
+The SIMT VF reads the elements assigned to each thread into the array once, and the subsequent computation reuses the loaded data, reducing data copies:
 
 ```cpp
 template <uint32_t kThreadCount, uint32_t kBucketCols>
@@ -238,8 +238,8 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     // Each row in the tile is stored with the stride of kBucketCols.
     // The space beyond the real data is left unused.
     const uint32_t row_offset = row_in_tile * kBucketCols;
-    // Fixed-length array: both the length and the access indices are
-    // compile-time constants, so it can stay in registers.
+    // The loop bounds and access indices for the array are compile-time
+    // constants, so the array can stay in registers.
     float elements[kWarpIterations];
 
     // Read the elements assigned to this thread in one pass. Invalid tail
@@ -249,8 +249,8 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
         elements[iter] = col < cols ? static_cast<float>(input_ub[row_offset + col]) : -ASCRT_INF_F;
     }
 
-    // Complete the max on registers, then obtain the row maximum
-    // through the Warp reduction.
+    // Compute the max over the loaded array elements, then obtain the row
+    // maximum through the Warp reduction.
     float max_value = elements[0];
     for (uint32_t iter = 1; iter < kWarpIterations; ++iter) {
         max_value = max(max_value, elements[iter]);
@@ -282,7 +282,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
 **Analysis**:
 
-The main change of Case 2 over Case 1 is that "runtime cols" becomes "compile-time bucket upper bound": the length and indices of the fixed-length array are determined at compile time, the compiler keeps all in-row intermediate values in registers, and both the input row and `exp` are processed only once. `aiv_vec_time` further decreases from 7.833μs to 4.593μs, a reduction of about 41.4%. `Task Duration` decreases from 11.923μs to 8.588μs, a reduction of about 28.0%. The bucket only affects the stride of the UB layout. MTE still moves data by the real cols, and `aiv_mte2_time` stays nearly the same as Case 1. The reduction of the total time makes `aiv_vec_ratio` drop from 0.758 to 0.653 and `aiv_mte2_ratio` rise from 0.241 to 0.362. The time proportions of in-row computation and MTE2 movement are already close. Compared with Case 0, `Task Duration` decreases from 12.975μs to 8.588μs, an overall reduction of about 33.8%.
+The main change of Case 2 over Case 1 is that "runtime cols" becomes "compile-time bucket upper bound": the loop bounds and indices for traversing the array are determined at compile time, the compiler keeps all in-row intermediate values in registers, and both the input row and `exp` are processed only once. `aiv_vec_time` further decreases from 7.833μs to 4.593μs, a reduction of about 41.4%. `Task Duration` decreases from 11.923μs to 8.588μs, a reduction of about 28.0%. The bucket only affects the stride of the UB layout. MTE still moves data by the real cols, and `aiv_mte2_time` stays nearly the same as Case 1. The reduction of the total time makes `aiv_vec_ratio` drop from 0.758 to 0.653 and `aiv_mte2_ratio` rise from 0.241 to 0.362. The time proportions of in-row computation and MTE2 movement are already close. Compared with Case 0, `Task Duration` decreases from 12.975μs to 8.588μs, an overall reduction of about 33.8%.
 
 ## Performance Comparison Summary
 
@@ -307,7 +307,7 @@ The `Task Duration` of Case 1 keeps rising as cols increases: the in-row computa
 ## Tuning Recommendations
 
 1. Organize threads along the reduction dimension for reduction computation: assign the data within the reduction dimension to one Warp and complete the reduction with Warp reduction primitives. Dimensions are naturally parallel, and no cross-Warp synchronization is needed.
-2. When loop bounds or array indices depend on runtime parameters and the number of iterations is small, classify the parameters into a small number of upper bounds and fix them as compile-time constants, so that the loops can be fully expanded and fixed-length arrays stay in registers, avoiding repeated input reads and repeated computation.
+2. When loop bounds or array indices depend on runtime parameters and the number of iterations is small, classify the parameters into a small number of upper bounds and fix them as compile-time constants, so that the loops can be fully expanded and the arrays stay in registers, avoiding repeated input reads and repeated computation.
 
 ## Build and Run
 
