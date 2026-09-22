@@ -69,7 +69,7 @@ __aicore__ inline void Gatherb(
     }
 #endif
     uint32_t srcLength = src.GetSize();
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103))
     GatherImpl(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ uint32_t*)offset.GetPhyAddr(), srcLength, repeatTime, repeatParams);
@@ -198,7 +198,7 @@ __aicore__ inline void Gather(
     }
 #endif
     uint32_t vectorRegWidth = 256;
-#if (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113))
+#if (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103))
     vectorRegWidth = VECTOR_REG_WIDTH;
 #endif
     uint32_t elementCountSingleRepeat;
@@ -207,13 +207,13 @@ __aicore__ inline void Gather(
     } else {
         elementCountSingleRepeat = 64;
     }
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103)
     elementCountSingleRepeat = vectorRegWidth / sizeof(T);
     uint32_t repeatStride = vectorRegWidth / ONE_BLK_SIZE;
 #endif
     const uint32_t elementCountTail = count % elementCountSingleRepeat;
     const uint8_t repeatTime = count / elementCountSingleRepeat;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103)
     if (repeatTime > 0) {
         Gather(dst, src, srcOffset, srcBaseOffset, (uint64_t)elementCountSingleRepeat, repeatTime, repeatStride);
     }

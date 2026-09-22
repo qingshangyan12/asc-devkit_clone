@@ -395,6 +395,37 @@ __aicore__ inline void DataCopyGM2L1DN2NZImpl(
     }
 }
 
+template <typename T>
+__aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams)
+{
+    uint16_t ndNum = intriParams.ndNum;
+    uint16_t nValue = intriParams.nValue;
+    uint16_t dValue = intriParams.dValue;
+    uint16_t srcNdMatrixStride = intriParams.srcNdMatrixStride;
+    uint16_t srcDValue = intriParams.srcDValue;
+    uint16_t dstNzC0Stride = intriParams.dstNzC0Stride;
+    uint16_t dstNzNStride = intriParams.dstNzNStride;
+    uint16_t dstNzMatrixStride = intriParams.dstNzMatrixStride;
+
+    ASCENDC_DEBUG_ASSERT(((dValue * sizeof(T)) % BYTE_32_ALIGN == 0), "dValue should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(
+        ((srcNdMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), "srcNdMatrixStride should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(((srcDValue * sizeof(T)) % BYTE_32_ALIGN == 0), "srcDValue should be 32B aligned \n");
+    ASCENDC_DEBUG_ASSERT(
+        ((dstNzMatrixStride * sizeof(T)) % BYTE_32_ALIGN == 0), "dstNzMatrixStride should be 32B aligned \n");
+
+    uint32_t elementsPerBlock = ONE_BLK_SIZE / sizeof(T);
+    uint32_t NBlockSize = dValue / elementsPerBlock;
+    for (uint32_t ndIdx = 0; ndIdx < ndNum; ++ndIdx) {
+        for (int i = 0; i < NBlockSize; ++i) {
+            uint32_t offsetDst = ndIdx * dstNzMatrixStride + i * elementsPerBlock * dstNzC0Stride;
+            uint32_t offsetSrc = ndIdx * srcNdMatrixStride + i * elementsPerBlock;
+            copy_ubuf_to_cbuf(
+                dst + offsetDst, src + offsetSrc, 0, nValue, 1, srcDValue / elementsPerBlock - 1, dstNzNStride - 1);
+        }
+    }
+}
+
 /* **************************************************************************************************
  * NZ2ND                                         *
  * ************************************************************************************************* */

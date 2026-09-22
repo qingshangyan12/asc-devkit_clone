@@ -10,11 +10,11 @@
 
 /*!
  * \file kernel_operator_data_copy_impl.h
- * \brief AscendC l311 support data copy api.
+ * \brief AscendC l310 support data copy api.
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/basic_api/dav_l311/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic_api/dav_l310/kernel_operator_data_copy_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_tensor.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_IMPL_H__
 #endif
@@ -240,26 +240,9 @@ __aicore__ inline void TransND2NZ(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplB16(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
-    }
-
-    uint16_t loop2DstStride = intriParams.dstNzNStride;  // loop2_dst_stride = dst_nz_n_stride
-    uint16_t loop3DstStride = intriParams.dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
-    uint16_t loop4DstStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride * sizeof(T) / ONE_BLOCK_SIZE);
-
-    uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
-    mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
-    mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
-    mte2NzPara |= static_cast<uint64_t>(intriParams.ndNum);            // MTE2_NZ_PARA[15:0]
-    set_mte2_nz_para(mte2NzPara); // CCE: store parameters for ND2NZ DMA instructions
-
-    uint64_t loop1SrcStride = intriParams.srcDValue * sizeof(T);
-    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
-    copy_gm_to_cbuf_multi_nd2nz(
-        (__cbuf__ half*)dst, (__gm__ half*)src, 0, loop1SrcStride, intriParams.nValue, intriParams.dValue,
-        loop4SrcStride, false, false);
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 nd2nz on this version");
+    });
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ half* dst, __gm__ half* src, const Nd2NzParams& intriParams)
@@ -282,26 +265,9 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplB32(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
-    }
-
-    uint16_t loop2DstStride = intriParams.dstNzNStride;  // loop2_dst_stride = dst_nz_n_stride
-    uint16_t loop3DstStride = intriParams.dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
-    uint16_t loop4DstStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride * sizeof(T) / ONE_BLOCK_SIZE);
-
-    uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
-    mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
-    mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
-    mte2NzPara |= static_cast<uint64_t>(intriParams.ndNum);            // MTE2_NZ_PARA[15:0]
-    set_mte2_nz_para(mte2NzPara); // CCE: store parameters for ND2NZ DMA instructions
-
-    uint64_t loop1SrcStride = intriParams.srcDValue * sizeof(T);
-    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
-    copy_gm_to_cbuf_multi_nd2nz(
-        (__cbuf__ float*)dst, (__gm__ float*)src, 0, loop1SrcStride, intriParams.nValue, intriParams.dValue,
-        loop4SrcStride, false, false);
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 nd2nz on this version");
+    });
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ float* dst, __gm__ float* src, const Nd2NzParams& intriParams)
@@ -324,26 +290,9 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 template <typename T>
 __aicore__ inline void DataCopyGM2L1ND2NZImplB8(__cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
 {
-    if constexpr (g_gm_overflow_check) {
-        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
-    }
-
-    uint16_t loop2DstStride = intriParams.dstNzNStride;  // loop2_dst_stride = dst_nz_n_stride
-    uint16_t loop3DstStride = intriParams.dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
-    uint16_t loop4DstStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride * sizeof(T) / ONE_BLOCK_SIZE);
-
-    uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
-    mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
-    mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
-    mte2NzPara |= static_cast<uint64_t>(intriParams.ndNum);            // MTE2_NZ_PARA[15:0]
-    set_mte2_nz_para(mte2NzPara); // CCE: store parameters for ND2NZ DMA instructions
-
-    uint64_t loop1SrcStride = intriParams.srcDValue * sizeof(T);
-    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
-    copy_gm_to_cbuf_multi_nd2nz(
-        (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, 0, loop1SrcStride, intriParams.nValue, intriParams.dValue,
-        loop4SrcStride, false, false);
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 nd2nz on this version");
+    });
 }
 
 __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ int8_t* dst, __gm__ int8_t* src, const Nd2NzParams& intriParams)
@@ -355,6 +304,24 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, const Nd2NzParams& intriParams)
 {
     DataCopyGM2L1ND2NZImplB8(dst, src, intriParams);
+}
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1DN2NZImplBase(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version");
+    });
+}
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1DN2NZImpl(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version");
+    });
 }
 
 template <typename T>

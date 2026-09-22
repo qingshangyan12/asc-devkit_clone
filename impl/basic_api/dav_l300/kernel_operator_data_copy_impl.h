@@ -282,6 +282,24 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 }
 
 template <typename T>
+__aicore__ inline void DataCopyGM2L1DN2NZImplBase(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version");
+    });
+}
+
+template <typename T>
+__aicore__ inline void DataCopyGM2L1DN2NZImpl(
+    __cbuf__ T* dst, __gm__ T* src, const Dn2NzParams& intriParams, bool enableSmallC0, const uint8_t cacheMode = 0)
+{
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from gm to l1 dn2nz on this version");
+    });
+}
+
+template <typename T>
 __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, const Nd2NzParams& intriParams)
 {
     uint16_t ndNum = intriParams.ndNum;                         // nd矩阵数据

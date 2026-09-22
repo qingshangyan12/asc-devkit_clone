@@ -42,6 +42,8 @@
 #include "dav_l300/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_mm_impl.h"
+#elif (__NPU_ARCH__ == 3103)
+#include "dav_l310/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #include "dav_5161/kernel_operator_mm_impl.h"
 #endif
@@ -336,7 +338,9 @@ LoadData(
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 template <typename T, typename U>
 __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     const LocalTensor<T>& dst, const GlobalTensor<U>& src, const LoadData2DParamsV2& loadDataParams,
@@ -504,7 +508,7 @@ __aicore__ inline void MmadImpl(
         (uint64_t)bias.GetPhyAddr(), mmadParams, cmatrixSource);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
@@ -550,7 +554,9 @@ __aicore__ inline void MmadImpl(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
         (uint64_t)bias.GetPhyAddr(), mmadParams);
 }
+#endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 template <typename T, typename U, typename S>
 __aicore__ inline void MmadMxImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams)
@@ -804,7 +810,7 @@ __aicore__ inline void SetFmatrixImpl(
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101))
 __aicore__ inline void SetFmatrixImpl(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
     if (fmatrixMode == FmatrixMode::FMATRIX_LEFT) {

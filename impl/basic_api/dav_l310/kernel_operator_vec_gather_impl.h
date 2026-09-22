@@ -10,11 +10,11 @@
 
 /*!
  * \file kernel_operator_vec_gather_impl.h
- * \brief AscendC l311 support vector gather api.
+ * \brief AscendC l310 support vector gather api.
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/basic_api/dav_l311/kernel_operator_vec_gather_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic_api/dav_l310/kernel_operator_vec_gather_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_vec_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_GATHER_IMPL_H__
 #endif
@@ -50,14 +50,14 @@ __aicore__ inline void VfGatherApi0B16(
         ShiftRights(offsetReg0, offsetReg0, (int16_t)1, indexMask);
         ShiftRights(offsetReg1, offsetReg1, (int16_t)1, indexMask);
         // extract the lower 16-bit of uint32_t offset data into uint16_t index data:
-        // for offsetReg0£¬pack every lower 16-bit into the lower half of the vreg£º
+        // for offsetReg0ï¿½ï¿½pack every lower 16-bit into the lower half of the vregï¿½ï¿½
         // 0x00FF00FE00FD... ->0xFFFEFD...000000...
         // for offsetReg1, pack every higher 16-bit into the higher half of the vreg:
         // 0x001100120013... -> 0x000000...111213...
         Reg::Pack<uint16_t, uint32_t, Reg::HighLowPart::LOWEST>((Reg::RegTensor<uint16_t>&)offsetReg0, offsetReg0);
         Reg::Pack<uint16_t, uint32_t, Reg::HighLowPart::HIGHEST>((Reg::RegTensor<uint16_t>&)offsetReg1, offsetReg1);
         // Select the effective data in offsetReg0 and offsetReg1 and joint them into a complete uint16_t type
-        // indexReg£º0xFFFEFD...111213...
+        // indexRegï¿½ï¿½0xFFFEFD...111213...
         Select(indexReg, (Reg::RegTensor<uint16_t>&)offsetReg0, (Reg::RegTensor<uint16_t>&)offsetReg1, selectMask);
         DataCopyGather(dstReg, (__ubuf__ uint16_t*)src + srcBaseIndex, indexReg, dstMask);
         DataCopy((__ubuf__ uint16_t*)dst + i * dstRepStride * blkCount, dstReg, dstMask);

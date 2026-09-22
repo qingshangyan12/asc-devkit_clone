@@ -10,11 +10,11 @@
 
 /*!
  * \file kernel_operator_common_impl.h
- * \brief AscendC l311 support common api.
+ * \brief AscendC l310 support common api.
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-    "impl/basic_api/dav_l311/kernel_operator_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic_api/dav_l310/kernel_operator_common_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_COMMON_IMPL_H__
 #endif
@@ -24,7 +24,7 @@
 #include "../utils/kernel_utils_mode.h"
 #include "../../../include/basic_api/kernel_common.h"
 #include "../kernel_utils.h"
-#if defined(__DAV_VEC__) && (__NPU_ARCH__ == 3113)
+#if defined(__DAV_VEC__) && (__NPU_ARCH__ == 3103)
 using namespace __cce_simd;
 #endif
 #define GetLoopBoundB8(x) (((x) - 1) / VECTOR_REG_WIDTH)
