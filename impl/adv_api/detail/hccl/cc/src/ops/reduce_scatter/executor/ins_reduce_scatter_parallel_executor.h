@@ -62,6 +62,10 @@ private:
     HcclResult PrepareResForTemplate(const InsAlgTemplate0& tempAlgIntra, const InsAlgTemplate1& tempAlgInter);
     uint64_t GetRankSize(const std::vector<std::vector<u32>>& subCommRanks) const;
 
+    double multipleDimensionSplitRatio_{0.5};
+    MultipleDimensionSplitRatioSource multipleDimensionSplitRatioSource_
+        = MultipleDimensionSplitRatioSource::BUILTIN_FORMULA;
+
     uint64_t rankSizeLevel0_{0};
     uint64_t rankSizeLevel1_{0};
 
