@@ -4,7 +4,7 @@
 
 ## 地址对齐约束
 
-DAV_3510各存储单元的架构基线对齐如下表所示。
+NPU架构版本3510各存储单元的架构基线对齐如下表所示。
 
 **表1** 存储单元地址对齐要求
 
@@ -36,7 +36,7 @@ DAV_3510各存储单元的架构基线对齐如下表所示。
 
 ## 搬运量与存储边界
 
-DAV_3510的主要片上存储容量如下：
+NPU架构版本3510的主要片上存储容量如下：
 
 | 存储单元 | 容量上限 |
 | --- | --- |
@@ -72,7 +72,7 @@ DAV_3510的主要片上存储容量如下：
 
 以下代码展示PIPE_MTE2上两次GM到UB搬运的目的区域重叠时的同步方式：
 
-```cpp
+```c
 asc_copy_gm2ub(ub0, gm0, size0);
 asc_sync_pipe(PIPE_MTE2);
 asc_copy_gm2ub(ub1, gm1, size1);
@@ -80,7 +80,7 @@ asc_copy_gm2ub(ub1, gm1, size1);
 
 如果GM到UB搬运的结果随后由PIPE_V读取，则需要建立PIPE_MTE2到PIPE_V的依赖：
 
-```cpp
+```c
 asc_copy_gm2ub(ub0, gm0, size0);
 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
@@ -91,7 +91,7 @@ asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
 ## 地址重叠
 
-源、目的有效搬运区域是否允许重叠由具体接口决定。DAV_3510的UB内部复制要求实际参与搬运的源、目的DataBlock互不重叠，即使两段地址的整体跨度可以交叠，也不能把`asc_copy_ub2ub`当作支持重叠区域的`memmove`。Reg指令访问重叠UB区域并存在读写冲突时，按对应接口要求使用`asc_mem_bar`。
+源、目的有效搬运区域是否允许重叠由具体接口决定。NPU架构版本3510的UB内部复制要求实际参与搬运的源、目的DataBlock互不重叠，即使两段地址的整体跨度可以交叠，也不能把`asc_copy_ub2ub`当作支持重叠区域的`memmove`。Reg指令访问重叠UB区域并存在读写冲突时，按对应接口要求使用`asc_mem_bar`。
 
 ## 初始化与配置状态
 

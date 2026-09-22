@@ -10,7 +10,7 @@ AI Core采用分层存储架构。计算单元包括Cube、Vector和Scalar；存
 
 ![NPU架构版本2201下的AI Core硬件架构](../../figures/atlas_a2_a3_architecture.png "NPU架构版本2201下的AI Core硬件架构")
 
-DAV_3510的内部结构如图2所示。与图1相比，数据通路主要有以下变化：
+NPU架构版本3510的内部结构如图2所示。与图1相比，数据通路主要有以下变化：
 
 - 新增L0C Buffer到UB的单向数据通路。
 - 新增UB到L1 Buffer的数据通路。
@@ -22,7 +22,7 @@ DAV_3510的内部结构如图2所示。与图1相比，数据通路主要有以�
 
 ![NPU架构版本3510下的AI Core硬件架构与同步关系](../../figures/npu_3510_hw_arch_sync.png "NPU架构版本3510下的AI Core硬件架构与同步关系")
 
-本导览后续接口选择均以Ascend 950PR/Ascend 950DT（NPU架构为DAV_3510）为准。其他产品的数据通路和接口支持情况应以对应接口文档的产品支持表为准。
+本导览后续接口选择均以Ascend 950PR/Ascend 950DT（NPU架构版本3510）为准。其他产品的数据通路和接口支持情况应以对应接口文档的产品支持表为准。
 
 ### 存储单元用途
 
@@ -40,9 +40,9 @@ DAV_3510的内部结构如图2所示。与图1相比，数据通路主要有以�
 
 ## 数据通路与搬运流水
 
-下表按源、目的存储单元列出DAV_3510可用的数据搬运功能。每行对应一种可直接选择的C接口形态；同一接口具有多个重载时，按功能分别列出。
+下表按源、目的存储单元列出NPU架构版本3510可用的数据搬运功能。每行对应一种可直接选择的C接口形态；同一接口具有多个重载时，按功能分别列出。
 
-**表1** DAV_3510数据搬运功能总览
+**表1** NPU架构版本3510数据搬运功能总览
 
 | 源（SRC） | 目的（DST） | 流水 | 功能 | C API |
 | --- | --- | --- | --- | --- |
@@ -87,6 +87,6 @@ DAV_3510的内部结构如图2所示。与图1相比，数据通路主要有以�
 | UB | SIMD Register File | Vector Function | 对齐、非对齐、广播或掩码加载 | [Reg数据搬入](../../reg_compute/load/reg_load_overview.md) |
 | SIMD Register File | UB | Vector Function | 对齐、非对齐或掩码存储 | [Reg数据搬出](../../reg_compute/store/reg_store_overview.md) |
 
-DAV_3510不支持GM到L0A/L0B直达搬运，数据需要经过GM到L1、L1到L0两段通路；也不支持L1到GM或UB到L0C的通用直达搬运。接口名称在多个NPU架构间相同时，也不能据此推断DAV_3510支持该接口，应以接口文档中的产品支持情况为准。
+NPU架构版本3510不支持GM到L0A/L0B直达搬运，数据需要经过GM到L1、L1到L0两段通路；也不支持L1到GM或UB到L0C的通用直达搬运。接口名称在多个NPU架构间相同时，也不能据此推断NPU架构版本3510支持该接口，应以接口文档中的产品支持情况为准。
 
-各通路的模式、参数单位和关键约束请继续阅读[数据搬运导览](../data_move_guide.md)中的对应章节。硬件存储结构的完整说明请参见[DAV_3510架构规格](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md)。
+各通路的模式、参数单位和关键约束请继续阅读[数据搬运导览](../data_move_guide.md)中的对应章节。硬件存储结构的完整说明请参见[NPU架构版本3510硬件规格](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md)。

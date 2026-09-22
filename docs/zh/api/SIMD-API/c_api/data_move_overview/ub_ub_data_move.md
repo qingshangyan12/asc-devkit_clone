@@ -1,6 +1,6 @@
 # UB与UB数据搬运
 
-DAV_3510通过[asc_copy_ub2ub](../vector_datamove/asc_copy_ub2ub.md)在UB内部复制数据。接口运行在PIPE_V，仅在AIV生效，支持连续和高维切分两种模式，数据格式和内容保持不变。
+NPU架构版本3510通过[asc_copy_ub2ub](../vector_datamove/asc_copy_ub2ub.md)在UB内部复制数据。接口运行在PIPE_V，仅在AIV生效，支持连续和高维切分两种模式，数据格式和内容保持不变。
 
 ## 总体说明
 
@@ -15,7 +15,7 @@ DAV_3510通过[asc_copy_ub2ub](../vector_datamove/asc_copy_ub2ub.md)在UB内部�
 
 连续模式从`src`开始复制`size`字节到`dst`：
 
-```cpp
+```c
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst,
                                       __ubuf__ void* src,
                                       uint32_t size)
@@ -30,7 +30,7 @@ __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst,
 
 高维切分模式搬运`burst_count`个数据块，每个数据块包含`burst_len`个DataBlock：
 
-```cpp
+```c
 __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst,
                                       __ubuf__ void* src,
                                       uint16_t burst_count,
@@ -56,5 +56,5 @@ __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst,
 ## 容量与同步
 
 - 源、目的地址加实际访问跨度均不得超过已分配UB范围。UB名义容量为256KB，实际可用容量还会受SIMD VF栈、预留空间和SIMT Data Cache影响。
-- `asc_copy_ub2ub`运行在PIPE_V。在DAV_3510上，PIPE_V内部的执行顺序由硬件保证，多条`asc_copy_ub2ub`之间不需要额外插入事件同步。
+- `asc_copy_ub2ub`运行在PIPE_V。在NPU架构版本3510上，PIPE_V内部的执行顺序由硬件保证，多条`asc_copy_ub2ub`之间不需要额外插入事件同步。
 - 目的UB随后由PIPE_MTE3或其他流水读取时，使用[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)建立PIPE_V到消费者流水的依赖。

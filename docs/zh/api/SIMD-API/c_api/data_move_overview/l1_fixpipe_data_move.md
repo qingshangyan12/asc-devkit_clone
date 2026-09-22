@@ -1,6 +1,6 @@
 # L1到Fixpipe Buffer数据搬运
 
-Fixpipe Buffer保存L0C搬出时使用的随路Vector量化参数和随路ReLU参数。DAV_3510通过[asc_copy_l12fb](../cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md)从L1装载参数，接口运行在PIPE_FIX，仅在AIC生效，支持连续和高维切分两种模式。
+Fixpipe Buffer保存L0C搬出时使用的随路Vector量化参数和随路ReLU参数。NPU架构版本3510通过[asc_copy_l12fb](../cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md)从L1装载参数，接口运行在PIPE_FIX，仅在AIC生效，支持连续和高维切分两种模式。
 
 ## 参数地址空间
 
@@ -17,7 +17,7 @@ Fixpipe Buffer保存L0C搬出时使用的随路Vector量化参数和随路ReLU�
 
 连续模式通过`size`装载前n个字节的参数：
 
-```cpp
+```c
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst,
                                       __cbuf__ void* src,
                                       uint32_t size)
@@ -31,7 +31,7 @@ __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst,
 
 高维切分模式可从L1中的多个数据块装载参数，并在源、目的端保留间隔：
 
-```cpp
+```c
 __aicore__ inline void asc_copy_l12fb(__fbuf__ void* dst,
                                       __cbuf__ void* src,
                                       uint16_t n_burst,

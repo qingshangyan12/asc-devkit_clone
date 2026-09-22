@@ -1,6 +1,6 @@
 # L1与L0数据搬运
 
-L1到L0A/L0B用于为Cube矩阵计算装载左、右矩阵，由PIPE_MTE1执行；矩阵计算结果位于L0C，可由PIPE_FIX搬到L1。DAV_3510的通路具有方向性，不提供L0A/L0B到L1或L1到L0C的通用复制。
+L1到L0A/L0B用于为Cube矩阵计算装载左、右矩阵，由PIPE_MTE1执行；矩阵计算结果位于L0C，可由PIPE_FIX搬到L1。NPU架构版本3510的通路具有方向性，不提供L0A/L0B到L1或L1到L0C的通用复制。
 
 ## 总体说明
 
@@ -21,7 +21,7 @@ L1到L0A/L0B用于为Cube矩阵计算装载左、右矩阵，由PIPE_MTE1执行�
 
 [asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md)按源矩阵行列起始位置、搬运分形数和源/目的分形步长，把L1中的二维矩阵装载到L0A。`asc_copy_l12l0a_transpose`使用相同参数形式，在搬运时对分形矩阵执行转置。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_l12l0a(__ca__ <dtype>* dst,
                                        __cbuf__ <dtype>* src,
                                        uint16_t m_start_position,
@@ -78,7 +78,7 @@ L0A和L0B三维接口也可用于普通二维矩阵装载，但地址、传输�
 
 [asc_copy_l12l0b_trans](../cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md)按`repeat`次数处理一个或多个512字节分形，并通过`src_stride`、`dst_gap`、`src_frac_gap`和`dst_frac_gap`控制Repeat之间及同一Repeat内的分形排布。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_l12l0b_trans(__cb__ <dtype>* dst,
                                              __cbuf__ <dtype>* src,
                                              uint16_t index_id,

@@ -1,6 +1,6 @@
 # GM与UB数据搬运
 
-GM与UB数据搬运是Vector侧加载输入和回写结果的主要通路。GM到UB由PIPE_MTE2执行，UB到GM由PIPE_MTE3执行，相关接口仅在AIV生效。DAV_3510支持连续、高维切分、非对齐以及GM到UB的NDDMA多维搬运。
+GM与UB数据搬运是Vector侧加载输入和回写结果的主要通路。GM到UB由PIPE_MTE2执行，UB到GM由PIPE_MTE3执行，相关接口仅在AIV生效。NPU架构版本3510支持连续、高维切分、非对齐以及GM到UB的NDDMA多维搬运。
 
 ## 总体说明
 
@@ -22,7 +22,7 @@ GM与UB数据搬运是Vector侧加载输入和回写结果的主要通路。GM�
 
 该模式从GM连续读取`size`字节，并按原排布写入UB，数据格式和内容保持不变。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
                                       __gm__ void* src,
                                       uint32_t size)
@@ -36,7 +36,7 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
 
 该模式搬运`burst_count`个数据块，每块包含`burst_len`字节。`src_stride`和`dst_stride`分别表示源、目的相邻数据块**起始地址之间**的距离，单位均为字节。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
                                       __gm__ void* src,
                                       uint16_t burst_count,
@@ -57,7 +57,7 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
 
 ### 连续模式
 
-```cpp
+```c
 __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
                                             uint32_t size)
@@ -78,7 +78,7 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ <dtype>* dst,
 
 NDDMA通过五层循环描述GM到UB的数据访问，每一维均可配置元素个数、源步长、目的步长和左右Padding。未使用的高维仍需按接口要求填写合法循环大小。
 
-```cpp
+```c
 __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ <dtype>* dst,
                                            __gm__ <dtype>* src,
                                            uint32_t loop0_size,
@@ -104,7 +104,7 @@ NDDMA可以通过步长组合实现多维Padding、Transpose、Broadcast和Slice
 
 该模式从UB连续读取`size`字节并写入GM，数据格式和内容保持不变。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst,
                                       __ubuf__ void* src,
                                       uint32_t size)
@@ -118,7 +118,7 @@ __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst,
 
 该模式通过`burst_count`和`burst_len`描述多个有效数据块，`src_stride`和`dst_stride`分别表示源、目的相邻数据块起始地址之间的字节距离。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst,
                                       __ubuf__ void* src,
                                       uint16_t burst_count,

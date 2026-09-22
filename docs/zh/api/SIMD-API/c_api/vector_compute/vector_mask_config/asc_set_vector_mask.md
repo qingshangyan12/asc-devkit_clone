@@ -87,7 +87,7 @@ PIPE_S
 ## 约束说明
 
 <!-- npu="950" id14 -->
-- 针对Ascend 950PR&950DT系列产品：该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../defs/type/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。更推荐用户使用VF场景内[掩码寄存器操作](../../reg_compute/reg_mask/reg_mask.md)章节中的接口完成Reg矢量计算掩码配置。
+- 针对Ascend 950PR&950DT系列产品：该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。更推荐用户使用VF场景内[掩码寄存器操作](../../reg_compute/reg_mask/reg_mask.md)章节中的接口完成Reg矢量计算掩码配置。
 <!-- end id14 -->
 
 <!-- npu="A3,910b" id15 -->
@@ -114,7 +114,7 @@ PIPE_S
   bisheng example.asc -o main --npu-arch=dav-3510; ./main
   ```
 
-  以下调用示例代码仅Ascend 950PR&950DT系列产品支持。示例在VF场景外调用本接口设置掩码寄存器（低64bit全1、高64bit全0，即b16模式下前64个元素参与计算），并在VF场景内通过[asc_get_mask_spr](../../defs/type/asc_get_mask_spr.md)读取掩码值后完成Reg矢量计算，最终仅有前64个元素被写为广播值。
+  以下调用示例代码仅Ascend 950PR&950DT系列产品支持。示例在VF场景外调用本接口设置掩码寄存器（低64bit全1、高64bit全0，即b16模式下前64个元素参与计算），并在VF场景内通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)读取掩码值后完成Reg矢量计算，最终仅有前64个元素被写为广播值。
 
   ```cpp
   #include <cstdint>

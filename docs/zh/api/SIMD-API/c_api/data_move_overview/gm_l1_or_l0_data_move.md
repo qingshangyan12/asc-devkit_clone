@@ -1,6 +1,6 @@
 # GM与L1/L0数据搬运
 
-DAV_3510提供GM到L1和L0C到GM两类直达通路。矩阵输入从GM进入L0A/L0B时，需要先通过PIPE_MTE2搬到L1，再通过PIPE_MTE1装载到L0A/L0B；矩阵计算结果可通过PIPE_FIX从L0C直接搬回GM。DAV_3510不提供GM到L0A/L0B或L1到GM的直达搬运。
+NPU架构版本3510提供GM到L1和L0C到GM两类直达通路。矩阵输入从GM进入L0A/L0B时，需要先通过PIPE_MTE2搬到L1，再通过PIPE_MTE1装载到L0A/L0B；矩阵计算结果可通过PIPE_FIX从L0C直接搬回GM。NPU架构版本3510不提供GM到L0A/L0B或L1到GM的直达搬运。
 
 ## 总体说明
 
@@ -18,7 +18,7 @@ DAV_3510提供GM到L1和L0C到GM两类直达通路。矩阵输入从GM进入L0A/
 
 该接口按照`n_burst`指定的数据块个数执行搬运。每个数据块包含`len_burst`个32字节单元，`src_stride`和`dst_stride`表示源、目的相邻数据块起始地址之间的距离，单位同样为32字节。只搬运一段连续数据时，可将`n_burst`设为1，并将两个步长设为0。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst,
                                       __gm__ void* src,
                                       uint32_t n_burst,
@@ -37,7 +37,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ void* dst,
 
 二维模式从GM矩阵中按行列起始位置和步长选取完整分形，并写入L1。每个分形固定为512字节，搬运过程中不执行格式转换。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
                                       __gm__ <dtype>* src,
                                       uint32_t m_start_position,
@@ -57,7 +57,7 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
 
 该接口从GM读取ND排布矩阵，在写入L1时转换为Nz分形排布。源矩阵可包含多个ND矩阵，`src_d_value`描述同一矩阵相邻行起始地址间距，`src_nd_matrix_stride`描述相邻ND矩阵起始地址间距。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
                                             uint64_t src_d_value,
@@ -85,7 +85,7 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
 
 该接口支持有效块长不是32字节整数倍的数据，并可在目的L1中执行补齐。高维切分模式通过数据块个数、有效字节数、左右Padding、填充来源、L2 Cache策略和源/目的步长描述搬运。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
                                             uint32_t burst_count,
@@ -131,7 +131,7 @@ __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ <dtype>* dst,
 
 ## GM到L0A/L0B的两段搬运
 
-DAV_3510的矩阵输入需要按以下顺序准备：
+NPU架构版本3510的矩阵输入需要按以下顺序准备：
 
 1. 使用本章GM到L1接口把输入数据或分形搬到L1。
 2. 在PIPE_MTE2与PIPE_MTE1之间建立数据依赖。

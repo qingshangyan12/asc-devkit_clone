@@ -1,6 +1,6 @@
 # L1/L0C与UB数据搬运
 
-DAV_3510支持L1到UB、UB到L1以及L0C到UB三条片上通路，用于在Cube侧和Vector侧之间交换输入或中间结果。三条通路均为单向通路，分别属于PIPE_MTE1、PIPE_MTE3和PIPE_FIX；DAV_3510不提供UB到L0C的通用搬运。
+NPU架构版本3510支持L1到UB、UB到L1以及L0C到UB三条片上通路，用于在Cube侧和Vector侧之间交换输入或中间结果。三条通路均为单向通路，分别属于PIPE_MTE1、PIPE_MTE3和PIPE_FIX；NPU架构版本3510不提供UB到L0C的通用搬运。
 
 ## 总体说明
 
@@ -16,7 +16,7 @@ DAV_3510支持L1到UB、UB到L1以及L0C到UB三条片上通路，用于在Cube�
 
 连续模式按`size`指定的字节数从UB搬到L1，数据格式和内容保持不变。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,
                                       __ubuf__ void* src,
                                       uint32_t size)
@@ -30,7 +30,7 @@ __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,
 
 高维切分模式通过数据块个数、每块长度以及源、目的块间间隔描述非连续排布。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,
                                       __ubuf__ void* src,
                                       uint16_t burst_count,
@@ -47,7 +47,7 @@ __aicore__ inline void asc_copy_ub2l1(__cbuf__ void* dst,
 
 该接口从AIC发射，把L1数据写入指定AIV的UB。通过`burst_count`、`burst_len`、`src_gap`和`dst_gap`描述高维切分排布；连续场景可配置一个数据块，或令多个数据块的间隔为0。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_l12ub(__ubuf__ void* dst_addr,
                                       __cbuf__ void* src_addr,
                                       int8_t sub_blockid,
@@ -66,7 +66,7 @@ __aicore__ inline void asc_copy_l12ub(__ubuf__ void* dst_addr,
 
 该接口将Cube计算结果直接写入一个或两个AIV的UB，可在PIPE_FIX中组合类型转换、量化、激活和格式转换。
 
-```cpp
+```c
 __aicore__ inline void asc_copy_l0c2ub(__ubuf__ <dst_dtype>* dst,
                                        __cc__ <src_dtype>* src,
                                        uint16_t n_size,
