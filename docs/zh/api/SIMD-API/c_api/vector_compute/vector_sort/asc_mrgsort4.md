@@ -95,7 +95,13 @@ __aicore__ inline void asc_mrgsort4(__ubuf__ float* dst,
 <!-- npu="950" id8 -->
 ## 调用示例
 
-以下示例对8条已排序的float队列进行两级归并，每条队列32条记录。第一步以`repeat = 2`产生两条128记录队列；第二步归并为一条256记录队列。Host端逐条比较score和index，验证归并顺序和索引对应关系。
+以下示例将256个乱序float类型score及其index分别作为输入，通过[asc_bitsort](asc_bitsort.md)与`asc_mrgsort4`配合完成全局降序排序，每个输出数据单元包含一个score及其对应的index，占8字节，总体计算流程为：
+
+1. 调用`asc_bitsort`，以`repeat = 8`对每组32个元素分别排序，生成8条有序队列。此时各队列内部有序，全部数据尚未全局有序。
+2. 调用`asc_mrgsort4`，以`repeat = 2`分别归并两组各4条队列，生成两条各包含128个数据单元的有序队列。
+3. 再次调用`asc_mrgsort4`，以`repeat = 1`、`valid_bit = 0b0011`归并上述两条队列，得到包含256个数据单元的全局有序结果。
+
+Host端使用CPU排序结果，逐一核对全部256个score及其对应的index。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
@@ -134,28 +140,40 @@ struct Record {
 static_assert(sizeof(Record) == 8, "Each record must occupy 8 bytes.");
 constexpr uint32_t WORD_COUNT = RECORD_COUNT * 2;
 constexpr uint32_t BYTE_COUNT = RECORD_COUNT * sizeof(Record);
+constexpr uint32_t SCORE_BYTES = RECORD_COUNT * sizeof(float);
+constexpr uint32_t INDEX_BYTES = RECORD_COUNT * sizeof(uint32_t);
 
-__global__ __vector__ void mrgsort_kernel(__gm__ float* dst, __gm__ float* src)
+__global__ __vector__ void mrgsort_kernel(
+    __gm__ float* dst, __gm__ float* scores, __gm__ uint32_t* indices)
 {
     asc_init();
-    __ubuf__ float src_local[WORD_COUNT];
+    __ubuf__ float score_local[RECORD_COUNT];
+    __ubuf__ uint32_t index_local[RECORD_COUNT];
+    __ubuf__ float sorted_local[WORD_COUNT];
     __ubuf__ float tmp_local[WORD_COUNT];
     __ubuf__ float dst_local[WORD_COUNT];
 
-    asc_copy_gm2ub_align(src_local, src, BYTE_COUNT);
+    asc_copy_gm2ub_align(score_local, scores, SCORE_BYTES);
+    asc_copy_gm2ub_align(index_local, indices, INDEX_BYTES);
     asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
-    // float记录占2个float位置；每组4条队列，repeat=2得到两条128记录队列。
+    // 第一步：每次迭代排序32个score，8次迭代生成8条独立的有序队列。
+    // 输出交错存放(score, index)，每个数据单元占8字节，即2个float位置。
+    asc_bitsort(sorted_local, score_local, index_local, QUEUE_COUNT);
+    asc_sync();
+
+    // 第二步：每组归并4条队列，repeat=2得到两条128个数据单元的队列。
     __ubuf__ float* queues[ASC_C_API_MRGSORT_ELEMENT_LEN] = {
-        src_local, src_local + 2 * QUEUE_LENGTH,
-        src_local + 4 * QUEUE_LENGTH, src_local + 6 * QUEUE_LENGTH
+        sorted_local, sorted_local + 2 * QUEUE_LENGTH,
+        sorted_local + 4 * QUEUE_LENGTH, sorted_local + 6 * QUEUE_LENGTH
     };
     asc_mrgsort4(tmp_local, queues, 2, QUEUE_LENGTH, QUEUE_LENGTH,
         QUEUE_LENGTH, QUEUE_LENGTH, false, 0b1111);
     // 下一次归并读取本次结果，先完成同步。
     asc_sync();
 
+    // 第三步：将两条128个数据单元的队列归并为全局有序结果。
     queues[0] = tmp_local;
     queues[1] = tmp_local + 2 * (4 * QUEUE_LENGTH);
     // 无效队列也初始化为合法的UB地址，长度设为0。
@@ -172,29 +190,34 @@ __global__ __vector__ void mrgsort_kernel(__gm__ float* dst, __gm__ float* src)
 
 int main()
 {
-    std::vector<Record> input(RECORD_COUNT), output(RECORD_COUNT);
-    for (uint32_t q = 0; q < QUEUE_COUNT; ++q) {
-        for (uint32_t i = 0; i < QUEUE_LENGTH; ++i) {
-            // 每条队列内部降序，不同队列的score相互交错。
-            uint32_t index = q * QUEUE_LENGTH + i;
-            input[index] = {static_cast<float>(RECORD_COUNT - i * QUEUE_COUNT - q), index};
-        }
+    std::vector<float> scores(RECORD_COUNT);
+    std::vector<uint32_t> indices(RECORD_COUNT);
+    std::vector<Record> golden(RECORD_COUNT), output(RECORD_COUNT);
+    for (uint32_t i = 0; i < RECORD_COUNT; ++i) {
+        // 73与256互质，生成1～256的不重复乱序分数，每组32个元素也未排序。
+        scores[i] = static_cast<float>((i * 73 + 19) % RECORD_COUNT + 1);
+        indices[i] = i;
+        golden[i] = {scores[i], indices[i]};
     }
-    auto golden = input;
     std::stable_sort(golden.begin(), golden.end(),
         [](const Record& a, const Record& b) { return a.score > b.score; });
 
     ACL_CHECK(aclInit(nullptr));
     ACL_CHECK(aclrtSetDevice(0));
-    float* src_device = nullptr;
+    float* score_device = nullptr;
+    uint32_t* index_device = nullptr;
     float* dst_device = nullptr;
-    ACL_CHECK(aclrtMalloc(reinterpret_cast<void**>(&src_device), BYTE_COUNT,
+    ACL_CHECK(aclrtMalloc(reinterpret_cast<void**>(&score_device), SCORE_BYTES,
+        ACL_MEM_MALLOC_HUGE_FIRST));
+    ACL_CHECK(aclrtMalloc(reinterpret_cast<void**>(&index_device), INDEX_BYTES,
         ACL_MEM_MALLOC_HUGE_FIRST));
     ACL_CHECK(aclrtMalloc(reinterpret_cast<void**>(&dst_device), BYTE_COUNT,
         ACL_MEM_MALLOC_HUGE_FIRST));
-    ACL_CHECK(aclrtMemcpy(src_device, BYTE_COUNT, input.data(), BYTE_COUNT,
+    ACL_CHECK(aclrtMemcpy(score_device, SCORE_BYTES, scores.data(), SCORE_BYTES,
         ACL_MEMCPY_HOST_TO_DEVICE));
-    mrgsort_kernel<<<1, 0>>>(dst_device, src_device);
+    ACL_CHECK(aclrtMemcpy(index_device, INDEX_BYTES, indices.data(), INDEX_BYTES,
+        ACL_MEMCPY_HOST_TO_DEVICE));
+    mrgsort_kernel<<<1, 0>>>(dst_device, score_device, index_device);
     ACL_CHECK(aclrtSynchronizeDevice());
     ACL_CHECK(aclrtMemcpy(output.data(), BYTE_COUNT, dst_device, BYTE_COUNT,
         ACL_MEMCPY_DEVICE_TO_HOST));
@@ -214,17 +237,11 @@ int main()
     std::cout << '\n' << (passed ? "[Success] asc_mrgsort4 passed."
                                 : "[Failed] asc_mrgsort4 failed.") << std::endl;
     ACL_CHECK(aclrtFree(dst_device));
-    ACL_CHECK(aclrtFree(src_device));
+    ACL_CHECK(aclrtFree(index_device));
+    ACL_CHECK(aclrtFree(score_device));
     ACL_CHECK(aclrtResetDevice(0));
     ACL_CHECK(aclFinalize());
     return passed ? 0 : 1;
 }
-```
-
-上述示例在Ascend 950PR（`dav-3510`）上的输出为：
-
-```text
-First 8 (score, index): (256, 0) (255, 32) (254, 64) (253, 96) (252, 128) (251, 160) (250, 192) (249, 224)
-[Success] asc_mrgsort4 passed.
 ```
 <!-- end id8 -->
