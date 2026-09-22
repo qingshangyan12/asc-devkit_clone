@@ -53,6 +53,9 @@ using fp8_e8m0_t = float8_e8m0_t;
 #if (ASC_DEVKIT_VERSION_NUM >= 902000000)
 using hif4x2_t = hifloat4x2_t;
 #endif
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+using fp8_e6m2_t = float8_e6m2_t;
+#endif
 #endif
 
 constexpr uint32_t INT4_BIT_NUM = 4;
