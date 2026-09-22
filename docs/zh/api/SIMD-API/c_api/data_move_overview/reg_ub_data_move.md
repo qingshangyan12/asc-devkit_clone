@@ -11,7 +11,7 @@ DAV_3510的矢量数据寄存器长度（VL）为256字节，掩码寄存器长�
 | 场景 | 代表接口 | 说明 |
 | --- | --- | --- |
 | 连续对齐加载 | [asc_loadalign](../reg_compute/load/asc_loadalign.md) | 从32字节对齐地址加载一个VL，可使用立即数或地址寄存器偏移。 |
-| 对齐加载并更新地址 | [asc_loadalign_postupdate](../reg_compute/load/asc_loadalign_postupdate.md) | 加载后自动更新源地址或地址寄存器。 |
+| 对齐加载并更新地址 | [asc_loadalign_postupdate](../reg_compute/load/asc_loadalign_postupdate.md) | 加载后自动更新按引用传入的源地址指针。 |
 | 按DataBlock步长加载 | [asc_loadalign_datablock_strided](../reg_compute/load/asc_loadalign_datablock_strided.md) | 按步长加载8个DataBlock。 |
 | DataBlock或元素广播 | [asc_loadalign_brc_datablock](../reg_compute/load/asc_loadalign_brc_datablock.md)、[asc_loadalign_brc_elem](../reg_compute/load/asc_loadalign_brc_elem.md) | 把一个DataBlock或一个元素广播到矢量寄存器。 |
 | 解交织、上下采样或解包加载 | [Reg数据搬入概述](../reg_compute/load/reg_load_overview.md#矢量数据寄存器搬入) | 加载时改变寄存器内排布。 |
@@ -24,7 +24,7 @@ DAV_3510的矢量数据寄存器长度（VL）为256字节，掩码寄存器长�
 | 场景 | 代表接口 | 说明 |
 | --- | --- | --- |
 | 连续或按步长对齐存储 | [asc_storealign](../reg_compute/store/asc_storealign.md) | 按`mask`写入一个VL，或按DataBlock步长写入。 |
-| 对齐存储并更新地址 | [asc_storealign_postupdate](../reg_compute/store/asc_storealign_postupdate.md) | 写入后自动更新目的地址或地址寄存器。 |
+| 对齐存储并更新地址 | [asc_storealign_postupdate](../reg_compute/store/asc_storealign_postupdate.md) | 写入后自动更新按引用传入的目的地址指针。 |
 | 首元素存储 | [asc_storealign_1st](../reg_compute/store/asc_storealign_1st.md) | 仅写入矢量寄存器的第一个元素，地址按数据类型对齐。 |
 | 交织或压缩存储 | [Reg数据搬出概述](../reg_compute/store/reg_store_overview.md#矢量数据寄存器搬出) | 支持两个寄存器交织、半宽压缩和Quarter Pack。 |
 | 连续非对齐存储 | [asc_storeunalign](../reg_compute/store/asc_storeunalign.md)、[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md) | 使用`vector_store_unalign`暂存不能立即写出的尾块。 |
@@ -40,7 +40,7 @@ DAV_3510的矢量数据寄存器长度（VL）为256字节，掩码寄存器长�
 - 直接计算每次调用的UB指针。
 - 传入相对基地址的立即数偏移。
 - 使用`addr_reg`描述Hardware Loop中的动态偏移。
-- 使用Post Update接口在加载或存储后自动更新地址。
+- 使用对齐Post Update接口在加载或存储后自动更新地址指针。地址寄存器的自动更新仅适用于具有对应重载的非对齐Post Update接口。
 
 偏移单位随接口和寄存器类型变化。矢量数据偏移通常以元素为单位，掩码地址偏移可能以字节为单位，非连续模式还可能以DataBlock为单位，应以接口参数表为准。
 
