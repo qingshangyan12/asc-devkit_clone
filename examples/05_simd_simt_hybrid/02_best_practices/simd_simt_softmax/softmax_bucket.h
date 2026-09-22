@@ -46,7 +46,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
     // tile内每行按kBucketCols的步长存放，真实数据之外的余量空置。
     const uint32_t row_offset = row_in_tile * kBucketCols;
-    // 定长数组：长度和访问下标均为编译期常量，可驻留寄存器。
+    // 遍历数组的循环边界与访问下标均为编译期常量，数组可驻留寄存器。
     float elements[kWarpIterations];
 
     // 一轮读入线程分到的元素，尾部无效列用-inf屏蔽，不参与后续计算。
@@ -55,7 +55,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
         elements[iter] = col < cols ? static_cast<float>(input_ub[row_offset + col]) : -ASCRT_INF_F;
     }
 
-    // 在寄存器上完成max，再经Warp归约得到行最大值。
+    // 对已读入的数组元素求max，再经Warp归约得到行最大值。
     float max_value = elements[0];
     for (uint32_t iter = 1; iter < kWarpIterations; ++iter) {
         max_value = max(max_value, elements[iter]);

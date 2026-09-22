@@ -64,7 +64,7 @@
 | ---- | ----------------------------------- | ------------------ | ----------------------------------------- | -------------------------------------------------------------------- |
 | 0    | softmax_gm_kernel   | 根据数据量动态计算 | 32 × warps_per_block，随rows自适应，最多2048 | SIMT VF直接读GM，一个Warp处理一行，Warp归约完成行内max和sum          |
 | 1    | softmax_ub_kernel | 根据数据量动态计算 | 32 × rows_per_tile，随rows和UB容量自适应，最多2048 | 输入经MTE搬入UB中转，双份tile缓冲区轮换，搬运与计算重叠              |
-| 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值以定长数组驻留寄存器；UB按bucket宽度补齐 |
+| 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值驻留寄存器；UB按bucket宽度补齐 |
 
 其中线程块数量在Host侧根据数据量动态计算：先通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)` 查询硬件AIV核数，再取AIV核数与rows的较小值作为线程块数量。一个Warp处理一行：Case 0和Case 1中每个Thread Block实际启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行；Case 2的UB缓冲区为静态数组，维度由线程数与bucket容量共同决定，必须编译期确定，因此线程数只能取512/1024/2048固定档位、实际启动的线程数与档位一致，不能随rows任意变化，每个Thread Block按固定行数处理数据，rows较小时部分Thread Block无行可处理、直接退出。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
 
@@ -207,18 +207,18 @@ Case 1的计算耗时主要集中在行内计算的组织方式上：行内计�
 
 ### Case 2：编译期bucket与动态线程选择
 
-**优化目标**：消除Case 1行内计算对输入行的重复读取和对 `exp` 的重复计算。第一步先引入静态数组，把整行元素从UB缓存下来，一次读入完成max、exp/sum和归一化；第二步再设法让数组驻留寄存器，进一步降低访存开销。为此将实现收敛为编译期bucket：按cols上界64/128/256/384/512分成五档，每档生成定长特化kernel，使整行中间值驻留寄存器；Host侧按shape动态选择线程数。
+**优化目标**：消除Case 1行内计算对输入行的重复读取和对 `exp` 的重复计算。第一步先引入静态数组，把整行元素从UB缓存下来，一次读入完成max、exp/sum和归一化；第二步再设法让数组驻留寄存器，进一步降低访存开销。为此将实现收敛为编译期bucket：按cols上界64/128/256/384/512分成五档，每档生成特化kernel，使整行中间值驻留寄存器；Host侧按shape动态选择线程数。
 
 **核心实现**：
 
-- 编译期bucket：本样例cols不超过512，一个线程分到的元素最多为512/32 = 16个，适合直接驻留寄存器。但遍历数组的循环以cols为边界：cols是运行时参数，循环次数和每次迭代访问的数组下标在编译期均无法确定，编译器不能展开循环，动态下标的数组只能分配在栈空间，访问效率低于寄存器。为此将cols按上界划分为64/128/256/384/512五档bucket，按档位实例化特化kernel：bucket容量为编译期常量，循环次数和下标均为常量，访问数组的循环可完全展开，静态数组 `elements[kWarpIterations]` 驻留寄存器；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与归约与归一化。
+- 编译期bucket：本样例cols不超过512，一个线程分到的元素最多为512/32 = 16个，适合直接驻留寄存器。但遍历数组的for循环以cols为判断条件：cols是运行时参数，循环次数和每次迭代访问的数组下标在编译期均无法确定，编译器不能展开循环，数组只能分配在栈空间，访问效率低于寄存器。为此将cols按上界划分为64/128/256/384/512五档bucket，按档位实例化特化kernel：bucket容量为编译期常量，for循环的判断条件为常量，循环可完全展开，`elements[kWarpIterations]` 得以驻留寄存器；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与归约与归一化。
 - UB布局：tile缓冲区按bucket容量 `kBucketCols` 申请，MTE按运行时的真实cols搬运每行数据，真实元素之后的余量空置；SIMT VF在padded UB上计算，MTE3按真实cols将结果搬回GM。bucket分桶与UB布局如下图所示。
 
   <img src="./figures/case2.png">
 
 - 动态线程选择：Host按每核行数选择线程数，512/1024/2048线程对应每个tile最多处理16/32/64行；`cols > 256` 时考虑寄存器压力，最多启动1024个线程。
 
-SIMT VF将线程分到的元素读入定长数组，在寄存器中完成全部计算：
+SIMT VF将线程分到的元素一次读入数组，后续计算复用已读入的数据，减少数据拷贝：
 
 ```cpp
 template <uint32_t kThreadCount, uint32_t kBucketCols>
@@ -235,7 +235,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
     // tile内每行按kBucketCols的步长存放，真实数据之外的余量空置。
     const uint32_t row_offset = row_in_tile * kBucketCols;
-    // 定长数组：长度和访问下标均为编译期常量，可驻留寄存器。
+    // 遍历数组的循环边界与访问下标均为编译期常量，数组可驻留寄存器。
     float elements[kWarpIterations];
 
     // 一轮读入线程分到的元素，尾部无效列用-inf屏蔽，不参与后续计算。
@@ -244,7 +244,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
         elements[iter] = col < cols ? static_cast<float>(input_ub[row_offset + col]) : -ASCRT_INF_F;
     }
 
-    // 在寄存器上完成max，再经Warp归约得到行最大值。
+    // 对已读入的数组元素求max，再经Warp归约得到行最大值。
     float max_value = elements[0];
     for (uint32_t iter = 1; iter < kWarpIterations; ++iter) {
         max_value = max(max_value, elements[iter]);
@@ -275,7 +275,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
 **分析**：
 
-Case 2相对Case 1的主要变化是“运行时cols”变为“编译期bucket上界”：定长数组的长度和下标在编译期确定，编译器将整行中间值暂存在寄存器中，输入行与 `exp` 均只处理一次。`aiv_vec_time` 从7.833μs进一步降至4.593μs，下降约41.4%；`Task Duration` 从11.923μs降至8.588μs，下降约28.0%。bucket只影响UB布局的步长，MTE仍按真实cols搬运，`aiv_mte2_time` 与Case 1基本持平；总耗时下降使 `aiv_vec_ratio` 从0.758降至0.653、`aiv_mte2_ratio` 从0.241升至0.362，行内计算与MTE2搬运的耗时占比已接近。相对Case 0，`Task Duration` 从12.975μs降至8.588μs，整体下降约33.8%。
+Case 2相对Case 1的主要变化是“运行时cols”变为“编译期bucket上界”：遍历数组的循环边界与下标在编译期确定，编译器将整行中间值暂存在寄存器中，输入行与 `exp` 均只处理一次。`aiv_vec_time` 从7.833μs进一步降至4.593μs，下降约41.4%；`Task Duration` 从11.923μs降至8.588μs，下降约28.0%。bucket只影响UB布局的步长，MTE仍按真实cols搬运，`aiv_mte2_time` 与Case 1基本持平；总耗时下降使 `aiv_vec_ratio` 从0.758降至0.653、`aiv_mte2_ratio` 从0.241升至0.362，行内计算与MTE2搬运的耗时占比已接近。相对Case 0，`Task Duration` 从12.975μs降至8.588μs，整体下降约33.8%。
 
 ## 性能对比总结
 
@@ -300,7 +300,7 @@ Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行�
 ## 调优建议
 
 1. 归约类计算按归约维度组织线程：归约维度内的数据交给一个Warp，用Warp归约原语完成归约；维度之间天然并行，不需要跨Warp同步。
-2. 循环边界或数组下标依赖运行时参数、且循环次数较少时，可将参数按少量上界分档并固化为编译期常量，使循环完全展开、定长数组驻留寄存器，避免重复读取输入和重复计算。
+2. 循环边界或数组下标依赖运行时参数、且循环次数较少时，可将参数按少量上界分档并固化为编译期常量，使循环完全展开、数组驻留寄存器，避免重复读取输入和重复计算。
 
 ## 编译运行
 
