@@ -139,26 +139,27 @@ TEST(ReduceScatterConcur, RestoringChannelsDoesNotRetainPreviousLayerCounts)
     EXPECT_NE(alg.SetchannelsPerRank({}), HCCL_SUCCESS);
 }
 
-TEST(ReduceScatterConcur, BothNamesRejectUnsupportedForcedTopologyAndReduction)
+TEST(ReduceScatterConcur, OnlyConcurNameRegisteredAndRejectsUnsupportedTopologyAndReduction)
 {
-    for (const char* name : {"AicpuReduceScatterSoleMeshConcur", "InsReduceScatterMesh1DZAxisDetour"}) {
-        auto exec = CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_REDUCE_SCATTER, name);
-        ASSERT_NE(exec, nullptr);
-        auto topo = MeshTopo(2);
-        OpParam param{};
-        param.engine = COMM_ENGINE_AICPU_TS;
-        param.DataDes.dataType = HCCL_DATA_TYPE_FP32;
-        param.reduceType = HCCL_REDUCE_PROD;
-        AlgHierarchyInfoForAllLevel hierarchy{};
-        hierarchy.infos = {{{0, 1}}};
-        AlgResourceRequest request{};
-        EXPECT_EQ(exec->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_E_NOT_SUPPORT);
-        param.reduceType = HCCL_REDUCE_SUM;
-        topo.topoLevelNums = 2;
-        EXPECT_EQ(exec->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_E_NOT_SUPPORT);
-        topo.topoLevelNums = 1;
-        topo.level0Topo = Level0Shape::MESH_1D_CLOS;
-        topo.level0PcieMix = false;
-        EXPECT_EQ(exec->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_E_NOT_SUPPORT);
-    }
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetAlgExec(
+        HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterMesh1DZAxisDetour"), nullptr);
+    auto exec = CollAlgExecRegistryV2::Instance().GetAlgExec(
+        HCCL_CMD_REDUCE_SCATTER, "AicpuReduceScatterSoleMeshConcur");
+    ASSERT_NE(exec, nullptr);
+    auto topo = MeshTopo(2);
+    OpParam param{};
+    param.engine = COMM_ENGINE_AICPU_TS;
+    param.DataDes.dataType = HCCL_DATA_TYPE_FP32;
+    param.reduceType = HCCL_REDUCE_PROD;
+    AlgHierarchyInfoForAllLevel hierarchy{};
+    hierarchy.infos = {{{0, 1}}};
+    AlgResourceRequest request{};
+    EXPECT_EQ(exec->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_E_NOT_SUPPORT);
+    param.reduceType = HCCL_REDUCE_SUM;
+    topo.topoLevelNums = 2;
+    EXPECT_EQ(exec->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_E_NOT_SUPPORT);
+    topo.topoLevelNums = 1;
+    topo.level0Topo = Level0Shape::MESH_1D_CLOS;
+    topo.level0PcieMix = false;
+    EXPECT_EQ(exec->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_E_NOT_SUPPORT);
 }

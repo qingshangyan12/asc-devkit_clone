@@ -11,7 +11,7 @@
 
 | 项目 | 迁移前 | 迁移后 |
 |---|---|---|
-| 注册名 | InsReduceScatterMesh1DZAxisDetour | 新增 AicpuReduceScatterSoleMeshConcur，旧名称保留 |
+| 注册名 | InsReduceScatterMesh1DZAxisDetour | 仅保留 AicpuReduceScatterSoleMeshConcur，删除旧名称注册 |
 | AICPU 自动选择 | 双层物理网络，总量 >1536 MiB 选择 Detour | 双层物理网络，2P 单 rank 输出 >=4 MiB 优先选择 Concur；其他对应大数据分支选择 MeshChunk |
 | 分流 | 2P 固定 0.25，其余 0.5 | level0 权重为 templateRankSize-1，level1 按 portGroupSize 分配 |
 | 尾块 | 固定比例拆分 | 保持上游元素对齐策略，最后 channel 承接余量 |
@@ -19,14 +19,14 @@
 | 可选物理层缺失 | 仍继续查询该层 links | 直接跳过；必需层缺失仍报错 |
 | PostCopy 失败 | KernelRun 忽略返回值 | 向调用方传播错误 |
 
-逻辑 topology 单层与物理网络两层是两个概念，不可混淆。新旧名称的 Sole executor
+逻辑 topology 单层与物理网络两层是两个概念，不可混淆。新名称的 Sole executor
 资源预检均限制为支持的完整 Mesh、单层逻辑拓扑、AICPU/AICPU_TS，排除 64-bit/PROD。
 自动选择额外排除纯 Host-DPU；未修改 CCU selector 的优先级。
 
 保留 MC2 的 mc2_ops_hccl 命名空间、strideCount、输入地址/容量校验及本地 executor。
 不迁移 CostModel、对称内存、公共框架、HCCL 的全部循环容量策略。
 没有新增 join/fence/notify，也没有改变 PreSync -> 数据任务 -> PostSync -> PostCopy 顺序。
-旧 Detour 名称保留的是调用兼容性，不是固定分流比例。
+旧算法名称不再注册；指定算法时须使用 AicpuReduceScatterSoleMeshConcur。内部 Detour 模板类名不变。
 sequence executor 复用该模板，因此会采用新的分流权重，但其算法选择和层级编排未修改。
 
 ## 已执行验证
@@ -71,7 +71,7 @@ cmake --build build_concur_test \
 ## 板上待验收
 
 - 在具备两层物理网络的 2P 环境验证 >=4 MiB 自动选择；普通 2P 不代表具备该拓扑。
-- 指定新旧名称验证 2/4/8P；日志确认本地 Detour 模板、两层真实 channel 和分流数量。
+- 指定 AicpuReduceScatterSoleMeshConcur 验证 2/4/8P；日志确认本地 Detour 模板、两层真实 channel 和分流数量。
 - 同通信域反复切换 shape/dtype/stride，覆盖尾块、循环边界和资源重复创建销毁。
 - 验证 PCIe mixed CLOS、非 PCIe CLOS、纯 Host-DPU、缺少可选/必需物理层及强制不支持算法的行为。
 - 回归 sequence Detour、多层网络、普通 Mesh、MeshChunk 与 AllGather channel 申请。

@@ -277,9 +277,6 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterAicpuReduceNHR, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     InsTempReduceScatterAicpuReduceNHR);
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DZAxisDetour, InsV2ReduceScatterSoleExecutor,
-    TopoMatch1D, InsTempReduceScatterMesh1DZAxisDetour);
-REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleMeshConcur, InsV2ReduceScatterSoleExecutor,
     TopoMatch1D, InsTempReduceScatterMesh1DZAxisDetour);
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
