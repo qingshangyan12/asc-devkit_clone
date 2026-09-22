@@ -84,8 +84,8 @@ protected:
 
     HcclResult InitTemplateParams(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx,
-        const std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap,
-        std::map<u32, TemplateResource>& tempResMap, std::map<u32, TemplateDataParams>& tempAlgParamMap);
+        const std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap, std::map<u32, TemplateResource>& tempResMap,
+        std::map<u32, TemplateDataParams>& tempAlgParamMap);
 
     HcclResult DoLocalCopy(
         const TemplateDataParams& tempAlgParams, const ThreadHandle& thread, const std::vector<u64>& allRankSplitData,
