@@ -86,7 +86,7 @@ Perform the following steps in the sample root directory to build and run the sa
 
 - Configure Environment Variables
 
-  Configure the environment variables according to the CANN development kit [installation instructions](../../../../../../docs/en/quick_start.md#prepare&install). **Currently, only [CANN master](../../../../../../docs/en/quick_start.md#cann-install) is supported.**
+  Configure the environment variables according to the CANN development kit [installation instructions](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md). **Currently, only [CANN master](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md) is supported.**
 
   > **Note:** `${install_path}` is the CANN package installation directory. If no installation directory is specified, the default directory is `/usr/local/Ascend`.
 
