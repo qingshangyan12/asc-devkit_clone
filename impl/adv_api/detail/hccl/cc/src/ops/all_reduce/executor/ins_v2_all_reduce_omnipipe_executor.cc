@@ -31,9 +31,10 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::InitCommInfo(
-    HcclComm comm, const OpParam& param, TopoInfoWithNetLayerDetails* topoInfo,
-    AlgHierarchyInfoForAllLevel& algHierarchyInfo)
+    InsAgAlgTemplateZ>::
+    InitCommInfo(
+        HcclComm comm, const OpParam& param, TopoInfoWithNetLayerDetails* topoInfo,
+        AlgHierarchyInfoForAllLevel& algHierarchyInfo)
 {
     (void)comm;
     myRank_ = topoInfo->userRank;
@@ -52,8 +53,9 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::CalcAlgHierarchyInfo(
-    HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo)
+    InsAgAlgTemplateZ>::
+    CalcAlgHierarchyInfo(
+        HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo)
 {
     myRank_ = topoInfo->userRank;
     rankSize_ = topoInfo->userRankSize;
@@ -69,9 +71,10 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::CalcResLevel(
-    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-    std::shared_ptr<InsAlgTemplateBase> tempAlg, AlgResourceRequest& resourceRequest, bool addChannel)
+    InsAgAlgTemplateZ>::
+    CalcResLevel(
+        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+        std::shared_ptr<InsAlgTemplateBase> tempAlg, AlgResourceRequest& resourceRequest, bool addChannel)
 {
     AlgResourceRequest resReqlevel;
     CHK_RET(tempAlg->CalcRes(comm, param, topoInfo, resReqlevel));
@@ -93,9 +96,10 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::CalcRes(
-    HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
-    const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
+    InsAgAlgTemplateZ>::
+    CalcRes(
+        HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
+        const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     myRank_ = topoInfo->userRank;
     rankSize_ = topoInfo->userRankSize;
@@ -137,8 +141,7 @@ HcclResult InsV2AllReduceOmniPipeExecutor<
     resourceRequest.notifyNumOnMainThread = 0;
     for (int level = 0; level < OMNIPIPE_AR_LEVEL_NUM; level++) {
         if (tempMap.count(level) > 0) {
-            CHK_RET(CalcResLevel(
-                comm, param, topoInfo, tempMap[level], resourceRequest, level < OMNIPIPE_AG_LEVEL0));
+            CHK_RET(CalcResLevel(comm, param, topoInfo, tempMap[level], resourceRequest, level < OMNIPIPE_AG_LEVEL0));
         }
     }
     return HCCL_SUCCESS;
@@ -208,8 +211,7 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::GenTemplateAlgParamsByDimData(
-    TemplateDataParams& tempAlgParams, StepSliceInfo& stepSliceInfo)
+    InsAgAlgTemplateZ>::GenTemplateAlgParamsByDimData(TemplateDataParams& tempAlgParams, StepSliceInfo& stepSliceInfo)
 {
     tempAlgParams.buffInfo.inBuffType = BufferType::HCCL_BUFFER;
     tempAlgParams.buffInfo.outBuffType = BufferType::HCCL_BUFFER;
@@ -240,8 +242,8 @@ HcclResult InsV2AllReduceOmniPipeExecutor<
     } else if (level == OMNIPIPE_LEVEL2) {
         levelThreadsRS_[OMNIPIPE_LEVEL2].assign(
             threads_.begin() + 1 + levelThreadsRS_[OMNIPIPE_LEVEL0].size() + levelThreadsRS_[OMNIPIPE_LEVEL1].size(),
-            threads_.begin() + 1 + levelThreadsRS_[OMNIPIPE_LEVEL0].size() + levelThreadsRS_[OMNIPIPE_LEVEL1].size()
-                + levelThreadNum);
+            threads_.begin() + 1 + levelThreadsRS_[OMNIPIPE_LEVEL0].size() + levelThreadsRS_[OMNIPIPE_LEVEL1].size() +
+                levelThreadNum);
         tempMainThreadsLevel2RS_.push_back(levelThreadsRS_[OMNIPIPE_LEVEL2].at(0));
     }
 
@@ -266,8 +268,8 @@ HcclResult InsV2AllReduceOmniPipeExecutor<
 {
     HCCL_INFO("[InsV2AllReduceOmniPipeExecutor][%s], level[%u]", __func__, level);
     u64 levelThreadNum = tempBase->GetThreadNum();
-    u64 threadsNumStart = levelThreadsRS_[OMNIPIPE_LEVEL0].size() + levelThreadsRS_[OMNIPIPE_LEVEL1].size()
-                          + levelThreadsRS_[OMNIPIPE_LEVEL2].size();
+    u64 threadsNumStart = levelThreadsRS_[OMNIPIPE_LEVEL0].size() + levelThreadsRS_[OMNIPIPE_LEVEL1].size() +
+                          levelThreadsRS_[OMNIPIPE_LEVEL2].size();
     if (level == OMNIPIPE_LEVEL0) {
         levelThreadsAG_[OMNIPIPE_LEVEL0].assign(
             threads_.begin() + threadsNumStart + 1, threads_.begin() + threadsNumStart + 1 + levelThreadNum);
@@ -301,9 +303,10 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::RestoreChannelMap(
-    const AlgResourceCtxSerializable& resCtx,
-    std::vector<std::map<u32, std::vector<ChannelInfo>>>& rankIdToChannelInfo)
+    InsAgAlgTemplateZ>::
+    RestoreChannelMap(
+        const AlgResourceCtxSerializable& resCtx,
+        std::vector<std::map<u32, std::vector<ChannelInfo>>>& rankIdToChannelInfo)
 {
     rankIdToChannelInfo.resize(OMNIPIPE_LEVEL_NUM);
     u32 level = 0;
@@ -332,25 +335,26 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::InitOmniPipeScratchParam(
-    OmniPipeScratchParam& scratchParam, const OpParam& param, const std::vector<double>& endpointAttrBwNew,
-    std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap)
+    InsAgAlgTemplateZ>::
+    InitOmniPipeScratchParam(
+        OmniPipeScratchParam& scratchParam, const OpParam& param, const std::vector<double>& endpointAttrBwNew,
+        std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap)
 {
     scratchParam.levelRankSize = {rankSizeLevel0_, rankSizeLevel1_, rankSizeLevel2_};
     scratchParam.endpointAttrBw = endpointAttrBwNew;
     std::vector<u64> levelAlgType;
     levelAlgType.push_back(
-        tempMap.count(OMNIPIPE_RS_LEVEL0) > 0 ? tempMap[OMNIPIPE_RS_LEVEL0]->CalcScratchMultiple(
-                                                   BufferType::DEFAULT, BufferType::DEFAULT) :
-                                               0);
+        tempMap.count(OMNIPIPE_RS_LEVEL0) > 0 ?
+            tempMap[OMNIPIPE_RS_LEVEL0]->CalcScratchMultiple(BufferType::DEFAULT, BufferType::DEFAULT) :
+            0);
     levelAlgType.push_back(
-        tempMap.count(OMNIPIPE_RS_LEVEL1) > 0 ? tempMap[OMNIPIPE_RS_LEVEL1]->CalcScratchMultiple(
-                                                   BufferType::DEFAULT, BufferType::DEFAULT) :
-                                               0);
+        tempMap.count(OMNIPIPE_RS_LEVEL1) > 0 ?
+            tempMap[OMNIPIPE_RS_LEVEL1]->CalcScratchMultiple(BufferType::DEFAULT, BufferType::DEFAULT) :
+            0);
     levelAlgType.push_back(
-        tempMap.count(OMNIPIPE_RS_LEVEL2) > 0 ? tempMap[OMNIPIPE_RS_LEVEL2]->CalcScratchMultiple(
-                                                   BufferType::DEFAULT, BufferType::DEFAULT) :
-                                               0);
+        tempMap.count(OMNIPIPE_RS_LEVEL2) > 0 ?
+            tempMap[OMNIPIPE_RS_LEVEL2]->CalcScratchMultiple(BufferType::DEFAULT, BufferType::DEFAULT) :
+            0);
     scratchParam.levelAlgType = levelAlgType;
     scratchParam.dataTypeSize = dataTypeSize_;
     scratchParam.opMode = param.opMode;
@@ -363,9 +367,10 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::InitOmniPipeSliceParam(
-    OmniPipeSliceParam& sliceParam, const OpParam& param, const std::vector<double>& endpointAttrBwNew,
-    std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap, u64 maxCountPerLoop)
+    InsAgAlgTemplateZ>::
+    InitOmniPipeSliceParam(
+        OmniPipeSliceParam& sliceParam, const OpParam& param, const std::vector<double>& endpointAttrBwNew,
+        std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap, u64 maxCountPerLoop)
 {
     (void)maxCountPerLoop;
     sliceParam.levelRankSize = {rankSizeLevel0_, rankSizeLevel1_, rankSizeLevel2_};
@@ -373,17 +378,17 @@ HcclResult InsV2AllReduceOmniPipeExecutor<
     sliceParam.endpointAttrBw = endpointAttrBwNew;
     std::vector<u64> levelAlgType;
     levelAlgType.push_back(
-        tempMap.count(OMNIPIPE_RS_LEVEL0) > 0 ? tempMap[OMNIPIPE_RS_LEVEL0]->CalcScratchMultiple(
-                                                   BufferType::DEFAULT, BufferType::DEFAULT) :
-                                               0);
+        tempMap.count(OMNIPIPE_RS_LEVEL0) > 0 ?
+            tempMap[OMNIPIPE_RS_LEVEL0]->CalcScratchMultiple(BufferType::DEFAULT, BufferType::DEFAULT) :
+            0);
     levelAlgType.push_back(
-        tempMap.count(OMNIPIPE_RS_LEVEL1) > 0 ? tempMap[OMNIPIPE_RS_LEVEL1]->CalcScratchMultiple(
-                                                   BufferType::DEFAULT, BufferType::DEFAULT) :
-                                               0);
+        tempMap.count(OMNIPIPE_RS_LEVEL1) > 0 ?
+            tempMap[OMNIPIPE_RS_LEVEL1]->CalcScratchMultiple(BufferType::DEFAULT, BufferType::DEFAULT) :
+            0);
     levelAlgType.push_back(
-        tempMap.count(OMNIPIPE_RS_LEVEL2) > 0 ? tempMap[OMNIPIPE_RS_LEVEL2]->CalcScratchMultiple(
-                                                   BufferType::DEFAULT, BufferType::DEFAULT) :
-                                               0);
+        tempMap.count(OMNIPIPE_RS_LEVEL2) > 0 ?
+            tempMap[OMNIPIPE_RS_LEVEL2]->CalcScratchMultiple(BufferType::DEFAULT, BufferType::DEFAULT) :
+            0);
     sliceParam.levelAlgType = levelAlgType;
     sliceParam.dataTypeSize = dataTypeSize_;
     sliceParam.opMode = param.opMode;
@@ -396,10 +401,11 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::InitTemplate(
-    const OpParam& param, std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap,
-    const std::vector<std::vector<u32>>& subCommRanks0, const std::vector<std::vector<u32>>& subCommRanks1,
-    const std::vector<std::vector<u32>>& subCommRanks2)
+    InsAgAlgTemplateZ>::
+    InitTemplate(
+        const OpParam& param, std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap,
+        const std::vector<std::vector<u32>>& subCommRanks0, const std::vector<std::vector<u32>>& subCommRanks1,
+        const std::vector<std::vector<u32>>& subCommRanks2)
 {
     if (rankSizeLevel0_ > 1) {
         tempMap[OMNIPIPE_RS_LEVEL0] = std::make_shared<InsRsAlgTemplateX>(param, myRank_, subCommRanks0);
@@ -435,10 +441,11 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::InitTemplateParams(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx,
-    const std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap,
-    std::map<u32, TemplateResource>& tempResMap, std::map<u32, TemplateDataParams>& tempAlgParamMap)
+    InsAgAlgTemplateZ>::
+    InitTemplateParams(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx,
+        const std::map<u32, std::shared_ptr<InsAlgTemplateBase>>& tempMap, std::map<u32, TemplateResource>& tempResMap,
+        std::map<u32, TemplateDataParams>& tempAlgParamMap)
 {
     for (int level = 0; level < OMNIPIPE_AR_LEVEL_NUM; level++) {
         if (tempMap.count(level) > 0) {
@@ -464,9 +471,10 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::InitSubCommRanks(
-    std::vector<std::vector<u32>>& subCommRanks0, std::vector<std::vector<u32>>& subCommRanks1,
-    std::vector<std::vector<u32>>& subCommRanks2, const TopoInfoWithNetLayerDetails* topoInfo)
+    InsAgAlgTemplateZ>::
+    InitSubCommRanks(
+        std::vector<std::vector<u32>>& subCommRanks0, std::vector<std::vector<u32>>& subCommRanks1,
+        std::vector<std::vector<u32>>& subCommRanks2, const TopoInfoWithNetLayerDetails* topoInfo)
 {
     subCommRanks0.clear();
     subCommRanks1.clear();
@@ -555,8 +563,8 @@ HcclResult InsV2AllReduceOmniPipeExecutor<
     u64 loopTimes = loopInfo[1];
     HCCL_DEBUG("maxCountPerLoop[%u], loopTimes[%u]", maxCountPerLoop, loopTimes);
 
-    auto multiLoopAllRankSplitData = OmniPipeSplitRankDataLoop(
-        allRankSplitData, maxCountPerLoop, loopTimes, dataTypeSize_);
+    auto multiLoopAllRankSplitData =
+        OmniPipeSplitRankDataLoop(allRankSplitData, maxCountPerLoop, loopTimes, dataTypeSize_);
 
     OmniPipeSliceParam sliceParam;
     CHK_RET(InitOmniPipeSliceParam(sliceParam, param, endpointAttrBwNew, tempMap, maxCountPerLoop));
@@ -572,8 +580,7 @@ HcclResult InsV2AllReduceOmniPipeExecutor<
     for (u64 loop = 0; loop < loopTimes; loop++) {
         CHK_PRT_RET(
             multiLoopAllRankSplitData.size() <= loop,
-            HCCL_ERROR(
-                "[InsV2AllReduceOmniPipeExecutor][Orchestrate] multiLoopAllRankSplitData.size() <= loop"),
+            HCCL_ERROR("[InsV2AllReduceOmniPipeExecutor][Orchestrate] multiLoopAllRankSplitData.size() <= loop"),
             HCCL_E_PARA);
 
         if (loop == 0 || !isSameLoop(multiLoopAllRankSplitData[loop - 1], multiLoopAllRankSplitData[loop])) {
@@ -686,9 +693,10 @@ template <
     typename InsAgAlgTemplateX, typename InsAgAlgTemplateY, typename InsAgAlgTemplateZ>
 HcclResult InsV2AllReduceOmniPipeExecutor<
     AlgTopoMatch, InsRsAlgTemplateX, InsRsAlgTemplateY, InsRsAlgTemplateZ, InsAgAlgTemplateX, InsAgAlgTemplateY,
-    InsAgAlgTemplateZ>::DoLocalCopy(
-    const TemplateDataParams& tempAlgParams, const ThreadHandle& thread, const std::vector<u64>& allRankSplitData,
-    const std::vector<u64>& curLoopAllRankSplitData)
+    InsAgAlgTemplateZ>::
+    DoLocalCopy(
+        const TemplateDataParams& tempAlgParams, const ThreadHandle& thread, const std::vector<u64>& allRankSplitData,
+        const std::vector<u64>& curLoopAllRankSplitData)
 {
     std::vector<DataSlice> srcDataSlice;
     std::vector<DataSlice> dstDataSlice;
