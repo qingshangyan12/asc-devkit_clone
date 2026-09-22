@@ -54,6 +54,29 @@ npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files)
 
 只记录动态编译资料。后续静态编译结果不回流到打包阶段。聚合工具不扫描动态 ELF，不执行 readelf，不接受 --binary-dir。
 
+### 3.1 接入工程已有的编译命令
+
+工程已自行生成 OPC 命令时，不需要复制 SDK 的 Python 参数处理模块，也不需要修改每个生成 shell 脚本。可以在实际执行 kernel 编译的公共 CMake 位置使用现有接口：
+
+```cmake
+# 仅需该函数时可单独 include SDK 的 fwk_modules/kernel_options.cmake。
+npu_op_kernel_options(existing_kernel_target ALL
+    OPTIONS "--kernel-spec=${KERNEL_SPEC_MODE}"
+            "--kernel-spec-dir=${manifest_dir}"
+    OUTPUT_COMMAND kernel_command_prefix)
+add_custom_target(existing_kernel_target
+    COMMAND ${kernel_command_prefix} bash "${existing_script}"
+    VERBATIM)
+```
+
+`OUTPUT_COMMAND` 返回 `cmake -E env` 命令前缀，不创建 target，不修改全局环境，也不写入 autogen 文件。前缀设置 `ASCENDC_KERNEL_SPEC_MODE` 和 `ASCENDC_KERNEL_SPEC_DIR`，只影响这条命令及其子进程。OPC 在未显式传入对应命令行参数时读取这些默认值；显式 `--kernel-spec=None` 可关闭继承的配置。工程仍负责把前缀用于真正执行 OPC 的命令，仅用于生成任务的命令不够。
+
+关闭模式返回的前缀会显式设置 None 并清空目录，避免继承父进程的 JIT 配置。已有工程不要在关闭模式直接省略环境隔离；若需兼容旧 SDK，可在关闭分支用 `cmake -E env ASCENDC_KERNEL_SPEC_MODE=None ASCENDC_KERNEL_SPEC_DIR=`，无需加载新版模块。未知参数、关键字缺值及重复选项值冲突会在配置阶段报错。
+
+此分支仅接受 `ALL` 和两项 kernel-spec 选项，不支持算子或芯片筛选，因为它作用于整个子进程。启用时目录必须为绝对路径。工程可复用原芯片循环提供不同输出目录，无需新增编译循环。原有未指定 OUTPUT_COMMAND 的调用行为不变，SDK 接管的自定义包继续使用第 3 节原流程。
+
+已有工程仍需将 manifest 目录、kernel 完成依赖和源码安装位置交给资源聚合步骤；这个命令前缀只解决配置下发，不替代原打包和安装清单。
+
 ## 4. 构建依赖和产物位置
 
 ```text
@@ -136,3 +159,5 @@ python3 tests/python/asc_op_compiler/test_static_compile_resource_generator.py
 4. RUN 实际安装、覆盖升级、卸载及 SK 上卡数值验证未完成。验证中使用 CMake install 和归档数据提取，不能代替安装生命周期验收。
 
 已验证 AddCustom 三种交付的离线静态编译。ops-cv Ascend910B 全量包有 9 份 manifest、13 个入口，26 次离线编译中 24 次成功，2 次为上述 key 1 错误。不能宣称所有生产算子已经可用。
+
+构建会清理上次的 manifest 集合，避免混入旧任务，但保留已发布的资源 SO/object。重新生成的输入相同时可复用聚合缓存；输入改变时先生成临时产物，成功后替换输出。构建失败仍返回错误，保留旧文件不代表本次构建成功。

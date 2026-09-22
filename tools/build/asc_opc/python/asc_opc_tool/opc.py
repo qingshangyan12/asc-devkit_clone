@@ -240,11 +240,13 @@ class OpcOptionParser:
         )
         self.__define_option(
             OpcOptions.KERNEL_SPEC,
-            "None",
+            os.environ.get("ASCENDC_KERNEL_SPEC_MODE", "None"),
             "kernel spec mode. Support None, Normal and SK.",
         )
         self.__define_option(
-            OpcOptions.KERNEL_SPEC_DIR, None, "kernel spec output directory."
+            OpcOptions.KERNEL_SPEC_DIR,
+            os.environ.get("ASCENDC_KERNEL_SPEC_DIR") or None,
+            "kernel spec output directory.",
         )
 
     @staticmethod

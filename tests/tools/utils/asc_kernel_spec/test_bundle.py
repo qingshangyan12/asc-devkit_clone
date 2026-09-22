@@ -394,6 +394,10 @@ class SourceUniqueness(unittest.TestCase):
                     json.loads(output.read_text())["source_file"],
                     f"share/package/src/{directory}/kernel.cpp",
                 )
+                # A new dynamic build recreates identical manifests; keep the published bundle.
+                original = manifest.read_bytes()
+                manifest.unlink()
+                manifest.write_bytes(original)
                 cached = subprocess.run(
                     argv, check=True, capture_output=True, text=True
                 )
