@@ -295,7 +295,7 @@ Case 2相对Case 1的主要变化是“运行时cols”变为“编译期bucket�
 
 <img src="./figures/perf_trend.png">
 
-Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行遍历，每个线程处理的元素数与cols成正比。Case 2的增长呈阶梯状：同一bucket档位内基本持平——每线程的计算量由 `kWarpIterations` 决定、保持不变，只有MTE按真实cols搬运的数据量随cols小幅增长；跨过bucket边界时计算量跳升一档，`Task Duration` 随之跳升。全部cols区间Case 2均优于Case 1，且cols越大优势越明显，cols=512时 `Task Duration` 约为Case 1的48%；bucket上界超出真实cols较多的档位中部（如cols=96、197），Case 2需要多处理尾部无效列，相对优势小于档位边界处（如cols=128、384、512）。
+Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行遍历，每个线程处理的元素数与cols成正比。Case 2的增长呈阶梯状：同一bucket档位内基本持平——每线程的计算量由 `kWarpIterations` 决定、保持不变，只有MTE按真实cols搬运的数据量随cols小幅增长；跨过bucket边界时计算量跳升一档，`Task Duration` 随之跳升。全部cols区间Case 2均优于Case 1，且cols越大优势越明显，cols=512时Case 2的 `Task Duration` 约为Case 1的48%；bucket上界超出真实cols较多的档位中部（如cols=96、197），Case 2需要多处理尾部无效列，相对优势小于档位边界处（如cols=128、384、512）。
 
 ## 调优建议
 
