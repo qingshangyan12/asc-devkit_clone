@@ -103,24 +103,24 @@ __aicore__ inline void SetConvStrideParaImpl(const ConvStrideBitModeParams& para
 
 __aicore__ inline void SetConvStrideParaImpl(const ConvStrideParams& params) { SetConvStrideParaCal(params); }
 
-// __aicore__ inline void SetMatrixParaImpl(const MatrixParaBitModeParams& params) { SetMatrixParaCal(params); }
+__aicore__ inline void SetMatrixParaImpl(const MatrixParaBitModeParams& params) { SetMatrixParaCal(params); }
 
-// __aicore__ inline void SetMatrixParaImpl(const MatrixParaParams& params) { SetMatrixParaCal(params); }
+__aicore__ inline void SetMatrixParaImpl(const MatrixParaParams& params) { SetMatrixParaCal(params); }
 
-// __aicore__ inline void SetMmadStrideParaImpl(const MmadStrideParaBitModeParams& params)
-// {
-//     SetMmadStrideParaCal(params);
-// }
+__aicore__ inline void SetMmadStrideParaImpl(const MmadStrideParaBitModeParams& params)
+{
+    SetMmadStrideParaCal(params);
+}
 
-// __aicore__ inline void SetMmadStrideParaImpl(const MmadStrideParaParams& params) { SetMmadStrideParaCal(params); }
+__aicore__ inline void SetMmadStrideParaImpl(const MmadStrideParaParams& params) { SetMmadStrideParaCal(params); }
 
-// __aicore__ inline void SetItaMaxAddrImpl(const ItaMaxAddrBitModeParams& params) { SetItaMaxAddrCal(params); }
+__aicore__ inline void SetItaMaxAddrImpl(const ItaMaxAddrBitModeParams& params) { SetItaMaxAddrCal(params); }
 
-// __aicore__ inline void SetItaMaxAddrImpl(const ItaMaxAddrParaParams& params) { SetItaMaxAddrCal(params); }
+__aicore__ inline void SetItaMaxAddrImpl(const ItaMaxAddrParaParams& params) { SetItaMaxAddrCal(params); }
 
-// __aicore__ inline void SetMatrixMxParaImpl(const MatrixMxParaBitModeParams& params) { SetMatrixMxParaCal(params); }
+__aicore__ inline void SetMatrixMxParaImpl(const MatrixMxParaBitModeParams& params) { SetMatrixMxParaCal(params); }
 
-// __aicore__ inline void SetMatrixMxParaImpl(const MatrixMxParaParams& params) { SetMatrixMxParaCal(params); }
+__aicore__ inline void SetMatrixMxParaImpl(const MatrixMxParaParams& params) { SetMatrixMxParaCal(params); }
 
 template <typename T, typename U, typename S>
 __aicore__ inline void ConvFixImpl(
@@ -176,85 +176,85 @@ __aicore__ inline void ConvFixImpl(
         (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), convFixParams);
 }
 
-// template <typename T, typename U, typename S>
-// __aicore__ inline void MmadFixImpl(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
-//     const MmadFixBitModeParams& mmadFixParams)
-// {
-//     MmadFixCal(
-//         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
-//         (__cb__ PrimT<S>*)right.GetPhyAddr(), mmadFixParams);
-// }
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    MmadFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
+        (__cb__ PrimT<S>*)right.GetPhyAddr(), mmadFixParams);
+}
 
-// template <typename T, typename U, typename S>
-// __aicore__ inline void MmadFixImpl(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
-//     const MmadFixParams& mmadFixParams)
-// {
-//     MmadFixCal(
-//         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
-//         (__cb__ PrimT<S>*)right.GetPhyAddr(), mmadFixParams);
-// }
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
+        (__cb__ PrimT<S>*)right.GetPhyAddr(), mmadFixParams);
+}
 
-// template <typename T, typename U, typename S, typename V>
-// __aicore__ inline void MmadFixImpl(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
-//     const MmadFixBitModeParams& mmadFixParams)
-// {
-//     MmadFixCal(
-//         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
-//         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
-// }
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    MmadFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
+        (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
+}
 
-// template <typename T, typename U, typename S, typename V>
-// __aicore__ inline void MmadFixImpl(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
-//     const MmadFixParams& mmadFixParams)
-// {
-//     MmadFixCal(
-//         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
-//         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
-// }
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
+        (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
+}
 
-// template <typename T, typename U, typename S>
-// __aicore__ inline void MmadMxFixImpl(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
-//     const MmadFixBitModeParams& mmadFixParams)
-// {
-//     MmadMxFixCal(
-//         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
-//         (__cb__ PrimT<S>*)right.GetPhyAddr(), mmadFixParams);
-// }
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    MmadMxFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
+        (__cb__ PrimT<S>*)right.GetPhyAddr(), mmadFixParams);
+}
 
-// template <typename T, typename U, typename S>
-// __aicore__ inline void MmadMxFixImpl(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
-//     const MmadFixParams& mmadFixParams)
-// {
-//     MmadMxFixCal(
-//         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
-//         (__cb__ PrimT<S>*)right.GetPhyAddr(), mmadFixParams);
-// }
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadMxFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
+        (__cb__ PrimT<S>*)right.GetPhyAddr(), mmadFixParams);
+}
 
-// template <typename T, typename U, typename S, typename V>
-// __aicore__ inline void MmadMxFixImpl(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
-//     const MmadFixBitModeParams& mmadFixParams)
-// {
-//     MmadMxFixCal(
-//         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
-//         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
-// }
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    MmadMxFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
+        (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
+}
 
-// template <typename T, typename U, typename S, typename V>
-// __aicore__ inline void MmadMxFixImpl(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
-//     const MmadFixParams& mmadFixParams)
-// {
-//     MmadMxFixCal(
-//         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
-//         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
-// }
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFixImpl(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadMxFixCal(
+        (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
+        (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
+}
 } // namespace AscendC
 
 #endif

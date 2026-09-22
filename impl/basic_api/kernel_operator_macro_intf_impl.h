@@ -98,22 +98,22 @@ __aicore__ inline void SetConvStridePara(const ConvStrideBitModeParams& params) 
 
 __aicore__ inline void SetConvStridePara(const ConvStrideParams& params) { SetConvStrideParaImpl(params); }
 
-// __aicore__ inline void SetMatrixPara(const MatrixParaBitModeParams& params) { SetMatrixParaImpl(params); }
+__aicore__ inline void SetMatrixPara(const MatrixParaBitModeParams& params) { SetMatrixParaImpl(params); }
 
-// __aicore__ inline void SetMatrixPara(const MatrixParaParams& params) { SetMatrixParaImpl(params); }
+__aicore__ inline void SetMatrixPara(const MatrixParaParams& params) { SetMatrixParaImpl(params); }
 
-// __aicore__ inline void SetMmadStridePara(const MmadStrideParaBitModeParams& params) { SetMmadStrideParaImpl(params);
-// }
+__aicore__ inline void SetMmadStridePara(const MmadStrideParaBitModeParams& params) { SetMmadStrideParaImpl(params);
+}
 
-// __aicore__ inline void SetMmadStridePara(const MmadStrideParaParams& params) { SetMmadStrideParaImpl(params); }
+__aicore__ inline void SetMmadStridePara(const MmadStrideParaParams& params) { SetMmadStrideParaImpl(params); }
 
-// __aicore__ inline void SetItaMaxAddr(const ItaMaxAddrBitModeParams& params) { SetItaMaxAddrImpl(params); }
+__aicore__ inline void SetItaMaxAddr(const ItaMaxAddrBitModeParams& params) { SetItaMaxAddrImpl(params); }
 
-// __aicore__ inline void SetItaMaxAddr(const ItaMaxAddrParaParams& params) { SetItaMaxAddrImpl(params); }
+__aicore__ inline void SetItaMaxAddr(const ItaMaxAddrParaParams& params) { SetItaMaxAddrImpl(params); }
 
-// __aicore__ inline void SetMatrixMxPara(const MatrixMxParaBitModeParams& params) { SetMatrixMxParaImpl(params); }
+__aicore__ inline void SetMatrixMxPara(const MatrixMxParaBitModeParams& params) { SetMatrixMxParaImpl(params); }
 
-// __aicore__ inline void SetMatrixMxPara(const MatrixMxParaParams& params) { SetMatrixMxParaImpl(params); }
+__aicore__ inline void SetMatrixMxPara(const MatrixMxParaParams& params) { SetMatrixMxParaImpl(params); }
 
 template <typename T, typename U, typename S>
 __aicore__ inline void ConvFix(
@@ -147,69 +147,69 @@ __aicore__ inline void ConvFix(
     ConvFixImpl(dst, fm, filter, bias, convFixParams);
 }
 
-// template <typename T, typename U, typename S>
-// __aicore__ inline void MmadFix(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
-//     const MmadFixBitModeParams& mmadFixParams)
-// {
-//     MmadFixImpl(dst, left, right, mmadFixParams);
-// }
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    MmadFixImpl(dst, left, right, mmadFixParams);
+}
 
-// template <typename T, typename U, typename S, typename V>
-// __aicore__ inline void MmadFix(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
-//     const MmadFixBitModeParams& mmadFixParams)
-// {
-//     MmadFixImpl(dst, left, right, bias, mmadFixParams);
-// }
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    MmadFixImpl(dst, left, right, bias, mmadFixParams);
+}
 
-// template <typename T, typename U, typename S>
-// __aicore__ inline void MmadFix(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
-//     const MmadFixParams& mmadFixParams)
-// {
-//     MmadFixImpl(dst, left, right, mmadFixParams);
-// }
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadFixImpl(dst, left, right, mmadFixParams);
+}
 
-// template <typename T, typename U, typename S, typename V>
-// __aicore__ inline void MmadFix(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
-//     const MmadFixParams& mmadFixParams)
-// {
-//     MmadFixImpl(dst, left, right, bias, mmadFixParams);
-// }
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadFixImpl(dst, left, right, bias, mmadFixParams);
+}
 
-// template <typename T, typename U, typename S>
-// __aicore__ inline void MmadMxFix(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
-//     const MmadFixBitModeParams& mmadFixParams)
-// {
-//     MmadMxFixImpl(dst, left, right, mmadFixParams);
-// }
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    MmadMxFixImpl(dst, left, right, mmadFixParams);
+}
 
-// template <typename T, typename U, typename S, typename V>
-// __aicore__ inline void MmadMxFix(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
-//     const MmadFixBitModeParams& mmadFixParams)
-// {
-//     MmadMxFixImpl(dst, left, right, bias, mmadFixParams);
-// }
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
+    const MmadFixBitModeParams& mmadFixParams)
+{
+    MmadMxFixImpl(dst, left, right, bias, mmadFixParams);
+}
 
-// template <typename T, typename U, typename S>
-// __aicore__ inline void MmadMxFix(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
-//     const MmadFixParams& mmadFixParams)
-// {
-//     MmadMxFixImpl(dst, left, right, mmadFixParams);
-// }
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadMxFixImpl(dst, left, right, mmadFixParams);
+}
 
-// template <typename T, typename U, typename S, typename V>
-// __aicore__ inline void MmadMxFix(
-//     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
-//     const MmadFixParams& mmadFixParams)
-// {
-//     MmadMxFixImpl(dst, left, right, bias, mmadFixParams);
-// }
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void MmadMxFix(
+    const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
+    const MmadFixParams& mmadFixParams)
+{
+    MmadMxFixImpl(dst, left, right, bias, mmadFixParams);
+}
 } // namespace AscendC
 
 #endif // __NPU_ARCH__
