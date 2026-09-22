@@ -20,6 +20,8 @@
 - **[asc_float2int64](asc_float2int64.md)**
 - **[asc_floor](asc_floor.md)**
 - **[asc_half2bfloat16](asc_half2bfloat16.md)**
+- **[asc_half2e4m3](asc_half2e4m3.md)**
+- **[asc_half2e5m2](asc_half2e5m2.md)**
 - **[asc_half2float](asc_half2float.md)**
 - **[asc_half2hif8](asc_half2hif8.md)**
 - **[asc_half2int16](asc_half2int16.md)**
