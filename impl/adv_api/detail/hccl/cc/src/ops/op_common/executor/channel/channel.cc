@@ -457,6 +457,49 @@ HcclResult ProcessLinkForProtocolNhr(
         std::string("[CalcLevel1ChannelRequestNhr]"));
 }
 
+#ifndef AICPU_COMPILE
+static bool IsUbMultiChannelProtocol(CommProtocol protocol)
+{
+    if (protocol == CommProtocol::COMM_PROTOCOL_UBC_CTP) {
+        return true;
+    }
+    return false;
+}
+
+static void DuplicateUbMultiChannelDescs(
+    std::vector<HcclChannelDesc>& channels, size_t channelCountBefore, u32 multiChannelNum)
+{
+    if (multiChannelNum <= 1) {
+        return;
+    }
+    std::vector<HcclChannelDesc> newChannels(channels.begin() + channelCountBefore, channels.end());
+    for (const auto& desc : newChannels) {
+        u32 duplicateCount = (IsUbMultiChannelProtocol(desc.channelProtocol)) ? (multiChannelNum - 1) : 0;
+        for (u32 n = 0; n < duplicateCount; ++n) {
+            channels.push_back(desc);
+        }
+    }
+}
+
+HcclResult GetUbMultiChannelNum(HcclComm comm, u32& multiChannelNum)
+{
+    // 值对齐 CANN hcomm 侧 HCCL_CONFIG_TYPE_UB_MULTI_CHANNEL_NUM（hccl_host_comm_dl.h 同值）；
+    // 本地 hccl_comm.h 尚未收敛该成员，为避免对 include/adv_api 对外头的变更，此处使用局部常量直传。
+    constexpr HcclConfigType kCfgTypeUbMultiChannelNum = static_cast<HcclConfigType>(2);
+    multiChannelNum = 1;
+    u32 cfgNum = 0;
+    uint32_t infoLen = sizeof(u32);
+    HcclResult ret = HcclConfigGetInfo(comm, kCfgTypeUbMultiChannelNum, infoLen, &cfgNum);
+    if (ret != HCCL_SUCCESS) {
+        // 旧版本 hcomm 不支持该配置项时保持默认单通道，不阻塞建链
+        HCCL_INFO("[GetUbMultiChannelNum] HcclConfigGetInfo failed, ret[%d], use default.", ret);
+        return HCCL_SUCCESS;
+    }
+    multiChannelNum = cfgNum;
+    return HCCL_SUCCESS;
+}
+#endif
+
 HcclResult CalcChannelRequestNhr(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
@@ -464,6 +507,11 @@ HcclResult CalcChannelRequestNhr(
 #ifndef AICPU_COMPILE
     (void)param;
     channels.clear();
+    u32 multiChannelNum = 1;
+    if (param.engine == CommEngine::COMM_ENGINE_AICPU_TS) {
+        CHK_RET(GetUbMultiChannelNum(comm, multiChannelNum));
+    }
+    HCCL_DEBUG(" %s multiChannelNum is %u ", __func__, multiChannelNum);
     std::set<u32> connectRanks;
     u32 myRank = topoInfo->userRank;
     auto it = std::find(subcommInfo[0].begin(), subcommInfo[0].end(), myRank);
@@ -522,6 +570,8 @@ HcclResult CalcChannelRequestNhr(
                 "[CalcChannelRequestNhr] Failed to create channel between myRank=%u and rank=%u, there is no link.",
                 myRank, subcommInfo[0][rankIdx]),
             HcclResult::HCCL_E_INTERNAL);
+
+        DuplicateUbMultiChannelDescs(channels, channelCountBefore, multiChannelNum);
     }
 #endif
     return HCCL_SUCCESS;
