@@ -4,7 +4,7 @@
 
 Ascend 950PR/Ascend 950DT新增了使用`Mutex`实现核内多流水同步的能力。当矢量算子的数据搬入、矢量计算和数据搬出等不同流水之间存在数据依赖时，通过`Mutex`建立流水同步关系，使不同流水中存在数据依赖的操作串行执行，可以避免不同流水并发访问同一资源时产生数据错误。
 
-本文以Basic API中的[Mutex::Lock](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Mutex_ISASI.md)和[Mutex::Unlock](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Mutex_ISASI.md)为例，说明使用[Mutex实现双缓冲多流水同步](../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex/README.md)的原理。相关同步原理同样适用于C API中的[asc_lock](../../../../api/SIMD-API/c_api/sync/asc_lock.md)和[asc_unlock](../../../../api/SIMD-API/c_api/sync/asc_unlock.md)。C API双缓冲样例请参考[add_double_buffer样例](../../../../../../examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer/README.md)。
+本文以Basic API中的[Mutex::Lock](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Mutex_ISASI.md)和[Mutex::Unlock](../../../../api/SIMD-API/basic_api/sync_control/intra_core_sync/Mutex_ISASI.md)为例，说明使用[Mutex实现双缓冲多流水同步](../../../../../../examples/01_simd_cpp_api/03_basic_api/05_sync_control/mutex/README.md)的原理。相关同步原理同样适用于C API中的[asc_lock](../../../../api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../../../api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md)。C API双缓冲样例请参考[add_double_buffer样例](../../../../../../examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer/README.md)。
 
 本文首先介绍双缓冲算子中的正向数据依赖和反向数据依赖，然后说明如何规划`MutexID`并建立流水同步关系，接着通过`Lock`/`Unlock`与`SetFlag`/`WaitFlag`的对比说明`Mutex`的使用方式，最后介绍`Mutex`接口的使用约束。
 
