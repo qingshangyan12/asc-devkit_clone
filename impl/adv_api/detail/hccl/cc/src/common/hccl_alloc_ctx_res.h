@@ -108,6 +108,12 @@ enum class AlgorithmType {
     // 153/155 已被 master 尾部隐式编号占用（AllGatherSoleMesh/AllToAllSoleMeshConcurrent），ConcurRS 顺延 156。
     CcuSchedReduceScatterConcurMeshNHRMultiLink = 156,
     CcuSchedAllToAllMesh1DMultiJetty = 157,
+    // v3（§12-11 甲路线尾款轮，2026-09-21）：unified Plan server 的分派键——
+    // CcuPrepareForOp 的 AG 分支二级分派（AIV 侧）+ GetAlgorithmType 线性匹配
+    //（hcclNewContext_->opType[index] 命中后返回本值）。devkit 内部枚举追加
+    //（本头非对外头，新增枚举值不属 ABI 变更）；AIC 侧镜像枚举（hccl_ccu_v0_def.h）
+    // 同步追加同值 158。
+    CcuUnifiedPlan = 158,
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
