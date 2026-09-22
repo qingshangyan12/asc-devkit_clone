@@ -15,6 +15,32 @@
 
 namespace mc2_ops_hccl {
 
+namespace {
+constexpr uint64_t RS_CHUNK_ALIGN_SIZE = 128;
+constexpr uint64_t RS_TARGET_CHUNK_SIZE = 512 * 1024;
+
+uint64_t CalcRepeatNumByChunkSize(uint64_t sliceSize, uint64_t lastSliceSize)
+{
+    if (sliceSize < RS_TARGET_CHUNK_SIZE || lastSliceSize < RS_TARGET_CHUNK_SIZE) {
+        return 1;
+    }
+    uint64_t repeatNum = sliceSize / RS_TARGET_CHUNK_SIZE;
+    if (repeatNum > 16) {
+        repeatNum = 16;
+    }
+    while (repeatNum > 1) {
+        bool sliceAligned = (sliceSize % repeatNum == 0) && ((sliceSize / repeatNum) % RS_CHUNK_ALIGN_SIZE == 0);
+        bool lastSliceAligned =
+            (lastSliceSize % repeatNum == 0) && ((lastSliceSize / repeatNum) % RS_CHUNK_ALIGN_SIZE == 0);
+        if (sliceAligned && lastSliceAligned) {
+            break;
+        }
+        repeatNum--;
+    }
+    return repeatNum;
+}
+} // namespace
+
 CcuTempReduceScatterMesh1DMem2Mem::CcuTempReduceScatterMesh1DMem2Mem(
     const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
     : CcuAlgTemplateBase(param, rankId, subCommRanks)
@@ -120,7 +146,17 @@ HcclResult CcuTempReduceScatterMesh1DMem2Mem::KernelRun(
     uint64_t normalSliceSize = templateDataParams.sliceSize;
     uint64_t lastSliceSize = templateDataParams.tailSize;
 
-    uint64_t repeatNum = UINT64_MAX - repeatNumTmp;
+    uint64_t repeat = repeatNumTmp;
+    if (repeat <= 1) {
+        repeat = CalcRepeatNumByChunkSize(normalSliceSize, lastSliceSize);
+        normalSliceSize /= repeat;
+        lastSliceSize /= repeat;
+        uint64_t chunkSize = (mySubCommRank_ == (templateRankSize_ - 1)) ? lastSliceSize : normalSliceSize;
+        inputRepeatStride = chunkSize;
+        outputRepeatStride = chunkSize;
+    }
+
+    uint64_t repeatNum = UINT64_MAX - repeat;
 
     std::unique_ptr<hcomm::CcuTaskArg> taskArg = std::make_unique<CcuTaskArgReduceScatterMesh1DMem2Mem>(
         inputAddr, outputAddr, token, scratchAddr, inputSliceStride, outputSliceStride, inputRepeatStride,
@@ -146,10 +182,9 @@ HcclResult CcuTempReduceScatterMesh1DMem2Mem::KernelRun(
 
 u64 CcuTempReduceScatterMesh1DMem2Mem::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
 {
-    // one shot 场景，scratch Buffer 需要是 usrIn的rankSize倍
     (void)inBuffType;
     (void)outBuffType;
-    return templateRankSize_;
+    return templateRankSize_ * 2;
 }
 
 u64 CcuTempReduceScatterMesh1DMem2Mem::GetThreadNum() const { return 1; }
