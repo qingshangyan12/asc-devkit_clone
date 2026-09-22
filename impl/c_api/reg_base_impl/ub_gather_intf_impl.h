@@ -142,6 +142,14 @@ __simd_callee__ inline void asc_gather(
 }
 
 __simd_callee__ inline void asc_gather(
+    vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgather2(dst, src, index, mask);
+    }
+}
+
+__simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -318,6 +326,14 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint32_t index, vector_bool mask)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index, mask);
+    }
+}
+
 __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
 {
     if ASC_IS_AIV {
@@ -452,6 +468,14 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint32_t index)
+{
+    if ASC_IS_AIV {
+        vgatherb(dst, src, index);
+    }
+}
+
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
     vector_int8_t dst;
@@ -540,6 +564,13 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_gather(__ubuf__ fp8_e5m2_t* src, ve
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather(__ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask)
 {
     vector_fp8_e8m0_t dst;
+    asc_gather(dst, src, index, mask);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_gather(__ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask)
+{
+    vector_fp8_e6m2_t dst;
     asc_gather(dst, src, index, mask);
     return dst;
 }
@@ -697,6 +728,14 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(
     return dst;
 }
 
+__simd_callee__ inline vector_fp8_e6m2_t asc_gather_datablock(
+    __ubuf__ fp8_e6m2_t* src, vector_uint32_t index, vector_bool mask)
+{
+    vector_fp8_e6m2_t dst;
+    asc_gather_datablock(dst, src, index, mask);
+    return dst;
+}
+
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index)
 {
     vector_int8_t dst;
@@ -805,6 +844,13 @@ __simd_callee__ inline vector_int4x2_t asc_gather_datablock(__ubuf__ int4b_t* sr
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(__ubuf__ fp8_e8m0_t* src, vector_uint32_t index)
 {
     vector_fp8_e8m0_t dst;
+    asc_gather_datablock(dst, src, index);
+    return dst;
+}
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_gather_datablock(__ubuf__ fp8_e6m2_t* src, vector_uint32_t index)
+{
+    vector_fp8_e6m2_t dst;
     asc_gather_datablock(dst, src, index);
     return dst;
 }
