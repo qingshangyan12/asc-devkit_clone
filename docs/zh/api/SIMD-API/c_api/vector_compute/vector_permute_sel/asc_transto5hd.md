@@ -98,7 +98,7 @@ PIPE_V
 
 ## 调用示例
 
-将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。一次运行会分别验证下面两个场景。
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
 以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
@@ -109,18 +109,10 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 <!-- end id8 -->
 
-<!-- npu="A3,910b" id9 -->
-以Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品（对应NPU架构为`dav-2201`）为例，编译运行命令如下：
+一次运行会分别验证下面两个场景：
 
-```bash
-bisheng example.asc -o main --npu-arch=dav-2201 && ./main
-```
-
-<!-- end id9 -->
-
-示例一展示单次Repeat的矩阵转置。输入是一块按行连续存放的16×16矩阵，每行恰好占用一个16位数据类型的DataBlock。代码将每行的起始地址写入`src_list`，并将目的矩阵每行的起始地址写入`dst_list`；两组地址分别通过`asc_set_va_reg`关联到相邻的地址寄存器。调用`asc_transto5hd_b16`时设置`repeat=1`、`dst_stride=0`、`src_stride=0`，完成一次转置，最终逐元素检查输出第`col`行、第`row`列是否等于输入第`row`行、第`col`列。
-
-示例二展示多次Repeat配合外层循环完成NCHW到NC1HWC0格式转换。输入形状为N=2、C=32、H=W=16，按每16个通道划为一组，共有4组。外层循环每次为一组通道更新16个源地址和16个目的地址：源地址指向各通道的HW平面起点，目的地址指向目标布局中对应通道的起点。每组调用一次`asc_transto5hd_b16`，通过`repeat=16`遍历HW方向上的16段数据；`src_stride=1`使每次迭代读取源平面的下一个DataBlock，`dst_stride=16`使输出按NC1HWC0布局前进。最后按`[N, C1, H, W, C0]`的索引顺序逐元素核对结果。
+- 单次Repeat的矩阵转置。输入是一块按行连续存放的16×16矩阵，每行恰好占用一个16位数据类型的DataBlock。代码将每行的起始地址写入`src_list`，并将目的矩阵每行的起始地址写入`dst_list`；两组地址分别通过`asc_set_va_reg`关联到相邻的地址寄存器。调用`asc_transto5hd_b16`时设置`repeat=1`、`dst_stride=0`、`src_stride=0`，完成一次转置，最终逐元素检查输出第`col`行、第`row`列是否等于输入第`row`行、第`col`列。
+- 多次Repeat配合外层循环完成NCHW到NC1HWC0格式转换。输入形状为N=2、C=32、H=W=16，按每16个通道划为一组，共有4组。外层循环每次为一组通道更新16个源地址和16个目的地址：源地址指向各通道的HW平面起点，目的地址指向目标布局中对应通道的起点。每组调用一次`asc_transto5hd_b16`，通过`repeat=16`遍历HW方向上的16段数据；`src_stride=1`使每次迭代读取源平面的下一个DataBlock，`dst_stride=16`使输出按NC1HWC0布局前进。最后按`[N, C1, H, W, C0]`的索引顺序逐元素核对结果。
 
 ```cpp
 #include <cstdint>
@@ -148,7 +140,7 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
     __ubuf__ half* src_list[16];
     __ubuf__ half* dst_list[16];
 
-    // 示例一：一次repeat完成16x16矩阵转置，stride为0时从地址列表起点读取。
+    // 场景一：一次repeat完成16x16矩阵转置，stride为0时从地址列表起点读取。
     asc_copy_gm2ub_align(src, matrix_in, MATRIX_ELEMENTS * sizeof(uint16_t));
     asc_sync_mte2(0);
     for (int i = 0; i < 16; ++i) {
@@ -164,7 +156,7 @@ __global__ __vector__ void transto5hd_kernel(__gm__ uint16_t* matrix_out,
     asc_copy_ub2gm_align(matrix_out, dst, MATRIX_ELEMENTS * sizeof(uint16_t));
     asc_sync_mte3(0);
 
-    // 示例二：N=2、C=32、H=W=16，四组C0=16通道分别处理。
+    // 场景二：N=2、C=32、H=W=16，四组C0=16通道分别处理。
     asc_copy_gm2ub_align(src, layout_in, TOTAL_ELEMENTS * sizeof(uint16_t));
     asc_sync_mte2(0);
     for (int j = 0; j < 4; ++j) {
