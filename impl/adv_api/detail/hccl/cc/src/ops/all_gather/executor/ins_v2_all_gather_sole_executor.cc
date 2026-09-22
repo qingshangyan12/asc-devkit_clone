@@ -16,6 +16,26 @@
 #endif
 #include "topo_match_ubx.h"
 #include <cstddef>
+#include <type_traits>
+
+namespace {
+
+// CCU KFC 模板不继承 InsAlgTemplateBase（无 SetchannelsPerRank），SFINAE 分发保底成功
+template <typename InsAlgTemplate>
+typename std::enable_if<std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
+SetChannelsPerRankIfSupported(InsAlgTemplate& algTemplate, const std::map<u32, std::vector<ChannelInfo>>& channels)
+{
+    return algTemplate.SetchannelsPerRank(channels);
+}
+
+template <typename InsAlgTemplate>
+typename std::enable_if<!std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
+SetChannelsPerRankIfSupported(InsAlgTemplate&, const std::map<u32, std::vector<ChannelInfo>>&)
+{
+    return HCCL_SUCCESS;
+}
+} // namespace
+
 namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
@@ -129,6 +149,12 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         templateAlgRes.channels.size(), templateAlgRes.threads.size());
     // 构建template
     InsAlgTemplate algTemplate(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+    // AicpuAllGatherSoleNHR 在计算资源时按照channels取最大，实际使用资源由SetchannelsPerRank使能；
+    // MultiLink（及 Pod 场景的 SoleNHR）按恢复的实际 channel map 重算通道数
+    if (param.engine == COMM_ENGINE_AICPU_TS
+        && (resCtx.topoInfo.isPod || std::string(param.algName) != "AicpuAllGatherSoleNHR")) {
+        CHK_RET(SetChannelsPerRankIfSupported(algTemplate, templateAlgRes.channels));
+    }
     u32 templateScratchMultiplier =
         algTemplate.CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
@@ -195,6 +221,10 @@ REGISTER_EXEC_V2(
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHR, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    InsTempAllGatherNHR);
+
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHRMultiLink, InsV2AllGatherSoleExecutor, TopoMatch1D,
     InsTempAllGatherNHR);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
