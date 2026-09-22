@@ -40,9 +40,9 @@ This sample uses softmax as an example to introduce tuning methods for in-row re
 
 - Computation rule:
 
-  Softmax is computed row by row, and rows are independent of each other. For each row: first compute the in-row maximum, then subtract the maximum from each element and apply the exponential function, sum the exponential results across the row, and finally divide each exponential value by the row sum to obtain the normalized output. The computation process is shown in the following figure, taking the row [1, 2, 3] as an example.
+  Softmax is computed row by row, and rows are independent of each other. For each row: first compute the in-row maximum, then subtract the maximum from each element and apply the exponential function, sum the exponential results across the row, and finally divide each exponential value by the row sum to obtain the normalized output. One Warp processes one row, as shown in the following figure.
 
-  <img src="./figures/compute_rule.png">
+  <img src="./figures/warp_per_row.png">
 
 - Sample specifications:
 
@@ -90,11 +90,7 @@ Except for Task Duration, all other metrics are averages across all Thread Block
 
 **Optimization Goal**: Establish the functional correctness and performance baseline with the most direct implementation: the Warp reads input directly from GM, completes the in-row max, exp/sum, and normalization, and introduces no intermediate buffer.
 
-**Core Implementation**: The in-row softmax is completed in three passes: the row maximum, the exponential sum, and the normalized output, all reading GM directly. The thread organization is "one Warp processes one row": the 32 threads in a Warp are respectively responsible for different columns of the row, and the in-row max and sum are completed with Warp reduction primitives. Multiple Warps in a Thread Block each process different rows, and the row direction covers all rows through a grid-stride loop; the number of Warps launched per Thread Block adapts to rows, and when rows are fewer than the AIV core count, each Thread Block processes only one row. Take the default shape [8192, 197] as an example. The 197 columns of a row are processed by 32 threads in multiple rounds: each thread starts from the column equal to its thread ID and processes the following columns in steps of 32. Since 197 = 6 x 32 + 5, all 32 threads participate in the first six rounds, and in the seventh round only the first 5 threads still have data to process. One Warp processes one row, as shown in the following figure.
-
-<img src="./figures/warp_per_row.png">
-
-Taking the in-row max as an example, the 32 threads in a Warp first compute their partial maximums and then obtain the row maximum through the Warp reduction primitive, as shown in the following figure.
+**Core Implementation**: The in-row softmax is completed in three passes: the row maximum, the exponential sum, and the normalized output, all reading GM directly. The thread organization is "one Warp processes one row": the 32 threads in a Warp are respectively responsible for different columns of the row, and the in-row max and sum are completed with Warp reduction primitives. Multiple Warps in a Thread Block each process different rows, and the row direction covers all rows through a grid-stride loop; the number of Warps launched per Thread Block adapts to rows, and when rows are fewer than the AIV core count, each Thread Block processes only one row. Take the default shape [8192, 197] as an example. The 197 columns of a row are processed by 32 threads in multiple rounds: each thread starts from the column equal to its thread ID and processes the following columns in steps of 32. Since 197 = 6 x 32 + 5, all 32 threads participate in the first six rounds, and in the seventh round only the first 5 threads still have data to process. Taking the in-row max as an example, the 32 threads in a Warp first compute their partial maximums and then obtain the row maximum through the Warp reduction primitive, as shown in the following figure.
 
 <img src="./figures/case0.png">
 
