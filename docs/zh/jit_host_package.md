@@ -86,9 +86,14 @@ manifest 继续只使用 `source_file`：
 
 RUN 自定义包根为 vendors/<vendor>，内置为 opp/built-in；库交付根为安装前缀。不允许绝对路径、父目录跳转或符号链接逃出包根。
 
-RUN、SHARED 根据原源码安装规则传入内部 source-map，只改写打包副本的 source_file。STATIC 不传自动安装映射，保留原 source_file，不新增 STATIC 专用的路径限制校验；源码布局与检索由使用方组织。compile_op 原始 manifest 始终保留。原源码和头文件复用工程交付；资源中额外保存生成桩、生成头文件和 manifest。默认以选中源文件的父目录作为 include 基础，额外 include 路径仍需编译选项提供，不扫描头文件自动猜测。
+RUN、SHARED 根据原源码安装规则传入内部 source-map，在打包副本中改写 source_file，以及有明确目录映射的 include 路径。STATIC 不传自动安装映射，保留原 source_file，不新增 STATIC 专用的路径限制校验；源码布局与检索由使用方组织。compile_op 原始 manifest 始终保留。原源码和头文件复用工程交付；资源中额外保存生成桩、生成头文件和 manifest。默认以选中源文件的父目录作为 include 基础，额外 include 路径仍需编译选项提供，不扫描头文件自动猜测。
 
 `${source_file_path}` 是已有编译命令占位符，表示定位后的源文件目录；不是另一个 manifest 字段。
+
+打包工具复用该占位符，将明确映射的 `-I`、`-isystem`、`-iquote`、`-idirafter` 路径写成相对于源码目录的形式，保持搜索顺序。例如安装后的源码在 `src/op/kernel.cpp`，公共头文件在 `src/common`，则对应 include 写为 `-I${source_file_path}/../common`。目录映射按最长路径前缀匹配，同一前缀对应不同安装位置时报歧义；未映射的外部路径、环境变量和原相对路径保持不变。生成器也不会因目录在生成时不存在而静默删除用户的 include。
+
+内置仓如果把公共头文件复制到构建目录再编译，应在已有内部 source-map 中补充该副本与安装目录的对应关系。它描述公共构建目录，不需要逐算子配置。SDK 不扫描同名头文件猜位置，不改写源码内的相对 include，也不补打包工程缺失的依赖。原 compile_op 使用同一安装包也会失败的缺文件或目录布局问题，由工程原源码交付处理。
+
 
 ## 6. 加载与静态编译
 

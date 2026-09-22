@@ -100,12 +100,64 @@ def validate_sources(source_root, manifests, source_maps=()):
     return resolved
 
 
-def stage_unique_resources(manifests, destination, source_paths=None):
+def relocate_include_paths(document, source_maps):
+    """Relocate only explicitly mapped include directories, preserving search order."""
+    if not source_maps:
+        return
+    source_parent = Path(safe_source_path(document["source_file"])).parent
+    directories = {}
+    for source, destination in source_maps:
+        if Path(source).is_dir():
+            root = Path(os.path.abspath(source))
+            directories.setdefault(root, set()).add(Path(safe_source_path(destination)))
+
+    def relocate(value):
+        if not os.path.isabs(value) or "${" in value:
+            return value
+        path = Path(os.path.abspath(value))
+        root = next(
+            (parent for parent in (path, *path.parents) if parent in directories), None
+        )
+        if root is None:
+            return value
+        destinations = directories[root]
+        if len(destinations) != 1:
+            raise ValueError("Ambiguous include installation mapping: " + value)
+        destination = next(iter(destinations)) / path.relative_to(root)
+        relative = os.path.relpath(destination, source_parent)
+        return "${source_file_path}" + ("/" + relative if relative != "." else "")
+
+    def rewrite(argv):
+        index = 0
+        while index < len(argv):
+            token = argv[index]
+            if token in ("-I", "-isystem", "-iquote", "-idirafter"):
+                if index + 1 < len(argv):
+                    argv[index + 1] = relocate(argv[index + 1])
+                index += 2
+                continue
+            for prefix in ("-I", "-isystem", "-iquote", "-idirafter"):
+                if token.startswith(prefix) and len(token) > len(prefix):
+                    argv[index] = prefix + relocate(token[len(prefix) :])
+                    break
+            index += 1
+
+    for options in document.get("options", {}).values():
+        rewrite(options)
+    for kernel in document.get("kernels", []):
+        for obj in kernel.get("objects", []):
+            for command in obj.get("commands", []):
+                if command.get("type") == "compile":
+                    rewrite(command["cmd"])
+
+
+def stage_unique_resources(manifests, destination, source_paths=None, source_maps=()):
     selected = {}
     for manifest in sorted(manifests):
         document = json.loads(manifest.read_text())
         if source_paths and manifest in source_paths:
             document["source_file"] = source_paths[manifest]
+        relocate_include_paths(document, source_maps)
         resource_id = document.get("resource_id", "")
         if not re.fullmatch(r"[0-9a-f]{64}", resource_id):
             raise ValueError("Invalid resource_id in " + str(manifest))
@@ -253,7 +305,9 @@ def main():
     with bundle_work_directory(work, keep_temp) as temporary:
         result = Path(temporary) / output.name
         collected = Path(temporary) / "inputs"
-        count = stage_unique_resources(manifests, collected, source_paths)
+        count = stage_unique_resources(
+            manifests, collected, source_paths, args.source_map
+        )
         command = [
             args.exporter,
             "--input-dir",

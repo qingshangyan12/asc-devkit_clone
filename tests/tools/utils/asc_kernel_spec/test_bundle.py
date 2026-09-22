@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import shutil
 import subprocess
 from pathlib import Path
 import sys
@@ -25,6 +26,141 @@ import kernel_spec_options
 
 
 class SourceUniqueness(unittest.TestCase):
+    def test_include_paths_follow_install_mapping_without_changing_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            common = root / "build/common"
+            common.mkdir(parents=True)
+            external = root / "external"
+            external.mkdir()
+            document = {
+                "source_file": "src/op/op_kernel/kernel.cpp",
+                "options": {
+                    "common_compile": [
+                        "-I" + str(common),
+                        "-I",
+                        str(external),
+                        "-isystem",
+                        str(common / "nested"),
+                        "-DVALUE=1",
+                    ]
+                },
+                "kernels": [
+                    {
+                        "objects": [
+                            {
+                                "commands": [
+                                    {
+                                        "type": "compile",
+                                        "cmd": ["cc", "-iquote", str(common)],
+                                    },
+                                    {"type": "link", "cmd": ["ld", "-I" + str(common)]},
+                                ]
+                            }
+                        ]
+                    }
+                ],
+            }
+            build_bundle.relocate_include_paths(document, [(str(common), "src/common")])
+            self.assertEqual(
+                document["options"]["common_compile"],
+                [
+                    "-I${source_file_path}/../../common",
+                    "-I",
+                    str(external),
+                    "-isystem",
+                    "${source_file_path}/../../common/nested",
+                    "-DVALUE=1",
+                ],
+            )
+            commands = document["kernels"][0]["objects"][0]["commands"]
+            self.assertEqual(
+                commands[0]["cmd"],
+                ["cc", "-iquote", "${source_file_path}/../../common"],
+            )
+            self.assertEqual(commands[1]["cmd"], ["ld", "-I" + str(common)])
+
+    def test_include_mapping_uses_most_specific_root_and_rejects_ambiguity(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            nested = root / "nested"
+            nested.mkdir()
+
+            def document():
+                return {
+                    "source_file": "src/kernel.cpp",
+                    "options": {"common_compile": ["-I" + str(nested)]},
+                }
+
+            mappings = [(str(root), "src"), (str(nested), "headers")]
+            value = document()
+            build_bundle.relocate_include_paths(value, mappings)
+            self.assertEqual(
+                value["options"]["common_compile"], ["-I${source_file_path}/../headers"]
+            )
+            with self.assertRaisesRegex(ValueError, "Ambiguous include"):
+                build_bundle.relocate_include_paths(
+                    document(), mappings + [(str(nested), "other")]
+                )
+
+    def test_static_without_install_mapping_preserves_options(self):
+        document = {
+            "source_file": "kernel.cpp",
+            "options": {
+                "common_compile": ["-I/build/missing", "-Irelative", "-I${env:HEADERS}"]
+            },
+        }
+        original = json.loads(json.dumps(document))
+        build_bundle.relocate_include_paths(document, [])
+        self.assertEqual(document, original)
+
+    @unittest.skipUnless(shutil.which("c++"), "requires the host C++ compiler")
+    def test_staged_manifest_compiles_after_build_directory_is_removed(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            build = root / "build"
+            source, headers = build / "op", build / "headers"
+            source.mkdir(parents=True)
+            headers.mkdir()
+            (source / "kernel.cpp").write_text(
+                '#include "value.h"\nstatic_assert(VALUE == 7);\n'
+            )
+            (headers / "value.h").write_text("#define VALUE 7\n")
+            manifest = root / "kernel_manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "source_file": "kernel.cpp",
+                        "resource_id": "b" * 64,
+                        "options": {"common_compile": ["-I", str(headers)]},
+                    }
+                )
+            )
+            mappings = [(str(source), "src/op"), (str(headers), "src/common")]
+            paths = build_bundle.validate_sources(source, [manifest], mappings)
+            staged = root / "staged"
+            build_bundle.stage_unique_resources([manifest], staged, paths, mappings)
+            package = root / "moved_package"
+            shutil.copytree(source, package / "src/op")
+            shutil.copytree(headers, package / "src/common")
+            shutil.rmtree(build)
+            document = json.loads(
+                (staged / ("b" * 64) / "kernel_manifest.json").read_text()
+            )
+            installed_source = package / document["source_file"]
+            options = [
+                value.replace("${source_file_path}", str(installed_source.parent))
+                for value in document["options"]["common_compile"]
+            ]
+            subprocess.run(
+                ["c++", "-std=c++17", "-fsyntax-only", *options, str(installed_source)],
+                check=True,
+                capture_output=True,
+            )
+            self.assertEqual(
+                json.loads(manifest.read_text())["source_file"], "kernel.cpp"
+            )
+
     def test_kernel_spec_modes(self):
         with tempfile.TemporaryDirectory() as tmp:
             config = Path(tmp) / "options.ini"

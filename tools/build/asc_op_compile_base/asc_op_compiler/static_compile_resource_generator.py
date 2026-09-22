@@ -430,9 +430,6 @@ def _normalize_source_include_options(
                 source_include_added = True
             index += option_size
             continue
-        if os.path.isabs(include_path) and not os.path.exists(include_path):
-            index += option_size
-            continue
         normalized.extend(argv[index : index + option_size])
         index += option_size
     if replacement is not None and not source_include_added:

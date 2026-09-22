@@ -396,12 +396,9 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
     def test_normalize_source_include_options(self):
         replacement = "${source_file_path}"
         source_argument = self.wrapper_path
-        missing_include = os.path.join(self.input_root, "missing")
         cases = (
             ("split", ["-I", self.input_root]),
             ("joined", ["-I" + self.input_root]),
-            ("missing split", ["-I", missing_include]),
-            ("missing joined", ["-I" + missing_include]),
         )
         for name, include_options in cases:
             with self.subTest(name=name):
@@ -415,6 +412,23 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     ),
                     [self.bisheng, "-I", replacement, source_argument],
                 )
+
+    def test_missing_external_include_is_preserved(self):
+        missing = os.path.join(self.input_root, "../external_missing")
+        argv = [self.bisheng, "-I", missing, self.wrapper_path]
+        self.assertEqual(
+            generator._normalize_source_include_options(
+                argv, self.source_path, "${source_file_path}", self.wrapper_path
+            ),
+            [
+                self.bisheng,
+                "-I",
+                missing,
+                "-I",
+                "${source_file_path}",
+                self.wrapper_path,
+            ],
+        )
 
     def test_manifest_package_writer_writes_snapshot(self):
         compile_info = self.make_compile_context()
@@ -530,6 +544,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
             "link_option",
         ):
             self.assertNotIn(f'"{old_name}"', serialized)
+        for suffix in ("missing_joined", "missing_split"):
+            serialized = serialized.replace(os.path.join(self.input_root, suffix), "")
         self.assertNotIn(self.root, serialized)
         resource_root = os.path.join(self.output_dir, "resources")
         self.assertEqual(
@@ -571,7 +587,7 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     if value.startswith("${resource}/resources/src/")
                 ),
             )
-            self.assertFalse(
+            self.assertTrue(
                 any(
                     "missing_joined" in value or "missing_split" in value
                     for value in expanded_cmd
@@ -1171,7 +1187,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         )
         bind_compile = sk_object["commands"][1]["cmd"]
         self.assertNotIn("${source_file_path}", bind_compile)
-        self.assertNotIn(self.input_root, json.dumps(bind_compile))
+        self.assertNotIn(self.input_root, bind_compile)
+        self.assertIn(os.path.join(self.input_root, "missing_split"), bind_compile)
         bind_reference = next(
             value
             for value in sk_object["commands"][1]["cmd"]
