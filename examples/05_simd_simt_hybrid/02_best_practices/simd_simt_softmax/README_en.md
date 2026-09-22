@@ -54,7 +54,7 @@ This sample uses softmax as an example to introduce tuning methods for in-row re
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">softmax_gm_kernel / softmax_ub_kernel / softmax_bucket_kernel</td></tr>
   </table>
 
-  > **Input Constraint:** The default shape of this sample is [8192, 197]. A custom shape can be specified through running arguments, and each row contains 1 to 512 elements.
+  > **Input Constraint:** The default shape of this sample is [8192, 197]. A custom shape can be specified through running arguments, and each row contains 1 to 512 elements (cols).
 
 ## Sample Implementation
 
@@ -140,7 +140,7 @@ The `aiv_vec_ratio` of Case 0 reaches 0.946, and the time is concentrated on GM 
 
 ### Case 1: UB Staging with MTE Double Buffering
 
-**Optimization Goal**: Change the direct GM read in Case 0 to MTE movement with UB staging: the SIMT VF completes the in-row computation only on UB. Double buffering is used between tiles so that movement and computation overlap.
+**Optimization Goal**: Use MTE to move data between GM and UB, let the SIMT VF compute on the data in UB, and use double buffering to run computation and data movement as parallel pipelines.
 
 **Core Implementation**:
 
@@ -207,11 +207,11 @@ The computation time of Case 1 is mainly spent on how the in-row computation is 
 
 ### Case 2: Intermediate Values in Registers
 
-**Optimization Goal**: Eliminate the repeated reads of the input row and the repeated computation of `exp` in the Case 1 in-row computation. The first step is to introduce a static array that caches the whole row from UB, so that one read completes the max, exp/sum, and normalization. The second step is to make the array stay in registers to further reduce the memory access overhead. To this end, the implementation converges to compile-time buckets: cols upper bounds 64/128/256/384/512 are divided into five levels, a specialized kernel is generated for each level so that all in-row intermediate values stay in registers, and the Host side dynamically selects the thread count based on the shape.
+**Optimization Goal**: Keep the intermediate results of the computation, that is, the exp value of each element, in registers, avoiding repeated data movement and computation. The first step introduces a static array, reads the whole row from UB, and completes the max, exp/sum, and normalization in one read; the second step keeps the array in registers. To this end, the implementation converges to compile-time buckets: cols upper bounds 64/128/256/384/512 are divided into five levels, and a specialized kernel is generated for each level; the Host side dynamically selects the thread count based on the shape.
 
 **Core Implementation**:
 
-- Compile-time bucket: The cols covered by this sample does not exceed 512, and each thread is assigned at most 512/32 = 16 elements, which fits directly in registers. However, the for loop that traverses the array takes cols as its condition: cols is a runtime parameter, so neither the number of iterations nor the array indices accessed in each iteration can be determined at compile time. The compiler cannot unroll the loop, and the array can only be allocated in stack space, whose access efficiency is lower than that of registers. Therefore, cols is divided into five buckets by the upper bounds 64/128/256/384/512, and a specialized kernel is instantiated per bucket: the bucket capacity is a compile-time constant, the for loop condition is a constant, the loop can be fully expanded, and `elements[kWarpIterations]` can stay in registers. Invalid tail columns are masked with `-ASCRT_INF_F` and excluded from the reduction and normalization.
+- Compile-time bucket: The cols covered by this sample does not exceed 512, and each thread is assigned at most 512/32 = 16 elements, which fits entirely in registers; this requires that all array access addresses, that is, the computation of all array indices, can be determined at compile time. However, the for loop that traverses the array takes cols as its condition, and cols is a runtime parameter, so neither the number of iterations nor the array indices accessed in each iteration can be determined at compile time. The compiler cannot unroll the loop, and the array can only be allocated in stack space, whose access efficiency is lower than that of registers. Therefore, cols is divided into five buckets by the upper bounds 64/128/256/384/512, and a specialized kernel is instantiated per bucket: the bucket capacity is a compile-time constant, the for loop condition is a constant, the loop can be fully expanded, and `elements[kWarpIterations]` can stay in registers. Invalid tail columns are masked with `-ASCRT_INF_F` and excluded from the reduction and normalization.
 - UB layout: tile buffers are allocated by the bucket capacity `kBucketCols`. MTE moves each row based on the real cols at runtime, and the space after the real elements is left unused. The computation results are written to UB, and MTE3 moves the result back to GM by the real cols. Taking the in-row max as an example, the reduction process of Case 2 after the tail columns are padded is shown in the following figure.
 
   <img src="./figures/case2.png">
@@ -280,7 +280,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
 
 **Analysis**:
 
-The main change of Case 2 over Case 1 is that "runtime cols" becomes "compile-time bucket upper bound": the loop bounds and indices for traversing the array are determined at compile time, the compiler keeps all in-row intermediate values in registers, and both the input row and `exp` are processed only once. `aiv_vec_time` further decreases from 7.833μs to 4.593μs, a reduction of about 41.4%. `Task Duration` decreases from 11.923μs to 8.588μs, a reduction of about 28.0%. The bucket only affects the stride of the UB layout. MTE still moves data by the real cols, and `aiv_mte2_time` stays nearly the same as Case 1. The reduction of the total time makes `aiv_vec_ratio` drop from 0.758 to 0.653 and `aiv_mte2_ratio` rise from 0.241 to 0.362. The time proportions of in-row computation and MTE2 movement are already close. Compared with Case 0, `Task Duration` decreases from 12.975μs to 8.588μs, an overall reduction of about 33.8%.
+The main change of Case 2 over Case 1 is that all in-row intermediate values stay in registers: after "runtime cols" becomes "compile-time bucket upper bound", the loop bounds and indices for traversing the array are determined at compile time, and both the input row and `exp` are processed only once. `aiv_vec_time` further decreases from 7.833μs to 4.593μs, a reduction of about 41.4%. `Task Duration` decreases from 11.923μs to 8.588μs, a reduction of about 28.0%. The bucket only affects the stride of the UB layout. MTE still moves data by the real cols, and `aiv_mte2_time` stays nearly the same as Case 1. The reduction of the total time makes `aiv_vec_ratio` drop from 0.758 to 0.653 and `aiv_mte2_ratio` rise from 0.241 to 0.362. The time proportions of in-row computation and MTE2 movement are already close. Compared with Case 0, `Task Duration` decreases from 12.975μs to 8.588μs, an overall reduction of about 33.8%.
 
 ## Performance Comparison Summary
 
