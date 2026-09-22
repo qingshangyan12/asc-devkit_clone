@@ -109,6 +109,9 @@
             -   [缓存一致性](./programming_guide/advanced_programming/memory_model/cache_coherence.md)
             -   [内存一致性](./programming_guide/advanced_programming/memory_model/memory_consistency.md)
 
+        -   [核间通信](./programming_guide/advanced_programming/inter_core_communication/inter_core_communication.md)
+            -   [使用SSBuffer实现核间通信](./programming_guide/advanced_programming/inter_core_communication/ssbuffer_inter_core_memory_feature.md)
+
         -   [高级AI Core编程模型](./programming_guide/advanced_programming/advanced_ai_core_programming_model/advanced_ai_core_programming_model.md)
             -   [SIMD与SIMT混合编程](./programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
                 -   [概述](./programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
@@ -332,6 +335,7 @@
             -   [同一Warp内避免分支跳转](operator_practice/simt_operator_optimization/control_flow/avoid_warp_branch.md)
         -   [指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
             -   [原子操作指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
+            -   [原地加法指令优化](operator_practice/simt_operator_optimization/instruction_optimization/inplace_add_instruction_optimization.md)
 
     -   [SIMD与SIMT混合算子性能优化](operator_practice/simd_simt_hybrid_optimization/simd_simt_hybrid_optimization.md)
         -   [概述](operator_practice/simd_simt_hybrid_optimization/overview.md)
