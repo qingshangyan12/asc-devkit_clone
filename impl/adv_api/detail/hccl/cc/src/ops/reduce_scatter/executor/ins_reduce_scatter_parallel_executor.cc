@@ -14,6 +14,7 @@
 #include "alg_data_trans_wrapper.h"
 #include "alg_meta_registry.h"
 #include "external_alg_rules.h"
+#include "hccl_rank_graph.h"
 
 namespace mc2_ops_hccl {
 
@@ -64,13 +65,14 @@ HcclResult InsReduceScatterParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAl
         // PCIE 定制机型：TopoMatchPcieMix 产出的 infos[0] 是全网 mesh 合并名单，infos[1] 依赖
         // CLOS 实例（PCIE 机组间无 CLOS 实例时为空）。参照上游两级语义重新推导两级分组：
         // 框内组 = 我所在的 mesh 组（rank/组大小 同商）；框间组 = 跨组同位卡（%组大小 同余，含自己）。
+        // rankNumForTopoType 是类型级聚合值（非每实例大小），取组大小必须用每实例大小列表，
+        // 与 TopoMatchPcieMix::MatchTopo / 上游 instSizeListByLayer 同源。
         u32 meshGroupSize = 0;
-        if (!topoInfo->topoInstDetailsOfLayer.empty()) {
-            const auto& instDetails = topoInfo->topoInstDetailsOfLayer[0];
-            auto instIt = instDetails.rankNumForTopoType.find(CommTopo::COMM_TOPO_1DMESH);
-            if (instIt != instDetails.rankNumForTopoType.end() && !instIt->second.empty()) {
-                meshGroupSize = instIt->second[0];
-            }
+        uint32_t* instSizeList = nullptr;
+        uint32_t instSizeNum = 0;
+        CHK_RET(HcclRankGraphGetInstSizeListByLayer(comm, 0, &instSizeList, &instSizeNum));
+        if (instSizeList != nullptr && instSizeNum > 0) {
+            meshGroupSize = instSizeList[0];
         }
         CHK_PRT_RET(
             meshGroupSize == 0,
