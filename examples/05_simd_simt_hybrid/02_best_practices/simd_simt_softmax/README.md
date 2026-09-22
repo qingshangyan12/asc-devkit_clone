@@ -40,7 +40,9 @@
 
 - 计算规则：
 
-  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算，并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。
+  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算，并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。计算过程如下图所示（以一行 [1, 2, 3] 为例）。
+
+  <img src="./figures/compute_rule.png">
 
 - 样例规格：
 
@@ -52,7 +54,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">softmax_gm_kernel / softmax_ub_kernel / softmax_bucket_kernel</td></tr>
   </table>
 
-  > **输入约束：** 样例默认shape为[8192, 197]；支持通过运行参数指定自定义shape，cols取值范围为1~512。
+  > **输入约束：** 样例默认shape为[8192, 197]；支持通过运行参数指定自定义shape，每行元素个数为1~512。
 
 ## 样例实现
 
@@ -66,7 +68,7 @@
 | 1    | softmax_ub_kernel | 根据数据量动态计算 | 32 × rows_per_tile，随rows和UB容量自适应，最多2048 | 输入经MTE搬入UB中转，双份tile缓冲区轮换，搬运与计算重叠              |
 | 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值驻留寄存器；UB按bucket宽度补齐 |
 
-其中线程块数量在Host侧根据数据量动态计算：先通过 `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)` 查询硬件AIV核数，再取AIV核数与rows的较小值作为线程块数量。一个Warp处理一行：Case 0和Case 1中每个Thread Block实际启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行；Case 2的UB缓冲区为静态数组，维度由线程数与bucket容量共同决定，必须编译期确定，因此线程数只能取512/1024/2048固定档位、实际启动的线程数与档位一致，不能随rows任意变化，每个Thread Block按固定行数处理数据，rows较小时部分Thread Block无行可处理、直接退出。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
+其中线程块数量在Host侧根据数据量动态计算：取硬件AIV核数与rows的较小值作为线程块数量。三个Case均采用“一个Warp处理一行”的线程组织，各Case具体的线程组织方式见各自的核心实现。三个Case通过编译选项 `SCENARIO_NUM` 选择，0、1、2分别对应Case 0、Case 1和Case 2，默认为2。
 
 ### 性能指标说明
 
@@ -88,7 +90,11 @@
 
 **优化目标**：以最直接的实现建立功能正确性和性能基线：Warp直接从GM读取输入，完成行内max、exp/sum和归一化，不引入任何中间缓冲。
 
-**核心实现**：行内softmax分三轮完成，依次求行最大值、指数和与归一化输出，三轮均直接读GM。线程组织采用“一个Warp处理一行”：Warp内32个线程分别负责同一行中不同列的数据，行内最大值与求和通过Warp归约原语完成；一个Thread Block内的多个Warp各自处理不同的行，行方向按grid-stride循环覆盖全部行。以默认规格 [8192, 197] 为例，一行197列由32个线程分多轮处理：每个线程从与自身线程号相同的列开始，以32列为步进依次处理后续列；197 = 6×32 + 5，前6轮32个线程全部参与计算，第7轮仅前5个线程存在待处理数据。线程与行内数据的对应关系如下图所示。
+**核心实现**：行内softmax分三轮完成，依次求行最大值、指数和与归一化输出，三轮均直接读GM。线程组织采用“一个Warp处理一行”：Warp内32个线程分别负责同一行中不同列的数据，行内最大值与求和通过Warp归约原语完成；一个Thread Block内的多个Warp各自处理不同的行，行方向按grid-stride循环覆盖全部行；每个Thread Block启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行。以默认规格 [8192, 197] 为例，一行197列由32个线程分多轮处理：每个线程从与自身线程号相同的列开始，以32列为步进依次处理后续列；197 = 6×32 + 5，前6轮32个线程全部参与计算，第7轮仅前5个线程存在待处理数据。一个Warp处理一行如下图所示。
+
+<img src="./figures/warp_per_row.png">
+
+以行内求max为例，Warp内32个线程先各自求得部分最大值，再通过Warp归约原语得到行最大值，如下图所示。
 
 <img src="./figures/case0.png">
 
@@ -140,14 +146,10 @@ Case 0的 `aiv_vec_ratio` 达到0.946，耗时集中在SIMT线程的GM读写和�
 
 **核心实现**：
 
-- 每个Thread Block按tile处理行数据。tile内的行数决定一次VF调用启动的Warp数量（一个Warp处理一行），该行数取以下三者中的最小值：本Thread Block分到的行数、UB容量内四份tile缓冲区可容纳的行数、一个Thread Block最多启动2048个线程（64个Warp）对应的64行。
+- 每个Thread Block按tile处理行数据。tile内的行数决定一次VF调用启动的Warp数量（一个Warp处理一行），该行数取以下三者中的最小值：本Thread Block分到的行数、UB容量内四份tile缓冲区可容纳的行数、一个Thread Block最多启动2048个线程（64个Warp）对应的64行；行数随rows自适应。
 - kernel将动态UB划分为双份输入tile缓冲区与双份输出tile缓冲区，两组缓冲区随tile交替使用，各自的生命周期由独立的事件管理。
 - MTE2使用 `asc_copy_gm2ub_align` 二维搬运，按真实cols把GM每行搬入UB；MTE3按同样方式把结果搬回GM。
-- SIMT VF仍按一个Warp一行的方式在UB上完成max、exp/sum和归一化三轮循环。
-
-Case 1的数据流如下图所示。
-
-<img src="./figures/case1.png">
+- SIMT VF仍按一个Warp一行的方式完成max、exp/sum和归一化三轮循环，行内处理逻辑与Case 0相同，只是输入来自UB。
 
 ```cpp
 uint32_t tile_idx = 0;
@@ -212,11 +214,11 @@ Case 1的计算耗时主要集中在行内计算的组织方式上：行内计�
 **核心实现**：
 
 - 编译期bucket：本样例cols不超过512，一个线程分到的元素最多为512/32 = 16个，适合直接驻留寄存器。但遍历数组的for循环以cols为判断条件：cols是运行时参数，循环次数和每次迭代访问的数组下标在编译期均无法确定，编译器不能展开循环，数组只能分配在栈空间，访问效率低于寄存器。为此将cols按上界划分为64/128/256/384/512五档bucket，按档位实例化特化kernel：bucket容量为编译期常量，for循环的判断条件为常量，循环可完全展开，`elements[kWarpIterations]` 得以驻留寄存器；尾部无效列用 `-ASCRT_INF_F` 屏蔽，不参与归约与归一化。
-- UB布局：tile缓冲区按bucket容量 `kBucketCols` 申请，MTE按运行时的真实cols搬运每行数据，真实元素之后的余量空置；SIMT VF在padded UB上计算，MTE3按真实cols将结果搬回GM。bucket分桶与UB布局如下图所示。
+- UB布局：tile缓冲区按bucket容量 `kBucketCols` 申请，MTE按运行时的真实cols搬运每行数据，真实元素之后的余量空置；计算结果写到UB上，MTE3按真实cols将结果搬回GM。以行内求max为例，Case 2带bucket padding的规约过程如下图所示。
 
   <img src="./figures/case2.png">
 
-- 动态线程选择：Host按每核行数选择线程数，512/1024/2048线程对应每个tile最多处理16/32/64行；`cols > 256` 时考虑寄存器压力，最多启动1024个线程。
+- 动态线程选择：UB缓冲区为静态数组，维度由线程数与bucket容量共同决定，必须编译期确定，因此线程数只能取512/1024/2048固定档位，实际启动的线程数与档位一致。Host按每核行数选择档位，512/1024/2048线程对应每个tile最多处理16/32/64行；`cols > 256` 时考虑寄存器压力，最多启动1024个线程；每个Thread Block按固定行数处理数据，rows较小时部分Thread Block无行可处理、直接退出。
 
 SIMT VF将线程分到的元素一次读入数组，后续计算复用已读入的数据，减少数据拷贝：
 
@@ -300,7 +302,7 @@ Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行�
 ## 调优建议
 
 1. 归约类计算按归约维度组织线程：归约维度内的数据交给一个Warp，用Warp归约原语完成归约；维度之间天然并行，不需要跨Warp同步。
-2. 循环边界或数组下标依赖运行时参数、且循环次数较少时，可将参数按少量上界分档并固化为编译期常量，使循环完全展开、数组驻留寄存器，避免重复读取输入和重复计算。
+2. 要让数组驻留寄存器，需使数组的访问下标在编译期确定；当循环边界或下标依赖运行时参数、且循环次数较少时，可将参数按少量上界分档并固化为编译期常量，使循环完全展开，避免重复读取输入和重复计算。
 
 ## 编译运行
 
@@ -329,7 +331,7 @@ Case 1的 `Task Duration` 随cols增大持续上升：行内计算三轮串行�
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin       # 校验真值数据
   ```
 
-  也支持自定义shape：先执行 `python3 ../scripts/gen_data.py <rows> <cols>`，再执行 `./softmax <rows> <cols>`，其中cols取值范围为1~512。
+  也支持自定义shape：先执行 `python3 ../scripts/gen_data.py <rows> <cols>`，再执行 `./softmax <rows> <cols>`，其中每行元素个数为1~512。
 
   使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
