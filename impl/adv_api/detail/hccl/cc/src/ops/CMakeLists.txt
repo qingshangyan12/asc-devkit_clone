@@ -8,6 +8,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 add_subdirectory(op_common)
+add_subdirectory(unified)
 add_subdirectory(reduce_scatter)
 add_subdirectory(all_gather)
 add_subdirectory(all_to_all_v)

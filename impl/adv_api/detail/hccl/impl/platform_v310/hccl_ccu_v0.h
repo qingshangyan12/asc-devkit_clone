@@ -277,6 +277,23 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
+        // v3（§12-11 甲路线尾款轮，2026-09-21，纯新增分支）：unified Plan 分派——
+        // blob 落盘 + 哨兵 + 逐帧信号由 CcuPrepareForUnifiedPlan 一次性完成（N+1 帧
+        // 全自管）。ccuUsedXnNum_ 置 0：CcuSendMsg 的 xn 写循环按 ccuUsedXnNum_ 折算
+        //（for i<ccuUsedXnNum_），置 0 即跳过 xnData_ 落盘——否则它会把 resourceId
+        // 槽位的第一槽写坏（v3 帧序列已占满 0..N 槽）。flush 循环 (0+7)/8=0 次同样
+        // 跳过。commitCKE 信号 CcuSendMsg 仍会写一个（resourceId 全局游标槽）——
+        // MINOR-3（M2 审查修正，幂等模型）：时序上 CcuPrepareForOp 先于 CcuSendMsg
+        // 完成（N+1 帧与信号全部定格后 server 才可能启动），该残留信号落点 =
+        // GetCommitCkeAddr(globalCurResId_)——落在信号集 {0..N} 内是对已置 1 槽的
+        // 幂等重写（无新增轮次）；落在集合外（globalCurResId_ ≥ N+1 的复用场景）则
+        // server 已在哨兵帧退出、永不轮询该槽。两种情形均无害——"空转一轮"不存在
+        //（早先按轮询交错模型写的描述有误，按幂等模型改写）。v2 判定链下方逐字节保持。
+        if (GetAlgorithmType(handleId) == CCU_ALGORITHM_TYPE_UNIFIED_PLAN) {
+            ccuUsedXnNum_ = 0;
+            CcuPrepareForUnifiedPlan(&handleParamGM_[handleId]);
+            return;
+        }
         if (GetAlgorithmType(handleId) ==
             static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink)) {
             ccuUsedXnNum_ = KFC_PARALLEL_AG_STORAGE_NUM;
@@ -292,9 +309,22 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             CcuPrepareForAllGatherM2M(&handleParamGM_[handleId]);
         }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLREDUCE) {
+        // 前瞻护栏（M2 审查条件②，纯新增）：unified 158 若漏进本分支（未来路由放开
+        // 而 v3 分派漏加），v2 默认 prepare 会生成错误帧——此处显式拒绝并保持帧区不动。
+        if (GetAlgorithmType(handleId) == CCU_ALGORITHM_TYPE_UNIFIED_PLAN) {
+            KERNEL_LOG(KERNEL_ERROR,
+                "ApiClient CcuPrepareForOp: unified plan(158) not dispatched under ALLREDUCE (v3 scope is AG only).");
+            return;
+        }
         ccuUsedXnNum_ = 26;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
+        // 前瞻护栏（M2 审查条件②，纯新增）：同 ALLREDUCE 注。
+        if (GetAlgorithmType(handleId) == CCU_ALGORITHM_TYPE_UNIFIED_PLAN) {
+            KERNEL_LOG(KERNEL_ERROR,
+                "ApiClient CcuPrepareForOp: unified plan(158) not dispatched under ALLTOALL (v3 scope is AG only).");
+            return;
+        }
         if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllMesh1DMultiJetty)) {
             ccuUsedXnNum_ = KFC_A2A_MJ_PARAM_NUM;
             CcuPrepareForAllToAllMultiJetty(&handleParamGM_[handleId]);
@@ -323,6 +353,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             ccuUsedXnNum_ = KFC_RS_SOLE_NHR_2DIE_PARAM_NUM;
             CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamGM_[handleId]);
         } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        // 前瞻护栏（M2 审查条件②，纯新增）：同 ALLREDUCE 注。
+        if (GetAlgorithmType(handleId) == CCU_ALGORITHM_TYPE_UNIFIED_PLAN) {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "ApiClient CcuPrepareForOp: unified plan(158) not dispatched under REDUCE_SCATTER (v3 scope is AG only).");
+            return;
+        }
+        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_RS_PARAM_NUM;
             CcuPrepareForConcurrentReduceScatterM2M(&handleParamGM_[handleId]);
         } else if (

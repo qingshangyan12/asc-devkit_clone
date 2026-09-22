@@ -21,6 +21,10 @@ namespace mc2_ops_hccl {
 using namespace HcclKfcProtocol;
 
 constexpr uint32_t KFC_SERVER_PROTOCOL_VERSION = 2U;
+// v3（§12-11 甲路线 2026-09-21）：unified Plan 轮级动作 ID 分发——分发判据从实例级
+// role 下沉到每轮消息槽 param[0] 的动作 ID（KFC_UNIFIED_ACTION_*）。既有 VERSION=2
+// 常量与全部 v2 枚举不动（纯追加）。
+constexpr uint32_t KFC_SERVER_PROTOCOL_VERSION_V3 = 3U;
 constexpr uint32_t KFC_SERVER_ARG_NUM = 6U;
 constexpr uint32_t KFC_SERVER_XN_ADDR_ARG_INDEX = 0U;
 constexpr uint32_t KFC_SERVER_CKE_ADDR_ARG_INDEX = 1U;
@@ -77,6 +81,15 @@ enum class KfcServerRole : uint32_t {
     ALL_TO_ALL_CLOS = 8,
     REDUCE_SCATTER_SOLE_NHR_2DIE = 9,
     ALL_GATHER_SOLE_NHR = 10,
+    // v3（§12-11 甲路线）：unified Plan server——host 侧按 kernelFuncName 的动作 kernel
+    // 前缀（KFC_UNIFIED_ACTION_COLLECT_ALL_KERNEL_NAME = "CcuActionCollectAll"，unified
+    // 树 l4/backend_ccu_collect_all.h 的注册名）识别并覆写本 role，server 循环按逐记录
+    // param[0] 动作 ID 分发（DispatchUnifiedPlanV3），一个 server 实例执行 Plan.segments
+    // 多段计划。CcuKernelArgKfcServer 结构不加字段（ABI 零触碰）。
+    // PR rebase 勘误（2026-10-16）：上游 master 已占 9/10（SoleNHR 两 role），UNIFIED_PLAN
+    // 顺延 11——role 是 host 侧内部分派键（非跨进程协议值，GetKfcServerRole/前缀覆写
+    // 同仓闭合），改值零外溢。
+    UNIFIED_PLAN = 11,
 };
 
 inline KfcServerRole GetKfcServerRole(const char* algName, uint32_t missionIndex)

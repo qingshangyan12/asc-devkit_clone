@@ -113,6 +113,13 @@ enum class AlgorithmType {
     // 与设备侧 hccl_ccu_v0_def.h 的 AlgorithmType 同值（158，两级拓扑 L1 NHR 中继 RS）
     CcuSchedReduceScatterSoleNHR = 158,
     CcuSchedAllGatherSoleNHR = 159,
+    // v3（§12-11 甲路线尾款轮，2026-09-21）：unified Plan server 的分派键——
+    // CcuPrepareForOp 的 AG 分支二级分派（AIV 侧）+ GetAlgorithmType 线性匹配
+    //（hcclNewContext_->opType[index] 命中后返回本值）。devkit 内部枚举追加
+    //（本头非对外头，新增枚举值不属 ABI 变更）；AIC 侧镜像枚举（hccl_ccu_v0_def.h）
+    // 同步追加同值 160（PR rebase 勘误 2026-10-16：上游 master 尾部已占 158/159
+    // ——SoleNHR 两枚举，unified 分派键顺延 160，两侧同步改值，互锁不破）。
+    CcuUnifiedPlan = 160,
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {

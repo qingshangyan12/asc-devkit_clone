@@ -20,6 +20,10 @@
 #include "kernel_launch.h"
 #include "hcomm_diag_dl.h"
 #include "hcomm_device_profiling_dl.h"
+// R6 unified 灰度分叉（exec 期）：AICPU 消费方 + 真原语后端（unified/exec/，
+// 编译期开关关时符号仍在（mc2_client 全量库），分支判定不命中零执行）
+#include "hcomm_verb_sink.h"
+#include "unified_aicpu_exec.h"
 #include <unordered_map>
 #include <shared_mutex>
 #include <atomic>
@@ -351,6 +355,31 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             CUSTOM_TIMEOUT);
         CHK_RET(static_cast<HcclResult>(HcommThreadNotifyWaitOnThread(thread, maxNotifyNum, CUSTOM_TIMEOUT)));
 
+        // ------------------------------------------------------------------
+        // R6 unified 灰度分叉（exec 期，2026-09-22；终审 BLOCKER 修复：判定前移到
+        // GetAlgExec **之前**）：algName 携带 unified 识别键（资源期 unified 成功
+        // 路径回填）→ 不走存量 executor，走 unified AICPU 消费方（blob 校验 +
+        // exec 期现值实例化 + L4 Emit + HcommVerbSink 真原语）。
+        // ★判序（BLOCKER 教训）："unified_aicpu" 无 CollAlgExecRegistryV2 注册项，
+        //   GetAlgExec 对它必返 nullptr——若分叉放在查表之后，:359 的 nullptr
+        //   拦截会先 return 1，unified 分支永不可达（生产死代码）。前移后 unified
+        //   键根本到不了 GetAlgExec，存量 algName 路径（查表+nullptr 拦截+Orchestrate）
+        //   行为零变化——"前移改存量行序"不成立。
+        // ------------------------------------------------------------------
+        if (refactor::IsUnifiedAicpuAlgName(algName.c_str())) {
+            // R6 unified AICPU 消费方的 sink（l5/ WP-A1 交付：真原语后端——统一
+            // 资源束 threads+channels；RunUnifiedAicpuOp 内部按 blob 驱动）
+            refactor::HcommVerbSink unifiedSink(refactor::MakeHcommVerbRes(resCtx));
+            const HcclResult unifiedRet = refactor::RunUnifiedAicpuOp(*param, resCtx, unifiedSink);
+            if (unifiedRet != HCCL_SUCCESS) {
+                HCCL_ERROR("[UnifiedExec][AICPU] RunUnifiedAicpuOp failed, ret[%d], algName[%s].",
+                    static_cast<int>(unifiedRet), param->algName);
+                return 1;
+            }
+            HCCL_INFO("[UnifiedExec][AICPU] unified path done (skipping legacy Orchestrate), algName[%s].",
+                param->algName);
+            // 统一走下方既有的收尾链（profiling/notify/batch-end）——不重复实现
+        } else {
         std::shared_ptr<InsCollAlgBase> executor = CollAlgExecRegistryV2::Instance().GetAlgExec(param->opType, algName);
         if (executor.get() == nullptr) {
             HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str());
@@ -361,6 +390,7 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
         if (executor->Orchestrate(*param, resCtx) != HCCL_SUCCESS) {
             HCCL_ERROR("orchestrate failed for alg:%s", param->algName);
             return 1;
+        }
         }
 
         if (HcommProfilingReportDeviceOp(param->commName) != HCCL_SUCCESS) {

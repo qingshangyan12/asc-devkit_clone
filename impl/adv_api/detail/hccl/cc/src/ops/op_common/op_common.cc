@@ -51,6 +51,31 @@
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
 #include "kfc_server_protocol.h"
+// M1（§12-11 甲路线尾款轮，2026-09-21）：unified CCU 真注册链需要 server kernel 符号
+//（CcuKfcServerKernel，注册的微码函数本体）与 KFC server kernelArg 继承件——
+// ccu_kernel_kfc_server.h 提供 CcuKernelArgKfcServer/CcuKfcServerKernel（kfc_server/
+// template/ccu 树，同一 mc2_client 目标内编译，CMake 依赖已存在：
+// ops/CMakeLists.txt:17 add_subdirectory(kfc_server) → template/ccu/kernel/...）；
+// InheritKfcServerKernelArg 定义在 ccu_temp_kfc_server.cc（无头声明），此处补 extern
+// 声明（定义同目标内，链接期解析）。
+#include "kernel/ccu_kernel_kfc_server.h"
+namespace mc2_ops_hccl {
+HcclResult InheritKfcServerKernelArg(
+    const CcuKernelInfo& srcKernel, CcuKernelInfo& dstKernel, const OpParam& param, uint32_t rankId,
+    const std::vector<std::vector<u32>>& subCommRanks, uint32_t missionIndex);
+} // namespace mc2_ops_hccl
+// unified 分层重构（§10.2 A5）：ResourceBroker 真实现所需——通道申请复用
+// CalcChannelRequestMesh1D 的探测链（channel.h），ChannelReq/CcuKernelPlan 值对象
+//（unified 树 inc/，mc2_client include 路径已接线）。编译期开关默认关，
+// 下方 unified 函数在开关关时无调用方。
+#include "executor/channel/channel.h"
+#include "action_spec.h"
+// M3-条件A：CcuKernelHandle（l1_adapter.h 的 refactor 域别名 = uint64_t，与
+// ccu_types.h:74 真实 typedef 逐位一致）——op_common 不引 l1_adapter.h（unified
+// L2 接口经本文件前向声明接入），此处补等值别名供下方签名使用。
+namespace mc2_ops_hccl::refactor {
+using CcuKernelHandle = ::uint64_t;
+}
 
 #ifndef MC2_CLIENT_ENABLE_CCU
 #define MC2_CLIENT_ENABLE_CCU 0
@@ -2921,6 +2946,375 @@ HcclResult SetMultipleDimensionSplitRatio(HcclComm comm, OpParam& param)
     param.opConfig.multipleDimensionSplitRatio = defaultRatio;
     param.opConfig.multipleDimensionSplitRatioSource = MultipleDimensionSplitRatioSource::BUILTIN_FORMULA;
     HCCL_INFO("[SetMultipleDimensionSplitRatio] ratioSource[BUILTIN_FORMULA], configuredRatio[%f]", defaultRatio);
+    return HCCL_SUCCESS;
+}
+
+// ===========================================================================
+// unified 分层重构 · ResourceBroker 真实现（§10.2 A5，声明在 hccl_alloc_ctx_res.cc）
+// 编译期开关 MC2_UNIFIED_RESOURCE 默认关——关时以下函数零调用（符号保留但不进链路）。
+// 设计：unified 侧 ResourceClaim → 本层翻译为既有资源 API；不改任何既有函数体。
+// ===========================================================================
+HcclResult HcclGetAlgResUnified(HcclComm comm, const OpParam& param, u32 threadNum, u32 notifyNum,
+    const std::vector<refactor::ChannelReq>& channels, std::string& err)
+{
+    (void)channels;
+    if (threadNum == 0U) {
+        return HCCL_SUCCESS;                      // CCU 微码自驱动：不占 AICPU 线程
+    }
+    // AICPU 线程：HcclGetThread（:1073）的 AICPU_TS 分支同式——批量一次申请
+    //（threadNum = slaveThreadNum+1 个线程；notifyNum 已含 host-device 同步的 +1，
+    //  由调用方按 max(notifyNumOnMainThread, max(perThread))+1 现状公式算好传入）
+    std::vector<ThreadHandle> threads(threadNum);
+    const HcclResult ret = HcclThreadAcquire(comm, param.engine, threadNum, notifyNum, threads.data());
+    if (ret != HCCL_SUCCESS) {
+        err = "HcclThreadAcquire failed in unified path";
+        HCCL_ERROR("[UnifiedRes] %s, ret[%d], threadNum[%u], notifyNum[%u].", err.c_str(), static_cast<int>(ret),
+            threadNum, notifyNum);
+    }
+    return ret;
+}
+
+HcclResult HcclChannelAcquireUnified(HcclComm comm, const OpParam& param,
+    const std::vector<refactor::ChannelReq>& channels, std::string& err)
+{
+    if (channels.empty()) {
+        return HCCL_SUCCESS;
+    }
+    // 通道申请：复用 CalcChannelRequestMesh1D 的探测链（rank graph → 协议匹配 → desc 填充），
+    // 与两引擎现状同一条路（§6.5"通道申请引擎无关、只算一次"）。
+    std::vector<std::vector<u32>> subcommInfo(1U);            // 单域 PoC 口径（多域随 §6.11）
+    for (const auto& cr : channels) {
+        subcommInfo[0].push_back(cr.remoteRank);
+    }
+    subcommInfo[0].push_back(param.userRank);                 // 探测函数需域内含本 rank
+    TopoInfoWithNetLayerDetails topoMinimal;                  // 最小 topo（userRank 校验用）
+    topoMinimal.userRank = param.userRank;
+    std::vector<HcclChannelDesc> channelRequest;
+    HcclResult ret = CalcChannelRequestMesh1D(comm, param, &topoMinimal, subcommInfo, channelRequest);
+    if (ret != HCCL_SUCCESS) {
+        err = "CalcChannelRequestMesh1D failed in unified path";
+        HCCL_ERROR("[UnifiedRes] %s, ret[%d].", err.c_str(), static_cast<int>(ret));
+        return ret;
+    }
+    // multi-channel（count>1）：desc 级展开（现状 multiJetty 同式——每对 rank 多条通道）
+    std::vector<HcclChannelDesc> expanded;
+    for (const auto& desc : channelRequest) {
+        u32 count = 1U;
+        for (const auto& cr : channels) {
+            if (cr.remoteRank == desc.remoteRank) {
+                count = (cr.count == 0U) ? 1U : cr.count;
+                break;
+            }
+        }
+        for (u32 i = 0U; i < count; ++i) {
+            expanded.push_back(desc);
+        }
+    }
+    std::vector<ChannelHandle> handles(expanded.size());
+    ret = HcclChannelAcquire(comm, param.engine, expanded.data(), static_cast<u32>(expanded.size()),
+        handles.data());
+    if (ret != HCCL_SUCCESS) {
+        err = "HcclChannelAcquire failed in unified path";
+        HCCL_ERROR("[UnifiedRes] %s, ret[%d], channelNum[%zu].", err.c_str(), static_cast<int>(ret),
+            expanded.size());
+    }
+    return ret;
+}
+
+namespace {
+// ---------------------------------------------------------------------------
+// M1（§12-11 甲路线尾款轮）：unified CCU 真注册链的私有构造件。
+//
+// 与存量 RegisterCcuKernels（:1827）的关系：存量输入源是 resourceRequest.ccuKernelInfos
+//（executor->CalcRes 产出，含 channels/ChannelHandle/dieId），unified 的输入源是
+// plan.claim.kernels（CcuKernelPlan：kernelFuncName + ChannelReq）——形状不同，
+// 复用存量函数需伪造 AlgResourceRequest（MAJOR-2 勘误：RegisterCcuKernels 本体
+// 不碰通道——v2 通道申请在 HcclGetChannelForCcu，注册之前；不复用的真实原因是
+// 输入形状与 kernelHandle 出参载体不同，非"通道双份申请"）。注意本链路确实存在
+// 两次 HcclChannelAcquire（Materialize→HcclChannelAcquireUnified 一次 + 本函数
+// 一次）——同参数 Acquire 幂等返回同批 handle（comm 级通道表），M3 组装段补
+// "两次句柄相等"断言收口。故本文件平行实现注册三件套（resGroup 分批 +
+// HcommCcuKernelRegister + handle 回填），与存量 RegisterCcuKernels 同模式、
+// 输入源不同——存量函数本体零改动（第五轮硬约束：RegisterCcuKernels 存量
+// 行为零改动，unified 注册链是平行新增调用方）。
+//
+// 注册的 kernelFunc：CcuKfcServerKernel（server 常驻循环本体，分发判据在 server
+// 内部按槽 0 动作 ID——对照 CcuTempKfcServer::CalcRes :175 的存量做法）。
+// kernelFuncName："CcuKernelKfcServer"（对齐存量，保 HcommCcuKernelRegister 的
+// 驱动侧名称查表）；sourceKernel 侧的 "CcuActionCollectAll" 只作 InheritKfcServerKernelArg
+// 的识别键（触发 role=UNIFIED_PLAN 覆写 + 域信息继承）。
+// ---------------------------------------------------------------------------
+
+// 构造 unified 路径的 KFC server CcuKernelInfo（对照 CcuTempKfcServer::CalcRes :196-217）：
+// kernelFunc/kernalFuncName 直填 server 本体；kernelArg 经 InheritKfcServerKernelArg 从
+// "源动作 kernel"占位条目继承（unified 动作 kernel 无私有 kernelArg，域信息从公共入参取）。
+HcclResult BuildUnifiedKfcServerKernelInfo(HcclComm comm, const OpParam& param,
+    const refactor::CcuKernelPlan& plan, CcuKernelInfo& serverKernel, std::string& err)
+{
+    (void)comm;
+    // ① 源动作 kernel 占位条目：kernelFuncName 携带 "CcuAction" 前缀识别键
+    //（InheritKfcServerKernelArg 的 role 覆写触发条件），channels 携带已申请的
+    // desc（由调用方从 ChannelReq 探测展开，与 HcclChannelAcquireUnified 同源）。
+    CcuKernelInfo srcKernel{};
+    const errno_t cpRet = strcpy_s(srcKernel.kernelFuncName, sizeof(srcKernel.kernelFuncName),
+        plan.kernelFuncName.c_str());
+    CHK_PRT_RET(cpRet != EOK, HCCL_ERROR("[UnifiedRes] copy kernelFuncName failed."), HCCL_E_MEMORY);
+
+    // ② server kernel 条目：注册本体（对照存量 :199-202）
+    CcuKernelInfo kernelInfo{};
+    const errno_t scRet = strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcServer");
+    CHK_PRT_RET(scRet != EOK, HCCL_ERROR("[UnifiedRes] copy server kernelFuncName failed."), HCCL_E_MEMORY);
+    kernelInfo.kernelFunc = reinterpret_cast<void*>(CcuKfcServerKernel);
+
+    // ③ 域信息：单域 PoC 口径（与 GetUnifiedOpParamResCtxImpl 的 hierarchyRanks 同源——
+    // 全域 rank 列表，本 rank 在列）。InheritKfcServerKernelArg 用它取 rankSize/algRank。
+    std::vector<u32> domainRanks;
+    for (const auto& cr : plan.channels) {
+        domainRanks.push_back(cr.remoteRank);
+    }
+    domainRanks.push_back(param.userRank);
+    const std::vector<std::vector<u32>> subCommRanks = {domainRanks};
+
+    u32 userRank = INVALID_VALUE_RANKID;
+    CHK_RET(HcclGetRankId(comm, &userRank));
+    // missionNum=1/missionIndex=0：v3 单 server 实例消费整条段序列（分发判据在逐记录
+    // 槽 0 动作 ID，无需多 mission 分体——对照 AcquireAlgResources :857-868 的 v2 组装，
+    // v2 按 algName 推 missionNum，v3 恒 1）。
+    CHK_RET(InheritKfcServerKernelArg(srcKernel, kernelInfo, param, userRank, subCommRanks, 0U));
+
+    serverKernel = kernelInfo;
+    return HCCL_SUCCESS;
+}
+
+// 通道 desc 构造（ChannelReq → HcclChannelDesc，复用 HcclChannelAcquireUnified 的探测链
+// 口径）：unified Materialize 已按 ChannelReq 申请过通道（AcquireChannels），注册链只需
+// desc 形状供 InheritKfcServerKernelArg 继承 channels。
+HcclResult BuildUnifiedChannelDescs(HcclComm comm, const OpParam& param,
+    const std::vector<refactor::ChannelReq>& channels, std::vector<HcclChannelDesc>& descs, std::string& err)
+{
+    if (channels.empty()) {
+        err = "unified plan has no channel requests";
+        return HCCL_E_PARA;
+    }
+    std::vector<std::vector<u32>> subcommInfo(1U);
+    for (const auto& cr : channels) {
+        subcommInfo[0].push_back(cr.remoteRank);
+    }
+    subcommInfo[0].push_back(param.userRank);
+    TopoInfoWithNetLayerDetails topoMinimal;
+    topoMinimal.userRank = param.userRank;
+    topoMinimal.userRankSize = static_cast<u32>(subcommInfo[0].size());
+    return CalcChannelRequestMesh1D(comm, param, &topoMinimal, subcommInfo, descs);
+}
+} // namespace
+
+HcclResult HcclCcuKernelRegisterUnified(HcclComm comm, const OpParam& param,
+    const std::vector<refactor::CcuKernelPlan>& kernels, refactor::CcuKernelHandle& kernelHandleOut,
+    std::string& err)
+{
+    kernelHandleOut = 0;
+    if (kernels.empty()) {
+        return HCCL_SUCCESS;
+    }
+    // M1 真注册链（§12-11 甲路线尾款轮，2026-09-21）：
+    //   1. 计划校验（既有壳逻辑保留：kernelFuncName/channels 非空）
+    //   2. CcuKernelInfo 构造（server 本体 + "CcuAction" 识别键 + 域信息继承）
+    //   3. 通道申请（ChannelReq → desc → HcclChannelAcquire，dieId 从首通道反查）
+    //   4. insHandle 查询/复用（HcclCommQueryCcuIns，存量同式 :2197-2212）
+    //   5. resGroup 分批注册（HcommCcuKernelRegisterStart/Register/End 三件套，
+    //      对照存量 RegisterCcuKernels :1837-1873；CCU_E_UNAVAIL → HCCL_E_UNAVAIL
+    //      上抛触发灰度回退）——kernelHandle 经 kernelHandleOut 回传（M3-条件A：
+    //      注册时刻唯一回传点，发射链 CcuKernelLaunch 要求非 0）
+    //   6. ChannelHandle 回填 kernelArgBase（对照 HcclGetChannelForCcu :1557-1561）
+    //   7. kfcServerArgs/ccuKernels 回填 resCtxHost——由调用方（分叉处组装段）落，
+    //      本函数经 kernelHandleOut 交注册产物。
+    // 注：7 的回填不在本函数做——Materialize(AcquireCcuKernel) 只给 kernels 列表，
+    // resCtxHost 在 GetUnifiedOpParamResCtxImpl 作用域，M3 组装段统一落。
+    for (const auto& k : kernels) {
+        if (k.kernelFuncName.empty() || k.channels.empty()) {
+            err = "CcuKernelPlan incomplete (kernelFuncName/channels empty)";
+            HCCL_ERROR("[UnifiedRes] %s: func[%s], channels[%zu].", err.c_str(), k.kernelFuncName.c_str(),
+                k.channels.size());
+            return HCCL_E_PARA;
+        }
+    }
+    // C3（终审 MAJOR-4 修复，2026-09-21）：checkRes 探测路径——v2 对照
+    // CreateAndAssignNewCcuIns :2181-2183（"checkRes only, skip kernel register"）：
+    // 探测调用只做计划校验 + 通道探测申请后即释放（ReleaseCcuAcquiredChannels 同式），
+    // 不走 HcommCcuKernelRegister 三件套（探测后真实调用会再注册——重复条目且
+    // 探测注册的 handle 无人消费）。kernelHandleOut 保持 0（探测无注册产物）。
+    if (param.checkRes) {
+        // 探测仍做通道探测申请（HcclChannelAcquire 探测真实可分配性）+ 立即释放
+        //（v2 HcclAllocAlgResourceCcu :1498-1503 的 checkRes 分支同式——探测后
+        // ReleaseCcuAcquiredChannels）。ins 查询保留（探测实例可用性，不注册）。
+        HCCL_INFO("[UnifiedRes] checkRes only, probe channels + ins, skip kernel register, planNum[%zu].",
+            kernels.size());
+        const refactor::CcuKernelPlan& probePlan = kernels[0];
+        std::vector<HcclChannelDesc> probeDescs;
+        HcclResult probeRet = BuildUnifiedChannelDescs(comm, param, probePlan.channels, probeDescs, err);
+        if (probeRet != HCCL_SUCCESS) {
+            return probeRet;
+        }
+        const u32 probeChannelNum = static_cast<u32>(probeDescs.size());
+        std::vector<ChannelHandle> probeHandles(probeChannelNum);
+        probeRet = HcclChannelAcquire(
+            comm, param.engine, probeDescs.data(), probeChannelNum, probeHandles.data());
+        if (probeRet == HCCL_E_UNAVAIL) {
+            err = "channel unavailable in unified probe";
+            HCCL_WARNING("[UnifiedRes] %s, channelNum[%u].", err.c_str(), probeChannelNum);
+            return HCCL_E_UNAVAIL;
+        }
+        if (probeRet != HCCL_SUCCESS) {
+            return probeRet;
+        }
+        // 释放探测通道（新建的销毁，已存在的 HcclChannelDestroy 幂等）
+        if (HcommIsSupportHcclChannelDestroy() && probeChannelNum > 0U) {
+            const HcclResult destroyRet = HcclChannelDestroy(comm, probeHandles.data(), probeChannelNum);
+            if (destroyRet != HCCL_SUCCESS) {
+                HCCL_WARNING("[UnifiedRes] probe channel destroy failed, ret[%d].", static_cast<int>(destroyRet));
+            }
+        }
+        // ins 探测（不注册）：无实例 → UNAVAIL（老路径会建，与真实路径语义一致）
+        CcuInsHandle probeInsHandle = 0;
+        uint32_t probeInsNum = 0;
+        const HcclResult probeQuery = HcclCommQueryCcuIns(comm, &probeInsHandle, &probeInsNum);
+        if (probeQuery == HCCL_E_UNAVAIL || probeInsNum == 0U) {
+            err = "no reusable CcuIns in unified probe";
+            HCCL_WARNING("[UnifiedRes] %s.", err.c_str());
+            return HCCL_E_UNAVAIL;
+        }
+        return probeQuery;
+    }
+    // v3 机制轮单 server：多个 CcuKernelPlan（多段/多动作）只注册一个 server kernel
+    //（server 循环按逐记录动作 ID 分发，段数不增加 kernel 数）。取首条计划构造。
+    const refactor::CcuKernelPlan& plan = kernels[0];
+
+    // ② server CcuKernelInfo 构造（含 "CcuAction" 识别键 → role=UNIFIED_PLAN 覆写）
+    CcuKernelInfo serverKernel{};
+    HcclResult ret = BuildUnifiedKfcServerKernelInfo(comm, param, plan, serverKernel, err);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("[UnifiedRes] build server CcuKernelInfo failed, ret[%d], err[%s].", static_cast<int>(ret),
+            err.c_str());
+        return ret;
+    }
+
+    // ③ 通道申请：ChannelReq 直投 HcclChannelAcquire（unified 路径 Materialize 已完成
+    // 探测展开，此处按 desc 申请 + dieId 反查，对照 HcclGetChannelForCcu :1518-1561）
+    std::vector<HcclChannelDesc> channelDescs;
+    ret = BuildUnifiedChannelDescs(comm, param, plan.channels, channelDescs, err);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("[UnifiedRes] build channel descs failed, ret[%d], err[%s].", static_cast<int>(ret), err.c_str());
+        return ret;
+    }
+    const u32 channelNum = static_cast<u32>(channelDescs.size());
+    // MAJOR-1（M1 审查）：CcuKernelArgBase.channels 是 ChannelHandle[CCU_MAX_RANK_SIZE=16]
+    // 定长数组（alg_param.h:332），16 卡×2 通道=30>16 会越界写——镜像 HcclGetChannelForCcu
+    // :1511-1514 的入口守卫（v2 同式）。
+    CHK_PRT_RET(
+        channelNum > CCU_MAX_RANK_SIZE, HCCL_ERROR("[UnifiedRes] too many channels[%u] (max %llu).", channelNum,
+        static_cast<unsigned long long>(CCU_MAX_RANK_SIZE)), HCCL_E_PARA);
+    std::vector<ChannelHandle> channelHandles(channelNum);
+    ret = HcclChannelAcquire(comm, param.engine, channelDescs.data(), channelNum, channelHandles.data());
+    if (ret == HCCL_E_UNAVAIL) {
+        err = "channel unavailable in unified registration";
+        HCCL_WARNING("[UnifiedRes] %s, channelNum[%u].", err.c_str(), channelNum);
+        return HCCL_E_UNAVAIL;
+    }
+    CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("[UnifiedRes] HcclChannelAcquire failed, ret[%d].",
+        static_cast<int>(ret)), ret);
+
+    // dieId：从首条 channel 的 localEndpoint 反查（对照 HcclGetChannelForCcu :1544-1553）。
+    // MINOR-1（M1 审查）：channelDescs[0] 补空防御——v2 同点有 if(channelNum>0) 包裹，
+    // 空表时 dieId 保持缺省 0（单 die 场景合法值）。
+    u32 userRank = INVALID_VALUE_RANKID;
+    CHK_RET(HcclGetRankId(comm, &userRank));
+    if (channelNum > 0U) {
+        EndpointDesc localEndpoint = channelDescs[0].localEndpoint;
+        using DieIdType = uint32_t;
+        const uint32_t dieIdTypeSize = sizeof(DieIdType);
+        DieIdType dieId = 0;
+        ret = HcclRankGraphGetEndpointInfo(
+            comm, userRank, &localEndpoint, ENDPOINT_ATTR_DIE_ID, dieIdTypeSize, static_cast<void*>(&dieId));
+        if (ret != HCCL_SUCCESS) {
+            HCCL_ERROR("[UnifiedRes] query dieId failed, ret[%d].", static_cast<int>(ret));
+            return ret;
+        }
+        serverKernel.dieId = dieId;
+    }
+    serverKernel.channels = channelDescs;
+
+    // ④⑤ insHandle + resGroup 分批注册（单 resGroup=0，对照存量三件套）
+    CcuInsHandle insHandle = 0;
+    uint32_t insNum = 0;
+    const HcclResult queryRet = HcclCommQueryCcuIns(comm, &insHandle, &insNum);
+    if (queryRet == HCCL_E_UNAVAIL || insNum == 0U) {
+        // 无可复用实例：unified 机制轮不新建 CcuIns（新建走 HcclCcuInsCreate + 默认阈值
+        // 聚合，属存量 HcclGetCcuKernelDynamic :2099+ 的职责域）——返回 UNAVAIL 触发
+        // 灰度回退，由存量路径完成实例创建（下一次 unified 进来时 Query 命中即直用）。
+        err = "no reusable CcuIns for unified registration (legacy path will create one)";
+        HCCL_WARNING("[UnifiedRes] %s.", err.c_str());
+        return HCCL_E_UNAVAIL;
+    }
+    CHK_PRT_RET(queryRet != HCCL_SUCCESS,
+        HCCL_ERROR("[UnifiedRes] HcclCommQueryCcuIns failed, ret[%d].", static_cast<int>(queryRet)), queryRet);
+
+    CcuResult regStartRet = HcommCcuKernelRegisterStart(insHandle);
+    CHK_PRT_RET(regStartRet != CCU_SUCCESS,
+        HCCL_ERROR("[UnifiedRes] register start failed: ccuRet -> %d", regStartRet), ConvertCcuToHccl(regStartRet));
+    CcuKernelHandle kernelHandle = 0;
+    const void* kernelArgs[] = {serverKernel.kernelArg};
+    CcuResult regRet = HcommCcuKernelRegister(
+        insHandle, serverKernel.dieId, serverKernel.kernelFuncName,
+        reinterpret_cast<void*>(serverKernel.kernelFunc), kernelArgs, 1, &kernelHandle);
+    if (regRet == CCU_E_UNAVAIL) {
+        (void)HcommCcuKernelRegisterEnd(insHandle);
+        err = "kernel unavailable in unified registration";
+        HCCL_WARNING("[UnifiedRes] %s: kernel[%s].", err.c_str(), serverKernel.kernelFuncName);
+        return HCCL_E_UNAVAIL;
+    }
+    CHK_PRT_RET(regRet != CCU_SUCCESS,
+        HCCL_ERROR("[UnifiedRes] kernel register failed: ccuRet -> %d, kernel[%s]", regRet,
+            serverKernel.kernelFuncName),
+        ConvertCcuToHccl(regRet));
+    CcuResult regEndRet = HcommCcuKernelRegisterEnd(insHandle);
+    CHK_PRT_RET(regEndRet != CCU_SUCCESS,
+        HCCL_ERROR("[UnifiedRes] register end failed: ccuRet -> %d", regEndRet), ConvertCcuToHccl(regEndRet));
+
+    // ⑥ ChannelHandle 回填 kernelArg（对照 HcclGetChannelForCcu :1557-1561）
+    auto* kernelArgBase = static_cast<CcuKernelArgBase*>(serverKernel.kernelArg);
+    CHK_PRT_RET(kernelArgBase == nullptr, HCCL_ERROR("[UnifiedRes] kernelArg ptr is null."), HCCL_E_INTERNAL);
+    for (u32 i = 0; i < channelNum; ++i) {
+        kernelArgBase->channels[i] = channelHandles[i];
+    }
+    kernelArgBase->channelCount = channelNum;
+
+    HCCL_INFO(
+        "[UnifiedRes] CCU kernel registered: func[%s], kernelHandle[0x%llx], dieId[%u], channels[%u] "
+        "(v3 id dispatch, single server instance).",
+        serverKernel.kernelFuncName, static_cast<unsigned long long>(kernelHandle), serverKernel.dieId, channelNum);
+    kernelHandleOut = kernelHandle;   // M3-条件A：注册产物回传（发射链 ccuKernels[0]）
+    return HCCL_SUCCESS;
+}
+
+HcclResult HcclSerializeUnifiedPlan(HcclComm comm, const OpParam& param, const std::string& unifiedAlgTag,
+    const std::string& planBlob, void** resCtxOut)
+{
+    (void)param;
+    CHK_PTR_NULL(resCtxOut);
+    *resCtxOut = nullptr;
+    // ABI 方案 B（§12-10）：Plan 序列化进独立 ctx（HcclEngineCtxCreate），OpParam 不动。
+    void* ctx = nullptr;
+    const HcclResult ret = HcclEngineCtxCreate(comm, unifiedAlgTag.c_str(), COMM_ENGINE_AICPU,
+        planBlob.size(), &ctx);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("[UnifiedRes] HcclEngineCtxCreate failed, ret[%d], tag[%s].", static_cast<int>(ret),
+            unifiedAlgTag.c_str());
+        return ret;
+    }
+    const errno_t cpRet = memcpy_s(ctx, planBlob.size(), planBlob.data(), planBlob.size());
+    CHK_PRT_RET(cpRet != EOK, HCCL_ERROR("[UnifiedRes] memcpy plan blob failed."), HCCL_E_MEMORY);
+    *resCtxOut = ctx;
+    HCCL_INFO("[UnifiedRes] plan serialized, tag[%s], size[%zu].", unifiedAlgTag.c_str(), planBlob.size());
     return HCCL_SUCCESS;
 }
 } // namespace mc2_ops_hccl

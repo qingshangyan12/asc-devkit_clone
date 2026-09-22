@@ -46,6 +46,13 @@ enum class AlgorithmType : uint8_t {
     CcuSchedReduceScatterSoleNHR = 158,
     CcuSchedAllGatherSoleNHR = 159
 };
+// v3（§12-11 甲路线尾款轮，2026-09-21，纯新增）：unified Plan server 分派键——与宿主侧
+// hccl_alloc_ctx_res.h 的 AlgorithmType::CcuUnifiedPlan 同值 158。不进上方枚举体
+//（枚举尾项加逗号会动 v2 行，纯新增纪律下以独立 constexpr 追加；GetAlgorithmType
+// 按 uint32_t 值比较，跨枚举/constexpr 等价）。
+// PR rebase 勘误（2026-10-16）：上游 master 尾部 AlgorithmType 已占 158/159
+//（SoleNHR 两枚举），unified 分派键 host 侧顺延 160（hccl_alloc_ctx_res.h），本镜像同步。
+constexpr uint32_t CCU_ALGORITHM_TYPE_UNIFIED_PLAN = 160;
 
 template <const auto& config>
 class HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config> {
@@ -148,6 +155,10 @@ private:
     __aicore__ inline void CcuPrepareForReduceScatterSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterSoleNhr2DieM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllGatherSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
+    // M2（§12-11 甲路线尾款轮，2026-09-21）：unified Plan 的 device 写入方——
+    // 从 OpResCtx.res[1] 读 v3 blob，逐段写 xn 消息区 + 哨兵帧 + 逐帧 commit 信号
+    //（实现见 hccl_ccu_v0_prepare.h 尾部）。纯新增声明。
+    __aicore__ inline void CcuPrepareForUnifiedPlan(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
     __gm__ HcclCombineOpParam* hcclContext_;

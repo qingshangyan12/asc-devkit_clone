@@ -33,6 +33,25 @@ HcclResult InheritKfcServerKernelArg(
     auto kfcArg = std::make_shared<CcuKernelArgKfcServer>();
 
     kfcArg->role = GetKfcServerRole(param.algName, missionIndex);
+    // v3 分叉（§12-11 甲路线，纯新增）：unified 动作 kernel（kernelFuncName 以
+    // "CcuAction" 前缀标记，注册名 KFC_UNIFIED_ACTION_COLLECT_ALL_KERNEL_NAME =
+    // "CcuActionCollectAll"，kfc_server_message.h:225；取前缀而非全等——后续
+    // CcuActionReduceSlice 等动作 kernel 同规则命中，无需逐个扩名单）覆写 role =
+    // UNIFIED_PLAN——server 循环按逐记录 param[0] 动作 ID 分发，不走 v2 algName→role
+    // 推导。CcuKernelArgKfcServer 不加字段（role 复用既有枚举追加值，ABI 零触碰）；
+    // v2 名单内的 kernelFuncName 均不带该前缀，覆写分支零命中。
+    // BLOCKER-1 修复（2026-09-21 审查打回）：原 compare(0, 10, "CcuAction") 把 compare
+    // 的子串长度参数误写为 10——substr(0,10)="CcuActionC"（10 字符）与 "CcuAction"
+    //（9 字符）字典序比较恒 >0，判定永假，v3 host 入口不可达。长度 9 == strlen
+    //（"CcuAction"），下方 static_assert 双保险；判定回归断言见
+    // unified/test/poc_unified_kfc_gate_test.cc（12 名单 + 注册常量命中）。
+    static_assert(sizeof(KFC_UNIFIED_ACTION_PREFIX) - 1 == KFC_UNIFIED_ACTION_PREFIX_LEN,
+        "prefix literal length must equal the compare sub-length");
+    const bool isUnifiedPlanKernelSrc =
+        srcName.compare(0, KFC_UNIFIED_ACTION_PREFIX_LEN, KFC_UNIFIED_ACTION_PREFIX) == 0;
+    if (isUnifiedPlanKernelSrc) {
+        kfcArg->role = KfcServerRole::UNIFIED_PLAN;
+    }
     if (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) {
         const auto* baseArg = static_cast<const CcuKernelArgBase*>(srcKernel.kernelArg);
         CHK_PTR_NULL(baseArg);
@@ -132,6 +151,16 @@ HcclResult InheritKfcServerKernelArg(
         kfcArg->subCommRanks = srcArg->subCommRanks;
     } else if (
         isAllGather || isAllGatherKfc || isReduceScatter || isReduceScatterPeerOnly || isAlltoAll || isAllReduce) {
+        kfcArg->rankSize = subCommRanks[0].size();
+        kfcArg->rankId = rankId;
+        kfcArg->loadFromMem = false;
+        kfcArg->opParam = param;
+        kfcArg->subCommRanks = subCommRanks;
+    } else if (isUnifiedPlanKernelSrc) {
+        // v3（§12-11 甲路线）：unified 动作 kernel 无私有 kernelArg 可继承（unified 树
+        // 纯数据申报，CcuKernelPlan 只带 kernelFuncName+channels）——域信息从公共入参
+        // 取（同 v2 AG/RS Mesh 的 else-if 分支同式）；opParam 用于 server 侧日志，分发
+        // 判据不依赖 opType/algName（server 按 role==UNIFIED_PLAN 走 v3 分支）。
         kfcArg->rankSize = subCommRanks[0].size();
         kfcArg->rankId = rankId;
         kfcArg->loadFromMem = false;
@@ -254,6 +283,20 @@ HcclResult CcuTempKfcServer::CalcRes(
                                  (missionIndex == 1U && (isAllGatherNhr || isReduceScatterNhr)) ||
                                  (missionNum == KFC_MAX_MISSION_NUM && isAlltoAllKfcMultiJetty) ||
                                  isAlltoAllMultiJetty || (isSoleNhr2Die && isReduceScatterNhr2Die);
+                                 (missionNum == KFC_MAX_MISSION_NUM && isAlltoAllKfcMultiJetty) || isAlltoAllMultiJetty;
+        // v3 分叉（§12-11 甲路线，2026-09-21，纯新增）：unified 动作 kernel 跳过下方 v2
+        // 白名单（role 由 InheritKfcServerKernelArg 覆写为 UNIFIED_PLAN，server 按 v3
+        // 逐记录动作 ID 分发，missionNum=1 单 server 消费整条段序列，kernelArg 继承走
+        // InheritKfcServerKernelArg 的 isUnifiedPlanKernelSrc 域信息分支）。v2 名单
+        // kernelFuncName 均不带 "CcuAction" 前缀，isUnifiedPlanKernel 对 v2 恒 false，
+        // 下方 v2 判定逐字节保持。
+        const bool isUnifiedPlanKernel =
+            sourceName.compare(0, KFC_UNIFIED_ACTION_PREFIX_LEN, KFC_UNIFIED_ACTION_PREFIX) == 0;
+        if (isUnifiedPlanKernel) {
+            HCCL_INFO("[CcuTempKfcServer::CalcRes] unified plan kernel[%s] at mission[%u] (v3 id dispatch)",
+                resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName, missionIndex);
+        }
+        if (!isUnifiedPlanKernel) {
         if ((!isAllGather && !isAllGatherKfc && !isAllGatherNhr && !isReduceScatter && !isReduceScatterPeerOnly &&
              !isReduceScatterNhr && !isReduceScatterNhr2Die && !isAlltoAll && !isAlltoAllKfcMultiJetty &&
              !isAllReduce && !isAllToAllV && !isAlltoAllMultiJetty && !isAllGatherSoleNhr) ||
@@ -262,6 +305,7 @@ HcclResult CcuTempKfcServer::CalcRes(
                 "[CcuTempKfcServer::CalcRes] unsupported or misordered source kernel[%s] at mission[%u]",
                 resourceRequest.ccuKernelInfos[kernelIndex].kernelFuncName, missionIndex);
             return HCCL_E_NOT_SUPPORT;
+        }
         }
         HCCL_INFO(
             "[CcuTempKfcServer::CalcRes] mission[%u] inheriting kernelargs from[%s]", missionIndex,

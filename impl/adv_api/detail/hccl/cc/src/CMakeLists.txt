@@ -99,6 +99,18 @@ list(APPEND INCLUDE_LIST
     ${ASCEND_CANN_PACKAGE_PATH}/include/hcomm
     ${ASCEND_CANN_PACKAGE_PATH}/include/hcomm/ccu
 
+    # unified（R6 WP-A2/R6.5）：common/hccl_alloc_ctx_res.cc 与 op_common/kernel_launch.cc
+    # include 了 exec/unified_aicpu_exec.h、l5/hcomm_verb_sink.h（存量侧消费 unified 头，
+    # R6 前这些编译单元由 unified/CMakeLists 的 target_include_directories 覆盖不到——
+    # 该 target 级配置只作用于 unified 树自身的 TU，跨目录消费需进全局 INCLUDE_LIST）。
+    # inc/ 必须在列：hcomm_verb_sink.h include "verb_sink.h"（词汇表半边在 inc/）——
+    # 设备侧 mc2_server 也编 kernel_launch.cc，缺 inc 路径即报 verb_sink.h not found
+    # （PR #6326 CI 实测：本地只编 mc2_client 时被 unified 树的 target 级配置掩盖）。
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/inc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/exec
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/l5
+
+
     # runtime头文件
     ${ASCEND_CANN_PACKAGE_PATH}/include/base/
     ${ASCEND_CANN_PACKAGE_PATH}/include/driver/

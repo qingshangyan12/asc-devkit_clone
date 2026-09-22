@@ -49,6 +49,13 @@ static_assert(
     "Concurrent ReduceScatter parameters exceed the KFC server load width");
 static_assert(KFC_MAX_MISSION_NUM == 2U, "KFC server CKE partitioning expects two missions");
 static_assert(KFC_SIGNAL_REGIONS_PER_MISSION == 2U, "Each KFC mission requires commit and done regions");
+// v3 三处同名登记（§6.12 性质）：server 分支 ID ↔ 协议槽 0 常量 ↔ unified ActionKind 枚举。
+// 前两者在本文件构造性对齐（分支直接引用 KFC_UNIFIED_ACTION_COLLECT_ALL /
+// KFC_UNIFIED_ACTION_REDUCE_SLICE）；与 unified ActionKind 的跨树对齐由 unified 测试
+// poc_unified_serialize_v3_test.cc 以编译期常量对比守门（unified 树不 include devkit
+// CCU 侧头，由测试镜像常量核验）。
+static_assert(KFC_UNIFIED_ACTION_COLLECT_ALL == 0U, "v3 slot0 action id must stay aligned with ActionKind::CollectAll");
+static_assert(KFC_UNIFIED_ACTION_REDUCE_SLICE == 1U, "v3 slot0 action id must stay aligned with ActionKind::ReduceSlice");
 
 const uint32_t HBM_PARAM_IDX_0 = 0;
 const uint32_t HBM_PARAM_IDX_1 = 1;
@@ -182,8 +189,83 @@ CcuResult LoadFuncParamFromMemory(
     return CCU_SUCCESS;
 }
 
+// ============================================================================
+// v3 分发（§12-11 甲路线 2026-09-21）：unified Plan 轮级动作 ID 分发。
+// 与 v2 的差别：v2 分发判据是实例级（role/algName 随 CCU 实例创建固定），
+// v3 判据是每轮消息槽数据——param[0] 的动作 ID（KFC_UNIFIED_ACTION_*，值与
+// unified ActionKind 枚举对齐，kfc_server_message.h 已 static_assert 三处登记）。
+// 格式与读取宽度同 v2：每段一条 32×u64 记录（LoadFuncParamFromMemory 一次 Load），
+// 出口哨兵同 param[0]==INVALID_U64（记录由 device 写入方按队列协议追加）。
+//
+// 直接调用既有 kernel 函数（v2 风格），不引入 ccu::CallFunc——公共逻辑（若后续
+// 动作 kernel 共享 Pre/PostSync 壳）未来可提取为 CallFunc FuncBlock 备选，机制轮
+// 不动设备侧资源模型（零新增 FuncBlock 查找/合成）。
+// ============================================================================
+static void DispatchUnifiedPlanV3(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
+{
+    CCU_IF(param[KFC_UNIFIED_ACTION_ID] == static_cast<u64>(KFC_UNIFIED_ACTION_COLLECT_ALL))
+    {
+        // 槽位转发序 == v2 AG else 分支（ccu_kernel_kfc_server.cc AG else 的读取序）：
+        // KFC_UNIFIED_COLLECT_ALL_* 槽 1..14 与 KFC_CONCURRENT_AG_MESH_* 槽 1..14
+        // 逐槽相等（kfc_server_message.h static_assert 守门）；token 语义同 v2——
+        // 槽位参数不含 token，恒取 ctx.token。
+        HCCL_INFO("[KFC][Unified][Dispatch] v3 action COLLECT_ALL -> CcuKfcAllGatherMesh1DMem2MemKernel");
+        CcuKfcAllGatherMesh1DMem2MemKernel(
+            param[KFC_UNIFIED_COLLECT_ALL_INPUT], param[KFC_UNIFIED_COLLECT_ALL_OUTPUT], ctx.token,
+            param[KFC_UNIFIED_COLLECT_ALL_OUTPUT_OFFSET], param[KFC_UNIFIED_COLLECT_ALL_SLICE_SIZE],
+            param[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_0], param[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_1],
+            param[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_2], param[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_3],
+            param[KFC_UNIFIED_COLLECT_ALL_CURRENT_RANK_SLICE_INPUT_OFFSET],
+            param[KFC_UNIFIED_COLLECT_ALL_REPEAT_NUM_INV], param[KFC_UNIFIED_COLLECT_ALL_INPUT_REPEAT_STRIDE],
+            param[KFC_UNIFIED_COLLECT_ALL_OUTPUT_REPEAT_STRIDE],
+            param[KFC_UNIFIED_COLLECT_ALL_LAST_SLICE_SIZE], param[KFC_UNIFIED_COLLECT_ALL_INPUT_OUTPUT_EQUAL],
+            ctx.arg->channels, ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId);
+    }
+    // R6（2026-09-21）：ReduceSlice 段分发——目标 CcuReduceScatterMesh1DMem2MemKernel
+    //（既有 kernel，v2 风格直调）。槽位转发序 == v2 REDUCE_SCATTER_MESH 分支（:327-339
+    // 的参数转发序）：KFC_UNIFIED_REDUCE_SLICE_* 槽 1..15 与 KFC_CONCURRENT_RS_MESH_*
+    // 槽 1..15 逐槽相等（kfc_server_message.h static_assert 守门）；token 同 v2 恒取
+    // ctx.token；dataType/outputType/reduceType 同 v2 从 ctx.arg->opParam 取（不占槽）。
+    CCU_IF(param[KFC_UNIFIED_ACTION_ID] == static_cast<u64>(KFC_UNIFIED_ACTION_REDUCE_SLICE))
+    {
+        HCCL_INFO("[KFC][Unified][Dispatch] v3 action REDUCE_SLICE -> CcuReduceScatterMesh1DMem2MemKernel");
+        CcuReduceScatterMesh1DMem2MemKernel(
+            param[KFC_UNIFIED_REDUCE_SLICE_INPUT], param[KFC_UNIFIED_REDUCE_SLICE_OUTPUT], ctx.token,
+            param[KFC_UNIFIED_REDUCE_SLICE_SCRATCH], param[KFC_UNIFIED_REDUCE_SLICE_RANK_SLICE_OFFSET],
+            param[KFC_UNIFIED_REDUCE_SLICE_CHUNK_SIZE], param[KFC_UNIFIED_REDUCE_SLICE_CHUNK_LOOP_NUM],
+            param[KFC_UNIFIED_REDUCE_SLICE_TAIL_SIZE], param[KFC_UNIFIED_REDUCE_SLICE_FULL_GO_ADDR_OFFSET],
+            param[KFC_UNIFIED_REDUCE_SLICE_FULL_GO_LOOP_PARAM], param[KFC_UNIFIED_REDUCE_SLICE_FULL_GO_PARALLEL_PARAM],
+            param[KFC_UNIFIED_REDUCE_SLICE_FULL_GO_RESIDUAL], param[KFC_UNIFIED_REDUCE_SLICE_TAIL_GO_ADDR_OFFSET],
+            param[KFC_UNIFIED_REDUCE_SLICE_TAIL_GO_LOOP_PARAM], param[KFC_UNIFIED_REDUCE_SLICE_TAIL_GO_PARALLEL_PARAM],
+            param[KFC_UNIFIED_REDUCE_SLICE_TAIL_GO_RESIDUAL], ctx.arg->channels, ctx.arg->channelCount,
+            static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
+            ctx.arg->opParam.DataDes.outputType, ctx.arg->opParam.reduceType);
+    }
+    // 未知动作 ID：server 微码循环内无法快速失败给 host（无同步回传通道，且
+    // DispatchKfcSubKernel 调用点不检查返回值——v2 各分支 kernel 返回值同样丢弃），
+    // 按现状惯例 HCCL_ERROR 打日志，队列循环继续消费后续记录。param[0] 是设备侧
+    // 运行时值，gen 期不可读（v2 分支同样不打印槽值），日志不带值。真注册链落地后
+    // 升级为 host 下发前 Validate 拦截（server 侧只处理已校验 ID）。
+    // R6 起已知合法 ID 集合 = {COLLECT_ALL=0, REDUCE_SLICE=1}——下两条 CCU_IF 的
+    // "非 COLLECT_ALL / 非 REDUCE_SLICE"判据合取即为未知 ID 判定（CCU 条件表达式
+    // 无逻辑与，按既有单比较式并列）。
+    CCU_IF(param[KFC_UNIFIED_ACTION_ID] != static_cast<u64>(KFC_UNIFIED_ACTION_COLLECT_ALL))
+    {
+        CCU_IF(param[KFC_UNIFIED_ACTION_ID] != static_cast<u64>(KFC_UNIFIED_ACTION_REDUCE_SLICE))
+        {
+            HCCL_ERROR("[KFC][Unified][Dispatch] unknown action id in unified plan record (slot0)");
+        }
+    }
+}
+
 static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
 {
+    // v3 分叉（§12-11 甲路线）：UNIFIED_PLAN 实例不走 v2 opType/role if-else——
+    // 分发判据在每轮 param[0] 动作 ID，不在实例属性。v2 既有分支一行不动。
+    if (ctx.arg->role == KfcServerRole::UNIFIED_PLAN) {
+        DispatchUnifiedPlanV3(param, ctx);
+        return;
+    }
     if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         const auto* arg = static_cast<const KfcParallelAllGatherArg*>(ctx.arg->algArg.get());
         if (ctx.arg->algSubType == KFC_PARALLEL_ALL_GATHER_SUB_TYPE && ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {

@@ -708,6 +708,231 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     KERNEL_LOG(
         KERNEL_INFO, "RS sole-NHR-2die prepare: slice=0x%llx, stride=0x%llx, die0=0x%llx, die1=0x%llx, eq=%llu\n",
         sliceSize, sliceStride, die0Size, die1Size, isInputOutputEqual);
+// ============================================================================
+// M2（§12-11 甲路线尾款轮，2026-09-21）：unified Plan 的 device 写入方。
+//
+// 职责：从 OpResCtx.res[1] 携带的 v3 blob device 地址读 blob → 剥头部 4 槽 →
+// 逐段写 xn 消息区（每段一帧 32 槽）→ 追加 INVALID_U64 哨兵帧 → 逐帧写 commit CKE
+// 信号。与既有 CcuPrepareFor* 的差别：那些是"单帧参数装配"（xnData_[32] 填值后由
+// CcuSendMsg 落盘一帧 + 一个信号），本函数是"多帧批量落盘"——信号粒度是帧不是消息
+//（M0-① 裁定）：N 段 + 1 哨兵 = N+1 次 commitCKE 写，只写 xn 不逐帧写信号 =
+// server 第 2 轮起在 waitAddr+8 死锁。
+//
+// 落盘方式：直写 GM（parallel AG 先例 CcuPrepareForParallelAllGatherM2M 的 queueBase
+// 同式）+ 自理 flush（每帧 32 槽=256B=2 个 128B 行）。不复用 CcuSendMsg：它写的是
+// xnData_[32] 单帧寄存器快照（v3 的段数据在 blob GM 区不在寄存器），且其 flush 按
+// ccuUsedXnNum_ 折算——多帧直写更直接，也避免与 v2 消息流的 resourceId 全局游标错位。
+//
+// 帧几何（M0-② 裁定）：AIV 每帧步进 CCU_MSG_XN_NUM*CCU_XN_DATA_SIZE=512B（CcuSendMsg
+// 同式），server 每帧步进 CCU_PARAM_NUM_MAX*8B=512B（server 侧 paramAddr 推进），
+// 两侧天然对齐；v3 记录只用前 32 槽（server LoadFuncParamFromMemory 只 Load 32），
+// 后 32 槽闲置不写。
+//
+// blob 格式（kfc_server_message.h M2 常量，镜像 unified plan_serializer.h；R6 头部
+// 扩槽 4→7/版本升 4——dataType/outputType/reduceType 进头部 [4..6]，写入方只透传
+// 不消费，server 分发不读头部）：
+//   [0]=magic "UPL3"、[1]=版本 4、[2]=段数 N、[3]=保留、[4]=dataType、[5]=outputType、
+//   [6]=reduceType；[7..] = N×32 槽段记录。
+// 校验（M4-①/M4-④ 落点）：magic/版本不符即拒发（不写 xn 区——server 不会收到假帧，
+// 本轮通信悬置由 host 侧调用方超时兜底，与 v2 各 prepare 的 ASCENDC_ASSERT 拒发同粒度）；
+// 段数越界（0 或 >63）同样拒发。空 Plan 口径（M4-④ 裁定）：拒绝 segNum=0——允许空
+// 计划会把"编译产物为空"静默成"零动作通信"吞掉错误，拒绝则逼上游 Compile 期显式化。
+// 哨兵帧不属于 blob（第四轮契约），本函数追加。
+//
+// R6.5 · WP-C1（B-CCU②，2026-09-22）：本函数从"纯拷贝"升级为"拷贝 + 数据槽覆写"
+// ——方向 B 的 CCU 侧落地（AICPU 姊妹件 = R6 的 unified_exec/aicpu_consumer.h
+// InstantiateSegment 八字段实例化）。动机（B0 注释④病灶）：资源期 count=0（
+// PrepareParamForAllGather 显式置 0，真值 exec 期由 commParam 注入），blob 的数据
+// 相关槽全是占位值——槽 4(sliceSize)=0、槽 5..8(goSize)=全零、槽 14(inOutEqual)
+// 按 0==0 误判 1。落盘前以 exec 期 commParam 现值重算覆盖（11 槽现值覆写 +
+// 5 槽常量透传，M0-1 名单）：
+//   覆写槽（v2 CcuPrepareForAllGatherM2M :273-296 逐式同源）：
+//     1  input       = commParam->sendBuf + count*repeatIndex*dts + blob槽1（合成式：
+//                     blob 槽值是段内 inBaseOff 结构量非地址——AG 恒 0 时退化为直替，
+//                     但合成式是正确形态，防未来非零 baseOff/切轮帧）
+//     2  output      = commParam->recvBuf + count*repeatIndex*dts + blob槽2（同式）
+//     3  outputOffset= rankId * (strideCount==0 ? sliceSize : strideCount*dts)
+//                     （★strideCount 也是 exec 现值——三分支齐，只按 count 推漏分支）
+//     4  sliceSize   = commParam->count * GetHcclDataTypeSize(commParam->dataType)
+//     5..8 goSize    = CalcGoSize(覆写后 sliceSize, CCU_LOOP_COUNT_M2M_AG,
+//                     CCU_MEMSLICE_SIZE*8)（设备侧 :148 同式）
+//     13 lastSliceSize = 覆写后 sliceSize（AG 等分场景；blob 编译期尾片结构按新
+//                     count 重算的位置——AG 恒等分，P2 尾片场景在此扩展）
+//     14 inOutEqual  = (覆写后槽1 == 覆写后槽2 + 槽3) ? 1 : 0（重判——资源期
+//                     count=0 下 blob 槽 14 恒 1 是误判值，透传必错）
+//   透传槽（值不依赖 count/dataType/strideCount/ptrs 任一 exec 现值，资源期
+//   与 exec 期同值）：0 动作 ID、9 curRankInOff（AG 恒 0）、10 repeatNumInv、
+//   11/12 repeatStride。
+//   goSize 上界拒收（WP-C2 降级后的唯一真实约束，R6.5 修订一）：覆写后
+//   sliceSize > 262144×8192 = 2 GiB → 拒收不落盘（loopSize=8×32768=262144、
+//   MaxLoopIterNum=(1<<13)-1=8191，v2 基准 ccu_kernel_alg_base.cc:48 maxSize）。
+//   ★比 v2 严：v2 设备侧 CalcGoSize（hccl_ccu_xn_utils.h:148）与本防线前对 2GiB+
+//   AG 均静默溢出——此为**新增防线非存量复刻**，防后人按"对齐 v2"名义移除。
+//   RS 帧级拒收（R6.5 修订三）：段帧槽 0 != CollectAll → ERROR + return（RS
+//   instantiation 属 R7；与 magic/版本/段数拒发同粒度——不落盘不发信号，本轮
+//   通信由 host 侧调用方超时兜底，M4-④"宁可显式失败"口径族）。
+// ============================================================================
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForUnifiedPlan(
+    __gm__ CommonPrepareParamCcu* commParam)
+{
+    // R6.5 B-CCU②：commParam 现值消费（count/dataType/strideCount/sendBuf/recvBuf
+    // ——exec 期注入的数据真值；AICPU 八字段的 CCU 投影 AG 子集）
+    // ① blob 地址与头部校验（res[1] 携带，M0-⑤ 裁定；res[0]=scratch 已被 RS 占用）
+    if (!newCcuFlag_ || hcclNewContext_ == nullptr) {
+        KERNEL_LOG(KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan requires new ccu context (OpResCtx).");
+        return;
+    }
+    __gm__ uint64_t* blob = reinterpret_cast<__gm__ uint64_t*>(hcclNewContext_->res[1]);
+    if (blob == nullptr) {
+        KERNEL_LOG(KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan res[1] (plan blob addr) is null.");
+        return;
+    }
+    const uint64_t magic = ReadHBMData(blob);
+    if (magic != KFC_UNIFIED_BLOB_MAGIC) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan bad magic[0x%llx] != UPL3.",
+            (unsigned long long)magic);
+        return;
+    }
+    const uint64_t version = ReadHBMData(blob + 1);
+    if (version != KFC_UNIFIED_BLOB_VERSION) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan bad version[%llu] != 4.",
+            (unsigned long long)version);
+        return;
+    }
+    const uint64_t segNum = ReadHBMData(blob + 2);
+    if (segNum == 0U || segNum > KFC_UNIFIED_MAX_SEGMENTS) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan invalid segNum[%llu] (need 1..63).",
+            (unsigned long long)segNum);
+        return;
+    }
+
+    // R6.5 B-CCU② · 覆写前置计算（exec 现值，v2 :273-296 同式）：
+    //   首帧（帧 0）的动作 ID 决定覆写路径——AG（CollectAll）走数据槽覆写；
+    //   其他动作 ID 帧级拒收（RS 属 R7，帧级判据而非 Plan 级）
+    // ★R7 锚点（审查预核登记，随切轮/多帧设计处理）：
+    //   ①首帧预检（本段）与帧循环内判据（②段）是**双份 CollectAll 检查**——单帧
+    //     blob（本轮唯一形态）无害，R7 多帧时二选一（预检可撤或循环判据专职）；
+    //   ②槽 3 覆写本轮**丢弃 blob 编译期值**正确（资源期 count=0 → blob 槽 3 恒 0，
+    //     无可保留结构量），但 R7 切轮帧若把**轮内偏移**编码进槽 3（帧间基址推进
+    //     现在走槽 1/2 的 blob 结构 offset），须改为合成式（rankId×stride + 轮偏移）
+    //     而非整体覆写——届时本行是改造点。
+    __gm__ uint64_t* firstFrame = blob + KFC_UNIFIED_BLOB_HEADER_SLOTS;
+    const uint64_t firstActionId = ReadHBMData(firstFrame + KFC_UNIFIED_ACTION_ID);
+    if (firstActionId != KFC_UNIFIED_ACTION_COLLECT_ALL) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan action[%llu] != CollectAll "
+            "(RS instantiation lands in R7; refusing, not silently passing through).",
+            (unsigned long long)firstActionId);
+        return;
+    }
+    // exec 现值派生量（对全部 AG 段帧统一预计算——单帧 blob 恒一帧，切轮帧 R7 起）
+    const uint64_t dts = GetHcclDataTypeSize(commParam->dataType);
+    const uint64_t sliceSize = commParam->count * dts;
+    // goSize 上界拒收（WP-C2：唯一真实约束；2 GiB = 262144 × 8192）
+    constexpr uint64_t kGoSizeLoopLimit = 262144ULL * 8192ULL;   // loopSize × (MaxLoopIterNum+1)
+    if (sliceSize > kGoSizeLoopLimit) {
+        KERNEL_LOG(
+            KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan sliceSize[%llu] > 2GiB goSize loop "
+            "limit[%llu] (v2 single-frame capacity; rejecting — this guard is STRICTER than v2, "
+            "which silently overflows; do not remove when aligning to v2).",
+            (unsigned long long)sliceSize, (unsigned long long)kGoSizeLoopLimit);
+        return;
+    }
+    const uint64_t repeatOffset = commParam->count * ccuParam_.repeatIndex * dts;   // v2 :275 同式
+    const uint64_t outputOffset = ccuParam_.rankId *
+        ((commParam->strideCount == 0U) ? sliceSize : (commParam->strideCount * dts)); // v2 :283-284 同式
+    KERNEL_LOG(
+        KERNEL_INFO, "ApiClient CcuPrepareForUnifiedPlan exec-instantiation: count[%llu] dts[%llu] "
+        "slice[%llu] rank[%u] outOff[%llu] repeatIdx[%u] repeatOff[%llu].",
+        (unsigned long long)commParam->count, (unsigned long long)dts,
+        (unsigned long long)sliceSize, ccuParam_.rankId, (unsigned long long)outputOffset,
+        ccuParam_.repeatIndex, (unsigned long long)repeatOffset);
+
+    // ② 消息区基址（与 CcuPrepareForParallelAllGatherM2M 的 queueBase 同式）+ 逐帧落盘。
+    // R6 头部扩槽：segBase 按新头宽（KFC_UNIFIED_BLOB_HEADER_SLOTS=7，R6 裁决一：
+    // dataType/outputType/reduceType 进头部 [4..6]，写入方只透传不消费——server 分发
+    // 不读头部）剥头；帧推进不变（段记录区仍 N×32 槽，帧几何与本函数头注 M0-② 相同）
+    GM_ADDR queueBase = reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr);
+    __gm__ uint64_t* segBase = blob + KFC_UNIFIED_BLOB_HEADER_SLOTS;
+    const uint64_t totalFrames = segNum + 1U;   // 段帧 + 哨兵帧
+
+    KERNEL_LOG(
+        KERNEL_INFO, "ApiClient CcuPrepareForUnifiedPlan blob[0x%llx] segs[%llu] queueBase[0x%llx] frames[%llu]",
+        (unsigned long long)(uint64_t)(blob), (unsigned long long)segNum,
+        (unsigned long long)(uint64_t)queueBase, (unsigned long long)totalFrames);
+
+    for (uint64_t frame = 0; frame < totalFrames; ++frame) {
+        GM_ADDR frameAddr = queueBase + frame * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
+        __gm__ uint64_t* dst = reinterpret_cast<__gm__ uint64_t*>(frameAddr);
+        if (frame < segNum) {
+            // 段帧：从 blob 逐槽拷 32 个（v3 记录宽度；后 32 槽闲置不写——server 只 Load 前 32）
+            __gm__ uint64_t* src = segBase + frame * KFC_UNIFIED_PARAM_NUM_PER_RECORD;
+            for (uint32_t i = 0; i < KFC_UNIFIED_PARAM_NUM_PER_RECORD; ++i) {
+                dst[i] = ReadHBMData(src + i);
+            }
+            // R6.5 B-CCU②：AG 段帧数据槽覆写（拷贝后、flush/信号前——落盘值=结构透传
+            // 槽 + exec 现值覆写槽的合成；11 覆写 + 5 透传，M0-1 名单）。
+            // 帧级动作 ID 已在预检（首帧 CollectAll + 后续帧同判——多帧场景 R7 起逐帧
+            // 独立覆写；本轮单帧 blob 恒帧 0）
+            const uint64_t frameActionId = dst[KFC_UNIFIED_ACTION_ID];
+            if (frameActionId != KFC_UNIFIED_ACTION_COLLECT_ALL) {
+                KERNEL_LOG(
+                    KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan frame[%llu] action[%llu] != "
+                    "CollectAll (RS instantiation lands in R7; refusing).",
+                    (unsigned long long)frame, (unsigned long long)frameActionId);
+                return;   // 拒发：不落盘剩余帧、不发信号（与头部拒发同粒度）
+            }
+            // 槽 1/2：合成式（blob 槽值是段内结构 offset，与 exec 现址相加）
+            dst[KFC_UNIFIED_COLLECT_ALL_INPUT] =
+                (uint64_t)commParam->sendBuf + repeatOffset + dst[KFC_UNIFIED_COLLECT_ALL_INPUT];
+            dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT] =
+                (uint64_t)commParam->recvBuf + repeatOffset + dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT];
+            // 槽 3：rankId × stride 分支（strideCount 是 exec 现值——三分支齐）
+            dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT_OFFSET] = outputOffset;
+            // 槽 4：sliceSize 现值
+            dst[KFC_UNIFIED_COLLECT_ALL_SLICE_SIZE] = sliceSize;
+            // 槽 5..8：goSize 重算（覆写后 sliceSize；设备侧 CalcGoSize 同式）
+            CalcGoSize(sliceSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U,
+                &dst[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_0]);
+            // 槽 13：lastSliceSize = 覆写后 sliceSize（AG 等分；尾片重算 P2 扩展位）
+            dst[KFC_UNIFIED_COLLECT_ALL_LAST_SLICE_SIZE] = sliceSize;
+            // 槽 14：inOutEqual 重判（★透传必错：资源期 count=0 下 blob 槽 14 按
+            // 0==0 恒 1 是误判值；v2 :292-296 合成式同源）
+            dst[KFC_UNIFIED_COLLECT_ALL_INPUT_OUTPUT_EQUAL] =
+                (dst[KFC_UNIFIED_COLLECT_ALL_INPUT] ==
+                 dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT] + dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT_OFFSET]) ?
+                    1U : 0U;
+            // 透传槽（0/9/10/11/12）已由拷贝落值，不覆写
+        } else {
+            // 哨兵帧：槽 0 = INVALID_U64（server 出口判定 param[0]==INVALID_U64），
+            // 其余槽清 0（Finalize 先例只写槽 0；此处全清更干净——server 只读槽 0 判
+            // 出口，后续槽不消费，不违背契约）
+            for (uint32_t i = 0; i < KFC_UNIFIED_PARAM_NUM_PER_RECORD; ++i) {
+                dst[i] = 0ULL;
+            }
+            dst[KFC_UNIFIED_ACTION_ID] = 0xFFFFFFFFFFFFFFFFULL;   // INVALID_U64 出口哨兵
+        }
+        // flush：MAJOR-3（M2 审查修正）——cache line 实为 64B（FlushDataCache 只刷新
+        // 传入地址所在的 line），v3 帧 32 槽 = 256B = 4 行。镜像 v2 节奏
+        // for(i<(32+7)/8)（CcuSendMsg 同折算式，步长 MAX_DCCI_CNT）——4 次覆盖全帧，
+        // 槽 16..31（P2 的 RS NHR 24 槽/并发 RS 25 槽在此区间）不再漏落 HBM。
+        for (uint32_t i = 0; i < ((KFC_UNIFIED_PARAM_NUM_PER_RECORD + 7U) / 8U); ++i) {
+            FlushDataCache(frameAddr + MAX_DCCI_CNT * i);
+        }
+
+        // ③ 逐帧 commit 信号（M0-① 裁定：帧粒度；missionNum=1 单 server，
+        // GetCommitCkeAddr(frame, 0) 与 server 侧 waitAddr+frame*8 对称）
+        ccuMsg_.commitCKEAddr = GetCommitCkeAddr(static_cast<uint8_t>(frame), 0U);
+        WriteHBMData(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.commitCKEAddr), CCU_MSG_CKE_SET_VALUE);
+    }
+
+    KERNEL_LOG(
+        KERNEL_INFO, "ApiClient CcuPrepareForUnifiedPlan done: [%llu] frames written + signaled.",
+        (unsigned long long)totalFrames);
 }
 } // namespace AscendC
 
