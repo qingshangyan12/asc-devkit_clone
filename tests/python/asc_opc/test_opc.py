@@ -981,45 +981,19 @@ class TestOpc02(unittest.TestCase):
         assert do_check_input_args(["--deterministic", "false"]) == True
         assert do_check_input_args(["--deterministic", "other"]) == False
 
-    def test_kernel_spec_command_environment_defaults(self):
-        with tempfile.TemporaryDirectory() as directory:
-            with patch.dict(
-                os.environ,
-                {
-                    "ASCENDC_KERNEL_SPEC_MODE": "Normal",
-                    "ASCENDC_KERNEL_SPEC_DIR": directory,
-                },
-            ), RequiredValidArgs() as required:
-                sys.argv = required
-                _, parser = opc.parse_args()
-                self.assertTrue(parser.check_input_params())
-                self.assertEqual(parser.get_option(OpcOptions.KERNEL_SPEC), "Normal")
-                self.assertEqual(
-                    parser.get_option(OpcOptions.KERNEL_SPEC_DIR), directory
-                )
-
-    def test_explicit_kernel_spec_overrides_command_environment(self):
-        with tempfile.TemporaryDirectory() as directory:
-            for mode in ("None", "SK"):
-                with self.subTest(mode=mode), patch.dict(
-                    os.environ,
-                    {
-                        "ASCENDC_KERNEL_SPEC_MODE": "Normal",
-                        "ASCENDC_KERNEL_SPEC_DIR": directory,
-                    },
-                ), RequiredValidArgs() as required:
-                    sys.argv = required + ["--kernel-spec=" + mode]
-                    _, parser = opc.parse_args()
-                    self.assertTrue(parser.check_input_params())
-                    self.assertEqual(parser.get_option(OpcOptions.KERNEL_SPEC), mode)
-
-    def test_invalid_kernel_spec_environment_is_rejected(self):
+    def test_kernel_spec_ignores_removed_environment_defaults(self):
         with patch.dict(
-            os.environ, {"ASCENDC_KERNEL_SPEC_MODE": "All"}
+            os.environ,
+            {
+                "ASCENDC_KERNEL_SPEC_MODE": "Normal",
+                "ASCENDC_KERNEL_SPEC_DIR": "/unrelated/package",
+            },
         ), RequiredValidArgs() as required:
             sys.argv = required
             _, parser = opc.parse_args()
-            self.assertFalse(parser.check_input_params())
+            self.assertTrue(parser.check_input_params())
+            self.assertEqual(parser.get_option(OpcOptions.KERNEL_SPEC), "None")
+            self.assertIsNone(parser.get_option(OpcOptions.KERNEL_SPEC_DIR))
 
     def test_kernel_spec_defaults_to_none(self):
         with RequiredValidArgs() as required_args:

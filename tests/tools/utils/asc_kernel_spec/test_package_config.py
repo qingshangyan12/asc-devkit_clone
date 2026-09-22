@@ -10,10 +10,10 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-import json
-import sys
 from pathlib import Path
 import subprocess
+import shlex
+import sys
 import tempfile
 import unittest
 
@@ -34,85 +34,60 @@ class ExistingPackageConfig(unittest.TestCase):
                 capture_output=True,
             )
 
-    def test_existing_command_gets_isolated_kernel_spec_environment(self):
+    def test_existing_options_route_to_opc_not_device_compiler(self):
+        util = FUNCTIONS.parent / "util"
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "probe.py").write_text(
-                "import json,os,sys\nfrom pathlib import Path\n"
-                "Path(sys.argv[1]).write_text(json.dumps([os.getenv('ASCENDC_KERNEL_SPEC_MODE'),"
-                "os.getenv('ASCENDC_KERNEL_SPEC_DIR')]))\n"
-            )
             (
                 root / "CMakeLists.txt"
             ).write_text(f'''cmake_minimum_required(VERSION 3.16)
-project(command_scope NONE)
+project(options NONE)
 include("{FUNCTIONS}")
-npu_op_kernel_options(first ALL OPTIONS --kernel-spec=Normal "--kernel-spec-dir=${{CMAKE_BINARY_DIR}}/with space"
-  OUTPUT_COMMAND first_command)
-npu_op_kernel_options(second ALL OPTIONS --kernel-spec=None OUTPUT_COMMAND second_command)
-add_custom_target(first ALL COMMAND ${{first_command}} "{sys.executable}" "{root}/probe.py" "{root}/first.json" VERBATIM)
-add_custom_target(second ALL COMMAND ${{second_command}} "{sys.executable}" "{root}/probe.py" "{root}/second.json" VERBATIM)
+set(ASCEND_PYTHON_EXECUTABLE "{sys.executable}")
+set(ASCENDC_CMAKE_SCRIPTS_PATH "{FUNCTIONS.parent}")
+set(CUSTOM_COMPILE_OPTIONS custom_compile_options.ini)
+set_property(GLOBAL PROPERTY ASCENDC_AUTO_GEN_PATH "{root}")
+npu_op_kernel_options(kernel ALL OPTIONS "--kernel-spec=Normal" "--kernel-spec-dir={root}/manifest with space" -O2 --save-temp-files)
+npu_op_kernel_options(kernel AddCustom COMPUTE_UNIT ascend910b OPTIONS --kernel-spec=None)
 ''')
-            result = subprocess.run(
+            configured = subprocess.run(
                 ["cmake", "-S", str(root), "-B", str(root / "build")],
                 capture_output=True,
                 text=True,
             )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            result = subprocess.run(
-                ["cmake", "--build", str(root / "build"), "--parallel", "2"],
-                capture_output=True,
-                text=True,
-            )
-            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertEqual(
-                json.loads((root / "first.json").read_text()),
-                ["Normal", str(root / "build/with space")],
+                configured.returncode, 0, configured.stdout + configured.stderr
             )
-            self.assertEqual(
-                json.loads((root / "second.json").read_text()), ["None", ""]
-            )
-
-    def test_command_configuration_rejects_unsupported_options(self):
-        for options, message in [
-            ("ALL OPTIONS --kernel-spec=All", "KERNEL_SPEC_MODE must be"),
-            (
-                "ALL OPTIONS --kernel-spec=Normal --kernel-spec-dir=relative",
-                "absolute path",
-            ),
-            ("Add OPTIONS --kernel-spec=None", "whole command"),
-            ("ALL OPTIONS -O2", "only supports"),
-        ]:
-            with self.subTest(options=options):
-                result = self.configure(
-                    f"npu_op_kernel_options(demo {options} OUTPUT_COMMAND prefix)\n"
+            device_options = (root / "custom_compile_options.ini").read_text()
+            self.assertIn("-O2", device_options)
+            self.assertNotIn("kernel-spec", device_options)
+            self.assertIn("dump_cce", (root / "custom_opc_options.ini").read_text())
+            for op_type, expected in (
+                (
+                    "Other",
+                    [
+                        "--kernel-spec=Normal",
+                        f"--kernel-spec-dir={root}/manifest with space/ascend910b",
+                    ],
+                ),
+                ("AddCustom", []),
+            ):
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        str(util / "kernel_spec_options.py"),
+                        "--config-file",
+                        str(root / "custom_opc_options.ini"),
+                        "--op-type",
+                        op_type,
+                        "--soc",
+                        "Ascend910B1",
+                    ],
+                    check=True,
+                    capture_output=True,
+                    text=True,
                 )
-                self.assertNotEqual(result.returncode, 0)
-                self.assertIn(message, result.stderr)
-
-    def test_command_rejects_malformed_arguments(self):
-        for arguments in (
-            "OPTIONS --kernel-spec=Normal --kernel-spec=None OUTPUT_COMMAND prefix",
-            "OPTIONS --kernel-spec=None OUTPUT_COMMAND prefix TYPO value",
-            "OPTIONS --kernel-spec=None COMPUTE_UNIT OUTPUT_COMMAND prefix",
-            "OPTIONS --kernel-spec=None OUTPUT_COMMAND",
-            "OPTIONS OUTPUT_COMMAND prefix",
-            "OPTIONS --kernel-spec=None --kernel-spec-dir=/one --kernel-spec-dir=/two OUTPUT_COMMAND prefix",
-        ):
-            with self.subTest(arguments=arguments):
-                result = self.configure(f"npu_op_kernel_options(k ALL {arguments})\n")
-                self.assertNotEqual(result.returncode, 0, result.stdout)
-
-    def test_command_options_ignore_project_cache_variables(self):
-        result = self.configure("""
-set(spec_mode SK CACHE STRING "Project setting")
-set(spec_dir /unrelated CACHE STRING "Project setting")
-npu_op_kernel_options(k ALL OPTIONS --kernel-spec=Normal --kernel-spec-dir=/resources OUTPUT_COMMAND prefix)
-if(NOT "${prefix}" MATCHES "ASCENDC_KERNEL_SPEC_MODE=Normal;ASCENDC_KERNEL_SPEC_DIR=/resources$")
-  message(FATAL_ERROR "Project cache affected command options")
-endif()
-""")
-        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertEqual(shlex.split(result.stdout), expected)
 
     def test_invalid_mode(self):
         for mode in ("Wrong", "All"):

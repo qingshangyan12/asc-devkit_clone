@@ -54,28 +54,22 @@ npu_op_kernel_options(ascendc_kernels ALL OPTIONS --save-temp-files)
 
 只记录动态编译资料。后续静态编译结果不回流到打包阶段。聚合工具不扫描动态 ELF，不执行 readelf，不接受 --binary-dir。
 
-### 3.1 接入工程已有的编译命令
+### 3.1 内置工程使用脚本副本时的同步要求
 
-工程已自行生成 OPC 命令时，不需要复制 SDK 的 Python 参数处理模块，也不需要修改每个生成 shell 脚本。可以在实际执行 kernel 编译的公共 CMake 位置使用现有接口：
+内置工程若复制过 SDK 的任务生成脚本，应同步其中的 JIT 选项处理，不再增加另一套执行接口。公共 CMake 沿用工程已有的 add_ops_compile_options，将 --kernel-spec 和 --kernel-spec-dir 写入原配置；最终用户仍只设置一次 KERNEL_SPEC_MODE。
 
-```cmake
-# 仅需该函数时可单独 include SDK 的 fwk_modules/kernel_options.cmake。
-npu_op_kernel_options(existing_kernel_target ALL
-    OPTIONS "--kernel-spec=${KERNEL_SPEC_MODE}"
-            "--kernel-spec-dir=${manifest_dir}"
-    OUTPUT_COMMAND kernel_command_prefix)
-add_custom_target(existing_kernel_target
-    COMMAND ${kernel_command_prefix} bash "${existing_script}"
-    VERBATIM)
-```
+需要同步的内容：
 
-`OUTPUT_COMMAND` 返回 `cmake -E env` 命令前缀，不创建 target，不修改全局环境，也不写入 autogen 文件。前缀设置 `ASCENDC_KERNEL_SPEC_MODE` 和 `ASCENDC_KERNEL_SPEC_DIR`，只影响这条命令及其子进程。OPC 在未显式传入对应命令行参数时读取这些默认值；显式 `--kernel-spec=None` 可关闭继承的配置。工程仍负责把前缀用于真正执行 OPC 的命令，仅用于生成任务的命令不够。
+- ascendc_gen_options.py 调用 SDK kernel_spec_options.py 的 split_and_write_options：把两项 OPC 选项写入 custom_opc_options.ini，不传给 device 编译器。
+- ascendc_bin_param_build.py 根据原配置文件、算子及芯片调用 shell_options，将结果追加到生成的 OPC 命令。
+- 使用 shell 生成 OPC 任务的工程，在对应生成位置调用同一辅助模块；解析失败必须让任务生成失败。
+- kernel_spec_options.py 随 SDK 脚本一起同步，保持内容一致；不要为某个仓单独修改模式或作用范围规则。升级时一并同步依赖。
 
-关闭模式返回的前缀会显式设置 None 并清空目录，避免继承父进程的 JIT 配置。已有工程不要在关闭模式直接省略环境隔离；若需兼容旧 SDK，可在关闭分支用 `cmake -E env ASCENDC_KERNEL_SPEC_MODE=None ASCENDC_KERNEL_SPEC_DIR=`，无需加载新版模块。未知参数、关键字缺值及重复选项值冲突会在配置阶段报错。
+不应整体替换存在仓特有逻辑的任务生成器，只同步上述调用点和依赖。共享辅助模块在脚本相邻目录加载，不新增 Python 包依赖。原执行命令、任务依赖和单算子代码保持原样。
 
-此分支仅接受 `ALL` 和两项 kernel-spec 选项，不支持算子或芯片筛选，因为它作用于整个子进程。启用时目录必须为绝对路径。工程可复用原芯片循环提供不同输出目录，无需新增编译循环。原有未指定 OUTPUT_COMMAND 的调用行为不变，SDK 接管的自定义包继续使用第 3 节原流程。
+配置要在原 autogen 清理之后写入；有 prepare 子工程的工程也需通过原参数传递方式传入同一模式。配置文件在每次配置时按原流程重建，None 不追加导出参数。生成的 OPC 命令是显式配置依据，不从进程环境继承 JIT 模式。芯片子目录由辅助模块按既有规则追加，复用原芯片编译流程。
 
-已有工程仍需将 manifest 目录、kernel 完成依赖和源码安装位置交给资源聚合步骤；这个命令前缀只解决配置下发，不替代原打包和安装清单。
+源码安装映射、kernel 完成依赖、资源聚合和安装位置仍使用现有实现。save_temp_files 继续读取原 OPC 配置；这次同步不改变资源格式或运行时加载方式。
 
 ## 4. 构建依赖和产物位置
 
