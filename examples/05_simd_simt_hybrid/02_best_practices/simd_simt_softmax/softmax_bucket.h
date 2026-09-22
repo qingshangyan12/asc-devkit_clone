@@ -24,7 +24,6 @@ constexpr uint32_t BUCKET_THREAD_COUNT_MID = 1024;
 constexpr uint32_t BUCKET_THREAD_COUNT_LARGE = 2048;
 constexpr uint32_t BUCKET_DYNAMIC_MAX_COLS = 256;
 constexpr uint32_t BUCKET_FIXED_MAX_COLS = 512;
-constexpr uint32_t BLOCK_SIZE_BYTES = 32;
 
 template <typename T>
 __aicore__ inline __gm__ T* mutable_gm_ptr(__gm__ const T* ptr)
@@ -70,7 +69,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     }
     sum_value = asc_reduce_add(sum_value);
 
-    // 归一化写回，只处理真实cols内的列。
+    // 归一化写回padded UB，尾部无效列写0；MTE3仅搬回真实cols内的数据。
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
         const uint32_t col = thread_in_warp + iter * warpSize;
         output_ub[row_offset + col] = static_cast<half>(elements[iter] / sum_value);
@@ -104,14 +103,11 @@ __global__ __vector__ void softmax_bucket_kernel(
         const uint32_t rows_in_tile = rows_remaining >= kRowsPerTile ? kRowsPerTile : rows_remaining;
         const uint32_t row_bytes = cols * sizeof(half);
         const uint32_t padded_row_bytes = kBucketCols * sizeof(half);
-        const uint8_t right_padding_elems =
-            static_cast<uint8_t>(((BLOCK_SIZE_BYTES - (row_bytes & (BLOCK_SIZE_BYTES - 1))) &
-                                  (BLOCK_SIZE_BYTES - 1)) /
-                                 sizeof(half));
 
         asc_sync_wait(PIPE_V, PIPE_MTE2, event_id);
+        // 每行按真实cols搬入，行尾由硬件自动补齐到32字节，padding区域不参与计算。
         asc_copy_gm2ub_align(input_tile_ub[slot], mutable_gm_ptr(input + row_base * cols),
-            static_cast<uint16_t>(rows_in_tile), row_bytes, 0, right_padding_elems, true,
+            static_cast<uint16_t>(rows_in_tile), row_bytes, 0, 0, false,
             asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, row_bytes, padded_row_bytes);
         asc_sync_notify(PIPE_MTE2, PIPE_V, event_id);
 

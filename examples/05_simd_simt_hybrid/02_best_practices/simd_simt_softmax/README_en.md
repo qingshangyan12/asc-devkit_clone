@@ -40,9 +40,7 @@ This sample uses softmax as an example to introduce tuning methods for in-row re
 
 - Computation rule:
 
-  Softmax is computed row by row, and rows are independent of each other. For each row: first compute the in-row maximum, then subtract the maximum from each element and apply the exponential function, sum the exponential results across the row, and finally divide each exponential value by the row sum to obtain the normalized output. In the implementation, one Warp processes one row, and rows are processed in parallel, as shown in the following figure.
-
-  <img src="./figures/warp_per_row.png">
+  Softmax is computed row by row, and rows are independent of each other. For each row: first compute the in-row maximum, then subtract the maximum from each element and apply the exponential function, sum the exponential results across the row, and finally divide each exponential value by the row sum to obtain the normalized output.
 
 - Sample specifications:
 
@@ -54,7 +52,7 @@ This sample uses softmax as an example to introduce tuning methods for in-row re
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">softmax_gm_kernel / softmax_ub_kernel / softmax_bucket_kernel</td></tr>
   </table>
 
-  > **Input Constraint:** The default shape of this sample is [8192, 197]. A custom shape can be specified through running arguments, and each row contains 1 to 512 elements (cols).
+  > **Input Constraint:** The default shape of this sample is [8192, 197]. A custom shape can be specified through running arguments, each row contains 1 to 512 elements (cols), and the total number of elements rows x cols must not exceed UINT32_MAX (4294967295).
 
 ## Sample Implementation
 
@@ -68,7 +66,7 @@ This sample constructs an optimization path through three cases. The kernel, Thr
 | 1 | softmax_ub_kernel | Dynamically calculated based on the data size | 32 x rows_per_tile, adaptive to rows and UB capacity, up to 2048 | Input is moved to UB through MTE for staging. Double tile buffers are used in rotation so that movement and computation overlap |
 | 2 | softmax_bucket_kernel | Dynamically calculated based on the data size | 512/1024/2048 (dynamically selected based on the shape) | The compile-time bucket keeps intermediate values in registers. UB is padded to the bucket width |
 
-The Thread Block count is dynamically calculated on the Host side based on the data size: the smaller value between the hardware AIV core count and rows is used. All three cases use the thread organization of "one Warp processes one row"; the specific organization is described in the core implementation of each case. The three cases are selected through the build option `SCENARIO_NUM`, and the default value is 2.
+The Thread Block count and the thread count of each Thread Block are dynamically calculated on the Host side based on the data size; see the core implementation of each case for the details. All three cases use the thread organization of "one Warp processes one row". The three cases are selected through the build option `SCENARIO_NUM`, and the default value is 2.
 
 ### Performance Metrics
 
@@ -90,7 +88,11 @@ Except for Task Duration, all other metrics are averages across all Thread Block
 
 **Optimization Goal**: Establish the functional correctness and performance baseline with the most direct implementation: the Warp reads input directly from GM, completes the in-row max, exp/sum, and normalization, and introduces no intermediate buffer.
 
-**Core Implementation**: The in-row softmax is completed in three passes: the row maximum, the exponential sum, and the normalized output, all reading GM directly. The thread organization is "one Warp processes one row": the 32 threads in a Warp are respectively responsible for different columns of the row, and the in-row max and sum are completed with Warp reduction primitives. Multiple Warps in a Thread Block each process different rows, and the row direction covers all rows through a grid-stride loop; the number of Warps launched per Thread Block adapts to rows, and when rows are fewer than the AIV core count, each Thread Block processes only one row. Take the default shape [8192, 197] as an example. The 197 columns of a row are processed by 32 threads in multiple rounds: each thread starts from the column equal to its thread ID and processes the following columns in steps of 32. Since 197 = 6 x 32 + 5, all 32 threads participate in the first six rounds, and in the seventh round only the first 5 threads still have data to process. Taking the in-row max as an example, the 32 threads in a Warp first compute their partial maximums and then obtain the row maximum through the Warp reduction primitive, as shown in the following figure.
+**Core Implementation**: The in-row softmax is completed in three passes: the row maximum, the exponential sum, and the normalized output, all reading GM directly. The thread organization is "one Warp processes one row": the 32 threads in a Warp are respectively responsible for different columns of the row, and the in-row max and sum are completed with Warp reduction primitives. Multiple Warps in a Thread Block each process different rows, and the row direction covers all rows through a grid-stride loop; the number of Warps launched per Thread Block adapts to rows, and when rows are fewer than the AIV core count, each Thread Block processes only one row. Take the default shape [8192, 197] as an example. The 197 columns of a row are processed by 32 threads in multiple rounds: each thread starts from the column equal to its thread ID and processes the following columns in steps of 32. Since 197 = 6 x 32 + 5, all 32 threads participate in the first six rounds, and in the seventh round only the first 5 threads still have data to process. One Warp processes one row, and rows are processed in parallel, as shown in the following figure.
+
+<img src="./figures/warp_per_row.png">
+
+Taking the in-row max as an example, the 32 threads in a Warp first compute their partial maximums and then obtain the row maximum through the Warp reduction primitive, as shown in the following figure.
 
 <img src="./figures/case0.png">
 
@@ -264,7 +266,8 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     }
     sum_value = asc_reduce_add(sum_value);
 
-    // Normalized write-back, covering only the columns within the real cols.
+    // Normalized write-back to the padded UB (invalid tail columns are written as 0);
+    // MTE3 moves back only the real cols.
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
         const uint32_t col = thread_in_warp + iter * warpSize;
         output_ub[row_offset + col] = static_cast<half>(elements[iter] / sum_value);

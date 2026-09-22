@@ -40,9 +40,7 @@
 
 - 计算规则：
 
-  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算，并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。实现中一个Warp处理一行，行与行之间并行，如下图所示。
-
-  <img src="./figures/warp_per_row.png">
+  softmax按行独立计算，行与行之间互不依赖。对每一行：先求行内最大值，再将行内每个元素减去该最大值后做指数运算，并对指数结果按行求和，最后用每个指数值除以该行和，得到归一化输出。
 
 - 样例规格：
 
@@ -54,7 +52,7 @@
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">softmax_gm_kernel / softmax_ub_kernel / softmax_bucket_kernel</td></tr>
   </table>
 
-  > **输入约束：** 样例默认shape为[8192, 197]；支持通过运行参数指定自定义shape，每行元素个数（cols）为1~512。
+  > **输入约束：** 样例默认shape为[8192, 197]；支持通过运行参数指定自定义shape，每行元素个数（cols）为1~512，且总元素数rows×cols不超过UINT32_MAX（4294967295）。
 
 ## 样例实现
 
@@ -68,7 +66,7 @@
 | 1    | softmax_ub_kernel | 根据数据量动态计算 | 32 × rows_per_tile，随rows和UB容量自适应，最多2048 | 输入经MTE搬入UB中转，双份tile缓冲区轮换，搬运与计算重叠              |
 | 2    | softmax_bucket_kernel | 根据数据量动态计算 | 512/1024/2048（按shape动态选择） | 编译期bucket使中间值驻留寄存器；UB按bucket宽度补齐 |
 
-其中线程块数量在Host侧根据数据量动态计算：取硬件AIV核数与rows中的较小值。三个Case均采用“一个Warp处理一行”的线程组织，具体方式见各Case的核心实现。三个Case通过编译选项 `SCENARIO_NUM` 选择，默认为2。
+其中线程块数量和每个Thread Block的线程数在Host侧根据数据量动态计算，具体方式见各Case的核心实现；三个Case均采用“一个Warp处理一行”的线程组织。三个Case通过编译选项 `SCENARIO_NUM` 选择，默认为2。
 
 ### 性能指标说明
 
@@ -90,7 +88,11 @@
 
 **优化目标**：以最直接的实现建立功能正确性和性能基线：Warp直接从GM读取输入，完成行内max、exp/sum和归一化，不引入任何中间缓冲。
 
-**核心实现**：行内softmax分三轮完成，依次求行最大值、指数和与归一化输出，三轮均直接读GM。线程组织采用“一个Warp处理一行”：Warp内32个线程分别负责同一行中不同列的数据，行内最大值与求和通过Warp归约原语完成；一个Thread Block内的多个Warp各自处理不同的行，行方向按grid-stride循环覆盖全部行；每个Thread Block启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行。以默认规格 [8192, 197] 为例，一行197列由32个线程分多轮处理：每个线程从与自身线程号相同的列开始，以32列为步进依次处理后续列；197 = 6×32 + 5，前6轮32个线程全部参与计算，第7轮仅前5个线程存在待处理数据。以行内求max为例，Warp内32个线程先各自求得部分最大值，再通过Warp归约原语得到行最大值，如下图所示。
+**核心实现**：行内softmax分三轮完成，依次求行最大值、指数和与归一化输出，三轮均直接读GM。线程组织采用“一个Warp处理一行”：Warp内32个线程分别负责同一行中不同列的数据，行内最大值与求和通过Warp归约原语完成；一个Thread Block内的多个Warp各自处理不同的行，行方向按grid-stride循环覆盖全部行；每个Thread Block启动的Warp数随rows自适应，rows不足AIV核数时每个Thread Block只处理一行。以默认规格 [8192, 197] 为例，一行197列由32个线程分多轮处理：每个线程从与自身线程号相同的列开始，以32列为步进依次处理后续列；197 = 6×32 + 5，前6轮32个线程全部参与计算，第7轮仅前5个线程存在待处理数据。一个Warp处理一行，行与行之间并行，如下图所示。
+
+<img src="./figures/warp_per_row.png">
+
+以行内求max为例，Warp内32个线程先各自求得部分最大值，再通过Warp归约原语得到行最大值，如下图所示。
 
 <img src="./figures/case0.png">
 
@@ -257,7 +259,7 @@ __simt_vf__ __launch_bounds__(kThreadCount) inline void softmax_bucket_vf(
     }
     sum_value = asc_reduce_add(sum_value);
 
-    // 归一化写回，只处理真实cols内的列。
+    // 归一化写回padded UB，尾部无效列写0；MTE3仅搬回真实cols内的数据。
     for (uint32_t iter = 0; iter < kWarpIterations; ++iter) {
         const uint32_t col = thread_in_warp + iter * warpSize;
         output_ub[row_offset + col] = static_cast<half>(elements[iter] / sum_value);
