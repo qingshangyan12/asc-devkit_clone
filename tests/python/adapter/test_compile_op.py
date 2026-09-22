@@ -110,7 +110,10 @@ class TestCompileOp(unittest.TestCase):
             "OOMTryRegisterTensorWithStorageShape(oomStorageShapeCursor, x, static_cast<uint64_t>(4))", tensor_source
         )
         self.assertIn("OOMCheckAddrRange(x, inputShapeLen)", tensor_source)
-        self.assertIn("OOMTryRegisterTensorListWithStorageShape(oomStorageShapeCursor, xs, static_cast<uint64_t>(2))")
+        self.assertIn(
+            "OOMTryRegisterTensorListWithStorageShape(oomStorageShapeCursor, xs, static_cast<uint64_t>(2))",
+            tensor_list_source,
+        )
         self.assertIn("OOMCheckTensorListRange(xs, 2)", tensor_list_source)
 
     def setUp(self):
