@@ -26,9 +26,7 @@ def main():
     input_dir.mkdir(exist_ok=True)
     output_dir.mkdir(exist_ok=True)
 
-    input_data = ((np.arange(ELEMENT_COUNT, dtype=np.int32) % 97) - 48).astype(
-        np.float16
-    )
+    input_data = ((np.arange(ELEMENT_COUNT, dtype=np.int32) % 97) - 48).astype(np.float16)
     golden = np.where(input_data > 0, input_data, input_data * ALPHA).astype(np.float16)
     input_data.tofile(input_dir / "input_x.bin")
     golden.tofile(output_dir / "golden.bin")

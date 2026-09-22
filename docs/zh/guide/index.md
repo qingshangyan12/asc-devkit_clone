@@ -109,6 +109,9 @@
             -   [缓存一致性](./programming_guide/advanced_programming/memory_model/cache_coherence.md)
             -   [内存一致性](./programming_guide/advanced_programming/memory_model/memory_consistency.md)
 
+        -   [核间通信](./programming_guide/advanced_programming/inter_core_communication/inter_core_communication.md)
+            -   [使用SSBuffer实现核间通信](./programming_guide/advanced_programming/inter_core_communication/ssbuffer_inter_core_memory_feature.md)
+
         -   [高级AI Core编程模型](./programming_guide/advanced_programming/advanced_ai_core_programming_model/advanced_ai_core_programming_model.md)
             -   [SIMD与SIMT混合编程](./programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
                 -   [概述](./programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
@@ -211,7 +214,7 @@
                 -   [尾核切分](operator_practice/simd_operator_impl/vector_programming/multi_core_tiling/tail_core_split.md)
                 -   [尾核尾块切分](operator_practice/simd_operator_impl/vector_programming/multi_core_tiling/tail_core_tail_block_split.md)
 
-            -   [DoubleBuffer场景](operator_practice/simd_operator_impl/vector_programming/double_buffer_scenario.md)
+            -   [Double Buffer场景](operator_practice/simd_operator_impl/vector_programming/double_buffer_scenario.md)
             -   [Broadcast场景](operator_practice/simd_operator_impl/vector_programming/broadcast_scenario.md)
             -   [非对齐场景](operator_practice/simd_operator_impl/vector_programming/unaligned_scenario.md)
 
@@ -243,6 +246,7 @@
             -   [CV融合](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/basics.md)
                 -   [基础知识](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/basics.md)
                 -   [算子实现](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/operator_impl.md)
+                -   [基于SSBuffer的核间通信特性](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/ssbuffer_feature_scenarios.md)
 
             -   [通算融合](operator_practice/simd_operator_impl/fusion_operator_programming/general_fusion/basics.md)
                 -   [基础知识](operator_practice/simd_operator_impl/fusion_operator_programming/general_fusion/basics.md)
@@ -278,7 +282,7 @@
             -   [核函数内删除Workspace相关冗余操作](operator_practice/simd_operator_optimization/overhead_optimization/remove_workspace_redundancy.md)
             -   [设置DCI编译选项来减少算子尾开销](operator_practice/simd_operator_optimization/overhead_optimization/dci_compile_option.md)
         -   [流水编排](operator_practice/simd_operator_optimization/pipeline_scheduling/pipeline_scheduling.md)
-            -   [开启DoubleBuffer](operator_practice/simd_operator_optimization/pipeline_scheduling/enable_double_buffer.md)
+            -   [开启Double Buffer](operator_practice/simd_operator_optimization/pipeline_scheduling/enable_double_buffer.md)
             -   [启用Iterate或IterateAll异步接口避免AIC/AIV同步依赖](operator_practice/simd_operator_optimization/pipeline_scheduling/enable_iterate_avoid_sync.md)
 
         -   [内存访问](operator_practice/simd_operator_optimization/memory_access/memory_access.md)
@@ -331,6 +335,7 @@
             -   [同一Warp内避免分支跳转](operator_practice/simt_operator_optimization/control_flow/avoid_warp_branch.md)
         -   [指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
             -   [原子操作指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
+            -   [原地加法指令优化](operator_practice/simt_operator_optimization/instruction_optimization/inplace_add_instruction_optimization.md)
 
     -   [SIMD与SIMT混合算子性能优化](operator_practice/simd_simt_hybrid_optimization/simd_simt_hybrid_optimization.md)
         -   [概述](operator_practice/simd_simt_hybrid_optimization/overview.md)
@@ -389,7 +394,7 @@
         -   [内存访问原理](./technical_appendix/concepts_and_terms/memory_access/scalar_read_write.md)
             -   [Scalar读写数据](./technical_appendix/concepts_and_terms/memory_access/scalar_read_write.md)
         -   [性能优化技术原理](./technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)
-            -   [DoubleBuffer](./technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)
+            -   [Double Buffer](./technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)
     -   [C++标准支持](./technical_appendix/cpp_standard_support/overview.md)
         -   [概述](./technical_appendix/cpp_standard_support/overview.md)
         -   [Device侧C/C++语法限制](./technical_appendix/cpp_standard_support/syntax_restrictions/syntax_restrictions.md)

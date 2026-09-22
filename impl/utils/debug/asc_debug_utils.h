@@ -22,12 +22,14 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #ifndef ASCENDC_CPU_DEBUG
 #include <type_traits>
 
-#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
 #include "impl/utils/debug/asc_utils_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
 
 #if __NPU_ARCH__ == 2002
 #include "impl/utils/debug/npu_arch_2002/asc_debug_utils_impl.h"
+#elif __NPU_ARCH__ == 3002
+#include "impl/utils/debug/npu_arch_3002/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 3510

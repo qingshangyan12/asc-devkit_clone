@@ -93,12 +93,18 @@ enum BinaryMetaType { // function level TLV type
     B_TYPE_DEBUG_INFO = 1,
     B_TYPE_DYNAMIC_PARAM = 2,
     B_TYPE_OPTIONAL_PARAM = 3,
-    B_TYPE_SK_INFO = 5
+    B_TYPE_SK_INFO = 5,
+    B_TYPE_SPECIALIZATION_RESOURCE_ID = 6
 };
 
 struct BaseTlv { // definition of TLV head
     unsigned short type;
     unsigned short len;
+};
+
+struct BinaryMetaSpecializationResourceId {
+    BaseTlv head;
+    char value[64];
 };
 
 struct BinaryMetaVersion {
@@ -210,9 +216,9 @@ enum class CacheMode { CACHE_MODE_DISABLE = 0, CACHE_MODE_NORMAL = 1, CACHE_MODE
 
 enum class CacheRwMode { READ = 1, WRITE = 2, RW = 3 };
 
-#if defined(__NPU_ARCH__) &&                                                                             \
-        (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
-         __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163) ||                        \
+#if defined(__NPU_ARCH__) &&                                                                              \
+        (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3113 ||  \
+         __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163) || \
     defined(__ASC_NPU_HOST__)
 constexpr uint64_t L2_CACHE_OFFSET = 60;
 constexpr uint64_t L2_CACHE_OFFSET_MASK = (1ul << L2_CACHE_OFFSET) - 1;

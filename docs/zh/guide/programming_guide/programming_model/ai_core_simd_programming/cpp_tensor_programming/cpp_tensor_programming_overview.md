@@ -68,7 +68,7 @@ Tensor本质是基于数组的编程抽象，而非简单的内存地址封装�
 
 前文的Tensor抽象示例中已展示了GlobalTensor和LocalTensor的基本用法。下面从硬件存储层级的角度，进一步介绍外部存储和内部存储的特性及Tensor管理方式。
 GM是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟较长。用于存储算子的输入数据、输出结果和中间计算数据。GM具有持久性：其中存储的数据持续保留，直到内存空间被释放或应用程序终止。
-用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数（Kernel）执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数（Kernel）执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/README.md)。
 
 如下示例展示了在Host侧通过Runtime API管理分配Device内存、在Host与Device之间数据拷贝以及核函数（Kernel）的调用过程：
 ```cpp
@@ -401,7 +401,7 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 ## 支持的API范围<a name="section2633193623711"></a>
 
 <!-- npu="310p" id1 -->
-**表1**  针对Atlas 推理系列产品AI Core，支持的API范围
+**表1**  针对Atlas推理系列产品AI Core，支持的API范围
 
 <a name="table56285428438"></a>
 <table><thead align="left"><tr id="row46697425436"><th class="cellrowborder" valign="top" width="30.28%" id="mcps1.2.3.1.1"><p id="p866911429430"><a name="p866911429430"></a><a name="p866911429430"></a>接口分类</p>
@@ -511,7 +511,7 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 <!-- end id1 -->
 
 <!-- npu="910b" id2 -->
-**表2**  针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的API范围
+**表2**  针对Atlas A2系列产品，支持的API范围
 
 <a name="table1842818536431"></a>
 <table><thead align="left"><tr id="row104742531436"><th class="cellrowborder" valign="top" width="29.9%" id="mcps1.2.4.1.1"><p id="p10474205364319"><a name="p10474205364319"></a><a name="p10474205364319"></a>接口分类</p>
@@ -714,7 +714,7 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 <!-- end id2 -->
 
 <!-- npu="A3" id3 -->
-**表3**  针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的API范围
+**表3**  针对Atlas A3系列产品，支持的API范围
 
 <a name="table167051848128"></a>
 <table><thead align="left"><tr id="row07054481922"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p135155581014"><a name="p135155581014"></a><a name="p135155581014"></a>接口分类</p>
@@ -930,7 +930,7 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
-**表4**  针对Ascend 950PR/Ascend 950DT，支持的API范围
+**表4**  针对Ascend 950PR&950DT系列产品，支持的API范围
 
 <a name="table1798673512413"></a>
 <table><thead align="left"><tr id="row109864353413"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p1098613524117"><a name="p1098613524117"></a><a name="p1098613524117"></a>接口分类</p>
