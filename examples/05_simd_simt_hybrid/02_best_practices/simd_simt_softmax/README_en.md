@@ -148,7 +148,7 @@ The `aiv_vec_ratio` of Case 0 reaches 0.946, and the time is concentrated on GM 
 
 - Each Thread Block processes row data in tiles. The number of rows in a tile determines the number of Warps launched by one VF call (one Warp processes one row). The row count takes the minimum of the following three values: the rows assigned to this Thread Block, the maximum number of rows that the four tile buffers can hold within the UB capacity, and the 64 rows corresponding to the limit that one Thread Block launches at most 2048 threads (64 Warps).
 - The kernel divides the dynamic UB into two input tile buffers and two output tile buffers. The two buffer sets are used alternately by tile, and their lifecycles are managed by separate events.
-- MTE2 uses the two-dimensional movement of `asc_copy_gm2ub_align` to move each GM row into UB by the real cols, and MTE3 moves the result back to GM in the same way.
+- MTE2 moves each GM row into UB by the real cols, and MTE3 moves the result back to GM in the same way.
 - The SIMT VF still completes the max, exp/sum, and normalization in three passes with one Warp processing one row. The in-row processing logic is the same as Case 0, and the input comes from UB.
 
 ```cpp
