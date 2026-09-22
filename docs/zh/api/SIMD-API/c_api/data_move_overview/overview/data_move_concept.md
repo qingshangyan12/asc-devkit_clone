@@ -11,7 +11,7 @@
 | 多维切片及重排 | 按1至5维循环、步长和Padding搬运数据 | [asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md) |
 | 随路格式转换 | 搬运时完成ND、DN、Nz等格式转换 | [asc_copy_gm2l1_nd2nz](../../cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)、[asc_copy_l0c2gm](../../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md) |
 | 随路量化激活 | 搬出L0C结果时完成类型转换、量化或激活 | [asc_copy_l0c2gm](../../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2ub](../../cube_datamove/asc_copy_l0c2ub.md) |
-| 非对齐数据搬运 | 处理有效数据长度或边界不满足32字节对齐的场景 | [asc_copy_gm2ub_align](../../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)、[asc_copy_gm2l1_align](../../cube_datamove/asc_copy_gm2l1_align.md) |
+| 非对齐数据搬运 | 显式控制非32字节块长的片上补齐布局或Padding | [asc_copy_gm2ub_align](../../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)、[asc_copy_gm2l1_align](../../cube_datamove/asc_copy_gm2l1_align.md) |
 | UB内部复制 | 在UB内连续或按块复制数据 | [asc_copy_ub2ub](../../vector_datamove/asc_copy_ub2ub.md) |
 | 矩阵分形搬运 | 在L1与L0A/L0B之间搬运二维、三维或MX矩阵 | [asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)、[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md) |
 | Reg与UB数据交换 | 在Vector Function中加载或存储矢量、掩码数据 | [Reg数据搬入](../../reg_compute/load/reg_load_overview.md)、[Reg数据搬出](../../reg_compute/store/reg_store_overview.md) |
@@ -75,9 +75,9 @@
 
 ## 非对齐数据搬运
 
-普通搬运接口通常要求UB或L1地址满足32字节对齐，并对有效数据长度有数据类型或搬运粒度约束。当有效长度不是32字节的整数倍，或需要在数据块左右补充元素时，应使用专用非对齐接口：
+搬运接口通常要求UB或L1起始地址满足32字节对齐，但有效长度约束因接口而异。`asc_copy_gm2ub`和`asc_copy_ub2gm`以字节表示有效长度，长度只需满足数据类型字节对齐，可以不是32字节的整数倍。普通接口的GM到UB仍会在UB端补齐写入，UB到GM也会补齐读取UB，容量计算不能只使用有效长度。需要显式控制非32字节数据的片上补齐布局、左右Padding、L2 Cache策略或更大的高维切分参数范围时，使用专用非对齐接口：
 
-- GM到UB使用[asc_copy_gm2ub_align](../../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)。目的端可选择Compact或Normal模式，并支持常量或首元素填充。
+- GM到UB使用[asc_copy_gm2ub_align](../../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)。高维切分原型的目的端可选择Compact或Normal模式，并支持常量或首元素填充。
 - UB到GM使用[asc_copy_ub2gm_align](../../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)。硬件读取UB时补充dummy数据，写入GM时丢弃补充部分。
 - GM到L1使用[asc_copy_gm2l1_align](../../cube_datamove/asc_copy_gm2l1_align.md)，支持Compact、Normal、左右Padding和循环填充模式。
 

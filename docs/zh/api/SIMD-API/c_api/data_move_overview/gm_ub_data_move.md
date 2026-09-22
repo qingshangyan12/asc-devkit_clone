@@ -16,7 +16,7 @@ GM与UB数据搬运是Vector侧加载输入和回写结果的主要通路。GM�
 | UB到GM | 非对齐连续 | [asc_copy_ub2gm_align](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md) | `size`：字节 |
 | UB到GM | 非对齐高维切分 | [asc_copy_ub2gm_align](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md) | 有效长度、源/目的步长：字节 |
 
-普通接口适用于地址和有效长度满足对应约束的场景；有效长度不是32字节的整数倍或需要目的端Padding时，选择`*_align`接口；需要描述三维及以上排布或实现多维重排时，选择NDDMA。
+普通接口以字节表示有效长度，只需满足数据类型字节对齐，有效长度可以不是32字节的整数倍。非32字节有效长度仍会在UB一侧产生对齐补齐访问，容量计算需包含该范围。需要显式控制片上补齐布局、GM到UB左右Padding、L2 Cache策略或更大的高维切分参数范围时，选择对应的`*_align`高维切分原型；需要描述三维及以上排布或实现多维重排时，选择NDDMA。
 
 ## asc_copy_gm2ub（GM到UB连续数据搬运）
 
@@ -30,7 +30,7 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
 
 - `dst`需要32字节对齐，`src`需要1字节对齐。
 - `size`单位为字节，取值范围为[1, $2^{21}-1$]，并需满足数据类型字节对齐要求。
-- 如果尾部有效数据不满足普通接口约束，使用`asc_copy_gm2ub_align`，不要扩大`size`读取GM有效范围之外的数据。
+- `size`不需要满足32字节对齐，不要为了凑齐32字节而扩大`size`、读取GM有效范围之外的数据。长度非32字节对齐时，硬件会在目的UB尾部写入dummy数据补齐至32字节边界，因此UB需要预留补齐后的空间。
 
 ## asc_copy_gm2ub（GM到UB高维切分数据搬运）
 
@@ -47,8 +47,9 @@ __aicore__ inline void asc_copy_gm2ub(__ubuf__ void* dst,
 
 - `dst`需要32字节对齐，`src`需要1字节对齐。
 - `burst_len`需满足数据类型字节对齐；只搬运一个数据块时，两个步长可设为0。
-- `dst_stride`不等于`burst_len`时，目的数据块不连续，`dst_stride`需要32字节对齐。
-- 地址跨度按最后一个数据块的起始偏移加`burst_len`计算，而不是简单使用`burst_count * burst_len`。
+- `dst_stride`等于`burst_len`时为Compact排布，所有有效数据块紧密排列，仅在整体末尾补齐至32字节边界。
+- `dst_stride`不等于`burst_len`时为Normal排布，`dst_stride`需要32字节对齐，每个数据块分别补齐到32字节边界。
+- 源GM跨度按最后一个数据块的起始偏移加`burst_len`计算；目的UB跨度还要计入Compact整体补齐或Normal逐块补齐。
 
 ## asc_copy_gm2ub_align（GM到UB非对齐数据搬运）
 
@@ -62,7 +63,7 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ <dtype>* dst,
                                             uint32_t size)
 ```
 
-`size`不是32字节的整数倍时，硬件将目的数据补齐到32字节边界。通过[asc_set_copy_pad_val](../vector_datamove/asc_set_copy_pad_val.md)可设置常量填充值；未配置常量填充时，硬件使用数据块首元素生成dummy数据。目的UB必须为补齐后的范围预留空间。
+`size`不是32字节的整数倍时，硬件将目的数据补齐到32字节边界，补齐值固定取数据块的首元素。该连续原型不提供常量填充选择；如果需要常量填充，应使用高维切分原型，将`burst_count`设为1、`enable_constant_pad`设为`true`，并先通过[asc_set_copy_pad_val](../vector_datamove/asc_set_copy_pad_val.md)配置填充值。目的UB必须为补齐后的范围预留空间。
 
 ### 高维切分模式
 
@@ -71,7 +72,7 @@ __aicore__ inline void asc_copy_gm2ub_align(__ubuf__ <dtype>* dst,
 - **Compact模式：** `dst_stride`等于`burst_len`，左右Padding均为0。多个有效数据块在UB中紧密排列，全部数据仅在整体末尾补齐到32字节边界。
 - **Normal模式：** `dst_stride`不等于`burst_len`且为32字节的整数倍。每个数据块分别补齐，并可通过`left_padding_num`和`right_padding_num`在两侧填充元素。
 
-左右Padding非0时，必须先调用`asc_set_copy_pad_val`配置填充值。需要重复执行相同搬运模式时，可通过[asc_set_gm2ub_loop_size](../vector_datamove/asc_set_gm2ub_loop_size.md)、[asc_set_gm2ub_loop1_stride](../vector_datamove/asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](../vector_datamove/asc_set_gm2ub_loop2_stride.md)配置两层循环。
+左右Padding非0时，`enable_constant_pad`不生效，必须先调用`asc_set_copy_pad_val`配置填充值。左右Padding均为0时，`enable_constant_pad`为`false`表示用数据块首元素补齐，为`true`表示使用`asc_set_copy_pad_val`配置的常量，此时也必须先调用该配置接口。需要重复执行相同搬运模式时，可通过[asc_set_gm2ub_loop_size](../vector_datamove/asc_set_gm2ub_loop_size.md)、[asc_set_gm2ub_loop1_stride](../vector_datamove/asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](../vector_datamove/asc_set_gm2ub_loop2_stride.md)配置两层循环。
 
 ## asc_ndim_copy_gm2ub（GM到UB多维数据搬运）
 
@@ -91,7 +92,7 @@ __aicore__ inline void asc_ndim_copy_gm2ub(__ubuf__ <dtype>* dst,
                                            asc_load_l2_cache_mode l2_cache_mode)
 ```
 
-- 通过[asc_set_ndim_loop_stride](../vector_datamove/asc_set_ndim_loop_stride.md)设置各维源、目的步长。
+- 调用主接口前，必须通过[asc_set_ndim_loop_stride](../vector_datamove/asc_set_ndim_loop_stride.md)完成各维源、目的步长配置。
 - 通过[asc_set_ndim_pad_count](../vector_datamove/asc_set_ndim_pad_count.md)设置1至4维的左右Padding数量，0维Padding数量由主接口传入。
 - 常数Padding通过[asc_set_ndim_pad_value](../vector_datamove/asc_set_ndim_pad_value.md)设置；`padding_mode`为`false`时使用边界最近值填充。
 - 各维目的步长必须避免循环之间发生写覆盖；一条指令可访问的总地址范围不能超过40位。
@@ -111,7 +112,7 @@ __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst,
 
 - `src`需要32字节对齐，`dst`需要1字节对齐。
 - `size`单位为字节，取值范围为[1, $2^{21}-1$]，并需满足数据类型字节对齐要求。
-- 写回非对齐尾块时，优先使用`asc_copy_ub2gm_align`，避免把UB中的无效补齐数据写入GM。
+- `size`不需要满足32字节对齐，接口只向GM写入`size`指定的有效字节，不会把UB中对齐范围内的其他数据写入GM。但硬件会从UB读取补齐到32字节边界的范围，源UB需要为该范围预留合法空间。
 
 ## asc_copy_ub2gm（UB到GM高维切分数据搬运）
 
@@ -126,7 +127,7 @@ __aicore__ inline void asc_copy_ub2gm(__gm__ void* dst,
                                       uint16_t src_stride)
 ```
 
-当`src_stride`不等于`burst_len`时，源数据块不连续，`src_stride`需要32字节对齐。不建议把`src_stride`设为0实现Broadcast；需要把同一源数据块广播到多个GM位置时，应通过[asc_set_ub2gm_loop_size](../vector_datamove/asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../vector_datamove/asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../vector_datamove/asc_set_ub2gm_loop2_stride.md)按接口文档配置循环。
+`src_stride`等于`burst_len`时为Compact排布，硬件仅在所有有效数据的整体末尾补齐读取；`src_stride`不等于`burst_len`时为Normal排布，`src_stride`需要32字节对齐，硬件对每个数据块分别补齐读取。补齐部分不写入GM，但必须位于合法UB范围内。不建议把`src_stride`设为0实现Broadcast；需要把同一源数据块广播到多个GM位置时，应通过[asc_set_ub2gm_loop_size](../vector_datamove/asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../vector_datamove/asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../vector_datamove/asc_set_ub2gm_loop2_stride.md)按接口文档配置循环。
 
 ## asc_copy_ub2gm_align（UB到GM非对齐数据搬运）
 

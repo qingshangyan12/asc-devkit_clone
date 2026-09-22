@@ -56,5 +56,5 @@ __aicore__ inline void asc_copy_ub2ub(__ubuf__ void* dst,
 ## 容量与同步
 
 - 源、目的地址加实际访问跨度均不得超过已分配UB范围。UB名义容量为256KB，实际可用容量还会受SIMD VF栈、预留空间和SIMT Data Cache影响。
-- 多条`asc_copy_ub2ub`指令写入重叠目的范围时，按接口约束使用[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)保证指令串行化。
+- `asc_copy_ub2ub`运行在PIPE_V。在DAV_3510上，PIPE_V内部的执行顺序由硬件保证，多条`asc_copy_ub2ub`之间不需要额外插入事件同步。
 - 目的UB随后由PIPE_MTE3或其他流水读取时，使用[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)建立PIPE_V到消费者流水的依赖。
