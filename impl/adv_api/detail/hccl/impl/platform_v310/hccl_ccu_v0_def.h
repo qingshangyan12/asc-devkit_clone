@@ -143,6 +143,7 @@ private:
     __aicore__ inline void CcuPrepareForConcurrentReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForAllGatherSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
     __gm__ HcclCombineOpParam* hcclContext_;

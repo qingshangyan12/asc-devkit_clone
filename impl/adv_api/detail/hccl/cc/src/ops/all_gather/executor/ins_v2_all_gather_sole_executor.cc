@@ -13,6 +13,7 @@
 #include "ins_temp_all_gather_nhr.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_all_gather_mesh_1D_mem2mem.h"
+#include "ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
 #endif
 #include "topo_match_ubx.h"
 #include <cstddef>
@@ -202,6 +203,10 @@ REGISTER_EXEC_V2(
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, InsV2AllGatherSoleExecutor, TopoMatch1D,
     CcuTempKfcAllGatherMesh1DMem2Mem);
+
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleNHR, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    CcuTempKfcAllGatherNHR1DMem2Mem);
 
 #endif
 } // namespace mc2_ops_hccl
