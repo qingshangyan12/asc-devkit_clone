@@ -108,82 +108,83 @@ PIPE_S
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id18 -->
-以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+- 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
-```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
-```
+  ```bash
+  bisheng example.asc -o main --npu-arch=dav-3510; ./main
+  ```
 
-以下调用示例代码仅Ascend 950PR&950DT系列产品支持。示例在VF场景外调用本接口设置掩码寄存器（低64bit全1、高64bit全0，即b16模式下前64个元素参与计算），并在VF场景内通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)读取掩码值后完成Reg矢量计算，最终仅有前64个元素被写为广播值。
+  以下调用示例代码仅Ascend 950PR&950DT系列产品支持。示例在VF场景外调用本接口设置掩码寄存器（低64bit全1、高64bit全0，即b16模式下前64个元素参与计算），并在VF场景内通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)读取掩码值后完成Reg矢量计算，最终仅有前64个元素被写为广播值。
 
-```cpp
-#include <cstdint>
-#include <iostream>
-#include <vector>
-#include "c_api/asc_simd.h"
-#include "acl/acl.h"
+  ```cpp
+  #include <cstdint>
+  #include <iostream>
+  #include <vector>
+  #include "c_api/asc_simd.h"
+  #include "acl/acl.h"
 
-namespace {
+  namespace {
 
-constexpr uint32_t ELEMENTS = 128; // b16模式下，单次矢量计算处理128个int16_t元素
-constexpr uint32_t BYTES = ELEMENTS * sizeof(int16_t);
+  constexpr uint32_t ELEMENTS = 128; // b16模式下，单次矢量计算处理128个int16_t元素
+  constexpr uint32_t BYTES = ELEMENTS * sizeof(int16_t);
 
-__simd_vf__ inline void exercise(__ubuf__ int16_t* output)
-{
-    // 读取VF场景外通过asc_set_vector_mask设置的掩码寄存器值
-    vector_bool mask16 = asc_get_mask_spr_b16();
-    vector_int16_t value16;
-    // 掩码筛选的元素广播为2，未筛选的元素置0
-    asc_duplicate_scalar(value16, static_cast<int16_t>(2), mask16);
-    // 掩码筛选的元素写入UB，未筛选的元素保持UB原值
-    asc_storealign(output, value16, mask16);
-}
+  __simd_vf__ inline void exercise(__ubuf__ int16_t* output)
+  {
+      // 读取VF场景外通过asc_set_vector_mask设置的掩码寄存器值
+      vector_bool mask16 = asc_get_mask_spr_b16();
+      vector_int16_t value16;
+      // 掩码筛选的元素广播为2，未筛选的元素置0
+      asc_duplicate_scalar(value16, static_cast<int16_t>(2), mask16);
+      // 掩码筛选的元素写入UB，未筛选的元素保持UB原值
+      asc_storealign(output, value16, mask16);
+  }
 
-__global__ __vector__ void asc_set_vector_mask_kernel(__gm__ int16_t* output, __gm__ int16_t* input)
-{
-    asc_init();
-    __ubuf__ int16_t output_local[ELEMENTS];
-    asc_copy_gm2ub_align(output_local, input, BYTES);
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    // VF场景外设置掩码寄存器：低64bit全1、高64bit全0，即前64个元素参与计算
-    asc_set_vector_mask(0, 0xffffffffffffffff);
-    exercise(output_local);
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_copy_ub2gm_align(output, output_local, BYTES);
-    asc_sync();
-}
-} // namespace
+  __global__ __vector__ void asc_set_vector_mask_kernel(__gm__ int16_t* output, __gm__ int16_t* input)
+  {
+      asc_init();
+      __ubuf__ int16_t output_local[ELEMENTS];
+      asc_copy_gm2ub_align(output_local, input, BYTES);
+      asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+      asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+      // VF场景外设置掩码寄存器：低64bit全1、高64bit全0，即前64个元素参与计算
+      asc_set_vector_mask(0, 0xffffffffffffffff);
+      exercise(output_local);
+      asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+      asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+      asc_copy_ub2gm_align(output, output_local, BYTES);
+      asc_sync();
+  }
+  } // namespace
 
-int main()
-{
-    std::vector<int16_t> input(ELEMENTS), output(ELEMENTS), golden(ELEMENTS);
-    for (uint32_t i = 0; i < ELEMENTS; ++i) {
-        input[i] = static_cast<int16_t>(i);
-        // 前64个元素被写入2，后64个元素保持输入值
-        golden[i] = (i < 64) ? static_cast<int16_t>(2) : static_cast<int16_t>(i);
-    }
-    aclInit(nullptr);
-    aclrtSetDevice(0);
-    int16_t* input_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&input_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    int16_t* output_device = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
-    aclrtMemcpy(input_device, BYTES, input.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
-    asc_set_vector_mask_kernel<<<1, 0>>>(output_device, input_device);
-    aclrtSynchronizeDevice();
-    aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
-    const bool passed = output == golden;
-    std::cout << (passed ? "[Success] asc_set_vector_mask passed." : "[Failed] asc_set_vector_mask failed.")
-              << std::endl;
-    aclrtFree(input_device);
-    aclrtFree(output_device);
-    aclrtResetDevice(0);
-    aclFinalize();
-    return passed ? 0 : 1;
-}
-```
+  int main()
+  {
+      std::vector<int16_t> input(ELEMENTS), output(ELEMENTS), golden(ELEMENTS);
+      for (uint32_t i = 0; i < ELEMENTS; ++i) {
+          input[i] = static_cast<int16_t>(i);
+          // 前64个元素被写入2，后64个元素保持输入值
+          golden[i] = (i < 64) ? static_cast<int16_t>(2) : static_cast<int16_t>(i);
+      }
+      aclInit(nullptr);
+      aclrtSetDevice(0);
+      int16_t* input_device = nullptr;
+      aclrtMalloc(reinterpret_cast<void**>(&input_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+      int16_t* output_device = nullptr;
+      aclrtMalloc(reinterpret_cast<void**>(&output_device), BYTES, ACL_MEM_MALLOC_HUGE_FIRST);
+      aclrtMemcpy(input_device, BYTES, input.data(), BYTES, ACL_MEMCPY_HOST_TO_DEVICE);
+      asc_set_vector_mask_kernel<<<1, 0>>>(output_device, input_device);
+      aclrtSynchronizeDevice();
+      aclrtMemcpy(output.data(), BYTES, output_device, BYTES, ACL_MEMCPY_DEVICE_TO_HOST);
+      const bool passed = output == golden;
+      std::cout << (passed ? "[Success] asc_set_vector_mask passed." : "[Failed] asc_set_vector_mask failed.")
+                << std::endl;
+      aclrtFree(input_device);
+      aclrtFree(output_device);
+      aclrtResetDevice(0);
+      aclFinalize();
+      return passed ? 0 : 1;
+  }
+  ```
+
 <!-- end id18 -->
 
 <!-- npu="A3,910b" id19 -->
