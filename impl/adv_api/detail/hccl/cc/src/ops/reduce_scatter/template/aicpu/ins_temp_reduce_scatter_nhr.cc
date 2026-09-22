@@ -83,6 +83,12 @@ HcclResult InsTempReduceScatterNHR::KernelRun(
     channels_ = templateResource.channels;
     dataType_ = param.DataDes.dataType;
     dataTypeSize_ = DATATYPE_SIZE_TABLE[dataType_];
+    if (!channels_.empty()) {
+        CHK_PRT_RET(
+            channels_.begin()->second.empty(), HCCL_ERROR("[InsTempReduceScatterNHR] channels is empty."),
+            HcclResult::HCCL_E_INTERNAL);
+        channelsPerRank_ = CalcChannelsPerRank(channels_);
+    }
 
     bool isPcieProtocal = IsPcieProtocol(channels_); // 判断是否存在pcie链路
     isDmaRead_ = isPcieProtocal;                     // 是否使用Read模式
