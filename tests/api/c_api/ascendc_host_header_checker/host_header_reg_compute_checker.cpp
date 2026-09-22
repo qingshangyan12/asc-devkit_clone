@@ -227,6 +227,7 @@ static void test_host_c_api_reg_compute_5()
     using ::asc_float2half_rz_sat_merge;
     using ::asc_float2half_rz_sat_v2;
     using ::asc_float2half_rz_v2;
+    using ::asc_rcpe6m22bfloat16;
 }
 
 static void test_host_c_api_reg_compute_6()

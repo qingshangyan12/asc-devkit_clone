@@ -6974,6 +6974,21 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_merge(
         dst_quarter_pos);
 
 #endif
+// ================asc_rcpe6m22bfloat16================
+__simd_callee__ inline void asc_rcpe6m22bfloat16(
+    vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline void asc_rcpe6m22bfloat16(
+    vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
+
+__simd_callee__ inline vector_bfloat16_t asc_rcpe6m22bfloat16(
+    vector_fp8_e6m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
+
+__simd_callee__ inline vector_bfloat16_t asc_rcpe6m22bfloat16(
+    vector_fp8_e6m2_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos);
 
 // ==========Deprecated conversion interfaces==========
 

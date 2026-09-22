@@ -1891,6 +1891,39 @@ __simd_callee__ inline void asc_cast(
     if ASC_IS_AIV {
         vcvt_bf162e8m0(dst, src, mask, ROUND_Z, RS_ENABLE, PART_ODD, MODE_ZEROING);
     }
+// ================asc_rcpe6m22bfloat16================
+__simd_callee__ inline void asc_rcpe6m22bfloat16(
+    vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt_rcpe6m22bf16(dst, src, mask, PART_EVEN);
+    }
+}
+
+__simd_callee__ inline void asc_rcpe6m22bfloat16(
+    vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt_rcpe6m22bf16(dst, src, mask, PART_ODD);
+    }
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_rcpe6m22bfloat16(
+    vector_fp8_e6m2_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    vector_bfloat16_t dst;
+    asc_rcpe6m22bfloat16(dst, src, mask, dst_pos);
+    return dst;
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_rcpe6m22bfloat16(
+    vector_fp8_e6m2_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    vector_bfloat16_t dst;
+    asc_rcpe6m22bfloat16(dst, src, mask, dst_pos);
+    return dst;
 }
 
 #endif

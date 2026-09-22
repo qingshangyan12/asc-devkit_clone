@@ -189,6 +189,9 @@ inline void mad_mx(
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
 
+// The compiler supports this instruction, but it is missing from the CPU debug stub header.
+inline void vcvt_rcpe6m22bf16(vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask, Literal part) {}
+
 #ifndef ULL
 #define ULL unsigned long long
 #endif
