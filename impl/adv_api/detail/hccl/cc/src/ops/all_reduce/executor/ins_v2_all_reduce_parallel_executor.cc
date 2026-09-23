@@ -1063,6 +1063,6 @@ REGISTER_EXECUTOR_BY_FOUR_TEMPS(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHRPcie, InsAllReduceParallelExecutor, TopoMatchPcieMix,
     InsTempReduceScatterMesh1D, InsTempReduceScatterNHR, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
     COND_NONE, FLAG_PCIE_MIX, 0);
 } // namespace mc2_ops_hccl
