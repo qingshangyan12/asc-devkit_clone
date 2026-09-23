@@ -5,6 +5,7 @@
 - **[exp](exp.md)**
 - **[leaky_relu](leaky_relu.md)**
 - **[log](log.md)**
+- **[ln](ln.md)**
 - **[log10](log10.md)**
 - **[log2](log2.md)**
 - **[max](max.md)**
@@ -12,6 +13,7 @@
 - **[mull](mull.md)**
 - **[+](operator_add.md)**
 - **[-](operator_sub.md)**
+- **[neg（-）](neg.md)**
 - **[*](operator_mul.md)**
 - **[/](div.md)**
 - **[prelu](prelu.md)**
