@@ -32,8 +32,8 @@ extended:
   - id: X1
     args: "--operation synchronization"
     include:
-      - docs/zh/api/SIMD-API/c_api/sync/asc_sync_notify.md
-      - docs/zh/api/SIMD-API/c_api/sync/asc_sync_wait.md
+      - docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+      - docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
   - id: X2
     args: "--operation matrix_multiply_accumulate"
     include:

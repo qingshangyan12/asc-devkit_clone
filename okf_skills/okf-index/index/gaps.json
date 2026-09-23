@@ -1,0 +1,9 @@
+{
+  "scope_out_gaps": [],
+  "relation_gaps": [
+    {
+      "from": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+      "note": "正文声明需与Compare操作配合使用，但未链接具体比较接口；检索该 API 时应提示配合对象待确认，待人工补充后移除登记。"
+    }
+  ]
+}

@@ -134,6 +134,7 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
                     dtype_values = dtype_field or []
                 signatures.append({
                     "prototype_id": identifier,
+                    "id_kind": "macro_id" if sig.get("macro_id") else ("override_id" if sig.get("override_id") else "prototype_id"),
                     "headers": sorted(set(sig_headers)),
                     "archs": sorted(sig.get("archs", [])),
                     "dtypes": sorted({normalize_dtype(v) for v in dtype_values}),
@@ -167,7 +168,7 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
     return documents, pending
 
 
-def classify(documents: dict[str, dict[str, Any]], errors: list[str]) -> None:
+def classify(documents: dict[str, dict[str, Any]], errors: list[str], warnings: list[str]) -> None:
     scope_root = SCOPE_DIRS[0]
     root_nav = f"{scope_root}/c_api.md"
     by_dir: dict[str, list[str]] = {}
@@ -188,8 +189,10 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str]) -> None:
             landing[directory] = exact[0]
         elif len(index_pages) == 1:
             landing[directory] = index_pages[0]
-        else:
+        elif index_pages:
             errors.append(f"{directory}: cannot determine landing page for sub directory")
+        # Directories without any index page (e.g. single-API dirs like reg_compute/vf_call)
+        # have no landing page; their members fall back to the category page for navigation.
         if any(
             documents[r]["okftype"] == "reference.arch.cpp" and ARCH_RE.fullmatch(PurePosixPath(r).stem)
             for r in members
@@ -208,9 +211,7 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str]) -> None:
         elif len(parts) == 7:
             doc["nav_page"] = f"{scope_root}/{parts[5]}/{parts[5]}.md"
         else:
-            doc["nav_page"] = landing.get(directory, "")
-            if not doc["nav_page"]:
-                continue
+            doc["nav_page"] = landing.get(directory, "") or f"{scope_root}/{parts[5]}/{parts[5]}.md"
         if doc["okftype"] == "reference.arch.cpp":
             match = ARCH_RE.fullmatch(stem)
             if not match:
@@ -230,8 +231,10 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str]) -> None:
         else:
             doc["family"] = stem
         if doc["okftype"] in {"reference.api.cpp", "reference.arch.cpp"} and not doc["signatures"]:
-            errors.append(f"{rel}: api/arch page without signature")
-        if doc["okftype"] == "reference.type.cpp" and doc["signatures"]:
+            warnings.append(f"{rel}: api/arch page without signature (sanctioned blank, degraded indexing)")
+        if doc["okftype"] == "reference.type.cpp" and any(
+            sig.get("id_kind") != "macro_id" for sig in doc["signatures"]
+        ):
             errors.append(f"{rel}: type page with signature")
 
 
@@ -415,6 +418,7 @@ def overview(index: dict[str, Any], gaps: dict[str, Any]) -> str:
         "# OKF 索引概览（构建副产物，勿手改）", "",
         f"- 文档总数：{meta['doc_count']}（主文档 {meta['primary_count']}、导航页 {meta['nav_page_count']}、架构页 {meta['arch_page_count']}）",
         f"- 范围内尚未生成 OKF 头的文档：{meta['pending_no_okf']} 篇（跳过索引，待补齐后重建）",
+        f"- signature 降级页（api/arch 页无 signature，仅按 tag/description/依赖检索）：{meta['degraded_no_signature']} 篇",
         f"- 范围外缺口登记：{len(meta['gap_ids'])} 条；关系缺口：{meta['relation_gap_count']} 条", "",
         "## 分阶段候选规模", "", "| 阶段 | 主文档数 |", "| --- | ---: |",
     ]
@@ -432,9 +436,10 @@ def overview(index: dict[str, Any], gaps: dict[str, Any]) -> str:
 
 def build(root: Path, out_dir: Path) -> list[Path]:
     errors: list[str] = []
+    warnings: list[str] = []
     documents, pending = load_raw_documents(root, errors)
     if documents:
-        classify(documents, errors)
+        classify(documents, errors, warnings)
         rollup_families(documents)
         edges = check_graph(root, documents, errors)
     else:
@@ -464,6 +469,8 @@ def build(root: Path, out_dir: Path) -> list[Path]:
             "gap_ids": [gap["id"] for gap in gaps["scope_out_gaps"]],
             "relation_gap_count": len(gaps["relation_gaps"]),
             "pending_no_okf": len(pending),
+            "degraded_no_signature": len(warnings),
+            "degraded_no_signature_docs": sorted(warnings),
         },
         "documents": {
             rel: {
