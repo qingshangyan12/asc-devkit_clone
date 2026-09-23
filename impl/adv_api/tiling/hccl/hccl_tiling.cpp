@@ -174,8 +174,10 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2InitTiling& tiling)
     for (uint32_t i = 0; i < MAX_CC_TILING_NUM; i++) {
         tilingInner->offset[i] = 0;
     }
+    TILING_LOG_INFO("l00653936 IsCcuAlgorithmRegistered algConfig_:%s, commEngine_:%u.",impl_.algConfig_, impl_.commEngine_);
     if (IsCcuAlgorithmRegistered(impl_.algConfig_, impl_.commEngine_)) {
         tilingInner->version = INIT_TILING_CCU_NEW_VERSION;
+        TILING_LOG_INFO("l00653936 IsCcuAlgorithmRegistered inner algConfig_:%s, commEngine_:%u.",impl_.algConfig_, impl_.commEngine_);
     }
     ASCENDC_HOST_ASSERT(SetDevType(tilingInner) == EXIT_SUCCESS, return EXIT_FAILURE, "SetDevType failed.");
 
@@ -330,6 +332,7 @@ uint32_t Mc2CcTilingConfig::SetCommBlockNum(uint16_t num)
 uint32_t Mc2CcTilingConfig::SetCommEngine(uint8_t commEngine)
 {
     impl_.commEngine_ = commEngine;
+    TILING_LOG_INFO("l00653936 Mc2CcTilingConfig commEngine_:%u.", static_cast<uint32_t>(commEngine));
     return EXIT_SUCCESS;
 }
 } // namespace AscendC
