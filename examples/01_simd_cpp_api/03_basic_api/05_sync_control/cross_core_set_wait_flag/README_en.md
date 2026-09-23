@@ -1,7 +1,7 @@
 # CrossCoreSetFlag and CrossCoreWaitFlag Inter-Core Synchronization Example
 
 ## Overview
-This example demonstrates modes 0, 1, 2, and 4 of the CrossCoreSetFlag and CrossCoreWaitFlag inter-core synchronization interfaces in pure Vector and Cube-Vector fused computation scenarios. Mode 4 is supported only on Ascend 950PR/Ascend 950DT.
+This example demonstrates modes 0, 1, 2, and 4 of the [CrossCoreSetFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md) and [CrossCoreWaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md) inter-core synchronization interfaces in pure Vector and Cube-Vector fused computation scenarios. Mode 4 is supported only on Ascend 950PR/Ascend 950DT.
 <table border="1" align="center">
   <tr bgcolor="lightgray">
     <td>Synchronization Control Mode</td>
