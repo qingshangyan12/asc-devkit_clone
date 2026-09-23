@@ -66,6 +66,29 @@ __aicore__ inline void TestLog2()
 }
 
 template <typename T>
+__aicore__ inline void TestLn()
+{
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::ln(src);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
+}
+
+template <typename T>
+__aicore__ inline void TestNeg()
+{
+    reg_type<T> src{};
+    src.mask = all_mask<T>().reg;
+
+    using asc::te::experimental::operator-;
+    auto dst = -src;
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src.mask);
+}
+
+template <typename T>
 __aicore__ inline void TestLog10()
 {
     reg_type<T> src{};
@@ -211,6 +234,13 @@ BASIC_ARITHMETIC_TEST(Exp, half)
 BASIC_ARITHMETIC_TEST(Exp, float)
 BASIC_ARITHMETIC_TEST(Sqrt, half)
 BASIC_ARITHMETIC_TEST(Sqrt, float)
+BASIC_ARITHMETIC_TEST(Ln, half)
+BASIC_ARITHMETIC_TEST(Ln, float)
+BASIC_ARITHMETIC_TEST(Neg, int8_t)
+BASIC_ARITHMETIC_TEST(Neg, int16_t)
+BASIC_ARITHMETIC_TEST(Neg, half)
+BASIC_ARITHMETIC_TEST(Neg, int32_t)
+BASIC_ARITHMETIC_TEST(Neg, float)
 BASIC_ARITHMETIC_TEST(Log2, half)
 BASIC_ARITHMETIC_TEST(Log2, float)
 BASIC_ARITHMETIC_TEST(Log10, half)

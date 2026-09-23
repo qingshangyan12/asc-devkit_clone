@@ -65,7 +65,8 @@ __simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src)
 
 ## 约束说明
 
-src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 整型数据采用非饱和环绕处理。例如`int8_t`输入为`-128`时，绝对值`128`超出表示范围，结果截断为`-128`。
 
 ## 调用示例
 
