@@ -30,9 +30,10 @@
 #include "../../impl/basic_api/kernel_log.h"
 #include "../../impl/basic_api/kernel_reg.h"
 #include "../../impl/basic_api/kernel_process_lock.h"
-#include "kernel_struct_aipp.h"
 #include "../../impl/basic_api/kernel_utils.h"
 #include "../../impl/basic_api/utils/kernel_utils_macros.h"
+#include "kernel_struct_aipp.h"
+#include "kernel_struct_waipp.h"
 #include "kernel_operator_swap_mem_intf.h"
 #include "kernel_operator_sys_var_intf.h"
 #include "../utils/base/helpers.h"
@@ -51,7 +52,7 @@ template <typename T>
 class GlobalTensor;
 } // namespace AscendC
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
 #endif
 
@@ -75,7 +76,7 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 #endif
 #endif // end ASCENDC_DEBUG
 
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
+#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163
 __BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
@@ -141,7 +142,7 @@ public:
     template <pipe_t pipe>
     static __aicore__ inline void Lock(MutexID id)
     {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
         ASCENDC_ASSERT((id <= MAX_MUTEXID), {
             KERNEL_LOG(KERNEL_ERROR, "For Mutex::Lock current id is %u, max MutexID is %u", id, MAX_MUTEXID);
@@ -153,7 +154,7 @@ public:
     template <pipe_t pipe>
     static __aicore__ inline void Unlock(MutexID id)
     {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
         ASCENDC_ASSERT((id <= MAX_MUTEXID), {
             KERNEL_LOG(KERNEL_ERROR, "For Mutex::Unlock current id is %u, max MutexID is %u", id, MAX_MUTEXID);
@@ -165,7 +166,7 @@ public:
 
 __aicore__ inline MutexID AllocMutexID()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     MutexID id = static_cast<uint8_t>(sff0(Internal::g_bufId));
     Internal::g_bufId = sbitset1(Internal::g_bufId, id);
     ASCENDC_ASSERT((id <= MAX_MUTEXID), {
@@ -181,7 +182,7 @@ __aicore__ inline MutexID AllocMutexID()
 
 __aicore__ inline void ReleaseMutexID(MutexID id)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     ASCENDC_ASSERT((id <= MAX_MUTEXID), {
         KERNEL_LOG(
             KERNEL_ERROR, "current id is %d, which should be larger than or equals to 0, and less than or equal to %d",
@@ -217,7 +218,7 @@ template <typename T, typename U>
 __aicore__ inline void SetAippFunctions(const GlobalTensor<T>& src0, AippInputFormat format, AippParams<U> config)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) || \
-                              (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+                              (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     SetAippFunctionsImpl<PrimT<T>, U>(const_cast<__gm__ PrimT<T>*>(src0.GetPhyAddr()), format, config);
 #endif
 }
@@ -227,11 +228,19 @@ __aicore__ inline void SetAippFunctions(
     const GlobalTensor<T>& src0, const GlobalTensor<T>& src1, AippInputFormat format, AippParams<U> config)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002) || \
-                              (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+                              (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     SetAippFunctionsImpl<PrimT<T>, U>(
         const_cast<__gm__ PrimT<T>*>(src0.GetPhyAddr()), const_cast<__gm__ PrimT<T>*>(src1.GetPhyAddr()), format,
         config);
-#endif // (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 3002)
+#endif
+}
+
+template <typename T>
+__aicore__ inline void SetWaippFunctions(WaippParams<T> &params)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+    SetWaippFunctionsImpl<T>(params);
+#endif
 }
 } // namespace AscendC
 

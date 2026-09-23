@@ -678,6 +678,18 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(
 }
 
 /* **************************************************************************************************
+ * StoreImageToGlobal                                             *
+ * ************************************************************************************************* */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(MTE3) void StoreImageToGlobal(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const StoreImageToGlobalParams& params)
+{
+    StoreImageToGlobalImpl(dst, src, params);
+}
+#endif
+
+/* **************************************************************************************************
  * LoadDataUnzip                                             *
  * ************************************************************************************************* */
 /*

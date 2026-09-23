@@ -654,6 +654,26 @@ __aicore__ inline void MmadMxImpl(
 }
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+/* **************************************************************************************************
+ * StoreImageToGlobal                                             *
+ * ************************************************************************************************* */
+template <typename T, typename U>
+__aicore__ inline void StoreImageToGlobalImpl(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const StoreImageToGlobalParams& params)
+{
+    const Hardware srcScope = GetPhyType((TPosition)src.GetPosition());
+    if (srcScope == Hardware::L1) {
+        StoreImageToGlobalCal(
+            (__gm__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)src.GetPhyAddr(), params);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "src", "A1 / B1", "StoreImageToGlobal",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(src.GetPosition())));
+    }
+}
+#endif
+
 #if __NPU_ARCH__ == 2201
 template <
     typename T = int32_t, typename U = int8_t,
