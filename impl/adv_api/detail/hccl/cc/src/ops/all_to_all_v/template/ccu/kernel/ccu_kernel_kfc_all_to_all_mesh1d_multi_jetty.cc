@@ -34,6 +34,7 @@ struct KfcAllToAllContext : CcuKernelCtxBase {
     ccu::Variable dstOffset;
     GroupOpSizeVars goSize;
     ccu::Event event;
+    ccu::Event localCopyEvent;
 };
 
 CcuResult InitResource(KfcAllToAllContext& ctx)
@@ -124,11 +125,10 @@ CcuResult DoAllToAll(KfcAllToAllContext& ctx)
     localDst.addr = ctx.output;
     localDst.addr += ctx.dstOffset;
     localDst.token = ctx.token;
-    // Same as AG/hccl: GroupCopy chunks the slice by goSize and its loop body
-    // waits on its own chunk events, so no external event wait is needed here.
     CCU_IF(ctx.sliceSize != 0)
     {
-        CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize));
+        CCU_CHK_RET(ccu::LocalCopy(localDst, localSrc, ctx.sliceSize, ctx.localCopyEvent, 1));
+        CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
     }
     CCU_CHK_RET(ccu::EventRecord(ctx.event, static_cast<uint16_t>(1U << ctx.rankId)));
 
