@@ -2,12 +2,36 @@
   "schema_version": 1,
   "status": "frozen",
   "base_version": "c-api-full-v2-frozen.json",
-  "required_namespaces": ["api_surfaces", "roles", "families", "operations", "objects", "execution_models", "source_locations", "destination_locations", "traits"],
-  "mandatory_namespaces": ["roles"],
-  "core_namespaces": ["roles", "operations"],
+  "required_namespaces": [
+    "api_surfaces",
+    "roles",
+    "families",
+    "operations",
+    "objects",
+    "execution_models",
+    "source_locations",
+    "destination_locations",
+    "traits"
+  ],
+  "mandatory_namespaces": [
+    "api_surfaces",
+    "roles"
+  ],
+  "core_namespaces": [
+    "api_surfaces",
+    "roles",
+    "operations",
+    "execution_models"
+  ],
   "conditional_requirements": {
-    "operations": ["compute", "data_movement", "data_initialization"],
-    "execution_models": ["compute"]
+    "operations": [
+      "compute",
+      "data_movement",
+      "data_initialization"
+    ],
+    "execution_models": [
+      "compute"
+    ]
   },
   "review_source": "reconciled-independent-review.json",
   "previous_review_source": "c-api-v7-navigation-admission-review.json",

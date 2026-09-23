@@ -122,7 +122,7 @@ def validate_annotation(
     tags = annotation.get("tag")
     if not isinstance(tags, dict) or not set(tags).issubset(set(namespaces)):
         raise ValidationError(f"{location}.tag must contain only frozen namespaces")
-    missing = set(taxonomy_payload.get("mandatory_namespaces", ["roles"])) - set(tags)
+    missing = set(taxonomy_payload.get("mandatory_namespaces", ["api_surfaces", "roles"])) - set(tags)
     if missing:
         raise ValidationError(f"{location}.tag is missing required namespaces: {sorted(missing)}")
     normalized: dict[str, list[str]] = {}
@@ -159,7 +159,10 @@ def validate_annotation(
         if not isinstance(excerpt, str) or not excerpt.strip():
             raise ValidationError(f"{location}.evidence.{key} must be a non-empty string")
         namespace, value = key.split(":", 1)
-        if namespace != "api_surfaces" and excerpt not in text:
+        if namespace == "api_surfaces":
+            if excerpt != path or not valid_relative_api_path(excerpt):
+                raise ValidationError(f"{location}.evidence.{key} must be the stable resource path")
+        elif excerpt not in text:
             raise ValidationError(f"{location}.evidence.{key} is not a verbatim excerpt from the document")
         if namespace == "traits" and value == "deprecated" and not re.search(
             r"\bdeprecated\b|废弃", excerpt, re.IGNORECASE

@@ -74,7 +74,7 @@ def normalize_dtype(value: str) -> str:
 def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[str, Any]], list[str]]:
     namespaces, tax_values = taxonomy(TAXONOMY_PATH)
     taxonomy_payload = json.loads(TAXONOMY_PATH.read_text(encoding="utf-8"))
-    required_namespaces = set(taxonomy_payload.get("mandatory_namespaces", ["roles"]))
+    required_namespaces = set(taxonomy_payload.get("mandatory_namespaces", ["api_surfaces", "roles"]))
     documents: dict[str, dict[str, Any]] = {}
     pending: list[str] = []
     for scope in SCOPE_DIRS:
@@ -271,7 +271,9 @@ def rollup_families(documents: dict[str, dict[str, Any]]) -> None:
 
 def stage_of(doc: dict[str, Any]) -> list[str]:
     tags = doc["tags"]
-    roles, src, dst = set(tags["roles"]), set(tags["source_locations"]), set(tags["destination_locations"])
+    roles = set(tags.get("roles", []))
+    src = set(tags.get("source_locations", []))
+    dst = set(tags.get("destination_locations", []))
     local_src = src & LOCAL_BUFFERS
     local_dst = dst & LOCAL_BUFFERS
     stages = []
@@ -289,7 +291,7 @@ def stage_of(doc: dict[str, Any]) -> list[str]:
 
 
 def conversion_pair(rel: str, doc: dict[str, Any]) -> str | None:
-    if "conversion" not in doc["tags"]["operations"]:
+    if "conversion" not in doc["tags"].get("operations", []):
         return None
     stem = Path(rel).stem
     match = CONVERT_RE.fullmatch(stem)
@@ -360,9 +362,9 @@ def build_views(documents: dict[str, dict[str, Any]]) -> dict[str, Any]:
         doc = documents[rel]
         for stage in stage_of(doc):
             views["by_stage"][stage].append(rel)
-        for role in doc["tags"]["roles"]:
+        for role in doc["tags"].get("roles", []):
             views["by_role"].setdefault(role, []).append(rel)
-        for op in doc["tags"]["operations"]:
+        for op in doc["tags"].get("operations", []):
             views["by_operation"].setdefault(op, []).append(rel)
         views["by_category"].setdefault(doc["category"], []).append(rel)
         for sig in doc["signatures"]:

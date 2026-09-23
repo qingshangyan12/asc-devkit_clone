@@ -121,10 +121,13 @@ def validate_annotation(
         raise ValidationError(f"{location}.confidence must be a number between 0 and 1")
 
     tags = annotation.get("tag")
-    if not isinstance(tags, dict) or set(tags) != set(namespaces):
-        raise ValidationError(f"{location}.tag must contain exactly the frozen namespaces")
+    if not isinstance(tags, dict) or not set(tags).issubset(set(namespaces)):
+        raise ValidationError(f"{location}.tag must contain only frozen namespaces")
+    missing = {"api_surfaces", "roles"} - set(tags)
+    if missing:
+        raise ValidationError(f"{location}.tag is missing required namespaces: {sorted(missing)}")
     normalized: dict[str, list[str]] = {}
-    for namespace in namespaces:
+    for namespace in tags:
         raw_values = tags[namespace]
         if not isinstance(raw_values, list) or not raw_values or any(
             not isinstance(value, str) or not value for value in raw_values
@@ -157,12 +160,20 @@ def validate_annotation(
         if not isinstance(excerpt, str) or not excerpt.strip():
             raise ValidationError(f"{location}.evidence.{key} must be a non-empty string")
         namespace, value = key.split(":", 1)
-        if namespace != "api_surfaces" and excerpt not in text:
+        if namespace == "api_surfaces":
+            if excerpt != path or not valid_relative_api_path(excerpt):
+                raise ValidationError(f"{location}.evidence.{key} must be the stable resource path")
+        elif excerpt not in text:
             raise ValidationError(f"{location}.evidence.{key} is not a verbatim excerpt from the document")
         if namespace == "traits" and value == "deprecated" and not re.search(
             r"\bdeprecated\b|废弃", excerpt, re.IGNORECASE
         ):
             raise ValidationError(f"{location}.evidence.{key} must explicitly state deprecation")
+    roles = set(normalized.get("roles", []))
+    if roles & {"compute", "data_movement", "data_initialization"} and "operations" not in normalized:
+        raise ValidationError(f"{location}.tag.operations is required for executable roles")
+    if "compute" in roles and not normalized.get("execution_models"):
+        raise ValidationError(f"{location}.tag.execution_models is required for compute APIs")
     return document, normalized
 
 
@@ -182,6 +193,8 @@ def load_annotations(path: Path) -> list[Any]:
 def render_tag_block(tags: dict[str, list[str]], namespaces: tuple[str, ...]) -> str:
     lines = ["tag:"]
     for namespace in namespaces:
+        if namespace not in tags:
+            continue
         values = tags[namespace]
         if any(not SAFE_VALUE_RE.fullmatch(value) for value in values):
             raise ValidationError(f"tag value cannot be rendered safely: {namespace}")

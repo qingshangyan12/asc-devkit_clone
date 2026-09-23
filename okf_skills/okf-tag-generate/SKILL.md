@@ -36,7 +36,7 @@ description: 从本 Skill 的冻结词表和 API Markdown 正文证据生成并�
 
 `api_surfaces`、`roles`、`families`、`operations`、`objects`、`execution_models`、`source_locations`、`destination_locations`、`traits`。
 
-只有 `roles` 是全局必填。`operations` 对 `compute`、`data_movement`、`data_initialization` 角色条件必填；`execution_models` 对 `compute` 条件必填。其他字段按正文证据和实际检索需求选填。
+`api_surfaces` 和 `roles` 是全局必填；api_surfaces 必须由稳定资源路径证明。`operations` 对 `compute`、`data_movement`、`data_initialization` 角色条件必填；`execution_models` 对 `compute` 条件必填。其他字段按正文证据和实际检索需求选填。
 
 YAML 使用主题加内容的数组形式，每个 namespace 只能出现一次：
 

@@ -5,10 +5,10 @@
 - `signature` 只记录正文、声明和证据能确认的集合；无法确认时为 `[]`。沿用旧生成器的 `identifier_field` 规则：仍保留文档占位符的标识符使用 `prototype_id`；没有文档占位符的具体重载使用 `override_id`。C++ 模板参数 `T`、`S`、`U` 不视为文档占位符；已证实的函数宏使用唯一字段 `macro_id`，且不得附加 archs 或 headers。同目录同 API 的 `_arch_<型号>` 文档若证实存在相同 concrete override_id，只给这些冲突项追加 `@型号`，例如 `...@2201`；该后缀不是新字段，且必须同步到 signature 和 marker。若记录命中同一物理 header 声明，Doxygen 继续按旧规则合并 canonical ID 与 archs。
 - `dtype` 只在正文明确列出对应 `<dtype>` 可取类型时写入该 `signature` 条目，并与 `prototype_id` 同级；值为不重复的单行字符串数组，例如 `dtype: [half, float]`。不同原型的类型集合不得合并为根级 dtype。不得在函数原型前新增 `api_signature` YAML 围栏。
 - `signature.headers` 只写唯一、参数兼容且范围内的真实声明 header。文档提示头文件时先查提示头，再查其递归 include 闭包；没有提示时按 API family 查找，最后才报告全量 include 的范围外候选。参数类型/数量不一致、同名多候选和范围外候选均不写入 YAML。
-- `tag` 使用本 Skill 内冻结 taxonomy，主题每个只出现一次。`roles` 全局必填；compute、data_movement、
+- `tag` 使用本 Skill 内冻结 taxonomy，主题每个只出现一次。`api_surfaces`、`roles` 全局必填，api_surfaces 由稳定资源路径证明；compute、data_movement、
   data_initialization 角色要求 `operations`，compute 角色要求 `execution_models`。其他 namespace 按证据和检索用途选填，
   不适用字段省略，不用空数组伪造信息。每个非空值必须有 `namespace:value` 级逐字证据。
-  reference.type.cpp 页仅 api_surfaces 必填，其余 namespace 有证据即填、无证据留空数组。
+  reference.type.cpp 页仍填写 api_surfaces 和 roles；其余 namespace 有证据即填，无证据时省略。
 - `dependencies` 是唯一依赖字段；无明确关系写 `[]`，删除旧 `usage_dependencies`。
 - `examples` 只记录真实存在且能关联到文档的样例；无法确认时为 `[]`。
 - `headers`、`declaration`、`type_catalog` 只用于 `c_api/defs` 实体页，且必须完全来自本地解析器。

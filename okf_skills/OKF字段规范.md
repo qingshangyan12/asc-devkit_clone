@@ -68,7 +68,7 @@ include 则保留各自带 `@型号` 后缀的 ID。
 适用 `defs/` 下的常量、枚举、宏、类型别名、联合体定义页。规则：
 
 - description 取自功能说明或定义说明（常量定义/宏定义/枚举类具体定义/类型别名具体定义/结构体具体定义）章节，压缩为一句话检索摘要。
-- tag 仅 api_surfaces 必填（值为 c_api，由稳定路径证明）；objects、families 等其他 namespace 仅在有逐字正文证据时填写（例如数据类型定义页可按其描述的数据对象填 objects），没有证据的 namespace 保留键并写空数组。
+- tag 的 `api_surfaces` 和 `roles` 全局必填；api_surfaces 值由稳定资源路径证明。objects、families 等其他 namespace 仅在有逐字正文证据时填写，没有证据时省略。
 - 不写 signature（无函数原型）；dependencies/examples 按正文证据正常处理。
 - 枚举值详解中的产品差异注释不作为 archs 证据；架构支持情况不写入 YAML（products 字段本期不引入）。
 
@@ -76,7 +76,7 @@ include 则保留各自带 `@型号` 后缀的 ID。
 
 标签必须使用唯一冻结词表中的受控命名空间和值。标签不预先在本文档中扩大枚举值。
 
-tag 允许使用 taxonomy 中声明的 namespace。`roles` 是全局必填；当 roles 包含 `compute`、`data_movement` 或 `data_initialization` 时，`operations` 必填；当 roles 包含 `compute` 时，`execution_models` 必填。其余 namespace 仅在正文证据和实际检索用途同时成立时填写。不适用 namespace 省略，不得使用空数组、unknown 或 other 逃避条件要求。
+tag 允许使用 taxonomy 中声明的 namespace。`api_surfaces` 和 `roles` 是全局必填；当 roles 包含 `compute`、`data_movement` 或 `data_initialization` 时，`operations` 必填；当 roles 包含 `compute` 时，`execution_models` 必填。其余 namespace 仅在正文证据和实际检索用途同时成立时填写。不适用 namespace 省略，不得使用空数组、unknown 或 other 逃避条件要求。
 每个标签都必须有目标 Markdown 正文中的逐字证据；api_surfaces 等允许由稳定路径证明的导航标签可以使用路径证据。
 没有明确证据的 API 不得按目录、名称、dtype、架构、头文件属性或样例注释推断标签。
 
