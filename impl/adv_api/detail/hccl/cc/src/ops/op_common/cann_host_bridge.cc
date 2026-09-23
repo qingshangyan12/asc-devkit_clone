@@ -141,8 +141,9 @@ const CannSyms& LoadCannSyms()
 
 bool UseCannBridge(const OpParam& param)
 {
+    // allreduce-111: 去除 ALLREDUCE 的 CANN bridge 拦截，算法走 asc-devkit 本地路径（仅保留 ALLTOALLV）
     return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
-           (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV || param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+           (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV);
 }
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)

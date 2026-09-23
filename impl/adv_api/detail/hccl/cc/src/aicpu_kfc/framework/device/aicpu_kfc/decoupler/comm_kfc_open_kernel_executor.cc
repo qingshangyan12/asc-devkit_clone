@@ -178,7 +178,8 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
 
-    const bool useCannBridge = (param->opType == HCCL_CMD_ALLTOALLV || param->opType == HCCL_CMD_ALLREDUCE);
+    // allreduce-111: 去除 ALLREDUCE 的 AICPU 侧 bridge 拦截（与 Host 侧 UseCannBridge 同步，仅保留 ALLTOALLV）
+    const bool useCannBridge = (param->opType == HCCL_CMD_ALLTOALLV);
     if (useCannBridge) {
         HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(
             *param, resCtx, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });

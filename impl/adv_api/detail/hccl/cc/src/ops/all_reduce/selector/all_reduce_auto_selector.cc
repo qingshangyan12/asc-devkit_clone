@@ -77,7 +77,7 @@ SelectorStatus AllReduceAutoSelector::SelectAicpuAlgo(
     if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix &&
         !IsLayerAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH) && !specialDataOrReduce &&
         dataSize < AR_PCIE_PARALLEL_MAX_DATA_SIZE) {
-        selectAlgName = "AicpuAllreduceParallelMeshNHRPcie";
+        selectAlgName = "AicpuAllReduceParallelMeshNHRPcie";
         HCCL_INFO("[AllReduceAutoSelector][%s] Algo match [%s]", __func__, selectAlgName.c_str());
         return SelectorStatus::MATCH;
     }
