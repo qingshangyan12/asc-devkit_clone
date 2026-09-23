@@ -16,6 +16,12 @@ MARKDOWN_LINK_CHECK_FULL="${MARKDOWN_LINK_CHECK_FULL:-0}"
 MARKDOWN_LINK_CHECK_DRY_RUN="${MARKDOWN_LINK_CHECK_DRY_RUN:-0}"
 MARKDOWN_LINK_CHECK_VERBOSE="${MARKDOWN_LINK_CHECK_VERBOSE:-0}"
 MARKDOWN_LINK_CHECK_ONLINE="${MARKDOWN_LINK_CHECK_ONLINE:-1}"
+MARKDOWN_LINK_CHECK_REQUIRE="${MARKDOWN_LINK_CHECK_REQUIRE:-0}"
+MARKDOWN_LINK_CHECK_CONNECT_TIMEOUT="${MARKDOWN_LINK_CHECK_CONNECT_TIMEOUT:-10}"
+MARKDOWN_LINK_CHECK_MAX_TIME="${MARKDOWN_LINK_CHECK_MAX_TIME:-120}"
+MARKDOWN_LINK_CHECK_INSTALL_LOCK_TIMEOUT="${MARKDOWN_LINK_CHECK_INSTALL_LOCK_TIMEOUT:-300}"
+MARKDOWN_LINK_CHECK_INSTALL_LOCK_STALE_MINUTES="${MARKDOWN_LINK_CHECK_INSTALL_LOCK_STALE_MINUTES:-15}"
+MARKDOWN_LINK_CHECK_INSTALL_COOLDOWN_MINUTES="${MARKDOWN_LINK_CHECK_INSTALL_COOLDOWN_MINUTES:-360}"
 MARKDOWN_LINK_CHECK_START=$SECONDS
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
@@ -37,7 +43,9 @@ Set MARKDOWN_LINK_CHECK_DRY_RUN=1 to print the computed scan set only.
 Set MARKDOWN_LINK_CHECK_LYCHEE to use a preinstalled lychee binary.
 Set MARKDOWN_LINK_CHECK_ONLINE=0 to skip remote HTTP(S) links.
 Set MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL, MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL, or
-MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL to use mirrors.
+Set MARKDOWN_LINK_CHECK_REQUIRE=1 to fail when lychee cannot be provisioned instead of skipping.
+Set MARKDOWN_LINK_CHECK_CONNECT_TIMEOUT and MARKDOWN_LINK_CHECK_MAX_TIME to bound network waits.
+Set MARKDOWN_LINK_CHECK_FORCE_INSTALL=1 to retry provisioning during the post-failure cooldown window.
 EOF
 }
 
@@ -45,42 +53,133 @@ markdown_check_duration() {
     printf '%ss' "$((SECONDS - MARKDOWN_LINK_CHECK_START))"
 }
 
-download_lychee_archive() {
-    local target archive_url tmp_dir version_placeholder target_placeholder
+markdown_check_curl() {
+    curl -L --proto '=https' --tlsv1.2 -sSf \
+        --connect-timeout "$MARKDOWN_LINK_CHECK_CONNECT_TIMEOUT" \
+        --max-time "$MARKDOWN_LINK_CHECK_MAX_TIME" \
+        --retry 1 --retry-connrefused \
+        "$@"
+}
 
-    case "$(uname -s):$(uname -m)" in
-        Linux:x86_64|Linux:amd64)
-            target="x86_64-unknown-linux-gnu"
+lychee_archive_target() {
+    local machine
+    machine="$(uname -m)"
+    case "$(uname -s)" in
+        Linux)
+            case "$machine" in
+                x86_64|amd64) printf '%s\n' "x86_64-unknown-linux-gnu" ;;
+                aarch64|arm64) printf '%s\n' "aarch64-unknown-linux-gnu" ;;
+                *) return 1 ;;
+            esac
             ;;
-        Linux:aarch64|Linux:arm64)
-            target="aarch64-unknown-linux-gnu"
+        Darwin)
+            case "$machine" in
+                x86_64|amd64) printf '%s\n' "x86_64-apple-darwin" ;;
+                aarch64|arm64) printf '%s\n' "aarch64-apple-darwin" ;;
+                *) return 1 ;;
+            esac
+            ;;
+        MINGW*|MSYS*|CYGWIN*)
+            case "$machine" in
+                x86_64|amd64) printf '%s\n' "x86_64-pc-windows-msvc" ;;
+                aarch64|arm64) printf '%s\n' "aarch64-pc-windows-msvc" ;;
+                *) return 1 ;;
+            esac
             ;;
         *)
             return 1
             ;;
     esac
+}
+
+extract_lychee_binary() {
+    local archive dest candidate
+    archive="$1"
+    dest="$2"
+
+    case "$archive" in
+        *.zip)
+            if command -v unzip >/dev/null 2>&1; then
+                unzip -o -q "$archive" -d "$dest" >&2 || return 1
+            else
+                python3 - "$archive" "$dest" <<'PY' || return 1
+import sys
+import zipfile
+
+with zipfile.ZipFile(sys.argv[1]) as archive:
+    archive.extractall(sys.argv[2])
+PY
+            fi
+            ;;
+        *)
+            tar -xzf "$archive" -C "$dest" >&2 || return 1
+            ;;
+    esac
+
+    for candidate in "$dest/lychee" "$dest/lychee.exe" "$dest"/lychee*.exe; do
+        if [ -f "$candidate" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+    return 1
+}
+
+download_lychee_archive() {
+    local target template ext archive_url tmp_dir archive_path unpacked extensions
+
+    if ! target=$(lychee_archive_target); then
+        echo "[Markdown check] Unsupported platform for lychee download: $(uname -s)/$(uname -m)" >&2
+        return 1
+    fi
 
     if [ -n "${MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL:-}" ]; then
-        archive_url="$MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL"
+        template="$MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL"
     else
-        archive_url="https://cann-3rd.obs.cn-north-4.myhuaweicloud.com/lychee-v{version}/lychee-{target}.tar.gz"
+        template="https://cann-3rd.obs.cn-north-4.myhuaweicloud.com/lychee-v{version}/lychee-{target}{ext}"
     fi
-    version_placeholder="{version}"
-    target_placeholder="{target}"
-    archive_url="${archive_url//$version_placeholder/$LYCHEE_VERSION}"
-    archive_url="${archive_url//$target_placeholder/$target}"
-    tmp_dir=$(mktemp -d)
-    echo "[Markdown check] Downloading lychee@$LYCHEE_VERSION from $archive_url..." >&2
-    if ! curl -L --proto '=https' --tlsv1.2 -sSf "$archive_url" -o "$tmp_dir/lychee.tar.gz"; then
+
+    case "$template" in
+        *"{ext}"*)
+            case "$target" in
+                *windows*) extensions=(".zip" ".tar.gz") ;;
+                *) extensions=(".tar.gz" ".zip") ;;
+            esac
+            ;;
+        *)
+            extensions=("")
+            ;;
+    esac
+
+    for ext in "${extensions[@]}"; do
+        archive_url="${template//\{version\}/$LYCHEE_VERSION}"
+        archive_url="${archive_url//\{target\}/$target}"
+        archive_url="${archive_url//\{ext\}/$ext}"
+        tmp_dir=$(mktemp -d)
+        archive_path="$tmp_dir/lychee-archive$ext"
+        echo "[Markdown check] Downloading lychee@$LYCHEE_VERSION from $archive_url..." >&2
+        if markdown_check_curl "$archive_url" -o "$archive_path"; then
+            if unpacked=$(extract_lychee_binary "$archive_path" "$tmp_dir"); then
+                install -m 0755 "$unpacked" "$LYCHEE_BIN"
+                rm -rf "$tmp_dir"
+                return 0
+            fi
+            echo "[Markdown check] Failed to unpack lychee from $archive_url" >&2
+        fi
         rm -rf "$tmp_dir"
+    done
+    return 1
+}
+
+markdown_check_lychee_unavailable() {
+    echo "[Markdown check] lychee@$LYCHEE_VERSION is unavailable, so Markdown link checking did not run." >&2
+    echo "[Markdown check] Supply a binary with MARKDOWN_LINK_CHECK_LYCHEE=<path>, or point " \
+        "MARKDOWN_LINK_CHECK_LYCHEE_ARCHIVE_URL / MARKDOWN_LINK_CHECK_LYCHEE_PKG_URL at a reachable mirror." >&2
+    if [ "$MARKDOWN_LINK_CHECK_REQUIRE" = "1" ]; then
+        echo "[Markdown check] FAILED: lychee is required but could not be provisioned." >&2
         return 1
     fi
-    if ! tar -xzf "$tmp_dir/lychee.tar.gz" -C "$tmp_dir" lychee; then
-        rm -rf "$tmp_dir"
-        return 1
-    fi
-    install -m 0755 "$tmp_dir/lychee" "$LYCHEE_BIN"
-    rm -rf "$tmp_dir"
+    echo "[Markdown check] SKIPPED: set MARKDOWN_LINK_CHECK_REQUIRE=1 to turn this into a failure." >&2
     return 0
 }
 
@@ -128,17 +227,28 @@ find_lychee() {
         return 0
     fi
 
-    mkdir -p "$CARGO_BIN"
+    local failure_marker
+    failure_marker="$CACHE_ROOT/lychee-$LYCHEE_VERSION.install.failed"
+    if [ -f "$failure_marker" ] && [ "${MARKDOWN_LINK_CHECK_FORCE_INSTALL:-0}" != "1" ] &&
+        find "$failure_marker" -maxdepth 0 -mmin "-$MARKDOWN_LINK_CHECK_INSTALL_COOLDOWN_MINUTES" 2>/dev/null | grep -q .; then
+        echo "[Markdown check] Skipping lychee provisioning for $MARKDOWN_LINK_CHECK_INSTALL_COOLDOWN_MINUTES minute(s) after the previous failure ($failure_marker); rerun with MARKDOWN_LINK_CHECK_FORCE_INSTALL=1 to retry now." >&2
+        return 1
+    fi
 
     local lock_dir lock_wait
     lock_dir="$CACHE_ROOT/lychee-$LYCHEE_VERSION.install.lock"
     lock_wait=0
+    if [ -d "$lock_dir" ] &&
+        find "$lock_dir" -maxdepth 0 -mmin "+$MARKDOWN_LINK_CHECK_INSTALL_LOCK_STALE_MINUTES" 2>/dev/null | grep -q .; then
+        echo "[Markdown check] Removing stale lychee install lock: $lock_dir" >&2
+        rm -rf "$lock_dir"
+    fi
     until mkdir "$lock_dir" 2>/dev/null; do
         if [ -x "$LYCHEE_BIN" ]; then
             printf '%s\n' "$LYCHEE_BIN"
             return 0
         fi
-        if [ "$lock_wait" -ge 300 ]; then
+        if [ "$lock_wait" -ge "$MARKDOWN_LINK_CHECK_INSTALL_LOCK_TIMEOUT" ]; then
             echo "[Markdown check] Timed out waiting for lychee install lock: $lock_dir" >&2
             exit 1
         fi
@@ -166,7 +276,7 @@ find_lychee() {
         else
             echo "[Markdown check] Installing cargo-binstall..." >&2
             CARGO_BINSTALL_INSTALLER_URL="${MARKDOWN_LINK_CHECK_CARGO_BINSTALL_INSTALLER_URL:-https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh}"
-            curl -L --proto '=https' --tlsv1.2 -sSf \
+            markdown_check_curl \
                 "$CARGO_BINSTALL_INSTALLER_URL" \
                 | CARGO_HOME="$CARGO_HOME_DIR" BASH_XTRACEFD=7 bash 7>/dev/null >&2
             BINSTALL=("$CARGO_BIN/cargo-binstall")
@@ -179,15 +289,24 @@ find_lychee() {
         fi
         BINSTALL_ARGS+=("lychee@$LYCHEE_VERSION")
         "${BINSTALL[@]}" "${BINSTALL_ARGS[@]}" >&2
-        if [ ! -x "$CARGO_BIN/lychee" ]; then
+        local installed_lychee=""
+        for candidate in "$CARGO_BIN/lychee" "$CARGO_BIN/lychee.exe"; do
+            if [ -x "$candidate" ]; then
+                installed_lychee="$candidate"
+                break
+            fi
+        done
+        if [ -z "$installed_lychee" ]; then
             echo "[Markdown check] lychee binary was not installed." >&2
             exit 1
         fi
-        mv -f "$CARGO_BIN/lychee" "$LYCHEE_BIN"
+        mv -f "$installed_lychee" "$LYCHEE_BIN"
     ); then
+        rm -f "$failure_marker"
         printf '%s\n' "$LYCHEE_BIN"
         return 0
     fi
+    : >"$failure_marker"
     exit 1
 }
 
@@ -975,6 +1094,25 @@ set -e
 
 set +e
 LYCHEE_BIN=$(find_lychee)
+LYCHEE_LOOKUP_RC=$?
+set -e
+
+if [ "$LYCHEE_LOOKUP_RC" -ne 0 ] || [ -z "$LYCHEE_BIN" ] || [ ! -x "$LYCHEE_BIN" ] ||
+    ! "$LYCHEE_BIN" --version >/dev/null 2>&1; then
+    if [ -n "$LYCHEE_BIN" ] && [ -x "$LYCHEE_BIN" ]; then
+        echo "[Markdown check] Cached lychee binary $LYCHEE_BIN cannot run on this host." >&2
+    fi
+    FINAL_RC=0
+    if [ "$CROSS_LINK_RC" -ne 0 ]; then
+        cat "$CROSS_LINK_OUTPUT_FILE"
+        FINAL_RC=1
+    fi
+    if ! markdown_check_lychee_unavailable; then
+        FINAL_RC=1
+    fi
+    exit "$FINAL_RC"
+fi
+
 LYCHEE_ARGS=(--no-progress --config "$CONFIG_FILE")
 if [ "$MARKDOWN_LINK_CHECK_ONLINE" != "1" ]; then
     LYCHEE_ARGS+=(--offline)
