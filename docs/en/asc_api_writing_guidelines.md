@@ -256,7 +256,7 @@ The content of Neg_ISASI.md is as follows:
 
 [Level] Mandatory
 
-[Description] The md file of each interface must organize sections in the following order (all second-level headings). The Data Type, Key Features, and Required Header Files sections are optional based on the actual interface. For example, the Sin interface in the advanced API supports the same data types across different chips, so no separate section is needed to describe the differences. The description can be included with the parameter description. For another example, the basic API uniformly describes the required header files in the function description, so the "Required Header Files" section is not needed. APIs of the same type should maintain a consistent section structure.
+[Description] The md file of each interface must organize sections in the following order (all second-level headings). The Data Type and Key Features sections are optional based on the actual interface. For example, the Sin interface in the advanced API supports the same data types across different chips, so no separate section is needed to describe the differences. The description can be included with the parameter description. APIs of the same type should maintain a consistent section structure.
 
 ```text
 Product Support
@@ -266,7 +266,6 @@ Parameter Description
 Data Type
 Return Value Description
 Constraints
-Required Header Files
 Key Features
 Usage Example
 ```
@@ -388,13 +387,12 @@ Obtain the preload status of ICache.
 
 [Level] Mandatory
 
-[Description] The header file where the interface is located and the header files that need to be included when using the interface must be provided. If a general introduction has been provided in an earlier section by API category or in a separate section, the function description does not need to repeat this information. The header file path must be wrapped in backticks.
+[Description] The header file where the interface is located and the header files that need to be included when using the interface must be provided. If a general introduction has been provided in an earlier section by API category, the function description does not need to repeat this information. The header file path must be wrapped in backticks.
 
 [Positive Example]  
 The header file path is: `"basic_api/kernel_operator_vec_binary_intf.h"`.
 
 [Exception]  
-- If a separate "Required Header Files" section exists to describe the required header files, this section is not needed.
 - If the required header files for a class of interfaces have been described in an earlier section, this section is not needed.
 
 ### API-FUNC-02 New Concepts Must Include Necessary Explanations or Hyperlinks
@@ -1058,11 +1056,13 @@ bool, int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0
 
 ## 12 Figure Guidelines
 
+For figure templates, refer to [Ascend C Drawing Templates](../zh/figures/asc_templates.xml) (draw.io templates).
+
 ### API-FIGURE-00 Figure Fonts and Sizes Must Meet Requirements
 
 [Level] Mandatory
 
-[Description] Chinese text must use Founder Lanting Hei Simplified, and English text must use Huawei Sans. Chinese text must not be smaller than 9pt (equivalent to 12 pixels), full-width characters; English text must not be smaller than 8pt (equivalent to 10 pixels), half-width characters.
+[Description] Founder Lanting Hei Simplified must be used. Chinese text must not be smaller than 9pt (equivalent to 12 pixels), full-width characters; English text must not be smaller than 8pt (equivalent to 10 pixels), half-width characters.
 
 ### API-FIGURE-01 Figure Width Must Meet Requirements
 
@@ -1074,7 +1074,7 @@ bool, int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0
 
 [Level] Mandatory
 
-[Description] After completing the drawing, click to fit the page to the drawing, and add a white background to ensure that dark lines in the figure are still clearly visible under the dark theme of IDEs and browsers.
+[Description] After completing the drawing, add a white background to ensure that dark lines in the figure are still clearly visible under the dark theme of IDEs and browsers.
 
 ### API-FIGURE-03 Connections Between Figures Must Use No-Jump Line Style
 

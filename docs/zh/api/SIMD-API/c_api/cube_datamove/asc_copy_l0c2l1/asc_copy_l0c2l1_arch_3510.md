@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -41,8 +41,8 @@
 - Nz2ND格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2nd`使用；
 - Nz2DN格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)、[asc_set_l0c_copy_channel_para](../asc_set_l0c_copy_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
 - 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路tensor量化模式下，需通过[asc_set_l0c2gm_config](../asc_set_l0c2gm_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路激活模式下，需通过[asc_set_l0c2gm_relu_alpha](../asc_set_l0c2gm_relu_alpha.md)、[asc_set_l0c2gm_lrelu_alpha](../asc_set_l0c2gm_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用。
+- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
+- 随路激活模式下，需通过[asc_set_l0c_copy_relu_alpha](../asc_set_l0c_copy_relu_alpha.md)、[asc_set_l0c_copy_lrelu_alpha](../asc_set_l0c_copy_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用。
 
 quant_pre_mode量化模式参数支持的枚举值如下：
 
@@ -86,45 +86,21 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ <dst_dtype>* dst,
                                        uint16_t m_size,
                                        uint32_t dst_stride,
                                        uint16_t src_stride,
-                                       uint8_t enable_clip_relu_pre,
-                                       uint8_t unit_flag_mode,
-                                       uint64_t quant_pre_mode,
-                                       uint8_t relu_pre_mode,
+                                       asc_unit_flag_mode unit_flag_mode,
+                                       asc_quant_mode quant_pre_mode,
+                                       asc_relu_pre_mode relu_pre_mode,
                                        bool enable_channel_split,
                                        bool enable_nz2nd,
-                                       uint64_t quant_post,
-                                       uint8_t relu_post,
-                                       bool clip_relu_post,
-                                       uint8_t eltwise_op,
-                                       uint8_t eltwise_antq_en,
-                                       bool c0_pad_en)
-__aicore__ inline void asc_copy_l0c2l1(__cbuf__ int4b_t* dst,
-                                       __cc__ <src_dtype>* src,
-                                       uint16_t n_size,
-                                       uint16_t m_size,
-                                       uint32_t dst_stride,
-                                       uint16_t src_stride,
-                                       uint8_t l2_cache_mode,
-                                       uint8_t enable_clip_relu_pre,
-                                       uint8_t unit_flag_mode,
-                                       uint64_t quant_pre_mode,
-                                       uint8_t relu_pre_mode,
-                                       bool enable_channel_split,
-                                       bool enable_nz2nd,
-                                       uint64_t quant_post,
-                                       uint8_t relu_post,
-                                       bool clip_relu_post,
-                                       uint8_t eltwise_op,
-                                       bool eltwise_antq_en,
-                                       bool c0_pad_en,
-                                       bool broadcast_en,
-                                       bool enable_nz2dn)
+                                       bool enable_nz2dn,
+                                       bool enable_clip_relu_pre)
 ```
 
 ### dtype支持的数据类型
 
-- 普通原型中，`src_dtype`为`int32_t`时，`dst_dtype`支持`half`、`int8_t`、`uint8_t`、`int32_t`；`src_dtype`为`float`时，`dst_dtype`支持`half`、`bfloat16_t`、`int8_t`、`uint8_t`、`float`。
-- 带`l2_cache_mode`的原型中，`dst_dtype`为`int4b_t`，`src_dtype`支持`int32_t`、`float`。
+src dtype与dst dtype支持以下组合：
+
+- `src_dtype`为`int32_t`时，`dst_dtype`支持`int4b_t`、`int8_t`、`uint8_t`、`half`、`bfloat16_t`、`int32_t`。
+- `src_dtype`为`float`时，`dst_dtype`支持`int4b_t`、`int8_t`、`uint8_t`、`fp8_e4m3fn_t`、`hifloat8_t`、`half`、`bfloat16_t`、`float`。
 
 ### 函数原型典型示例
 
@@ -136,18 +112,13 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst,
                                        uint16_t m_size,
                                        uint32_t dst_stride,
                                        uint16_t src_stride,
-                                       uint8_t enable_clip_relu_pre,
-                                       uint8_t unit_flag_mode,
-                                       uint64_t quant_pre_mode,
-                                       uint8_t relu_pre_mode,
+                                       asc_unit_flag_mode unit_flag_mode,
+                                       asc_quant_mode quant_pre_mode,
+                                       asc_relu_pre_mode relu_pre_mode,
                                        bool enable_channel_split,
                                        bool enable_nz2nd,
-                                       uint64_t quant_post,
-                                       uint8_t relu_post,
-                                       bool clip_relu_post,
-                                       uint8_t eltwise_op,
-                                       uint8_t eltwise_antq_en,
-                                       bool c0_pad_en)
+                                       bool enable_nz2dn,
+                                       bool enable_clip_relu_pre)
 ```
 
 ## 参数说明
@@ -162,21 +133,13 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst,
 | m_size | 输入 | 源Nz矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；<br>&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。<br>&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。<br>  |
 | dst_stride | 输入 | &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br>&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。<br> |
 | src_stride | 输入 | 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。 |
-| l2_cache_mode | 输入 | 无效参数，用户无需关注，传入0即可。 |
-| enable_clip_relu_pre | 输入 | 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：<br>&nbsp;&nbsp;&bull; 0：不开启Clip ReLU；<br>&nbsp;&nbsp;&bull; 1：开启Clip ReLU（scalar 模式）。 |
-| unit_flag_mode | 输入 | unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; 0：不开启unit_flag；<br>&nbsp;&nbsp;&bull; 2：开启unit_flag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; 3：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为2或3。 |
+| unit_flag_mode | 输入 | unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。 |
 | quant_pre_mode | 输入 | 预处理阶段量化参数。取值见[功能说明](#功能说明)。 |
-| relu_pre_mode | 输入 | 预处理阶段ReLU模式控制，取值如下：<br>&nbsp;&nbsp;&bull; 0：不开启ReLU；<br>&nbsp;&nbsp;&bull; 1：开启Normal ReLU；<br>&nbsp;&nbsp;&bull; 2：开启Scalar ReLU；<br>&nbsp;&nbsp;&bull; 3：开启Vector ReLU。 |
+| relu_pre_mode | 输入 | 预处理阶段ReLU模式控制，取值如下：<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。 |
 | enable_channel_split | 输入 | 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
 | enable_nz2nd | 输入 | 是否开启Nz2ND功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
-| quant_post | 输入 | 无效参数，用户无需关注，传入0即可。 |
-| relu_post | 输入 | 无效参数，用户无需关注，传入0即可。 |
-| clip_relu_post | 输入 | 无效参数，用户无需关注，传入false即可。 |
-| eltwise_op | 输入 | 无效参数，用户无需关注，传入0即可。 |
-| eltwise_antq_en | 输入 | 无效参数，用户无需关注，传入false或0即可。 |
-| c0_pad_en | 输入 | 无效参数，用户无需关注，传入false即可。 |
-| broadcast_en | 输入 | 无效参数，用户无需关注，传入false即可。 |
 | enable_nz2dn | 输入 | 是否开启Nz2DN功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
+| enable_clip_relu_pre | 输入 | 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：<br>&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；<br>&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。 |
 
 ## 返回值说明
 
@@ -193,7 +156,7 @@ PIPE_FIX
 - 本接口仅在AIC上生效，非AIC调用直接返回。
 - `dst`起始地址需32字节对齐（L1 Buffer对齐要求），否则会导致搬运异常。
 - `src`起始地址需64字节对齐（L0C Buffer对齐要求，`src`为`int32_t`或`float`时），否则会导致搬运异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - L0C Buffer容量上限：L0C Buffer总容量256KB，`src`偏移加搬运大小不可越界，否则触发异常。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，`dst`偏移加搬运大小不可越界，否则触发异常。
 
@@ -216,7 +179,7 @@ PIPE_FIX
 本示例固定`M=N=K=128`，通过MMAD生成L0C Buffer结果，调用本接口转换为ND格式并搬至L1 Buffer，随后经UB回传GM与Host侧Golden结果比较。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
@@ -247,21 +210,21 @@ __global__ __mix__(1, 2) void CopyL0c2l1Kernel(
     __ubuf__ int32_t* output_ub = reinterpret_cast<__ubuf__ int32_t*>(0);
     if ASC_IS_AIC {
         asc_set_gm2l1_nz_para(1, 1, M, 0);
-        asc_copy_gm2l1_nd2nz(a_l1, a, K, 0, M, K, 0, false);
+        asc_copy_gm2l1_nd2nz(a_l1, a, K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, M, K, 0, false);
         asc_set_gm2l1_nz_para(1, 1, K, 0);
-        asc_copy_gm2l1_nd2nz(b_l1, b, K, 0, N, K, 0, false);
+        asc_copy_gm2l1_nd2nz(b_l1, b, K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, N, K, 0, false);
         asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_copy_l12l0a(a_l0, a_l1, 0, 0, M / 16, K / 32, M / 16, M / 16);
         asc_copy_l12l0b(b_l0, b_l1, 0, 0, N / 16, K / 32, N / 16, N / 16);
         asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
         asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
-        asc_mmad(c_l0, a_l0, b_l0, M, K, N, 0, true, false, true);
+        asc_mmad(c_l0, a_l0, b_l0, M, K, N, asc_unit_flag_mode::DISABLE, true, false, true);
         asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
         asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
         asc_set_l0c_copy_nz_para(1, 0, 0);
-        asc_copy_l0c2l1(output_l1, c_l0, N, M, N, M, 0, 0,
-            static_cast<uint64_t>(QuantMode_t::NoQuant), 0, false, true, 0, 0, false, 0, 0, false);
+        asc_copy_l0c2l1(output_l1, c_l0, N, M, N, M, asc_unit_flag_mode::DISABLE,
+            asc_quant_mode::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
         asc_sync_notify(PIPE_FIX, PIPE_MTE1, EVENT_ID0);
         asc_sync_wait(PIPE_FIX, PIPE_MTE1, EVENT_ID0);
         asc_copy_l12ub(output_ub, output_l1, 0, 1, ELEMENTS * sizeof(int32_t) / 32, 0, 0);
