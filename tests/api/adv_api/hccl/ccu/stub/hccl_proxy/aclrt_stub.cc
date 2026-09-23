@@ -15,6 +15,7 @@
 #include "acl/acl_base.h"
 #include "runtime/base.h"
 #include "runtime/stream.h"
+#include "rt_external.h"
 #include "hccl/hccl_types.h"
 #include "sim_world.h"
 #include "sim_stream.h"
@@ -26,6 +27,13 @@
 using namespace hccl;
 using namespace mc2_ops_hccl;
 thread_local uint32_t curr_dev_id = UINT32_MAX;
+
+namespace mc2_ops_hccl {
+extern DevType g_stubDeviceType;
+bool g_stubAclrtMemcpyFail = false;
+uint32_t g_stubAclrtMemcpyCallCount = 0U;
+uint32_t g_stubAclrtMemcpyFailOnCall = 0U;
+} // namespace mc2_ops_hccl
 
 extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param);
 
@@ -77,6 +85,12 @@ aclError aclrtStreamGetId(aclrtStream stream, int32_t* streamId_)
 
 aclError aclrtMemcpy(void* dst, size_t destMax, const void* src, size_t count, aclrtMemcpyKind kind)
 {
+    ++mc2_ops_hccl::g_stubAclrtMemcpyCallCount;
+    if (mc2_ops_hccl::g_stubAclrtMemcpyFail ||
+        (mc2_ops_hccl::g_stubAclrtMemcpyFailOnCall != 0U &&
+         mc2_ops_hccl::g_stubAclrtMemcpyCallCount == mc2_ops_hccl::g_stubAclrtMemcpyFailOnCall)) {
+        return ACL_ERROR_INTERNAL_ERROR;
+    }
     if (dst == nullptr || src == nullptr) {
         HCCL_ERROR("[aclrtMemcpy] invalid input dst or src");
         return ACL_ERROR_INVALID_PARAM;
@@ -121,7 +135,7 @@ const char* aclrtGetSocName()
 
 HcclResult hrtGetDeviceType(DevType& devType)
 {
-    devType = DevType::DEV_TYPE_950;
+    devType = mc2_ops_hccl::g_stubDeviceType;
     return HCCL_SUCCESS;
 }
 
@@ -365,6 +379,24 @@ aclError aclsysGetVersionNum(char* pkgNname, int32_t* versionNum)
 aclError aclmdlRICaptureThreadExchangeMode(aclmdlRICaptureMode* mode) { return ACL_SUCCESS; }
 
 aclError aclrtGetOpTimeOutInterval(uint64_t* interval) { return ACL_SUCCESS; }
+
+aclError aclrtGetOpExecuteTimeout(uint32_t* const timeoutMs)
+{
+    if (timeoutMs == nullptr) {
+        HCCL_ERROR("[aclrtGetOpExecuteTimeout] invalid input timeoutMs");
+        return ACL_ERROR_INVALID_PARAM;
+    }
+    *timeoutMs = 0;
+    return ACL_SUCCESS;
+}
+
+rtError_t rtAicpuKernelLaunchExWithArgs(
+    const uint32_t kernelType, const char_t* const opName, const uint32_t numBlocks, const rtAicpuArgsEx_t* argsInfo,
+    rtSmDesc_t* const smDesc, const rtStream_t stm, const uint32_t flags)
+{
+    HCCL_WARNING("[%s] not support, numBlocks[%u].", __func__, numBlocks);
+    return RT_ERROR_NONE;
+}
 
 #ifdef __cplusplus
 }

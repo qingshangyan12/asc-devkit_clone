@@ -2,13 +2,13 @@
 
 ## 产品支持情况
 
-- Ascend 950PR/Ascend 950DT：支持
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
-- Atlas 200I/500 A2 推理产品：不支持
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
-- Atlas 训练系列产品：不支持
+- Ascend 950PR&950DT系列产品：支持
+- Atlas A3系列产品：支持
+- Atlas A2系列产品：支持
+- Atlas 200I/500 A2推理产品：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
+- Atlas训练系列产品：不支持
 
 
 ## 功能说明<a name="section259105813316"></a>
@@ -57,7 +57,7 @@ assert(expr)
 ## 约束说明<a name="section43265506459"></a>
 
 -   该接口仅支持通过<<<...\>\>\>调用，并在异构编译场景使用。
--   kernel开发不要包含系统的assert.h，会导致宏定义冲突。
+-   核函数（Kernel）开发不要包含系统的assert.h，会导致宏定义冲突。
 -   assert接口调用形式与C语言一致，不需要使用AscendC命名空间。
 
 -   该接口使用Dump功能，所有使用Dump功能的接口在每个核上单次Dump的数据量不可超过1M。请开发者自行控制待打印的内容数据量，超出则不会打印。
@@ -71,7 +71,7 @@ assert(expr)
 
 ## 调用示例<a name="section82241477610"></a>
 
-在算子kernel侧实现代码中需要增加断言的地方使用assert检查代码示例如下：
+在算子核函数（Kernel）侧实现代码中需要增加断言的地方使用assert检查代码示例如下：
 
 ```
 int assertFlag = 10;

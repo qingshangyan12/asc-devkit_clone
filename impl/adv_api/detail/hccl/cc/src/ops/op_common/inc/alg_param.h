@@ -331,6 +331,10 @@ struct CcuKernelArgBase {
     // std::vector<ChannelHandle> channels;
     ChannelHandle channels[CCU_MAX_RANK_SIZE];
     uint32_t channelCount;
+    // Host 编译 CCU 指令时使用；不序列化为设备 XN 参数。
+    // 框架只保留所有权并透传，具体算法在 dispatch 中解释。
+    uint32_t algSubType = 0;
+    std::shared_ptr<void> algArg;
 };
 
 // ccu kernel register所需信息
@@ -632,6 +636,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     void* inputSymWindow = nullptr;
     void* outputSymWindow = nullptr;
     bool supportSymmetricMemory{false};
+    bool symMemChecked{false};
     u64 inputOffset = 0;
     u64 outputOffset = 0;
     HcclMem hcclBuff; // 当前仅快速下发时使用此处的地址

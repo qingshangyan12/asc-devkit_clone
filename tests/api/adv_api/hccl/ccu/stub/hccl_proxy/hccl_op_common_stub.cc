@@ -41,6 +41,8 @@ extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param) { re
 namespace mc2_ops_hccl {
 
 bool g_stubCcuAlgorithmRegistered = true;
+// IsRegistered按名字打桩：非空且匹配时返回false，供闸门B一好一坏用例使用
+std::string g_stubCcuAlgNotRegisteredName;
 
 // 强制算法执行器获取打桩：置true且（g_stubCcuAlgExecNullName为空或算法名匹配）时
 // CollAlgExecRegistryV2::GetAlgExec返回nullptr，使CheckForcedAlgResource校验失败，
@@ -54,6 +56,15 @@ std::string g_stubSelectorAlgName;
 // HcclGetAlgRes资源不足打桩：置true时HcclGetAlgRes直接返回HCCL_E_UNAVAIL，
 // 用于验证checkOnly场景下UNAVAIL被翻译为HCCL_E_RES_NOT_SUFFICIENT（非checkOnly保持UNAVAIL原样）。
 bool g_stubCcuAlgResUnavailable = false;
+
+// HcclGetAlgRes按算法名资源不足打桩：非空且param.algName匹配时返回HCCL_E_UNAVAIL，
+// 用于验证GetOpParam资源失败回退（限定名可让回退后的算法资源计算成功）。模式仿g_stubCcuAlgExecNullName。
+std::string g_stubCcuAlgResUnavailableName;
+
+HcclResult g_stubHcomCheckDataTypeResult = HCCL_SUCCESS;
+HcclResult g_stubHcomCheckReductionOpResult = HCCL_SUCCESS;
+// HcclCalcTopoInfo打桩返回值：置非SUCCESS模拟topo准备失败，供外部名定名链失败复位用例使用
+HcclResult g_stubCalcTopoInfoResult = HCCL_SUCCESS;
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
 {
@@ -117,9 +128,9 @@ HcclResult HcclCheckTag(const char* tag) { return HcclResult::HCCL_SUCCESS; }
 
 HcclResult CheckDataType(HcclDataType dataType, bool needReduce) { return HcclResult::HCCL_SUCCESS; }
 
-HcclResult HcomCheckDataType(HcclDataType dataType) { return HcclResult::HCCL_SUCCESS; }
+HcclResult HcomCheckDataType(HcclDataType dataType) { return g_stubHcomCheckDataTypeResult; }
 
-HcclResult HcomCheckReductionOp(HcclReduceOp op) { return HcclResult::HCCL_SUCCESS; }
+HcclResult HcomCheckReductionOp(HcclReduceOp op) { return g_stubHcomCheckReductionOpResult; }
 
 HcclResult HcomCheckUserRank(const u32 totalRanks, const u32 userRank) { return HcclResult::HCCL_SUCCESS; }
 
@@ -144,7 +155,7 @@ HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 
 HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo)
 {
-    return HcclResult::HCCL_SUCCESS;
+    return g_stubCalcTopoInfoResult;
 }
 
 HcclResult InitRankInfo(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo) { return HcclResult::HCCL_SUCCESS; }
@@ -184,7 +195,7 @@ HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* top
     static const std::map<HcclCMDType, std::string> aicpuAlgMap = {
         {HcclCMDType::HCCL_CMD_ALLGATHER, "InsAllGatherMesh"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterNHR"},
-        {HcclCMDType::HCCL_CMD_ALLREDUCE, "InsAllReduceNHR"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "AicpuAllReduceSoleNHR"},
         {HcclCMDType::HCCL_CMD_ALLTOALL, "InsAlltoAllMesh"},
         {HcclCMDType::HCCL_CMD_ALLTOALLV, "InsAlltoAllvMesh"},
     };
@@ -267,6 +278,16 @@ const bool& GetExternalInputHcclAicpuUnfold()
     return value;
 }
 
+bool GetExternalInputExecTimeout(double& execTimeOut)
+{
+    const char* envValue = std::getenv("HCCL_EXEC_TIMEOUT");
+    if (envValue == nullptr) {
+        return false;
+    }
+    execTimeOut = std::strtod(envValue, nullptr);
+    return true;
+}
+
 HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
 {
     // 生成 algTag: tag_algName_host_dataType_reduceType
@@ -311,6 +332,9 @@ CollAlgExecRegistryV2& CollAlgExecRegistryV2::Instance()
 
 bool CollAlgExecRegistryV2::IsRegistered(HcclCMDType opType, const std::string& algTag) const
 {
+    if (!g_stubCcuAlgNotRegisteredName.empty() && algTag == g_stubCcuAlgNotRegisteredName) {
+        return false;
+    }
     return g_stubCcuAlgorithmRegistered;
 }
 
@@ -332,6 +356,11 @@ HcclResult HcclGetAlgRes(
 
     // 资源不足打桩：模拟CCU通道/实例资源不足，供checkOnly的UNAVAIL→RES_NOT_SUFFICIENT用例使用
     if (g_stubCcuAlgResUnavailable) {
+        return HCCL_E_UNAVAIL;
+    }
+
+    // 按算法名资源不足打桩：供GetOpParam资源失败回退用例使用（限定名，回退算法不受影响）
+    if (!g_stubCcuAlgResUnavailableName.empty() && g_stubCcuAlgResUnavailableName == param.algName) {
         return HCCL_E_UNAVAIL;
     }
 
@@ -361,6 +390,9 @@ HcclResult HcclGetAlgRes(
                 resCtxHost->kfcServerArgs[5] = token;
             }
         }
+        // Provide one valid launch pair so the public MC2 launch UT reaches HcommCcuKernelLaunch.
+        resCtxHost->threads = {1U};
+        resCtxHost->ccuKernels = {1U};
     }
 
     // 序列化并创建新资源

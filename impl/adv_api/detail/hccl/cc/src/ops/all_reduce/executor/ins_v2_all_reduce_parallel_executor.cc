@@ -9,11 +9,15 @@
  */
 
 #include "ins_v2_all_reduce_parallel_executor.h"
+#include <algorithm>
 #include "ins_temp_reduce_scatter_mesh_1D.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "ins_temp_all_gather_mesh_1D.h"
 #include "ins_temp_all_gather_nhr.h"
+#include "topo_match_multilevel.h"
 #include "topo_match_pcie_mix.h"
+#include "alg_meta_registry.h"
+#include "external_alg_rules.h"
 #include <cmath>
 
 namespace mc2_ops_hccl {
@@ -172,6 +176,8 @@ HcclResult InsAllReduceParallelExecutor<
     dataType_ = param.DataDes.dataType;
     dataTypeSize_ = DATATYPE_SIZE_TABLE[param.DataDes.dataType];
     dataSize_ = dataCount_ * dataTypeSize_;
+    multipleDimensionSplitRatio_ = param.opConfig.multipleDimensionSplitRatio;
+    multipleDimensionSplitRatioSource_ = param.opConfig.multipleDimensionSplitRatioSource;
 
     // 获取算法Topo信息
     vTopo_ = resCtx.algHierarchyInfo.infos; // 本通信域内的通信平面
@@ -226,9 +232,15 @@ template <
 void InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, InsAlgTemplate2, InsAlgTemplate3>::
     GetParallelDataSplit(std::vector<float>& splitDataSize) const
 {
-    constexpr double ratio = 0.5;
-    splitDataSize.push_back(ratio);
-    splitDataSize.push_back(ratio);
+    double ratio = multipleDimensionSplitRatio_;
+    if (multipleDimensionSplitRatioSource_ == MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
+        ratio = CalcParallelDataSplitRatio(
+            intraLocalRankSize_, interLocalRankSize_, intraLinks_, interLinks_,
+            ParallelDataSplitType::REDUCE_SCATTER_WITH_LOCAL_REDUCE, multipleDimensionSplitRatio_);
+    }
+    ratio = std::max(0.0, std::min(ratio, 1.0));
+    splitDataSize.push_back(static_cast<float>(ratio));
+    splitDataSize.push_back(static_cast<float>(1.0 - ratio));
     HCCL_INFO(
         "[InsAllReduceParallelExecutor] meshFirstRatio[%f], closFirstRatio[%f]", splitDataSize[0], splitDataSize[1]);
     return;
@@ -239,7 +251,7 @@ template <
     typename InsAlgTemplate3>
 uint64_t InsAllReduceParallelExecutor<
     AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, InsAlgTemplate2,
-    InsAlgTemplate3>::GetRankSize(const std::vector<std::vector<u32>>& vTopo)
+    InsAlgTemplate3>::GetRankSize(const std::vector<std::vector<u32>>& vTopo) const
 {
     uint64_t count = 1;
     for (const auto& i : vTopo) {
@@ -338,6 +350,8 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, TemplateResource& intraTempAlgRes,
         TemplateResource& interTempAlgRes, bool isRsStage)
 {
+    (void)param;
+    (void)isRsStage;
     intraTempAlgRes.channels = intraLinks_;
     interTempAlgRes.channels = interLinks_;
     intraTempAlgRes.threads = intraThreads_;
@@ -454,7 +468,7 @@ template <
 void InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, InsAlgTemplate2, InsAlgTemplate3>::
     FillDataMap(
         const u64 sliceCount, const u32 part1, const u32 part2, std::map<u32, std::pair<u64, u64>>& dataMap,
-        bool isInter)
+        bool isInter) const
 {
     u64 sliceSize = sliceCount * dataTypeSize_;
     u64 rankStridePart1 = RoundDown(sliceSize, (part1 * dataTypeSize_)) * dataTypeSize_;
@@ -486,7 +500,7 @@ template <
 void InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, InsAlgTemplate2, InsAlgTemplate3>::
     FillOffsetMaps(
         const std::map<u32, std::pair<u64, u64>>& dataMap, const u32 part1, const u32 part2, std::map<u32, u64>& agMap,
-        bool isInter)
+        bool isInter) const
 {
     u64 baseOffAG = 0;
     u64 accumAG = 0;
@@ -777,7 +791,7 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
     RunTemplateIntra0(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
         const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
-        InsAlgTemplate0& tempAlgIntra)
+        InsAlgTemplate0& tempAlgIntra) const
 {
     // step1 - parallel 0: RS mesh
     u64 inputOffset = 0;
@@ -801,7 +815,7 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
     RunTemplateInter1(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
         const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
-        InsAlgTemplate1& tempAlgInter)
+        InsAlgTemplate1& tempAlgInter) const
 {
     // step1 - parallel 1: RS nhr
     u64 inputOffset = 0;
@@ -937,7 +951,7 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
     RunTemplateIntra01(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
         const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
-        InsAlgTemplate2& tempAlgIntra1)
+        InsAlgTemplate2& tempAlgIntra1) const
 {
     // step4 - parallel 0: AG mesh
     u64 inputOffset = 0;
@@ -961,7 +975,7 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
     RunTemplateInter11(
         const OpParam& param, const AlgResourceCtxSerializable& resCtx, const u64 dataOffset, const u64 currCountPart,
         const u64 scratchOffsetCount, TemplateDataParams& dataParams, TemplateResource& templateResource,
-        InsAlgTemplate3& tempAlgInter1)
+        InsAlgTemplate3& tempAlgInter1) const
 {
     // step4 - parallel 1: AG nhr
     u64 inputOffset = 0;
@@ -979,6 +993,16 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
 
 // 算法注册
 REGISTER_EXECUTOR_BY_FOUR_TEMPS(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHR, InsAllReduceParallelExecutor, TopoMatchMultilevel,
+    InsTempReduceScatterMesh1D, InsTempReduceScatterNHR, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHR, AlgEngine::AICPU, "parallel[mesh,nhr]", COND_NONE,
+    FLAG_MULTI_LEVEL, 0);
+
+REGISTER_EXECUTOR_BY_FOUR_TEMPS(
     HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, InsAllReduceParallelExecutor, TopoMatchPcieMix,
     InsTempReduceScatterMesh1D, InsTempReduceScatterNHR, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
+    COND_NONE, FLAG_PCIE_MIX, 0);
 } // namespace mc2_ops_hccl

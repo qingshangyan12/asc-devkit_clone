@@ -26,6 +26,7 @@
 namespace platform_ascendc {
 const static uint64_t LOCAL_RESERV_SIZE = 256;
 const static uint64_t KIRIN_UB_RESERVED_SIZE = 8 * 1024;
+const static uint32_t WORK_SPACE_SIZE_MC62 = 1024;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_950 = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE = 2 * 1024 * 1024;
@@ -63,6 +64,7 @@ static const std::map<std::string, SocVersion> convertMap{
     {"MC61AM21A", SocVersion::MC61AM21A},
     {"MC62", SocVersion::MC62},
     {"SD3403", SocVersion::SD3403},
+    {"Ascend5162A", SocVersion::ASCEND5162A},
     {"KirinX90", SocVersion::KIRINX90},
     {"Kirin9030", SocVersion::KIRIN9030},
     {"KirinDev0000", SocVersion::KIRINDEV0000},
@@ -274,6 +276,8 @@ uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const
     if (npuArch == NpuArch::DAV_RESV) {
         PF_LOGE("get platform failed, CurNpuArch is NpuArch::DAV_RESV");
         return -1;
+    } else if (npuArch == NpuArch::DAV_5102) {
+        return WORK_SPACE_SIZE_MC62;
     } else if (npuArch == NpuArch::DAV_2201) {
         return WORK_SPACE_SIZE_910B;
     } else if (npuArch == NpuArch::DAV_3510) {

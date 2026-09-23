@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/sort_operations/MrgSort_res.md#id1 -->
 
@@ -28,19 +28,19 @@
 将已经排好序的最多4条队列，合并排列成1条队列，结果按照score域由大到小排序，排布方式如下：
 
 <!-- npu="950" id7 -->
-Ascend 950PR/Ascend 950DT采用方式一。
+Ascend 950PR&950DT系列产品采用方式一。
 <!-- end id7 -->
 
 <!-- npu="A3" id8 -->
-Atlas A3 训练系列产品/Atlas A3 推理系列产品采用方式一。
+Atlas A3系列产品采用方式一。
 <!-- end id8 -->
 
 <!-- npu="910b" id9 -->
-Atlas A2 训练系列产品/Atlas A2 推理系列产品采用方式一。
+Atlas A2系列产品采用方式一。
 <!-- end id9 -->
 
 <!-- npu="310p" id10 -->
-Atlas 推理系列产品AI Core采用方式二。
+Atlas推理系列产品AI Core采用方式二。
 <!-- end id10 -->
 
 -   排布方式一：
@@ -81,7 +81,7 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 | --- | --- | --- |
 | dst | 输出 | 目的操作数，存储经过排序后的数据。<br><br>类型为[LocalTensor](../../basic_api/data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
 | sortList | 输入 | 源操作数，支持2-4个队列，并且每个队列都已经排好序，类型为MrgSortSrcList结构体，具体请参考下表。MrgSortSrcList中传入要合并的队列，定义如下方代码所示。 |
-| elementCountList | 输入 | 四个源队列的长度（排序方式一：8Bytes结构的数目，排序方式二：16*sizeof(T)Bytes结构的数目），类型为长度为4的uint16_t数据类型的数组，理论上每个元素取值范围[0, 4095]，但不能超出UB的存储空间。 |
+| elementCountList | 输入 | 四个源队列的长度（排序方式一：8Bytes结构的数目，排序方式二：16*sizeof(T)Bytes结构的数目），类型为长度为4的uint16_t数据类型的数组，理论上每个元素取值范围[0, 4095]，但不能超出Unified Buffer（UB）的存储空间。 |
 | sortedNum | 输出 | 耗尽模式下（即isExhaustedSuspension为true时），停止合并时每个队列已排序的元素个数。 |
 | validBit | 输入 | 有效队列个数，取值如下：<br>0b11：前两条队列有效<br>0b111：前三条队列有效<br>0b1111：四条队列全部有效 |
 | repeatTime | 输入 | 迭代次数，每一次源操作数和目的操作数跳过四个队列总长度。取值范围：repeatTime∈[1,255]。<br>repeatTime参数生效是有条件的，需要同时满足以下四个条件：<br>srcLocal包含四条队列并且validBit=15。<br>四个源队列的长度一致。<br>四个源队列连续存储。<br>isExhaustedSuspension为false。 |
@@ -122,15 +122,15 @@ struct MrgSortSrcList {
     该样例适用于：
 
     <!-- npu="950" id11 -->
-    Ascend 950PR/Ascend 950DT
+    Ascend 950PR&950DT系列产品
     <!-- end id11 -->
 
     <!-- npu="910b" id12 -->
-    Atlas A2 训练系列产品/Atlas A2 推理系列产品
+    Atlas A2系列产品
     <!-- end id12 -->
 
     <!-- npu="A3" id13 -->
-    Atlas A3 训练系列产品/Atlas A3 推理系列产品
+    Atlas A3系列产品
     <!-- end id13 -->
 
     ```
@@ -177,7 +177,7 @@ struct MrgSortSrcList {
     该样例适用于：
 
     <!-- npu="310p" id14 -->
-    Atlas 推理系列产品AI Core
+    Atlas推理系列产品AI Core
     <!-- end id14 -->
 
     ```

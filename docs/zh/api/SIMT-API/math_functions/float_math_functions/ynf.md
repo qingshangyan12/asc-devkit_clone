@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMT-API/math_functions/float_math_functions/ynf_res.md#id1 -->
 
@@ -55,13 +55,14 @@ inline float ynf(int n, float x)
 -   当x<0时，返回值为nan。
 -   当x=inf时，返回值为0。
 -   当x=nan时，返回值为nan。
+-   在快速计算模式（[--cce-use-fast-math](../../../../guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md#常用的编译选项)设置为`true`）下，若内部计算的除数为Subnormal数据，则接口返回值为±inf。
 
 ## 约束说明
 
--   n的最大取值为128。
-<!-- npu="950" id7 -->
--   针对Ascend 950PR/Ascend 950DT，本接口不支持Subnormal场景：本接口内部实现使用到了除法运算符，由于除法运算符不支持Subnormal场景，在极少数场景下内部计算的除数为Subnormal数据，导致本接口最终结果为±inf。
-<!-- end id7 -->
+-  n的最大取值为128。
+-  本接口受编译选项`--cce-use-fast-math`的影响。
+    -   --cce-use-fast-math=true：开启快速计算模式。本接口内部实现使用到了除法运算符，由于快速计算模式下除法运算符不支持Subnormal场景，因此本接口不支持内部计算的除数为Subnormal数据的场景。
+    -   --cce-use-fast-math=false：支持Subnormal场景的高精度计算。
 
 ## 调用示例
 

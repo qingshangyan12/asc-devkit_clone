@@ -6,7 +6,7 @@
 
 线程块数量与物理核数的关系会影响调度开销：当线程块数量 ≤ 物理核数时，所有线程块可以一次性占用全部物理核并行执行，需要启动调度的线程块较少、固定开销有限；当线程块数量 > 物理核数时，超出物理核数的线程块需等待前序线程块执行完成后再调度，需要启动和调度的线程块数量继续增加，多线程块启动和调度的固定开销开始明显累积，调度开销随线程块数量增大而上升。
 
-物理核数可以在运行期通过[aclrtGetDeviceInfo](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_1867.html)查询。
+物理核数可以在运行期通过[aclrtGetDeviceInfo](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/04_device_management.md#aclrtGetDeviceInfo)查询。
 > 注：在下面的两个场景中，实测的物理核数均为64。
 
 确定物理核数后，还需结合数据规模来设置线程块数量。
@@ -99,7 +99,7 @@ gather_strided_kernel<<<64, MAX_THREAD_NUM, 0, stream>>>(
 【反例】小数据量场景下沿用“使用全部物理核”的经验，把线程块数量直接设为物理核数64。
 
 ```cpp
-// kernel与大数据量场景正例完全相同(gather_strided_kernel)，仅将数据量调整为小数据量场景16384
+// 核函数（Kernel）与大数据量场景正例完全相同(gather_strided_kernel)，仅将数据量调整为小数据量场景16384
 // 直接沿用"使用全部物理核"的经验，线程块数量=64
 gather_strided_kernel<<<64, MAX_THREAD_NUM, 0, stream>>>(
     input_device, index_device, output_device,
@@ -115,14 +115,14 @@ gather_strided_kernel<<<64, MAX_THREAD_NUM, 0, stream>>>(
 【正例】小数据量场景下不直接沿用“使用全部物理核”的经验，而是设置多档线程块数量实测，取Task Duration最低点。
 
 ```cpp
-// kernel不变，仅设置不同线程块数量，通过msOpProf工具实测性能
+// 核函数（Kernel）不变，仅设置不同线程块数量，通过msOpProf工具实测性能
 // 小数据量场景(16384)实测：线程块数量取4 / 8 / 16 / 32 / 64，最低点在线程块数量=32
 gather_strided_kernel<<<32, MAX_THREAD_NUM, 0, stream>>>(
     input_device, index_device, output_device,
     input_total_length, index_total_length);
 ```
 
-上述实现的kernel不变，仅在4到64之间设置不同的线程块数量并逐档实测。每个线程块的线程数取每个线程块需处理的数据量与硬件线程数上限2048中的较小值：当每个线程块需处理的数据量不小于2048时，线程数设为2048；小于2048时，线程数降为实际需处理的数据量。小数据量场景下Task Duration随线程块数量变化呈“先降后升”的趋势，本样例实测最优线程块数量为32，而非使用全部物理核的线程块数量64。
+上述实现的核函数（Kernel）不变，仅在4到64之间设置不同的线程块数量并逐档实测。每个线程块的线程数取每个线程块需处理的数据量与硬件线程数上限2048中的较小值：当每个线程块需处理的数据量不小于2048时，线程数设为2048；小于2048时，线程数降为实际需处理的数据量。小数据量场景下Task Duration随线程块数量变化呈“先降后升”的趋势，本样例实测最优线程块数量为32，而非使用全部物理核的线程块数量64。
 
   | 线程块的数量 | 每个线程块的线程数 | Task Duration（us） |
   | :----------: | :----------------: |:---------------: |
