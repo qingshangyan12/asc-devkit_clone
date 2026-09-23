@@ -23,7 +23,6 @@ constexpr uint32_t BUCKET_THREAD_COUNT_SMALL = 512;
 constexpr uint32_t BUCKET_THREAD_COUNT_MID = 1024;
 constexpr uint32_t BUCKET_THREAD_COUNT_LARGE = 2048;
 constexpr uint32_t BUCKET_DYNAMIC_MAX_COLS = 256;
-constexpr uint32_t BUCKET_FIXED_MAX_COLS = 512;
 
 template <typename T>
 __aicore__ inline __gm__ T* mutable_gm_ptr(__gm__ const T* ptr)
