@@ -1,0 +1,71 @@
+# 20 题索引 dry-run 清单：每题 ≤2 次查询（阶段5 okf-retrieve 检索策略的基线示范）
+# 断言口径：required 全覆盖（含家族等价展开）；替代组每组 ≥1 成员；E 类命中缺口登记。
+# 查询结果可含 required/optional/替代组之外的候选，检索阶段由 okf-retrieve 按需收敛。
+# v2（c_api 全量 800 篇）：category 维度改按一级目录（A3/B3 改用 category/kw 表达）；
+# E1-E3 原范围外能力（sync、reg_compute load、floor）已入范围，改用文档检索表达；
+# extended 覆盖新能力面（cube 搬运、matrix_compute、defs 类型页、fp8/fp4 转换对、
+# deprecated standalone 家族卡、空缺口登记）。
+queries:
+  A1: ["--operation add", "--stage in,out"]
+  A2: ["--operation leaky_relu", "--stage in,out"]
+  A3: ["--category vector_compute", "--stage in,out"]
+  A4: ["--convert half int4,int32", "--stage in,out"]
+  A5: ["--operation divide", "--stage in,out"]
+  A6: ["--operation multiply", "--stage in,out"]
+  A7: ["--operation selection", "--stage in,out"]
+  A8: ["--operation gather", "--stage in,out"]
+  B1: ["--kw 非对齐"]
+  B2: ["--api asc_copy_gm2ub"]
+  B3: ["--kw mask"]
+  B4: ["--convert half float"]
+  B5: ["--kw 相邻"]
+  C1: ["--api asc_ndim_copy_gm2ub", "--deps-of asc_ndim_copy_gm2ub --kind requires"]
+  C2: ["--api asc_deq_int322half", "--deps-of asc_deq_int322half"]
+  D1: ["--operation reduction", "--stage in,out"]
+  D2: ["--kw 填充", "--stage out"]
+  E1: ["--operation synchronization"]
+  E2: ["--api asc_loadalign"]
+  E3: ["--api asc_floor"]
+
+# 新能力面抽验：include 全部命中方为通过；empty 表示期望无结果。
+extended:
+  - id: X1
+    args: "--operation synchronization"
+    include:
+      - docs/zh/api/SIMD-API/c_api/sync/asc_sync_notify.md
+      - docs/zh/api/SIMD-API/c_api/sync/asc_sync_wait.md
+  - id: X2
+    args: "--operation matrix_multiply_accumulate"
+    include:
+      - docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
+      - docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md
+  - id: X3
+    args: "--stage in --category cube_datamove"
+    include:
+      - docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l0a.md
+      - docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1.md
+  - id: X4
+    args: "--gap 同步"
+    empty: true
+  - id: X5
+    args: "--api asc_copy_l12l0a"
+    include:
+      - docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md
+      - docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md
+      - docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md
+      - docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md
+  - id: X6
+    args: "--category defs"
+    include:
+      - docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md
+      - docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
+  - id: X7
+    args: "--convert bfloat16 float"
+    include:
+      - docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md
+      - docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md
+  - id: X8
+    args: "--api asc_copy_gm2ub_sync"
+    include:
+      - docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_sync_arch_2201_deprecated.md
+      - docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_sync_arch_3510_deprecated.md
