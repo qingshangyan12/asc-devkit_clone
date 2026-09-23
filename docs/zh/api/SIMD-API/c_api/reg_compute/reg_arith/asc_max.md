@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_max
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max.md
+description: 根据mask对两个源矢量数据寄存器按元素求最大值并写入目的操作数，结果可通过引用参数或函数返回值输出，支持整型与浮点数据类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [maximum]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_max__Rv<dtype>_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_max__v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_max
 
 ## 产品支持情况

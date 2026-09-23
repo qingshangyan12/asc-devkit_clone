@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: asc_add_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add_scalar.md
+description: 将源矢量各元素与给定标量value逐元素相加，结果写入目的矢量，支持前n个数据计算与高维切分计算。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [add]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, scalar_operand]
+signature:
+  - override_id: asc_add_scalar__PUi16_PUi16_i16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_add_scalar__PUf16_PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_add_scalar__PUi32_PUi32_i32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_add_scalar__PUf32_PUf32_f32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_add_scalar__PUi16_PUi16_i16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_add_scalar__PUf16_PUf16_f16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_add_scalar__PUi32_PUi32_i32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_add_scalar__PUf32_PUf32_f32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_add_scalar
 
 ## 产品支持情况

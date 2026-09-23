@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_get_phy_stack_base
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_stack_base.md
+description: 获取物理堆栈基地址并返回，常用于调试时定位当前核的堆栈在物理内存中的位置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_phy_stack_base__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/utils/sys_var.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_phy_stack_base
 
 ## 产品支持情况

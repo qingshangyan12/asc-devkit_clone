@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: asc_int82int32（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82int32_deprecated.md
+description: 已废弃的矢量寄存器类型转换接口：将int8_t类型元素转换为int32_t类型，因源与目的操作数位宽比为1:4，读取时按索引将一个VL大小的数据分为四部分，请使用asc_int82int32的显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, masked, widening_result]
+signature:
+  - override_id: asc_int82int32__Rvi32_vi8_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int82int32_v2__Rvi32_vi8_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int82int32_v3__Rvi32_vi8_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int82int32_v4__Rvi32_vi8_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_int82int32（废弃）
 
 ## 产品支持情况

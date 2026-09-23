@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_clear_ar_spr（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_clear_ar_spr_deprecated.md
+description: 对AR特殊寄存器进行清零操作，供调用asc_squeeze_with_status前初始化AR寄存器以统计有效元素总字节数；该接口已废弃，请使用asc_squeeze_and_storeunalign_init实现此功能。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [control]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_clear_ar_spr__z
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_clear_ar_spr（废弃）
 ## 产品支持情况
 

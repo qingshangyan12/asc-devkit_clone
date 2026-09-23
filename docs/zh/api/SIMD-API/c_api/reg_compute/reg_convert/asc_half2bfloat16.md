@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: asc_half2bfloat16
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md
+description: 根据mask将矢量数据寄存器中参与计算的half元素转换为bfloat16_t类型并写入dst，支持rd、rn、rna、ru、rz多种舍入模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked, rounding_mode]
+signature:
+  - override_id: asc_half2bfloat16_rd__Rvbf16_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_rn__Rvbf16_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_rna__Rvbf16_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_ru__Rvbf16_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_rz__Rvbf16_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_rd__vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_rn__vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_rna__vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_ru__vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2bfloat16_rz__vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_half2bfloat16
 
 ## 产品支持情况

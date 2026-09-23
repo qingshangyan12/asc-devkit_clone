@@ -28,36 +28,151 @@
 #include "impl/c_api/reg_base_impl/datamove_atomic_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_float__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_add_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_int8__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_add_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_int16__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_add_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_int32__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_add_int32();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_disable_dma_atomic__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_disable_dma_atomic();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_bfloat__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_add_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_add_float16__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_add_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_bfloat__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_max_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_float__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_max_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_float16__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_max_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_int8__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_max_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_int16__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_max_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_max_int32__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_max_int32();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_bfloat__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_min_bfloat();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_float__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_min_float();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_float16__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_min_float16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_int8__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_min_int8();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_int16__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_min_int16();
+/**
+ * @ingroup simd_c_api.atomic.datamove_atomic
+ * @override_id asc_set_atomic_min_int32__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_min_int32();
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_disable_dma_atomic)
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_set_atomic_none__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_none();
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_atomic_add_int32)
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_set_atomic_add_int__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_add_int();
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_atomic_max_int32)
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_set_atomic_max_int__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_max_int();
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_set_atomic_min_int32)
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_set_atomic_min_int__z
+ * @archs 2201 3510
+ */
 __aicore__ inline void asc_set_atomic_min_int();
 
 #endif

@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_ub2l1_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_ub2l1_sync_deprecated.md
+description: 已废弃接口，将一段连续数据从Unified Buffer（UB）搬运到L1 Buffer并在搬运完成后执行同步，请使用asc_copy_ub2l1配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [l1_buffer]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_copy_ub2l1_sync__PL1v_PUv_u32
+    archs: ['3510']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_ub2l1_sync（废弃）
 
 ## 产品支持情况

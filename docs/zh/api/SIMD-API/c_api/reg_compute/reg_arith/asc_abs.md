@@ -1,3 +1,39 @@
+---
+okftype: reference.api.cpp
+title: asc_abs
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md
+description: 根据mask对源矢量数据寄存器按元素取绝对值，结果写入目的矢量数据寄存器或通过函数返回值返回，掩码位为0的元素不参与计算并在结果中置0。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [absolute]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_abs__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int8_t, int16_t, half, int32_t, float]
+  - prototype_id: asc_abs__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int8_t, int16_t, half, int32_t, float]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs
+    file: abs.asc
+    archs: ['3510']
+    override_id: asc_abs__Rvf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
+    file: elu.asc
+    archs: ['3510']
+    override_id: asc_abs__Rvf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_abs
 
 ## 产品支持情况

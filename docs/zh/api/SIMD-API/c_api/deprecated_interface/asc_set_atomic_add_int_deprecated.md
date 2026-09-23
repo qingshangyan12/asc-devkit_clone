@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_set_atomic_add_int（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md
+description: 已废弃接口，设置后续从UB、L0C Buffer或L1 Buffer到GM的数据传输开启int32_t类型的原子累加，请使用asc_set_atomic_add_int32替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: [add]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [atomic, deprecated]
+signature:
+  - override_id: asc_set_atomic_add_int__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/atomic/datamove_atomic.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
+    kind: related
+    condition: 使用完成后，建议清空原子操作的状态
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_set_atomic_add_int（废弃）
 
 ## 产品支持情况

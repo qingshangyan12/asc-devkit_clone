@@ -1,3 +1,133 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_ub2gm_align
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
+description: 提供数据非对齐搬运的功能，将数据从Unified Buffer（UB）搬运到Global Memory (GM)，支持连续和高维切分数据搬运，非对齐时自动补充dummy假数据且写入GM时丢弃，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [global_memory]
+  - traits: [high_dimensional, unaligned_transfer]
+signature:
+  - prototype_id: asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32_u32_storel2_u64_u32
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1
+    file: data_copy_l0c2l1.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGu8_PUu8_u32
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub
+    file: data_copy_l0c2ub.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGu8_PUu8_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs
+    file: abs.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange
+    file: arange.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast
+    file: cast.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGi32_PUi32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast
+    file: cast.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGi16_PUi16_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare
+    file: compare.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout
+    file: data_relayout.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGu16_PUu16_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div
+    file: div.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate
+    file: duplicate.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
+    file: elu.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
+    file: elu.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf16_PUf16_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather
+    file: gather.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf16_PUf16_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram
+    file: histogram.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGu16_PUu16_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode
+    file: mergemode.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul
+    file: mul.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls
+    file: muls.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block
+    file: reduce_block.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair
+    file: reduce_pair.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select
+    file: select.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze
+    file: squeeze.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate
+    file: truncate.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
+timestamp: '2026-09-23'
+---
 # asc_copy_ub2gm_align
 
 ## 产品支持情况

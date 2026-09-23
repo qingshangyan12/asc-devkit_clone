@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_get_saturation_strategy
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md
+description: 读取当前饱和控制策略并返回USE_API或USE_GLOBAL，常用于临时切换策略前保存原配置，或与设置接口配合做回读校验。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_saturation_strategy__z
+    archs: ['3510']
+    headers: [/include/c_api/spr/spr.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_saturation_strategy
 
 ## 产品支持情况

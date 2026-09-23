@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_sync_block_wait
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
+description: 与asc_sync_block_arrive配对使用，实现单AI Core内AIC与全部AIV之间的同步（核间同步模式2）。检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水与NPU架构有关。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [control]
+  - families: []
+  - operations: [synchronization]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [inter_core_synchronization]
+signature:
+  - override_id: asc_sync_block_wait__pipe_i64
+    archs: ['2201', '3510']
+    headers: [/include/c_api/sync/sync.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
+    kind: related
+    condition: 用户需要确保配套使用（`flag_id`必须完全一致）`asc_sync_block_arrive`和`asc_sync_block_wait`，否则会出现未定义行为。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_sync_block_wait
 
 ## 产品支持情况

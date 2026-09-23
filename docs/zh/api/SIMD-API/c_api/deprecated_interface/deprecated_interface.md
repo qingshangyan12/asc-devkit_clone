@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 废弃接口
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/deprecated_interface.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-24'
+---
 # 废弃接口
 
 ## 矩阵数据搬运

@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_set_l0c_copy_relu_alpha
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
+description: 在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数，由后续L0C搬出接口与relu_pre_mode搭配使用，仅在AIC上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_l0c_copy_relu_alpha__f32
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
+    kind: configures
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_l0c_copy_relu_alpha
 
 ## 产品支持情况

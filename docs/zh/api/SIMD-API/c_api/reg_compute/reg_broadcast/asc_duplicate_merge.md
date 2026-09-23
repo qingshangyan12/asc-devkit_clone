@@ -1,3 +1,59 @@
+---
+okftype: reference.api.cpp
+title: asc_duplicate_merge
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_merge.md
+description: merge模式下将src的最低位元素广播到dst中被mask筛选的位置，未被mask筛选的元素保留原值，为仅在AIV上生效的Reg矢量计算接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [broadcast]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked]
+signature:
+  - override_id: asc_duplicate_merge__Rvi8_vi8_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvu8_vu8_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvf8e8m0_vf8e8m0_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvf8e5m2_vf8e5m2_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvf8e4m3_vf8e4m3_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvi16_vi16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvu16_vu16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvf16_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvbf16_vbf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvi32_vi32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvu32_vu32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+  - override_id: asc_duplicate_merge__Rvf32_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_duplicate_merge
 
 ## 产品支持情况

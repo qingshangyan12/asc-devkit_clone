@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_squeeze_and_storeunalign_init
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
+description: 对AR特殊寄存器进行清零操作，在首次调用asc_squeeze_and_storeunalign之前执行；AR寄存器记录有效元素的总字节数，供该接口内自动地址偏移使用。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_squeeze_and_storeunalign_init__z
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
+    kind: related
+    condition: 开始新一组操作前
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_squeeze_and_storeunalign_init
 
 ## 产品支持情况

@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: asc_gt
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt.md
+description: 逐元素比较两个源操作数大小（大于），比较结果为真时对应比特位为1，否则为0，结果以掩码寄存器返回或写入dst，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_gt__v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_gt__Rvb_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare
+    file: compare.asc
+    archs: ['3510']
+    override_id: asc_gt__Rvb_vf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_gt
 
 ## 产品支持情况

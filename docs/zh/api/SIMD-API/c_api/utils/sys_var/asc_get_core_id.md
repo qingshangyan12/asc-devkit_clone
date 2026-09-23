@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_get_core_id
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_core_id.md
+description: 获取当前AI Core相对其余AI Core的编号，与内置变量获取的核内AIC或AIV索引层级不同，常用于按核编号划分任务以实现多核并行。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_core_id__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/utils/sys_var.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_core_id
 
 ## 产品支持情况

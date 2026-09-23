@@ -1,3 +1,46 @@
+---
+okftype: reference.api.cpp
+title: asc_storealign_1st
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st.md
+description: 将矢量数据寄存器中的首个元素搬出到Unified Buffer（UB），单次搬出量为一个元素，不支持设置掩码，提供对齐、立即数偏移和地址寄存器偏移三种搬出模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_storealign_1st__PU<dtype>_v<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_storealign_1st__PU<dtype>_v<dtype>_i32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_storealign_1st__PU<dtype>_v<dtype>_ar
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_storealign_1st
 
 ## 产品支持情况

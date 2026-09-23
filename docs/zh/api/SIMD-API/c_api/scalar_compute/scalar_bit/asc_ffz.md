@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_ffz
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffz.md
+description: FindFirstZero接口，在输入uint64_t数据的二进制表示中从最低位向最高位查找第一个值为0的比特并返回其位索引，未找到时返回-1；返回值范围为0到63或-1。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [bit_manipulation]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_ffz__u64
+    archs: ['2201', '3510']
+    headers: [/include/c_api/scalar_compute/compute/scalar_bit.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_ffz
 
 ## 产品支持情况

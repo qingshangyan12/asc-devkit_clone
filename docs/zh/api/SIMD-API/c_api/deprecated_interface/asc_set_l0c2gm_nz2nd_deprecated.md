@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_set_l0c2gm_nz2nd（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md
+description: 该接口已废弃，用于在L0C Buffer搬出接口启用随路Nz转ND格式功能时配置格式转换所需的相关参数，仅在AIC上生效，请使用asc_set_l0c_copy_nz_para接口替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_set_l0c2gm_nz2nd__u64_u64_u64
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
+    kind: related
+    condition: 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
+    kind: related
+    condition: 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
+    kind: related
+    condition: 调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
+    kind: related
+    condition: '`asc_set_l0c2gm_nz2nd`接口已废弃。请使用[asc_set_l0c_copy_nz_para](../cube_datamove/asc_set_l0c_copy_nz_para.md)接口替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_set_l0c2gm_nz2nd（废弃）
 
 ## 产品支持情况

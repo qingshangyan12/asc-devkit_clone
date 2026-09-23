@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_store_dev
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
+description: 不经过DCache向GM地址写入数据，当多核操作GM且数据无法对齐到Cache Line时，可避免按Cache Line读写导致的多核数据随机覆盖问题。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: [global_memory]
+  - traits: []
+signature:
+  - prototype_id: asc_store_dev__PG<dtype>_<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_store.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: 若其他核或其他通路通过缓存访问同一GM地址
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
+    kind: requires
+    condition: 若其他核或其他通路通过缓存访问同一GM地址
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_store_dev
 
 ## 产品支持情况

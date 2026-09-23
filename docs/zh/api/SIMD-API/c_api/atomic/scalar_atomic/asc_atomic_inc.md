@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_atomic_inc
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md
+description: 对Global Memory中address指向的单个元素执行原子递增操作：读取旧值，当旧值大于等于val时写回0，否则写回旧值加1，并返回旧值，整个读取、判断和写回过程为原子操作。该接口为标量计算，访问GM时绕过DCache，需保证缓存一致性。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [add]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [atomic]
+signature:
+  - prototype_id: asc_atomic_inc__PG<dtype>_<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/atomic/scalar_atomic.h]
+    dtype: [uint32_t, uint64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: Scalar原子操作会绕过DCache
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_atomic_inc
 
 ## 产品支持情况

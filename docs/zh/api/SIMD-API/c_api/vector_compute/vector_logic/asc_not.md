@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_not
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
+description: 对源矢量的每个元素做按位取反，结果存放到目的矢量。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [bitwise]
+  - operations: [bitwise_not]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [elementwise, high_dimensional]
+signature:
+  - override_id: asc_not__PUi16_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_not__PUu16_PUu16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_not__PUi16_PUi16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_not__PUu16_PUu16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_not
 
 ## 产品支持情况

@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 系统缓存概述
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/system_cache_overview.md
+description: 系统缓存概述页，介绍L2 Cache、DCache、ICache、SIMT DCache、NDDMA Cache的类型与功能，Prefetch、Preload、Invalid、Clean四种缓存操作，Cache写策略与多核一致性问题，并按Cache类型汇总缓存控制接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 系统缓存概述
 
 ## Cache类型

@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_set_copy_pad_val
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
+description: 与asc_copy_gm2ub_align配合使用，设置连续搬运数据块左右两侧的填充值，须在调用搬运接口前写入配置，配置持续生效直至再次调用覆盖，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_set_copy_pad_val__<dtype>
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
+    kind: configures
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_copy_pad_val
 
 ## 产品支持情况

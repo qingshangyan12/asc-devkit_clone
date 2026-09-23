@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_fill_l0a_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md
+description: 已废弃接口，将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化，请使用asc_fill_l0a与asc_sync组合替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_initialization]
+  - families: []
+  - operations: [fill]
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: [l0a_buffer]
+  - traits: [deprecated]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md
+    kind: related
+    condition: '`asc_fill_l0a_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0a.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_fill_l0a_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0a.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_fill_l0a_sync（废弃）
 
 ## 产品支持情况

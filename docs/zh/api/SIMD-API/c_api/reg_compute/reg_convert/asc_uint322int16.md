@@ -1,3 +1,52 @@
+---
+okftype: reference.api.cpp
+title: asc_uint322int16
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322int16.md
+description: 将uint32_t类型数据转为int16_t类型，支持饱和与非饱和模式；因源与目的类型位宽比为2:1，通过dst_pos选择将结果写入目的矢量数据寄存器偶数或奇数索引位置，其余位置清零，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, saturation_mode]
+signature:
+  - override_id: asc_uint322int16__Rvi16_vu32_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint322int16_sat__Rvi16_vu32_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint322int16__Rvi16_vu32_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint322int16_sat__Rvi16_vu32_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint322int16__vu32_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint322int16_sat__vu32_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint322int16__vu32_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint322int16_sat__vu32_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: 使用饱和或非饱和模式时，需要配置`ctrl`寄存器
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_uint322int16
 
 ## 产品支持情况

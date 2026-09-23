@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_get_sub_block_id
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md
+description: 在分离模式下获取逻辑AI Core上Cube Core或Vector Core的逻辑索引，为不修改任何寄存器或存储状态的只读查询接口，SubBlockNum可通过配套查询接口GetSubBlockNum获取。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: [system]
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_sub_block_id__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/utils/sys_var.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md
+    kind: related
+    condition: SubBlockNum可以通过[GetSubBlockNum](asc_get_sub_block_num.md)获取。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_sub_block_id
 
 ## 产品支持情况

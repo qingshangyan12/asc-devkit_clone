@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_reduce_min_datablock
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md
+description: 根据mask对每个DataBlock（32B）内的元素求最小值，得到各DataBlock的归约结果并依次保存在dst低位，仅输出最小值不输出索引，其余元素置0。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [reduction]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked]
+signature:
+  - prototype_id: asc_reduce_min_datablock__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
+    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
+  - prototype_id: asc_reduce_min_datablock__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
+    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_reduce_min_datablock
 
 ## 产品支持情况

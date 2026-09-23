@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_abs_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md
+description: 按元素计算源矢量操作数的绝对值并写入目的操作数，接口已废弃，请通过asc_abs和同步接口asc_sync实现精细化调优以达成最优性能。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [absolute]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_abs_sync__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_abs_sync__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_abs_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_enable_hf32
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md
+description: 设置Mmad计算开启HF32模式，开启后L0A Buffer与L0B Buffer中的FP32数据在参与Mmad计算之前被舍入为HF32格式，可提升FP32数据计算性能但带来一定精度损失，最终结果仍以FP32格式输出。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [matrix_compute]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [rounding_mode]
+signature:
+  - override_id: asc_enable_hf32__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/cube_compute/cube_compute.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md
+    kind: related
+    condition: 如需关闭HF32模式，请重新调用[asc_disable_hf32](asc_disable_hf32.md)接口。
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
+    kind: configures
+    condition: 本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md
+    kind: related
+    condition: HF32模式启用后，FP32转换为HF32格式的舍入模式由配套的[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置，须在本接口之后调用该配套接口配置舍入模式，否则舍入模式沿用上次配置或默认值。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_enable_hf32
 
 ## 产品支持情况

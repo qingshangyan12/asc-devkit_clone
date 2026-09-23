@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_rcp_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_rcp_sync_deprecated.md
+description: 已废弃接口，执行矢量取倒数运算，按元素计算dst等于1除以src，请使用非同步接口asc_rcp配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [reciprocal]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, elementwise]
+signature:
+  - override_id: asc_rcp_sync__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_rcp_sync__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_rcp_sync（废弃）
 
 ## 产品支持情况

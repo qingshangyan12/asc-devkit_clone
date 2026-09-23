@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: asc_bfloat162e1m2x2
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e1m2x2.md
+description: 根据mask将src中参与计算的bfloat16_t元素转换为fp4x2_e1m2_t类型并写入dst，因源与目的类型位宽比为4:1，由dst_quarter_pos参数每隔4个元素离散选取写入位置，其余位置置零。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, rounding_mode, saturation_mode]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_bfloat162e1m2x2
 
 ## 产品支持情况

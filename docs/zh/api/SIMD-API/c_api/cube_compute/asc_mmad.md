@@ -1,3 +1,70 @@
+---
+okftype: reference.api.cpp
+title: asc_mmad
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
+description: 矩阵乘加核心计算接口，完成左矩阵A与右矩阵B的乘法并累加到结果矩阵C，C矩阵可通过参数初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，仅在AIC上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [matrix_multiply_accumulate]
+  - objects: [matrix]
+  - execution_models: [matrix_compute]
+  - source_locations: [l0a_buffer, l0b_buffer]
+  - destination_locations: [l0c_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b
+    archs: ['3510']
+    headers: [/include/c_api/cube_compute/cube_compute.h]
+  - prototype_id: asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b
+    archs: ['3510']
+    headers: [/include/c_api/cube_compute/cube_compute.h]
+  - prototype_id: asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_compute/cube_compute.h]
+  - override_id: asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_unitflag_b_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_compute/cube_compute.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md
+    kind: constrained_by
+    condition: 矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)。
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
+    kind: constrained_by
+    condition: 矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)。
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
+    kind: requires
+    condition: 需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
+    kind: related
+    condition: 需要清除UnitFlag产生的残留状态时，可调用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)，并将`enable_unit_flag`设置为true，将L0C
+      Buffer中所有内存块的单元标志位设置为0并关闭UnitFlag。
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: 浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\[48\]比特位控制计算时的模式：
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: constrained_by
+    condition: 当`(m / 16) * (n / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/intra_core_sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
+    file: mmad_s1.h
+    archs: ['3510']
+    override_id: asc_mmad__PCCi32_PCAi8_PCBi8_u16_u16_u16_unitflag_b_b_b
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
+    file: mmad_s2.h
+    archs: ['3510']
+    override_id: asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1
+    file: data_copy_ub2l1.asc
+    archs: ['3510']
+    override_id: asc_mmad__PCCf32_PCAf16_PCBf16_u16_u16_u16_unitflag_b_b_b
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
+    file: matmul.asc
+    archs: ['3510']
+    override_id: asc_mmad__PCCf32_PCAf32_PCBf32_u16_u16_u16_unitflag_b_b_b
+timestamp: '2026-09-23'
+---
 # asc_mmad
 
 ## 产品支持情况

@@ -1,3 +1,59 @@
+---
+okftype: reference.api.cpp
+title: asc_add
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md
+description: 根据mask对两个源矢量数据寄存器按元素求和并写入目的操作数，另提供带进位输出加法形式，硬件按32位无符号数处理，加法和的低32位写入矢量数据寄存器、进位写入目的掩码寄存器。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [add]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, supports_carry_output]
+signature:
+  - prototype_id: asc_add__Rv<dtype>_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_add__v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_add__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int32_t, uint32_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
+    file: c_api_add.asc
+    archs: ['3510']
+    override_id: asc_add__Rvf32_vf32_vf32_vb
+  - path: /examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode
+    file: set_l2_cache_mode.h
+    archs: ['3510', '2201']
+    override_id: asc_add__Rvf16_vf16_vf16_vb
+  - path: /examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer
+    file: add_double_buffer.asc
+    archs: ['3510']
+    override_id: asc_add__Rvf16_vf16_vf16_vb
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
+    file: reg_load_store_align.asc
+    archs: ['3510']
+    override_id: asc_add__Rvf16_vf16_vf16_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce
+    file: reduce.asc
+    archs: ['3510']
+    override_id: asc_add__Rvf32_vf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_add
 
 ## 产品支持情况

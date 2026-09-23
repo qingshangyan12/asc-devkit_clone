@@ -1,3 +1,39 @@
+---
+okftype: reference.api.cpp
+title: asc_mul_scalar_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mul_scalar_sync_deprecated.md
+description: 已废弃的同步矢量运算接口：执行矢量与标量value的乘法运算，将src各元素与标量相乘后写入dst，请使用非同步接口asc_mul_scalar并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [multiply]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, scalar_operand]
+signature:
+  - override_id: asc_mul_scalar_sync__PUi16_PUi16_i16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_mul_scalar_sync__PUf16_PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_mul_scalar_sync__PUi32_PUi32_i32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_mul_scalar_sync__PUf32_PUf32_f32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul_scalar.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_mul_scalar_sync（废弃）
 
 ## 产品支持情况

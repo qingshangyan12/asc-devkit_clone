@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_ge_scalar_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ge_scalar_sync_deprecated.md
+description: 已废弃的同步矢量比较接口：按元素判断src是否大于等于标量value，成立则输出结果为1否则为0，每个元素的比较结果占1个bit，请使用非同步接口asc_ge_scalar并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, elementwise, scalar_operand]
+signature:
+  - override_id: asc_ge_scalar_sync__PUu8_PUf16_f16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_ge_scalar_sync__PUu8_PUf32_f32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_ge_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_ge_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md
+    kind: related
+    condition: '`asc_ge_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_ge_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_ge_scalar_sync（废弃）
 
 ## 产品支持情况

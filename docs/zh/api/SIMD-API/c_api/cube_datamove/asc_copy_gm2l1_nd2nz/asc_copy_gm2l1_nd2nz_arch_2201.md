@@ -1,3 +1,47 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_gm2l1_nd2nz
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md
+description: 将数据从Global Memory (GM)搬运到Level 1 cache (L1)，支持在数据搬运时进行ND格式到NZ格式的转换，通过目的NZ矩阵各方向步长参数控制转换后的排布。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, layout_transform]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l1_buffer]
+  - traits: []
+signature:
+  - override_id: asc_copy_gm2l1_nd2nz__PL1i8_PGi8_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_gm2l1_nd2nz__PL1u8_PGu8_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_gm2l1_nd2nz__PL1bf16_PGbf16_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_gm2l1_nd2nz__PL1f16_PGf16_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_gm2l1_nd2nz__PL1i16_PGi16_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_gm2l1_nd2nz__PL1f32_PGf32_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_gm2l1_nd2nz__PL1i32_PGi32_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_gm2l1_nd2nz__PL1u32_PGu32_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_copy_gm2l1_nd2nz
 
 ## 产品支持情况

@@ -1,3 +1,45 @@
+---
+okftype: reference.type.cpp
+title: asc_saturation_mode
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
+description: 表示饱和控制所作用模式类型的枚举，在调用asc_set_saturation_flag和asc_get_saturation_flag时使用。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    kind: related
+examples: []
+headers: [/include/c_api/defs/enum.h]
+declaration:
+  symbol: asc_saturation_mode
+  cpp: "enum class asc_saturation_mode : uint8_t {\n    FLOAT = 48,\n    FLOAT8 =\
+    \ 50,\n    INT = 53,\n    CAST = 59\n};"
+  members:
+    - name: FLOAT
+      value: '48'
+      description: 浮点计算及部分浮点精度转换场景的饱和控制，浮点数计算时支持half数据类型；浮点数精度转换时支持hifloat8_t、fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t、half、bfloat16_t数据类型。
+    - name: FLOAT8
+      value: '50'
+      description: fp8_e8m0_t、fp8_e5m2_t、fp8_e4m3fn_t相关场景的饱和控制。
+    - name: INT
+      value: '53'
+      description: 整数计算溢出时的饱和/截断控制。
+    - name: CAST
+      value: '59'
+      description: 浮点转整数或整数转整数时的精度转换饱和控制。仅在饱和策略为[asc_override_strategy::USE_GLOBAL](asc_override_strategy.md)时生效。
+  underlying_type: uint8_t
+timestamp: '2026-09-23'
+---
 # asc_saturation_mode
 
 asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。

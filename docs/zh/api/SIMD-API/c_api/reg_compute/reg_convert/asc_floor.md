@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_floor
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md
+description: 将矢量数据寄存器中的浮点数元素按FLOOR模式（向负无穷方向舍入）舍入到整数值，结果保持原浮点数据类型，支持函数返回值或引用参数输出，未被mask筛选的元素置零。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked, rounding_mode]
+signature:
+  - prototype_id: asc_floor__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+    dtype: [half, bfloat16_t, float]
+  - prototype_id: asc_floor__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+    dtype: [half, bfloat16_t, float]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate
+    file: truncate.asc
+    archs: ['3510']
+    override_id: asc_floor__Rvf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_floor
 
 ## 产品支持情况

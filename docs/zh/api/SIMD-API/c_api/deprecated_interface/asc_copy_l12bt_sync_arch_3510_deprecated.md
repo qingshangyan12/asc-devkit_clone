@@ -1,3 +1,31 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_l12bt_sync_arch_3510（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12bt_sync_arch_3510_deprecated.md
+description: 已废弃的同步搬运接口，将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer，请改用非同步asc_copy_l12bt接口和asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l1_buffer]
+  - destination_locations: [bias_table_buffer]
+  - traits: [deprecated]
+signature:
+  - prototype_id: asc_copy_l12bt_sync__u64_PL1<dtype>_u32
+    archs: ['3510']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+    dtype: [half, bfloat16_t, int32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_l12bt_sync_arch_3510（废弃）
 
 ## 产品支持情况

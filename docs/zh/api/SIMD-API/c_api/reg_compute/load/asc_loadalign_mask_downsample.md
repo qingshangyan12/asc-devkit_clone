@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_loadalign_mask_downsample
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md
+description: 从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度数据，保留偶数下标bit得到VL/8长度数据，并通过函数返回值返回掩码寄存器。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [load]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [vector_register]
+  - traits: []
+signature:
+  - override_id: asc_loadalign_mask_downsample__PUu32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_loadalign_mask_downsample
 
 ## 产品支持情况

@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: asc_intlv
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md
+description: 将两个源矢量数据寄存器中的元素以元素为单位交织后分别写入两个目的矢量数据寄存器，前半部分元素依次交替写入dst0、后半部分依次交替写入dst1，也支持按位宽分组交织掩码寄存器，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [interleave]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_intlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
+      uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+  - override_id: asc_intlv_b8__Rvb_Rvb_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_intlv_b16__Rvb_Rvb_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_intlv_b32__Rvb_Rvb_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout
+    file: data_relayout.asc
+    archs: ['3510']
+    override_id: asc_intlv__Rvu16_Rvu16_vu16_vu16
+timestamp: '2026-09-23'
+---
 # asc_intlv
 
 ## 产品支持情况

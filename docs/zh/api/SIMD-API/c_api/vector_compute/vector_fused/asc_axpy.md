@@ -1,3 +1,41 @@
+---
+okftype: reference.api.cpp
+title: asc_axpy
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md
+description: 将源操作数src中每个元素与标量value求积，再与目的操作数dst中的对应元素相加后写回dst，支持half、float类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [fused_multiply_add]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, high_dimensional, scalar_operand]
+signature:
+  - override_id: asc_axpy__PUf16_PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_axpy__PUf32_PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_axpy__PUf32_PUf32_f32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_axpy__PUf16_PUf16_f16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_axpy__PUf32_PUf16_f16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_axpy__PUf32_PUf32_f32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_axpy
 
 ## 产品支持情况

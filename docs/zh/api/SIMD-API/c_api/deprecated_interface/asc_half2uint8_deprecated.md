@@ -1,3 +1,89 @@
+---
+okftype: reference.api.cpp
+title: asc_half2uint8（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2uint8_deprecated.md
+description: 已废弃的寄存器矢量转换接口：根据mask将half类型元素转换为uint8_t类型写入dst，支持多种舍入与饱和/非饱和模式，位宽比为2:1，按后缀写入偶数或奇数位置，请使用asc_half2uint8的显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, masked, rounding_mode, saturation_mode]
+signature:
+  - override_id: asc_half2uint8_rd__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rd_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rd_sat__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rd_sat_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rn__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rn_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rn_sat__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rn_sat_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rna__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rna_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rna_sat__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rna_sat_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_ru__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_ru_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_ru_sat__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_ru_sat_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rz__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rz_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rz_sat__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2uint8_rz_sat_v2__Rvu8_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md
+    kind: related
+    condition: 该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_half2uint8](../reg_compute/reg_convert/asc_half2uint8.md)的显式位置参数重载替代。
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: constrained_by
+    condition: 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../spr/asc_set_ctrl.md)。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_half2uint8（废弃）
 
 ## 产品支持情况

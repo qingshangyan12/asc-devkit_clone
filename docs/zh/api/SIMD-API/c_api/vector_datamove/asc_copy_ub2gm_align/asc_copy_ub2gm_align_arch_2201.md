@@ -1,3 +1,113 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_ub2gm_align
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md
+description: 将数据从Unified Buffer（UB）搬运到Global Memory (GM)，支持8位/16位/32位分块拷贝操作；非32字节对齐时读取UB数据自动补充dummy假数据补齐，写入GM时丢弃补充的dummy假数据。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [global_memory]
+  - traits: [high_dimensional, unaligned_transfer]
+signature:
+  - override_id: asc_copy_ub2gm_align__PGu8_PUu8_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGi8_PUi8_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGu16_PUu16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGi16_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGbf16_PUbf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGu32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGi32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGf64_PUf64_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGi64_PUi64_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGu64_PUu64_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGu8_PUu8_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGi8_PUi8_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGf16_PUf16_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGu16_PUu16_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGi16_PUi16_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGbf16_PUbf16_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGu32_PUu32_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGf32_PUf32_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGi32_PUi32_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGf64_PUf64_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGi64_PUi64_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm_align__PGu64_PUu64_u16_u32_u8_u8_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/cast
+    file: cast.asc
+    archs: ['2201']
+    override_id: asc_copy_ub2gm_align__PGu8_PUu8_u32
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/cast
+    file: cast.asc
+    archs: ['2201']
+    override_id: asc_copy_ub2gm_align__PGi32_PUi32_u32
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/compare
+    file: compare.asc
+    archs: ['2201']
+    override_id: asc_copy_ub2gm_align__PGu8_PUu8_u32
+timestamp: '2026-09-23'
+---
 # asc_copy_ub2gm_align
 
 ## 产品支持情况

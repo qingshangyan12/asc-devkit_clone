@@ -1,3 +1,65 @@
+---
+okftype: reference.api.cpp
+title: asc_gather
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
+description: 按照src_offset给定的偏移将源矢量src中的元素按元素收集到目的矢量dst中，偏移量相对于源操作数起始基地址且单位为字节。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [gather]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [elementwise, high_dimensional]
+signature:
+  - override_id: asc_gather__PUi16_PUi16_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUu16_PUu16_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUf16_PUf16_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUbf16_PUbf16_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUi32_PUi32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUu32_PUu32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUf32_PUf32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUi16_PUi16_PUu32_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUu16_PUu16_PUu32_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUf16_PUf16_PUu32_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUbf16_PUbf16_PUu32_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUi32_PUi32_PUu32_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUu32_PUu32_PUu32_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather__PUf32_PUf32_PUu32_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 
 # asc_gather
 

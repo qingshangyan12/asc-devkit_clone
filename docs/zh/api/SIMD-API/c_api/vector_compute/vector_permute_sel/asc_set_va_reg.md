@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: asc_set_va_reg
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md
+description: 将操作数地址序列与地址寄存器关联，用于设置transpose的16个DataBlock地址，前8个和后8个地址序列需分别关联。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_va_reg__uba8_PPUi8
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_set_va_reg__uba8_PPUu8
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_set_va_reg__uba8_PPUi16
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_set_va_reg__uba8_PPUu16
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_set_va_reg__uba8_PPUf16
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_set_va_reg__uba8_PPUi32
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_set_va_reg__uba8_PPUu32
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_set_va_reg__uba8_PPUf32
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_va_reg
 
 ## 产品支持情况

@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_ndim_copy_dci
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
+description: 刷新NDDMA DataCache，多核场景下多个AI Core读取同一块GM地址时NDDMA DataCache可能缓存旧数据，需在使用asc_ndim_copy_gm2ub前调用本接口刷新缓存，保证多核间数据一致性。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [control]
+  - families: [cache_management]
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_ndim_copy_dci__z
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: related
+    condition: 本接口仅在使用[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)前调用，用于刷新NDDMA DataCache。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_ndim_copy_dci
 
 ## 产品支持情况

@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_l12ub_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12ub_sync_deprecated.md
+description: 已废弃接口，将数据从L1 Buffer搬运到Unified Buffer（UB），请使用asc_copy_l12ub配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l1_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_copy_l12ub_sync__PUv_PL1v_i8_u16_u16_u16_u16
+    archs: ['3510']
+    headers: []
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_l12ub_sync（废弃）
 
 ## 产品支持情况

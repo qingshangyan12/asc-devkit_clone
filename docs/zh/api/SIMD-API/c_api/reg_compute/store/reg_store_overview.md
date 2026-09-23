@@ -1,3 +1,33 @@
+---
+okftype: reference.index.cpp
+title: Reg数据搬出概述
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/reg_store_overview.md
+description: Reg数据搬出概述页：说明该类接口将矢量数据寄存器、掩码寄存器或非对齐寄存器中的数据写入Unified Buffer（UB），按对齐、非对齐及压缩、交织等模式给出接口选择表，并对比手动偏移、立即数偏移、地址寄存器偏移与Post
+  Update四种目的地址维护方式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # Reg数据搬出概述
 
 Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对齐寄存器中的数据写入Unified Buffer（UB）。接口在Vector Function（`__simd_vf__`标记的函数）内使用，仅在AIV上生效。

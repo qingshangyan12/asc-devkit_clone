@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_set_l0c2gm_quant_post（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md
+description: 该接口已废弃且暂无替代接口，用于对QUANT_POST寄存器中的值进行设置，该64bit寄存器存储Fixpipe后处理阶段的量化信息。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_set_l0c2gm_quant_post__u64
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_set_l0c2gm_quant_post（废弃）
 
 ## 产品支持情况

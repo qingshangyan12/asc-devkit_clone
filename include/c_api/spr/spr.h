@@ -27,18 +27,63 @@
 #include "impl/c_api/reg_base_impl/spr_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_ctrl__z
+ * @archs 2201 3510
+ */
 __aicore__ inline int64_t asc_get_ctrl();
 
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_set_ctrl__u64
+ * @archs 2201 3510
+ * @param [in] config 待设置的寄存器值。常用CTRL寄存器比特位说明参考表2。
+ */
 __aicore__ inline void asc_set_ctrl(uint64_t config);
 
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_squeeze_status__z
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_get_squeeze_status();
 
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_set_saturation_flag__saturation_b
+ * @archs 3510
+ * @param [in] saturation_mode 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。
+ * @param [in] enable_sat 是否开启饱和。`true`表示开启饱和，`false`表示关闭饱和（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断，见上表）。
+ */
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_saturation_flag__saturation
+ * @archs 3510
+ * @param [in] saturation_mode 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。
+ */
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode);
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_set_saturation_strategy__strategy
+ * @archs 3510
+ * @param [in] strategy 饱和控制策略，取值见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。
+ */
 __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy);
+/**
+ * @ingroup simd_c_api.spr
+ * @override_id asc_get_saturation_strategy__z
+ * @archs 3510
+ */
 __aicore__ inline asc_override_strategy asc_get_saturation_strategy();
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_get_squeeze_status)
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_get_ar_spr__z
+ * @archs 3510
+ */
 __aicore__ inline int64_t asc_get_ar_spr();
 
 #endif

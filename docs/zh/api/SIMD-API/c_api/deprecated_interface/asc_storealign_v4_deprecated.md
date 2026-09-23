@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_storealign_pack_postupdate_v2（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md
+description: 该接口已废弃，将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），并通过offset启用Post
+  Update模式自动更新目的操作数地址，请使用asc_storealign_pack_quarter_postupdate接口实现此功能。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: []
+  - source_locations: [vector_register]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated, masked, post_update]
+signature:
+  - override_id: asc_storealign_pack_postupdate_v2__RPUi32_vi32_i32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+  - override_id: asc_storealign_pack_postupdate_v2__RPUu32_vu32_i32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+  - override_id: asc_storealign_pack_postupdate_v2__RPUf32_vf32_i32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md
+    kind: related
+    condition: 该接口已废弃。请使用[asc_storealign_pack_quarter_postupdate](../reg_compute/store/asc_storealign_pack_quarter_postupdate.md)实现此功能。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_storealign_pack_postupdate_v2（废弃）
 
 ## 产品支持情况

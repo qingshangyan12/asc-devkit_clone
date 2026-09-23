@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_set_hf32_round_mode
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md
+description: 设置HF32模式的舍入方式，支持NEAREST_AWAY与NEAREST_EVEN两种枚举值，使用前需先开启HF32模式，且需在矩阵乘加指令执行前调用以确保配置生效，配置在HF32模式开启期间持续有效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [matrix_compute]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [rounding_mode]
+signature:
+  - override_id: asc_set_hf32_round_mode__hfround
+    archs: ['2201', '3510']
+    headers: [/include/c_api/cube_compute/cube_compute.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md
+    kind: requires
+    condition: 使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
+    kind: configures
+    condition: 本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_hf32_round_mode
 
 ## 产品支持情况

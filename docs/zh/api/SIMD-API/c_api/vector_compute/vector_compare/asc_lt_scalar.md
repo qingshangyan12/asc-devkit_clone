@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_lt_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md
+description: 执行矢量中每个位置和标量比较，值小于标量值时结果为1，否则为0，结果按每个bit位小端序排布。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, scalar_operand]
+signature:
+  - override_id: asc_lt_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - override_id: asc_lt_scalar__PUu8_PUf32_f32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_lt_scalar
 
 ## 产品支持情况

@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 矩阵搬出关键特性说明
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/cube_store_key_features.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 矩阵搬出关键特性说明
 
 - **[NZ2NZ](NZ2NZ.md)**

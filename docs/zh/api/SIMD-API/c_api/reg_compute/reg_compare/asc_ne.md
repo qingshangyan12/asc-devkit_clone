@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_ne
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ne.md
+description: 逐元素比较两个源操作数是否不等，不等则结果对应比特位为1，否则为0，比较结果以掩码寄存器返回或写入dst，为仅在AIV上生效的Reg矢量计算接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_ne__v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_ne__Rvb_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_ne
 
 ## 产品支持情况

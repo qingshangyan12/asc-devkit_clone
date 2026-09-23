@@ -1,3 +1,51 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_gm2l0a_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l0a_sync_deprecated.md
+description: 将数据从GM搬运到L0A Buffer，支持按分形矩阵ID、迭代次数、源步长和目的间隔参数进行搬运；接口已废弃，请使用对应的非同步接口asc_copy_gm2l0a和同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l0a_buffer]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_copy_gm2l0a_sync__PCAbf16_PGbf16_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l0a_sync__PCAf16_PGf16_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l0a_sync__PCAf32_PGf32_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l0a_sync__PCAi32_PGi32_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l0a_sync__PCAu8_PGu8_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l0a_sync__PCAi8_PGi8_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l0a_sync__PCAu32_PGu32_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l0a_sync__PCAi4x2_PGi4x2_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l0a.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_gm2l0a_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_lt_scalar_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_lt_scalar_sync_deprecated.md
+description: 已废弃的同步矢量比较接口：将矢量每个位置的元素与标量value比较，小于标量值则为1否则为0，结果按bit位小端序排布，请使用非同步接口asc_lt_scalar并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, elementwise, scalar_operand]
+signature:
+  - override_id: asc_lt_scalar_sync__PUu8_PUf16_f16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_lt_scalar_sync__PUu8_PUf32_f32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_lt_scalar_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,48 @@
+---
+okftype: reference.api.cpp
+title: asc_set_l0c_copy_nz_para
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
+description: 在L0C Buffer搬出接口启用随路Nz转ND/DN格式功能时，配置矩阵数量、源相邻Nz矩阵偏移和目的相邻ND/DN矩阵偏移等格式转换参数，仅在AIC上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
+    kind: configures
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/load_data_l12l0_950
+    file: load_data_l12l0_950.asc
+    archs: ['3510']
+    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
+    file: matmul.asc
+    archs: ['3510']
+    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
+    file: mmad_s1.h
+    archs: ['3510']
+    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
+    file: mmad_s2.h
+    archs: ['3510']
+    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx
+    file: mmad_mx.asc
+    archs: ['3510']
+    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
+timestamp: '2026-09-23'
+---
 # asc_set_l0c_copy_nz_para
 
 ## 产品支持情况

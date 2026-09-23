@@ -1,3 +1,62 @@
+---
+okftype: reference.api.cpp
+title: asc_duplicate_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md
+description: 将标量value广播到目的操作数中，支持带mask和不带mask两类重载，带mask时仅被筛选位置写入value、未筛选位置置0，不带mask时写入全部元素位置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [broadcast]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked, scalar_operand]
+signature:
+  - prototype_id: asc_duplicate_scalar__<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+    dtype: [int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_duplicate_scalar__Rv<dtype>_<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+    dtype: [int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_duplicate_scalar__<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+    dtype: [int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_duplicate_scalar__Rv<dtype>_<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+    dtype: [int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: related
+    condition: 如果不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖，需要调用asc_mem_bar进行同步
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate
+    file: duplicate.asc
+    archs: ['3510']
+    override_id: asc_duplicate_scalar__Rvf32_f32_vb
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
+    file: reg_load_store_align.asc
+    archs: ['3510']
+    override_id: asc_duplicate_scalar__Rvf16_f16_vb
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_mask
+    file: reg_load_store_mask.asc
+    archs: ['3510']
+    override_id: asc_duplicate_scalar__Rvu8_u8_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce
+    file: reduce.asc
+    archs: ['3510']
+    override_id: asc_duplicate_scalar__Rvf32_f32
+timestamp: '2026-09-23'
+---
 # asc_duplicate_scalar
 
 ## 产品支持情况

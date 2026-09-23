@@ -1,3 +1,83 @@
+---
+okftype: reference.api.cpp
+title: asc_int642float
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md
+description: 将int64_t类型数据转换为float类型，支持多种舍入模式，位宽比为2:1，根据位置标签选择写入目的操作数偶数或奇数索引位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, rounding_mode]
+signature:
+  - override_id: asc_int642float_rd__Rvf32_vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rn__Rvf32_vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rna__Rvf32_vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_ru__Rvf32_vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rz__Rvf32_vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rd__Rvf32_vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rn__Rvf32_vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rna__Rvf32_vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_ru__Rvf32_vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rz__Rvf32_vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rd__vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rn__vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rna__vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_ru__vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rz__vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rd__vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rn__vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rna__vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_ru__vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rz__vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_int642float
 
 ## 产品支持情况

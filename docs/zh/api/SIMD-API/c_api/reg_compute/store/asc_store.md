@@ -1,3 +1,48 @@
+---
+okftype: reference.api.cpp
+title: asc_store
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md
+description: 将矢量数据寄存器中的数据搬出到Unified Buffer（UB），底层经非对齐搬出指令完成单次连续写入，支持整矢量连续搬出和按count部分搬出两种模式，搬运过程中数据格式和内容保持不变。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [unified_buffer]
+  - traits: [unaligned_transfer]
+signature:
+  - prototype_id: asc_store__PU<dtype>_v<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/composite/storeunalign_composite.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e4m3fn_t,
+      fp8_e5m2_t, fp8_e8m0_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t]
+  - prototype_id: asc_store__PU<dtype>_v<dtype>_u32
+    archs: ['3510']
+    headers: [/include/c_api/composite/storeunalign_composite.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e4m3fn_t,
+      fp8_e5m2_t, fp8_e8m0_t, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float,
+      int64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
+    file: c_api_add.asc
+    archs: ['3510']
+    override_id: asc_store__PUf32_vf32
+  - path: /examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode
+    file: set_l2_cache_mode.h
+    archs: ['3510', '2201']
+    override_id: asc_store__PUf16_vf16
+timestamp: '2026-09-23'
+---
 # asc_store
 
 ## 产品支持情况

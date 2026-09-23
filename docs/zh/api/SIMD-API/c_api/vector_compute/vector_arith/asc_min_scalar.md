@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: asc_min_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md
+description: 源矢量逐元素与标量比较，比标量值大则取标量值，比标量值小则取源操作数值，结果写入目的矢量。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [minimum]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, scalar_operand]
+signature:
+  - override_id: asc_min_scalar__PUf16_PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_min_scalar__PUf32_PUf32_f32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_min_scalar__PUi16_PUi16_i16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_min_scalar__PUi32_PUi32_i32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_min_scalar__PUf16_PUf16_f16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_min_scalar__PUf32_PUf32_f32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_min_scalar__PUi16_PUi16_i16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_min_scalar__PUi32_PUi32_i32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_min_scalar
 
 ## 产品支持情况

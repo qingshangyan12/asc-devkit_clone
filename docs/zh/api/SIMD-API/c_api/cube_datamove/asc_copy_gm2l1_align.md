@@ -1,3 +1,45 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_gm2l1_align
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md
+description: 将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力，支持Compact、Normal及左右填充等padding模式，填充值可由硬件自动填充或预先配置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l1_buffer]
+  - traits: [padding, unaligned_transfer]
+signature:
+  - prototype_id: asc_copy_gm2l1_align__PL1<dtype>_PG<dtype>_u32_u32_u8_u8_b_loadl2_u64_u32
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+    dtype: [int8_t, uint8_t, hifloat8_t, int16_t, uint16_t, half, bfloat16_t, int32_t,
+      uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md
+    kind: related
+    condition: 循环填充模式
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md
+    kind: related
+    condition: 循环填充模式
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md
+    kind: related
+    condition: 循环填充模式
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_copy_gm2l1_align
 
 ## 产品支持情况

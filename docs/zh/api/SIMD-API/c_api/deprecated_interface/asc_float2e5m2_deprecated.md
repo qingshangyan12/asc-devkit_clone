@@ -1,3 +1,53 @@
+---
+okftype: reference.api.cpp
+title: asc_float2e5m2（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md
+description: 已废弃接口，将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式，饱和/非饱和模式，位宽比为4:1，请使用显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, masked, rounding_mode, saturation_mode]
+signature:
+  - override_id: asc_float2e5m2_rn__Rvf8e5m2_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_float2e5m2_rn_v2__Rvf8e5m2_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_float2e5m2_rn_v3__Rvf8e5m2_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_float2e5m2_rn_v4__Rvf8e5m2_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_float2e5m2_rn_sat__Rvf8e5m2_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_float2e5m2_rn_sat_v2__Rvf8e5m2_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_float2e5m2_rn_sat_v3__Rvf8e5m2_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_float2e5m2_rn_sat_v4__Rvf8e5m2_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md
+    kind: related
+    condition: 该接口的无显式位置参数原型已废弃，请使用[asc_float2e5m2](../reg_compute/reg_convert/asc_float2e5m2.md)的显式位置参数重载替代。
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: constrained_by
+    condition: 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_float2e5m2（废弃）
 
 ## 产品支持情况

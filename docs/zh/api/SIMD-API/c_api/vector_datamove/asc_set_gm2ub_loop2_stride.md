@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_set_gm2ub_loop2_stride
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
+description: 设置asc_copy_gm2ub_align使用循环搬运模式时，外层循环中相邻两次迭代源操作数与目的操作数数据块起始地址之间的偏移量，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_gm2ub_loop2_stride__u64_u64
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_gm2ub_loop2_stride
 
 ## 产品支持情况

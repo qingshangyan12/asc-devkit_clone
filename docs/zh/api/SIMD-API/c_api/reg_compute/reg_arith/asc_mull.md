@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_mull
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mull.md
+description: 根据掩码将两个源矢量数据寄存器中的有效元素相乘，32位元素相乘得到64位乘积，并拆分为低32位与高32位分别写入两个目的矢量数据寄存器。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [multiply]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, split_high_low, widening_result]
+signature:
+  - prototype_id: asc_mull__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int32_t, uint32_t]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_mull
 
 ## 产品支持情况

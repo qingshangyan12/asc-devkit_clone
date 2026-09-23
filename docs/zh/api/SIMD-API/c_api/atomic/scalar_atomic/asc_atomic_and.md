@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_atomic_and
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md
+description: 对Global Memory中address指向的单个元素执行原子按位与操作，读取该元素的旧值old_value，将old_value与val按位与的结果写回该地址并返回修改前的旧值，整个读取、计算和写回过程为原子操作。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [bitwise_and]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [atomic]
+signature:
+  - prototype_id: asc_atomic_and__PG<dtype>_<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/atomic/scalar_atomic.h]
+    dtype: [int32_t, uint32_t, int64_t, uint64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_atomic_and
 
 ## 产品支持情况

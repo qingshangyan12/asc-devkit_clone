@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_ub2ub
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md
+description: 将数据从Unified Buffer（UB）搬运到UB，支持连续数据搬运和高维切分数据搬运，搬运大小需为32的整数倍。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - override_id: asc_copy_ub2ub__PUv_PUv_u32
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2ub__PUv_PUv_u16_u16_u16_u16
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: 如果需要执行多条本接口指令，且目的地址存在重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: 如果需要执行多条本接口指令，且目的地址存在重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_copy_ub2ub
 
 ## 产品支持情况

@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_reduce
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
+description: 以内置固定模式对应的二进制或用户自定义数值对应的gather掩码，从源操作数中选取元素写入目的操作数，且不支持通过asc_set_vector_mask配置掩码。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [gather]
+  - objects: [mask, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional, masked]
+signature:
+  - override_id: asc_reduce__PUu16_PUu16_PUu16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+  - override_id: asc_reduce__PUu32_PUu32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+  - override_id: asc_reduce__PUu16_PUu16_PUu16_u16_u8_u8_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+  - override_id: asc_reduce__PUu32_PUu32_PUu32_u16_u8_u8_u16_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: constrained_by
+    condition: 接口不支持通过[asc_set_vector_mask](../vector_mask_config/asc_set_vector_mask.md)配置掩码。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_reduce
 
 ## 产品支持情况

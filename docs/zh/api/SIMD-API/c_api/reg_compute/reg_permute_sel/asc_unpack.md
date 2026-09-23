@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: asc_unpack
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
+description: 将矢量数据寄存器或掩码寄存器中低半部分或高半部分的元素以扩充位宽的方式解压缩写入目的寄存器或通过函数返回值返回，无符号整型高位填0，有符号整型保持符号位扩充。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, widening_result]
+signature:
+  - prototype_id: asc_unpack_lower__v<dtype_src>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - prototype_id: asc_unpack_upper__v<dtype_src>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - prototype_id: asc_unpack_lower__Rv<dtype_dst>_v<dtype_src>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - prototype_id: asc_unpack_upper__Rv<dtype_dst>_v<dtype_src>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unpack_lower__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unpack_upper__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unpack_lower__Rvb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unpack_upper__Rvb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_unpack
 
 ## 产品支持情况

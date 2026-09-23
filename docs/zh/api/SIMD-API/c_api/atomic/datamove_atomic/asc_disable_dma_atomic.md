@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_disable_dma_atomic
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
+description: 与asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min接口配合使用的关闭接口，在完成原子操作后关闭数据搬运随路原子操作，避免影响后续向GM的数据搬运。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [atomic]
+signature:
+  - override_id: asc_disable_dma_atomic__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/atomic/datamove_atomic.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
+    kind: related
+    condition: 用于在完成原子操作后关闭原子操作，避免影响后续搬运。
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md
+    kind: related
+    condition: 用于在完成原子操作后关闭原子操作，避免影响后续搬运。
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
+    kind: related
+    condition: 用于在完成原子操作后关闭原子操作，避免影响后续搬运。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_disable_dma_atomic
 
 ## 产品支持情况

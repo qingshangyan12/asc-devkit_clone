@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_load_image_to_cbuf_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_load_image_to_cbuf_sync_deprecated.md
+description: 已废弃的同步图像搬运接口：将图像数据从Global Memory搬运到L1 Buffer，支持指定加载区域及上下左右填充像素，请使用非同步接口asc_load_image_to_cbuf并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l1_buffer]
+  - traits: [deprecated, padding]
+signature:
+  - override_id: asc_load_image_to_cbuf_sync__PL1i8_u16_u16_u16_u16_u16_u8_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_load_image_to_cbuf_sync__PL1f16_u16_u16_u16_u16_u16_u8_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_load_image_to_cbuf_sync（废弃）
 
 ## 产品支持情况

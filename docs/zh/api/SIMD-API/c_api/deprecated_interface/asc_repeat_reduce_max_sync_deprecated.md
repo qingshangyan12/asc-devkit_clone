@@ -1,3 +1,54 @@
+---
+okftype: reference.api.cpp
+title: asc_repeat_reduce_max_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_repeat_reduce_max_sync_deprecated.md
+description: 已废弃接口，对每个Repeat内所有元素求最大值以及首个最大值元素的索引，一次Repeat计算256字节，请使用非同步接口asc_repeat_reduce_max配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [reduction]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_repeat_reduce_max_index_value_sync__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_repeat_reduce_max_index_value_sync__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_repeat_reduce_max_value_index_sync__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_repeat_reduce_max_value_index_sync__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_repeat_reduce_max_only_value_sync__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_repeat_reduce_max_only_value_sync__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_repeat_reduce_max_only_index_sync__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_repeat_reduce_max_only_index_sync__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md
+    kind: related
+    condition: 执行此接口后，可以继续执行[asc_get_reduce_max_cnt](../vector_compute/vector_reduce/asc_get_reduce_max_cnt.md)获取全部repeat内的最大值，以及第一个最大值时的索引。
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_repeat_reduce_max_sync（废弃）
 
 ## 产品支持情况

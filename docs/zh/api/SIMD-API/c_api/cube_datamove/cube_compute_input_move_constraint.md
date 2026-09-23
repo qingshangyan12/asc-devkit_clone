@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 矩阵计算输入搬运约束
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_input_move_constraint.md
+description: 汇总矩阵计算输入搬运的对齐、搬运粒度、分形排布与数据类型约束，覆盖GM到L1及L1到L0A/L0B通路的2D、3D、转置与稀疏矩阵搬运规则。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, img2col, layout_transform, transpose]
+  - objects: [matrix]
+  - execution_models: []
+  - source_locations: [global_memory, l1_buffer]
+  - destination_locations: [l0a_buffer, l0b_buffer, l1_buffer]
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 矩阵计算输入搬运约束
 
 ## 对齐约束

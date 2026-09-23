@@ -1,3 +1,75 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_l12l0a_sync_arch_2201（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_arch_2201_deprecated.md
+description: 已废弃的同步搬运接口，将存放在L1 Buffer里的512B大小矩阵搬运到L0A Buffer，包含2D与3D格式的高维切分搬运，请改用非同步接口和asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, transpose]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l1_buffer]
+  - destination_locations: [l0a_buffer]
+  - traits: [deprecated, high_dimensional]
+signature:
+  - override_id: asc_copy_l12l0a_sync__PCAi4x2_PL1i4x2_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAu8_PL1u8_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAi8_PL1i8_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAf16_PL1f16_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAbf16_PL1bf16_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAu32_PL1u32_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAi32_PL1i32_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAf32_PL1f32_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAi4x2_PL1i4x2_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAu8_PL1u8_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAi8_PL1i8_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAf16_PL1f16_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAbf16_PL1bf16_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAu32_PL1u32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAi32_PL1i32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_l12l0a_sync__PCAf32_PL1f32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_l12l0a_sync_arch_2201（废弃）
 
 ## 产品支持情况

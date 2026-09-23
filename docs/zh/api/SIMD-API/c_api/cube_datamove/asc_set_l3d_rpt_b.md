@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_set_l3d_rpt_b
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md
+description: 通过64位配置参数配置3D img2col搬运模式下repeat模式搬运右矩阵所需的参数，供f_matrix_ctrl为true的asc_copy_l12l0b
+  3D搬运接口使用，仅在AIC上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: [img2col]
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_l3d_rpt_b__u64
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md
+    kind: configures
+    condition: 3D搬运接口的参数`f_matrix_ctrl`取值为`true`时配置才会生效。
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_l3d_rpt_b
 
 ## 产品支持情况

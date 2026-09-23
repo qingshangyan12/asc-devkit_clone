@@ -1,3 +1,45 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_ub2gm
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md
+description: 将数据从Unified Buffer（UB）搬运到Global Memory（GM），支持连续数据搬运和高维切分数据搬运，可通过loop功能实现Broadcast，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [global_memory]
+  - traits: [high_dimensional]
+signature:
+  - override_id: asc_copy_ub2gm__PGv_PUv_u32@3510
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_copy_ub2gm__PGv_PUv_u16_u16_u16_u16@3510
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/asc_copy_l0c2ub
+    file: asc_copy_l0c2ub.asc
+    archs: ['3510']
+    override_id: asc_copy_ub2gm__PGv_PUv_u16_u16_u16_u16@3510
+timestamp: '2026-09-23'
+---
 # asc_copy_ub2gm
 
 ## 产品支持情况

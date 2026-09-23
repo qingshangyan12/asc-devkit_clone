@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_bfloat162float
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md
+description: 根据mask将矢量数据寄存器中参与计算的bfloat16_t元素转换为float类型并写入dst，源与目的位宽比为1:2，通过src_pos选择读取源数据的偶数或奇数位置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked, widening_result]
+signature:
+  - override_id: asc_bfloat162float__Rvf32_vbf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_bfloat162float__Rvf32_vbf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_bfloat162float__vbf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_bfloat162float__vbf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_bfloat162float
 
 ## 产品支持情况

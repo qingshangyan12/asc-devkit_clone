@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: asc_set_atomic_none（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_none_deprecated.md
+description: 已废弃接口，与原子累加及原子比较接口配合使用，在完成原子操作后关闭原子操作以避免影响后续搬运，请使用asc_disable_dma_atomic替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [atomic, deprecated]
+signature:
+  - override_id: asc_set_atomic_none__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/atomic/datamove_atomic.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
+    kind: related
+    condition: 用于在完成原子操作后关闭原子操作，避免影响后续搬运。
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md
+    kind: related
+    condition: 用于在完成原子操作后关闭原子操作，避免影响后续搬运。
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
+    kind: related
+    condition: 用于在完成原子操作后关闭原子操作，避免影响后续搬运。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_set_atomic_none（废弃）
 
 ## 产品支持情况

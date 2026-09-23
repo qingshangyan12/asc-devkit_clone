@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: GEMV
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/GEMV.md
+description: 介绍矩阵乘加的GEMV特性：当矩阵A的维度M取值为1时接口自动启用Gemv功能，矩阵乘退化为1×K行向量与K×N矩阵的乘法运算，可减少搬运数据量并降低搬运开销。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # GEMV
 
 **特性说明：**

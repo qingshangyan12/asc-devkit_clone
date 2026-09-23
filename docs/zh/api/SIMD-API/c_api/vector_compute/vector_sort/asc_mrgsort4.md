@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_mrgsort4
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+description: 将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按照score从大到小排序，输入一般是经过asc_bitsort指令处理后的输出数据。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [sort]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_mrgsort4__PU<dtype>_AmrgPU<dtype>_u8_u16_u16_u16_u16_b_u8
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
+    dtype: [half, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+    kind: related
+    condition: 该接口不负责将无序的输入队列排序，输入一般是经过[asc_bitsort](asc_bitsort.md)指令处理后的输出数据，队列详细结构请参考[asc_bitsort功能说明](asc_bitsort.md#功能说明)中的介绍。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_mrgsort4
 
 ## 产品支持情况

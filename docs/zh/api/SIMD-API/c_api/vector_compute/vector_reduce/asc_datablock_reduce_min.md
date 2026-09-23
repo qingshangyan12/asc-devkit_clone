@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_datablock_reduce_min
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md
+description: 执行数据块内的求最小值规约操作，将每个DataBlock内元素的最小值规约输出到目的矢量。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [reduction]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - override_id: asc_datablock_reduce_min__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+  - override_id: asc_datablock_reduce_min__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+  - override_id: asc_datablock_reduce_min__PUf16_PUf16_u8_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+  - override_id: asc_datablock_reduce_min__PUf32_PUf32_u8_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_datablock_reduce_min
 
 ## 产品支持情况

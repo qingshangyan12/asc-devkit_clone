@@ -1,3 +1,52 @@
+---
+okftype: reference.api.cpp
+title: asc_scatter（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md
+description: 已废弃接口，根据索引值index将源操作数src中的元素分散到目的操作数dst中，请使用新版asc_scatter接口实现此功能。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [scatter]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, masked]
+signature:
+  - override_id: asc_scatter__Rvi8_PUi8_vu16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - override_id: asc_scatter__Rvu8_PUu8_vu16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - override_id: asc_scatter__Rvi16_PUi16_vu16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - override_id: asc_scatter__Rvu16_PUu16_vu16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - override_id: asc_scatter__Rvi32_PUi32_vu32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - override_id: asc_scatter__Rvu32_PUu32_vu32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - override_id: asc_scatter__Rvbf16_PUbf16_vu16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - override_id: asc_scatter__Rvf16_PUf16_vu16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - override_id: asc_scatter__Rvf32_PUf32_vu32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_scatter（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: L1 Buffer、L0A Buffer/L0B Buffer内存结构介绍
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/L1_L0A_B_memory_structure_intro.md
+description: 介绍L1 Buffer以及L0A Buffer、L0B Buffer的容量、Bank与Bank Group组织方式、地址编码格式，并说明各Buffer在同一Bank上读写并发的约束。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # L1 Buffer、L0A Buffer/L0B Buffer内存结构介绍
 
 为提升数据访问效率和吞吐量，Buffer采用了等容量的内存模块（Bank）结构设计。内存空间被划分为多个Bank，并以Bank为单位进一步分组形成多个Bank Group（BG）；每个Bank Group包含若干Bank，每个Bank都是一个可独立操作的存储单元子模块。

@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 核间同步能力概述
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md
+description: 核间同步能力概述页，说明一个核的计算依赖其他核计算结果的典型场景，介绍group内block与subblock的结构及算子类型对应的函数执行空间限定符配置，并按四种同步模式汇总各对核间同步接口的同步范围与功能。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 核间同步能力概述
 
 核间同步的使用场景通常是：一个核计算所依赖的数据，需要等待其他相关核的计算全部完成后才能获取。  

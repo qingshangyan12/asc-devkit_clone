@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_disable_hif8
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md
+description: 设置Mmad计算关闭HiF8模式，作用与asc_enable_hif8相反且二者不同时生效。关闭后左右矩阵均为fp8_e4m3fn_t输入时，L0A
+  Buffer和L0B Buffer中的数据不转换为hifloat8_t，直接以fp8_e4m3fn_t类型参与矩阵乘法运算。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [matrix_compute]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_disable_hif8__z
+    archs: ['3510']
+    headers: [/include/c_api/cube_compute/cube_compute.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md
+    kind: related
+    condition: 如需开启HiF8模式，请重新调用[asc_enable_hif8](./asc_enable_hif8.md)接口。
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
+    kind: configures
+    condition: 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md
+    kind: configures
+    condition: 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_disable_hif8
 
 ## 产品支持情况

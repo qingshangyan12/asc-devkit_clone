@@ -1,3 +1,40 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_l0c2gm_arch_3510
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
+description: 将矩阵计算结果从L0C Buffer搬运至Global Memory，搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合，需通过配套接口预先配置相关参数，仅在AIC上执行有效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, layout_transform]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l0c_buffer]
+  - destination_locations: [global_memory]
+  - traits: [quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
+    kind: requires
+    condition: Nz2DN格式转换场景下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
+    kind: requires
+    condition: 随路tensor量化模式下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md
+    kind: requires
+    condition: 随路激活模式下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
+    kind: requires
+    condition: Nz2ND格式转换场景下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md
+    kind: requires
+    condition: 随路scalar量化模式下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
+    kind: requires
+    condition: 随路激活模式下
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_copy_l0c2gm_arch_3510
 
 ## 产品支持情况

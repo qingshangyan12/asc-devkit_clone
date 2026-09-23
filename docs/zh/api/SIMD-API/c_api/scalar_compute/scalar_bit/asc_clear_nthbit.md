@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_clear_nthbit
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clear_nthbit.md
+description: 对64位无符号整数执行位清除操作，将bits中第idx位清零、其余位保持不变，返回修改后的64位无符号整数；实际位索引按(idx % 64
+  + 64) % 64计算，接口为标量位运算，运行在标量流水上。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [bitwise]
+  - operations: [bit_manipulation]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_clear_nthbit__u64_i64
+    archs: ['2201', '3510']
+    headers: [/include/c_api/scalar_compute/compute/scalar_bit.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_clear_nthbit
 
 ## 产品支持情况

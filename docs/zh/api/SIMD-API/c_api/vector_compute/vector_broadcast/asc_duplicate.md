@@ -1,3 +1,65 @@
+---
+okftype: reference.api.cpp
+title: asc_duplicate
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md
+description: 执行矢量复制操作，将标量值复制填充到目的矢量中，支持前n个数据计算与高维切分计算两种模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [broadcast]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [scalar_operand]
+signature:
+  - override_id: asc_duplicate__PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUi16_i16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUu16_u16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUbf16_bf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUf32_f32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUi32_i32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUu32_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUf16_f16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUi16_i16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUu16_u16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUbf16_bf16_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUf32_f32_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUi32_i32_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+  - override_id: asc_duplicate__PUu32_u32_u8_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_duplicate
 
 ## 产品支持情况

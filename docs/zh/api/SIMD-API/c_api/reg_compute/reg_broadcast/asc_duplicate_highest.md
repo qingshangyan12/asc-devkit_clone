@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_duplicate_highest
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest.md
+description: 将源操作数src的最高位元素（下标最大的元素）广播到dst中被mask筛选的位置，未被筛选的元素置0，与asc_duplicate的区别在于本接口使用src的最高位元素作为待广播数据。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [broadcast]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked]
+signature:
+  - prototype_id: asc_duplicate_highest__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+    dtype: [int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: related
+    condition: 如果不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖，需要调用asc_mem_bar进行同步
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_duplicate_highest
 
 ## 产品支持情况

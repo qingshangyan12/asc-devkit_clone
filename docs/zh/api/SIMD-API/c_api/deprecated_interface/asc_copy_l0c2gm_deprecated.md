@@ -1,3 +1,51 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_l0c2gm（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2gm_deprecated.md
+description: asc_copy_l0c2gm旧参数形式及同步接口已废弃，将矩阵计算结果从L0C Buffer搬运至Global Memory，支持随路量化、随路激活与Nz2ND等格式转换组合，请改用新接口和asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, layout_transform]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l0c_buffer]
+  - destination_locations: [global_memory]
+  - traits: [deprecated, quantization]
+signature:
+  - prototype_id: asc_copy_l0c2gm__PG<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - prototype_id: asc_copy_l0c2gm_sync__PG<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
+    archs: ['3510']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
+    kind: requires
+    condition: Nz2DN格式转换场景下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
+    kind: requires
+    condition: 随路tensor量化模式下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md
+    kind: requires
+    condition: 随路激活模式下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
+    kind: requires
+    condition: Nz2ND格式转换场景下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md
+    kind: requires
+    condition: 随路scalar量化模式下
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
+    kind: requires
+    condition: 随路激活模式下
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_l0c2gm（废弃）
 
 ## 产品支持情况

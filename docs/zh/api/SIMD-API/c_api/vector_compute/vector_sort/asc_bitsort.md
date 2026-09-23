@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_bitsort
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+description: 一次迭代内对32个数做降序排列，src0和src1分别为待排序的score及对应索引，排序后以score和index结构存入dst，不同迭代之间不进行排序。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [sort]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - prototype_id: asc_bitsort__PU<dtype>_PU<dtype>_PUu32_i32
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
+    dtype: [half, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_bitsort
 
 ## 产品支持情况

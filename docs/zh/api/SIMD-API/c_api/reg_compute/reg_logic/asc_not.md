@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: asc_not
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md
+description: 根据mask对矢量数据寄存器或掩码寄存器执行按位取反操作，结果写入目的操作数或通过函数返回值返回，掩码为0的对应比特位写0，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [bitwise_not]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_not__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float]
+  - prototype_id: asc_not__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float]
+  - override_id: asc_not__vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
+  - override_id: asc_not__Rvb_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_not
 
 ## 产品支持情况

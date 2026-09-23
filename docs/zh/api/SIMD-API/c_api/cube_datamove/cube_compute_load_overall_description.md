@@ -1,3 +1,23 @@
+---
+okftype: reference.index.cpp
+title: 矩阵搬入总体说明
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load_overall_description.md
+description: 矩阵计算搬入接口的总体说明，介绍Global Memory到L1、L0A、L0B等数据通路，以及GM到L1、L1到L0A/L0B的接口分类、使用场景和辅助配置接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, img2col, layout_transform, transpose]
+  - objects: [matrix]
+  - execution_models: []
+  - source_locations: [global_memory, l1_buffer]
+  - destination_locations: [bias_table_buffer, fixpipe_buffer, l0a_buffer, l0b_buffer,
+      l0c_buffer, l1_buffer]
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 矩阵搬入总体说明
 
 矩阵计算的搬入是Ascend C编程框架中用于数据搬运的一类核心接口，主要实现Global Memory到L0A Buffer/L0B Buffer之间的数据高效传输。该类接口提供了多种数据搬运模式，能够满足矩阵计算中左右矩阵等数据的搬运需求，通常与Mmad接口配合使用。

@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_storeunalign_post
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
+description: 将非对齐寄存器中暂存的尾块写入Unified Buffer（UB）完成连续非对齐搬运收尾，提供立即数偏移与地址寄存器偏移两种模式，须与前序主搬出接口复用同一个非对齐寄存器。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: [unified_buffer]
+  - traits: [unaligned_transfer]
+signature:
+  - prototype_id: asc_storeunalign_post__PU<dtype>_vstoreunalign_i32
+    archs: ['3510']
+    headers: []
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t]
+  - prototype_id: asc_storeunalign_post__PU<dtype>_vstoreunalign_ar
+    archs: ['3510']
+    headers: []
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_storeunalign_post
 
 ## 产品支持情况

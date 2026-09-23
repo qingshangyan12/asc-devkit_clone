@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_addc
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md
+description: 根据mask对源操作数src0、src1及输入进位carry_src按元素求和，结果写入目的矢量数据寄存器，同时将每个元素的进位写入目的掩码寄存器，硬件按32位无符号数处理。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [add]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [carry_input, elementwise, masked, supports_carry_output]
+signature:
+  - prototype_id: asc_addc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int32_t, uint32_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_addc
 
 ## 产品支持情况

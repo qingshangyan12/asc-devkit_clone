@@ -1,3 +1,40 @@
+---
+okftype: reference.type.cpp
+title: asc_store_atomic_config
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md
+description: 包含原子操作启用位与原子操作类型的联合体，用于asc_get_store_atomic_config接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [atomic]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md
+    kind: related
+examples: []
+headers: [/include/c_api/defs/union.h]
+declaration:
+  symbol: asc_store_atomic_config
+  cpp: "union asc_store_atomic_config {\n    uint64_t config = ASC_STORE_ATOMIC_DEFAULT_VALUE;\n\
+    \    struct {\n        uint64_t atomic_type : 3;\n        uint64_t atomic_op :\
+    \ 2;\n        uint64_t reserved1 : 59;\n    };\n};"
+  fields:
+    - name: atomic_type
+      description: 原子操作启用位，默认值：0。0：无原子操作。1：开启原子操作，进行原子操作的数据类型为float。2：开启原子操作，进行原子操作的数据类型为half。3：开启原子操作，进行原子操作的数据类型为int16_t。4：开启原子操作，进行原子操作的数据类型为int32_t。5：开启原子操作，进行原子操作的数据类型为int8_t。6：开启原子操作，进行原子操作的数据类型为bfloat16_t。其余值无具体含义。
+      type: uint64_t
+      bits: '3'
+    - name: atomic_op
+      description: 原子操作类型，默认值：0。0：求和操作。其余值无具体含义。
+      type: uint64_t
+      bits: '2'
+  record_kind: union
+timestamp: '2026-09-23'
+---
 # asc_store_atomic_config
 
 asc_store_atomic_config参数包含原子操作启用位与原子操作类型，用于[asc_get_store_atomic_config](../../atomic/scalar_atomic/asc_get_store_atomic_config.md)接口使用。

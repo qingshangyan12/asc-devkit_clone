@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_rint
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_rint.md
+description: 将源操作数中的浮点数元素按照RINT舍入模式（四舍六入五成双）舍入到整数值，结果仍保持原浮点数据类型，未被掩码筛选的元素置零。本接口为Reg矢量计算接口，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, rounding_mode, saturation_mode]
+signature:
+  - prototype_id: asc_rint__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+    dtype: [half, bfloat16_t, float]
+  - prototype_id: asc_rint__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+    dtype: [half, bfloat16_t, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_rint
 
 ## 产品支持情况

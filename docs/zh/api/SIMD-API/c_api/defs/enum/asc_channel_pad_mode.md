@@ -1,3 +1,63 @@
+---
+okftype: reference.type.cpp
+title: asc_channel_pad_mode
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md
+description: 表示GM搬运到L1 Buffer时每个32字节通道块填充或压缩模式的枚举，可用于asc_copy_gm2l1高维切分搬运接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md
+    kind: related
+examples: []
+headers: [/include/c_api/defs/enum.h]
+declaration:
+  symbol: asc_channel_pad_mode
+  cpp: "enum class asc_channel_pad_mode : uint8_t {\n    NONE = 0,\n    EXPAND_1B\
+    \ = 1,\n    EXPAND_2B = 2,\n    EXPAND_4B = 3,\n    EXPAND_8B = 4,\n    EXPAND_16B\
+    \ = 5,\n    COMPACT_4B = 6,\n    COMPACT_8B = 7,\n    COMPACT_16B = 8\n};"
+  members:
+    - name: NONE
+      value: '0'
+      description: 不执行通道填充或压缩。
+    - name: EXPAND_1B
+      value: '1'
+      description: 每1字节源数据后插入31字节填充值，其中插入的每个padding的位宽为b8。
+    - name: EXPAND_2B
+      value: '2'
+      description: 每2字节源数据后插入15个填充值，其中插入的每个padding的位宽为b16。
+    - name: EXPAND_4B
+      value: '3'
+      description: 每4字节源数据后插入14个填充值，其中插入的每个padding的位宽为b16。
+    - name: EXPAND_8B
+      value: '4'
+      description: 每8字节源数据后插入12个填充值，其中插入的每个padding的位宽为b16。
+    - name: EXPAND_16B
+      value: '5'
+      description: 每16字节源数据后插入8个填充值，其中插入的每个padding的位宽为b16。
+    - name: COMPACT_4B
+      value: '6'
+      description: 每32字节源数据保留低4字节，丢弃高28字节，只保留4个最低有效位字节。
+    - name: COMPACT_8B
+      value: '7'
+      description: 每32字节源数据保留低8字节，丢弃高24字节，只保留8个最低有效位字节。
+    - name: COMPACT_16B
+      value: '8'
+      description: 每32字节源数据保留低16字节，丢弃高16字节，只保留16个最低有效位字节。
+  underlying_type: uint8_t
+timestamp: '2026-09-23'
+---
 # asc_channel_pad_mode
 
 头文件路径为：`"c_api/defs/enum.h"`。

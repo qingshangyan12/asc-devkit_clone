@@ -1,3 +1,22 @@
+---
+okftype: reference.api.cpp
+title: asc_e2m1x22bfloat16
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16.md
+description: 根据mask将矢量数据寄存器中参与计算的fp4x2_e2m1_t元素转换为bfloat16_t类型并写入dst，源与目的元素位宽比为1:4，通过src_quarter_pos每隔4个索引离散选取一组位置读取数据。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked, widening_result]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_e2m1x22bfloat16
 
 ## 产品支持情况

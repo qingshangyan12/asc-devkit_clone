@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_or
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
+description: 对两个源矢量的每对元素执行按位或运算，结果存入目的矢量。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [bitwise]
+  - operations: [bitwise_or]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [elementwise, high_dimensional]
+signature:
+  - override_id: asc_or__PUi16_PUi16_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_or__PUu16_PUu16_PUu16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_or__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_or__PUu16_PUu16_PUu16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_or
 
 ## 产品支持情况

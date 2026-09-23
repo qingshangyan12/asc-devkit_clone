@@ -1,3 +1,50 @@
+---
+okftype: reference.api.cpp
+title: asc_load
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md
+description: 从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据到矢量数据寄存器，搬运过程中数据格式和内容保持不变，连续搬入时需在每次调用前手动更新源地址。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [load]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [vector_register]
+  - traits: []
+signature:
+  - prototype_id: asc_load__PU<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/composite/loadunalign_composite.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_load__Rv<dtype>_PU<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/composite/loadunalign_composite.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples:
+  - path: /examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
+    file: c_api_add.asc
+    archs: ['3510']
+    override_id: asc_load__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode
+    file: set_l2_cache_mode.h
+    archs: ['3510', '2201']
+    override_id: asc_load__Rvf16_PUf16
+timestamp: '2026-09-23'
+---
 # asc_load
 
 ## 产品支持情况

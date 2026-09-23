@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_leakyrelu
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md
+description: 根据掩码对源矢量数据寄存器中的元素执行Leaky ReLU操作：大于0的元素直接写入输出结果，小于或等于0的元素乘以标量alpha后写入，掩码为0的元素在输出结果中置零，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [leaky_relu]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, scalar_operand]
+signature:
+  - prototype_id: asc_leakyrelu__v<dtype>_<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
+    dtype: [half, float]
+  - prototype_id: asc_leakyrelu__Rv<dtype>_v<dtype>_<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
+    dtype: [half, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_leakyrelu
 
 ## 产品支持情况

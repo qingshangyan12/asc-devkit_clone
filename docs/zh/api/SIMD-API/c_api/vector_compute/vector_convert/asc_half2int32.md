@@ -1,3 +1,57 @@
+---
+okftype: reference.api.cpp
+title: asc_half2int32
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md
+description: 将half类型数据转换为int32_t类型，支持多种舍入模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [rounding_mode]
+signature:
+  - override_id: asc_half2int32_rn__PUi32_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_rna__PUi32_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_rd__PUi32_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_ru__PUi32_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_rz__PUi32_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_rn__PUi32_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_rna__PUi32_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_rd__PUi32_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_ru__PUi32_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int32_rz__PUi32_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/cast
+    file: cast.asc
+    archs: ['2201']
+    override_id: asc_half2int32_ru__PUi32_PUf16_u32
+timestamp: '2026-09-23'
+---
 # asc_half2int32
 
 ## 产品支持情况

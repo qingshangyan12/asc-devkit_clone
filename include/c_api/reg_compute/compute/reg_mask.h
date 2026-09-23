@@ -25,14 +25,42 @@
 #include "impl/c_api/reg_base_impl/reg_mask_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_mask
+ * @override_id asc_update_mask_b8__Ru32
+ * @archs 3510
+ * @param [in,out] value 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。执行完一次该接口后，value = (value 例如，有320个b16数据类型的元素，每次处理128个元素：第一次调用接口，生成的mask对应的元素全为有效数据，value = 320-128 = 192。第二次调用接口，生成的mask对应的元素全为有效数据，value = 192-128 = 64。第三次调用接口，生成的mask对应的元素只有低半部分为有效数据，value = 0。
+ */
 __simd_callee__ inline vector_bool asc_update_mask_b8(uint32_t& value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_mask
+ * @override_id asc_update_mask_b16__Ru32
+ * @archs 3510
+ * @param [in,out] value 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。执行完一次该接口后，value = (value 例如，有320个b16数据类型的元素，每次处理128个元素：第一次调用接口，生成的mask对应的元素全为有效数据，value = 320-128 = 192。第二次调用接口，生成的mask对应的元素全为有效数据，value = 192-128 = 64。第三次调用接口，生成的mask对应的元素只有低半部分为有效数据，value = 0。
+ */
 __simd_callee__ inline vector_bool asc_update_mask_b16(uint32_t& value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_mask
+ * @override_id asc_update_mask_b32__Ru32
+ * @archs 3510
+ * @param [in,out] value 元素个数。调用后自动减去当前向量处理单元的元素个数（b8模式、b16模式、b32模式分别为256、128、64）。执行完一次该接口后，value = (value 例如，有320个b16数据类型的元素，每次处理128个元素：第一次调用接口，生成的mask对应的元素全为有效数据，value = 320-128 = 192。第二次调用接口，生成的mask对应的元素全为有效数据，value = 192-128 = 64。第三次调用接口，生成的mask对应的元素只有低半部分为有效数据，value = 0。
+ */
 __simd_callee__ inline vector_bool asc_update_mask_b32(uint32_t& value);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_mask
+ * @override_id asc_get_mask_spr_b16__z
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bool asc_get_mask_spr_b16();
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_mask
+ * @override_id asc_get_mask_spr_b32__z
+ * @archs 3510
+ */
 __simd_callee__ inline vector_bool asc_get_mask_spr_b32();
 
 #define asc_create_mask_b8 pset_b8

@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_copy
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
+description: 完成数据在寄存器间的搬运，支持矢量数据寄存器到矢量数据寄存器、掩码寄存器到掩码寄存器以及矢量数据寄存器到掩码寄存器三种模式，按mask筛选或按part选取数据块控制搬运，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
+  - traits: [masked]
+signature:
+  - prototype_id: asc_copy__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_copy.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - override_id: asc_copy__Rvb_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_copy.h]
+  - override_id: asc_copy__Rvb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_copy.h]
+  - override_id: asc_copy__Rvb_vu16_i16
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_copy.h]
+  - override_id: asc_copy__Rvb_vu32_i16
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_copy.h]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode
+    file: mergemode.asc
+    archs: ['3510']
+    override_id: asc_copy__Rvf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_copy
 
 ## 产品支持情况

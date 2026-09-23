@@ -1,3 +1,49 @@
+---
+okftype: reference.api.cpp
+title: asc_storeunalign_postupdate
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
+description: 将矢量数据寄存器或掩码寄存器中的数据连续搬出到非32字节对齐的Unified Buffer（UB）地址，提供立即数偏移、地址寄存器偏移与掩码寄存器三种模式；搬出后自动累加目的地址指针或地址寄存器，尾块暂存至非对齐寄存器并由后处理接口收尾。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [unified_buffer]
+  - traits: [post_update, unaligned_transfer]
+signature:
+  - prototype_id: asc_storeunalign_postupdate__RPU<dtype>_Rvstoreunalign_v<dtype>_u32
+    archs: ['3510']
+    headers: []
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t]
+  - prototype_id: asc_storeunalign_postupdate__PU<dtype>_Rvstoreunalign_v<dtype>_Rar
+    archs: ['3510']
+    headers: []
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t]
+  - prototype_id: asc_storeunalign_postupdate__RPU<dtype>_Rvstoreunalign_vb
+    archs: ['3510']
+    headers: []
+    dtype: [uint16_t, uint32_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: 地址寄存器偏移搬出模式
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_storeunalign_postupdate
 
 ## 产品支持情况

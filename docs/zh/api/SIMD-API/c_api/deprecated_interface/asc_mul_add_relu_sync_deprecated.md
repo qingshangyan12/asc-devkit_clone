@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_mul_add_relu_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mul_add_relu_sync_deprecated.md
+description: 已废弃的同步融合运算接口：按元素将src0与dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值）后存入dst，请使用非同步接口asc_mul_add_relu并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [fused_multiply_add, relu]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, elementwise]
+signature:
+  - override_id: asc_mul_add_relu_sync__PUf16_PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_mul_add_relu_sync__PUf32_PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_mul_add_relu_sync（废弃）
 
 ## 产品支持情况

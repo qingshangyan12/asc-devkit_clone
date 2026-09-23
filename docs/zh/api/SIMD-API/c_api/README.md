@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: C API
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/README.md
+description: 介绍Ascend C语言扩展层SIMD C API的定位与特性：基于指针编程、直接映射NPU硬件指令、开放全部底层硬件能力，并说明头文件包含方式、关键字、流水类型、API目录列表与参考样例入口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # C API
 
 C API开放芯片完备编程能力，支持[以数组形式分配内存](general_description_and_constraints.md#以数组方式申请内存)，一般基于指针编程。提供与业界一致的C语言编程体验。

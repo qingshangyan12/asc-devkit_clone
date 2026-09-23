@@ -1,3 +1,69 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_ub2gm_align_sync_arch_2201（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_align_sync_arch_2201_deprecated.md
+description: 已废弃接口，将数据从Unified Buffer（UB）搬运到Global Memory (GM)，支持前n个数据搬运和高维切分搬运两种方式，请使用asc_copy_ub2gm_align配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [global_memory]
+  - traits: [deprecated, high_dimensional, unaligned_transfer]
+signature:
+  - override_id: asc_copy_ub2gm_align_sync__PGu8_PUu8_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGi8_PUi8_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGu16_PUu16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGi16_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGbf16_PUbf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGu32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGi32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGf64_PUf64_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGi64_PUi64_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_copy_ub2gm_align_sync__PGu64_PUu64_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_ub2gm_align_sync_arch_2201（废弃）
 
 ## 产品支持情况

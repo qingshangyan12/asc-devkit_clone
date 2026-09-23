@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_select_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_select_sync_deprecated.md
+description: 已废弃接口，执行矢量选择操作，依据sel_mask比特位从src0或src1中选取元素写入dst，需配合asc_set_cmp_mask使用，请使用非同步接口asc_select配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [selection]
+  - objects: [mask, vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, masked]
+signature:
+  - override_id: asc_select_sync__PUf16_PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_select_sync__PUf32_PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+    condition: 需要配合[asc_set_cmp_mask](../vector_compute/vector_compare/asc_set_cmp_mask.md)接口使用。
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_select_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,46 @@
+---
+okftype: reference.api.cpp
+title: asc_loadalign_deintlv
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md
+description: 从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据并解交织，偶数下标元素写入矢量数据寄存器dst0，奇数下标元素写入矢量数据寄存器dst1。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [deinterleave, load]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [vector_register]
+  - traits: []
+signature:
+  - prototype_id: asc_loadalign_deintlv__Rv<dtype>_Rv<dtype>_PU<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_loadalign_deintlv__Rv<dtype>_Rv<dtype>_PU<dtype>_i32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_loadalign_deintlv__Rv<dtype>_Rv<dtype>_PU<dtype>_ar
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_loadalign_deintlv
 
 ## 产品支持情况

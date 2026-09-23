@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 关键特性说明
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/key_features.md
+description: 关键特性说明页，阐述原子操作场景下的确定性计算：分析带随路原子操作的搬运指令乱序与开启原子操作前后指令乱序两类非确定性结果的产生原因，并给出通过核内同步及基于GM信号量的软件核间同步保证确定性执行顺序的实现方案。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 关键特性说明
 
 确定性计算是指在相同输入条件下，无论执行次数或执行环境如何变化，总能产生完全一致输出结果的计算过程。确定性计算为系统稳定性和实验可验证性提供保障。

@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_set_l13d_size
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md
+description: 设置asc_copy_l12l0a和asc_copy_l12l0b的3D格式搬运接口在L1 Buffer的边界值，源操作数地址超出边界时将从L1
+  Buffer起始地址开始读取数据。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_l13d_size__u64
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
+    kind: configures
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_l13d_size
 
 ## 产品支持情况

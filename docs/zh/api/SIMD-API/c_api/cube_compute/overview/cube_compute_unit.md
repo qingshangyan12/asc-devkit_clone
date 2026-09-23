@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 矩阵计算单元
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_unit.md
+description: 介绍矩阵计算单元Cube及其直接访问的专用缓存：L0A Buffer存储左矩阵，L0B Buffer存储右矩阵，L0C Buffer存储初始化累加值和矩阵计算结果，并以表格说明L1、Fixpipe、BiasTable等关联存储单元的用途。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 矩阵计算单元
 
 Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。

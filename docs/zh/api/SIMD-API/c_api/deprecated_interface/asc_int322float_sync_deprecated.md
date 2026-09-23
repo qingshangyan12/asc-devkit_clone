@@ -1,3 +1,45 @@
+---
+okftype: reference.api.cpp
+title: asc_int322float_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322float_sync_deprecated.md
+description: 已废弃的同步类型转换接口，将int32_t类型数据转换为float类型，支持多种舍入模式，请改用对应的非同步接口和同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, rounding_mode]
+signature:
+  - override_id: asc_int322float_sync__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_int322float_rn_sync__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_int322float_rna_sync__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_int322float_rd_sync__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_int322float_ru_sync__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_int322float_rz_sync__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_int322float_sync（废弃）
 
 ## 产品支持情况

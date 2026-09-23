@@ -1,3 +1,50 @@
+---
+okftype: reference.api.cpp
+title: asc_gather_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_gather_sync_deprecated.md
+description: 已废弃的同步矢量收集接口：将src按照src_offset给定的偏移按元素收集到dst中，请使用非同步接口asc_gather并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [gather]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated, elementwise]
+signature:
+  - override_id: asc_gather_sync__PUi16_PUi16_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_gather_sync__PUu16_PUu16_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_gather_sync__PUf16_PUf16_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_gather_sync__PUbf16_PUbf16_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_gather_sync__PUi32_PUi32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_gather_sync__PUu32_PUu32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_gather_sync__PUf32_PUf32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_gather_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_gather/asc_gather.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
+    kind: related
+    condition: '`asc_gather_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_gather/asc_gather.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_gather_sync（废弃）
 
 ## 产品支持情况

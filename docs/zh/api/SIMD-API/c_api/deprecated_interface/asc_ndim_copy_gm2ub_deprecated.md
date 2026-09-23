@@ -1,3 +1,82 @@
+---
+okftype: reference.api.cpp
+title: asc_ndim_copy_gm2ub（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ndim_copy_gm2ub_deprecated.md
+description: 已废弃的多维数据搬运接口，将数据从Global Memory搬运到Unified Buffer，最多支持5个维度，每个维度可单独配置Stride并支持随路Padding，请使用新接口形式替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated, high_dimensional, padding]
+signature:
+  - override_id: asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_u8
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
+    kind: requires
+    condition: 相关配置参数有很多，需要通过不同的接口传入。
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+    kind: requires
+    condition: 相关配置参数有很多，需要通过不同的接口传入。
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+    kind: related
+    condition: 当padding_mode为true时，该值将作为Padding的填充固定值。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_ndim_copy_gm2ub（废弃）
 
 ## 产品支持情况

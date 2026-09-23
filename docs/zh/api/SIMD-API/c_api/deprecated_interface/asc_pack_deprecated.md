@@ -1,3 +1,57 @@
+---
+okftype: reference.api.cpp
+title: asc_pack (废弃)
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_pack_deprecated.md
+description: 已废弃接口，将源操作数元素选取低8位、低16位或低32位写入目的操作数的低半部分或高半部分，请使用asc_pack_to_low和asc_pack_to_high替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [compression]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_pack__Rvu8_vu16
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack__Rvu8_vi16
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack__Rvu16_vu32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack__Rvu16_vi32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack__Rvb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack_v2__Rvu8_vu16
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack_v2__Rvu8_vi16
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack_v2__Rvu16_vu32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack_v2__Rvu16_vi32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_pack_v2__Rvb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_pack (废弃)
 
 ## 产品支持情况

@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_gm2l1_arch_3510（高维切分数据搬运）（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md
+description: 将数据从Global Memory搬运到L1 Buffer且格式内容保持不变，通过配置数据块个数、块长度和地址偏移实现非连续的高维切分搬运，支持按通道padding模式插入或移除padding；使用pad_func_mode的旧常规重载及其同步接口已废弃，请使用带pad_mode参数的新接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l1_buffer]
+  - traits: [deprecated, high_dimensional, padding]
+signature:
+  - override_id: asc_copy_gm2l1__PL1v_PGv_u32_u32_u8_u64_u32
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_gm2l1_sync__PL1v_PGv_u32_u32_u8_u64_u32
+    archs: ['3510']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md
+    kind: related
+    condition: 按通道padding模式
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md
+    kind: related
+    condition: 填充模式
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_gm2l1_arch_3510（高维切分数据搬运）（废弃）
 
 ## 产品支持情况

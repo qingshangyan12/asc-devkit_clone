@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_set_l0c2gm_channel_para（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md
+description: 该接口已废弃，用于在L0C Buffer搬出并执行Nz2DN格式转换时配置源Nz矩阵中相邻行的地址偏移，配置由后续开启Nz2DN功能的L0C搬出接口使用，请使用asc_set_l0c_copy_channel_para接口替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_set_l0c2gm_channel_para__u64
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
+    kind: related
+    condition: 配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
+    kind: related
+    condition: 配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
+    kind: related
+    condition: 配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
+    kind: related
+    condition: '`asc_set_l0c2gm_channel_para`接口已废弃。请使用[asc_set_l0c_copy_channel_para](../cube_datamove/asc_set_l0c_copy_channel_para.md)接口替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_set_l0c2gm_channel_para（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_exp_sub（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md
+description: 已废弃接口，将src0与src1按元素相减并计算以差值为指数的自然指数函数，结果写入dst，请使用asc_exp_sub新原型替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [exponential, subtract]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, elementwise, masked]
+signature:
+  - override_id: asc_exp_sub__Rvf32_vf16_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
+  - override_id: asc_exp_sub_v2__Rvf32_vf16_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
+  - override_id: asc_exp_sub_v2__Rvf32_vf32_vf32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md
+    kind: related
+    condition: 输入数据类型为`half`且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃。新接口请参见[asc_exp_sub](../reg_compute/reg_fused/asc_exp_sub.md)。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_exp_sub（废弃）
 
 ## 产品支持情况

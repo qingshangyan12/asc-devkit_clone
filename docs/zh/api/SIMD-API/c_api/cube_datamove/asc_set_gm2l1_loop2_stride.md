@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_set_gm2l1_loop2_stride
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md
+description: 将数据从GM搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔，仅在AIC上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_gm2l1_loop2_stride__u64_u64
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_gm2l1_loop2_stride
 
 ## 产品支持情况

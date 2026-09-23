@@ -1,3 +1,59 @@
+---
+okftype: reference.api.cpp
+title: asc_int322float
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md
+description: 将int32_t类型数据逐元素转换为float类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，操作数起始地址需32字节对齐。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [high_dimensional, rounding_mode]
+signature:
+  - override_id: asc_int322float__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_rn__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_rna__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_rd__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_ru__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_rz__PUf32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float__PUf32_PUi32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_rn__PUf32_PUi32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_rna__PUf32_PUi32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_rd__PUf32_PUi32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_ru__PUf32_PUi32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int322float_rz__PUf32_PUi32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_int322float
 
 ## 产品支持情况

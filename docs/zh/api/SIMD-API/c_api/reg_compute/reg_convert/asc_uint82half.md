@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_uint82half
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md
+description: 将uint8_t类型数据转为half类型；因源与目的类型位宽比为1:2，读取时通过src_pos选择源矢量数据寄存器中偶数或奇数索引位置的元素参与转换，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, widening_result]
+signature:
+  - override_id: asc_uint82half__Rvf16_vu8_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint82half__Rvf16_vu8_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint82half__vu8_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint82half__vu8_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_uint82half
 
 ## 产品支持情况

@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_float2int64_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int64_sync_deprecated.md
+description: 已废弃的同步矢量转换接口：将float类型转化为int64_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请使用非同步接口asc_float2int64并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, rounding_mode]
+signature:
+  - override_id: asc_float2int64_rn_sync__PUi64_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_float2int64_rna_sync__PUi64_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_float2int64_rd_sync__PUi64_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_float2int64_ru_sync__PUi64_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_float2int64_rz_sync__PUi64_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_float2int64_rn_sync`、`asc_float2int64_rna_sync`、`asc_float2int64_rd_sync`、`asc_float2int64_ru_sync`和`asc_float2int64_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2int64.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md
+    kind: related
+    condition: '`asc_float2int64_rn_sync`、`asc_float2int64_rna_sync`、`asc_float2int64_rd_sync`、`asc_float2int64_ru_sync`和`asc_float2int64_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2int64.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_float2int64_sync（废弃）
 
 ## 产品支持情况

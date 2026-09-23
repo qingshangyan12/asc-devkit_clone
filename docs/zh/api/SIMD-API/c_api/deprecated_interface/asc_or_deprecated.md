@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_or（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_or_deprecated.md
+description: 该接口的浮点类型重载已废弃，根据mask对矢量数据寄存器src0、src1执行按位或操作并将结果写入dst，仅在AIV上生效，请使用等位宽的asc_or整数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [bitwise]
+  - operations: [bitwise_or]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, elementwise, masked]
+signature:
+  - prototype_id: asc_or__Rv<dtype>_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
+    dtype: [half, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_or（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_get_block_idx（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md
+description: 已废弃的核索引查询接口：获取当前运行核（逻辑核）的索引，运行于标量流水，请使用内置变量block_idx结合asc_get_sub_block_num和asc_get_sub_block_id接口替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: [system]
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_get_block_idx__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/utils/sys_var.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md
+    kind: related
+    condition: 该接口已废弃，请使用[内置变量block_idx](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)结合[asc_get_sub_block_num](../utils/sys_var/asc_get_sub_block_num.md)和[asc_get_sub_block_id](../utils/sys_var/asc_get_sub_block_id.md)接口替代。
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md
+    kind: related
+    condition: 该接口已废弃，请使用[内置变量block_idx](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#内置变量)结合[asc_get_sub_block_num](../utils/sys_var/asc_get_sub_block_num.md)和[asc_get_sub_block_id](../utils/sys_var/asc_get_sub_block_id.md)接口替代。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_get_block_idx（废弃）
 
 ## 产品支持情况

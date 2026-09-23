@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 关键特性说明
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md
+description: 介绍Reg矢量计算的关键特性，涵盖Hardware Loop编码规范、指令双发优化、VF融合以及数据搬运接口的选择与优化示例。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 关键特性说明
 
 ## 硬件循环（HardwareLoop）

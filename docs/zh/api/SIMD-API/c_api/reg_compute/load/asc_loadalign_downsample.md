@@ -1,3 +1,59 @@
+---
+okftype: reference.api.cpp
+title: asc_loadalign_downsample
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md
+description: 从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，矢量数据寄存器结果保留偶数下标元素，掩码寄存器结果保留偶数下标bit。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [load]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [vector_register]
+  - traits: []
+signature:
+  - prototype_id: asc_loadalign_downsample__PU<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t]
+  - prototype_id: asc_loadalign_downsample__Rv<dtype>_PU<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t]
+  - override_id: asc_loadalign_downsample__Rvb_PUu32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+  - prototype_id: asc_loadalign_downsample__Rv<dtype>_PU<dtype>_i32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t]
+  - override_id: asc_loadalign_downsample__Rvb_PUu32_i32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+  - prototype_id: asc_loadalign_downsample__Rv<dtype>_PU<dtype>_ar
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t]
+  - override_id: asc_loadalign_downsample__Rvb_PUu32_ar
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_loadalign_downsample
 
 ## 产品支持情况

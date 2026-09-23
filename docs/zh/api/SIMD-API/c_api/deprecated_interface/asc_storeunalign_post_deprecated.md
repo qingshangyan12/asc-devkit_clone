@@ -1,3 +1,77 @@
+---
+okftype: reference.api.cpp
+title: asc_storeunalign_post（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md
+description: 该接口已废弃，将非对齐寄存器中暂存的尾块数据搬出到Unified Buffer（UB），需先调用asc_storeunalign_postupdate接口，请使用asc_squeeze_and_storeunalign_finalize接口实现此功能。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated, unaligned_transfer]
+signature:
+  - override_id: asc_storeunalign_post__PUi8_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUu8_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUf4e2m1x2_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUf4e1m2x2_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUi4x2_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUf8e8m0_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUf8e5m2_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUf8e4m3_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUi16_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUu16_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUf16_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUbf16_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUi32_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUu32_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUf32_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+  - override_id: asc_storeunalign_post__PUi64_vstoreunalign
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md
+    kind: requires
+    condition: 调用本接口之前，需要调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate_deprecated.md)接口，且本接口与前序接口的非对齐寄存器要保持一致。
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
+    kind: related
+    condition: 该接口已废弃。请使用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)实现此功能。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_storeunalign_post（废弃）
 
 ## 产品支持情况

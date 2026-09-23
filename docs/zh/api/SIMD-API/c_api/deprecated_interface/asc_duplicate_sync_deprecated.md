@@ -1,3 +1,50 @@
+---
+okftype: reference.api.cpp
+title: asc_duplicate_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_duplicate_sync_deprecated.md
+description: 已废弃接口，执行矢量复制操作，将标量值复制填充到矢量中，请使用asc_duplicate与asc_sync组合替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [broadcast]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, scalar_operand]
+signature:
+  - override_id: asc_duplicate_sync__PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_duplicate_sync__PUi16_i16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_duplicate_sync__PUu16_u16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_duplicate_sync__PUbf16_bf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_duplicate_sync__PUf32_f32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_duplicate_sync__PUi32_i32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_duplicate_sync__PUu32_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_duplicate_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_broadcast/asc_duplicate.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md
+    kind: related
+    condition: '`asc_duplicate_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_broadcast/asc_duplicate.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_duplicate_sync（废弃）
 
 ## 产品支持情况

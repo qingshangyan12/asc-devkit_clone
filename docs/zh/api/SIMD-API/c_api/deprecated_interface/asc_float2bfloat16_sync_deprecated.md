@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_float2bfloat16_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md
+description: 已废弃接口，将float类型数据转换为bfloat16_t类型，并支持多种舍入模式，支持多种舍入模式，请使用asc_float2bfloat16与asc_sync组合替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, rounding_mode]
+signature:
+  - override_id: asc_float2bfloat16_rn_sync__PUbf16_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_float2bfloat16_rna_sync__PUbf16_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_float2bfloat16_rd_sync__PUbf16_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_float2bfloat16_ru_sync__PUbf16_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_float2bfloat16_rz_sync__PUbf16_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_float2bfloat16_rn_sync`、`asc_float2bfloat16_rna_sync`、`asc_float2bfloat16_rd_sync`、`asc_float2bfloat16_ru_sync`和`asc_float2bfloat16_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2bfloat16.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md
+    kind: related
+    condition: '`asc_float2bfloat16_rn_sync`、`asc_float2bfloat16_rna_sync`、`asc_float2bfloat16_rd_sync`、`asc_float2bfloat16_ru_sync`和`asc_float2bfloat16_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2bfloat16.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_float2bfloat16_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,74 @@
+---
+okftype: reference.api.cpp
+title: asc_half2hif8
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md
+description: 根据mask将矢量数据寄存器中参与计算的half元素转换为hifloat8_t类型并写入dst，支持舍入模式和饱和/非饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的的偶数或奇数位置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked, rounding_mode, saturation_mode]
+signature:
+  - override_id: asc_half2hif8_rna__Rvhf8_vf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rna_sat__Rvhf8_vf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rh__Rvhf8_vf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rh_sat__Rvhf8_vf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rna__Rvhf8_vf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rna_sat__Rvhf8_vf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rh__Rvhf8_vf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rh_sat__Rvhf8_vf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rna__vf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rna_sat__vf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rh__vf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rh_sat__vf16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rna__vf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rna_sat__vf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rh__vf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2hif8_rh_sat__vf16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: constrained_by
+    condition: 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_half2hif8
 
 ## 产品支持情况

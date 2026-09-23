@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: asc_half2int4x2
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md
+description: 根据mask将矢量数据寄存器中参与计算的half元素转换为int4x2_t类型，两个连续half元素打包为一对4bit有符号整数，支持舍入和饱和/非饱和模式，按dst_quarter_pos每隔4个存储单元写入，其他位置置零。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked, rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: constrained_by
+    condition: 开启饱和模式或非饱和模式时，需配置ctrl寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_half2int4x2
 
 ## 产品支持情况

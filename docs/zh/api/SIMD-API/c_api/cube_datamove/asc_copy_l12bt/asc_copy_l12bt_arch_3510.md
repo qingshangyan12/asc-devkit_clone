@@ -1,3 +1,45 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_l12bt
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
+description: 将L1 Buffer中的偏置数据搬运到BiasTable Buffer，供矩阵计算单元（Mmad）作为bias输入读取，支持高维切分和连续数据两种搬运模式，half、bfloat16_t类型在搬运中会随路格式转换后写入。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l1_buffer]
+  - destination_locations: [bias_table_buffer]
+  - traits: [high_dimensional]
+signature:
+  - prototype_id: asc_copy_l12bt__u64_PL1<dtype>_u16_u16_u16_u16_u16
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+    dtype: [half, bfloat16_t, int32_t, float]
+  - prototype_id: asc_copy_l12bt__u64_PL1<dtype>_u32
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+    dtype: [half, bfloat16_t, int32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
+    file: matmul.asc
+    archs: ['3510']
+    override_id: asc_copy_l12bt__u64_PL1f32_u16_u16_u16_u16_u16
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
+    file: mmad_s1.h
+    archs: ['3510']
+    override_id: asc_copy_l12bt__u64_PL1i32_u16_u16_u16_u16_u16
+timestamp: '2026-09-23'
+---
 # asc_copy_l12bt
 
 ## 产品支持情况

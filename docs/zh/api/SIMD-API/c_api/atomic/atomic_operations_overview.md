@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 原子操作概述
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md
+description: 原子操作概述页，介绍数据搬运随路原子操作与Scalar原子操作两类接口：前者对后续目的地址为GM的数据搬运指令开启原子累加、原子比较等随路操作，后者在指定GM地址上进行单点原子计算操作，并以表格汇总各接口的功能描述与返回值行为。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 原子操作概述
 
 数据搬运随路原子操作接口用于对后续目的地址为GM的数据搬运指令开启原子操作，涉及的接口请参见[表1](#table1)。如下图1的左侧子图所示，未开启原子操作时，写入GM的数据搬运完成后，GM中原始数据将被新搬运数据完全覆盖。如图1右侧子图所示，当数据搬运随路原子操作接口被调用后，系统将为后续写入GM的数据搬运开启原子操作。此时，数据搬运完成后，GM中的最终数据由原始GM数据与新搬运数据共同决定。

@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 位运算
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/scalar_bit.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 位运算
 
 - **[asc_clear_nthbit](asc_clear_nthbit.md)**

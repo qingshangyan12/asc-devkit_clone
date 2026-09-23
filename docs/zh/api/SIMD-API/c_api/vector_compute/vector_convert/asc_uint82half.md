@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_uint82half
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md
+description: 将uint8_t类型数据逐元素转换为half类型，提供前n个数据计算和高维切分计算两种接口形式，操作数起始地址需32字节对齐。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [high_dimensional]
+signature:
+  - override_id: asc_uint82half__PUf16_PUu8_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_uint82half__PUf16_PUu8_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_uint82half
 
 ## 产品支持情况

@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_get_rsvd_count
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md
+description: 获取执行asc_reduce操作后剩余的元素数量，需与asc_reduce操作配合使用，并通过同步确保其执行完成后再调用。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_rsvd_count__z
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
+    kind: requires
+    condition: 需通过同步操作确保[asc_reduce](asc_reduce.md)执行完成后再调用本接口获取结果。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_rsvd_count
 
 ## 产品支持情况

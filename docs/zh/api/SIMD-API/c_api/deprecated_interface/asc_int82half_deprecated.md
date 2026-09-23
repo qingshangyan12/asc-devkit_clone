@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_int82half（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82half_deprecated.md
+description: 已废弃接口，将int8_t类型数据转换为half类型，请改用asc_int82half的显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_int82half__Rvf16_vi8_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int82half_v2__Rvf16_vi8_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82half.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_int82half（废弃）
 
 ## 产品支持情况

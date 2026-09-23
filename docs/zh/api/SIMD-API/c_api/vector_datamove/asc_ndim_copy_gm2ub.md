@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: asc_ndim_copy_gm2ub
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+description: 将多维数据从Global Memory（GM）搬运到Unified Buffer（UB），最多支持5个维度，每个维度均可单独配置Stride并支持随路Padding功能，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional, padding]
+signature:
+  - prototype_id: asc_ndim_copy_gm2ub__PU<dtype>_PG<dtype>_u32_u32_u32_u32_u32_u8_u8_b_loadl2
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+    dtype: [int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t,
+      int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
+    kind: requires
+    condition: 多核场景下，如果多个AI Core可能读取同一块GM地址，且该GM地址中的数据可能被其他核更新，应在调用本接口前调用[asc_ndim_copy_dci](asc_ndim_copy_dci.md)刷新NDDMA
+      DataCache，保证多核间数据一致性。
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
+    kind: requires
+    condition: 各维源/目步长须通过配套接口（[asc_set_ndim_loop_stride](asc_set_ndim_loop_stride.md)）预先配置
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+    kind: requires
+    condition: loop1~loop4维度的左右填充元素数须通过配套接口（[asc_set_ndim_pad_count](asc_set_ndim_pad_count.md)）预先配置
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+    kind: related
+    condition: 当`padding_mode`为`true`时，该值作为Padding的固定填充值
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_ndim_copy_gm2ub
 
 ## 产品支持情况

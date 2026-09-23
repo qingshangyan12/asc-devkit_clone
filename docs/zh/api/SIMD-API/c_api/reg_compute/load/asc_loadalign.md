@@ -1,3 +1,177 @@
+---
+okftype: reference.api.cpp
+title: asc_loadalign
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
+description: 从Unified Buffer（UB）中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，提供连续对齐、立即数偏移、地址寄存器偏移和非连续对齐四种搬入模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [load]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [vector_register]
+  - traits: [masked]
+signature:
+  - prototype_id: asc_loadalign__PU<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_loadalign__Rv<dtype>_PU<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t, uint64_t]
+  - override_id: asc_loadalign__Rvb_PUu32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+  - prototype_id: asc_loadalign__Rv<dtype>_PU<dtype>_i32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t, uint64_t]
+  - override_id: asc_loadalign__Rvb_PUu32_i32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+  - prototype_id: asc_loadalign__Rv<dtype>_PU<dtype>_ar
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t, uint64_t]
+  - override_id: asc_loadalign__Rvb_PUu32_ar
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+  - prototype_id: asc_loadalign__Rv<dtype>_PU<dtype>_u16_u16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md
+    kind: related
+    condition: 当dtype为`int64_t`时
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
+    kind: related
+    condition: 当dtype为`int64_t`时
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples:
+  - path: /examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer
+    file: add_double_buffer.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf16_PUf16
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather
+    file: reg_load_gather.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvu16_PUu16
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather
+    file: reg_load_gather.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvu32_PUu32
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
+    file: reg_load_store_align.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf16_PUf16
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
+    file: reg_load_store_align.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf16_PUf16_ar
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_mask
+    file: reg_load_store_mask.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvb_PUu32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs
+    file: abs.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast
+    file: cast.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare
+    file: compare.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout
+    file: data_relayout.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvu16_PUu16
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout
+    file: data_relayout.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvu32_PUu32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div
+    file: div.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
+    file: elu.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather
+    file: gather.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf16_PUf16
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather
+    file: gather.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvu16_PUu16
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram
+    file: histogram.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvu8_PUu8
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode
+    file: mergemode.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul
+    file: mul.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls
+    file: muls.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce
+    file: reduce.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block
+    file: reduce_block.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair
+    file: reduce_pair.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select
+    file: select.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze
+    file: squeeze.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate
+    file: truncate.asc
+    archs: ['3510']
+    override_id: asc_loadalign__Rvf32_PUf32
+timestamp: '2026-09-23'
+---
 # asc_loadalign
 
 ## 产品支持情况

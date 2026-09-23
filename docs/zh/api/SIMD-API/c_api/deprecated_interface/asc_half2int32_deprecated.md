@@ -1,3 +1,56 @@
+---
+okftype: reference.api.cpp
+title: asc_half2int32（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int32_deprecated.md
+description: 已废弃的寄存器矢量转换接口：根据mask将half类型元素转换为int32_t类型写入dst，支持FLOOR、RINT、ROUND、CEIL、TRUNC舍入模式，位宽比为1:2，按后缀读取偶数或奇数索引，请使用asc_half2int32的显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, masked, rounding_mode, widening_result]
+signature:
+  - override_id: asc_half2int32_rd__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_rd_v2__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_rn__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_rn_v2__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_rna__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_rna_v2__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_ru__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_ru_v2__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_rz__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_half2int32_rz_v2__Rvi32_vf16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md
+    kind: related
+    condition: 该接口通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_half2int32](../reg_compute/reg_convert/asc_half2int32.md)的显式位置参数重载替代。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_half2int32（废弃）
 
 ## 产品支持情况

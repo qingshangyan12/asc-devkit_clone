@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: asc_half2int4_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int4_sync_deprecated.md
+description: 已废弃的同步矢量转换接口：将half类型数据转换为int4类型，支持多种舍入模式，目的操作数为int4b_t时count必须为偶数，请使用非同步接口asc_half2int4并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, rounding_mode]
+signature:
+  - override_id: asc_half2int4_sync__PUi4x2_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_half2int4_rn_sync__PUi4x2_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_half2int4_rd_sync__PUi4x2_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_half2int4_rna_sync__PUi4x2_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_half2int4_ru_sync__PUi4x2_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_half2int4_rz_sync__PUi4x2_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_half2int4_sync`、`asc_half2int4_rn_sync`、`asc_half2int4_rd_sync`、`asc_half2int4_rna_sync`、`asc_half2int4_ru_sync`和`asc_half2int4_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_half2int4.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md
+    kind: related
+    condition: '`asc_half2int4_sync`、`asc_half2int4_rn_sync`、`asc_half2int4_rd_sync`、`asc_half2int4_rna_sync`、`asc_half2int4_ru_sync`和`asc_half2int4_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_half2int4.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_half2int4_sync（废弃）
 
 ## 产品支持情况

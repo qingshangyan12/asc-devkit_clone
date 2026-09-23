@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_get_ffts_base_addr
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md
+description: 获取核间同步寄存器的基地址，该基地址需在Host侧获取并经asc_set_ffts_base_addr配置后使用，本接口为只读查询，常用于设置后的回读校验。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_ffts_base_addr__z
+    archs: ['2201']
+    headers: [/include/c_api/utils/sys_var.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_ffts_base_addr
 
 ## 产品支持情况

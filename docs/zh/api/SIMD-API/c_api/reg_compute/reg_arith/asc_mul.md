@@ -1,3 +1,43 @@
+---
+okftype: reference.api.cpp
+title: asc_mul
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul.md
+description: 根据mask对两个源矢量数据寄存器按元素相乘并将结果写入目的操作数，支持整型与浮点数据类型，结果可通过引用参数或函数返回值输出。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [multiply]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_mul__Rv<dtype>_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_mul__v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul
+    file: mul.asc
+    archs: ['3510']
+    override_id: asc_mul__Rvf32_vf32_vf32_vb
+  - path: /examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer
+    file: add_double_buffer.asc
+    archs: ['3510']
+    override_id: asc_mul__Rvf16_vf16_vf16_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
+    file: elu.asc
+    archs: ['3510']
+    override_id: asc_mul__Rvf32_vf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_mul
 
 ## 产品支持情况

@@ -1,3 +1,36 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_ub2gm_sync_arch_3510（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_sync_arch_3510_deprecated.md
+description: 已废弃接口，将数据从Unified Buffer（UB）搬运到Global Memory (GM)，前n个数据搬运时搬运数据大小要求32字节对齐，请使用asc_copy_ub2gm配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [unified_buffer]
+  - destination_locations: [global_memory]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_copy_ub2gm_sync__PGv_PUv_u32
+    archs: ['3510']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_ub2gm_sync_arch_3510（废弃）
 
 ## 产品支持情况

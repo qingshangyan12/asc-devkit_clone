@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_axpy_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_axpy_sync_deprecated.md
+description: 将源操作数每个元素与标量value求积后和目的操作数对应元素相加；接口已废弃，请使用对应的非同步接口asc_axpy和同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [fused_multiply_add]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, scalar_operand]
+signature:
+  - override_id: asc_axpy_sync__PUf16_PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_axpy_sync__PUf32_PUf16_f16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_axpy_sync__PUf32_PUf32_f32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_axpy_sync（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_get_l0c2gm_relu
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_relu.md
+description: 用于数据搬运随路量化场景下读取ReLU操作前矢量的起始地址，无输入参数，返回该起始地址。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_l0c2gm_relu__z
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_l0c2gm_relu
 
 ## 产品支持情况

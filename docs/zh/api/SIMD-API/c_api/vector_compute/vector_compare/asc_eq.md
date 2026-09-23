@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_eq
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md
+description: 逐元素比较两个源矢量是否相等，比较结果为真时对应比特位设为1，否则设为0，结果可存入寄存器或目的矢量。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise]
+signature:
+  - override_id: asc_eq__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - override_id: asc_eq__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - override_id: asc_eq__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - override_id: asc_eq__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - override_id: asc_eq__PUu8_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: requires
+    condition: 使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+    condition: 如果要初始化寄存器，可以调用[asc_set_cmp_mask](asc_set_cmp_mask.md)接口。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_eq
 
 ## 产品支持情况

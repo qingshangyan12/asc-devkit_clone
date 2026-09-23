@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_gather_datablock
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
+description: 给定输入矢量和地址偏移矢量，根据偏移地址按照DataBlock粒度将输入矢量收集到目的矢量中。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [gather]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [high_dimensional]
+signature:
+  - override_id: asc_gather_datablock__PUu16_PUu16_PUu32_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - override_id: asc_gather_datablock__PUu32_PUu32_PUu32_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_gather.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_gather_datablock
 
 ## 产品支持情况

@@ -25,12 +25,44 @@
 #include "impl/c_api/reg_base_impl/reg_histogram_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @override_id asc_cumulative_histogram_bin0__Rvu16_vu8_vb
+ * @archs 3510
+ * @param [in,out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_cumulative_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @override_id asc_cumulative_histogram_bin1__Rvu16_vu8_vb
+ * @archs 3510
+ * @param [in,out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。mask中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ */
 __simd_callee__ inline void asc_cumulative_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @override_id asc_frequency_histogram_bin0__Rvu16_vu8_vb
+ * @archs 3510
+ * @param [in,out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_frequency_histogram_bin0(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_histogram
+ * @override_id asc_frequency_histogram_bin1__Rvu16_vu8_vb
+ * @archs 3510
+ * @param [in,out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。
+ */
 __simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, vector_uint8_t src, vector_bool mask);
 
 #endif

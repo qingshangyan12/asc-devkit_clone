@@ -1,3 +1,58 @@
+---
+okftype: reference.type.cpp
+title: asc_load_l2_cache_mode
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+description: 表示数据从GM搬运到Unified Buffer时L2 Cache管理策略的枚举，可用于向量搬运接口及标量访存路径的load策略配置与查询。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: related
+examples: []
+headers: [/include/c_api/defs/enum.h]
+declaration:
+  symbol: asc_load_l2_cache_mode
+  cpp: "enum class asc_load_l2_cache_mode : uint8_t {\n    NORMAL_FIRST_VICTIM = 0,\n\
+    \    NORMAL_LAST_VICTIM = 1,\n    NORMAL_PERSISTENT = 2,\n    NOTALLOC_KEEP =\
+    \ 4,\n    NOTALLOC_CLEAN = 5,\n    NOTALLOC_DROP = 6\n};"
+  members:
+    - name: NORMAL_FIRST_VICTIM
+      value: '0'
+      description: 启用L2 Cache，并且将分配的Cache Line标记为高替换优先级。
+    - name: NORMAL_LAST_VICTIM
+      value: '1'
+      description: 启用L2 Cache，并且将分配的Cache Line标记为低替换优先级。
+    - name: NORMAL_PERSISTENT
+      value: '2'
+      description: 启用L2 Cache。已存入L2 Cache中的数据可能被替换，若需确保特定数据始终保留在L2 Cache中，可采用驻留模式。&bull;
+        注意，被标记为驻留模式的Cache Line只能被其他同样被标记为驻留模式的Cache Line替换。
+    - name: NOTALLOC_KEEP
+      value: '4'
+      description: 不启用L2 Cache，每次都直接从GM中读取，并且保持已有Cache Line的状态不变。
+    - name: NOTALLOC_CLEAN
+      value: '5'
+      description: 不启用L2 Cache，若L2 Cache中已有同地址缓存会被保留并标记为Clean，标记为Clean的Cache Line被移出L2
+        Cache时会被直接丢弃。
+    - name: NOTALLOC_DROP
+      value: '6'
+      description: 不启用L2 Cache，若L2 Cache中已有同地址缓存，会被直接丢弃。
+  underlying_type: uint8_t
+timestamp: '2026-09-23'
+---
 # asc_load_l2_cache_mode
 
 asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 Cache管理策略，可用于：

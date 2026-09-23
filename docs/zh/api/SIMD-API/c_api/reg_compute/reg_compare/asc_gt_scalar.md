@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: asc_gt_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt_scalar.md
+description: 根据mask将源操作数src按元素与标量value进行大于比较，结果为真时对应位为1，否则为0，每个元素的比较结果占一个比特，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, scalar_operand]
+signature:
+  - prototype_id: asc_gt_scalar__v<dtype>_<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_gt_scalar__Rvb_v<dtype>_<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare
+    file: compare.asc
+    archs: ['3510']
+    override_id: asc_gt_scalar__Rvb_vf32_f32_vb
+timestamp: '2026-09-23'
+---
 # asc_gt_scalar
 
 ## 产品支持情况

@@ -1,3 +1,68 @@
+---
+okftype: reference.api.cpp
+title: asc_fill_l0b
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md
+description: 将value的二进制值赋值给目的操作数dst，完成L0B Buffer本地存储（Local Memory）的初始化。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_initialization]
+  - families: []
+  - operations: [fill]
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: [l0b_buffer]
+  - traits: []
+signature:
+  - override_id: asc_fill_l0b__PCBi16_f16_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBi16_u32_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBu16_f16_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBu16_u32_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBf16_f16_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBf16_u32_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBbf16_bf16_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBbf16_f16_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBbf16_u32_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBi32_f16_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBi32_u32_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBu32_f16_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBu32_u32_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBf32_f16_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_fill_l0b__PCBf32_u32_RCfillcfg
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_fill_l0b
 
 ## 产品支持情况

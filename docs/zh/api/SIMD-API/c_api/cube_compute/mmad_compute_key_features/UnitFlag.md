@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: UnitFlag
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
+description: 介绍UnitFlag特性：asc_mmad与L0C Buffer搬出接口引入单元标志机制，以内存块为粒度实现精细化数据同步以降低同步延迟，并说明ENABLE_KEEP与ENABLE_UPDATE模式的读写行为、使用约束及K轴迭代示例。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # UnitFlag
 
 **特性说明：**

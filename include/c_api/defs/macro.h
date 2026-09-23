@@ -11,6 +11,10 @@
 #ifndef INCLUDE_C_API_DEFS_MACRO_H
 #define INCLUDE_C_API_DEFS_MACRO_H
 
+/**
+ * @ingroup simd_c_api.defs.macro
+ * @macro_id ASC_DEPRECATED__version__removal_date__replacement
+ */
 #define ASC_DEPRECATED(version, removal_date, replacement)                                                  \
     [[deprecated("Deprecated since " #version ", Will be removed after " removal_date ", Use " #replacement \
                  " instead.")]]

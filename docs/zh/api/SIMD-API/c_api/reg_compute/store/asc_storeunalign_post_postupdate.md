@@ -1,3 +1,34 @@
+---
+okftype: reference.api.cpp
+title: asc_storeunalign_post_postupdate
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
+description: 将非对齐寄存器中暂存的尾块写入Unified Buffer（UB），为asc_storeunalign_postupdate立即数偏移搬出模式收尾；搬出后按立即数offset个元素自动累加目的地址指针，硬件循环内连续调用无需手动维护目的地址。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: [unified_buffer]
+  - traits: [post_update, unaligned_transfer]
+signature:
+  - prototype_id: asc_storeunalign_post_postupdate__RPU<dtype>_vstoreunalign_i32
+    archs: ['3510']
+    headers: []
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float, int64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
+    kind: requires
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_storeunalign_post_postupdate
 
 ## 产品支持情况

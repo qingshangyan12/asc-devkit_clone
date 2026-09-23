@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_set_l0c2gm_lrelu_alpha（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md
+description: 该接口已废弃，用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值，该值只支持half和float两种数据类型，请使用asc_set_l0c_copy_lrelu_alpha接口替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_set_l0c2gm_lrelu_alpha__Rf16
+    archs: ['2201', '3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_set_l0c2gm_lrelu_alpha__Rf32
+    archs: ['2201', '3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md
+    kind: related
+    condition: '`asc_set_l0c2gm_lrelu_alpha`接口已废弃。请使用[asc_set_l0c_copy_lrelu_alpha](../cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)接口替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_set_l0c2gm_lrelu_alpha（废弃）
 
 ## 产品支持情况

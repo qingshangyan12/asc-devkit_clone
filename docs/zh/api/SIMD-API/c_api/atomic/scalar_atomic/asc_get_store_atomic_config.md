@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_get_store_atomic_config
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md
+description: 获取原子操作启用位与原子操作类型的值，可用于校验asc_set_store_atomic_config_v1等接口设置的值是否符合预期。该接口在Ascend
+  950PR&950DT系列产品上已废弃，原子加操作可直接使用asc_atomic_add实现，运行在标量流水PIPE_S上。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_get_store_atomic_config__Ratomiccfg
+    archs: ['2201', '3510']
+    headers: [/include/c_api/atomic/scalar_atomic.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md
+    kind: related
+    condition: 原子加操作可以直接使用[asc_atomic_add](asc_atomic_add.md)实现
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md
+    kind: related
+    condition: 可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期
+  - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md
+    kind: related
+    condition: 可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_store_atomic_config
 
 ## 产品支持情况

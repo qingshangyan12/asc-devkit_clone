@@ -1,3 +1,44 @@
+---
+okftype: reference.api.cpp
+title: asc_set_ndim_loop_stride
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
+description: 设置asc_ndim_copy_gm2ub进行NDDMA多维数据搬运时，loop0至loop4各循环维度的源操作数步长和目的操作数步长，配置持续生效直至重新配置，仅在AIV上执行有效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_ndim_loop0_stride__u64_u64
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_set_ndim_loop1_stride__u64_u64
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_set_ndim_loop2_stride__u64_u64
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_set_ndim_loop3_stride__u64_u64
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+  - override_id: asc_set_ndim_loop4_stride__u64_u64
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_ndim_loop_stride
 
 ## 产品支持情况

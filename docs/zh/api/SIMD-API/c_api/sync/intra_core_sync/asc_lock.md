@@ -1,3 +1,25 @@
+---
+okftype: reference.api.cpp
+title: asc_lock
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
+description: 与asc_unlock配对使用，实现核内异步流水指令之间的同步处理。根据mutex_id获取Mutex，若Mutex已被锁定则阻塞指定流水上的后续指令，直到所有流水中相同mutex_id的Mutex均被释放，可选mode参数指定是否阻塞流水。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [control]
+  - families: []
+  - operations: [synchronization]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
+    kind: related
+    condition: '`asc_lock`与`asc_unlock`必须严格成对使用，并使用相同的`pipe`、`mutex_id`和`mode`。'
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_lock
 
 ## 产品支持情况

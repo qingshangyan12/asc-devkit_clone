@@ -1,3 +1,27 @@
+---
+okftype: reference.type.cpp
+title: asc_quant_mode
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md
+description: 表示L0C Buffer数据搬出时类型转换或量化模式的类型别名，作为矩阵搬出接口quant_pre_mode参数的类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [quantization]
+dependencies: []
+examples: []
+headers: [/include/c_api/defs/enum.h]
+declaration:
+  symbol: asc_quant_mode
+  cpp: using asc_quant_mode = QuantMode_t;
+  target: QuantMode_t
+timestamp: '2026-09-23'
+---
 # asc_quant_mode
 
 `asc_quant_mode`用于表示L0C Buffer数据搬出时的类型转换或量化模式，作为矩阵搬出接口中`quant_pre_mode`参数的类型。

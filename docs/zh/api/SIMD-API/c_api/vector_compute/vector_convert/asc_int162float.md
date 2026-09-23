@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_int162float
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md
+description: 将int16_t类型数据逐元素转换为float类型，结果存入目的操作数dst，源和目的操作数起始地址需32字节对齐。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [high_dimensional]
+signature:
+  - override_id: asc_int162float__PUf32_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_int162float__PUf32_PUi16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_int162float
 
 ## 产品支持情况

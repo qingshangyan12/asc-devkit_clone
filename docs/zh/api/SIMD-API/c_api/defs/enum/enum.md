@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 枚举
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/enum.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-24'
+---
 # 枚举
 
 - **[asc_channel_pad_mode](asc_channel_pad_mode.md)**

@@ -1,3 +1,28 @@
+---
+okftype: reference.type.cpp
+title: ASC_DEPRECATED
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md
+description: 为C API声明添加C++弃用属性的宏，编译调用被标记接口的代码时生成含废弃版本、计划移除日期和替代接口的告警。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - macro_id: ASC_DEPRECATED__version__removal_date__replacement
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_muls_deprecated.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # ASC_DEPRECATED
 
 ## 功能说明

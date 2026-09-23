@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_get_program_counter
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md
+description: 获取程序计数器的指针，程序计数器用于记录当前程序执行的位置，常用于调试时定位当前执行位置或作为指令预取的起始地址。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_program_counter__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/utils/sys_var.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_program_counter
 
 ## 产品支持情况

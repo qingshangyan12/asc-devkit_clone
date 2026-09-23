@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_sync_mte2
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md
+description: 针对PIPE_MTE2执行同步操作的易用性接口，保证PIPE_MTE2中前序指令（如GM到UB的数据搬运）全部完成后，PIPE_MTE3与PIPE_V的后续指令才能开始执行，用于简化手工同步的编码，只能在AIV中调用。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [control]
+  - families: []
+  - operations: [synchronization]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_sync_mte2__i
+    archs: ['2201', '3510']
+    headers: [/include/c_api/sync/sync.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: related
+    condition: 其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_sync_mte2
 
 ## 产品支持情况

@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: asc_deintlv
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md
+description: 将src0和src1两个矢量数据寄存器或掩码寄存器中的元素解交织后分别存入dst0和dst1，偶数索引元素写入dst0、奇数索引元素写入dst1，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [deinterleave]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - prototype_id: asc_deintlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
+      uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+  - override_id: asc_deintlv_b8__Rvb_Rvb_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_deintlv_b16__Rvb_Rvb_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_deintlv_b32__Rvb_Rvb_vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_deintlv
 
 ## 产品支持情况

@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_uint162uint32
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md
+description: 将uint16_t类型数据转为uint32_t类型，位宽比为1:2，根据位置标签选择读取源操作数偶数或奇数索引位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, widening_result]
+signature:
+  - override_id: asc_uint162uint32__Rvu32_vu16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint162uint32__Rvu32_vu16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint162uint32__vu16_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint162uint32__vu16_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_uint162uint32
 
 ## 产品支持情况

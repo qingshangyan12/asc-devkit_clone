@@ -1,3 +1,28 @@
+---
+okftype: reference.api.cpp
+title: asc_get_scalar_store_cache_mode
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md
+description: 读取当前标量store路径的L2 Cache管理策略并返回asc_store_l2_cache_mode枚举值，该值由asc_set_scalar_cache_mode设置，常用于临时切换策略前保存原配置或设置后回读校验。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: [cache_management]
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_scalar_store_cache_mode__z
+    archs: ['3510']
+    headers: [/include/c_api/cache_ctrl/cache_ctrl.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_scalar_store_cache_mode
 
 ## 产品支持情况

@@ -1,3 +1,39 @@
+---
+okftype: reference.api.cpp
+title: asc_add_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_add_sync_deprecated.md
+description: 执行矢量加法运算，按元素将两个源矢量操作数相加并写入目的操作数；接口已废弃，请使用对应的非同步接口asc_add和同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [add]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_add_sync__PUi16_PUi16_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_add_sync__PUf16_PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_add_sync__PUi32_PUi32_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_add_sync__PUf32_PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_add_sync（废弃）
 
 ## 产品支持情况

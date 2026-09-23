@@ -1,3 +1,36 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_gm2ub_sync_arch_3510（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_sync_arch_3510_deprecated.md
+description: 已废弃的同步搬运接口，将数据从Global Memory搬运到Unified Buffer，请改用非同步asc_copy_gm2ub接口和asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_copy_gm2ub_sync__PUv_PGv_u32
+    archs: ['3510']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_gm2ub_sync_arch_3510（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_atomic_dec
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md
+description: 对Global Memory中address指向的uint32_t或uint64_t计数器执行原子递减操作，旧值为0或大于val时将该地址赋值为val，否则数值减1，接口返回修改前的旧值，整个读取、判断和写回过程为原子操作。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [subtract]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [atomic]
+signature:
+  - prototype_id: asc_atomic_dec__PG<dtype>_<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/atomic/scalar_atomic.h]
+    dtype: [uint32_t, uint64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_atomic_dec
 
 ## 产品支持情况

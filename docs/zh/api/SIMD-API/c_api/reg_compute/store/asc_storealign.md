@@ -1,3 +1,163 @@
+---
+okftype: reference.api.cpp
+title: asc_storealign
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
+description: 将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB），矢量场景单次搬出256字节并支持掩码控制，提供连续、立即数偏移、地址寄存器偏移和非连续对齐四种搬出模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [unified_buffer]
+  - traits: [masked]
+signature:
+  - prototype_id: asc_storealign__PU<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_storealign__PU<dtype>_v<dtype>_i32_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_storealign__PU<dtype>_v<dtype>_ar_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e8m0_t,
+      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_storealign__PU<dtype>_v<dtype>_u16_u16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
+      uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_storealign__PU<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [uint8_t, uint16_t, uint32_t]
+  - prototype_id: asc_storealign__PU<dtype>_vb_i32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [uint8_t, uint16_t, uint32_t]
+  - prototype_id: asc_storealign__PU<dtype>_vb_ar
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [uint8_t, uint16_t, uint32_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples:
+  - path: /examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer
+    file: add_double_buffer.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf16_vf16_vb
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather
+    file: reg_load_gather.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf16_vf16_vb
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
+    file: reg_load_store_align.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf16_vf16_vb
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
+    file: reg_load_store_align.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf16_vf16_ar_vb
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_mask
+    file: reg_load_store_mask.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUu8_vu8_vb
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_mask
+    file: reg_load_store_mask.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUu8_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs
+    file: abs.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange
+    file: arange.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast
+    file: cast.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUi32_vi32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare
+    file: compare.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout
+    file: data_relayout.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUu16_vu16_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div
+    file: div.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate
+    file: duplicate.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
+    file: elu.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather
+    file: gather.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf16_vf16_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram
+    file: histogram.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUu16_vu16_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode
+    file: mergemode.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul
+    file: mul.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls
+    file: muls.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce
+    file: reduce.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block
+    file: reduce_block.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair
+    file: reduce_pair.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select
+    file: select.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze
+    file: squeeze.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate
+    file: truncate.asc
+    archs: ['3510']
+    override_id: asc_storealign__PUf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_storealign
 
 ## 产品支持情况

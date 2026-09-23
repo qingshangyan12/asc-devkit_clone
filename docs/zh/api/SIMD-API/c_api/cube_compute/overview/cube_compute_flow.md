@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 普通矩阵计算流程
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
+description: 介绍C API矩阵计算编程模型的典型流程，涵盖普通矩阵计算的数据搬入、矩阵乘加与结果搬出，以及Mx矩阵计算、4选2稀疏矩阵计算和Conv2D前向计算流程中各接口的使用方式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 普通矩阵计算流程
 
 C API针对矩阵计算编程模型提供了数据搬入、矩阵计算和结果搬出接口，分别承载Cube核中各个通路的搬运能力和计算能力，如下图所示：

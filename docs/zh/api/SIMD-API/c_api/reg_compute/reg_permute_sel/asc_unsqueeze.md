@@ -1,3 +1,45 @@
+---
+okftype: reference.api.cpp
+title: asc_unsqueeze
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md
+description: 根据mask对目的矢量数据寄存器进行解压缩，dst第0个元素置为0，第i个元素等于mask中前i个元素中1的数量，mask最高位被忽略，结果也可通过函数返回值返回。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_unsqueeze_u8__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unsqueeze_s8__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unsqueeze_u16__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unsqueeze_s16__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unsqueeze_u32__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - override_id: asc_unsqueeze_s32__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+  - prototype_id: asc_unsqueeze__Rv<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_unsqueeze
 
 ## 产品支持情况

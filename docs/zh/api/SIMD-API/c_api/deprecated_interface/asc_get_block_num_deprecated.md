@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_get_block_num（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md
+description: 已废弃的核数查询接口：获取当前任务配置的核数，用于代码内部的多核逻辑控制，运行于标量流水，请使用内置变量block_num替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: [system]
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_get_block_num__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/utils/sys_var.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_get_block_num（废弃）
 
 ## 产品支持情况

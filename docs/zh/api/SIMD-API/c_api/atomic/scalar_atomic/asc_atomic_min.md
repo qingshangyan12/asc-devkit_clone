@@ -1,3 +1,45 @@
+---
+okftype: reference.api.cpp
+title: asc_atomic_min
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md
+description: 对Global Memory中address指向的单个元素执行原子取小操作：读取旧值并与输入标量值比较，将较小值写回该地址并返回旧值，整个读取、比较和写回过程为原子操作。该接口运行在标量流水PIPE_S上，访问GM时绕过DCache，不维护缓存一致性。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [minimum]
+  - objects: [scalar]
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [atomic]
+signature:
+  - prototype_id: asc_atomic_min__PG<dtype>_<dtype>
+    archs: ['3510']
+    headers: [/include/c_api/atomic/scalar_atomic.h]
+    dtype: [int32_t, uint32_t, float, int64_t, uint64_t]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
+    kind: related
+    condition: 本接口不受[asc_set_atomic_min](../datamove_atomic/asc_set_atomic_min.md)等数据搬运随路原子设置影响，也不会影响后续搬运指令。
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: requires
+    condition: 若其他核或其他通路通过缓存访问同一GM地址
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
+    kind: requires
+    condition: 若其他核或其他通路通过缓存访问同一GM地址
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: requires
+    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_atomic_min
 
 ## 产品支持情况

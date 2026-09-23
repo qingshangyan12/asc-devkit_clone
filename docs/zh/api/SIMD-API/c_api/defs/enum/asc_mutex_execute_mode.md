@@ -1,3 +1,38 @@
+---
+okftype: reference.type.cpp
+title: asc_mutex_execute_mode
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md
+description: 选择互斥锁阻塞或非阻塞执行模式的枚举，作为asc_lock和asc_unlock接口mode参数的类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
+    kind: related
+examples: []
+headers: [/include/c_api/defs/enum.h]
+declaration:
+  symbol: asc_mutex_execute_mode
+  cpp: "enum asc_mutex_execute_mode {\n    ASC_LOCK_BLOCK = 0,\n    ASC_LOCK_NON_BLOCK\
+    \ = 1\n};"
+  members:
+    - name: ASC_LOCK_BLOCK
+      value: '0'
+      description: 阻塞`pipe`指定流水的执行，为默认模式。
+    - name: ASC_LOCK_NON_BLOCK
+      value: '1'
+      description: 不阻塞流水的执行。
+timestamp: '2026-09-23'
+---
 # asc_mutex_execute_mode
 
 `asc_mutex_execute_mode`用于选择互斥锁的阻塞或非阻塞执行模式，作为[asc_lock](../../sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../sync/intra_core_sync/asc_unlock.md)接口的`mode`参数类型。兼容类型名`ascMutexExecuteMode`是该类型的别名。

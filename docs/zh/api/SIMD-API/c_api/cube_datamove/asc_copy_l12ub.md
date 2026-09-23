@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_l12ub
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md
+description: 在L1 Buffer与Unified Buffer（UB）之间搬运数据，搬运过程中格式和内容保持不变，支持按数据块个数、单个数据块长度及源、目间隔组织的连续与非连续搬运。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l1_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: []
+signature:
+  - override_id: asc_copy_l12ub__PUv_PL1v_i8_u16_u16_u16_u16
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠，需要插入同步指令
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠，需要插入同步指令
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_copy_l12ub
 
 ## 产品支持情况

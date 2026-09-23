@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_reduce_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_reduce_sync_deprecated.md
+description: 已废弃接口，依据内置固定模式或用户自定义数值对应的gather mask从源操作数中选取元素写入目的操作数，请使用非同步接口asc_reduce配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [gather]
+  - objects: [mask, vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, masked]
+signature:
+  - override_id: asc_reduce_sync__PUu16_PUu16_PUu16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_reduce_sync__PUu32_PUu32_PUu32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: constrained_by
+    condition: 接口不支持通过[asc_set_vector_mask](../vector_compute/vector_mask_config/asc_set_vector_mask.md)配置掩码。
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_reduce_sync（废弃）
 
 ## 产品支持情况

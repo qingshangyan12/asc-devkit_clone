@@ -1,3 +1,23 @@
+---
+okftype: reference.index.cpp
+title: 关键特性说明<a id="inter_core_sync_key_features"></a>
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md
+description: 关键特性说明页，配合时序图介绍四对核间同步接口实现的四种同步控制模式：模式0为多AI Core间AIC或AIV全核同步，模式1为单AI Core内AIV全核同步，模式2为单AI
+  Core内AIC与AIV全核同步，模式4为单AI Core内AIC与单个AIV同步。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 关键特性说明<a id="inter_core_sync_key_features"></a>
 
 如图1所示，本章节将配合时序图介绍四对核间同步接口支持的四种同步控制模式各自实现的原理。

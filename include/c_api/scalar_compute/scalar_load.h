@@ -26,13 +26,61 @@
 #include "impl/c_api/reg_base_impl/scalar_load_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @override_id asc_load_dev__PGi8
+ * @archs 3510
+ * @param [in] addr 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+ */
 __aicore__ inline int8_t asc_load_dev(__gm__ int8_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @override_id asc_load_dev__PGu8
+ * @archs 3510
+ * @param [in] addr 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+ */
 __aicore__ inline uint8_t asc_load_dev(__gm__ uint8_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @override_id asc_load_dev__PGi16
+ * @archs 3510
+ * @param [in] addr 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+ */
 __aicore__ inline int16_t asc_load_dev(__gm__ int16_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @override_id asc_load_dev__PGu16
+ * @archs 3510
+ * @param [in] addr 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+ */
 __aicore__ inline uint16_t asc_load_dev(__gm__ uint16_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @override_id asc_load_dev__PGi32
+ * @archs 3510
+ * @param [in] addr 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+ */
 __aicore__ inline int32_t asc_load_dev(__gm__ int32_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @override_id asc_load_dev__PGu32
+ * @archs 3510
+ * @param [in] addr 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+ */
 __aicore__ inline uint32_t asc_load_dev(__gm__ uint32_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @override_id asc_load_dev__PGi64
+ * @archs 3510
+ * @param [in] addr 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+ */
 __aicore__ inline int64_t asc_load_dev(__gm__ int64_t* addr);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_load
+ * @override_id asc_load_dev__PGu64
+ * @archs 3510
+ * @param [in] addr 源GM地址。支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+ */
 __aicore__ inline uint64_t asc_load_dev(__gm__ uint64_t* addr);
 
 #endif

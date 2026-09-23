@@ -33,7 +33,9 @@ __aicore__ inline void s2_copy_matrix_a_to_l1(__cbuf__ bfloat16_t* dst, __gm__ b
     uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(ceil_align(M, BLOCK_CUBE)) << 32) |
                       (static_cast<uint64_t>(1) << 16) | (static_cast<uint64_t>(1));
 
+    //! [asc_set_gm2l1_nz_para__u64]
     asc_set_gm2l1_nz_para(config);
+    //! [asc_set_gm2l1_nz_para__u64]
 
     uint64_t loop1_src_stride = K * sizeof(bfloat16_t);
     asc_load_l2_cache_mode l2_cache_ctl = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
@@ -42,7 +44,9 @@ __aicore__ inline void s2_copy_matrix_a_to_l1(__cbuf__ bfloat16_t* dst, __gm__ b
     uint64_t loop4_src_stride = 0;
     bool smallc0_en = false;
 
+    //! [asc_copy_gm2l1_nd2nz__PL1bf16_PGbf16_u64_loadl2_u16_u32_u64_b]
     asc_copy_gm2l1_nd2nz(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+    //! [asc_copy_gm2l1_nd2nz__PL1bf16_PGbf16_u64_loadl2_u16_u32_u64_b]
 
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 }
@@ -52,7 +56,9 @@ __aicore__ inline void s2_copy_matrix_b_to_l1(__cbuf__ bfloat16_t* dst, __gm__ b
     uint64_t config = (static_cast<uint64_t>(0) << 48) | (static_cast<uint64_t>(ceil_align(N, BLOCK_CUBE)) << 32) |
                       (static_cast<uint64_t>(1) << 16) | (static_cast<uint64_t>(1));
 
+    //! [asc_set_gm2l1_nz_para__u64]
     asc_set_gm2l1_nz_para(config);
+    //! [asc_set_gm2l1_nz_para__u64]
 
     uint64_t loop1_src_stride = K * sizeof(bfloat16_t);
     asc_load_l2_cache_mode l2_cache_ctl = asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM;
@@ -61,7 +67,9 @@ __aicore__ inline void s2_copy_matrix_b_to_l1(__cbuf__ bfloat16_t* dst, __gm__ b
     uint64_t loop4_src_stride = 0;
     bool smallc0_en = false;
 
+    //! [asc_copy_gm2l1_nd2nz__PL1bf16_PGbf16_u64_loadl2_u16_u32_u64_b]
     asc_copy_gm2l1_nd2nz(dst, src, loop1_src_stride, l2_cache_ctl, n_value, d_value, loop4_src_stride, smallc0_en);
+    //! [asc_copy_gm2l1_nd2nz__PL1bf16_PGbf16_u64_loadl2_u16_u32_u64_b]
 
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID1);
 }
@@ -79,7 +87,9 @@ __aicore__ inline void s2_split_matrix_a_to_l0a(__ca__ bfloat16_t* dst, __cbuf__
     int16_t src_stride = AscendC::Std::ceil_div(M, BLOCK_CUBE);
     uint16_t dst_stride = AscendC::Std::ceil_div(M, BLOCK_CUBE);
 
+    //! [asc_copy_l12l0a__PCAbf16_PL1bf16_u16_u16_u8_u8_i16_u16]
     asc_copy_l12l0a(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    //! [asc_copy_l12l0a__PCAbf16_PL1bf16_u16_u16_u8_u8_i16_u16]
 
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
 }
@@ -95,7 +105,9 @@ __aicore__ inline void s2_split_matrix_b_to_l0b(__cb__ bfloat16_t* dst, __cbuf__
     int16_t src_stride = AscendC::Std::ceil_div(N, BLOCK_CUBE);
     uint16_t dst_stride = AscendC::Std::ceil_div(N, BLOCK_CUBE);
 
+    //! [asc_copy_l12l0b__PCBbf16_PL1bf16_u16_u16_u8_u8_i16_u16]
     asc_copy_l12l0b(dst, src, m_start_position, k_start_position, m_step, k_step, src_stride, dst_stride);
+    //! [asc_copy_l12l0b__PCBbf16_PL1bf16_u16_u16_u8_u8_i16_u16]
 
     asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID1);
 }
@@ -115,18 +127,22 @@ __aicore__ inline void s2_compute_mmad(__cc__ float* c_matrix, __ca__ bfloat16_t
     bool c_matrix_source = false;
     bool c_matrix_init_val = true;
 
+    //! [asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b]
     asc_mmad(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag_mode, disable_gemv, c_matrix_source,
         c_matrix_init_val);
+    //! [asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b]
 
     asc_sync_pipe(PIPE_M);
 
     c_matrix_source = false;
     c_matrix_init_val = false;
 
+    //! [asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b]
     asc_mmad(
         c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, unit_flag_mode, disable_gemv, c_matrix_source,
         c_matrix_init_val);
+    //! [asc_mmad__PCCf32_PCAbf16_PCBbf16_u16_u16_u16_unitflag_b_b_b]
 
     asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
 }
@@ -141,7 +157,9 @@ __aicore__ inline void s2_copy_result_to_gm(__gm__ float* dst, __cc__ float* src
     uint16_t src_nz_matrix_stride = 0;
     uint32_t dst_matrix_stride = 0;
 
+    //! [asc_set_l0c_copy_nz_para__u16_u16_u32]
     asc_set_l0c_copy_nz_para(matrix_num, src_nz_matrix_stride, dst_matrix_stride);
+    //! [asc_set_l0c_copy_nz_para__u16_u16_u32]
 
     uint16_t n_size = N;
     uint16_t m_size = M;

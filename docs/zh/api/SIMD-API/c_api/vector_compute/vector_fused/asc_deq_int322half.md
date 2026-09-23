@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_deq_int322half
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md
+description: 对输入的int32_t类型数据按元素做量化并转换为half类型，scale量化参数需通过asc_set_deq_scale接口设置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, high_dimensional, quantization]
+signature:
+  - override_id: asc_deq_int322half__PUf16_PUi32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_deq_int322half__PUf16_PUi32_u8_u16_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+    kind: constrained_by
+    condition: 需配合[asc_set_deq_scale](asc_set_deq_scale.md)接口的非向量模式使用，该接口用于设置量化参数。
+examples: []
+timestamp: '2026-09-23'
+---
 
 # asc_deq_int322half
 

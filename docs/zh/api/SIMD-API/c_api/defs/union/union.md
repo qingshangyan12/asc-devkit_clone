@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 联合体
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/union.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-24'
+---
 # 联合体
 
 - **[asc_fill_value_config](asc_fill_value_config.md)**

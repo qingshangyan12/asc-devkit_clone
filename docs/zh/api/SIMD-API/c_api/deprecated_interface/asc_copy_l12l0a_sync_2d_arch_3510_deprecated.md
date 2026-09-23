@@ -1,3 +1,43 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_l12l0a_sync_2d_arch_3510（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_2d_arch_3510_deprecated.md
+description: 已废弃的同步搬运接口，以512字节分形为粒度完成矩阵计算所需2D格式数据从L1 Buffer到L0A Buffer的搬运，支持非转置与转置矩阵，请改用非同步接口和asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, transpose]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l1_buffer]
+  - destination_locations: [l0a_buffer]
+  - traits: [deprecated]
+signature:
+  - prototype_id: asc_copy_l12l0a_sync__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16
+    archs: ['3510']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
+      fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_copy_l12l0a_transpose_sync__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16
+    archs: ['3510']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
+      fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_l12l0a_sync_2d_arch_3510（废弃）
 
 ## 产品支持情况

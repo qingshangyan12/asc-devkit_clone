@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_set_mask_count
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md
+description: 设置Mask模式为Counter模式，可直接传入数据计算数量，实际迭代次数由Vector计算单元自动推断，无需感知迭代次数和处理非对齐尾块。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: [mask]
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_mask_count__z
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_mask_config.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+    kind: related
+    condition: 该API需和[asc_set_vector_mask](asc_set_vector_mask.md)配合使用。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_mask_count
 
 ## 产品支持情况

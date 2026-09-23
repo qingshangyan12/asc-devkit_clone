@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_fma
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md
+description: 根据mask对源操作数src0、src1按元素相乘后与src2中的对应元素相加，将计算结果作为返回值返回，公式为result_i等于src0_i乘src1_i加src2_i，支持half、bfloat16_t与float类型，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [fused_multiply_add]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_fma__v<dtype>_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
+    dtype: [half, bfloat16_t, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_fma
 
 ## 产品支持情况

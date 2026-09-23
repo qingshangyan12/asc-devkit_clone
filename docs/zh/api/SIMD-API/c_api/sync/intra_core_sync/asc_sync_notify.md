@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_sync_notify
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+description: 与asc_sync_wait配对使用，实现AI Core内部不同流水之间的同步控制。当源流水的前序指令所有读写操作都完成后，将硬件中对应标志位设置为1，只设置标志位而不阻塞源流水中的下一个指令。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [control]
+  - families: []
+  - operations: [synchronization]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_sync_notify__pipe_pipe_event
+    archs: ['2201', '3510']
+    headers: [/include/c_api/sync/sync.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: related
+    condition: 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_sync_notify
 
 ## 产品支持情况

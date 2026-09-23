@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_sqrt_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md
+description: 该接口已废弃，用于按元素做开方运算，请使用非同步接口asc_sqrt和同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [sqrt]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_sqrt_sync__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_sqrt_sync__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_sqrt_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sqrt.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sqrt.md
+    kind: related
+    condition: '`asc_sqrt_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sqrt.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_sqrt_sync（废弃）
 
 ## 产品支持情况

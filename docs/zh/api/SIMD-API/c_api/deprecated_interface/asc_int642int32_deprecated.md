@@ -1,3 +1,37 @@
+---
+okftype: reference.api.cpp
+title: asc_int642int32（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642int32_deprecated.md
+description: 已废弃接口，将int64_t类型的源操作数转换成int32_t类型，支持不同的饱和模式，请改用asc_int642int32的显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, saturation_mode]
+signature:
+  - override_id: asc_int642int32__Rvi32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32_sat__Rvi32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32_v2__Rvi32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32_sat_v2__Rvi32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_int642int32（废弃）
 
 ## 产品支持情况

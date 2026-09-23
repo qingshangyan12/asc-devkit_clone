@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 随路量化与随路ReLU场景组合
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
+description: 说明矩阵搬出支持的随路量化与随路ReLU组合能力：以组合表给出不激活与Normal ReLU场景下REQ8、DEQF16、QF322B8_PRE等量化模式的M1、M2随路系数取值，其中M1用于原始数据非负时，M2用于原始数据为负数时。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: [quantization]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 随路量化与随路ReLU场景组合
 
 矩阵搬出支持多种随路量化与随路ReLU的组合，常用的不激活/Normal ReLU组合参考下表，Scalar/Vector扩展组合见后文。

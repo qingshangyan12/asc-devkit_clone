@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_storealign_1st_postupdate
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st_postupdate.md
+description: 将源矢量数据寄存器中的第一个元素写入Unified Buffer（UB）中目的地址，采用Post Update模式在搬运完成后自动更新目的地址，便于硬件循环内连续多次调用。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [store]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [unified_buffer]
+  - traits: [post_update]
+signature:
+  - prototype_id: asc_storealign_1st_postupdate__RPU<dtype>_v<dtype>_i32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/store/storealign.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_storealign_1st_postupdate
 
 ## 产品支持情况

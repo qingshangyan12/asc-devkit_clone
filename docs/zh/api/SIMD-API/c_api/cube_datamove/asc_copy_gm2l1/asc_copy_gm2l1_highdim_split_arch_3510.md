@@ -1,3 +1,30 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_gm2l1_arch_3510（高维切分数据搬运）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md
+description: 将数据从Global Memory搬运到L1 Buffer，格式和内容保持不变，支持通过配置数据块个数、单个数据块长度和地址偏移实现高维切分的非连续搬运，并支持按通道padding模式插入或移除padding。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l1_buffer]
+  - traits: [high_dimensional, padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_copy_gm2l1_arch_3510（高维切分数据搬运）
 
 ## 产品支持情况

@@ -1,3 +1,50 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_l0c2l1
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_2201.md
+description: 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到L1 Buffer中，支持九种量化模式及int4b_t量化，并可通过参数开启ReLU、通道拆分和NZ2ND功能。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, layout_transform]
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: [l1_buffer]
+  - traits: [quantization]
+signature:
+  - override_id: asc_copy_l0c2l1__PL1f16_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_l0c2l1__PL1bf16_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_l0c2l1__PL1i8_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_l0c2l1__PL1f16_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_l0c2l1__PL1i16_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_l0c2l1__PL1i8_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_l0c2l1__PL1u8_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_l0c2l1__PL1v_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_copy_l0c2l1__PL1v_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_copy_l0c2l1
 
 ## 产品支持情况

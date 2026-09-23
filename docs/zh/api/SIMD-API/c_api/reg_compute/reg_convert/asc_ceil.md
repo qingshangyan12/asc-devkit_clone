@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_ceil
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_ceil.md
+description: 将矢量数据寄存器中的浮点数元素按CEIL模式（向正无穷方向舍入）舍入到整数值，结果保持原浮点数据类型，支持函数返回值或引用参数输出，未被mask筛选的元素置零。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked, rounding_mode]
+signature:
+  - prototype_id: asc_ceil__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+    dtype: [half, bfloat16_t, float]
+  - prototype_id: asc_ceil__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+    dtype: [half, bfloat16_t, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_ceil
 
 ## 产品支持情况

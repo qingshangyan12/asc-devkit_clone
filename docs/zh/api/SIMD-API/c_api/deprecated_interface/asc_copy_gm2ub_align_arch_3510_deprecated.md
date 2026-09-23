@@ -1,3 +1,69 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_gm2ub_align_arch_3510（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_arch_3510_deprecated.md
+description: 已废弃的高维切分搬运接口旧形式，提供GM到UB的非对齐数据搬运，支持手动或自动填充补齐至32字节对齐，请改用asc_copy_gm2ub_align高维切分新接口及asc_load_l2_cache_mode枚举配置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated, high_dimensional, padding, unaligned_transfer]
+signature:
+  - override_id: asc_copy_gm2ub_align__PUi8_PGi8_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUu8_PGu8_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUhf8_PGhf8_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUf8e5m2_PGf8e5m2_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUf8e4m3_PGf8e4m3_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUi16_PGi16_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUu16_PGu16_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUf16_PGf16_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUbf16_PGbf16_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUi32_PGi32_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUu32_PGu32_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+  - override_id: asc_copy_gm2ub_align__PUf32_PGf32_u16_u32_u8_u8_b_u8_u64_u32
+    archs: ['3510']
+    headers: []
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果需要执行多条`asc_copy_gm2ub_align`指令，且`asc_copy_gm2ub_align`指令的目的地址存在重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果需要执行多条`asc_copy_gm2ub_align`指令，且`asc_copy_gm2ub_align`指令的目的地址存在重叠
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_gm2ub_align_arch_3510（废弃）
 
 ## 产品支持情况

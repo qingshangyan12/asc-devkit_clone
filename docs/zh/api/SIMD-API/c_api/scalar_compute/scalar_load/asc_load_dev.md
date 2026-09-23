@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: asc_load_dev
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md
+description: 不经过DCache直接从GM地址读取整型数据并返回，可在多核操作GM且数据无法对齐到Cache Line时避免Cache Line粒度的数据覆盖。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [load]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: [global_memory]
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_load_dev__PGi8
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
+  - override_id: asc_load_dev__PGu8
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
+  - override_id: asc_load_dev__PGi16
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
+  - override_id: asc_load_dev__PGu16
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
+  - override_id: asc_load_dev__PGi32
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
+  - override_id: asc_load_dev__PGu32
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
+  - override_id: asc_load_dev__PGi64
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
+  - override_id: asc_load_dev__PGu64
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/scalar_load.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_load_dev
 
 ## 产品支持情况

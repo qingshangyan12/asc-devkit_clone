@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 矩阵计算搬运
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_datamove.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 矩阵计算搬运
 
 - **[矩阵搬入总体说明](cube_compute_load_overall_description.md)**

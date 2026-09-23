@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_shiftright_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md
+description: 根据掩码对矢量数据寄存器中的元素执行右移，右移位数由int16_t标量立即数指定，无符号整数执行逻辑右移、有符号整数执行算术右移并复制符号位，掩码为0的元素置零，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [bitwise_shift]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, scalar_operand]
+signature:
+  - prototype_id: asc_shiftright_scalar__v<dtype>_i16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
+  - prototype_id: asc_shiftright_scalar__Rv<dtype>_v<dtype>_i16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_shiftright_scalar
 
 ## 产品支持情况

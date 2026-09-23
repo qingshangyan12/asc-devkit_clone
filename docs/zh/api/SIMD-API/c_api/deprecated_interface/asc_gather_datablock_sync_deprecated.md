@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_gather_datablock_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_gather_datablock_sync_deprecated.md
+description: 已废弃的同步矢量收集接口：给定输入矢量与地址偏移矢量，按DataBlock粒度根据偏移地址将输入矢量收集到目的矢量中，请使用非同步接口asc_gather_datablock并配合同步接口asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [gather]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_gather_datablock_sync__PUu16_PUu16_PUu32_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_gather_datablock_sync__PUu32_PUu32_PUu32_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_gather_datablock_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_gather/asc_gather_datablock.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
+    kind: related
+    condition: '`asc_gather_datablock_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_gather/asc_gather_datablock.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_gather_datablock_sync（废弃）
 
 ## 产品支持情况

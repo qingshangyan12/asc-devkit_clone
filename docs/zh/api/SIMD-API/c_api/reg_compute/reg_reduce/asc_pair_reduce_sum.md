@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_pair_reduce_sum
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md
+description: 根据mask将源操作数中每两个相邻元素相加，结果连续保存在目的操作数低半部分，高半部分置0，不参与计算的元素被当作0进行累加，支持half和float类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [add, reduction]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked]
+signature:
+  - prototype_id: asc_pair_reduce_sum__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
+    dtype: [half, float]
+  - prototype_id: asc_pair_reduce_sum__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
+    dtype: [half, float]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair
+    file: reduce_pair.asc
+    archs: ['3510']
+    override_id: asc_pair_reduce_sum__Rvf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_pair_reduce_sum
 
 ## 产品支持情况

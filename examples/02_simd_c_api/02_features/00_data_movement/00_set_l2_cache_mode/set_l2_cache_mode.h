@@ -39,11 +39,21 @@ __simd_vf__ inline void add_vf_half(
     vector_half reg_src1;
     vector_half reg_dst;
     for (uint16_t i = 0; i < repeat_time; ++i) {
+        //! [asc_update_mask_b16__Ru32]
         vmask = asc_update_mask_b16(data_len);
+        //! [asc_update_mask_b16__Ru32]
+        //! [asc_load__Rvf16_PUf16]
         asc_load(reg_src0, x_local + i * one_rep_size);
+        //! [asc_load__Rvf16_PUf16]
+        //! [asc_load__Rvf16_PUf16]
         asc_load(reg_src1, y_local + i * one_rep_size);
+        //! [asc_load__Rvf16_PUf16]
+        //! [asc_add__Rvf16_vf16_vf16_vb]
         asc_add(reg_dst, reg_src0, reg_src1, vmask);
+        //! [asc_add__Rvf16_vf16_vf16_vb]
+        //! [asc_store__PUf16_vf16]
         asc_store(z_local + i * one_rep_size, reg_dst);
+        //! [asc_store__PUf16_vf16]
     }
 }
 

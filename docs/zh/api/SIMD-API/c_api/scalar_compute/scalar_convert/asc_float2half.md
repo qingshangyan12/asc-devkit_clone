@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_float2half
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md
+description: 将float类型的标量转换为half类型并返回，舍入模式固定为ODD（最近邻奇数舍入），饱和与非饱和模式可通过asc_set_saturation_flag配置。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [scalar]
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [rounding_mode]
+signature:
+  - override_id: asc_float2half_ro__f32
+    archs: ['3510']
+    headers: [/include/c_api/scalar_compute/compute/scalar_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    kind: constrained_by
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_float2half
 
 ## 产品支持情况

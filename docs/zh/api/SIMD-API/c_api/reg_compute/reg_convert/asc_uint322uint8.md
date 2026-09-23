@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_uint322uint8
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md
+description: 根据mask将src中参与计算的uint32_t类型元素转换为uint8_t类型并写入dst；因类型位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取写入位置，其余位置置零，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: 使用饱和或非饱和模式时，需要配置`ctrl`寄存器
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_uint322uint8
 
 ## 产品支持情况

@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_reduce_sum_datablock
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md
+description: 根据mask将每个DataBlock（32B）中参与计算的元素相加，得到各DataBlock的归约结果并依次保存在dst最低位，其余位置置0。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [reduction]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked]
+signature:
+  - prototype_id: asc_reduce_sum_datablock__v<src_dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
+  - prototype_id: asc_reduce_sum_datablock__Rv<dst_dtype>_v<src_dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_reduce.h]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block
+    file: reduce_block.asc
+    archs: ['3510']
+    override_id: asc_reduce_sum_datablock__Rvf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_reduce_sum_datablock
 
 ## 产品支持情况

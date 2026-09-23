@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_log
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_log.md
+description: 根据mask将源矢量数据寄存器按元素取自然对数并写入目的矢量数据寄存器，计算公式为ln(src)，支持half与float数据类型。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [natural_log]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_log__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [half, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_log
 
 ## 产品支持情况

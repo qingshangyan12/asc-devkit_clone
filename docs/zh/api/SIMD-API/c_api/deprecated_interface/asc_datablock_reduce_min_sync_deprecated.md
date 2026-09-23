@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_datablock_reduce_min_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_datablock_reduce_min_sync_deprecated.md
+description: 已废弃接口，执行数据块内的求最小值规约操作，请使用asc_datablock_reduce_min配合asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [reduction]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_datablock_reduce_min_sync__PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+  - override_id: asc_datablock_reduce_min_sync__PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/composite/vector_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_datablock_reduce_min_sync（废弃）
 
 ## 产品支持情况

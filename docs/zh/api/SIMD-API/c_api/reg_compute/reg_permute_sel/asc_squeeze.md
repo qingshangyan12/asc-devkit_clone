@@ -1,3 +1,39 @@
+---
+okftype: reference.api.cpp
+title: asc_squeeze
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md
+description: 将src中被mask选择的有效元素压缩后依次复制到dst或通过函数返回值返回，有效元素在结果中从低到高连续排列，剩余位置置0，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [compact]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
+  - traits: [masked]
+signature:
+  - prototype_id: asc_squeeze__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
+      uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_squeeze__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
+      uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: related
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze
+    file: squeeze.asc
+    archs: ['3510']
+    override_id: asc_squeeze__Rvf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_squeeze
 
 ## 产品支持情况

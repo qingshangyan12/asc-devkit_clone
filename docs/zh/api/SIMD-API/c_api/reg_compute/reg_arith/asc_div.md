@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_div
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md
+description: 根据mask对两个源矢量数据寄存器按元素求商并写入目的操作数，支持整型与浮点数据类型，浮点计算结果与标准IEEE 754二进制浮点除法相比可能存在1
+  ULP精度差异。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [divide]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
+  - prototype_id: asc_div__v<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div
+    file: div.asc
+    archs: ['3510']
+    override_id: asc_div__Rvf32_vf32_vf32_vb
+timestamp: '2026-09-23'
+---
 # asc_div
 
 ## 产品支持情况

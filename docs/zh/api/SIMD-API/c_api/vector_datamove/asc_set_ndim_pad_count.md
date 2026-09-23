@@ -1,3 +1,30 @@
+---
+okftype: reference.api.cpp
+title: asc_set_ndim_pad_count
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+description: 配置NDDMA高维切分搬运中loop1至loop4各维左右两侧的填充元素数，配置结果供后续调用asc_ndim_copy_gm2ub时使用，仅在AIV上执行有效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_ndim_pad_count__Rpadcountcfg
+    archs: ['3510']
+    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_ndim_pad_count
 
 ## 产品支持情况

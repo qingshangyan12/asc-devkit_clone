@@ -1,3 +1,32 @@
+---
+okftype: reference.api.cpp
+title: asc_get_squeeze_status
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
+description: 读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，需先清空AR寄存器并完成数据筛选后再调用，用于获取已连续搬出的有效数据量。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_squeeze_status__z
+    archs: ['3510']
+    headers: [/include/c_api/spr/spr.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
+    kind: requires
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_squeeze_status
 
 ## 产品支持情况

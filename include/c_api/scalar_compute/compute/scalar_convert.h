@@ -26,11 +26,41 @@
 #include "impl/c_api/reg_base_impl/scalar_convert_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2half_ro__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline half asc_float2half_ro(float value);
 
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2int32_rd__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rd(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2int32_ru__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_ru(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2int32_rn__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rn(float value);
+/**
+ * @ingroup simd_c_api.scalar_compute.scalar_convert
+ * @override_id asc_float2int32_rna__f32
+ * @archs 3510
+ * @param [in] value 源操作数（标量），数据类型为`float`。
+ */
 __aicore__ inline int32_t asc_float2int32_rna(float value);
 
 #endif

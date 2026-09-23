@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_set_vector_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
+description: 设置矢量计算的Mask值以指示哪些数据参与计算，使用前需先调用asc_set_mask_count或asc_set_mask_norm设置Mask模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [configuration]
+  - families: []
+  - operations: []
+  - objects: [mask]
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_vector_mask__u64_u64
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_mask_config.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md
+    kind: related
+    condition: 该接口用于在VF场景外设置掩码寄存器。在Reg矢量计算配置时，通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md
+    kind: requires
+    condition: 需先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
+    kind: requires
+    condition: 需先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_vector_mask
 
 ## 产品支持情况

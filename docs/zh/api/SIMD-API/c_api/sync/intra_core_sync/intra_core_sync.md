@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 核内同步
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 核内同步
 
 - **[核内同步能力概述](intra_core_sync_overview.md)**

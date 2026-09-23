@@ -1,3 +1,55 @@
+---
+okftype: reference.api.cpp
+title: asc_int642float（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642float_deprecated.md
+description: 已废弃接口，将int64_t类型数据转换为float，支持多种舍入模式，请改用asc_int642float的显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, rounding_mode]
+signature:
+  - override_id: asc_int642float_rn__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rn_v2__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rna__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rna_v2__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rd__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rd_v2__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_ru__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_ru_v2__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rz__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642float_rz_v2__Rvf32_vi64_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_int642float（废弃）
 
 ## 产品支持情况

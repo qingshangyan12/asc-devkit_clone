@@ -1,3 +1,50 @@
+---
+okftype: reference.api.cpp
+title: asc_vdeq_int162b8
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md
+description: 将int16_t类型数据转化为int8_t或uint8_t类型，并按接口变体存放到每个DataBlock的上半块或下半块，使用前需调用asc_set_deq_scale设置量化参数。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [arithmetic]
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [elementwise, high_dimensional]
+signature:
+  - override_id: asc_vdeq_int162b8_h__PUi8_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_vdeq_int162b8_h__PUu8_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_vdeq_int162b8_l__PUi8_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_vdeq_int162b8_l__PUu8_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_vdeq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_vdeq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_vdeq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_vdeq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+    kind: requires
+    condition: 使用该接口前需要调用asc_set_deq_scale设置量化参数。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_vdeq_int162b8
 
 ## 产品支持情况

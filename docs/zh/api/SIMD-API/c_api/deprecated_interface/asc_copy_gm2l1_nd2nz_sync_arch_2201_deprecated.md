@@ -1,3 +1,51 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_gm2l1_nd2nz_sync_arch_2201（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_sync_arch_2201_deprecated.md
+description: 已废弃的同步搬运接口，将数据从Global Memory搬运到L1，并在数据搬运时进行ND格式到NZ格式的转换，请改用非同步asc_copy_gm2l1_nd2nz接口和asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, layout_transform]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l1_buffer]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1i8_PGi8_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1u8_PGu8_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1bf16_PGbf16_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1f16_PGf16_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1i16_PGi16_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1f32_PGf32_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1i32_PGi32_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1u32_PGu32_u16_u16_u16_u16_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_gm2l1_nd2nz_sync_arch_2201（废弃）
 
 ## 产品支持情况

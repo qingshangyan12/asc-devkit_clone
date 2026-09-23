@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_div
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md
+description: 对两个源矢量执行逐元素除法运算并将结果写入目的矢量，使用时需注意除0错误。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [divide]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise]
+signature:
+  - override_id: asc_div__PUf16_PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_div__PUf32_PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_div__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - override_id: asc_div__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_div
 
 ## 产品支持情况

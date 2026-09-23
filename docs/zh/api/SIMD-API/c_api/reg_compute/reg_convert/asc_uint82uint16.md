@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_uint82uint16
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md
+description: 根据mask将源操作数中每个uint8_t类型元素转为uint16_t类型并写入dst；因类型位宽比为1:2，通过src_pos选择读取源矢量数据寄存器中偶数或奇数索引位置的元素，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, widening_result]
+signature:
+  - override_id: asc_uint82uint16__Rvu16_vu8_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint82uint16__Rvu16_vu8_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint82uint16__vu8_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_uint82uint16__vu8_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_uint82uint16
 
 ## 产品支持情况

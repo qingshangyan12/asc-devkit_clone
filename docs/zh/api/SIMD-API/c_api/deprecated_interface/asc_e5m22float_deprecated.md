@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_e5m22float（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e5m22float_deprecated.md
+description: 已废弃接口，将vector_fp8_e5m2_t类型源操作数以256B为单位分为四部分，按后缀读取其中一部分并转换成vector_float类型写入目的操作数，请使用显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated, masked, widening_result]
+signature:
+  - override_id: asc_e5m22float__Rvf32_vf8e5m2_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_e5m22float_v2__Rvf32_vf8e5m2_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_e5m22float_v3__Rvf32_vf8e5m2_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_e5m22float_v4__Rvf32_vf8e5m2_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md
+    kind: related
+    condition: 该接口的无显式位置参数原型已废弃，请使用[asc_e5m22float](../reg_compute/reg_convert/asc_e5m22float.md)的显式位置参数重载替代。
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_e5m22float（废弃）
 
 ## 产品支持情况

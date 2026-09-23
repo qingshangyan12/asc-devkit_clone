@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_mmad_sparse（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md
+description: 已废弃的稀疏矩阵乘加接口：左矩阵A为稀疏矩阵、右矩阵B为稠密矩阵，矩阵A在计算时完成稠密化，仅在AIC上生效；请使用asc_unit_flag_mode类型入参的新asc_mmad_sparse接口替代，同步功能通过asc_sync实现。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [matrix_multiply_accumulate]
+  - objects: []
+  - execution_models: [matrix_compute]
+  - source_locations: [l0a_buffer, l0b_buffer]
+  - destination_locations: [l0c_buffer]
+  - traits: [deprecated, sparse_input]
+signature:
+  - override_id: asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/cube_compute/cube_compute.h]
+  - override_id: asc_mmad_sparse_sync__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b
+    archs: ['2201']
+    headers: [/include/c_api/composite/cube_compute_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_mmad_sparse（废弃）
 
 ## 产品支持情况

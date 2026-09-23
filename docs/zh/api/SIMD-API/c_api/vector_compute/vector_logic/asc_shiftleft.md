@@ -1,3 +1,47 @@
+---
+okftype: reference.api.cpp
+title: asc_shiftleft
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
+description: 将矢量中所有元素左移distance位，distance不支持负数且不能超过源数据类型的位宽。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [bitwise]
+  - operations: [bitwise_shift]
+  - objects: [scalar, vector]
+  - execution_models: [memory_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [elementwise, high_dimensional, scalar_operand]
+signature:
+  - override_id: asc_shiftleft__PUi16_PUi16_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_shiftleft__PUu16_PUu16_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_shiftleft__PUi32_PUi32_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_shiftleft__PUu32_PUu32_u32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_shiftleft__PUi16_PUi16_u32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_shiftleft__PUu16_PUu16_u32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_shiftleft__PUi32_PUi32_u32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+  - override_id: asc_shiftleft__PUu32_PUu32_u32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 
 # asc_shiftleft
 

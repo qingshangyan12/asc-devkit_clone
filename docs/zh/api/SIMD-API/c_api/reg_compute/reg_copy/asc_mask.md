@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md
+description: 将src中被mask筛选的有效元素或bit复制到函数返回值：矢量到矢量模式未被筛选的位置值未定义，掩码到掩码模式未被筛选的位置置0，功能与asc_copy的掩码复制模式相同，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
+  - traits: [masked]
+signature:
+  - prototype_id: asc_mask__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_copy.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - override_id: asc_mask__vb_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_copy.h]
+  - override_id: asc_mask__vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_copy.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
+    kind: related
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_mask
 
 ## 产品支持情况

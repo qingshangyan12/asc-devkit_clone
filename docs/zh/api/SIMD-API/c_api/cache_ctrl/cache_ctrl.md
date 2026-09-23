@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 缓存控制
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/cache_ctrl.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 缓存控制
 
 - **[系统缓存概述](system_cache_overview.md)**

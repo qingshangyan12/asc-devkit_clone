@@ -1,3 +1,30 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_l12fb_sync_arch_3510（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12fb_sync_arch_3510_deprecated.md
+description: 已废弃的同步搬运接口，将数据从L1 Buffer搬运到用于存放量化参数的Fixpipe Buffer，请改用非同步asc_copy_l12fb接口和asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: []
+  - execution_models: []
+  - source_locations: [l1_buffer]
+  - destination_locations: [fixpipe_buffer]
+  - traits: [deprecated]
+signature:
+  - override_id: asc_copy_l12fb_sync__PFBv_PL1v_u32
+    archs: ['3510']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_l12fb_sync_arch_3510（废弃）
 
 ## 产品支持情况

@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_set_nthbit
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_set_nthbit.md
+description: 将uint64_t数据的指定二进制位置为1，其余位保持不变，返回修改后的uint64_t整数；实际位索引按(idx % 64 + 64)
+  % 64计算，索引范围为0到63。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: [bitwise]
+  - operations: [bit_manipulation]
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_nthbit__u64_i64
+    archs: ['2201', '3510']
+    headers: [/include/c_api/scalar_compute/compute/scalar_bit.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_set_nthbit
 
 ## 产品支持情况

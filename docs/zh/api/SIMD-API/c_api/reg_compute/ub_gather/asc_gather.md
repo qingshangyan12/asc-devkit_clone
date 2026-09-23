@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_gather
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md
+description: 根据索引位置index将Unified Buffer（UB）中的源操作数按元素收集到目的矢量数据寄存器：按index保存的逐元素索引从UB读取对应元素写入dst，受mask掩码控制且未选中的位置写0，提供引用参数输出与函数返回值两种形式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [gather, load]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [vector_register]
+  - traits: [masked]
+signature:
+  - prototype_id: asc_gather__Rv<dst_dtype>_PU<src_dtype>_v<index_dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/gather/ub_gather.h]
+  - prototype_id: asc_gather__PU<src_dtype>_v<index_dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/gather/ub_gather.h]
+dependencies: []
+examples:
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather
+    file: reg_load_gather.asc
+    archs: ['3510']
+    override_id: asc_gather__Rvf16_PUf16_vu16_vb
+timestamp: '2026-09-23'
+---
 # asc_gather
 
 ## 产品支持情况

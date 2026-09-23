@@ -1,3 +1,59 @@
+---
+okftype: reference.api.cpp
+title: asc_add_relu
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md
+description: 按元素求和后再进行Relu计算（结果和0对比取较大值），并提供s162s8、f322f16、f162s8的最终结果类型转换功能，结果存入dst。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: [activation, arithmetic]
+  - operations: [add, conversion, relu]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, high_dimensional]
+signature:
+  - override_id: asc_add_relu__PUf16_PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUf32_PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUi16_PUi16_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUi8_PUi16_PUi16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUf16_PUf32_PUf32_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUi8_PUf16_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUi8_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUf16_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - override_id: asc_add_relu__PUi8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_add_relu
 
 ## 产品支持情况

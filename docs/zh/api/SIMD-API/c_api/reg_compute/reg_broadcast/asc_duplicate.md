@@ -1,3 +1,36 @@
+---
+okftype: reference.api.cpp
+title: asc_duplicate
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md
+description: 将源操作数src的最低位元素（即下标为0的元素）广播到目的操作数dst中被mask筛选的位置，未被mask筛选的位置置零，为仅在AIV上生效的Reg矢量计算接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [broadcast]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [masked]
+signature:
+  - prototype_id: asc_duplicate__v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+    dtype: [int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+  - prototype_id: asc_duplicate__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_broadcast.h]
+    dtype: [int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: related
+    condition: 如果不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖，需要调用asc_mem_bar进行同步
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_duplicate
 
 ## 产品支持情况

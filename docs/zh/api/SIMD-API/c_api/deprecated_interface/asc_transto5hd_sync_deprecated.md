@@ -1,3 +1,38 @@
+---
+okftype: reference.api.cpp
+title: asc_transto5hd_sync（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md
+description: 该接口已废弃，用于数据格式转换，一般将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，请使用asc_transto5hd和asc_sync接口替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [layout_transform, transpose]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_transto5hd_b32_sync__uba8_uba8_u8_u16_u16
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_transto5hd_b16_sync__uba8_uba8_u8_u16_u16
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - override_id: asc_transto5hd_b8_sync__uba8_uba8_u8_u16_u16_b_b
+    archs: ['2201', '3510']
+    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+    condition: '`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/intra_core_sync/asc_sync.md)接口替代。'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md
+    kind: related
+    condition: '`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/intra_core_sync/asc_sync.md)接口替代。'
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_transto5hd_sync（废弃）
 
 ## 产品支持情况

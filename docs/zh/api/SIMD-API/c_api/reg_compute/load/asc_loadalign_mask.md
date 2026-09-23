@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_loadalign_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md
+description: 从Unified Buffer（UB）中32字节对齐的起始地址读取VL/8长度数据并通过函数返回值返回掩码寄存器，与asc_loadalign连续对齐搬入模式中掩码寄存器原型功能相同。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [load]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: [unified_buffer]
+  - destination_locations: [vector_register]
+  - traits: []
+signature:
+  - override_id: asc_loadalign_mask__PUu32
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/load/loadalign.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在UB地址重叠
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_loadalign_mask
 
 ## 产品支持情况

@@ -1,3 +1,77 @@
+---
+okftype: reference.api.cpp
+title: asc_set_gm2l1_nz_para
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md
+description: 配置从Global Memory搬运至L1 Buffer过程中ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量和相邻行、相邻Z矩阵、相邻Nz矩阵的步长；本接口只完成参数配置，不执行数据搬运。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement_configuration]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_set_gm2l1_nz_para__u16_u16_u16_u16
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+  - override_id: asc_set_gm2l1_nz_para__u64
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md
+    kind: configures
+examples:
+  - path: /examples/02_simd_c_api/02_features/02_matrix_compute/00_mmad_double_buffer
+    file: mmad_double_buffer.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u64
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_gm2l1
+    file: data_copy_gm2l1.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u64
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm
+    file: data_copy_l0c2gm.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u16_u16_u16_u16
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1
+    file: data_copy_l0c2l1.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u16_u16_u16_u16
+  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub
+    file: data_copy_l0c2ub.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u16_u16_u16_u16
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/asc_copy_l0c2ub
+    file: asc_copy_l0c2ub.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u16_u16_u16_u16
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/load_data_l12l0_950
+    file: load_data_l12l0_950.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u16_u16_u16_u16
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
+    file: matmul.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u64
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
+    file: mmad_s1.h
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u64
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
+    file: mmad_s2.h
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u64
+  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx
+    file: mmad_mx.asc
+    archs: ['3510']
+    override_id: asc_set_gm2l1_nz_para__u64
+timestamp: '2026-09-23'
+---
 # asc_set_gm2l1_nz_para
 
 ## 产品支持情况

@@ -1,3 +1,22 @@
+---
+okftype: reference.index.cpp
+title: 特殊寄存器访问
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/spr.md
+description: ''
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 特殊寄存器访问
 
 - **[asc_get_ctrl](asc_get_ctrl.md)**

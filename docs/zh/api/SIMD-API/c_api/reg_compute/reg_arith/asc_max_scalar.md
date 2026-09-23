@@ -1,3 +1,33 @@
+---
+okftype: reference.api.cpp
+title: asc_max_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max_scalar.md
+description: 根据mask将源矢量数据寄存器按元素与标量value比较取最大值，结果写入目的矢量数据寄存器或通过函数返回值返回，掩码位为0的元素在结果中置0。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [maximum]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, scalar_operand]
+signature:
+  - prototype_id: asc_max_scalar__v<dtype>_<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+  - prototype_id: asc_max_scalar__Rv<dtype>_v<dtype>_<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
+      float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_max_scalar
 
 ## 产品支持情况

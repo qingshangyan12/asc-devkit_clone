@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_ln
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_ln.md
+description: 根据mask将源矢量数据寄存器按元素取自然对数，结果写入目的矢量数据寄存器，掩码位为0的元素不参与计算并在结果中置0。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [natural_log]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked]
+signature:
+  - prototype_id: asc_ln__Rv<dtype>_v<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
+    dtype: [half, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_ln
 
 ## 产品支持情况

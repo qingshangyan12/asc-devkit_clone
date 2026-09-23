@@ -1,3 +1,35 @@
+---
+okftype: reference.api.cpp
+title: asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_2d_deprecated.md
+description: 将数据从Global Memory搬运到L1 Buffer，以512字节分形为单位按行列位置与步长切分提取多个分形矩阵，用于矩阵计算所需的2D格式数据加载；使用decomp_mode和l2_cache_ctl的旧常规重载及其同步接口已废弃，请使用带l2_cache_mode参数的新接口。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy]
+  - objects: [matrix]
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l1_buffer]
+  - traits: [deprecated]
+signature:
+  - prototype_id: asc_copy_gm2l1__PL1<dtype>_PG<dtype>_u32_u32_u16_u16_u16_u8_u8
+    archs: ['3510']
+    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+    dtype: [int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
+      int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, void]
+  - prototype_id: asc_copy_gm2l1_sync__PL1<dtype>_PG<dtype>_u32_u32_u16_u16_u16_u8_u8
+    archs: ['3510']
+    headers: [/include/c_api/composite/cube_datamove_composite.h]
+    dtype: [int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
+      int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, void]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_2d_arch_3510.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）（废弃）
 
 ## 产品支持情况

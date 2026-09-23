@@ -1,3 +1,27 @@
+---
+okftype: reference.api.cpp
+title: asc_axpy
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_axpy.md
+description: 根据mask将源操作数src中每个元素与标量value求积后，与目的操作数dst中的对应元素相加并将结果写回dst，dst既作为输入累加器参与计算又存储最终结果，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [fused_multiply_add]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, scalar_operand]
+signature:
+  - prototype_id: asc_axpy__Rv<dtype>_v<dtype>_<dtype>_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
+    dtype: [half, float]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_axpy
 
 ## 产品支持情况

@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_get_cmp_mask
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+description: 获取Compare操作的比较结果并存放到指定地址，需与Compare操作配合使用。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: []
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_cmp_mask__PUv
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_cmp_mask
 
 ## 产品支持情况

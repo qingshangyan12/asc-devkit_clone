@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_sync_intra_wait
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md
+description: 与asc_sync_intra_arrive配对使用，实现单AI Core内AIC与单个AIV之间的同步。检测到对应sync_id的计数器非0后解除阻塞并将计数器减1，arrive与wait传入的sync_id需符合跨核ID映射关系。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [control]
+  - families: []
+  - operations: [synchronization]
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [inter_core_synchronization]
+signature:
+  - override_id: asc_sync_intra_wait__pipe_u64
+    archs: ['3510']
+    headers: [/include/c_api/sync/sync.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md
+    kind: related
+    condition: 本接口与`asc_sync_intra_arrive`配对使用时，**不要求**`arrive`与`wait`传入的`sync_id`相同，而是要求二者符合如下跨核ID映射关系，否则会出现未定义行为。
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_sync_intra_wait
 
 ## 产品支持情况

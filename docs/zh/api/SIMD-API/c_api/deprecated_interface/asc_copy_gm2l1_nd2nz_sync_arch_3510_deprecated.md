@@ -1,3 +1,40 @@
+---
+okftype: reference.arch.cpp
+title: asc_copy_gm2l1_nd2nz_sync_arch_3510（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_sync_arch_3510_deprecated.md
+description: 已废弃的同步搬运接口，将数据从Global Memory搬运到L1 Buffer，并在搬运中将源端ND格式数据转换为Nz分形排布以支撑矩阵计算，请改用非同步接口和asc_sync替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - families: []
+  - operations: [copy, layout_transform]
+  - objects: []
+  - execution_models: []
+  - source_locations: [global_memory]
+  - destination_locations: [l1_buffer]
+  - traits: [deprecated]
+signature:
+  - prototype_id: asc_copy_gm2l1_nd2nz_sync__PL1<dtype>_PG<dtype>_u64_u8_u16_u32_u64_b
+    archs: ['3510']
+    headers: []
+    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
+      half, bfloat16_t, int32_t, uint32_t, float]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: constrained_by
+    condition: 如果本指令与其他指令存在目的地址重叠
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_copy_gm2l1_nd2nz_sync_arch_3510（废弃）
 
 ## 产品支持情况

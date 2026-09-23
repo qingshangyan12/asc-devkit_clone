@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_sflbits
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_sflbits.md
+description: 对64位有符号整数取最高位符号位作为参考位，统计从次高位开始与符号位相同的连续比特位个数；输入为全0或全1时返回-1，其余输入返回值范围为0到62，仅支持int64_t。
+tag:
+  - api_surfaces: [c_api]
+  - roles: []
+  - families: []
+  - operations: [bit_manipulation]
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_sflbits__i64
+    archs: ['2201', '3510']
+    headers: [/include/c_api/scalar_compute/compute/scalar_bit.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_sflbits
 
 ## 产品支持情况

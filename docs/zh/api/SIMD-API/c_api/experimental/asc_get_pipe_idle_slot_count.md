@@ -1,3 +1,42 @@
+---
+okftype: reference.api.cpp
+title: 指令发射队列空闲槽位查询
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md
+description: 试验接口，提供六个函数分别查询PIPE_MTE2、PIPE_MTE3、PIPE_V、PIPE_M、PIPE_MTE1、PIPE_FIX发射队列当前的空闲槽位数量，用于观察队列占用情况；不支持的AI
+  Core类型上调用返回0。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: [system]
+  - operations: []
+  - objects: []
+  - execution_models: []
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_pipe_mte2_idle_slot_count__z
+    archs: ['3510']
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
+  - override_id: asc_get_pipe_mte3_idle_slot_count__z
+    archs: ['3510']
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
+  - override_id: asc_get_pipe_v_idle_slot_count__z
+    archs: ['3510']
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
+  - override_id: asc_get_pipe_m_idle_slot_count__z
+    archs: ['3510']
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
+  - override_id: asc_get_pipe_mte1_idle_slot_count__z
+    archs: ['3510']
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
+  - override_id: asc_get_pipe_fix_idle_slot_count__z
+    archs: ['3510']
+    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # 指令发射队列空闲槽位查询
 
 ## 产品支持情况

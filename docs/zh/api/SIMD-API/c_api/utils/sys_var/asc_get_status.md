@@ -1,3 +1,26 @@
+---
+okftype: reference.api.cpp
+title: asc_get_status
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_status.md
+description: 读取当前核上下文中STATUS状态寄存器的64bit整体值并按int64_t返回，该寄存器记录核运行过程中各类告警事件的发生情况，状态位一旦因告警行为置位即保持，直到复位或被读取清除。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [query]
+  - families: [system]
+  - operations: []
+  - objects: []
+  - execution_models: [scalar]
+  - source_locations: []
+  - destination_locations: []
+  - traits: []
+signature:
+  - override_id: asc_get_status__z
+    archs: ['2201', '3510']
+    headers: [/include/c_api/utils/sys_var.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_get_status
 
 ## 产品支持情况

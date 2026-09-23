@@ -1,3 +1,31 @@
+---
+okftype: reference.api.cpp
+title: asc_int162uint32（废弃）
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162uint32_deprecated.md
+description: 已废弃接口，将src中int16_t类型的元素转换为uint32_t类型写入dst，请改用asc_int162uint32的显式位置参数重载替代。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [deprecated]
+signature:
+  - override_id: asc_int162uint32__Rvu32_vi16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int162uint32_v2__Rvu32_vi16_vb
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md
+    kind: related
+examples: []
+timestamp: '2026-09-24'
+---
 # asc_int162uint32（废弃）
 
 ## 产品支持情况

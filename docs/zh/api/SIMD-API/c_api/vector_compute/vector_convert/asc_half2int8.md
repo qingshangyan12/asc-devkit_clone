@@ -1,3 +1,59 @@
+---
+okftype: reference.api.cpp
+title: asc_half2int8
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md
+description: 将half类型数据转换为int8_t类型，支持多种舍入模式。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: [vector]
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [rounding_mode]
+signature:
+  - override_id: asc_half2int8__PUi8_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_rn__PUi8_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_rna__PUi8_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_rd__PUi8_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_ru__PUi8_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_rz__PUi8_PUf16_u32
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8__PUi8_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_rn__PUi8_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_rna__PUi8_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_rd__PUi8_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_ru__PUi8_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+  - override_id: asc_half2int8_rz__PUi8_PUf16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_half2int8
 
 ## 产品支持情况

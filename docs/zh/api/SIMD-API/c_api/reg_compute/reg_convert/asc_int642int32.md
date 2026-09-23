@@ -1,3 +1,50 @@
+---
+okftype: reference.api.cpp
+title: asc_int642int32
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md
+description: 将int64_t类型的源操作数转换成int32_t类型，支持不同的饱和模式，位宽比为2:1，根据位置标签选择写入目的操作数偶数或奇数索引位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [conversion]
+  - objects: []
+  - execution_models: [register_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, masked, saturation_mode]
+signature:
+  - override_id: asc_int642int32__Rvi32_vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32_sat__Rvi32_vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32__Rvi32_vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32_sat__Rvi32_vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32__vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32_sat__vi64_vb_icposeven
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32__vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+  - override_id: asc_int642int32_sat__vi64_vb_icposodd
+    archs: ['3510']
+    headers: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: 使用饱和或非饱和模式时，需要配置`ctrl`寄存器
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_int642int32
 
 ## 产品支持情况

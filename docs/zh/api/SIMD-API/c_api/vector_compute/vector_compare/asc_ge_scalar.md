@@ -1,3 +1,29 @@
+---
+okftype: reference.api.cpp
+title: asc_ge_scalar
+resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md
+description: 按元素判断源矢量元素是否大于等于标量value，成立时输出结果为1，否则为0，每个元素比较结果占1个bit。
+tag:
+  - api_surfaces: [c_api]
+  - roles: [compute]
+  - families: []
+  - operations: [comparison]
+  - objects: []
+  - execution_models: [memory_vector]
+  - source_locations: []
+  - destination_locations: []
+  - traits: [elementwise, scalar_operand]
+signature:
+  - override_id: asc_ge_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - override_id: asc_ge_scalar__PUu8_PUf32_f32_u8_u16_u16_u16_u16
+    archs: ['2201']
+    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+dependencies: []
+examples: []
+timestamp: '2026-09-23'
+---
 # asc_ge_scalar
 
 ## 产品支持情况
