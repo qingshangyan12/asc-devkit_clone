@@ -1120,7 +1120,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | float/float/half | +0/+0<br>+0/-0<br>-0/-0 | +0 | +0 | +0 |
 | float/float/half | -0/+0 | -0 | +0 | +0 |
 | float/float/half | +inf/-inf<br>+inf/MAX<br>+inf/MIN<br>+0/-inf<br>-0/-inf<br>MAX/MIN | +inf | +inf | +inf |
-| float/float/half | -inf/+0<br>-inf/+0<br>-inf/MAX<br>-inf/MIN<br>+0/+inf<br>-0/+inf<br>MIN/MAX | -inf | +0 | +0 |
+| float/float/half | -inf/+0<br>-inf/MAX<br>-inf/MIN<br>+0/+inf<br>-0/+inf<br>MIN/MAX | -inf | +0 | +0 |
 | float/float/half | 使得src0-src1=MAX | MAX | MAX | MAX |
 | float/float/half | 使得src0-src1=MIN | MIN | +0 | +0 |
 | float/float/half | nan/任意值<br>+inf/+inf<br>-inf/-inf | nan | nan | +0 |
@@ -1412,12 +1412,12 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half/uint8_t | nan | 0 | 0 |
 | half/uint8_t | +inf | 255 | 255 |
 | half/uint8_t | -inf | 0 | 0 |
-| half/int16_t | MAX | 65504 | 65504 |
-| half/int16_t | MIN | -65504 | -65504 |
+| half/int16_t | MAX | 32767 | 32767 |
+| half/int16_t | MIN | -32768 | -32768 |
 | half/int16_t | +0/-0 | 0 | 0 |
 | half/int16_t | nan | 0 | 0 |
-| half/int16_t | +inf | 65504 | 65504 |
-| half/int16_t | -inf | -65504 | -65504 |
+| half/int16_t | +inf | 32767 | 32767 |
+| half/int16_t | -inf | -32768 | -32768 |
 | half/int32_t | MAX | 65504 | 65504 |
 | half/int32_t | MIN | -65504 | -65504 |
 | half/int32_t | +0/-0 | 0 | 0 |
@@ -1430,10 +1430,10 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | half/float | nan | nan | nan |
 | half/float | +inf | +inf | +inf |
 | half/float | -inf | -inf | -inf |
-| int16_t/half | MAX | 32768.00 | 32768.00 |
+| int16_t/half | MAX | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND/CAST_NONE模式下，输出32768.00；CAST_FLOOR/CAST_TRUNC模式下，输出32752.00 | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND/CAST_NONE模式下，输出32768.00；CAST_FLOOR/CAST_TRUNC模式下，输出32752.00 |
 | int16_t/half | MIN | -32768.00 | -32768.00 |
 | int16_t/half | 0 | +0 | +0 |
-| int16_t/float | MAX | 32768.00 | 32768.00 |
+| int16_t/float | MAX | 32767.00 | 32767.00 |
 | int16_t/float | MIN | -32768.00 | -32768.00 |
 | int16_t/float | 0 | +0 | +0 |
 | bfloat16_t/int32_t | 3.3895314e+38（MAX） | 2147483647 | 2147483647 |
@@ -1452,7 +1452,7 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | int32_t/int16_t | MIN | MIN | MIN |
 | int32_t/int16_t | 0 | 0 | 0 |
 | int32_t/half（参考CastDequant） | / | / | / |
-| int32_t/float | 2147483647（MAX） | 2147483520.00 | 2147483520.00 |
+| int32_t/float | 2147483647（MAX） | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND/CAST_NONE模式下，输出2147483648.00；CAST_FLOOR/CAST_TRUNC模式下，输出2147483520.00 | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND/CAST_NONE模式下，输出2147483648.00；CAST_FLOOR/CAST_TRUNC模式下，输出2147483520.00 |
 | int32_t/float | -2147483648（MIN） | -2147483648.00 | -2147483648.00 |
 | int32_t/int64_t | 2147483647（MAX） | 2147483647 | 2147483647 |
 | int32_t/int64_t | -2147483648（MIN） | -2147483648 | -2147483648 |
@@ -1462,8 +1462,8 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | float/int16_t | +inf | 32767 | 32767 |
 | float/int16_t | -inf | -32768 | -32768 |
 | float/int16_t | nan | 0 | 0 |
-| float/bfloat16_t | 3.4028235e+38（MAX） | +inf | MAX |
-| float/bfloat16_t | -3.4028235e+38（MIN） | -inf | MIN |
+| float/bfloat16_t | 3.4028235e+38（MAX） | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出+inf；CAST_FLOOR/CAST_TRUNC模式下，输出3.3895314e+38 | MAX（3.3895314e+38） |
+| float/bfloat16_t | -3.4028235e+38（MIN） | 不同舍入模式下输出不同，CAST_RINT/CAST_FLOOR/CAST_ROUND模式下，输出-inf；CAST_CEIL/CAST_TRUNC模式下，输出-3.3895314e+38 | MIN（-3.3895314e+38） |
 | float/bfloat16_t | +0 | +0 | +0 |
 | float/bfloat16_t | -0 | -0 | -0 |
 | float/bfloat16_t | +inf | +inf | MAX |
@@ -1496,12 +1496,8 @@ Memory矢量计算接口在边界值输入下，有两类输出结果：
 | float/int64_t | nan | 0 | 0 |
 | int64_t/int32_t | MAX | 2147483647 | 2147483647 |
 | int64_t/int32_t | MIN | -2147483648 | -2147483648 |
-| int64_t/float | MAX | 9223372036854775808.00（MAX） | 9223372036854775808.00（MAX） |
+| int64_t/float | MAX | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出9223372036854775808.00；CAST_FLOOR/CAST_TRUNC模式下，输出9223371487098961920.00 | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出9223372036854775808.00；CAST_FLOOR/CAST_TRUNC模式下，输出9223371487098961920.00 |
 | int64_t/float | MIN | -9223372036854775808.00（MIN） | -9223372036854775808.00（MIN） |
-| int16_t/int8_t | MAX | 127 | 127 |
-| int16_t/int8_t | MIN | -128 | -128 |
-| int16_t/uint8_t | MAX | 255 | 255 |
-| int16_t/uint8_t | MIN | 0 | 0 |
 
 注：float->float转换，-0会被转为+0，与IEEE754不一致。
 
