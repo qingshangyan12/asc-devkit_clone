@@ -698,15 +698,25 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_payne_hanek_radian_reduct
         quotient += 1;
     }
 
-    // Step 9: Split product into high and low
+    // Step 9: Split the 62-bit fraction product into two 24-bit float parts.
     int64_t product_int64 = static_cast<int64_t>(product);
-    int64_t high_float = static_cast<float>(product_int64);
-    product_int64 = product_int64 - static_cast<int64_t>(high_float);
-    int64_t low_float = static_cast<float>(product_int64);
+    int64_t high_part = static_cast<int64_t>(static_cast<float>(product_int64));
+    product_int64 = product_int64 - high_part;
+    int64_t low_part = static_cast<int64_t>(static_cast<float>(product_int64));
 
-    // Step 10: Compute final result = (high + low) * pi/2 * 2^-62
-    float pi_over_two_low = 3.4061215800865545e-19f; // pi/2 * 2^-62
-    float reduced_angle = (high_float + low_float) * pi_over_two_low;
+    // Step 10: reduced_angle = product * (pi/2) * 2^-62. Using a two-float scale
+    // (hi + lo) plus compensated FMA keeps the reduced angle correctly rounded,
+    // instead of truncating it through a single 24-bit multiply (which cost ~1 ulp
+    // of argument precision and pushed cosf to 3 ulp near the Payne-Hanek range).
+    constexpr float pio2_scale_hi = 3.4061216748705226e-19f; // pi/2 * 2^-62 (hi)
+    constexpr float pio2_scale_lo = -9.478396428567739e-27f; // pi/2 * 2^-62 (lo)
+    float hi_val = static_cast<float>(high_part);
+    float lo_val = static_cast<float>(low_part);
+    float reduced_angle = hi_val * pio2_scale_hi;
+    float corr = fmaf(hi_val, pio2_scale_hi, -reduced_angle);
+    corr = fmaf(lo_val, pio2_scale_hi, corr);
+    corr = fmaf(hi_val, pio2_scale_lo, corr);
+    reduced_angle = reduced_angle + corr;
 
     // Step 11: Handle negative input
     if (x < 0.0f) {
