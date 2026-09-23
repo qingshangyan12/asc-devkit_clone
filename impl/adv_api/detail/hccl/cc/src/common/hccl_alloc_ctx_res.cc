@@ -598,6 +598,13 @@ HcclResult InitOpParamByTiling(
     opParam.opType = static_cast<HcclCMDType>(ccTiling->opType);
     opParam.stream = reinterpret_cast<aclrtStream>(stream);
     opParam.engine = OpExecuteConfigToCommEngine(ccTiling->commEngine);
+    opParam.ccuAgTuningEnable = ccTiling->ccuAgTuningEnable;
+    if (opParam.ccuAgTuningEnable != 0U) {
+        opParam.ccuAgUnroll = ccTiling->ccuAgUnroll;
+        opParam.ccuAgJettyNum = ccTiling->ccuAgJettyNum;
+        opParam.ccuAgLocalCopyMode = ccTiling->ccuAgLocalCopyMode;
+        opParam.ccuAgMeshRatio = ccTiling->ccuAgMeshRatio;
+    }
 
     if (ccTiling->commEngine == static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
         opParam.commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_AI_CPU;

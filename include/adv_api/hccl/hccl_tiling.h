@@ -44,6 +44,10 @@ public:
     uint32_t SetQueueNum(uint16_t num);
     uint32_t SetCommBlockNum(uint16_t num);
     uint32_t SetCommEngine(uint8_t commEngine);
+    // Experimental CCU parallel-AllGather tuning. localCopyMode is a bitmask:
+    // bit0 selects GroupCopy for Mesh, bit1 selects GroupCopy for NHR.
+    uint32_t SetCcuAllGatherTuning(
+        uint8_t unroll, uint8_t jettyNum, uint8_t localCopyMode, uint8_t meshRatio);
 
 private:
     HcclTilingImpl impl_;

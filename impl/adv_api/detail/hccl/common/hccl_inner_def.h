@@ -199,6 +199,8 @@ struct CcuPrepareParam {
     uint8_t alltoallvCnt = 0;
     __gm__ CCUMsgExt* ccuMsgExt;
     uint64_t scratchAddr;
+    uint8_t agJettyNum = 1U;
+    uint8_t agMeshRatio = 50U;
 };
 
 struct AlltoAllVParamCcu {

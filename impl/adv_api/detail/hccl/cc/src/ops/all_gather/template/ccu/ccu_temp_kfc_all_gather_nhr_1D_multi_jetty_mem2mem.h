@@ -26,6 +26,8 @@ struct KfcParallelAllGatherArg {
     uint32_t rankSizeLevel1 = 0;
     uint32_t rankIdxLevel1 = 0;
     uint32_t jettyNum = 1;
+    uint32_t unroll = 1;
+    uint32_t localCopyMode = 3;
     std::vector<KfcNhrStepInfo> stepInfoVector;
     std::map<uint32_t, uint32_t> rank2ChannelIdx;
 };

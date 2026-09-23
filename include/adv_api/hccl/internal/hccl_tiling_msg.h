@@ -39,7 +39,14 @@ struct Mc2CcTilingInner {
     uint8_t skipBufferWindowCopy;
     uint8_t stepSize;
     uint8_t version;
-    char reserved[9];
+    // CCU AllGather performance-search knobs.  tuningEnable == 0 keeps the
+    // production defaults and makes old tiling producers binary compatible.
+    uint8_t ccuAgTuningEnable;
+    uint8_t ccuAgUnroll;
+    uint8_t ccuAgJettyNum;
+    uint8_t ccuAgLocalCopyMode;
+    uint8_t ccuAgMeshRatio;
+    char reserved[4];
     uint8_t commEngine;
     uint8_t srcDataType;
     uint8_t dstDataType;
@@ -49,6 +56,7 @@ struct Mc2CcTilingInner {
     uint32_t reduceType;
     char reserved2[232];
 };
+static_assert(sizeof(Mc2CcTilingInner) == 512U, "Mc2CcTilingInner ABI size must remain unchanged");
 } // namespace HcclApi
 
 #endif // IMPL_HCCL_HCCL_TILING_MSG_H

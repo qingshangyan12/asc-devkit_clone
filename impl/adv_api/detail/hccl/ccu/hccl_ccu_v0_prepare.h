@@ -391,10 +391,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 {
     // Keep the split identical to InsV2AllGatherParallelExecutor: split by
     // element count so neither half can cut through an element.
-    constexpr uint64_t nhrJettyNum = 1U;
+    const uint64_t nhrJettyNum = ccuParam_.agJettyNum;
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
     const uint64_t totalSize = commParam->count * dataTypeSize;
-    const uint64_t part0Size = (commParam->count / 2U) * dataTypeSize;
+    const uint64_t part0Count = commParam->count * ccuParam_.agMeshRatio / 100U;
+    const uint64_t part0Size = part0Count * dataTypeSize;
     const uint64_t part1Size = totalSize - part0Size;
     const uint64_t repeatOffset = totalSize * ccuParam_.repeatIndex;
     const uint64_t outputStride = commParam->strideCount == 0U ? totalSize : commParam->strideCount * dataTypeSize;
@@ -418,10 +419,15 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         reinterpret_cast<uint64_t>(queueBase + KFC_PARALLEL_AG_NHR_PHASE_DONE_STORAGE * CCU_XN_DATA_SIZE);
     CalcGoSize(part0Size, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_PARALLEL_AG_PART0_GO_SIZE_0]);
     CalcGoSize(part1Size, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_PARALLEL_AG_PART1_GO_SIZE_0]);
-    xnData_[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY] = part0Size / nhrJettyNum;
-    xnData_[KFC_PARALLEL_AG_PART0_LAST_SLICE_PER_JETTY] = part0Size;
-    xnData_[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY] = part1Size / nhrJettyNum;
-    xnData_[KFC_PARALLEL_AG_PART1_LAST_SLICE_PER_JETTY] = part1Size;
+    const uint64_t splitAlignment = 128U;
+    xnData_[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY] =
+        part0Size / nhrJettyNum / splitAlignment * splitAlignment;
+    xnData_[KFC_PARALLEL_AG_PART0_LAST_SLICE_PER_JETTY] =
+        part0Size - (nhrJettyNum - 1U) * xnData_[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY];
+    xnData_[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY] =
+        part1Size / nhrJettyNum / splitAlignment * splitAlignment;
+    xnData_[KFC_PARALLEL_AG_PART1_LAST_SLICE_PER_JETTY] =
+        part1Size - (nhrJettyNum - 1U) * xnData_[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY];
     xnData_[KFC_PARALLEL_AG_MESH_PHASE_DONE_STORAGE] = 0U;
     xnData_[KFC_PARALLEL_AG_NHR_PHASE_DONE_STORAGE] = 0U;
 }

@@ -50,7 +50,7 @@ HcclResult CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem::CalcRes(
     kernelArg->rankId = mySubCommRank_;
     kernelArg->jettyNum =
         (param.algName != nullptr && std::strcmp(param.algName, KFC_PARALLEL_ALL_GATHER_ALG_NAME) == 0) ?
-            1U :
+            (param.ccuAgTuningEnable != 0U ? param.ccuAgJettyNum : 1U) :
             KFC_NHR_JETTY_NUM;
     kernelArg->opParam = param;
     kernelArg->subCommRanks = subCommRanks_;
