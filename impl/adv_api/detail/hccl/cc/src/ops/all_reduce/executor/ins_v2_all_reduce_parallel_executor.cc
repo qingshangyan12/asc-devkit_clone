@@ -18,7 +18,6 @@
 #include "topo_match_pcie_mix.h"
 #include "alg_meta_registry.h"
 #include "external_alg_rules.h"
-#include "hccl_rank_graph.h"
 #include <cmath>
 
 namespace mc2_ops_hccl {
@@ -76,65 +75,6 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
             }
         }
         temp1HierarchyInfo = {closRanks};
-    } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix) {
-        // PCIE 定制机型：TopoMatchPcieMix 产出的 infos[0] 是全网 mesh 合并名单，infos[1] 依赖
-        // CLOS 实例（PCIE 机组间无 CLOS 实例时为空）。参照上游两级语义重新推导两级分组：
-        // 框内组 = 含本 rank 的 COMM_TOPO_1DMESH 实例成员（与 hccl physicalLevels/localRanks
-        // 的 AppendTopoInstLevel 同源，不做 rank 值运算推导）；组大小 = 该实例大小；
-        // 框间组 = 跨组同位卡（%组大小 同余，含自己），仍从全网合并名单推导。
-        std::vector<u32> intraRanks;
-        u32 meshGroupSize = 0;
-        uint32_t* rawInstIds = nullptr;
-        uint32_t rawInstNum = 0;
-        CHK_RET(HcclRankGraphGetTopoInstsByLayer(comm, 0, &rawInstIds, &rawInstNum));
-        // 立即复制：该接口下一次调用会重填同一块内存（与 hccl FetchTopoInstIds 同款处理）
-        std::vector<uint32_t> instIds;
-        if (rawInstIds != nullptr && rawInstNum > 0) {
-            instIds.assign(rawInstIds, rawInstIds + rawInstNum);
-        }
-        for (u32 i = 0; i < instIds.size() && meshGroupSize == 0; ++i) {
-            CommTopo instType = CommTopo::COMM_TOPO_RESERVED;
-            CHK_RET(HcclRankGraphGetTopoType(comm, 0, instIds[i], &instType));
-            if (instType != CommTopo::COMM_TOPO_1DMESH) {
-                continue;
-            }
-            uint32_t* instRanks = nullptr;
-            uint32_t instRankNum = 0;
-            CHK_RET(HcclRankGraphGetRanksByTopoInst(comm, 0, instIds[i], &instRanks, &instRankNum));
-            if (instRanks == nullptr) {
-                continue;
-            }
-            for (u32 j = 0; j < instRankNum; ++j) {
-                if (instRanks[j] == topoInfo->userRank) {
-                    intraRanks.assign(instRanks, instRanks + instRankNum);
-                    meshGroupSize = instRankNum;
-                    break;
-                }
-            }
-        }
-        CHK_PRT_RET(
-            meshGroupSize == 0,
-            HCCL_ERROR(
-                "[%s] 1DMESH instance containing rank[%u] not found on pcie mix topo.", __func__,
-                topoInfo->userRank),
-            HcclResult::HCCL_E_PARA);
-        // 框间组遍历全 rank 空间推导：infos[0][0] 只含本 rank 所在实例的成员
-        //（GetTopoInstsByLayer 仅返回当前 rank 的实例），与 hccl
-        // BuildRepresentativeGroup（offset + i*step 纯算术）等价。
-        std::vector<u32> interRanks;
-        for (u32 rank = 0; rank < topoInfo->userRankSize; ++rank) {
-            if (rank % meshGroupSize == topoInfo->userRank % meshGroupSize) {
-                interRanks.push_back(rank);
-            }
-        }
-        CHK_PRT_RET(
-            interRanks.empty(),
-            HCCL_ERROR(
-                "[%s] hierarchy re-split failed on pcie mix topo, rank[%u], groupSize[%u].", __func__,
-                topoInfo->userRank, meshGroupSize),
-            HcclResult::HCCL_E_PARA);
-        temp0HierarchyInfo = {intraRanks};
-        temp1HierarchyInfo = {interRanks};
     } else {
         temp0HierarchyInfo = algHierarchyInfo.infos[0];
         temp1HierarchyInfo = algHierarchyInfo.infos[1];
@@ -1060,9 +1000,9 @@ REGISTER_ALG_META(
     FLAG_MULTI_LEVEL, 0);
 
 REGISTER_EXECUTOR_BY_FOUR_TEMPS(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHRPcie, InsAllReduceParallelExecutor, TopoMatchPcieMix,
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, InsAllReduceParallelExecutor, TopoMatchPcieMix,
     InsTempReduceScatterMesh1D, InsTempReduceScatterNHR, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllReduceParallelMeshNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
+    HcclCMDType::HCCL_CMD_ALLREDUCE, AicpuAllreduceParallelMeshNHRPcie, AlgEngine::AICPU, "parallel[mesh,nhr]",
     COND_NONE, FLAG_PCIE_MIX, 0);
 } // namespace mc2_ops_hccl
