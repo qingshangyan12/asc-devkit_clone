@@ -351,7 +351,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentAllToAll(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    constexpr uint64_t meshBandwidth = 13U; // mesh:clos = 13:20，与 executor 侧 MESH_BW_CCU/CLOS_BW_CCU 同步
+    constexpr uint64_t meshBandwidth = 9U; // mesh:clos = 9:24，与 executor 侧 MESH_BW_CCU/CLOS_BW_CCU 同步
     constexpr uint64_t totalBandwidth = 33U;
     constexpr uint64_t splitAlignment = 128U;
     constexpr uint64_t closJettyNum = 1U; // 与 CcuTempAllToAllMesh1DMultiJetty 的 A2A_JETTY_NUM 保持一致
