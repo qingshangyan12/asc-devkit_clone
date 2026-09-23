@@ -1,7 +1,7 @@
 # CrossCoreSetFlag和CrossCoreWaitFlag核间同步样例
 
 ## 概述
-本样例介绍核间同步接口CrossCoreSetFlag和CrossCoreWaitFlag的模式0、模式1、模式2和模式4，并通过纯Vector计算以及Cube与Vector融合计算场景说明各模式的使用方法。其中模式4仅支持Ascend 950PR/Ascend 950DT。
+本样例介绍核间同步接口[CrossCoreSetFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md)和[CrossCoreWaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md)的模式0、模式1、模式2和模式4，并通过纯Vector计算以及Cube与Vector融合计算场景说明各模式的使用方法。其中模式4仅支持Ascend 950PR/Ascend 950DT。
 <table border="1" align="center">
   <tr bgcolor="lightgray">
     <td>同步控制模式</td>
