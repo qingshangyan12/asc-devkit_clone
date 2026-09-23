@@ -41,7 +41,10 @@ class ScanDebugApisTest(unittest.TestCase):
 
         result = scan_text(source, "kernel.asc")
 
-        self.assertEqual(result["supported"], ["printf", "assert", "__trap", "asc_dump", "clock", "asc_time_stamp"])
+        self.assertEqual(
+            result["supported"],
+            ["printf", "assert", "__trap", "asc_dump", "clock", "asc_time_stamp"],
+        )
         self.assertEqual(result["excluded"], [])
         self.assertEqual(result["files"], ["kernel.asc"])
 
@@ -52,7 +55,8 @@ class ScanDebugApisTest(unittest.TestCase):
 
         self.assertEqual(result["supported"], [])
         self.assertEqual(
-            result["excluded"], sorted(EXCLUDED_APIS & {"asc_prof_start", "TRACE_START", "asc_mark_stamp"})
+            result["excluded"],
+            sorted(EXCLUDED_APIS & {"asc_prof_start", "TRACE_START", "asc_mark_stamp"}),
         )
 
     def test_accepts_kernel_operator_as_umbrella_header(self):
@@ -77,7 +81,9 @@ class ScanDebugApisTest(unittest.TestCase):
                 "--fail-on-excluded",
                 str(source_path),
             ]
-            completed = subprocess.run(command, capture_output=True, text=True, check=False)
+            completed = subprocess.run(
+                command, capture_output=True, text=True, check=False
+            )
 
         self.assertEqual(completed.returncode, 1)
         report = json.loads(completed.stdout)
