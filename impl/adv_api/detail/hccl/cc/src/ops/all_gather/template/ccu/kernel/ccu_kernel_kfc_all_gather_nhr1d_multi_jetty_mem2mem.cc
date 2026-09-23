@@ -18,6 +18,7 @@ constexpr uint16_t NHR_POST_SYNC_BIT = 1U << 3U;
 constexpr uint16_t NHR_STEP_PRE_SYNC_BIT = 1U << 4U;
 constexpr uint16_t NHR_STEP_POST_SYNC_BIT = 1U << 5U;
 constexpr uint16_t NHR_CKE_IDX = 0U;
+constexpr uint32_t AG_LOCAL_COPY_NHR_GROUP_BIT = 2U;
 
 struct KfcAllGatherNhrContext : CcuKernelCtxBase {
     const ChannelHandle* channels = nullptr;
@@ -25,6 +26,7 @@ struct KfcAllGatherNhrContext : CcuKernelCtxBase {
     uint32_t rankSize = 0;
     uint32_t rankId = 0;
     uint32_t jettyNum = 1;
+    uint32_t localCopyMode = 3;
     const std::vector<KfcNhrStepInfo>* stepInfoVector = nullptr;
     const std::map<uint32_t, uint32_t>* rank2ChannelIdx = nullptr;
 
@@ -99,8 +101,15 @@ CcuResult PostSync(KfcAllGatherNhrContext& ctx)
 CcuResult WriteSlice(KfcAllGatherNhrContext& ctx, uint32_t toRank, ccu::LocalAddr& source, ccu::RemoteAddr& destination)
 {
     const ChannelHandle channel = ctx.channels[ctx.rank2ChannelIdx->at(toRank)];
-    ccu::LocalAddr src = source;
-    ccu::RemoteAddr dst = destination;
+    // Variable copy construction aliases the same CCU variable handle.  Use
+    // fresh address variables exactly as the HCCL implementation does;
+    // otherwise jetty offset increments corrupt the caller's base address.
+    ccu::LocalAddr src;
+    ccu::RemoteAddr dst;
+    src.addr = source.addr;
+    src.token = source.token;
+    dst.addr = destination.addr;
+    dst.token = destination.token;
     CCU_IF(ctx.sliceSizePerJetty != 0)
     {
         for (uint32_t jetty = 0; jetty + 1U < ctx.jettyNum; ++jetty) {
@@ -210,8 +219,12 @@ CcuResult RunNhr(KfcAllGatherNhrContext& ctx)
         constexpr uint16_t rankMask = 1U;
         CCU_IF(ctx.isInputOutputEqual == 0)
         {
-            CCU_CHK_RET(GroupCopy(ctx, dst, src, ctx.goSize));
-            CCU_CHK_RET(ccu::EventRecord(ctx.event, rankMask));
+            if ((ctx.localCopyMode & AG_LOCAL_COPY_NHR_GROUP_BIT) != 0U) {
+                CCU_CHK_RET(GroupCopy(ctx, dst, src, ctx.goSize));
+                CCU_CHK_RET(ccu::EventRecord(ctx.event, rankMask));
+            } else {
+                CCU_CHK_RET(ccu::LocalCopy(dst, src, ctx.sliceSize, ctx.event, rankMask));
+            }
         }
         CCU_ELSE { CCU_CHK_RET(ccu::EventRecord(ctx.event, rankMask)); }
         CCU_CHK_RET(ccu::EventWait(ctx.event, rankMask));
@@ -263,7 +276,8 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
     ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
     ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
-    uint32_t rankSize, uint32_t rankId, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
+    uint32_t rankSize, uint32_t rankId, uint32_t jettyNum, uint32_t localCopyMode,
+    const std::vector<KfcNhrStepInfo>& stepInfoVector,
     const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
 {
     KfcAllGatherNhrContext ctx;
@@ -272,6 +286,7 @@ CcuResult CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
     ctx.rankSize = rankSize;
     ctx.rankId = rankId;
     ctx.jettyNum = jettyNum;
+    ctx.localCopyMode = localCopyMode;
     ctx.stepInfoVector = &stepInfoVector;
     ctx.rank2ChannelIdx = &rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
@@ -296,7 +311,8 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable part0GoSize1, ccu::Variable part0GoSize2, ccu::Variable part0GoSize3, ccu::Variable part1GoSize0,
     ccu::Variable part1GoSize1, ccu::Variable part1GoSize2, ccu::Variable part1GoSize3, const ChannelHandle channels[],
     uint32_t channelCount, uint32_t rankSizeLevel0, uint32_t rankIdxLevel0, uint32_t rankSizeLevel1,
-    uint32_t rankIdxLevel1, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
+    uint32_t rankIdxLevel1, uint32_t jettyNum, uint32_t localCopyMode,
+    const std::vector<KfcNhrStepInfo>& stepInfoVector,
     const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
 {
     KfcAllGatherNhrContext ctx;
@@ -305,6 +321,7 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     ctx.rankSize = rankSizeLevel1;
     ctx.rankId = rankIdxLevel1;
     ctx.jettyNum = jettyNum;
+    ctx.localCopyMode = localCopyMode;
     ctx.stepInfoVector = &stepInfoVector;
     ctx.rank2ChannelIdx = &rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);

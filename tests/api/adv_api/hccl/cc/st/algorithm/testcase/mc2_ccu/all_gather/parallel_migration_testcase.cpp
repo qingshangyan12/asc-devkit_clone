@@ -61,11 +61,13 @@ protected:
     // 当前 RuntimeWorld 每 rank 只有一个执行上下文，故分别验证 Mesh/NHR
     // mission，预填另一 mission 的 phase-0 结果和完成标志。此测试不声称
     // 覆盖双 mission 的真实并发、GM 可见性或硬件资源容量。
-    void VerifyMission(uint32_t meshSize, uint32_t nhrSize, uint64_t count, uint64_t elementSize, bool mesh)
+    void VerifyMission(
+        uint32_t meshSize, uint32_t nhrSize, uint64_t count, uint64_t elementSize, bool mesh,
+        uint32_t unroll = 1U, uint32_t jettyNum = 1U, uint32_t localCopyMode = 3U, uint32_t meshRatio = 50U)
     {
         const uint32_t ranks = meshSize * nhrSize;
         const uint64_t bytes = count * elementSize;
-        const uint64_t part0 = count / 2 * elementSize;
+        const uint64_t part0 = count * meshRatio / 100U * elementSize;
         const uint64_t stride = 2 * bytes + 16; // 两个请求 + rank 间 guard
         const uint32_t mission = mesh ? 0U : 1U;
         std::vector<RankMemory> memories(ranks);
@@ -126,10 +128,14 @@ protected:
                 const auto part1GoSize = mc2_ops_hccl::CalGoSize(bytes - part0, config);
                 std::copy(part0GoSize.begin(), part0GoSize.end(), p + KFC_PARALLEL_AG_PART0_GO_SIZE_0);
                 std::copy(part1GoSize.begin(), part1GoSize.end(), p + KFC_PARALLEL_AG_PART1_GO_SIZE_0);
-                p[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY] = part0;
-                p[KFC_PARALLEL_AG_PART0_LAST_SLICE_PER_JETTY] = part0;
-                p[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY] = bytes - part0;
-                p[KFC_PARALLEL_AG_PART1_LAST_SLICE_PER_JETTY] = bytes - part0;
+                constexpr uint64_t splitAlignment = 128U;
+                const uint64_t part0PerJetty = part0 / jettyNum / splitAlignment * splitAlignment;
+                const uint64_t part1PerJetty = (bytes - part0) / jettyNum / splitAlignment * splitAlignment;
+                p[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY] = part0PerJetty;
+                p[KFC_PARALLEL_AG_PART0_LAST_SLICE_PER_JETTY] = part0 - (jettyNum - 1U) * part0PerJetty;
+                p[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY] = part1PerJetty;
+                p[KFC_PARALLEL_AG_PART1_LAST_SLICE_PER_JETTY] =
+                    bytes - part0 - (jettyNum - 1U) * part1PerJetty;
                 const uint64_t base = memory.ParameterAddress() + entry * QUEUE_WORDS * sizeof(uint64_t);
                 p[KFC_PARALLEL_AG_MESH_PHASE_DONE_ADDR] = base + KFC_PARALLEL_AG_MESH_PHASE_DONE_STORAGE * 8;
                 p[KFC_PARALLEL_AG_NHR_PHASE_DONE_ADDR] = base + KFC_PARALLEL_AG_NHR_PHASE_DONE_STORAGE * 8;
@@ -153,7 +159,9 @@ protected:
             parallel->rankIdxLevel1 = n;
             arg.rankSize = mesh ? meshSize : nhrSize;
             arg.rankId = mesh ? m : n;
-            parallel->jettyNum = 1;
+            parallel->jettyNum = jettyNum;
+            parallel->unroll = unroll;
+            parallel->localCopyMode = localCopyMode;
             parallel->stepInfoVector = NhrSteps(n, nhrSize);
             std::vector<ChannelHandle> channels;
             for (uint32_t peer = 0; peer < arg.rankSize; ++peer) {
@@ -233,6 +241,14 @@ TEST_F(ParallelAllGatherMigrationTest, LargeCopyWithTail)
     // per-rank >512 KiB，跨越 GroupCopy 整块边界，并带非对齐尾块。
     VerifyMission(4, 2, 262147, 2, true);
     VerifyMission(4, 2, 262147, 2, false);
+}
+
+TEST_F(ParallelAllGatherMigrationTest, RuntimeTuningKnobs)
+{
+    // Exercise maximum dynamic unroll, four NHR jetties, LocalCopy on both phases,
+    // and a non-default 60:40 Mesh:NHR split in the real product kernels.
+    VerifyMission(4, 2, 4099, 2, true, 16, 4, 0, 60);
+    VerifyMission(4, 2, 4099, 2, false, 16, 4, 0, 60);
 }
 } // namespace
 } // namespace CcuSt

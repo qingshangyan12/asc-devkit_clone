@@ -213,6 +213,11 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2CcTiling& tiling)
     tilingInner->stepSize = impl_.stepSize_;
     tilingInner->version = 1U;
     (void)memset_s(tilingInner->reserved, sizeof(tilingInner->reserved), 0, sizeof(tilingInner->reserved));
+    tilingInner->ccuAgTuningEnable = impl_.ccuAgTuningEnable_;
+    tilingInner->ccuAgUnroll = impl_.ccuAgUnroll_;
+    tilingInner->ccuAgJettyNum = impl_.ccuAgJettyNum_;
+    tilingInner->ccuAgLocalCopyMode = impl_.ccuAgLocalCopyMode_;
+    tilingInner->ccuAgMeshRatio = impl_.ccuAgMeshRatio_;
     auto ret = strcpy_s(tilingInner->groupName, sizeof(tilingInner->groupName), impl_.groupName_.c_str());
     ASCENDC_HOST_ASSERT(ret == EOK, return EXIT_FAILURE, "groupName(%s) copy failed.", impl_.groupName_.c_str());
     ret = strcpy_s(tilingInner->algConfig, sizeof(tilingInner->algConfig), impl_.algConfig_.c_str());
@@ -330,6 +335,25 @@ uint32_t Mc2CcTilingConfig::SetCommBlockNum(uint16_t num)
 uint32_t Mc2CcTilingConfig::SetCommEngine(uint8_t commEngine)
 {
     impl_.commEngine_ = commEngine;
+    return EXIT_SUCCESS;
+}
+
+uint32_t Mc2CcTilingConfig::SetCcuAllGatherTuning(
+    uint8_t unroll, uint8_t jettyNum, uint8_t localCopyMode, uint8_t meshRatio)
+{
+    ASCENDC_HOST_ASSERT(
+        unroll >= 1U && unroll <= 16U, return EXIT_FAILURE, "unroll(%u) must be in [1, 16].", unroll);
+    ASCENDC_HOST_ASSERT(
+        jettyNum >= 1U && jettyNum <= 16U, return EXIT_FAILURE, "jettyNum(%u) must be in [1, 16].", jettyNum);
+    ASCENDC_HOST_ASSERT(
+        localCopyMode <= 3U, return EXIT_FAILURE, "localCopyMode(%u) must be in [0, 3].", localCopyMode);
+    ASCENDC_HOST_ASSERT(
+        meshRatio >= 1U && meshRatio <= 99U, return EXIT_FAILURE, "meshRatio(%u) must be in [1, 99].", meshRatio);
+    impl_.ccuAgTuningEnable_ = 1U;
+    impl_.ccuAgUnroll_ = unroll;
+    impl_.ccuAgJettyNum_ = jettyNum;
+    impl_.ccuAgLocalCopyMode_ = localCopyMode;
+    impl_.ccuAgMeshRatio_ = meshRatio;
     return EXIT_SUCCESS;
 }
 } // namespace AscendC

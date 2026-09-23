@@ -34,6 +34,11 @@ public:
     uint8_t srcDataType_;
     uint8_t dstDataType_;
     uint8_t commEngine_;
+    uint8_t ccuAgTuningEnable_ = 0U;
+    uint8_t ccuAgUnroll_ = 1U;
+    uint8_t ccuAgJettyNum_ = 1U;
+    uint8_t ccuAgLocalCopyMode_ = 3U;
+    uint8_t ccuAgMeshRatio_ = 50U;
 };
 }  // namespace AscendC
 #endif  // IMPL_HCCL_HCCL_TILING_IMPL_DEF_H

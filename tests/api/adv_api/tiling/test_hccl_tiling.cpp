@@ -71,6 +71,41 @@ TEST_F(TestHcclTiling, Mc2CcTilingConfig_normal)
     EXPECT_EQ(ccTilingConfig.GetTiling(ccTilingInner), EXIT_SUCCESS);
 }
 
+TEST_F(TestHcclTiling, Mc2CcTilingConfig_CcuAllGatherTuning)
+{
+    ::Mc2InitTiling initTiling{};
+    ::Mc2CcTiling ccTiling{};
+    Mc2CcTilingConfig config(
+        "test", static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER),
+        "CcuSchedAllGatherParallelMeshNHRMultiLink", 0U);
+
+    EXPECT_EQ(config.SetCcuAllGatherTuning(8U, 4U, 2U, 60U), EXIT_SUCCESS);
+    ASSERT_EQ(config.GetTiling(initTiling), EXIT_SUCCESS);
+    ASSERT_EQ(config.GetTiling(ccTiling), EXIT_SUCCESS);
+
+    const auto* inner = reinterpret_cast<const Mc2CcTilingInner*>(&ccTiling);
+    EXPECT_EQ(inner->ccuAgTuningEnable, 1U);
+    EXPECT_EQ(inner->ccuAgUnroll, 8U);
+    EXPECT_EQ(inner->ccuAgJettyNum, 4U);
+    EXPECT_EQ(inner->ccuAgLocalCopyMode, 2U);
+    EXPECT_EQ(inner->ccuAgMeshRatio, 60U);
+}
+
+TEST_F(TestHcclTiling, Mc2CcTilingConfig_CcuAllGatherTuningRejectsInvalidValues)
+{
+    Mc2CcTilingConfig config(
+        "test", static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALLGATHER),
+        "CcuSchedAllGatherParallelMeshNHRMultiLink", 0U);
+
+    EXPECT_EQ(config.SetCcuAllGatherTuning(0U, 1U, 0U, 50U), EXIT_FAILURE);
+    EXPECT_EQ(config.SetCcuAllGatherTuning(17U, 1U, 0U, 50U), EXIT_FAILURE);
+    EXPECT_EQ(config.SetCcuAllGatherTuning(1U, 0U, 0U, 50U), EXIT_FAILURE);
+    EXPECT_EQ(config.SetCcuAllGatherTuning(1U, 17U, 0U, 50U), EXIT_FAILURE);
+    EXPECT_EQ(config.SetCcuAllGatherTuning(1U, 1U, 4U, 50U), EXIT_FAILURE);
+    EXPECT_EQ(config.SetCcuAllGatherTuning(1U, 1U, 0U, 0U), EXIT_FAILURE);
+    EXPECT_EQ(config.SetCcuAllGatherTuning(1U, 1U, 0U, 100U), EXIT_FAILURE);
+}
+
 TEST_F(TestHcclTiling, Mc2CcTilingConfig_failed1)
 {
     // member variable boundary value validation use case

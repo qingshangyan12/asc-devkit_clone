@@ -121,6 +121,8 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
                 HCCL_ERROR("[ParallelAllGather] non-contiguous NHR ranks"), HCCL_E_PARA);
         }
         arg->jettyNum = nhr->jettyNum;
+        arg->unroll = param.ccuAgTuningEnable != 0U ? param.ccuAgUnroll : 1U;
+        arg->localCopyMode = param.ccuAgTuningEnable != 0U ? param.ccuAgLocalCopyMode : 3U;
         arg->stepInfoVector = nhr->stepInfoVector;
         arg->rank2ChannelIdx = nhr->rank2ChannelIdx;
         mesh->algSubType = nhr->algSubType = KFC_PARALLEL_ALL_GATHER_SUB_TYPE;

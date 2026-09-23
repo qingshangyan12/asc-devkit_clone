@@ -709,6 +709,13 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     u64 varMemSize{0};
     u8 varData[0];
     u64 ccuKfcArgs[4];     // 测试，ccu-kfc作为通信算子
+    // Parallel AllGather autotuning values copied from Mc2CcTilingInner.
+    // The enable byte preserves the original defaults for all existing ops.
+    u8 ccuAgTuningEnable = 0U;
+    u8 ccuAgUnroll = 1U;
+    u8 ccuAgJettyNum = 1U;
+    u8 ccuAgLocalCopyMode = 3U;
+    u8 ccuAgMeshRatio = 50U;
     bool isKfc = false;    // 标记是否使用KFC Server kernel
     bool checkRes = false; // 仅校验资源是否充足，不实际下发
 };

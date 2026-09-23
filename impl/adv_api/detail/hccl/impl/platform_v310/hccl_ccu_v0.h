@@ -355,6 +355,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitCcuParam(const HcclHandle handleId)
 {
+    // The MC2 object may serve more than one launch.  Always restore the
+    // production defaults before reading this launch's optional tuning data.
+    ccuParam_.agJettyNum = 1U;
+    ccuParam_.agMeshRatio = 50U;
     uint64_t ccTiling = 0;
     if (curVersion_ == HcclTilingVersion::NEW_TILING_VERSION) {
         ccTiling = ccOpTilingDataTable_[static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType)];
@@ -373,6 +377,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         handleParamGM_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
         handleParamGM_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);
         handleParamGM_[handleId].op = static_cast<HcclReduceOp>(tilingPtr->reduceType);
+        if (tilingPtr->ccuAgTuningEnable != 0U) {
+            ccuParam_.agJettyNum = tilingPtr->ccuAgJettyNum;
+            ccuParam_.agMeshRatio = tilingPtr->ccuAgMeshRatio;
+        }
     }
 
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
