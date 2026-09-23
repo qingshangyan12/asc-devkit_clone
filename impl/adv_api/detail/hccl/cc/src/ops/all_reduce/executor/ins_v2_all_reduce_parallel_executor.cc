@@ -77,7 +77,6 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
         }
         temp1HierarchyInfo = {closRanks};
     } else if (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix) {
-#ifndef AICPU_COMPILE
         // PCIE 定制机型：TopoMatchPcieMix 产出的 infos[0] 是全网 mesh 合并名单，infos[1] 依赖
         // CLOS 实例（PCIE 机组间无 CLOS 实例时为空）。参照上游两级语义重新推导两级分组：
         // 框内组 = 含本 rank 的 COMM_TOPO_1DMESH 实例成员（与 hccl physicalLevels/localRanks
@@ -136,12 +135,6 @@ InsAllReduceParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, Ins
             HcclResult::HCCL_E_PARA);
         temp0HierarchyInfo = {intraRanks};
         temp1HierarchyInfo = {interRanks};
-#else
-        // AICPU 侧不执行 CalcRes（资源由 Host 计算并序列化下发），此处仅需可编链；
-        // hcomm rank-graph API 仅 Host 可用，保持原直接消费。
-        temp0HierarchyInfo = algHierarchyInfo.infos[0];
-        temp1HierarchyInfo = algHierarchyInfo.infos[1];
-#endif
     } else {
         temp0HierarchyInfo = algHierarchyInfo.infos[0];
         temp1HierarchyInfo = algHierarchyInfo.infos[1];
