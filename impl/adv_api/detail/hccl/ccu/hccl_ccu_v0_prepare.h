@@ -371,7 +371,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_A2A_MESH_SRC_STRIDE] = strideSize;
     xnData_[KFC_CONCURRENT_A2A_MESH_SRC_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_A2A_MESH_DST_OFFSET] = strideSize * ccuParam_.rankId;
-    CalcGoSize(meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_0]);
+    // TEMP-BISECT-3: mesh goSize置零（clos保持开启），鉴别"mesh独有"与"(m=0,n>=3)尾部区"两种假设
+    xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_0] = 0U;
+    xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_1] = 0U;
+    xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_2] = 0U;
+    xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_3] = 0U;
 
     xnData_[KFC_CONCURRENT_A2A_CLOS_INPUT] = inputBase + meshSize;
     xnData_[KFC_CONCURRENT_A2A_CLOS_OUTPUT] = outputBase + meshSize;
