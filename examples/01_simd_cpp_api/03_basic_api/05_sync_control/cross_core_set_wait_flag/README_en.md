@@ -1,7 +1,7 @@
 # CrossCoreSetFlag and CrossCoreWaitFlag Inter-Core Synchronization Example
 
 ## Overview
-This example first introduces the three synchronization modes supported by the inter-core synchronization interfaces CrossCoreSetFlag and CrossCoreWaitFlag (see the table below), and then demonstrates the specific usage of these three synchronization modes in two practical scenarios: a pure Vector computation scenario and a Cube and Vector fused computation scenario.
+This example demonstrates modes 0, 1, 2, and 4 of the CrossCoreSetFlag and CrossCoreWaitFlag inter-core synchronization interfaces in pure Vector and Cube-Vector fused computation scenarios. Mode 4 is supported only on Ascend 950PR/Ascend 950DT.
 <table border="1" align="center">
   <tr bgcolor="lightgray">
     <td>Synchronization Control Mode</td>
@@ -24,6 +24,10 @@ This example first introduces the three synchronization modes supported by the i
   </tr>
   <tr>
     <td>After both AIVs execute CrossCoreSetFlag, instructions after CrossCoreWaitFlag on the AIC can execute.</td>
+  </tr>
+  <tr>
+    <td>mode 4</td>
+    <td>Synchronizes the AIC with one selected AIV in an AI Core. AIV0 and AIV1 use different flagId mappings when synchronizing with the AIC.</td>
   </tr>
 </table>
 
@@ -72,8 +76,13 @@ This example first introduces the three synchronization modes supported by the i
     <td>Cube and Vector fused computation scenario</td>
     <td>mode 2 (AIC waits for AIV), mode 2 (AIV waits for AIC), mode 0 (all AIC core synchronization)</td>
   </tr>
+  <tr>
+    <td>3</td>
+    <td>Cube and Vector fused computation (Ascend 950PR/Ascend 950DT only)</td>
+    <td>mode 4 (AIC synchronizes independently with AIV0 and AIV1)</td>
+  </tr>
 </table>
-This example controls execution branches through SCENARIO_NUM. Different values of this variable correspond to different business scenarios and synchronization modes. As shown in the table above, when SCENARIO_NUM takes different values, it demonstrates the specific usage of the three synchronization modes in pure Vector computation scenarios and Cube and Vector fused computation scenarios respectively.
+SCENARIO_NUM controls the execution branch. Scenarios 0 to 2 can be built for dav-2201 and dav-3510. Scenario 3 uses mode 4 and the direct L0C Buffer-to-UB path, so it requires dav-3510.
 
 ### Computation Formula and Example Specifications
 
@@ -134,6 +143,13 @@ This example controls execution branches through SCENARIO_NUM. Different values 
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">c</td><td align="center">[32, 64]</td><td align="center">float32</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">mmad_custom</td></tr>
   </table>
+
+#### SCENARIO_NUM=3 (Cube and Vector Fused Computation, Mode 4)
+
+Scenario 3 uses the same formula and tensor specifications as scenario 2, but launches one AI Core. AIV0 and AIV1 convert matrices A and B and notify the AIC independently through mode 4. The first 16 rows of the matrix multiplication result move directly from L0C Buffer to AIV0's UB. The remaining 16 rows move from L0C Buffer to GM and then from GM to AIV1's UB. Each AIV applies LeakyRelu and writes its half to GM.
+
+Mode 4 applies a flagId offset for AIV1: an AIV1 flagId in 0-15 maps to 16-31 on the AIC, while an AIC flagId in 16-31 maps to 0-15 on AIV1. See the [CrossCoreSetFlag flagId rules](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md#flagId取值范围说明).
+
 ## Example Implementation
 ### 1. Cube and Vector Fused Computation Scenario
 #### 1.1 Overall Logic
@@ -220,6 +236,19 @@ Specifically, the accumulated C matrix is split into 16 parts along the M axis, 
 Figure 4: LeakyRelu operation and result write-back phase, mode 2 diagram
 </p>
 
+#### 1.5 Split L0C-to-UB/GM Output Phase (Mode 4)
+
+Scenario 3 does not use multi-AIC block accumulation. After matrix multiplication, the AIC sends two mode 4 notifications. AIV0 consumes the first half directly from UB, while AIV1 loads the second half from GM. This demonstrates both single-AIV synchronization and the L0C Buffer-to-UB path available on Ascend 950PR/Ascend 950DT.
+
+```cpp
+AscendC::CrossCoreSetFlag<4, PIPE_MTE3>(SYNC_MODE4_INPUT_FLAG);
+AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG);
+AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG + SYNC_MODE4_AIV1_OFFSET);
+
+AscendC::CrossCoreSetFlag<4, PIPE_FIX>(SYNC_MODE4_OUTPUT_FLAG);
+AscendC::CrossCoreSetFlag<4, PIPE_FIX>(SYNC_MODE4_OUTPUT_FLAG + SYNC_MODE4_AIV1_OFFSET);
+```
+
 ### 2. Pure Vector Computation Scenario
 #### 2.1 Comparison of Mode 0 and Mode 1
 This example sets NUM\_BLOCKS to 8 (8 AI Cores), with each AI Core having an AIC to AIV ratio of 1:2, meaning this example launches 8 AICs and 16 AIVs in total, with AIV BlockIdx ranging from 0 to 15.
@@ -281,7 +310,15 @@ if ASCEND_IS_AIV {
 
 (3) The example uses the static Tensor programming paradigm, which requires manually inserting intra-core synchronization. Additionally, in the static Tensor programming mode, developers need to manually call the InitSocState() interface to initialize the global state register.
 
-#### 3.2 Pure Vector Computation Scenario
+#### 3.2 Inter-Core Synchronization Constraints
+
+(1) CrossCoreSetFlag and CrossCoreWaitFlag must be paired. See the [CrossCoreSetFlag constraints](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md#section633mcpsimp) and [CrossCoreWaitFlag constraints](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md#section633mcpsimp) for supported modes, kernel types, pipelines, and flagId ranges.
+
+(2) Mode 4 supports only Ascend 950PR/Ascend 950DT and requires a `__mix__(1, 2)` kernel. The CMake configuration rejects scenario 3 for architectures other than dav-3510.
+
+(3) Mode 0 can deadlock in concurrent multi-stream workloads when core resources are insufficient. Production operators should follow the API guidance for batch mode and resource scheduling.
+
+#### 3.3 Pure Vector Computation Scenario
 (1) When using the CrossCoreSetFlag and CrossCoreWaitFlag inter-core synchronization interfaces, even in pure Vector computation scenarios, the kernel function cannot use the __vector__ modifier.
 The kernel function in this example uses __mix__(1,2) decoration, but in the pure Vector scenario, since only vector computation is performed, the ASCEND_IS_AIV macro must be used to ensure the program runs only on AIV cores, otherwise the program will hang.
 ```
@@ -310,9 +347,10 @@ Run the following steps in the root directory of this example to build and run t
 
   Run the following commands in the example directory.
   ```bash
-  SCENARIO_NUM=0  # Set the scenario number (values: 0, 1, 2)
+  SCENARIO_NUM=0  # Set the scenario number (values: 0, 1, 2, 3)
+  ASC_ARCH=dav-2201  # Scenario 3 requires dav-3510
   mkdir -p build && cd build;      # Create and enter the build directory
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # Build the project
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # Build the project
   python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM   # Generate test input data
   ./demo                           # Run the compiled executable to execute the example
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # Verify whether the output result is correct
@@ -322,8 +360,8 @@ Run the following steps in the root directory of this example to build and run t
   
   Examples:
   ```bash
-  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU debug mode
-  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU simulation mode
+  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU debug mode
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU simulation mode
   ```
   > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.
 
@@ -333,7 +371,7 @@ Run the following steps in the root directory of this example to build and run t
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `0` (default), `1`, `2` | Scenario number: 0 (pure Vector mode 0), 1 (pure Vector mode 1), 2 (Cube+Vector fusion) |
+  | `SCENARIO_NUM` | `0` (default), `1`, `2`, `3` | Scenario number: 0 (pure Vector mode 0), 1 (pure Vector mode 1), 2 (Cube+Vector modes 0/2), 3 (Cube+Vector mode 4, dav-3510 only) |
 
 - Execution result
 

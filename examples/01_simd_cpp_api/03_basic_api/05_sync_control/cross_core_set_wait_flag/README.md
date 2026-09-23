@@ -1,7 +1,7 @@
 # CrossCoreSetFlag和CrossCoreWaitFlag核间同步样例
 
 ## 概述
-本样例首先介绍核间同步接口CrossCoreSetFlag和CrossCoreWaitFlag支持的三种同步模式(详见下表)，随后分别在纯 Vector 计算场景以及Cube 与 Vector 融合计算场景这两个实际业务中，说明上述三种同步模式的具体使用方法。
+本样例介绍核间同步接口CrossCoreSetFlag和CrossCoreWaitFlag的模式0、模式1、模式2和模式4，并通过纯Vector计算以及Cube与Vector融合计算场景说明各模式的使用方法。其中模式4仅支持Ascend 950PR/Ascend 950DT。
 <table border="1" align="center">
   <tr bgcolor="lightgray">
     <td>同步控制模式</td>
@@ -24,6 +24,10 @@
   </tr>
   <tr>
     <td>两个AIV都执行CrossCoreSetFlag后，AIC上CrossCoreWaitFlag后续的指令才能执行。</td>
+  </tr>
+  <tr>
+    <td>mode 4</td>
+    <td>单个AI Core内部，AIC与指定的单个AIV之间进行同步控制。AIV0和AIV1通过不同的flagId映射分别与AIC同步。</td>
   </tr>
 </table>
 
@@ -72,8 +76,13 @@
     <td>Cube 与 Vector 融合计算场景</td>
     <td>mode 2（AIC等AIV）、mode2（AIV等AIC）、mode0（AIC全核同步）</td>
   </tr>
+  <tr>
+    <td>3</td>
+    <td>Cube与Vector融合计算场景（仅Ascend 950PR/Ascend 950DT）</td>
+    <td>mode 4（AIC分别与AIV0、AIV1同步）</td>
+  </tr>
 </table>
-本样例通过SCENARIO_NUM控制执行分支，该变量的不同取值对应不同的业务场景和同步模式。如上表所示，当 SCENARIO_NUM取不同值时，会分别演示纯 Vector 计算场景和 Cube 与 Vector 融合计算场景下三种同步模式的具体使用方法。
+本样例通过SCENARIO_NUM控制执行分支。场景0~2可在dav-2201和dav-3510上编译，场景3使用模式4以及L0C Buffer到UB直达能力，必须配置dav-3510。
 
 ### 计算公式与样例规格
 
@@ -134,6 +143,13 @@
   <tr><td rowspan="1" align="center">样例输出</td><td align="center">c</td><td align="center">[32, 64]</td><td align="center">float32</td><td align="center">ND</td><td align="center">-</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">mmad_custom</td></tr>
   </table>
+
+#### SCENARIO_NUM=3（Cube与Vector融合计算场景，模式4）
+
+场景3的计算公式、输入输出规格与场景2相同，但仅启动1个AI Core。AIV0和AIV1分别完成A、B矩阵的精度转换，并通过模式4独立通知AIC；矩阵乘结果的前16行通过Fixpipe从L0C Buffer直达AIV0的UB，后16行先从L0C Buffer搬至GM，再由AIV1搬入UB。两个AIV分别执行LeakyRelu并写回各自对应的GM区域。
+
+模式4下AIV1与AIC的flagId存在偏移映射：AIV1使用0~15时，AIC侧对应16~31；AIC使用16~31时，AIV1侧对应0~15。具体规则请参见[CrossCoreSetFlag的flagId取值范围说明](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md#flagId取值范围说明)。
+
 ## 样例实现
 ### 1. Cube与Vector融合计算场景
 #### 1.1 整体逻辑
@@ -220,6 +236,21 @@ $$
 图4：LeakyRelu运算与结果回写阶段，模式2示意图
 </p>
 
+#### 1.5 L0C到UB/GM分流阶段（模式4）
+
+场景3不进行多AIC分块累加。AIC完成矩阵乘后，使用两个模式4通知分别唤醒AIV0和AIV1：AIV0直接消费L0C到UB的前半矩阵，AIV1从GM搬入后半矩阵。这样既展示了模式4能够选择单个AIV同步，也体现了Ascend 950PR/Ascend 950DT支持的L0C Buffer到UB数据通路。
+
+```cpp
+// AIV0/AIV1分别通知AIC输入已准备完成；AIC等待AIV1时使用flagId + 16。
+AscendC::CrossCoreSetFlag<4, PIPE_MTE3>(SYNC_MODE4_INPUT_FLAG);
+AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG);
+AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG + SYNC_MODE4_AIV1_OFFSET);
+
+// AIC分别通知AIV0和AIV1输出已准备完成。
+AscendC::CrossCoreSetFlag<4, PIPE_FIX>(SYNC_MODE4_OUTPUT_FLAG);
+AscendC::CrossCoreSetFlag<4, PIPE_FIX>(SYNC_MODE4_OUTPUT_FLAG + SYNC_MODE4_AIV1_OFFSET);
+```
+
 ### 2. 纯Vector计算场景
 #### 2.1 模式0和模式1的对比
 本样例设置NUM\_BLOCKS为8(8个AI Core)，每一个AI Core内AIC与AIV配比为1:2，即本样例总共起了8个AIC和16个AIV，AIV的BlockIdx范围为0\~15。
@@ -281,7 +312,15 @@ if ASCEND_IS_AIV {
 
 (3) 样例采用静态Tensor编程范式需要手动插入核内同步。另外，静态Tensor编程方式中需要开发者手动调用InitSocState()接口初始化全局状态寄存器。
 
-#### 3.2 纯Vector计算场景
+#### 3.2 核间同步接口约束
+
+(1) CrossCoreSetFlag与CrossCoreWaitFlag必须配对使用，模式支持范围、Kernel类型、pipe类型以及flagId范围请参见[CrossCoreSetFlag接口约束](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md#section633mcpsimp)和[CrossCoreWaitFlag接口约束](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md#section633mcpsimp)。
+
+(2) 模式4仅支持Ascend 950PR/Ascend 950DT，且Kernel必须配置为`__mix__(1, 2)`。场景3的CMake配置会拒绝非dav-3510架构。
+
+(3) 模式0在多流并发且资源不足时可能死锁，工程化使用时需根据接口资料配置batchmode并避免核资源互相等待。
+
+#### 3.3 纯Vector计算场景
 (1) 在使用 CrossCoreSetFlag 与 CrossCoreWaitFlag 核间同步接口时，即使是纯 Vector 计算场景，核函数也不能使用__vector__ 修饰符。
 本样例核函数采用__mix__(1,2) 修饰，但在纯 Vector 场景下，由于仅执行矢量计算，必须通过 ASCEND_IS_AIV 宏确保程序仅在 AIV 核上运行，否则会导致程序卡死。
 ```
@@ -310,9 +349,10 @@ if ASCEND_IS_AIV {
 
   在本样例目录下执行如下命令。
   ```bash
-  SCENARIO_NUM=0  # 设置场景编号（取值为0、1、2）
+  SCENARIO_NUM=0  # 设置场景编号（取值为0、1、2、3）
+  ASC_ARCH=dav-2201  # 场景3必须设置为dav-3510
   mkdir -p build && cd build;      # 创建并进入build目录
-  cmake .. -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程
+  cmake .. -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH -DSCENARIO_NUM=$SCENARIO_NUM;make -j;    # 编译工程
   python3 ../scripts/gen_data.py -scenarioNum $SCENARIO_NUM   # 生成测试输入数据
   ./demo                           # 执行编译生成的可执行程序，执行样例
   python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin  # 验证输出结果是否正确
@@ -322,8 +362,8 @@ if ASCEND_IS_AIV {
   
   示例如下：
   ```bash
-  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU调试模式
-  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
+  cmake .. -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # CPU调试模式
+  cmake .. -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=$ASC_ARCH -DSCENARIO_NUM=$SCENARIO_NUM;make -j; # NPU仿真模式
   ```
   > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
 
@@ -333,7 +373,7 @@ if ASCEND_IS_AIV {
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
-  | `SCENARIO_NUM` | `0`（默认）、`1`、`2` | 场景编号：0（纯Vector模式0）、1（纯Vector模式1）、2（Cube+Vector融合） |
+  | `SCENARIO_NUM` | `0`（默认）、`1`、`2`、`3` | 场景编号：0（纯Vector模式0）、1（纯Vector模式1）、2（Cube+Vector模式0/2）、3（Cube+Vector模式4，仅dav-3510） |
 
 - 执行结果
 
