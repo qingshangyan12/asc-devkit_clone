@@ -1197,7 +1197,12 @@ HcclResult GetUnfoldThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle
     char unfoldAlgTag[ALG_TAG_LENGTH] = {0};
     int ret = snprintf_s(unfoldAlgTag, sizeof(unfoldAlgTag), sizeof(unfoldAlgTag) - 1, "%s_unfold", param.commName);
     CHK_PRT_RET(ret <= 0, HCCL_ERROR("[%s] failed to fill unfoldAlgTag", __func__), HCCL_E_INTERNAL);
-    CHK_RET(HcclEngineCtxGet(comm, unfoldAlgTag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size));
+    const auto ctxRet = HcclEngineCtxGet(comm, unfoldAlgTag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size);
+    if (ctxRet == HCCL_E_NOT_FOUND) {
+        // The caller creates the unfold thread when its context does not exist yet.
+        return ctxRet;
+    }
+    CHK_RET(ctxRet);
     CHK_PTR_NULL(ctx);
     CHK_PRT_RET(
         size != sizeof(ThreadHandle), HCCL_ERROR("[%s] invalid unfold context size[%llu]", __func__, size),
