@@ -508,7 +508,7 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "parallel[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllReduceParallelMeshNHR"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
-         "AicpuAllreduceParallelMeshNHRPcie"},
+         "AicpuAllReduceParallelMeshNHRPcie"},
         // AICPU·A2A·sole[mesh]
         {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllToAllSoleMesh"},
@@ -774,7 +774,7 @@ TEST(ExtAlgWhitelist, IsAlgAllowedMatchesNameList)
              "AicpuAllReduceSoleNHR",
              "AicpuAllReduceSoleNHRAicpuReduce",
              "AicpuAllReduceParallelMeshNHR",
-             "AicpuAllreduceParallelMeshNHRPcie",
+             "AicpuAllReduceParallelMeshNHRPcie",
          }) {
         EXPECT_FALSE(IsAlgAllowed(name)) << name;
     }
