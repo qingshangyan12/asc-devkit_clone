@@ -18,7 +18,7 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 
 > [!NOTE]说明
 >
->- 饱和模式按数据类型分类设置：浮点计算及浮点精度转换由`SaturationMode::FLOAT`控制，整数计算由`SaturationMode::INT`控制，浮点数转整数及整数转整数由`SaturationMode::CAST`控制。表中“INF/NAN模式”列为未开启相应饱和模式时的结果，“饱和模式”列为开启时的结果。
+>- 饱和模式按数据类型分类设置，各饱和模式（`SaturationMode::FLOAT`、`SaturationMode::INT`、`SaturationMode::CAST`）影响的数据类型请参考[SetSaturationFlag](../SIMD-API/basic_api/special_register_access/SetSaturationFlag_ISASI.md#数据类型)。表中“INF/NAN模式”列为未开启相应饱和模式时的结果，“饱和模式”列为开启时的结果。
 >
 >- **绝大部分场景下，INF/NAN模式的输出结果与IEEE754标准结果一致。如存在不一致的情况，会在对应接口处备注说明。**
 
