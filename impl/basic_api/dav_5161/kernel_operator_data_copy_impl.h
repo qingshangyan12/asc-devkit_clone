@@ -259,41 +259,9 @@ __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const
 template <typename T>
 __aicore__ inline void DataCopyL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165))
-    // v516 moves data from L1 to GM via fixpipe only, and fixpipe supports 8bit/16bit types only.
-    if constexpr (sizeof(T) == B8_BYTE_SIZE || sizeof(T) == B16_BYTE_SIZE) {
-        // ISA/API: Is the ND matrix number to be moved
-        uint64_t ndNum = 1;
-        // ISA/API: unit of element
-        uint32_t loop3Size = intriParams.blockCount;
-        // ISA/API: unit of element, blockLen is in unit of 32 bytes
-        uint16_t loop2Size = (uint64_t)intriParams.blockLen * BYTE_32_ALIGN / sizeof(T);
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
-        constexpr uint64_t loop2SrcStride = 1;
-        // ISA: unit of C0_size(32B), gap-inclusive distance between adjacent blocks
-        uint64_t loop3SrcStride = (uint64_t)intriParams.srcStride + intriParams.blockLen;
-        // ISA: unit of C0_size(32B)
-        uint64_t loop4SrcStride = 0;
-        // ISA: unit of byte, gap-inclusive distance between adjacent blocks
-        uint64_t loop2DstStride = ((uint64_t)intriParams.dstStride + intriParams.blockLen) * BYTE_32_ALIGN;
-        // ISA: unit of byte
-        uint64_t loop4DstStride = 0;
-
-        // SPR.FIXP_NZ_PARA
-        uint64_t config = ndNum | (loop4SrcStride << 16) | (loop4DstStride << 32);
-        set_fixp_nz_para(config);
-
-        fix_cbuf_to_gm(
-            dst, src, loop3Size, loop2Size, loop2DstStride, loop3SrcStride, loop2SrcStride, fixp_trans_mode_t::NORMAL_DMA,
-            intriParams.sid);
-    } else {
-        ASSERT(false && "unsupported data type of copy L1 to GM on current device");
-    }
-#else
     CopyCbufToGmAlignV2(
         dst, src, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, intriParams.dstStride,
         intriParams.sid);
-#endif
 }
 
 template <typename T>
