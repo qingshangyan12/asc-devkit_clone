@@ -42,7 +42,6 @@ namespace AscendC {
  * Adds                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Adds Level 0
  * @brief dst[i] = src[i] + sacalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -103,7 +102,6 @@ __aicore__ inline void Adds(
 #endif
 
 /*
- * @ingroup Adds Level 2
  * @brief dst = src[i] + sacalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -133,7 +131,6 @@ __aicore__ inline void Adds(const U& dst, const S& src0, const V& src1, const in
  * Muls                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Muls Level 0
  * @brief dst[i] = src[i] * sacalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -194,7 +191,6 @@ __aicore__ inline void Muls(
 #endif
 
 /*
- * @ingroup Muls Level 2
  * @brief dst = src[i] * sacalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -224,7 +220,6 @@ __aicore__ inline void Muls(const U& dst, const S& src0, const V& src1, const in
  * Maxs                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Maxs Level 0
  * @brief dst[i] = src[i] > sacalar ? src[0] : scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -285,7 +280,6 @@ __aicore__ inline void Maxs(
 #endif
 
 /*
- * @ingroup Maxs Level 2
  * @brief dst = src[i] > sacalar ? src[0] : scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -315,7 +309,6 @@ __aicore__ inline void Maxs(const U& dst, const S& src0, const V& src1, const in
  * Mins                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Mins Level 0
  * @brief dst[i] = src[i] < sacalar ? src[0] : scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -376,7 +369,6 @@ __aicore__ inline void Mins(
 #endif
 
 /*
- * @ingroup Mins Level 2
  * @brief dst = src[i] < sacalar ? src[0] : scalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -406,7 +398,6 @@ __aicore__ inline void Mins(const U& dst, const S& src0, const V& src1, const in
  * ShiftLeft                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup ShiftLeft Level 0
  * @brief dst[i] = src[i] << sacalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -447,7 +438,6 @@ __aicore__ inline void ShiftLeft(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Shiftleft Level 2
  * @brief dst = src[i] << sacalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -468,7 +458,6 @@ __aicore__ inline void ShiftLeft(
  * ShiftRight                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup ShiftRight Level 0
  * @brief dst[i] = src[i] >> sacalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -513,7 +502,6 @@ __aicore__ inline void ShiftRight(
     const UnaryRepeatParams& repeatParams, bool roundEn);
 
 /*
- * @ingroup ShiftRight Level 2
  * @brief dst = src[i] >> sacalar
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -534,7 +522,6 @@ __aicore__ inline void ShiftRight(
  * LeakyRelu                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup LeakyRelu Level 0
  * @brief dst[i] = src[i] < 0 ? (scalar * src[i]) : src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -575,7 +562,6 @@ __aicore__ inline void LeakyRelu(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup LeakyRelu Level 2
  * @brief dst = src[i] < 0 ? (scalar * src[i]) : src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -596,7 +582,6 @@ __aicore__ inline void LeakyRelu(
  * Subs                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Subs Level 0
  * @brief dst[i] = src0 - src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
@@ -625,7 +610,6 @@ __aicore__ inline void Subs(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Subs Level 2
  * @brief dst = src0 - src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
@@ -641,7 +625,6 @@ __aicore__ inline void Subs(const U& dst, const S& src0, const V& src1, const in
  * Divs                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Divs Level 0
  * @brief dst[i] = src0 // src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
@@ -670,7 +653,6 @@ __aicore__ inline void Divs(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Divs Level 2
  * @brief dst = src0 // src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
@@ -686,7 +668,6 @@ __aicore__ inline void Divs(const U& dst, const S& src0, const V& src1, const in
  * Ands                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Ands Level 0
  * @brief dst[i] = src0 & src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
@@ -715,7 +696,6 @@ __aicore__ inline void Ands(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Ands Level 2
  * @brief dst = src0 & src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
@@ -731,7 +711,6 @@ __aicore__ inline void Ands(const U& dst, const S& src0, const V& src1, const in
  * Ors                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Ors Level 0
  * @brief dst[i] = src0 | src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
@@ -760,7 +739,6 @@ __aicore__ inline void Ors(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Ors Level 2
  * @brief dst = src0 | src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor or scalar, one of src0/src1 should be scalar or single point LocalTensor
@@ -776,7 +754,6 @@ __aicore__ inline void Ors(const U& dst, const S& src0, const V& src1, const int
  * MulsCast                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup MulsCast Level 2
  * @brief dst = abs(src0 - src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor

@@ -46,7 +46,6 @@ namespace AscendC {
 
 /* **************************************** Relu ****************************************** */
 /*
- * @ingroup Relu Level 0
  * @brief dst[i] = (src[i] < 0) ? 0 : src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -69,7 +68,6 @@ __aicore__ inline void Relu(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Relu Level 2
  * @brief dst[i] = (src[i] < 0) ? 0 : src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -80,7 +78,6 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 /* **************************************** Exp ****************************************** */
 /*
- * @ingroup Exp Level 0
  * @brief dst[i] = exp(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -114,7 +111,6 @@ __aicore__ inline void Exp(
 #endif
 
 /*
- * @ingroup Exp Level 2
  * @brief dst[i] = exp(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -130,7 +126,6 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 /* **************************************** Ln ****************************************** */
 /*
- * @ingroup Ln Level 0
  * @brief dst[i] = Ln(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -164,7 +159,6 @@ __aicore__ inline void Ln(
 #endif
 
 /*
- * @ingroup Ln Level 2
  * @brief dst[i] = Ln(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -180,7 +174,6 @@ __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, 
 
 /* **************************************** Abs ****************************************** */
 /*
- * @ingroup Abs Level 0
  * @brief dst[i] = abs(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -203,7 +196,6 @@ __aicore__ inline void Abs(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Abs Level 2
  * @brief dst[i] = abs(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -214,7 +206,6 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 /*
- * @ingroup Abs Level 2 for complex32/complex64
  * @brief dst[i] = abs(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -226,7 +217,6 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src,
 
 /* **************************************** Reciprocal ****************************************** */
 /*
- * @ingroup Rec Level 0
  * @brief dst[i] = 1/src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -262,7 +252,6 @@ __aicore__ inline void Reciprocal(
 #endif
 
 /*
- * @ingroup Rec Level 2
  * @brief dst[i] = 1/src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -278,7 +267,6 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
 
 /* **************************************** Rsqrt ****************************************** */
 /*
- * @ingroup Rsqrt Level 0
  * @brief dst[i] = 1/sqrt(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -312,7 +300,6 @@ __aicore__ inline void Rsqrt(
 #endif
 
 /*
- * @ingroup Rsqrt Level 2
  * @brief dst[i] = 1/sqrt(src[i])
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -328,7 +315,6 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
 
 /* **************************************** Sqrt ****************************************** */
 /*
- * @ingroup Sqrt Level 0
  * @brief dst[i] = src[i]^(0.5)
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -362,7 +348,6 @@ __aicore__ inline void Sqrt(
 #endif
 
 /*
- * @ingroup Sqrt Level 2
  * @brief dst[i] = src[i]^(0.5)
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -378,7 +363,6 @@ __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src
 
 /* **************************************** Not ****************************************** */
 /*
- * @ingroup Not Level 0
  * @brief dst[i] = ~src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -401,7 +385,6 @@ __aicore__ inline void Not(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Not Level 2
  * @brief dst[i] = ~src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -412,7 +395,6 @@ __aicore__ inline void Not(const LocalTensor<T>& dst, const LocalTensor<T>& src,
 
 /* **************************************** Neg ****************************************** */
 /*
- * @ingroup Neg Level 2
  * @brief dst[i] = -src[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor

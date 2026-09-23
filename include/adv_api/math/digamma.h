@@ -38,7 +38,6 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 /*
- * @ingroup Digamma
  * @brief Computes the logarithmic derivative of the gamma function on input. f(x) = digamma(x)
  * @tparam T: Input and output data types, half or float.
  * @tparam isReuseSrc: Whether temporary variables can reuse the input memory.
@@ -65,7 +64,6 @@ __aicore__ inline void Digamma(
 }
 
 /*
- * @ingroup Digamma
  * @brief Computes the logarithmic derivative of the gamma function on input. f(x) = digamma(x)
  * @tparam T: Input and output data types, half or float.
  * @tparam isReuseSrc: Whether temporary variables can reuse the input memory.

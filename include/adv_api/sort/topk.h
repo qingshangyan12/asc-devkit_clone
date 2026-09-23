@@ -57,7 +57,6 @@ namespace AscendC {
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || \
                               __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 /*
- * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
  * @tparam T: Data type to be sorted, half or float.
  * @tparam isInitIndex: Whether to transfer the index of the input data.
@@ -140,7 +139,6 @@ __aicore__ inline void TopK(
 }
 
 /*
- * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
  * @tparam T: Data type to be sorted, half or float.
  * @tparam isInitIndex: Whether to transfer the index of the input data.
@@ -235,7 +233,6 @@ __aicore__ inline void TopK(
 }
 #else
 /*
- * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
  * @tparam T: Data type to be sorted, half or float.
  * @tparam isInitIndex: Whether to transfer the index of the input data.
@@ -293,7 +290,6 @@ __aicore__ inline void TopK(
 }
 
 /*
- * @ingroup TopK
  * @brief Get the top k maximum or minimum values and their corresponding indices of the last dimension.
  * @tparam T: Data type to be sorted, half or float.
  * @tparam isInitIndex: Whether to transfer the index of the input data.

@@ -38,7 +38,6 @@ namespace AscendC {
 #pragma begin_pipe(V)
 /* **************************************** MrgSort4 ****************************************** */
 /*
- * @ingroup MrgSort4
  * @brief Arrange and merge up to four arranged potential queues into one queue
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor list
@@ -53,7 +52,6 @@ __aicore__ inline void MrgSort4(const LocalTensor<T>& dst, const MrgSortSrcList<
 
 /* **************************************** RpSort16 ****************************************** */
 /*
- * @ingroup RpSort16
  * @brief Sort them according to the score field in the Region Proposals
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -64,7 +62,6 @@ __aicore__ inline void RpSort16(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 /* **************************************** MrgSort ****************************************** */
 /*
- * @ingroup MrgSort
  * @brief Arrange and merge up to four arranged potential queues into one queue
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor list
@@ -79,7 +76,6 @@ __aicore__ inline void MrgSort(const LocalTensor<T>& dst, const MrgSortSrcList<T
 
 /* **************************************** Sort32 ****************************************** */
 /*
- * @ingroup Sort32
  * @brief Sort 32 elements
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -92,7 +88,6 @@ __aicore__ inline void Sort32(
 
 /* **************************************** ProposalConcat ****************************************** */
 /*
- * @ingroup ProposalConcat
  * @brief Combine continuous elements into corresponding positions in the Region Proposal
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -105,7 +100,6 @@ __aicore__ inline void ProposalConcat(
 
 /* **************************************** ProposalExtract ****************************************** */
 /*
- * @ingroup ProposalExtract
  * @brief ProposalExtract and rearrange the individual elements in the corresponding position from the Region Proposals
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -118,7 +112,6 @@ __aicore__ inline void ProposalExtract(
 
 /* **************************************** Concat ****************************************** */
 /*
- * @ingroup Concat
  * @brief Combine continuous elements into corresponding positions
  * @param [out] concat output LocalTensor
  * @param [in] src input LocalTensor
@@ -131,7 +124,6 @@ __aicore__ inline void Concat(
 
 /* **************************************** Extract ****************************************** */
 /*
- * @ingroup Extract
  * @brief Extract and rearrange the individual elements in the corresponding position
  * @param [out] dstValue output LocalTensor
  * @param [in] dstIndex output LocalTensor
@@ -145,7 +137,6 @@ __aicore__ inline void Extract(
 
 /* **************************************** MrgSort ****************************************** */
 /*
- * @ingroup MrgSort
  * @brief Arrange and merge up to four arranged potential queues into one queue
  * @param [out] dst output LocalTensor
  * @param [in] sortList input LocalTensor list
@@ -161,7 +152,6 @@ __aicore__ inline void MrgSort(
 
 /* ***************************************** Sort ****************************************** */
 /*
- * @ingroup Sort
  * @brief Sort them according to the value
  * @param [out] dst output LocalTensor
  * @param [in] concat input LocalTensor
@@ -176,7 +166,6 @@ __aicore__ inline void Sort(
 
 /* **************************************** GetSortOffset ****************************************** */
 /*
- * @ingroup GetSortOffset
  * @brief get sort offset in the sorted struct
  * @param [in] elemOffset element number offer
  */
@@ -185,7 +174,6 @@ __aicore__ inline uint32_t GetSortOffset(const uint32_t elemOffset);
 
 /* **************************************** GetSortLen ****************************************** */
 /*
- * @ingroup GetSortLen
  * @brief get sort length in the sorted struct
  * @param [in] elemOffset element number ocountffer
  */

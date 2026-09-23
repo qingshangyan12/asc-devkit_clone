@@ -20,7 +20,6 @@
 
 namespace AscendC {
 /*
- * @ingroup GetSigmoidMaxMinTmpSize
  * @brief This interface is used to obtain the maximum and minimum temporary space reserved or applied.
  *  The developer selects a proper space size based on this range as the tiling parameter.
  * @param [in] srcShape : input src Tensor shape

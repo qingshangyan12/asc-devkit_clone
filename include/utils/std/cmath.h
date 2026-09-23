@@ -31,7 +31,6 @@ template <typename T> __aicore__ inline T sqrt(const T src);
 template <typename T> __aicore__ inline T abs(const T src);
 
 /*
- * @ingroup Cmath
  * @brief Divide a by b and return the ceiling of the quotient
  * @param [in] a dividend
  * @param [in] b divisor

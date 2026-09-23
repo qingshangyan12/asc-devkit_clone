@@ -19,7 +19,6 @@
 #include "tiling/platform/platform_ascendc.h"
 namespace AscendC {
 /*
- * @ingroup GetBroadCastMaxMinTmpSize
  * @brief get broadcast api calculate need max and min temporary local space size
  * @param [in] ascendcPlatform : ascendc platform infomation
  * @param [in] srcShape : src tensor shape

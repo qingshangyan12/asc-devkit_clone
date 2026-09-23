@@ -40,7 +40,6 @@ template <typename T>
 __aicore__ inline GemmTiling GetGemmTiling(uint32_t m, uint32_t k, uint32_t n);
 
 /*
- * @ingroup Gemm
  * @brief Multiply two matrices
  * @param [out] dst output LocalTensor
  * @param [in] src0 input GlobalTensor

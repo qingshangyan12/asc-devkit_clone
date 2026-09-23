@@ -30,7 +30,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @ingroup tsch
  * @brief max event num of dha_dfx
  */
 #define DHA_DFX_EVENT_MAX_NUM (8U)

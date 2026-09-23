@@ -20,7 +20,6 @@
 
 namespace AscendC {
 /*
- * @ingroup GetReduceXorSumMaxMinTmpSize
  * @brief Get ReduceXorSum api calculate need max and min temporary local space size.
  * @param [in] srcShape: src tensor shape.
  * @param [in] typeSize: src and dst tensor dtype size.

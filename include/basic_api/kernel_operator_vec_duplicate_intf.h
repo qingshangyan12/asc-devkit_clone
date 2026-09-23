@@ -39,7 +39,6 @@ namespace AscendC {
  * Duplicate                                            *
  * ************************************************************************************************* */
 /*
- * @ingroup Duplicate Level 0
  * @brief dst[i] = scalar
  * @param [out] dst output LocalTensor
  * @param [in] scalar input scalar number
@@ -61,7 +60,6 @@ __aicore__ inline void Duplicate(
     const uint16_t dstBlockStride, const uint8_t dstRepeatStride);
 
 /*
- * @ingroup Duplicate Level 2
  * @brief dst = dst[i] = scalar
  * @param [out] dst output LocalTensor
  * @param [in] scalar input scalar number
@@ -72,7 +70,6 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const T& scalarValue
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 /*
- * @ingroup Duplicate lowest position of src
  * @brief dst = dst[i] = src[0]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -86,7 +83,6 @@ __aicore__ inline void Duplicate(const LocalTensor<T>& dst, const LocalTensor<T>
  * Interleave                                            *
  * ************************************************************************************************* */
 /*
- * @ingroup Interleave Level 2
  * @brief Interleave src0 and src1 to dst0 and dst1
  * @param [out] dst0 output0 LocalTensor
  * @param [out] dst1 output1 LocalTensor
@@ -103,7 +99,6 @@ __aicore__ inline void Interleave(
  * DeInterleave                                            *
  * ************************************************************************************************* */
 /*
- * @ingroup DeInterleave Level 2
  * @brief DeInterleave src0 and src1 to dst0 and dst1
  * @param [out] dst0 output0 LocalTensor
  * @param [out] dst1 output1 LocalTensor
@@ -117,7 +112,6 @@ __aicore__ inline void DeInterleave(
     const int32_t count);
 
 /*
- * @ingroup DeInterleave Level 2
  * @brief DeInterleave src to dst0 and dst1
  * @param [out] dst0 output0 LocalTensor
  * @param [out] dst1 output1 LocalTensor

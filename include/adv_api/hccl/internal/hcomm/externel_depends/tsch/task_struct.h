@@ -15,7 +15,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @ingroup tsch
  * @brief the type definition of task
  */
 typedef enum tag_ts_task_type {
@@ -135,7 +134,6 @@ typedef enum tag_ts_common_cmd {
 } ts_ph_common_cmd_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of report msg when task is completed
  */
 typedef struct tag_ts_task_report_msg {
@@ -182,7 +180,6 @@ typedef struct tag_ts_logic_cq_report_msg {
 } ts_logic_cq_report_msg_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of callback report msg
  */
 
@@ -259,7 +256,6 @@ typedef struct tag_ts_host_func_sq_send_msg {
 } ts_host_func_sq_send_msg_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of kernel type task
  */
 typedef struct tag_ts_kernel_task {
@@ -278,7 +274,6 @@ typedef struct tag_ts_kernel_task {
 } ts_kernel_task_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of event record type task
  */
 typedef struct tag_ts_event_record_task {
@@ -295,7 +290,6 @@ typedef struct tag_ts_event_record_task {
 } ts_event_record_task_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of event reset type task
  */
 typedef struct tag_ts_event_reset_task {
@@ -304,7 +298,6 @@ typedef struct tag_ts_event_reset_task {
     uint8_t reserved[44]; // reserved 44 bytes
 } ts_event_reset_task_t;
 /**
- * @ingroup tsch
  * @brief the struct define of stream wait event type task
  */
 typedef struct tag_ts_stream_wait_event_task {
@@ -321,7 +314,6 @@ typedef struct tag_ts_stream_wait_event_task {
 } ts_stream_wait_event_task_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of notify record type task
  */
 typedef struct tag_ts_notify_record_task {
@@ -331,7 +323,6 @@ typedef struct tag_ts_notify_record_task {
 } ts_notify_record_task_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of ipc interrupt notice type task
  */
 typedef struct tag_ts_ipc_int_notice_task {
@@ -347,7 +338,6 @@ typedef struct tag_ts_ipc_int_notice_task {
 } ts_ipc_int_notice_task_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of notify wait type task
  */
 typedef struct tag_ts_notify_wait_task {
@@ -358,7 +348,6 @@ typedef struct tag_ts_notify_wait_task {
     uint8_t reserved[38];
 } ts_notify_wait_task_t;
 /**
- * @ingroup tsch
  * @brief the struct define of fusion type task
  */
 typedef struct tag_ts_fusion_task {
@@ -381,7 +370,6 @@ enum tag_ts_fusion_flag {
 #define TS_TASK_FAST_CQ_FLAG 0x40U /* bit 6: fast cq flag */
 
 /**
- * @ingroup tsch
  * @brief the struct define of memory copy type task
  */
 enum rtMemcpyAddrConvertType { TS_NOT_NEED_CONVERT, TS_DMA_ADDR_CONVERT, TS_NO_DMA_ADDR_CONVERT };
@@ -439,7 +427,6 @@ typedef struct tag_ts_reduce_async_v2_task {
 } ts_reduce_async_v2_task_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of maintenance type task
  */
 typedef struct tag_ts_maintenance_task {
@@ -725,7 +712,6 @@ typedef struct tag_ts_aicpu_load_info_task {
 } ts_aicpu_load_info_task_t;
 
 /**
- * @ingroup ts
  * @brief the struct define of debug register task
  */
 typedef struct tag_ts_debug_register_task {
@@ -737,7 +723,6 @@ typedef struct tag_ts_debug_register_task {
 } ts_debug_register_task_t;
 
 /**
- * @ingroup ts
  * @brief the struct define of debug unregister task
  */
 typedef struct tag_ts_debug_unregister_task {
@@ -746,7 +731,6 @@ typedef struct tag_ts_debug_unregister_task {
 } ts_debug_unregister_task_t;
 
 /**
- * @ingroup ts
  * @brief the struct define of debug register with stream task
  */
 typedef struct tag_ts_debug_register_with_stream_task {
@@ -758,7 +742,6 @@ typedef struct tag_ts_debug_register_with_stream_task {
 } ts_debug_register_with_stream_task_t;
 
 /**
- * @ingroup ts
  * @brief the struct define of debug unregister with stream task
  */
 typedef struct tag_ts_debug_unregister_with_stream_task {
@@ -935,7 +918,6 @@ typedef struct tag_ts_get_stars_version {
 } ts_get_stars_version_t;
 
 /**
- * @ingroup tsch
  * @brief the struct define of task
  */
 typedef struct tag_ts_task {

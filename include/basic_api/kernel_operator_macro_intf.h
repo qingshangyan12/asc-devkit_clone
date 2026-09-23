@@ -43,7 +43,6 @@
 
 namespace AscendC {
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -51,7 +50,6 @@ __aicore__ inline void SetConvKernel(const ConvKernelBitModeParams& params);
 __aicore__ inline void SetConvKernel(const ConvKernelParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -59,7 +57,6 @@ __aicore__ inline void SetConvFMatrix(const ConvFMatrixBitModeParams& params);
 __aicore__ inline void SetConvFMatrix(const ConvFMatrixParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -67,7 +64,6 @@ __aicore__ inline void SetConvFMatrixStepPos(const ConvFMatrixStepPosBitModePara
 __aicore__ inline void SetConvFMatrixStepPos(const ConvFMatrixStepPosParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -75,7 +71,6 @@ __aicore__ inline void SetConvFMatrixDual0(const ConvFMatrixDual0BitModeParams& 
 __aicore__ inline void SetConvFMatrixDual0(const ConvFMatrixDual0Params& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -83,7 +78,6 @@ __aicore__ inline void SetConvFMatrixDual1(const ConvFMatrixDual1BitModeParams& 
 __aicore__ inline void SetConvFMatrixDual1(const ConvFMatrixDual1Params& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -93,7 +87,6 @@ template <typename T>
 __aicore__ inline void SetConvPadding(const ConvPaddingParams<T>& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -101,7 +94,6 @@ __aicore__ inline void SetFixPipeConfig(const FixPipeConfigBitModeParams& params
 __aicore__ inline void SetFixPipeConfig(const FixPipeConfigParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -109,21 +101,18 @@ __aicore__ inline void SetFixPipeReluAlpha(const FixPipeReluAlphaBitModeParams& 
 __aicore__ inline void SetFixPipeReluAlpha(const FixPipeReluAlphaParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
 __aicore__ inline void SetFixpipePostQuantFlag(uint64_t config);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
 __aicore__ inline void SetFixpipeEltAntiq(uint64_t config);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -131,7 +120,6 @@ __aicore__ inline void SetFixPipeAddr(const FixPipeAddrBitModeParams& params);
 __aicore__ inline void SetFixPipeAddr(const FixPipeAddrParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -139,7 +127,6 @@ __aicore__ inline void SetConvStridePara(const ConvStrideBitModeParams& params);
 __aicore__ inline void SetConvStridePara(const ConvStrideParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -147,7 +134,6 @@ __aicore__ inline void SetMatrixPara(const MatrixParaBitModeParams& params);
 __aicore__ inline void SetMatrixPara(const MatrixParaParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -155,7 +141,6 @@ __aicore__ inline void SetMmadStridePara(const MmadStrideParaBitModeParams& para
 __aicore__ inline void SetMmadStridePara(const MmadStrideParaParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -163,7 +148,6 @@ __aicore__ inline void SetItaMaxAddr(const ItaMaxAddrBitModeParams& params);
 __aicore__ inline void SetItaMaxAddr(const ItaMaxAddrParaParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief setting the register
  * @param [in] params register
  */
@@ -171,7 +155,6 @@ __aicore__ inline void SetMatrixMxPara(const MatrixMxParaBitModeParams& params);
 __aicore__ inline void SetMatrixMxPara(const MatrixMxParaParams& params);
 
 /*
- * @ingroup MacroCube
  * @brief performs normal convolution
  * @param [out] dst
  * @param [in] fm
@@ -200,7 +183,6 @@ __aicore__ inline void ConvFix(
     const ConvFixParams& convFixParams);
 
 /*
- * @ingroup MacroCube
  * @brief performs normal matmul
  * @param [out] dst
  * @param [in] left
@@ -229,7 +211,6 @@ __aicore__ inline void MmadFix(
     const MmadFixParams& mmadFixParams);
 
 /*
- * @ingroup MacroCube
  * @brief performs normal matmul
  * @param [out] dst
  * @param [in] left

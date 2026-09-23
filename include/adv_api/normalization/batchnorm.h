@@ -41,7 +41,6 @@ namespace AscendC {
  * BatchNorm                                             *
  * ************************************************************************************************** */
 /*
- * @ingroup BatchNorm
  * @brief compute output = gamm * (x - outputMean) * rsqrt(outputVariance + epsilon) + beta
  * @brief compute outputMean = sum(x) / batch
  * @brief compute outputVariance = sqrt(x - outputMean) / batch

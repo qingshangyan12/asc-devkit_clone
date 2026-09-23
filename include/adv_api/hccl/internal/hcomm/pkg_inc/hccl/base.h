@@ -344,7 +344,6 @@ typedef struct {
 } HcclTopoDescs;
 
 /**
- * @ingroup Hccl Address type
  * @brief communication address type of HCCL
  */
 enum HcclAddrType {
@@ -354,7 +353,6 @@ enum HcclAddrType {
 };
 
 /**
- * @ingroup HcclAddr
  * @brief Hccl communication address.
  */
 typedef struct {

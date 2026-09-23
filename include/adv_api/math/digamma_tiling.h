@@ -20,7 +20,6 @@
 
 namespace AscendC {
 /*
- * @ingroup GetDigammaMaxMinTmpSize
  * @brief Get Digamma api calculate need max and min temporary local space size.
  * @param [in] srcShape: src tensor shape.
  * @param [in] typeSize: src and dst tensor dtype size.
@@ -33,7 +32,6 @@ void GetDigammaMaxMinTmpSize(
     uint32_t& minValue);
 
 /*
- * @ingroup GetDigammaTmpBufferFactorSize
  * @brief Get the size relationship between the temporary space used by the digamma API calculation and
           the input tensor space, and the extra space used.
  * @param [in] typeSize: src and dst tensor dtype size.

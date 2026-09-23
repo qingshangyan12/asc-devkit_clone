@@ -37,7 +37,6 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 /*
- * @ingroup Broadcast, now only support dim=1 or dim=2
  * @brief https://numpy.org.cn/user/basics/broadcasting.html
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
@@ -58,7 +57,6 @@ __aicore__ inline void Broadcast(
 }
 
 /*
- * @ingroup Broadcast, now only support dim=1 or dim=2
  * @brief https://numpy.org.cn/user/basics/broadcasting.html
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
@@ -78,7 +76,6 @@ __aicore__ inline void Broadcast(
 }
 
 /*
- * @ingroup GetBroadcastTilingInfo
  * @brief get broadcast tiling information
  * @param [in] rank, the dimension of src and dst
  * @param [in] dstShape, the shape of dst tensor
@@ -98,7 +95,6 @@ __aicore__ inline void GetBroadcastTilingInfo(
 }
 
 /*
- * @ingroup Broadcast
  * @brief https://numpy.org.cn/user/basics/broadcasting.html
  * @param [out] dst, output LocalTensor
  * @param [in] src, input LocalTensor

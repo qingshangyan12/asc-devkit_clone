@@ -53,7 +53,6 @@ enum class HF32TransMode {
  * LoadData 2d                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup DataLoad
  * @brief Cube data loading
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -76,7 +75,6 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
  * LoadData 2dV2                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup DataLoad
  * @brief Cube data loading
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor/GlobalTensor
@@ -116,7 +114,6 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
  * LoadData 3dv1                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup DataLoad
  * @brief Cube data loading
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -151,7 +148,6 @@ __aicore__ inline void LoadData(
  * enhanced from v1, suitable for aicore > 200                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup DataLoad
  * @brief Cube data loading
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -195,7 +191,6 @@ __aicore__ inline void LoadData(
  * enhanced from v1, suitable for aicore > 200                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup DataLoad
  * @brief Cube data loading
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -230,7 +225,6 @@ __aicore__ inline void LoadData(
  * LoadDataWithTranspose                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup DataLoad
  * @brief Cube data loading
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -246,7 +240,6 @@ __aicore__ inline void LoadDataWithTranspose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParams& loadDataParams);
 
 /*
- * @ingroup DataLoad
  * @brief Cube data loading
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -280,7 +273,6 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
  * Mmad                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Mmad
  * @brief Matrix multiplication and addition
  * @param [out] dst output LocalTensor
  * @param [in] fm input LocalTensor
@@ -321,7 +313,6 @@ __aicore__ inline void Mmad(
  * MmadMx                                                                                           *
  * **************************************************************************************************/
 /*
- * @ingroup MmadMx
  * @brief Matrix multiplication and addition in microscaling scenario
  * @param [out] dst output LocalTensor
  * @param [in] fm input LocalTensor
@@ -385,7 +376,6 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(
  * Fill                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Fill
  * @brief L0A/L0B/L1 value initializing
  * @param [out] dst output LocalTensor
  * @param [in] InitConstValueParams.repeatTimes repeat times
@@ -406,7 +396,6 @@ __aicore__ inline void InitConstValue(const LocalTensor<T>& dst, const InitConst
  * SetLoadDataPaddingValue                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup SetLoadDataPaddingValue
  * @brief setting loadData pad value
  * @param [in]padValue padding value
  */
@@ -417,7 +406,6 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue);
  * SetFmatrix                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup SetFmatrix
  * @brief setting fmatrix
  * @param [in]l1H operand height
  * @param [in]l1W operand width
@@ -432,7 +420,6 @@ __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const Fm
  * SetLoadDataBoundary                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup SetFmatrix
  * @brief setting loaddata boundary
  * @param [in]boundaryValue
  */
@@ -446,7 +433,6 @@ __aicore__ inline void SetLoadDataRepeatWithStride(const LoadDataRepeatParamWith
  * LoadImageToLocal                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup LoadImageToLocal
  * @brief loadData image from gm to L1
  * @param [out] dst output LocalTensor
  * @param [in] loadImageToLocalParams.horizSize operand height
@@ -466,7 +452,6 @@ __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadIma
  * LoadDataUnzip                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup LoadDataUnzip
  * @brief loadData and unzip
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor
@@ -508,14 +493,12 @@ __aicore__ inline void SetHF32TransMode(HF32TransMode mode);
 __aicore__ inline void SetHF32TransMode(bool hf32TransMode);
 
 /*
- * @ingroup MMLayout
  * @brief Sets matrix multiplication result layout to row major
  * @note This function sets the CUBE output to row major format (M direction first, then N direction)
  */
 __aicore__ inline void SetMMRowMajor();
 
 /*
- * @ingroup MMLayout
  * @brief Sets matrix multiplication result layout to column major
  * @note This function sets the CUBE output to column major format (N direction first, then M direction)
  */

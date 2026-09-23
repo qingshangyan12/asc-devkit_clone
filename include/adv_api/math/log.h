@@ -32,7 +32,6 @@ namespace AscendC {
 #pragma begin_pipe(V)
 /*
  * @brief dst = log(src)
- * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  * @param [in] calCount, amount of data to be calculated
@@ -56,7 +55,6 @@ __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 /*
  * @brief dst = log(src), calcalate
- * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  */
@@ -68,7 +66,6 @@ __aicore__ inline void Log(const LocalTensor<T>& dstTensor, const LocalTensor<T>
 
 /*
  * @brief dst = log2(src)
- * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  * @param [in] sharedTmpBuffer, input local temporary Tensor
@@ -95,7 +92,6 @@ __aicore__ inline void Log2(
 
 /*
  * @brief dst = log2(src)
- * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  * @param [in] sharedTmpBuffer, input local temporary Tensor
@@ -109,7 +105,6 @@ __aicore__ inline void Log2(
 
 /*
  * @brief dst = log2(src)
- * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  * @param [in] calCount, amount of data to be calculated
@@ -129,7 +124,6 @@ __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T
 
 /*
  * @brief dst = log2(src)
- * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  */
@@ -141,7 +135,6 @@ __aicore__ inline void Log2(const LocalTensor<T>& dstTensor, const LocalTensor<T
 
 /*
  * @brief dst = log10(src)
- * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  * @param [in] calCount, amount of data to be calculated
@@ -165,7 +158,6 @@ __aicore__ inline void Log10(const LocalTensor<T>& dstTensor, const LocalTensor<
 
 /*
  * @brief dst = log10(src)
- * @ingroup Log
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  */

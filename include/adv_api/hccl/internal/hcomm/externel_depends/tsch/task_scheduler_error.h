@@ -15,7 +15,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 /**
- * @ingroup tsch
  * @brief the return value of task scheduler module
  */
 typedef enum tag_ts_error {

@@ -43,7 +43,6 @@ namespace AscendC {
  * DataCopy                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor
@@ -57,7 +56,6 @@ __aicore__ inline void __inout_pipe__(MTE2)
     DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams);
 
 /*
- * @ingroup DataCopy Level 0
  * @brief format transform(such as nd2nz) during data load from OUT to L1
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor
@@ -82,7 +80,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 #endif
 
 /*
- * @ingroup DataCopy Level 0
  * @brief format transform(such as nd2nz) during data load from UB to L1(Only TSCM)
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -99,7 +96,6 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const Nd2NzParams& intriParams);
 
 /*
- * @ingroup DataCopy Level 0
  * @brief format transform(such as dn2nz) during data load from OUT to L1
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor
@@ -120,7 +116,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
 #endif
 
 /*
- * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor
@@ -134,7 +129,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
 
 /*
- * @ingroup DataCopy Level 0
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -148,7 +142,6 @@ __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
 
 /*
- * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to bt, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -162,7 +155,6 @@ __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& repeatParams);
 
 /*
- * @ingroup Copy Level 0
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -195,7 +187,6 @@ __aicore__ inline __inout_pipe__(V) void Copy(
 #endif
 
 /*
- * @ingroup DataCopy Level 1
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor
@@ -209,7 +200,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1);
 
 /*
- * @ingroup DataCopy Level 1
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor
@@ -223,7 +213,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     const SliceInfo srcSliceInfo[], const uint32_t dimValue = 1);
 
 /*
- * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor
@@ -234,7 +223,6 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count);
 
 /*
- * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor
@@ -245,7 +233,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
 
 /*
- * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -255,7 +242,6 @@ template <typename T>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
 
 /*
- * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, nz2nd, applicable to simulated cube data(such as data from l0c, 16*16)
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor
@@ -265,7 +251,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams);
 
 /*
- * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, nz2dn, applicable to simulated cube data(such as data from l0c, 16*16)
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor
@@ -281,7 +266,6 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
  * DataCopy Enhanced                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup DataCopy
  * @brief datacopy from src to dst, applicable to cube data
  * @param [out] dst output LocalTensor
  * @param [in] src input GlobalTensor

@@ -37,7 +37,6 @@ namespace AscendC {
 /*
  * @brief This function Computes the natural logarithm of the absolute value of the gamma function on input (e.g.
  * lgamma(1) is 0)
- * @ingroup Lgamma
  * @param [in] srcTensor, input LocalTensor
  * @param [in] sharedTmpBuffer, input local temporary Tensor
  * @param [in] calCount, amount of data to be calculated
@@ -63,7 +62,6 @@ __aicore__ inline void Lgamma(
 /*
  * @brief This function Computes the natural logarithm of the absolute value of the gamma function on input (e.g.
  * lgamma(1) is 0)
- * @ingroup Lgamma
  * @param [in] srcTensor, input LocalTensor
  * @param [in] calCount, amount of data to be calculated
  * @param [out] dstTensor, output LocalTensor

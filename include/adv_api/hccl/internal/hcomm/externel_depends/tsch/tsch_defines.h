@@ -43,25 +43,21 @@ typedef char char_t;
 #endif
 
 /**
- * @ingroup tsch
  * @brief the size of each task command is 64 byte
  */
 #define TS_TASK_COMMAND_SIZE (64U)
 
 /**
- * @ingroup tsch
  * @brief the size of each task report msg to host is 4 byte
  */
 #define TS_TASK_REPORT_MSG_SIZE (12U)
 
 /**
- * @ingroup tsch
  * @brief the count of task report queue's slot
  */
 #define TS_TASK_REPORT_QUEUE_SLOTS_COUNT (1024U)
 
 /**
-* @ingroup tsch
 * @brief when the number of report queue's msg node is large than the task report queue's threshold,
 
 *        then trigger the interrupt to the host
@@ -69,56 +65,47 @@ typedef char char_t;
 #define TS_TASK_REPORT_THRESHOLD (512U)
 
 /**
- * @ingroup tsch
  * @brief  the duration of report timer is x milliseconds
  */
 #define TS_TASK_REPORT_TIMER_DURATION (10U)
 
 /**
- * @ingroup tsch
  * @brief there are 8 priority levels
  */
 #define TS_TASK_CMD_QUEUE_PRIORITIES_LEVEL (8U)
 
 /**
- * @ingroup tsch
  * @brief the total count of those task command queue's slot is 1024
  */
 #define TS_TASK_CMD_QUEUE_SLOTS_COUNT (1024U)
 
 /**
- * @ingroup tsch
  * @brief the size of each task command queue
  */
 #define TS_SIZE_OF_PER_TASK_CMD_QUEUE (TS_TASK_CMD_QUEUE_SLOTS_COUNT / TS_TASK_CMD_QUEUE_PRIORITIES_LEVEL)
 
 /**
- * @ingroup tsch
  * @brief the number of task commands for one prefetch from SQ queue
  */
 #define ONE_SQ_PREFECH_NUM (4U)
 
 /**
- * @ingroup tsch
  * @brief the report number of one CQ,1024 reports
  */
 #define CQ_LEN (1024U)
 
 /**
- * @ingroup tsch
  * @brief cq flow control
  */
 #define FLOW_CONTROL_HIGH_LIMITS (900U)
 #define FLOW_CONTROL_LOW_LIMITS (700U)
 #define FLOW_CONTROL_FREE_LIMITS (CQ_LEN - FLOW_CONTROL_HIGH_LIMITS)
 /**
- * @ingroup tsch
  * @brief the initial flag of BS
  */
 #define BS_INITIALIZED (0x2U)
 
 /**
- * @ingroup tsch
  * @brief aicore 10 group 16 cycle for bs9sx1a, 8 group 8cycle for pg1
  */
 #define CUBE_ACTIVE_CFG_EN_VAL 1U
@@ -171,7 +158,6 @@ typedef struct ts_ttv_msg {
 } ts_ttv_msg_t;
 
 /**
-* @ingroup tsch
 * @brief error code and exception code encoding scheme
 Loc information 2 bits (31~30) ------ 0x01:device
 Code category 2 bits (29~28) ------------- 0x01:error code
@@ -299,7 +285,6 @@ typedef enum tag_debug_exception {
     UNKNOWN_EXCEPTION = 0xF0000000ULL
 } ts_dbg_except_t;
 /**
- * @ingroup tsch
  * @brief the bool value definition
  */
 #define TS_FALSE ((ts_bool_t)0U)

@@ -42,7 +42,6 @@
 namespace AscendC {
 #pragma begin_pipe(V)
 /*
- * @ingroup ReduceXorSum
  * @brief f(x) = sum(a ^ b)
  *        If the final calculation result is beyond the range of int16,
  *        the calculation result is not guaranteed.
@@ -72,7 +71,6 @@ __aicore__ inline void ReduceXorSum(
 }
 
 /*
- * @ingroup ReduceXorSum
  * @brief f(x) = sum(a ^ b)
  *        If the final calculation result is beyond the range of int16,
  *        the calculation result is not guaranteed.

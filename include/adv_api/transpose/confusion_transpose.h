@@ -37,7 +37,6 @@ namespace AscendC {
  * Transpose                                              *
  * ************************************************************************************************* */
 /*
- * @ingroup Transpose
  * @arrange and reshape the data from src to dst.
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -57,7 +56,6 @@ __aicore__ inline void Transpose(
  * Transpose                                              *
  * ************************************************************************************************* */
 /*
- * @ingroup Transpose
  * @arrange and reshape the data from src to dst.
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor

@@ -34,7 +34,6 @@
 #endif
 
 /*
- * @ingroup Sort
  * @brief Sort them according to the value
  * @param [out] dstLocal output LocalTensor
  * @param [in] concatLocal input LocalTensor

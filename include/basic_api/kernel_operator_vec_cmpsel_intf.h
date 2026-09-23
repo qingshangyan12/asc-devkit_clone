@@ -42,7 +42,6 @@ namespace AscendC {
  * Compare                                           *
  * ************************************************************************************************* */
 /*
- * @ingroup Compare Level 0
  * @brief Compare the size of two tensors one by one. If true, the corresponding bit is 1, otherwise it is 0
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -80,7 +79,6 @@ __aicore__ inline void Compare(
     const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Compare Level 2
  * @brief Compare the size of two tensors one by one. If true, the corresponding bit is 1, otherwise it is 0
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -102,7 +100,6 @@ __aicore__ inline void SetCmpMask(const LocalTensor<T>& src);
  * Compares                                           *
  * ************************************************************************************************* */
 /*
- * @ingroup Compares Level 0
  * @brief Compare the size of a tensor and a scalar one by one. If true, the corresponding bit is 1, otherwise it is 0
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -143,7 +140,6 @@ __aicore__ inline void CompareScalar(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const T src1Scalar, CMPMODE cmpMode, const uint64_t mask,
     uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 /*
- * @ingroup Compares Level 2
  * @brief Compares the size of two tensors one by one. If true, the corresponding bit is 1, otherwise it is 0
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -168,7 +164,6 @@ __aicore__ inline void CompareScalar(
 
 // ================================
 /*
- * @ingroup Select Level 0
  * @brief Select element according to the bit value of sel
  * @param [out] dst output LocalTensor
  * @param [in] selMask select mask LocalTensor
@@ -213,7 +208,6 @@ __aicore__ inline void Select(
     const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Select Level 2
  * @brief Select element according to the bit value of sel
  * @param [out] dst output LocalTensor
  * @param [in] selMask select mask LocalTensor
@@ -231,7 +225,6 @@ __aicore__ inline void Select(
 
 // ================================
 /*
- * @ingroup Select Level 0
  * @brief Select element according to the bit value of sel
  * @param [out] dst output LocalTensor
  * @param [in] selMask select mask LocalTensor
@@ -263,7 +256,6 @@ __aicore__ inline void Select(
 
 // select mode: 1
 /*
- * @ingroup Select Level 2
  * @brief Select element according to the bit value of sel
  * @param [out] dst output LocalTensor
  * @param [in] selMask select mask LocalTensor
@@ -279,7 +271,6 @@ __aicore__ inline void Select(
     uint32_t count);
 
 /*
- * @ingroup Compares Level 2
  * @brief Compares the size of two tensors one by one. If true, the corresponding bit is 1, otherwise it is 0
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor/Scalar, one of src0/src1 should be Scalar or single point LocalTensor

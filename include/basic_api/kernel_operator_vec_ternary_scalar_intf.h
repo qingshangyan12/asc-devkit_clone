@@ -37,7 +37,6 @@
 #pragma begin_pipe(V)
 namespace AscendC {
 /*
- * @ingroup Axpy Level 0
  * @brief dst[i] = src[i]*scalar + dst[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -62,7 +61,6 @@ __aicore__ inline void Axpy(
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Axpy Level 2
  * @brief dst[i] = src[i]*scalar + dst[i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor

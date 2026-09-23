@@ -84,7 +84,6 @@ __aicore__ inline void ReduceRepeat(
 
 /* **************************************** Reduce Interface ****************************************** */
 /*
- * @ingroup ReduceMax Level 0
  * @brief Index of the maximum value of all input elements
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -100,7 +99,6 @@ __aicore__ inline void ReduceMax(
     const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0);
 
 /*
- * @ingroup ReduceMin
  * @brief Index of the minimum value of all input elements
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -116,7 +114,6 @@ __aicore__ inline void ReduceMin(
     const int32_t repeatTime, const int32_t srcRepStride, bool calIndex = 0);
 
 /*
- * @ingroup ReduceSum
  * @brief sum all input elements
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -144,7 +141,6 @@ __aicore__ inline void ReduceSum(
     const int32_t repeatTime, const int32_t srcRepStride);
 
 /*
- * @ingroup ReduceMin Level 2
  * @brief Index of the minimum value of all input elements
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -158,7 +154,6 @@ __aicore__ inline void ReduceMin(
     bool calIndex = 0);
 
 /*
- * @ingroup ReduceMax Level 2
  * @brief Index of the maximum value of all input elements
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -172,7 +167,6 @@ __aicore__ inline void ReduceMax(
     bool calIndex = 0);
 
 /*
- * @ingroup ReduceSum Level 2
  * @brief sum all input elements
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor

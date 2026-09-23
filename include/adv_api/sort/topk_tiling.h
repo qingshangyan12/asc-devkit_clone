@@ -23,7 +23,6 @@
 namespace AscendC {
 
 /*
- * @ingroup GetTopKMaxMinTmpSize
  * @brief Get TopK api calculate need max and min temporary local space size.
  * @param [in] ascendcPlatform: Information about the hardware platform.
  * @param [in] inner: Inner axis length of input data.
@@ -44,7 +43,6 @@ bool GetTopKMaxMinTmpSize(
     const uint32_t dataTypeSize, uint32_t& maxValue, uint32_t& minValue);
 
 /*
- * @ingroup GetTopKMaxMinTmpSize
  * @brief Get the max and min temporary local space size used for TopK api calculation.
  * @param [in] inner: Inner axis length of input data.
  * @param [in] outter: Outer axis length of input data.
@@ -66,7 +64,6 @@ bool GetTopKMaxMinTmpSize(
     uint32_t& maxValue, uint32_t& minValue);
 
 /*
- * @ingroup TopKTilingFunc
  * @brief Get the tiling information required by the Topk interface.
  * @param [in] ascendcPlatform: Information about the hardware platform.
  * @param [in] inner: Inner axis length of input data.

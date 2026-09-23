@@ -45,7 +45,6 @@ namespace AscendC {
  * Add                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Add Level 0
  * @brief dst = src0 + src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -72,7 +71,6 @@ __aicore__ inline void Add(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Add Level 2
  * @brief dst = src0 + src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -87,7 +85,6 @@ __aicore__ inline void Add(
  * Sub                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Sub Level 0
  * @brief dst = src0 - src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -114,7 +111,6 @@ __aicore__ inline void Sub(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Sub Level 2
  * @brief dst = src0 - src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -129,7 +125,6 @@ __aicore__ inline void Sub(
  * Mul                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Mul Level 0
  * @brief dst = src0 * src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -156,7 +151,6 @@ __aicore__ inline void Mul(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Mul Level 2
  * @brief dst = src0 * src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -171,7 +165,6 @@ __aicore__ inline void Mul(
  * Div                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Div Level 0
  * @brief dst = src0 / src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -210,7 +203,6 @@ __aicore__ inline void Div(
 #endif
 
 /*
- * @ingroup Div Level 2
  * @brief dst = src0 / src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -231,7 +223,6 @@ __aicore__ inline void Div(
  * MulAddDst                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup MulAddDst Level 0
  * @brief dst = src0 * src1 + dst
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -258,7 +249,6 @@ __aicore__ inline void MulAddDst(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup MulAddDst Level 2
  * @brief dst = src0 * src1 + dst
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -273,7 +263,6 @@ __aicore__ inline void MulAddDst(
  * Max                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Max Level 0
  * @brief dst = src0 > src1 ? src0 : src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -300,7 +289,6 @@ __aicore__ inline void Max(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Max Level 2
  * @brief dst = src0 > src1 ? src0 : src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -315,7 +303,6 @@ __aicore__ inline void Max(
  * Min                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Min Level 0
  * @brief dst = src0 > src1 ? src1 : src0
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -342,7 +329,6 @@ __aicore__ inline void Min(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Min Level 2
  * @brief dst = src0 > src1 ? src1 : src0
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -357,7 +343,6 @@ __aicore__ inline void Min(
  * And                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup And Level 0
  * @brief dst = src0 & src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -384,7 +369,6 @@ __aicore__ inline void And(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup And Level 2
  * @brief dst = src0 & src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -399,7 +383,6 @@ __aicore__ inline void And(
  * Or                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Or Level 0
  * @brief dst = src0 | src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -426,7 +409,6 @@ __aicore__ inline void Or(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Or Level 2
  * @brief dst = src0 | src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -441,7 +423,6 @@ __aicore__ inline void Or(
  * ShiftLeft                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup ShiftLeft Level 2
  * @brief dst = src0 << src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -456,7 +437,6 @@ __aicore__ inline void ShiftLeft(
  * ShiftRight                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup ShiftRight Level 2
  * @brief dst = src0 >> src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -471,7 +451,6 @@ __aicore__ inline void ShiftRight(
  * AddRelu                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup AddRelu Level 0
  * @brief dst = Relu(src0 + src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -498,7 +477,6 @@ __aicore__ inline void AddRelu(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup AddRelu Level 2
  * @brief dst = Relu(src0 + src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -513,7 +491,6 @@ __aicore__ inline void AddRelu(
  * AddDeqRelu                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup AddDeqRelu Level 0
  * @brief dst = DeqRelu(src0 + src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -555,7 +532,6 @@ __aicore__ inline void AddDeqRelu(
     const LocalTensor<T>& dst, const LocalTensor<U>& src0, const LocalTensor<U>& src1, uint64_t mask,
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 /*
- * @ingroup AddDeqRelu Level 2
  * @brief dst = DeqRelu(src0 + src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -578,7 +554,6 @@ __aicore__ inline void AddDeqRelu(
  * FusedMulAdd                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup FusedMulAdd Level 0
  * @brief dst = src0 * dst + src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -607,7 +582,6 @@ __aicore__ inline void FusedMulAdd(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup FusedMulAdd Level 2
  * @brief dst = src0 * dst + src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -622,7 +596,6 @@ __aicore__ inline void FusedMulAdd(
  * MulAddRelu                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup MulAddRelu Level 0
  * @brief dst = relu(src0 * dst + src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -667,7 +640,6 @@ __aicore__ inline void FusedMulAddRelu(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup MulAddRelu Level 2
  * @brief dst = relu(src0 * dst + src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -687,7 +659,6 @@ __aicore__ inline void FusedMulAddRelu(
  * SubRelu                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup SubRelu Level 0
  * @brief dst = Relu(src0 - src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -721,7 +692,6 @@ __aicore__ inline void SubRelu(
  * Prelu                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Prelu Level 2
  * @brief dst = (src0 >= 0) ? src0 : src0 * src1
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -736,7 +706,6 @@ __aicore__ inline void Prelu(
  * Mull                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Mull Level 2
  * @brief Multiply input data src0 and src1 by element based on the mask, write the result to
         dst0, and write the overflow part to dst1.
  * @param [out] dst0 output LocalTensor
@@ -754,7 +723,6 @@ __aicore__ inline void Mull(
  * AbsSub                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup AbsSub Level 2
  * @brief dst = abs(src0 - src1)
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -774,7 +742,6 @@ __aicore__ inline void FusedAbsSub(
  * ExpSub                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup ExpSub Level 2
  * @brief when T is float : dst = e^(src0 - src1); when T is half : dst = e^(cast_f16_to_f32(src0) -
  * cast_f16_to_f32(src1))
  * @param [out] dst output LocalTensor

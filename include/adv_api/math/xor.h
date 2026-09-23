@@ -39,7 +39,6 @@ namespace AscendC {
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
  * are treated as True. Mathematical formulas: 0^0=0�?^1=1�?^0=1�?^1=0
- * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
  * @param [in] srcTensor1, input LocalTensor
@@ -69,7 +68,6 @@ __aicore__ inline void Xor(
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
  * are treated as True. Mathematical formulas: 0^0=0�?^1=1�?^0=1�?^1=0
- * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
  * @param [in] srcTensor1, input LocalTensor
@@ -96,7 +94,6 @@ __aicore__ inline void Xor(
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
  * are treated as True. Mathematical formulas: 0^0=0�?^1=1�?^0=1�?^1=0
- * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
  * @param [in] srcTensor1, input LocalTensor
@@ -117,7 +114,6 @@ __aicore__ inline void Xor(
 /*
  * @brief Xor Computes the element-wise logical XOR of the given input tensors. Zeros are treated as False and nonzeros
  * are treated as True. Mathematical formulas: 0^0=0�?^1=1�?^0=1�?^1=0
- * @ingroup xor
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor0, input LocalTensor
  * @param [in] srcTensor1, input LocalTensor

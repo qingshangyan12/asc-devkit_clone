@@ -20,7 +20,6 @@
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {
 /*
- * @ingroup GetLogSoftMaxMaxTmpSize
  * @brief get logsoftmax api calculate need max temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -30,7 +29,6 @@ namespace AscendC {
 uint32_t GetLogSoftMaxMaxTmpSize(
     const AscendC::TensorShape srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
 /*
- * @ingroup GetLogSoftMaxMinTmpSize
  * @brief get logsoftmax api calculate need min temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -40,7 +38,6 @@ uint32_t GetLogSoftMaxMaxTmpSize(
 uint32_t GetLogSoftMaxMinTmpSize(
     const AscendC::TensorShape srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
 /*
- * @ingroup LogSoftMaxTilingFunc
  * @brief calculate LogSoftMax api need tiling
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size

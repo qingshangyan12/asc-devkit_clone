@@ -39,7 +39,6 @@ namespace AscendC {
  * Fixpipe                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Fixpipe
  * @brief After calculation, process the results
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor

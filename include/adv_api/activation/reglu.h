@@ -37,7 +37,6 @@ namespace AscendC {
 /*
  * @brief ReGLU is an activation function which is a variant of GLU(e.g.ReGlu(1, 1) is 1).
  * Mathematical formulas: ReGlu(x1, x2) = x1 * max(0, x2)
- * @ingroup ReGlu
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input LocalTensor
  * @param [in] sharedTmpBuffer, input local temporary Tensor
@@ -59,7 +58,6 @@ __aicore__ inline void ReGlu(
 }
 
 /*
- * @ingroup ReGlu
  * @param [out] dstTensor, output LocalTensor
  * @param [in] srcTensor, input local temporary Tensor
  * @param [in] calCount, amount of input data to be calculated

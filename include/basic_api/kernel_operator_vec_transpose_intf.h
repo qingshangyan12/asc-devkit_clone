@@ -41,7 +41,6 @@ namespace AscendC {
  * Transpose                                            *
  * ************************************************************************************************* */
 /*
- * @ingroup Transpose
  * @brief dst[i][j] = src[j][i]
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -53,7 +52,6 @@ __aicore__ inline void Transpose(const LocalTensor<T>& dst, const LocalTensor<T>
  * TransDataTo5HD                                            *
  * ************************************************************************************************* */
 /*
- * @ingroup Nchwconv
  * @brief NCHW to NC1HWC0 format
  * @param [out] dstList output LocalTensor list
  * @param [in] srcList input LocalTensor list

@@ -37,7 +37,6 @@
 #pragma begin_pipe(V)
 namespace AscendC {
 /*
- * @ingroup brcb Level 0
  * @brief this function fetches 8 b16/b32 data from src, broadcast each data into one 32B block,
  * @brief then finally writes these 8 blocks into dst continously.
  * @brief gather element in the uint of block

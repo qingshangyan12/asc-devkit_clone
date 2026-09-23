@@ -22,7 +22,6 @@
 #include "kernel_tiling/kernel_tiling.h"
 namespace AscendC {
 /*
- * @ingroup GetSoftMaxMaxTmpSize
  * @brief get softmax api calculate need max temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -32,7 +31,6 @@ namespace AscendC {
 uint32_t GetSoftMaxMaxTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
 /*
- * @ingroup GetSoftMaxMinTmpSize
  * @brief get softmax api calculate need min temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -42,7 +40,6 @@ uint32_t GetSoftMaxMaxTmpSize(
 uint32_t GetSoftMaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isReuseSource);
 /*
- * @ingroup SoftMaxTilingFunc
  * @brief calculate SoftMax api need tiling
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -57,7 +54,6 @@ void SoftMaxTilingFunc(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
     AscendC::tiling::SoftMaxTiling& softmaxTiling);
 /*
- * @ingroup GetSoftMaxFlashV3MaxMinTmpSize
  * @brief calculate SoftmaxFlashV3 api need min/max temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize1 : input src Tensor and dst Tensor DType size
@@ -69,7 +65,6 @@ void GetSoftMaxFlashV3MaxMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
     uint32_t& maxValue, uint32_t& minValue, const bool isUpdate, const bool isBasicBlock = false);
 /*
- * @ingroup SoftMaxFlashV3TilingFunc
  * @brief calculate SoftmaxFlashV3 api need tiling
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize1 : input src Tensor and dst Tensor DType size
@@ -89,7 +84,6 @@ void SoftMaxFlashV3TilingFunc(
     const uint32_t localWorkSpaceSize, AscendC::tiling::SoftMaxTiling& softmaxFlashV3Tiling, const bool isUpdate,
     const bool isBasicBlock = false);
 /*
- * @ingroup GetSoftMaxFlashMaxTmpSize
  * @brief calculate SoftmaxFlash api need max temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -100,7 +94,6 @@ void SoftMaxFlashV3TilingFunc(
 uint32_t GetSoftMaxFlashMaxTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isUpdate, const bool isReuseSource);
 /*
- * @ingroup GetSoftMaxFlashMinTmpSize
  * @brief calculate SoftmaxFlash api need min temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -111,7 +104,6 @@ uint32_t GetSoftMaxFlashMaxTmpSize(
 uint32_t GetSoftMaxFlashMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isUpdate, const bool isReuseSource);
 /*
- * @ingroup SoftMaxFlashTilingFunc
  * @brief calculate SoftmaxFlash api need tiling
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -128,7 +120,6 @@ void SoftMaxFlashTilingFunc(
     AscendC::tiling::SoftMaxTiling& softmaxFlashTiling, const bool isUpdate = false);
 
 /*
- * @ingroup GetSoftMaxGradMaxTmpSize
  * @brief get SoftmaxGrad api need max temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -139,7 +130,6 @@ void SoftMaxFlashTilingFunc(
 uint32_t GetSoftMaxGradMaxTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isFront, const bool isReuseSource);
 /*
- * @ingroup GetSoftMaxGradMinTmpSize
  * @brief get SoftmaxGrad api need min temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -150,7 +140,6 @@ uint32_t GetSoftMaxGradMaxTmpSize(
 uint32_t GetSoftMaxGradMinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const bool isFront, const bool isReuseSource);
 /*
- * @ingroup SoftMaxGradTilingFunc
  * @brief calculate SoftmaxGrad api need tiling
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize : input dstMax Tensor and expSum Tensor DType size
@@ -166,7 +155,6 @@ void SoftMaxGradTilingFunc(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize, const uint32_t localWorkSpaceSize,
     AscendC::tiling::SoftMaxTiling& softmaxGradTiling, const bool isFront = false);
 /*
- * @ingroup IsBasicBlockInSoftMax
  * @brief judge tiling is basicBlock or not
  * @param [in] tiling : input softmax series api tiling
  * @param [in] dataTypeSize : input src Tensor and dst Tensor DType size
@@ -176,7 +164,6 @@ bool IsBasicBlockInSoftMax(optiling::SoftMaxTiling& tiling, const uint32_t dataT
 
 bool IsBasicBlockInSoftMax(AscendC::tiling::SoftMaxTiling& tiling, const uint32_t dataTypeSize = 2);
 /*
- * @ingroup GetSoftMaxFlashV2MinTmpSize
  * @brief get SoftmaxFlashV2 api need min temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize1 : input src Tensor and dst Tensor DType size
@@ -190,7 +177,6 @@ uint32_t GetSoftMaxFlashV2MinTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
     const bool isUpdate, const bool isBasicBlock = false, const bool isFlashOutputBrc = false);
 /*
- * @ingroup GetSoftMaxFlashV2MaxTmpSize
  * @brief get SoftmaxFlashV2 api need max temporary local space size
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize1 : input src Tensor and dst Tensor DType size
@@ -204,7 +190,6 @@ uint32_t GetSoftMaxFlashV2MaxTmpSize(
     const AscendC::TensorShape& srcShape, const uint32_t dataTypeSize1, const uint32_t dataTypeSize2,
     const bool isUpdate, const bool isBasicBlock = false, const bool isFlashOutputBrc = false);
 /*
- * @ingroup SoftMaxFlashV2TilingFunc
  * @brief calculate SoftmaxFlashV2 api need tiling
  * @param [in] srcShape : input src Tensor shape
  * @param [in] dataTypeSize1 : input src Tensor and dst Tensor DType size

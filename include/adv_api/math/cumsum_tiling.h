@@ -19,7 +19,6 @@
 #include "../utils/types.h"
 namespace AscendC {
 /*
- * @ingroup GetCumSumMaxMinTmpSize
  * @brief get cumsum api calculate need max and min temporary local space size
  * @param [in] srcShape : src tensor shape
  * @param [in] typeSize : src tensor dtype size

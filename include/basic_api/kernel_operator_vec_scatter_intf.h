@@ -36,7 +36,6 @@
 #pragma begin_pipe(V)
 namespace AscendC {
 /*
- * @ingroup scatter Level 0
  * @brief scatter element from dst according to dstOffset
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -51,7 +50,6 @@ __aicore__ inline void Scatter(
     const uint32_t dstBaseAddr, const uint64_t mask, const uint8_t repeatTime, const uint8_t srcRepStride);
 
 /*
- * @ingroup scatter Level 0
  * @brief scatter element from dst according to dstOffset
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -66,7 +64,6 @@ __aicore__ inline void Scatter(
     const uint32_t dstBaseAddr, const uint64_t mask[], const uint8_t repeatTime, const uint8_t srcRepStride);
 
 /*
- * @ingroup scatter Level 2
  * @brief scatter element from dst according to dstOffset
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor

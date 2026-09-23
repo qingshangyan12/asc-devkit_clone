@@ -19,7 +19,6 @@
 #include "../utils/types.h"
 namespace AscendC {
 /*
- * @ingroup GetPowerMaxMinTmpSize for V220
  * @brief This interface is used to obtain the maximum and minimum temporary space reserved or applied.
  *  The developer selects a proper space size based on this range as the tiling parameter.
  * @param [in] srcShape1 : input base Tensor shape
@@ -35,7 +34,6 @@ void GetPowerMaxMinTmpSize(
     const uint32_t typeSize, const bool isReuseSource, uint32_t& maxValue, uint32_t& minValue);
 
 /*
- * @ingroup GetPowerTmpBufferFactorSize for V220
  * @brief The calculation of the Round interface requires the developer to reserve or apply for temporary space. The
  *  relationship between the maximum temporary space (maxTmpBuffer) and the space occupied by the input (inputSize x
  *  typeSize) is as follows: maxTmpBuffer = maxLiveNodeCount * inputSize * typeSize + extraBuf

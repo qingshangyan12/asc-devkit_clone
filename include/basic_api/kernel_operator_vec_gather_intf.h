@@ -37,7 +37,6 @@
 #pragma begin_pipe(V)
 namespace AscendC {
 /*
- * @ingroup gatherb Level 0
  * @brief this function fetches N addresses from offset,then accesses these N addresses(plus the src address)
  * @brief to get N 32Byte block, and finally writes these N blocks into dst.
  * @brief gather element in the uint of block
@@ -54,7 +53,6 @@ __aicore__ inline void Gatherb(
     const GatherRepeatParams& repeatParams);
 
 /*
- * @ingroup gather Level 0
  * @brief gather element from src according to srcOffset
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -70,7 +68,6 @@ __aicore__ inline void Gather(
     const uint32_t srcBaseOffset, const uint64_t mask, const uint8_t repeatTime, const uint16_t dstRepStride);
 
 /*
- * @ingroup gather Level 0
  * @brief gather element from src according to srcOffset
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -86,7 +83,6 @@ __aicore__ inline void Gather(
     const uint32_t srcBaseOffset, const uint64_t mask[], const uint8_t repeatTime, const uint16_t dstRepStride);
 
 /*
- * @ingroup gather Level 2
  * @brief gather element from src according to srcOffset
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor

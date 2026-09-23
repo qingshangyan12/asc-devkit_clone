@@ -39,7 +39,6 @@ namespace AscendC {
  * Pad                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Pad
  * @brief pad from src to dst, applicable to vector data
  * @param [out] dstTensor output LocalTensor
  * @param [in] srcTensor input LocalTensor
@@ -67,7 +66,6 @@ __aicore__ inline void Pad(
  * Pad                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Pad
  * @brief pad from src to dst, applicable to vector data
  * @param [out] dstTensor output LocalTensor
  * @param [in] srcTensor input LocalTensor
@@ -94,7 +92,6 @@ __aicore__ inline void Pad(
  * UnPad                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup UnPad
  * @brief unpad from src to dst, applicable to vector data
  * @param [out] dstTensor output LocalTensor
  * @param [in] srcTensor input LocalTensor
@@ -118,7 +115,6 @@ __aicore__ inline void UnPad(
  * UnPad                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup UnPad
  * @brief unpad from src to dst, applicable to vector data
  * @param [out] dstTensor output LocalTensor
  * @param [in] srcTensor input LocalTensor

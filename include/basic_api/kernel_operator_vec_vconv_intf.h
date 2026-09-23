@@ -43,7 +43,6 @@ namespace AscendC {
  * Cast                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup Cast Level 0
  * @brief Precision conversion
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -70,7 +69,6 @@ __aicore__ inline void Cast(
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup Cast Level 2
  * @brief dst[i] = Precision conversion
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -82,7 +80,6 @@ __aicore__ inline void Cast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint32_t count);
 
 /*
- * @ingroup CastDequant Level 0
  * @brief Dequant from int16_t to uint8_t/int8_t
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -121,7 +118,6 @@ __aicore__ inline void CastDeq(
     const UnaryRepeatParams& repeatParams);
 
 /*
- * @ingroup CastDequant Level 2
  * @brief Dequant from int16_t to uint8_t/int8_t
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -138,7 +134,6 @@ __aicore__ inline void CastDeq(const LocalTensor<T>& dst, const LocalTensor<U>& 
  * AddReluCast                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup AddReluCast Level 0
  * @brief Precision conversion
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -169,7 +164,6 @@ __aicore__ inline void AddReluCast(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup AddReluCast Level 2
  * @brief dst[i] = Precision conversion
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -184,7 +178,6 @@ __aicore__ inline void AddReluCast(
  * SubReluCast                                             *
  * ************************************************************************************************* */
 /*
- * @ingroup SubReluCast Level 0
  * @brief Precision conversion
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -215,7 +208,6 @@ __aicore__ inline void SubReluCast(
     const uint8_t repeatTime, const BinaryRepeatParams& repeatParams);
 
 /*
- * @ingroup SubReluCast Level 2
  * @brief dst[i] = Precision conversion
  * @param [out] dst output LocalTensor
  * @param [in] src0 input LocalTensor
@@ -235,7 +227,6 @@ template <typename T>
 __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& vdeqInfo);
 
 /*
- * @ingroup Truncate Level 2
  * @brief dst[i] = Precision conversion
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor

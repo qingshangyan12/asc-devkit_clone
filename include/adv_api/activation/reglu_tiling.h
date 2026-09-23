@@ -22,7 +22,6 @@ namespace AscendC {
 /*
  * This interface is used to obtain the maximum and minimum temporary space reserved or applied.
  * The developer selects a proper space size based on this range as the tiling parameter.
- * @ingroup ReGlu
  * @param [in] srcShape, input shape information
  * @param [in] typeSize, input LocalTensor typeSize, half is 2 and float is 4
  * @param [in] isReuseSource, whether to reuse the input space of the source operand
