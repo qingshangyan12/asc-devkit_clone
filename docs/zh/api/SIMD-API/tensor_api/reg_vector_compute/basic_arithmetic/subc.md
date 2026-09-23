@@ -16,13 +16,17 @@
 
 命名空间：`asc::te::experimental`。
 
-对输入元素执行逐元素减法，并返回结果和借位；带`borrow_src`的重载会额外减去输入借位：
+对输入元素执行逐元素减法，并返回结果和借位。两个重载分别为不带输入借位、带输入借位：
 
 $$
-\{carry_i, dst_i\} = \{1'b0, src0_i\} - \{1'b0, src1_i\} - carry\_src_i
+\{borrow_i, dst_i\} = \{0, src0_i\} - \{0, src1_i\}
 $$
 
-当前接口仅支持`int32_t`和`uint32_t`。`carry`表示每个元素的借位输出。
+$$
+\{borrow_i, dst_i\} = \{0, src0_i\} - \{0, src1_i\} - borrow\_src_i
+$$
+
+当前接口仅支持`int32_t`和`uint32_t`。返回值`second`表示每个元素的借位输出。
 
 ## 函数原型
 
@@ -46,7 +50,7 @@ __simd_callee__ inline reg_pair<T, bool> subc(
 | T | 模板参数 | 操作数数据类型，支持`int32_t`、`uint32_t`。 |
 | src0 | 输入 | 被减数，类型为`reg_tensor<T>`；`src0.mask`控制参与计算的元素。 |
 | src1 | 输入 | 减数，类型为`reg_tensor<T>`。 |
-| borrow_src | 输入 | 借位输入，类型为`reg_tensor<bool>`；对应元素为1时再减1。 |
+| borrow_src | 输入 | 借位输入，类型为`reg_tensor<bool>`；对应元素为1时再减1。仅第二个重载使用。 |
 
 ## 返回值说明
 
@@ -56,7 +60,7 @@ __simd_callee__ inline reg_pair<T, bool> subc(
 
 `src0.mask`需通过`with_mask`接口预先设置。`src1.mask`和`borrow_src.mask`不参与本次计算。
 
-## 调用示例
+## 不带输入借位的调用示例
 
 ```cpp
 #include "tensor_api/tensor.h"
@@ -69,7 +73,25 @@ __simd_vf__ inline void sub_c_example(InputTensor input0, InputTensor input1, Ou
     auto mask = asc::te::experimental::all_mask<uint32_t>();
     auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
     auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0));
-    auto borrow_src = asc::te::experimental::all_mask<uint32_t>();
+    auto result = asc::te::experimental::subc(src0, src1);
+    asc::te::experimental::store(output, asc::te::make_coord(0), result.first);
+}
+```
+
+## 带输入借位的调用示例
+
+```cpp
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void subc_with_borrow_example(InputTensor input0, InputTensor input1, OutputTensor output)
+{
+    auto mask = asc::te::experimental::all_mask<uint32_t>();
+    auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
+    auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0));
+    asc::te::experimental::reg_tensor<bool> borrow_src{};
     auto result = asc::te::experimental::subc(src0, src1, borrow_src);
     asc::te::experimental::store(output, asc::te::make_coord(0), result.first);
 }
