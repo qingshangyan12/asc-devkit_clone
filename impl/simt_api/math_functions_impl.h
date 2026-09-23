@@ -3034,7 +3034,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
 {
     float result = logf(x + sqrtf(x * x - 1.0f));
     if (x < 1) {
-        result = ASCRT_INF_F / ASCRT_INF_F;
+        result = ASCRT_NAN_F;
     }
     return result;
 }
@@ -5306,7 +5306,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
     // acosh(x) = ln(x + sqrt(x^2 - 1)), defined on [1, +inf). Inputs below 1 are out of domain and
     // return NaN; a NaN input also fails this comparison and falls through to a NaN-producing path.
     if (x < 1) {
-        result = ASCRT_INF_F / ASCRT_INF_F;
+        result = ASCRT_NAN_F;
     }
 
     return result;
