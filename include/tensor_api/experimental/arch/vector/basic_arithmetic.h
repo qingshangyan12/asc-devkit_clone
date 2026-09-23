@@ -27,6 +27,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src);
 
 template <typename T>
+__simd_callee__ inline reg_tensor<T> ln(const reg_tensor<T>& src);
+
+template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
@@ -34,6 +37,9 @@ __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> neg(const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
