@@ -3041,9 +3041,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
 {
-    float result;
     if (fabsf(x) > 0.1f) {
-        result = x > 0 ? __logf(x + __sqrtf(x * x + 1.0f)) : __logf(__sqrtf(x * x + 1.0f) - x) * (-1);
+        if (x > 0) {
+            return __logf(x + __sqrtf(x * x + 1.0f));
+        } else {
+            return __logf(__sqrtf(x * x + 1.0f) - x) * (-1);
+        }
     } else {
         float square_v = 0;
         float dst = 0;
@@ -3059,9 +3062,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
             -0.01396484375,
         };
         __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
-        result = dst;
+        return dst;
     }
-    return result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x) { return logf(1.0f + x); }
