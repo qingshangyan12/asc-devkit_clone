@@ -91,6 +91,8 @@ target_compile_definitions(${HCCL_CHECKER_SELECTOR_TARGET} PRIVATE
 
 add_library(${HCCL_CHECKER_EXECUTOR_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_pcie_mix.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_base_v2.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_two_level.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_ubx_1d.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_v2_reduce_scatter_sole_executor.cc
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/executor/ins_reduce_scatter_parallel_executor.cc
@@ -171,6 +173,8 @@ add_library(${HCCL_CHECKER_KERNEL_TARGET} STATIC
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_base.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_pcie_mix.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_base_v2.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_two_level.cc
     topo_match_aicpu_stub.cc
     ${HCCL_DEV_BASE}/src/ops/op_common/topo/topo_match_ubx_1d.cc
 
