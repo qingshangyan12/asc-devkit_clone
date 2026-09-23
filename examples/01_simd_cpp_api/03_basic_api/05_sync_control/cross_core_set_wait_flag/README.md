@@ -318,7 +318,9 @@ if ASCEND_IS_AIV {
 
 (2) 模式4仅支持Ascend 950PR/Ascend 950DT，且Kernel必须配置为`__mix__(1, 2)`。场景3的CMake配置会拒绝非dav-3510架构。
 
-(3) 模式0在多流并发且资源不足时可能死锁，工程化使用时需根据接口资料配置batchmode并避免核资源互相等待。
+(3) `CrossCoreWaitFlag`的`pipe`模板参数在dav-2201（Atlas A2/A3）上不影响硬件指令，但在dav-3510（Ascend 950）上会生效。由于dav-3510的模式0、模式1和模式2不支持默认的`PIPE_S`，样例代码通过架构条件分别处理：dav-3510显式传入`PIPE_MTE2`或`PIPE_FIX`，dav-2201保留默认参数行为。具体约束请参见[CrossCoreWaitFlag模板参数默认值及生效情况](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md#template-parameter-defaults)。
+
+(4) 模式0在多流并发且资源不足时可能死锁，工程化使用时需根据接口资料配置batchmode并避免核资源互相等待。
 
 #### 3.3 纯Vector计算场景
 (1) 在使用 CrossCoreSetFlag 与 CrossCoreWaitFlag 核间同步接口时，即使是纯 Vector 计算场景，核函数也不能使用__vector__ 修饰符。

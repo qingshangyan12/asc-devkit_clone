@@ -69,6 +69,18 @@ constexpr uint16_t SYNC_MODE4_AIV1_OFFSET = 16;
 
 constexpr AscendC::FixpipeConfig CFG_ROW_MAJOR_UB = {AscendC::CO2Layout::ROW_MAJOR, true};
 
+// dav-3510将CrossCoreWaitFlag的pipe模板参数作为硬件指令输入，模式0/1/2不支持默认的PIPE_S；
+// dav-2201上该参数不影响硬件指令，保持省略参数可兼容两类架构。
+template <uint8_t modeId, pipe_t pipe>
+__aicore__ inline void CrossCoreWaitFlagForArch(uint16_t flagId)
+{
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    AscendC::CrossCoreWaitFlag<modeId, pipe>(flagId);
+#else
+    AscendC::CrossCoreWaitFlag<modeId>(flagId);
+#endif
+}
+
 /**
  * @brief Cube与Vector融合计算场景的Kernel实现类，实现矩阵乘和LeakyRelu运算
  */
@@ -108,7 +120,7 @@ public:
             AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG + SYNC_MODE4_AIV1_OFFSET);
         } else {
             // 模式2：AIC等待本AI Core内2个AIV完成精度转换。
-            AscendC::CrossCoreWaitFlag<2>(SYNC_AIV_AIC_FLAG);
+            CrossCoreWaitFlagForArch<2, PIPE_MTE2>(SYNC_AIV_AIC_FLAG);
         }
 
         CopyIn(a1Local, b1Local);
@@ -124,7 +136,7 @@ public:
 
             // 模式0：8个AIC全核同步，确保原子累加结果正确。
             AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);
-            AscendC::CrossCoreWaitFlag<0>(SYNC_AIC_FLAG);
+            CrossCoreWaitFlagForArch<0, PIPE_FIX>(SYNC_AIC_FLAG);
 
             // 模式2：AIC通知本AI Core内2个AIV可以执行LeakyRelu。
             AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);
@@ -178,7 +190,7 @@ public:
             AscendC::CrossCoreSetFlag<2, PIPE_MTE3>(SYNC_AIV_AIC_FLAG);
 
             // 模式2：AIV等待本AI Core内AIC完成矩阵乘。
-            AscendC::CrossCoreWaitFlag<2>(SYNC_AIC_AIV_FLAG);
+            CrossCoreWaitFlagForArch<2, PIPE_MTE2>(SYNC_AIC_AIV_FLAG);
             AscendC::DataCopy(cLocal, CVectorGM, C_AIV_BLOCKS_LENGTH);
             AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
             AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
@@ -398,7 +410,7 @@ public:
         // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成
         AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
         // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
-        AscendC::CrossCoreWaitFlag<0>(0);
+        CrossCoreWaitFlagForArch<0, PIPE_MTE2>(0);
         // 关闭原子累加
         AscendC::DisableDmaAtomic();
 
@@ -431,7 +443,7 @@ public:
             AscendC::SetAtomicAdd<float>();
             AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
             AscendC::CrossCoreSetFlag<1, PIPE_MTE3>(0);
-            AscendC::CrossCoreWaitFlag<1>(0);
+            CrossCoreWaitFlagForArch<1, PIPE_MTE2>(0);
             AscendC::DisableDmaAtomic();
 
             if (AscendC::GetBlockIdx() == 2) {

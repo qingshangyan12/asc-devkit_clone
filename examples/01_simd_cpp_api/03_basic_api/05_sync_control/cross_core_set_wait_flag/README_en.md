@@ -316,7 +316,9 @@ if ASCEND_IS_AIV {
 
 (2) Mode 4 supports only Ascend 950PR/Ascend 950DT and requires a `__mix__(1, 2)` kernel. The CMake configuration rejects scenario 3 for architectures other than dav-3510.
 
-(3) Mode 0 can deadlock in concurrent multi-stream workloads when core resources are insufficient. Production operators should follow the API guidance for batch mode and resource scheduling.
+(3) The `pipe` template parameter of `CrossCoreWaitFlag` does not affect the hardware instruction on dav-2201 (Atlas A2/A3), but takes effect on dav-3510 (Ascend 950). Because dav-3510 does not support the default `PIPE_S` for modes 0, 1, and 2, the example uses architecture-specific handling: it passes `PIPE_MTE2` or `PIPE_FIX` explicitly on dav-3510 and keeps the default parameter behavior on dav-2201. See [CrossCoreWaitFlag template parameter defaults and effects](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md#template-parameter-defaults) for details.
+
+(4) Mode 0 can deadlock in concurrent multi-stream workloads when core resources are insufficient. Production operators should follow the API guidance for batch mode and resource scheduling.
 
 #### 3.3 Pure Vector Computation Scenario
 (1) When using the CrossCoreSetFlag and CrossCoreWaitFlag inter-core synchronization interfaces, even in pure Vector computation scenarios, the kernel function cannot use the __vector__ modifier.
