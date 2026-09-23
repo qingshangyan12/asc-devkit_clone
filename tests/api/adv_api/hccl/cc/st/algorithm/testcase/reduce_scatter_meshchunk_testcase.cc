@@ -373,7 +373,9 @@ struct Scenario {
             auto resources = Resources(r);
             ctx.threads = resources.threads;
             ctx.cclMem.addr = Tmp(r);
-            ctx.cclMem.size = loopCount * elementSize * (ranks - 1);
+            // scratch multiple 已修正为 1（原位累加只需 1 份单趟段），
+            // cclMem.size 直接等于期望的单趟容量（不再乘 N-1）。
+            ctx.cclMem.size = loopCount * elementSize;
             ctx.channels.resize(1);
             for (const auto& peer : resources.channels) {
                 ctx.channels[0].push_back(peer.second[0]);
