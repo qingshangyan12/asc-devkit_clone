@@ -80,9 +80,17 @@ CcuResult PreSync(AllToAllMesh1DMultiJettyContext& ctx)
 
 CcuResult PostSync(AllToAllMesh1DMultiJettyContext& ctx)
 {
-    for (uint32_t i = 0; i < ctx.channelCount; ++i) {
-        CCU_CHK_RET(ccu::NotifyRecord(ctx.channels[i], A2A_CKE_IDX, A2A_POST_SYNC_BIT));
+    // 逐对端收齐写在途后立即发送完成通知，替代“全收齐后再统一广播”，让对端尽早结束等待
+    uint32_t channelId = 0;
+    for (uint32_t rankIdx = 0; rankIdx < ctx.rankSize; ++rankIdx) {
+        if (rankIdx == ctx.rankId) {
+            continue;
+        }
+        CCU_CHK_RET(ccu::EventWait(ctx.eventList[rankIdx], static_cast<uint16_t>((1U << ctx.jettyNum) - 1U)));
+        CCU_CHK_RET(ccu::NotifyRecord(ctx.channels[channelId], A2A_CKE_IDX, A2A_POST_SYNC_BIT));
+        ++channelId;
     }
+    CCU_CHK_RET(ccu::EventWait(ctx.eventList[ctx.rankId], 1U));
     for (uint32_t i = 0; i < ctx.channelCount; ++i) {
         CCU_CHK_RET(ccu::NotifyWait(ctx.channels[i], A2A_CKE_IDX, A2A_POST_SYNC_BIT));
     }
@@ -147,16 +155,15 @@ CcuResult DoAllToAll(AllToAllMesh1DMultiJettyContext& ctx)
     localDst.token = ctx.token;
     CCU_IF(ctx.sliceSize != 0)
     {
+<<<<<<< HEAD
         CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize, GetCcuVersion()));
         CCU_CHK_RET(ccu::EventRecord(ctx.eventList[ctx.rankId], 1U));
         CCU_CHK_RET(ccu::EventWait(ctx.eventList[ctx.rankId], 1U));
+=======
+        CCU_CHK_RET(GroupCopy(ctx, localDst, localSrc, ctx.goSize));
+>>>>>>> 801c2126d (test)
     }
     CCU_CHK_RET(ccu::EventRecord(ctx.eventList[ctx.rankId], 1U));
-
-    for (uint32_t r = 0; r < ctx.rankSize; ++r) {
-        const uint16_t waitMask = (r == ctx.rankId) ? 1U : static_cast<uint16_t>((1U << ctx.jettyNum) - 1U);
-        CCU_CHK_RET(ccu::EventWait(ctx.eventList[r], waitMask));
-    }
     return CCU_SUCCESS;
 }
 } // namespace
