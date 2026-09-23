@@ -22,13 +22,19 @@ namespace asc {
 namespace te {
 namespace experimental {
 template <typename T>
-__simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src)
+__simd_callee__ inline reg_tensor<T> ln(const reg_tensor<T>& src)
 {
-    static_assert(detail::supports_float_math_v<T>, "log does not support this element type");
+    static_assert(detail::supports_float_math_v<T>, "ln does not support this element type");
     reg_tensor<T> dst;
     asc_ln(dst.reg, src.reg, src.mask);
     dst.mask = src.mask;
     return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src)
+{
+    return ln(src);
 }
 
 template <typename T>
@@ -57,6 +63,16 @@ __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor
     static_assert(detail::supports_add_sub_v<T>, "scalar operator+ does not support this element type");
     reg_tensor<T> dst;
     asc_add_scalar(dst.reg, src.reg, scalar, src.mask);
+    dst.mask = src.mask;
+    return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> neg(const reg_tensor<T>& src)
+{
+    static_assert(detail::supports_neg_v<T>, "neg does not support this element type");
+    reg_tensor<T> dst;
+    asc_neg(dst.reg, src.reg, src.mask);
     dst.mask = src.mask;
     return dst;
 }
