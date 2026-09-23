@@ -895,8 +895,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
     // the first octant, so the magnitudes are reduced first and the octant is restored afterwards.
     float ay = __fabsf(y);
     float ax = __fabsf(x);
-    // Summing the magnitudes tests both arguments for NaN at once and propagates it as the result.
-    float sum = ax + ay;
 
     // Order the magnitudes so the ratio lo / hi never exceeds 1, which is the polynomial's valid range.
     bool y_gt_x = ay > ax;
@@ -942,6 +940,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
         a = signbit(x) ? 3.14159274101257324219f : 0.0f;
     }
     float result = signbit(y) ? -a : a;
+    // Summing the magnitudes tests both arguments for NaN at once and propagates it as the result.
+    float sum = ax + ay;
     if (__isnan(sum)) {
         result = sum;
     }
@@ -988,11 +988,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
         result = fmaf(0.93318945169448852539f, 1.6832555532455444336f, -result);
     }
 
-    if (!(abs_x > ASCRT_INF_F)) {
-        result = __internal_with_sign_bit(result, x);
-    }
-
-    return result;
+    return __internal_with_sign_bit(result, x);
 }
 
 #define __INTERNAL_SINCOSF(x, s, c)                                              \
