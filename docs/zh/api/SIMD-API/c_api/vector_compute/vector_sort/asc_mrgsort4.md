@@ -49,7 +49,7 @@ __aicore__ inline void asc_mrgsort4(__ubuf__ <dtype>* dst,
 
 ### dtype支持数据类型
 
-`dtype`支持的数据类型为`half`、`float`。源操作数与目的操作数的指针类型须一致。
+`dtype`支持的数据类型为`half`、`float`，源操作数与目的操作数的指针类型须一致。
 
 ### 函数原型典型示例
 
@@ -97,12 +97,27 @@ PIPE_V
 - 每次迭代内的数据会进行排序，不同迭代间的数据不会进行排序。
 - src数组的4个元素均须初始化，即使对应队列未被`valid_bit`选中。
 - 当`repeat = 1`时，有效源队列可以长度不同、存储不连续。当`repeat > 1`时，必须同时满足：
-  - 4条源队列长度一致，均为`L`。
-  - 每组4条队列按`src[0]`至`src[3]`顺序连续存储，各组也连续存储。
-  - `if_exhausted_suspension = false`。
-  - `valid_bit = 15`。
+    - 4条源队列长度一致，均为`L`。
+    - 每组4条队列按`src[0]`至`src[3]`顺序连续存储，各组也连续存储。
+    - `if_exhausted_suspension = false`。
+    - `valid_bit = 15`。
 
   第`r`次迭代（从0开始）的源、目的地址相对于初始地址均偏移`r * 4 * L * 8`字节，每次产生一条包含`4 * L`个数据单元的有序队列。
+<!-- npu="A3,910b,950" id12 -->
+- 当参数`repeat = 0`时，该接口的行为如下：
+    <!-- npu="A3,910b" id10 -->
+    - 针对如下型号，不会执行计算操作，不会对目的操作数进行写入，该接口将被视为NOP（空操作）。
+       <!-- npu="A3" id13 -->
+       - Atlas A3系列产品
+       <!-- end id13 -->
+       <!-- npu="910b" id9 -->
+       - Atlas A2系列产品
+       <!-- end id9 -->
+    <!-- end id10 -->
+    <!-- npu="950" id11 -->
+    - 针对Ascend 950PR&950DT系列产品，不保证该接口被视为NOP（空操作）。
+    <!-- end id11 -->
+<!-- end id12 -->
 
 <!-- npu="950" id8 -->
 ## 调用示例
@@ -117,7 +132,7 @@ Host端使用CPU排序结果，逐一核对全部256个score及其对应的index
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
