@@ -207,7 +207,7 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 param[KFC_PARALLEL_AG_PART1_GO_SIZE_0], param[KFC_PARALLEL_AG_PART1_GO_SIZE_1],
                 param[KFC_PARALLEL_AG_PART1_GO_SIZE_2], param[KFC_PARALLEL_AG_PART1_GO_SIZE_3], ctx.arg->channels,
                 ctx.arg->channelCount, arg->rankSizeLevel0, arg->rankIdxLevel0, arg->rankSizeLevel1,
-                arg->rankIdxLevel1);
+                arg->rankIdxLevel1, false);
         } else if (ctx.arg->role == KfcServerRole::ALL_GATHER_NHR) {
             CcuKfcAllGatherNHR1DMultiJettyMem2MemKernel(
                 param[KFC_CONCURRENT_AG_NHR_INPUT], param[KFC_CONCURRENT_AG_NHR_OUTPUT], ctx.token,
