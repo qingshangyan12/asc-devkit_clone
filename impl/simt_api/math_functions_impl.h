@@ -3042,11 +3042,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
 {
     if (fabsf(x) > 0.1f) {
+        float result;
         if (x > 0) {
-            return __logf(x + __sqrtf(x * x + 1.0f));
+            result = __logf(x + __sqrtf(x * x + 1.0f));
         } else {
-            return __logf(__sqrtf(x * x + 1.0f) - x) * (-1);
+            result = __logf(__sqrtf(x * x + 1.0f) - x) * (-1);
         }
+        return result;
     } else {
         float square_v = 0;
         float dst = 0;
