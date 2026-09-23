@@ -541,14 +541,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     const uint64_t sliceSize = commParam->count * dataSize;
     xnData_[4] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
-    xnData_[5] = 0;
+    xnData_[5] = commParam->skipLocalRankCopy;
     xnData_[6] = 0;
     CalcPeerOnlyChunkParams(sliceSize, &xnData_[7], &xnData_[8]);
     KERNEL_LOG(
         KERNEL_INFO,
-        "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, "
+        "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, skipLocalRankCopy=%llu, "
         "chunk=0x%llx, tail=0x%llx, loop=0x%llx\n",
-        xnData_[1], xnData_[2], xnData_[4], sliceSize, CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
+        xnData_[1], xnData_[2], xnData_[4], sliceSize, xnData_[5], CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
 }
 
 // SoleNHRMultiLink（CcuSchedReduceScatterSoleNHRMultiLink）的 AIV prepare：
