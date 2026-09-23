@@ -28,7 +28,7 @@
 
 头文件路径：`"tensor_api/experimental/arch/vector/basic_arithmetic.h"`。
 
-该接口根据src.mask，对源操作数src中的有效元素逐个求自然对数（以e为底），并返回计算结果。计算公式如下：
+该接口根据`src.mask`，对源操作数`src`中的有效元素逐个求自然对数（以 e 为底），并返回计算结果。`log` 与 `ln` 的计算语义一致，计算公式如下：
 
 $$
 dst_i = \ln(src_i)
@@ -66,6 +66,7 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src)
 ## 约束说明
 
 - `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- `src` 的有效元素应满足自然对数的输入定义域要求；非法输入的结果遵循 C API `asc_ln` 的浮点语义。
 
 ## 调用示例
 
