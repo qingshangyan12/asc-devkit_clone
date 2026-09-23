@@ -1639,22 +1639,24 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | int16_t/uint32_t | MAX | 32767 | 32767 |
 | int16_t/int4b_t | MIN | 0.0 | -8 |
 | int16_t/int4b_t | MAX | -1 | 7 |
-| int16_t/int32_t，int16_t/float<br>int16_t/half | MIN | -32768 | -32768 |
-| int16_t/int32_t，int16_t/float<br>int16_t/half | MAX | 32767 | 32767 |
-| uint16_t/uint32_t，int32_t/float，uint32_t/uint16_t | 0.0 | 0.0 | 0.0 |
-| uint16_t/uint32_t，int32_t/float，uint32_t/uint16_t | MAX | 65535 | 65535 |
+| int16_t/int32_t，int16_t/float | MIN | -32768 | -32768 |
+| int16_t/int32_t，int16_t/float | MAX | 32767 | 32767 |
+| int16_t/half | MIN | -32768 | -32768 |
+| int16_t/half | MAX | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出32768.00；CAST_FLOOR/CAST_TRUNC模式下，输出32752.00 | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出32768.00；CAST_FLOOR/CAST_TRUNC模式下，输出32752.00 |
+| uint16_t/uint32_t，uint32_t/uint16_t | 0.0 | 0.0 | 0.0 |
+| uint16_t/uint32_t，uint32_t/uint16_t | MAX | 65535 | 65535 |
 | int32_t/int16_t | MIN | 0.0 | -32768 |
 | int32_t/int16_t | MAX | -1 | 32767 |
 | int32_t/float | MIN | -2147483648 | -2147483648 |
-| int32_t/float | MAX | 2147483647 | 2147483647 |
+| int32_t/float | MAX | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出2147483648.00；CAST_FLOOR/CAST_TRUNC模式下，输出2147483520.00 | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出2147483648.00；CAST_FLOOR/CAST_TRUNC模式下，输出2147483520.00 |
 | int32_t/int64_t | MIN | -2147483648 | -2147483648 |
 | int32_t/int64_t | MAX | 2147483647 | 2147483647 |
 | uint32_t/int16_t | 0.0 | 0.0 | 0.0 |
 | uint32_t/int16_t | MAX | -1 | 32767 |
 | int64_t/int32_t | MIN | 0.0 | -2147483648 |
 | int64_t/int32_t | MAX | -1 | 2147483647 |
-| int64_t/float | MIN | &nbsp;&nbsp; | &nbsp;&nbsp; |
-| int64_t/float | MAX | &nbsp;&nbsp; | &nbsp;&nbsp; |
+| int64_t/float | MIN | -9223372036854775808.00 | -9223372036854775808.00 |
+| int64_t/float | MAX | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出9223372036854775808.00；CAST_FLOOR/CAST_TRUNC模式下，输出9223371487098961920.00 | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出9223372036854775808.00；CAST_FLOOR/CAST_TRUNC模式下，输出9223371487098961920.00 |
 | float/int16_t | 0.0 | 0.0 | 0.0 |
 | float/int16_t | MIN | 0.0 | -32768 |
 | float/int16_t | MAX | 0.0 | 32767 |
@@ -1668,8 +1670,8 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | float/int32_t | -inf | -2147483648 | -2147483648 |
 | float/int32_t | nan | 0.0 | 0.0 |
 | float/bfloat16_t | 0.0 | 0.0 | 0.0 |
-| float/bfloat16_t | MIN | -inf | -3.39e+38 |
-| float/bfloat16_t | MAX | inf | 3.39e+38 |
+| float/bfloat16_t | MIN | 不同舍入模式下输出不同，CAST_RINT/CAST_FLOOR/CAST_ROUND模式下，输出-inf；CAST_CEIL/CAST_TRUNC模式下，输出-3.3895314e+38 | -3.39e+38 |
+| float/bfloat16_t | MAX | 不同舍入模式下输出不同，CAST_RINT/CAST_CEIL/CAST_ROUND模式下，输出inf；CAST_FLOOR/CAST_TRUNC模式下，输出3.3895314e+38 | 3.39e+38 |
 | float/bfloat16_t | inf | inf | 3.39e+38 |
 | float/bfloat16_t | -inf | -inf | -3.39e+38 |
 | float/bfloat16_t | nan | nan | 0.0 |
@@ -1734,8 +1736,8 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | half/int32_t | -inf | -2147483648 | -2147483648 |
 | half/int32_t | nan | 0.0 | 0.0 |
 | half/int16_t | 0.0 | 0.0 | 0.0 |
-| half/int16_t | MIN | -32768 | -32768 |
-| half/int16_t | MAX | 32767 | 32767 |
+| half/int16_t | MIN | 32 | -32768 |
+| half/int16_t | MAX | -32 | 32767 |
 | half/int16_t | inf | 32767 | 32767 |
 | half/int16_t | -inf | -32768 | -32768 |
 | half/int16_t | nan | 0.0 | 0.0 |
@@ -1794,8 +1796,8 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | bfloat16_t/fp4x2_e1m2_t | -inf | -1.75 | -1.75 |
 | bfloat16_t/fp4x2_e1m2_t | nan | 0.0 | 0.0 |
 | bfloat16_t/fp8_e8m0_t | 0.0 | 0.0 | 0.0 |
-| bfloat16_t/fp8_e8m0_t | MIN | 1.70141e+40 | 1.70141e+40 |
-| bfloat16_t/fp8_e8m0_t | MAX | 1.70141e+40 | 1.70141e+40 |
+| bfloat16_t/fp8_e8m0_t | MIN | 1.70141e+38 | 1.70141e+38 |
+| bfloat16_t/fp8_e8m0_t | MAX | 1.70141e+38 | 1.70141e+38 |
 | bfloat16_t/fp8_e8m0_t | inf | nan | nan |
 | bfloat16_t/fp8_e8m0_t | -inf | nan | nan |
 | bfloat16_t/fp8_e8m0_t | nan | nan | nan |
@@ -1804,7 +1806,7 @@ Reg矢量计算接口在边界值输入下，有两类输出结果：
 | fp4x2_e1m2_t/bfloat16_t | MIN | -1.75 | -1.75 |
 | fp4x2_e1m2_t/bfloat16_t | MAX | 1.75 | 1.75 |
 | fp8_e8m0_t/bfloat16_t | MIN | 1.57772e-30 | 1.57772e-30 |
-| fp8_e8m0_t/bfloat16_t | MAX | 1.70141e+40 | 1.70141e+40 |
+| fp8_e8m0_t/bfloat16_t | MAX | 1.70141e+38 | 1.70141e+38 |
 | fp8_e8m0_t/bfloat16_t | nan | nan | nan |
 
 
