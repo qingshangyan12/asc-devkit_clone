@@ -505,7 +505,11 @@ __aicore__ inline void DataCopy(
                 (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, float>::value ||
                  Std::is_same<PrimSrcType, int32_t>::value)) {
                 DataCopyL12BTImpl(
+<<<<<<< HEAD
                     (uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimSrcType*)src.GetPhyAddr(),
+=======
+                    (uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimSrcType*)src.GetPhyAddr(), 
+>>>>>>> 0c82ea3b8f15eea442f98e667836d591dc8cd3b3
                     static_cast<uint16_t>(Std::is_same<PrimDstType, PrimSrcType>::value ? 0 : 2), repeatParams);
             } else if constexpr (Std::is_same<PrimDstType, PrimSrcType>::value) {
 #else
