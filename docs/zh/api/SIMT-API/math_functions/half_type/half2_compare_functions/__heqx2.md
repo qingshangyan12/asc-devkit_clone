@@ -87,6 +87,16 @@ half2 __heqx2(half2 x, half2 y)
     <td>nan</td>
     <td>0</td>
   </tr>
+  <tr>
+    <td>nan</td>
+    <td>非nan值</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>非nan值</td>
+    <td>nan</td>
+    <td>0</td>
+  </tr>
 </table>
 
 ## 约束说明

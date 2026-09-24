@@ -52,10 +52,8 @@ inline float fmaxf(float x, float y)
 
 -   x为+0，y为-0时，返回x。
 -   x为-0，y为+0时，返回y。
--   x为nan时，返回值为y。
--   y为nan时，返回值为x。
--   x，y同时为nan时，返回值为nan。
--   x，y任意一个为inf时，返回值为inf。
+-   x为nan时，返回值为y；y为nan时，返回值为x；x，y同时为nan时，返回值为nan（nan的判断优先于下列规则）。
+-   x或y为+inf时，返回值为+inf。
 -   x为-inf时，返回值为y。
 -   y为-inf时，返回值为x。
 
