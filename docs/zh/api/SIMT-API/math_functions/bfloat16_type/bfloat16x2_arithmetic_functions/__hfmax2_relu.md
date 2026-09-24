@@ -61,25 +61,25 @@ bfloat16x2_t __hfmax2_relu(const bfloat16x2_t x, const bfloat16x2_t y, const bfl
   <tbody>
     <tr>
       <td colspan="3">x、y、z任意一个为nan</td>
-      <td>nan</td>
+      <td>0</td>
     </tr>
     <tr>
       <td>inf</td>
       <td>0</td>
       <td>任意值</td>
-      <td>nan</td>
+      <td>0</td>
     </tr>
     <tr>
       <td>0</td>
       <td>inf</td>
       <td>任意值</td>
-      <td>nan</td>
+      <td>0</td>
     </tr>
     <tr>
       <td>inf</td>
       <td>inf</td>
       <td>-inf</td>
-      <td>nan</td>
+      <td>0</td>
     </tr>
     <tr>
       <td>-inf</td>

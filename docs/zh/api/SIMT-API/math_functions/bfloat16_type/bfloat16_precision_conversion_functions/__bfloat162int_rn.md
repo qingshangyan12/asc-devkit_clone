@@ -55,6 +55,8 @@ inline int __bfloat162int_rn(const bfloat16_t x)
 | ASCRT_MAX_NORMAL_BF16 | 2147483647（INT32_MAX） |
 | -inf | -2147483648（INT32_MIN） |
 | -ASCRT_MAX_NORMAL_BF16 | -2147483648（INT32_MIN） |
+| 任意大于INT32_MAX的有限值 | 2147483647（INT32_MAX） |
+| 任意小于INT32_MIN的有限值 | -2147483648（INT32_MIN） |
 | ±0.5 | 0 |
 | 1.5 | 2 |
 | 2.5 | 2 |

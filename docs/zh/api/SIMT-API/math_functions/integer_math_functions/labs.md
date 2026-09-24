@@ -45,7 +45,7 @@ inline long int labs(long int x)
 
 ## 返回值说明
 
-输入数据的绝对值。
+输入数据的绝对值。当x为LONG\_MIN时，结果为未定义行为。
 
 ## 约束说明
 

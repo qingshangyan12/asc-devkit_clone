@@ -53,6 +53,7 @@ inline unsigned int __bfloat162uint_rz(const bfloat16_t x)
 | nan | 0 |
 | inf | 4294967295（UINT32_MAX） |
 | ASCRT_MAX_NORMAL_BF16 | 4294967295（UINT32_MAX） |
+| 任意超出uint32_t表示范围的有限正值 | 4294967295（UINT32_MAX） |
 | -inf | 0 |
 | 负值 | 0 |
 
