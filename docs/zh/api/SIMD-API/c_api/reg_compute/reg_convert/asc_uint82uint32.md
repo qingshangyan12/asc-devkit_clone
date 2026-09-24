@@ -9,6 +9,13 @@ tag:
   - operations: [conversion]
   - execution_models: [register_vector]
   - traits: [elementwise, masked, widening_result]
+signature:
+  - archs: ['3510']
+    headers: []
+    override_id: asc_uint82uint32__Rvu32_vu8_vb_icposquarter
+  - archs: ['3510']
+    headers: []
+    override_id: asc_uint82uint32__vu8_vb_icposquarter
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

@@ -8,6 +8,13 @@ tag:
   - roles: [control]
   - operations: [synchronization]
   - execution_models: [scalar]
+signature:
+  - override_id: asc_lock__pipe_u8
+    archs: ['3510']
+    headers: [/include/c_api/sync/sync.h]
+  - override_id: asc_lock__pipe_u8_mutexexec
+    archs: ['3510']
+    headers: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
     kind: related

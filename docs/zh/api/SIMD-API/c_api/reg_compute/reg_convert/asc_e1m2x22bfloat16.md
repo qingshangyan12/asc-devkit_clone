@@ -10,6 +10,13 @@ tag:
   - objects: [vector]
   - execution_models: [register_vector]
   - traits: [masked, widening_result]
+signature:
+  - archs: ['3510']
+    headers: []
+    override_id: asc_e1m2x22bfloat16__Rvbf16_vf4e1m2x2_vb_icposquarter
+  - archs: ['3510']
+    headers: []
+    override_id: asc_e1m2x22bfloat16__vf4e1m2x2_vb_icposquarter
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

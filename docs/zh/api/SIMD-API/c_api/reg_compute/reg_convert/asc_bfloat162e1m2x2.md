@@ -9,6 +9,10 @@ tag:
   - operations: [conversion]
   - execution_models: [register_vector]
   - traits: [elementwise, masked, rounding_mode, saturation_mode]
+signature:
+  - archs: ['3510']
+    headers: []
+    override_id: asc_bfloat162e1m2x2___Rvf4e1m2x2_vbf16_vb_icposquarter
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

@@ -74,6 +74,22 @@ def _parse_signature(value: str) -> Any | None:
     )
 
 
+def _signature_type_key(declaration: Any) -> str:
+    """Return the signature identity used for header matching.
+
+    Markdown signatures may retain parameter names while declarations parsed
+    from headers may not.  Normalize both through the same parameter parser;
+    names are checked separately by ``_signature_parameter_names``.
+    """
+    parameters = []
+    for parameter in _normalized_parameter_list(declaration.parameters or "", keep_names=True):
+        name = _parameter_name(parameter)
+        if name and re.search(rf"(?:[*&]\s*|\s+){re.escape(name)}$", parameter):
+            parameter = parameter[:-len(name)].rstrip()
+        parameters.append(parameter)
+    return f"{declaration.symbol}({','.join(parameters)})"
+
+
 @lru_cache(maxsize=256)
 def _all_header_declaration_ranges(
     header_text: str,
@@ -125,11 +141,17 @@ def _matching_declarations(header_text: str, function: str, parameters: str | No
     declaration = _parse_signature(function)
     if declaration is None:
         return []
+    # Header parsing canonicalizes parameter types without parameter names,
+    # while the Markdown mapping may retain names in its canonical string.
+    # Compare parsed canonical signatures so both paths identify the same
+    # declaration; parameter names remain checked separately below.
+    canonical_function = _signature_type_key(declaration)
     desired_names = _signature_parameter_names(parameters or "")
     matches = []
     for start, end, text in _header_declaration_ranges(header_text, declaration.symbol):
         parsed = _parse_prototype_declaration(re.sub(r"\s+", " ", text).strip().rstrip(";{"))
-        if parsed is None or _canonical_signature_id(parsed) != function:
+        parsed_function = _signature_type_key(parsed) if parsed is not None else None
+        if parsed is None or parsed_function != canonical_function:
             continue
         if desired_names and _signature_parameter_names(text) != desired_names:
             continue

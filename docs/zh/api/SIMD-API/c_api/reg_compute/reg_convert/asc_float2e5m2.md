@@ -10,6 +10,10 @@ tag:
   - objects: [vector]
   - execution_models: [register_vector]
   - traits: [masked, rounding_mode, saturation_mode]
+signature:
+  - archs: ['3510']
+    headers: []
+    override_id: asc_float2e5m2_rn__Rvf8e5m2_vf32_vb_icposquarter
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: constrained_by

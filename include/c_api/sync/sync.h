@@ -166,12 +166,42 @@ __aicore__ inline void asc_sync_inter_wait(pipe_t pipe, int64_t flag_id);
  */
 __aicore__ inline void asc_sync_block_wait(pipe_t pipe, int64_t flag_id);
 
+/**
+ * @ingroup simd_c_api.sync.intra_core_sync
+ * @override_id asc_lock__pipe_u8
+ * @archs 3510
+ * @param [in] pipe 标识阻塞哪条流水上后续指令，直到所有流水中具有相同`mutex_id`的Mutex都已经被[asc_unlock](asc_unlock.md)释放。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
+ * @param [in] mutex_id mutex标号，取值范围为[0, 31]。
+ */
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id);
 
+/**
+ * @ingroup simd_c_api.sync.intra_core_sync
+ * @override_id asc_lock__pipe_u8_mutexexec
+ * @archs 3510
+ * @param [in] pipe 标识阻塞哪条流水上后续指令，直到所有流水中具有相同`mutex_id`的Mutex都已经被[asc_unlock](asc_unlock.md)释放。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
+ * @param [in] mutex_id mutex标号，取值范围为[0, 31]。
+ * @param [in] mode 可选参数，用于指定是否阻塞流水，默认值为`ASC_LOCK_BLOCK`。&bull; `ASC_LOCK_BLOCK`：阻塞`pipe`对应流水的执行，直到代码中位于当前`asc_lock`之前且`mutex_id`相同的所有`asc_unlock`调用均已执行完成。&bull; `ASC_LOCK_NON_BLOCK`：不阻塞`pipe`对应流水的执行。
+ */
 __aicore__ inline void asc_lock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
+/**
+ * @ingroup simd_c_api.sync.intra_core_sync
+ * @override_id asc_unlock__pipe_u8
+ * @archs 3510
+ * @param [in] pipe 指令的执行流水线。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
+ * @param [in] mutex_id mutex标号。取值范围[0, 31]。
+ */
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id);
 
+/**
+ * @ingroup simd_c_api.sync.intra_core_sync
+ * @override_id asc_unlock__pipe_u8_mutexexec
+ * @archs 3510
+ * @param [in] pipe 指令的执行流水线。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
+ * @param [in] mutex_id mutex标号。取值范围[0, 31]。
+ * @param [in] mode 可选参数，用于指定是否阻塞流水，默认值为`ASC_LOCK_BLOCK`。&bull; `ASC_LOCK_BLOCK`：该指令等待`pipe`所对应的流水线中所有前置指令完成后执行。&bull; `ASC_LOCK_NON_BLOCK`：该指令等待`pipe`所对应的流水线中所有前置指令完成且相同`mutex_id`的所有`asc_unlock`指令执行完成后执行。
+ */
 __aicore__ inline void asc_unlock(pipe_t pipe, uint8_t mutex_id, const asc_mutex_execute_mode mode);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sync)

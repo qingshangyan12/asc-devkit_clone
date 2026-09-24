@@ -9,6 +9,10 @@ tag:
   - operations: [conversion]
   - execution_models: [register_vector]
   - traits: [elementwise, masked, saturation_mode]
+signature:
+  - archs: ['3510']
+    headers: []
+    override_id: asc_int322uint8__Rvu8_vi32_vb_icposquarter
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: requires
