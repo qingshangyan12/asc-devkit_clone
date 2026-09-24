@@ -51,6 +51,7 @@ inline long int lrintf(float x)
 -   当x为0.5时，返回值为0。
 -   当x为1.5时，返回值为2。
 -   当x为nan时，返回值为0。
+-   当舍入结果超出返回类型（long int）的表示范围（含x为±inf）时，行为未定义。
 
 ## 约束说明
 

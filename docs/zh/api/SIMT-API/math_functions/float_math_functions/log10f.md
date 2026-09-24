@@ -51,6 +51,7 @@ inline float log10f(float x)
 
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为nan。
+-   当x为负有限值时，返回值为nan。
 -   当x为nan时，返回值为nan。
 
 ## 约束说明

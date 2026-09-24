@@ -35,6 +35,30 @@
 float min(float x, float y)
 ```
 
+此外，`"simt_api/math_functions.h"`还提供以下整数重载，语义为返回两数中的较小值：
+
+```cpp
+int min(int x, int y)
+```
+
+```cpp
+unsigned int min(unsigned int x, unsigned int y)
+```
+
+```cpp
+long min(long x, long y)
+```
+
+```cpp
+long long min(long long x, long long y)
+```
+
+```cpp
+unsigned long long min(unsigned long long x, unsigned long long y)
+```
+
+说明：当前不支持有符号与无符号混合入参的重载，混合类型入参不会执行integer promotion，调用方需自行保证两个入参类型一致。
+
 ## 参数说明
 
 **表1**  参数说明
