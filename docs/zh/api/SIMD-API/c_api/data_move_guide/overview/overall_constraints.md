@@ -36,7 +36,7 @@ NPU架构版本3510各存储单元的架构基线对齐如下表所示。
 
 ## 搬运量与存储边界
 
-NPU架构版本3510的主要片上存储容量如下：
+[NPU架构版本3510硬件规格](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md)中的主要片上存储容量如下：
 
 | 存储单元 | 容量上限 |
 | --- | --- |
@@ -91,7 +91,7 @@ asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
 ## 地址重叠
 
-源、目的有效搬运区域是否允许重叠由具体接口决定。NPU架构版本3510的UB内部复制要求实际参与搬运的源、目的DataBlock互不重叠，即使两段地址的整体跨度可以交叠，也不能把`asc_copy_ub2ub`当作支持重叠区域的`memmove`。Reg指令访问重叠UB区域并存在读写冲突时，按对应接口要求使用`asc_mem_bar`。
+源、目的有效搬运区域是否允许重叠由具体接口决定。NPU架构版本3510的UB内部复制要求实际参与搬运的源、目的DataBlock互不重叠，即使两段地址的整体跨度可以交叠，也不能把`asc_copy_ub2ub`当作支持重叠区域的`memmove`。Reg指令访问重叠UB区域并存在读写冲突时，按对应接口要求使用[asc_mem_bar](../../reg_compute/reg_sync/asc_mem_bar.md)。
 
 ## 初始化与配置状态
 

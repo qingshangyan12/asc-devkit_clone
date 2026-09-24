@@ -2,7 +2,7 @@
 
 C API文档按最细粒度公共头文件归类。除试验接口外，整体使用时可以包含`c_api/asc_simd.h`。
 
-数据搬运接口的概念、硬件通路和选型说明请参见[数据搬运导览](data_move_overview/data_move_guide.md)。
+数据搬运接口的概念、硬件通路和选型说明请参见[数据搬运导览](data_move_guide/data_move_guide.md)。
 
 ## 基础定义
 

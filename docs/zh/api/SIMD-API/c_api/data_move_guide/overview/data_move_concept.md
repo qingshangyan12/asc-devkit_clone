@@ -110,4 +110,4 @@ NDDMA以1至5维循环描述GM到UB的数据访问，每维均可独立配置元
 
 Vector Function通过加载接口把UB数据读入矢量数据寄存器、掩码寄存器或非对齐寄存器，通过存储接口将结果写回UB。对齐访问通常以32字节为基线；尾块或任意起始地址可使用非对齐加载、存储接口，并按规定复用`vector_load_unalign`或`vector_store_unalign`状态。
 
-Reg接口的有效元素数由数据类型和掩码共同决定。多条Reg指令访问重叠UB区域并存在读写冲突时，应按接口约束使用`asc_mem_bar`建立顺序。
+Reg接口的有效元素数由数据类型和掩码共同决定。多条Reg指令访问重叠UB区域并存在读写冲突时，应按接口约束使用[asc_mem_bar](../../reg_compute/reg_sync/asc_mem_bar.md)建立顺序。

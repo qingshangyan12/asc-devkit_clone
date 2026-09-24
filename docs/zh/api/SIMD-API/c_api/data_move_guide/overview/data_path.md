@@ -4,18 +4,18 @@
 
 AI Core采用分层存储架构。计算单元包括Cube、Vector和Scalar；存储单元包括Global Memory（GM）、L1 Buffer、L0A/L0B/L0C Buffer、Unified Buffer（UB）、BiasTable Buffer、Fixpipe Buffer和SIMD Register File；MTE1、MTE2、MTE3和Fixpipe负责在不同存储单元之间传输数据。
 
-图1给出NPU架构版本2201的存储和搬运通路，便于理解AI Core各存储层级的基本关系。
+图1给出[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)的存储和搬运通路，便于理解AI Core各存储层级的基本关系。
 
 **图1** NPU架构版本2201下的AI Core硬件架构
 
 ![NPU架构版本2201下的AI Core硬件架构](../../figures/atlas_a2_a3_architecture.png "NPU架构版本2201下的AI Core硬件架构")
 
-NPU架构版本3510的内部结构如图2所示。与图1相比，数据通路主要有以下变化：
+[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)的内部结构如图2所示。与图1相比，数据通路主要有以下变化：
 
 - 新增L0C Buffer到UB的单向数据通路。
 - 新增UB到L1 Buffer的数据通路。
-- 不再提供GM到L0A/L0B的直达通路，矩阵输入需要先搬到L1。
-- 不再提供L1到GM的直达通路。
+- 不再提供GM到L0A/L0B的直达通路，矩阵输入需要先搬到L1 Buffer。
+- 不再提供L1 Buffer到GM的直达通路。
 - AIV增加SIMD Register File，Vector Function通过Reg加载、存储接口与UB交换数据。
 
 **图2** NPU架构版本3510下的AI Core硬件架构与同步关系
@@ -36,7 +36,7 @@ NPU架构版本3510的内部结构如图2所示。与图1相比，数据通路�
 | UB | `__ubuf__` | 保存Vector输入、输出和中间结果，并作为AIC与AIV交换数据的片上存储。 |
 | BiasTable Buffer | 以`uint64_t`目的地址传入 | 保存Mmad使用的bias。 |
 | Fixpipe Buffer | `__fbuf__` | 保存L0C搬出使用的随路Vector量化和随路ReLU参数。 |
-| SIMD Register File | `vector_*`、`vector_bool`等寄存器类型 | 保存Vector Function使用的矢量数据、掩码和地址状态。 |
+| SIMD Register File | `vector_*`、`vector_bool`等[寄存器类型](../../defs/type/reg_data_types.md) | 保存Vector Function使用的矢量数据、掩码和地址状态。 |
 
 ## 数据通路与搬运流水
 
@@ -87,6 +87,6 @@ NPU架构版本3510的内部结构如图2所示。与图1相比，数据通路�
 | UB | SIMD Register File | Vector Function | 对齐、非对齐、广播或掩码加载 | [Reg数据搬入](../../reg_compute/load/reg_load_overview.md) |
 | SIMD Register File | UB | Vector Function | 对齐、非对齐或掩码存储 | [Reg数据搬出](../../reg_compute/store/reg_store_overview.md) |
 
-NPU架构版本3510不支持GM到L0A/L0B直达搬运，数据需要经过GM到L1、L1到L0两段通路；也不支持L1到GM或UB到L0C的通用直达搬运。接口名称在多个NPU架构间相同时，也不能据此推断NPU架构版本3510支持该接口，应以接口文档中的产品支持情况为准。
+NPU架构版本3510不支持GM到L0A/L0B直达搬运，数据需要经过GM到L1 Buffer、L1 Buffer到L0两段通路；也不支持L1 Buffer到GM或UB到L0C的通用直达搬运。接口名称在多个NPU架构间相同时，也不能据此推断NPU架构版本3510支持该接口，应以接口文档中的产品支持情况为准。
 
 各通路的模式、参数单位和关键约束请继续阅读[数据搬运导览](../data_move_guide.md)中的对应章节。硬件存储结构的完整说明请参见[NPU架构版本3510硬件规格](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/architecture_spec/npu_arch_3510.md)。
