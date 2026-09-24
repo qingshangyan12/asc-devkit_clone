@@ -84,6 +84,11 @@ SEMANTIC_SCHEMA_VERSION = 1
 SEMANTIC_RESULT_PURPOSE = "okf_yaml_semantic_result"
 SIGNATURE_KEYS = {"prototype_id", "override_id", "macro_id", "archs", "header", "dtype"}
 DEFAULT_WRITE_CONTRACTS = ("front_matter",)
+# Registry fields must have both an emission path and a validation path before
+# a run can start. The YAML registry remains the source of truth for profile
+# membership; these sets declare code capability for those fields.
+GENERATED_FIELDS = frozenset(ALLOWED_FIELDS)
+VALIDATED_FIELDS = frozenset(ALLOWED_FIELDS)
 ISSUE_TYPES = {"document_defect", "source_defect", "tool_defect", "unresolved"}
 RESOLUTIONS = {
     "blank_field", "report_source_defect", "report_unresolved", "tool_change_required",
@@ -1517,10 +1522,34 @@ def split_conflicting_doxygen_records(
 
 
 def prepare(args: argparse.Namespace) -> int:
+    model = load_model()
+    registered = set(model["common_fields"])
+    for profile_name, profile in model["profiles"].items():
+        registered.update(profile.get("fields", []))
+    missing_generators = sorted(registered - GENERATED_FIELDS)
+    missing_validators = sorted(registered - VALIDATED_FIELDS)
+    if missing_generators or missing_validators:
+        problems = []
+        if missing_generators:
+            problems.append(f"missing generators: {', '.join(missing_generators)}")
+        if missing_validators:
+            problems.append(f"missing validators: {', '.join(missing_validators)}")
+        raise ValidationError("profile registry capability check failed; " + "; ".join(problems))
     root = args.devkit_root.expanduser().resolve()
     if not root.is_dir():
         raise ValidationError(f"DevKit root does not exist: {root}")
     selected = api_documents(root, args.source_dir, args.document)
+    unclassified = []
+    for path in selected:
+        document = (root / path).resolve()
+        body = split_front_matter(document.read_text(encoding="utf-8", errors="replace"))[2]
+        classification = classify_document(path, body, model)
+        if classification is None:
+            unclassified.append(path)
+    if unclassified:
+        raise ValidationError(
+            "selected documents have no registered okftype: " + ", ".join(unclassified)
+        )
     run_dir = args.run_dir.expanduser().resolve()
     run_dir.mkdir(parents=True, exist_ok=True)
     batches = [selected[index:index + 25] for index in range(0, len(selected), 25)]
@@ -1809,7 +1838,12 @@ def normalize_navigation(navigation: Any, document_path: str) -> list[dict[str, 
 
 def validate_base_fields(fields: dict[str, Any], path: str) -> None:
     """Enforce the fixed top-level YAML contract before rendering."""
-    profiles = load_model()["profiles"]
+    model = load_model()
+    profiles = model["profiles"]
+    required_fields = model["common_required_fields"]
+    missing = [field for field in required_fields if field not in fields]
+    if missing:
+        raise ValidationError(f"{path}: missing required fields: {', '.join(missing)}")
     if fields.get("okftype") not in profiles:
         raise ValidationError(f"{path}: okftype must be one of {sorted(profiles)}")
     if not isinstance(fields.get("title"), str) or not fields["title"].strip():

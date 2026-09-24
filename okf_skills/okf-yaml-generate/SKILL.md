@@ -47,8 +47,11 @@ Doxygen 仍按旧生成器合并为 canonical ID 和汇总的 `@archs`；不同�
 
 ## 总控流程
 
-1. 执行 `prepare`，解析范围、计算输入 hash、建立批次和 worker 任务包。
-   每个批次必须先由语义取证 agent 生成 `semantic-input.json`：为批次内每个文档提供哈希绑定的
+1. 执行 `prepare`。首先对本次选中的每个 Markdown 完成结构分类，确认其 `okftype` 已在
+   `config/document-profile-registry.yaml` 注册；同时检查注册表声明的公共字段和 Profile 字段
+   都有对应的代码生成能力和校验能力。任一文件无法分类、Profile 未注册、字段缺少生成器或校验器时，
+   `prepare` 立即中止，不建立可执行批次。随后计算输入 hash、建立批次和 worker 任务包。
+ 每个批次必须先由语义取证 agent 生成 `semantic-input.json`：为批次内每个文档提供哈希绑定的
    `description`、完整必需 `tag` 及其逐值 evidence、`dependencies`。description 必须来自已通过
    `okf-description-generate validate` 的结果；不能用 worker scaffold 代替。
 2. 目录超过 25 个文档时按最多 25 个一批；每波最多 6 个 worker。worker 只读证据并输出结果，
