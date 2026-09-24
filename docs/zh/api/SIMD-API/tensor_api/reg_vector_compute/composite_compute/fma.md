@@ -72,6 +72,8 @@ __simd_callee__ inline reg_tensor<T> fma(
 
 src0.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 
+`src0.mask`对应位置为`0`时，返回结果的对应元素置零。
+
 ## 调用示例
 
 以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，

@@ -81,8 +81,9 @@ __simd_callee__ inline reg_tensor<T> exp_diff(
 ## 约束说明
 
 - `src0.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
-- 输入为`half`时，mask按照输出`float`元素解释，应使用`all_mask<float>`、`make_mask<..., float>`或`update_mask<float>`生成。不要将mask设置成交替的奇偶位；源元素位置由`src_pos`选择。
-- 输入为`half`时必须传入`src_pos`；选择偶数位置时传入`ASC_POSITION_EVEN`。
+- 不带`src_pos`的重载仅支持`T`为`float`、`U`为`float`；带`src_pos`的重载仅支持`T`为`float`、`U`为`half`。
+- 输入为`half`时，mask按照输出`float`元素解释，应使用`all_mask<float>`、`make_mask<..., float>`或`update_mask<float>`生成；源元素位置由`src_pos`选择。
+- 输入为`half`时必须传入`src_pos`，且`src_pos`只能取`ASC_POSITION_EVEN`或`ASC_POSITION_ODD`。
 
 ## 调用示例
 

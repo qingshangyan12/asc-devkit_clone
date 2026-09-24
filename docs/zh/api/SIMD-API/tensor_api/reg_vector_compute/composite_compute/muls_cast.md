@@ -70,7 +70,7 @@ src和scalar的数据类型为float，返回值的元素类型为half。
 ## 约束说明
 
 - src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
-- `T`和`U`当前仅支持`half`和`float`的组合。
+- `T`必须为`half`，`U`必须为`float`。
 - `Layout`仅支持`cast_layout::zero`和`cast_layout::one`。
 
 ## 调用示例

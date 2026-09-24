@@ -82,11 +82,12 @@ dst和返回值的元素类型为uint16_t，src的元素类型为uint8_t。
 
 ## 约束说明
 
+- `options.half`只能取`histogram_half::low`或`histogram_half::high`，`options.mode`只能取`histogram_mode::frequency`或`histogram_mode::cumulative`。
 - src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与统计的元素位置错误。
 - `src.mask`只用于筛选参与统计的输入元素，不用于筛选返回值中的统计位置。返回值中的所有位置都会在`dst`原值的基础上更新。
-- 统计结果在`dst`原有数据的基础上累加。首次统计前需要初始化`dst`，多次调用时后一次结果累加到前一次结果中。
+- 统计结果在`dst`原有数据的基础上累加。调用前必须初始化`dst.reg`，多次调用时后一次结果累加到前一次结果中。返回值的`mask`继承`dst.mask`，将返回值用于`store`前需要通过`with_mask`设置`dst.mask`。
 - `dst`的元素类型为`uint16_t`，单个统计结果的最大值为65535。用户需要保证累加结果不超过该范围，否则会发生溢出。
-- 完整统计`[0, 255]`需要分别选择`low`和`high`，并使用两个目标寄存器保存结果。
+- 完整统计`[0, 255]`需要分别选择`low`和`high`，并使用两个独立的目标寄存器保存结果。
 - 非默认配置必须先定义具名的`constexpr histogram_options`，再作为模板实参传入。
 
 ## 调用示例
@@ -107,9 +108,10 @@ __simd_vf__ inline void histograms_example(
     auto src_mask = asc::te::experimental::all_mask<uint8_t>();
     auto dst_mask = asc::te::experimental::all_mask<uint16_t>();
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(src_mask);
-    auto initial = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
-    auto low = asc::te::experimental::histograms(initial, src);
-    auto high = asc::te::experimental::histograms<high_options>(initial, src);
+    auto initial_low = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
+    auto initial_high = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
+    auto low = asc::te::experimental::histograms(initial_low, src);
+    auto high = asc::te::experimental::histograms<high_options>(initial_high, src);
 
     asc::te::experimental::store(output, asc::te::make_coord(0), low);
     asc::te::experimental::store(output, asc::te::make_coord(1), high);
