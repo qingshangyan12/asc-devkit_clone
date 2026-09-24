@@ -185,7 +185,7 @@ aclError aclrtBinaryUnLoad(aclrtBinHandle binHandle)
     return ACL_SUCCESS;
 }
 
-aclError aclrtBinaryGetFunction(const aclrtBinHandle binHandle, const char* kernelName, aclrtFuncHandle* funcHandle)
+aclError aclrtBinaryGetFunction(const aclrtBinHandle binHandle, const char* kernelName, const void** funcHandle)
 {
     // AICPU模式直掉kernel函数, 不使用funcHandle, 桩函数直接返回成功
     HCCL_WARNING("[%s] not support.", __func__);
@@ -198,7 +198,7 @@ struct ArgsBuffer {
     uint64_t size;
 };
 
-aclError aclrtKernelArgsInit(aclrtFuncHandle funcHandle, aclrtArgsHandle* argsHandle)
+aclError aclrtKernelArgsInit(const void* funcHandle, aclrtArgsHandle* argsHandle)
 {
     if (argsHandle == nullptr) {
         HCCL_ERROR("[aclrtKernelArgsInit] invalid input argsHandle");
@@ -289,7 +289,7 @@ aclError aclrtBinaryLoadFromFile(const char* binPath, aclrtBinaryLoadOptions* op
 }
 
 aclError aclrtLaunchKernelWithConfig(
-    aclrtFuncHandle funcHandle, uint32_t numBlocks, aclrtStream stream, aclrtLaunchKernelCfg* cfg,
+    const void* funcHandle, uint32_t numBlocks, aclrtStream stream, aclrtLaunchKernelCfg* cfg,
     aclrtArgsHandle argsHandle, void* reserve)
 {
     if (argsHandle == nullptr || stream == nullptr) {
@@ -312,7 +312,7 @@ aclError aclrtLaunchKernelWithConfig(
 }
 
 aclError aclrtLaunchKernelWithHostArgs(
-    aclrtFuncHandle funcHandle, uint32_t blockDim, aclrtStream stream, aclrtLaunchKernelCfg* cfg, void* hostArgs,
+    const void* funcHandle, uint32_t blockDim, aclrtStream stream, aclrtLaunchKernelCfg* cfg, void* hostArgs,
     size_t argsSize, aclrtPlaceHolderInfo* placeHolderArray, size_t placeHolderNum)
 {
     HCCL_WARNING("[%s] not support.", __func__);

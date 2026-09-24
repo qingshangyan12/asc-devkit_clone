@@ -31,7 +31,7 @@ rtError_t rtKernelLaunchWithHandle(
 }
 
 aclError aclrtLaunchKernelWithConfig(
-    aclrtFuncHandle funcHandle, uint32_t numBlocks, aclrtStream stream, aclrtLaunchKernelCfg* cfg,
+    const void* funcHandle, uint32_t numBlocks, aclrtStream stream, aclrtLaunchKernelCfg* cfg,
     aclrtArgsHandle argsHandle, void* reserve)
 {
     return 0;
