@@ -46,7 +46,7 @@ bool __hbnex2(half2 x, half2 y)
 
 ## 返回值说明
 
-比较输入数据各分量是否均不相等的结果。任一输入为nan时返回false。
+比较输入数据各分量是否均不相等的结果（ordered-not-equal）。任一输入为nan时返回false；x、y为同号无穷（+inf与+inf、-inf与-inf）时返回false，异号无穷时对应分量结果为true。
 
 ## 约束说明
 

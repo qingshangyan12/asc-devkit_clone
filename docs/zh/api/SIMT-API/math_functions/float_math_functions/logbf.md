@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/math_functions.h"`。
 
-计算以2为底，输入数据的对数，并对结果向下取整，返回浮点数。
+返回输入数据x的绝对值的指数（unbiased exponent）：以浮点数形式返回将|x|表示为m × 2^e（1 ≤ m < 2）时的指数e。subnormal输入同样返回其真实指数（例如x为2^-149时，返回-149.0）。
 
 ![](../../../figures/zh-cn_formulaimage_0000002516816343.png)
 
@@ -47,7 +47,7 @@ inline float logbf(float x)
 
 ## 返回值说明
 
-以2为底的x的绝对值(|x|)的对数，并向下取整后的值。
+|x|的unbiased exponent（二进制指数）的浮点数表示。
 
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为inf。

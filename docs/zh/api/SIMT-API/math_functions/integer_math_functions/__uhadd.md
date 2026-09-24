@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/device_functions.h"`。
 
-获取uint32类型数据`x`和`y`的平均值，避免中间求和溢出。
+获取uint32类型数据`x`和`y`的平均值，等价于(x + y) >> 1，即奇数和向下取整的平均值，避免中间求和溢出。
 
 ![](../../../figures/zh-cn_formulaimage_0000002554985178.png)
 
