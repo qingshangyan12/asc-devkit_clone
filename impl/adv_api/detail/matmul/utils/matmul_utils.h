@@ -215,6 +215,11 @@ __aicore__ inline T CeilAlignT(T num1, T num2)
 }
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201))
+#if defined(USE_WORKSPACE) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+// Intra-block fixp event id, same value as VEC_WAIT_INTRA_Enum::WAIT_FIXP which is only declared in
+// the SSBUF-only header. The GM compatible mode uses it for the point-to-point AIC->AIV notify.
+constexpr uint16_t GM_WAIT_FIXP_ID = 1U;
+#endif
 template <class T, class U>
 __aicore__ inline void InitKfcClient(
     T& matmulClient, U* tiling, TPipe* tpipe, KfcCommClient* client, int instIdx, GM_ADDR workspace)

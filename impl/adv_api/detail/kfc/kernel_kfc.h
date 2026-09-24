@@ -208,6 +208,12 @@ public:
                         dcci(
                             reinterpret_cast<__gm__ int64_t*>(secondMsgStartPos), cache_line_t::SINGLE_CACHE_LINE,
                             dcci_dst_t::CACHELINE_OUT);
+                        // Both AIVs read their own SuperKernelWaitEventCnt after the quit ack, so the counter
+                        // buffer of the other AIV must be flushed as well, otherwise it may read a stale value.
+                        auto otherMsgStartPos = kfcCommSrv[(i + 1) % MIX_NUM].GetSecondBuffStart();
+                        dcci(
+                            reinterpret_cast<__gm__ int64_t*>(otherMsgStartPos), cache_line_t::SINGLE_CACHE_LINE,
+                            dcci_dst_t::CACHELINE_OUT);
                         SetFlag<HardEvent::S_MTE3>(EVENT_ID0);
                         WaitFlag<HardEvent::S_MTE3>(EVENT_ID0);
                         NotifyEvent<PIPE_MTE3>(KFC_SYNC_ID);
