@@ -19,6 +19,8 @@
 #include "external_alg_rules.h"
 
 namespace mc2_ops_hccl {
+constexpr u32 RANK_LEVEL_2 = 2;
+constexpr u32 RANK_LEVEL_4 = 4;
 
 template <
     typename AlgTopoMatch, typename InsRsAlgTemplateX, typename InsRsAlgTemplateY, typename InsRsAlgTemplateZ,
@@ -532,10 +534,10 @@ HcclResult InsV2AllReduceOmniPipeExecutor<
     double bw_rs_l1 = BW_OMNI_DEFAULT;
     double bw_rs_l2 = BW_OMNI_DEFAULT;
     if (resCtx.topoInfo.level0PcieMix) {
-        if (rankSizeLevel1_ == 2) {
+        if (rankSizeLevel1_ == RANK_LEVEL_2) {
             bw_ag_l1 = BW_OMNI_PCIE_EIGHT_AG_CLOS;
             bw_rs_l1 = BW_OMNI_PCIE_EIGHT_RS_CLOS;
-        } else if (rankSizeLevel1_ == 4) {
+        } else if (rankSizeLevel1_ == RANK_LEVEL_4) {
             bw_ag_l1 = BW_OMNI_PCIE_SIXTEEN_AG_CLOS;
             bw_rs_l1 = BW_OMNI_PCIE_SIXTEEN_RS_CLOS;
         }
