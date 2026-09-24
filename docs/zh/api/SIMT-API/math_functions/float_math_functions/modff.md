@@ -48,9 +48,9 @@ inline float modff(float x, float *n)
 
 输入参数的小数部分。
 
--   当x为nan时，返回值为nan。
--   当x为inf时，返回值为0。
--   当x为-inf时，返回值为0。
+-   当x为nan时，返回值为nan，n写入nan。
+-   当x为inf时，返回值为0，n写入inf。
+-   当x为-inf时，返回值为0，n写入-inf。
 
 ## 约束说明
 

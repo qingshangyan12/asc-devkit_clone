@@ -50,6 +50,7 @@ inline float roundf(float x)
 -   当x为nan时，返回值为nan。
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为-inf。
+-   半值输入远离0方向舍入，例如：roundf(0.5) = 1.0，roundf(-0.5) = -1.0。
 
 ## 约束说明
 

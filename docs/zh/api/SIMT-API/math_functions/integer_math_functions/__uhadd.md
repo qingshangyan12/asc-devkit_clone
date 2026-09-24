@@ -48,7 +48,7 @@ unsigned int __uhadd(unsigned int x, unsigned int y)
 
 ## 返回值说明
 
-输入数据的平均值。
+输入数据的平均值，等价于(x + y) >> 1，即奇数和向下取整的平均值，中间求和不会溢出。
 
 ## 约束说明
 
