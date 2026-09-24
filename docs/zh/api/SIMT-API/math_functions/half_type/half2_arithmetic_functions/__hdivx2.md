@@ -48,6 +48,8 @@ half2 __hdivx2(const half2 x, const half2 y)
 
 输入数据各分量相除的结果。本接口受全局饱和寄存器的影响，特殊值如下：
 
+表中±号表示：除法结果的符号遵循有符号除法规则，即结果符号为x分量符号与y分量符号的异或（同号得正、异号得负），例如+1/-0的结果为-inf；x、y均为±inf时结果为nan（不定式）。
+
 <table>
   <tr>
     <th>x分量</th>
@@ -106,7 +108,9 @@ half2 __hdivx2(const half2 x, const half2 y)
 
 ## 约束说明
 
-无
+<!-- npu="950" id7 -->
+针对Ascend 950PR&950DT系列产品，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
+<!-- end id7 -->
 
 ## 调用示例
 

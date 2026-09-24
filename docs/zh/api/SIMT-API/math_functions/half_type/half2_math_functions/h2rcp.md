@@ -47,12 +47,12 @@ inline half2 h2rcp(half2 x)
 
 ## 返回值说明
 
-输入数据各元素的倒数。本接口受全局饱和寄存器影响，特殊值如下：
+输入数据各元素的倒数，普通有限输入的结果按round-to-nearest-even模式舍入。本接口受全局饱和寄存器影响，特殊值如下：
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
 | 0 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| ASCRT\_MAX\_NORMAL\_FP16 | 1.52588e-05 | 1.52588e-05 |
 | -0 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 | nan | nan | 0 |
 | inf | 0 | 0 |

@@ -73,6 +73,36 @@ bool __hbltx2(half2 x, half2 y)
     <td>-inf</td>
     <td>false</td>
   </tr>
+  <tr>
+    <td>inf</td>
+    <td>有限值</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td>有限值</td>
+    <td>inf</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>有限值</td>
+    <td>-inf</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>有限值</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>inf</td>
+    <td>-inf</td>
+    <td>false</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>inf</td>
+    <td>true</td>
+  </tr>
 </table>
 
 ## 约束说明
