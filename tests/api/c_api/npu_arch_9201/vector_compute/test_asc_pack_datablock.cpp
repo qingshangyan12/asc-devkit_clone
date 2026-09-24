@@ -9,14 +9,14 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-#define TEST_PACK_DATABLOCK(type_name, type)                                                                     \
-    TEST(PackDatablock, type_name)                                                                                \
-    {                                                                                                             \
-        type dst;                                                                                                 \
-        type src;                                                                                                 \
-        MOCKER_CPP(vpackv2, void(type&, type)).times(1);                                                         \
-        asc_pack_datablock(dst, src);                                                                             \
-        GlobalMockObject::verify();                                                                               \
+#define TEST_PACK_DATABLOCK(type_name, type)             \
+    TEST(PackDatablock, type_name)                       \
+    {                                                    \
+        type dst;                                        \
+        type src;                                        \
+        MOCKER_CPP(vpackv2, void(type&, type)).times(1); \
+        asc_pack_datablock(dst, src);                    \
+        GlobalMockObject::verify();                      \
     }
 
 TEST_PACK_DATABLOCK(UInt16, vector_uint16_t);
