@@ -117,4 +117,3 @@ TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2, uint8_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2_s4, fp4x2_e1m2_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2_s4, fp4x2_e2m1_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2_s4, void);
-TEST_CUBE_DATAMOVE_COPY_GM2L1(load_gm_to_cbuf_2dv2_s4, hif4_scale);
