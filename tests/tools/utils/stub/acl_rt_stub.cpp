@@ -40,12 +40,12 @@ int64_t g_aclrtGetDeviceInfoVectorNum = 0;
 int aclrtMemcpy(void* dst, size_t destMax, const void* src, size_t count, aclrtMemcpyKind kind) { return 0; }
 
 int aclrtRegisterCpuFunc(
-    const aclrtBinHandle handle, const char* funcName, const char* kernelName, aclrtFuncHandle* funcHandle)
+    const aclrtBinHandle handle, const char* funcName, const char* kernelName, const void** funcHandle)
 {
     return 0;
 }
 
-int aclrtKernelArgsInit(aclrtFuncHandle funcHandle, aclrtArgsHandle* argsHandle) { return 0; }
+int aclrtKernelArgsInit(const void* funcHandle, aclrtArgsHandle* argsHandle) { return 0; }
 
 int aclrtKernelArgsAppend(aclrtArgsHandle argsHandle, void* param, size_t paramSize, aclrtParamHandle* paramHandle)
 {
@@ -62,7 +62,7 @@ int aclrtResetDevice(int32_t deviceId) { return 0; }
 
 int aclrtMalloc(void** devPtr, size_t size, aclrtMemMallocPolicy policy) { return 0; }
 
-int aclrtGetFunctionName(aclrtFuncHandle funcHandle, uint32_t maxLen, char* name) { return 0; }
+int aclrtGetFunctionName(const void* funcHandle, uint32_t maxLen, char* name) { return 0; }
 
 aclError aclrtRecordEvent(aclrtEvent event, aclrtStream stream)
 {
@@ -169,13 +169,13 @@ aclError aclrtMallocWithCfg(void** devPtr, size_t size, aclrtMemMallocPolicy pol
     return ACL_ERROR_NONE;
 }
 
-aclError aclrtBinaryGetFunction(const aclrtBinHandle binHandle, const char* kernelName, aclrtFuncHandle* funcHandle)
+aclError aclrtBinaryGetFunction(const aclrtBinHandle binHandle, const char* kernelName, const void** funcHandle)
 {
     return 0;
 }
 
 aclError aclrtLaunchKernelWithHostArgs(
-    aclrtFuncHandle funcHandle, uint32_t numBlocks, aclrtStream stream, aclrtLaunchKernelCfg* cfg, void* hostArgs,
+    const void* funcHandle, uint32_t numBlocks, aclrtStream stream, aclrtLaunchKernelCfg* cfg, void* hostArgs,
     size_t argsSize, aclrtPlaceHolderInfo* placeHolderArray, size_t placeHolderNum)
 {
     ++g_aclrtLaunchKernelWithHostArgsCallCount;
@@ -194,7 +194,7 @@ aclError aclrtLaunchKernelWithHostArgs(
 
 aclError aclmdlRICaptureThreadExchangeMode(aclmdlRICaptureMode* mode) { return 0; }
 
-aclError aclrtBinaryGetFunctionByEntry(const aclrtBinHandle binHandle, uint64_t entry, aclrtFuncHandle* funcHandle)
+aclError aclrtBinaryGetFunctionByEntry(const aclrtBinHandle binHandle, uint64_t entry, const void** funcHandle)
 {
     return 0;
 }
