@@ -1,6 +1,6 @@
 {
  "schema": "okf-index-meta/1",
- "source_commit": "a21fcbb8ceb713f889813a4e8e43a2af884314e4",
+ "source_commit": "8b3c244b6eb9f1c90fe4a0841f10586eb64b3dba",
  "taxonomy_sha256": "a973c3392bbc3d1b5ef56dde76000aada6cffbf555e1957f3891ddfe2bfc04ce",
  "gaps_sha256": "3274f294fd7c2785036e36584e6f0d4d2cf0d47383281bf050e7c33fc86b186f",
  "document_sha256": {

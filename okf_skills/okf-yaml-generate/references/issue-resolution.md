@@ -9,7 +9,7 @@
 
 ## 决定
 
-- `blank_field`：只把对应 YAML 字段或 namespace 置空。
+- `blank_field`：把对应 YAML 字段或 namespace 在 worker 工件中置空；渲染输出省略该字段或 namespace，不写空数组或空值。
 - `report_source_defect`：保留可确认 YAML，报告源问题，不改源文件。
 - `report_unresolved`：保留可确认 YAML，记录待人工处理。
 - `tool_change_required`：本轮不写入，报告需要修改生成器。

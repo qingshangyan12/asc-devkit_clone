@@ -42,6 +42,45 @@ def build_to_tmp() -> Path:
     return payload
 
 
+class EmptyTagGuardTest(unittest.TestCase):
+    def test_empty_tag_namespace_rejected_and_clean_doc_passes(self):
+        front_matter = (
+            "okftype: reference.api.cpp\n"
+            "title: {title}\n"
+            "resource: asc-devkit/docs/zh/api/SIMD-API/c_api/foo.md\n"
+            "description: 测试。\n"
+            "tag:\n"
+            "  - api_surfaces: [c_api]{extra_tag}\n"
+            "  - roles: [compute]\n"
+            "signature: []\n"
+            "dependencies: []\n"
+            "examples: []\n"
+            "timestamp: '2026-09-24'\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            doc = root / BASE / "foo.md"
+            doc.parent.mkdir(parents=True)
+            doc.write_text(
+                "---\n" + front_matter.format(title="foo", extra_tag="") + "---\n\n# foo\n",
+                encoding="utf-8",
+            )
+            errors: list[str] = []
+            documents, _ = build_index.load_raw_documents(root, errors)
+            self.assertEqual(errors, [])
+            self.assertEqual(documents[doc.relative_to(root).as_posix()]["tags"]["api_surfaces"], ["c_api"])
+
+            doc.write_text(
+                "---\n" + front_matter.format(title="foo", extra_tag="\n  - families: []") + "---\n\n# foo\n",
+                encoding="utf-8",
+            )
+            errors = []
+            build_index.load_raw_documents(root, errors)
+            self.assertTrue(
+                any("empty tag namespace rendered: families" in error for error in errors), errors
+            )
+
+
 class BuildTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

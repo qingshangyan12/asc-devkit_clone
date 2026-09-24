@@ -626,6 +626,56 @@ constexpr uint8_t ASC_SIZE = 16;
             self.assertIn("declaration:", rendered)
             self.assertNotIn("signature:", rendered)
 
+    def test_render_omits_empty_tag_namespaces(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = "docs/zh/api/SIMD-API/c_api/vector_compute/asc_add.md"
+            namespaces, values = module.taxonomy(ROOT / "taxonomy/releases/core-v9-frozen.json")
+            fields = {
+                "okftype": "reference.api.cpp",
+                "title": "asc_add",
+                "resource": f"asc-devkit/{path}",
+                "description": "矢量加法。",
+                "tag": [
+                    {"api_surfaces": ["c_api"]},
+                    {"roles": ["compute"]},
+                    {"families": []},
+                    {"operations": ["add"]},
+                    {"objects": []},
+                    {"execution_models": ["memory_vector"]},
+                    {"source_locations": []},
+                    {"destination_locations": []},
+                    {"traits": ["elementwise"]},
+                ],
+                "signature": [],
+                "dependencies": [],
+                "examples": [],
+                "headers": None,
+                "declaration": None,
+                "type_catalog": None,
+                "timestamp": "2026-09-24",
+            }
+            body = "# asc_add\n\n按元素相加的内存矢量加法运算。\n"
+            evidence = {
+                "api_surfaces:c_api": [{"source_path": path, "excerpt": path}],
+                "roles:compute": [{"source_path": path, "excerpt": "加法运算"}],
+                "operations:add": [{"source_path": path, "excerpt": "按元素相加"}],
+                "execution_models:memory_vector": [{"source_path": path, "excerpt": "内存矢量加法运算"}],
+                "traits:elementwise": [{"source_path": path, "excerpt": "按元素相加"}],
+            }
+            allowed_empty = {
+                "tag.families", "tag.objects", "tag.source_locations", "tag.destination_locations",
+            }
+            rendered = module.render_yaml(fields, namespaces, values, root, path, body, evidence, allowed_empty)
+            self.assertIn("api_surfaces: [c_api]", rendered)
+            self.assertIn("roles: [compute]", rendered)
+            self.assertIn("operations: [add]", rendered)
+            self.assertIn("execution_models: [memory_vector]", rendered)
+            self.assertIn("traits: [elementwise]", rendered)
+            for namespace in ("families", "objects", "source_locations", "destination_locations"):
+                self.assertNotIn(f"- {namespace}:", rendered, namespace)
+
     def test_prepare_worker_and_field_degradation(self):
         with tempfile.TemporaryDirectory() as temp:
             devkit = Path(temp) / "devkit"

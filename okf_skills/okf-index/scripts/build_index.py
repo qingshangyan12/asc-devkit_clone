@@ -105,6 +105,11 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
                     if ns not in namespaces:
                         errors.append(f"{rel}: unknown tag namespace {ns}")
                         continue
+                    if not values:
+                        # Reverse guard: inapplicable namespaces must be omitted, never
+                        # rendered as empty arrays (OKF 字段规范 / 最小标签集设计说明).
+                        errors.append(f"{rel}: empty tag namespace rendered: {ns}")
+                        continue
                     unknown = sorted(set(values) - tax_values.get(ns, set()))
                     if unknown:
                         errors.append(f"{rel}: tag {ns} values outside taxonomy: {unknown}")

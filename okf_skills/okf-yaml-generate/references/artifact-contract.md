@@ -35,8 +35,9 @@
 }
 ```
 
-每个文档只能由一个 worker 提交。`fields` 必须包含所有顶层字段；不能以缺键表示未知，未知值按
-字段规则写空。`dtype` 是含 `<dtype>` 的 `signature` 条目中的字符串数组，写入时与 `prototype_id` 同级渲染为
+每个文档只能由一个 worker 提交。`fields` 必须包含所有顶层字段（`tag` 键本身不得缺失），不能以缺键表示未知，
+未知值按字段规则写空；但 `tag` 数组按需生成：只包含有逐字证据的非空 namespace，无证据的 namespace 直接
+省略、不写空数组，降级信号由对应的 scaffold issue 携带。`dtype` 是含 `<dtype>` 的 `signature` 条目中的字符串数组，写入时与 `prototype_id` 同级渲染为
 单行数组，绝不位于根级或 Markdown 原型前的 YAML 围栏。证据必须带 source path 和逐字 excerpt。
 
 `fields.description` 不由 worker 或总控脚本生成。它必须来自同一文档、同一哈希且已通过
