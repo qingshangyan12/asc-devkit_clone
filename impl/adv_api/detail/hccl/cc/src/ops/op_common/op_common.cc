@@ -881,7 +881,7 @@ HcclResult HcclGetAlgRes(
         param.algTag);
     const bool useCannBridge =
         (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
-        (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV || param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+        (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV);
     if (useCannBridge) {
         AlgAttrs algAttrs = executor->GetAlgoMeta(std::string(param.algName));
         HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
