@@ -4,6 +4,7 @@
 
 -   [基础矢量算子](basic_vector_operator.md)：开发一个简单的Add矢量算子。
 -   [TBuf的使用](tbuf_usage.md)：在算子计算过程中使用临时空间存储运算的中间结果。
+-   [hifloat8_t数据类型算子实践](hifloat8_operator.md)：了解Ascend 950上hifloat8_t的硬件能力（数据搬运、矩阵乘、Fixpipe随路量化），并以SwiGLU激活算子为例，基于静态Tensor编程学习"反量化-计算-再量化"的开发模式、舍入模式选择和精度验证方法。
 -   [多核Tiling切分](multi_core_tiling/overview.md)：当算子需要多核并行计算或支持动态shape时，对输入数据进行切分、分块计算，并将不同数据块分配到多个AI Core上处理。
     -   [主块均分](multi_core_tiling/main_block_even_split.md)：算子在AI处理器的多个核上运行，所有核的计算数据量相等且32字节对齐。
     -   [尾块均分](multi_core_tiling/tail_block_even_split.md)：算子在AI处理器的多个核上运行，所有核的计算数据量相等，每个核上除最后一个数据块（尾块）外，其余数据块的数据量相等，每个核都需要处理尾块数据的计算。
