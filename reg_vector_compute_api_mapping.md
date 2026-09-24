@@ -12,56 +12,56 @@
 
 | 基础 API 类别 | 基础 API 接口名称 | 基础 API 支持的数据类型 | Tensor API 接口名称 | Tensor API 支持的数据类型 | Tensor API 对标能力 |
 | --- | --- | --- | --- | --- | --- |
-| basic_arithmetic | `Abs` | `int8_t`、`int16_t`、`half`、`int32_t`、`float`、`int64_t`；`complex32→half`、`complex64→float` | `abs` | `int8_t`、`int16_t`、`half`、`int32_t`、`float` | 部分对标：逐元素绝对值；数据类型缺少：`int64_t`和复数模值形式。 |
-| basic_arithmetic | `Add` | 普通结果：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64`；带进位：`int32_t`、`uint32_t` | `operator+`；`addc`（带进位） | `operator+`：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`；`addc`：`int32_t`、`uint32_t` | 部分对标：普通加法和输出进位均有对应实现；普通加法数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`。`addc`还支持输入进位。 |
+| basic_arithmetic | `Abs` | `int8_t`、`int16_t`、`half`、`int32_t`、`float`、`int64_t`；`complex32→half`、`complex64→float` | `abs` | `int8_t`、`int16_t`、`half`、`int32_t`、`float` | 数据类型缺少：`int64_t`、`complex32→half`、`complex64→float`。 |
+| basic_arithmetic | `Add` | 普通结果：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64`；带进位：`int32_t`、`uint32_t` | `operator+`；`addc`（带进位） | `operator+`：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`；`addc`：`int32_t`、`uint32_t` | 普通加法数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`；普通加法模式缺少：merging mode。 |
 | basic_arithmetic | `AddC` | `int32_t`、`uint32_t` | `addc` | `int32_t`、`uint32_t` | 完整对标：均支持输入进位并返回结果与输出进位。 |
-| basic_arithmetic | `Adds` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64` | `operator+`（reg_tensor与标量） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 部分对标：覆盖矢量与标量加法，数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`。 |
-| basic_arithmetic | `Div` | 依算法模式：`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64`；高精度模式为`half/float/complex64`子集 | `operator/` | `int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` | 部分对标：逐元素除法；无Basic API算法模式，且数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
-| basic_arithmetic | `Exp` | `half`、`float` | `exp` | `half`、`float` | 部分对标：数学运算和类型对应，但Tensor API无算法精度及FTZ/Subnormal模板模式。 |
+| basic_arithmetic | `Adds` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64` | `operator+`（reg_tensor与标量） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`；模式缺少：merging mode。 |
+| basic_arithmetic | `Div` | 依算法模式：`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64`；高精度模式为`half/float/complex64`子集 | `operator/` | `int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`complex32`、`int64_t`、`uint64_t`、`complex64`；模式缺少：不同算法模式。 |
+| basic_arithmetic | `Exp` | `half`、`float` | `exp` | `half`、`float` | 模式缺少：不同算法模式。 |
 | basic_arithmetic | `LeakyRelu` | `half`、`float` | `leaky_relu` | `half`、`float` | 完整对标。 |
-| basic_arithmetic | `Ln` | `half`、`float` | `log` | `half`、`float` | 部分对标：均计算自然对数，但Tensor API无算法精度及FTZ/Subnormal模板模式。 |
-| basic_arithmetic | `Log` | `half`、`float` | `log` | `half`、`float` | 部分对标：Basic API的`Log`与`Ln`等价，但Tensor API无算法精度及FTZ/Subnormal模板模式。 |
-| basic_arithmetic | `Log10` | `half`、`float` | `log10` | `half`、`float` | 部分对标：数学运算和类型对应，但Tensor API无算法精度及FTZ/Subnormal模板模式。 |
-| basic_arithmetic | `Log2` | `half`、`float` | `log2` | `half`、`float` | 部分对标：数学运算和类型对应，但Tensor API无算法精度及FTZ/Subnormal模板模式。 |
-| basic_arithmetic | `Max` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` | `max`（reg_tensor与reg_tensor） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
-| basic_arithmetic | `Maxs` | 同`Max` | `max`（reg_tensor与标量） | 同Tensor API `max` | 部分对标：覆盖矢量与标量求最大值；Tensor `max`数据类型缺少：`int64_t`、`uint64_t`。 |
-| basic_arithmetic | `Min` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` | `min`（reg_tensor与reg_tensor） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
-| basic_arithmetic | `Mins` | 同`Min` | `min`（reg_tensor与标量） | 同Tensor API `min` | 部分对标：覆盖矢量与标量求最小值；Tensor `min`数据类型缺少：`int64_t`、`uint64_t`。 |
-| basic_arithmetic | `Mul` | `int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64` | `operator*`（reg_tensor与reg_tensor） | `int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 部分对标：数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`。 |
+| basic_arithmetic | `Ln` | `half`、`float` | `log` | `half`、`float` | 模式缺少：不同算法模式。 |
+| basic_arithmetic | `Log` | `half`、`float` | `log` | `half`、`float` | 模式缺少：不同算法模式。 |
+| basic_arithmetic | `Log10` | `half`、`float` | `log10` | `half`、`float` | 模式缺少：不同算法模式。 |
+| basic_arithmetic | `Log2` | `half`、`float` | `log2` | `half`、`float` | 模式缺少：不同算法模式。 |
+| basic_arithmetic | `Max` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` | `max`（reg_tensor与reg_tensor） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`int64_t`、`uint64_t`；模式缺少：merging mode。 |
+| basic_arithmetic | `Maxs` | 同`Max` | `max`（reg_tensor与标量） | 同Tensor API `max` | 数据类型缺少：`int64_t`、`uint64_t`；模式缺少：merging mode。 |
+| basic_arithmetic | `Min` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` | `min`（reg_tensor与reg_tensor） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`int64_t`、`uint64_t`；模式缺少：merging mode。 |
+| basic_arithmetic | `Mins` | 同`Min` | `min`（reg_tensor与标量） | 同Tensor API `min` | 数据类型缺少：`int64_t`、`uint64_t`；模式缺少：merging mode。 |
+| basic_arithmetic | `Mul` | `int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64` | `operator*`（reg_tensor与reg_tensor） | `int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`。 |
 | basic_arithmetic | `Mull` | `int32_t`、`uint32_t` | `mull` | `int32_t`、`uint32_t` | 完整对标：返回乘积高、低32位寄存器。 |
-| basic_arithmetic | `Muls` | `int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64` | `operator*`（reg_tensor与标量） | `int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` | 部分对标：数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`。 |
-| basic_arithmetic | `Neg` | `int8_t`、`int16_t`、`half`、`int32_t`、`float`、`int64_t` | 无 | — | 无直接对标：Tensor API仅文档化二元`operator-`，没有一元取负接口。 |
+| basic_arithmetic | `Muls` | `int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64` | `operator*`（reg_tensor与标量） | `int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`。 |
+| basic_arithmetic | `Neg` | `int8_t`、`int16_t`、`half`、`int32_t`、`float`、`int64_t` | 无 | — | 未支持 |
 | basic_arithmetic | `Prelu` | `half`、`float` | `prelu` | `half`、`float` | 完整对标。 |
-| basic_arithmetic | `Relu` | `half`、`int32_t`、`float`、`int64_t` | `relu` | `half`、`int32_t`、`float` | 部分对标：数据类型缺少：`int64_t`。 |
-| basic_arithmetic | `Sqrt` | `half`、`float` | `sqrt` | `half`、`float` | 部分对标：数学运算和类型对应，但Tensor API无0/1ulp算法、快速求逆及FTZ/Subnormal模板模式。 |
-| basic_arithmetic | `Sub` | 普通结果：与`Add`普通结果相同；带借位：`int32_t`、`uint32_t` | `operator-`；`subc`（带借位） | `operator-`：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`；`subc`：`int32_t`、`uint32_t` | 部分对标：普通减法和输出借位均有对应实现；普通减法数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`。 |
+| basic_arithmetic | `Relu` | `half`、`int32_t`、`float`、`int64_t` | `relu` | `half`、`int32_t`、`float` | 数据类型缺少：`int64_t`。 |
+| basic_arithmetic | `Sqrt` | `half`、`float` | `sqrt` | `half`、`float` | 模式缺少：不同算法模式。 |
+| basic_arithmetic | `Sub` | 普通结果：与`Add`普通结果相同；带借位：`int32_t`、`uint32_t` | `operator-`；`subc`（带借位） | `operator-`：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`；`subc`：`int32_t`、`uint32_t` | 普通减法数据类型缺少：`complex32`、`complex64`、`int64_t`、`uint64_t`。 |
 | basic_arithmetic | `SubC` | `int32_t`、`uint32_t` | `subc` | `int32_t`、`uint32_t` | 完整对标：均支持输入借位并返回结果与借位。 |
-| compare_and_select | `Compare` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`；输出Mask | `operator_compare`（`== != < <= > >=`） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`；返回`reg_tensor<bool>` | 部分对标：覆盖寄存器间比较，数据类型缺少：`int64_t`、`uint64_t`。 |
-| compare_and_select | `Compares` | 同`Compare`，第二操作数为标量 | `operator_compare`（reg_tensor与标量） | 同Tensor API `operator_compare` | 部分对标：覆盖标量比较，数据类型缺少：`int64_t`、`uint64_t`。 |
-| compare_and_select | `Select` | `bool`、8/16/32/64位有符号与无符号整数、`half`、`bfloat16_t`、`float` | `select` | `bool`、`int8_t`、`uint8_t`、`fp8_e4m3fn_t`、`hifloat8_t`、`fp8_e5m2_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 部分对标：按mask选择语义一致；数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
-| compare_and_select | `Squeeze` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` | 无 | — | 无直接对标。 |
-| composite_compute | `AbsSub` | `half`、`float`、`int64_t` | 无 | — | 无直接对标；可由减法与绝对值组合，但不等价于单接口。 |
-| composite_compute | `Axpy` | `half`、`float`、`int64_t`、`uint64_t` | 无 | — | 无直接对标；可组合乘法和加法，非融合接口。 |
-| composite_compute | `ExpSub` | `half→float`、`float→float` | 无 | — | 无直接对标；可组合减法和指数，非融合接口。 |
-| composite_compute | `MulAddDst` | `int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` | 无 | — | 无直接对标；Tensor API无对应融合累加接口。 |
-| composite_compute | `MulDstAdd` | `half×half→float`、`bfloat16_t→bfloat16_t`、`float→float` | 无 | — | 无直接对标。 |
-| composite_compute | `MulsCast` | `float×float→half` | 无 | — | 无直接对标。 |
-| data_compression | `Pack` | `int16_t/uint16_t→uint8_t`、`int32_t/uint32_t→uint16_t`、`int64_t/uint64_t→uint32_t` | `store<store_sideband_mode::pack>` | `int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`half`、`bfloat16_t`、`float` | 部分对标：Basic支持`int16_t/uint16_t→uint8_t`、`int32_t/uint32_t→uint16_t`、`int64_t/uint64_t→uint32_t`；Tensor `pack`支持`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`及浮点，但未按Basic源→目的映射逐项暴露。 |
-| data_compression | `UnPack` | `int8_t→int16_t`、`uint8_t→uint16_t`、`int16_t→int32_t`、`uint16_t→uint32_t`、`int32_t→int64_t`、`uint32_t→uint64_t` | `load<load_sideband_mode::unpack>` | 8/16/32bit元素类型（含整数、浮点和打包4bit类型） | 部分对标：Basic支持`int8_t→int16_t`、`uint8_t→uint16_t`、`int16_t→int32_t`、`uint16_t→uint32_t`、`int32_t→int64_t`、`uint32_t→uint64_t`；Tensor `unpack`为搬入展开，数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
-| data_compression | `Unsqueeze` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t` | 无 | — | 无直接对标。`load`的upsample是搬入时重复元素，语义不等同。 |
-| data_padding | `Duplicate` | `bool`、4/8位小数类型、8/16/32/64位整数、`half`、`bfloat16_t`、`float`、`complex32/64` | `fill` | `int8_t`、`uint8_t`、FP8类、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 部分对标：均以标量填充寄存器；Tensor API数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
-| data_reorder | `DeInterleave` | `bool`、8/16/32/64位整数、`half`、`bfloat16_t`、`float` | `deinterleave` | `int8_t`、`uint8_t`、FP8/HIFLOAT8、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 部分对标：数据解交织语义一致；Tensor数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
-| data_reorder | `Interleave` | 同Basic API `DeInterleave` | `interleave` | 同Tensor API `deinterleave` | 部分对标：数据交织语义一致；Tensor数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
-| histogram_compute | `Histograms` | `uint8_t→uint16_t` | 无 | — | 无直接对标。 |
-| index_operations | `Arange` | `int8_t`、`int16_t`、`int32_t`、`half`、`float`、`int64_t` | 无 | — | 无直接对标。 |
-| logical_compute | `And` | `bool`、8/16/32/64位有符号与无符号整数 | `operator&` | `bool`、8/16/32位有符号与无符号整数 | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
+| compare_and_select | `Compare` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`；输出Mask | `operator_compare`（`== != < <= > >=`） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`；返回`reg_tensor<bool>` | 数据类型缺少：`int64_t`、`uint64_t`。 |
+| compare_and_select | `Compares` | 同`Compare`，第二操作数为标量 | `operator_compare`（reg_tensor与标量） | 数据类型缺少：`int64_t`、`uint64_t`。 |
+| compare_and_select | `Select` | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float` | `select` | `bool`、`int8_t`、`uint8_t`、`fp8_e4m3fn_t`、`hifloat8_t`、`fp8_e5m2_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`int64_t`、`uint64_t`；数据类型多了：`fp8_e4m3fn_t`、`hifloat8_t`、`fp8_e5m2_t`。 |
+| compare_and_select | `Squeeze` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` | 无 | — | 未支持。 |
+| composite_compute | `AbsSub` | `half`、`float`、`int64_t` | 无 | — | 未支持。 |
+| composite_compute | `Axpy` | `half`、`float`、`int64_t`、`uint64_t` | 无 | — | 未支持。 |
+| composite_compute | `ExpSub` | `half→float`、`float→float` | 无 | — | 未支持。 |
+| composite_compute | `MulAddDst` | `int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` | 未支持。 |
+| composite_compute | `MulDstAdd` | `half×half→float`、`bfloat16_t→bfloat16_t`、`float→float` | 无 | — | 未支持。 |
+| composite_compute | `MulsCast` | `float×float→half` | 无 | — | 未支持。 |
+| data_compression | `Pack` | `int16_t/uint16_t→uint8_t`、`int32_t/uint32_t→uint16_t`、`int64_t/uint64_t→uint32_t` | 无 | — | 未支持 |
+| data_compression | `UnPack` | `int8_t→int16_t`、`uint8_t→uint16_t`、`int16_t→int32_t`、`uint16_t→uint32_t`、`int32_t→int64_t`、`uint32_t→uint64_t` | 无 | — | 未支持。 |
+| data_compression | `Unsqueeze` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t` | 无 | — | 未支持。 |
+| data_padding | `Duplicate` | `bool`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`complex32`、`int64_t`、`uint64_t`、`complex64` | `fill` | `int8_t`、`uint8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`complex32`、`int64_t`、`uint64_t`、`complex64`。 |
+| data_reorder | `DeInterleave` | ``bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float` | `deinterleave` | `int8_t`、`uint8_t`、FP8/HIFLOAT8、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` | 数据类型缺少：`int64_t`、`uint64_t`。 |
+| data_reorder | `Interleave` | 同Basic API `DeInterleave` | `interleave` | 同Tensor API `deinterleave` | 数据类型缺少：`int64_t`、`uint64_t`。 |
+| histogram_compute | `Histograms` | `uint8_t→uint16_t` | 无 | — | 未支持。 |
+| index_operations | `Arange` | `int8_t`、`int16_t`、`int32_t`、`half`、`float`、`int64_t` | 无 | — | 未支持。 |
+| logical_compute | `And` | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t` | `operator&` | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
 | logical_compute | `Not` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t` | `operator!` | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float` | 部分对标：均按二进制编码逐位取反；数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
-| logical_compute | `Or` | `bool`、8/16/32/64位有符号与无符号整数 | `operator or`（按位或） | `bool`、8/16/32位有符号与无符号整数 | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
-| logical_compute | `ShiftLeft` | 数据：8/16/32/64位有符号与无符号整数；寄存器移位量为匹配位宽的有符号整数 | `operator<<`（寄存器移位） | 数据：8/16/32位有符号与无符号整数；移位量：对应`reg_tensor<int8_t/int16_t/int32_t>` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
-| logical_compute | `ShiftLefts` | 数据：8/16/32/64位有符号与无符号整数；标量移位量`int16_t` | `operator<<`（标量移位） | 数据：8/16/32位有符号与无符号整数；移位量`int16_t` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
-| logical_compute | `ShiftRight` | 数据：8/16/32/64位有符号与无符号整数；寄存器移位量为匹配位宽的有符号整数 | `operator>>`（寄存器移位） | 数据：8/16/32位有符号与无符号整数；移位量：对应`reg_tensor<int8_t/int16_t/int32_t>` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
-| logical_compute | `ShiftRights` | 数据：8/16/32/64位有符号与无符号整数；标量移位量`int16_t` | `operator>>`（标量移位） | 数据：8/16/32位有符号与无符号整数；移位量`int16_t` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
-| logical_compute | `Xor` | `bool`、8/16/32/64位有符号与无符号整数 | `operator^` | `bool`、8/16/32位有符号与无符号整数 | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
+| logical_compute | `Or` | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t` | `operator or`（按位或） | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
+| logical_compute | `ShiftLeft` | 数据：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`；寄存器移位量：`int8_t`、`int16_t`、`int32_t`、`int64_t` | `operator<<`（寄存器移位） | 数据：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`；移位量：`reg_tensor<int8_t>`、`reg_tensor<int16_t>`、`reg_tensor<int32_t>` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
+| logical_compute | `ShiftLefts` | 数据：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`；标量移位量：`int16_t` | `operator<<`（标量移位） | 数据：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`；移位量：`int16_t` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
+| logical_compute | `ShiftRight` | 数据：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`；寄存器移位量：`int8_t`、`int16_t`、`int32_t`、`int64_t` | `operator>>`（寄存器移位） | 数据：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`；移位量：`reg_tensor<int8_t>`、`reg_tensor<int16_t>`、`reg_tensor<int32_t>` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
+| logical_compute | `ShiftRights` | 数据：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`；标量移位量：`int16_t` | `operator>>`（标量移位） | 数据：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`；移位量：`int16_t` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
+| logical_compute | `Xor` | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t` | `operator^` | `bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t` | 部分对标：数据类型缺少：`int64_t`、`uint64_t`。 |
 | MaskReg_compute | `DeInterleave` | `b8`、`b16`、`b32` | `deinterleave`（掩码） | `DataType`分组支持`b8`、`b16`、`b32`；数据为`reg_tensor<bool>` | 完整对标。 |
 | MaskReg_compute | `Interleave` | `b8`、`b16`、`b32` | `interleave`（掩码） | `DataType`分组支持`b8`、`b16`、`b32`；数据为`reg_tensor<bool>` | 完整对标。 |
 | MaskReg_compute | `Move` | Mask寄存器（文档未按元素类型区分） | `reg_tensor<bool>`赋值/传递，无独立接口页 | `bool` | 部分对标：可通过对象赋值表达，但Tensor API无同名公开计算接口。 |
@@ -70,28 +70,28 @@
 | MaskReg_compute | `Select` | Mask寄存器（文档未按元素类型区分） | `select` | 条件为`reg_tensor<bool>`；数据类型见compare_and_select的`select` | 部分对标：可按`reg_tensor<bool>`选择数据；Basic MaskReg版无直接等价物，且Tensor `select`数据类型缺少：`int64_t`、`uint64_t`，新增`fp8_e4m3fn_t`、`fp8_e5m2_t`、`hifloat8_t`。 |
 | MaskReg_compute | `UnPack` | Mask寄存器（文档未按元素类型区分） | 无 | — | 无直接对标。 |
 | reduction_compute | `PairReduceElem` | `half`、`float` | 无 | — | 无直接对标。 |
-| reduction_compute | `Reduce` | 求和：`half→half`、`int16_t→int32_t`、`uint16_t→uint32_t`、32/64位同型、`float`；最大/最小：16/32/64位整数、`half`、`float`同型 | 无 | — | 无直接对标。 |
-| reduction_compute | `ReduceDataBlock` | 求和：`half→half`、`int16_t→int32_t`、`uint16_t→uint32_t`、32位同型、`float`；最大/最小：16/32位整数、`half`、`float`同型 | 无 | — | 无直接对标。 |
+| reduction_compute | `Reduce` | 求和：`half→half`、`int16_t→int32_t`、`uint16_t→uint32_t`、`int32_t→int32_t`、`uint32_t→uint32_t`、`float→float`、`int64_t→int64_t`、`uint64_t→uint64_t`；最大/最小：`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`同型 | 无 | — | 无直接对标。 |
+| reduction_compute | `ReduceDataBlock` | 求和：`half→half`、`int32_t→int32_t`、`int16_t→int32_t`、`uint32_t→uint32_t`、`uint16_t→uint32_t`、`float→float`；最大/最小：`half`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`float`同型 | 无 | — | 无直接对标。 |
 | reg_data_load | `GatherB`（离散搬入） | 数据`b8/b16/b32/b64`；索引`uint32_t` | 无 | — | 无直接对标。 |
-| reg_data_load | `Gather`（离散搬入） | 数据为8/16/32/64位整数、`half`、`bfloat16_t`、`float`（部分8位源扩展到16位）；索引`uint16_t/uint32_t/uint64_t` | 无 | — | 无直接对标。 |
+| reg_data_load | `Gather`（离散搬入） | 数据为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float`（部分8位源扩展到16位）；索引`uint16_t/uint32_t/uint64_t` | 无 | — | 无直接对标。 |
 | reg_data_load | `Load` | 单寄存器`b8/b16/b32/b64`；双寄存器`complex32/b64` | `load<direct>` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float`、HIFLOAT8/FP8/4bit打包类型 | 部分对标：均从UB连续搬入；Basic `Load`允许非32字节对齐，Tensor `load<direct>`要求32字节对齐，且不支持双寄存器复数形式。 |
-| reg_data_load | `LoadAlign`（连续对齐搬入） | 单寄存器`b8/b16/b32/b64`；双寄存器`complex32/b64` | `load<direct>` | 同上 | 部分对标：连续对齐搬入能力对应；Tensor API数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
+| reg_data_load | `LoadAlign`（连续对齐搬入） | 单寄存器`b8/b16/b32/b64`；双寄存器`complex32/b64` | `load<direct>` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t` | 部分对标：连续对齐搬入能力对应；Tensor API数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
 | reg_data_load | `LoadAlign`（MaskReg搬入） | 源`b8/b16/b32/b64` | 无 | — | 无直接对标。 |
-| reg_data_load | `LoadAlign`（非连续对齐搬入） | `b8/b16/b32` | `load`的`downsample/unpack/unpack4/upsample`模式（视步长语义） | 按模式支持8/16/32bit元素及部分低精度类型 | 部分对标：Tensor仅提供`downsample`、`unpack`、`unpack4`、`upsample`固定排列，数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
+| reg_data_load | `LoadAlign`（非连续对齐搬入） | `b8/b16/b32` | `load`的`downsample/unpack/unpack4/upsample`模式（视步长语义） | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`（具体由模式限制） | 部分对标：Tensor仅提供`downsample`、`unpack`、`unpack4`、`upsample`固定排列，数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
 | reg_data_load | `LoadUnAlign`（连续非对齐搬入） | 单寄存器`b8/b16/b32/b64`；双寄存器`complex32/b64` | 无 | — | 无直接对标：Tensor API `load`要求其模式规定的地址对齐。 |
 | reg_data_load | `MaskGenWithRegTensor`（MaskReg搬入） | 源`b16/b32` | 无 | — | 无直接对标。 |
-| reg_data_load | `Move` | `bool`、8/16/32/64位整数、`half`、`bfloat16_t`、`float` | `reg_tensor`赋值/传递，无独立接口页 | 取决于`reg_tensor<T>` | 部分对标：可由Tensor对象赋值表达，但无同名公开搬运接口。 |
-| reg_data_store | `Scatter`（离散搬出） | 数据为8/16/32/64位整数、`half`、`bfloat16_t`、`float`；索引`uint16_t/uint32_t/uint64_t` | 无 | — | 无直接对标。 |
+| reg_data_load | `Move` | ``bool`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float` | `reg_tensor`赋值/传递，无独立接口页 | 取决于`reg_tensor<T>` | 部分对标：可由Tensor对象赋值表达，但无同名公开搬运接口。 |
+| reg_data_store | `Scatter`（离散搬出） | 数据为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float`；索引`uint16_t/uint32_t/uint64_t` | 无 | — | 无直接对标。 |
 | reg_data_store | `Store` | 单寄存器`b8/b16/b32/b64`；双寄存器`complex32/b64` | `store<direct>` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、HIFLOAT8/FP8/4bit打包类型 | 部分对标：均连续搬出到UB Tensor；Tensor API不含64位和双寄存器复数，且遵循Tensor布局/对齐约束。 |
-| reg_data_store | `StoreAlign`（连续对齐搬出） | 单寄存器`b8/b16/b32/b64`；双寄存器`complex32/b64` | `store<direct>` | 同上 | 部分对标：连续对齐搬出对应；Tensor API数据类型缺少：`int64_t`、`uint64_t`及双寄存器`complex32`/`b64`形式。 |
+| reg_data_store | `StoreAlign`（连续对齐搬出） | 单寄存器`b8/b16/b32/b64`；双寄存器`complex32/b64` | `store<direct>` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t` | 部分对标：连续对齐搬出对应；Tensor API数据类型缺少：`int64_t`、`uint64_t`及双寄存器`complex32`/`b64`形式。 |
 | reg_data_store | `StoreAlign`（MaskReg搬出） | 目的`b8/b16/b32/b64` | 无 | — | 无直接对标。 |
-| reg_data_store | `StoreAlign`（非连续对齐搬出） | `b8/b16/b32` | `store`的`store_1st/intlv/pack/pack_quarter`模式（视布局语义） | 按模式支持8/16/32/64bit中的子集及部分浮点/低精度类型 | 部分对标：Tensor仅提供`store_1st`、`intlv`、`pack`、`pack_quarter`固定模式，数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
+| reg_data_store | `StoreAlign`（非连续对齐搬出） | `b8/b16/b32` | `store`的`store_1st/intlv/pack/pack_quarter`模式（视布局语义） | `direct/store_1st`：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`；`intlv`：除`float`外的上述类型；`pack`：`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`half`、`float`；`pack_quarter`：`int32_t`、`uint32_t`、`float` | 部分对标：Tensor仅提供`store_1st`、`intlv`、`pack`、`pack_quarter`固定模式，数据类型缺少：请参见该行Basic/Tensor类型列逐项比对。 |
 | reg_data_store | `StoreUnAlign`（连续非对齐搬出） | 单寄存器`b8/b16/b32/b64`；双寄存器`complex32/b64` | 无 | — | 无直接对标。 |
 | reg_data_store | `StoreUnAlign`（MaskReg非对齐搬出） | 目的`b16/b32` | 无 | — | 无直接对标。 |
 | scatter_operations | `Gather` | 数据`b8/b16/b32`；索引`uint8_t/uint16_t/uint32_t` | 无 | — | 无直接对标。 |
 | sync_control | `LocalMemBar` | 无数据类型 | 无 | — | 无直接对标。 |
 | system_variable_access | `ClearSpr` | 无数据类型 | 无 | — | 无直接对标。 |
-| type_conversion | `Cast` | 文档列出的完整源→目的矩阵，覆盖4/8位低精度、8/16/32/64位整数、`half`、`bfloat16_t`、`float` | `cast` | 完整配置表覆盖上述大部分类型，并按`layout_mode`、`round_mode`、`saturation_mode`约束组合 | 部分对标：核心类型转换、舍入、饱和及布局能力对应；两侧合法类型对和模式组合并非完全相同，应按Tensor `cast`完整配置表迁移。 |
+| type_conversion | `Cast` | 文档列出的完整源→目的矩阵，覆盖4/8位低精度、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float` | `cast` | 完整配置表覆盖上述大部分类型，并按`layout_mode`、`round_mode`、`saturation_mode`约束组合 | 部分对标：核心类型转换、舍入、饱和及布局能力对应；两侧合法类型对和模式组合并非完全相同，应按Tensor `cast`完整配置表迁移。 |
 | type_conversion | `Truncate` | `half`、`bfloat16_t`、`float` | `trunc` | `half`、`bfloat16_t`、`float` | 部分对标：默认向零截断及类型对应，但Tensor API没有Basic API的可选舍入模板模式。 |
 | vf_call | `asc_vf_call` | 无固定数据类型（由被调用VF签名决定） | 无 | — | 无直接对标。 |
 
@@ -208,6 +208,18 @@ Tensor API目录没有`LocalMemBar`对标接口，因此这些同步范围不能
 
 **结论：** Basic API的优势主要是64位整数、复数、MaskReg专用操作、归约/离散搬运及精细的模式参数；Tensor API的优势主要是FP8/HIFLOAT8/FP4/INT4等低精度类型的Tensor化搬运、布局转换和类型转换。两者共有的整数、`half`、`float`、`bfloat16_t`能力仍需结合模式、舍入、饱和、对齐和mask语义判断，不能仅依据接口名称或数据类型名称认定完全等价。
 
+## 重点能力统计
 
+以下统计以基础 API 接口文档中“数据类型”和“参数说明”明确声明的支持范围为准，按接口去重；仅在示例代码或说明文字中偶然出现的类型不计入。
 
+| 能力 | 数量 | 基础 API 接口 | 统计口径 |
+| --- | ---: | --- | --- |
+| 支持 `b64`（包括`int64_t`、`uint64_t`） | 43 | `Abs`、`Add`、`Adds`、`Div`、`Max`、`Maxs`、`Min`、`Mins`、`Mul`、`Muls`、`Neg`、`Relu`、`Sub`、`Compare`、`Compares`、`Select`、`AbsSub`、`Axpy`、`MulAddDst`、`Pack`、`UnPack`、`Duplicate`、`DeInterleave`、`Interleave`、`Arange`、`And`、`Not`、`Or`、`ShiftLeft`、`ShiftLefts`、`ShiftRight`、`ShiftRights`、`Xor`、`Reduce`、`Gather`（离散搬入）、`Load`、`LoadAlign`（连续对齐搬入）、`Move`、`Scatter`（离散搬出）、`StoreAlign`（连续对齐搬出）、`StoreAlign`（非连续对齐搬出）、`Cast` | 按基础 API 主表逐行统计：凡数据类型或源→目的类型组合明确包含`int64_t`或`uint64_t`，均计入需要支持`b64`的接口；显式`b64`位宽搬运接口也属于该范围。 |
+| 支持复数 | 14 | `Abs`、`Add`、`Adds`、`Div`、`Mul`、`Muls`、`Sub`、`Duplicate`、`Load`、`LoadAlign`（连续对齐搬入）、`LoadUnAlign`（连续非对齐搬入）、`Store`、`StoreAlign`（连续对齐搬出）、`StoreUnAlign`（连续非对齐搬出） | 文档明确列出`complex32`或`complex64`；`Abs`为`complex32→half`、`complex64→float`，搬运接口为双寄存器复数形式。 |
+| 支持 `MERGING` 模式 | 5 | `Add`、`Max`、`Min`、`Duplicate`、`Move` | 文档明确说明mask未选中元素保留`dstReg`原值；其中`Move`仅支持`MERGING`，`ZEROING`不支持。其他带`MaskMergeMode`的接口文档均明确写明`MERGING`当前不支持。 |
 
+### 统计注意事项
+
+- `b64`统计的是文档声明的接口能力，不等同于所有重载都支持`b64`；例如`Load/Store`的双寄存器或`RegTraitNumTwo`重载有额外限制。
+- 复数统计区分计算结果类型和搬运表示：计算接口可能把复数映射为实数结果，搬运接口则使用双寄存器`complex32/b64`形式。
+- `MERGING`是逐接口的模板模式能力，不能从参数类型名推断；必须以接口文档对`MaskMergeMode`的明确说明为准。

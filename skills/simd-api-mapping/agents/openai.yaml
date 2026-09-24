@@ -1,0 +1,4 @@
+interface:
+  display_name: "SIMD API 对标分析"
+  short_description: "对照 Basic 与 Tensor SIMD API 并生成类型和模式差异表"
+  default_prompt: "请以 Basic SIMD API 为基线分析 Tensor API 对标接口，提取支持类型、模板模式和能力差异，生成结构化 Markdown 表格。"
