@@ -72,6 +72,31 @@ bfloat16x2_t __hgex2(bfloat16x2_t x, bfloat16x2_t y)
       <td>0</td>
     </tr>
     <tr>
+      <td>inf</td>
+      <td>inf</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>-inf</td>
+      <td>-inf</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>inf</td>
+      <td>-inf</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>有限值</td>
+      <td>-inf</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
       <td>±0</td>
       <td>±0</td>
       <td>1.0</td>

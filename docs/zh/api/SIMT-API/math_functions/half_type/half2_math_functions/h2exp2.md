@@ -47,7 +47,7 @@ inline half2 h2exp2(half2 x)
 
 ## 返回值说明
 
-输入的各元素，2的该元素次方。本接口受全局饱和寄存器影响，特殊值如下：
+输入的各元素，2的该元素次方。普通有限输入的结果遵循CAST\_RINT模式舍入，本接口受全局饱和寄存器影响，特殊值如下：
 
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
@@ -55,7 +55,7 @@ inline half2 h2exp2(half2 x)
 | nan | nan | 0 |
 | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | 0 | 0 |
-| x>ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| 2^x超出half可表示范围 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 

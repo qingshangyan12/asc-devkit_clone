@@ -85,9 +85,22 @@ half2 __hmaxx2(const half2 x, const half2 y)
     <td>-ASCRT_MAX_NORMAL_FP16</td>
   </tr>
   <tr>
-    <td colspan="2">任一分量为nan</td>
     <td>nan</td>
-    <td>0</td>
+    <td>非nan值</td>
+    <td>y分量值</td>
+    <td>y分量值</td>
+  </tr>
+  <tr>
+    <td>非nan值</td>
+    <td>nan</td>
+    <td>x分量值</td>
+    <td>x分量值</td>
+  </tr>
+  <tr>
+    <td>nan</td>
+    <td>nan</td>
+    <td>nan</td>
+    <td>nan</td>
   </tr>
 </table>
 
