@@ -10,7 +10,6 @@
 #ifndef __TESTS_C_API_STUB__
 #define __TESTS_C_API_STUB__
 #include <cstdint>
-#include "impl/utils/common_types.h"
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
