@@ -227,11 +227,13 @@ def taxonomy(path: Path) -> tuple[tuple[str, ...], dict[str, set[str]]]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("status") != "frozen":
         raise ValidationError("taxonomy is not frozen")
-    required = payload.get("required_namespaces")
+    order = payload.get("namespace_order")
     defs = payload.get("namespaces")
     namespaces = list(defs) if isinstance(defs, dict) else None
-    if not isinstance(required, list) or not isinstance(namespaces, list) or not isinstance(defs, dict):
+    if not isinstance(order, list) or not isinstance(namespaces, list) or not isinstance(defs, dict):
         raise ValidationError("taxonomy metadata is invalid")
+    if set(order) != set(namespaces):
+        raise ValidationError("taxonomy namespace_order does not match namespace keys")
     values = {}
     for namespace in namespaces:
         definition = defs.get(namespace, {})
@@ -1164,6 +1166,11 @@ def build_worker_document(
     else:
         timestamp = date.today().isoformat()
     tags = normalize_tag(data.get("tag"), namespaces)
+    # On-demand scaffold: keep only namespaces with values so the artifact the worker
+    # edits never carries empty tag entries (最小标签集: 不适用字段省略，不使用空数组).
+    # Degradation is signalled by issues for every namespace without values, so the
+    # resolver decision flow and issue counts are unchanged.
+    filled_tags = [item for item in tags if next(iter(item.values()))]
     source_dtypes = source_signature_dtypes(body) if definition is None else {}
     raw_signature = source_signature if definition is not None else source_signature or normalize_signature_ids(
         data.get("signature") if isinstance(data.get("signature"), list) else []
@@ -1181,7 +1188,7 @@ def build_worker_document(
         "title": title,
         "resource": f"asc-devkit/{path}",
         "description": description,
-        "tag": tags,
+        "tag": filled_tags,
         "signature": normalize_signature_dtypes(
             raw_signature,
             source_dtypes,
@@ -1217,9 +1224,9 @@ def build_worker_document(
         if len(identifier_keys) != 1:
             issues.append(issue(path, "signature", "tool_defect", "signature 条目必须唯一包含 prototype_id、override_id 或 macro_id，不能写入原始 prototype 字段。"))
             break
-    for item in fields["tag"]:
-        namespace, selected = next(iter(item.items()))
-        if not selected:
+    filled_namespaces = {next(iter(item)) for item in fields["tag"]}
+    for namespace in namespaces:
+        if namespace not in filled_namespaces:
             issues.append(issue(path, f"tag.{namespace}", "unresolved", "当前 worker 没有找到该标签主题的充分正文证据。"))
     # Multiple overloads can produce the same document-level diagnostic. Keep one
     # stable record so every issue ID still has exactly one resolver decision.

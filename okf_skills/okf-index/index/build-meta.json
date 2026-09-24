@@ -1,7 +1,7 @@
 {
  "schema": "okf-index-meta/1",
- "source_commit": "8b3c244b6eb9f1c90fe4a0841f10586eb64b3dba",
- "taxonomy_sha256": "a973c3392bbc3d1b5ef56dde76000aada6cffbf555e1957f3891ddfe2bfc04ce",
+ "source_commit": "ca99fd28ff8028d4a710d36695bb18f475bad0fe",
+ "taxonomy_sha256": "fa438c6e747ea872e030eb88fa3201810fdaba5a96edb73a1065f67e6141a557",
  "gaps_sha256": "3274f294fd7c2785036e36584e6f0d4d2cf0d47383281bf050e7c33fc86b186f",
  "document_sha256": {
   "docs/zh/api/SIMD-API/c_api/README.md": "1601b940d726a0dfe8385b2e199e8045d139b8344a327d8e82651e9fbf3e3289",

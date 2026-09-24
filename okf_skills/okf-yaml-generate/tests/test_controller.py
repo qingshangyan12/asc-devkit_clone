@@ -676,6 +676,76 @@ constexpr uint8_t ASC_SIZE = 16;
             for namespace in ("families", "objects", "source_locations", "destination_locations"):
                 self.assertNotIn(f"- {namespace}:", rendered, namespace)
 
+    def test_scaffold_emits_on_demand_tags_only(self):
+        with tempfile.TemporaryDirectory() as temp:
+            devkit = Path(temp) / "devkit"
+            document = devkit / "docs/zh/api/SIMD-API/c_api/foo/foo.md"
+            document.parent.mkdir(parents=True)
+            run = Path(temp) / "run"
+            namespaces = json.loads(
+                (ROOT / "taxonomy/releases/core-v9-frozen.json").read_text(encoding="utf-8")
+            )["namespace_order"]
+
+            # Greenfield doc without front matter: no namespace has values, so the
+            # scaffold must emit an empty tag list plus one issue per namespace.
+            document.write_text("# foo\n\n## 功能说明\n\n按元素相加。\n", encoding="utf-8")
+            subprocess.run(
+                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
+                 "--document", "docs/zh/api/SIMD-API/c_api/foo/foo.md", "--run-dir", str(run)],
+                check=True,
+            )
+            output = run / "batches/batch-01/worker-result.json"
+            subprocess.run(
+                ["python3", str(CONTROLLER), "worker", "--task", str(run / "batches/batch-01/task.json"),
+                 "--output", str(output)],
+                check=True,
+            )
+            doc = json.loads(output.read_text(encoding="utf-8"))["documents"][0]
+            self.assertEqual(doc["fields"]["tag"], [])
+            issue_fields = {item["field"] for item in doc["issues"]}
+            self.assertEqual({f"tag.{ns}" for ns in namespaces} <= issue_fields, True)
+
+            # Doc with existing on-demand front matter: scaffold keeps only the
+            # non-empty namespaces and raises issues for the missing ones.
+            document.write_text(
+                "---\n"
+                "okftype: reference.api.cpp\n"
+                "title: foo\n"
+                "resource: asc-devkit/docs/zh/api/SIMD-API/c_api/foo/foo.md\n"
+                "description: 已确认\n"
+                "tag:\n"
+                "  - api_surfaces: [c_api]\n"
+                "  - roles: [compute]\n"
+                "  - operations: [add]\n"
+                "signature: []\n"
+                "dependencies: []\n"
+                "examples: []\n"
+                "timestamp: '2026-09-24'\n"
+                "---\n\n# foo\n\n按元素相加的矢量计算。\n",
+                encoding="utf-8",
+            )
+            subprocess.run(
+                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
+                 "--document", "docs/zh/api/SIMD-API/c_api/foo/foo.md", "--run-dir", str(run)],
+                check=True,
+            )
+            subprocess.run(
+                ["python3", str(CONTROLLER), "worker", "--task", str(run / "batches/batch-01/task.json"),
+                 "--output", str(output)],
+                check=True,
+            )
+            doc = json.loads(output.read_text(encoding="utf-8"))["documents"][0]
+            self.assertEqual(
+                doc["fields"]["tag"],
+                [{"api_surfaces": ["c_api"]}, {"roles": ["compute"]}, {"operations": ["add"]}],
+            )
+            issue_fields = {item["field"] for item in doc["issues"]}
+            missing = {ns for ns in namespaces} - {"api_surfaces", "roles", "operations"}
+            self.assertEqual({f"tag.{ns}" for ns in missing} <= issue_fields, True)
+            self.assertNotIn("tag.api_surfaces", issue_fields)
+            self.assertNotIn("tag.roles", issue_fields)
+            self.assertNotIn("tag.operations", issue_fields)
+
     def test_prepare_worker_and_field_degradation(self):
         with tempfile.TemporaryDirectory() as temp:
             devkit = Path(temp) / "devkit"
@@ -1011,7 +1081,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                 }),
                 encoding="utf-8",
             )
-            namespaces = json.loads(taxonomy.read_text(encoding="utf-8"))["required_namespaces"]
+            namespaces = json.loads(taxonomy.read_text(encoding="utf-8"))["namespace_order"]
             worker_result = {
                 "schema_version": 1,
                 "run_id": "run",

@@ -36,18 +36,20 @@ def load_taxonomy(path: Path) -> tuple[tuple[str, ...], dict[str, set[str]], dic
     if payload.get("status") != "frozen":
         raise ValidationError(f"taxonomy is not frozen: {path}")
     namespaces = payload.get("namespaces")
-    required = payload.get("required_namespaces")
-    if not isinstance(namespaces, dict) or not isinstance(required, list) or not required:
+    order = payload.get("namespace_order")
+    if not isinstance(namespaces, dict) or not isinstance(order, list) or not order:
         raise ValidationError(f"taxonomy has invalid namespace metadata: {path}")
-    if len(required) != len(set(required)) or any(not isinstance(item, str) for item in required):
-        raise ValidationError("taxonomy required_namespaces must be a unique string list")
+    if len(order) != len(set(order)) or any(not isinstance(item, str) for item in order):
+        raise ValidationError("taxonomy namespace_order must be a unique string list")
     values: dict[str, set[str]] = {}
-    for namespace in required:
+    for namespace in order:
         definition = namespaces.get(namespace)
         options = definition.get("values") if isinstance(definition, dict) else None
         if not isinstance(options, dict) or any(not isinstance(value, str) for value in options):
             raise ValidationError(f"taxonomy has invalid values for namespace: {namespace}")
         values[namespace] = set(options)
+    if set(namespaces) != set(order):
+        raise ValidationError("taxonomy namespaces differ from namespace_order")
     return tuple(namespaces), values, payload
 
 

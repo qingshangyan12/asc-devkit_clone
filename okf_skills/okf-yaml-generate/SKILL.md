@@ -134,7 +134,7 @@ Doxygen 记录不接受 `path/anchor/text` 自由补丁。主控按结构化声�
 
 文档错误不会导致整篇 YAML 跳过。头文件、样例或实现代码问题只能报告，不能修改源代码。
 正常文档的必填 tag namespace 不允许为空；只有该 namespace 存在对应 issue、经过 resolver 记录并进入报告后，
-才允许定向置空。每个非空 tag 值必须有 `namespace:value` 级逐字证据。
+才允许省略该 namespace。每个非空 tag 值必须有 `namespace:value` 级逐字证据。
 
 ## 错误报告
 
