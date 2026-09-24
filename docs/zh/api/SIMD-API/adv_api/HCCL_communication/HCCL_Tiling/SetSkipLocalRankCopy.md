@@ -25,14 +25,7 @@ uint32_t SetSkipLocalRankCopy(uint8_t skipLocalRankCopy)
 
 ## 约束说明
 
-在 Ascend 950 的 CCU 算法 `CcuSchedReduceScatterSoleMeshPeerOnly`（算法编号 53）中，该参数含义如下：
-
-- `0`（默认）：通信算法先将本卡对应输入分片复制到 `recvBuf`，等待复制完成后再归约对端分片。独立调用 ReduceScatter 不需要预置输出。
-- `1`：调用者保证每次通信前，本卡分片的完整结果已经写入 `recvBuf`，并且该写入对 CCU 可见。通信算法跳过本卡复制，仅将对端分片归约到已有输出。例如，配套的 MMRS peer-only Matmul kernel 将本卡结果直接写入最终输出。
-
-仅切换算法名不代表已经满足上述前置条件；不得对未预置本卡数据的独立通信设置为 `1`。该设置随通信 tiling 在 Prepare 时保存，后续修改 tiling 不改变已创建 handle 的设置。其他算法及硬件的原有行为不变。
-
-ASC 与 MMRS 的此项适配需要配套构建和升级，包括使用 ASC 头文件编译的算子 kernel。不支持将此版本 ASC 与尚未设置该参数的旧 peer-only MMRS 二进制混用。
+无
 
 ## 调用示例
 
