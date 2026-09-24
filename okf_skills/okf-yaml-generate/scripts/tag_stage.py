@@ -14,7 +14,7 @@ import yaml
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_TAXONOMY = SKILL_ROOT.parent / "okf-tag-generate" / "taxonomy" / "releases" / "core-v9-frozen.json"
+DEFAULT_TAXONOMY = SKILL_ROOT.parents[1] / "okf-tag-generate" / "taxonomy" / "tag-taxonomy.json"
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
 TOP_LEVEL_KEY_RE = re.compile(r"^[^\s#][^:]*:\s*(?:.*)?(?:\n|$)")
@@ -36,21 +36,21 @@ def load_taxonomy(path: Path) -> tuple[tuple[str, ...], dict[str, set[str]]]:
     if payload.get("status") != "frozen":
         raise ValidationError(f"taxonomy is not frozen: {path}")
     namespaces = payload.get("namespaces")
-    order = payload.get("namespace_order")
-    if not isinstance(namespaces, dict) or not isinstance(order, list) or not order:
+    required = payload.get("required_namespaces")
+    if not isinstance(namespaces, dict) or not isinstance(required, list) or not required:
         raise ValidationError(f"taxonomy has invalid namespace metadata: {path}")
-    if len(order) != len(set(order)) or any(not isinstance(item, str) for item in order):
-        raise ValidationError("taxonomy namespace_order must be a unique string list")
+    if len(required) != len(set(required)) or any(not isinstance(item, str) for item in required):
+        raise ValidationError("taxonomy required_namespaces must be a unique string list")
     values: dict[str, set[str]] = {}
-    for namespace in order:
+    for namespace in required:
         definition = namespaces.get(namespace)
         options = definition.get("values") if isinstance(definition, dict) else None
         if not isinstance(options, dict) or any(not isinstance(value, str) for value in options):
             raise ValidationError(f"taxonomy has invalid values for namespace: {namespace}")
         values[namespace] = set(options)
-    if set(namespaces) != set(order):
-        raise ValidationError("taxonomy namespaces differ from namespace_order")
-    return tuple(order), values
+    if set(namespaces) != set(required):
+        raise ValidationError("taxonomy namespaces differ from required_namespaces")
+    return tuple(required), values
 
 
 def split_front_matter(text: str) -> tuple[dict[str, Any], str, str]:

@@ -11,7 +11,7 @@ description: 从本 Skill 的冻结词表和 API Markdown 正文证据生成并�
 
 本 Skill 是冻结标签词表的唯一事实源：
 
-- `okf-skills/okf-tag-generate/taxonomy/core-v8-frozen.json`
+- `okf_skills/okf-tag-generate/taxonomy/tag-taxonomy.json`
 
 ## 适用范围
 
@@ -53,9 +53,10 @@ tag:
   - traits: [elementwise]
 ```
 
-输出顺序固定为 taxonomy 的 namespace 顺序，namespace 内的值按字典序排列。不得写成 `tags`、`semantic_tags`，也不得把主题和值压缩成无 namespace 的字符串数组。
+输出顺序固定为 taxonomy 的 namespace 顺序，namespace 内的值按字典序排列。必填和条件必填规则统一读取
+`taxonomy/tag-rules.yaml`。不得写成 `tags`、`semantic_tags`，也不得把主题和值压缩成无 namespace 的字符串数组。
 
-冻结词表基线不能原地修改。经过调研和人工批准的新版本写入本 Skill 的 `taxonomy/releases/`，写入器只能使用已批准的冻结版本。
+词表和规则只维护在 `taxonomy/tag-taxonomy.json` 与 `taxonomy/tag-rules.yaml`；写入器只能使用这两个事实源。
 
 ## 证据要求
 

@@ -16,3 +16,17 @@
 
 文档错误不能导致其他字段全部消失。source defect 不能通过修改头文件、样例或实现代码解决。
 同一文档的多个 issue 在最终报告中合并展示。
+
+## 严格决议边界
+
+| issue_type | 允许的 resolution | 是否允许 validate 通过 |
+| --- | --- | --- |
+| `document_defect` | `blank_field`、`report_source_defect`、`report_unresolved` | 仅 `blank_field` 或 `report_source_defect` |
+| `source_defect` | `report_source_defect`、`report_unresolved` | 仅 `report_source_defect` |
+| `unresolved` | `report_unresolved` | 否 |
+| `tool_defect` | `tool_change_required` | 否 |
+
+`tool_defect` 不得被降级成 `blank_field`。语义输入缺失、hash 不一致、冻结 taxonomy 不匹配和解析器
+无法处理合法声明都属于工具/协议阻断；必须先修复工件或代码，再重新运行 `prepare`、`worker` 和
+`validate`。任何 `report_unresolved` 或 `tool_change_required` 都会生成 `validation.json` 的
+`blocked` 状态，`write` 不得执行。

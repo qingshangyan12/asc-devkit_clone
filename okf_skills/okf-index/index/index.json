@@ -1,8 +1,8 @@
 {
  "schema": "okf-index/1",
  "meta": {
-  "source_commit": "97bff7aa84d650e2c8b9d9addd704c5300038081",
-  "commit_date": "2026-09-24T10:07:40+08:00",
+  "source_commit": "8b3c244b6eb9f1c90fe4a0841f10586eb64b3dba",
+  "commit_date": "2026-09-24T09:22:26+08:00",
   "doc_count": 838,
   "primary_count": 742,
   "nav_page_count": 65,
@@ -10,7 +10,7 @@
   "gap_ids": [],
   "relation_gap_count": 1,
   "pending_no_okf": 0,
-  "degraded_no_signature": 10,
+  "degraded_no_signature": 29,
   "degraded_no_signature_docs": [
    "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md: api/arch page without signature (sanctioned blank, degraded indexing)",
    "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md: api/arch page without signature (sanctioned blank, degraded indexing)",
@@ -20,8 +20,27 @@
    "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md: api/arch page without signature (sanctioned blank, degraded indexing)",
    "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md: api/arch page without signature (sanctioned blank, degraded indexing)",
    "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e1m2x2.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e2m1x2.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e1m2x22bfloat16.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md: api/arch page without signature (sanctioned blank, degraded indexing)",
    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md: api/arch page without signature (sanctioned blank, degraded indexing)",
-   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md: api/arch page without signature (sanctioned blank, degraded indexing)"
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint8.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22half.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22int16.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md: api/arch page without signature (sanctioned blank, degraded indexing)",
+   "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md: api/arch page without signature (sanctioned blank, degraded indexing)"
   ]
  },
  "documents": {
@@ -41886,17 +41905,7 @@
      "saturation_mode"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_bfloat162e1m2x2___Rvf4e1m2x2_vbf16_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_bfloat162e1m2x2",
@@ -41928,17 +41937,7 @@
      "saturation_mode"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_bfloat162e2m1x2___Rvf4e2m1x2_vbf16_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_bfloat162e2m1x2",
@@ -42856,26 +42855,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_e1m2x22bfloat16__Rvbf16_vf4e1m2x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_e1m2x22bfloat16__vf4e1m2x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_e1m2x22bfloat16",
@@ -42908,26 +42888,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_e2m1x22bfloat16__Rvbf16_vf4e2m1x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_e2m1x22bfloat16__vf4e2m1x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_e2m1x22bfloat16",
@@ -42960,26 +42921,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_e4m32float__Rvf32_vf8e4m3_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_e4m32float__vf8e4m3_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_e4m32float",
@@ -43012,26 +42954,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_e5m22float__Rvf32_vf8e5m2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_e5m22float__vf8e5m2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_e5m22float",
@@ -43546,17 +43469,7 @@
      "saturation_mode"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_float2e4m3_rn__Rvf8e4m3_vf32_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [
     {
      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
@@ -43596,17 +43509,7 @@
      "saturation_mode"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_float2e5m2_rn__Rvf8e5m2_vf32_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [
     {
      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
@@ -46538,26 +46441,7 @@
      "saturation_mode"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "_sat__Rvi4x2_vf16_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "_sat__vf16_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [
     {
      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
@@ -47556,26 +47440,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_hif82float__Rvf32_vhf8_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_hif82float__vhf8_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_hif82float",
@@ -48636,17 +48501,7 @@
      "saturation_mode"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_int322uint8__Rvu8_vi32_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [
     {
      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
@@ -48683,26 +48538,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_int4x22bfloat16__Rvbf16_vi4x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_int4x22bfloat16__vi4x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_int4x22bfloat16",
@@ -48733,26 +48569,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_int4x22half__Rvf16_vi4x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_int4x22half__vi4x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_int4x22half",
@@ -48783,26 +48600,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_int4x22int16__Rvi16_vi4x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_int4x22int16__vi4x2_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_int4x22int16",
@@ -49363,26 +49161,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_int82int32__Rvi32_vi8_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_int82int32__vi8_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_int82int32",
@@ -50065,17 +49844,7 @@
      "saturation_mode"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_uint322uint8__Rvu8_vu32_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [
     {
      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
@@ -50269,26 +50038,7 @@
      "widening_result"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_uint82uint32__Rvu32_vu8_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_uint82uint32__vu8_vb_icposquarter",
-     "id_kind": "override_id",
-     "headers": [],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [],
    "examples": [],
    "family": "asc_uint82uint32",
@@ -51407,9 +51157,6 @@
    "tags": {
     "api_surfaces": [
      "c_api"
-    ],
-    "roles": [
-     "compute"
     ],
     "execution_models": [
      "register_vector"
@@ -53308,9 +53055,6 @@
    "tags": {
     "api_surfaces": [
      "c_api"
-    ],
-    "roles": [
-     "compute"
     ],
     "execution_models": [
      "register_vector"
@@ -57638,30 +57382,7 @@
      "scalar"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_lock__pipe_u8",
-     "id_kind": "override_id",
-     "headers": [
-      "c_api/sync/sync.h"
-     ],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_lock__pipe_u8_mutexexec",
-     "id_kind": "override_id",
-     "headers": [
-      "c_api/sync/sync.h"
-     ],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [
     {
      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
@@ -58210,30 +57931,7 @@
      "scalar"
     ]
    },
-   "signatures": [
-    {
-     "prototype_id": "asc_unlock__pipe_u8",
-     "id_kind": "override_id",
-     "headers": [
-      "c_api/sync/sync.h"
-     ],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    },
-    {
-     "prototype_id": "asc_unlock__pipe_u8_mutexexec",
-     "id_kind": "override_id",
-     "headers": [
-      "c_api/sync/sync.h"
-     ],
-     "archs": [
-      "3510"
-     ],
-     "dtypes": []
-    }
-   ],
+   "signatures": [],
    "deps_out": [
     {
      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
@@ -73556,7 +73254,6 @@
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md",
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md",
@@ -73571,7 +73268,6 @@
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md",
@@ -74006,7 +73702,6 @@
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md",
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md",
@@ -74021,7 +73716,6 @@
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max.md",
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md",
@@ -82453,12 +82147,6 @@
    "asc_ne_scalar__Rvb_v<dtype>_<dtype>_vb": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ne_scalar.md"
    ],
-   "asc_bfloat162e1m2x2___Rvf4e1m2x2_vbf16_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e1m2x2.md"
-   ],
-   "asc_bfloat162e2m1x2___Rvf4e2m1x2_vbf16_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e2m1x2.md"
-   ],
    "asc_bfloat162float__Rvf32_vbf16_vb_icposeven": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md"
    ],
@@ -82657,30 +82345,6 @@
    "asc_ceil__Rv<dtype>_v<dtype>_vb": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_ceil.md"
    ],
-   "asc_e1m2x22bfloat16__Rvbf16_vf4e1m2x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e1m2x22bfloat16.md"
-   ],
-   "asc_e1m2x22bfloat16__vf4e1m2x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e1m2x22bfloat16.md"
-   ],
-   "asc_e2m1x22bfloat16__Rvbf16_vf4e2m1x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16.md"
-   ],
-   "asc_e2m1x22bfloat16__vf4e2m1x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16.md"
-   ],
-   "asc_e4m32float__Rvf32_vf8e4m3_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md"
-   ],
-   "asc_e4m32float__vf8e4m3_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md"
-   ],
-   "asc_e5m22float__Rvf32_vf8e5m2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md"
-   ],
-   "asc_e5m22float__vf8e5m2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md"
-   ],
    "asc_float2bfloat16_rd__Rvbf16_vf32_vb_icposeven": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md"
    ],
@@ -82800,12 +82464,6 @@
    ],
    "asc_float2bfloat16_rz_sat__vf32_vb_icposodd": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md"
-   ],
-   "asc_float2e4m3_rn__Rvf8e4m3_vf32_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md"
-   ],
-   "asc_float2e5m2_rn__Rvf8e5m2_vf32_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md"
    ],
    "asc_float2half_rd__Rvf16_vf32_vb_icposeven": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md"
@@ -83467,12 +83125,6 @@
    "asc_half2int32_rz__vf16_vb_icposodd": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md"
    ],
-   "_sat__Rvi4x2_vf16_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md"
-   ],
-   "_sat__vf16_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md"
-   ],
    "asc_half2int8_rd__Rvi8_vf16_vb_icposeven": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md"
    ],
@@ -83713,12 +83365,6 @@
    "asc_half2uint8_rz_sat__vf16_vb_icposodd": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md"
    ],
-   "asc_hif82float__Rvf32_vhf8_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md"
-   ],
-   "asc_hif82float__vhf8_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md"
-   ],
    "asc_hif82half__Rvf16_vhf8_vb_icposeven": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md"
    ],
@@ -83911,27 +83557,6 @@
    "asc_int322uint16_sat__vi32_vb_icposodd": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint16.md"
    ],
-   "asc_int322uint8__Rvu8_vi32_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint8.md"
-   ],
-   "asc_int4x22bfloat16__Rvbf16_vi4x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md"
-   ],
-   "asc_int4x22bfloat16__vi4x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md"
-   ],
-   "asc_int4x22half__Rvf16_vi4x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22half.md"
-   ],
-   "asc_int4x22half__vi4x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22half.md"
-   ],
-   "asc_int4x22int16__Rvi16_vi4x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22int16.md"
-   ],
-   "asc_int4x22int16__vi4x2_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22int16.md"
-   ],
    "asc_int642float_rd__Rvf32_vi64_vb_icposeven": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md"
    ],
@@ -84040,12 +83665,6 @@
    "asc_int82int16__vi8_vb_icposodd": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int16.md"
    ],
-   "asc_int82int32__Rvi32_vi8_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md"
-   ],
-   "asc_int82int32__vi8_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md"
-   ],
    "asc_rint__v<dtype>_vb": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_rint.md"
    ],
@@ -84148,9 +83767,6 @@
    "asc_uint322uint16_sat__vu32_vb_icposodd": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint16.md"
    ],
-   "asc_uint322uint8__Rvu8_vu32_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md"
-   ],
    "asc_uint82half__Rvf16_vu8_vb_icposeven": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md"
    ],
@@ -84168,12 +83784,6 @@
    ],
    "asc_uint82uint16__vu8_vb_icposodd": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md"
-   ],
-   "asc_uint82uint32__Rvu32_vu8_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md"
-   ],
-   "asc_uint82uint32__vu8_vb_icposquarter": [
-    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md"
    ],
    "asc_copy__Rv<dtype>_v<dtype>_vb": [
     "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md"
@@ -84790,12 +84400,6 @@
    "asc_sync_subblock_wait__pipe_i64": [
     "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md"
    ],
-   "asc_lock__pipe_u8": [
-    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md"
-   ],
-   "asc_lock__pipe_u8_mutexexec": [
-    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md"
-   ],
    "asc_sync__z": [
     "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md"
    ],
@@ -84822,12 +84426,6 @@
    ],
    "asc_sync_wait__pipe_pipe_event": [
     "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md"
-   ],
-   "asc_unlock__pipe_u8": [
-    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md"
-   ],
-   "asc_unlock__pipe_u8_mutexexec": [
-    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md"
    ],
    "asc_init__z": [
     "docs/zh/api/SIMD-API/c_api/utils/sys_init/asc_init.md"
@@ -87504,7 +87102,6 @@
     "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
     "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
     "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
-    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
     "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
     "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
     "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
@@ -87512,8 +87109,7 @@
     "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
     "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
     "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
-    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
-    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md"
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md"
    ],
    "c_api/utils/sys_init.h": [
     "docs/zh/api/SIMD-API/c_api/utils/sys_init/asc_init.md"

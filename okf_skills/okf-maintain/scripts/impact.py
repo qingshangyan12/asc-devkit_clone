@@ -36,7 +36,7 @@ def resolve_paths(root: Path) -> dict[str, Path]:
         "build_meta": okf / "okf-index/index/build-meta.json",
         "index": okf / "okf-index/index/index.json",
         "gaps": okf / "okf-index/index/gaps.json",
-        "taxonomy": okf / "okf-tag-generate/taxonomy/releases/core-v9-frozen.json",
+        "taxonomy": okf / "okf-tag-generate/taxonomy/tag-taxonomy.json",
         "tasks": okf / "okf-evaluate/testset/tasks.yaml",
         "dryrun": okf / "okf-index/tests/dryrun.yaml",
         "scope": root / SCOPE_DIR,
@@ -200,7 +200,7 @@ def text_report(report: dict) -> str:
     if fingerprints["taxonomy_changed"] or fingerprints["gaps_changed"]:
         lines += ["", "二、指纹漂移"]
         if fingerprints["taxonomy_changed"]:
-            lines.append("- 词表已变化：core-v9-frozen.json 与 build-meta 不一致，全量文档需按新词表重校验")
+            lines.append("- 词表已变化：tag-taxonomy.json 与 build-meta 不一致，全量文档需按新词表重校验")
         if fingerprints["gaps_changed"]:
             lines.append("- 缺口登记已变化：gaps.json 与 build-meta 不一致，重跑 build_index.py 同步指纹")
     lines += ["", "三、影响面"]

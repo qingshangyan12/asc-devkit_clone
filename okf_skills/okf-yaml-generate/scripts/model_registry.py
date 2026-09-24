@@ -1,0 +1,224 @@
+"""Load the flat OKF profile and classify documents from their structure."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from functools import lru_cache
+from pathlib import Path
+import re
+from typing import Any
+
+import yaml
+
+
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+CONFIG_ROOT = SKILL_ROOT / "config"
+PROFILE_PATH = CONFIG_ROOT / "document-profile-registry.yaml"
+SOURCE_CONTEXT_PATH = CONFIG_ROOT / "source-context-v1.yaml"
+
+
+class ModelValidationError(ValueError):
+    """Raised when the flat profile or source context is inconsistent."""
+
+
+@dataclass(frozen=True)
+class Classification:
+    okftype: str
+    rule: str
+    default_tags: dict[str, list[str]]
+
+
+@dataclass(frozen=True)
+class ExecutionPlan:
+    okftype: str
+    rule: str
+    fields: tuple[str, ...]
+    outputs: tuple[str, ...]
+    default_tags: dict[str, list[str]]
+
+
+def _load_yaml(path: Path) -> dict[str, Any]:
+    try:
+        value = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise ModelValidationError(f"cannot load registry {path}: {exc}") from exc
+    if not isinstance(value, dict):
+        raise ModelValidationError(f"registry must be a YAML mapping: {path}")
+    return value
+
+
+def _string_list(value: Any, location: str, *, allow_empty: bool = False) -> list[str]:
+    if not isinstance(value, list) or any(not isinstance(item, str) or not item for item in value):
+        raise ModelValidationError(f"{location} must be a string list")
+    if not allow_empty and not value:
+        raise ModelValidationError(f"{location} must not be empty")
+    if len(value) != len(set(value)):
+        raise ModelValidationError(f"{location} must not contain duplicates")
+    return list(value)
+
+
+@lru_cache(maxsize=1)
+def load_model() -> dict[str, Any]:
+    document = _load_yaml(PROFILE_PATH)
+    source = _load_yaml(SOURCE_CONTEXT_PATH)
+    if document.get("schema_version") != 4 or document.get("status") != "active":
+        raise ModelValidationError("document profile registry must be active schema version 4")
+    if source.get("schema_version") != 1:
+        raise ModelValidationError("source context registry must use schema version 1")
+
+    profiles = document.get("profiles")
+    fields = document.get("field_catalog")
+    common = _string_list(document.get("common_required_fields"), "common_required_fields")
+    common_fields = _string_list(document.get("common_fields"), "common_fields")
+    field_order = _string_list(document.get("field_order"), "field_order")
+    output_contracts = document.get("output_contracts")
+    if not isinstance(profiles, dict) or not profiles:
+        raise ModelValidationError("profiles must be a non-empty mapping")
+    if not isinstance(fields, dict) or not fields:
+        raise ModelValidationError("field_catalog must be a non-empty mapping")
+    if not isinstance(output_contracts, dict) or not output_contracts:
+        raise ModelValidationError("output_contracts must be a non-empty mapping")
+    if any(field not in fields for field in common):
+        raise ModelValidationError("common_required_fields contains an unregistered field")
+    if set(field_order) != set(fields):
+        raise ModelValidationError("field_order must contain every registered field exactly once")
+
+    for name, profile in profiles.items():
+        if not isinstance(name, str) or not name.count(".") == 2:
+            raise ModelValidationError(f"profile key must be a complete okftype: {name!r}")
+        if not isinstance(profile, dict):
+            raise ModelValidationError(f"profile {name} must be a mapping")
+        profile_fields = _string_list(profile.get("fields", []), f"profile {name}.fields", allow_empty=True)
+        unknown_fields = sorted(set(profile_fields) - set(fields))
+        if unknown_fields:
+            raise ModelValidationError(f"profile {name} has unknown fields: {', '.join(unknown_fields)}")
+        outputs = _string_list(profile.get("outputs", []), f"profile {name}.outputs")
+        unknown_outputs = sorted(set(outputs) - set(output_contracts))
+        if unknown_outputs:
+            raise ModelValidationError(f"profile {name} has unknown outputs: {', '.join(unknown_outputs)}")
+
+    roots = _string_list(source.get("document_roots"), "source_context.document_roots")
+    context = source.get("context")
+    if not isinstance(context, dict):
+        raise ModelValidationError("source_context.context must be a mapping")
+    family = context.get("family")
+    technology = context.get("technology")
+    if not isinstance(family, str) or not family or not isinstance(technology, str) or not technology:
+        raise ModelValidationError("source_context.context requires family and technology")
+
+    return {
+        "document": document,
+        "source": source,
+        "roots": tuple(roots),
+        "common_fields": tuple(common_fields),
+        "common_required_fields": tuple(common),
+        "field_order": tuple(field_order),
+        "profiles": profiles,
+        "output_contracts": output_contracts,
+        "context": {"family": family, "technology": technology},
+    }
+
+
+def document_is_in_scope(path: str, model: dict[str, Any] | None = None) -> bool:
+    model = model or load_model()
+    return any(path.startswith(root.rstrip("/") + "/") for root in model["roots"])
+
+
+FUNCTION_SECTION_RE = re.compile(
+    r"^\s{0,3}#{2,6}\s+函数(?:原型|声明)(?:\s|[<（(]|$)", re.MULTILINE
+)
+MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\([^)]+\.md(?:#[^)]*)?\)")
+DEFINITION_SECTION_RE = re.compile(
+    r"^\s{0,3}#{2,6}\s+(?:宏定义|枚举类具体定义|结构体定义|联合体定义|类型定义|常量定义)",
+    re.MULTILINE,
+)
+CONCEPT_HEADING_RE = re.compile(
+    r"^\s{0,3}#{1,6}[^\n]*(?:概述|概念|特性|约束|说明|机制|简介|overview|feature|constraint|description)",
+    re.IGNORECASE | re.MULTILINE,
+)
+
+
+def classify_document(path: str, body: str, model: dict[str, Any] | None = None) -> Classification | None:
+    """Return one flat okftype using universal document-structure signals."""
+    model = model or load_model()
+    if not document_is_in_scope(path, model):
+        return None
+    kind, rule = _classify_kind(path, body)
+    context = model["context"]
+    okftype = f"{context['family']}.{kind}.{context['technology']}"
+    if okftype not in model["profiles"]:
+        return None
+    return Classification(
+        okftype=okftype,
+        rule=rule,
+        default_tags=_default_tags(path, model),
+    )
+
+
+def _classify_kind(path: str, body: str) -> tuple[str, str]:
+    relative = Path(path)
+    parts = set(relative.parts)
+    # defs is a parser-selection hint for the shared definition extractor, not
+    # a per-directory okftype mapping. Individual entity kinds stay in source evidence.
+    if "defs" in parts and relative.stem != relative.parent.name:
+        return "type", "definition_structure"
+    if FUNCTION_SECTION_RE.search(body) or DEFINITION_SECTION_RE.search(body) and re.search(r"#define|\benum\b|\b(struct|union|typedef|using)\b", body):
+        return "api", "callable_structure"
+    if CONCEPT_HEADING_RE.search(body):
+        return "concept", "concept_structure"
+    if MARKDOWN_LINK_RE.search(body):
+        return "index", "navigation_structure"
+    return "concept", "prose_structure"
+
+
+def _default_tags(path: str, model: dict[str, Any]) -> dict[str, list[str]]:
+    candidates = model["source"].get("default_tags", {})
+    if not isinstance(candidates, dict):
+        return {}
+    matched = [prefix for prefix in candidates if isinstance(prefix, str) and path.startswith(prefix)]
+    if not matched:
+        return {}
+    raw = candidates[max(matched, key=len)]
+    if not isinstance(raw, dict):
+        return {}
+    return {
+        namespace: list(values)
+        for namespace, values in raw.items()
+        if isinstance(namespace, str) and isinstance(values, list) and all(isinstance(value, str) for value in values)
+    }
+
+
+def compile_execution_plan(
+    classification: Classification,
+    *,
+    model: dict[str, Any] | None = None,
+) -> ExecutionPlan:
+    """Compile one flat Profile into fields and output contracts."""
+    model = model or load_model()
+    profile = model["profiles"].get(classification.okftype)
+    if not isinstance(profile, dict):
+        raise ModelValidationError(f"unknown profile: {classification.okftype}")
+    selected = set(model["common_required_fields"])
+    selected.update(profile.get("fields", []))
+    fields = [field for field in model["field_order"] if field in selected]
+    return ExecutionPlan(
+        okftype=classification.okftype,
+        rule=classification.rule,
+        fields=tuple(_ordered_unique(fields)),
+        outputs=tuple(profile["outputs"]),
+        default_tags=classification.default_tags,
+    )
+
+
+def plan_to_dict(plan: ExecutionPlan) -> dict[str, Any]:
+    return {
+        "okftype": plan.okftype,
+        "rule": plan.rule,
+        "fields": list(plan.fields),
+        "outputs": list(plan.outputs),
+        "default_tags": plan.default_tags,
+    }
+
+
+def _ordered_unique(values: list[str]) -> list[str]:
+    return list(dict.fromkeys(values))

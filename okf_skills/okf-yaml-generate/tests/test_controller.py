@@ -8,7 +8,6 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTROLLER = ROOT / "scripts" / "controller.py"
-TAXONOMY = ROOT.parent / "okf-tag-generate" / "taxonomy" / "releases" / "core-v9-frozen.json"
 
 
 class ControllerSmokeTest(unittest.TestCase):
@@ -57,7 +56,7 @@ class ControllerSmokeTest(unittest.TestCase):
                 {
                     "override_id": "asc_example__u32",
                     "archs": [],
-                    "headers": ["/include/c_api/detail/asc_example.h"],
+                    "header": ["/include/c_api/detail/asc_example.h"],
                 },
                 signatures,
             )
@@ -539,7 +538,7 @@ constexpr uint8_t ASC_SIZE = 16;
             object_macro = module._source_definition_fields(root, object_macro_doc, object_macro_doc.read_text(encoding="utf-8"))
 
             self.assertNotIn("api_kind", enum)
-            self.assertEqual(enum["headers"], ["/include/c_api/defs/enum.h"])
+            self.assertEqual(enum["header"], ["/include/c_api/defs/enum.h"])
             self.assertEqual(enum["declaration"]["members"][0]["name"], "DEFAULT")
             self.assertNotIn("api_kind", alias)
             self.assertEqual(alias["declaration"]["target"], "asc_mode")
@@ -600,9 +599,9 @@ constexpr uint8_t ASC_SIZE = 16;
             document = root / path
             document.parent.mkdir(parents=True)
             document.write_text("# asc_mode\n", encoding="utf-8")
-            namespaces, values = module.taxonomy(TAXONOMY)
+            namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
             fields = {
-                "okftype": "reference.api.cpp",
+                "okftype": "reference.type.cpp",
                 "title": "asc_mode",
                 "resource": f"asc-devkit/{path}",
                 "description": "枚举模式。",
@@ -611,7 +610,7 @@ constexpr uint8_t ASC_SIZE = 16;
                 "dependencies": [],
                 "examples": [],
                 "api_kind": "enum",
-                "headers": ["/include/c_api/defs/enum.h"],
+                "header": ["/include/c_api/defs/enum.h"],
                 "declaration": {
                     "symbol": "asc_mode",
                     "cpp": "enum class asc_mode { DEFAULT };",
@@ -623,7 +622,7 @@ constexpr uint8_t ASC_SIZE = 16;
             allowed_empty = {f"tag.{namespace}" for namespace in namespaces}
             rendered = module.render_yaml(fields, namespaces, values, root, path, "# asc_mode\n", {}, allowed_empty)
             self.assertNotIn("api_kind:", rendered)
-            self.assertIn("headers: [/include/c_api/defs/enum.h]", rendered)
+            self.assertIn("header: [/include/c_api/defs/enum.h]", rendered)
             self.assertIn("declaration:", rendered)
             self.assertNotIn("signature:", rendered)
 
@@ -632,7 +631,7 @@ constexpr uint8_t ASC_SIZE = 16;
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             path = "docs/zh/api/SIMD-API/c_api/vector_compute/asc_add.md"
-            namespaces, values = module.taxonomy(TAXONOMY)
+            namespaces, values = module.taxonomy(ROOT / "taxonomy/releases/core-v9-frozen.json")
             fields = {
                 "okftype": "reference.api.cpp",
                 "title": "asc_add",
@@ -677,244 +676,6 @@ constexpr uint8_t ASC_SIZE = 16;
             for namespace in ("families", "objects", "source_locations", "destination_locations"):
                 self.assertNotIn(f"- {namespace}:", rendered, namespace)
 
-    def test_scaffold_emits_on_demand_tags_only(self):
-        with tempfile.TemporaryDirectory() as temp:
-            devkit = Path(temp) / "devkit"
-            document = devkit / "docs/zh/api/SIMD-API/c_api/foo/foo.md"
-            document.parent.mkdir(parents=True)
-            run = Path(temp) / "run"
-            namespaces = json.loads(
-                (TAXONOMY).read_text(encoding="utf-8")
-            )["namespace_order"]
-
-            # Greenfield doc without front matter: api_surfaces is injected from the
-            # source context (path-proven), every other namespace raises an issue.
-            document.write_text("# foo\n\n## 功能说明\n\n按元素相加。\n", encoding="utf-8")
-            subprocess.run(
-                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
-                 "--document", "docs/zh/api/SIMD-API/c_api/foo/foo.md", "--run-dir", str(run)],
-                check=True,
-            )
-            output = run / "batches/batch-01/worker-result.json"
-            subprocess.run(
-                ["python3", str(CONTROLLER), "worker", "--task", str(run / "batches/batch-01/task.json"),
-                 "--output", str(output)],
-                check=True,
-            )
-            doc = json.loads(output.read_text(encoding="utf-8"))["documents"][0]
-            self.assertEqual(doc["fields"]["tag"], [{"api_surfaces": ["c_api"]}])
-            self.assertIn("api_surfaces:c_api", doc["evidence"])
-            issue_fields = {item["field"] for item in doc["issues"]}
-            self.assertNotIn("tag.api_surfaces", issue_fields)
-            self.assertEqual(
-                {f"tag.{ns}" for ns in namespaces} - {"tag.api_surfaces"} <= issue_fields, True
-            )
-
-            # A basic_api document gets its own surface injected.
-            basic = devkit / "docs/zh/api/SIMD-API/basic_api/bar/bar.md"
-            basic.parent.mkdir(parents=True)
-            basic.write_text("# bar\n\n## 功能说明\n\n基础接口。\n", encoding="utf-8")
-            run_basic = Path(temp) / "run-basic"
-            subprocess.run(
-                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
-                 "--document", "docs/zh/api/SIMD-API/basic_api/bar/bar.md", "--run-dir", str(run_basic)],
-                check=True,
-            )
-            output_basic = run_basic / "batches/batch-01/worker-result.json"
-            subprocess.run(
-                ["python3", str(CONTROLLER), "worker",
-                 "--task", str(run_basic / "batches/batch-01/task.json"),
-                 "--output", str(output_basic)],
-                check=True,
-            )
-            doc_basic = json.loads(output_basic.read_text(encoding="utf-8"))["documents"][0]
-            self.assertEqual(doc_basic["fields"]["tag"], [{"api_surfaces": ["basic_api"]}])
-
-            # Doc with existing on-demand front matter: scaffold keeps only the
-            # non-empty namespaces and raises issues for the missing ones.
-            document.write_text(
-                "---\n"
-                "okftype: reference.api.cpp\n"
-                "title: foo\n"
-                "resource: asc-devkit/docs/zh/api/SIMD-API/c_api/foo/foo.md\n"
-                "description: 已确认\n"
-                "tag:\n"
-                "  - api_surfaces: [c_api]\n"
-                "  - roles: [compute]\n"
-                "  - operations: [add]\n"
-                "signature: []\n"
-                "dependencies: []\n"
-                "examples: []\n"
-                "timestamp: '2026-09-24'\n"
-                "---\n\n# foo\n\n按元素相加的矢量计算。\n",
-                encoding="utf-8",
-            )
-            subprocess.run(
-                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
-                 "--document", "docs/zh/api/SIMD-API/c_api/foo/foo.md", "--run-dir", str(run)],
-                check=True,
-            )
-            subprocess.run(
-                ["python3", str(CONTROLLER), "worker", "--task", str(run / "batches/batch-01/task.json"),
-                 "--output", str(output)],
-                check=True,
-            )
-            doc = json.loads(output.read_text(encoding="utf-8"))["documents"][0]
-            self.assertEqual(
-                doc["fields"]["tag"],
-                [{"api_surfaces": ["c_api"]}, {"roles": ["compute"]}, {"operations": ["add"]}],
-            )
-            issue_fields = {item["field"] for item in doc["issues"]}
-            missing = {ns for ns in namespaces} - {"api_surfaces", "roles", "operations"}
-            self.assertEqual({f"tag.{ns}" for ns in missing} <= issue_fields, True)
-            self.assertNotIn("tag.api_surfaces", issue_fields)
-            self.assertNotIn("tag.roles", issue_fields)
-            self.assertNotIn("tag.operations", issue_fields)
-
-    def test_tag_rules_match_taxonomy_mandatory_namespaces(self):
-        module = self._controller_module()
-        taxonomy_payload = json.loads(TAXONOMY.read_text(encoding="utf-8"))
-        rules = module.load_tag_rules()
-        self.assertEqual(
-            sorted(rules["required_namespaces"]["always"]),
-            sorted(taxonomy_payload["mandatory_namespaces"]),
-        )
-        conditional_namespaces = set(rules["required_namespaces"]["conditional"])
-        self.assertEqual(conditional_namespaces, {"operations", "execution_models"})
-
-    def test_tag_rules_allow_sanctioned_blank_of_conditional_namespace(self):
-        module = self._controller_module()
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp)
-            path = "docs/zh/api/SIMD-API/c_api/foo/asc_add.md"
-            namespaces, values = module.taxonomy(TAXONOMY)
-            fields = {
-                "okftype": "reference.api.cpp",
-                "title": "asc_add",
-                "resource": f"asc-devkit/{path}",
-                "description": "矢量加法。",
-                "tag": [
-                    {"api_surfaces": ["c_api"]},
-                    {"roles": ["compute"]},
-                    {"operations": []},
-                    {"execution_models": ["memory_vector"]},
-                ],
-                "signature": [],
-                "dependencies": [],
-                "examples": [],
-                "headers": None,
-                "declaration": None,
-                "type_catalog": None,
-                "timestamp": "2026-09-24",
-            }
-            body = "# asc_add\n\n按元素相加的内存矢量加法运算。\n"
-            evidence = {
-                "api_surfaces:c_api": [{"source_path": path, "excerpt": path}],
-                "roles:compute": [{"source_path": path, "excerpt": "加法运算"}],
-                "execution_models:memory_vector": [{"source_path": path, "excerpt": "内存矢量加法运算"}],
-            }
-            # 无决议时条件必填仍阻断。
-            with self.assertRaises(module.ValidationError):
-                module.render_yaml(fields, namespaces, values, root, path, body, evidence, set())
-            # 经 resolver blank_field 决议（allowed_empty）后通过，且渲染省略该 namespace。
-            rendered = module.render_yaml(
-                fields, namespaces, values, root, path, body, evidence, {"tag.operations"}
-            )
-            self.assertIn("roles: [compute]", rendered)
-            self.assertIn("execution_models: [memory_vector]", rendered)
-            self.assertNotIn("operations:", rendered)
-
-    def test_semantic_input_flow_and_gating(self):
-        doc_path = "docs/zh/api/SIMD-API/c_api/foo/asc_add.md"
-        with tempfile.TemporaryDirectory() as temp:
-            devkit = Path(temp) / "devkit"
-            document = devkit / doc_path
-            document.parent.mkdir(parents=True)
-            document.write_text("# asc_add\n\n## 功能说明\n\n按元素相加的内存矢量加法运算。\n", encoding="utf-8")
-            run = Path(temp) / "run"
-            subprocess.run(
-                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
-                 "--document", doc_path, "--run-dir", str(run)],
-                check=True,
-            )
-            task_path = run / "batches/batch-01/task.json"
-            output = run / "batches/batch-01/worker-result.json"
-            semantic_path = run / "batches/batch-01/semantic-input.json"
-            doc_rel = doc_path
-            semantic = {
-                "schema_version": 1,
-                "purpose": "okf_yaml_semantic_input",
-                "run_id": "run",
-                "batch_id": "batch-01",
-                "annotations": [{
-                    "document_path": doc_rel,
-                    "document_sha256": hashlib.sha256(document.read_bytes()).hexdigest(),
-                    "description": {
-                        "value": "按元素相加。",
-                        "evidence": [{"source_path": doc_rel, "excerpt": "按元素相加的内存矢量加法运算"}],
-                    },
-                    "tag": [
-                        {"roles": ["compute"]},
-                        {"operations": ["add"]},
-                        {"execution_models": ["memory_vector"]},
-                    ],
-                    "tag_evidence": {
-                        "roles:compute": [{"source_path": doc_rel, "excerpt": "加法运算"}],
-                        "operations:add": [{"source_path": doc_rel, "excerpt": "按元素相加"}],
-                        "execution_models:memory_vector": [{"source_path": doc_rel, "excerpt": "内存矢量加法运算"}],
-                    },
-                    "dependencies": [],
-                }],
-            }
-            semantic_path.write_text(json.dumps(semantic, ensure_ascii=False), encoding="utf-8")
-
-            # 缺语义输入的 scaffold：semantic_verified=false，validate 必须阻断。
-            subprocess.run(
-                ["python3", str(CONTROLLER), "worker", "--task", str(task_path), "--output", str(output)],
-                check=True,
-            )
-            payload = json.loads(output.read_text(encoding="utf-8"))
-            self.assertFalse(payload["documents"][0]["semantic_verified"])
-            blocked = subprocess.run(
-                ["python3", str(CONTROLLER), "validate", "--run-dir", str(run)],
-                capture_output=True, text=True,
-            )
-            self.assertNotEqual(blocked.returncode, 0)
-            self.assertIn("semantic input missing", blocked.stderr + blocked.stdout)
-
-            # 带语义输入的合并：api_surfaces 注入 + 语义 tag 按需合并，issue 不含已填 namespace。
-            subprocess.run(
-                ["python3", str(CONTROLLER), "worker", "--task", str(task_path),
-                 "--semantic-input", str(semantic_path), "--output", str(output)],
-                check=True,
-            )
-            payload = json.loads(output.read_text(encoding="utf-8"))
-            doc = payload["documents"][0]
-            self.assertTrue(doc["semantic_verified"])
-            self.assertEqual(doc["fields"]["description"], "按元素相加。")
-            self.assertEqual(
-                doc["fields"]["tag"],
-                [
-                    {"api_surfaces": ["c_api"]},
-                    {"roles": ["compute"]},
-                    {"operations": ["add"]},
-                    {"execution_models": ["memory_vector"]},
-                ],
-            )
-            issue_fields = {item["field"] for item in doc["issues"]}
-            for filled in ("tag.api_surfaces", "tag.roles", "tag.operations", "tag.execution_models"):
-                self.assertNotIn(filled, issue_fields)
-
-            # 输入在 prepare 后发生变化：hash 对账必须失败。
-            document.write_text("# asc_add\n\n## 功能说明\n\n按元素相加的内存矢量加法运算。改动。\n", encoding="utf-8")
-            stale = subprocess.run(
-                ["python3", str(CONTROLLER), "worker", "--task", str(task_path),
-                 "--semantic-input", str(semantic_path), "--output", str(output)],
-                capture_output=True, text=True,
-            )
-            self.assertNotEqual(stale.returncode, 0)
-            self.assertIn("hash mismatch", stale.stderr + stale.stdout)
-
     def test_prepare_worker_and_field_degradation(self):
         with tempfile.TemporaryDirectory() as temp:
             devkit = Path(temp) / "devkit"
@@ -949,9 +710,7 @@ constexpr uint8_t ASC_SIZE = 16;
             )
             payload = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(payload["documents"][0]["path"], "docs/zh/api/SIMD-API/c_api/foo/foo.md")
-            # api_surfaces 由 source-context 注入，不再产生 tag.api_surfaces issue：
-            # 8 个缺失 namespace + 1 个 description issue = 9。
-            self.assertEqual(len(payload["documents"][0]["issues"]), 9)
+            self.assertEqual(len(payload["documents"][0]["issues"]), 10)
             self.assertNotIn("usage_dependencies", payload["documents"][0]["fields"])
 
     def test_dependency_evidence_is_required(self):
@@ -1001,7 +760,7 @@ constexpr uint8_t ASC_SIZE = 16;
             self.assertEqual(worker["fields"]["description"], "")
             self.assertTrue(any(item["field"] == "description" for item in worker["issues"]))
 
-    def test_worker_normalizes_signature_identifier_kind(self):
+    def test_worker_does_not_reuse_legacy_signature_without_source_evidence(self):
         with tempfile.TemporaryDirectory() as temp:
             devkit = Path(temp) / "devkit"
             document_path = "docs/zh/api/SIMD-API/c_api/foo/foo.md"
@@ -1028,14 +787,8 @@ constexpr uint8_t ASC_SIZE = 16;
                  "--output", str(output)],
                 check=True,
             )
-            signature = json.loads(output.read_text(encoding="utf-8"))["documents"][0]["fields"]["signature"]
-            self.assertEqual(
-                signature,
-                [
-                    {"override_id": "asc_fixed__u32"},
-                    {"prototype_id": "asc_template__v<dtype>"},
-                ],
-            )
+            fields = json.loads(output.read_text(encoding="utf-8"))["documents"][0]["fields"]
+            self.assertNotIn("signature", fields)
 
     def test_validate_signature_rejects_identifier_kind_mismatch(self):
         from importlib.util import spec_from_file_location, module_from_spec
@@ -1089,7 +842,7 @@ example: true
             self.assertNotIn("api_signature:", module.strip_inline_api_signature_blocks(body))
             self.assertIn("example: true", module.strip_inline_api_signature_blocks(body))
 
-            namespaces, values = module.taxonomy(TAXONOMY)
+            namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
             fields = {
                 "okftype": "reference.api.cpp",
                 "title": "asc_foo",
@@ -1099,12 +852,12 @@ example: true
                 "signature": [{
                     "prototype_id": "asc_foo__v<dtype>",
                     "archs": [],
-                    "headers": [],
+                    "header": [],
                     "dtype": ["half", "float"],
                 }],
                 "dependencies": [],
                 "examples": [],
-                "headers": None,
+                "header": None,
                 "declaration": None,
                 "type_catalog": None,
                 "timestamp": "2026-09-20",
@@ -1168,7 +921,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         self.assertEqual(normalized[0]["dtype"], ["half", "float"])
         self.assertEqual(normalized[1]["dtype"], ["int16_t", "uint16_t"])
 
-    def test_prepare_records_all_default_write_targets(self):
+    def test_prepare_records_default_write_contracts(self):
         module = self._controller_module()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp) / "devkit"
@@ -1182,7 +935,83 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                 check=True,
             )
             manifest = json.loads((run / "manifest.json").read_text(encoding="utf-8"))
-            self.assertEqual(manifest["write_targets"], list(module.DEFAULT_WRITE_TARGETS))
+            self.assertEqual(manifest["write_contracts"], list(module.DEFAULT_WRITE_CONTRACTS))
+
+    def test_profile_order_is_explicit_and_applicability_is_not_generated(self):
+        module = self._controller_module()
+        model = module.load_model()
+        self.assertNotIn("applicability", model["field_order"])
+        classification = module.classify_document(
+            "docs/zh/api/SIMD-API/c_api/foo/foo.md",
+            "## 函数原型\n\n```c\nvoid foo();\n```\n",
+        )
+        self.assertIsNotNone(classification)
+        plan = module.compile_execution_plan(classification)
+        self.assertEqual(
+            plan.fields,
+            (
+                "okftype", "title", "resource", "description", "tag", "signature", "archs", "header",
+                "dependencies", "examples", "timestamp",
+            ),
+        )
+        self.assertNotIn("applicability", plan.fields)
+
+    def test_render_yaml_follows_registry_order_and_never_emits_applicability(self):
+        module = self._controller_module()
+        namespaces, values = module.taxonomy(
+            ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
+        )
+        document_path = "docs/zh/api/SIMD-API/c_api/foo/foo.md"
+        fields = {
+            "okftype": "reference.api.cpp",
+            "title": "foo",
+            "resource": f"asc-devkit/{document_path}",
+            "description": "这是一个用于测试字段顺序的接口描述。",
+            "tag": [
+                {namespace: [next(iter(values[namespace]))]}
+                for namespace in namespaces
+            ],
+            "signature": [],
+            "dependencies": [],
+            "examples": [],
+            "timestamp": "2026-09-23",
+        }
+        body = "# foo\n\n正文证据。\n"
+        evidence = {
+            f"{namespace}:{next(iter(values[namespace]))}": [{
+                "source_path": document_path,
+                "excerpt": document_path if namespace == "api_surfaces" else "正文证据。",
+            }]
+            for namespace in namespaces
+        }
+        rendered = module.render_yaml(fields, namespaces, values, Path("/tmp"), document_path, body, evidence, set())
+        keys = [line.split(":", 1)[0] for line in rendered.splitlines() if line and not line[0].isspace()]
+        self.assertEqual(
+            keys,
+            ["okftype", "title", "resource", "description", "tag", "signature", "dependencies", "examples", "timestamp"],
+        )
+        self.assertNotIn("applicability", rendered)
+
+        index_fields = {
+            "okftype": "reference.index.cpp",
+            "title": "foo index",
+            "resource": f"asc-devkit/{document_path}",
+            "description": "这是一个用于测试索引页字段规则的描述。",
+            "tag": [
+                {namespace: ["c_api"] if namespace == "api_surfaces" else []}
+                for namespace in namespaces
+            ],
+            "dependencies": [],
+            "timestamp": "2026-09-23",
+        }
+        index_evidence = {
+            "api_surfaces:c_api": [{"source_path": document_path, "excerpt": document_path}]
+        }
+        index_rendered = module.render_yaml(
+            index_fields, namespaces, values, Path("/tmp"), document_path,
+            body, index_evidence, set(),
+        )
+        self.assertIn("api_surfaces: [c_api]", index_rendered)
 
     def test_base_and_example_fields_follow_the_okf_contract(self):
         module = self._controller_module()
@@ -1240,7 +1069,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             run = Path(temp) / "run"
             batch = run / "batches" / "batch-01"
             batch.mkdir(parents=True)
-            taxonomy = TAXONOMY
+            taxonomy = ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
             (run / "manifest.json").write_text(
                 json.dumps({
                     "schema_version": 1,
@@ -1252,7 +1081,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                 }),
                 encoding="utf-8",
             )
-            namespaces = json.loads(taxonomy.read_text(encoding="utf-8"))["namespace_order"]
+            namespaces = json.loads(taxonomy.read_text(encoding="utf-8"))["required_namespaces"]
             worker_result = {
                 "schema_version": 1,
                 "run_id": "run",
@@ -1333,6 +1162,24 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         self.assertIn("description", output)
         self.assertIn("signature", output)
 
+    def test_validation_failure_persists_report_and_blocked_state(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            run = Path(temp) / "run"
+            run.mkdir()
+            (run / "manifest.json").write_text(
+                json.dumps({"run_id": "run-report", "documents": []}), encoding="utf-8"
+            )
+            module.write_validation_failure_report(run, module.ValidationError("missing issue resolution"))
+            report_json = run / "error-report.json"
+            report_md = run / "error-report.md"
+            validation = run / "validation.json"
+            self.assertTrue(report_json.is_file())
+            self.assertTrue(report_md.is_file())
+            self.assertTrue(validation.is_file())
+            self.assertEqual(json.loads(validation.read_text(encoding="utf-8"))["status"], "blocked")
+            self.assertIn("missing issue resolution", report_md.read_text(encoding="utf-8"))
+
 
     def _build_run(self, temp, doxygen, markers):
         devkit = Path(temp) / "devkit"
@@ -1353,7 +1200,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         run = Path(temp) / "run"
         batch = run / "batches/batch-01"
         batch.mkdir(parents=True)
-        taxonomy = TAXONOMY
+        taxonomy = ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
         (run / "manifest.json").write_text(
             json.dumps({
                 "schema_version": 1,

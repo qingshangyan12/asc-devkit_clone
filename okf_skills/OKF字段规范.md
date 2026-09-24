@@ -15,10 +15,10 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 | resource | string | 是 | 全部 | 从 asc-devkit 开始的仓库相对路径，使用 /。 |
 | description | string | API/架构页必需，索引页可省略 | API/架构页 | 由 description Agent 基于功能说明等正文证据生成的检索摘要，不得引入正文没有的能力。 |
 | tag | object[] | 是 | API/架构页 | 受控检索标签，每项为 namespace 及其标签内容数组。 |
-| signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。函数项包含 prototype_id 或 override_id、archs、headers；含 `<dtype>` 的 prototype_id 在同一条目中添加 dtype；函数宏项只包含 macro_id。 |
+| signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。函数项包含 prototype_id 或 override_id、archs、header；含 `<dtype>` 的 prototype_id 在同一条目中添加 dtype；函数宏项只包含 macro_id。 |
 | dependencies | object[] | 含明确关联时填写 | 全部 | 有正文依据的关联文档，包含 path、kind，必要时包含 condition。 |
 | examples | object[] | 含示例时填写 | API/架构页 | 样例工程或源码位置和明确的示例架构，包含样例 path，可选 file、archs、override_id。 |
-| headers | string[] | 可选 | 非 callable 定义页 | 唯一确认的真实声明头文件，使用 `/include/...` 路径。 |
+| header | string[] | 可选 | 非 callable 定义页 | 唯一确认的真实声明头文件，使用 `/include/...` 路径。 |
 | declaration | object | 定义页可选 | enum、record、constant、type_alias、对象宏 | 从正文定义代码块提取的受限声明结构。 |
 | type_catalog | object | 类型目录页可选 | `c_api/defs/type` | 正文表格中的数据类型分组。 |
 | timestamp | string | 是 | 全部 | 元数据生成日期。 |
@@ -28,11 +28,11 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 ## 定义页
 
 `c_api/defs` 的实体页不是函数 API。enum、struct/union、constant 和 `using` 类型别名仅在正文定义与唯一
-声明 header 同时确认时写 `declaration` 和 `headers`。`declaration` 至少包含
+声明 header 同时确认时写 `declaration` 和 `header`。`declaration` 至少包含
 `symbol`、`cpp`；enum 包含 `members`，record 包含 `fields` 和 `record_kind`，constant 可包含 `type`、`value`，
 type alias 包含 `target`。数据类型目录使用 `type_catalog.groups`，不要求 header。
 
-函数宏仍使用 `signature` 中唯一的 `macro_id`，不附加 header；对象宏使用 `headers` 和
+函数宏仍使用 `signature` 中唯一的 `macro_id`，不附加 header；对象宏使用 `header` 和
 `declaration.macros`。定义页没有函数原型、不可调用样例或 Doxygen 目标是正常情况，不能由此伪造 `signature`、
 example marker 或函数 Doxygen。
 
@@ -44,7 +44,7 @@ signature 必须按调用模式拆分，例如 contiguous、strided、scalar、m
 不得按整页合并。archs 只记录正文、文件名或编译命令明确给出的 dav-* 架构；产品支持区中机器可读的
 `<!-- npu="..." -->` 支持标记可按既有架构映射使用。不得从其他产品状态文案推断架构。
 
-headers 保存真实声明文件路径，例如 /include/c_api/vector_compute/compute/vector_arith.h。文档给出的
+header 保存真实声明文件路径，例如 /include/c_api/vector_compute/compute/vector_arith.h。文档给出的
 聚合头只是查找范围；只有在该头或其递归 include 闭包中唯一匹配的声明 header 才能写入 signature。
 
 对已验证且带命名参数的具体函数声明，include Doxygen 必须从本页“参数说明”表提取每个参数的方向和描述，
@@ -143,7 +143,7 @@ archs。override_id 必须与 signature 和样例源码中的调用标记对应�
     signature:
       - prototype_id: "asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb"
         archs: ["3510"]
-        headers:
+        header:
           - /include/c_api/reg_compute/compute/reg_arith.h
         dtype: [half, float]
     dependencies:

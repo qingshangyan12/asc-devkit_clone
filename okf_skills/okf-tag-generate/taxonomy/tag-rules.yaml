@@ -1,0 +1,17 @@
+schema_version: 1
+required_namespaces:
+  always:
+    - roles
+  conditional:
+    operations:
+      when_roles_in:
+        - compute
+        - data_movement
+        - data_initialization
+    execution_models:
+      when_roles_in:
+        - compute
+evidence:
+  every_selected_value_requires_evidence: true
+  evidence_must_match_source: true
+  deprecated_requires_explicit_statement: true

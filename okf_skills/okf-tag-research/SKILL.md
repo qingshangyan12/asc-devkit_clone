@@ -11,9 +11,9 @@ description: 自动完成 Ascend DevKit API tag 词表调研，包括两个独�
 
 ## 词表来源
 
-冻结 tag 词表由 `../okf-tag-generate/taxonomy/core-v8-frozen.json` 唯一维护；本 Skill 不再维护第二份
+冻结 tag 词表由 `../okf-tag-generate/taxonomy/tag-taxonomy.json` 唯一维护；本 Skill 不再维护第二份
 taxonomy。所有运行默认读取这个文件；不得在项目仓库或其他目录另建一份并行词表。批准后的新 taxonomy
-版本写入 `../okf-tag-generate/taxonomy/releases/`，基线文件不得原地覆盖。
+规则和词表均直接维护在 `../okf-tag-generate/taxonomy/` 的唯一事实源文件中。
 
 taxonomy 中标记为 `required: true` 的 namespace 是强制概念维度。每一个最终 API 标注必须为每个
 强制 namespace 至少选择一个值，并为每个值提供目标 Markdown 正文中的逐字证据；缺少任一强制
@@ -37,7 +37,7 @@ taxonomy 中标记为 `required: true` 的 namespace 是强制概念维度。每
 3. 执行两次 `validate-discovery`。任何校验失败即停止本轮；源文档缺失或哈希变化同样使本轮无效。
 4. 执行 `summarize-discovery`。此时主代理才可读取两份已校验发现结果、汇总和原文，并按 `references/artifact-contract.md` 写入 `main-agent-review.json`。主代理只能批准两个发现子代理均支持的候选；定义、选择规则或原文证据不明确时必须 `defer`。
 5. 执行 `validate-review`、`freeze-provisional` 和 `build-release-bundle`。产出的 provisional taxonomy 不能被 tag 写入器使用。
-6. 仅向人工审批者展示发布包和 proposed taxonomy diff。收到 approval record 后运行 `approve`，默认将新的冻结 taxonomy 写入 `okf-tag-generate/taxonomy/releases/`。结果仍是候选发布工件，绝不自动切换生产 release。
+6. 仅向人工审批者展示发布包和 proposed taxonomy diff。收到 approval record 后，按批准结果更新唯一的 `okf-tag-generate/taxonomy/tag-taxonomy.json`。
 
 ## 子代理隔离
 
@@ -83,7 +83,7 @@ python3 scripts/tag_research.py approve \
 ```
 
 如需审计或迁移，可显式传入 `--taxonomy`；正常运行不要替换 Skill 内置基线。
-`approve` 省略输出路径时，会写入 `../okf-tag-generate/taxonomy/releases/`，并拒绝覆盖已有文件。
+`approve` 省略输出路径时，目标为唯一的 `../okf-tag-generate/taxonomy/tag-taxonomy.json`。
 
 主代理创建 review 或 approval 文件前，必须阅读 `references/artifact-contract.md`；启动子代理前，必须阅读 `references/worker-protocol.md`。
 
