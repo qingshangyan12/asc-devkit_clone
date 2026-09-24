@@ -50,6 +50,9 @@ using fp4x2_e1m2_t = float4_e1m2x2_t;
 using fp8_e5m2_t = float8_e5m2_t;
 using fp8_e4m3fn_t = float8_e4m3_t;
 using fp8_e8m0_t = float8_e8m0_t;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+using fp8_e6m2_t = float8_e6m2_t;
+#endif
 #endif
 
 constexpr uint32_t INT4_BIT_NUM = 4;
