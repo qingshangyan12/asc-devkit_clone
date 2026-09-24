@@ -1,14 +1,28 @@
 # Artifact 契约
 
-## 语义输入（semantic-input.json）
+## Worker 结果
 
-语义取证 agent 产出批次级语义工件，契约见 [`semantic-contract.md`](semantic-contract.md)：
-`annotations` 与 task documents 精确对账，`document_sha256` 等于 prepare 输入哈希；`description` 来自
-已通过 `okf-description-generate validate` 的结果；`tag` 按需只含有逐字证据的 namespace（不含
-`api_surfaces`，不写空数组）；`tag_evidence` 覆盖每个 `namespace:value`；`dependencies` 每项带内联
-`evidence{source_path, excerpt}`。
+Index 文档使用独立字段契约：
 
-## Worker 结果（controller 产出，语义输入与结构 scaffold 的合并）
+### Index 示例
+
+```json
+{
+  "fields": {
+    "okftype": "reference.index.cpp",
+    "title": "Vector Compute",
+    "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compute.md",
+    "navigation": [
+      {"path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/vector_arith.md", "title": "基础算术"}
+    ],
+    "timestamp": "2026-09-24"
+  }
+}
+```
+
+Index 结果不得包含 `description`、`tag`、`dependencies`、`examples`、`signature` 或 `header`。
+
+### 普通 API 示例
 
 ```json
 {
@@ -20,6 +34,12 @@
     {
       "path": "docs/zh/api/SIMD-API/c_api/foo.md",
       "sha256": "...",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "rule": "callable_structure",
+        "fields": ["okftype", "title", "resource", "description", "tag", "signature", "dependencies", "examples", "timestamp"],
+        "outputs": ["front_matter", "doxygen", "example_markers"]
+      },
       "fields": {
         "okftype": "reference.api.cpp",
         "title": "foo",
@@ -36,6 +56,7 @@
         "api_surfaces:c_api": [{"source_path": "docs/zh/api/SIMD-API/c_api/foo.md", "excerpt": "docs/zh/api/SIMD-API/c_api/foo.md"}]
       },
       "issues": [],
+      "semantic_verified": true,
       "doxygen": [],
       "example_markers": []
     }
@@ -43,14 +64,19 @@
 }
 ```
 
-每个文档只能由一个 worker 提交。`fields` 必须包含所有顶层字段（`tag` 键本身不得缺失），不能以缺键表示未知，
-未知值按字段规则写空；但 `tag` 数组按需生成：只包含有逐字证据的非空 namespace，无证据的 namespace 直接
-省略、不写空数组，降级信号由对应的 scaffold issue 携带。`dtype` 是含 `<dtype>` 的 `signature` 条目中的字符串数组，写入时与 `prototype_id` 同级渲染为
+每个文档只能由一个 worker 提交。`plan` 是扁平 Profile 计算出的字段和输出契约；`fields` 只允许包含
+公共字段和该 Profile 声明的字段，无法确认的字段按字段规则写空或省略。Index 只允许写入 navigation。`dtype` 是含 `<dtype>` 的
+`signature` 条目中的字符串数组，写入时与 `prototype_id` 同级渲染为
 单行数组，绝不位于根级或 Markdown 原型前的 YAML 围栏。证据必须带 source path 和逐字 excerpt。
 
-`fields.description` 不由 worker 或总控脚本生成。它必须来自同一文档、同一哈希且已通过
-`okf-description-generate validate` 的 `description-result.json`；worker 将其中的 evidence 补充当前
-`source_path` 后写入本工件。没有有效结果时，description 保持空并记录问题。
+普通 API 的 `fields.description`、`fields.tag` 和 `fields.dependencies` 不由 worker 或总控脚本猜测。它们必须来自同一
+批次 `semantic-input.json`，并且每项 annotation 的 document hash 与当前输入一致。description 必须来自同一
+文档、同一哈希且已通过 `okf-description-generate validate` 的 `description-result.json`；tag 的每个非空值
+必须有 namespace:value 级 evidence。没有有效语义结果时，普通 API worker 只能标记 `semantic_verified: false`，
+`validate` 必须阻断；Index 不需要语义结果。
+
+语义输入契约见 [`semantic-contract.md`](semantic-contract.md)。它要求 annotation 覆盖整个 batch，且不允许
+从旧 front matter 继承字段。
 
 `doxygen` 不是 `{path, anchor, text}` 补丁。每项以 `header`、canonical `function`、带名称的
 `parameters`（宏另含 `macro_id`）定位真实声明；控制器负责写入关联块并只增加有 evidence 的
@@ -64,10 +90,10 @@ archs，marker 始终使用与 signature 相同的派生 ID。
 每项含 `name`、`direction`、`description` 和逐字表格 `evidence`。表缺失、未覆盖全部参数或方向不明确时，
 worker 保留空 `doxygen` 但必须附加 `include_doxygen` 问题，不能静默成功。
 
-`c_api/defs` 实体页的 `fields` 可附加 source-derived 字段：`headers`、`declaration`、`type_catalog`。
-`headers` 仅在唯一的真实声明 header 已验证时写入；`declaration` 记录 enum/record/constant/
+`c_api/defs` 实体页的 `fields` 可附加 source-derived 字段：`header`、`declaration`、`type_catalog`。
+`header` 仅在唯一的真实声明 header 已验证时写入；`declaration` 记录 enum/record/constant/
 type alias 或对象宏定义，`type_catalog` 记录数据类型分组。函数宏仍只通过 `signature[].macro_id` 表达，
-不写 top-level `headers` 或 `declaration`。定义页没有可调用签名时，不能产生“缺函数原型”问题。
+不写 top-level `header` 或 `declaration`。定义页没有可调用签名时，不能产生“缺函数原型”问题。
 
 `resolve-issues --run-dir` 会先生成精简的 `issues.json` 和 `resolution-input.json`。问题处理 agent
 只读取 `resolution-input.json`，一次性处理该运行的全部问题；不应重新读取完整 API 文档。

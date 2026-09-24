@@ -5,12 +5,22 @@ description: 集中编排 Ascend DevKit API 的完整 OKF YAML 生成、并发�
 
 # OKF YAML 总控生成
 
-本 Skill 是完整 OKF YAML 生成的唯一中控入口。所有脚本、协议和报告格式都在本目录内，
+本 Skill 是完整 OKF YAML 生成的唯一中控入口。所有脚本、词表、协议和报告格式都在本目录内，
 不得在运行时导入 `api-yaml-metadata-guard`、旧 OKF skill、issue ledger、remedy library 或索引工具。原型 ID、
 原型/宏解析、header 映射和样例 marker 的已验证实现已 vendoring 到本目录，必须以本地副本为准。
-冻结词表是唯一的共享例外：以 `okf-tag-generate/taxonomy/releases/core-v9-frozen.json` 为跨 skill
-唯一事实源（本 Skill 不持有本地副本）；每次运行必须把实际解析的绝对路径写入
+默认词表固定为 `../okf-tag-generate/taxonomy/tag-taxonomy.json`；tag 规则固定由同目录的
+`tag-rules.yaml` 提供；每次运行必须把实际解析的绝对路径写入
 `manifest.json`，不得与旧版本混用。
+
+## 分类与 Profile
+
+Profile 使用完整 `okftype` 作为扁平键，例如 `reference.api.cpp`。分类器从文档结构事实
+产出一个 `okftype`：函数原型和真实声明得到 `reference.api.cpp`，定义声明得到
+`reference.type.cpp`，以 Markdown 链接导航为主的页面得到 `reference.index.cpp`。
+`config/source-context-v1.yaml` 只提供源集合根目录、文档族和技术上下文，不维护逐路径
+分类规则。`config/document-profile-registry.yaml` 只声明公共必填字段、Profile 允许字段
+和输出契约；实体解析结果（枚举、函数宏、对象宏等）只决定实际有证据的字段，不形成新的
+注册表层级。无法可靠分类时只报告，不继承旧 front matter，也不静默降级。
 
 ## 处理范围
 
@@ -26,7 +36,7 @@ include 只允许增加有证据的 Doxygen 注释，样例只允许增加 marke
 
 函数原型和 header 必须按本 Skill 内的 legacy-compatible 解析器生成：它处理文档占位符、C++ 模板参数、
 函数名占位符展开、函数宏、对象宏别名、头文件路径提示和聚合头 include 闭包。只有唯一且参数可兼容的真实
-声明可以进入 `signature[].headers`；候选、多义或范围外结果只能进入问题报告。`c_api/defs` 的实体页走独立
+声明可以进入 `signature[].header`；候选、多义或范围外结果只能进入问题报告。`c_api/defs` 的实体页走独立
 定义解析：enum、struct/union、constant、`using` 类型别名、数据类型目录和宏定义分别产生受限的定义字段，
 不因没有函数原型而降级。`defs.md` 及与目录同名的索引页不进入目录批处理。
 
@@ -38,18 +48,20 @@ Doxygen 仍按旧生成器合并为 canonical ID 和汇总的 `@archs`；不同�
 ## 总控流程
 
 1. 执行 `prepare`，解析范围、计算输入 hash、建立批次和 worker 任务包。
-2. 目录超过 25 个文档时按最多 25 个一批；每波最多 6 个语义取证 agent。语义取证 agent 产出批次级
-   `semantic-input.json`（description/tag/dependencies 及逐字证据，契约见
-   `references/semantic-contract.md`）；controller 以 `--semantic-input` 将其与结构 scaffold 合并。
-   语义 agent 只读证据并输出语义工件，不得触碰结构字段、不得写 DevKit；缺语义输入的 worker 结果
-   `semantic_verified: false`，`validate` 阻断。
+   每个批次必须先由语义取证 agent 生成 `semantic-input.json`：为批次内每个文档提供哈希绑定的
+   `description`、完整必需 `tag` 及其逐值 evidence、`dependencies`。description 必须来自已通过
+   `okf-description-generate validate` 的结果；不能用 worker scaffold 代替。
+2. 目录超过 25 个文档时按最多 25 个一批；每波最多 6 个 worker。worker 只读证据并输出结果，
+   不得写 DevKit；调用时必须传入对应的 `--semantic-input`。
 3. 主控汇总 worker 结果，执行一轮独立的问题处理 agent。问题处理 agent 只分析指定证据，
    输出分类和处理决定，不修改任何源文件。
 4. 主控根据结果生成完整 write plan：基础 YAML、tag、dependencies、Doxygen 和 example marker。
 5. 执行 `validate`。它必须校验所有路径、hash、证据、词表、字段、问题决定和写入边界，并完成
-   所有阶段的 dry-run。
+   所有阶段的 dry-run。缺少语义输入、未解决问题或生成器无法处理的合法结构都会使校验阻断，
+   不得以空 description/tag/dependencies 继续写入。
 6. 只有 `validate` 成功后，使用相同 run directory 执行 `write`。写入前再次确认输入 hash 未变化。
-7. 运行结束必须生成机器可读 `error-report.json` 和中文 `error-report.md`。同一文档的所有问题必须
+7. Index Profile 只生成 `okftype`、`title`、`resource`、`navigation` 和 `timestamp`，不生成 description、tag、dependencies 或 examples。
+8. 运行结束必须生成机器可读 `error-report.json` 和中文 `error-report.md`。同一文档的所有问题必须
    合并在同一个报告章节中。
 
 ## 临时目录和最终反馈
@@ -96,39 +108,43 @@ python3 scripts/controller.py write \
   --run-dir tmp/<run-id>
 ```
 
+`scripts/controller.py` 是唯一入口。`tag_stage.py`、`dependency_stage.py` 和其他历史分阶段脚本不是本流程
+的独立入口；不得绕过 semantic-input、统一校验或字段顺序单独运行它们。
+
 主代理负责按 task 包启动 worker 和问题处理 agent；没有并发能力时按同一批次顺序执行。
 `write` 不接受临时字段或新 artifact，只使用当前 run 的校验结果。
 
 ## 快速路径
 
-- 单文档只启动一个语义取证 agent；不要为每个字段或每个问题单独启动 agent。
-- 语义取证 agent 逐篇走 `okf-description-generate` 流程并从正文取证 tag/dependencies，一次性写出
-  `semantic-input.json`；主控随后运行 `controller.py worker --semantic-input` 完成结构合并。
+- 单文档只启动一个 worker；不要为每个字段或每个问题单独启动 agent。
+- worker 先运行 `controller.py worker` 生成 scaffold，再只补充缺失的语义字段和证据。
 - 使用 `rg` 定位标题、功能说明、原型、约束和样例链接；只读取命中的局部区段，不要整篇重复读取。
-- 合并完成后先运行 `resolve-issues` 生成紧凑的 `resolution-input.json`。问题处理 agent 只接收该文件内容，
+- worker 完成后先运行 `resolve-issues` 生成紧凑的 `resolution-input.json`。问题处理 agent 只接收该文件内容，
   默认不给 resolver DevKit 根目录、run directory 或 worker-result 路径，不重新读取全文；只有证据冲突时才回读对应局部区段。
 - 没有问题时跳过问题处理 agent，直接进入 validate。多个问题必须由同一轮 resolver 一次性处理。
 - validate/write 是本地脚本操作，不需要再次让 agent 解释或复述整个文档。
 
 ## 字段和降级规则
 
-基础 YAML 字段为 `okftype`、`title`、`resource`、`description`、`tag`、`signature`、
-`dependencies`、`examples`、`timestamp`。`c_api/defs` 实体页还可有 source-derived 的 `headers`、
+基础 YAML 字段按固定顺序为 `okftype`、`title`、`resource`、`description`、`tag`、`signature`、
+`header`、`declaration`、`type_catalog`、`dependencies`、`examples`、`timestamp`。`c_api/defs` 实体页还可有 source-derived 的 `header`、
 `declaration` 或 `type_catalog`；这些字段不由 worker 猜测，也不用于普通函数页。
 
 问题只影响对应字段：
 
-- description 无法确认：先运行 `okf-description-generate`；其 `unresolved` 结果才允许按决议写 `description: ""`，总控脚本不得自行从正文提取摘要。
-- signature 无法确认：`signature: []`
+- description 无法确认：先运行 `okf-description-generate` 并提交哈希绑定的语义工件；没有有效工件或
+  工件未通过校验时，`validate` 阻断，不得自动写 `description: ""`。
+- signature 无法确认：API Profile 保留 `signature: []`；没有原型的索引、概念和定义页不生成 signature 字段。
 - dtype 有正文明确类型列表时：仅写入对应 `prototype_id` 同级的单行数组，例如 `dtype: [half, float]`；
   不得写为根级字段，也不得在函数原型前的 YAML 代码块写 dtype。
-- 非 callable 定义：只有正文能解析出声明且唯一 header 确认时才写 `declaration` 和 `headers`。
-  `type_catalog` 不要求 header；函数宏继续使用独立 `signature[].macro_id`，对象宏使用 `headers` 和
+- 非 callable 定义：只有正文能解析出声明且唯一 header 确认时才写 `declaration` 和 `header`。
+  `type_catalog` 不要求 header；函数宏继续使用独立 `signature[].macro_id`，对象宏使用 `header` 和
   `declaration.macros` 表达。
 - examples 无法确认：`examples: []`
-- dependencies 无法确认：`dependencies: []`
-- tag 某 namespace 无法确认：worker 工件保留该 namespace 空数组以触发 resolver 决议；渲染输出省略该
-  namespace，不写空数组（不适用字段省略）
+- dependencies 无法确认：语义工件中写 `dependencies: []`，不能省略该字段
+- tag 某必需 namespace 无法确认：`validate` 阻断；不能把缺证据静默变成空数组。只有经过明确 issue/resolution
+  的定向降级才允许置空。
+- `applicability` 不属于任何 Profile，禁止生成、保留或从旧 front matter 继承。
 - Doxygen 或 marker 无法确认：不写入该注释，并记录问题
 
 Doxygen 记录不接受 `path/anchor/text` 自由补丁。主控按结构化声明身份写入或补齐
@@ -140,7 +156,7 @@ Doxygen 记录不接受 `path/anchor/text` 自由补丁。主控按结构化声�
 
 文档错误不会导致整篇 YAML 跳过。头文件、样例或实现代码问题只能报告，不能修改源代码。
 正常文档的必填 tag namespace 不允许为空；只有该 namespace 存在对应 issue、经过 resolver 记录并进入报告后，
-才允许省略该 namespace。每个非空 tag 值必须有 `namespace:value` 级逐字证据。
+才允许定向置空。每个非空 tag 值必须有 `namespace:value` 级逐字证据。
 
 ## 错误报告
 
@@ -155,6 +171,8 @@ Doxygen 记录不接受 `path/anchor/text` 自由补丁。主控按结构化声�
 
 中文报告必须明确列出文件、具体问题、证据、处理决定、实际降级字段和是否写入。问题类型为
 `document_defect`、`source_defect`、`tool_defect` 或 `unresolved`。
+`report_unresolved` 和 `tool_change_required` 都会使本轮 `validate` 状态为 `blocked`；必须修复证据或
+生成器后重新运行，不能直接执行 `write`。
 
 ## 写入边界
 

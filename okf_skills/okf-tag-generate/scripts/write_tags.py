@@ -14,7 +14,8 @@ import yaml
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_TAXONOMY = SKILL_ROOT / "taxonomy" / "releases" / "core-v9-frozen.json"
+DEFAULT_TAXONOMY = SKILL_ROOT / "taxonomy" / "tag-taxonomy.json"
+TAG_RULES = SKILL_ROOT / "taxonomy" / "tag-rules.yaml"
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
 TOP_LEVEL_KEY_RE = re.compile(r"^[^\s#][^:]*:\s*(?:.*)?(?:\n|$)")
@@ -36,21 +37,29 @@ def load_taxonomy(path: Path) -> tuple[tuple[str, ...], dict[str, set[str]], dic
     if payload.get("status") != "frozen":
         raise ValidationError(f"taxonomy is not frozen: {path}")
     namespaces = payload.get("namespaces")
-    order = payload.get("namespace_order")
-    if not isinstance(namespaces, dict) or not isinstance(order, list) or not order:
+    required = payload.get("required_namespaces")
+    if not isinstance(namespaces, dict) or not isinstance(required, list) or not required:
         raise ValidationError(f"taxonomy has invalid namespace metadata: {path}")
-    if len(order) != len(set(order)) or any(not isinstance(item, str) for item in order):
-        raise ValidationError("taxonomy namespace_order must be a unique string list")
+    if len(required) != len(set(required)) or any(not isinstance(item, str) for item in required):
+        raise ValidationError("taxonomy required_namespaces must be a unique string list")
     values: dict[str, set[str]] = {}
-    for namespace in order:
+    for namespace in required:
         definition = namespaces.get(namespace)
         options = definition.get("values") if isinstance(definition, dict) else None
         if not isinstance(options, dict) or any(not isinstance(value, str) for value in options):
             raise ValidationError(f"taxonomy has invalid values for namespace: {namespace}")
         values[namespace] = set(options)
-    if set(namespaces) != set(order):
-        raise ValidationError("taxonomy namespaces differ from namespace_order")
     return tuple(namespaces), values, payload
+
+
+def load_tag_rules(path: Path) -> dict[str, Any]:
+    try:
+        payload = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as exc:
+        raise ValidationError(f"cannot read tag rules: {path}: {exc}") from exc
+    if not isinstance(payload, dict) or not isinstance(payload.get("required_namespaces"), dict):
+        raise ValidationError(f"tag rules are invalid: {path}")
+    return payload
 
 
 def split_front_matter(text: str) -> tuple[dict[str, Any], str, str]:
@@ -96,6 +105,7 @@ def validate_annotation(
     namespaces: tuple[str, ...],
     values_by_namespace: dict[str, set[str]],
     taxonomy_payload: dict[str, Any],
+    tag_rules: dict[str, Any],
 ) -> tuple[Path, dict[str, list[str]]]:
     location = f"annotations[{index}]"
     if not isinstance(annotation, dict):
@@ -171,10 +181,14 @@ def validate_annotation(
         ):
             raise ValidationError(f"{location}.evidence.{key} must explicitly state deprecation")
     roles = set(normalized.get("roles", []))
-    if roles & {"compute", "data_movement", "data_initialization"} and "operations" not in normalized:
-        raise ValidationError(f"{location}.tag.operations is required for executable roles")
-    if "compute" in roles and not normalized.get("execution_models"):
-        raise ValidationError(f"{location}.tag.execution_models is required for compute APIs")
+    requirements = tag_rules["required_namespaces"]
+    required_namespaces = set(requirements.get("always", []))
+    for namespace, condition in requirements.get("conditional", {}).items():
+        if roles & set(condition.get("when_roles_in", [])):
+            required_namespaces.add(namespace)
+    missing_required = sorted(namespace for namespace in required_namespaces if namespace not in normalized)
+    if missing_required:
+        raise ValidationError(f"{location}.tag is missing required namespaces: {missing_required}")
     return document, normalized
 
 
@@ -243,6 +257,7 @@ def prepare_writes(
     namespaces: tuple[str, ...],
     values_by_namespace: dict[str, set[str]],
     taxonomy_payload: dict[str, Any],
+    tag_rules: dict[str, Any],
 ) -> list[tuple[Path, str, str]]:
     prepared: list[tuple[Path, str, str]] = []
     seen: set[str] = set()
@@ -253,7 +268,7 @@ def prepare_writes(
         if isinstance(path, str):
             seen.add(path)
         document, tags = validate_annotation(
-            annotation, index, devkit_root, namespaces, values_by_namespace, taxonomy_payload
+            annotation, index, devkit_root, namespaces, values_by_namespace, taxonomy_payload, tag_rules
         )
         original = document.read_text(encoding="utf-8")
         _, raw_front_matter, body = split_front_matter(original)
@@ -286,8 +301,9 @@ def main() -> int:
         if not devkit_root.is_dir():
             raise ValidationError(f"devkit root does not exist: {devkit_root}")
         namespaces, values_by_namespace, taxonomy_payload = load_taxonomy(args.taxonomy.expanduser().resolve())
+        tag_rules = load_tag_rules(TAG_RULES)
         annotations = load_annotations(args.input.expanduser().resolve())
-        prepared = prepare_writes(annotations, devkit_root, namespaces, values_by_namespace, taxonomy_payload)
+        prepared = prepare_writes(annotations, devkit_root, namespaces, values_by_namespace, taxonomy_payload, tag_rules)
         if args.write:
             for document, original, updated in prepared:
                 if document.read_text(encoding="utf-8") != original:

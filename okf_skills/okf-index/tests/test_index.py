@@ -132,7 +132,7 @@ class BuildTest(unittest.TestCase):
 
     def test_stage_views(self):
         views = self.index["views"]["by_stage"]
-        self.assertEqual({k: len(v) for k, v in views.items()}, {"in": 63, "out": 32, "compute": 384})
+        self.assertEqual({k: len(v) for k, v in views.items()}, {"in": 63, "out": 32, "compute": 382})
         self.assertIn(f"{BASE}/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md", views["in"])
         self.assertIn(f"{BASE}/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md", views["out"])
         # cube 搬运（gm→l0a/l1 入、l0c→gm 出）与寄存器 load/store 进入阶段视图。

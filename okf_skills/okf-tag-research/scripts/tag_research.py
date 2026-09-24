@@ -26,7 +26,7 @@ TAG_RE = re.compile(r"^(?P<namespace>[a-z][a-z0-9_]*):(?P<value>[a-z][a-z0-9_]*)
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 GENERATOR_SKILL_ROOT = SKILL_ROOT.parent / "okf-tag-generate"
-DEFAULT_TAXONOMY = GENERATOR_SKILL_ROOT / "taxonomy" / "releases" / "core-v9-frozen.json"
+DEFAULT_TAXONOMY = GENERATOR_SKILL_ROOT / "taxonomy" / "tag-taxonomy.json"
 RELEASE_DIR = GENERATOR_SKILL_ROOT / "taxonomy" / "releases"
 
 
@@ -89,16 +89,16 @@ def taxonomy_namespaces(taxonomy: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 
 def required_namespaces(taxonomy: dict[str, Any]) -> set[str]:
-    """Namespaces that research annotations must cover: the full schema registry."""
     namespaces = taxonomy_namespaces(taxonomy)
-    declared = taxonomy.get("namespace_order")
-    if not isinstance(declared, list) or not declared or len(declared) != len(set(declared)) or any(
-        not isinstance(item, str) for item in declared
-    ):
-        raise ValueError("taxonomy namespace_order must be a unique non-empty string list")
-    if set(declared) != set(namespaces):
-        raise ValueError("taxonomy namespace_order does not match namespace keys")
-    return set(declared)
+    required = {
+        name for name, definition in namespaces.items() if definition.get("required") is True
+    }
+    if not required:
+        raise ValueError("taxonomy must declare at least one required namespace")
+    declared = taxonomy.get("required_namespaces")
+    if declared is not None and (not isinstance(declared, list) or set(declared) != required):
+        raise ValueError("taxonomy required_namespaces does not match namespace required flags")
+    return required
 
 
 def known_tags(taxonomy: dict[str, Any]) -> set[str]:
@@ -881,7 +881,7 @@ def command_approve(args: argparse.Namespace) -> dict[str, Any]:
             candidate.relative_to(RELEASE_DIR.resolve())
         except ValueError as error:
             raise ValueError(
-                "approved taxonomy must be written under okf-tag-generate/taxonomy/releases"
+                "approved taxonomy must be written to okf-tag-generate/taxonomy/tag-taxonomy.json"
             ) from error
     if output.exists():
         raise FileExistsError("refusing to overwrite taxonomy")

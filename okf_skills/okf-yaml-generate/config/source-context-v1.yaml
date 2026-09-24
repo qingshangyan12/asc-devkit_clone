@@ -1,8 +1,7 @@
 # 源文档上下文配置。
 #
-# api_surfaces 由稳定资源路径证明（最小标签集设计说明），controller 在 scaffold 阶段按
-# 最长前缀匹配自动注入，语义取证代理与 worker 不再手填该 namespace（证据即文档路径本身）。
-# 本文件只声明路径前缀到路径可证标签的映射；页面分类、okftype 等仍由文档事实判定。
+# 本文件只描述本次源集合的范围、文档族和技术上下文；不为每个目录或文件
+# 编写 okftype 映射。页面种类由通用结构分类器从文档事实判断。
 
 schema_version: 1
 registry_id: okf-source-context-v1
@@ -12,6 +11,7 @@ context:
   family: reference
   technology: cpp
 
+# 这些是来源范围标签，不参与页面分类。
 default_tags:
   docs/zh/api/SIMD-API/c_api/: {api_surfaces: [c_api]}
   docs/zh/api/SIMD-API/basic_api/: {api_surfaces: [basic_api]}

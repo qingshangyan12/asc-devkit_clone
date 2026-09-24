@@ -670,12 +670,12 @@ def validate_prototype_links(
         if field == "macro_id":
             _validate_macro_entry(entry, source, f"signature[{index}]")
             archs = ()
-            headers = ()
+            header = ()
         else:
             archs = _entry_string_list(entry, "archs", source, f"signature[{index}]")
-            headers = _entry_string_list(entry, "headers", source, f"signature[{index}]")
+            header = _entry_string_list(entry, "header", source, f"signature[{index}]")
         _validate_identifier_kind(field, value, source, f"signature[{index}]")
-        top_links.append((field, value, archs, headers))
+        top_links.append((field, value, archs, header))
     duplicates = sorted({link for link in top_links if top_links.count(link) > 1})
     if duplicates:
         raise PrototypeIdError(
@@ -692,15 +692,15 @@ def validate_prototype_links(
         if field == "macro_id":
             _validate_macro_entry(entry, source, label)
             archs = ()
-            headers = ()
+            header = ()
         else:
             archs = _entry_string_list(entry, "archs", source, label)
-            headers = _entry_string_list(entry, "headers", source, label)
+            header = _entry_string_list(entry, "header", source, label)
         _validate_identifier_kind(field, local_id, source, label)
         if field != "macro_id":
             placeholders = tuple(dict.fromkeys(PLACEHOLDER_RE.findall(local_id)))
             _validate_dtype(entry.get("dtype"), placeholders, source, index)
-        local_links.append((field, local_id, archs, headers))
+        local_links.append((field, local_id, archs, header))
 
     missing_local = sorted(set(top_links) - set(local_links))
     missing_top = sorted(set(local_links) - set(top_links))

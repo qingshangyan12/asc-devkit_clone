@@ -11,7 +11,6 @@ from contextlib import contextmanager
 import fcntl
 import hashlib
 import json
-from functools import lru_cache
 from pathlib import Path
 import re
 import sys
@@ -21,6 +20,7 @@ import yaml
 
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
+TAG_RULES_PATH = SCRIPTS_DIR.parents[1] / "okf-tag-generate" / "taxonomy" / "tag-rules.yaml"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
@@ -52,26 +52,38 @@ from prototype_id import (
     architecture_override_id,
     signature_identifier,
 )
+from model_registry import (
+    Classification,
+    ExecutionPlan,
+    ModelValidationError,
+    classify_document,
+    compile_execution_plan,
+    document_is_in_scope,
+    load_model,
+    plan_to_dict,
+)
 
 
 API_ROOT = Path("docs/zh/api/SIMD-API")
+DOCUMENT_ROOT = Path("docs/zh/api")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
-OKF_TYPES = {
+# Backward-compatible exports used by the repository's index builder. The
+# registry remains the source of truth for controller rendering and validation.
+OKF_TYPES = (
     "reference.api.cpp", "reference.arch.cpp", "reference.index.cpp", "reference.type.cpp",
-}
+)
 ALLOWED_FIELDS = (
-    "okftype", "title", "resource", "description", "tag", "signature",
-    "dependencies", "examples", "headers", "declaration",
-    "type_catalog", "timestamp",
+    "okftype", "title", "resource", "description", "tag", "signature", "archs", "header",
+    "declaration", "type_catalog", "dependencies", "examples", "navigation", "timestamp",
 )
 DEFINITION_CATEGORIES = {"constant", "enum", "macro", "type", "union"}
 DEFINITIONS_ROOT = API_ROOT / "c_api" / "defs"
 MACRO_DEFINITION_SECTION_RE = re.compile(r"^\s{0,3}#{2,6}\s+宏定义(?:\s|<|$)", re.MULTILINE)
 DEPENDENCY_KINDS = {"requires", "configures", "constrained_by", "related"}
-SIGNATURE_KEYS = {"prototype_id", "override_id", "macro_id", "archs", "headers", "dtype"}
-DEFAULT_WRITE_TARGETS = (
-    "front_matter", "tag", "dependencies", "include_doxygen", "example_markers",
-)
+SEMANTIC_SCHEMA_VERSION = 1
+SEMANTIC_RESULT_PURPOSE = "okf_yaml_semantic_result"
+SIGNATURE_KEYS = {"prototype_id", "override_id", "macro_id", "archs", "header", "dtype"}
+DEFAULT_WRITE_CONTRACTS = ("front_matter",)
 ISSUE_TYPES = {"document_defect", "source_defect", "tool_defect", "unresolved"}
 RESOLUTIONS = {
     "blank_field", "report_source_defect", "report_unresolved", "tool_change_required",
@@ -151,10 +163,9 @@ def relative_api_path(root: Path, value: str) -> Path:
     candidate = Path(value)
     if candidate.is_absolute() or ".." in candidate.parts or candidate.suffix.lower() != ".md":
         raise ValidationError(f"invalid repository-relative Markdown path: {value!r}")
-    if len(candidate.parts) < 5 or candidate.parts[:4] != API_ROOT.parts:
-        raise ValidationError(f"path is outside supported API families: {value!r}")
-    if candidate.parts[4] not in API_SURFACES:
-        raise ValidationError(f"unsupported API surface: {value!r}")
+    path = candidate.as_posix()
+    if not document_is_in_scope(path):
+        raise ValidationError(f"path is outside registered document roots: {value!r}")
     resolved = (root / candidate).resolve()
     try:
         resolved.relative_to(root.resolve())
@@ -189,8 +200,8 @@ def api_documents(root: Path, source_dir: str | None, document: list[str] | None
         base = Path(source_dir or str(API_ROOT / "c_api"))
         if base.is_absolute():
             base = Path(repo_relative(root, base))
-        if base.parts[:4] != API_ROOT.parts or len(base.parts) < 5 or base.parts[4] not in API_SURFACES:
-            raise ValidationError("--source-dir is outside supported API families")
+        if not document_is_in_scope((base / "placeholder.md").as_posix()):
+            raise ValidationError("--source-dir is outside registered document roots")
         directory = (root / base).resolve()
         if not directory.is_dir():
             raise ValidationError(f"source directory does not exist: {base}")
@@ -224,78 +235,14 @@ def normalize_tag(value: Any, namespaces: tuple[str, ...]) -> list[dict[str, lis
     return [{namespace: sorted(set(result.get(namespace, [])))} for namespace in namespaces]
 
 
-TAG_RULES_PATH = Path(__file__).resolve().parents[1] / "config" / "tag-rules.yaml"
-SOURCE_CONTEXT_PATH = Path(__file__).resolve().parents[1] / "config" / "source-context-v1.yaml"
-
-
-@lru_cache(maxsize=1)
-def load_source_context() -> dict[str, Any]:
-    """Load the source-context path-injection config (config/source-context-v1.yaml)."""
-    try:
-        payload = yaml.safe_load(SOURCE_CONTEXT_PATH.read_text(encoding="utf-8"))
-    except (OSError, yaml.YAMLError) as error:
-        raise ValidationError(f"cannot read source context: {SOURCE_CONTEXT_PATH}: {error}") from error
-    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
-        raise ValidationError("source context schema is invalid")
-    default_tags = payload.get("default_tags")
-    if not isinstance(default_tags, dict) or not default_tags:
-        raise ValidationError("source context default_tags is invalid")
-    for prefix, tags in default_tags.items():
-        if not isinstance(prefix, str) or not isinstance(tags, dict) or not tags:
-            raise ValidationError("source context default_tags entries are invalid")
-        for namespace, values in tags.items():
-            if not isinstance(values, list) or not values:
-                raise ValidationError(f"source context default_tags.{prefix}.{namespace} must be a non-empty list")
-    return payload
-
-
-def source_context_default_tags(path: str) -> dict[str, list[str]]:
-    """Longest-prefix path-proven tags for a repository-relative document path."""
-    matched: dict[str, list[str]] = {}
-    best = ""
-    for prefix, tags in load_source_context()["default_tags"].items():
-        if path.startswith(prefix) and len(prefix) > len(best):
-            best = prefix
-            matched = tags
-    return matched if best else {}
-
-
-@lru_cache(maxsize=1)
-def load_tag_rules() -> dict[str, Any]:
-    """Load the machine-readable mandatory/conditional tag rules (config/tag-rules.yaml)."""
-    try:
-        payload = yaml.safe_load(TAG_RULES_PATH.read_text(encoding="utf-8"))
-    except (OSError, yaml.YAMLError) as error:
-        raise ValidationError(f"cannot read tag rules: {TAG_RULES_PATH}: {error}") from error
-    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
-        raise ValidationError("tag rules schema is invalid")
-    required = payload.get("required_namespaces")
-    if not isinstance(required, dict):
-        raise ValidationError("tag rules required_namespaces is invalid")
-    always = required.get("always")
-    if not isinstance(always, list) or not always or not all(isinstance(item, str) for item in always):
-        raise ValidationError("tag rules required_namespaces.always must be a non-empty string list")
-    conditional = required.get("conditional", {})
-    if not isinstance(conditional, dict):
-        raise ValidationError("tag rules required_namespaces.conditional is invalid")
-    for namespace, condition in conditional.items():
-        when = condition.get("when_roles_in") if isinstance(condition, dict) else None
-        if not isinstance(when, list) or not when or not all(isinstance(item, str) for item in when):
-            raise ValidationError(f"tag rules conditional.{namespace}.when_roles_in must be a non-empty string list")
-    return payload
-
-
 def taxonomy(path: Path) -> tuple[tuple[str, ...], dict[str, set[str]]]:
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("status") != "frozen":
         raise ValidationError("taxonomy is not frozen")
-    order = payload.get("namespace_order")
+    namespaces = payload.get("required_namespaces")
     defs = payload.get("namespaces")
-    namespaces = list(defs) if isinstance(defs, dict) else None
-    if not isinstance(order, list) or not isinstance(namespaces, list) or not isinstance(defs, dict):
+    if not isinstance(namespaces, list) or not isinstance(defs, dict):
         raise ValidationError("taxonomy metadata is invalid")
-    if set(order) != set(namespaces):
-        raise ValidationError("taxonomy namespace_order does not match namespace keys")
     values = {}
     for namespace in namespaces:
         definition = defs.get(namespace, {})
@@ -309,6 +256,161 @@ def taxonomy(path: Path) -> tuple[tuple[str, ...], dict[str, set[str]]]:
 def first_heading(body: str, fallback: str) -> str:
     match = re.search(r"(?m)^#\s+(.+?)\s*$", body)
     return match.group(1).strip() if match else fallback
+
+
+def _semantic_references(
+    value: Any,
+    *,
+    document_path: str,
+    body: str,
+    location: str,
+    minimum: int = 1,
+    maximum: int = 3,
+    allow_outside_body: bool = False,
+) -> list[dict[str, str]]:
+    if not isinstance(value, list) or not minimum <= len(value) <= maximum:
+        raise ValidationError(f"{location} must contain {minimum} to {maximum} evidence entries")
+    references: list[dict[str, str]] = []
+    for index, item in enumerate(value):
+        if not isinstance(item, dict) or set(item) != {"source_path", "excerpt"}:
+            raise ValidationError(f"{location}[{index}] must contain source_path and excerpt")
+        source_path = item.get("source_path")
+        excerpt = item.get("excerpt")
+        if source_path != document_path:
+            raise ValidationError(f"{location}[{index}].source_path must be the annotated document")
+        if (
+            not isinstance(excerpt, str)
+            or not excerpt.strip()
+            or (not allow_outside_body and excerpt not in body)
+        ):
+            raise ValidationError(f"{location}[{index}].excerpt is not verbatim document text")
+        references.append({"source_path": source_path, "excerpt": excerpt})
+    return references
+
+
+def _semantic_annotation(
+    annotation: Any,
+    *,
+    root: Path,
+    document: Path,
+    document_path: str,
+    digest: str,
+    body: str,
+    namespaces: tuple[str, ...],
+    values: dict[str, set[str]],
+    required_tags: set[str],
+) -> tuple[dict[str, Any], dict[str, list[dict[str, str]]]]:
+    expected_keys = {
+        "document_path", "document_sha256", "description", "tag", "tag_evidence", "dependencies",
+    }
+    if not isinstance(annotation, dict) or set(annotation) != expected_keys:
+        raise ValidationError("semantic annotation has an invalid field set")
+    if annotation.get("document_path") != document_path or annotation.get("document_sha256") != digest:
+        raise ValidationError(f"semantic annotation does not match {document_path} or its input hash")
+
+    description = annotation["description"]
+    if not isinstance(description, dict) or set(description) != {"value", "evidence"}:
+        raise ValidationError(f"{document_path}: description must contain value and evidence")
+    description_value = description.get("value")
+    title = first_heading(body, document.stem)
+    if (
+        not isinstance(description_value, str)
+        or not 8 <= len(description_value.strip()) <= 180
+        or "\n" in description_value
+        or description_value.strip() in {title, document.stem}
+    ):
+        raise ValidationError(f"{document_path}: description must be a non-title single paragraph of 8 to 180 characters")
+    description_evidence = _semantic_references(
+        description.get("evidence"), document_path=document_path, body=body, location=f"{document_path}.description.evidence"
+    )
+
+    raw_tags = annotation["tag"]
+    raw_tag_evidence = annotation["tag_evidence"]
+    if not isinstance(raw_tags, dict) or set(raw_tags) != set(namespaces):
+        raise ValidationError(f"{document_path}: tag must contain exactly the frozen taxonomy namespaces")
+    if not isinstance(raw_tag_evidence, dict):
+        raise ValidationError(f"{document_path}: tag_evidence must be an object")
+    tags: list[dict[str, list[str]]] = []
+    tag_evidence: dict[str, list[dict[str, str]]] = {}
+    expected_tag_evidence: set[str] = set()
+    for namespace in namespaces:
+        selected = raw_tags[namespace]
+        if not isinstance(selected, list) or any(not isinstance(value, str) or not value for value in selected):
+            raise ValidationError(f"{document_path}: tag.{namespace} must be a string array")
+        selected = sorted(set(selected))
+        if len(selected) != len(raw_tags[namespace]):
+            raise ValidationError(f"{document_path}: tag.{namespace} contains duplicate values")
+        unknown = sorted(set(selected) - values[namespace])
+        if unknown:
+            raise ValidationError(f"{document_path}: tag.{namespace} contains unknown values: {unknown}")
+        if namespace in required_tags and not selected:
+            raise ValidationError(f"{document_path}: required tag namespace is empty: {namespace}")
+        tags.append({namespace: selected})
+        for selected_value in selected:
+            key = f"{namespace}:{selected_value}"
+            expected_tag_evidence.add(key)
+            references = _semantic_references(
+                raw_tag_evidence.get(key), document_path=document_path, body=body,
+                location=f"{document_path}.tag_evidence.{key}", maximum=3,
+                allow_outside_body=namespace == "api_surfaces",
+            )
+            tag_evidence[key] = references
+    if set(raw_tag_evidence) != expected_tag_evidence:
+        raise ValidationError(f"{document_path}: tag_evidence must match selected tag values exactly")
+
+    dependencies = annotation["dependencies"]
+    normalized_dependencies = normalize_dependencies(root, document_path, dependencies)
+    if not isinstance(dependencies, list):
+        raise ValidationError(f"{document_path}: dependencies must be an array")
+    return {
+        "description": description_value,
+        "tag": tags,
+        "dependencies": dependencies,
+        "normalized_dependencies": normalized_dependencies,
+    }, {"description": description_evidence, **tag_evidence}
+
+
+def load_semantic_annotations(
+    semantic_input: Path,
+    task: dict[str, Any],
+    root: Path,
+    namespaces: tuple[str, ...],
+    values: dict[str, set[str]],
+) -> dict[str, tuple[dict[str, Any], dict[str, list[dict[str, str]]]]]:
+    payload = read_json(semantic_input.expanduser().resolve())
+    if (
+        payload.get("schema_version") != SEMANTIC_SCHEMA_VERSION
+        or payload.get("purpose") != SEMANTIC_RESULT_PURPOSE
+        or payload.get("run_id") != task.get("run_id")
+        or payload.get("batch_id") != task.get("batch_id")
+    ):
+        raise ValidationError("semantic input does not belong to this worker task")
+    annotations = payload.get("annotations")
+    if not isinstance(annotations, list):
+        raise ValidationError("semantic input annotations must be an array")
+    expected = set(task.get("documents", []))
+    indexed: dict[str, Any] = {}
+    for annotation in annotations:
+        path = annotation.get("document_path") if isinstance(annotation, dict) else None
+        if not isinstance(path, str) or path not in expected or path in indexed:
+            raise ValidationError(f"semantic input has duplicate or out-of-scope document: {path}")
+        indexed[path] = annotation
+    if set(indexed) != expected:
+        raise ValidationError("semantic input must provide exactly one annotation for every batch document")
+
+    result: dict[str, tuple[dict[str, Any], dict[str, list[dict[str, str]]]]] = {}
+    for path in task["documents"]:
+        document = relative_api_path(root, path)
+        body = split_front_matter(document.read_text(encoding="utf-8", errors="replace"))[2]
+        classification = classify_document(path, body)
+        if classification is None:
+            raise ValidationError(f"document cannot be classified from source structure: {path}")
+        plan = compile_execution_plan(classification)
+        result[path] = _semantic_annotation(
+            indexed[path], root=root, document=document, document_path=path, digest=sha256(document), body=body,
+            namespaces=namespaces, values=values, required_tags=_required_tag_namespaces(plan, namespaces),
+        )
+    return result
 
 
 def _tag_evidence_excerpt(body: str) -> str:
@@ -413,25 +515,25 @@ def _parameter_documentation_tables(markdown: str) -> list[dict[str, dict[str, s
     for index in range(start, len(lines) - 1):
         if index > start and LEVEL_TWO_HEADING_RE.match(lines[index]):
             break
-        headers = _markdown_table_cells(lines[index])
+        header = _markdown_table_cells(lines[index])
         separators = _markdown_table_cells(lines[index + 1])
         if (
-            not headers
-            or len(headers) != len(separators)
+            not header
+            or len(header) != len(separators)
             or not _is_markdown_table_separator(separators)
         ):
             continue
-        normalized_headers = [re.sub(r"\s+", "", header) for header in headers]
+        normalized_header = [re.sub(r"\s+", "", header) for header in header]
         name_index = next(
-            (position for position, header in enumerate(normalized_headers) if header in {"参数名", "参数", "名称"}),
+            (position for position, header in enumerate(normalized_header) if header in {"参数名", "参数", "名称"}),
             None,
         )
         direction_index = next(
-            (position for position, header in enumerate(normalized_headers) if header in {"输入/输出", "输入输出", "方向"}),
+            (position for position, header in enumerate(normalized_header) if header in {"输入/输出", "输入输出", "方向"}),
             None,
         )
         description_index = next(
-            (position for position, header in enumerate(normalized_headers) if "描述" in header or "说明" in header),
+            (position for position, header in enumerate(normalized_header) if "描述" in header or "说明" in header),
             None,
         )
         if name_index is None or direction_index is None or description_index is None:
@@ -441,18 +543,26 @@ def _parameter_documentation_tables(markdown: str) -> list[dict[str, dict[str, s
             cells = _markdown_table_cells(lines[row_index])
             if not cells:
                 break
-            if len(cells) < len(headers):
+            if len(cells) < len(header):
                 break
             name = cells[name_index].strip()
             direction = _parameter_direction(cells[direction_index])
             description = cells[description_index].strip()
             if not name or not description:
                 continue
-            entries.setdefault(name, {
+            item = {
                 "direction": direction or "",
                 "description": description,
                 "evidence": lines[row_index].strip(),
-            })
+            }
+            # Documentation sometimes describes adjacent parameters in one
+            # cell (for example, ``src0、src1``). Preserve the original row as
+            # evidence while exposing each explicit parameter name to the
+            # Doxygen mapper. This is deliberately limited to clear name
+            # separators; arbitrary substring matching would hide omissions.
+            names = [part.strip() for part in re.split(r"[、,，/]", name) if part.strip()]
+            for parameter_name in names or [name]:
+                entries.setdefault(parameter_name, item)
         if entries:
             tables.append(entries)
     return tables
@@ -748,6 +858,9 @@ def _source_signature_fields(
     document: Path,
     markdown: str,
     example_discovery_index: Any = None,
+    *,
+    include_examples: bool = True,
+    include_doxygen: bool = True,
 ) -> tuple[
     list[dict[str, Any]],
     list[dict[str, Any]],
@@ -755,7 +868,7 @@ def _source_signature_fields(
     list[dict[str, Any]],
     list[dict[str, Any]],
 ]:
-    """Derive only source-proven signatures, headers, and example calls.
+    """Derive only source-proven signatures, header, and example calls.
 
     The parsing and header-resolution implementation is vendored from the
     legacy guard.  This controller intentionally publishes only a unique,
@@ -763,7 +876,14 @@ def _source_signature_fields(
     """
     try:
         mappings, _ = resolve_signature_header_mappings(document, markdown, root)
-    except (PrototypeIdError, ValueError) as exc:
+    except PrototypeIdError as exc:
+        return [], [], [], [], [issue(
+            repo_relative(root, document),
+            "signature",
+            "tool_defect",
+            f"函数原型或头文件映射无法解析：{exc}",
+        )]
+    except ValueError as exc:
         return [], [], [], [], [issue(
             repo_relative(root, document),
             "signature",
@@ -776,7 +896,7 @@ def _source_signature_fields(
     for comparison in comparisons:
         comparison_statuses.setdefault(comparison.document_parameters, set()).add(comparison.status)
     document_archs = tuple(supported_archs(markdown))
-    parameter_tables = _parameter_documentation_tables(markdown)
+    parameter_tables = _parameter_documentation_tables(markdown) if include_doxygen else []
 
     signatures: list[dict[str, Any]] = []
     doxygen_records: list[dict[str, Any]] = []
@@ -807,10 +927,12 @@ def _source_signature_fields(
                 mapping.status in VERIFIED_HEADER_STATUSES
                 and not statuses.intersection(UNSAFE_HEADER_COMPARISONS)
             )
-            entry["headers"] = sorted(dict.fromkeys(mapping.headers)) if verified else []
+            entry["header"] = sorted(dict.fromkeys(mapping.headers)) if verified else []
         if entry not in signatures:
             signatures.append(entry)
         if (
+            include_doxygen
+            and
             not mapping.macro_id
             and mapping.override_id
             and mapping.status in VERIFIED_HEADER_STATUSES
@@ -840,7 +962,7 @@ def _source_signature_fields(
                 "template_parameters": [],
                 "doxygen": {"params": params} if params else {},
             })
-        elif mapping.macro_id and len(mapping.headers) == 1:
+        elif include_doxygen and mapping.macro_id and len(mapping.headers) == 1:
             doxygen_records.append({
                 "source_document": repo_relative(root, document),
                 "header": mapping.headers[0].lstrip("/"),
@@ -854,10 +976,13 @@ def _source_signature_fields(
         if mapping.status not in VERIFIED_HEADER_STATUSES and mapping.status != "compiler_generated_macro":
             mapping_issues.append(issue(
                 repo_relative(root, document),
-                "signature.headers",
+                "signature.header",
                 "unresolved",
-                f"{mapping.name} 的头文件映射未唯一确认（{mapping.status}），已保留空 headers。",
+                f"{mapping.name} 的头文件映射未唯一确认（{mapping.status}），已保留空 header。",
             ))
+
+    if not include_examples:
+        return signatures, [], [], doxygen_records, mapping_issues
 
     examples: list[dict[str, Any]] = []
     marker_examples: list[dict[str, Any]] = []
@@ -955,15 +1080,15 @@ def _definition_header(
     if len(resources) != 1:
         return [], [issue(
             path,
-            "headers",
+            "header",
             "unresolved",
-            "定义的头文件映射未唯一确认，已保留空 headers。",
+            "定义的头文件映射未唯一确认，已保留空 header。",
         )]
     resource = resources[0]
     if not _resource_declares_symbol(str(root), resource, symbol, None):
         return [], [issue(
             path,
-            "headers",
+            "header",
             "source_defect",
             f"{symbol} 未在文档关联的头文件 {resource} 中声明。",
         )]
@@ -1011,7 +1136,7 @@ def _source_macro_definition_fields(
     if not documented:
         issues.append(issue(path, "declaration", "document_defect", "正文没有可确认的宏定义。"))
         return {
-            "headers": [],
+            "header": [],
             "declaration": None,
             "type_catalog": None,
             "signature": [],
@@ -1020,15 +1145,15 @@ def _source_macro_definition_fields(
         }
 
     candidates = list(metadata.header_candidates)
-    headers = sorted(dict.fromkeys(resource for resource in candidates if isinstance(resource, str)))
+    header = sorted(dict.fromkeys(resource for resource in candidates if isinstance(resource, str)))
     header_macros = []
-    if len(headers) == 1:
-        header_path = root / headers[0].lstrip("/")
+    if len(header) == 1:
+        header_path = root / header[0].lstrip("/")
         if header_path.is_file():
             header_macros = list(_macro_definitions(header_path.read_text(encoding="utf-8", errors="replace")))
-    if len(headers) != 1:
-        issues.append(issue(path, "headers", "unresolved", "宏定义的头文件映射未唯一确认，已保留空 headers。"))
-        headers = []
+    if len(header) != 1:
+        issues.append(issue(path, "header", "unresolved", "宏定义的头文件映射未唯一确认，已保留空 header。"))
+        header = []
     else:
         for macro in documented:
             if not any(
@@ -1037,11 +1162,11 @@ def _source_macro_definition_fields(
             ):
                 issues.append(issue(
                     path,
-                    "headers",
+                    "header",
                     "source_defect",
-                    f"{macro.symbol} 未在文档关联的头文件 {headers[0]} 中以相同形参声明。",
+                    f"{macro.symbol} 未在文档关联的头文件 {header[0]} 中以相同形参声明。",
                 ))
-                headers = []
+                header = []
                 break
 
     signatures: list[dict[str, Any]] = []
@@ -1062,10 +1187,10 @@ def _source_macro_definition_fields(
         entry = {"macro_id": identifier}
         if entry not in signatures:
             signatures.append(entry)
-        if headers:
+        if header:
             doxygen.append({
                 "source_document": path,
-                "header": headers[0].lstrip("/"),
+                "header": header[0].lstrip("/"),
                 "function": f"{macro.symbol}({macro.parameters})",
                 "parameters": f"{macro.symbol}({macro.parameters})",
                 "macro_id": identifier,
@@ -1077,7 +1202,7 @@ def _source_macro_definition_fields(
     has_object_macro = any(macro.parameters is None for macro in documented)
     if not has_object_macro and signatures:
         return {
-            "headers": [],
+            "header": [],
             "declaration": None,
             "type_catalog": None,
             "signature": signatures,
@@ -1085,7 +1210,7 @@ def _source_macro_definition_fields(
             "issues": issues,
         }
     return {
-        "headers": headers,
+        "header": header,
         "declaration": {"macros": [_macro_declaration_entry(macro) for macro in documented]},
         "type_catalog": None,
         "signature": signatures,
@@ -1108,7 +1233,7 @@ def _source_definition_fields(
         metadata = extract_api_metadata(document, date.today().isoformat(), root)
     except (OSError, ValueError) as exc:
         return {
-            "headers": [],
+            "header": [],
             "declaration": None,
             "type_catalog": None,
             "signature": [],
@@ -1138,16 +1263,16 @@ def _source_definition_fields(
     elif not isinstance(declaration, dict):
         issues.append(issue(path, "declaration", "document_defect", "正文没有可确认的定义声明。"))
 
-    headers: list[str] = []
+    header: list[str] = []
     if definition_kind != "type_catalog" and isinstance(declaration, dict):
         symbol = declaration.get("symbol")
         if isinstance(symbol, str) and symbol:
-            headers, header_issues = _definition_header(root, metadata.header_candidates, symbol, path)
+            header, header_issues = _definition_header(root, metadata.header_candidates, symbol, path)
             issues.extend(header_issues)
         else:
             issues.append(issue(path, "declaration", "document_defect", "定义声明缺少符号名。"))
     return {
-        "headers": headers,
+        "header": header,
         "declaration": declaration,
         "type_catalog": type_catalog,
         "signature": [],
@@ -1190,119 +1315,121 @@ def issue(path: str, field: str, issue_type: str, message: str, evidence: list[d
     }
 
 
+def _source_navigation_fields(body: str, document_path: str) -> list[dict[str, str]]:
+    """Extract direct Markdown links for an index page in source order."""
+    entries: list[dict[str, str]] = []
+    base = Path(document_path).parent
+    pattern = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+    for match in pattern.finditer(body):
+        target = match.group(1).strip().split("#", 1)[0]
+        if not target or target.startswith(("http:", "https:", "mailto:")):
+            continue
+        resolved = (base / target).resolve().as_posix()
+        marker = "/docs/zh/api/"
+        if marker not in resolved or not resolved.endswith(".md"):
+            continue
+        path = resolved.split(marker, 1)[1]
+        entry = {"path": f"docs/zh/api/{path}", "title": match.group(0).split("](", 1)[0][1:]}
+        if entry not in entries:
+            entries.append(entry)
+    return entries
+
+
 def build_worker_document(
     root: Path,
     path: str,
     namespaces: tuple[str, ...],
     example_discovery_index: Any = None,
-    semantic: dict[str, Any] | None = None,
+    semantic: tuple[dict[str, Any], dict[str, list[dict[str, str]]]] | None = None,
 ) -> dict[str, Any]:
     document = relative_api_path(root, path)
     original = document.read_text(encoding="utf-8", errors="replace")
-    data, _, body = split_front_matter(original)
-    definition = _source_definition_fields(root, document, body)
-    if definition is None:
+    _, _, body = split_front_matter(original)
+    classification = classify_document(path, body)
+    if classification is None:
+        raise ValidationError(f"document cannot be classified from source structure: {path}")
+
+    definition = _source_definition_fields(root, document, body) if classification.okftype == "reference.type.cpp" else None
+    plan = compile_execution_plan(classification)
+    needs_signature = "signature" in plan.fields
+    needs_examples = "examples" in plan.fields
+    needs_doxygen = "doxygen" in plan.outputs
+
+    if needs_signature and definition is None:
         source_signature, source_examples, marker_examples, source_doxygen, source_issues = _source_signature_fields(
-            root, document, body, example_discovery_index
+            root,
+            document,
+            body,
+            example_discovery_index,
+            include_examples=needs_examples,
+            include_doxygen=needs_doxygen,
         )
         source_definition: dict[str, Any] = {
-            "headers": None,
+            "header": None,
             "declaration": None,
             "type_catalog": None,
         }
-    else:
+    elif definition is not None:
         source_signature = definition["signature"]
         source_examples = []
         marker_examples = []
-        source_doxygen = definition["doxygen"]
+        source_doxygen = definition["doxygen"] if needs_doxygen else []
         source_issues = definition["issues"]
         source_definition = definition
+    else:
+        source_signature = []
+        source_examples = []
+        marker_examples = []
+        source_doxygen = []
+        source_issues = []
+        source_definition = {"header": None, "declaration": None, "type_catalog": None}
+
     title = first_heading(body, document.stem)
-    semantic_verified = semantic is not None
-    if semantic is not None:
-        # 语义输入是唯一语义来源：description/tag/dependencies 全部来自已验证的 semantic-input，
-        # 旧 front matter 的语义值不被继承（结构字段仍由 scaffold 解析）。
-        description = semantic["description"]["value"]
-        merged_tags: dict[str, list[str]] = {
-            namespace: list(values) for namespace, values in source_context_default_tags(path).items()
-        }
-        for item in semantic["tag"]:
-            namespace, selected = next(iter(item.items()))
-            merged_tags[namespace] = list(selected)
-        semantic_dependencies = semantic["dependencies"]
-    else:
-        description = data.get("description")
-        if not isinstance(description, str):
-            description = ""
-        tags = normalize_tag(data.get("tag"), namespaces)
-        merged_tags = {
-            namespace: values for item in tags for namespace, values in item.items()
-        }
-        # source-context 注入：api_surfaces 等路径可证标签按最长前缀自动注入，语义代理不填。
-        for namespace, values in source_context_default_tags(path).items():
-            if not merged_tags.get(namespace):
-                merged_tags[namespace] = list(values)
-        semantic_dependencies = None
-    existing_timestamp = data.get("timestamp")
-    if isinstance(existing_timestamp, date):
-        timestamp = existing_timestamp.isoformat()
-    elif isinstance(existing_timestamp, str):
-        timestamp = existing_timestamp
-    else:
-        timestamp = date.today().isoformat()
-    # On-demand scaffold: keep only namespaces with values so the artifact the worker
-    # edits never carries empty tag entries (最小标签集: 不适用字段省略，不使用空数组).
-    # Degradation is signalled by issues for every namespace without values, so the
-    # resolver decision flow and issue counts are unchanged.
-    filled_tags = [
-        {namespace: merged_tags[namespace]} for namespace in namespaces if merged_tags.get(namespace)
-    ]
-    source_dtypes = source_signature_dtypes(body) if definition is None else {}
-    raw_signature = source_signature if definition is not None else source_signature or normalize_signature_ids(
-        data.get("signature") if isinstance(data.get("signature"), list) else []
-    )
-    if definition is not None:
-        okftype = "reference.type.cpp"
-    elif ARCH_DOCUMENT_NAME_RE.search(document.name):
-        okftype = "reference.arch.cpp"
-    elif FUNCTION_PROTOTYPE_SECTION_RE.search(body):
-        okftype = "reference.api.cpp"
-    else:
-        okftype = "reference.index.cpp"
-    fields: dict[str, Any] = {
-        "okftype": okftype,
-        "title": title,
-        "resource": f"asc-devkit/{path}",
-        "description": description,
-        "tag": filled_tags,
-        "signature": normalize_signature_dtypes(
-            raw_signature,
-            source_dtypes,
-            data.get("dtype"),
-        ),
-        "dependencies": semantic_dependencies if semantic_dependencies is not None else _retained_dependencies_with_evidence(
-            path, body, data.get("dependencies") if isinstance(data.get("dependencies"), list) else [],
-        ),
-        "examples": source_examples if definition is not None else source_examples or (
-            data.get("examples") if isinstance(data.get("examples"), list) else []
-        ),
-        "headers": source_definition["headers"],
-        "declaration": source_definition["declaration"],
-        "type_catalog": source_definition["type_catalog"],
-        "timestamp": timestamp,
-    }
-    _apply_architecture_override_suffixes(
-        fields,
-        source_doxygen,
-        marker_examples,
-        _architecture_override_suffixes(root, document, body, fields["signature"]),
-    )
+    semantic_fields = semantic[0] if semantic is not None else {}
+    semantic_evidence = semantic[1] if semantic is not None else {}
+    tags = semantic_fields.get("tag", normalize_tag(plan.default_tags, namespaces))
+    fields: dict[str, Any] = {}
+    if "okftype" in plan.fields:
+        fields["okftype"] = plan.okftype
+    if "title" in plan.fields:
+        fields["title"] = title
+    if "resource" in plan.fields:
+        fields["resource"] = f"asc-devkit/{path}"
+    if "description" in plan.fields:
+        fields["description"] = semantic_fields.get("description", "")
+    if "tag" in plan.fields:
+        fields["tag"] = tags
+    if "timestamp" in plan.fields:
+        fields["timestamp"] = date.today().isoformat()
+    if "signature" in plan.fields:
+        fields["signature"] = normalize_signature_dtypes(
+            source_signature,
+            source_signature_dtypes(body) if definition is None else {},
+            None,
+        )
+    if "dependencies" in plan.fields:
+        fields["dependencies"] = semantic_fields.get("dependencies", [])
+    if "examples" in plan.fields:
+        fields["examples"] = source_examples
+    if "navigation" in plan.fields:
+        fields["navigation"] = _source_navigation_fields(body, path)
+    for key in ("header", "declaration", "type_catalog"):
+        if key in plan.fields:
+            fields[key] = source_definition[key]
+
+    if "signature" in fields:
+        _apply_architecture_override_suffixes(
+            fields,
+            source_doxygen,
+            marker_examples,
+            _architecture_override_suffixes(root, document, body, fields["signature"]),
+        )
     issues: list[dict[str, Any]] = list(source_issues)
-    if not description:
+    if "description" in fields and not fields["description"]:
         issues.append(issue(path, "description", "document_defect", "缺少由 description agent 生成并验证的 API 描述。"))
-    if definition is None and not fields["signature"] and not re.search(r"函数原型|函数声明", body):
+    if "signature" in fields and not fields["signature"] and not re.search(r"函数原型|函数声明", body):
         issues.append(issue(path, "signature", "document_defect", "正文没有可确认的函数原型信息。"))
-    for signature in fields["signature"]:
+    for signature in fields.get("signature", []):
         identifier_keys = [
             key for key in ("prototype_id", "override_id", "macro_id")
             if isinstance(signature, dict) and isinstance(signature.get(key), str)
@@ -1310,9 +1437,10 @@ def build_worker_document(
         if len(identifier_keys) != 1:
             issues.append(issue(path, "signature", "tool_defect", "signature 条目必须唯一包含 prototype_id、override_id 或 macro_id，不能写入原始 prototype 字段。"))
             break
-    filled_namespaces = {next(iter(item)) for item in fields["tag"]}
-    for namespace in namespaces:
-        if namespace not in filled_namespaces:
+    required_tags = _required_tag_namespaces(plan, namespaces)
+    for item in fields.get("tag", []):
+        namespace, selected = next(iter(item.items()))
+        if not selected and namespace in required_tags:
             issues.append(issue(path, f"tag.{namespace}", "unresolved", "当前 worker 没有找到该标签主题的充分正文证据。"))
     # Multiple overloads can produce the same document-level diagnostic. Keep one
     # stable record so every issue ID still has exactly one resolver decision.
@@ -1322,39 +1450,27 @@ def build_worker_document(
         if found["issue_id"] not in seen_issue_ids:
             unique_issues.append(found)
             seen_issue_ids.add(found["issue_id"])
-    if semantic is not None:
-        # 语义证据合并并逐字校验（fail fast；validate 阶段仍会独立复检）。
-        for reference in semantic["description"]["evidence"]:
-            if reference["excerpt"] not in body:
-                raise ValidationError(f"{path}: semantic description evidence is not verbatim")
-        evidence: dict[str, Any] = {
-            "description": [
-                {"source_path": path, "excerpt": reference["excerpt"]}
-                for reference in semantic["description"]["evidence"]
-            ],
-        }
-        for key, references in semantic["tag_evidence"].items():
-            for reference in references:
-                if reference["excerpt"] not in body:
-                    raise ValidationError(f"{path}: semantic tag evidence is not verbatim for {key}")
-            evidence[key] = [
-                {"source_path": path, "excerpt": reference["excerpt"]} for reference in references
-            ]
-        for namespace, values in source_context_default_tags(path).items():
-            for value in values:
-                evidence.setdefault(f"{namespace}:{value}", [{"source_path": path, "excerpt": path}])
-    else:
-        evidence = {"description": [], **_retained_tag_evidence(path, body, fields["tag"])}
     return {
         "path": path,
         "sha256": sha256(document),
+        "plan": plan_to_dict(plan),
         "fields": fields,
-        "evidence": evidence,
+        "evidence": {
+            **({"description": semantic_evidence.get("description", [])} if "description" in fields else {}),
+            **(
+                {key: value for key, value in semantic_evidence.items() if key != "description"}
+                if semantic is not None
+                else (_retained_tag_evidence(path, body, fields["tag"]) if "tag" in fields else {})
+            ),
+        },
         "issues": unique_issues,
-        "doxygen": source_doxygen,
-        "example_markers": marker_examples,
-        "semantic_verified": semantic_verified,
+        "doxygen": source_doxygen if "doxygen" in plan.outputs else [],
+        "example_markers": marker_examples if "example_markers" in plan.outputs else [],
     }
+
+
+def _required_tag_namespaces(plan: ExecutionPlan, namespaces: tuple[str, ...]) -> set[str]:
+    return {"roles"} if "roles" in namespaces else set()
 
 
 def write_json(path: Path, value: Any) -> None:
@@ -1414,8 +1530,8 @@ def prepare(args: argparse.Namespace) -> int:
         "devkit_root": str(root),
         "documents": selected,
         "batches": [],
-        "taxonomy": str((Path(__file__).resolve().parents[2] / "okf-tag-generate" / "taxonomy" / "releases" / "core-v9-frozen.json").resolve()),
-        "write_targets": list(DEFAULT_WRITE_TARGETS),
+        "taxonomy": str((Path(__file__).resolve().parents[2] / "okf-tag-generate" / "taxonomy" / "tag-taxonomy.json").resolve()),
+        "write_contracts": list(DEFAULT_WRITE_CONTRACTS),
     }
     for index, batch in enumerate(batches, 1):
         batch_id = f"batch-{index:02d}"
@@ -1436,137 +1552,34 @@ def prepare(args: argparse.Namespace) -> int:
     return 0
 
 
-def load_semantic_input(
-    path: Path,
-    task: dict[str, Any],
-    root: Path,
-    namespaces: tuple[str, ...],
-    values: dict[str, set[str]],
-) -> dict[str, dict[str, Any]]:
-    """Load and validate a batch-level semantic-input artifact (see references/semantic-contract.md)."""
-    payload = read_json(path)
-    if payload.get("schema_version") != 1 or payload.get("purpose") != "okf_yaml_semantic_input":
-        raise ValidationError("semantic input schema or purpose is invalid")
-    if payload.get("run_id") != task["run_id"] or payload.get("batch_id") != task["batch_id"]:
-        raise ValidationError("semantic input run_id/batch_id does not match the task")
-    annotations = payload.get("annotations")
-    if not isinstance(annotations, list) or not annotations:
-        raise ValidationError("semantic input annotations must be a non-empty list")
-    expected = set(task["documents"])
-    by_path: dict[str, dict[str, Any]] = {}
-    for annotation in annotations:
-        if not isinstance(annotation, dict):
-            raise ValidationError("semantic input annotation must be an object")
-        document_path = annotation.get("document_path")
-        if not isinstance(document_path, str) or document_path not in expected:
-            raise ValidationError(f"semantic input annotation path out of scope: {document_path!r}")
-        if document_path in by_path:
-            raise ValidationError(f"semantic input duplicate annotation: {document_path}")
-        target = root / document_path
-        if not target.is_file():
-            raise ValidationError(f"semantic input document missing: {document_path}")
-        if annotation.get("document_sha256") != sha256(target):
-            raise ValidationError(f"semantic input hash mismatch (input changed after prepare): {document_path}")
-        description = annotation.get("description")
-        if not isinstance(description, dict) or not isinstance(description.get("value"), str):
-            raise ValidationError(f"semantic input description is invalid: {document_path}")
-        desc_evidence = description.get("evidence")
-        if description["value"]:
-            if not isinstance(desc_evidence, list) or not desc_evidence:
-                raise ValidationError(f"semantic input description evidence is missing: {document_path}")
-            for reference in desc_evidence:
-                if (
-                    not isinstance(reference, dict)
-                    or not isinstance(reference.get("excerpt"), str)
-                    or reference.get("source_path") != document_path
-                ):
-                    raise ValidationError(f"semantic input description evidence is invalid: {document_path}")
-        elif desc_evidence:
-            raise ValidationError(f"semantic input unresolved description must not carry evidence: {document_path}")
-        tag = annotation.get("tag")
-        if not isinstance(tag, list):
-            raise ValidationError(f"semantic input tag is invalid: {document_path}")
-        tag_evidence = annotation.get("tag_evidence")
-        if not isinstance(tag_evidence, dict):
-            raise ValidationError(f"semantic input tag_evidence is invalid: {document_path}")
-        for item in tag:
-            if not isinstance(item, dict) or len(item) != 1:
-                raise ValidationError(f"semantic input tag entries must be single-key objects: {document_path}")
-            namespace, selected = next(iter(item.items()))
-            if namespace == "api_surfaces":
-                raise ValidationError(
-                    f"semantic input must not carry api_surfaces (path-injected by source context): {document_path}"
-                )
-            if namespace not in namespaces:
-                raise ValidationError(f"semantic input tag namespace unknown: {namespace}")
-            if (
-                not isinstance(selected, list)
-                or not selected
-                or not all(isinstance(value, str) and value for value in selected)
-            ):
-                raise ValidationError(f"semantic input tag.{namespace} must be a non-empty string list: {document_path}")
-            unknown = set(selected) - values.get(namespace, set())
-            if unknown:
-                raise ValidationError(
-                    f"semantic input tag.{namespace} values outside taxonomy {sorted(unknown)}: {document_path}"
-                )
-            for value in set(selected):
-                references = tag_evidence.get(f"{namespace}:{value}")
-                if not isinstance(references, list) or not references:
-                    raise ValidationError(f"semantic input missing evidence for {namespace}:{value}: {document_path}")
-                for reference in references:
-                    if (
-                        not isinstance(reference, dict)
-                        or not isinstance(reference.get("excerpt"), str)
-                        or reference.get("source_path") != document_path
-                    ):
-                        raise ValidationError(f"semantic input evidence for {namespace}:{value} is invalid: {document_path}")
-        dependencies = annotation.get("dependencies")
-        if not isinstance(dependencies, list):
-            raise ValidationError(f"semantic input dependencies is invalid: {document_path}")
-        for dep in dependencies:
-            if (
-                not isinstance(dep, dict)
-                or not isinstance(dep.get("path"), str)
-                or dep.get("kind") not in DEPENDENCY_KINDS
-            ):
-                raise ValidationError(f"semantic input dependency entry is invalid: {document_path}")
-            evidence = dep.get("evidence")
-            if (
-                not isinstance(evidence, dict)
-                or set(evidence) != {"source_path", "excerpt"}
-                or evidence.get("source_path") != document_path
-            ):
-                raise ValidationError(f"semantic input dependency evidence is invalid: {document_path}")
-        by_path[document_path] = annotation
-    missing = expected - set(by_path)
-    if missing:
-        raise ValidationError("semantic input does not cover every task document: " + ", ".join(sorted(missing)))
-    return by_path
-
-
 def worker(args: argparse.Namespace) -> int:
     task = read_json(args.task.expanduser().resolve())
     if task.get("schema_version") != 1:
         raise ValidationError("worker task schema_version must be 1")
     root = Path(task["devkit_root"]).resolve()
     namespaces, values = taxonomy(Path(task["taxonomy"]).resolve())
+    semantic = None
+    if args.semantic_input is not None:
+        semantic = load_semantic_annotations(args.semantic_input, task, root, namespaces, values)
     example_discovery_index = build_example_discovery_index(root)
-    semantic_by_path: dict[str, dict[str, Any]] | None = None
-    if args.semantic_input:
-        semantic_by_path = load_semantic_input(
-            args.semantic_input.expanduser().resolve(), task, root, namespaces, values
-        )
     documents = [
         build_worker_document(
             root, path, namespaces, example_discovery_index,
-            semantic=semantic_by_path.get(path) if semantic_by_path is not None else None,
+            semantic[path] if semantic is not None else None,
         )
         for path in task["documents"]
     ]
+    for document in documents:
+        document["semantic_verified"] = semantic is not None
+        if semantic is None and document["plan"]["okftype"] != "reference.index.cpp":
+            document["issues"].append(issue(
+                document["path"],
+                "semantic_input",
+                "tool_defect",
+                "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+            ))
     result = {key: task[key] for key in ("schema_version", "run_id", "batch_id")}
     result["worker_id"] = args.worker_id
-    result["semantic_input"] = bool(semantic_by_path)
     result["documents"] = documents
     write_json(args.output.expanduser().resolve(), result)
     print(json.dumps({"output": str(args.output), "documents": len(documents)}, ensure_ascii=False, indent=2))
@@ -1587,9 +1600,9 @@ def blank_field(fields: dict[str, Any], field: str) -> None:
         if not any(namespace in item for item in updated):
             updated.append({namespace: []})
         fields["tag"] = updated
-    elif field in {"signature", "dependencies", "examples"}:
+    elif field in {"signature", "dependencies", "examples", "navigation"}:
         fields[field] = []
-    elif field == "headers":
+    elif field == "header":
         fields[field] = []
     elif field in {"declaration", "type_catalog"}:
         fields[field] = None
@@ -1652,10 +1665,22 @@ def resolve_issues(args: argparse.Namespace) -> int:
         issue_id = decision.get("issue_id")
         if issue_id not in issue_map or issue_id in seen:
             raise ValidationError(f"invalid or duplicate issue decision: {issue_id}")
-        if decision.get("classification") not in ISSUE_TYPES or decision.get("resolution") not in RESOLUTIONS:
+        classification = decision.get("classification")
+        resolution = decision.get("resolution")
+        allowed_resolutions = {
+            "document_defect": {"blank_field", "report_source_defect", "report_unresolved"},
+            "source_defect": {"report_source_defect", "report_unresolved"},
+            "unresolved": {"report_unresolved"},
+            "tool_defect": {"tool_change_required"},
+        }
+        if classification not in ISSUE_TYPES or resolution not in RESOLUTIONS:
             raise ValidationError(f"invalid decision for {issue_id}")
-        if decision["classification"] != issue_map[issue_id]["issue_type"]:
+        if classification != issue_map[issue_id]["issue_type"]:
             raise ValidationError(f"classification disagrees with issue: {issue_id}")
+        if resolution not in allowed_resolutions[classification]:
+            raise ValidationError(
+                f"resolution {resolution!r} is not allowed for {classification}: {issue_id}"
+            )
         if decision.get("field") not in {None, issue_map[issue_id]["field"]}:
             raise ValidationError(f"decision field disagrees with issue: {issue_id}")
         seen.add(issue_id)
@@ -1766,15 +1791,32 @@ def normalize_examples(root: Path, document_path: str, examples: Any) -> list[di
     return normalized
 
 
+def normalize_navigation(navigation: Any, document_path: str) -> list[dict[str, str]]:
+    if not isinstance(navigation, list):
+        raise ValidationError(f"{document_path}: navigation must be an array")
+    result = []
+    for index, item in enumerate(navigation):
+        if not isinstance(item, dict) or set(item) != {"path", "title"}:
+            raise ValidationError(f"{document_path}: navigation[{index}] must contain path and title")
+        path, title = item["path"], item["title"]
+        if not isinstance(path, str) or not path.startswith("docs/zh/api/") or not path.endswith(".md"):
+            raise ValidationError(f"{document_path}: navigation[{index}].path is invalid")
+        if not isinstance(title, str) or not title.strip():
+            raise ValidationError(f"{document_path}: navigation[{index}].title must be non-empty")
+        result.append({"path": path, "title": title})
+    return result
+
+
 def validate_base_fields(fields: dict[str, Any], path: str) -> None:
     """Enforce the fixed top-level YAML contract before rendering."""
-    if fields.get("okftype") not in OKF_TYPES:
-        raise ValidationError(f"{path}: okftype must be one of {sorted(OKF_TYPES)}")
+    profiles = load_model()["profiles"]
+    if fields.get("okftype") not in profiles:
+        raise ValidationError(f"{path}: okftype must be one of {sorted(profiles)}")
     if not isinstance(fields.get("title"), str) or not fields["title"].strip():
         raise ValidationError(f"{path}: title must be a non-empty string")
     if fields.get("resource") != f"asc-devkit/{path}":
         raise ValidationError(f"{path}: resource must equal asc-devkit/<document path>")
-    if not isinstance(fields.get("description"), str):
+    if "description" in fields and not isinstance(fields.get("description"), str):
         raise ValidationError(f"{path}: description must be a string")
     timestamp = fields.get("timestamp")
     if not isinstance(timestamp, str):
@@ -1793,10 +1835,21 @@ def validate_tags(
     body: str,
     evidence: dict[str, Any],
     allowed_empty: set[str],
+    required_namespaces: set[str],
 ) -> list[dict[str, list[str]]]:
     result = normalize_tag(fields.get("tag"), namespaces)
+    rules = yaml.safe_load(TAG_RULES_PATH.read_text(encoding="utf-8"))
+    rule_data = rules.get("required_namespaces", {}) if isinstance(rules, dict) else {}
+    required_namespaces = set(rule_data.get("always", []))
+    conditional = rule_data.get("conditional", {})
+    selected_roles = set(next((item["roles"] for item in result if "roles" in item), []))
+    for namespace, condition in conditional.items():
+        if selected_roles & set(condition.get("when_roles_in", [])):
+            required_namespaces.add(namespace)
     for item in result:
         namespace, selected = next(iter(item.items()))
+        if not selected and namespace in required_namespaces and f"tag.{namespace}" not in allowed_empty:
+            raise ValidationError(f"{path}: required tag namespace is empty: {namespace}")
         unknown = set(selected) - values[namespace]
         if unknown:
             raise ValidationError(f"{path}: tag {namespace} has unknown values: {sorted(unknown)}")
@@ -1810,19 +1863,6 @@ def validate_tags(
                     raise ValidationError(f"{path}: invalid evidence for tag {key}")
                 if namespace != "api_surfaces" and reference["excerpt"] not in body:
                     raise ValidationError(f"{path}: tag evidence is not verbatim for {key}")
-    selected_map = {next(iter(item)): next(iter(item.values())) for item in result}
-    rules = load_tag_rules()["required_namespaces"]
-    for namespace in rules["always"]:
-        if not selected_map.get(namespace) and f"tag.{namespace}" not in allowed_empty:
-            raise ValidationError(f"{path}: required tag namespace is empty: {namespace}")
-    roles = set(selected_map.get("roles", []))
-    for namespace, condition in rules["conditional"].items():
-        if roles & set(condition["when_roles_in"]) and not selected_map.get(namespace):
-            if f"tag.{namespace}" not in allowed_empty:
-                raise ValidationError(
-                    f"{path}: tag.{namespace} is required for roles: "
-                    + ",".join(sorted(roles & set(condition["when_roles_in"])))
-                )
     return result
 
 
@@ -1854,7 +1894,7 @@ def validate_signature(signature: Any, path: str) -> list[dict[str, Any]]:
             raise ValidationError(
                 f"{path}: signature[{index}] {reason} and must use {expected_key}"
             )
-        for key in ("archs", "headers", "dtype"):
+        for key in ("archs", "header", "dtype"):
             if key in item and (not isinstance(item[key], list) or any(not isinstance(value, str) for value in item[key])):
                 raise ValidationError(f"{path}: signature[{index}].{key} must be a string array")
         if "dtype" in item:
@@ -1867,18 +1907,18 @@ def validate_signature(signature: Any, path: str) -> list[dict[str, Any]]:
     return signature
 
 
-def _validate_headers(headers: Any, path: str) -> list[str]:
-    if not isinstance(headers, list) or any(not isinstance(item, str) for item in headers):
-        raise ValidationError(f"{path}: headers must be a string array")
-    if len(headers) != len(set(headers)):
-        raise ValidationError(f"{path}: headers must not contain duplicates")
-    for header in headers:
+def _validate_header(header: Any, path: str) -> list[str]:
+    if not isinstance(header, list) or any(not isinstance(item, str) for item in header):
+        raise ValidationError(f"{path}: header must be a string array")
+    if len(header) != len(set(header)):
+        raise ValidationError(f"{path}: header must not contain duplicates")
+    for header in header:
         candidate = Path(header)
         if not header.startswith("/include/") or candidate.suffix not in {".h", ".hpp"}:
-            raise ValidationError(f"{path}: headers must be /include/ header resources")
+            raise ValidationError(f"{path}: header must be /include/ header resources")
         if ".." in candidate.parts:
-            raise ValidationError(f"{path}: headers must not escape the repository")
-    return headers
+            raise ValidationError(f"{path}: header must not escape the repository")
+    return header
 
 
 def _validate_declaration(definition_kind: str, declaration: Any, path: str) -> None:
@@ -1981,16 +2021,21 @@ def _definition_kind_from_fields(fields: dict[str, Any]) -> str | None:
 def validate_definition_fields(
     fields: dict[str, Any], path: str, allowed_empty: set[str]
 ) -> None:
+    # Callable API profiles legitimately publish common header metadata at
+    # document level after signature normalization; definition validation does
+    # not apply to those pages.
+    if fields.get("okftype") == "reference.api.cpp":
+        return
     definition_kind = _definition_kind_from_fields(fields)
     if definition_kind is None:
-        if any(fields.get(key) not in (None, [], {}) for key in ("headers", "declaration", "type_catalog")):
+        if any(fields.get(key) not in (None, [], {}) for key in ("header", "declaration", "type_catalog")):
             raise ValidationError(f"{path}: unsupported definition metadata structure")
         return
     if definition_kind != "type_catalog" and fields.get("type_catalog") not in (None, {}):
         raise ValidationError(f"{path}: type_catalog is only valid for type catalog metadata")
-    headers = fields.get("headers")
-    if headers not in (None, []):
-        _validate_headers(headers, path)
+    header = fields.get("header")
+    if header not in (None, []):
+        _validate_header(header, path)
     if definition_kind == "type_catalog":
         if fields.get("declaration") not in (None, {}):
             raise ValidationError(f"{path}: type_catalog must not contain declaration")
@@ -2000,7 +2045,7 @@ def validate_definition_fields(
             _validate_type_catalog(fields["type_catalog"], path)
         return
     if definition_kind == "function_macro":
-        if fields.get("headers") not in (None, []) or fields.get("declaration") not in (None, {}):
+        if fields.get("header") not in (None, []) or fields.get("declaration") not in (None, {}):
             raise ValidationError(f"{path}: function_macro only uses signature metadata")
         if not fields.get("signature") and "signature" not in allowed_empty:
             raise ValidationError(f"{path}: function_macro signature is required")
@@ -2012,40 +2057,82 @@ def validate_definition_fields(
     _validate_declaration(definition_kind, fields["declaration"], path)
 
 
+def _promote_common_signature_fields(fields: dict[str, Any]) -> None:
+    """Remove repeated signature metadata and publish it at document level."""
+    signature = fields.get("signature")
+    if not isinstance(signature, list) or not signature or not all(isinstance(item, dict) for item in signature):
+        return
+    for key in ("archs", "header"):
+        values = [item.get(key) for item in signature]
+        if not values or any(not isinstance(value, list) for value in values):
+            continue
+        first = values[0]
+        if not first or any(value != first for value in values[1:]):
+            continue
+        fields[key] = list(first)
+        for item in signature:
+            item.pop(key, None)
+
+
 def render_yaml(
     fields: dict[str, Any], namespaces: tuple[str, ...], values: dict[str, set[str]],
     root: Path, path: str, body: str, evidence: dict[str, Any], allowed_empty: set[str],
 ) -> str:
-    output = {key: deepcopy(fields.get(key)) for key in ALLOWED_FIELDS}
+    model = load_model()
+    _promote_common_signature_fields(fields)
+    profile = model["profiles"].get(fields.get("okftype"))
+    if not isinstance(profile, dict):
+        raise ValidationError(f"{path}: unknown okftype {fields.get('okftype')!r}")
+    allowed_fields = set(model["common_required_fields"]) | set(profile.get("fields", []))
+    output = {
+        key: deepcopy(fields[key])
+        for key in model["field_order"]
+        if key in allowed_fields and key in fields
+    }
     validate_base_fields(output, path)
-    output["signature"] = normalize_signature_ids(output["signature"])
-    output["tag"] = validate_tags(output, namespaces, values, path, body, evidence, allowed_empty)
-    # Empty namespaces stay in worker artifacts (resolver degradation signal) but are
-    # omitted from the rendered front matter: inapplicable fields are omitted, never
-    # written as empty arrays (OKF 字段规范 / 最小标签集设计说明).
-    output["tag"] = [
-        {namespace: InlineList(selected)}
-        for item in output["tag"] for namespace, selected in item.items() if selected
-    ]
-    output["dependencies"] = normalize_dependencies(root, path, output.get("dependencies", []))
-    for signature in output["signature"]:
+    if "signature" in output:
+        output["signature"] = normalize_signature_ids(output["signature"])
+    if "tag" in output:
+        output["tag"] = validate_tags(
+            output,
+            namespaces,
+            values,
+            path,
+            body,
+            evidence,
+            allowed_empty,
+            {"roles"} if "roles" in namespaces else set(),
+        )
+        output["tag"] = [
+            {namespace: InlineList(selected)}
+            for item in output["tag"] for namespace, selected in item.items() if selected
+        ]
+    if "dependencies" in output:
+        output["dependencies"] = normalize_dependencies(root, path, output.get("dependencies", []))
+    if "navigation" in output:
+        output["navigation"] = normalize_navigation(output["navigation"], path)
+    for signature in output.get("signature", []):
         if isinstance(signature, dict):
-            for key in ("archs", "headers", "dtype"):
+            for key in ("archs", "header", "dtype"):
                 if isinstance(signature.get(key), list):
                     signature[key] = InlineList(signature[key])
-    for example in output["examples"]:
+    for example in output.get("examples", []):
         if isinstance(example, dict) and isinstance(example.get("archs"), list):
             example["archs"] = InlineList(example["archs"])
-    output["signature"] = validate_signature(output["signature"], path)
-    output["examples"] = normalize_examples(root, path, output["examples"])
+    if "signature" in output:
+        output["signature"] = validate_signature(output["signature"], path)
+    if "examples" in output:
+        output["examples"] = normalize_examples(root, path, output["examples"])
     validate_definition_fields(output, path, allowed_empty)
-    if not output["signature"]:
-        output.pop("signature")
-    for key in ("headers", "declaration", "type_catalog"):
+    if "signature" in output and not output["signature"] and output.get("okftype") != "reference.api.cpp":
+        output.pop("signature", None)
+    for key in ("header", "declaration", "type_catalog"):
         if output.get(key) in (None, [], {}):
             output.pop(key, None)
-    if isinstance(output.get("headers"), list):
-        output["headers"] = InlineList(output["headers"])
+    if isinstance(output.get("header"), list):
+        output["header"] = InlineList(output["header"])
+    if isinstance(output.get("archs"), list):
+        output["archs"] = InlineList(output["archs"])
     return yaml.dump(output, allow_unicode=True, sort_keys=False, default_flow_style=False, Dumper=DisplayDumper)
 
 
@@ -2124,16 +2211,15 @@ def validate(args: argparse.Namespace) -> int:
         target = relative_api_path(root, path)
         if sha256(target) != document["sha256"]:
             raise ValidationError(f"input changed after worker read: {path}")
-        if not document.get("semantic_verified", False):
-            # 语义输入门禁：未经 semantic-input 合并的结果只能用于调试，不得写入 DevKit
-            # （构造 worker-result 的控制器单元测试必须显式置 semantic_verified: true）。
-            raise ValidationError(
-                f"{path}: semantic input missing (semantic_verified=false); "
-                "rerun controller.py worker with --semantic-input"
-            )
         fields = deepcopy(document["fields"])
         allowed_empty: set[str] = set()
-        for found in document.get("issues", []):
+        document_blocked = False
+        discovered_issues = list(document.get("issues", []))
+        if document.get("plan", {}).get("okftype") != "reference.index.cpp" and not document.get("semantic_verified", False) and not any(
+            found.get("field") == "semantic_input" for found in discovered_issues
+        ):
+            raise ValidationError(f"{path}: worker result is missing semantic_input issue")
+        for found in discovered_issues:
             decision = decision_map.get(found["issue_id"])
             if decision is None:
                 raise ValidationError(f"missing issue resolution: {found['issue_id']}")
@@ -2151,8 +2237,10 @@ def validate(args: argparse.Namespace) -> int:
                 allowed_empty.add(found["field"])
             if decision["resolution"] == "blank_field":
                 blank_field(fields, found["field"])
-            if decision["resolution"] == "tool_change_required":
-                raise ValidationError(f"tool change required: {found['issue_id']}")
+            if decision["resolution"] in {"report_unresolved", "tool_change_required"}:
+                document_blocked = True
+        if document_blocked:
+            continue
         normalized_dependencies = normalize_dependencies(root, path, fields.get("dependencies", []))
         requires_graph[path] = {
             item["path"] for item in normalized_dependencies if item["kind"] == "requires"
@@ -2293,6 +2381,25 @@ def validate(args: argparse.Namespace) -> int:
     report = {"schema_version": 1, "run_id": manifest["run_id"], "issues": issue_report, "documents": manifest["documents"]}
     write_json(run_dir / "error-report.json", report)
     (run_dir / "error-report.md").write_text(report_markdown(report), encoding="utf-8")
+    blocking = [
+        item for item in issue_report
+        if item.get("decision", {}).get("resolution") in {"report_unresolved", "tool_change_required"}
+    ]
+    if blocking:
+        write_json(
+            run_dir / "validation.json",
+            {
+                "schema_version": 1,
+                "run_id": manifest["run_id"],
+                "status": "blocked",
+                "issues": len(issue_report),
+                "blocking_issues": len(blocking),
+                "report": str(run_dir / "error-report.md"),
+            },
+        )
+        raise ValidationError(
+            f"validation blocked by {len(blocking)} unresolved/tool-defect issues; see {run_dir / 'error-report.md'}"
+        )
     files = sorted(file_final.values(), key=lambda item: item["path"])
     write_json(
         run_dir / "write-plan.json",
@@ -2345,6 +2452,45 @@ def write_lock(root: Path):
             fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
+def write_validation_failure_report(run_dir: Path, error: Exception) -> None:
+    """Persist a diagnostic report even when validation fails before issue aggregation."""
+    if (run_dir / "error-report.json").is_file() and (run_dir / "error-report.md").is_file():
+        return
+    try:
+        manifest = read_json(run_dir / "manifest.json")
+    except (OSError, ValueError, TypeError, KeyError):
+        return
+    report = {
+        "schema_version": 1,
+        "run_id": manifest.get("run_id", run_dir.name),
+        "issues": [{
+            "document_path": "<validation>",
+            "field": "validation",
+            "issue_type": "tool_defect",
+            "message": str(error),
+            "evidence": [],
+            "decision": {
+                "resolution": "tool_change_required",
+                "note": "validate 在完成问题聚合前失败，未生成 write plan。",
+            },
+        }],
+        "documents": manifest.get("documents", []),
+    }
+    write_json(run_dir / "error-report.json", report)
+    (run_dir / "error-report.md").write_text(report_markdown(report), encoding="utf-8")
+    write_json(
+        run_dir / "validation.json",
+        {
+            "schema_version": 1,
+            "run_id": report["run_id"],
+            "status": "blocked",
+            "issues": 1,
+            "blocking_issues": 1,
+            "report": str(run_dir / "error-report.md"),
+        },
+    )
+
+
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(description=__doc__)
     sub = root.add_subparsers(dest="command", required=True)
@@ -2356,7 +2502,10 @@ def parser() -> argparse.ArgumentParser:
     worker_parser = sub.add_parser("worker")
     worker_parser.add_argument("--task", type=Path, required=True)
     worker_parser.add_argument("--output", type=Path, required=True)
-    worker_parser.add_argument("--semantic-input", type=Path, default=None)
+    worker_parser.add_argument(
+        "--semantic-input", type=Path,
+        help="verified batch semantic artifact; omission is allowed only for scaffold tests and cannot pass validate",
+    )
     worker_parser.add_argument("--worker-id", default="worker-a")
     resolve_parser = sub.add_parser("resolve-issues")
     resolve_parser.add_argument("--run-dir", type=Path, required=True)
@@ -2379,6 +2528,8 @@ def main() -> int:
             return resolve_issues(args)
         return args.handler(args)
     except (OSError, KeyError, TypeError, ValueError, ValidationError) as exc:
+        if args.command == "validate":
+            write_validation_failure_report(args.run_dir.expanduser().resolve(), exc)
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
