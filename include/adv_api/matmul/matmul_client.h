@@ -768,6 +768,22 @@ public:
         return true;
     }
 
+private:
+    // Wait for the AIC result-ready event. On dav-3510/9201 GM compatible mode this is the
+    // point-to-point intra-block flag set by the server (MatmulService::NotifyAivEvent), so the
+    // sibling AIV's event counter is never touched; other modes keep the broadcast event counter.
+    __aicore__ inline void WaitAivEvent()
+    {
+#if defined(USE_WORKSPACE) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+        if constexpr (!(A_TYPE::ibShare && B_TYPE::ibShare)) {
+            CrossCoreWaitFlag<INTRA_MODE, PIPE_S>(static_cast<uint16_t>(GM_WAIT_FIXP_ID) + this->instIdx);
+            return;
+        }
+#endif
+        WaitEvent(this->devEvtID);
+    }
+
+public:
     // Only support the mode that the IterateAll is asynchronous and GM output is continuous.
     // In discontinuous scenarios, the system stops responding.
     __aicore__ inline void WaitIterateAll()
@@ -796,7 +812,7 @@ public:
             }
             WaitEvent(intraId);
         } else {
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
         }
 #endif
     }
@@ -812,7 +828,7 @@ public:
 #if defined(USE_SSBUF)
         CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(waitFixpId);
 #else
-        WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+        WaitAivEvent();
 #endif
     }
 
@@ -976,7 +992,7 @@ public:
                 }
                 WaitEvent(intraId);
             } else {
-                WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+                WaitAivEvent();
             }
         }
         isSyncGetC = sync;
@@ -1016,7 +1032,7 @@ public:
         PostMessage<KFC_Enum::MMFUN_ITERATE_ALL, sync>();
 
         if constexpr (sync) {
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
             CopyToUB(ubCmatrix, gmDataAddr, ubCmatrix.GetSize());
         }
         isSyncGetC = sync;
@@ -1060,7 +1076,7 @@ public:
 #if defined(USE_SSBUF)
             CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(waitFixpId);
 #else
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
 #endif
         }
         isSyncGetC = sync;
@@ -1113,7 +1129,7 @@ public:
                 CrossCoreWaitFlag<INTRA_MODE, PIPE_V>(waitFixpId);
             }
 #else
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
             CopyToUB(ubCmatrix, gmDataAddr, ubCmatrix.GetSize());
 #endif
         }
@@ -1167,7 +1183,7 @@ public:
 #if defined(USE_SSBUF)
             CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(waitFixpId);
 #else
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
 #endif
         }
         isSyncGetC = sync;
@@ -1307,7 +1323,7 @@ public:
         PostMessage<KFC_Enum::MMFUN_GET_TENSOR_C, sync>();
 
         if constexpr (sync) {
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
         }
         TRACE_STOP(TraceId::KFC_CLIENT_REV_MSG_GM);
     }
@@ -1331,7 +1347,7 @@ public:
 
             if (curProcess < INC_PROCESS_CHECK) {
                 ++curProcess;
-                WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+                WaitAivEvent();
             }
 
             uint32_t size;
@@ -1360,7 +1376,7 @@ public:
         GM_ADDR gmDataAddr = reinterpret_cast<GM_ADDR>(kfcMsg_.body.cAddr);
         PostMessage<KFC_Enum::MMFUN_GET_TENSOR_C, true>();
 
-        WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+        WaitAivEvent();
 
         if constexpr (PhyPosIsUB(C_TYPE::pos)) {
             if constexpr (doPad) {
@@ -1398,7 +1414,7 @@ public:
 #if defined(USE_SSBUF)
             CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(waitFixpId);
 #else
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
 #endif
         }
 
@@ -1429,7 +1445,7 @@ public:
                 }
                 WaitEvent(intraId);
             } else {
-                WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+                WaitAivEvent();
             }
 #endif
         }
@@ -1470,7 +1486,7 @@ public:
 #if defined(USE_SSBUF)
             CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(waitFixpId);
 #else
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
 #endif
         }
 
@@ -1513,7 +1529,7 @@ public:
 #if defined(USE_SSBUF)
             CrossCoreWaitFlag<INTRA_MODE, PIPE_MTE2>(waitFixpId); // GM to UB
 #else
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
 #endif
         }
         // 计算batchC
@@ -1552,7 +1568,7 @@ public:
 #if defined(USE_SSBUF)
             CrossCoreWaitFlag<INTRA_MODE, PIPE_V>(waitFixpId);
 #else
-            WaitKfcResultEvent(this->devEvtID, this->instIdx, A_TYPE::ibShare && B_TYPE::ibShare);
+            WaitAivEvent();
 #endif
         }
 

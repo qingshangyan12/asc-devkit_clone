@@ -42,7 +42,6 @@
 #include "../feature_trait/matmul_feature_trait.h"
 #include "mx_matmul_utils.h"
 #include "batch_matmul_utils.h"
-#include "../../../../../include/basic_api/kernel_operator_block_sync_intf.h"
 
 namespace AscendC {
 
@@ -221,22 +220,6 @@ __aicore__ inline T CeilAlignT(T num1, T num2)
 // the SSBUF-only header. The GM compatible mode uses it for the point-to-point AIC->AIV notify.
 constexpr uint16_t GM_WAIT_FIXP_ID = 1U;
 #endif
-
-// Wait for the AIC result-ready event of the matmul object. On dav-3510/9201 GM compatible mode
-// (non sameAB) the server notifies via the point-to-point intra-block flag (MatmulService::
-// NotifyAivEvent), so the sibling AIV's broadcast event counter never accumulates residual; other
-// modes (2201 / sameAB / SSBUF) keep the original broadcast event counter.
-__aicore__ inline void WaitKfcResultEvent(uint16_t devEvtID, uint8_t instIdx, bool isSameAB)
-{
-#if defined(USE_WORKSPACE) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
-    if (!isSameAB) {
-        CrossCoreWaitFlag<INTRA_MODE, PIPE_S>(static_cast<uint16_t>(GM_WAIT_FIXP_ID) + instIdx);
-        return;
-    }
-#endif
-    WaitEvent(devEvtID);
-}
-
 template <class T, class U>
 __aicore__ inline void InitKfcClient(
     T& matmulClient, U* tiling, TPipe* tpipe, KfcCommClient* client, int instIdx, GM_ADDR workspace)
