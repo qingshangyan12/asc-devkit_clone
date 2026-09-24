@@ -113,6 +113,12 @@ private:
     std::vector<std::vector<DataSlice>> localCopyInfoFullMesh_;
     std::vector<ThreadHandle> subThreadsBoard_;
     std::vector<ThreadHandle> subThreadsFullMesh_;
+    bool enableRemoteMemAccess_{false};
+    u64 inputOffset_{0};
+    u64 outputOffset_{0};
+    void* inputSymWindow_{nullptr};
+    void* outputSymWindow_{nullptr};
+    HcclResult GetSymmetricPeerInput(u32 peerRank, void** peerInput) const;
 };
 
 } // namespace mc2_ops_hccl
