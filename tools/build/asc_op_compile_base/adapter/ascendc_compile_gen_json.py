@@ -30,16 +30,15 @@ from .ascendc_constants import KernelMetaType
 from .super_kernel_sub_op_compile import save_kernel_type
 from .global_storage import global_var_storage
 from .ascendc_identify_meta_section_info import check_op_type_is_simt
+import subprocess
+import struct
 import hashlib
-
 from tbe.common.context import get_context
 from .get_op_tiling import OpInfo
-from .ascendc_constants import COMPILE_INFO_KEY, GEN_PLACE_HOLDER_STR
 from .ascendc_compile_dfx import DFXSectionGenerator
-from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manager
-from .super_kernel_constants import SuperKernelStreamFusionMode
 from .super_kernel_sub_op_compile import add_sub_super_kernel_info
-from .ascendc_compile_gen_code import _get_tiling_struct_size, delete_tiling_section
+from .super_kernel_constants import SuperKernelStreamFusionMode
+from .ascendc_kernel_feature_manager import global_ascendc_kernel_feature_manager
 
 
 def _get_kernel_type_dict(compile_info: CompileInfo, tiling_key: int):
@@ -95,23 +94,17 @@ def _get_kernel_type_dict(compile_info: CompileInfo, tiling_key: int):
     return tiling_key_dict
 
 
-def _gen_mix_json_from_seperate_json(
-    kernel_name: str, task_ration_str: str, core_type: int, no_set_kernel_type: bool
-):
+def _gen_mix_json_from_seperate_json(kernel_name: str, task_ration_str: str, core_type: int, no_set_kernel_type: bool):
     kernel_meta_path = CommonUtility.get_kernel_meta_dir()
     core_type_marker = "_mix_aic" if core_type == CORE_TYPE_CUBE else "_mix_aiv"
-    seperate_json_path = os.path.join(
-        kernel_meta_path, kernel_name + f"{core_type_marker}.json"
-    )
+    seperate_json_path = os.path.join(kernel_meta_path, kernel_name + f"{core_type_marker}.json")
     mix_json_path = os.path.join(kernel_meta_path, kernel_name + ".json")
     os.rename(seperate_json_path, mix_json_path)
     try:
         with open(mix_json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
     js["binFileName"] = kernel_name
     js["kernelName"] = kernel_name
     js["coreType"] = "MIX"
@@ -122,9 +115,7 @@ def _gen_mix_json_from_seperate_json(
             os.chmod(mix_json_path, stat.S_IRUSR + stat.S_IWUSR)
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
 
 
 def _gen_mix_json_from_seperate_json_for_kernel_type(
@@ -136,9 +127,7 @@ def _gen_mix_json_from_seperate_json_for_kernel_type(
         with open(json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
     js["binFileName"] = kernel_name
     js["kernelName"] = kernel_name
     js["coreType"] = "MIX"
@@ -149,16 +138,11 @@ def _gen_mix_json_from_seperate_json_for_kernel_type(
             os.chmod(json_path, stat.S_IRUSR + stat.S_IWUSR)
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
 
 
 def _dynamic_kernel_list_to_json(
-    kernel_name: str,
-    tiling_key_list: list,
-    enable_deterministic: bool,
-    tiling_key_deterministic: dict,
+    kernel_name: str, tiling_key_list: list, enable_deterministic: bool, tiling_key_deterministic: dict
 ):
     kernel_meta_path = CommonUtility.get_kernel_meta_dir()
     dynamic_kernel_json_path = os.path.join(kernel_meta_path, kernel_name + ".json")
@@ -166,34 +150,19 @@ def _dynamic_kernel_list_to_json(
         with open(dynamic_kernel_json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
     js["kernelName"] = kernel_name
     js["kernelList"] = []
     for tiling_key in tiling_key_list:
         if tiling_key in tiling_key_deterministic:
             js["kernelList"].append(
-                {
-                    "deterministic": tiling_key_deterministic[tiling_key],
-                    "kernelName": kernel_name + "_" + tiling_key,
-                }
+                {"deterministic": tiling_key_deterministic[tiling_key], "kernelName": kernel_name + "_" + tiling_key}
             )
         elif enable_deterministic:
             if get_current_build_config("enable_deterministic_mode") == 1:
-                js["kernelList"].append(
-                    {
-                        "deterministic": "true",
-                        "kernelName": kernel_name + "_" + tiling_key,
-                    }
-                )
+                js["kernelList"].append({"deterministic": "true", "kernelName": kernel_name + "_" + tiling_key})
             else:
-                js["kernelList"].append(
-                    {
-                        "deterministic": "false",
-                        "kernelName": kernel_name + "_" + tiling_key,
-                    }
-                )
+                js["kernelList"].append({"deterministic": "false", "kernelName": kernel_name + "_" + tiling_key})
         else:
             js["kernelList"].append({"kernelName": kernel_name + "_" + tiling_key})
     try:
@@ -201,9 +170,7 @@ def _dynamic_kernel_list_to_json(
             os.chmod(dynamic_kernel_json_path, stat.S_IRUSR + stat.S_IWUSR)
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
 
 
 def _dynamic_regbase_kernel_list_to_json(
@@ -219,9 +186,7 @@ def _dynamic_regbase_kernel_list_to_json(
         with open(dynamic_kernel_json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
     js["kernelName"] = kernel_name
     js["kernelList"] = []
     js["magic"] = "RT_DEV_BINARY_MAGIC_ELF"
@@ -230,26 +195,13 @@ def _dynamic_regbase_kernel_list_to_json(
     for tiling_key in tiling_key_list:
         if tiling_key in tiling_key_deterministic:
             js["kernelList"].append(
-                {
-                    "deterministic": tiling_key_deterministic[tiling_key],
-                    "kernelName": kernel_name + "_" + tiling_key,
-                }
+                {"deterministic": tiling_key_deterministic[tiling_key], "kernelName": kernel_name + "_" + tiling_key}
             )
         elif enable_deterministic:
             if get_current_build_config("enable_deterministic_mode") == 1:
-                js["kernelList"].append(
-                    {
-                        "deterministic": "true",
-                        "kernelName": kernel_name + "_" + tiling_key,
-                    }
-                )
+                js["kernelList"].append({"deterministic": "true", "kernelName": kernel_name + "_" + tiling_key})
             else:
-                js["kernelList"].append(
-                    {
-                        "deterministic": "false",
-                        "kernelName": kernel_name + "_" + tiling_key,
-                    }
-                )
+                js["kernelList"].append({"deterministic": "false", "kernelName": kernel_name + "_" + tiling_key})
         else:
             js["kernelList"].append({"kernelName": kernel_name + "_" + tiling_key})
     try:
@@ -257,9 +209,7 @@ def _dynamic_regbase_kernel_list_to_json(
             os.chmod(dynamic_kernel_json_path, stat.S_IRUSR + stat.S_IWUSR)
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
 
 
 def _static_regbase_kernel_list_to_json(kernel_name: str):
@@ -269,23 +219,17 @@ def _static_regbase_kernel_list_to_json(kernel_name: str):
         with open(kernel_json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
     js["magic"] = "RT_DEV_BINARY_MAGIC_ELF"
     try:
         with open(kernel_json_path, "w") as fd_write:
             os.chmod(kernel_json_path, stat.S_IRUSR + stat.S_IWUSR)
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
 
 
-def _gen_mix_sub_json(
-    compile_info: CompileInfo, tiling_info: TilingInfo, core_type: int = CORE_TYPE_CUBE
-):
+def _gen_mix_sub_json(compile_info: CompileInfo, tiling_info: TilingInfo, core_type: int = CORE_TYPE_CUBE):
     """generate cube/vector json file in code_channel_mix
 
     Args:
@@ -328,9 +272,7 @@ def _gen_mix_sub_json(
     )
 
 
-def _gen_static_json_for_no_mix_v200(
-    compile_info: CompileInfo, tiling_info: TilingInfo, kernel_type
-):
+def _gen_static_json_for_no_mix_v200(compile_info: CompileInfo, tiling_info: TilingInfo, kernel_type):
     target = "cce_core"
     tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_num)
     # if enable_vector_core, json has _mix_aic suffix
@@ -338,20 +280,12 @@ def _gen_static_json_for_no_mix_v200(
         kernel_meta_path = CommonUtility.get_kernel_meta_dir()
         kernel_name = compile_info.kernel_name
         kernel_json_path = os.path.join(kernel_meta_path, kernel_name + ".json")
-        core_type_marker = (
-            "_mix_aic"
-            if kernel_type is KernelMetaType.KERNEL_TYPE_AICORE
-            else "_mix_aiv"
-        )
-        seperate_json_path = os.path.join(
-            kernel_meta_path, kernel_name + f"{core_type_marker}.json"
-        )
+        core_type_marker = "_mix_aic" if kernel_type is KernelMetaType.KERNEL_TYPE_AICORE else "_mix_aiv"
+        seperate_json_path = os.path.join(kernel_meta_path, kernel_name + f"{core_type_marker}.json")
         os.rename(seperate_json_path, kernel_json_path)
 
 
-def _gen_non_mix_sub_json(
-    compile_info: CompileInfo, tiling_info: TilingInfo, sub_core_type: str
-):
+def _gen_non_mix_sub_json(compile_info: CompileInfo, tiling_info: TilingInfo, sub_core_type: str):
     """generate json file if operator code only has cube or vector code in v220
 
     Args:
@@ -393,9 +327,7 @@ def _gen_non_mix_sub_json(
     )
 
 
-def _gen_static_json_for_mix_v200(
-    compile_info: CompileInfo, tiling_info: TilingInfo, kernel_type
-):
+def _gen_static_json_for_mix_v200(compile_info: CompileInfo, tiling_info: TilingInfo, kernel_type):
     set_soc_spec("AiCore")
     target = "cce_core"
     tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_num)
@@ -407,18 +339,14 @@ def _gen_static_json_for_mix_v200(
     # if enable_vector_core, json has _mix_aic suffix
     if get_current_build_config(enable_vector_core):
         core_type_marker = "_mix_aic"
-        seperate_json_path = os.path.join(
-            kernel_meta_path, kernel_name + f"{core_type_marker}.json"
-        )
+        seperate_json_path = os.path.join(kernel_meta_path, kernel_name + f"{core_type_marker}.json")
         os.rename(seperate_json_path, kernel_json_path)
 
     try:
         with open(kernel_json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
     js["binFileName"] = kernel_name
     js["kernelName"] = kernel_name
     if kernel_type is KernelMetaType.KERNEL_TYPE_MIX_AICORE:
@@ -431,25 +359,17 @@ def _gen_static_json_for_mix_v200(
         with open(kernel_json_path, "w") as fd_write:
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
 
 
 def _dynamic_kernel_list_to_json_for_kernel_type_one(
-    compile_info: CompileInfo,
-    kernel_name: str,
-    tiling_key: str,
-    enable_deterministic: bool,
-    final_kernel_type: int,
+    compile_info: CompileInfo, kernel_name: str, tiling_key: str, enable_deterministic: bool, final_kernel_type: int
 ):
     tiling_key_dict = {}
     if final_kernel_type != 0x1 and final_kernel_type != 0x2:
         tiling_key_dict = _get_kernel_type_dict(compile_info, tiling_key)
     if tiling_key in compile_info.tiling_key_deterministic:
-        tiling_key_dict["deterministic"] = compile_info.tiling_key_deterministic[
-            tiling_key
-        ]
+        tiling_key_dict["deterministic"] = compile_info.tiling_key_deterministic[tiling_key]
         tiling_key_dict["kernelName"] = kernel_name + "_" + tiling_key
     elif enable_deterministic:
         if get_current_build_config("enable_deterministic_mode") == 1:
@@ -476,33 +396,21 @@ def _dynamic_kernel_list_to_json_for_kernel_type(
         with open(dynamic_kernel_json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
     js["kernelName"] = kernel_name
     js["kernelList"] = []
     if final_kernel_type != 0x1 and final_kernel_type != 0x2:
         js["taskRation"] = "tilingKey"
     for tiling_key in tiling_key_list:
         tiling_key_dict = _dynamic_kernel_list_to_json_for_kernel_type_one(
-            compile_info,
-            kernel_name,
-            tiling_key,
-            enable_deterministic,
-            final_kernel_type,
+            compile_info, kernel_name, tiling_key, enable_deterministic, final_kernel_type
         )
         js["kernelList"].append(tiling_key_dict)
         if compile_info.tiling_key_group_map is not None:
             if tiling_key in compile_info.tiling_key_group_map.keys():
                 for tiling_key_slave in compile_info.tiling_key_group_map[tiling_key]:
-                    tiling_key_dict_slave = (
-                        _dynamic_kernel_list_to_json_for_kernel_type_one(
-                            compile_info,
-                            kernel_name,
-                            tiling_key_slave,
-                            enable_deterministic,
-                            final_kernel_type,
-                        )
+                    tiling_key_dict_slave = _dynamic_kernel_list_to_json_for_kernel_type_one(
+                        compile_info, kernel_name, tiling_key_slave, enable_deterministic, final_kernel_type
                     )
                     js["kernelList"].append(tiling_key_dict_slave)
 
@@ -511,14 +419,10 @@ def _dynamic_kernel_list_to_json_for_kernel_type(
             os.chmod(dynamic_kernel_json_path, stat.S_IRUSR + stat.S_IWUSR)
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
 
 
-def _gen_dynamic_json_for_v200(
-    compile_info: CompileInfo, tiling_info: TilingInfo, final_kernel_type: str
-):
+def _gen_dynamic_json_for_v200(compile_info: CompileInfo, tiling_info: TilingInfo, final_kernel_type: str):
     """according to the kernel type of each tiling key, get the finel kernel type
     Args:
         compile_info (CompileInfo): compile info for generate .o and .json
@@ -537,17 +441,13 @@ def _gen_dynamic_json_for_v200(
     # if enable_vector_core, json has _mix_aic suffix
     if get_current_build_config(enable_vector_core):
         core_type_marker = "_mix_aic"
-        seperate_json_path = os.path.join(
-            kernel_meta_path, kernel_name + f"{core_type_marker}.json"
-        )
+        seperate_json_path = os.path.join(kernel_meta_path, kernel_name + f"{core_type_marker}.json")
         os.rename(seperate_json_path, kernel_json_path)
     try:
         with open(kernel_json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
 
     js["binFileName"] = kernel_name
     js["kernelName"] = kernel_name
@@ -557,9 +457,7 @@ def _gen_dynamic_json_for_v200(
         with open(kernel_json_path, "w") as fd_write:
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
 
     _dynamic_kernel_list_to_json_for_kernel_type(
         compile_info,
@@ -628,9 +526,7 @@ def _generate_final_json(compile_info: CompileInfo, tiling_info: TilingInfo):
         )
 
 
-def _get_simt_type_in_staic(
-    tiling_info: TilingInfo, compile_info: CompileInfo, obj_path
-):
+def _get_simt_type_in_staic(tiling_info: TilingInfo, compile_info: CompileInfo, obj_path):
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         return False
     if tiling_info.static_shape_flag is False:
@@ -655,10 +551,7 @@ no need to detect SIMT type",
         if kernel_type in [KernelMetaType.KERNEL_TYPE_AIV_ONLY]:
             kernel_name = compile_info.get_kernel_func_name()
             return check_op_type_is_simt(obj_path, kernel_name)
-        elif kernel_type in [
-            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1,
-            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2,
-        ]:
+        elif kernel_type in [KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1, KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2]:
             kernel_name = compile_info.kernel_name + vec_marker
             return check_op_type_is_simt(obj_path, kernel_name)
     else:
@@ -675,18 +568,25 @@ no need to detect SIMT type",
     return False
 
 
+COMPILE_INFO_KEY = "compileInfo"
+
+
+GEN_PLACE_HOLDER_STR = "gen_placeholder"
+
+
+TILING_KEY_SEARCH_KEYWORD = "Contents of section"  # used in new tiling to search tiling section lines
+
+
 def _infer_name(key, sub_operater_infos, chip_version):
     if key == "stream":
         if (
             sub_operater_infos["sub_operator_kernel_type"] == "KERNEL_TYPE_AIV_ONLY"
-            or sub_operater_infos["sub_operator_kernel_type"]
-            == "KERNEL_TYPE_MIX_AIV_1_0"
+            or sub_operater_infos["sub_operator_kernel_type"] == "KERNEL_TYPE_MIX_AIV_1_0"
         ):
             name = f"dav-{chip_version}-vec"
         elif (
             sub_operater_infos["sub_operator_kernel_type"] == "KERNEL_TYPE_MIX_AIC_1_1"
-            or sub_operater_infos["sub_operator_kernel_type"]
-            == "KERNEL_TYPE_MIX_AIC_1_2"
+            or sub_operater_infos["sub_operator_kernel_type"] == "KERNEL_TYPE_MIX_AIC_1_2"
         ):
             name = f"dav-{chip_version}-mix"
         else:
@@ -700,9 +600,7 @@ def _update_super_dfx_info(name, chip_version, sub_dfx_info, super_dfx_info):
     if name == f"dav-{chip_version}-mix":
         name_list = [f"dav-{chip_version}-vec", f"dav-{chip_version}-cube"]
         for sub_name in name_list:
-            if sub_name in super_dfx_info and isinstance(
-                super_dfx_info[sub_name], list
-            ):
+            if sub_name in super_dfx_info and isinstance(super_dfx_info[sub_name], list):
                 super_dfx_info[sub_name].append(sub_dfx_info)
             else:
                 super_dfx_info[sub_name] = [sub_dfx_info]
@@ -732,60 +630,38 @@ def _json_except_info(compile_info: CompileInfo):
             sub_dfx_info["func_name"] = sub_operater_infos["kernelName"]
             sub_dfx_info["split_mode"] = sub_operater_infos.get("split_mode")
             sub_dfx_info["blockNum"] = sub_operater_infos["blockDim"]
-            sub_dfx_info["sub_operator_op_type"] = sub_operater_infos.get(
-                "sub_operator_op_type", ""
-            )
-            sub_dfx_info["sub_operator_kernel_type"] = sub_operater_infos[
-                "sub_operator_kernel_type"
-            ]
-            sub_dfx_info["sub_operator_early_start_set_flag"] = sub_operater_infos[
-                "sub_operator_early_start_set_flag"
-            ]
+            sub_dfx_info["sub_operator_op_type"] = sub_operater_infos.get("sub_operator_op_type", "")
+            sub_dfx_info["sub_operator_kernel_type"] = sub_operater_infos["sub_operator_kernel_type"]
+            sub_dfx_info["sub_operator_early_start_set_flag"] = sub_operater_infos["sub_operator_early_start_set_flag"]
             sub_dfx_info["sub_operator_early_start_wait_flag"] = sub_operater_infos[
                 "sub_operator_early_start_wait_flag"
             ]
-            sub_dfx_info["sub_operator_call_dcci_before_kernel_start"] = (
-                sub_operater_infos.get(
-                    "sub_operator_call_dcci_before_kernel_start", False
-                )
+            sub_dfx_info["sub_operator_call_dcci_before_kernel_start"] = sub_operater_infos.get(
+                "sub_operator_call_dcci_before_kernel_start", False
             )
-            sub_dfx_info["sub_operator_call_dcci_after_kernel_end"] = (
-                sub_operater_infos.get("sub_operator_call_dcci_after_kernel_end", False)
+            sub_dfx_info["sub_operator_call_dcci_after_kernel_end"] = sub_operater_infos.get(
+                "sub_operator_call_dcci_after_kernel_end", False
             )
-            sub_dfx_info["sub_operator_call_dcci_disable_on_kernel"] = (
-                sub_operater_infos.get(
-                    "sub_operator_call_dcci_disable_on_kernel", False
-                )
+            sub_dfx_info["sub_operator_call_dcci_disable_on_kernel"] = sub_operater_infos.get(
+                "sub_operator_call_dcci_disable_on_kernel", False
             )
             sub_dfx_info["streamid"] = sub_op.get("stream_id")
-            sub_dfx_info["send_event_list"] = compile_info.super_kernel_info[
-                "send_event_list"
-            ][i]
-            notify_before_call_event_list = compile_info.super_kernel_info.get(
-                "notify_before_call_event_list", []
-            )
+            sub_dfx_info["send_event_list"] = compile_info.super_kernel_info["send_event_list"][i]
+            notify_before_call_event_list = compile_info.super_kernel_info.get("notify_before_call_event_list", [])
             if notify_before_call_event_list and notify_before_call_event_list[i]:
-                sub_dfx_info["notify_before_call_event_list"] = (
-                    notify_before_call_event_list[i]
-                )
-            sub_dfx_info["recv_event_list"] = compile_info.super_kernel_info[
-                "recv_event_list"
-            ][i]
+                sub_dfx_info["notify_before_call_event_list"] = notify_before_call_event_list[i]
+            sub_dfx_info["recv_event_list"] = compile_info.super_kernel_info["recv_event_list"][i]
             arg_list["param_offset"] = compile_info.super_kernel_info["param_offset"][i]
             if compile_info.super_kernel_info["send_event_list"][i]:
-                arg_list["notify_param_offset"] = compile_info.super_kernel_info[
-                    "notify_param_offset"
-                ][i]
+                arg_list["notify_param_offset"] = compile_info.super_kernel_info["notify_param_offset"][i]
             else:
                 arg_list["notify_param_offset"] = None
             if notify_before_call_event_list and notify_before_call_event_list[i]:
-                arg_list["notify_before_call_param_offset"] = (
-                    compile_info.super_kernel_info["notify_before_call_param_offset"][i]
-                )
-            if compile_info.super_kernel_info["recv_event_list"][i]:
-                arg_list["wait_param_offset"] = compile_info.super_kernel_info[
-                    "wait_param_offset"
+                arg_list["notify_before_call_param_offset"] = compile_info.super_kernel_info[
+                    "notify_before_call_param_offset"
                 ][i]
+            if compile_info.super_kernel_info["recv_event_list"][i]:
+                arg_list["wait_param_offset"] = compile_info.super_kernel_info["wait_param_offset"][i]
             else:
                 arg_list["wait_param_offset"] = None
             sub_dfx_info["arg_list"] = arg_list
@@ -808,10 +684,7 @@ def _init_param_value(op_info: OpInfo, tiling_info: TilingInfo, js):
                 if init_value is not None:
                     if init_value.isdigit():
                         # generate init value for InitValue(uint64_t)
-                        param_init_value = {
-                            "dtype": output["dtype"],
-                            "init_value": int(init_value),
-                        }
+                        param_init_value = {"dtype": output["dtype"], "init_value": int(init_value)}
                     else:
                         try:
                             init_value_json = json.loads(init_value)
@@ -819,9 +692,7 @@ def _init_param_value(op_info: OpInfo, tiling_info: TilingInfo, js):
                             if init_value_json["is_list"]:
                                 param_init_value = {
                                     "dtype": init_value_json[output["dtype"]]["type"],
-                                    "init_value": init_value_json[output["dtype"]][
-                                        "value"
-                                    ],
+                                    "init_value": init_value_json[output["dtype"]]["value"],
                                 }
                             else:
                                 #  generate init value for InitValue(ScalarVar)
@@ -831,8 +702,7 @@ def _init_param_value(op_info: OpInfo, tiling_info: TilingInfo, js):
                                 }
                         except Exception as err:
                             raise_tbe_python_err(
-                                TBE_DEFAULT_PYTHON_ERROR_CODE,
-                                ("read initValue error, reason is:", err),
+                                TBE_DEFAULT_PYTHON_ERROR_CODE, ("read initValue error, reason is:", err)
                             )
                     param_of_init_values.append(param_init_value)
                 else:
@@ -860,9 +730,7 @@ def _json_post_process(
         with open(json_path, "r") as fd:
             js = json.load(fd)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read json file failed, reason is:", err))
     if input_gen_placehoder:
         js["optionalInputMode"] = GEN_PLACE_HOLDER_STR
     if output_gen_placehoder:
@@ -873,11 +741,7 @@ def _json_post_process(
         else:
             js["deterministic"] = "false"
 
-    superkernel_black_op_list = [
-        "MoeInitRoutingV3",
-        "MoeInitRoutingV2",
-        "MoeInitRoutingQuant",
-    ]
+    superkernel_black_op_list = ["MoeInitRoutingV3", "MoeInitRoutingV2", "MoeInitRoutingQuant"]
     if op_info.op_type not in superkernel_black_op_list or not CommonUtility.is_v220():
         js["supportSuperKernel"] = 1
     else:
@@ -889,9 +753,7 @@ the superkernel cannot be integrated with the operator.",
         )
 
     if CommonUtility.is_c310():
-        if tiling_info.local_memory_size > 0 or _get_simt_type_in_staic(
-            tiling_info, compile_info, obj_path
-        ):
+        if tiling_info.local_memory_size > 0 or _get_simt_type_in_staic(tiling_info, compile_info, obj_path):
             js["supportSuperKernel"] = 0
             CommonUtility.print_compile_log(
                 compile_info.kernel_name,
@@ -913,14 +775,9 @@ the superkernel cannot be integrated with the operator.",
     vectorcore_num = get_context().get_addition("_op_vectorcore_num")
     has_platform_info = False
     if aicore_num is not None and vectorcore_num is not None:
-        js["platformInfo"] = {
-            "cubeCoreCnt": int(aicore_num),
-            "vectorCoreCnt": int(vectorcore_num),
-        }
+        js["platformInfo"] = {"cubeCoreCnt": int(aicore_num), "vectorCoreCnt": int(vectorcore_num)}
         has_platform_info = True
-    deterministic_level = _safe_int_conversion(
-        get_current_build_config("deterministic_level")
-    )
+    deterministic_level = _safe_int_conversion(get_current_build_config("deterministic_level"))
     if deterministic_level != -1:
         if not has_platform_info:
             js["platformInfo"] = {}
@@ -932,19 +789,15 @@ the superkernel cannot be integrated with the operator.",
         js["platformInfo"]["pcie_through_flag"] = pcie_through
 
     # set tilingdata of mc2 operator when online static compile
-    if (
-        tiling_info.static_shape_flag is True
-        and op_info.mc2_ctx is not None
-        and len(op_info.mc2_ctx) != 0
-    ):
+    if tiling_info.static_shape_flag is True and op_info.mc2_ctx is not None and len(op_info.mc2_ctx) != 0:
         js["runInfo"] = tiling_info.raw_run_info
 
     # gen sub operator infos for super kernel feature
     js = add_sub_super_kernel_info(js, tiling_info.static_shape_flag, compile_info)
 
-    if compile_info.super_kernel_info.get(
+    if compile_info.super_kernel_info.get("timestamp_option") is not None and compile_info.super_kernel_info.get(
         "timestamp_option"
-    ) is not None and compile_info.super_kernel_info.get("timestamp_option"):
+    ):
         del js["workspace"]
         js["debugOptions"] = compile_info.super_kernel_info["debug_option"]
         js["debugBufSize"] = compile_info.super_kernel_info["debug_size"]
@@ -953,11 +806,7 @@ the superkernel cannot be integrated with the operator.",
         compile_info.super_kernel_info.get("workspace_size") is not None
         and compile_info.super_kernel_info.get("workspace_size") > 0
     ):
-        js["workspace"] = {
-            "num": 1,
-            "size": [compile_info.super_kernel_info.get("workspace_size")],
-            "type": [0],
-        }
+        js["workspace"] = {"num": 1, "size": [compile_info.super_kernel_info.get("workspace_size")], "type": [0]}
 
     # get max tiling size when use tiling new
     if len(compile_info.tiling_key_struct_map) > 0:
@@ -974,12 +823,14 @@ the superkernel cannot be integrated with the operator.",
     # updata op_param size by flag of oom
     if "oom" in get_current_build_config("tir.op_debug_config"):
         # tiling need align to 8 bytes, dfx need 8 bytes for dfx point,
-        # oom need allocate 8 * (input + output + shape_tensor+ workspace)
+        # oom needs 8 * (input + output + shape_tensor + workspace) plus its extension header
         op_param_size = (
             ((max_tiling_size + 7) // 8) * 8
             + 8
             + 8 * DFXSectionGenerator().param_placeholder_num
+            + 2  # Optional OOM storage-shape extension header.
         )
+        js["oom"] = {"version": 1, "tensor_version": 1}
     else:
         op_param_size = max_tiling_size + 8
 
@@ -1002,22 +853,94 @@ the superkernel cannot be integrated with the operator.",
     if compile_info.super_kernel_info.get("kernel_name") is not None:
         js["SuperkernelInfo"] = _json_except_info(compile_info)
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
-        js["feature_list"] = (
-            global_ascendc_kernel_feature_manager.get_available_feature_versions()
-        )
+        js["feature_list"] = global_ascendc_kernel_feature_manager.get_available_feature_versions()
 
     try:
         with open(obj_path, "rb") as obj_file:
             js["sha256"] = hashlib.sha256(obj_file.read()).hexdigest()
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("read obj_file failed, reason is:", err)
-        )
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("read obj_file failed, reason is:", err))
     try:
         with open(json_path, "w") as fd_write:
             os.chmod(json_path, stat.S_IRUSR + stat.S_IWUSR)
             json.dump(js, fd_write, indent=2)
     except Exception as err:
-        raise_tbe_python_err(
-            TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err)
+        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("write json file failed, reason is:", err))
+
+
+def _get_tiling_struct_size(compile_info):
+    tiling_struct_set = set()
+    tiling_struct_size_map = {}
+    max_tiling_size = 0
+    for _, tiling_struct in compile_info.tiling_key_struct_map.items():
+        tiling_struct_set.add(tiling_struct)
+
+    for tiling_struct in tiling_struct_set:
+        objdump_cmd = [
+            "llvm-objdump",
+            "-s",
+            "-j",
+            ".ascendc_tiling.{}".format(tiling_struct),
+            "{}".format(compile_info.dst_file),
+        ]
+        proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=None)
+        (out, _) = proc.communicate()
+        """
+        e.g.
+        Contents of section .ascend.meta.TilingData:         # main_tiling_info[0]
+        0000 50000000 00000000                    P.......   # main_tiling_info[1] that needs to be parsed
+        """
+        tiling_str_info = out.decode("utf-8")
+        if TILING_KEY_SEARCH_KEYWORD in tiling_str_info:  # key words from llvm-objdump .ascendc_tiling.
+            main_line_start_index = tiling_str_info.index(TILING_KEY_SEARCH_KEYWORD)
+            main_tiling_info = tiling_str_info[main_line_start_index:].split("\n")
+            hex_num = main_tiling_info[1].split(" ")[2:4]
+            hex_num_str = CommonUtility.parser_uint64_hex_num(hex_num)
+            bytes_data = bytes.fromhex(hex_num_str)
+            dec_data = struct.unpack(">Q", bytes_data)[0]
+            tiling_struct_size_map[tiling_struct] = dec_data
+            max_tiling_size = max(max_tiling_size, dec_data)
+
+    # Preserve exact per-key sizes for Manifest constants before removing sections.
+    compile_info.compiled_tiling_key_data_size_map = {
+        str(tiling_key): int(tiling_struct_size_map[tiling_struct])
+        for tiling_key, tiling_struct in compile_info.tiling_key_struct_map.items()
+        if tiling_struct in tiling_struct_size_map
+    }
+    # The sk sub operator failed to rm tiling section because llvm-objcopy could not correctly process the ar obj.
+    if (
+        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
+        and compile_info.is_super_kernel_compile is False
+    ):
+        CommonUtility.print_compile_log(
+            compile_info.kernel_name,
+            "[Superkernel]In sk sub kernel compile, do not need rm tiling seciton!",
+            AscendCLogLevel.LOG_INFO,
         )
+        return max_tiling_size
+    # remove ascendc_tiling section
+    objdump_cmd = ["llvm-objcopy", "--remove-section=.ascendc_tiling.*", "{}".format(compile_info.dst_file)]
+    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    CommonUtility.print_compile_log(compile_info.kernel_name, "need rm tiling seciton!", AscendCLogLevel.LOG_INFO)
+    (out, _) = proc.communicate()
+    return max_tiling_size
+
+
+def delete_tiling_section(compile_info: CompileInfo):
+    # The sk sub operator failed to rm tiling section because llvm-objcopy could not correctly process the ar obj.
+    if (
+        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
+        and compile_info.is_super_kernel_compile is False
+    ):
+        CommonUtility.print_compile_log(
+            compile_info.kernel_name,
+            "[Superkernel]In sk sub kernel compile, do not need rm tiling seciton!",
+            AscendCLogLevel.LOG_INFO,
+        )
+        return
+    # remove ascendc_tiling section
+    objdump_cmd = ["llvm-objcopy", "--remove-section=.ascendc_tiling.*", "{}".format(compile_info.dst_file)]
+    proc = subprocess.Popen(objdump_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    CommonUtility.print_compile_log(compile_info.kernel_name, "need rm tiling seciton!", AscendCLogLevel.LOG_INFO)
+    (out, _) = proc.communicate()
+    return

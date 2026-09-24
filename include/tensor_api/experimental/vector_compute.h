@@ -32,6 +32,7 @@
 #include "tensor_api/experimental/arch/vector/logical_compute.h"
 #include "tensor_api/experimental/arch/vector/composite_compute.h"
 #include "tensor_api/experimental/arch/vector/histogram_compute.h"
+#include "tensor_api/experimental/arch/vector/reduction_compute.h"
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
