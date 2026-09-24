@@ -149,7 +149,7 @@ def get_dynamic_compile_static(op_type, op_info):
     if dynamic_compile_static == "tune":
         dynamic_compile_static_update, _ = get_dynamic_compile_static_from_kb(op_type, op_info)
         if dynamic_compile_static_update not in {"true", "false", None}:
-            logger.error("Op {} dynamic_compile_static {} invalid.".format(op_type, dynamic_comiple_static))
+            logger.error("Op {} dynamic_compile_static {} invalid.".format(op_type, dynamic_compile_static))
             return None
         elif dynamic_compile_static_update is None:
             return dynamic_compile_static
@@ -205,7 +205,7 @@ def find_mode_file_from_custom(op_type, custom_opp_path_list):
             op_py_file = get_file_real_path(op_path_custom, op_type_name, "py", middle_path)
             logger.debug("op: {} op file is {}, py_module_path is {}.".format(op_type, op_py_file, py_module_path))
             if op_py_file is not None and Path(op_py_file).is_file():
-                ogger.debug("op: {} op file is {}.".format(op_type, op_py_file))
+                logger.debug("op: {} op file is {}.".format(op_type, op_py_file))
                 if py_module_path not in sys.path:
                     logger.debug("op: {} add py_module_path is {}.".format(op_type, py_module_path))
                     sys.path.append(py_module_path)
