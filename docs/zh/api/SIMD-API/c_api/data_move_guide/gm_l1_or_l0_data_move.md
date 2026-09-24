@@ -1,6 +1,6 @@
 # GM与L1/L0数据搬运
 
-NPU架构版本3510提供GM到L1和L0C到GM两类直达通路。矩阵输入从GM进入L0A/L0B时，需要先通过PIPE_MTE2搬到L1，再通过PIPE_MTE1装载到L0A/L0B；矩阵计算结果可通过PIPE_FIX从L0C直接搬回GM。NPU架构版本3510不提供GM到L0A/L0B或L1到GM的直达搬运。
+NPU架构版本3510提供GM到L1 Buffer和L0C Buffer到GM两类直达通路。矩阵输入从GM进入L0A Buffer/L0B Buffer时，需要先通过PIPE_MTE2搬到L1 Buffer，再通过PIPE_MTE1装载到L0A Buffer/L0B Buffer；矩阵计算结果可通过PIPE_FIX从L0C Buffer直接搬回GM。NPU架构版本3510不提供GM到L0A Buffer/L0B Buffer或L1 Buffer到GM的直达搬运。
 
 ## 总体说明
 
