@@ -51,7 +51,7 @@ inline int __float_as_int(const float x)
 |---|---|
 | 0 | 0 |
 | -0 | ASCRT_MIN_VAL_S |
-| nan | 2143289344 |
+| nan | 按输入nan的位模式重解释（结果取决于输入nan的实际位模式，非固定值） |
 | inf | ASCRT_INT32_INF_S |
 | -inf | -8388608 |
 | ASCRT_MAX_NORMAL_F | 2139095039 |

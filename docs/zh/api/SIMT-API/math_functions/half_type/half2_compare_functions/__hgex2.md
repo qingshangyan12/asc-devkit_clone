@@ -78,6 +78,31 @@ half2 __hgex2(half2 x, half2 y)
     <td>ASCRT_MAX_NORMAL_FP16</td>
     <td>1</td>
   </tr>
+  <tr>
+    <td>inf</td>
+    <td>inf</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>-inf</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>inf</td>
+    <td>-inf</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>inf</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>有限值</td>
+    <td>-inf</td>
+    <td>1</td>
+  </tr>
 </table>
 
 ## 约束说明
