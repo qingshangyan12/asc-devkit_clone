@@ -170,7 +170,7 @@ __aicore__ inline half hlog10_case0(half x)
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
-| 1890 | 14.919 | 5232.88 |
+| 2375 | 15.309 | 5664.38 |
 
 **性能数据分析**：
 
@@ -209,11 +209,11 @@ __aicore__ inline half hlog10_case1(half x)
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
-| 1406 | 14.946 | 5194.75 |
+| 2049 | 16.358 | 5829.50 |
 
 **优化效果分析**：
 
-- 统一return后，编译器将修正链中的分支转换为带谓词的直线执行，跳转与分支栈操作减少，相比Case 0的1890，execute cycle降至1406，aiv_total_cycles从5232.88降至5194.75。
+- 统一return后，编译器将修正链中的分支转换为带谓词的直线执行，跳转与分支栈操作减少，相比Case 0的2375，execute cycle降至2049，下降约13.7%。
 
 ### Case 2: j0f分支链divergence版本
 
@@ -273,11 +273,11 @@ __aicore__ inline float j0f_case2(float x)
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
-| 2345 | 14.567 | 5025.12 |
+| 3149 | 16.632 | 5736.25 |
 
 **性能数据分析**：
 
-- 大部分输入数据在两次跳过特殊值判断后命中对应分支，少量数据在第一个分支即命中返回；未命中的判断仍产生跳转与分支栈开销，但各线程只执行命中方向的分段体，execute cycle为2345；
+- 大部分输入数据在两次跳过特殊值判断后命中对应分支，少量数据在第一个分支即命中返回；未命中的判断仍产生跳转与分支栈开销，但各线程只执行命中方向的分段体，execute cycle为3149；
 - aiv_total_cycles为全部block的平均值，其中首个block包含kernel启动初期的额外开销。
 
 ### Case 3: j0f分支链计算后统一return版本
@@ -311,11 +311,11 @@ __aicore__ inline float j0f_case3(float x)
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
-| 14692 | 22.726 | 19514.88 |
+| 14225 | 24.178 | 18937.38 |
 
 **优化效果分析**：
 
-- 相比Case 2的2345，execute cycle升至14692，Task Duration从14.567μs增至22.726μs，aiv_total_cycles从5025.12升至19514.88。Case 3反而显著慢于基线，原因在于命中率高的分支完成对应分支计算之后，还要执行后续计算，使得大量线程做了很多不必要的计算，造成性能损耗。
+- 相比Case 2的3149，execute cycle升至14225，Task Duration从16.632μs增至24.178μs，aiv_total_cycles从5736.25升至18937.38。Case 3反而显著慢于基线，原因在于命中率高的分支完成对应分支计算之后，还要执行后续计算，使得大量线程做了很多不必要的计算，造成性能损耗。
 - Case3和Case2的对比结果说明在进行predicate优化时，需要考虑分支命中率，Case 4进一步结合命中情况，探究谓词化的适用边界。
 
 ### Case 4: j0f分支链高命中率分支提前return,低命中率分支predicate优化版本
@@ -349,49 +349,49 @@ __aicore__ inline float j0f_case4(float x)
 
 | 数据批 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:---:|:-----------:|:---------------:|:--------------:|
-| input（low） | 1767 | 14.389 | 4860.21 |
-| input（high） | 2342 | 14.563 | 5468.46 |
-| input（special） | 2395 | 14.088 | 5367.21 |
-| input（mixed） | 2704 | 14.608 | 5756.00 |
+| input（low） | 2384 | 16.384 | 5508.25 |
+| input（high） | 2902 | 16.685 | 6170.50 |
+| input（special） | 17163 | 24.322 | 19441.12 |
+| input（mixed） | 18151 | 25.739 | 20466.75 |
 
 **优化效果分析**：
 
-- input（low）：命中`ax <= 8.0f`时立即返回，大量线程不执行后续未命中的分支计算，execute cycle降至1767；
-- input（high）：只执行命中分支，execute cycle为2342，快于Case 3计算后统一return；
-- input（special）：处理特殊值时需要先经过两次未命中的分段判断，再执行`ax > 1.0e13f`范围数据计算，最后才被特殊值修正覆盖，execute cycle为2395；
-- input（mixed）：命中率高的分支产生divergence, 命中率低的分支predicate优化各取所长，execute cycle为2704。
+- input（low）：命中`ax <= 8.0f`时立即返回，大量线程不执行后续未命中的分支计算，execute cycle降至2384；
+- input（high）：只执行命中分支，execute cycle为2902，快于Case 3计算后统一return；
+- input（special）：NaN/Inf不命中任何分段，需先经过两次未命中的分段判断，再执行`ax > 1.0e13f`范围计算（+Inf时`alpha >= 105615.0f`成立还会触发Payne-Hanek辐角缩减这一长计算），最后才被特殊值修正覆盖，大部分线程空算了长分支体，execute cycle升至17163；
+- input（mixed）：四类数据交替，各Warp内分段命中方向不一致，分段跳转分支产生divergence，特殊值又使尾部谓词化区域执行长计算，execute cycle为18151。
 
-四批数据命中情况不同，性能表现随之变化：输入数据以`ax <= 8.0f`为主时，命中率高的分支提前return跳过的计算最多、收益最大；输入数据以`8.0f < ax <= 1.0e13f`为主时，命中率低的分支产生divergence快于全部计算之后统一return；输入数据每个段均匀分布时，divergence和predicate各取所长，既能避免执行不必要的分支，又能消除跳转与分支栈开销。综合Case 3与Case 4可得predicate优化的边界：命中率低的分支predicate优化收益明显；命中率高的分支产生divergence、命中即提前return收益明显。
+四批数据性能对比结果可知，输入数据大多落在`ax <= 8.0f`范围内时，execute cycle最低：命中率高的分段提前return只执行命中方向，剩余分支predicate优化，两种机制各取所长。
 
 ## 性能对比总结
 
 **综合优化效果**：
 
-- hlog10组：从Case 0基线版本到Case 1优化版本，execute cycle从1890降低到1406，下降约25.6%；
-- j0f组：输入数据构成相同时，从Case 2基线版本到Case 3,execute cycle从2345升至14692；Case 4 execute cycle为1767，快于Case2 和Case3。
+- hlog10组：从Case 0基线版本到Case 1优化版本，execute cycle从2375降低到2049，下降约13.7%；
+- j0f组：输入数据构成相同时，从Case 2基线版本到Case 3,execute cycle从3149升至14225；Case 4在input（low）上execute cycle为2384，快于Case2 和Case3。
 
 - hlog10组（约1/16特殊值的常规输入）：
 
 | Case | execute cycle | Task Duration(μs) | aiv_total_cycles | 优化点 |
 |--------|:-----------:|:---------------:|:--------------:|--------------------|
-| Case 0 | 1890 | 14.919 | 5232.88 | 基线版本，特殊值前置、命中即提前return |
-| Case 1 | **1406** | 14.946 | **5194.75** | 修正链统一return，跳转由6级减至4级、末级谓词化 |
+| Case 0 | 2375 | 15.309 | 5664.38 | 基线版本，特殊值前置、命中即提前return |
+| Case 1 | **2049** | 16.358 | 5829.50 | 修正链统一return，整链谓词化消除跳转与分支栈开销 |
 
 - j0f组case2/3（常规输入：低值段为主 + 约1/16特殊值）：
 
 | Case | execute cycle | Task Duration(μs) | aiv_total_cycles | 优化点 |
 |--------|:-----------:|:---------------:|:--------------:|--------------------|
-| Case 2 | **2345** | **14.567** | **5025.12** | 基线版本，特殊值前置、全部分支命中即返回 |
-| Case 3 | 14692 | 22.726 | 19514.88 | 全部分支统一return、逐级覆盖，长短分支全部谓词化，execute cycle高于基线 |
+| Case 2 | **3149** | **16.632** | **5736.25** | 基线版本，特殊值前置、全部分支命中即返回 |
+| Case 3 | 14225 | 24.178 | 18937.38 | 全部分支统一return、逐级覆盖，长短分支全部谓词化，execute cycle高于基线 |
 
 - j0f组case4（execute cycle，按数据批）：
 
 | 数据批 | Case 4 | 命中率特征 |
 |--------|:-----:|--------------------|
-| input（low） | **1767** | 低值段命中率高 |
-| input（high） | 2342 | 中值段命中率高 |
-| input（special） | 2395 | 特殊值命中率高 |
-| input（mixed） | 2704 | 各方向命中率接近 |
+| input（low） | **2384** | 低值段命中率高 |
+| input（high） | 2902 | 中值段命中率高 |
+| input（special） | 17163 | 特殊值命中率高，不命中任何分段 |
+| input（mixed） | 18151 | 各方向命中率接近 |
 
 可见，predicate优化的收益与命中情况有关：命中率低的分支predicate化收益明显；命中率高的分支产生divergence、命中即提前return。
 
