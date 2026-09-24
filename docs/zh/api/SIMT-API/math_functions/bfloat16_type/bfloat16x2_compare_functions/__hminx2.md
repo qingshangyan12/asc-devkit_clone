@@ -50,8 +50,8 @@ bfloat16x2_t __hminx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 | x分量值 | y分量值 | 返回值 |
 |---|---|---|
-| nan | 非nan | nan |
-| 非nan | nan | nan |
+| nan | 非nan | y分量值 |
+| 非nan | nan | x分量值 |
 | nan | nan | nan |
 | 0 | -0 | -0 |
 | -0 | 0 | -0 |

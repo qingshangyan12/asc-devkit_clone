@@ -48,6 +48,8 @@ bfloat16x2_t __hdivx2(const bfloat16x2_t x, const bfloat16x2_t y)
 
 输入数据各分量相除的结果。本接口受全局饱和模式影响，相除的分量x和y满足：
 
+表中±号表示：除法结果的符号遵循有符号除法规则，即结果符号为x分量符号与y分量符号的异或（同号得正、异号得负），例如+1/-0的结果为-inf；x、y均为±inf时结果为nan（不定式）。
+
 <table>
   <thead>
     <tr>

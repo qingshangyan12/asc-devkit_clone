@@ -48,9 +48,9 @@ inline float rhypotf(float x, float y)
 
 ## 返回值说明
 
-x^2 + y^2的平方根的倒数。
+x^2 + y^2的平方根的倒数。本接口可避免不必要的中间上溢或下溢，大数值输入不会因中间平方运算溢出而返回错误结果（例如rhypotf(FLT_MAX, FLT_MAX)仍返回正确的subnormal结果）。
 
--   若x^2 + y^2的平方根超出float最大范围，返回值为0。
+-   若x^2 + y^2的平方根的倒数超出float最小范围，返回值为+0。
 -   若x^2 + y^2的平方根的倒数超出float最大范围，返回值为inf。
 -   若x和y都为0，返回值为inf。
 -   若x，y任意一个为±inf，返回值为0。

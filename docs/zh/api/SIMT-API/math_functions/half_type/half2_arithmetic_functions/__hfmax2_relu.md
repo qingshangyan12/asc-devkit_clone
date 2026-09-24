@@ -59,20 +59,20 @@ half2 __hfmax2_relu(const half2 x, const half2 y, const half2 z)
   </tr>
   <tr>
     <td colspan="3">任一值为nan</td>
-    <td>nan</td>
+    <td>0</td>
     <td>0</td>
   </tr>
   <tr>
     <td>inf</td>
     <td>±0</td>
     <td>任意值</td>
-    <td>nan</td>
+    <td>0</td>
     <td>0</td>
   </tr>
   <tr>
     <td colspan="2">x*y=±inf</td>
     <td>异号inf</td>
-    <td>nan</td>
+    <td>0</td>
     <td>0</td>
   </tr>
   <tr>

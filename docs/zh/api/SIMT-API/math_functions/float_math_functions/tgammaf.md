@@ -53,6 +53,7 @@ inline float tgammaf(float x)
 -   当x为-0.0时，返回值为-inf。
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为nan。
+-   当x为负整数时，返回值为nan。
 -   当x为nan时，返回值为nan。
 -   若返回值超出float最大范围，返回值为inf。
 -   若返回值超出float最小范围，返回值为-inf。
