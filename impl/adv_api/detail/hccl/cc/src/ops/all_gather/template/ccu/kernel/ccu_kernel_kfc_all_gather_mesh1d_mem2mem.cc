@@ -212,8 +212,7 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, boo
                 if (useGroupCopy) {
                     CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
                 } else {
-                    CCU_CHK_RET(ccu::LocalCopy(
-                        ctx.localDst, ctx.srcLocCopy, ctx.sliceSize, ctx.localCopyEvent, 1));
+                    CCU_CHK_RET(ccu::LocalCopy(ctx.localDst, ctx.srcLocCopy, ctx.sliceSize, ctx.localCopyEvent, 1));
                     CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
                 }
                 ctx.repeatTimeFlag = 1;
