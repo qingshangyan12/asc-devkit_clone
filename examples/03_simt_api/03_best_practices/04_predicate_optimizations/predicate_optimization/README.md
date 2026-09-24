@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例通过数学接口`hlog10`、`j0f`的分支链路展现SIMT编程模式下[Warp分支发散](../../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/thread_architecture.md#warp执行机制)的调优方法，重点呈现了predicate（谓词）优化的性能收益与适用场景。样例包含2个基线版本以及3个优化版本：基线版本命中分支即提前return，分支判断产生跳转，引发分支发散；优化版本消除分支跳转，将分支转换为谓词直线执行，并按分支覆盖范围选择predicate优化的适用范围。
+本样例通过数学接口`hlog10`、`j0f`展现SIMT编程模式下[Warp分支发散](../../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/thread_architecture.md#warp执行机制)的调优方法，重点呈现了predicate（谓词）优化的性能收益与适用场景。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -20,24 +20,19 @@
 │   ├── README.md                   // 样例说明文档
 │   ├── README_en.md                // 英文样例说明文档
 ```
-
-## 样例描述
-
-- 样例功能
-
-  对数学接口`hlog10`（half输入，6个精度特殊值需修正）与`j0f`（float输入，分段计算并处理特殊值）的分支链路，分别以"提前return"与"统一return"等不同分支组织方式实现kernel。前者展示predicate优化的性能收益，后者展示predicate优化的适用场景。通过不同分支组织方式的对比，展示SIMT编程方式下predicate优化的性能收益与适用场景。
+## 基础知识说明
 
 - **Warp与分支发散（Warp Divergence）**
 
-  在C++代码开发中，开发者遇到特殊值时，通常将特殊值处理置于正常计算逻辑之前，并通过控制流语句划分出不同的执行分支。然而在SIMT编程模式下，Warp是基本的调度和执行单位，当代码中出现分支判断时，Warp内的线程会产生分支发散（divergence），各分支代码只能串行执行，发散点处汇合点地址与各方向的活跃线程掩码被压入分支栈（Divergence Stack），并通过活跃掩码（active mask）屏蔽未进入当前分支的线程、仅让进入该分支的线程执行。更多说明请参考[Warp执行机制](../../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/thread_architecture.md#warp执行机制)。
+  在SIMT编程模式下，Warp是基本的调度和执行单位，当代码中出现分支判断时，Warp内的线程会产生分支发散（Warp divergence），各分支代码串行执行，发散点处汇合点地址与各方向的活跃线程掩码被压入分支栈（Divergence Stack），并通过活跃掩码（active mask）屏蔽未进入当前分支的线程、仅让进入该分支的线程执行。更多说明请参考[Warp执行机制](../../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/thread_architecture.md#warp执行机制)。
 
   以Warp内一半线程`cond`为真、一半为假的if-else为例：
 
   ```cpp
   if (cond) {
-      r = a + b;    // if 体
+      r = a + b;   
   } else {
-      r = a - b;    // else 体
+      r = a - b;   
   }
   ```
 
@@ -45,40 +40,11 @@
 
   ![Warp分支发散的控制流](./figures/branch.png "Warp分支发散的控制流")
 
-  对应的指令流：
-
-  ```text
-      cmp.eq  p0, cond, 1          ; 每线程独立计算分支条件
-      branch  .BB_IF, p0           ; 条件跳转：Warp内跳转目标不一致 → 分支发散
-      ; ─── 分支栈 push：{汇合点 .END_DVG 地址, else 方向的活跃掩码} ───
-  .BB_IF:                          ; ── 第1趟：执行 if 体 ──
-      add     r4, r2, r3           ; cond=1 的16线程生效，
-      ;                              cond=0 的16线程被掩码屏蔽空转
-      branch  .END_DVG             ; if 体完成，跳到汇合点
-      ; ─── 分支栈 pop：切换活跃掩码到 else 方向，跳回执行 else 体 ───
-  .BB_ELSE:                        ; ── 第2趟：执行 else 体 ──
-      sub     r4, r2, r3           ; cond=0 的16线程生效，
-      ;                              cond=1 的16线程被掩码屏蔽空转
-  .END_DVG:                        ; ── 汇合点 ──
-      ; ─── 分支栈 pop：恢复完整掩码，Warp重新汇合 ───
-      stg     r2, [r5]             ; 汇合后继续顺序执行
-  ```
-
 - **Predicate（谓词）优化**
 
-  为避免分支切换产生的开销，编译器可通过谓词优化（Predication，又称if-conversion）将较为简单的分支改写为直线执行：分支条件不再驱动跳转，而是被计算为每线程一个谓词位（predicate flag）；分支体内的指令被改写为带谓词的指令，Warp内32个线程**全部发射**，指令流保持一条直线，仅谓词为真的线程写回结果，谓词为假的线程丢弃结果（不写回寄存器、不产生访存副作用）。同样的if-else，predicate优化后的控制流如下：
+  为避免分支切换产生的开销，编译器可通过predicate优化（又称if-conversion）将简单分支改写为直线执行：分支条件不再驱动跳转，而是被计算为每线程一个谓词位（predicate flag）；分支体内的指令被改写为带谓词的指令，Warp内32个线程**全部发射**，指令流保持一条直线，仅谓词为真的线程写回结果，谓词为假的线程丢弃结果（不写回寄存器、不产生访存副作用）。同样的if-else，predicate优化后的控制流如下：
 
   ![谓词优化后的控制流](./figures/predicate.png "谓词优化后的控制流")
-
-
-  对应的指令流：
-
-  ```text
-      cmp.eq  p0, cond, 1          ; 每线程独立计算谓词，不产生跳转
-      add     r4, r2, r3,  p0      ; 全部32线程发射；仅 p0=1 的16线程写回 r4
-      sub     r4, r2, r3, ~p0      ; 全部32线程发射；仅 p0=0 的16线程写回 r4
-      ; 无跳转指令、无分支栈操作，Warp内指令流始终一条，顺序执行
-  ```
 
   将两种机制下Warp的完整指令流逐环节对比：
 
@@ -89,42 +55,30 @@
   | 分支体执行 | 各方向串行执行，每趟约一半线程空转 | 两个分支体各执行一次，每个发射槽都对一半线程有效 |
   | 汇合 | 需要硬件同步恢复掩码 | 天然顺序执行，无需汇合 |
 
-  汇总成指令序列：分支发散下，Warp依次发出`条件计算 → 跳转 → 压栈 → else体 → 弹栈切换 → if体 → 弹栈汇合`；predicate优化后，Warp依次发出`条件计算 → if体 → else体`。由此可见，predicate优化可以避免divergence中跳转和分支栈的开销。
+  汇总成指令序列：分支发散下，Warp依次发出`条件计算 → 跳转 → 压栈 → if体 → 弹栈切换 → else体 → 弹栈汇合`；predicate优化后，Warp依次发出`条件计算 → if体 → else体`。由此可见，predicate优化可以避免divergence中跳转和分支栈的开销。
 
- predicate优化相比于divergence在处理控制流语句是会有较大的性能收益，但并不是所有的场景使用predicate优化都可以带来性能收益。而当某分支命中率高时，提前return可使大部分线程直接跳过后续全部分支的判断与执行，此时保留分支跳转会有更大的性能收益；此外，包含复杂控制流或带副作用指令（写内存、原子操作、同步）的分支体编译器不会对其进行优化。本文基于hlog10与j0f两组样例，展示predicate优化的性能收益来源和适用范围。
+## hlog10样例描述
+
+- 样例功能
+
+  以[hlog10](../../../../api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)分支链路为载体。使用`logf(x) / logf(10.0f)`计算输入数据的常用对数，并对6个精度有偏差的特殊值各做一步修正，样例以8192个half元素为输入。通过对比“分支命中即return”和“使用临时变量存储结果，统一return”的性能差异，展示predicate优化的收益来源。
 
 - 样例规格：
-
   <table>
-  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">hlog10 / j0f（数学接口分支链路）</td></tr>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">hlog10</td></tr>
   <tr><td rowspan="3" align="center">样例输入/输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">input / output（hlog10组）</td><td align="center">[8192]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">input / output（j0f组）</td><td align="center">[8192]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">hlog10_case0_kernel / hlog10_case1_kernel / j0f_case2_kernel / j0f_case3_kernel / j0f_case4_kernel</td></tr>
+  <tr><td align="center">input / output</td><td align="center">[8192]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">hlog10（两组Case共用，由编译宏SCENARIO_NUM选择Case版本）</td></tr>
   </table>
 
-- j0f组：
+## hlog10样例实现
 
-  case2与case3共用一批常规输入（大量数据落在`ax <= 8.0f`低值段，约1/16为NaN/Inf特殊值），在常规数据分布下对比divergence基线与predicate优化的开销；case4按命中情况构造四批输入，以不同命中率下的性能数据界定predicate优化的适用边界：
-
-  | 输入数据 | 数据范围 |
-  | --- | --- |
-  | input（low） | `ax <= 8.0f` |
-  | input（high） | `ax > 8.0f` |
-  | input（special） | NaN / +Inf |
-  | input（mixed） | `ax <= 8.0f`、`8.0f < ax <= 1.0e13f`、`ax > 1.0e13f`、NaN、-Inf按`i % 4`交替 |
-
-## 样例实现
-
-本样例包含5个独立的kernel，每个kernel对应特定的Case版本。
+本组两组Case共用同一个核函数名`hlog10`，由编译宏`SCENARIO_NUM`在编译期选择Case版本。
 
 | Case | 实现特点 | 使用的核函数 | 分支链处理方式 |
 |--------|---------------------------------------------------|--------------------|---------------------|
-| Case 0 | 特殊值处理放在正常值路径之前，命中即提前return | hlog10_case0_kernel | 基线版本divergence |
-| Case 1 | 正常值路径前置，修正链统一return覆盖temp | hlog10_case1_kernel | predicate优化 |
-| Case 2 | NaN/Inf特殊值前置，所有分支命中即直接返回 | j0f_case2_kernel | 基线版本divergence |
-| Case 3 | 分段计算逐级覆盖result，特殊值处理放最后，统一return | j0f_case3_kernel | predicate优化，统一return |
-| Case 4 | 命中率高的分支命中即返回，剩余短修正统一return | j0f_case4_kernel | divergence与predicate优化结合 |
+| Case 0 | 特殊值处理放在正常值路径之前，命中即提前return | hlog10 | 基线版本divergence |
+| Case 1 | 正常值路径前置，修正链统一return覆盖temp | hlog10 | predicate优化 |
 
 各Case启动配置与输入生成方式一致（同组Case共用同一批输入的构造规则），区别仅在于kernel内分支链的组织方式。
 
@@ -136,7 +90,7 @@
 |      Task Duration(μs)      | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。          |
 |      aiv_total_cycles       | Task在Vector Core上执行所消耗的CPU周期（Cycle）总数。          |
 
-除 Task Duration 外，其余指标均为所有 block 上的平均值。execute cycle由kernel内`clock()`直接打印；Task Duration与aiv_total_cycles通过msOpProf采集，方法见[性能调试](#性能调试)。
+execute cycle由kernel内`clock()`在block 0的线程0上采样并写回GM、host侧读出，性能数据取30次运行的中位数；Task Duration与aiv_total_cycles通过msOpProf采集（各采集3次取中位数），其中aiv_total_cycles为所有block上的平均值，采集方法见[性能调试](#性能调试)。
 
 ### Case 0: hlog10分支链divergence版本
 
@@ -145,7 +99,7 @@
 **关键代码**：
 
 ```cpp
-__aicore__ inline half hlog10_case0(half x)
+__aicore__ inline half hlog10(half x)
 {
     if (x == static_cast<half>(0.2362060546875f)) {
         return static_cast<half>(-0.62646484375f);
@@ -166,24 +120,60 @@ __aicore__ inline half hlog10_case0(half x)
 }
 ```
 
-**性能数据**（输入中约1/16为特殊值，其余为正常值）：
+将上述提前return写法展开为等价的显式if-else嵌套，其真实控制流为：
+
+```cpp
+__aicore__ inline half hlog10(half x)
+{
+    if (x == static_cast<half>(0.2362060546875f)) {
+        return static_cast<half>(-0.62646484375f);
+    } else {
+        if (x == static_cast<half>(0.2490234375f)) {
+            return static_cast<half>(-0.60400390625f);
+        } else {
+            if (x == static_cast<half>(3.0703125f)) {
+                return static_cast<half>(0.487060546875f);
+            } else {
+                if (x == static_cast<half>(126.0625f)) {
+                    return static_cast<half>(2.099609375f);
+                } else {
+                    if (x == static_cast<half>(11496.0f)) {
+                        return static_cast<half>(4.05859375f);
+                    } else {
+                        if (x == static_cast<half>(2976.0f)) {
+                            return static_cast<half>(3.474609375f);
+                        } else {
+                            // 正常值路径位于6层嵌套的最内层
+                            float x_fp32 = __half2float(x);
+                            float result_fp32 = logf(x_fp32) / logf(10.0f);
+                            return __float2half_rn(result_fp32);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+**性能数据**：
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
-| 2375 | 15.309 | 5664.38 |
+| 433 | 2.198 | 2399.50 |
 
 **性能数据分析**：
 
-- Warp内少数线程命中特殊值后提前返回，多数线程继续走正常路径。提前返回的线程并不能使Warp跳过后续指令，仍需在汇合点等待其他线程执行完正常路径，造成计算资源浪费；6级跳转判断链的分支栈开销也无法避免。
+- 正常值路径位于6级判断链的最内层，需依次通过6个条件判断才能到达，逐级叠加的跳转与分支栈开销无法避免。
 
 ### Case 1: hlog10分支链predicate优化版本
 
-**实现方式**：先完整执行正常值路径得到temp，再对精度有偏差的六个特殊值做矫正，覆盖temp，最后统一返回temp。各修正分支的分支体只有一条赋值语句，整条链共用统一的返回出口。
+**实现方式**：先完整执行正常值路径得到temp，再对精度有偏差的六个特殊值做矫正，覆盖temp，最后统一return。
 
 **关键代码**：
 
 ```cpp
-__aicore__ inline half hlog10_case1(half x)
+__aicore__ inline half hlog10(half x)
 {
     float x_fp32 = __half2float(x);
     float result_fp32 = logf(x_fp32) / logf(10.0f); // log10(x) = log(x) / log(10)
@@ -205,15 +195,53 @@ __aicore__ inline half hlog10_case1(half x)
 }
 ```
 
-**性能数据**（输入与Case 0相同：约1/16为特殊值，其余为正常值）：
+**性能数据**：
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
-| 2049 | 16.358 | 5829.50 |
+| 394.5 | 2.226 | 2385.75 |
 
 **优化效果分析**：
 
-- 统一return后，编译器将修正链中的分支转换为带谓词的直线执行，跳转与分支栈操作减少，相比Case 0的2375，execute cycle降至2049，下降约13.7%。
+- 统一return后，编译器将会自动进行predicate优化，消除了跳转与分支栈操作，相比Case 0的433，execute cycle降至394.5，下降约8.9%。
+- 提前return在实际场景中很难触发：SIMT代码实际以warp为单位执行，必须warp内所有线程的数据都是特殊值才能提前return，从概率上可以忽略不计，绝大部分场景下，特殊值线程需要等其他线程完成计算后再一起往下执行。
+
+对比Case0和Case1可得：Warp 内出现分支发散时，predicate优化相对divergence的收益，主要来自消除跳转与分支栈开销。但若某分支命中率较高，predicate优化会让这部分线程执行完全部指令才返回，多执行大量无用指令，会造成性能损失。后续样例将对不同命中率的分支采用不同处理方式，展示predicate优化的适用范围。
+
+## j0f样例描述
+
+- 样例功能
+
+以[j0f](../../../../api/SIMT-API/math_functions/float_math_functions/j0f.md)分支链路为载体。计算输入数据第一类零阶贝塞尔函数。接口按输入数据绝对值分三段计算，并对两个特殊值进行单独处理。样例以8192个float元素为输入，正常情况下数据的取值范围为`ax <= 1.0e13f`。
+
+- 样例规格：
+  <table>
+  <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">j0f</td></tr>
+  <tr><td rowspan="3" align="center">样例输入/输出</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
+  <tr><td align="center">input / output</td><td align="center">[8192]</td><td align="center">float</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">j0f（三组Case共用，由编译宏SCENARIO_NUM选择Case版本）</td></tr>
+  </table>
+
+  case2与case3在常规数据分布下对比divergence基线与predicate优化的开销；case4按命中情况构造两批输入，以不同命中率下的性能数据界定predicate优化的适用边界：
+
+  | 输入数据 | 数据范围 |
+  | --- | --- |
+  | input（normal） | `ax <= 1.0e13f` |
+  | input（mixed） | `ax <= 8.0f`、`8.0f < ax <= 1.0e13f`、`ax > 1.0e13f`、NaN、-Inf按`i % 5`交替 |
+
+## j0f样例实现
+
+本组三组Case共用同一个核函数名`j0f`，由编译宏`SCENARIO_NUM`在编译期选择Case版本。
+
+| Case | 实现特点 | 使用的核函数 | 分支链处理方式 |
+|--------|---------------------------------------------------|--------------------|---------------------|
+| Case 2 | NaN/Inf特殊值前置，所有分支命中即直接返回 | j0f | 基线版本divergence |
+| Case 3 | 分段计算逐级覆盖result，特殊值处理放最后，统一return | j0f | predicate优化，统一return |
+| Case 4 | 命中率高的分支命中即返回，剩余分支统一return | j0f | divergence与predicate优化结合 |
+
+各Case启动配置与输入生成方式一致（同组Case共用同一批输入的构造规则），区别仅在于kernel内分支链的组织方式。
+
+本组各Case的性能指标含义与采集方式同上，参见[性能指标说明](#性能指标说明)。
 
 ### Case 2: j0f分支链divergence版本
 
@@ -222,7 +250,7 @@ __aicore__ inline half hlog10_case1(half x)
 **关键代码**：
 
 ```cpp
-__aicore__ inline float j0f_case2(float x)
+__aicore__ inline float j0f(float x)
 {
     if (isnan(x)) {
         return x;
@@ -241,44 +269,15 @@ __aicore__ inline float j0f_case2(float x)
 }
 ```
 
-将上面的提前return写法展开为等价的显式if-else嵌套，其真实控制流为：
-
-```cpp
-__aicore__ inline float j0f_case2(float x)
-{
-    if (isnan(x)) {
-        return x;
-    } else {
-        float ax = fabsf(x);
-        if (isinf(ax)) {
-            return 0.0f;
-        } else {
-            if (ax <= 8.0f) {
-                return __internal_j0f_less8(ax);
-            } else {
-                if (ax <= 1.0e13f) {
-                    return __internal_j0f_middle_range(ax);
-                } else {
-                    return __internal_j0f_huge_range(ax);   // 尾部return实为最内层else
-                }
-            }
-        }
-    }
-}
-```
-
-提前return隐式携带else分支，跳转与分支栈开销沿4级判断链逐级叠加。
-
-**性能数据**（输入数据大部分为`ax <= 8.0f`，约1/16为特殊值）：
+**性能数据**：
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
-| 3149 | 16.632 | 5736.25 |
+| 1221.5 | 2.551 | 3015.88 |
 
 **性能数据分析**：
 
-- 大部分输入数据在两次跳过特殊值判断后命中对应分支，少量数据在第一个分支即命中返回；未命中的判断仍产生跳转与分支栈开销，但各线程只执行命中方向的分段体，execute cycle为3149；
-- aiv_total_cycles为全部block的平均值，其中首个block包含kernel启动初期的额外开销。
+- 输入数据不含特殊值，两次特殊值判断均未命中；各线程命中对应分段并返回，只执行命中方向的分段体，未命中的判断仍逐级产生跳转与分支栈开销，execute cycle为1221.5；
 
 ### Case 3: j0f分支链计算后统一return版本
 
@@ -287,7 +286,7 @@ __aicore__ inline float j0f_case2(float x)
 **关键代码**：
 
 ```cpp
-__aicore__ inline float j0f_case3(float x)
+__aicore__ inline float j0f(float x)
 {
     float ax = fabsf(x);
     float result = __internal_j0f_huge_range(ax);   
@@ -307,15 +306,15 @@ __aicore__ inline float j0f_case3(float x)
 }
 ```
 
-**性能数据**（输入与Case 2同为常规批：低值段为主 + 约1/16特殊值）：
+**性能数据**：
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:-----------:|:---------------:|:--------------:|
-| 14225 | 24.178 | 18937.38 |
+| 2104.5 | 2.829 | 3468.25 |
 
 **优化效果分析**：
 
-- 相比Case 2的3149，execute cycle升至14225，Task Duration从16.632μs增至24.178μs，aiv_total_cycles从5736.25升至18937.38。Case 3反而显著慢于基线，原因在于命中率高的分支完成对应分支计算之后，还要执行后续计算，使得大量线程做了很多不必要的计算，造成性能损耗。
+- 相比Case 2的1221.5，execute cycle升至2104.5，Task Duration从2.551μs增至2.829μs，aiv_total_cycles从3015.88升至3468.25。Case 3反而显著慢于基线，原因在于统一return后三段计算全部无条件执行，大量线程做了无用计算，造成性能损耗。
 - Case3和Case2的对比结果说明在进行predicate优化时，需要考虑分支命中率，Case 4进一步结合命中情况，探究谓词化的适用边界。
 
 ### Case 4: j0f分支链高命中率分支提前return,低命中率分支predicate优化版本
@@ -325,11 +324,11 @@ __aicore__ inline float j0f_case3(float x)
 **关键代码**：
 
 ```cpp
-__aicore__ inline float j0f_case4(float x)
+__aicore__ inline float j0f(float x)
 {
     float ax = fabsf(x);
     if (ax <= 8.0f) {
-        return __internal_j0f_less8(ax);    // 分支体长：命中即返回，只执行命中方向
+        return __internal_j0f_less8(ax);    
     }
     if (ax <= 1.0e13f) {
         return __internal_j0f_middle_range(ax);
@@ -345,61 +344,55 @@ __aicore__ inline float j0f_case4(float x)
 }
 ```
 
-**性能数据**（四批输入，考察不同命中情况下的性能表现）：
+**性能数据**：
 
 | 数据批 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 |:---:|:-----------:|:---------------:|:--------------:|
-| input（low） | 2384 | 16.384 | 5508.25 |
-| input（high） | 2902 | 16.685 | 6170.50 |
-| input（special） | 17163 | 24.322 | 19441.12 |
-| input（mixed） | 18151 | 25.739 | 20466.75 |
+| input（normal） | 1301 | 2.538 | 2972.25 |
+| input（mixed） | 19260 | 13.136 | 18508.50 |
 
 **优化效果分析**：
 
-- input（low）：命中`ax <= 8.0f`时立即返回，大量线程不执行后续未命中的分支计算，execute cycle降至2384；
-- input（high）：只执行命中分支，execute cycle为2902，快于Case 3计算后统一return；
-- input（special）：NaN/Inf不命中任何分段，需先经过两次未命中的分段判断，再执行`ax > 1.0e13f`范围计算（+Inf时`alpha >= 105615.0f`成立还会触发Payne-Hanek辐角缩减这一长计算），最后才被特殊值修正覆盖，大部分线程空算了长分支体，execute cycle升至17163；
-- input（mixed）：四类数据交替，各Warp内分段命中方向不一致，分段跳转分支产生divergence，特殊值又使尾部谓词化区域执行长计算，execute cycle为18151。
+- input（normal）：命中`ax <= 8.0f`和` 8.0f =< ax <= 1.0e13f`时立即返回，不执行后续未命中的分支计算，execute cycle为1301，与Case 2基线1221.5接近；Task Duration与aiv_total_cycles分别为2.538μs与2972.25，略低于Case 2的2.551μs与3015.88，整体开销与基线相当；
+- input（mixed）：四类数据交替，分段跳转分支产生divergence，特殊值触发Payne-Hanek辐角缩减计算，execute cycle为19260。
 
-四批数据性能对比结果可知，输入数据大多落在`ax <= 8.0f`范围内时，execute cycle最低：命中率高的分段提前return只执行命中方向，剩余分支predicate优化，两种机制各取所长。
+两批数据性能对比结果可知，输入数据落在`ax <= 1.0e13f`范围内时，execute cycle最低：命中率高的分段提前return只执行命中方向，剩余分支predicate优化，两种机制结合性能最优。
 
 ## 性能对比总结
 
 **综合优化效果**：
 
-- hlog10组：从Case 0基线版本到Case 1优化版本，execute cycle从2375降低到2049，下降约13.7%；
-- j0f组：输入数据构成相同时，从Case 2基线版本到Case 3,execute cycle从3149升至14225；Case 4在input（low）上execute cycle为2384，快于Case2 和Case3。
+- hlog10样例：从Case 0基线版本到Case 1优化版本，execute cycle从433降低到394.5，下降约8.9%；
+- j0f样例：输入数据构成相同时，从Case 2基线版本到Case 3,execute cycle从1221.5升至2104.5；Case 4在input（normal）上execute cycle为1301，与Case 2接近，且明显快于Case 3。
 
-- hlog10组（约1/16特殊值的常规输入）：
-
-| Case | execute cycle | Task Duration(μs) | aiv_total_cycles | 优化点 |
-|--------|:-----------:|:---------------:|:--------------:|--------------------|
-| Case 0 | 2375 | 15.309 | 5664.38 | 基线版本，特殊值前置、命中即提前return |
-| Case 1 | **2049** | 16.358 | 5829.50 | 修正链统一return，整链谓词化消除跳转与分支栈开销 |
-
-- j0f组case2/3（常规输入：低值段为主 + 约1/16特殊值）：
+- hlog10组（全正常值输入）：
 
 | Case | execute cycle | Task Duration(μs) | aiv_total_cycles | 优化点 |
 |--------|:-----------:|:---------------:|:--------------:|--------------------|
-| Case 2 | **3149** | **16.632** | **5736.25** | 基线版本，特殊值前置、全部分支命中即返回 |
-| Case 3 | 14225 | 24.178 | 18937.38 | 全部分支统一return、逐级覆盖，长短分支全部谓词化，execute cycle高于基线 |
+| Case 0 | 433 | 2.198 | 2399.50 | 基线版本，特殊值前置、命中即提前return |
+| Case 1 | **394.5** | 2.226 | 2385.75 | 修正链统一return，整链谓词化消除跳转与分支栈开销 |
+
+- j0f组case2/3（常规输入：`ax <= 8.0f`为主，约1/16落在`8.0f < ax <= 1.0e13f`）：
+
+| Case | execute cycle | Task Duration(μs) | aiv_total_cycles | 优化点 |
+|--------|:-----------:|:---------------:|:--------------:|--------------------|
+| Case 2 | **1221.5** | 2.551 | 3015.88 | 基线版本，特殊值前置、全部分支命中即返回 |
+| Case 3 | 2104.5 | 2.829 | 3468.25 | 全部分支统一return、逐级覆盖，长短分支全部谓词化，execute cycle高于基线 |
 
 - j0f组case4（execute cycle，按数据批）：
 
 | 数据批 | Case 4 | 命中率特征 |
 |--------|:-----:|--------------------|
-| input（low） | **2384** | 低值段命中率高 |
-| input（high） | 2902 | 中值段命中率高 |
-| input（special） | 17163 | 特殊值命中率高，不命中任何分段 |
-| input（mixed） | 18151 | 各方向命中率接近 |
+| input（normal） | **1301** | 低值段命中率高 |
+| input（mixed） | 19260 | 各方向命中率接近，含特殊值 |
 
-可见，predicate优化的收益与命中情况有关：命中率低的分支predicate化收益明显；命中率高的分支产生divergence、命中即提前return。
+复杂逻辑编译器不会用predicate优化，在开发时需要根据输入数据的分布，考虑提前return的收益，引导编译器选择divergence或者predicate优化，来提高算子性能。
 
 ## 调优建议
 
 1. **使用predicate优化分支链路**：当出现warp divergence时，可使用predicate优化消除分支跳转开销。
 
-2. **divergence和predicate优化结合使用**：当分支链路中各分支命中率不同时，命中率高的分支保留divergence，命中率低的分支进行predicate优化，即可以避免执行不必要的指令又可以消除分支跳转的开销。
+2. **divergence和predicate优化结合使用**：当分支链路中各分支命中率不同时，命中率高的分支保留divergence，命中率低的分支进行predicate优化，既可以避免执行不必要的指令又可以消除分支跳转的开销。
 
 ## 编译运行
 
@@ -439,15 +432,15 @@ __aicore__ inline float j0f_case4(float x)
   |---------------------------|------------|---------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
-  | `SCENARIO_NUM` | `1` ~ `8`（默认`1`） | 编译期选择运行的用例，见下表 |
+  | `SCENARIO_NUM` | `1` ~ `6`（默认`1`） | 编译期选择运行的用例，见下表 |
 
   | SCENARIO_NUM | 用例 | 说明 |
   | --- | --- | --- |
-  | 1 | hlog10_case0 | 基线版本 |
-  | 2 | hlog10_case1 | 优化版本 |
-  | 3 | j0f_case2 | 基线版本 |
-  | 4 | j0f_case3 | 全谓词化版本 |
-  | 5 / 6 / 7 / 8 | j0f_case4_low / j0f_case4_high / j0f_case4_special / j0f_case4_mixed | 优化版本，输入批依次为低值段为主/高值段为主/全特殊值/混合 |
+  | 1 | hlog10 | 基线版本 |
+  | 2 | hlog10 | 优化版本 |
+  | 3 | j0f | 基线版本 |
+  | 4 | j0f | 全谓词化版本 |
+  | 5 / 6 | j0f | 优化版本，输入批依次为常规批（`ax <= 8.0f`为主）/混合批 |
 
   每次编译只包含选定的用例：换用不同的SCENARIO_NUM重新编译并运行，即可逐个完成各用例、完成各组的完整对比。
 

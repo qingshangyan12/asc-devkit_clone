@@ -17,18 +17,16 @@ find_package(ASC REQUIRED)
 project(kernel_samples LANGUAGES ASC CXX)
 
 # 场景参数（通过命令行传入）
-# SCENARIO_NUM: 用例编号
-#   1 - hlog10_case0：特殊值修正链前置，命中即提前return（基线）
-#   2 - hlog10_case1：正常值路径前置，修正链统一return覆盖temp（优化）
-#   3 - j0f_case2：所有分支命中即直接返回（基线）
-#   4 - j0f_case3：分段计算逐级覆盖result，全分支统一return（全谓词化）
-#   5 - j0f_case4_low：真跳转与谓词化混合，低值段为主批
-#   6 - j0f_case4_high：真跳转与谓词化混合，高值段为主批
-#   7 - j0f_case4_special：真跳转与谓词化混合，全特殊值批
-#   8 - j0f_case4_mixed：真跳转与谓词化混合，混合批
-set(SCENARIO_NUM "1" CACHE STRING "Case type to run (1-8)")
-if(NOT SCENARIO_NUM MATCHES "^[1-8]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be in [1, 8], but got ${SCENARIO_NUM}")
+# SCENARIO_NUM: 用例编号（kernel与计算函数均以接口名hlog10/j0f命名，case版本由该宏隔开）
+#   1 - hlog10：特殊值修正链前置，命中即提前return（基线）
+#   2 - hlog10：正常值路径前置，修正链统一return覆盖temp（优化）
+#   3 - j0f：所有分支命中即直接返回（基线）
+#   4 - j0f：分段计算逐级覆盖result，全分支统一return（全谓词化）
+#   5 - j0f：真跳转与谓词化混合，常规批（ax <= 8.0f为主）
+#   6 - j0f：真跳转与谓词化混合，混合批
+set(SCENARIO_NUM "1" CACHE STRING "Case type to run (1-6)")
+if(NOT SCENARIO_NUM MATCHES "^[1-6]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be in [1, 6], but got ${SCENARIO_NUM}")
 endif()
 
 add_executable(predicate_optimization

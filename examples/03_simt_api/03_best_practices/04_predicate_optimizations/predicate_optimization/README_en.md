@@ -102,7 +102,7 @@ This sample demonstrates tuning methods for [Warp Divergence](../../../../../doc
   <tr><td rowspan="3" align="center">Sample Input/Output</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td align="center">input / output (hlog10 group)</td><td align="center">[8192]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td align="center">input / output (j0f group)</td><td align="center">[8192]</td><td align="center">float</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="4" align="center">hlog10_case0_kernel / hlog10_case1_kernel / j0f_case2_kernel / j0f_case3_kernel / j0f_case4_kernel</td></tr>
+  <tr><td rowspan="1" align="center">Kernel Name</td><td colspan="4" align="center">hlog10 / j0f (shared per group; the Case version is selected at compile time via SCENARIO_NUM)</td></tr>
   </table>
 
   Since the two gains must be measured separately under different branch hit situations, the j0f group constructs multiple test data batches by hit situation; the hlog10 group directly uses a single batch of input mixing special and normal values.
@@ -126,11 +126,11 @@ This sample contains 5 independent kernels, each corresponding to a specific Cas
 
 | Case | Implementation Characteristics | Kernel Used | Optimization Feature |
 |--------|---------------------------------------------------|--------------------|---------------------|
-| Case 0 | Special-value handling placed before the normal path, early return upon hit | hlog10_case0_kernel | Baseline version, real-jump correction chain |
-| Case 1 | Normal path first, correction chain with unified return overwriting temp | hlog10_case1_kernel | Predicated correction chain, fewer jumps and branch stack operations |
-| Case 2 | NaN/Inf special values first, all branches return immediately upon hit | j0f_case2_kernel | Baseline version, all real jumps |
-| Case 3 | Segmented computation overwriting result level by level, special-value handling last, unified return | j0f_case3_kernel | All branches unified return, both long and short branches predicated |
-| Case 4 | Long-body segments return upon hit, remaining short corrections use unified return | j0f_case4_kernel | Real jumps and predication combined, each used where best |
+| Case 0 | Special-value handling placed before the normal path, early return upon hit | hlog10 | Baseline version, real-jump correction chain |
+| Case 1 | Normal path first, correction chain with unified return overwriting temp | hlog10 | Predicated correction chain, fewer jumps and branch stack operations |
+| Case 2 | NaN/Inf special values first, all branches return immediately upon hit | j0f | Baseline version, all real jumps |
+| Case 3 | Segmented computation overwriting result level by level, special-value handling last, unified return | j0f | All branches unified return, both long and short branches predicated |
+| Case 4 | Long-body segments return upon hit, remaining short corrections use unified return | j0f | Real jumps and predication combined, each used where best |
 
 Each case shares an identical launch configuration and input generation scheme (same-group cases use the same input-batch construction rules); the only difference is the organization of the branch chain inside the kernel.
 
@@ -142,7 +142,7 @@ Each case shares an identical launch configuration and input generation scheme (
 |      Task Duration(μs)      | Total Task time, including scheduling to the accelerator, execution time on the accelerator, and response completion time.          |
 |      aiv_total_cycles       | Total CPU cycles consumed by the Task executing on the Vector Core.          |
 
-Except for Task Duration, all metrics are averages over all blocks. execute cycle is printed directly by `clock()` inside the kernel; Task Duration and aiv_total_cycles are collected via msOpProf, see [Performance Profiling](#performance-profiling).
+Except for Task Duration, all metrics are averages over all blocks. execute cycle is sampled by `clock()` inside the kernel, written back to GM and read out on the host side; Task Duration and aiv_total_cycles are collected via msOpProf, see [Performance Profiling](#performance-profiling).
 
 ### Case 0: hlog10 Branch Divergence Baseline
 
@@ -151,7 +151,7 @@ Except for Task Duration, all metrics are averages over all blocks. execute cycl
 **Key Code**:
 
 ```cpp
-__aicore__ inline half hlog10_case0(half x)
+__aicore__ inline half hlog10(half x)
 {
     if (x == static_cast<half>(0.2362060546875f)) {
         return static_cast<half>(-0.62646484375f);
@@ -189,7 +189,7 @@ __aicore__ inline half hlog10_case0(half x)
 **Key Code**:
 
 ```cpp
-__aicore__ inline half hlog10_case1(half x)
+__aicore__ inline half hlog10(half x)
 {
     float x_fp32 = __half2float(x);
     float result_fp32 = logf(x_fp32) / logf(10.0f); // log10(x) = log(x) / log(10)
@@ -229,7 +229,7 @@ __aicore__ inline half hlog10_case1(half x)
 **Key Code**:
 
 ```cpp
-__aicore__ inline float j0f_case2(float x)
+__aicore__ inline float j0f(float x)
 {
     if (isnan(x)) {
         return x;
@@ -251,7 +251,7 @@ __aicore__ inline float j0f_case2(float x)
 Expanding the early-return style above into the equivalent explicit if-else nesting, its real control flow is:
 
 ```cpp
-__aicore__ inline float j0f_case2(float x)
+__aicore__ inline float j0f(float x)
 {
     if (isnan(x)) {
         return x;
@@ -294,7 +294,7 @@ Early returns implicitly carry else branches, and the jump and branch stack over
 **Key Code**:
 
 ```cpp
-__aicore__ inline float j0f_case3(float x)
+__aicore__ inline float j0f(float x)
 {
     float ax = fabsf(x);
     float result = __internal_j0f_huge_range(ax);   // unconditional high-segment computation
@@ -332,7 +332,7 @@ __aicore__ inline float j0f_case3(float x)
 **Key Code**:
 
 ```cpp
-__aicore__ inline float j0f_case4(float x)
+__aicore__ inline float j0f(float x)
 {
     float ax = fabsf(x);
     if (ax <= 8.0f) {
@@ -451,11 +451,11 @@ Run the following steps in the root directory of this sample to build and execut
 
   | SCENARIO_NUM | Case | Description |
   | --- | --- | --- |
-  | 1 | hlog10_case0 | Baseline version |
-  | 2 | hlog10_case1 | Optimized version |
-  | 3 | j0f_case2 | Baseline version |
-  | 4 | j0f_case3 | Fully predicated version |
-  | 5 / 6 / 7 / 8 | j0f_case4_low / j0f_case4_high / j0f_case4_special / j0f_case4_mixed | Optimized version; input batches are low-dominant / high-dominant / all-special / mixed in turn |
+  | 1 | hlog10 | Baseline version |
+  | 2 | hlog10 | Optimized version |
+  | 3 | j0f | Baseline version |
+  | 4 | j0f | Fully predicated version |
+  | 5 / 6 | j0f | Optimized version; input batches are normal (mostly `ax <= 8.0f`) / mixed in turn |
 
   Each run builds and runs only the selected case: build with a different SCENARIO_NUM and run in turn to complete the full comparison of each group.
 
