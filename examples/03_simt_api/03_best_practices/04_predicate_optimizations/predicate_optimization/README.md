@@ -25,7 +25,7 @@
 
 - 样例功能
 
-  对数学接口`hlog10`（half输入，6个精度特殊值需修正）与`j0f`（float输入，分段计算并处理特殊值）的分支链路，分别以"提前return"与"统一return"等不同分支组织方式实现kernel。前者展示predicate优化的性能收益，后者展示predicate优化的适用场景。通过不同分支组织方式的对比，展示SIMT编程方式下predicate优化的性能收益与适用场景。
+  对数学接口`hlog10`（half输入，6个精度特殊值需修正）与`j0f`（float输入，分段计算并处理特殊值）的分支链路，分别以"提前return"与"统一return"等不同分支组织方式实现kernel。展示SIMT编程方式下predicate优化的性能收益与适用场景。
 
 - **Warp与分支发散（Warp Divergence）**
 
@@ -66,7 +66,7 @@
 
 - **Predicate（谓词）优化**
 
-  为避免分支切换产生的开销，编译器可通过谓词优化（Predication，又称if-conversion）将较为简单的分支改写为直线执行：分支条件不再驱动跳转，而是被计算为每线程一个谓词位（predicate flag）；分支体内的指令被改写为带谓词的指令，Warp内32个线程**全部发射**，指令流保持一条直线，仅谓词为真的线程写回结果，谓词为假的线程丢弃结果（不写回寄存器、不产生访存副作用）。同样的if-else，predicate优化后的控制流如下：
+  为避免分支切换产生的开销，编译器可通过predicate优化（又称if-conversion）将较为简单的分支改写为直线执行：分支条件不再驱动跳转，而是被计算为每线程一个谓词位（predicate flag）；分支体内的指令被改写为带谓词的指令，Warp内32个线程**全部发射**，指令流保持一条直线，仅谓词为真的线程写回结果，谓词为假的线程丢弃结果（不写回寄存器、不产生访存副作用）。同样的if-else，predicate优化后的控制流如下：
 
   ![谓词优化后的控制流](./figures/predicate.png "谓词优化后的控制流")
 
@@ -124,7 +124,7 @@
 | Case 1 | 正常值路径前置，修正链统一return覆盖temp | hlog10_case1_kernel | predicate优化 |
 | Case 2 | NaN/Inf特殊值前置，所有分支命中即直接返回 | j0f_case2_kernel | 基线版本divergence |
 | Case 3 | 分段计算逐级覆盖result，特殊值处理放最后，统一return | j0f_case3_kernel | predicate优化，统一return |
-| Case 4 | 命中率高的分支命中即返回，剩余短修正统一return | j0f_case4_kernel | divergence与predicate优化结合 |
+| Case 4 | 命中率高的分支命中即返回，剩余分支统一return | j0f_case4_kernel | divergence与predicate优化结合 |
 
 各Case启动配置与输入生成方式一致（同组Case共用同一批输入的构造规则），区别仅在于kernel内分支链的组织方式。
 
@@ -278,7 +278,6 @@ __aicore__ inline float j0f_case2(float x)
 **性能数据分析**：
 
 - 大部分输入数据在两次跳过特殊值判断后命中对应分支，少量数据在第一个分支即命中返回；未命中的判断仍产生跳转与分支栈开销，但各线程只执行命中方向的分段体，execute cycle为3149；
-- aiv_total_cycles为全部block的平均值，其中首个block包含kernel启动初期的额外开销。
 
 ### Case 3: j0f分支链计算后统一return版本
 
@@ -359,7 +358,7 @@ __aicore__ inline float j0f_case4(float x)
 - input（low）：命中`ax <= 8.0f`时立即返回，大量线程不执行后续未命中的分支计算，execute cycle降至2384；
 - input（high）：只执行命中分支，execute cycle为2902，快于Case 3计算后统一return；
 - input（special）：NaN/Inf不命中任何分段，需先经过两次未命中的分段判断，再执行`ax > 1.0e13f`范围计算（+Inf时`alpha >= 105615.0f`成立还会触发Payne-Hanek辐角缩减这一长计算），最后才被特殊值修正覆盖，大部分线程空算了长分支体，execute cycle升至17163；
-- input（mixed）：四类数据交替，各Warp内分段命中方向不一致，分段跳转分支产生divergence，特殊值又使尾部谓词化区域执行长计算，execute cycle为18151。
+- input（mixed）：四类数据交替，分段跳转分支产生divergence，特殊值触发Payne-Hanek辐角缩减计算，execute cycle为18151。
 
 四批数据性能对比结果可知，输入数据大多落在`ax <= 8.0f`范围内时，execute cycle最低：命中率高的分段提前return只执行命中方向，剩余分支predicate优化，两种机制各取所长。
 
