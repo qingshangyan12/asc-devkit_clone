@@ -218,6 +218,15 @@ __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const
     fix_cbuf_to_ubuf((__ubuf__ int8_t*)dst, (__cbuf__ int8_t*)src, xm, xt);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+template <typename T>
+__aicore__ inline void DataCopyL12UBIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
+{
+    DataCopyL12UBImpl((__ubuf__ T*)dstLocal.GetPhyAddr(), (__cbuf__ T*)srcLocal.GetPhyAddr(), intriParams);
+}
+#endif
+
 template <typename T>
 __aicore__ inline void DataCopyL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
@@ -334,7 +343,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 }
 
 template <typename T>
-__aicore__ inline void DataCopyGM2UBND2NZImpl(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline void DataCopyGM2UBND2NZImpl(
+    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
 {
     ASSERT(false && "unsupported data copy GM to UB ND2NZ on current device");
 }
@@ -726,6 +736,19 @@ __aicore__ inline void DataCopyL0C2UBImpl(
 }
 
 template <typename T, typename U>
+__aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy L0C to L1 on current device"); });
+}
+
+template <typename T, typename U>
+__aicore__ inline void DataCopyL0C2GMImpl(
+    __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
+{
+    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported data copy L0C to GM on current device"); });
+}
+
+template <typename T, typename U>
 __aicore__ inline void DataCopyUB2L0CImpl(
     __cc__ T* dst, __ubuf__ U* src, const DataCopyParams& intriParams, const DataCopyEnhancedParams& enhancedParams)
 {
@@ -738,8 +761,8 @@ __aicore__ inline void DataCopySliceGm2UBImpl(__ubuf__ T* dst, __gm__ T* src, co
     uint32_t offsetSrc = 0;
     uint32_t offsetDst = 0;
     for (uint32_t i = 0; i < intriParams.blockCount; i++) {
-        offsetSrc = offsetSrc + i * (intriParams.blockLen * ONE_BLK_SIZE + intriParams.srcStride);
-        offsetDst = offsetDst + i * (intriParams.blockLen * ONE_BLK_SIZE + intriParams.dstStride);
+        offsetSrc = i * (intriParams.blockLen * ONE_BLK_SIZE + intriParams.srcStride);
+        offsetDst = i * (intriParams.blockLen * ONE_BLK_SIZE + intriParams.dstStride);
         DataCopyGM2UBImpl(
             dst + offsetDst / sizeof(T), src + offsetSrc / sizeof(T), {1, intriParams.blockLen, 0, 0, intriParams.sid});
     }
@@ -751,8 +774,8 @@ __aicore__ inline void DataCopySliceUB2GMImpl(__gm__ T* dst, __ubuf__ T* src, co
     uint32_t offsetSrc = 0;
     uint32_t offsetDst = 0;
     for (uint32_t i = 0; i < intriParams.blockCount; i++) {
-        offsetSrc = offsetSrc + i * (intriParams.blockLen * ONE_BLK_SIZE + intriParams.srcStride);
-        offsetDst = offsetDst + i * (intriParams.blockLen * ONE_BLK_SIZE + intriParams.dstStride);
+        offsetSrc = i * (intriParams.blockLen * ONE_BLK_SIZE + intriParams.srcStride);
+        offsetDst = i * (intriParams.blockLen * ONE_BLK_SIZE + intriParams.dstStride);
         DataCopyUB2GMImpl(
             dst + offsetDst / sizeof(T), src + offsetSrc / sizeof(T), {1, intriParams.blockLen, 0, 0, intriParams.sid});
     }

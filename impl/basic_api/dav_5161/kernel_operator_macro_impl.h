@@ -570,6 +570,7 @@ __aicore__ inline void MmadFixCal(
     }
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadMxFixCal(
     __cbuf__ DstT* dst, __cbuf__ Src0T* left, __cb__ Src1T* right, const MmadFixBitModeParams& mmadFixParams)
@@ -696,6 +697,8 @@ __aicore__ inline void MmadMxFixCal(
         matmul_mx_to_cbuf(dst, left, right, (__cbuf__ int32_t*)bias, (uint64_t)0, config0);
     }
 }
+#endif
+
 } // namespace AscendC
 
 #endif // __NPU_ARCH__

@@ -30,19 +30,19 @@ enum class FmatrixMode : uint8_t {
 
 ```
 intf.h:414（声明，无 arch 守卫）
-  → intf_impl.h:575-580（公共包装，无 arch 守卫）
-    → base_impl.h:801-809（共享分发，无 arch 守卫）
+  → intf_impl.h:577-582（公共包装，无 arch 守卫）
+    → base_impl.h:803-811（共享分发，无 arch 守卫）
       → fmatrixMode == FMATRIX_LEFT  → Load3DSetFMatrixCal(l1H, l1W, padList)
       → fmatrixMode == FMATRIX_RIGHT → Load3DSetFMatrixBCal(l1H, l1W, padList)
         → dav_XXXX/kernel_operator_mm_impl.h（版本特定实现）
 ```
 
-### V2 调用链（arch 守卫 `3510 || 5102`）
+### V2 调用链（arch 守卫 `3510 || 5102`，适配后扩展为 `3510 || 5102 || 3003 || 3103 || 3113 || 5101`）
 
 ```
-intf.h:416-418（声明，arch 守卫 3510||5102）
-  → intf_impl.h:582-587（公共包装，arch 守卫 3510||5102）
-    → base_impl.h:811-820（共享分发，arch 守卫 3510||5102）
+intf.h:416-418（声明，arch 守卫，适配后已扩展）
+  → intf_impl.h:584-589（公共包装，arch 守卫，适配后已扩展）
+    → base_impl.h:813-822（共享分发，arch 守卫，适配后已扩展）
       → fmatrixMode == FMATRIX_LEFT  → Load3DSetFMatrixCal(param.GetConfig0())   // uint64_t 重载
       → fmatrixMode == FMATRIX_RIGHT → Load3DSetFMatrixBCal(param.GetConfig0())  // uint64_t 重载
         → dav_XXXX/kernel_operator_mm_impl.h（版本特定实现）
@@ -50,7 +50,7 @@ intf.h:416-418（声明，arch 守卫 3510||5102）
 
 ### 共享层分发逻辑（base_impl.h）
 
-**V1 分发**（L801-809，无 arch 守卫）：
+**V1 分发**（L803-811，无 arch 守卫）：
 ```cpp
 __aicore__ inline void SetFmatrixImpl(
     uint16_t l1H, uint16_t l1W, const uint8_t padList[4], const FmatrixMode& fmatrixMode)
@@ -63,7 +63,7 @@ __aicore__ inline void SetFmatrixImpl(
 }
 ```
 
-**V2 分发**（L811-820，arch 守卫 `3510 || 5102`）：
+**V2 分发**（L813-822，arch 守卫 `3510 || 5102`，适配后已扩展）：
 ```cpp
 __aicore__ inline void SetFmatrixImpl(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
@@ -82,30 +82,30 @@ __aicore__ inline void SetFmatrixImpl(const SetFMatrixBitModeParams& param, cons
 | 版本 | Arch | intf.h 声明 | intf_impl.h 包装 | base_impl.h 分发 | `Load3DSetFMatrixCal` (uint16_t,uint16_t,uint8_t*) | `Load3DSetFMatrixBCal` (uint16_t,uint16_t,uint8_t*) | 状态 |
 |------|------|------------|------------------|-----------------|---------------------------------------------------|----------------------------------------------------|------|
 | dav_3510 | 3510 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **完整** (L793-810) | **完整** (L819-836) | **可用** |
-| dav_l300 | 3003 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **完整** (L493-508) | **完整** (L510-525) | **可用** |
-| dav_l310 | 3103 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **完整** (L472-487) | **完整** (L489-504) | **可用** |
-| dav_l311 | 3113 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **完整** (L490-505) | **完整** (L507-522) | **可用** |
-| dav_5161 | 5101 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **桩** (L386-389) | **桩** (L396-399) | **桩函数** |
+| dav_l300 | 3003 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **完整** (L511-526) | **完整** (L528-543) | **可用** |
+| dav_l310 | 3103 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **完整** (L490-505) | **完整** (L507-522) | **可用** |
+| dav_l311 | 3113 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **完整** (L508-523) | **完整** (L525-540) | **可用** |
+| dav_5161 | 5101 | ✓ 无守卫 | ✓ 无守卫 | ✓ 无守卫 | **桩** (L399-402) | **桩** (L409-412) | **桩函数** |
 
 ### V2: `SetFmatrix(SetFMatrixBitModeParams&, FmatrixMode&)`
 
 | 版本 | Arch | intf.h 声明 | intf_impl.h 包装 | base_impl.h 分发 | `Load3DSetFMatrixCal` (uint64_t) | `Load3DSetFMatrixBCal` (uint64_t) | 状态 |
 |------|------|------------|------------------|-----------------|----------------------------------|----------------------------------|------|
-| dav_3510 | 3510 | ✓ 守卫 3510\|\|5102 | ✓ 守卫 3510\|\|5102 | ✓ 守卫 3510\|\|5102 | **完整** (L812-817) | **完整** (L838-843) | **可用** |
-| dav_l300 | 3003 | ✗ 守卫排除 | ✗ 守卫排除 | ✗ 守卫排除 | 未定义 | 未定义 | **不可用** |
-| dav_l310 | 3103 | ✗ 守卫排除 | ✗ 守卫排除 | ✗ 守卫排除 | 未定义 | 未定义 | **不可用** |
-| dav_l311 | 3113 | ✗ 守卫排除 | ✗ 守卫排除 | ✗ 守卫排除 | 未定义 | 未定义 | **不可用** |
-| dav_5161 | 5101 | ✗ 守卫排除 | ✗ 守卫排除 | ✗ 守卫排除 | **桩** (L391-394，死代码) | **桩** (L401-404，死代码) | **不可用** |
+| dav_3510 | 3510 | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | **完整** (L812-817) | **完整** (L838-843) | **可用** |
+| dav_l300 | 3003 | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | **完整** (L545-550，新增) | **完整** (L552-557，新增) | **可用** |
+| dav_l310 | 3103 | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | **完整** (L524-529，新增) | **完整** (L531-536，新增) | **可用** |
+| dav_l311 | 3113 | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | **完整** (L542-547，新增) | **完整** (L549-554，新增) | **可用** |
+| dav_5161 | 5101 | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | ✓ 守卫(适配后扩展) | **桩** (L404-407) | **桩** (L414-417) | **桩函数** |
 
 ### 合并支持矩阵
 
 | 版本 | Arch | V1 (uint16_t,uint16_t,uint8_t*,FmatrixMode) | V2 (SetFMatrixBitModeParams,FmatrixMode) |
 |------|------|---------------------------------------------|------------------------------------------|
 | dav_3510 | 3510 | **完整实现** | **完整实现** |
-| dav_l300 | 3003 | **完整实现** | 不可用（arch 守卫排除） |
-| dav_l310 | 3103 | **完整实现** | 不可用（arch 守卫排除） |
-| dav_l311 | 3113 | **完整实现** | 不可用（arch 守卫排除） |
-| dav_5161 | 5101 | **桩函数** | 不可用（arch 守卫排除） |
+| dav_l300 | 3003 | **完整实现** | **完整实现**（适配后新增） |
+| dav_l310 | 3103 | **完整实现** | **完整实现**（适配后新增） |
+| dav_l311 | 3113 | **完整实现** | **完整实现**（适配后新增） |
+| dav_5161 | 5101 | **桩函数** | **桩函数** |
 
 ## 各版本原始代码
 
@@ -183,7 +183,7 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
 
 ### dav_l300（目标版本，3003）
 
-#### `Load3DSetFMatrixCal(uint16_t, uint16_t, uint8_t*)` — 完整实现（L493-508）
+#### `Load3DSetFMatrixCal(uint16_t, uint16_t, uint8_t*)` — 完整实现（L511-526）
 
 ```cpp
 __aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uint8_t padList[4])
@@ -225,59 +225,11 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
 }
 ```
 
-> **注意**：dav_l300 无 `uint64_t` 重载（V2 不编译，不需要）。
+> **注意**：dav_l300 适配后已新增 `uint64_t` 重载（L545-550/L552-557），从 dav_3510 移植。
 
 ---
 
 ### dav_l310（目标版本，3103）
-
-#### `Load3DSetFMatrixCal(uint16_t, uint16_t, uint8_t*)` — 完整实现（L472-487）
-
-```cpp
-__aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uint8_t padList[4])
-{
-    uint64_t regFMatrix = 0;
-    regFMatrix |= uint64_t(l1W & 0xFFFF);
-
-    uint32_t l1HShiftBit = 16;
-    regFMatrix |= uint64_t(l1H & 0xFFFF) << l1HShiftBit;
-
-    uint32_t padNumber = 4;
-    uint32_t padListShiftBit = 8;
-    uint32_t padListShiftBase = 32;
-    for (uint32_t i = 0; i < padNumber; i++) {
-        regFMatrix |= uint64_t(padList[i] & 0xFF) << (padListShiftBase + i * padListShiftBit);
-    }
-    set_fmatrix(regFMatrix);
-}
-```
-
-#### `Load3DSetFMatrixBCal(uint16_t, uint16_t, uint8_t*)` — 完整实现（L489-504）
-
-```cpp
-__aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const uint8_t padList[4])
-{
-    uint64_t regFMatrix = 0;
-    regFMatrix |= (uint64_t)l1W;
-
-    uint32_t l1HShiftBit = 16;
-    regFMatrix |= (uint64_t)l1H << l1HShiftBit;
-
-    uint32_t padNumber = 4;
-    uint32_t padListShiftBit = 8;
-    uint32_t padListShiftBase = 32;
-    for (uint32_t i = 0; i < padNumber; i++) {
-        regFMatrix |= uint64_t(padList[i] & 0xFF) << (padListShiftBase + i * padListShiftBit);
-    }
-    set_fmatrix_b(regFMatrix);
-}
-```
-
-> **注意**：dav_l310 无 `uint64_t` 重载（V2 不编译，不需要）。常量使用普通局部变量（非 `constexpr`）。
-
----
-
-### dav_l311（目标版本，3113）
 
 #### `Load3DSetFMatrixCal(uint16_t, uint16_t, uint8_t*)` — 完整实现（L490-505）
 
@@ -321,13 +273,61 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
 }
 ```
 
-> **注意**：dav_l311 无 `uint64_t` 重载（V2 不编译，不需要）。代码与 dav_l310 完全一致（含非 `constexpr` 风格）。
+> **注意**：dav_l310 适配后已新增 `uint64_t` 重载（L524-529/L531-536），从 dav_3510 移植。常量使用普通局部变量（非 `constexpr`）。
+
+---
+
+### dav_l311（目标版本，3113）
+
+#### `Load3DSetFMatrixCal(uint16_t, uint16_t, uint8_t*)` — 完整实现（L508-523）
+
+```cpp
+__aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uint8_t padList[4])
+{
+    uint64_t regFMatrix = 0;
+    regFMatrix |= uint64_t(l1W & 0xFFFF);
+
+    uint32_t l1HShiftBit = 16;
+    regFMatrix |= uint64_t(l1H & 0xFFFF) << l1HShiftBit;
+
+    uint32_t padNumber = 4;
+    uint32_t padListShiftBit = 8;
+    uint32_t padListShiftBase = 32;
+    for (uint32_t i = 0; i < padNumber; i++) {
+        regFMatrix |= uint64_t(padList[i] & 0xFF) << (padListShiftBase + i * padListShiftBit);
+    }
+    set_fmatrix(regFMatrix);
+}
+```
+
+#### `Load3DSetFMatrixBCal(uint16_t, uint16_t, uint8_t*)` — 完整实现（L507-522）
+
+```cpp
+__aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const uint8_t padList[4])
+{
+    uint64_t regFMatrix = 0;
+    regFMatrix |= (uint64_t)l1W;
+
+    uint32_t l1HShiftBit = 16;
+    regFMatrix |= (uint64_t)l1H << l1HShiftBit;
+
+    uint32_t padNumber = 4;
+    uint32_t padListShiftBit = 8;
+    uint32_t padListShiftBase = 32;
+    for (uint32_t i = 0; i < padNumber; i++) {
+        regFMatrix |= uint64_t(padList[i] & 0xFF) << (padListShiftBase + i * padListShiftBit);
+    }
+    set_fmatrix_b(regFMatrix);
+}
+```
+
+> **注意**：dav_l311 适配后已新增 `uint64_t` 重载（L542-547/L549-554），从 dav_3510 移植。代码与 dav_l310 完全一致（含非 `constexpr` 风格）。
 
 ---
 
 ### dav_5161（目标版本，5101）
 
-#### `Load3DSetFMatrixCal(uint16_t, uint16_t, uint8_t*)` — 桩函数（L386-389）
+#### `Load3DSetFMatrixCal(uint16_t, uint16_t, uint8_t*)` — 桩函数（L399-402）
 
 ```cpp
 __aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uint8_t padList[4])
@@ -336,7 +336,7 @@ __aicore__ inline void Load3DSetFMatrixCal(uint16_t l1H, uint16_t l1W, const uin
 }
 ```
 
-#### `Load3DSetFMatrixCal(uint64_t)` — 桩函数（L391-394，死代码）
+#### `Load3DSetFMatrixCal(uint64_t)` — 桩函数（L404-407）
 
 ```cpp
 __aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix)
@@ -345,7 +345,7 @@ __aicore__ inline void Load3DSetFMatrixCal(uint64_t regFMatrix)
 }
 ```
 
-#### `Load3DSetFMatrixBCal(uint16_t, uint16_t, uint8_t*)` — 桩函数（L396-399）
+#### `Load3DSetFMatrixBCal(uint16_t, uint16_t, uint8_t*)` — 桩函数（L409-412）
 
 ```cpp
 __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const uint8_t padList[4])
@@ -354,7 +354,7 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint16_t l1H, uint16_t l1W, const ui
 }
 ```
 
-#### `Load3DSetFMatrixBCal(uint64_t)` — 桩函数（L401-404，死代码）
+#### `Load3DSetFMatrixBCal(uint64_t)` — 桩函数（L414-417）
 
 ```cpp
 __aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
@@ -379,7 +379,7 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
 | `l1W` 掩码 (Cal) | `& 0xFFFF` | `& 0xFFFF` | `& 0xFFFF` | `& 0xFFFF` | N/A |
 | `l1W` 掩码 (BCal) | 无掩码 | 无掩码 | 无掩码 | 无掩码 | N/A |
 | 硬件指令 | `set_fmatrix` / `set_fmatrix_b` | `set_fmatrix` / `set_fmatrix_b` | `set_fmatrix` / `set_fmatrix_b` | `set_fmatrix` / `set_fmatrix_b` | 无（桩函数） |
-| `uint64_t` 重载 | ✓ 完整 | ✗ 未定义 | ✗ 未定义 | ✗ 未定义 | ✓ 桩（死代码） |
+| `uint64_t` 重载 | ✓ 完整 | ✓ 完整（适配后新增） | ✓ 完整（适配后新增） | ✓ 完整（适配后新增） | ✓ 桩 |
 | 整体状态 | **完整实现** | **完整实现** | **完整实现** | **完整实现** | **桩函数** |
 
 ### 实现模式总结
@@ -425,30 +425,15 @@ __aicore__ inline void Load3DSetFMatrixBCal(uint64_t regFMatrix)
 
 ### 1. dav_5161 的 V1 桩函数：硬件不支持还是待补全？
 
-dav_5161 的 `Load3DSetFMatrixCal`/`Load3DSetFMatrixBCal` 全部为桩函数，报错 "LoadData 3D is not supported!"。
-
-- **若硬件不支持**：5101 不支持 LoadData 3D ISA（`set_fmatrix`/`set_fmatrix_b` 指令不存在），则桩函数正确，无需修改。
-- **若待补全**：需要确认 5101 是否有等效的 FMatrix 设置指令，并移植实现。
-
-**推测**：5101 是较新架构（v510），可能使用不同的 LoadData 机制（如 LoadData2D/V2），3D LoadData 逐渐被淘汰。桩函数消息 "LoadData 3D is not supported!" 暗示是硬件不支持。**需用户确认**。
+**已确认**：5101 不支持 `set_fmatrix` 和 `set_fmatrix_b`，V1 和 V2 均打桩。维持现状。
 
 ### 2. dav_5161 的 `uint64_t` 重载桩函数是否为死代码？
 
-dav_5161 同时提供了 `(uint16_t,uint16_t,uint8_t*)` 和 `(uint64_t)` 两种重载的桩函数。但 V2 调用链被 `3510 || 5102` 守卫排除，`(uint64_t)` 重载不会被调用。
-
-- **若为死代码**：可安全删除 `(uint64_t)` 重载，减少维护负担。
-- **若预留**：可能为将来 V2 守卫扩展到 5101 做准备。
-
-**推测**：这些桩函数是从 dav_3510 复制时一并带过来的，属于死代码。**需用户确认是否删除**。
+**已确认**：适配后 V2 守卫已扩展到 5101，`(uint64_t)` 重载不再是死代码，V2 API 调用时将触发桩函数。维持现状。
 
 ### 3. V2 守卫扩展问题：`SetFMatrixBitModeParams` 类 vs V2 API 守卫不一致
 
-`SetFMatrixBitModeParams` 类的 arch 守卫为 `3510 || 5102 || 3003 || 3103 || 3113 || 5101`（全版本），但 V2 API `SetFmatrix(SetFMatrixBitModeParams, FmatrixMode)` 的守卫仅 `3510 || 5102`。
-
-- **类可用但 API 不可用**：目标版本可以使用 `SetFMatrixBitModeParams` 类构造对象、调用 `GetConfig0()`，但无法通过 `SetFmatrix` V2 设置 FMatrix。
-- **是否有意为之**：可能是 V2 仅在 3510/5102 上有硬件支持，类定义保留全版本是为了其他用途（如 `LoadData3DBitModeParam` 相关路径）。
-
-**需用户确认**：是否需要将 V2 守卫扩展到目标版本？若扩展，dav_l300/l310/l311 需要补充 `uint64_t` 重载实现，dav_5161 需要从桩函数改为完整实现（前提是硬件支持）。
+**已解决**：适配后 V2 API 守卫已从 `3510 || 5102` 扩展为 `3510 || 5102 || 3003 || 3103 || 3113 || 5101`，与 `SetFMatrixBitModeParams` 类的守卫一致。dav_l300/l310/l311 已补充 `uint64_t` 重载完整实现（从 dav_3510 移植），dav_5161 维持桩函数。
 
 ### 4. l310/l311 与 l300 的 `constexpr` 差异是否有意？
 

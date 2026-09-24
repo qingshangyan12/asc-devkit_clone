@@ -8,7 +8,7 @@
 |------|------|---------|---------|-----------|-----------|
 | 2D GM→L1 | L71 | `LoadData2DParams` | `<T>` | 无 | `__inout_pipe__(MTE2)` |
 | 2DV2 GM→L1 | L96 | `LoadData2DParamsV2` | `<T>` | 无 | `__inout_pipe__(MTE2)` |
-| 2DV2+Nd2Nz GM→L1 | L109 | `LoadData2DParamsV2` + `Nd2NzParamsV2` | `<T, U>` | L108: `5102` | `__inout_pipe__(MTE2)` |
+| 2DV2+Nd2Nz GM→L1 | L111 | `LoadData2DParamsV2` + `Nd2NzParamsV2` | `<T, U>` | L108: `5102\|\|3113\|\|5101\|\|5161\|\|5165\|\|5163` | `__inout_pipe__(MTE2)` |
 
 **关键发现**：
 - 两个声明**均无 `__NPU_ARCH__` 守卫**，所有版本均编译
@@ -391,7 +391,7 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
 
 ### dav_l311（目标版本，3113）
 
-> **2DV2 代码与 dav_l310 完全一致**（L126-193），**2D 全桩与 dav_l310 一致**（L294-310）。
+> **2DV2 代码与 dav_l310 完全一致**（L126-193），**2D 全桩与 dav_l310 一致**（L322-338，适配后因 Nd2NzParamsV2 函数插入下移）。
 
 ---
 
@@ -548,7 +548,7 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
 
 7. **5161 2DV2 L0A 桩但 l310/l311 完整** — 5101 硬件不支持 GM→L0A 的 2DV2
 
-## L109（2DV2+Nd2Nz GM→L1）接口分析
+## L111（2DV2+Nd2Nz GM→L1）接口分析
 
 ### 接口说明
 
@@ -556,13 +556,13 @@ __aicore__ inline void LoadData2DGM2L1Cal(__cbuf__ T* dst, __gm__ T* src, const 
 
 **与 L96 的区别**：
 - L96：`<T>` 单模板，src 为 `GlobalTensor<T>`，无 Nd2NzParamsV2
-- L109：`<T, U>` 双模板，src 为 `GlobalTensor<U>`，多 `Nd2NzParamsV2` 参数，支持低精度解压（int4b→int8、int2b→int4b/int8、uint1b→int4b）
+- L111：`<T, U>` 双模板，src 为 `GlobalTensor<U>`，多 `Nd2NzParamsV2` 参数，支持低精度解压（int4b→int8、int2b→int4b/int8、uint1b→int4b）
 
 ### 调用链
 
 ```
-kernel_operator_mm_intf.h:108-113（声明，arch 守卫 L108: __NPU_ARCH__ == 5102）
-  → kernel_operator_mm_intf_impl.h:138-149（公共包装，arch 守卫 L138: __NPU_ARCH__ == 5102）
+kernel_operator_mm_intf.h:108-115（声明，arch 守卫 L108: 5102||3113||5101||5161||5165||5163，适配后扩展）
+  → kernel_operator_mm_intf_impl.h:138-151（公共包装，arch 守卫 L138: 同上，适配后扩展）
     → LoadDataImpl(dst, src, loadDataParams, nd2nzParams)
       → dav_m510/kernel_operator_mm_impl.h: LoadData2DGM2L1Cal(dst, src, loadDataParam, nd2nzParams)  [仅 L1 路径]
         → set_mte2_qtable0/qtable1 + load_gm_to_cbuf_2dv2  [硬件指令]
@@ -574,11 +574,11 @@ kernel_operator_mm_intf.h:108-113（声明，arch 守卫 L108: __NPU_ARCH__ == 5
 
 | 版本 | Arch | 声明守卫 | 包装函数 | LoadDataImpl(Nd2NzParamsV2) | LoadData2DGM2L1Cal(Nd2NzParamsV2) | L0A/L0B | 状态 |
 |------|------|---------|---------|---------------------------|----------------------------------|---------|------|
-| dav_3510 | 3510 | ❌不包含 | ❌不编译 | 未定义 | 未定义 | 未定义 | ❌ 接口不存在 |
-| dav_l300 | 3003 | ❌不包含 | ❌不编译 | 未定义 | 未定义 | 未定义 | ❌ 接口不存在 |
-| dav_l310 | 3103 | ❌不包含 | ❌不编译 | 未定义 | 未定义 | 未定义 | ❌ 接口不存在 |
-| dav_l311 | 3113 | ❌不包含 | ❌不编译 | 未定义 | 未定义 | 未定义 | ❌ 接口不存在 |
-| dav_5161 | 5101 | ❌不包含 | ❌不编译 | 未定义 | 未定义 | 未定义 | ❌ 接口不存在 |
+| dav_3510 | 3510 | ❌不包含 | ❌不编译 | 未定义 | 桩函数 | 未定义 | ❌ 接口存在但桩 |
+| dav_l300 | 3003 | ❌不包含 | ❌不编译 | 未定义 | 桩函数 | 未定义 | ❌ 接口存在但桩 |
+| dav_l310 | 3103 | ❌不包含 | ❌不编译 | 未定义 | 桩函数 | 未定义 | ❌ 接口存在但桩 |
+| dav_l311 | 3113 | ✅包含 | ✅编译 | 完整 | **完整**（L195-221，从dav_m510移植） | 未定义(仅L1路径) | ✅ 完整 |
+| dav_5161 | 5101 | ✅包含 | ✅编译 | 完整 | **完整**（L229-255，从dav_m510移植） | 未定义(仅L1路径) | ✅ 完整 |
 | dav_m510 | 5102 | ✅包含 | ✅编译 | 完整 | **完整**（L211-237） | 未定义(仅L1路径) | ✅ 完整（参照） |
 
 ### dav_m510 原始代码（参照版本）
@@ -652,7 +652,7 @@ __aicore__ inline void LoadData2DGM2L1Cal(
 
 8. **dav_l300 2D ISA 尾参 `inc`** — l300 传 `inc` 尾参，其他版本无此参数。`inc` 是什么含义？
 
-9. **L109 接口在目标版本完全缺失** — 4 个目标版本（3003/3103/3113/5101）和参照版本 3510 均无此接口（声明层 5102 守卫排除）。是硬件不支持低精度解压（int4b/int2b/uint1b），还是待补全？
+9. **L111 接口适配后状态** — 适配后 3113(dav_l311) 和 5101(dav_5161) 已包含声明守卫并从 dav_m510 移植完整实现；3510(dav_3510)/3003(dav_l300)/3103(dav_l310) 仍排除。详见 LoadData2D-GM-report.md。
 
 10. **L109 的 LoadDataImpl 位置** — `LoadDataImpl` 带 `Nd2NzParamsV2` 的重载不在共享文件 `load2d_impl.h` 中，直接在包装层调用后由版本特定文件提供。这是设计如此还是应在共享层添加分发逻辑？
 

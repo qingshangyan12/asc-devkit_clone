@@ -8,10 +8,10 @@
 |------|---------|---------|-----------|------|
 | V1 | `Mmad(dst, fm, filter, MmadParams)` | `intf.h:287-289` | 无 | 基础矩阵乘加 |
 | V2 | `Mmad(dst, fm, filter, bias, MmadParams)` | `intf.h:291-294` | 无 | 带 bias 的矩阵乘加 |
-| V3 | `Mmad(dst, fm, filter, MmadBitModeParams)` | `intf.h:297-300` | `#if __NPU_ARCH__ == 3510` (L296-306) | BitMode 参数版 |
-| V4 | `Mmad(dst, fm, filter, bias, MmadBitModeParams)` | `intf.h:302-305` | `#if __NPU_ARCH__ == 3510` (L296-306) | BitMode + bias 版 |
+| V3 | `Mmad(dst, fm, filter, MmadBitModeParams)` | `intf.h:297-300` | `#if __NPU_ARCH__ == 3510/3003/3103/3113/...`（适配后已扩展为多arch）(L296-306) | BitMode 参数版 |
+| V4 | `Mmad(dst, fm, filter, bias, MmadBitModeParams)` | `intf.h:302-305` | `#if __NPU_ARCH__ == 3510/3003/3103/3113/...`（适配后已扩展为多arch）(L296-306) | BitMode + bias 版 |
 
-> V3/V4 仅在 `__NPU_ARCH__ == 3510` 时声明，其余版本编译期不可见。
+> V3/V4 原仅在 `__NPU_ARCH__ == 3510` 时声明，适配后已扩展为多arch（3510||3003||3103||3113||...）。
 
 ## 调用链
 
@@ -23,9 +23,10 @@ intf.h:287/291（V1/V2 声明，无 arch 守卫）
       → MmadCal(c, a, b, bias, mmadParams, cmatrixSource)     [V2]
         → dav_XXXX/kernel_operator_mm_impl.h（版本特定实现）
 
-intf.h:297/302（V3/V4 声明，#if __NPU_ARCH__ == 3510）
-  → intf_impl.h:411-426 / 428-457（V3/V4 包装，#if __NPU_ARCH__ == 3510）
-    → MmadImpl（base_impl.h:511-526 / 528-556，#if __NPU_ARCH__ == 3510）
+intf.h:297/302（V3/V4 声明，#if __NPU_ARCH__ == 3510||3003||3103||3113||...，适配后已扩展为多arch）
+  → intf_impl.h:412-418 / 420-426（V3/V4 包装，#if __NPU_ARCH__ == 3510）
+  → intf_impl.h:428-457（MmadMx 包装，#if __NPU_ARCH__ == 3510）
+    → MmadImpl（base_impl.h:511-526 / 528-556，#if __NPU_ARCH__ == 3510||3003||3103||3113||...，适配后已扩展为多arch）
       → MmadCal(c, a, b, MmadBitModeParams)                    [V3]
       → MmadCal(c, a, b, bias, MmadBitModeParams)              [V4]
         → dav_3510/kernel_operator_mm_impl.h:540-610（仅 3510 定义）
@@ -52,8 +53,8 @@ intf.h:297/302（V3/V4 声明，#if __NPU_ARCH__ == 3510）
 |------|-----------------|-----------|----------------|
 | V1 | L473-483 | 无 | `MmadCal(c, a, b, mmadParams)` |
 | V2 | L485-509 | 无 | `MmadCal(c, a, b, bias, mmadParams, cmatrixSource)` |
-| V3 | L511-526 | `#if __NPU_ARCH__ == 3510` | `MmadCal(c, a, b, MmadBitModeParams)` |
-| V4 | L528-556 | `#if __NPU_ARCH__ == 3510` | `MmadCal(c, a, b, bias, MmadBitModeParams)` |
+| V3 | L511-526 | `#if __NPU_ARCH__ == 3510/3003/3103/3113/...`（适配后已扩展为多arch）| `MmadCal(c, a, b, MmadBitModeParams)` |
+| V4 | L528-556 | `#if __NPU_ARCH__ == 3510/3003/3103/3113/...`（适配后已扩展为多arch）| `MmadCal(c, a, b, bias, MmadBitModeParams)` |
 
 **MmadImpl V2 中的 bias 位置处理（base_impl.h:493-505）：**
 ```cpp
@@ -80,7 +81,7 @@ if (biasScope == Hardware::BIAS) {
 | dav_5161 | 5101 | **桩** (L346-350) | **桩** (L352-357) | N/A | N/A |
 | dav_3510 | 3510 | **完整** (L476-498) | **完整** (L500-538) | **完整** (L540-572) | **完整** (L574-610) |
 
-> V3/V4 仅在 `#if __NPU_ARCH__ == 3510` 下声明（intf.h:296），其余版本不编译该 API。
+> V3/V4 原仅在 `#if __NPU_ARCH__ == 3510` 下声明（intf.h:296），适配后已扩展为多arch（3510||3003||3103||3113||...）。
 >
 > **dav_5161 (5101) 桩函数说明：** 5101 架构使用宏指令，不支持 `mad` 硬件指令，因此 V1/V2 为桩函数（硬件不支持，非待补全）。V3/V4 亦不支持。
 >

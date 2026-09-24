@@ -103,8 +103,8 @@ kernel_operator_data_copy_intf.h:75-82（声明，有 arch 守卫 L73-74）
 |------|------|---------|----------------------|---------------|-----------|------|
 | dav_3510 | 3510 | V1 | **完整**（模板，L364-379） | ✅ | ✅ | 完整（参照） |
 | dav_l300 | 3003 | V2 | **B16完整 / B8完整 / B32桩**（重载，L214-282） | ❌ | ❌ | 部分完整 |
-| dav_l310 | 3103 | V2 | **完整**（B16/B32/B8，重载，L265-358） | ❌ | ❌ | 完整 |
-| dav_l311 | 3113 | V1 | **完整**（B16/B32/B8，重载，L265-358） | ❌ | ❌ | 完整 |
+| dav_l310 | 3103 | V2 | **桩函数**（B16/B32/B8全桩，重载，L240-307） | ❌ | ❌ | 桩函数 |
+| dav_l311 | 3113 | V1 | **完整**（B16/B32/B8，重载，L240-358） | ❌ | ❌ | 完整 |
 | dav_5161 | 5101 | V1 | **完整**（模板，L325-334） | ✅ | ✅ | 完整 |
 
 ### Nd2Nz — GM→UB 路径
@@ -445,7 +445,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(__cbuf__ uint8_t* dst, __gm__ uint
 
 ### dav_l311（目标版本，3113）
 
-> **代码与 dav_l310 完全一致**（B16/B32/B8 辅助函数和类型重载均在 L240-358，内容相同）。
+> **注意**：dav_l311 仍保留完整实现（B16/B32/B8 辅助函数和类型重载在 L240-358）。dav_l310 已改为桩函数，两者不再一致。
 
 #### DataCopyGM2UBND2NZImpl — 未定义
 
@@ -534,20 +534,20 @@ __aicore__ inline void DataCopyGM2UBND2NZImpl(__ubuf__ T* dst, __gm__ T* src, co
 
 | 特征 | dav_3510 | dav_l300 | dav_l310 | dav_l311 | dav_5161 |
 |------|----------|----------|----------|----------|----------|
-| 实现方式 | 模板 `<T, enableSmallC0>` + ImplBase | 非模板重载 × 9 + B16/B32/B8 | 非模板重载 × 8 + B16/B32/B8 | 同 l310 | 模板 `<T, enableSmallC0>` + ImplBase |
-| 类型分派 | `sizeof(T)` if constexpr | 具体类型重载 | 具体类型重载 | 同 l310 | `sizeof(T)` if constexpr |
-| ISA 函数 | `copy_gm_to_cbuf_multi_nd2nz` | `copy_gm_to_cbuf_multi_nd2nz_b16`/`_b8` | `copy_gm_to_cbuf_multi_nd2nz` | 同 l310 | `copy_gm_to_cbuf_multi_nd2nz` |
-| ISA 第3参数 | `0` | `0` | `0` | `0` | `intriParams.sid` |
-| ISA 参数列表 | `(dst, src, 0, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0)` | `(dst, src, 0, ndNum, nValue, dValue, srcNdMatrixStride, srcDValue, dstNzC0Stride, dstNzNStride, dstNzMatrixStride)` | `(dst, src, 0, loop1SrcStride, nValue, dValue, loop4SrcStride, false, false)` | 同 l310 | `(dst, src, sid, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0)` |
-| stride 传递 | `set_mte2_nz_para` + ISA 传 loop1/loop4 | ISA 直接传所有 stride | `set_mte2_nz_para` + ISA 传 loop1/loop4 | 同 l310 | `set_mte2_nz_para` + ISA 传 loop1/loop4 |
-| `set_mte2_nz_para` 硬件支持 | ✅(3510) | ❌(不支持，未使用) | ⚠️(不支持，但代码使用了) | ✅(3113起支持) | ✅ |
+| 实现方式 | 模板 `<T, enableSmallC0>` + ImplBase | 非模板重载 × 9 + B16/B32/B8 | 非模板重载 × 8 + B16/B32/B8 桩 | 非模板重载 × 8 + B16/B32/B8 | 模板 `<T, enableSmallC0>` + ImplBase |
+| 类型分派 | `sizeof(T)` if constexpr | 具体类型重载 | 具体类型重载(→桩) | 具体类型重载 | `sizeof(T)` if constexpr |
+| ISA 函数 | `copy_gm_to_cbuf_multi_nd2nz` | `copy_gm_to_cbuf_multi_nd2nz_b16`/`_b8` | 无(桩函数) | `copy_gm_to_cbuf_multi_nd2nz` | `copy_gm_to_cbuf_multi_nd2nz` |
+| ISA 第3参数 | `0` | `0` | N/A(桩函数) | `0` | `intriParams.sid` |
+| ISA 参数列表 | `(dst, src, 0, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0)` | `(dst, src, 0, ndNum, nValue, dValue, srcNdMatrixStride, srcDValue, dstNzC0Stride, dstNzNStride, dstNzMatrixStride)` | N/A(桩函数) | `(dst, src, 0, loop1SrcStride, nValue, dValue, loop4SrcStride, false, false)` | `(dst, src, sid, loop1SrcStride, cacheMode, nValue, dValue, loop4SrcStride, enableSmallC0)` |
+| stride 传递 | `set_mte2_nz_para` + ISA 传 loop1/loop4 | ISA 直接传所有 stride | N/A(桩函数) | `set_mte2_nz_para` + ISA 传 loop1/loop4 | `set_mte2_nz_para` + ISA 传 loop1/loop4 |
+| `set_mte2_nz_para` 硬件支持 | ✅(3510) | ❌(不支持，未使用) | ❌(不支持，已改桩) | ✅(3113起支持) | ✅ |
 | AIC 守卫 | `if ASCEND_IS_AIC` + AIV 路径 | 无 | 无 | 无 | 仅 `if ASCEND_IS_AIC` |
 | AIV TSCM 路径 | 有（`ScmDataCopyND2NZMsg`） | 无 | 无 | 无 | 无 |
 | fp4x2 支持 | ✅ | ❌ | ❌ | ❌ | ❌ |
 | cacheMode | ✅ | ❌ | ❌ | ❌ | ✅ |
 | enableSmallC0 | ✅ | ❌ | ❌ | ❌ | ✅ |
 | bfloat16_t | ✅ | ✅ | ❌缺失 | ❌缺失 | ✅ |
-| B32 (float等) | ✅完整 | ❌桩函数 | ✅完整 | ✅完整 | ✅完整 |
+| B32 (float等) | ✅完整 | ❌桩函数 | ❌桩函数 | ✅完整 | ✅完整 |
 | UB Nd2Nz | ✅完整 | ❌未定义 | ❌未定义 | ❌未定义 | ❌桩函数(签名不匹配) |
 
 ### 实现模式总结

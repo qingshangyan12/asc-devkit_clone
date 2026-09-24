@@ -29,9 +29,9 @@ __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParam
 
 ```
 intf.h:384/389（声明，无 arch 守卫）
-  → intf_impl.h:536-541 / 544-549（公共包装，无 arch 守卫）
-    → CheckInitParams（intf_impl.h:512-529，含 #if __NPU_ARCH__ == 2201 守卫，仅影响参数检查逻辑）
-    → FillImpl / InitConstValueImpl（base_impl.h:737-755 / 769-788，共享实现，无 arch 守卫）
+  → intf_impl.h:538-543 / 546-551（公共包装，无 arch 守卫）
+    → CheckInitParams（intf_impl.h:514-531，含 #if __NPU_ARCH__ == 2201 守卫，仅影响参数检查逻辑）
+    → FillImpl / InitConstValueImpl（base_impl.h:739-757 / 771-790，共享实现，无 arch 守卫）
       → 按 dstScope 分发（L0A / L0B / L1）
         → InitL0ANzMatrixCal / InitL0BNzMatrixCal / InitL1BufferCal
           → dav_XXXX/kernel_operator_mm_impl.h（版本特定实现，通过 base_impl.h:27-49 的 #elif #include 分派）
@@ -56,7 +56,7 @@ intf.h:384/389（声明，无 arch 守卫）
 #endif
 ```
 
-**`FillImpl`（base_impl.h:737-755）— 位置分发，无 arch 守卫：**
+**`FillImpl`（base_impl.h:739-757）— 位置分发，无 arch 守卫：**
 
 | dstScope | Cal 函数 | 地址空间 |
 |----------|---------|---------|
@@ -67,7 +67,7 @@ intf.h:384/389（声明，无 arch 守卫）
 
 > `FillImpl` 与 `InitConstValueImpl` 函数体逻辑完全相同，仅函数名和错误消息字符串不同。
 
-### CheckInitParams 中的 arch 守卫（intf_impl.h:512-529）
+### CheckInitParams 中的 arch 守卫（intf_impl.h:514-531）
 
 ```cpp
 #if ASCENDC_CPU_DEBUG
@@ -88,10 +88,10 @@ intf.h:384/389（声明，无 arch 守卫）
 注：在宏指令场景下没有l0a，所以是部分支持，自NCH版本硬件变更裁剪了l0b，所以NCH只支持L1
 | 版本 | Arch | L1 (InitL1BufferCal) | L0A (InitL0ANzMatrixCal) | L0B (InitL0BNzMatrixCal) |
 |------|------|----------------------|--------------------------|--------------------------|
-| dav_l300 | 3003 | **完整** (L607-623) | **完整** (L628-644) | **完整** (L649-665) |
-| dav_l310 | 3103 | **完整** (L586-602) | **完整** (L607-623) | **完整** (L628-644) |
-| dav_l311 | 3113 | **完整** (L604-620) | **完整** (L625-641) | **完整** (L646-662) |
-| dav_5161 | 5101 | **完整** (L465-480) | **桩** (L485-489) | **桩** (L494-498) |
+| dav_l300 | 3003 | **完整** (L639-655) | **完整** (L660-676) | **完整** (L681-697) |
+| dav_l310 | 3103 | **完整** (L618-634) | **完整** (L639-655) | **完整** (L660-676) |
+| dav_l311 | 3113 | **完整** (L636-652) | **完整** (L657-673) | **完整** (L678-694) |
+| dav_5161 | 5101 | **完整** (L478-493) | **桩** (L498-502) | **桩** (L507-511) |
 | dav_3510 | 3510 | **完整** (L722-744) | **桩** (L749-754) | **桩** (L759-764) |
 
 > Fill 和 InitConstValue 的支持矩阵完全一致（两者调用相同的 Cal 函数）。
@@ -154,7 +154,7 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValuePar
 
 ### dav_l300（目标版本，3003）
 
-#### InitL1BufferCal — 完整实现（L607-623）
+#### InitL1BufferCal — 完整实现（L639-655）
 
 ```cpp
 template <typename T>
@@ -176,7 +176,7 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 }
 ```
 
-#### InitL0ANzMatrixCal — 完整实现（L628-644）
+#### InitL0ANzMatrixCal — 完整实现（L660-676）
 
 ```cpp
 template <typename T>
@@ -198,7 +198,7 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValuePar
 }
 ```
 
-#### InitL0BNzMatrixCal — 完整实现（L649-665）
+#### InitL0BNzMatrixCal — 完整实现（L681-697）
 
 ```cpp
 template <typename T>
@@ -224,7 +224,7 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValuePar
 
 ### dav_l310（目标版本，3103）
 
-#### InitL1BufferCal — 完整实现（L586-602）
+#### InitL1BufferCal — 完整实现（L618-634）
 
 ```cpp
 template <typename T>
@@ -246,7 +246,7 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 }
 ```
 
-#### InitL0ANzMatrixCal — 完整实现（L607-623）
+#### InitL0ANzMatrixCal — 完整实现（L639-655）
 
 ```cpp
 template <typename T>
@@ -268,7 +268,7 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValuePar
 }
 ```
 
-#### InitL0BNzMatrixCal — 完整实现（L628-644）
+#### InitL0BNzMatrixCal — 完整实现（L660-676）
 
 ```cpp
 template <typename T>
@@ -294,7 +294,7 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValuePar
 
 ### dav_l311（目标版本，3113）
 
-#### InitL1BufferCal — 完整实现（L604-620）
+#### InitL1BufferCal — 完整实现（L636-652）
 
 ```cpp
 template <typename T>
@@ -316,7 +316,7 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 }
 ```
 
-#### InitL0ANzMatrixCal — 完整实现（L625-641）
+#### InitL0ANzMatrixCal — 完整实现（L657-673）
 
 ```cpp
 template <typename T>
@@ -338,7 +338,7 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValuePar
 }
 ```
 
-#### InitL0BNzMatrixCal — 完整实现（L646-662）
+#### InitL0BNzMatrixCal — 完整实现（L678-694）
 
 ```cpp
 template <typename T>
@@ -366,7 +366,7 @@ __aicore__ inline void InitL0BNzMatrixCal(__cb__ T* dst, const InitConstValuePar
 
 ### dav_5161（目标版本，5101）
 
-#### InitL1BufferCal — 完整实现（L465-480）
+#### InitL1BufferCal — 完整实现（L478-493）
 
 ```cpp
 template <typename T>
@@ -387,7 +387,7 @@ __aicore__ inline void InitL1BufferCal(__cbuf__ T* dst, const InitConstValuePara
 }
 ```
 
-#### InitL0ANzMatrixCal — 桩函数（L485-489）
+#### InitL0ANzMatrixCal — 桩函数（L498-502）
 
 ```cpp
 template <typename T>
@@ -397,7 +397,7 @@ __aicore__ inline void InitL0ANzMatrixCal(__ca__ T* dst, const InitConstValuePar
 }
 ```
 
-#### InitL0BNzMatrixCal — 桩函数（L494-498）
+#### InitL0BNzMatrixCal — 桩函数（L507-511）
 
 ```cpp
 template <typename T>

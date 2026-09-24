@@ -903,7 +903,7 @@ __aicore__ inline bool IsSupportQuantMode(QuantMode_t quantPre)
 
 template <typename T, typename U>
 __aicore__ inline void DataCopyL0C2GMImpl(
-    __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams, uint8_t cacheMode)
+    __gm__ T* dst, __cc__ U* src, const DataCopyCO12DstParams& intriParams)
 {
     if ASCEND_IS_AIC {
         static_assert(
@@ -922,9 +922,8 @@ __aicore__ inline void DataCopyL0C2GMImpl(
             }
             return copy_matrix_cc_to_gm(
                 dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
-                cacheMode, 0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
-                false);
+                0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false);
         } else {
             ASCENDC_ASSERT(false, {
                 KERNEL_LOG(
@@ -956,10 +955,9 @@ __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const 
                 dstStride = dstStride * ONE_BLK_SIZE / sizeof(T);
             }
             return copy_matrix_cc_to_cbuf(
-                dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride, 0, 0,
-                intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
-                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false, false,
-                false);
+                dst, src, intriParams.sid, intriParams.nSize, intriParams.mSize, dstStride, intriParams.srcStride,
+                0, intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), intriParams.reluPre,
+                intriParams.channelSplit, intriParams.nz2ndEn, 0, 0, false, false, 0, false, false, false, false);
         } else {
             ASCENDC_ASSERT(false, {
                 KERNEL_LOG(

@@ -17,13 +17,13 @@
 | `dav_l300/kernel_operator_mm_impl.h` | 新增 L0A V2 桩函数（L51-60） |
 | `dav_l310/kernel_operator_mm_impl.h` | 新增 L0A V2 桩函数（L42-51）+ L0B V2 替换为完整实现（L82-95） |
 | `dav_l311/kernel_operator_mm_impl.h` | 新增 L0A V2 桩函数（L42-51）+ L0B V2 维持桩函数 |
-| `dav_5161/kernel_operator_mm_impl.h` | 新增 L0A V2 桩函数（L240-245）+ 修正 L0B V1 错误消息（L252）+ 新增 L0B V2 桩函数（L255-258） |
+| `dav_5161/kernel_operator_mm_impl.h` | 新增 L0A V2 桩函数（L268-273）+ 修正 L0B V1 错误消息（L280）+ 新增 L0B V2 桩函数（L283-288） |
 
 ## 适配后各版本原始代码
 
 ### dav_3510（参照版本，未修改）
 
-#### L0A V1 — 桩函数（L451-460）
+#### L0A V1 — 桩函数（L460-469）
 
 ```cpp
 template <typename T>
@@ -125,7 +125,7 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 ```
 
-#### L0B V1 — 完整实现（L78-97，未修改）
+#### L0B V1 — 完整实现（L83-102，未修改）
 
 ```cpp
 template <typename T>
@@ -150,7 +150,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 }
 ```
 
-#### L0B V2 — 桩函数（L99-105，未修改）
+#### L0B V2 — 桩函数（L104-110，未修改）
 
 ```cpp
 template <typename T>
@@ -212,19 +212,22 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 }
 ```
 
-#### L0B V2 — 桩函数（L82-95，**维持桩函数**）
+#### L0B V2 — 完整实现（L82-95，**替换**，从 dav_3510 移植）
 
 ```cpp
 template <typename T>
 __aicore__ inline void LoadData2DL12L0BTransposeCal(
     __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
 {
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(
-            KERNEL_ERROR,
-            "LoadDataWithTranspose with LoadData2dTransposeParamsV2 from L1 Buffer(B1) to L0B Buffer(B2) is not "
-            "supported on current device");
-    });
+    static_assert(
+        SupportType<T, uint8_t, int8_t, half, bfloat16_t, float, int32_t, uint32_t>(),
+        "LoadDataWithTranspose only support uint8_t, int8_t, half, bfloat16_t, float, int32_t, uint32_t \
+         on current device!");
+    if ASCEND_IS_AIC {
+        load_cbuf_to_cb_transpose(
+            dst, src, loadDataParam.startIndex, loadDataParam.repeatTimes, loadDataParam.srcStride,
+            loadDataParam.dstGap, inc, loadDataParam.dstFracGap, loadDataParam.srcFracGap);
+    }
 }
 ```
 
@@ -278,7 +281,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 }
 ```
 
-#### L0B V2 — 桩函数（L82-95，**维持桩函数**）
+#### L0B V2 — 桩函数（L82-92，**维持桩函数**）
 
 ```cpp
 template <typename T>
@@ -298,7 +301,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 
 ### dav_5161（目标版本，5101）
 
-#### L0A V1 — 桩函数（L233-238，未修改）
+#### L0A V1 — 桩函数（L261-266，未修改）
 
 ```cpp
 template <typename T>
@@ -309,7 +312,7 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 ```
 
-#### L0A V2 — 桩函数（L240-245，**新增**）
+#### L0A V2 — 桩函数（L268-273，**新增**）
 
 ```cpp
 template <typename T>
@@ -320,7 +323,7 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 ```
 
-#### L0B V1 — 桩函数（L247-253，**修正错误消息**）
+#### L0B V1 — 桩函数（L275-281，**修正错误消息**）
 
 ```cpp
 template <typename T>
@@ -334,7 +337,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 
 > 修正：错误消息从 "LoadData A1 To A2 is not supported!" 改为 "LoadData B1 To B2 is not supported!"
 
-#### L0B V2 — 桩函数（L255-258，**新增桩函数**）
+#### L0B V2 — 桩函数（L283-288，**新增桩函数**）
 
 ```cpp
 template <typename T>

@@ -6,16 +6,16 @@
 
 | 变体 | 参数类型 | 声明位置 | 说明 |
 |------|---------|---------|------|
-| V1 | `LoadData2dTransposeParams` | `intf.h:244` | 基础转置参数 |
-| V2 | `LoadData2dTransposeParamsV2` | `intf.h:261` | 增加 `srcFracGap`、`addrMode` 字段 |
+| V1 | `LoadData2dTransposeParams` | `intf.h:246` | 基础转置参数 |
+| V2 | `LoadData2dTransposeParamsV2` | `intf.h:263` | 增加 `srcFracGap`、`addrMode` 字段 |
 
 两个声明均无 `__NPU_ARCH__` 守卫。
 
 ## 调用链
 
 ```
-intf.h:244/261（声明，无 arch 守卫）
-  → intf_impl.h:335/361（公共包装，无 arch 守卫）
+intf.h:246/263（声明，无 arch 守卫）
+  → intf_impl.h:337/363（公共包装，无 arch 守卫）
     → load2d_impl.h:122/154（共享实现，无 arch 守卫）
       → dav_XXXX/kernel_operator_mm_impl.h（版本特定实现）
 ```
@@ -45,7 +45,7 @@ V2 变体在共享层仅走 L0B 路径，因此所有版本都不需要 `LoadDat
 
 ### dav_3510（参照版本）
 
-#### L0A V1 — 桩函数（L451-460）
+#### L0A V1 — 桩函数（L460-469）
 
 ```cpp
 template <typename T>
@@ -132,7 +132,7 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 ```
 
-#### L0B V1 — 完整实现（L72-91）
+#### L0B V1 — 完整实现（L83-102）
 
 ```cpp
 template <typename T>
@@ -157,7 +157,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 }
 ```
 
-#### L0B V2 — 桩函数（L93-99）
+#### L0B V2 — 桩函数（L104-110）
 
 ```cpp
 template <typename T>
@@ -188,7 +188,7 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 ```
 
-#### L0B V1 — 桩函数（L59-69）
+#### L0B V1 — 桩函数（L70-80）
 
 ```cpp
 template <typename T>
@@ -204,21 +204,9 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 }
 ```
 
-#### L0B V2 — 桩函数（L71-81）
+#### L0B V2 — 完整实现（L82-95，适配后从桩函数改为完整实现）
 
-```cpp
-template <typename T>
-__aicore__ inline void LoadData2DL12L0BTransposeCal(
-    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParam)
-{
-    ASCENDC_ASSERT(false, {
-        KERNEL_LOG(
-            KERNEL_ERROR,
-            "LoadDataWithTranspose with LoadData2dTransposeParamsV2 from L1 Buffer(B1) to L0B Buffer(B2) is not "
-            "supported on current device");
-    });
-}
-```
+> **注意**：适配后 L0B V2 已从桩函数改为完整实现。此为 analysis 文档记录的适配前状态。
 
 ---
 
@@ -239,7 +227,7 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 ```
 
-#### L0B V1 — 桩函数（L59-69）
+#### L0B V1 — 桩函数（L70-80）
 
 ```cpp
 template <typename T>
@@ -255,7 +243,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 }
 ```
 
-#### L0B V2 — 桩函数（L71-81）
+#### L0B V2 — 桩函数（L82-92）
 
 ```cpp
 template <typename T>
@@ -277,7 +265,7 @@ __aicore__ inline void LoadData2DL12L0BTransposeCal(
 
 ### dav_5161（目标版本，5101）
 
-#### L0A V1 — 桩函数（L233-238）
+#### L0A V1 — 桩函数（L261-266）
 
 ```cpp
 template <typename T>
@@ -288,22 +276,13 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
 }
 ```
 
-#### L0B V1 — 桩函数（L240-246）
+#### L0B V1 — 桩函数（L275-281，适配后错误消息已修正）
 
-```cpp
-template <typename T>
-__aicore__ inline void LoadData2DL12L0BTransposeCal(
-    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams)
-{
-    // LoadData2dTransposeParams do not match hardware capabilities, not currently supported, will be added later
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "LoadData A1 To A2 is not supported!"); });
-}
-```
+> **注意**：适配后错误消息已从 "LoadData A1 To A2" 修正为 "LoadData B1 To B2"。此为 analysis 文档记录的适配前状态。
 
 #### L0B V2 — 未定义
 
-> dav_5161 未定义 `LoadData2dTransposeParamsV2` 重载。注释中写道"will be added later"。
-> 注意：L0B V1 桩函数的错误消息为 "LoadData A1 To A2"，疑似复制粘贴错误。
+> dav_5161 未定义 `LoadData2dTransposeParamsV2` 重载。
 
 ---
 
