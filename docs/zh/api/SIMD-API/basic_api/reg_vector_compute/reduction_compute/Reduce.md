@@ -67,6 +67,7 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
 
 ## 数据类型
 
+<!-- npu="950" id8 -->
 **表3** ReduceType::SUM数据类型支持情况
 
 | dstReg | srcReg |
@@ -92,6 +93,8 @@ __simd_callee__ inline void Reduce(S& dstReg, V srcReg, MaskReg mask)
 | float | float |
 | int64_t | int64_t |
 | uint64_t | uint64_t |
+<!-- end id8 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reduction_compute/Reduce_res.md#id2 -->
 
 ## 返回值说明
 
