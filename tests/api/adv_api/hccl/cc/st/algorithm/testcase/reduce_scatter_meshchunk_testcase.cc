@@ -381,7 +381,7 @@ struct Scenario {
                 ctx.channels[0].push_back(peer.second[0]);
             }
             auto exec = CollAlgExecRegistryV2::Instance().GetAlgExec(
-                HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterMesh1DMeshChunk");
+                HCCL_CMD_REDUCE_SCATTER, "AicpuReduceScatterSoleMeshChunk");
             ASSERT_NE(exec, nullptr);
             ASSERT_EQ(exec->Orchestrate(param, ctx), HCCL_SUCCESS);
         }
