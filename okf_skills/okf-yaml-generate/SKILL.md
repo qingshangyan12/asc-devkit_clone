@@ -5,10 +5,11 @@ description: 集中编排 Ascend DevKit API 的完整 OKF YAML 生成、并发�
 
 # OKF YAML 总控生成
 
-本 Skill 是完整 OKF YAML 生成的唯一中控入口。所有脚本、词表、协议和报告格式都在本目录内，
+本 Skill 是完整 OKF YAML 生成的唯一中控入口。所有脚本、协议和报告格式都在本目录内，
 不得在运行时导入 `api-yaml-metadata-guard`、旧 OKF skill、issue ledger、remedy library 或索引工具。原型 ID、
 原型/宏解析、header 映射和样例 marker 的已验证实现已 vendoring 到本目录，必须以本地副本为准。
-默认词表固定为冻结的 `taxonomy/releases/core-v9-frozen.json`；每次运行必须把实际解析的绝对路径写入
+冻结词表是唯一的共享例外：以 `okf-tag-generate/taxonomy/releases/core-v9-frozen.json` 为跨 skill
+唯一事实源（本 Skill 不持有本地副本）；每次运行必须把实际解析的绝对路径写入
 `manifest.json`，不得与旧版本混用。
 
 ## 处理范围
@@ -37,8 +38,11 @@ Doxygen 仍按旧生成器合并为 canonical ID 和汇总的 `@archs`；不同�
 ## 总控流程
 
 1. 执行 `prepare`，解析范围、计算输入 hash、建立批次和 worker 任务包。
-2. 目录超过 25 个文档时按最多 25 个一批；每波最多 6 个 worker。worker 只读证据并输出结果，
-   不得写 DevKit。
+2. 目录超过 25 个文档时按最多 25 个一批；每波最多 6 个语义取证 agent。语义取证 agent 产出批次级
+   `semantic-input.json`（description/tag/dependencies 及逐字证据，契约见
+   `references/semantic-contract.md`）；controller 以 `--semantic-input` 将其与结构 scaffold 合并。
+   语义 agent 只读证据并输出语义工件，不得触碰结构字段、不得写 DevKit；缺语义输入的 worker 结果
+   `semantic_verified: false`，`validate` 阻断。
 3. 主控汇总 worker 结果，执行一轮独立的问题处理 agent。问题处理 agent 只分析指定证据，
    输出分类和处理决定，不修改任何源文件。
 4. 主控根据结果生成完整 write plan：基础 YAML、tag、dependencies、Doxygen 和 example marker。
@@ -74,6 +78,7 @@ python3 scripts/controller.py prepare \
 
 python3 scripts/controller.py worker \
   --task tmp/<run-id>/batches/batch-01/task.json \
+  --semantic-input tmp/<run-id>/batches/batch-01/semantic-input.json \
   --output tmp/<run-id>/batches/batch-01/worker-result.json
 
 python3 scripts/controller.py resolve-issues \
@@ -96,10 +101,11 @@ python3 scripts/controller.py write \
 
 ## 快速路径
 
-- 单文档只启动一个 worker；不要为每个字段或每个问题单独启动 agent。
-- worker 先运行 `controller.py worker` 生成 scaffold，再只补充缺失的语义字段和证据。
+- 单文档只启动一个语义取证 agent；不要为每个字段或每个问题单独启动 agent。
+- 语义取证 agent 逐篇走 `okf-description-generate` 流程并从正文取证 tag/dependencies，一次性写出
+  `semantic-input.json`；主控随后运行 `controller.py worker --semantic-input` 完成结构合并。
 - 使用 `rg` 定位标题、功能说明、原型、约束和样例链接；只读取命中的局部区段，不要整篇重复读取。
-- worker 完成后先运行 `resolve-issues` 生成紧凑的 `resolution-input.json`。问题处理 agent 只接收该文件内容，
+- 合并完成后先运行 `resolve-issues` 生成紧凑的 `resolution-input.json`。问题处理 agent 只接收该文件内容，
   默认不给 resolver DevKit 根目录、run directory 或 worker-result 路径，不重新读取全文；只有证据冲突时才回读对应局部区段。
 - 没有问题时跳过问题处理 agent，直接进入 validate。多个问题必须由同一轮 resolver 一次性处理。
 - validate/write 是本地脚本操作，不需要再次让 agent 解释或复述整个文档。
@@ -164,3 +170,4 @@ include Doxygen 注释和 example marker；不得逐字段再次请求写入许�
 - [`references/issue-resolution.md`](references/issue-resolution.md)
 - [`references/field-rules.md`](references/field-rules.md)
 - [`references/worker-protocol.md`](references/worker-protocol.md)
+- [`references/semantic-contract.md`](references/semantic-contract.md)

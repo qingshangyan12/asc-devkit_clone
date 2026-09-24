@@ -8,6 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTROLLER = ROOT / "scripts" / "controller.py"
+TAXONOMY = ROOT.parent / "okf-tag-generate" / "taxonomy" / "releases" / "core-v9-frozen.json"
 
 
 class ControllerSmokeTest(unittest.TestCase):
@@ -599,7 +600,7 @@ constexpr uint8_t ASC_SIZE = 16;
             document = root / path
             document.parent.mkdir(parents=True)
             document.write_text("# asc_mode\n", encoding="utf-8")
-            namespaces, values = module.taxonomy(ROOT / "taxonomy/releases/core-v9-frozen.json")
+            namespaces, values = module.taxonomy(TAXONOMY)
             fields = {
                 "okftype": "reference.api.cpp",
                 "title": "asc_mode",
@@ -631,7 +632,7 @@ constexpr uint8_t ASC_SIZE = 16;
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             path = "docs/zh/api/SIMD-API/c_api/vector_compute/asc_add.md"
-            namespaces, values = module.taxonomy(ROOT / "taxonomy/releases/core-v9-frozen.json")
+            namespaces, values = module.taxonomy(TAXONOMY)
             fields = {
                 "okftype": "reference.api.cpp",
                 "title": "asc_add",
@@ -683,11 +684,11 @@ constexpr uint8_t ASC_SIZE = 16;
             document.parent.mkdir(parents=True)
             run = Path(temp) / "run"
             namespaces = json.loads(
-                (ROOT / "taxonomy/releases/core-v9-frozen.json").read_text(encoding="utf-8")
+                (TAXONOMY).read_text(encoding="utf-8")
             )["namespace_order"]
 
-            # Greenfield doc without front matter: no namespace has values, so the
-            # scaffold must emit an empty tag list plus one issue per namespace.
+            # Greenfield doc without front matter: api_surfaces is injected from the
+            # source context (path-proven), every other namespace raises an issue.
             document.write_text("# foo\n\n## 功能说明\n\n按元素相加。\n", encoding="utf-8")
             subprocess.run(
                 ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
@@ -701,9 +702,33 @@ constexpr uint8_t ASC_SIZE = 16;
                 check=True,
             )
             doc = json.loads(output.read_text(encoding="utf-8"))["documents"][0]
-            self.assertEqual(doc["fields"]["tag"], [])
+            self.assertEqual(doc["fields"]["tag"], [{"api_surfaces": ["c_api"]}])
+            self.assertIn("api_surfaces:c_api", doc["evidence"])
             issue_fields = {item["field"] for item in doc["issues"]}
-            self.assertEqual({f"tag.{ns}" for ns in namespaces} <= issue_fields, True)
+            self.assertNotIn("tag.api_surfaces", issue_fields)
+            self.assertEqual(
+                {f"tag.{ns}" for ns in namespaces} - {"tag.api_surfaces"} <= issue_fields, True
+            )
+
+            # A basic_api document gets its own surface injected.
+            basic = devkit / "docs/zh/api/SIMD-API/basic_api/bar/bar.md"
+            basic.parent.mkdir(parents=True)
+            basic.write_text("# bar\n\n## 功能说明\n\n基础接口。\n", encoding="utf-8")
+            run_basic = Path(temp) / "run-basic"
+            subprocess.run(
+                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
+                 "--document", "docs/zh/api/SIMD-API/basic_api/bar/bar.md", "--run-dir", str(run_basic)],
+                check=True,
+            )
+            output_basic = run_basic / "batches/batch-01/worker-result.json"
+            subprocess.run(
+                ["python3", str(CONTROLLER), "worker",
+                 "--task", str(run_basic / "batches/batch-01/task.json"),
+                 "--output", str(output_basic)],
+                check=True,
+            )
+            doc_basic = json.loads(output_basic.read_text(encoding="utf-8"))["documents"][0]
+            self.assertEqual(doc_basic["fields"]["tag"], [{"api_surfaces": ["basic_api"]}])
 
             # Doc with existing on-demand front matter: scaffold keeps only the
             # non-empty namespaces and raises issues for the missing ones.
@@ -746,6 +771,150 @@ constexpr uint8_t ASC_SIZE = 16;
             self.assertNotIn("tag.roles", issue_fields)
             self.assertNotIn("tag.operations", issue_fields)
 
+    def test_tag_rules_match_taxonomy_mandatory_namespaces(self):
+        module = self._controller_module()
+        taxonomy_payload = json.loads(TAXONOMY.read_text(encoding="utf-8"))
+        rules = module.load_tag_rules()
+        self.assertEqual(
+            sorted(rules["required_namespaces"]["always"]),
+            sorted(taxonomy_payload["mandatory_namespaces"]),
+        )
+        conditional_namespaces = set(rules["required_namespaces"]["conditional"])
+        self.assertEqual(conditional_namespaces, {"operations", "execution_models"})
+
+    def test_tag_rules_allow_sanctioned_blank_of_conditional_namespace(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = "docs/zh/api/SIMD-API/c_api/foo/asc_add.md"
+            namespaces, values = module.taxonomy(TAXONOMY)
+            fields = {
+                "okftype": "reference.api.cpp",
+                "title": "asc_add",
+                "resource": f"asc-devkit/{path}",
+                "description": "矢量加法。",
+                "tag": [
+                    {"api_surfaces": ["c_api"]},
+                    {"roles": ["compute"]},
+                    {"operations": []},
+                    {"execution_models": ["memory_vector"]},
+                ],
+                "signature": [],
+                "dependencies": [],
+                "examples": [],
+                "headers": None,
+                "declaration": None,
+                "type_catalog": None,
+                "timestamp": "2026-09-24",
+            }
+            body = "# asc_add\n\n按元素相加的内存矢量加法运算。\n"
+            evidence = {
+                "api_surfaces:c_api": [{"source_path": path, "excerpt": path}],
+                "roles:compute": [{"source_path": path, "excerpt": "加法运算"}],
+                "execution_models:memory_vector": [{"source_path": path, "excerpt": "内存矢量加法运算"}],
+            }
+            # 无决议时条件必填仍阻断。
+            with self.assertRaises(module.ValidationError):
+                module.render_yaml(fields, namespaces, values, root, path, body, evidence, set())
+            # 经 resolver blank_field 决议（allowed_empty）后通过，且渲染省略该 namespace。
+            rendered = module.render_yaml(
+                fields, namespaces, values, root, path, body, evidence, {"tag.operations"}
+            )
+            self.assertIn("roles: [compute]", rendered)
+            self.assertIn("execution_models: [memory_vector]", rendered)
+            self.assertNotIn("operations:", rendered)
+
+    def test_semantic_input_flow_and_gating(self):
+        doc_path = "docs/zh/api/SIMD-API/c_api/foo/asc_add.md"
+        with tempfile.TemporaryDirectory() as temp:
+            devkit = Path(temp) / "devkit"
+            document = devkit / doc_path
+            document.parent.mkdir(parents=True)
+            document.write_text("# asc_add\n\n## 功能说明\n\n按元素相加的内存矢量加法运算。\n", encoding="utf-8")
+            run = Path(temp) / "run"
+            subprocess.run(
+                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(devkit),
+                 "--document", doc_path, "--run-dir", str(run)],
+                check=True,
+            )
+            task_path = run / "batches/batch-01/task.json"
+            output = run / "batches/batch-01/worker-result.json"
+            semantic_path = run / "batches/batch-01/semantic-input.json"
+            doc_rel = doc_path
+            semantic = {
+                "schema_version": 1,
+                "purpose": "okf_yaml_semantic_input",
+                "run_id": "run",
+                "batch_id": "batch-01",
+                "annotations": [{
+                    "document_path": doc_rel,
+                    "document_sha256": hashlib.sha256(document.read_bytes()).hexdigest(),
+                    "description": {
+                        "value": "按元素相加。",
+                        "evidence": [{"source_path": doc_rel, "excerpt": "按元素相加的内存矢量加法运算"}],
+                    },
+                    "tag": [
+                        {"roles": ["compute"]},
+                        {"operations": ["add"]},
+                        {"execution_models": ["memory_vector"]},
+                    ],
+                    "tag_evidence": {
+                        "roles:compute": [{"source_path": doc_rel, "excerpt": "加法运算"}],
+                        "operations:add": [{"source_path": doc_rel, "excerpt": "按元素相加"}],
+                        "execution_models:memory_vector": [{"source_path": doc_rel, "excerpt": "内存矢量加法运算"}],
+                    },
+                    "dependencies": [],
+                }],
+            }
+            semantic_path.write_text(json.dumps(semantic, ensure_ascii=False), encoding="utf-8")
+
+            # 缺语义输入的 scaffold：semantic_verified=false，validate 必须阻断。
+            subprocess.run(
+                ["python3", str(CONTROLLER), "worker", "--task", str(task_path), "--output", str(output)],
+                check=True,
+            )
+            payload = json.loads(output.read_text(encoding="utf-8"))
+            self.assertFalse(payload["documents"][0]["semantic_verified"])
+            blocked = subprocess.run(
+                ["python3", str(CONTROLLER), "validate", "--run-dir", str(run)],
+                capture_output=True, text=True,
+            )
+            self.assertNotEqual(blocked.returncode, 0)
+            self.assertIn("semantic input missing", blocked.stderr + blocked.stdout)
+
+            # 带语义输入的合并：api_surfaces 注入 + 语义 tag 按需合并，issue 不含已填 namespace。
+            subprocess.run(
+                ["python3", str(CONTROLLER), "worker", "--task", str(task_path),
+                 "--semantic-input", str(semantic_path), "--output", str(output)],
+                check=True,
+            )
+            payload = json.loads(output.read_text(encoding="utf-8"))
+            doc = payload["documents"][0]
+            self.assertTrue(doc["semantic_verified"])
+            self.assertEqual(doc["fields"]["description"], "按元素相加。")
+            self.assertEqual(
+                doc["fields"]["tag"],
+                [
+                    {"api_surfaces": ["c_api"]},
+                    {"roles": ["compute"]},
+                    {"operations": ["add"]},
+                    {"execution_models": ["memory_vector"]},
+                ],
+            )
+            issue_fields = {item["field"] for item in doc["issues"]}
+            for filled in ("tag.api_surfaces", "tag.roles", "tag.operations", "tag.execution_models"):
+                self.assertNotIn(filled, issue_fields)
+
+            # 输入在 prepare 后发生变化：hash 对账必须失败。
+            document.write_text("# asc_add\n\n## 功能说明\n\n按元素相加的内存矢量加法运算。改动。\n", encoding="utf-8")
+            stale = subprocess.run(
+                ["python3", str(CONTROLLER), "worker", "--task", str(task_path),
+                 "--semantic-input", str(semantic_path), "--output", str(output)],
+                capture_output=True, text=True,
+            )
+            self.assertNotEqual(stale.returncode, 0)
+            self.assertIn("hash mismatch", stale.stderr + stale.stdout)
+
     def test_prepare_worker_and_field_degradation(self):
         with tempfile.TemporaryDirectory() as temp:
             devkit = Path(temp) / "devkit"
@@ -780,7 +949,9 @@ constexpr uint8_t ASC_SIZE = 16;
             )
             payload = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(payload["documents"][0]["path"], "docs/zh/api/SIMD-API/c_api/foo/foo.md")
-            self.assertEqual(len(payload["documents"][0]["issues"]), 10)
+            # api_surfaces 由 source-context 注入，不再产生 tag.api_surfaces issue：
+            # 8 个缺失 namespace + 1 个 description issue = 9。
+            self.assertEqual(len(payload["documents"][0]["issues"]), 9)
             self.assertNotIn("usage_dependencies", payload["documents"][0]["fields"])
 
     def test_dependency_evidence_is_required(self):
@@ -918,7 +1089,7 @@ example: true
             self.assertNotIn("api_signature:", module.strip_inline_api_signature_blocks(body))
             self.assertIn("example: true", module.strip_inline_api_signature_blocks(body))
 
-            namespaces, values = module.taxonomy(ROOT / "taxonomy/releases/core-v9-frozen.json")
+            namespaces, values = module.taxonomy(TAXONOMY)
             fields = {
                 "okftype": "reference.api.cpp",
                 "title": "asc_foo",
@@ -1069,7 +1240,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             run = Path(temp) / "run"
             batch = run / "batches" / "batch-01"
             batch.mkdir(parents=True)
-            taxonomy = ROOT / "taxonomy" / "releases" / "core-v9-frozen.json"
+            taxonomy = TAXONOMY
             (run / "manifest.json").write_text(
                 json.dumps({
                     "schema_version": 1,
@@ -1090,6 +1261,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                 "documents": [{
                     "path": document_path,
                     "sha256": hashlib.sha256(document.read_bytes()).hexdigest(),
+                    "semantic_verified": True,
                     "fields": {
                         "okftype": "reference.api.cpp",
                         "title": "foo",
@@ -1181,7 +1353,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         run = Path(temp) / "run"
         batch = run / "batches/batch-01"
         batch.mkdir(parents=True)
-        taxonomy = ROOT / "taxonomy" / "releases" / "core-v9-frozen.json"
+        taxonomy = TAXONOMY
         (run / "manifest.json").write_text(
             json.dumps({
                 "schema_version": 1,
@@ -1218,6 +1390,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             "documents": [{
                 "path": document_path,
                 "sha256": hashlib.sha256(document.read_bytes()).hexdigest(),
+                "semantic_verified": True,
                 "fields": {
                     "okftype": "reference.api.cpp",
                     "title": "foo",

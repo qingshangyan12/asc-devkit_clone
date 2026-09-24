@@ -11,6 +11,7 @@ from contextlib import contextmanager
 import fcntl
 import hashlib
 import json
+from functools import lru_cache
 from pathlib import Path
 import re
 import sys
@@ -221,6 +222,67 @@ def normalize_tag(value: Any, namespaces: tuple[str, ...]) -> list[dict[str, lis
     else:
         result = {}
     return [{namespace: sorted(set(result.get(namespace, [])))} for namespace in namespaces]
+
+
+TAG_RULES_PATH = Path(__file__).resolve().parents[1] / "config" / "tag-rules.yaml"
+SOURCE_CONTEXT_PATH = Path(__file__).resolve().parents[1] / "config" / "source-context-v1.yaml"
+
+
+@lru_cache(maxsize=1)
+def load_source_context() -> dict[str, Any]:
+    """Load the source-context path-injection config (config/source-context-v1.yaml)."""
+    try:
+        payload = yaml.safe_load(SOURCE_CONTEXT_PATH.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as error:
+        raise ValidationError(f"cannot read source context: {SOURCE_CONTEXT_PATH}: {error}") from error
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+        raise ValidationError("source context schema is invalid")
+    default_tags = payload.get("default_tags")
+    if not isinstance(default_tags, dict) or not default_tags:
+        raise ValidationError("source context default_tags is invalid")
+    for prefix, tags in default_tags.items():
+        if not isinstance(prefix, str) or not isinstance(tags, dict) or not tags:
+            raise ValidationError("source context default_tags entries are invalid")
+        for namespace, values in tags.items():
+            if not isinstance(values, list) or not values:
+                raise ValidationError(f"source context default_tags.{prefix}.{namespace} must be a non-empty list")
+    return payload
+
+
+def source_context_default_tags(path: str) -> dict[str, list[str]]:
+    """Longest-prefix path-proven tags for a repository-relative document path."""
+    matched: dict[str, list[str]] = {}
+    best = ""
+    for prefix, tags in load_source_context()["default_tags"].items():
+        if path.startswith(prefix) and len(prefix) > len(best):
+            best = prefix
+            matched = tags
+    return matched if best else {}
+
+
+@lru_cache(maxsize=1)
+def load_tag_rules() -> dict[str, Any]:
+    """Load the machine-readable mandatory/conditional tag rules (config/tag-rules.yaml)."""
+    try:
+        payload = yaml.safe_load(TAG_RULES_PATH.read_text(encoding="utf-8"))
+    except (OSError, yaml.YAMLError) as error:
+        raise ValidationError(f"cannot read tag rules: {TAG_RULES_PATH}: {error}") from error
+    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+        raise ValidationError("tag rules schema is invalid")
+    required = payload.get("required_namespaces")
+    if not isinstance(required, dict):
+        raise ValidationError("tag rules required_namespaces is invalid")
+    always = required.get("always")
+    if not isinstance(always, list) or not always or not all(isinstance(item, str) for item in always):
+        raise ValidationError("tag rules required_namespaces.always must be a non-empty string list")
+    conditional = required.get("conditional", {})
+    if not isinstance(conditional, dict):
+        raise ValidationError("tag rules required_namespaces.conditional is invalid")
+    for namespace, condition in conditional.items():
+        when = condition.get("when_roles_in") if isinstance(condition, dict) else None
+        if not isinstance(when, list) or not when or not all(isinstance(item, str) for item in when):
+            raise ValidationError(f"tag rules conditional.{namespace}.when_roles_in must be a non-empty string list")
+    return payload
 
 
 def taxonomy(path: Path) -> tuple[tuple[str, ...], dict[str, set[str]]]:
@@ -1133,6 +1195,7 @@ def build_worker_document(
     path: str,
     namespaces: tuple[str, ...],
     example_discovery_index: Any = None,
+    semantic: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     document = relative_api_path(root, path)
     original = document.read_text(encoding="utf-8", errors="replace")
@@ -1155,9 +1218,31 @@ def build_worker_document(
         source_issues = definition["issues"]
         source_definition = definition
     title = first_heading(body, document.stem)
-    description = data.get("description")
-    if not isinstance(description, str):
-        description = ""
+    semantic_verified = semantic is not None
+    if semantic is not None:
+        # 语义输入是唯一语义来源：description/tag/dependencies 全部来自已验证的 semantic-input，
+        # 旧 front matter 的语义值不被继承（结构字段仍由 scaffold 解析）。
+        description = semantic["description"]["value"]
+        merged_tags: dict[str, list[str]] = {
+            namespace: list(values) for namespace, values in source_context_default_tags(path).items()
+        }
+        for item in semantic["tag"]:
+            namespace, selected = next(iter(item.items()))
+            merged_tags[namespace] = list(selected)
+        semantic_dependencies = semantic["dependencies"]
+    else:
+        description = data.get("description")
+        if not isinstance(description, str):
+            description = ""
+        tags = normalize_tag(data.get("tag"), namespaces)
+        merged_tags = {
+            namespace: values for item in tags for namespace, values in item.items()
+        }
+        # source-context 注入：api_surfaces 等路径可证标签按最长前缀自动注入，语义代理不填。
+        for namespace, values in source_context_default_tags(path).items():
+            if not merged_tags.get(namespace):
+                merged_tags[namespace] = list(values)
+        semantic_dependencies = None
     existing_timestamp = data.get("timestamp")
     if isinstance(existing_timestamp, date):
         timestamp = existing_timestamp.isoformat()
@@ -1165,12 +1250,13 @@ def build_worker_document(
         timestamp = existing_timestamp
     else:
         timestamp = date.today().isoformat()
-    tags = normalize_tag(data.get("tag"), namespaces)
     # On-demand scaffold: keep only namespaces with values so the artifact the worker
     # edits never carries empty tag entries (最小标签集: 不适用字段省略，不使用空数组).
     # Degradation is signalled by issues for every namespace without values, so the
     # resolver decision flow and issue counts are unchanged.
-    filled_tags = [item for item in tags if next(iter(item.values()))]
+    filled_tags = [
+        {namespace: merged_tags[namespace]} for namespace in namespaces if merged_tags.get(namespace)
+    ]
     source_dtypes = source_signature_dtypes(body) if definition is None else {}
     raw_signature = source_signature if definition is not None else source_signature or normalize_signature_ids(
         data.get("signature") if isinstance(data.get("signature"), list) else []
@@ -1194,7 +1280,7 @@ def build_worker_document(
             source_dtypes,
             data.get("dtype"),
         ),
-        "dependencies": _retained_dependencies_with_evidence(
+        "dependencies": semantic_dependencies if semantic_dependencies is not None else _retained_dependencies_with_evidence(
             path, body, data.get("dependencies") if isinstance(data.get("dependencies"), list) else [],
         ),
         "examples": source_examples if definition is not None else source_examples or (
@@ -1236,17 +1322,38 @@ def build_worker_document(
         if found["issue_id"] not in seen_issue_ids:
             unique_issues.append(found)
             seen_issue_ids.add(found["issue_id"])
+    if semantic is not None:
+        # 语义证据合并并逐字校验（fail fast；validate 阶段仍会独立复检）。
+        for reference in semantic["description"]["evidence"]:
+            if reference["excerpt"] not in body:
+                raise ValidationError(f"{path}: semantic description evidence is not verbatim")
+        evidence: dict[str, Any] = {
+            "description": [
+                {"source_path": path, "excerpt": reference["excerpt"]}
+                for reference in semantic["description"]["evidence"]
+            ],
+        }
+        for key, references in semantic["tag_evidence"].items():
+            for reference in references:
+                if reference["excerpt"] not in body:
+                    raise ValidationError(f"{path}: semantic tag evidence is not verbatim for {key}")
+            evidence[key] = [
+                {"source_path": path, "excerpt": reference["excerpt"]} for reference in references
+            ]
+        for namespace, values in source_context_default_tags(path).items():
+            for value in values:
+                evidence.setdefault(f"{namespace}:{value}", [{"source_path": path, "excerpt": path}])
+    else:
+        evidence = {"description": [], **_retained_tag_evidence(path, body, fields["tag"])}
     return {
         "path": path,
         "sha256": sha256(document),
         "fields": fields,
-        "evidence": {
-            "description": [],
-            **_retained_tag_evidence(path, body, fields["tag"]),
-        },
+        "evidence": evidence,
         "issues": unique_issues,
         "doxygen": source_doxygen,
         "example_markers": marker_examples,
+        "semantic_verified": semantic_verified,
     }
 
 
@@ -1307,7 +1414,7 @@ def prepare(args: argparse.Namespace) -> int:
         "devkit_root": str(root),
         "documents": selected,
         "batches": [],
-        "taxonomy": str((Path(__file__).resolve().parents[1] / "taxonomy" / "releases" / "core-v9-frozen.json").resolve()),
+        "taxonomy": str((Path(__file__).resolve().parents[2] / "okf-tag-generate" / "taxonomy" / "releases" / "core-v9-frozen.json").resolve()),
         "write_targets": list(DEFAULT_WRITE_TARGETS),
     }
     for index, batch in enumerate(batches, 1):
@@ -1329,19 +1436,137 @@ def prepare(args: argparse.Namespace) -> int:
     return 0
 
 
+def load_semantic_input(
+    path: Path,
+    task: dict[str, Any],
+    root: Path,
+    namespaces: tuple[str, ...],
+    values: dict[str, set[str]],
+) -> dict[str, dict[str, Any]]:
+    """Load and validate a batch-level semantic-input artifact (see references/semantic-contract.md)."""
+    payload = read_json(path)
+    if payload.get("schema_version") != 1 or payload.get("purpose") != "okf_yaml_semantic_input":
+        raise ValidationError("semantic input schema or purpose is invalid")
+    if payload.get("run_id") != task["run_id"] or payload.get("batch_id") != task["batch_id"]:
+        raise ValidationError("semantic input run_id/batch_id does not match the task")
+    annotations = payload.get("annotations")
+    if not isinstance(annotations, list) or not annotations:
+        raise ValidationError("semantic input annotations must be a non-empty list")
+    expected = set(task["documents"])
+    by_path: dict[str, dict[str, Any]] = {}
+    for annotation in annotations:
+        if not isinstance(annotation, dict):
+            raise ValidationError("semantic input annotation must be an object")
+        document_path = annotation.get("document_path")
+        if not isinstance(document_path, str) or document_path not in expected:
+            raise ValidationError(f"semantic input annotation path out of scope: {document_path!r}")
+        if document_path in by_path:
+            raise ValidationError(f"semantic input duplicate annotation: {document_path}")
+        target = root / document_path
+        if not target.is_file():
+            raise ValidationError(f"semantic input document missing: {document_path}")
+        if annotation.get("document_sha256") != sha256(target):
+            raise ValidationError(f"semantic input hash mismatch (input changed after prepare): {document_path}")
+        description = annotation.get("description")
+        if not isinstance(description, dict) or not isinstance(description.get("value"), str):
+            raise ValidationError(f"semantic input description is invalid: {document_path}")
+        desc_evidence = description.get("evidence")
+        if description["value"]:
+            if not isinstance(desc_evidence, list) or not desc_evidence:
+                raise ValidationError(f"semantic input description evidence is missing: {document_path}")
+            for reference in desc_evidence:
+                if (
+                    not isinstance(reference, dict)
+                    or not isinstance(reference.get("excerpt"), str)
+                    or reference.get("source_path") != document_path
+                ):
+                    raise ValidationError(f"semantic input description evidence is invalid: {document_path}")
+        elif desc_evidence:
+            raise ValidationError(f"semantic input unresolved description must not carry evidence: {document_path}")
+        tag = annotation.get("tag")
+        if not isinstance(tag, list):
+            raise ValidationError(f"semantic input tag is invalid: {document_path}")
+        tag_evidence = annotation.get("tag_evidence")
+        if not isinstance(tag_evidence, dict):
+            raise ValidationError(f"semantic input tag_evidence is invalid: {document_path}")
+        for item in tag:
+            if not isinstance(item, dict) or len(item) != 1:
+                raise ValidationError(f"semantic input tag entries must be single-key objects: {document_path}")
+            namespace, selected = next(iter(item.items()))
+            if namespace == "api_surfaces":
+                raise ValidationError(
+                    f"semantic input must not carry api_surfaces (path-injected by source context): {document_path}"
+                )
+            if namespace not in namespaces:
+                raise ValidationError(f"semantic input tag namespace unknown: {namespace}")
+            if (
+                not isinstance(selected, list)
+                or not selected
+                or not all(isinstance(value, str) and value for value in selected)
+            ):
+                raise ValidationError(f"semantic input tag.{namespace} must be a non-empty string list: {document_path}")
+            unknown = set(selected) - values.get(namespace, set())
+            if unknown:
+                raise ValidationError(
+                    f"semantic input tag.{namespace} values outside taxonomy {sorted(unknown)}: {document_path}"
+                )
+            for value in set(selected):
+                references = tag_evidence.get(f"{namespace}:{value}")
+                if not isinstance(references, list) or not references:
+                    raise ValidationError(f"semantic input missing evidence for {namespace}:{value}: {document_path}")
+                for reference in references:
+                    if (
+                        not isinstance(reference, dict)
+                        or not isinstance(reference.get("excerpt"), str)
+                        or reference.get("source_path") != document_path
+                    ):
+                        raise ValidationError(f"semantic input evidence for {namespace}:{value} is invalid: {document_path}")
+        dependencies = annotation.get("dependencies")
+        if not isinstance(dependencies, list):
+            raise ValidationError(f"semantic input dependencies is invalid: {document_path}")
+        for dep in dependencies:
+            if (
+                not isinstance(dep, dict)
+                or not isinstance(dep.get("path"), str)
+                or dep.get("kind") not in DEPENDENCY_KINDS
+            ):
+                raise ValidationError(f"semantic input dependency entry is invalid: {document_path}")
+            evidence = dep.get("evidence")
+            if (
+                not isinstance(evidence, dict)
+                or set(evidence) != {"source_path", "excerpt"}
+                or evidence.get("source_path") != document_path
+            ):
+                raise ValidationError(f"semantic input dependency evidence is invalid: {document_path}")
+        by_path[document_path] = annotation
+    missing = expected - set(by_path)
+    if missing:
+        raise ValidationError("semantic input does not cover every task document: " + ", ".join(sorted(missing)))
+    return by_path
+
+
 def worker(args: argparse.Namespace) -> int:
     task = read_json(args.task.expanduser().resolve())
     if task.get("schema_version") != 1:
         raise ValidationError("worker task schema_version must be 1")
     root = Path(task["devkit_root"]).resolve()
-    namespaces, _ = taxonomy(Path(task["taxonomy"]).resolve())
+    namespaces, values = taxonomy(Path(task["taxonomy"]).resolve())
     example_discovery_index = build_example_discovery_index(root)
+    semantic_by_path: dict[str, dict[str, Any]] | None = None
+    if args.semantic_input:
+        semantic_by_path = load_semantic_input(
+            args.semantic_input.expanduser().resolve(), task, root, namespaces, values
+        )
     documents = [
-        build_worker_document(root, path, namespaces, example_discovery_index)
+        build_worker_document(
+            root, path, namespaces, example_discovery_index,
+            semantic=semantic_by_path.get(path) if semantic_by_path is not None else None,
+        )
         for path in task["documents"]
     ]
     result = {key: task[key] for key in ("schema_version", "run_id", "batch_id")}
     result["worker_id"] = args.worker_id
+    result["semantic_input"] = bool(semantic_by_path)
     result["documents"] = documents
     write_json(args.output.expanduser().resolve(), result)
     print(json.dumps({"output": str(args.output), "documents": len(documents)}, ensure_ascii=False, indent=2))
@@ -1572,8 +1797,6 @@ def validate_tags(
     result = normalize_tag(fields.get("tag"), namespaces)
     for item in result:
         namespace, selected = next(iter(item.items()))
-        if not selected and namespace == "roles" and f"tag.{namespace}" not in allowed_empty:
-            raise ValidationError(f"{path}: required tag namespace is empty: {namespace}")
         unknown = set(selected) - values[namespace]
         if unknown:
             raise ValidationError(f"{path}: tag {namespace} has unknown values: {sorted(unknown)}")
@@ -1588,11 +1811,18 @@ def validate_tags(
                 if namespace != "api_surfaces" and reference["excerpt"] not in body:
                     raise ValidationError(f"{path}: tag evidence is not verbatim for {key}")
     selected_map = {next(iter(item)): next(iter(item.values())) for item in result}
+    rules = load_tag_rules()["required_namespaces"]
+    for namespace in rules["always"]:
+        if not selected_map.get(namespace) and f"tag.{namespace}" not in allowed_empty:
+            raise ValidationError(f"{path}: required tag namespace is empty: {namespace}")
     roles = set(selected_map.get("roles", []))
-    if roles & {"compute", "data_movement", "data_initialization"} and not selected_map.get("operations"):
-        raise ValidationError(f"{path}: tag.operations is required for executable roles")
-    if "compute" in roles and not selected_map.get("execution_models"):
-        raise ValidationError(f"{path}: tag.execution_models is required for compute APIs")
+    for namespace, condition in rules["conditional"].items():
+        if roles & set(condition["when_roles_in"]) and not selected_map.get(namespace):
+            if f"tag.{namespace}" not in allowed_empty:
+                raise ValidationError(
+                    f"{path}: tag.{namespace} is required for roles: "
+                    + ",".join(sorted(roles & set(condition["when_roles_in"])))
+                )
     return result
 
 
@@ -1894,6 +2124,13 @@ def validate(args: argparse.Namespace) -> int:
         target = relative_api_path(root, path)
         if sha256(target) != document["sha256"]:
             raise ValidationError(f"input changed after worker read: {path}")
+        if not document.get("semantic_verified", False):
+            # 语义输入门禁：未经 semantic-input 合并的结果只能用于调试，不得写入 DevKit
+            # （构造 worker-result 的控制器单元测试必须显式置 semantic_verified: true）。
+            raise ValidationError(
+                f"{path}: semantic input missing (semantic_verified=false); "
+                "rerun controller.py worker with --semantic-input"
+            )
         fields = deepcopy(document["fields"])
         allowed_empty: set[str] = set()
         for found in document.get("issues", []):
@@ -2119,6 +2356,7 @@ def parser() -> argparse.ArgumentParser:
     worker_parser = sub.add_parser("worker")
     worker_parser.add_argument("--task", type=Path, required=True)
     worker_parser.add_argument("--output", type=Path, required=True)
+    worker_parser.add_argument("--semantic-input", type=Path, default=None)
     worker_parser.add_argument("--worker-id", default="worker-a")
     resolve_parser = sub.add_parser("resolve-issues")
     resolve_parser.add_argument("--run-dir", type=Path, required=True)

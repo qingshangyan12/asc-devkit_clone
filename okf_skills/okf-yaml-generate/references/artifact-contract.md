@@ -1,6 +1,14 @@
 # Artifact 契约
 
-## Worker 结果
+## 语义输入（semantic-input.json）
+
+语义取证 agent 产出批次级语义工件，契约见 [`semantic-contract.md`](semantic-contract.md)：
+`annotations` 与 task documents 精确对账，`document_sha256` 等于 prepare 输入哈希；`description` 来自
+已通过 `okf-description-generate validate` 的结果；`tag` 按需只含有逐字证据的 namespace（不含
+`api_surfaces`，不写空数组）；`tag_evidence` 覆盖每个 `namespace:value`；`dependencies` 每项带内联
+`evidence{source_path, excerpt}`。
+
+## Worker 结果（controller 产出，语义输入与结构 scaffold 的合并）
 
 ```json
 {

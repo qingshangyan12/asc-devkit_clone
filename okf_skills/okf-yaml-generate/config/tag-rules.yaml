@@ -1,0 +1,27 @@
+# OKF tag 必填与证据规则（机器可读；OKF字段规范 与 最小标签集设计说明 的执行形式）。
+#
+# - required_namespaces.always 必须与冻结词表的 mandatory_namespaces 一致（一致性测试守卫）。
+# - conditional 声明条件必填：roles 命中 when_roles_in 时该 namespace 必填。
+#   条件必填 namespace 允许经 resolver blank_field 决议后省略（allowed_empty 降级路径），
+#   用于词表缺口的 sanctioned degradation；always 项同样只允许决议后省略。
+# - evidence 声明证据规则，由 validate 阶段执行。
+
+schema_version: 1
+required_namespaces:
+  always:
+    - api_surfaces
+    - roles
+  conditional:
+    operations:
+      when_roles_in:
+        - compute
+        - data_movement
+        - data_initialization
+    execution_models:
+      when_roles_in:
+        - compute
+evidence:
+  every_selected_value_requires_evidence: true
+  evidence_must_match_source_verbatim: true
+  api_surfaces_uses_stable_path_evidence: true
+  deprecated_requires_explicit_statement: true

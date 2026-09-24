@@ -14,7 +14,7 @@ import yaml
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_TAXONOMY = SKILL_ROOT / "taxonomy" / "releases" / "core-v9-frozen.json"
+DEFAULT_TAXONOMY = SKILL_ROOT.parent / "okf-tag-generate" / "taxonomy" / "releases" / "core-v9-frozen.json"
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
 TOP_LEVEL_KEY_RE = re.compile(r"^[^\s#][^:]*:\s*(?:.*)?(?:\n|$)")

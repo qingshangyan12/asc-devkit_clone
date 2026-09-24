@@ -36,7 +36,7 @@ def resolve_paths(root: Path) -> dict[str, Path]:
         "build_meta": okf / "okf-index/index/build-meta.json",
         "index": okf / "okf-index/index/index.json",
         "gaps": okf / "okf-index/index/gaps.json",
-        "taxonomy": okf / "okf-yaml-generate/taxonomy/releases/core-v9-frozen.json",
+        "taxonomy": okf / "okf-tag-generate/taxonomy/releases/core-v9-frozen.json",
         "tasks": okf / "okf-evaluate/testset/tasks.yaml",
         "dryrun": okf / "okf-index/tests/dryrun.yaml",
         "scope": root / SCOPE_DIR,

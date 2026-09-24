@@ -1,41 +1,57 @@
-# Worker 与 Resolver 快速协议
+# 语义取证代理与 Resolver 协议
 
-## Worker
+## 语义取证代理（Semantic Agent）
 
-worker 收到 task 后按以下顺序执行：
+主控按 task 包为每批启动一个语义取证代理，产出批次级 `semantic-input.json`
+（契约见 [`semantic-contract.md`](semantic-contract.md)）。语义代理按以下顺序执行：
 
-1. 先运行 `controller.py worker` 生成 scaffold，不手工重写整份 YAML。
-2. description 只能读取通过 `okf-description-generate validate` 的 `description-result.json`；确认 document hash 一致后，
-   将其中的 description 与 evidence 带入 worker-result。不得从标题、正文或路径重新撰写、提取或猜测 description。
-3. scaffold 已按本地 vendored 规则提取函数原型、函数宏、真实 header、dtype、样例调用和 Doxygen 声明身份。`c_api/defs` 实体页改为提取 enum、record、constant、type alias、type catalog 或宏定义，不能以缺函数原型处理；目录索引页不进入批次。不要以标题或文件名重建 signature 或 declaration；仅补充脚本不能确认的语义字段和证据。signature 沿用旧生成器的 `identifier_field` 规则：保留文档占位符时写 `prototype_id`，具体重载写 `override_id`；C++ 模板参数 `T`、`S`、`U` 不视为文档占位符，函数宏使用独立 `macro_id`。同目录同 API 的 `_arch_<型号>` 文档出现相同 concrete override_id 时，scaffold 只给重叠项追加 `@型号`，并同步该 ID 到 marker；不要手工删改该后缀。Doxygen 若命中不同物理声明则保留后缀，若命中同一物理声明则按旧规则合并 canonical ID 和 archs。正文明确的 dtype 列表只能以与其 `prototype_id` 同级的单行 `dtype: [...]` 写入对应 signature 条目，不能写为根级字段，也不得在原型前插入 `api_signature` YAML 围栏。
-   tag 按需生成：scaffold 的 `fields.tag` 只含非空 namespace，worker 仅为有逐字证据的 namespace 补值或新增条目，
-   不添加空数组项。无证据 namespace 的降级信号由 scaffold issue 携带（填值后删除对应 issue），交 resolver 决议后
-   渲染自动省略该 namespace。
-4. 使用 `rg` 定位，再用短范围读取；没有命中证据时不要读取全文或遍历整个 examples 目录。
-5. 只有目标文档明确关联样例或依赖时，才读取对应的一个 README/源码片段。
-6. 一次性提交一个 worker-result；不要为不同字段拆分 agent，也不要在结果之外写解释性长文本。
+1. 逐篇读取 task documents 的正文（标题、功能说明、原型、参数说明、约束、示例），使用 `rg` 定位加
+   短范围读取；先运行 `okf-description-generate` 流程（prepare → 撰写 → validate），只把通过官方
+   validate 的 description 与 evidence 带入语义输入，不得从标题、正文或路径自行撰写、拼接或猜测。
+2. tag **按需生成**：只为有逐字证据的 namespace 提供值；无证据的 namespace 直接省略，不写空数组，
+   也不得包含 `api_surfaces`（controller 按路径自动注入）。必填性由 `config/tag-rules.yaml` 声明：
+   roles 恒必填；roles 含 compute/data_movement/data_initialization 时 operations 条件必填；含
+   compute 时 execution_models 条件必填。条件必填 namespace 证据不足时省略并依赖 scaffold issue 交
+   resolver 决议。词表顶层 `namespace_order` 是命名空间注册顺序，不是填写要求。
+3. `tag_evidence` 覆盖每个 `namespace:value`，`source_path` 为当前文档路径，`excerpt` 逐字摘自正文。
+4. `dependencies` 仅在正文明确说明与另一 API 文档的关系时提供（requires/configures/constrained_by/
+   related），每项带内联 `evidence{source_path, excerpt}`；互为"配对使用"的双向关系都用 related。
+5. 一次性写出 `semantic-input.json`；`annotations` 与 task documents 精确对账，`document_sha256`
+   使用 prepare 记录的输入哈希。
 
-worker-result 必须包含字段、证据和问题；缺少有效 description 工件时，description 保持空值并记录问题。
-tag、dependencies、doxygen 和 example_markers 都是默认处理字段；不能等待每个字段的额外写入许可。
-
-`doxygen` 是声明记录数组，而不是文本补丁：每项必须包含 `source_document`、`header`、`function`、
-`parameters`、`archs`、`template_parameters` 和可选 `macro_id`、派生 `override_id`、`doxygen`。`doxygen` 只可提供带 evidence 的
-`level`、`brief`、`params`，不得提交 `anchor`、`text` 或整段注释。已验证 concrete 函数有命名参数时，worker 必须从
-本页“参数说明”表完整生成 `params`；表缺失、覆盖不全或输入/输出方向不明确时，保留空值并提交 `include_doxygen` 问题。
-
-`example_markers` 是旧样例发现器输出的 example/call 记录数组。每个 call 使用 `file`、`call_start_offset`、
-`call_end_offset`、`canonical_id` 或 `call_template` 及可选 `placeholder_bindings`；只有控制器派生跨型号后缀时才可附带
-匹配 canonical function 的 `override_id`，不得提交任意 marker ID、anchor 或自由 comment。总控计算 concrete `override_id` 后生成成对 `//! [override_id]` 标签。
+语义代理不得触碰 signature、doxygen、example_markers 等结构字段，不得写 DevKit 任何文件。
 
 ## 主控派发要点
 
-主控给 worker 的派发提示词必须转述以下 tag 规则，不得出现"保留 9 个 namespace"、"保持空数组"类措辞：
+主控给语义代理的派发提示词必须转述以下规则，不得出现"保留 9 个 namespace"、"保持空数组"类措辞：
 
-- `fields.tag` 按需生成：只含有逐字证据的 namespace；不适用 namespace 省略，不写空数组。
-- 必填性：`api_surfaces`、`roles` 全局必填（词表 `mandatory_namespaces`）；roles 含
-  compute/data_movement/data_initialization 时 `operations` 必填；含 compute 时 `execution_models` 必填。
-  词表顶层 `namespace_order` 是命名空间注册顺序，不是填写要求。
-- 无证据 namespace 不添加条目；对应 scaffold issue 保留交 resolver 决议。
+- `tag` 按需生成：只含有逐字证据的 namespace；不适用 namespace 省略，不写空数组。
+- `api_surfaces` 由 source-context 按路径注入，语义代理不填。
+- 必填性以 `config/tag-rules.yaml` 为准（机器可读规则源）；无证据 namespace 由 scaffold issue
+  交 resolver 决议，条件必填 namespace 允许决议后省略。
+
+## 结构合并（Controller Worker）
+
+主控运行纯脚本合并，语义代理不参与：
+
+```bash
+python3 scripts/controller.py worker \
+  --task tmp/<run-id>/batches/batch-01/task.json \
+  --semantic-input tmp/<run-id>/batches/batch-01/semantic-input.json \
+  --output tmp/<run-id>/batches/batch-01/worker-result.json
+```
+
+- scaffold 由本地 vendored 规则提取函数原型、函数宏、真实 header、dtype、样例调用和 Doxygen 声明
+  身份；`c_api/defs` 实体页走独立定义解析，不能以缺函数原型处理；目录索引页不进入批次。
+- signature 沿用旧生成器的 `identifier_field` 规则：保留文档占位符时写 `prototype_id`，具体重载写
+  `override_id`；C++ 模板参数 `T`、`S`、`U` 不视为文档占位符，函数宏使用独立 `macro_id`。同目录同
+  API 的 `_arch_<型号>` 文档出现相同 concrete override_id 时，scaffold 只给重叠项追加 `@型号`，并同步
+  该 ID 到 marker。正文明确的 dtype 列表只能以与其 `prototype_id` 同级的单行 `dtype: [...]` 写入对应
+  signature 条目。
+- 缺 `--semantic-input` 时结果标记 `semantic_verified: false`，`validate` 阻断；构造 worker-result
+  的控制器单元测试必须显式置 `semantic_verified: true`。
+- worker-result 的 `doxygen` 是声明记录数组，不是文本补丁；`example_markers` 复用样例调用记录，
+  controller 严格生成成对 `//! [override_id]` 标签。二者均由结构解析产出，语义代理不参与。
 
 ## Resolver
 
@@ -45,9 +61,9 @@ tag、dependencies、doxygen 和 example_markers 都是默认处理字段；不�
 python3 scripts/controller.py resolve-issues --run-dir <run-dir>
 ```
 
-然后只把 `resolution-input.json` 的 JSON 内容交给一个 resolver agent，不把 run directory、DevKit 根目录、
-worker-result 或其他源文件路径传给它。resolver 不重新读取完整 Markdown、头文件或样例，只根据问题中的
+然后只把 `resolution-input.json` 的 JSON 内容交给一个 resolver agent，不把 run directory、DevKit 根目录或
+worker-result 传给它。resolver 不重新读取完整 Markdown、头文件或样例，只根据问题中的
 证据摘要给出一次性 decisions。只有证据互相冲突时，主代理才回读冲突位置并把补充摘要传给 resolver。
 
-没有问题时不启动 resolver。resolver 完成后立即运行带 `--decisions` 的 `resolve-issues`，不要让 agent
+没有问题时跳过 resolver。resolver 完成后立即运行带 `--decisions` 的 `resolve-issues`，不要让 agent
 再次复述文档或 write plan。
