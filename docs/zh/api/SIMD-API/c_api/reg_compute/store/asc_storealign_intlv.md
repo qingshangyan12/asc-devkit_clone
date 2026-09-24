@@ -6,13 +6,10 @@ description: 将两个矢量数据寄存器中的数据按元素顺序交织后�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [interleave, store]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_storealign_intlv__PU<dtype>_v<dtype>_v<dtype>
     archs: ['3510']

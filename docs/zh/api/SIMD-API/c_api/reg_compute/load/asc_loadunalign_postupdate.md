@@ -6,9 +6,7 @@ description: 从Unified Buffer按dtype对齐的起始地址读取VL长度连续�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [load]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]

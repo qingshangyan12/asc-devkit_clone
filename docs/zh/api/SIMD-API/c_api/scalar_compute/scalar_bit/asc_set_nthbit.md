@@ -6,14 +6,8 @@ description: 将uint64_t数据的指定二进制位置为1，其余位保持不�
   % 64计算，索引范围为0到63。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
   - families: [bitwise]
   - operations: [bit_manipulation]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_nthbit__u64_i64
     archs: ['2201', '3510']

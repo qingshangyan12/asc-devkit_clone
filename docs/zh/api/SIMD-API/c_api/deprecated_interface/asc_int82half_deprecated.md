@@ -6,12 +6,8 @@ description: 已废弃接口，将int8_t类型数据转换为half类型，请改
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_int82half__Rvf16_vi8_vb

@@ -6,12 +6,9 @@ description: 对Global Memory中address指向的单个元素执行原子取大�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [maximum]
   - objects: [scalar]
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic]
 signature:
   - prototype_id: asc_atomic_max__PG<dtype>_<dtype>

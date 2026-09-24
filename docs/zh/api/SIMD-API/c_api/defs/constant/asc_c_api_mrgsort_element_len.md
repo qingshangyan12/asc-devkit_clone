@@ -6,13 +6,6 @@ description: 定义MrgSort4操作支持的队列数量常量，值为4，用于a
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
     kind: related

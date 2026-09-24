@@ -6,13 +6,9 @@ description: 在L1 Buffer与Unified Buffer（UB）之间搬运数据，搬运过
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [unified_buffer]
-  - traits: []
 signature:
   - override_id: asc_copy_l12ub__PUv_PL1v_i8_u16_u16_u16_u16
     archs: ['3510']

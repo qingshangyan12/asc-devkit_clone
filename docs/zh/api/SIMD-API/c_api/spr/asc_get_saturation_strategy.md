@@ -6,13 +6,7 @@ description: 读取当前饱和控制策略并返回USE_API或USE_GLOBAL，常�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_saturation_strategy__z
     archs: ['3510']

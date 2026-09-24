@@ -6,12 +6,6 @@ description: 设置asc_copy_l12l0a、asc_copy_l12l0b的3D格式搬运接口Featu
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md

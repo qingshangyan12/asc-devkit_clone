@@ -6,12 +6,6 @@ description: 已废弃接口，在数据从GM非对齐搬运到UB时设置连续
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_set_gm2ub_pad__u32

@@ -6,10 +6,7 @@ description: 已废弃的同步搬运接口，提供GM到UB的非对齐数据搬
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [unified_buffer]
   - traits: [deprecated, padding, unaligned_transfer]

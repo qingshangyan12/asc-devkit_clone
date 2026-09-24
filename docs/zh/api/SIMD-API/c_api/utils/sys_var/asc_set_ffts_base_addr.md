@@ -7,12 +7,7 @@ tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
   - families: [system]
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_ffts_base_addr__u64
     archs: ['2201']

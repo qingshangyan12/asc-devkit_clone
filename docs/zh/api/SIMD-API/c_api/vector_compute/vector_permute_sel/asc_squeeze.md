@@ -6,7 +6,6 @@ description: 通过比较掩码src1将src0中的向量压缩成更短的向量�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [compression]
   - objects: [mask, vector]
   - execution_models: [memory_vector]

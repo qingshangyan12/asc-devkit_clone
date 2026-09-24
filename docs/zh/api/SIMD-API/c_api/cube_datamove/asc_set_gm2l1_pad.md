@@ -6,13 +6,6 @@ description: 用于设置asc_copy_gm2l1_align接口的常量填充值，在Norma
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_gm2l1_pad__u32
     archs: ['3510']

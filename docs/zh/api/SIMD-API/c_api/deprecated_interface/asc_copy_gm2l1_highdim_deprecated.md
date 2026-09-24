@@ -6,10 +6,7 @@ description: 将数据从Global Memory搬运到L1 Buffer且格式内容保持不
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l1_buffer]
   - traits: [deprecated, high_dimensional, padding]

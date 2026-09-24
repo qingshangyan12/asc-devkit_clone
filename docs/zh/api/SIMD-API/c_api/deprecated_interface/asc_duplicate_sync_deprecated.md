@@ -6,12 +6,8 @@ description: 已废弃接口，执行矢量复制操作，将标量值复制填�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [broadcast]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, scalar_operand]
 signature:
   - override_id: asc_duplicate_sync__PUf16_f16_u32

@@ -10,8 +10,6 @@ tag:
   - operations: [conversion, multiply]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, high_dimensional, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_mul_cast_half2uint8__PUu8_PUf16_PUf16_u32

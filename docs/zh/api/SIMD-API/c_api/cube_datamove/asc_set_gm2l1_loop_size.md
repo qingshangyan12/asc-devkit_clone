@@ -6,13 +6,6 @@ description: 将数据从GM搬运到L1 Buffer时，设置asc_copy_gm2l1_align循
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_gm2l1_loop_size__u64_u64
     archs: ['3510']

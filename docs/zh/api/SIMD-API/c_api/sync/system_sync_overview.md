@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
 description: 系统同步能力概述页，说明同步对协调多个执行单元访问共享资源顺序的意义，将AI Core的同步分为核内同步与核间同步两类，以表格汇总各类同步接口的功能简述，并配合示意图描述四种核间同步控制模式。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

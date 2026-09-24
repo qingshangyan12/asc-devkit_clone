@@ -6,12 +6,8 @@ description: 根据mask对两个源矢量数据寄存器按元素相乘并将结
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [multiply]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_mul__Rv<dtype>_v<dtype>_v<dtype>_vb

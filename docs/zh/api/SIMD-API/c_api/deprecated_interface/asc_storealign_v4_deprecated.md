@@ -7,10 +7,7 @@ description: 该接口已废弃，将矢量数据寄存器中由mask指示的有
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
-  - execution_models: []
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]
   - traits: [deprecated, masked, post_update]

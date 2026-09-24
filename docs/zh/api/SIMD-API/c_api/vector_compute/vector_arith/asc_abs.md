@@ -6,12 +6,8 @@ description: 按元素计算源矢量各元素的绝对值并写入目的矢量�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [absolute]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_abs__PUf16_PUf16_u32

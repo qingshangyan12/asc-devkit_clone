@@ -6,13 +6,9 @@ description: 从矢量数据寄存器中提取掩码寄存器并通过函数返�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_extract_mask__vu16_i16
     archs: ['3510']

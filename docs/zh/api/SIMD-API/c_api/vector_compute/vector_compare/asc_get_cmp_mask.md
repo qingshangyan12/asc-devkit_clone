@@ -6,13 +6,6 @@ description: 获取Compare操作的比较结果并存放到指定地址，需与
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_cmp_mask__PUv
     archs: ['2201']

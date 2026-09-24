@@ -6,13 +6,7 @@ description: 获取当前AI Core相对其余AI Core的编号，与内置变量�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_core_id__z
     archs: ['2201', '3510']

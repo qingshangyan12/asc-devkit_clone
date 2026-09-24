@@ -10,8 +10,6 @@ tag:
   - operations: [fused_multiply_add]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [high_dimensional]
 signature:
   - override_id: asc_mul_add__PUf16_PUf16_PUf16_u32

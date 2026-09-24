@@ -6,12 +6,8 @@ description: 根据mask将源操作数src（float类型）按元素与标量valu
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion, multiply]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, rounding_mode, scalar_operand]
 signature:
   - override_id: asc_mul_scalar_float2half_rn__vf32_f32_vb_icposeven

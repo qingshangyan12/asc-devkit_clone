@@ -6,12 +6,6 @@ description: 该接口已废弃且暂无替代接口，用于对QUANT_POST寄存
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_set_l0c2gm_quant_post__u64

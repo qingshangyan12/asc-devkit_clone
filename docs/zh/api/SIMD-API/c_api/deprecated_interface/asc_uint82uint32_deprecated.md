@@ -6,12 +6,8 @@ description: 已废弃接口，将uint8_t类型转化为uint32_t类型，按索�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_uint82uint32__Rvu32_vu8_vb

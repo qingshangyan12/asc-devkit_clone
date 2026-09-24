@@ -6,12 +6,9 @@ description: 已废弃接口，将fp4x2_e2m1_t类型转化为bfloat16_t类型，
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, widening_result]
 signature:
   - override_id: asc_e2m1x22bfloat16__Rvbf16_vf4e2m1x2_vb

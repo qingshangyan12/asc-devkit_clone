@@ -6,12 +6,8 @@ description: 将源操作数中的浮点数元素按照TRUNC模式向零方向�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, rounding_mode]
 signature:
   - prototype_id: asc_trunc__v<dtype>_vb

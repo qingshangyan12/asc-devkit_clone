@@ -6,12 +6,8 @@ description: 执行矢量加法运算，将源操作数每个元素与标量valu
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [add]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, scalar_operand]
 signature:
   - override_id: asc_add_scalar_sync__PUi16_PUi16_i16_u32

@@ -6,13 +6,8 @@ description: 计算uint64_t类型整数二进制表示的前导零个数，即�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [bit_manipulation]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_clz__u64
     archs: ['2201', '3510']

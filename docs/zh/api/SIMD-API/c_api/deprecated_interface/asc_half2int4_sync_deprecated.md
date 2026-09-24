@@ -6,12 +6,9 @@ description: 已废弃的同步矢量转换接口：将half类型数据转换为
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_half2int4_sync__PUi4x2_PUf16_u32

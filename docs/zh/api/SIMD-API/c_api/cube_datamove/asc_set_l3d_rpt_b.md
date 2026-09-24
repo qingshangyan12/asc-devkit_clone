@@ -7,13 +7,7 @@ description: 通过64位配置参数配置3D img2col搬运模式下repeat模式�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
   - operations: [img2col]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_l3d_rpt_b__u64
     archs: ['3510']

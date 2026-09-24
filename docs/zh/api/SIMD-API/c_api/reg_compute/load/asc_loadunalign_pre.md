@@ -6,12 +6,9 @@ description: 根据Unified Buffer中按dtype对齐的起始地址初始化非对
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [load]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [unified_buffer]
-  - destination_locations: []
   - traits: [unaligned_transfer]
 signature:
   - prototype_id: asc_loadunalign_pre__Rvloadunalign_PU<dtype>

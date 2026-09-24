@@ -6,12 +6,8 @@ description: 根据mask对源矢量数据寄存器按元素求自然指数，结
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [exponential]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_exp__Rv<dtype>_v<dtype>_vb

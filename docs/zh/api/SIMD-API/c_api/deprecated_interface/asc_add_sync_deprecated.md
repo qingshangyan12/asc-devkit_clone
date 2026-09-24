@@ -6,12 +6,8 @@ description: 执行矢量加法运算，按元素将两个源矢量操作数相�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [add]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_add_sync__PUi16_PUi16_PUi16_u32

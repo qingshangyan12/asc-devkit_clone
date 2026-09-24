@@ -6,10 +6,7 @@ description: 已废弃的多维数据搬运接口，将数据从Global Memory搬
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [unified_buffer]
   - traits: [deprecated, high_dimensional, padding]

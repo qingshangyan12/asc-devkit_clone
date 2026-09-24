@@ -6,12 +6,8 @@ description: 根据mask对源操作数src按元素执行ReLU操作，大于等�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [relu]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_relu__v<dtype>_vb

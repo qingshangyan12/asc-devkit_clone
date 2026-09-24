@@ -6,12 +6,8 @@ description: 根据mask对源操作数src0、src1按元素相乘后，与目的�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [fused_multiply_add]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_mula__Rv<dtype>_v<dtype>_v<dtype>_vb

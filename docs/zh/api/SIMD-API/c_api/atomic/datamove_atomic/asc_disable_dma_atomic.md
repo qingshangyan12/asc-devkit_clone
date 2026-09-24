@@ -6,12 +6,7 @@ description: 与asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min接�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic]
 signature:
   - override_id: asc_disable_dma_atomic__z

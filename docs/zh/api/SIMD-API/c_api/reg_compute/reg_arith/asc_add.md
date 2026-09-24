@@ -6,12 +6,8 @@ description: 根据mask对两个源矢量数据寄存器按元素求和并写入
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [add]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, supports_carry_output]
 signature:
   - prototype_id: asc_add__Rv<dtype>_v<dtype>_v<dtype>_vb

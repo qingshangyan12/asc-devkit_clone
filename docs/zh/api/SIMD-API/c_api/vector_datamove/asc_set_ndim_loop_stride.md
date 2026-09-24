@@ -6,13 +6,6 @@ description: 设置asc_ndim_copy_gm2ub进行NDDMA多维数据搬运时，loop0�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_ndim_loop0_stride__u64_u64
     archs: ['3510']

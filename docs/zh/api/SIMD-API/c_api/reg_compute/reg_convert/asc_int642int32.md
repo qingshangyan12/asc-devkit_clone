@@ -6,12 +6,8 @@ description: 将int64_t类型的源操作数转换成int32_t类型，支持不�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, saturation_mode]
 signature:
   - override_id: asc_int642int32__Rvi32_vi64_vb_icposeven

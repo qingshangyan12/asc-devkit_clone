@@ -6,13 +6,6 @@ description: 将操作数地址序列与地址寄存器关联，用于设置tran
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_va_reg__uba8_PPUi8
     archs: ['2201', '3510']

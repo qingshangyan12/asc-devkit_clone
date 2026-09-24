@@ -6,7 +6,6 @@ description: 对每个Repeat内所有元素求最大值以及Repeat内首个最�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reduction]
   - objects: [vector]
   - execution_models: [memory_vector]

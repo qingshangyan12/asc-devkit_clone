@@ -7,10 +7,7 @@ description: 已废弃的对齐搬入接口：从Unified Buffer连续对齐搬�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [broadcast, load]
-  - objects: []
-  - execution_models: []
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]
   - traits: [deprecated, post_update]

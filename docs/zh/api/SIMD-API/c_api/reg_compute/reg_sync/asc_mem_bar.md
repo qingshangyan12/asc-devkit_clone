@@ -6,13 +6,8 @@ description: Reg矢量计算内不同流水线之间的同步指令，通过mem_
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_mem_bar__mem
     archs: ['3510']

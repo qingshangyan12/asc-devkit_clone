@@ -6,12 +6,8 @@ description: 已废弃的同步矢量运算接口：将矢量src逐个元素与�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [maximum]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise, scalar_operand]
 signature:
   - override_id: asc_max_scalar_sync__PUi16_PUi16_i16_u32

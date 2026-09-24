@@ -7,12 +7,7 @@ description: 获取原子操作启用位与原子操作类型的值，可用于�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_get_store_atomic_config__Ratomiccfg

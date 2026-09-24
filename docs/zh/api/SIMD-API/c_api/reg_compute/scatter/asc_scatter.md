@@ -6,9 +6,7 @@ description: 根据索引寄存器中的索引值，将源矢量数据寄存器�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [scatter]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]

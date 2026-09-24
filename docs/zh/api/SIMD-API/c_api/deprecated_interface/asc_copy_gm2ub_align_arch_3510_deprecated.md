@@ -6,10 +6,7 @@ description: 已废弃的高维切分搬运接口旧形式，提供GM到UB的非
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [unified_buffer]
   - traits: [deprecated, high_dimensional, padding, unaligned_transfer]

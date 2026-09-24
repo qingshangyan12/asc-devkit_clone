@@ -6,12 +6,8 @@ description: 已废弃的同步矢量运算接口：按元素求src0与src1的�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [minimum]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_min_sync__PUi16_PUi16_PUi16_u32

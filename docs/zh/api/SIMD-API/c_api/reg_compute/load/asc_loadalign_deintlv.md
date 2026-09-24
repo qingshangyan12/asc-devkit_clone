@@ -6,13 +6,10 @@ description: 从Unified Buffer（UB）中32字节对齐的起始地址读取2×V
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [deinterleave, load]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]
-  - traits: []
 signature:
   - prototype_id: asc_loadalign_deintlv__Rv<dtype>_Rv<dtype>_PU<dtype>
     archs: ['3510']

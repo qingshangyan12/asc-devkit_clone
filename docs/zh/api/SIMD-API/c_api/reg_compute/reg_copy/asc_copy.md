@@ -6,9 +6,7 @@ description: 完成数据在寄存器间的搬运，支持矢量数据寄存器�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [vector_register]

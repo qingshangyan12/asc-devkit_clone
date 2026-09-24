@@ -6,12 +6,6 @@ description: 该接口已废弃，用于设置原子操作启用位与原子操�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic, deprecated]
 signature:
   - override_id: asc_set_store_atomic_config_v2__u16_u16

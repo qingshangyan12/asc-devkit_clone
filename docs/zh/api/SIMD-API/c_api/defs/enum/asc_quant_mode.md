@@ -6,12 +6,6 @@ description: 表示L0C Buffer数据搬出时类型转换或量化模式的类型
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [quantization]
 dependencies: []
 examples: []

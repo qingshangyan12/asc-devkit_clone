@@ -6,12 +6,8 @@ description: 已废弃接口，设置后续从UB、L0C Buffer或L1 Buffer到GM�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
   - operations: [add]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic, deprecated]
 signature:
   - override_id: asc_set_atomic_add_int__z

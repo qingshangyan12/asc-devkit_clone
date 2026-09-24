@@ -6,12 +6,8 @@ description: 已废弃接口，对源操作数src与标量value相乘后按ROUND
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion, multiply]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise, masked, rounding_mode, scalar_operand]
 signature:
   - override_id: asc_muls__Rvf16_vf32_f32_vb

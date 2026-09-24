@@ -6,13 +6,6 @@ description: 表示数据从GM搬运到Unified Buffer时L2 Cache管理策略的�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md
     kind: related

@@ -6,12 +6,9 @@ description: 已废弃的寄存器矢量转换接口：将half类型数据转为
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_half2int4x2_rd__Rvi4x2_vf16_vb

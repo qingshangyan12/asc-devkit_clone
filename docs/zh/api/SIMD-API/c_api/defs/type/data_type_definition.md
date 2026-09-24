@@ -5,14 +5,7 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.m
 description: Reg数据类型定义总览，说明矢量数据寄存器、掩码寄存器、非对齐寄存器与地址寄存器的类型、位宽类别、数量上限及配套接口。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
   - objects: [mask, vector]
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
     kind: related

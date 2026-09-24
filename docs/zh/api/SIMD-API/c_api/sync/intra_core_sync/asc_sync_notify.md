@@ -6,13 +6,8 @@ description: 与asc_sync_wait配对使用，实现AI Core内部不同流水之�
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_sync_notify__pipe_pipe_event
     archs: ['2201', '3510']

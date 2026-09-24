@@ -10,8 +10,6 @@ tag:
   - operations: [fused_multiply_add]
   - objects: [scalar, vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, high_dimensional, scalar_operand]
 signature:
   - override_id: asc_axpy__PUf16_PUf16_f16_u32

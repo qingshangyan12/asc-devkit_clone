@@ -6,12 +6,9 @@ description: 在矢量数据寄存器中将float类型数据转换为int32_t类�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2int32_rn__Rvi32_vf32_vb

@@ -6,11 +6,7 @@ description: 已废弃接口，将value的二进制值赋值给dst，对L0A Buff
 tag:
   - api_surfaces: [c_api]
   - roles: [data_initialization]
-  - families: []
   - operations: [fill]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [l0a_buffer]
   - traits: [deprecated]
 dependencies:

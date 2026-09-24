@@ -6,10 +6,7 @@ description: asc_copy_l0c2gm旧参数形式及同步接口已废弃，将矩阵�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
   - source_locations: [l0c_buffer]
   - destination_locations: [global_memory]
   - traits: [deprecated, quantization]

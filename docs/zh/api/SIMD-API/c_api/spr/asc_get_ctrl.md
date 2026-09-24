@@ -6,13 +6,7 @@ description: 读取CTRL寄存器（控制寄存器）特定比特位上的值并
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_ctrl__z
     archs: ['2201', '3510']

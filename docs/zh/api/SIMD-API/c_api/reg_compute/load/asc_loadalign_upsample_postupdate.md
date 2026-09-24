@@ -6,9 +6,7 @@ description: 从Unified Buffer（UB）中满足对应对齐要求的起始地址
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [load]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]

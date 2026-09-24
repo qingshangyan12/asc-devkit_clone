@@ -6,12 +6,8 @@ description: 已废弃接口，设置计算结果以原子比较方式传输到G
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
   - operations: [minimum]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic, deprecated]
 signature:
   - override_id: asc_set_atomic_min_int__z

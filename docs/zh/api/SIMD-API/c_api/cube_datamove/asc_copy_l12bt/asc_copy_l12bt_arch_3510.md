@@ -6,10 +6,7 @@ description: 将L1 Buffer中的偏置数据搬运到BiasTable Buffer，供矩阵
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [bias_table_buffer]
   - traits: [high_dimensional]

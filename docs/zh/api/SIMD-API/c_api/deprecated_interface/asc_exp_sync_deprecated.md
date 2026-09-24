@@ -6,12 +6,8 @@ description: 已废弃接口，按元素取自然指数并写入目的矢量，�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [exponential]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_exp_sync__PUf16_PUf16_u32

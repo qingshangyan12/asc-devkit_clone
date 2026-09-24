@@ -6,12 +6,8 @@ description: 已废弃接口，将int64_t类型数据转换为float，支持多�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_int642float_rn__Rvf32_vi64_vb

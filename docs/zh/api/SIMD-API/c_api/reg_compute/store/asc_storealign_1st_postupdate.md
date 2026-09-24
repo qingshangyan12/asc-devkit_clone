@@ -6,9 +6,7 @@ description: 将源矢量数据寄存器中的第一个元素写入Unified Buffe
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]

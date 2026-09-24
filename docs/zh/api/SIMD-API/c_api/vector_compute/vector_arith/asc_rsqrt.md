@@ -6,12 +6,8 @@ description: 按元素对源矢量先开方再取倒数，将平方根倒数写�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reciprocal_sqrt]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_rsqrt__PUf16_PUf16_u32

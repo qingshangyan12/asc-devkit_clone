@@ -6,12 +6,8 @@ description: 根据mask对源操作数src0、src1按元素相减后取绝对值�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [absolute, subtract]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_abs_sub__v<dtype>_v<dtype>_vb

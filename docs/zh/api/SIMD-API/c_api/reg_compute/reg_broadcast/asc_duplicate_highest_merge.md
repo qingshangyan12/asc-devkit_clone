@@ -6,12 +6,8 @@ description: 将源操作数src的最高位元素广播到dst中被mask筛选的
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [broadcast]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked]
 signature:
   - prototype_id: asc_duplicate_highest_merge__Rv<dtype>_v<dtype>_vb

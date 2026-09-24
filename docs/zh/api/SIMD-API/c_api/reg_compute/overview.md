@@ -6,14 +6,6 @@ description: Reg矢量计算C API概述页，介绍寄存器级矢量计算能�
   Function调用约束。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

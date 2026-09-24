@@ -6,12 +6,8 @@ description: 源矢量逐元素与标量比较，比标量值大则取标量值�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [minimum]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_min_scalar__PUf16_PUf16_f16_u32

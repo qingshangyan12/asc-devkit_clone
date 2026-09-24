@@ -6,12 +6,9 @@ description: 已废弃接口，将float类型转化为hifloat8_t类型，并支�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2hif8_rna__Rvhf8_vf32_vb

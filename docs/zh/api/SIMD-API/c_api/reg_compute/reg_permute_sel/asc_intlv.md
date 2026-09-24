@@ -6,13 +6,8 @@ description: 将两个源矢量数据寄存器中的元素以元素为单位交�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [interleave]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - prototype_id: asc_intlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>
     archs: ['3510']

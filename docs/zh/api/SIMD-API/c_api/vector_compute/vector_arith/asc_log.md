@@ -6,12 +6,8 @@ description: 按元素计算源矢量的自然对数并写入目的矢量，支�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [natural_log]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_log__PUf16_PUf16_u32

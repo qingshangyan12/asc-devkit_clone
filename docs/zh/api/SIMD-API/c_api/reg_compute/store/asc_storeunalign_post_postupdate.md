@@ -6,11 +6,8 @@ description: 将非对齐寄存器中暂存的尾块写入Unified Buffer（UB）
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
   - destination_locations: [unified_buffer]
   - traits: [post_update, unaligned_transfer]
 signature:

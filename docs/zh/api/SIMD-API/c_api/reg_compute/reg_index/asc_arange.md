@@ -5,13 +5,7 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange
 description: 以传入标量value为起始值生成递增或递减的索引序列并保存在矢量数据寄存器中，序列元素按1逐步递增或递减，整型结果超出可表示范围时回绕，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [scalar_operand]
 signature:
   - prototype_id: asc_arange__Rv<dtype>_<dtype>

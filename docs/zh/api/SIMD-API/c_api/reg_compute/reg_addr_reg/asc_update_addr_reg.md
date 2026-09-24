@@ -6,13 +6,6 @@ description: 更新地址寄存器addr_reg用于迭代寻址，支持1~4维偏�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_update_addr_reg_b8__u32
     archs: ['3510']

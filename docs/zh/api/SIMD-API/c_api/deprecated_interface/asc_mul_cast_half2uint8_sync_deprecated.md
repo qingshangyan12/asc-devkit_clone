@@ -6,12 +6,8 @@ description: 已废弃的同步融合运算接口：按元素将两个half源操
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion, multiply]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_mul_cast_half2uint8_sync__PUu8_PUf16_PUf16_u32

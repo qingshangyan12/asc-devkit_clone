@@ -6,13 +6,7 @@ description: 设置饱和控制策略为USE_API或USE_GLOBAL，该策略影响CA
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_saturation_strategy__strategy
     archs: ['3510']

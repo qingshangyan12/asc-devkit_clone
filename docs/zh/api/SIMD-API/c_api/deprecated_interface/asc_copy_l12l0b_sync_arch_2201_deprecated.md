@@ -6,10 +6,7 @@ description: 已废弃接口，搬运L1 Buffer里512B大小的矩阵到L0B Buffe
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, img2col, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0b_buffer]
   - traits: [deprecated, high_dimensional]

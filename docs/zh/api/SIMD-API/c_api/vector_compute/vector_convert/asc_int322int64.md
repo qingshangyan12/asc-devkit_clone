@@ -6,12 +6,9 @@ description: 将int32_t类型数据逐元素转换为int64_t类型，提供前n�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [high_dimensional]
 signature:
   - override_id: asc_int322int64__PUi64_PUi32_u32

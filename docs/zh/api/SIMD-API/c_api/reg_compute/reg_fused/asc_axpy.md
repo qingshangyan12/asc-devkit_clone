@@ -6,12 +6,8 @@ description: 根据mask将源操作数src中每个元素与标量value求积后�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [fused_multiply_add]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, scalar_operand]
 signature:
   - prototype_id: asc_axpy__Rv<dtype>_v<dtype>_<dtype>_vb

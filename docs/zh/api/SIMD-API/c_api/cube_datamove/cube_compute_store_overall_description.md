@@ -6,10 +6,7 @@ description: 矩阵计算搬出接口的总体说明，实现从L0C Buffer到Glo
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
   - source_locations: [l0c_buffer]
   - destination_locations: [global_memory, l1_buffer]
   - traits: [quantization]

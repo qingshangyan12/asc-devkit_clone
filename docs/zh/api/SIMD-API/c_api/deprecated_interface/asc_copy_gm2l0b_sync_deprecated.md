@@ -6,10 +6,8 @@ description: 将矩阵数据从Global Memory搬运到L0B Buffer，支持按分�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
   - objects: [matrix]
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l0b_buffer]
   - traits: [deprecated]

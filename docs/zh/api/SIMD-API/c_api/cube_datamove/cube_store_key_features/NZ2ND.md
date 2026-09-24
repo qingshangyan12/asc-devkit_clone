@@ -7,13 +7,8 @@ description: 介绍矩阵搬出时的Nz2ND功能：实现Nz格式到ND格式的�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
   - source_locations: [l0c_buffer]
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md
     kind: related

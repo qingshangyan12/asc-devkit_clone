@@ -6,12 +6,8 @@ description: 已废弃接口，完成MX矩阵计算所需右矩阵量化系数�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_copy_l12l0b_mx_sync__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16

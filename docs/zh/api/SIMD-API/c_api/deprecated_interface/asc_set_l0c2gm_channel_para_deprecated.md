@@ -6,12 +6,6 @@ description: 该接口已废弃，用于在L0C Buffer搬出并执行Nz2DN格式�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_set_l0c2gm_channel_para__u64

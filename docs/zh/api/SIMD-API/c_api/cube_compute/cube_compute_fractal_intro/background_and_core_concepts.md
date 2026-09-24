@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fracta
 description: 说明矩阵分形存储格式的背景与核心概念：矩阵计算单元采用分块计算逻辑，分形格式通过软件重排使每个16×16计算块在物理内存中连续存放，避免非连续访问并提升数据吞吐率，同时介绍大Y小x命名法。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

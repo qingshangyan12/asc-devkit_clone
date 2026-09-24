@@ -6,13 +6,6 @@ description: 设置L0C Buffer搬出场景下随路tensor量化、随路tensor激
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_l0c_copy_config__u64_u64_b
     archs: ['2201', '3510']

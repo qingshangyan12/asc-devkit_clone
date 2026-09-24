@@ -6,12 +6,8 @@ description: 逐元素比较源矢量与标量value的大小并取最大值存�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [maximum]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_max_scalar__PUi16_PUi16_i16_u32

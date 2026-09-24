@@ -7,13 +7,9 @@ description: 介绍矩阵计算搬出过程中的Nz2Nz特性：矩阵计算结�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l0c_buffer]
   - destination_locations: [global_memory, l1_buffer]
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md
     kind: related

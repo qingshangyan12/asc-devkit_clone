@@ -6,12 +6,9 @@ description: 根据mask将矢量数据寄存器中参与计算的float元素转�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked, rounding_mode, saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md

@@ -6,12 +6,8 @@ description: 针对PIPE_V执行同步操作的易用性接口，保证PIPE_V中�
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_sync_vec__i

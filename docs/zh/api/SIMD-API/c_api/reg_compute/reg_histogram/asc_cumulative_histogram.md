@@ -6,12 +6,8 @@ description: 对输入矢量数据寄存器中的uint8_t元素进行累计频率
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [histogram]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked]
 signature:
   - override_id: asc_cumulative_histogram_bin0__Rvu16_vu8_vb

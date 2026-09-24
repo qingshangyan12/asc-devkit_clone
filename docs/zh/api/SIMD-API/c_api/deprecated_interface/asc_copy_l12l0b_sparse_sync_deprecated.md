@@ -6,10 +6,7 @@ description: 已废弃接口，搬运L1 Buffer里512B大小的稠密权重矩阵
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0b_buffer]
   - traits: [deprecated, sparse_input]

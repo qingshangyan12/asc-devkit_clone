@@ -6,12 +6,6 @@ description: 该接口已废弃，用于对RELU_ALPHA寄存器中的值进行设
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_set_l0c2gm_relu_alpha__u64

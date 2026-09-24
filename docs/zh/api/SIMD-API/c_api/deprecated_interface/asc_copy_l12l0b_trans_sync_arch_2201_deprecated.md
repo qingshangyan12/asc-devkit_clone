@@ -6,10 +6,7 @@ description: 已废弃接口，实现带转置的2D格式数据从L1 Buffer到L0
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0b_buffer]
   - traits: [deprecated, high_dimensional]

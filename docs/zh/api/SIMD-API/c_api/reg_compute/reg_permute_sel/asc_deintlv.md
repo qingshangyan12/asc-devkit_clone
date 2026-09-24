@@ -6,13 +6,8 @@ description: 将src0和src1两个矢量数据寄存器或掩码寄存器中的�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [deinterleave]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - prototype_id: asc_deintlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>
     archs: ['3510']

@@ -6,13 +6,8 @@ description: 将value的二进制值赋值给目的操作数dst，完成L0B Buff
 tag:
   - api_surfaces: [c_api]
   - roles: [data_initialization]
-  - families: []
   - operations: [fill]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [l0b_buffer]
-  - traits: []
 signature:
   - override_id: asc_fill_l0b__PCBi16_f16_RCfillcfg
     archs: ['2201']

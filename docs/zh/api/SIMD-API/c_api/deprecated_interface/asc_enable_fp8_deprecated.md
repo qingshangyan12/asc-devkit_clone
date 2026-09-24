@@ -6,12 +6,7 @@ description: 已废弃接口，用于设置Mmad计算开启FP8模式，该模式
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [matrix_compute]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_enable_fp8__z

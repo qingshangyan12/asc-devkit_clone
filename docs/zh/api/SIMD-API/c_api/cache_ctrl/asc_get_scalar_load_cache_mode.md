@@ -7,12 +7,6 @@ tag:
   - api_surfaces: [c_api]
   - roles: [query]
   - families: [cache_management]
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_scalar_load_cache_mode__z
     archs: ['3510']

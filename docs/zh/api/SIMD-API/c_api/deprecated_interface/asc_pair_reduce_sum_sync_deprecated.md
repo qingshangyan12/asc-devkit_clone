@@ -10,8 +10,6 @@ tag:
   - operations: [reduction]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_pair_reduce_sum_sync__PUf16_PUf16_u32

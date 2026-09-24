@@ -6,13 +6,9 @@ description: 把L1 Buffer中的数据搬运至Global Memory，可按连续数据
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [global_memory]
-  - traits: []
 signature:
   - override_id: asc_copy_l12gm__PGv_PL1v_u16_u16_u16_u16
     archs: ['2201']

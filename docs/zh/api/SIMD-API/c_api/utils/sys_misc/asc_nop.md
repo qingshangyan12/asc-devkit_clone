@@ -6,13 +6,7 @@ description: 生成一条空操作指令，不执行实际计算，每调用一�
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_nop__z
     archs: ['3510']

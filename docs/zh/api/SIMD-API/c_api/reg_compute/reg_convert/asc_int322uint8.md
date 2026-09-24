@@ -6,12 +6,8 @@ description: 根据掩码将源操作数中参与计算的int32_t类型元素转
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md

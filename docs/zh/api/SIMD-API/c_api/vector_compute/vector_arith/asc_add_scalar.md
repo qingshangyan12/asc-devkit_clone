@@ -6,12 +6,8 @@ description: 将源矢量各元素与给定标量value逐元素相加，结果�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [add]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_add_scalar__PUi16_PUi16_i16_u32

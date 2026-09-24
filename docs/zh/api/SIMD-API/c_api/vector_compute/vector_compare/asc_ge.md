@@ -6,12 +6,8 @@ description: 逐元素比较src0是否大于等于src1，成立时输出结果�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_ge__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8

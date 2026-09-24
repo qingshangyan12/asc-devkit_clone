@@ -6,12 +6,8 @@ description: 该接口已废弃，用于实现16*16的二维矩阵数据块转�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [transpose]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_transpose_sync__PUi16_PUi16

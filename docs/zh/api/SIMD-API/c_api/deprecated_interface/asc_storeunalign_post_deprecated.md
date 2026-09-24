@@ -6,11 +6,7 @@ description: 该接口已废弃，将非对齐寄存器中暂存的尾块数据�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [unified_buffer]
   - traits: [deprecated, unaligned_transfer]
 signature:

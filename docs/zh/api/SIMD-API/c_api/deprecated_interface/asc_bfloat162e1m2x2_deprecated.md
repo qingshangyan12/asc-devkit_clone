@@ -6,12 +6,8 @@ description: 将bfloat16_t类型转换为fp4x2_e1m2_t类型，支持RINT、ROUND
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, rounding_mode]
 signature:
   - override_id: asc_bfloat162e1m2x2_rn__Rvf4e1m2x2_vbf16_vb

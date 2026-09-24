@@ -6,12 +6,8 @@ description: 将源操作数中int16_t类型的元素转换为half类型，源�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, rounding_mode]
 signature:
   - override_id: asc_int162half_rd__Rvf16_vi16_vb

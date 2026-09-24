@@ -6,14 +6,6 @@ description: 关键特性说明页，配合时序图介绍四对核间同步接�
   Core内AIC与AIV全核同步，模式4为单AI Core内AIC与单个AIV同步。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

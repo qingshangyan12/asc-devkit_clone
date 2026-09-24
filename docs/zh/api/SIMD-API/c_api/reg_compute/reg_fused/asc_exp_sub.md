@@ -6,12 +6,8 @@ description: 根据mask将src0与src1按元素相减，并计算以差值为指�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [exponential, subtract]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 dependencies: []
 examples: []

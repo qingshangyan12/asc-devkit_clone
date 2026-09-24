@@ -6,10 +6,7 @@ description: 将数据从GM搬运到L0A Buffer，支持按分形矩阵ID、迭�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l0a_buffer]
   - traits: [deprecated]

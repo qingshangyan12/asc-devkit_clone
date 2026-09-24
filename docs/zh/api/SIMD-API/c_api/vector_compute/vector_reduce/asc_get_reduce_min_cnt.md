@@ -6,13 +6,7 @@ description: 获取执行asc_repeat_reduce_min操作后的最小值以及第一�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_reduce_min_cnt__Rf16_Ru32
     archs: ['2201']

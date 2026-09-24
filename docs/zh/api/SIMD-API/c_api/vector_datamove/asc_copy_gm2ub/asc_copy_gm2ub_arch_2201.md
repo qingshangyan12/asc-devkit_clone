@@ -6,10 +6,7 @@ description: 将数据从Global Memory（GM）搬运到Unified Buffer（UB），
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [unified_buffer]
   - traits: [high_dimensional]

@@ -6,12 +6,8 @@ description: 根据mask将每个DataBlock（32B）中参与计算的元素相加
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reduction]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked]
 signature:
   - prototype_id: asc_reduce_sum_datablock__v<src_dtype>_vb

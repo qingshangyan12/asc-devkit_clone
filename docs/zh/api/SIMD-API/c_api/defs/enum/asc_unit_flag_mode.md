@@ -6,13 +6,6 @@ description: 配置矩阵计算或矩阵搬出接口执行后UnitFlag行为的�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 headers: [/include/c_api/defs/enum.h]

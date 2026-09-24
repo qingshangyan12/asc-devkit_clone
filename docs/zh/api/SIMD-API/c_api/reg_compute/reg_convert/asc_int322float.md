@@ -6,12 +6,8 @@ description: 根据掩码将源操作数中每个int32_t类型数据转换成flo
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, rounding_mode]
 signature:
   - override_id: asc_int322float_rd__Rvf32_vi32_vb

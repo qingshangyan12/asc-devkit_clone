@@ -6,12 +6,8 @@ description: 已废弃的同步矢量比较接口：将矢量每个位置的元�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise, scalar_operand]
 signature:
   - override_id: asc_lt_scalar_sync__PUu8_PUf16_f16_u8_u16_u16_u16_u16

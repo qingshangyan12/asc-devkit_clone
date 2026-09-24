@@ -6,13 +6,11 @@ description: 数据格式转换接口，一般用于将NCHW格式转换成NC1HWC
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion, layout_transform, transpose]
   - objects: [matrix]
   - execution_models: [memory_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [unified_buffer]
-  - traits: []
 signature:
   - override_id: asc_transto5hd_b32__uba8_uba8_u8_u16_u16
     archs: ['2201', '3510']

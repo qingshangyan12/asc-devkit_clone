@@ -6,10 +6,7 @@ description: 已废弃的同步图像搬运接口：将图像数据从Global Mem
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l1_buffer]
   - traits: [deprecated, padding]

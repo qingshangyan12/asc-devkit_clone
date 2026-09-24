@@ -6,12 +6,8 @@ description: 该接口已废弃，用于将所有元素左移distance位，请�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [bitwise_shift]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_shiftleft_sync__PUi16_PUi16_u32_u32

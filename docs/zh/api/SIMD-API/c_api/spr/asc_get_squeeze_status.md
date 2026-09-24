@@ -6,13 +6,7 @@ description: 读取squeeze操作后保存至AR特殊寄存器的有效数据长�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_squeeze_status__z
     archs: ['3510']

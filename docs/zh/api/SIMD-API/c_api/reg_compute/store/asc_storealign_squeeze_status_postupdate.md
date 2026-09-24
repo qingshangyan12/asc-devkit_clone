@@ -6,11 +6,8 @@ description: 将asc_squeeze_and_storeunalign操作后保存在AR特殊寄存器�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
   - destination_locations: [unified_buffer]
   - traits: [post_update]
 signature:

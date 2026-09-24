@@ -6,10 +6,7 @@ description: 已废弃接口，将一段连续数据从Unified Buffer（UB）搬
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [unified_buffer]
   - destination_locations: [l1_buffer]
   - traits: [deprecated]

@@ -6,13 +6,8 @@ description: 针对PIPE_MTE2执行同步操作的易用性接口，保证PIPE_MT
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_sync_mte2__i
     archs: ['2201', '3510']

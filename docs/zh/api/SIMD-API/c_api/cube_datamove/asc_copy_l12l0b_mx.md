@@ -6,13 +6,8 @@ description: 完成MX矩阵计算中右矩阵量化系数从L1 Buffer到L0B_MX B
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_copy_l12l0b_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16
     archs: ['3510']

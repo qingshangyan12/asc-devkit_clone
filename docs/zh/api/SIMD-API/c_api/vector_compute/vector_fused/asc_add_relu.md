@@ -10,8 +10,6 @@ tag:
   - operations: [add, conversion, relu]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, high_dimensional]
 signature:
   - override_id: asc_add_relu__PUf16_PUf16_PUf16_u32

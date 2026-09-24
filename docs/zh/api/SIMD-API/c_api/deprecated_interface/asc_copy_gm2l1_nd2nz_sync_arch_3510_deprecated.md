@@ -6,10 +6,7 @@ description: 已废弃的同步搬运接口，将数据从Global Memory搬运到
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l1_buffer]
   - traits: [deprecated]

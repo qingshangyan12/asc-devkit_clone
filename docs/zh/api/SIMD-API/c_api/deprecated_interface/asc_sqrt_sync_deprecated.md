@@ -6,12 +6,8 @@ description: 该接口已废弃，用于按元素做开方运算，请使用非�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [sqrt]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_sqrt_sync__PUf16_PUf16_u32

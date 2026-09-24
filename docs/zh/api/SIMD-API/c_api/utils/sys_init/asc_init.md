@@ -6,13 +6,7 @@ description: 将当前AI Core上可能由前序算子遗留的全局状态恢复
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_init__z
     archs: ['2201', '3510']

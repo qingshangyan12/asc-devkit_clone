@@ -6,12 +6,8 @@ description: 根据掩码对源矢量数据寄存器中的元素执行Leaky ReLU
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [leaky_relu]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, scalar_operand]
 signature:
   - prototype_id: asc_leakyrelu__v<dtype>_<dtype>_vb

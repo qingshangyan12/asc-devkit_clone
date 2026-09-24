@@ -6,12 +6,8 @@ description: merge模式下将src的最低位元素广播到dst中被mask筛选�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [broadcast]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked]
 signature:
   - override_id: asc_duplicate_merge__Rvi8_vi8_vb

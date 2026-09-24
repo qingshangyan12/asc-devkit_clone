@@ -6,12 +6,9 @@ description: 已废弃接口，对每个Repeat内所有元素求最小值以及�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reduction]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_repeat_reduce_min_index_value_sync__PUf16_PUf16_u32

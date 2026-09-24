@@ -6,9 +6,7 @@ description: 将矢量数据寄存器中前count个元素连续搬出到非32字
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]

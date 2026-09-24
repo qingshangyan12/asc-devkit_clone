@@ -6,13 +6,8 @@ description: 与asc_lock配对使用，实现核内异步流水指令之间的�
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
     kind: related

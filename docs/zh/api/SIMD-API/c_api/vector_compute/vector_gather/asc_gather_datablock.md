@@ -6,7 +6,6 @@ description: 给定输入矢量和地址偏移矢量，根据偏移地址按照D
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [gather]
   - objects: [vector]
   - execution_models: [memory_vector]

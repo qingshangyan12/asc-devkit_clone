@@ -6,12 +6,8 @@ description: 已废弃接口，执行矢量取倒数运算，按元素计算dst�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reciprocal]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_rcp_sync__PUf16_PUf16_u32

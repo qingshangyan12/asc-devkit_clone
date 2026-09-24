@@ -7,12 +7,7 @@ tag:
   - api_surfaces: [c_api]
   - roles: [query]
   - families: [system]
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_vf_len__z
     archs: ['3510']

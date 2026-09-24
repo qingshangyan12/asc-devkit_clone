@@ -6,12 +6,9 @@ description: 将half类型数据转换为int8_t类型，支持多种舍入模式
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [rounding_mode]
 signature:
   - override_id: asc_half2int8__PUi8_PUf16_u32

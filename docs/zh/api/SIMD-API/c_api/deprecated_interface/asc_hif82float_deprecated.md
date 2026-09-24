@@ -6,12 +6,9 @@ description: 已废弃的寄存器矢量转换接口：将hifloat8_t类型数据
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, widening_result]
 signature:
   - override_id: asc_hif82float__Rvf32_vhf8_vb

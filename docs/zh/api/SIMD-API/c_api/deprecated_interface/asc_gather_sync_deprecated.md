@@ -6,7 +6,6 @@ description: 已废弃的同步矢量收集接口：将src按照src_offset给定
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [gather]
   - objects: [vector]
   - execution_models: [memory_vector]

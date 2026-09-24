@@ -6,12 +6,9 @@ description: 已废弃接口，对输入的int32_t类型数据按元素做量化
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise, quantization]
 signature:
   - override_id: asc_deq_int322half_sync__PUf16_PUi32_u32

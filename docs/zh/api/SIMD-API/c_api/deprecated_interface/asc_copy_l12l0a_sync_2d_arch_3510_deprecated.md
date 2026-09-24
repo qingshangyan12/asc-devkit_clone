@@ -6,10 +6,7 @@ description: 已废弃的同步搬运接口，以512字节分形为粒度完成�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0a_buffer]
   - traits: [deprecated]

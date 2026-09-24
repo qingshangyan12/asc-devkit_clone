@@ -6,12 +6,7 @@ description: 已废弃接口，用于设置HF32模式舍入方式，需先开启
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [matrix_compute]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_enable_hf32_trans__u32

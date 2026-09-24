@@ -6,12 +6,9 @@ description: 已废弃接口，将float类型数据转换为fp8_e5m2类型，支
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2e5m2_rn__Rvf8e5m2_vf32_vb

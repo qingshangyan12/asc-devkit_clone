@@ -6,12 +6,8 @@ description: 已废弃的同步矢量运算接口：按元素取自然对数并�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [natural_log]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_log_sync__PUf16_PUf16_u32

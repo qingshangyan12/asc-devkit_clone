@@ -6,12 +6,8 @@ description: 对两个源矢量执行逐元素乘法运算并将结果写入目�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [multiply]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_mul__PUi16_PUi16_PUi16_u32

@@ -6,13 +6,6 @@ description: 设置asc_ndim_copy_gm2ub在常数填充模式下使用的填充值
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - prototype_id: asc_set_ndim_pad_value__<dtype>
     archs: ['3510']

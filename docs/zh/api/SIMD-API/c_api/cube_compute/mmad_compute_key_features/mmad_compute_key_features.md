@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_fe
 description: 矩阵计算关键特性说明目录页，链接GEMV、HF32、UnitFlag与K方向对齐约束四项Mmad计算关键特性的说明文档。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

@@ -6,13 +6,9 @@ description: 将half类型数据转换为float类型，该转换无舍入模式�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_half2float__PUf32_PUf16_u32
     archs: ['2201']

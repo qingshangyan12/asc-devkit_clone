@@ -6,12 +6,8 @@ description: 已废弃接口，根据mask将int4x2_t中打包的4bit有符号整
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_int4x22half__Rvf16_vi4x2_vb

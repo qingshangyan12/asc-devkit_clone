@@ -6,10 +6,7 @@ description: 将L1 Buffer中的随路Vector量化与随路ReLU参数搬运到Fix
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [fixpipe_buffer]
   - traits: [high_dimensional]

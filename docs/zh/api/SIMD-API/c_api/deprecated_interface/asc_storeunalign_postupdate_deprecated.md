@@ -6,10 +6,7 @@ description: 该接口不指定存储偏移量的原型及掩码寄存器b8搬�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
-  - execution_models: []
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]
   - traits: [deprecated, post_update, unaligned_transfer]

@@ -6,9 +6,7 @@ description: 将src中被mask选择的有效元素压缩后依次复制到dst或
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [compact]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [vector_register]

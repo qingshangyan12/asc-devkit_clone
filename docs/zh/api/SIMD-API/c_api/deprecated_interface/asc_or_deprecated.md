@@ -8,10 +8,7 @@ tag:
   - roles: [compute]
   - families: [bitwise]
   - operations: [bitwise_or]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise, masked]
 signature:
   - prototype_id: asc_or__Rv<dtype>_v<dtype>_v<dtype>_vb

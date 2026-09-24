@@ -6,12 +6,8 @@ description: 根据掩码将矢量数据寄存器中的元素左移，左移位�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [bitwise_shift]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, scalar_operand]
 signature:
   - prototype_id: asc_shiftleft_scalar__v<dtype>_i16_vb

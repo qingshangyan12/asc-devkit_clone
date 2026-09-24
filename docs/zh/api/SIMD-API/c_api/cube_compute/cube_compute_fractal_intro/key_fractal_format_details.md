@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fracta
 description: 详解矩阵计算的关键分形格式，说明ND、DN、Zz、Zn、Nz与NC1HWC0格式的定义、物理位置、设计原理、分形大小约束和转换过程，并给出矩阵乘法场景下各格式组合的要求。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

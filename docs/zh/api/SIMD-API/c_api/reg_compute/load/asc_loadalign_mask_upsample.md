@@ -6,13 +6,10 @@ description: 从Unified Buffer（UB）中16字节对齐的起始地址读取VL/1
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [load]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]
-  - traits: []
 signature:
   - override_id: asc_loadalign_mask_upsample__PUu32
     archs: ['3510']

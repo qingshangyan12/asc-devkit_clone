@@ -6,12 +6,8 @@ description: 已废弃接口，比较src0与src1对应索引位置的元素是�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_eq_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8

@@ -6,12 +6,9 @@ description: 将float类型的标量按指定舍入模式转换为int32_t并返�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [scalar]
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2int32_rd__f32

@@ -6,12 +6,8 @@ description: 根据掩码对源操作数src0中的元素执行PReLU运算，负�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [prelu]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_prelu__v<dtype>_v<dtype>_vb

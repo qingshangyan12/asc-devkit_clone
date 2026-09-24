@@ -6,13 +6,9 @@ description: 将数据从Global Memory搬运到L1 Buffer，以512字节的分形
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l1_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_copy_gm2l1__PL1<dtype>_PG<dtype>_u32_u32_u16_u16_u16_loadl2
     archs: ['3510']

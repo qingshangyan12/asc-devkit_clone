@@ -6,12 +6,8 @@ description: 已废弃接口，将uint16_t类型数据转化为uint8_t类型，�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, saturation_mode]
 signature:
   - override_id: asc_uint162uint8__Rvu8_vu16_vb

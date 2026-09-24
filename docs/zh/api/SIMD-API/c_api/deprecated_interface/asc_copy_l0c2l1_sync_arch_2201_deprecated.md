@@ -6,11 +6,7 @@ description: 已废弃的同步搬运接口，矩阵计算完成后对结果进�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [l1_buffer]
   - traits: [deprecated, quantization]
 signature:

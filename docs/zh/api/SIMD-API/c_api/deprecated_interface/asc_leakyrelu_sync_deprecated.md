@@ -6,12 +6,8 @@ description: 已废弃的同步矢量Leaky ReLU运算接口：按元素在src大
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [leaky_relu]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, scalar_operand]
 signature:
   - override_id: asc_leakyrelu_sync__PUf16_PUf16_f16_u32

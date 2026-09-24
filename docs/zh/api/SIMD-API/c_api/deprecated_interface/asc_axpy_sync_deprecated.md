@@ -6,12 +6,8 @@ description: 将源操作数每个元素与标量value求积后和目的操作�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [fused_multiply_add]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, scalar_operand]
 signature:
   - override_id: asc_axpy_sync__PUf16_PUf16_f16_u32

@@ -121,7 +121,8 @@ python3 scripts/controller.py write \
   `declaration.macros` 表达。
 - examples 无法确认：`examples: []`
 - dependencies 无法确认：`dependencies: []`
-- tag 某 namespace 无法确认：保留 namespace，值写空数组
+- tag 某 namespace 无法确认：worker 工件保留该 namespace 空数组以触发 resolver 决议；渲染输出省略该
+  namespace，不写空数组（不适用字段省略）
 - Doxygen 或 marker 无法确认：不写入该注释，并记录问题
 
 Doxygen 记录不接受 `path/anchor/text` 自由补丁。主控按结构化声明身份写入或补齐

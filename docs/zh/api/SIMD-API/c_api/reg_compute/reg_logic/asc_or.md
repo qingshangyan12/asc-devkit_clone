@@ -6,12 +6,8 @@ description: 根据mask对两个矢量数据寄存器或掩码寄存器执行按
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [bitwise_or]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_or__v<dtype>_v<dtype>_vb

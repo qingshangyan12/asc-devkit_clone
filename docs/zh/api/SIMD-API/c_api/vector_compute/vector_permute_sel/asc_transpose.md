@@ -6,13 +6,11 @@ description: 实现16*16的二维矩阵数据块转置，支持int16_t和uint16_
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [transpose]
   - objects: [matrix, vector]
   - execution_models: [memory_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [unified_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_transpose__PU<dtype>_PU<dtype>
     archs: ['2201', '3510']

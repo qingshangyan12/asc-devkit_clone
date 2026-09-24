@@ -6,12 +6,8 @@ description: 已废弃的同步矢量运算接口：将矢量src逐元素与标�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [minimum]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise, scalar_operand]
 signature:
   - override_id: asc_min_scalar_sync__PUf16_PUf16_f16_u32

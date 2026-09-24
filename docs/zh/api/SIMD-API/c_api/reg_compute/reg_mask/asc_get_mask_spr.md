@@ -7,13 +7,6 @@ description: 从SPR特殊寄存器中读取mask值并按数据类型格式化后
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_mask_spr_b16__z
     archs: ['3510']

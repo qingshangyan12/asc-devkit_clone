@@ -7,9 +7,7 @@ description: 将矢量数据寄存器中有效的32位元素按低8bit压缩后�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [compression, store]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]

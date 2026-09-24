@@ -6,9 +6,7 @@ description: 将src中被mask筛选的有效元素或bit复制到函数返回值
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [vector_register]

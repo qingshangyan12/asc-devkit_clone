@@ -6,12 +6,8 @@ description: 与asc_sync_inter_arrive配对使用，实现不同AI Core之间全
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [inter_core_synchronization]
 signature:
   - override_id: asc_sync_inter_wait__pipe_i64

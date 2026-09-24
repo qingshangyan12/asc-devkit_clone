@@ -7,11 +7,7 @@ tag:
   - api_surfaces: [c_api]
   - roles: [query]
   - families: [system]
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_get_block_num__z

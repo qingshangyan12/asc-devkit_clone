@@ -6,13 +6,7 @@ description: 获取执行asc_reduce操作后剩余的元素数量，需与asc_re
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_rsvd_count__z
     archs: ['2201']

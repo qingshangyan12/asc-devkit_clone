@@ -6,13 +6,7 @@ description: 获取执行asc_mrgsort4操作后4个队列中每个队列已处理
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_vms4_sr__Amrgu16
     archs: ['2201']

@@ -6,13 +6,10 @@ description: 将2、3或4条已经按score从大到小排列的队列合并为�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [sort]
-  - objects: []
   - execution_models: [memory_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [unified_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_mrgsort4__PU<dtype>_AmrgPU<dtype>_u8_u16_u16_u16_u16_b_u8
     archs: ['2201', '3510']

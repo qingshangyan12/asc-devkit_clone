@@ -6,13 +6,7 @@ description: 对AR特殊寄存器进行清零操作，在首次调用asc_squeeze
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_squeeze_and_storeunalign_init__z
     archs: ['3510']

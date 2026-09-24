@@ -6,12 +6,7 @@ description: 设置Mmad计算开启HF32模式，开启后L0A Buffer与L0B Buffer
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [matrix_compute]
-  - source_locations: []
-  - destination_locations: []
   - traits: [rounding_mode]
 signature:
   - override_id: asc_enable_hf32__z

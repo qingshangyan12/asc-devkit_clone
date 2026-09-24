@@ -7,13 +7,7 @@ description: 配置3D img2col搬运模式下左矩阵的Feature Map宽高与四�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
   - operations: [img2col]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_l13d_fmatrix__u16_u16_u8_u8_u8_u8
     archs: ['2201', '3510']

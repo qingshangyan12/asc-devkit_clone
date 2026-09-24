@@ -6,13 +6,6 @@ description: 在L0C Buffer搬出过程中进行随路Scalar激活时，配置激
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_l0c_copy_lrelu_alpha__f32
     archs: ['2201', '3510']

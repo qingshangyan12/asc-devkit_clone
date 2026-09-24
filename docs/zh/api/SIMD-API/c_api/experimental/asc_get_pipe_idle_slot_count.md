@@ -8,12 +8,6 @@ tag:
   - api_surfaces: [c_api]
   - roles: [query]
   - families: [system]
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_pipe_mte2_idle_slot_count__z
     archs: ['3510']

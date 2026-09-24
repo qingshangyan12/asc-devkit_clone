@@ -6,13 +6,6 @@ description: 表示L0C Buffer数据搬出时双目标拆分模式的枚举，作
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 headers: [/include/c_api/defs/enum.h]

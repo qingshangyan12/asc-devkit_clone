@@ -6,13 +6,6 @@ description: 配置从Global Memory搬运至L1 Buffer过程中ND2Nz或DN2Nz格�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_gm2l1_nz_para__u16_u16_u16_u16
     archs: ['3510']

@@ -6,13 +6,8 @@ description: 阻塞后续指令的执行，直到此前已发出但尚未完成�
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_sync_data_barrier__memdsb
     archs: ['2201', '3510']

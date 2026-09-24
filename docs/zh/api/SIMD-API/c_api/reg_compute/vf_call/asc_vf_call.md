@@ -7,13 +7,6 @@ description: 在SIMD C API编程场景下于Kernel中启动Vector Function（VF�
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_vf_call__QOpArgs
     archs: ['3510']

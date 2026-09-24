@@ -7,10 +7,7 @@ description: 将NC1HWC0格式的Feature Map按卷积步长、卷积核大小和�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, img2col, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0b_buffer]
   - traits: [padding]

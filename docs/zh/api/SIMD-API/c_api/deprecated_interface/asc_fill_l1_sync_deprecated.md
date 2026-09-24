@@ -6,11 +6,7 @@ description: 已废弃接口，将标量填充值写入L1 Buffer目的地址并�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_initialization]
-  - families: []
   - operations: [fill]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [l1_buffer]
   - traits: [deprecated]
 signature:

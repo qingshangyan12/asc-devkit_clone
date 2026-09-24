@@ -6,12 +6,9 @@ description: 将int16_t类型数据量化转换为int8_t或uint8_t类型，结�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [high_dimensional, quantization]
 signature:
   - override_id: asc_deq_int162b8_h__PUi8_PUi16_u32

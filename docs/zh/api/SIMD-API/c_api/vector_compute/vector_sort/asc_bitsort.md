@@ -6,13 +6,10 @@ description: 一次迭代内对32个数做降序排列，src0和src1分别为待
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [sort]
-  - objects: []
   - execution_models: [memory_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [unified_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_bitsort__PU<dtype>_PU<dtype>_PUu32_i32
     archs: ['2201', '3510']

@@ -9,11 +9,7 @@ tag:
   - roles: [compute]
   - families: [bitwise]
   - operations: [bit_manipulation]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_clear_nthbit__u64_i64
     archs: ['2201', '3510']

@@ -6,12 +6,8 @@ description: 逐元素比较两个源矢量是否相等，比较结果为真时�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_eq__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8

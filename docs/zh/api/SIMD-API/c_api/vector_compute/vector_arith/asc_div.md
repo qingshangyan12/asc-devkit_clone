@@ -6,12 +6,8 @@ description: 对两个源矢量执行逐元素除法运算并将结果写入目�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [divide]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_div__PUf16_PUf16_PUf16_u32

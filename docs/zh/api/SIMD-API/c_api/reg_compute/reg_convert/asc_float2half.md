@@ -6,12 +6,9 @@ description: 将矢量数据寄存器中的float类型数据转换为half类型�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2half_rd__Rvf16_vf32_vb_icposeven

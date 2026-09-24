@@ -10,8 +10,6 @@ tag:
   - operations: [conversion, relu, subtract]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, high_dimensional]
 signature:
   - override_id: asc_sub_relu__PUi16_PUi16_PUi16_u32

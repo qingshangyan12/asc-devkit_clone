@@ -6,13 +6,8 @@ description: 设置矢量计算的Mask值以指示哪些数据参与计算，使
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
   - objects: [mask]
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_vector_mask__u64_u64
     archs: ['2201', '3510']

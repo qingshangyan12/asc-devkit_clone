@@ -6,12 +6,8 @@ description: 该接口已废弃，用于执行矢量和标量的减法运算，�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [subtract]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, scalar_operand]
 signature:
   - override_id: asc_sub_scalar_sync__PUi16_PUi16_i16_u32

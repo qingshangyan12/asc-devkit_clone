@@ -6,12 +6,9 @@ description: 完成4选2稀疏矩阵乘加操作，左矩阵A为稀疏矩阵并�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [matrix_multiply_accumulate]
   - objects: [matrix]
   - execution_models: [matrix_compute]
-  - source_locations: []
-  - destination_locations: []
   - traits: [sparse_input]
 signature:
   - override_id: asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_unitflag_b_b

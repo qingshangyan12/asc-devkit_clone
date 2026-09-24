@@ -6,13 +6,7 @@ description: 为asc_select操作设置用于选择的Mask掩码，需与asc_sele
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
   - objects: [mask]
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_cmp_mask__PUv
     archs: ['2201']

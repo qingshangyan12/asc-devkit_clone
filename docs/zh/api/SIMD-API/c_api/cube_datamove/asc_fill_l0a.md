@@ -6,13 +6,8 @@ description: 将value的二进制值赋值给目的操作数dst，完成L0A Buff
 tag:
   - api_surfaces: [c_api]
   - roles: [data_initialization]
-  - families: []
   - operations: [fill]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [l0a_buffer]
-  - traits: []
 signature:
   - override_id: asc_fill_l0a__PCAi16_f16_RCfillcfg
     archs: ['2201']

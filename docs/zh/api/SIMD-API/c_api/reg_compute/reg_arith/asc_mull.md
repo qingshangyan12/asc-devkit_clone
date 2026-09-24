@@ -6,12 +6,8 @@ description: 根据掩码将两个源矢量数据寄存器中的有效元素相�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [multiply]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, split_high_low, widening_result]
 signature:
   - prototype_id: asc_mull__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>_vb

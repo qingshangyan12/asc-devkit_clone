@@ -6,13 +6,6 @@ description: 用于设置asc_copy_gm2l1高维切分数据搬运接口padding模�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - prototype_id: asc_set_gm2l1_padding__<dtype>
     archs: ['2201', '3510']

@@ -6,14 +6,6 @@ description: 介绍asc_mmad的K方向对齐约束特性：通过k_direction_alig
   Buffer矩阵在K方向的对齐方式，并说明A矩阵转置场景需开启该参数以避免读入无效数据。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

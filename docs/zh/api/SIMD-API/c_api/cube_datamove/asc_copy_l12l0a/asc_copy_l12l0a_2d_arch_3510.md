@@ -6,13 +6,9 @@ description: 以512字节的数据分形为搬运粒度，完成矩阵计算所�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0a_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_copy_l12l0a__PCA<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16
     archs: ['3510']

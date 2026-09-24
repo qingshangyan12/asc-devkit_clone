@@ -6,13 +6,6 @@ description: 根据传入的pat_mode生成对应的掩码寄存器，支持b8、
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_create_mask_b8__pattern
     archs: ['3510']

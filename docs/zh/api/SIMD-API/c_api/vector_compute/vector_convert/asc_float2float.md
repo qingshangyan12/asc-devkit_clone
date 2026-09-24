@@ -6,12 +6,9 @@ description: 对float类型数据进行精度转换处理，支持多种舍入�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [rounding_mode]
 signature:
   - override_id: asc_float2float_rn__PUf32_PUf32_u32

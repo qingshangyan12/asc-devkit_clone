@@ -6,13 +6,8 @@ description: 完成同一流水内的同步控制，约束同一流水内部的�
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_sync_pipe__pipe
     archs: ['2201', '3510']

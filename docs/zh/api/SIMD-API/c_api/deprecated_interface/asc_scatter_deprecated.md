@@ -6,12 +6,8 @@ description: 已废弃接口，根据索引值index将源操作数src中的元�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [scatter]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked]
 signature:
   - override_id: asc_scatter__Rvi8_PUi8_vu16_vb

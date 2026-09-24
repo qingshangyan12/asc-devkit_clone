@@ -6,13 +6,7 @@ description: 按饱和模式类型设置对应饱和开关，FLOAT、FLOAT8、IN
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_saturation_flag__saturation_b
     archs: ['3510']

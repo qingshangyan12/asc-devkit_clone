@@ -6,12 +6,9 @@ description: 已废弃接口，依据内置固定模式或用户自定义数值�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [gather]
   - objects: [mask, vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked]
 signature:
   - override_id: asc_reduce_sync__PUu16_PUu16_PUu16_u32

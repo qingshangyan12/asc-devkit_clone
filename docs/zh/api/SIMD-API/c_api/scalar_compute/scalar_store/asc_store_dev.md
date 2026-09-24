@@ -6,13 +6,9 @@ description: 不经过DCache向GM地址写入数据，当多核操作GM且数据
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
   - destination_locations: [global_memory]
-  - traits: []
 signature:
   - prototype_id: asc_store_dev__PG<dtype>_<dtype>
     archs: ['3510']

@@ -6,12 +6,8 @@ description: 逐元素比较两个源操作数大小（大于等于），比较�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_ge__v<dtype>_v<dtype>_vb

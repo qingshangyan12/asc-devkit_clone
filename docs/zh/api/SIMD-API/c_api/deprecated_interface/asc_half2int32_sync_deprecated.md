@@ -6,12 +6,9 @@ description: 已废弃的同步矢量转换接口：将half类型转化为int32_
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_half2int32_rn_sync__PUi32_PUf16_u32

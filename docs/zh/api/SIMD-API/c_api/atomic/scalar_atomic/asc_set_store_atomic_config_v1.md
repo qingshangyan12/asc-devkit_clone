@@ -6,12 +6,7 @@ description: 设置原子操作启用位与原子操作类型的值：type指定
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic]
 signature:
   - override_id: asc_set_store_atomic_config_v1__u16_u16

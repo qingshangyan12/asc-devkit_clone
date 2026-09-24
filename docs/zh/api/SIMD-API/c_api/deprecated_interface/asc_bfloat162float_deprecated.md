@@ -6,12 +6,8 @@ description: 根据掩码将bfloat16_t元素逐个转换为float类型写入目�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked]
 signature:
   - override_id: asc_bfloat162float__Rvf32_vbf16_vb

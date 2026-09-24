@@ -6,12 +6,8 @@ description: 将标量value广播到目的操作数中，支持带mask和不带m
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [broadcast]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked, scalar_operand]
 signature:
   - prototype_id: asc_duplicate_scalar__<dtype>_vb

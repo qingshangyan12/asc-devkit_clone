@@ -6,12 +6,8 @@ description: 已废弃接口，按元素进行开方后取倒数的计算，计�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reciprocal_sqrt]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_rsqrt_sync__PUf16_PUf16_u32

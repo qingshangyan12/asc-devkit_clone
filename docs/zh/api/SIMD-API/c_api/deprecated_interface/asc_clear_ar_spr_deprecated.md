@@ -6,12 +6,7 @@ description: 对AR特殊寄存器进行清零操作，供调用asc_squeeze_with_
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_clear_ar_spr__z

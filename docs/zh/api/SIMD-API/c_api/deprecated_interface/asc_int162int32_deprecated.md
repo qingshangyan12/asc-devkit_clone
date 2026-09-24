@@ -6,12 +6,8 @@ description: 已废弃接口，将src中int16_t类型的元素转换为int32_t�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_int162int32__Rvi32_vi16_vb

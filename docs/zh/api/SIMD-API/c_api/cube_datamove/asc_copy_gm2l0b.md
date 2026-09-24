@@ -6,13 +6,9 @@ description: 将矩阵数据从Global Memory搬运到L0B Buffer，通过起始�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l0b_buffer]
-  - traits: []
 signature:
   - override_id: asc_copy_gm2l0b__PCBi4x2_PGi4x2_u16_u8_u16_u16
     archs: ['2201']

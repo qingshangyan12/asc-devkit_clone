@@ -6,9 +6,7 @@ description: 已废弃的带量化系数矩阵乘加接口：左矩阵A与右矩
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [matrix_multiply_accumulate]
-  - objects: []
   - execution_models: [matrix_compute]
   - source_locations: [l0a_buffer, l0b_buffer]
   - destination_locations: [l0c_buffer]

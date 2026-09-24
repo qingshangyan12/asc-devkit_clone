@@ -6,10 +6,7 @@ description: 已废弃接口，以512字节分形为粒度完成矩阵计算所�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0b_buffer]
   - traits: [deprecated]

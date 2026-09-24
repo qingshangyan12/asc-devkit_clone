@@ -6,12 +6,8 @@ description: 已废弃接口，将源操作数元素选取低8位、低16位或�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [compression]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_pack__Rvu8_vu16

@@ -6,12 +6,8 @@ description: 已废弃的同步矢量乘加运算接口：按元素将src0与dst
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [fused_multiply_add]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_mul_add_sync__PUf16_PUf16_PUf16_u32

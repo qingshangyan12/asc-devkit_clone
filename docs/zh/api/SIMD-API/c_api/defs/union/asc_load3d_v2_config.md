@@ -6,13 +6,6 @@ description: 设置Load3Dv2接口repeat参数的联合体，包含迭代步长�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 headers: [/include/c_api/defs/union.h]

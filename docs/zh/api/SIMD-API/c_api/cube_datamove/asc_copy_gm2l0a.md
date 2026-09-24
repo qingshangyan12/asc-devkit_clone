@@ -6,13 +6,9 @@ description: 将数据从GM搬运到L0A Buffer，通过分形矩阵ID、迭代�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l0a_buffer]
-  - traits: []
 signature:
   - override_id: asc_copy_gm2l0a__PCAbf16_PGbf16_u16_u8_u16_u16
     archs: ['2201']

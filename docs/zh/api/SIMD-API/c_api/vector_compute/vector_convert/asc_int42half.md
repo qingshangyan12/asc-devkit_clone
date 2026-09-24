@@ -6,12 +6,9 @@ description: 将int4_t类型数据逐元素转换为half类型，当src为int4b_
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [high_dimensional]
 signature:
   - override_id: asc_int42half__PUf16_PUi4x2_u32

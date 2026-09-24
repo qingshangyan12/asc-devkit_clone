@@ -6,12 +6,8 @@ description: 位图排序函数，一次迭代完成32个元素的排序，按Sc
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [sort]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_bitsort_sync__PUf16_PUf16_PUu32_i32

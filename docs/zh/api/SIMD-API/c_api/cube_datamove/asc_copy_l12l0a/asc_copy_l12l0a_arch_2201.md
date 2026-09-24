@@ -6,10 +6,7 @@ description: 将存放在L1 Buffer里的512B大小矩阵搬运到L0A Buffer，�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, img2col, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0a_buffer]
   - traits: [high_dimensional]

@@ -6,11 +6,7 @@ description: 矩阵计算完成后，对结果进行量化处理，之后将处�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [l1_buffer]
   - traits: [quantization]
 signature:

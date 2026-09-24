@@ -6,10 +6,7 @@ description: 将NC1HWC0格式的Feature Map完成Image to Column展开后，从L
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, img2col, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0a_buffer]
   - traits: [padding]

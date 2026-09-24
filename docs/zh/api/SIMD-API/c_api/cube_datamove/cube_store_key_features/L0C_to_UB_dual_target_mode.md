@@ -7,13 +7,9 @@ description: 介绍仅适用于3510的L0C Buffer到UB双目标模式：启用后
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l0c_buffer]
   - destination_locations: [unified_buffer]
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
     kind: related

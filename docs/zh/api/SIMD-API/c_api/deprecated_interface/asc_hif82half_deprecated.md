@@ -6,12 +6,8 @@ description: 已废弃接口，将src中hifloat8_t数据类型的元素转换为
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_hif82half__Rvf16_vhf8_vb

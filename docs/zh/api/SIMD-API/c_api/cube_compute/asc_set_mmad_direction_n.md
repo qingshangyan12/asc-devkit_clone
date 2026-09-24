@@ -6,13 +6,8 @@ description: 设置矩阵乘加计算时逐行生成矩阵计算结果分形，�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [matrix_compute]
-  - source_locations: []
   - destination_locations: [l0c_buffer]
-  - traits: []
 signature:
   - override_id: asc_set_mmad_direction_n__z
     archs: ['2201', '3510']

@@ -6,12 +6,6 @@ description: 表示饱和控制所作用模式类型的枚举，在调用asc_set
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md

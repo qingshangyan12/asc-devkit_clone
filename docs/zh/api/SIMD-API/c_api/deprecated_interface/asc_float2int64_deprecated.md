@@ -6,12 +6,9 @@ description: 已废弃的寄存器矢量转换接口：将float类型数据转�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, rounding_mode, saturation_mode, widening_result]
 signature:
   - override_id: asc_float2int64_rn__Rvi64_vf32_vb

@@ -6,12 +6,8 @@ description: 将uint32_t类型数据转为int16_t类型，支持饱和与非饱�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, saturation_mode]
 signature:
   - override_id: asc_uint322int16__Rvi16_vu32_vb_icposeven

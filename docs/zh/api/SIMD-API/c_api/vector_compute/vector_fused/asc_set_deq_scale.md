@@ -6,13 +6,6 @@ description: 设置DEQSCALE（量化参数）寄存器的值，支持数组形�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_deq_scale__PUu64_Avdeqf32_Avdeqi16_Avdeqb
     archs: ['2201']

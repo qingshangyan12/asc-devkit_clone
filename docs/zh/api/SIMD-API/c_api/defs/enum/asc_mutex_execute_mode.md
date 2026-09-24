@@ -6,13 +6,6 @@ description: 选择互斥锁阻塞或非阻塞执行模式的枚举，作为asc_
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
     kind: related

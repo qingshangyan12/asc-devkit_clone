@@ -6,13 +6,7 @@ description: 设置asc_copy_ub2gm_align使用循环搬运模式时内层循环lo
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_ub2gm_loop_size__u32_u32
     archs: ['3510']

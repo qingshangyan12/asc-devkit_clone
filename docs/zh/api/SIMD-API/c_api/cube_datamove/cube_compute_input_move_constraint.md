@@ -6,13 +6,10 @@ description: 汇总矩阵计算输入搬运的对齐、搬运粒度、分形排�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, img2col, layout_transform, transpose]
   - objects: [matrix]
-  - execution_models: []
   - source_locations: [global_memory, l1_buffer]
   - destination_locations: [l0a_buffer, l0b_buffer, l1_buffer]
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

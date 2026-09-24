@@ -6,12 +6,9 @@ description: 将src中每个元素逐个与标量value比较，不等于value时
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
   - objects: [scalar, vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_ne_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16

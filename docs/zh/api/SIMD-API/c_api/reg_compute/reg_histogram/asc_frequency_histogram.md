@@ -6,12 +6,8 @@ description: 对输入矢量数据寄存器中的元素进行频率统计生成�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [histogram]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked]
 signature:
   - override_id: asc_frequency_histogram_bin0__Rvu16_vu8_vb

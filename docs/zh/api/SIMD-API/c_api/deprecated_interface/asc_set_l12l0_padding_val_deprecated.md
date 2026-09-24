@@ -6,12 +6,6 @@ description: 该接口已废弃，用于对PADDING_B寄存器中的值进行设�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_set_l12l0_padding_val__u64

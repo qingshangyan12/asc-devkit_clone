@@ -6,12 +6,7 @@ description: 已废弃的特殊寄存器读取接口：读取指定特殊寄存�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_get_ar_spr__z

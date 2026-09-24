@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md
 description: 为C API声明添加C++弃用属性的宏，编译调用被标记接口的代码时生成含废弃版本、计划移除日期和替代接口的告警。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - macro_id: ASC_DEPRECATED__version__removal_date__replacement
 dependencies:

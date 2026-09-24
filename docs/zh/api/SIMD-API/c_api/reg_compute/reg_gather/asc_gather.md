@@ -6,12 +6,8 @@ description: 根据索引位置index将源操作数src按元素收集到目的�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [gather]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - prototype_id: asc_gather__Rv<dtype>_v<dtype>_v<index_dtype>

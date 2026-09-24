@@ -6,12 +6,9 @@ description: 按元素判断src0是否小于等于src1，成立时输出结果�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_le__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8

@@ -6,13 +6,7 @@ description: 获取当前AI处理器架构版本号，通过输出参数core_ver
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_arch_ver__Ru32
     archs: ['2201', '3510']

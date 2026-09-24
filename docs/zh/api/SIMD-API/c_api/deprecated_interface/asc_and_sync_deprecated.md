@@ -8,10 +8,7 @@ tag:
   - roles: [compute]
   - families: [bitwise]
   - operations: [bitwise_and]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_and_sync__PUi16_PUi16_PUi16_u32

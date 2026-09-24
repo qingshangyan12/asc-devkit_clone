@@ -6,13 +6,6 @@ description: 根据元素个数value生成掩码寄存器，调用后自动将va
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_update_mask_b8__Ru32
     archs: ['3510']

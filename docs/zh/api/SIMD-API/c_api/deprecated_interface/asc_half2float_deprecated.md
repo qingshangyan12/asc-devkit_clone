@@ -6,12 +6,9 @@ description: 已废弃的寄存器矢量转换接口：根据mask将src中参与
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, widening_result]
 signature:
   - override_id: asc_half2float__Rvf32_vf16_vb

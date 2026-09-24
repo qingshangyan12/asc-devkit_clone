@@ -6,13 +6,6 @@ description: fill_value的初始化参数联合体，包含asc_fill_l0a、asc_fi
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md
     kind: related

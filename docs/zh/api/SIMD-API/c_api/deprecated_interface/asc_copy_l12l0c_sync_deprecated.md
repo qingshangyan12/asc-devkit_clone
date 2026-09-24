@@ -6,10 +6,7 @@ description: 已废弃接口，将矩阵由L1 Buffer搬运到L0C Buffer，支持
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [conversion, copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0c_buffer]
   - traits: [deprecated]

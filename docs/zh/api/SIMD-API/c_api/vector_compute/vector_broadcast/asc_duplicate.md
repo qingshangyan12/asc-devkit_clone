@@ -6,12 +6,8 @@ description: 执行矢量复制操作，将标量值复制填充到目的矢量�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [broadcast]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [scalar_operand]
 signature:
   - override_id: asc_duplicate__PUf16_f16_u32

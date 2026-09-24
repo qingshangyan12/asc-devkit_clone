@@ -6,12 +6,9 @@ description: 将矢量数据寄存器中的float类型数据转换为int64_t类�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked, rounding_mode, saturation_mode, widening_result]
 signature:
   - override_id: asc_float2int64_rd__Rvi64_vf32_vb_icposeven

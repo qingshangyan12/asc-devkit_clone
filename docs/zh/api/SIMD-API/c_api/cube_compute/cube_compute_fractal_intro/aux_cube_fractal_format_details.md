@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fracta
 description: 介绍矩阵计算的辅助矩阵分形格式，包括MX系数矩阵scaleA与scaleB的分形排布、设计原理与格式转换过程，以及4选2稀疏索引矩阵的定义、生成规则和Zn分形格式约束。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

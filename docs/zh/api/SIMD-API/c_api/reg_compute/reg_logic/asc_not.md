@@ -6,12 +6,8 @@ description: 根据mask对矢量数据寄存器或掩码寄存器执行按位取
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [bitwise_not]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_not__v<dtype>_vb

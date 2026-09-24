@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overvie
 description: 原子操作概述页，介绍数据搬运随路原子操作与Scalar原子操作两类接口：前者对后续目的地址为GM的数据搬运指令开启原子累加、原子比较等随路操作，后者在指定GM地址上进行单点原子计算操作，并以表格汇总各接口的功能描述与返回值行为。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

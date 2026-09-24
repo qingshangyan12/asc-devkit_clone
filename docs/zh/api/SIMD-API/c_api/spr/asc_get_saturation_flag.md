@@ -6,13 +6,7 @@ description: 按饱和模式类型读取当前是否开启饱和并返回布尔�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_saturation_flag__saturation
     archs: ['3510']

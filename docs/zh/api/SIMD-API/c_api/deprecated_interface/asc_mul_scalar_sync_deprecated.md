@@ -6,12 +6,8 @@ description: 已废弃的同步矢量运算接口：执行矢量与标量value�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [multiply]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, scalar_operand]
 signature:
   - override_id: asc_mul_scalar_sync__PUi16_PUi16_i16_u32

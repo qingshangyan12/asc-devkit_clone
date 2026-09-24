@@ -74,7 +74,14 @@ def normalize_dtype(value: str) -> str:
 def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[str, Any]], list[str]]:
     namespaces, tax_values = taxonomy(TAXONOMY_PATH)
     taxonomy_payload = json.loads(TAXONOMY_PATH.read_text(encoding="utf-8"))
-    required_namespaces = set(taxonomy_payload.get("mandatory_namespaces", ["api_surfaces", "roles"]))
+    # Only api_surfaces is hard-required here: it is the navigation anchor proved by
+    # the resource path and is always rendered. roles (and other mandatory namespaces)
+    # are enforced at the generation gate (okf-yaml-generate validate_tags + resolver
+    # decisions); nav pages and resolver-sanctioned gaps legitimately omit roles, so
+    # the index must not re-enforce its presence on the pure derivation.
+    required_namespaces = {"api_surfaces"} & set(
+        taxonomy_payload.get("mandatory_namespaces", ["api_surfaces", "roles"])
+    )
     documents: dict[str, dict[str, Any]] = {}
     pending: list[str] = []
     for scope in SCOPE_DIRS:
@@ -254,7 +261,7 @@ def rollup_families(documents: dict[str, dict[str, Any]]) -> None:
             doc["description"] = variants[0][1]["description"]
         for _, variant in variants:
             for ns, values in variant["tags"].items():
-                doc["tags"][ns] = sorted(set(doc["tags"][ns]) | set(values))
+                doc["tags"][ns] = sorted(set(doc["tags"].get(ns, [])) | set(values))
             doc["signatures"].extend(variant["signatures"])
             doc["deps_out"].extend(variant["deps_out"])
             doc["examples"].extend(variant["examples"])

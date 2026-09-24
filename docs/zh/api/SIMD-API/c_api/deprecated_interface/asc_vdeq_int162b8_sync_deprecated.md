@@ -6,12 +6,8 @@ description: 已废弃接口，将int16_t类型转化为int8_t或uint8_t类型�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, quantization]
 signature:
   - override_id: asc_vdeq_int162b8_h_sync__PUi8_PUi16_u32

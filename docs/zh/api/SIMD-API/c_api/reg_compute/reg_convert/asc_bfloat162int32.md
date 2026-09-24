@@ -6,12 +6,9 @@ description: 根据mask将矢量数据寄存器中参与计算的bfloat16_t元�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked, rounding_mode, saturation_mode, widening_result]
 signature:
   - override_id: asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposeven

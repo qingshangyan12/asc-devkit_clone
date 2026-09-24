@@ -6,12 +6,9 @@ description: 已废弃接口，执行矢量选择操作，依据sel_mask比特�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [selection]
   - objects: [mask, vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked]
 signature:
   - override_id: asc_select_sync__PUf16_PUf16_PUf16_u32

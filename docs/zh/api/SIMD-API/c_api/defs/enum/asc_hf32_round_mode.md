@@ -6,12 +6,6 @@ description: 表示Mmad计算开启HF32模式时FP32舍入到HF32的舍入模式
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [rounding_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md

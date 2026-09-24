@@ -7,12 +7,8 @@ description: 根据mask对两个源矢量数据寄存器按元素求商并写入
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [divide]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb

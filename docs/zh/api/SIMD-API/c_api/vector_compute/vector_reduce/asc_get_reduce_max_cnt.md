@@ -6,13 +6,7 @@ description: 获取asc_repeat_reduce_max操作后的最大值及第一个最大�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_reduce_max_cnt__Rf16_Ru32
     archs: ['2201']

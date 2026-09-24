@@ -6,13 +6,7 @@ description: 基于偏移量offset获取片上实际物理地址，常用于调�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_phy_buf_addr__u64
     archs: ['2201', '3510']

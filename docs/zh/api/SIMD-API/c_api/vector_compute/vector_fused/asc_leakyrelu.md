@@ -10,8 +10,6 @@ tag:
   - operations: [leaky_relu]
   - objects: [scalar, vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [high_dimensional, scalar_operand]
 signature:
   - override_id: asc_leakyrelu__PUf16_PUf16_f16_u32

@@ -6,12 +6,8 @@ description: 将源矢量各元素减去给定标量value并逐元素写入目�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [subtract]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_sub_scalar__PUi16_PUi16_i16_u32

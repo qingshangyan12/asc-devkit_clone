@@ -6,13 +6,7 @@ description: 启用矩阵乘加计算的HiF8模式。启用后当左矩阵A和�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [matrix_compute]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_enable_hif8__z
     archs: ['3510']

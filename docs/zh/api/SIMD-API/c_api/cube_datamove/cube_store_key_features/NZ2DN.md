@@ -7,13 +7,8 @@ description: 介绍矩阵搬出过程中的Nz2DN特性：将Nz格式矩阵转化
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
   - source_locations: [l0c_buffer]
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
     kind: related

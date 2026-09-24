@@ -6,13 +6,8 @@ description: 将源操作数中元素的低8位或低16位压缩写入目的操�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [compression]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - prototype_id: asc_pack_to_low__Rv<dtype_dst>_v<dtype_src>
     archs: ['3510']

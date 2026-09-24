@@ -6,12 +6,8 @@ description: 已废弃接口，将src0与src1按元素相减并计算以差值�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [exponential, subtract]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise, masked]
 signature:
   - override_id: asc_exp_sub__Rvf32_vf16_vf16_vb

@@ -6,12 +6,9 @@ description: 对输入的int32_t类型数据按元素做量化并转换为half�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, high_dimensional, quantization]
 signature:
   - override_id: asc_deq_int322half__PUf16_PUi32_u32

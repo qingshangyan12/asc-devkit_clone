@@ -6,12 +6,6 @@ description: 用于asc_set_ndim_pad_count接口设置asc_ndim_copy_gm2ub各维�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md

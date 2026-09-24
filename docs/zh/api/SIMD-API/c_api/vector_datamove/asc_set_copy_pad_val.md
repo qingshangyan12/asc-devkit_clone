@@ -6,13 +6,6 @@ description: 与asc_copy_gm2ub_align配合使用，设置连续搬运数据块�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - prototype_id: asc_set_copy_pad_val__<dtype>
     archs: ['2201', '3510']

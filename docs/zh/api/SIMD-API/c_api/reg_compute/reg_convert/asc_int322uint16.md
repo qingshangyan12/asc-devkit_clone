@@ -6,12 +6,8 @@ description: 根据掩码将源操作数中每个int32_t类型元素转换为uin
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, saturation_mode]
 signature:
   - override_id: asc_int322uint16__Rvu16_vi32_vb_icposeven

@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding
 description: 说明数据类型转换时Ascend C API支持的舍入模式与饱和/非饱和模式：舍入模式决定高精度数值到低精度表示的舍入方式，饱和与非饱和模式决定数值超出目标类型表示范围时的溢出行为。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related

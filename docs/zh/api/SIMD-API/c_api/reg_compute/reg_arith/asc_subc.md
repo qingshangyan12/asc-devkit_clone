@@ -6,12 +6,8 @@ description: 根据mask对源操作数src0、src1及输入借位carry_src进行�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [subtract]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [carry_input, elementwise, masked, supports_carry_output]
 signature:
   - prototype_id: asc_subc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb

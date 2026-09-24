@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/L0C_memory_structu
 description: 介绍L0C Buffer以Bank和Bank Group划分的内存结构、不同产品型号下的容量与地址编码格式，并说明C API中结果分形的存放类型、对齐要求及UnitFlag块的关系。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
     kind: related

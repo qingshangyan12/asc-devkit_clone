@@ -6,12 +6,8 @@ description: 根据mask对源矢量数据寄存器按元素与标量value相乘�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [multiply]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, scalar_operand]
 signature:
   - prototype_id: asc_mul_scalar__v<dtype>_<dtype>_vb

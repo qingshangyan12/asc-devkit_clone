@@ -6,10 +6,7 @@ description: 提供数据非对齐搬运的功能，将数据从Global Memory（
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [unified_buffer]
   - traits: [high_dimensional, padding, unaligned_transfer]

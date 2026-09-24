@@ -6,12 +6,9 @@ description: 已废弃接口，根据mask将float类型数据转换成bfloat16_t
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2bfloat16_rd__Rvbf16_vf32_vb

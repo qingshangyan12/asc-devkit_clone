@@ -6,13 +6,9 @@ description: 不经过DCache直接从GM地址读取整型数据并返回，可�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [load]
-  - objects: []
   - execution_models: [scalar]
   - source_locations: [global_memory]
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_load_dev__PGi8
     archs: ['3510']

@@ -6,12 +6,8 @@ description: 按元素判断源矢量元素是否大于等于标量value，成�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_ge_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16

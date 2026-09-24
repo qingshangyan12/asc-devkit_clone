@@ -6,12 +6,8 @@ description: 按元素计算源矢量的倒数并写入目的矢量，支持前n
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reciprocal]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_rcp__PUf16_PUf16_u32

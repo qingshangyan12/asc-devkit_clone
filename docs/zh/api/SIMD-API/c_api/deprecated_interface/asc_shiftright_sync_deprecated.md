@@ -6,12 +6,8 @@ description: 该接口已废弃，用于对src中的每个元素执行右移，�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [bitwise_shift]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_shiftright_sync__PUi16_PUi16_i32_u32

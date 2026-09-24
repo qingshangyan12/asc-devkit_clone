@@ -6,13 +6,7 @@ description: 设置Mmad计算关闭HF32模式，作用与asc_enable_hf32相反�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [matrix_compute]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_disable_hf32__z
     archs: ['2201', '3510']

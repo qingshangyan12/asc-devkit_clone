@@ -6,13 +6,8 @@ description: 设置Mask模式为Counter模式，可直接传入数据计算数�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
   - objects: [mask]
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_mask_count__z
     archs: ['2201']

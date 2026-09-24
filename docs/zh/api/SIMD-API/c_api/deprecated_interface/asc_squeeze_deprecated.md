@@ -6,12 +6,8 @@ description: 该接口已废弃，将src中被mask选择的有效元素依次复
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [compact]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked]
 signature:
   - override_id: asc_squeeze_v2__Rvi8_vi8_vb

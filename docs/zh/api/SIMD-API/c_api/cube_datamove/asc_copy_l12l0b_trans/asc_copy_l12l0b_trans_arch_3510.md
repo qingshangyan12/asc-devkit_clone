@@ -6,13 +6,9 @@ description: 将数据从L1 Buffer搬运到L0B Buffer，以512字节的数据分
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, transpose]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0b_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_copy_l12l0b_trans__PCB<dtype>_PL1<dtype>_u16_u8_u16_u16_u16_u16
     archs: ['3510']

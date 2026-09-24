@@ -6,11 +6,8 @@ description: 对Global Memory中address指向的单个元素执行原子交换�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [store]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
   - destination_locations: [global_memory]
   - traits: [atomic]
 signature:

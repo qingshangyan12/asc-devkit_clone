@@ -6,13 +6,9 @@ description: 将矩阵由L1 Buffer搬运到L0C Buffer，支持多种源与目的
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [conversion, copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0c_buffer]
-  - traits: []
 signature:
   - override_id: asc_copy_l12l0c__PCCbf16_PL1bf16_u16_u16_u16_u16
     archs: ['2201']

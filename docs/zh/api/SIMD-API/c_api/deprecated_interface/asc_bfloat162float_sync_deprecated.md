@@ -6,12 +6,8 @@ description: 将bfloat16_t类型数据转换为float类型，无舍入模式；�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_bfloat162float_sync__PUf32_PUbf16_u32

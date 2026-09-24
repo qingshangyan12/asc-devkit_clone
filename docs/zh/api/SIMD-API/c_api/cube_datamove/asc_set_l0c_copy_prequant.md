@@ -6,13 +6,6 @@ description: 在L0C Buffer搬出过程中进行随路Scalar量化时，配置量
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_l0c_copy_prequant__f32_u16_b
     archs: ['3510']

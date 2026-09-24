@@ -6,12 +6,7 @@ description: 设置HF32模式的舍入方式，支持NEAREST_AWAY与NEAREST_EVEN
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [matrix_compute]
-  - source_locations: []
-  - destination_locations: []
   - traits: [rounding_mode]
 signature:
   - override_id: asc_set_hf32_round_mode__hfround

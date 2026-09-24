@@ -6,12 +6,9 @@ description: 已废弃接口，将fp8_e4m3fn_t类型转化为float类型，位�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, widening_result]
 signature:
   - override_id: asc_e4m32float__Rvf32_vf8e4m3_vb

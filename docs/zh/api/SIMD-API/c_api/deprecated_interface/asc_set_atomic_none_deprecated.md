@@ -6,12 +6,7 @@ description: 已废弃接口，与原子累加及原子比较接口配合使用�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic, deprecated]
 signature:
   - override_id: asc_set_atomic_none__z

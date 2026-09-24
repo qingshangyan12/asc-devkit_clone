@@ -6,13 +6,9 @@ description: 将数据从Global Memory (GM)搬运到Level 1 cache (L1)，支持�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l1_buffer]
-  - traits: []
 signature:
   - override_id: asc_copy_gm2l1_nd2nz__PL1i8_PGi8_u16_u16_u16_u16_u16_u16_u16_u16
     archs: ['2201']

@@ -6,9 +6,7 @@ description: 将被squeeze_mask选中的源矢量数据寄存器元素压缩到�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [compact, store]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]

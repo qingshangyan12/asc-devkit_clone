@@ -6,9 +6,7 @@ description: 根据索引位置index将Unified Buffer（UB）中的源操作数�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [gather, load]
-  - objects: []
   - execution_models: [register_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]

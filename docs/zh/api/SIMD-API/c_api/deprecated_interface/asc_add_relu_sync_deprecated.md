@@ -6,12 +6,8 @@ description: 按元素求和后再进行Relu计算（结果和0对比取较大�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [add, conversion, relu]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_add_relu_sync__PUf16_PUf16_PUf16_u32

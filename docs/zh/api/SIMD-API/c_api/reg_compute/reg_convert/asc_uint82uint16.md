@@ -6,12 +6,8 @@ description: 根据mask将源操作数中每个uint8_t类型元素转为uint16_t
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, widening_result]
 signature:
   - override_id: asc_uint82uint16__Rvu16_vu8_vb_icposeven

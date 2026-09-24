@@ -6,7 +6,6 @@ description: 以内置固定模式对应的二进制或用户自定义数值对�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [gather]
   - objects: [mask, vector]
   - execution_models: [memory_vector]

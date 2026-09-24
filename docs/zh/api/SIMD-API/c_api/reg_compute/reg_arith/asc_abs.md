@@ -6,12 +6,8 @@ description: 根据mask对源矢量数据寄存器按元素取绝对值，结果
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [absolute]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_abs__v<dtype>_vb

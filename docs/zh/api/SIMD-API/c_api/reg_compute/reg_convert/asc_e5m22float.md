@@ -6,12 +6,9 @@ description: 根据mask将矢量数据寄存器中参与计算的fp8_e5m2_t元�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked, widening_result]
 dependencies: []
 examples: []

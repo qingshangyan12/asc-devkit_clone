@@ -7,12 +7,6 @@ tag:
   - api_surfaces: [c_api]
   - roles: [control]
   - families: [cache_management]
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_dcci_single__PGv
     archs: ['2201', '3510']

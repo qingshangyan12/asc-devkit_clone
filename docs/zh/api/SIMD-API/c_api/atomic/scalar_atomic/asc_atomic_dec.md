@@ -6,12 +6,8 @@ description: 对Global Memory中address指向的uint32_t或uint64_t计数器执�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [subtract]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic]
 signature:
   - prototype_id: asc_atomic_dec__PG<dtype>_<dtype>

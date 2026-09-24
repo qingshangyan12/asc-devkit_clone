@@ -6,10 +6,7 @@ description: 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffe
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [bias_table_buffer]
   - traits: [high_dimensional]

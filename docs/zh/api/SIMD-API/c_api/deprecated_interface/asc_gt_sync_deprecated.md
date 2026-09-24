@@ -6,12 +6,9 @@ description: 已废弃的同步矢量比较接口：按元素比较两个矢量�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_gt_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8

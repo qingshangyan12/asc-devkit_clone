@@ -1783,8 +1783,12 @@ def render_yaml(
     validate_base_fields(output, path)
     output["signature"] = normalize_signature_ids(output["signature"])
     output["tag"] = validate_tags(output, namespaces, values, path, body, evidence, allowed_empty)
+    # Empty namespaces stay in worker artifacts (resolver degradation signal) but are
+    # omitted from the rendered front matter: inapplicable fields are omitted, never
+    # written as empty arrays (OKF 字段规范 / 最小标签集设计说明).
     output["tag"] = [
-        {namespace: InlineList(selected)} for item in output["tag"] for namespace, selected in item.items()
+        {namespace: InlineList(selected)}
+        for item in output["tag"] for namespace, selected in item.items() if selected
     ]
     output["dependencies"] = normalize_dependencies(root, path, output.get("dependencies", []))
     for signature in output["signature"]:

@@ -6,13 +6,7 @@ description: 用于数据搬运随路量化场景下读取量化操作前矢量�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_get_l0c2gm_prequant__z
     archs: ['2201']

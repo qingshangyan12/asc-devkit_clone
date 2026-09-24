@@ -10,8 +10,6 @@ tag:
   - operations: [bitwise_not]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_not_sync__PUi16_PUi16_u32

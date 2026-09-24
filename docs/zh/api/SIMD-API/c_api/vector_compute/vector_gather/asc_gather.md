@@ -6,7 +6,6 @@ description: 按照src_offset给定的偏移将源矢量src中的元素按元素
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [gather]
   - objects: [vector]
   - execution_models: [memory_vector]

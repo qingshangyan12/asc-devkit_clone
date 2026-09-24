@@ -6,12 +6,8 @@ description: 按元素计算源矢量操作数的绝对值并写入目的操作�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [absolute]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_abs_sync__PUf16_PUf16_u32

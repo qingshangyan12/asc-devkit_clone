@@ -6,12 +6,8 @@ description: 根据mask将源矢量数据寄存器按元素与标量value比较�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [maximum]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, scalar_operand]
 signature:
   - prototype_id: asc_max_scalar__v<dtype>_<dtype>_vb

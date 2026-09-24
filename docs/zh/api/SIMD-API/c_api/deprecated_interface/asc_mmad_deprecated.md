@@ -6,9 +6,7 @@ description: 已废弃的矩阵乘加接口：完成结果矩阵C等于A乘B加C
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [matrix_multiply_accumulate]
-  - objects: []
   - execution_models: [matrix_compute]
   - source_locations: [l0a_buffer, l0b_buffer]
   - destination_locations: [l0c_buffer]

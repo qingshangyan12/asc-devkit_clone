@@ -6,12 +6,8 @@ description: 逐元素比较两个源矢量并取最大值写入目的矢量，�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [maximum]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - override_id: asc_max__PUi16_PUi16_PUi16_u32

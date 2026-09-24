@@ -6,13 +6,6 @@ description: 配置NDDMA高维切分搬运中loop1至loop4各维左右两侧的�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_ndim_pad_count__Rpadcountcfg
     archs: ['3510']

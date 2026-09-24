@@ -6,13 +6,8 @@ description: 用于同一核内所有流水之间的全部流水同步，功能�
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
-  - families: []
   - operations: [synchronization]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_sync__z
     archs: ['2201', '3510']

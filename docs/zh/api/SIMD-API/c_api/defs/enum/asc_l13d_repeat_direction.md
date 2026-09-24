@@ -6,13 +6,6 @@ description: 表示3D img2col搬运repeat迭代方向的枚举，作为asc_set_l
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md
     kind: related

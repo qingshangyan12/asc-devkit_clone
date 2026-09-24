@@ -6,13 +6,8 @@ description: 将一个标量填充值写入L1 Buffer的目的地址并广播到�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_initialization]
-  - families: []
   - operations: [fill]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [l1_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_fill_l1__PL1<dst_dtype>_<value_dtype>_RCfillcfg
     archs: ['2201', '3510']

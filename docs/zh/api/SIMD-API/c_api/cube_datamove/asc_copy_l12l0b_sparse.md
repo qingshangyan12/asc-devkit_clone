@@ -6,10 +6,7 @@ description: 搬运L1 Buffer中512B大小的稠密权重矩阵到L0B Buffer，�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
   - source_locations: [l1_buffer]
   - destination_locations: [l0b_buffer]
   - traits: [high_dimensional, sparse_input]

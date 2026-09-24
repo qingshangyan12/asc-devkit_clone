@@ -6,13 +6,8 @@ description: 设置Mask模式为系统默认的Normal模式，该模式下Mask�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
   - objects: [mask]
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_mask_norm__z
     archs: ['2201']

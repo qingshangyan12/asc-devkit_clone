@@ -7,10 +7,7 @@ description: 将矩阵计算结果从L0C Buffer搬运至Unified Buffer（UB）�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
   - source_locations: [l0c_buffer]
   - destination_locations: [unified_buffer]
   - traits: [quantization]

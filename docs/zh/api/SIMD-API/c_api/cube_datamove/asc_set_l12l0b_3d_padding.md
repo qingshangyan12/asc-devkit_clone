@@ -6,13 +6,6 @@ description: 设置3D格式分形矩阵搬运（im2col展开）指令使用的�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - prototype_id: asc_set_l12l0b_3d_padding__<dtype>
     archs: ['3510']

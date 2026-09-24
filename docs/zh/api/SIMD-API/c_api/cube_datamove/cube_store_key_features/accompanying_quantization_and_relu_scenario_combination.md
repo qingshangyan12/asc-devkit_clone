@@ -6,12 +6,7 @@ description: 说明矩阵搬出支持的随路量化与随路ReLU组合能力：
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [quantization]
 dependencies: []
 examples: []

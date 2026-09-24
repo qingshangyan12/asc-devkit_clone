@@ -6,12 +6,8 @@ description: 根据mask从两个源操作数中逐位置选择元素：mask比�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [selection]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise]
 signature:
   - prototype_id: asc_select__v<dtype>_v<dtype>_vb

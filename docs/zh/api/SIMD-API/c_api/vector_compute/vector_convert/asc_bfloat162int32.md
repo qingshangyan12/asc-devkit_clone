@@ -6,12 +6,9 @@ description: 将bfloat16_t类型数据转换为int32_t类型，支持多种舍�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [rounding_mode]
 signature:
   - override_id: asc_bfloat162int32_rn__PUi32_PUbf16_u32

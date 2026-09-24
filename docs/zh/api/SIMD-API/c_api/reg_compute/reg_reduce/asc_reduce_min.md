@@ -6,12 +6,8 @@ description: 根据mask对源矢量数据寄存器执行归约最小值操作，
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reduction]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked]
 signature:
   - prototype_id: asc_reduce_min__v<dtype>_vb

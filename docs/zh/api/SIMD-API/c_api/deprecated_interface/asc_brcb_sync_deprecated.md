@@ -6,12 +6,8 @@ description: 每次取输入矢量中的8个数填充到结果矢量的8个datab
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [broadcast]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_brcb_sync__PUu16_PUu16_u16_u16_u8

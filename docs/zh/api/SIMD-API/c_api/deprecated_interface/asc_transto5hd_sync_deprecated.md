@@ -6,12 +6,8 @@ description: 该接口已废弃，用于数据格式转换，一般将NCHW格式
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [layout_transform, transpose]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_transto5hd_b32_sync__uba8_uba8_u8_u16_u16

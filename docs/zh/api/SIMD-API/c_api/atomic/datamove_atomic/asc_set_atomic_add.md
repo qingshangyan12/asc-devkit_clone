@@ -6,12 +6,8 @@ description: 对后续目的地址为GM的数据搬运指令开启原子累加�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
   - operations: [add]
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic]
 signature:
   - override_id: asc_set_atomic_add_int8__z

@@ -6,12 +6,8 @@ description: 根据mask将源操作数src按元素与标量value进行小于等�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [comparison]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, scalar_operand]
 signature:
   - prototype_id: asc_le_scalar__v<dtype>_<dtype>_vb

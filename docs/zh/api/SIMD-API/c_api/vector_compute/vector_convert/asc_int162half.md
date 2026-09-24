@@ -6,12 +6,9 @@ description: 将int16_t类型数据逐元素转换为half类型，支持RINT、R
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [high_dimensional, rounding_mode]
 signature:
   - override_id: asc_int162half__PUf16_PUi16_u32

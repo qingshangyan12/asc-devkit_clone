@@ -6,13 +6,7 @@ description: 对CTRL寄存器（控制寄存器）的特定比特位进行设置
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_ctrl__u64
     archs: ['2201', '3510']

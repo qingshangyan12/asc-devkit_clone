@@ -6,13 +6,11 @@ description: 完成带有量化系数的矩阵乘加计算MmadMx，左矩阵A与
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [matrix_multiply_accumulate]
   - objects: [matrix]
   - execution_models: [matrix_compute]
   - source_locations: [l0a_buffer, l0b_buffer]
   - destination_locations: [l0c_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b
     archs: ['3510']

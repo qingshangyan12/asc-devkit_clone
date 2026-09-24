@@ -6,12 +6,8 @@ description: 已废弃的同步类型转换接口，将int32_t类型数据转换
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_int322float_sync__PUf32_PUi32_u32

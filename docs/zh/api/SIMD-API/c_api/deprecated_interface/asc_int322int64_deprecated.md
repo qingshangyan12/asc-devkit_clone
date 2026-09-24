@@ -6,12 +6,8 @@ description: 已废弃接口，根据mask将src中的每个int32_t类型元素�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_int322int64__Rvi64_vi32_vb

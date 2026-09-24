@@ -6,12 +6,8 @@ description: 根据mask将src中参与计算的bfloat16_t元素转换为fp4x2_e1
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, rounding_mode, saturation_mode]
 dependencies: []
 examples: []

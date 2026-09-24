@@ -6,12 +6,8 @@ description: 根据mask将源操作数中每两个相邻元素相加，结果连
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [add, reduction]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked]
 signature:
   - prototype_id: asc_pair_reduce_sum__v<dtype>_vb

@@ -6,12 +6,9 @@ description: 将uint8_t类型数据逐元素转换为half类型，提供前n个�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [high_dimensional]
 signature:
   - override_id: asc_uint82half__PUf16_PUu8_u32

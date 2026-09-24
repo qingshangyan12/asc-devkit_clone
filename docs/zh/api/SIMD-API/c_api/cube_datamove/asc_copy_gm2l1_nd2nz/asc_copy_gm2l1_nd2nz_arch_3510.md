@@ -6,13 +6,9 @@ description: 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy, layout_transform]
-  - objects: []
-  - execution_models: []
   - source_locations: [global_memory]
   - destination_locations: [l1_buffer]
-  - traits: []
 signature:
   - prototype_id: asc_copy_gm2l1_nd2nz__PL1<dtype>_PG<dtype>_u64_loadl2_u16_u32_u64_b
     archs: ['3510']

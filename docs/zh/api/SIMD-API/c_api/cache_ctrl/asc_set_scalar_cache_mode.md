@@ -7,12 +7,6 @@ tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
   - families: [cache_management]
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 signature:
   - override_id: asc_set_scalar_cache_mode__loadl2
     archs: ['3510']

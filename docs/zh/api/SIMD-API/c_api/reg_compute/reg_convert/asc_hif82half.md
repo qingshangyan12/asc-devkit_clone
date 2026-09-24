@@ -6,12 +6,8 @@ description: 将源操作数中hifloat8_t数据类型的元素转换为half数�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked, widening_result]
 signature:
   - override_id: asc_hif82half__Rvf16_vhf8_vb_icposeven

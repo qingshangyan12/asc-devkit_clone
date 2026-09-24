@@ -6,13 +6,6 @@ description: 表示源或目的操作数在寄存器中奇偶位置的枚举，�
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 headers: [/include/c_api/defs/enum.h]

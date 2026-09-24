@@ -6,12 +6,8 @@ description: 已废弃的同步归并排序接口：将已经排好序的最多4
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [sort]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_mrgsort4_sync__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8

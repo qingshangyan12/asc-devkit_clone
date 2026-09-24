@@ -6,12 +6,8 @@ description: 根据mask对源矢量数据寄存器按元素求开方并写入目
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [sqrt]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_sqrt__Rv<dtype>_v<dtype>_vb

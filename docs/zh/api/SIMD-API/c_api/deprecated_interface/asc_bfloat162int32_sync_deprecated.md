@@ -6,12 +6,8 @@ description: 将bfloat16_t类型数据转换为int32_t类型，支持RINT、ROUN
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_bfloat162int32_rn_sync__PUi32_PUbf16_u32

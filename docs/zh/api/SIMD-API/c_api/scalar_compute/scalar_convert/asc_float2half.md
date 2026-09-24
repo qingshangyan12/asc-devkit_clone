@@ -6,12 +6,9 @@ description: 将float类型的标量转换为half类型并返回，舍入模式�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [scalar]
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [rounding_mode]
 signature:
   - override_id: asc_float2half_ro__f32

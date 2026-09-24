@@ -6,12 +6,8 @@ description: 根据mask对每个DataBlock（32B）内的元素求最小值，得
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [reduction]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [masked]
 signature:
   - prototype_id: asc_reduce_min_datablock__v<dtype>_vb

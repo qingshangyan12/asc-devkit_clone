@@ -6,12 +6,8 @@ description: 已废弃接口，根据mask将源操作数中的uint8_t类型元�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
-  - objects: []
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_uint82uint16__Rvu16_vu8_vb_icposeven

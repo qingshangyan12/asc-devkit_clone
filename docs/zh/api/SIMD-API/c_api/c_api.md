@@ -5,14 +5,6 @@ resource: asc-devkit/docs/zh/api/SIMD-API/c_api/c_api.md
 description: C API接口总列表页，按最细粒度公共头文件归类，分基础定义、工具接口、矩阵计算、矩阵计算搬运、矢量计算、标量计算、缓存控制等目录列出各API名称、功能说明与所属头文件。
 tag:
   - api_surfaces: [c_api]
-  - roles: []
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

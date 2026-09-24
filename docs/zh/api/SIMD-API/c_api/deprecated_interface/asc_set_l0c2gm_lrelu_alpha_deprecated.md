@@ -6,12 +6,6 @@ description: 该接口已废弃，用于设置asc_copy_l0c2l1或asc_copy_l0c2gm�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_set_l0c2gm_lrelu_alpha__Rf16

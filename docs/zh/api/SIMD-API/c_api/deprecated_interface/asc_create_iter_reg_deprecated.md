@@ -6,12 +6,6 @@ description: 已废弃接口，初始化地址寄存器并支持1-4个offset参�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: []
-  - operations: []
-  - objects: []
-  - execution_models: []
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated]
 signature:
   - override_id: asc_create_iter_reg_b32__u32

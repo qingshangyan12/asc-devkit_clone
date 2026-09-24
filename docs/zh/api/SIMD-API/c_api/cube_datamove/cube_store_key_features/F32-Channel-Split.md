@@ -6,13 +6,8 @@ description: 介绍矩阵搬出过程中的F32 Channel Split特性：目标类�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - families: []
   - operations: [copy]
-  - objects: []
-  - execution_models: []
-  - source_locations: []
   - destination_locations: [global_memory]
-  - traits: []
 dependencies: []
 examples: []
 timestamp: '2026-09-23'

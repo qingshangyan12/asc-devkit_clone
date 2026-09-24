@@ -10,8 +10,6 @@ tag:
   - operations: [bitwise_xor]
   - objects: [scalar]
   - execution_models: [scalar]
-  - source_locations: []
-  - destination_locations: []
   - traits: [atomic]
 signature:
   - prototype_id: asc_atomic_xor__PG<dtype>_<dtype>

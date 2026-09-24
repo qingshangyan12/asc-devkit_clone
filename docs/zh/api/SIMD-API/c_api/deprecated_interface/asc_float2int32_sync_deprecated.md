@@ -6,12 +6,9 @@ description: 已废弃接口，将float类型转化为int32_t类型，并支持�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [memory_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_float2int32_rn_sync__PUi32_PUf32_u32

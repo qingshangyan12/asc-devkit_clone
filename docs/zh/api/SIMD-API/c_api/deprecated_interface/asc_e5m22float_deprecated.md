@@ -6,12 +6,9 @@ description: 已废弃接口，将vector_fp8_e5m2_t类型源操作数以256B为�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
-  - source_locations: []
-  - destination_locations: []
   - traits: [deprecated, masked, widening_result]
 signature:
   - override_id: asc_e5m22float__Rvf32_vf8e5m2_vb

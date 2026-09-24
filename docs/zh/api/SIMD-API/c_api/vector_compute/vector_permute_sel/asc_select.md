@@ -6,7 +6,6 @@ description: 根据sel_mask比特位从两个源矢量中逐元素选择数据�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: []
   - operations: [selection]
   - objects: [mask, vector]
   - execution_models: [memory_vector]
