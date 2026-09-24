@@ -52,10 +52,10 @@ bool __hbgtx2(half2 x, half2 y)
   <tr>
     <th>x分量</th>
     <th>y分量</th>
-    <th>返回值（该分量）</th>
+    <th>返回值</th>
   </tr>
   <tr>
-    <td colspan="2">各分量x&gt;y</td>
+    <td colspan="2">各分量均满足x&gt;y</td>
     <td>true</td>
   </tr>
   <tr>

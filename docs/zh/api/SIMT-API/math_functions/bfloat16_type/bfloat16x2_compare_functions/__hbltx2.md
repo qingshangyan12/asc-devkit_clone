@@ -82,6 +82,26 @@ bool __hbltx2(bfloat16x2_t x, bfloat16x2_t y)
       <td>true</td>
     </tr>
     <tr>
+      <td>inf</td>
+      <td>inf</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>-inf</td>
+      <td>-inf</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>inf</td>
+      <td>-inf</td>
+      <td>false</td>
+    </tr>
+    <tr>
+      <td>-inf</td>
+      <td>inf</td>
+      <td>true</td>
+    </tr>
+    <tr>
       <td>±0</td>
       <td>±0</td>
       <td>false</td>

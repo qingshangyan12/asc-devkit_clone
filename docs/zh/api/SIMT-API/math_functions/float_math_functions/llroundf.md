@@ -47,7 +47,9 @@ inline long long int llroundf(float x)
 
 对输入四舍五入后的整数。特别场景说明如下：
 
--   当`x`为nan时，返回值为0
+-   当`x`为nan时，返回值为0。
+-   半值输入远离0方向舍入，例如：llroundf(0.5) = 1，llroundf(-0.5) = -1。
+-   当舍入结果超出返回类型（long long int）的表示范围（含x为±inf）时，行为未定义。
 
 ## 约束说明
 
