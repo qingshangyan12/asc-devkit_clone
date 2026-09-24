@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/asc_fp16.h"`。
 
-指定输入x，对x的各元素，获取10的该元素次方。
+指定输入x，对x的各元素，获取10的该元素次方，并遵循CAST\_RINT模式对结果进行舍入处理。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002513174470.png)
 
@@ -55,7 +55,7 @@ inline half2 h2exp10(half2 x)
 | nan | nan | 0 |
 | inf | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 | -inf | 0 | 0 |
-| x>ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| 10^x超出half可表示范围 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
 
 ## 约束说明
 

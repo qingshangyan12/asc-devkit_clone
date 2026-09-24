@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/asc_fp16.h"`。
 
-获取输入数据x各元素的倒数。
+获取输入数据x各元素的倒数，并遵循CAST\_RINT模式对结果进行舍入处理。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002513334410.png)
 
@@ -52,7 +52,7 @@ inline half2 h2rcp(half2 x)
 | x值 | 非饱和模式返回值 | 饱和模式返回值 |
 | --- | --- | --- |
 | 0 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
-| ASCRT\_MAX\_NORMAL\_FP16 | inf | ASCRT\_MAX\_NORMAL\_FP16 |
+| ASCRT\_MAX\_NORMAL\_FP16 | 1.52588e-05 | 1.52588e-05 |
 | -0 | -inf | -ASCRT\_MAX\_NORMAL\_FP16 |
 | nan | nan | 0 |
 | inf | 0 | 0 |
