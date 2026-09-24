@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/asc_fp16.h"`。
 
-获取输入数据x的倒数。
+获取输入数据x的倒数，并遵循CAST\_RINT模式对结果进行舍入处理。
 
 ![](../../../../figures/zh-cn_formulaimage_0000002533480329.png)
 

@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/math_functions.h"`。
 
-对输入数据x、y、z，计算x与y相乘加上z的结果。
+对输入数据x、y、z，计算x与y相乘加上z的结果，并遵循CAST\_RINT模式对结果进行舍入处理；乘加在无限精度中执行后只舍入一次（融合乘加语义）。
 
 ![](../../../figures/zh-cn_formulaimage_0000002531284496.png)
 
