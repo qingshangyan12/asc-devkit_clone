@@ -63,6 +63,46 @@ half2 __hltx2(half2 x, half2 y)
     <td>±0</td>
     <td>0</td>
   </tr>
+  <tr>
+    <td>inf</td>
+    <td>inf</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>-inf</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>inf</td>
+    <td>有限值</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>有限值</td>
+    <td>inf</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>有限值</td>
+    <td>-inf</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>有限值</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>inf</td>
+    <td>-inf</td>
+    <td>0</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>inf</td>
+    <td>1</td>
+  </tr>
 </table>
 
 ## 约束说明

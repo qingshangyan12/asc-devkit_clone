@@ -51,7 +51,7 @@ inline unsigned int __float_as_uint(const float x)
 |---|---|
 | 0 | 0 |
 | -0 | 2147483648 |
-| nan | 2143289344 |
+| nan | 按输入nan的位模式重解释（结果取决于输入nan的实际位模式，非固定值） |
 | inf | ASCRT_INF_U |
 | -inf | 4286578688 |
 

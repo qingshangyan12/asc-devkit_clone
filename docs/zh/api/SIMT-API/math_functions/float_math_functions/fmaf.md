@@ -49,7 +49,7 @@ inline float fmaf(float x, float y, float z)
 
 ## 返回值说明
 
-x \* y + z的值。
+x \* y + z的值。乘法与加法在无限精度中执行，结果四舍五入到最接近的偶数，只舍入一次（融合乘加语义）。
 
 -   x为±inf，y为±0，返回nan。
 -   x为±0，y为±inf，返回nan。
