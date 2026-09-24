@@ -104,10 +104,14 @@
             -   [硬件约束](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2002.md)
                 -   [NPU架构版本2002](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2002.md)
                 -   [NPU架构版本2201](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2201.md)
+                -   [NPU架构版本3510](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_3510.md)
         
         -   [内存模型](./programming_guide/advanced_programming/memory_model/memory_model.md)
             -   [缓存一致性](./programming_guide/advanced_programming/memory_model/cache_coherence.md)
             -   [内存一致性](./programming_guide/advanced_programming/memory_model/memory_consistency.md)
+
+        -   [核间通信](./programming_guide/advanced_programming/inter_core_communication/inter_core_communication.md)
+            -   [使用SSBuffer实现核间通信](./programming_guide/advanced_programming/inter_core_communication/ssbuffer_inter_core_memory_feature.md)
 
         -   [高级AI Core编程模型](./programming_guide/advanced_programming/advanced_ai_core_programming_model/advanced_ai_core_programming_model.md)
             -   [SIMD与SIMT混合编程](./programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
