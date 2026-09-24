@@ -129,6 +129,7 @@ if(PRODUCT_SIDE STREQUAL "host")
         hccl_rank_graph_dl.cc
         hccl_res_dl.cc
         hcomm_primitives_dl.cc
+        hccl_sym_win_dl.cc
         hcomm_dlsym.cc
         hccl_inner_dl.cc
         hcomm_host_profiling_dl.cc

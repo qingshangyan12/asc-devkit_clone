@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "hccl_comm.h"
 #include "hccl_alloc_ctx_res.h"
 #include "kfc_server_protocol.h"
 
@@ -745,6 +746,40 @@ HcclResult SelectAlgAndPrepareEngine(
     return HCCL_SUCCESS;
 }
 
+static void CheckAndSetSymmetricMemoryForAllToAllUbx(OpParam& opParam)
+{
+    if (opParam.inputPtr != nullptr && opParam.inputSize > 0) {
+        size_t inputOffset = 0;
+        HcclResult ret = HcclCommSymWinGet(
+            opParam.hcclComm, opParam.inputPtr, opParam.inputSize, &opParam.inputSymWindow, &inputOffset);
+        if (ret != HCCL_SUCCESS || opParam.inputSymWindow == nullptr) {
+            HCCL_INFO(
+                "[SymMem][AllToAllUbx] input[%p] is not symmetric, ret[%d].", opParam.inputPtr,
+                static_cast<int>(ret));
+            return;
+        }
+        opParam.inputOffset = inputOffset;
+    } else {
+        return;
+    }
+    if (opParam.outputPtr != nullptr && opParam.outputSize > 0) {
+        size_t outputOffset = 0;
+        HcclResult ret = HcclCommSymWinGet(
+            opParam.hcclComm, opParam.outputPtr, opParam.outputSize, &opParam.outputSymWindow, &outputOffset);
+        if (ret != HCCL_SUCCESS || opParam.outputSymWindow == nullptr) {
+            HCCL_INFO(
+                "[SymMem][AllToAllUbx] output[%p] is not symmetric, ret[%d].", opParam.outputPtr,
+                static_cast<int>(ret));
+            return;
+        }
+        opParam.outputOffset = outputOffset;
+    }
+    opParam.supportSymmetricMemory = true;
+    HCCL_INFO(
+        "[SymMem][AllToAllUbx] symmetric memory enabled, inputSymWin[%p] outputSymWin[%p].",
+        opParam.inputSymWindow, opParam.outputSymWindow);
+}
+
 HcclResult FillOpParamAlgName(OpParam& opParam, const std::string& algName)
 {
     int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
@@ -922,6 +957,14 @@ HcclResult GetOpParam(
     if (skipGetRes) {
         opParam.all2AllVDataDes.sendCounts = origSendCounts;
         return HCCL_SUCCESS;
+    }
+
+    // 对称内存激活（仅 AicpuAllToAllSoleMeshUBX 算法 + UBX 单级拓扑）：
+    // 探测 input/output 是否注册对称窗口，命中则写入窗口句柄供算法直读对端。
+    if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL && algName == "AicpuAllToAllSoleMeshUBX"
+        && opParam.engine == CommEngine::COMM_ENGINE_AICPU_TS && topoInfo->topoLevelNums == 1U
+        && topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
+        CheckAndSetSymmetricMemoryForAllToAllUbx(opParam);
     }
 
     void* resCtxSequence = nullptr;
