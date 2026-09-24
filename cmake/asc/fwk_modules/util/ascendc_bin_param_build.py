@@ -389,10 +389,10 @@ class BinParamBuilder(opdesc_parser.OpDesc):
             param["op_type"] = self.op_type
             param["op_list"] = [op_node]
             objstr = json.dumps(param, indent="  ")
-            md5sum = hashlib.md5(objstr.encode("utf-8")).hexdigest()
+            md5sum = hashlib.md5(objstr.encode("utf-8"), usedforsecurity=False).hexdigest()
             while key_map.get(md5sum) is not None:
                 objstr += "1"
-                md5sum = hashlib.md5(objstr.encode("utf-8")).hexdigest()
+                md5sum = hashlib.md5(objstr.encode("utf-8"), usedforsecurity=False).hexdigest()
             key_map[md5sum] = md5sum
             bin_file = self.op_type + "_" + md5sum
             op_node["bin_filename"] = bin_file
