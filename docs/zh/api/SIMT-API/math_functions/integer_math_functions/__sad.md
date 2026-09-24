@@ -47,7 +47,7 @@ unsigned int __sad(int x, int y, unsigned int z)
 
 ## 返回值说明
 
-`|x - y| + z`的结果。
+`|x - y| + z`的结果。差值绝对值与z在32位上求和，中间计算不溢出，返回32位无符号结果。
 
 ## 约束说明
 
