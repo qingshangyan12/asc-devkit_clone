@@ -46,7 +46,7 @@ bool __hbequx2(half2 x, half2 y)
 
 ## 返回值说明
 
-比较输入数据各分量是否均相等的结果。任一输入为nan时返回false。
+比较输入数据各分量是否均相等的结果。整体返回值为两个分量比较结果的逻辑与：nan分量按unordered-equal规则比较（nan与任意值（含nan）的相等比较结果为true），两个分量比较结果均为true时返回true，否则返回false。
 
 ## 约束说明
 

@@ -106,7 +106,9 @@ half2 __hdivx2(const half2 x, const half2 y)
 
 ## 约束说明
 
-无
+<!-- npu="950" id7 -->
+针对Ascend 950PR&950DT系列产品，本接口不支持Subnormal场景：处于Subnormal范围内的输入和输出值，都会被刷新为保留符号的0。
+<!-- end id7 -->
 
 ## 调用示例
 
