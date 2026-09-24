@@ -10,6 +10,7 @@
 #include "hccl_alloc_ctx_res.h"
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
+#include "hccl_comm.h"
 
 #include <limits>
 
@@ -801,6 +802,40 @@ HcclResult SelectAlgAndPrepareEngine(
     return HCCL_SUCCESS;
 }
 
+static void CheckAndSetSymmetricMemoryForAllToAllUbx(OpParam& opParam)
+{
+    if (opParam.inputPtr != nullptr && opParam.inputSize > 0) {
+        size_t inputOffset = 0;
+        HcclResult ret = HcclCommSymWinGet(
+            opParam.hcclComm, opParam.inputPtr, opParam.inputSize, &opParam.inputSymWindow, &inputOffset);
+        if (ret != HCCL_SUCCESS || opParam.inputSymWindow == nullptr) {
+            HCCL_INFO(
+                "[SymMem][AllToAllUbx] input[%p] is not symmetric, ret[%d].", opParam.inputPtr,
+                static_cast<int>(ret));
+            return;
+        }
+        opParam.inputOffset = inputOffset;
+    } else {
+        return;
+    }
+    if (opParam.outputPtr != nullptr && opParam.outputSize > 0) {
+        size_t outputOffset = 0;
+        HcclResult ret = HcclCommSymWinGet(
+            opParam.hcclComm, opParam.outputPtr, opParam.outputSize, &opParam.outputSymWindow, &outputOffset);
+        if (ret != HCCL_SUCCESS || opParam.outputSymWindow == nullptr) {
+            HCCL_INFO(
+                "[SymMem][AllToAllUbx] output[%p] is not symmetric, ret[%d].", opParam.outputPtr,
+                static_cast<int>(ret));
+            return;
+        }
+        opParam.outputOffset = outputOffset;
+    }
+    opParam.supportSymmetricMemory = true;
+    HCCL_INFO(
+        "[SymMem][AllToAllUbx] symmetric memory enabled, inputSymWin[%p] outputSymWin[%p].",
+        opParam.inputSymWindow, opParam.outputSymWindow);
+}
+
 HcclResult FillOpParamAlgName(OpParam& opParam, const std::string& algName)
 {
     int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
@@ -972,6 +1007,14 @@ HcclResult GetOpParam(
         CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
     }
     CHK_RET(FillOpParamAlgName(opParam, algName));
+
+    // 对称内存激活（仅 AicpuAllToAllSoleMeshUBX 算法 + UBX 单级拓扑）：
+    // 探测 input/output 是否注册对称窗口，命中则写入窗口句柄供算法直读对端。
+    if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL && algName == "AicpuAllToAllSoleMeshUBX"
+        && opParam.engine == CommEngine::COMM_ENGINE_AICPU_TS && topoInfo->topoLevelNums == 1U
+        && topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && !topoInfo->level0PcieMix) {
+        CheckAndSetSymmetricMemoryForAllToAllUbx(opParam);
+    }
 
     bool skipGetRes = false;
     CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
