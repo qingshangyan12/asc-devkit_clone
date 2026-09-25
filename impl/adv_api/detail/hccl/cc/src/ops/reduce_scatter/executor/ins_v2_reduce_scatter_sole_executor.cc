@@ -15,6 +15,7 @@
 #include "ins_temp_reduce_scatter_mesh_1D_Z_axis_detour.h"
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
+#include "ccu_temp_kfc_reduce_scatter_mesh_1D_a5_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
 // Legacy direct-launch CCU headers are retained in source but are incompatible with the current hcomm API.
@@ -286,6 +287,9 @@ REGISTER_EXEC_V2(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE,
     FLAG_NONE, 0);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshA5, InsV2ReduceScatterSoleExecutor,
+    TopoMatch1D, CcuTempKfcReduceScatterMesh1DA5Mem2Mem);
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleMeshPeerOnly, InsV2ReduceScatterSoleExecutor,
     TopoMatch1D, CcuTempKfcReduceScatterMesh1DMem2MemPeerOnly);

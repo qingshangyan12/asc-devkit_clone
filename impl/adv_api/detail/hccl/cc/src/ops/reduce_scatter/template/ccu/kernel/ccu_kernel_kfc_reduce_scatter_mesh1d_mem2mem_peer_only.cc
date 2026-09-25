@@ -138,7 +138,7 @@ CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
     ctx.moRes.bufCount = 0;
 
     HCCL_INFO(
-        "[CcuSchedReduceScatterSoleMeshPeerOnly] run, rankId[%u], rankSize[%u], dataType[%d], reduceOp[%d].",
+        "[KFC CcuSchedReduceScatterSoleMeshPeerOnly] run, rankId[%u], rankSize[%u], dataType[%d], reduceOp[%d].",
         ctx.rankId, ctx.rankSize, ctx.dataType, ctx.reduceOp);
     CCU_CHK_RET(InitPeerOnlyResource(ctx));
     CCU_CHK_RET(
@@ -146,7 +146,7 @@ CcuResult CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
     CCU_CHK_RET(PeerOnlyPreSync(ctx));
     CCU_CHK_RET(DoPeerOnlyReduceScatter(ctx));
     CCU_CHK_RET(PeerOnlyPostSync(ctx));
-    HCCL_INFO("[CcuSchedReduceScatterSoleMeshPeerOnly] end.");
+    HCCL_INFO("[KFC CcuSchedReduceScatterSoleMeshPeerOnly] end.");
     return CCU_SUCCESS;
 }
 

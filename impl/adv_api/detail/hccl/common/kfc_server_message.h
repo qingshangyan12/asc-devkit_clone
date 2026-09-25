@@ -184,6 +184,36 @@ enum KfcConcurrentReduceScatterParamIndex : uint32_t {
     KFC_CONCURRENT_RS_PARAM_NUM = 25,
 };
 
+// ReduceScatter SoleMesh A5（CcuSchedReduceScatterSoleMeshA5）单帧 xnData 布局：
+// [0]=opId 哨兵，A5 参数从 1 顺排（20 个，tokenInfo 由 KFC server 的 ctx.token 透传，不占 xnData 槽）。
+// AIV prepare（CcuPrepareForReduceScatterSoleMeshA5M2M）写入、KFC dispatch 逐槽转发、kernel 形参三处索引必须一致。
+// 双缓冲流水线：goSizeA 为统一 chunk 切分，goSizeB 为尾 chunk 切分；
+// scratchRepeatStride=buffer A->B 偏移，scratchSlotStride=buffer 内 slot 间距。
+enum KfcReduceScatterSoleMeshA5ParamIndex : uint32_t {
+    KFC_RS_SOLE_MESH_A5_OP_ID = 0,
+    KFC_RS_SOLE_MESH_A5_INPUT = 1,
+    KFC_RS_SOLE_MESH_A5_OUTPUT = 2,
+    KFC_RS_SOLE_MESH_A5_SCRATCH = 3,
+    KFC_RS_SOLE_MESH_A5_RANK_SLICE_INPUT_OFFSET = 4,
+    KFC_RS_SOLE_MESH_A5_RANK_SLICE_OUTPUT_OFFSET = 5,
+    KFC_RS_SOLE_MESH_A5_INPUT_REPEAT_STRIDE = 6,
+    KFC_RS_SOLE_MESH_A5_OUTPUT_REPEAT_STRIDE = 7,
+    KFC_RS_SOLE_MESH_A5_NORMAL_SLICE_SIZE = 8,
+    KFC_RS_SOLE_MESH_A5_LAST_SLICE_SIZE = 9,
+    KFC_RS_SOLE_MESH_A5_SCRATCH_REPEAT_STRIDE = 10,
+    KFC_RS_SOLE_MESH_A5_REPEAT_NUM = 11,
+    KFC_RS_SOLE_MESH_A5_GO_ADDR_OFFSET = 12,
+    KFC_RS_SOLE_MESH_A5_GO_LOOP_PARAM = 13,
+    KFC_RS_SOLE_MESH_A5_GO_PARALLEL_PARAM = 14,
+    KFC_RS_SOLE_MESH_A5_GO_RESIDUAL = 15,
+    KFC_RS_SOLE_MESH_A5_GO_B_ADDR_OFFSET = 16,
+    KFC_RS_SOLE_MESH_A5_GO_B_LOOP_PARAM = 17,
+    KFC_RS_SOLE_MESH_A5_GO_B_PARALLEL_PARAM = 18,
+    KFC_RS_SOLE_MESH_A5_GO_B_RESIDUAL = 19,
+    KFC_RS_SOLE_MESH_A5_SCRATCH_SLOT_STRIDE = 20,
+    KFC_RS_SOLE_MESH_A5_PARAM_NUM = 21,
+};
+
 } // namespace HcclKfcProtocol
 
 #endif
