@@ -126,15 +126,17 @@ Run the following steps in the root directory of this example to build and run t
 
 - Run the example
 
+  > **Note:** The commands below are prefixed with `XMAKE_ROOT=y`. For safety, xmake refuses to run build scripts as root by default, and this variable explicitly allows it — so it is **only required when running as root**. **Regular (non-root) users do not need it**: run `xmake f --npu_arch=dav-2201`, `xmake` and `xmake run xmake_add` directly.
+
   ```bash
   # Configure the NPU architecture (optional; default is dav-2201)
-  xmake f --npu_arch=dav-2201
+  XMAKE_ROOT=y xmake f --npu_arch=dav-2201
 
   # Build
-  xmake
+  XMAKE_ROOT=y xmake
 
   # Run
-  xmake run xmake_add
+  XMAKE_ROOT=y xmake run xmake_add
   ```
 
   For the mapping between product models and architecture versions, see the [architecture mapping table](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch). This example currently supports `dav-2201` (Atlas A2/A3 series products).

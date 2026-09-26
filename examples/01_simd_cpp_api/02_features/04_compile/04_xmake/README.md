@@ -126,15 +126,17 @@ target("xmake_add")
 
 - 样例执行
 
+  > **说明：** 下列命令以 `XMAKE_ROOT=y` 开头。xmake 出于安全考虑默认拒绝以root身份运行构建脚本，该变量用于显式放行，因此**仅在root用户下需要**。**普通用户不需要该变量**，直接执行 `xmake f --npu_arch=dav-2201`、`xmake`、`xmake run xmake_add` 即可。
+
   ```bash
   # 配置NPU架构（可选；默认dav-2201）
-  xmake f --npu_arch=dav-2201
+  XMAKE_ROOT=y xmake f --npu_arch=dav-2201
 
   # 编译
-  xmake
+  XMAKE_ROOT=y xmake
 
   # 运行
-  xmake run xmake_add
+  XMAKE_ROOT=y xmake run xmake_add
   ```
 
   各产品型号对应的架构版本号请通过[对应关系表](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#npu-arch)查询。本样例当前支持`dav-2201`（Atlas A2/A3系列产品）。
