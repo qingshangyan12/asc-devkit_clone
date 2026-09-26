@@ -129,6 +129,10 @@ __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr()
 }
 } // namespace AscendC
 
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+__BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
+#endif
+
 #include "../../impl/basic_api/kernel_operator_sys_var_intf_impl.h"
 #endif // ASCENDC_MODULE_OPERATOR_SYS_VAR_INTERFACE_H
 
