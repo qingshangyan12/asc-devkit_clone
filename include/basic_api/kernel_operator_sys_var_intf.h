@@ -135,7 +135,7 @@ struct SkSystemArgs {
     inline __aicore__ uint16_t SkGetBlockIdx() { return skBlockIdx; }
     inline __aicore__ uint16_t SkGetNumBlocks() { return skNumBlocks; }
     inline __aicore__ uint16_t SkGetTaskSyncCfg() { return skTaskSyncCfg; }
-    inline __aicore__ void SkRestoreTaskSyncCfg() const
+    inline __aicore__ void SkApplyTaskSyncCfg() const
     {
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
         g_super_kernel_early_start_config = skTaskSyncCfg;
