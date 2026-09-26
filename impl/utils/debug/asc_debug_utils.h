@@ -22,12 +22,14 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #ifndef ASCENDC_CPU_DEBUG
 #include <type_traits>
 
-#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
 #include "impl/utils/debug/asc_utils_types.h"
 #include "impl/utils/debug/asc_debug_types.h"
 
 #if __NPU_ARCH__ == 2002
 #include "impl/utils/debug/npu_arch_2002/asc_debug_utils_impl.h"
+#elif __NPU_ARCH__ == 3002
+#include "impl/utils/debug/npu_arch_3002/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 3510
@@ -39,11 +41,6 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #endif
 
 namespace __asc_aicore {
-__aicore__ inline void asc_copy_ub2gm_align(__gm__ void* dst, __ubuf__ void* src, uint32_t size)
-{
-    copy_ubuf_to_gm_align_v2(dst, src, 1, size, 0, 0, 0, 0);
-}
-
 __aicore__ inline void enable_asc_diagnostics()
 {
 #if (!defined(ASCENDC_DUMP) || (ASCENDC_DUMP != 0)) || defined(ASCENDC_TIME_STAMP_ON)
@@ -201,10 +198,35 @@ __aicore__ inline void do_overlow_skip(
 {
     if (writeInfo->bufOffset + minTlvLen >= ringBufLen) {
         ringbuf_skip_directly(writeInfo);
+        return;
     }
     ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
 }
 
+#if __NPU_ARCH__ == 3510
+__aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
+{
+    constexpr uint32_t maxCounter = 15;
+    // DAV_3510 SYS_CNT runs at 1 GHz, 20 times the 50 MHz baseline used by the default timeout.
+    // Scale the cycle budget to retain a 300 ms wait and give RTS time to consume pending ring-buffer data.
+    constexpr uint64_t rtsWaitCycle = 15 * 1000 * 1000 * 20;
+    uint32_t counter = 0;
+    volatile uint64_t readofst = ld_dev((__gm__ uint64_t*)(&(readInfo->bufOffset)), 0);
+    volatile uint64_t writeofst = ld_dev((__gm__ uint64_t*)(&(writeInfo->bufOffset)), 0);
+    // notice all state which need to wait in function check_ringbuf_space has (w != r) before wait
+    while (readofst != writeofst) {
+        if (counter >= maxCounter) { // max wait 15 * 300ms, rts read gm per 200ms
+            return false;
+        }
+        ringbuf_wait_rts_sync<rtsWaitCycle>();
+        ++counter;
+        asc_entire_dcci((__gm__ uint64_t*)readInfo);
+        readofst = ld_dev((__gm__ uint64_t*)(&(readInfo->bufOffset)), 0);
+        writeofst = ld_dev((__gm__ uint64_t*)(&(writeInfo->bufOffset)), 0);
+    }
+    return true;
+}
+#else
 __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
 {
     constexpr uint32_t maxCounter = 15;
@@ -220,6 +242,7 @@ __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo
     }
     return true;
 }
+#endif
 
 __aicore__ inline bool check_ringbuf_space(__gm__ DebugBlockHeadInfo* blockInfo, const uint32_t& tlvLen)
 {
@@ -299,15 +322,23 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 #endif
 }
 
-__aicore__ static __attribute__((noinline)) void AscVFDebugTransferUb()
+__aicore__ static __attribute__((noinline)) void AscVFDebugFinish()
+{
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
+    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    __asc_simd_vf::asc_finish_flag();
+#endif
+}
+
+__aicore__ static __attribute__((noinline)) bool AscVFDebugTransferUb()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
     __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     if (g_sysPrintFifoSpace != nullptr) {
-        pipe_barrier(PIPE_ALL);
-        asc_vf_debug_ub2gm();
+        return asc_vf_debug_ub2gm();
     }
 #endif
+    return false;
 }
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_DEBUG_UTILS__)

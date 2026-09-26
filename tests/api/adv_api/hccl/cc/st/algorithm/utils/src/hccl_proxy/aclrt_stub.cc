@@ -10,11 +10,13 @@
 
 #include <vector>
 #include <atomic>
+#include <cstring>
 #include <iostream>
 #include "acl/acl_rt.h"
 #include "acl/acl_base.h"
 #include "runtime/base.h"
 #include "runtime/stream.h"
+#include "rt_external.h"
 #include "hccl/hccl_types.h"
 #include "sim_world.h"
 #include "sim_stream.h"
@@ -22,10 +24,24 @@
 #include "log.h"
 #include "alg_param.h"
 #include "sim_task_queue.h"
+#include "mc2_aicpu_launch_test_stub.h"
 
 using namespace hccl;
 using namespace mc2_ops_hccl;
 thread_local uint32_t curr_dev_id = UINT32_MAX;
+
+namespace mc2_ops_hccl {
+bool g_rejectDirectAclrtMemcpy = false;
+uint32_t g_aclrtMemcpyCallCount = 0;
+} // namespace mc2_ops_hccl
+
+namespace {
+Mc2AicpuLaunchStubState g_mc2AicpuLaunchStubState;
+} // namespace
+
+Mc2AicpuLaunchStubState& GetMc2AicpuLaunchStubState() { return g_mc2AicpuLaunchStubState; }
+
+void ResetMc2AicpuLaunchStubState() { g_mc2AicpuLaunchStubState = Mc2AicpuLaunchStubState(); }
 
 extern "C" unsigned int HcclLaunchAicpuKernel(OpParam* param);
 
@@ -62,9 +78,9 @@ aclError aclrtMalloc(void** devPtr, size_t size, aclrtMemMallocPolicy policy)
     u32 memType = static_cast<u32>(policy);
     HcclSim::SimNpu& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(curr_dev_id);
     if (memType == BUFFER_INPUT_MARK) {
-        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(BufferType::INPUT, size));
+        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(HcclSim::BufferType::INPUT, size));
     } else if (memType == BUFFER_OUTPUT_MARK) {
-        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(BufferType::OUTPUT, size));
+        *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(HcclSim::BufferType::OUTPUT, size));
     }
     return ACL_SUCCESS;
 }
@@ -77,6 +93,10 @@ aclError aclrtStreamGetId(aclrtStream stream, int32_t* streamId_)
 
 aclError aclrtMemcpy(void* dst, size_t destMax, const void* src, size_t count, aclrtMemcpyKind kind)
 {
+    ++mc2_ops_hccl::g_aclrtMemcpyCallCount;
+    if (mc2_ops_hccl::g_rejectDirectAclrtMemcpy) {
+        return ACL_ERROR_INTERNAL_ERROR;
+    }
     if (dst == nullptr || src == nullptr) {
         HCCL_ERROR("[aclrtMemcpy] invalid input dst or src");
         return ACL_ERROR_INVALID_PARAM;
@@ -366,6 +386,50 @@ aclError aclsysGetVersionNum(char* pkgNname, int32_t* versionNum)
 aclError aclmdlRICaptureThreadExchangeMode(aclmdlRICaptureMode* mode) { return ACL_SUCCESS; }
 
 aclError aclrtGetOpTimeOutInterval(uint64_t* interval) { return ACL_SUCCESS; }
+
+aclError aclrtGetOpExecuteTimeout(uint32_t* const timeoutMs)
+{
+    if (timeoutMs == nullptr) {
+        HCCL_ERROR("[aclrtGetOpExecuteTimeout] invalid input timeoutMs");
+        return ACL_ERROR_INVALID_PARAM;
+    }
+    auto& state = GetMc2AicpuLaunchStubState();
+    ++state.opExecuteTimeoutCalls;
+    if (state.opExecuteTimeoutFail) {
+        return ACL_ERROR_INTERNAL_ERROR;
+    }
+    *timeoutMs = state.opExecuteTimeoutMs;
+    return ACL_SUCCESS;
+}
+
+rtError_t rtAicpuKernelLaunchExWithArgs(
+    const uint32_t kernelType, const char_t* const opName, const uint32_t numBlocks, const rtAicpuArgsEx_t* argsInfo,
+    rtSmDesc_t* const smDesc, const rtStream_t stm, const uint32_t flags)
+{
+    HCCL_WARNING("[%s] not support, numBlocks[%u].", __func__, numBlocks);
+    auto& state = GetMc2AicpuLaunchStubState();
+    ++state.launchCalls;
+    state.kernelType = kernelType;
+    state.numBlocks = numBlocks;
+    state.flags = flags;
+    state.stream = stm;
+    state.opName = opName != nullptr ? opName : "";
+    if (argsInfo != nullptr) {
+        state.argsSize = argsInfo->argsSize;
+        state.soNameAddrOffset = argsInfo->soNameAddrOffset;
+        state.kernelNameAddrOffset = argsInfo->kernelNameAddrOffset;
+        state.timeout = argsInfo->timeout;
+        state.isNoNeedH2DCopy = argsInfo->isNoNeedH2DCopy;
+        if (argsInfo->args != nullptr && argsInfo->argsSize > 0U) {
+            const char* rawArgs = static_cast<const char*>(argsInfo->args);
+            state.argsBlob.assign(rawArgs, argsInfo->argsSize);
+            if (argsInfo->argsSize >= sizeof(state.ctxArgs)) {
+                (void)memcpy(state.ctxArgs, rawArgs, sizeof(state.ctxArgs));
+            }
+        }
+    }
+    return static_cast<rtError_t>(state.launchRet);
+}
 
 #ifdef __cplusplus
 }

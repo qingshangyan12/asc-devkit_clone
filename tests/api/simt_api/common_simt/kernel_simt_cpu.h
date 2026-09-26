@@ -19,7 +19,6 @@
 #include <chrono>
 
 #include "stub_def.h"
-#include "basic_api/kernel_common.h"
 
 namespace cce {
 struct dim3 {
@@ -39,10 +38,12 @@ struct dim3 {
 };
 } // namespace cce
 
-inline cce::dim3 blockDim(1u, 1u, 1u);
-inline cce::dim3 blockIdx(0u, 0u, 0u);
-inline thread_local cce::dim3 threadIdx(0u, 0u, 0u);
-inline cce::dim3 gridDim(8u, 1u, 1u);
+using dim3 = cce::dim3;
+
+inline dim3 blockDim(1u, 1u, 1u);
+inline dim3 blockIdx(0u, 0u, 0u);
+inline thread_local dim3 threadIdx(0u, 0u, 0u);
+inline dim3 gridDim(8u, 1u, 1u);
 
 namespace AscendC {
 namespace Simt {
@@ -155,6 +156,10 @@ uint32_t GetWarpId();
 void Sync();
 } // namespace Simt
 } // namespace AscendC
+
+uint64_t __cce_simt_get_para_base_imp();
+
+void __nop(void);
 
 #endif
 #endif // KERNEL_SIMT_CPU_DEBUG

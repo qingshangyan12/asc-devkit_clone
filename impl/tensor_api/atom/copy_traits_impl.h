@@ -24,32 +24,50 @@
 
 #include "impl/tensor_api/utils/utils_impl.h"
 
-namespace AscendC {
-namespace Te {
+namespace asc {
+namespace te {
 
-template <typename CopyOperation, typename... CopyOpArgs>
-struct CopyTraits {};
+template <typename AlwaysVoid, typename CopyOperation, typename Trait, const Trait& trait, typename... Args>
+struct has_pascal_copy_method : Std::false_type {};
 
-template <typename CopyOp, typename Traits, typename CopyOpWith, typename TraitsWith>
-struct CopyTraits<CopyOp, Traits, CopyOpWith, TraitsWith> {
-    using TraitType = typename Traits::TraitType;
-    static constexpr const TraitType defaultTrait = Traits::value;
+template <typename CopyOperation, typename Trait, const Trait& trait, typename... Args>
+struct has_pascal_copy_method<
+    void_t<decltype(CopyOperation::template Copy<Trait, trait, Args...>(std::declval<Args>()...))>, CopyOperation,
+    Trait, trait, Args...> : Std::true_type {};
 
-    template <typename... Args>
-    __aicore__ inline constexpr CopyTraits<CopyOpWith, TraitsWith> with(const Args&... args) const
-    {
-        return {args...};
+template <typename AlwaysVoid, typename CopyTraitsType, typename Trait, const Trait& trait, typename... Args>
+struct has_pascal_copy_unpack_method : Std::false_type {};
+
+template <typename CopyTraitsType, typename Trait, const Trait& trait, typename... Args>
+struct has_pascal_copy_unpack_method<
+    void_t<decltype(std::declval<const CopyTraitsType&>().template CopyUnpack<trait, Args...>(
+        std::declval<Args>()...))>,
+    CopyTraitsType, Trait, trait, Args...> : Std::true_type {};
+
+template <typename CopyOperation, typename CopyTrait, typename CopyOperationWith, typename CopyTraitWith>
+template <typename Params>
+__aicore__ inline constexpr copy_traits<CopyOperationWith, CopyTraitWith>
+copy_traits<CopyOperation, CopyTrait, CopyOperationWith, CopyTraitWith>::with(const Params& params) const
+{
+    return {params};
+}
+
+template <typename CopyOperation, typename CopyTrait, typename CopyOperationWith, typename CopyTraitWith>
+template <
+    const typename copy_traits<CopyOperation, CopyTrait, CopyOperationWith, CopyTraitWith>::trait_type& trait,
+    typename... Args>
+__aicore__ inline void copy_traits<CopyOperation, CopyTrait, CopyOperationWith, CopyTraitWith>::copy_unpack(
+    const Args&... args) const
+{
+    if constexpr (has_pascal_copy_method<void, CopyOperation, trait_type, trait, Args...>::value) {
+        CopyOperation::template Copy<trait_type, trait, Args...>(args...);
+    } else {
+        CopyOperation::template copy<trait_type, trait, Args...>(args...);
     }
+}
 
-    template <const TraitType& trait = defaultTrait, typename... Args>
-    __aicore__ inline void CopyUnpack(const Args&... args) const
-    {
-        CopyOp::template Copy<TraitType, trait, Args...>(args...);
-    }
-};
-
-} // namespace Te
-} // namespace AscendC
+} // namespace te
+} // namespace asc
 
 #endif // IMPL_TENSOR_API_ATOM_COPY_TRAITS_IMPL_H
 

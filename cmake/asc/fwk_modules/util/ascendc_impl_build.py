@@ -83,6 +83,8 @@ DTYPE_MAP = {{"float32": ["DT_FLOAT", "float"],
     "float8_e8m0":["DT_FLOAT8_E8M0", "fp8_e8m0_t"],
     "float4_e2m1":["DT_FLOAT4_E2M1", "fp4x2_e2m1_t"],
     "float4_e1m2":["DT_FLOAT4_E1M2", "fp4x2_e1m2_t"],
+    "hifloat4":["DT_HIFLOAT4", "hifloat4x2_t"],
+    "hifloat4_scale":["DT_HIFLOAT4_SCALE", "hif4_scale"],
     "int2":["DT_INT2","int2b_t"]}}
 
 def add_dtype_fmt_option_single(x, x_n, is_ref: bool = False):
@@ -353,13 +355,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
         self.op_compile_option: str = "{}"
         super().__init__(op_type)
 
-    def write_adapt(
-        self: any,
-        impl_path,
-        path: str,
-        op_compile_option_all: list = None,
-        src_ini_config=None,
-    ):
+    def write_adapt(self: any, impl_path, path: str, op_compile_option_all: list = None, src_ini_config=None):
         self._build_paradefault()
         src_file_path = None
         if src_ini_config is not None:
@@ -372,9 +368,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
                             src_ini_config.get(sub_sections, "kernel_file"),
                         )
                     else:
-                        src_file_path = os.path.join(
-                            impl_path, src_ini_config.get(sub_sections, "kernel_file")
-                        )
+                        src_file_path = os.path.join(impl_path, src_ini_config.get(sub_sections, "kernel_file"))
                     break
         if os.environ.get("BUILD_BUILTIN_OPP") != "1" and impl_path != "":
             if src_file_path is not None:
@@ -382,19 +376,25 @@ class AdpBuilder(opdesc_parser.OpDesc):
             else:
                 src_file = os.path.join(impl_path, self.op_file + ".cpp")
             if not os.path.exists(src_file):
-                raise FileNotFoundError(
-                    f"operator: {self.op_file} source file does not found, "
-                    f"which should correctly set in {os.path.join(impl_path, 'CMakeLists.txt')}, please check."
-                )
+                src_file = os.path.join(impl_path, optype_snake(self.op_type), self.op_file + ".cpp")
+                if not os.path.exists(src_file):
+                    raise FileNotFoundError(
+                        f"operator: {src_file} source file does not found, "
+                        f"which should correctly set in {os.path.join(impl_path, 'CMakeLists.txt')}, please check."
+                    )
 
         out_path = os.path.abspath(path)
         if self.dynamic_shape and not out_path.endswith("dynamic"):
             out_path = os.path.join(path, "dynamic")
             os.makedirs(out_path, exist_ok=True)
-        adpfile = os.path.join(out_path, self.op_file + ".py")
+        if os.path.dirname(self.op_file) != "":
+            adpfile = os.path.join(out_path, os.path.basename(self.op_file) + ".py")
+        else:
+            adpfile = os.path.join(out_path, self.op_file + ".py")
+        os.makedirs(os.path.dirname(adpfile), exist_ok=True)
         self._gen_op_compile_option(op_compile_option_all)
         with os.fdopen(os.open(adpfile, const_var.WFLAGS, const_var.WMODES), "w") as fd:
-            self._write_head(fd)
+            self._write_head(fd, src_ini_config)
             self._write_argparse(fd)
             self._get_impl_mode()
             self._write_impl(fd, impl_path, src_ini_config)
@@ -452,8 +452,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
                         "="
                         + "["
                         + ", ".join(
-                            word.strip().capitalize()
-                            for word in self.argsdefv[i + argidx].strip("[]").split(",")
+                            word.strip().capitalize() for word in self.argsdefv[i + argidx].strip("[]").split(",")
                         )
                         + "]"
                     )
@@ -509,9 +508,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
             val.append('"paramType":"optional"')
             val.append('"shape":[1]')
             val.append('"ori_shape":[1]')
-            virt_exp.append(
-                "    " + self.input_name[index] + " = {" + ",".join(val) + "}"
-            )
+            virt_exp.append("    " + self.input_name[index] + " = {" + ",".join(val) + "}")
         if len(virt_exp) > 0:
             return "\n".join(virt_exp)
         else:
@@ -546,21 +543,24 @@ class AdpBuilder(opdesc_parser.OpDesc):
                 self.argsdefv.append(attrval)
                 continue
             if optional:
-                self.argsdefv.append(
-                    ATTR_DEFAULT.get(self.attr_val.get(attr).get("type"))
-                )
+                self.argsdefv.append(ATTR_DEFAULT.get(self.attr_val.get(attr).get("type")))
             else:
                 self.argsdefv.append(None)
 
-    def _write_head(self: any, fd: object):
+    def _write_head(self: any, fd: object, src_ini_config=None):
         now = datetime.datetime.now()
         curr_year = now.year
         former_year = curr_year - 1
-        fd.write(
-            IMPL_HEAD.format(
-                former_year, curr_year, self.input_ori_name, self.output_ori_name
-            )
-        )
+
+        impl_head = IMPL_HEAD
+        if src_ini_config is not None:
+            for sub_sections in src_ini_config.sections():
+                if sub_sections[65:] == "IMPL_HEAD":
+                    impl_head_file = src_ini_config.get(sub_sections, "impl_head")
+                    if os.path.exists(impl_head_file):
+                        with open(impl_head_file, "r", newline="") as fh:
+                            impl_head = fh.read()
+        fd.write(impl_head.format(former_year, curr_year, self.input_ori_name, self.output_ori_name))
 
     def _write_argparse(self: any, fd: object):
         args = self._build_paralist(False)
@@ -592,11 +592,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
             fd.write("    if {} != None:\n".format(attr))
             fd.write("        attr = {}\n")
             fd.write('        attr["name"] = "{}"\n'.format(attr))
-            fd.write(
-                '        attr["dtype"] = "{}"\n'.format(
-                    self.attr_val.get(attr).get("type")
-                )
-            )
+            fd.write('        attr["dtype"] = "{}"\n'.format(self.attr_val.get(attr).get("type")))
             fd.write('        attr["value"] = {}\n'.format(attr))
             fd.write("        __attrs__.append(attr)\n")
         fd.write("    return __inputs__, __outputs__, __attrs__\n")
@@ -634,12 +630,8 @@ class AdpBuilder(opdesc_parser.OpDesc):
                 del op_compile_options["impl_mode"]
                 self.op_compile_option = json.dumps(op_compile_options)
             else:
-                self.impl_mode = (
-                    ", impl_mode ='" + op_compile_options["impl_mode"] + "'"
-                )
-                self.impl_mode_op_info = (
-                    ", impl_mode ='" + op_compile_options["impl_mode"] + "'"
-                )
+                self.impl_mode = ", impl_mode ='" + op_compile_options["impl_mode"] + "'"
+                self.impl_mode_op_info = ", impl_mode ='" + op_compile_options["impl_mode"] + "'"
         elif len(self.impl_mode_str) == 0:
             self.impl_mode = ', impl_mode = ""'
             self.impl_mode_op_info = ", impl_mode = impl_mode"
@@ -654,13 +646,9 @@ class AdpBuilder(opdesc_parser.OpDesc):
                 if sub_sections[65:] == self.op_type:
                     src_compute_units_low = []
                     if src_ini_config.has_option(sub_sections, "compute_unit"):
-                        src_compute_units = src_ini_config.get(
-                            sub_sections, "compute_unit"
-                        ).split(",")
+                        src_compute_units = src_ini_config.get(sub_sections, "compute_unit").split(",")
                         for sub_unit in src_compute_units:
-                            src_compute_units_low.append(
-                                _trans_soc_ver_to_short(sub_unit)
-                            )
+                            src_compute_units_low.append(_trans_soc_ver_to_short(sub_unit))
                     if len(src_compute_units_low) == 0:
                         if src_ini_config.has_option(sub_sections, "kernel_dir"):
                             src_file_dict["__ALLSOC__"] = (
@@ -669,9 +657,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
                                 + src_ini_config.get(sub_sections, "kernel_file")
                             )
                         else:
-                            src_file_dict["__ALLSOC__"] = src_ini_config.get(
-                                sub_sections, "kernel_file"
-                            )
+                            src_file_dict["__ALLSOC__"] = src_ini_config.get(sub_sections, "kernel_file")
                     else:
                         for op_compute_unit in src_compute_units_low:
                             if src_ini_config.has_option(sub_sections, "kernel_dir"):
@@ -681,9 +667,7 @@ class AdpBuilder(opdesc_parser.OpDesc):
                                     + src_ini_config.get(sub_sections, "kernel_file")
                                 )
                             else:
-                                src_file_dict[str(op_compute_unit)] = (
-                                    src_ini_config.get(sub_sections, "kernel_file")
-                                )
+                                src_file_dict[str(op_compute_unit)] = src_ini_config.get(sub_sections, "kernel_file")
         return src_file_dict
 
     def _write_impl(self: any, fd: object, impl_path: str = "", src_ini_config=None):
@@ -698,8 +682,18 @@ class AdpBuilder(opdesc_parser.OpDesc):
         src_file_dict = self._write_src_file_dict_impl(src_ini_config)
         src = self.op_file + ".cpp"
         virt_exprs = self._build_virtual()
+
+        impl_api = IMPL_API
+        if src_ini_config is not None:
+            for sub_sections in src_ini_config.sections():
+                if sub_sections[65:] == "IMPL_API":
+                    impl_api_file = src_ini_config.get(sub_sections, "impl_api")
+                    if os.path.exists(impl_api_file):
+                        with open(impl_api_file, "r", newline="") as fh:
+                            impl_api = fh.read()
+
         fd.write(
-            IMPL_API.format(
+            impl_api.format(
                 self.op_type,
                 pchk,
                 self.op_intf,
@@ -718,23 +712,14 @@ class AdpBuilder(opdesc_parser.OpDesc):
             )
         )
 
-        value_depend_obj = {
-            key: value for key, value in self.input_value_depend.items()
-        }
+        value_depend_obj = {key: value for key, value in self.input_value_depend.items()}
         extend_opt = {"valueDepend": value_depend_obj}
         if os.environ.get("BUILD_BUILTIN_OPP") == "1":
             relative_kernel_src_path = os.path.realpath(
-                self._get_kernel_source(
-                    impl_path,
-                    src,
-                    optype_snake(self.op_type),
-                    optype_snake_ex(self.op_type),
-                )
+                self._get_kernel_source(impl_path, src, optype_snake(self.op_type), optype_snake_ex(self.op_type))
             )
             # to match src path in .dat file system, turn relative path into absolute path
-            abs_rel_kernel_src_path = os.path.join(
-                "/", os.path.relpath(relative_kernel_src_path, impl_path)
-            )
+            abs_rel_kernel_src_path = os.path.join("/", os.path.relpath(relative_kernel_src_path, impl_path))
 
             # compiling hidden src file requires src path before packaging .dat file,
             # hard code such src path to <op_type>.py
@@ -777,24 +762,14 @@ class AdpBuilder(opdesc_parser.OpDesc):
         argsdef = self._build_paralist()
         argsval = self._build_paralist(False)
         if cap_name == "check_supported":
-            fd.write(
-                SUP_API.format(
-                    cap_name, argsdef, self.impl_mode, argsval, cap_name, self.op_type
-                )
-            )
+            fd.write(SUP_API.format(cap_name, argsdef, self.impl_mode, argsval, cap_name, self.op_type))
         else:
-            fd.write(
-                CAP_API.format(
-                    cap_name, argsdef, self.impl_mode, argsval, cap_name, self.op_type
-                )
-            )
+            fd.write(CAP_API.format(cap_name, argsdef, self.impl_mode, argsval, cap_name, self.op_type))
 
     def _write_glz(self: any, fd: object):
         argsdef = self._build_paralist()
         argsval = self._build_paralist(False)
-        fd.write(
-            GLZ_API.format(self.op_type, self.op_intf, argsdef, argsval, self.op_type)
-        )
+        fd.write(GLZ_API.format(self.op_type, self.op_intf, argsdef, argsval, self.op_type))
 
 
 def write_scripts(
@@ -807,26 +782,18 @@ def write_scripts(
 ):
     batch_lists = cfgs.get(const_var.REPLAY_BATCH).split(";")
     iterator_lists = cfgs.get(const_var.REPLAY_ITERATE).split(";")
-    if os.path.exists(kernel_source_ini_file):
-        src_ini_config = configparser.ConfigParser()
+    if isinstance(kernel_source_ini_file, str) and os.path.exists(kernel_source_ini_file):
+        src_ini_config = configparser.ConfigParser(interpolation=None)
         src_ini_config.read(kernel_source_ini_file)
     else:
         src_ini_config = None
     file_map = {}
     op_descs = opdesc_parser.get_op_desc(
-        cfgfile,
-        batch_lists,
-        iterator_lists,
-        AdpBuilder,
-        ops,
-        dirs.get(const_var.AUTO_GEN_DIR),
+        cfgfile, batch_lists, iterator_lists, AdpBuilder, ops, dirs.get(const_var.AUTO_GEN_DIR)
     )
     for op_desc in op_descs:
         op_desc.write_adapt(
-            dirs.get(const_var.CFG_IMPL_DIR),
-            dirs.get(const_var.CFG_OUT_DIR),
-            op_compile_option,
-            src_ini_config,
+            dirs.get(const_var.CFG_IMPL_DIR), dirs.get(const_var.CFG_OUT_DIR), op_compile_option, src_ini_config
         )
         file_map[op_desc.op_type] = op_desc.op_file
     return file_map
@@ -836,9 +803,7 @@ class OpFileNotExistsError(Exception):
     """File does not exist error."""
 
     def __str__(self) -> str:
-        return (
-            f"File aic-*-ops-info.ini does not exist in directory {super().__str__()}"
-        )
+        return f"File aic-*-ops-info.ini does not exist in directory {super().__str__()}"
 
 
 def get_ops_info_files(opsinfo_dir: List[str]) -> List[str]:
@@ -849,11 +814,31 @@ def get_ops_info_files(opsinfo_dir: List[str]) -> List[str]:
     return sorted(ops_info_files)
 
 
+def get_ops(ops_file: str) -> List[str]:
+    """Get ops list."""
+    ops = None
+    if isinstance(ops_file, str) and os.path.exists(ops_file):
+        with open(ops_file, "r", encoding="utf-8") as fh:
+            ops = [line.strip() for line in fh if line.strip()]
+    return ops
+
+
+def get_op_compile_option(option_file: str) -> dict:
+    op_compile_option = None
+    if isinstance(option_file, str) and os.path.exists(option_file):
+        with open(option_file, "r", encoding="utf-8") as fh:
+            op_compile_option = json.load(fh)
+    return op_compile_option
+
+
 def parse_args(argv):
     """Command line parameter parsing"""
     parser = argparse.ArgumentParser()
     parser.add_argument("argv", nargs="+")
     parser.add_argument("--opsinfo-dir", nargs="*", default=None)
+    parser.add_argument("--ops", nargs="?", default=None)
+    parser.add_argument("--op_compile_option", nargs="?", default=None)
+    parser.add_argument("--kernel_source_ini", nargs="?", default=None)
     return parser.parse_args(argv)
 
 
@@ -880,5 +865,16 @@ if __name__ == "__main__":
     else:
         ops_infos.append(args.argv[1])
 
+    ops = get_ops(args.ops)
+    op_compile_option = get_op_compile_option(args.op_compile_option)
+    kernel_source_ini_file = args.kernel_source_ini
+
     for ops_info in ops_infos:
-        write_scripts(cfgfile=ops_info, cfgs=rep_cfg, dirs=cfg_dir)
+        write_scripts(
+            cfgfile=ops_info,
+            cfgs=rep_cfg,
+            dirs=cfg_dir,
+            ops=ops,
+            op_compile_option=op_compile_option,
+            kernel_source_ini_file=kernel_source_ini_file,
+        )

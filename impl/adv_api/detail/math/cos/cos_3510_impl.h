@@ -24,8 +24,8 @@
 #include "../../../../../include/basic_api/kernel_tensor.h"
 #include "../../../../../include/basic_api/kernel_basic_intf.h"
 #include "../../common/common.h"
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #if __NPU_ARCH__ != 3003 && __NPU_ARCH__ != 3113
 #include "../sincos/sincos_3510_impl.h"
 #endif
@@ -187,9 +187,9 @@ __aicore__ inline void CosImpl(
     }
 
     static_assert(SupportType<T, half, float>(), "current data type is not supported on current device!");
-    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "Cos");
-    CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "Cos");
-    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN / VECCALC / VECOUT", "Cos");
+    CheckTensorPos<T>(dstTensor, Hardware::UB, "dstTensor", "VECIN/VECCALC/VECOUT", "Cos");
+    CheckTensorPos<T>(srcTensor, Hardware::UB, "srcTensor", "VECIN/VECCALC/VECOUT", "Cos");
+    CheckTensorPos<uint8_t>(sharedTmpBuffer, Hardware::UB, "sharedTmpBuffer", "VECIN/VECCALC/VECOUT", "Cos");
     ASCENDC_ASSERT((calCount <= srcTensor.GetSize()), {
         KERNEL_LOG(
             KERNEL_ERROR, "calCount is %u, which should not be larger than srcTensor length %u", calCount,
@@ -234,8 +234,7 @@ __aicore__ inline void CosImpl(
     CosImpl<T, isReuseSource, config>(dstTensor, srcTensor, sharedTmpBuffer, calCount);
 }
 
-__ASC_USE_RESERVED_UBUF__(3510,
-    "Cos is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "Cos is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void CosCastFullMask(
     const LocalTensor<float>& dstTensor, const LocalTensor<float>& srcTensor, RoundMode castType)
 {

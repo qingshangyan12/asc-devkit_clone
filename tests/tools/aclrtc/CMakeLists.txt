@@ -11,11 +11,19 @@ project(ascendc_tools_aclrtc_tests)
 cmake_minimum_required(VERSION 3.16.0)
 
 set(ACLRTC_TEST_HEADERS_FILES
-    ${ASCENDC_DIR}/tools/include/aclrtc
+    ${ASCENDC_DIR}/tools/include
 )
 
 file(GLOB ACLRTC_SRC_FILES
     ${ASCENDC_DIR}/tools/aclrtc/*.cpp
+    ${ASCENDC_DIR}/tools/aclrtc/specialization/*.cpp
+)
+
+set(ACLRTC_COMMON_DEPENDENCY_SRC_FILES
+    ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
+    ${ASCENDC_DIR}/tools/build/common/manifest_constant.cpp
+    ${ASCENDC_DIR}/tools/build/common/process_executor.cpp
+    ${ASCENDC_DIR}/tools/build/common/directory_cleanup_guard.cpp
 )
 
 file(GLOB TEST_ACLRTC_SRC_FILES
@@ -26,6 +34,7 @@ file(GLOB TEST_ACLRTC_SRC_FILES
 
 add_executable(ascendc_ut_aclrtc
     ${ACLRTC_SRC_FILES}
+    ${ACLRTC_COMMON_DEPENDENCY_SRC_FILES}
     ${TEST_ACLRTC_SRC_FILES}
 )
 
@@ -36,12 +45,16 @@ target_compile_definitions(ascendc_ut_aclrtc PRIVATE
 
 target_include_directories(ascendc_ut_aclrtc PRIVATE
     ${ACLRTC_TEST_HEADERS_FILES}
+    ${ASCENDC_DIR}/tools/aclrtc
+    ${ASCENDC_DIR}/tools/aclrtc/specialization
+    ${ASCENDC_DIR}/tools/build/common
     ${ASCEND_CANN_PACKAGE_PATH}/include
     ${ASCEND_CANN_PACKAGE_PATH}/include/acl
 )
 
 target_compile_options(ascendc_ut_aclrtc PRIVATE
     -Werror
+    -fno-access-control
 )
 
 target_link_directories(ascendc_ut_aclrtc PRIVATE
@@ -50,6 +63,10 @@ target_link_directories(ascendc_ut_aclrtc PRIVATE
 
 target_link_libraries(ascendc_ut_aclrtc PRIVATE
     $<BUILD_INTERFACE:intf_llt_pub_basic>
+    $<BUILD_INTERFACE:mmpa_headers>
+    $<BUILD_INTERFACE:metadef_headers>
+    Boost::filesystem
+    json
     -Wl,--no-as-needed
     c_sec
     dl

@@ -217,7 +217,7 @@ The Scalar unit accesses semaphores on GM through two access methods:
    Use the GetValue and SetValue member functions of GlobalTensor. In this case, developers must manually call the [DataCacheCleanAndInvalid](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_0177.html) API to ensure data consistency across multiple cores.
 
 2. **Access bypassing DCache**
-   Use [WriteGmByPassDCache](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00089.html) and ReadGmByPassDCache. This method ensures multi-core data consistency without additional operations.
+   Use [WriteGmBypassDCache](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/900beta2/API/ascendcopapi/atlasascendc_api_07_00089.html) and ReadGmBypassDCache. This method ensures multi-core data consistency without additional operations.
 
 Performance difference between the two schemes: bypassing DCache has relatively poorer performance, but if the amount of data read from or written to GM is small, the bypass-DCache method can be considered.
 The inter-core synchronization scheme also requires intra-core synchronization. The roles of the three intra-core synchronization points are described as follows:
@@ -313,7 +313,7 @@ When SCENARIO_NUM=2, it calls `IBSet` and `IBWait` for inter-core synchronizatio
 ## Build and Run
 Run the following steps in the root directory of this example to build and run it.
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

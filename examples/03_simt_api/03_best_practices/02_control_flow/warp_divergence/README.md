@@ -7,22 +7,20 @@
 - **Case 1**：一个线程处理一行数据，由于不同行的非零元素数量不同，同一Warp内线程的循环次数不一致，产生严重的Warp Divergence。
 - **Case 2**：一个Warp协作处理一行数据，减小Warp Divergence。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
-
-## 目录结构
+## 目录结构介绍
 
 ```text
 ├── warp_divergence
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── spmv.asc                    // SIMT SpMV 样例实现
-│   ├── README.md
-│   └── README_en.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -123,7 +121,7 @@ y[row] = sum;
 
 **性能数据分析**：
 
-- Warp Divergence是指Warp内所有线程执行相同指令时，因控制流的差异导致只有部分线程进入某一分支，此时进入该分支的线程会继续执行，而未进入该分支的线程则被掩码屏蔽等待。Warp Divergence会导致执行效率下降，更多说明请参考[Warp执行机制](../../../../../docs/zh/guide/编程指南/编程模型/AI-Core-SIMT编程/线程架构.md#warp执行机制)。在本实现中，不同行的非零元素数量不同（1~64个）。同一Warp内的32个线程各自处理不同行数据，各线程的循环次数不同，退出循环的时间不一致，产生严重的Warp Divergence。假设一个Warp中线程0处理的行非零元素个数为3，线程1处理的行非零元素个数为64。线程0在3次循环后进入空闲等待，而线程1需要执行64次循环。这种等待在每个Warp中都会发生，造成大量计算资源浪费。
+- Warp Divergence是指Warp内所有线程执行相同指令时，因控制流的差异导致只有部分线程进入某一分支，此时进入该分支的线程会继续执行，而未进入该分支的线程则被掩码屏蔽等待。Warp Divergence会导致执行效率下降，更多说明请参考[Warp执行机制](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simt_programming/thread_architecture.md#warp执行机制)。在本实现中，不同行的非零元素数量不同（1~64个）。同一Warp内的32个线程各自处理不同行数据，各线程的循环次数不同，退出循环的时间不一致，产生严重的Warp Divergence。假设一个Warp中线程0处理的行非零元素个数为3，线程1处理的行非零元素个数为64。线程0在3次循环后进入空闲等待，而线程1需要执行64次循环。这种等待在每个Warp中都会发生，造成大量计算资源浪费。
 
 **优化建议**：
 
@@ -133,7 +131,7 @@ y[row] = sum;
 
 ### Case 2: 一个Warp协作处理一行数据
 
-**实现方式**：一个Warp的32个线程协作处理同一行数据，各线程以`warpSize`为步长访问该行的非零元素，循环次数基本相同。使用[asc_reduce_add()](../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Reduce类函数/asc_reduce_add.md)对Warp内各线程的部分和进行规约，由线程0写出最终结果。
+**实现方式**：一个Warp的32个线程协作处理同一行数据，各线程以`warpSize`为步长访问该行的非零元素，循环次数基本相同。使用[asc_reduce_add()](../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_reduce_functions/asc_reduce_add.md)对Warp内各线程的部分和进行规约，由线程0写出最终结果。
 
 **关键代码**：
 
@@ -162,8 +160,6 @@ if (lane_id == 0) {
 - 与Case 1中同一Warp内各线程访问不同行的分散地址不同，Case 2中Warp内各线程访问同一行的连续元素，实现了访存合并，读主存储器次数从Case 1的39808次降至2278次。
 
 ## 性能对比总结
-
-### Ascend 950PR性能数据
 
 **综合优化效果**：
 - 从Case 1基线版本到Case 2优化版本，Task Duration从81.811μs降低到31.772μs，耗时下降约61.1%
@@ -202,10 +198,20 @@ if (lane_id == 0) {
   ./demo                               # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 - 编译选项说明
 
   | 选项                        | 可选值        | 说明                                                |
   |---------------------------|------------|---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM`            | `1`-`2`    | 样例类型，默认为1                                         |
 
@@ -215,7 +221,11 @@ if (lane_id == 0) {
   [Success] Case accuracy verification passed.
   ```
 
-## 性能数据获取
+## 性能调试
+
+### msOpProf工具介绍
+
+  msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
   使用 `msopprof` 工具获取单个组件上的性能数据：
 

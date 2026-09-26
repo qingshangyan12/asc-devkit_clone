@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <numeric>
+#include <vector>
 #include "topo_host.h"
 #include "hccl_rank_graph.h"
 #include "hcomm_primitives.h"
@@ -19,6 +20,14 @@
 #include "config_log.h"
 #include "topo.h"
 #include "dtype_common.h"
+#include "dlsym_common.h"
+#include "hccl_rank_graph_dl.h"
+#include "physical_level.h"
+
+// 老CANN的acl_rt.h没有设备形态(factor)查询接口, 由构建系统按平台注入开关, 未注入时默认0
+#ifndef HCCL_SUPPORT_DEV_FORM_FACTOR
+#define HCCL_SUPPORT_DEV_FORM_FACTOR 0
+#endif
 
 constexpr u32 FACTOR_NUM_TWO = 2;
 constexpr s32 DEVICE_PER_MODULE = 8;
@@ -79,7 +88,8 @@ HcclResult CalcMyRankInfo(HcclComm comm, TopoInfo* topoInfo)
     // 获取moduleIdx
     CHK_RET(CalcGroupIdx(comm, topoInfo, static_cast<uint32_t>(HcclNetLayer::HCCL_NetLayer_L0)));
     // 获取superPodIdx
-    if (netLayersNum >= NET_LAYER_NUM_TWO) {
+    if ((netLayersNum >= NET_LAYER_NUM_TWO) &&
+        (netlayers[netLayersNum - 1] == static_cast<uint32_t>(HcclNetLayer::HCCL_NetLayer_L1))) {
         CHK_RET(CalcGroupIdx(comm, topoInfo, static_cast<uint32_t>(HcclNetLayer::HCCL_NetLayer_L1)));
     } else {
         topoInfo->superPodIdx = 0;
@@ -283,7 +293,9 @@ HcclResult CalcGroupIdx(HcclComm comm, TopoInfo* topoInfo, uint32_t netLayer)
         HCCL_DEBUG(
             "[CalcGroupIdx]netLayer[%u] currentGroup[%u] serverIdx[%u] serverNum[%u]", netLayer, currentGroup,
             topoInfo->serverIdx, topoInfo->serverNum);
-    } else if (netLayer == static_cast<uint32_t>(HcclNetLayer::HCCL_NetLayer_L1)) {
+    } else if (
+        (netLayer == static_cast<uint32_t>(HcclNetLayer::HCCL_NetLayer_L1)) ||
+        (netLayer == static_cast<uint32_t>(HcclNetLayer::HCCL_NetLayer_L3))) {
         topoInfo->superPodIdx = currentGroup;
         HCCL_DEBUG(
             "[CalcGroupIdx]netLayer[%u] currentGroup[%u] superPodIdx[%u]", netLayer, currentGroup,
@@ -331,11 +343,11 @@ HcclResult GetPairLinkCounter(HcclComm comm, TopoInfo* topoInfo, std::unordered_
                 // 双向兼容处理：先处理版本号1的字段
                 if (currentLink.header.version >= 1) {
                     // --- 在这里处理 currentLink ---
-                    HCCL_DEBUG("  Link[%u] found between srcRank[%u] and dstRank[%u]:", i, srcRank, dstRank);
-                    HCCL_DEBUG("    LinkType: %u", currentLink.linkAttr.linkProtocol);  // 假设有 linkType 成员
-                    HCCL_DEBUG("    srcEndpointDesc: %u", currentLink.srcEndpointDesc); // 假设有此成员
-                    HCCL_DEBUG("    dstEndpointDesc: %u", currentLink.dstEndpointDesc); // 假设有此成员
-
+                    HCCL_DEBUG(
+                        "Link[%u] found between srcRank[%u] and dstRank[%u]:"
+                        "LinkType: %u, srcEndpointDesc: %u, dstEndpointDesc: %u",
+                        i, srcRank, dstRank, currentLink.linkAttr.linkProtocol, currentLink.srcEndpointDesc,
+                        currentLink.dstEndpointDesc);
                     // 可以将链路类型统计起来
                     // 原始代码中的 pairLinkCounter 应该在这里使用
                     pairLinkCounter[static_cast<u32>(currentLink.linkAttr.linkProtocol)]++;
@@ -440,7 +452,7 @@ HcclResult GetModuleMap(HcclComm comm, TopoInfo* topoInfo, std::map<u32, std::ve
             ranksStr += std::to_string(pair.second[i]);
         }
         ranksStr += "}";
-        HCCL_DEBUG("[GetModuleMap]  ModuleIdx[%u]: %s", pair.first, ranksStr.c_str());
+        HCCL_DEBUG("[GetModuleMap] ModuleIdx[%u]: %s", pair.first, ranksStr.c_str());
     }
 
     return HCCL_SUCCESS;
@@ -624,8 +636,9 @@ HcclResult CalcLevel0TopoShape(const HcclComm comm, TopoInfoWithNetLayerDetails*
         topoInfo->level0Topo = Level0Shape::MESH_1D_CLOS;
         return HCCL_SUCCESS;
     }
-    HCCL_ERROR("Unkown topo for level 0, topoInstNum[%u]", topoInstNum);
-    return HCCL_E_INTERNAL;
+    topoInfo->level0Topo = Level0Shape::CLOS; // A2场景不匹配默认为Clos
+    HCCL_WARNING("Unknown topo for level 0, topoInstNum[%u], default topo:%d", topoInstNum, topoInfo->level0Topo);
+    return HCCL_SUCCESS;
 }
 
 // 计算 Level1 NHR 标记：当 Level0 GCD 为 1 时，Mesh 无意义，需要退化为单级 NHR
@@ -653,15 +666,93 @@ static HcclResult CalcLevel1Nhr(const HcclComm comm, TopoInfoWithNetLayerDetails
     return HCCL_SUCCESS;
 }
 
+static HcclResult CalcLevel1Hd(TopoInfoWithNetLayerDetails* topoInfo)
+{
+    if (topoInfo->topoLevelNums <= 1 || topoInfo->netLayerDetails.netLayers.size() <= 1) {
+        return HCCL_SUCCESS;
+    }
+    const u32 level1Idx = topoInfo->netLayerDetails.netLayers[1];
+    CHK_PRT_RET(
+        topoInfo->topoInstDetailsOfLayer.size() <= level1Idx,
+        HCCL_WARNING(
+            "[TopoHost][CalcLevel1Hd] topoInstDetailsOfLayer size[%zu] <= level1Idx[%u]",
+            topoInfo->topoInstDetailsOfLayer.size(), level1Idx),
+        HCCL_SUCCESS);
+
+    const auto& rankNumForTopoType = topoInfo->topoInstDetailsOfLayer[level1Idx].rankNumForTopoType;
+    auto closIter = rankNumForTopoType.find(CommTopo::COMM_TOPO_CLOS);
+    if (closIter == rankNumForTopoType.end() || closIter->second.size() != 1) {
+        return HCCL_SUCCESS;
+    }
+
+    const u32 closRankSize = closIter->second[0];
+    topoInfo->Level1Hd = closRankSize != 0 && (closRankSize & (closRankSize - 1)) == 0;
+    HCCL_INFO(
+        "[TopoHost][CalcLevel1Hd] level1Idx[%u], closRankSize[%u], Level1Hd[%d]", level1Idx, closRankSize,
+        topoInfo->Level1Hd);
+    return HCCL_SUCCESS;
+}
+
+/**
+ * 查询本卡是否为POD机型。恒返回HCCL_SUCCESS: 该字段是纯附加信息, 取不到时停在false,
+ * 现有字段与旧执行路径完全不受影响。
+ */
+HcclResult CalcDeviceFormFactor(TopoInfoWithNetLayerDetails* topoInfo)
+{
+    CHK_PTR_NULL(topoInfo);
+    topoInfo->isPod = false;
+#ifndef AICPU_COMPILE
+#if !HCCL_SUPPORT_DEV_FORM_FACTOR
+    // 老CANN的acl_rt.h没有ACL_DEV_ATTR_DEVICE_FORM_FACTOR, 无从查起, 一律按非POD建模。
+    // 与成功路径同为INFO同前缀: 现场grep一次就能分清走的是哪一条
+    HCCL_INFO("[Topo][CalcDeviceFormFactor] acl has no device form factor attr, isPod stays false");
+#else
+    // aclrtGetDeviceInfo的deviceId形参就是userDevId(aclrtGetDevice的返回值), ACL内部自己做user->logic映射。
+    // 这里不能再调aclrtGetLogicDevIdByUserDevId转一道: 配了ASCEND_RT_VISIBLE_DEVICES时会二次映射, 读到另一张卡
+    s32 userDevId = 0;
+    aclError aclRet = aclrtGetDevice(&userDevId);
+    if (aclRet != ACL_SUCCESS) {
+        HCCL_WARNING("[Topo][CalcDeviceFormFactor] get current device failed, ret[%d]. isPod stays false.", aclRet);
+        return HCCL_SUCCESS;
+    }
+
+    s64 val = 0;
+    // quiet: 老驱动不支持该infoType时会稳定失败, 按ERROR打会在正常的老环境上持续刷错误日志
+    HcclResult ret = hcalrtGetDeviceInfo(static_cast<u32>(userDevId), ACL_DEV_ATTR_DEVICE_FORM_FACTOR, val, true);
+    if (ret != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[Topo][CalcDeviceFormFactor] get device form factor failed, ret[%d], userDevId[%d]. "
+            "isPod stays false.",
+            ret, userDevId);
+        return HCCL_SUCCESS;
+    }
+
+    // 必须是严格相等的正向判断: ACL将来新增形态时, 未识别的取值必须落到false一侧
+    topoInfo->isPod = (val == ACL_DEVICE_FORM_FACTOR_POD);
+    // 原始取值和设备号都打出来: 现场据此分辨"确实不是POD"还是"取到了个没见过的形态"
+    HCCL_INFO(
+        "[Topo][CalcDeviceFormFactor] userDevId[%d] formFactor[%ld] isPod[%d]", userDevId, val,
+        static_cast<s32>(topoInfo->isPod));
+#endif // HCCL_SUPPORT_DEV_FORM_FACTOR
+#endif // AICPU_COMPILE
+    return HCCL_SUCCESS;
+}
+
 HcclResult CalcTopoShape(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo)
 {
     CHK_RET(ExtractNetLayerDetails(comm, topoInfo));
     CHK_RET(CalcLevel1Nhr(comm, topoInfo));
     CHK_RET(ExtractTopoDetails(comm, topoInfo));
+    CHK_RET(CalcLevel1Hd(topoInfo));
     CHK_RET(CalcLevel0TopoShape(comm, topoInfo));
     CHK_RET(Is2DieFullMesh(comm, topoInfo));
     CHK_RET(IsLevel0PcieMix(comm, topoInfo));
     CHK_RET(CalcLevel0MeshType(comm, topoInfo));
+    // 与comm无关, 只查本卡; 恒返回HCCL_SUCCESS, 取不到时停在false
+    CHK_RET(CalcDeviceFormFactor(topoInfo));
+    // 放在最后: 现有字段的提取与派生逻辑完全不受影响, 且可复用已提取的netLayerDetails。
+    // BuildPhysicalLevels恒返回HCCL_SUCCESS, 内部失败一律降级为空视图
+    CHK_RET(BuildPhysicalLevels(comm, topoInfo));
     return HCCL_SUCCESS;
 }
 
@@ -681,9 +772,11 @@ HcclResult ExtractNetLayerDetails(const HcclComm comm, TopoInfoWithNetLayerDetai
     for (uint32_t netLayerIdx = 0; netLayerIdx < netLayerNum; netLayerIdx++) {
         netLayers.push_back(netlayersTemp[netLayerIdx]);
     }
-    netInstNumOfLayer.resize(netLayerNum);   // 每层网络中有几个网络实例
-    instSizeListOfLayer.resize(netLayerNum); // 每层网络中的各个网络实例的大小
-    localNetInsSizeOfLayer.resize(netLayerNum);
+    // 取最高层级+1适配ranktable配置netLayers={0,3}的情况
+    uint32_t actualLayerNum = netLayers[netLayerNum - 1] + 1;
+    netInstNumOfLayer.resize(actualLayerNum);   // 每层网络中有几个网络实例
+    instSizeListOfLayer.resize(actualLayerNum); // 每层网络中的各个网络实例的大小
+    localNetInsSizeOfLayer.resize(actualLayerNum);
 
     HcclResult ret;
     // 获取并校验每一层的网路实例大小
@@ -711,11 +804,11 @@ HcclResult ExtractNetLayerDetails(const HcclComm comm, TopoInfoWithNetLayerDetai
     }
 
     topoLevelNum = 0;
-    // 获取最小的能覆盖所有卡的 layer
+    // 获取最小的能覆盖所有卡的 layer，topoLevelNum表示实际层级数量
     for (auto layerIdx : netLayers) {
+        topoLevelNum++;
         if (netInstNumOfLayer[layerIdx] == 1) {
-            // 当本层只有一个网络实例时, 认为这个就是当前的 topoLevelNum
-            topoLevelNum = layerIdx + 1;
+            // 当本层只有一个网络实例时, 认为已覆盖所有卡
             break;
         }
     }
@@ -738,11 +831,13 @@ HcclResult ExtractTopoDetails(HcclComm comm, TopoInfoWithNetLayerDetails* topoIn
     HcclResult ret;
     CHK_PRT_RET(comm == nullptr, HCCL_ERROR("[Topo][ExtractNetLayerDetails] comm is null"), HCCL_E_PTR);
     u32 netLayerNum = topoInfo->netLayerDetails.netLayerNum;
+    auto& netLayers = topoInfo->netLayerDetails.netLayers;
+    uint32_t actualLayerNum = netLayers[netLayerNum - 1] + 1;
 
     // 初始化每一层的 TopoInstDetails
-    topoInfo->topoInstDetailsOfLayer.resize(netLayerNum);
-    topoInfo->topoInstDetailsOfLayerSize = netLayerNum;
-    for (u32 netLayerIdx = 0; netLayerIdx < netLayerNum; netLayerIdx++) {
+    topoInfo->topoInstDetailsOfLayer.resize(actualLayerNum);
+    topoInfo->topoInstDetailsOfLayerSize = actualLayerNum;
+    for (auto netLayerIdx : netLayers) {
         auto& currentNetLayerTopoTopoDetail = topoInfo->topoInstDetailsOfLayer[netLayerIdx];
         auto& currentLayerTopoSize = currentNetLayerTopoTopoDetail.sizeOfTopo;
         auto& currentLayerTopoType = currentNetLayerTopoTopoDetail.typeOfTopo;
@@ -925,6 +1020,38 @@ HcclResult CalcLevel0MeshType(HcclComm comm, TopoInfoWithNetLayerDetails* topoIn
     } else {
         topoInfo->level0MeshType = Level0MeshType::TWO_DIE_NOT_REGULAR;
         HCCL_INFO("[Topo][CalcLevel0MeshType] linkNum on 2 dies are not off by 1. Not regular shape.");
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult CalAllLevelEndpointAttrBwCoeff(
+    HcclComm comm, uint32_t rankId, uint32_t levelSize, std::vector<std::vector<EndpointAttrBwCoeff>>& endpointAttrBw)
+{
+    (void)levelSize;
+    uint32_t* netLayers = nullptr; // 网络层次list
+    uint32_t netLayerNum = 0;
+    CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum)); // 获取layer总数和layerlist
+    for (uint32_t layerIdx = 0; layerIdx < netLayerNum; layerIdx++) {
+        uint32_t netLayerId = netLayers[layerIdx];
+        uint32_t* topoInsts = nullptr;
+        uint32_t topoInstNum = 0;
+        CHK_RET(HcclRankGraphGetTopoInstsByLayer(comm, netLayerId, &topoInsts, &topoInstNum)); // 获取topoInstId
+        // 同层可以有多个topoInstId，遍历获取
+        for (uint32_t topoInsIdx = 0; topoInsIdx < topoInstNum; topoInsIdx++) {
+            uint32_t topoInstId = topoInsts[topoInsIdx];
+            uint32_t endPointNums = 0;
+            CHK_RET(HcclRankGraphGetEndpointNum(
+                comm, netLayerId, topoInstId, &endPointNums)); // 获取endPointNums，计算同层有多少节点
+            EndpointDesc* endPointDescs = nullptr;
+            CHK_RET(HcclRankGraphGetEndpointDesc(
+                comm, netLayerId, topoInstId, &endPointNums,
+                endPointDescs)); // 根据Layer和topoInstId，拿到所有的Endpoint信息；返回vector(获取EndpointDesc)
+            uint32_t infoLen = sizeof(EndpointAttrBwCoeff);
+            EndpointAttrBwCoeff bwCoeff{};
+            CHK_RET(HcclRankGraphGetEndpointInfo(
+                comm, rankId, endPointDescs, ENDPOINT_ATTR_BW_COEFF, infoLen, &bwCoeff)); // 获取该维度的带宽
+            endpointAttrBw.emplace_back(bwCoeff);
+        }
     }
     return HCCL_SUCCESS;
 }

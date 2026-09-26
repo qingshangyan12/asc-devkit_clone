@@ -4,13 +4,11 @@
 
 This example introduces UB bank conflicts that may occur when multiple threads in the same Warp access UB in the Ascend C SIMT programming model. The example constructs 5 cases with different UB read address patterns, demonstrating typical scenarios such as same-address merge, cross-bank/subbank distributed access, same 8B-range merge for contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -29,7 +27,7 @@ This example introduces UB bank conflicts that may occur when multiple threads i
 
 This example is used to verify UB bank conflict behavior when multiple threads in the same Warp access UB in Ascend C SIMT programming. The example uses the compile-time parameter `SCENARIO_NUM` to select different cases and construct typical access patterns, including same-address merge, cross-subbank distributed access, same 8B-range merge in contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
-On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](../../../../../../docs/zh/api/Utils-API/调测接口/clock.md) to count the cycles spent reading UB data.
+On the Host side, the input array is constructed and copied to GM. The kernel first moves input data from GM to UB, then repeatedly reads data according to the UB address pattern of the current case, and uses [`clock()`](../../../../../../docs/zh/api/Utils-API/tuning_interface/clock.md) to count the cycles spent reading UB data.
 
 ### Example Specifications
 
@@ -92,7 +90,7 @@ for (uint32_t i = 0; i < REPEAT_TIMES; ++i) {
 }
 ```
 
-**Table 2** Case implementation description
+**Table 1** Case implementation description
 
 | Case   | Scenario Description                                                 | Expected Access Characteristics                                                                |
 | ------ | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -239,7 +237,7 @@ __aicore__ inline uint32_t get_ub_index_device(uint32_t thread_id)
 ...
 #elif SCENARIO_NUM == 3
     // 512B access stride returns addresses to different rows of the same bank and same subbank.
-    return thread_id * 128;
+    return thread_id * SAME_BANK_SUBBANK_STRIDE;
 ...
 }
 ```
@@ -293,7 +291,7 @@ In Case 4, the 32 threads concentrate on same-index subbank resources in the sam
 
 Case 0 and Case 2 show that mergeable access does not form subbank conflicts, and Case 1 is the conflict-free baseline. The cycles of Case 3 and Case 4 increase significantly, indicating that concentrating accesses on same-index subbanks in the same bank group causes subbank resource contention.
 
-When writing SIMT code, avoid concentrating multiple threads in the same Warp on same-index subbanks in the same bank group in one UB access instruction. If such an access pattern is unavoidable, consider adjusting the data layout, access stride, or adding padding in UB to distribute subbank accesses. For an optimization example that avoids access conflicts, see the [matrix transpose example](https://gitcode.com/cann/asc-devkit/tree/master/examples/03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice).
+When writing SIMT code, avoid concentrating multiple threads in the same Warp on same-index subbanks in the same bank group in one UB access instruction. If such an access pattern is unavoidable, consider adjusting the data layout, access stride, or adding padding in UB to distribute subbank accesses. For an optimization example that avoids access conflicts, see the [matrix transpose example](../../../../03_best_practices/00_memory_optimizations/matrix_transpose_practice).
 
 ## Build and Run
 
@@ -301,7 +299,7 @@ Run the following steps in the root directory of this example to build and execu
 
 - Configure Environment Variables
 
-  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -318,10 +316,21 @@ Run the following steps in the root directory of this example to build and execu
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;  # Build the project
   ./demo                               # Run the example
   ```
+
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build Options Description
 
   | Option                      | Values       | Description                                                                       |
   | --------------------------- | ------------ | --------------------------------------------------------------------------------- |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
   | `SCENARIO_NUM`            | `0`-`4`  | Example type, default value is 0                                                  |
 

@@ -19,6 +19,7 @@ using namespace HcclApi;
 
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
 {
+    HCCL_INFO("[Mc2ServerKernel]Start Mc2ServerKernel.");
     if (args == nullptr) {
         HCCL_ERROR("args is null.");
         return HCCL_E_PARA;
@@ -26,7 +27,12 @@ extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void*
 
     constexpr int DESC_POS = 0;
     uint64_t descValue = reinterpret_cast<uint64_t>(args[DESC_POS]);
+    if (descValue == MC2_AICPU_SIMPLE_CTX_PROTOCOL) {
+        HCCL_INFO("[Mc2ServerKernel]Simple ctx protocol, ctxNum is 1.");
+        return CommKfcDispatcher::Run(&(args[1]), 1U);
+    }
     auto* desc = reinterpret_cast<CommKfcParamDesc*>(&descValue);
     AicpuKfcUtils::PrintHcclCommParamDesc(*desc);
+    HCCL_INFO("[Mc2ServerKernel]Finish Mc2ServerKernel.");
     return CommKfcDispatcher::Run(&(args[1]), desc->itemNum);
 }

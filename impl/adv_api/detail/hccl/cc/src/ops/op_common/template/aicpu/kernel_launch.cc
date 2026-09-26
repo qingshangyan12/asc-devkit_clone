@@ -11,6 +11,7 @@
 #include <sstream>
 #include <memory>
 #include "alg_param.h"
+#include "alg_data_trans_wrapper.h"
 #include "executor_base.h"
 #include "coll_alg_exec_registry.h"
 #include "coll_alg_v2_exec_registry.h"
@@ -316,6 +317,12 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             HCCL_ERROR("failed to restore optype [%d] data and counts.", param->opType);
             return 1;
         }
+        if (InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported) != HCCL_SUCCESS) {
+            HCCL_ERROR(
+                "failed to initialize HcommBatchTransferOnThread support, tag is %s, supported is %d.", param->algTag,
+                static_cast<int>(resCtx.isHcommBatchTransferOnThreadSupported));
+            return 1;
+        }
         // 获取Device测主thread
         ThreadHandle thread = resCtx.threads[0];
         if (HcommBatchModeStart(param->algTag) != HCCL_SUCCESS) {
@@ -433,8 +440,14 @@ extern "C" __attribute__((visibility("default"))) unsigned int HcclLaunchAicpuKe
             // 上报device侧的op 附加信息
             HcomProInfoTmp profInfo;
             std::string algTypeStr(param->algTypeStr);
-            strcpy_s(profInfo.algType, sizeof(profInfo.algType), algTypeStr.c_str());
-            strcpy_s(profInfo.commName, sizeof(profInfo.commName), param->commName);
+            if (strcpy_s(profInfo.algType, sizeof(profInfo.algType), algTypeStr.c_str()) != EOK) {
+                HCCL_ERROR("failed to copy algType for profiling");
+                return 1;
+            }
+            if (strcpy_s(profInfo.commName, sizeof(profInfo.commName), param->commName) != EOK) {
+                HCCL_ERROR("failed to copy commName for profiling");
+                return 1;
+            }
             profInfo.commNameLen = strlen(param->commName);
             profInfo.dataCount = param->DataDes.count;
             profInfo.dataType = static_cast<uint8_t>(param->DataDes.dataType);

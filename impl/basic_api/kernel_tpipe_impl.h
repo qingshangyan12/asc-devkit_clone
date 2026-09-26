@@ -75,9 +75,6 @@ __aicore__ inline TPipe::TPipe()
 {
     InitSocState();
     Init();
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_TPIPE));
-#endif
 }
 
 __aicore__ inline TPipe::~TPipe()
@@ -114,7 +111,10 @@ __aicore__ inline void TPipe::Init()
 
         SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
     }
-#elif __NPU_ARCH__ == 3002 || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#elif (                                                                                             \
+    __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || \
+    __NPU_ARCH__ == 5162)
     auto enQueEvtID = this->AllocEventID<HardEvent::M_MTE1>();
     ASCENDC_DEBUG_ASSERT((enQueEvtID == 0), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "enQueEvtID should be 0"));
     SetFlag<HardEvent::M_MTE1>(static_cast<event_t>(enQueEvtID));
@@ -181,7 +181,7 @@ __aicore__ inline void TPipe::AllocAddrs(TBufType* ptr, const First& addr, const
     constexpr bool useAltBufId = T::config.consumerSize > 1;
     ptr->state = TBufState::FREE;
     ptr->freeBufEvt = T::freeBufEvt;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     if constexpr (UseBufIdSync<T>()) {
         ptr->bufId = AllocMutexID();
         ptr->bufIdAlt = INVALID_TBUFID;
@@ -226,7 +226,7 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, const Std::tuple<U, V>& addr0, 
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "buffer number is %u, which should be the same as TQueConfig::bufferNumber(%u)", num,
             que.config.bufferNumber));
-    static_assert(T::dstPosition != TPosition::TSCM, "Init Buffer is not support Postion TSCM");
+    static_assert(T::dstPosition != TPosition::TSCM, "Init Buffer is not support Postion L1 Buffer(TSCM)");
     Hardware pool = GetBufferPos(T::srcPosition, T::dstPosition);
     que.bufStart = this->g_tpipeImpl.buf_ + this->g_tpipeImpl.curBufSize_;
     que.value = num;
@@ -243,9 +243,6 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, const Std::tuple<U, V>& addr0, 
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n",
             this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
-#endif
     return true;
 }
 
@@ -277,7 +274,8 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
             KERNEL_ERROR, "buffer length is %u, which should be larger than 0, and at least less than or equal to %u",
             len, currentPoolSize));
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     if constexpr (T::dstPosition == TPosition::C2) {
         len = (len + TWO_BLK_SIZE - MIN_BLOCK_LEN) / TWO_BLK_SIZE * TWO_BLK_SIZE;
     }
@@ -309,7 +307,7 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
     for (int32_t i = 0; i < num; i++, ptr++) {
         ptr->state = TBufState::FREE;
         ptr->freeBufEvt = T::freeBufEvt;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
         if constexpr (UseBufIdSync<T>()) {
             ptr->bufId = AllocMutexID();
             ptr->bufIdAlt = INVALID_TBUFID;
@@ -346,9 +344,6 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "tscm addr is %d, limits is %d",
             this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr, this->g_tpipeImpl.tscmBufferPtr_));
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
-#endif
     return true;
 }
 
@@ -367,7 +362,8 @@ __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf, uint32_t len)
 #endif
 
     len = (len + ONE_BLK_SIZE - MIN_BLOCK_LEN) / ONE_BLK_SIZE * ONE_BLK_SIZE;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     if constexpr (pos == TPosition::C2) {
         len = (len + TWO_BLK_SIZE - MIN_BLOCK_LEN) / TWO_BLK_SIZE * TWO_BLK_SIZE;
     }
@@ -412,9 +408,6 @@ __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf, uint32_t len)
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n",
             this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
-#endif
     return true;
 }
 
@@ -591,7 +584,10 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
         WaitFlag<HardEvent::M_MTE1>(2);
         ReleaseEventID<HardEvent::M_MTE1>(2);
     }
-#elif __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
+#elif (                                                                                             \
+    __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
+    __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || \
+    __NPU_ARCH__ == 5162)
     WaitFlag<HardEvent::M_MTE1>(0);
     ReleaseEventID<HardEvent::M_MTE1>(0);
     WaitFlag<HardEvent::M_MTE1>(1);
@@ -599,7 +595,7 @@ __aicore__ inline void TPipe::DestroyWithoutPipeAll()
     WaitFlag<HardEvent::M_MTE1>(2);
     ReleaseEventID<HardEvent::M_MTE1>(2);
 #endif
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162
     Internal::g_bufId = 0;
 #endif
 }
@@ -654,14 +650,14 @@ __aicore__ inline void InitShareBufStart(
     tpipe->AuxShareBufStart(mode, shareLens, static_cast<uint8_t>(TShareBuf::ShareHard::L1), Hardware::L1, subBlockIdx);
     tpipe->AuxShareBufStart(
         mode, shareLens, static_cast<uint8_t>(TShareBuf::ShareHard::L0C), Hardware::L0C, subBlockIdx);
-#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     tpipe->AuxShareBufStart(mode, shareLens, static_cast<uint8_t>(TShareBuf::ShareHard::UB), Hardware::UB, subBlockIdx);
 #endif
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0A)].maxAddr = 0;
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0B)].maxAddr = 0;
     // v100 Shouldn't Use Bias Table
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::BIAS)].maxAddr = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     Internal::g_sharedEvtId = Internal::g_bufId;
 #endif
     return;
@@ -674,11 +670,11 @@ __aicore__ inline void InitShareBufEnd(TPipe* tpipe)
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::L1)];
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L0C)].maxAddr =
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::L0C)];
-#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     tpipe->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::UB)].maxAddr =
         tpipe->g_tpipeImpl.shareBufPool_.maxAddr[static_cast<uint8_t>(TShareBuf::ShareHard::UB)];
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     Internal::g_bufId = Internal::g_sharedEvtId;
 #endif
     return;
@@ -1032,7 +1028,7 @@ void inline TPipe::SetBufferCtx(Hardware hard, struct BufPoolExtra* bufPool)
 
 __aicore__ inline void TPipe::InitSocState() const { AscendCUtils::InitSocStateImpl(); }
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162
 __aicore__ inline MutexID TPipe::AllocMutexID() { return ::AscendC::AllocMutexID(); }
 
 __aicore__ inline void TPipe::ReleaseMutexID(MutexID id) { ::AscendC::ReleaseMutexID(id); }
@@ -1040,7 +1036,7 @@ __aicore__ inline void TPipe::ReleaseMutexID(MutexID id) { ::AscendC::ReleaseMut
 
 __aicore__ inline void TPipe::ResetPool()
 {
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162
     Internal::g_bufId = 0;
 #endif
     g_tpipeImpl.tscmBufferPtr_ = TOTAL_L1_SIZE;

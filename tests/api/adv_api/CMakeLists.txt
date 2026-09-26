@@ -16,8 +16,11 @@ set(ASCENDC_ADV_API_INCLUDE ${ASCENDC_DIR}/include/adv_api)
 set(ASCENDC_ADV_API_IMPL ${ASCENDC_DIR}/impl/adv_api)
 set(ASCENDC_UTILS_INCLUDE ${ASCENDC_DIR}/include/utils)
 
-set(PRODUCT_TYPE_LIST_INIT ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend950pr_9599_AIC ascend950pr_9599_AIV ascend310B1)
+set(PRODUCT_TYPE_LIST_INIT ascend610 ascend310p ascend910B1_AIC ascend910B1_AIV ascend950pr_9599_AIC ascend950pr_9599_AIV ascend310B1 KirinX90_AIV Kirin9030_AIV)
 set(PRODUCT_TYPE_LIST ${PRODUCT_TYPE_LIST_INIT} CACHE STRING "Supported product types")
+set(TILING_PRODUCT_TYPE_LIST ${PRODUCT_TYPE_LIST})
+# The shared tiling cases assert server-side matmul parameters and are not valid for Kirin platforms.
+list(REMOVE_ITEM TILING_PRODUCT_TYPE_LIST KirinX90_AIV Kirin9030_AIV)
 
 set(ASCENDC_DEP_HEADER_DIR
     ${ASCEND_CANN_PACKAGE_PATH}/include
@@ -188,7 +191,6 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/test_matmul_shape_info.cpp
     matmul/test_matmul_shape_info_left.cpp
     hccl/test_hccl.cpp
-    hcomm/test_hcomm.cpp
     matmul/copy_cube_in/test_copy_cube_in_norm.cpp
     matmul/copy_cube_in/test_copy_cube_in_mdl.cpp
     matmul/copy_cube_in/test_copy_cube_in_params.cpp
@@ -229,6 +231,94 @@ file(GLOB ASCENDC_TEST_ascend910B1_AIC_CASE_SRC_FILES
     matmul/scheduler/batch_scheduler/test_batch_scheduler.cpp
     matmul/scheduler/batch_scheduler/test_batch_scheduler_single.cpp
     matmul/kfc/test_matmul_server_c220.cpp
+)
+
+# KirinX90 aiv test cases
+file(GLOB ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES
+    math/asin/test_operator_asin.cpp
+    math/acos/test_operator_acos.cpp
+    math/atan/test_operator_atan.cpp
+    math/cos/test_operator_cos.cpp
+    math/cosh/test_operator_cosh.cpp
+    math/erf/test_operator_erf.cpp
+    math/erfc/test_operator_erfc.cpp
+    math/floor/test_operator_floor.cpp
+    math/log/test_operator_log.cpp
+    math/sign/test_operator_sign.cpp
+    math/sin/test_operator_sin.cpp
+    math/tan/test_operator_tan.cpp
+    math/tanh/test_operator_tanh.cpp
+    select/selectwithbytesmask/test_operator_selectwithbytesmask.cpp
+    index/arithprogression/test_operator_arithprogression.cpp
+    reduce/sum/test_operator_sum.cpp
+    activation/gelu/test_operator_gelu.cpp
+    activation/silu/test_operator_silu.cpp
+    activation/reglu/test_operator_reglu.cpp
+    activation/sigmoid/test_operator_vec_sigmoid.cpp
+    filter/dropout/test_operator_dropout.cpp
+    pad/broadcast/test_operator_broadcast_v200.cpp
+    matmul/test_matmul_shape_info.cpp
+    matmul/test_matmul_shape_info_left.cpp
+    matmul/test_matmul_l0c_buffer.cpp
+    normalization/rmsnorm/test_operator_rmsnorm.cpp
+    math/sinh/test_operator_sinh.cpp
+    sort/sort/test_operator_radix_sort.cpp
+    sort/topk/test_operator_radix_topk.cpp
+    transpose/confusion_transpose/test_operator_confusion_transpose.cpp
+    activation/geglu/test_operator_geglu.cpp
+    activation/swiglu/test_operator_swiglu.cpp
+    quantization/antiquant/test_ascend_antiquant.cpp
+    quantization/dequant/test_ascend_dequant.cpp
+    activation/gelu/test_operator_fast_gelu.cpp
+    activation/softmax/test_operator_softmax_v220.cpp
+)
+
+set(ASCENDC_TEST_KirinX90_AIV_CASE_SRC_FILES
+    ${ASCENDC_TEST_KirinX90_AIV_CASE_SRC_PART_FILES}
+)
+
+# Kirin9030 aiv test cases
+file(GLOB ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES
+    math/asin/test_operator_asin.cpp
+    math/acos/test_operator_acos.cpp
+    math/atan/test_operator_atan.cpp
+    math/cos/test_operator_cos.cpp
+    math/cosh/test_operator_cosh.cpp
+    math/erf/test_operator_erf.cpp
+    math/erfc/test_operator_erfc.cpp
+    math/floor/test_operator_floor.cpp
+    math/log/test_operator_log.cpp
+    math/sign/test_operator_sign.cpp
+    math/sin/test_operator_sin.cpp
+    math/tan/test_operator_tan.cpp
+    math/tanh/test_operator_tanh.cpp
+    select/selectwithbytesmask/test_operator_selectwithbytesmask.cpp
+    index/arithprogression/test_operator_arithprogression.cpp
+    reduce/sum/test_operator_sum.cpp
+    activation/reglu/test_operator_reglu.cpp
+    activation/sigmoid/test_operator_vec_sigmoid.cpp
+    filter/dropout/test_operator_dropout.cpp
+    pad/broadcast/test_operator_broadcast_v200.cpp
+    matmul/test_matmul_shape_info.cpp
+    matmul/test_matmul_shape_info_left.cpp
+    matmul/test_matmul_l0c_buffer.cpp
+    normalization/rmsnorm/test_operator_rmsnorm.cpp
+    math/sinh/test_operator_sinh.cpp
+    sort/sort/test_operator_radix_sort.cpp
+    sort/topk/test_operator_radix_topk.cpp
+    transpose/confusion_transpose/test_operator_confusion_transpose.cpp
+    activation/geglu/test_operator_geglu.cpp
+    activation/swiglu/test_operator_swiglu.cpp
+    quantization/antiquant/test_ascend_antiquant.cpp
+    quantization/dequant/test_ascend_dequant.cpp
+    activation/gelu/test_operator_fast_gelu.cpp
+    activation/softmax/test_operator_softmax_v220.cpp
+    activation/gelu/test_operator_gelu.cpp
+    activation/silu/test_operator_silu.cpp
+)
+
+set(ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_FILES
+    ${ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_PART_FILES}
 )
 
 # ascend950pr_9599 test cases
@@ -278,6 +368,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     index/arithprogression/test_operator_arithprogression.cpp
     #math
     math/clamp/test_operator_clamp.cpp
+    math/bessel_i0/test_operator_bessel_i0.cpp
     math/bitwise_and/test_operator_bitwise_and.cpp
     math/logical_and/test_operator_logical_and.cpp
     math/logical_ands/test_operator_logical_ands.cpp
@@ -297,6 +388,8 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     math/fmod/test_operator_fmod.cpp
     math/hypot/test_operator_hypot.cpp
     math/log/test_operator_log.cpp
+    math/ndtri/test_operator_ndtri.cpp
+    api_check/math/ndtri/kernel_ndtri_check.cpp
     math/philox/test_operator_philox_c310.cpp
     math/power/test_operator_power_c310.cpp
     math/sin/test_operator_sin_c310.cpp
@@ -366,8 +459,6 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     transpose/confusion_transpose/test_operator_confusion_transpose_c310.cpp
     # hccl
     hccl/test_hccl_aicpu_950.cpp
-    hcomm/test_hcomm_roce_950.cpp
-    hcomm/test_hcomm_urma_950.cpp
 )
 
 # ascend310B1 test cases
@@ -386,6 +477,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend310p>:../common/tik_pv_wrapper.cpp>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:../common/k3_pvwrap.cpp>
+        $<$<STREQUAL:${product_type},Kirin9030_AIV>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:../common/k3_pvwrap.cpp>
         $<$<STREQUAL:${product_type},ascend310B1>:../common/k3_pvwrap.cpp>
@@ -402,8 +495,11 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_VEC__;__DAV_VEC__>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_CUBE__>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__>
+        $<$<STREQUAL:${product_type},KirinX90_AIV>:__NPU_ARCH__=3003;__DAV_L300__;__DAV_L300_VEC__;__DAV_L300_VEC__>
+        $<$<STREQUAL:${product_type},Kirin9030_AIV>:__NPU_ARCH__=3113;__DAV_L311__;__DAV_L311_VEC__;__DAV_L311_VEC__>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002;__DAV_M300__>
         __disable_kernel_type_autoinfer__=
+        __callee__=
     )
 
     target_include_directories(ascendc_ut_adv_api_kernel_${product_type} PRIVATE
@@ -424,6 +520,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend610>:tikicpulib::ascend610>
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
+ 	    $<$<STREQUAL:${product_type},KirinX90_AIV>:tikicpulib::KirinX90>
+ 	    $<$<STREQUAL:${product_type},Kirin9030_AIV>:tikicpulib::Kirin9030>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},ascend310B1>:tikicpulib::ascend310B1>
@@ -466,11 +564,12 @@ file(GLOB ASCENDC_TILING_SRC_FILES
     ${ASCENDC_ADV_API_IMPL}/tiling/transpose/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/conv/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/conv_backprop/*.cpp
+    ${ASCENDC_ADV_API_IMPL}/tiling/experimental/math/*.cpp
     ${ASCENDC_ADV_API_IMPL}/detail/host_log.cpp
 )
 
 # ascendc_tiling_utest
-foreach(product_type ${PRODUCT_TYPE_LIST})
+foreach(product_type ${TILING_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_adv_api_tiling_${product_type}
         ${ASCENDC_DIR}/tests/main.cpp
         ../common/platform_stub.cpp
@@ -488,6 +587,8 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3510>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3510>
         $<$<STREQUAL:${product_type},ascend310B1>:__NPU_ARCH__=3002>
+ 	    $<$<STREQUAL:${product_type},KirinX90_AIV>:__NPU_ARCH__=3003>
+ 	    $<$<STREQUAL:${product_type},Kirin9030_AIV>:__NPU_ARCH__=3113>
     )
 
     target_include_directories(ascendc_ut_adv_api_tiling_${product_type} PRIVATE
@@ -495,6 +596,7 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         ${ASCENDC_TEST_HEADER_FILES}
         ${ASCENDC_DEP_HEADER_DIR}
         ${ASCENDC_TEST_${product_type}_HEADER_FILES}
+        ${ASCENDC_ADV_API_IMPL}/detail/hccl/cc/src/ops/op_common/external_alg
         ${ASCENDC_ADV_API_INCLUDE}/
         ${ASCENDC_ADV_API_INCLUDE}/activation/
         ${ASCENDC_ADV_API_INCLUDE}/filter/
@@ -512,7 +614,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
         ${ASCENDC_ADV_API_INCLUDE}/conv_backprop/
         ${ASCENDC_ADV_API_INCLUDE}/conv/conv3d/
     )
-
     target_link_directories(ascendc_ut_adv_api_tiling_${product_type} PRIVATE
         ${ASCEND_CANN_PACKAGE_PATH}/lib64
     )
@@ -539,5 +640,6 @@ foreach(product_type ${PRODUCT_TYPE_LIST})
 endforeach()
 
 add_subdirectory(hccl/cc)
+add_subdirectory(hccl/ccu)
 
 add_subdirectory(api_host_check)

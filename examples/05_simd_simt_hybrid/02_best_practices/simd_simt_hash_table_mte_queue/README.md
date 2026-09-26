@@ -19,7 +19,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -29,6 +29,7 @@
 │   ├── figures                       // README中的图片资源
 │   ├── hash_table_mte_queue.asc      // Ascend C样例实现
 │   ├── README.md                     // 样例说明文档
+│   ├── README_en.md                  // 英文样例说明文档
 │   └── scripts
 │       └── run.sh                    // 编译并使用msOpProf采集两种Case性能数据
 ```
@@ -96,7 +97,7 @@ $$
 
 ### Case 0：SIMT Warp直接写value
 
-**实现方式**：参考`insert_or_assign_warp_store_vf()`函数实现。
+**实现方式**：参考`try_lock_bucket_for_key_case0()`和`insert_or_assign_warp_store_vf()`函数实现。
 
 该实现中，每个Warp处理一条key。lane 0执行hash、线性探测和CAS锁定bucket，Warp内线程通过`asc_shfl`获取目标bucket index，并按`WARP_SIZE`分片写入value向量。对于探测到的临时`LOCKED_KEY`槽位，Case 0的lane 0会在当前槽位上持续重试，而不是直接跳过到下一个槽位，以避免同一个key在并发插入时跳过瞬时锁定槽位并产生重复可见项。value搬运由SIMT线程直接访问GM完成。
 
@@ -105,27 +106,37 @@ $$
 **关键代码**：
 
 ```cpp
-__simt_vf__ inline void insert_or_assign_warp_store_vf(__gm__ Bucket* table,
-    __gm__ float* table_values, __gm__ const int64_t* keys, __gm__ const float* values, uint32_t key_num,
-    uint32_t capacity, uint32_t dim, uint32_t block_index, uint32_t num_blocks)
+__simt_callee__ inline bool try_lock_bucket_for_key_case0(__gm__ int64_t* key_addr, int64_t key)
 {
-    const uint32_t lane_id = static_cast<uint32_t>(threadIdx.x) % WARP_SIZE;
-    ...
-    if (lane_id == 0) {
-        if (try_lock_bucket_for_key_case0(key_addr, key)) {
-            success = 1;
-            break;
+    while (true) {
+        int64_t current_key = *reinterpret_cast<__gm__ volatile int64_t*>(key_addr);
+        if (current_key == LOCKED_KEY) {
+            continue;
         }
         ...
     }
+}
+
+__simt_vf__ inline void insert_or_assign_warp_store_vf(
+    __gm__ Bucket* table, __gm__ float* table_values, __gm__ const int64_t* keys, __gm__ const float* values,
+    uint32_t key_num, uint32_t capacity, uint32_t dim, uint32_t block_index, uint32_t num_blocks)
+{
     ...
-    for (uint32_t j = lane_id; j < dim; j += WARP_SIZE) {
-        table_values[dst_base + j] = values[src_base + j];
-    }
-    asc_threadfence();
-    if (lane_id == 0) {
-        *reinterpret_cast<__gm__ volatile int64_t*>(&table[bucket_idx].key) = key;
-    }
+        success = asc_shfl(success, 0, WARP_SIZE);
+        bucket_idx = asc_shfl(bucket_idx, 0, WARP_SIZE);
+        if (success == 1) {
+            uint32_t dst_base = bucket_idx * dim;
+            uint32_t src_base = idx * dim;
+            for (uint32_t j = lane_id; j < dim; j += WARP_SIZE) {
+                table_values[dst_base + j] = values[src_base + j];
+            }
+            // Publish the key only after the value vector is visible.
+            asc_threadfence();
+            if (lane_id == 0) {
+                *reinterpret_cast<__gm__ volatile int64_t*>(&table[bucket_idx].key) = key;
+            }
+        }
+    ...
 }
 ```
 
@@ -166,42 +177,63 @@ Case 1保留SIMT处理hash/probe/CAS的职责，只把连续value搬运拆给MTE
 **关键代码**：
 
 ```cpp
-class mte_task_queue {
-public:
-    __simt_callee__ inline void assign_warp_task(
-        uint64_t src_addr, uint64_t dst_addr, int64_t key, uint64_t key_addr, bool need_assign)
-    {
-        uint32_t write_mask = asc_ballot(need_assign ? 1 : 0);
-        uint32_t warp_write_count = __popc(write_mask);
-        uint32_t task_start_id = (laneid() == 0) ? apply_id(warp_write_count) : 0;
-        task_start_id = asc_shfl(task_start_id, 0);
-        drain(task_start_id + warp_write_count);
-        if (need_assign) {
-            uint32_t lane_offset = __popc(write_mask & lanemask_lt());
-            fill_task_info(task_start_id + lane_offset, src_addr, dst_addr, key, key_addr);
+__simt_callee__ inline void fill_task_info(
+    uint32_t task_id, uint64_t src_addr, uint64_t dst_addr, int64_t key, uint64_t key_addr) const
+{
+    uint32_t slot = task_id & MTE_TASK_RING_MASK;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(src_addrs_)[slot] = src_addr;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(dst_addrs_)[slot] = dst_addr;
+    reinterpret_cast<__ubuf__ volatile int64_t*>(task_keys_)[slot] = key;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(key_addrs_)[slot] = key_addr;
+}
+
+...
+
+template <bool drain_all = false>
+__simt_callee__ inline void drain(uint32_t new_task_end_id) const
+{
+    while (true) {
+        ...
+        if (lane_id < publish_count) {
+            uint32_t slot = (key_assign_id + lane_id) & MTE_TASK_RING_MASK;
+            int64_t key = reinterpret_cast<__ubuf__ volatile int64_t*>(task_keys_)[slot];
+            uint64_t key_addr = reinterpret_cast<__ubuf__ volatile uint64_t*>(key_addrs_)[slot];
+            // The slot is still owned by this insert task, so a release store is enough to publish the key.
+            *reinterpret_cast<__gm__ volatile int64_t*>(key_addr) = key;
         }
         asc_threadfence();
-        if (laneid() == 0) {
-            assign_task(task_start_id, task_start_id + warp_write_count);
-        }
+        ...
     }
+}
 
-    __aicore__ inline void run_task() const
-    {
-        while (true) {
-            uint32_t simt_assign_id = *reinterpret_cast<__ubuf__ volatile uint32_t*>(simt_assign_id_);
-            uint32_t proc_count = min(max_proc_batch, simt_assign_id - mte_finish_id);
+...
+
+__aicore__ inline void run_task() const
+{
+    ...
+    while (true) {
+        ...
+        uint32_t available = simt_assign_id - mte_finish_id;
+        uint32_t proc_count = (available < max_proc_batch) ? available : max_proc_batch;
+        for (uint32_t i = 0; i < proc_count; ++i) {
             ...
-            asc_copy_gm2ub_align(value_local_, src_addr, 1, value_bytes, 0, 0, true, values_cache_mode_, 0, 0);
-            asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_copy_ub2gm_align(dst_addr, value_local_, 1, value_bytes, table_values_cache_mode, 0, 0);
-            asc_sync_notify(PIPE_MTE3, PIPE_S, EVENT_ID0);
-            asc_sync_wait(PIPE_MTE3, PIPE_S, EVENT_ID0);
-            *reinterpret_cast<__ubuf__ volatile uint32_t*>(mte_finish_id_) = mte_finish_id + proc_count;
+            asc_copy_gm2ub_align(
+                value_local_ + i * value_elems_aligned, reinterpret_cast<__gm__ float*>(src_addr), 1, value_bytes,
+                0, 0, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
         }
+        ...
+        for (uint32_t i = 0; i < proc_count; ++i) {
+            ...
+            asc_copy_ub2gm_align(
+                reinterpret_cast<__gm__ float*>(dst_addr), value_local_ + i * value_elems_aligned, 1, value_bytes,
+                asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
+        }
+        ...
+        mte_finish_id += proc_count;
+        *reinterpret_cast<__ubuf__ volatile uint32_t*>(mte_finish_id_) = mte_finish_id;
     }
-};
+}
+
 ```
 
 **性能数据**：
@@ -221,8 +253,6 @@ public:
 
 ## 性能对比总结
 
-### Ascend 950PR性能对比
-
 各dim配置下的性能数据如下：
 
 | dim | Case 0 SIMT Warp直接写value(μs) | Case 1 MTE task queue(μs) | Case 1加速比 |
@@ -233,7 +263,7 @@ public:
 | 128 | 376.517 | 131.696 | 2.86x |
 | 256 | 585.892 | 204.030 | 2.87x |
 
-### 优化要点总结
+## 调优建议
 
 | 优化手段 | 核心原理 | 样例体现 |
 |:---|:---|:---|
@@ -287,10 +317,20 @@ public:
   ./scripts/run.sh
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |:---|:---|:---|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应 Ascend 950PR/Ascend 950DT |
   | `SCENARIO_NUM` | `0`、`1` | Case编号：0=SIMT Warp直接写value，1=MTE task queue搬运value |
 
@@ -302,40 +342,33 @@ public:
   Verification PASSED
   ```
 
-### 性能分析
+## 性能调试
 
-使用msOpProf获取性能数据。对比脚本会先执行一次样例并检查`Verification PASSED`，确认结果正确后再通过`msopprof`命令采集目标kernel性能数据。
+### msOpProf工具介绍
 
-Case 0测试方式如下：
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
+
+通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
+
+使用`msOpProf`工具获取详细性能数据：
 
 ```bash
-cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
-make -j
-./hash_table_mte_queue 128
 msopprof ./hash_table_mte_queue 128
 ```
 
-Case 1测试方式如下：
+命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的性能数据文件夹，文件夹结构示例如下：
 
 ```bash
-cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
-make -j
-./hash_table_mte_queue 128
-msopprof ./hash_table_mte_queue 128
-```
-
-当前目录下会生成`OPPROF_`前缀的文件夹，保存当前kernel的性能分析数据。
-
-```text
-OPPROF_xxxx_XXXXXXXX
-├── ArithmeticUtilization.csv
-├── L2Cache.csv
-├── Memory.csv
-├── MemoryL0.csv
-├── MemoryUB.csv
-├── OpBasicInfo.csv
-├── PipeUtilization.csv
-└── ResourceConflictRatio.csv
+├──dump                       # 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            # 算子基础信息
+├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         # MindStudio Insight呈现文件
 ```
 
 查看具体的性能分析结果：

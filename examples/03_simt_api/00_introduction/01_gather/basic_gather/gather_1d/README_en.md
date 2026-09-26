@@ -4,13 +4,11 @@
 
 This sample implements a one-dimensional Gather operator in a simple scenario (with fixed shape) using the Ascend C SIMT programming mode. It collects elements at specified indices from a one-dimensional input, demonstrating the development method for discrete memory access operators in simplified scenarios.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Versions
-
-- \>= CANN 9.0.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -51,14 +49,14 @@ This sample implements a one-dimensional Gather operator in a simple scenario (w
   The implementation process of the gather_1d operator retrieves data at specified indices from the input (Global Memory). Based on the above data partitioning, it first calculates the index of data that the thread should process, then reads one element according to index[i] and writes it to output[i].
 
 - Invocation Implementation:  
-  Use the kernel call operator <<<>>> to launch the kernel.
+  Use the kernel call operator `<<<>>>` to launch the kernel.
 
 ## Build and Run
 
 Execute the following steps in the root directory of this sample to build and run the operator.
 
 - Configure Environment Variables  
-  Configure the environment variables according to the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
+  Configure the environment variables according to the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -75,10 +73,20 @@ Execute the following steps in the root directory of this sample to build and ru
   ./demo                        # Run the sample
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Build Option Description
 
   | Option | Available Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: This sample only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The following execution result indicates that the accuracy comparison succeeds.

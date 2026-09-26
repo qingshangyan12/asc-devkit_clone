@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses the [AscendAntiQuant](../../../../../docs/zh/api/SIMD-API/高阶API/量化操作/AscendAntiQuant.md) high-level API in a model quantization inference scenario to implement dequantization computation, which restores quantized low-precision data to high-precision data. The example demonstrates the PER_CHANNEL scenario (per-channel quantization), where int8_t type input data is added with an offset, multiplied by a scale factor, and converted to half type output. On the 950 series, while the AscendAntiQuant API is compatible, it is recommended to prefer the [AntiQuantize](../../../../../docs/zh/api/SIMD-API/高阶API/量化操作/AntiQuantize.md) API, which adapts to various quantization scenarios through a unified struct configuration.
+This example uses the [AscendAntiQuant](../../../../../docs/zh/api/SIMD-API/adv_api/quantization/AscendAntiQuant.md) high-level API in a model quantization inference scenario to implement dequantization computation, which restores quantized low-precision data to high-precision data. The example demonstrates the PER_CHANNEL scenario (per-channel quantization), where int8_t type input data is added with an offset, multiplied by a scale factor, and converted to half type output. On the 950 series, while the AscendAntiQuant API is compatible, it is recommended to prefer the [AntiQuantize](../../../../../docs/zh/api/SIMD-API/adv_api/quantization/AntiQuantize.md) API, which adapts to various quantization scenarios through a unified struct configuration.
 
 ## Supported Products and CANN Software Versions
 
@@ -31,21 +31,17 @@ This example uses the [AscendAntiQuant](../../../../../docs/zh/api/SIMD-API/高�
   Perform element-wise dequantization, for example converting int8_t data type to half data type.
 
 - Example specifications:
-  <table border="2" align="left">
-  <caption>Table 1: Example Input/Output Specifications</caption>
-  <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> antiquant </td></tr>
 
-  <tr><td rowspan="5" align="center">Example Input</td></tr>
-  <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">src</td><td align="center">[8, 128]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
-  <tr><td align="center">offset</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td align="center">scale</td><td align="center">[1, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td rowspan="2" align="center">Example Output</td></tr>
-  <tr><td align="center">dst</td><td align="center">[8, 128]</td><td align="center">half</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">antiquant_custom</td></tr>
-  </table>
-  <br clear="left" />
-<br />
+  **Table 1: Example Input/Output Specifications**
+
+  | Category | name | shape | data type | format |
+  | --- | --- | --- | --- | --- |
+  | Example Type (OpType) | antiquant | - | - | - |
+  | Example Input | src | [8, 128] | int8_t | ND |
+  | Example Input | offset | [1, 128] | half | ND |
+  | Example Input | scale | [1, 128] | half | ND |
+  | Example Output | dst | [8, 128] | half | ND |
+  | Kernel Function Name | antiquant_custom | - | - | - |
 
 - Example implementation:  
   This example implements an antiquant_custom example with fixed shapes of input src[8, 128], offset[1, 128], scale[1, 128], and output dst[8, 128]. It performs element-wise dequantization, converting int8_t type data to half type data.
@@ -59,7 +55,7 @@ This example uses the [AscendAntiQuant](../../../../../docs/zh/api/SIMD-API/高�
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

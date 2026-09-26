@@ -21,7 +21,9 @@
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_ASC_PRINTF_H__
 #endif
 
-#include "../../../impl/utils/sys_macros.h"
+#include "../../../impl/utils/sys_macros_impl.h"
+
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
 #include "simt_api/device_types.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
@@ -34,12 +36,13 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 #endif
 } // namespace __asc_simt_vf
 #endif
+#endif
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 namespace __asc_aicore {
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args);
+__aicore__ static __attribute__((noinline)) void printf(__gm__ const char* fmt, Args&&... args);
 } // namespace __asc_aicore
 
 namespace __asc_simd_vf {
@@ -61,7 +64,7 @@ __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args);
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 
-#if (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+#if __NPU_ARCH__ == 3510
 #include "impl/utils/debug/asc_simd_printf_impl.h"
 #endif
 #endif

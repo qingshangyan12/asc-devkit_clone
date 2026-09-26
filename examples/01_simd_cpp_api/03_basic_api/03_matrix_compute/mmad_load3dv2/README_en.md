@@ -8,9 +8,9 @@ This example introduces the usage scenarios and methods of the LoadData (convolu
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -52,7 +52,7 @@ Since this example does not currently support int4b_t input data type, it demons
 
 Note: For Atlas A3 Training Series Products/Atlas A3 Inference Series Products and Atlas A2 Training Series Products/Atlas A2 Inference Series Products, when the input data type is B8 and the destination address is on L0B, the load3dv2 instruction is not supported. For compatibility, when scenarioNum=5, SplitB calls the load2d instruction.
 
-  In this example, the A matrix in scenarioNum=3 and 4 is consistent with scenarioNum=12 and 13 in the [load_data_l12l0](../load_data_l12l0/README.md) example respectively, and the B matrix is consistent with scenarioNum=13 in that example. Therefore, the specific parameter configuration and diagrams of the load3dv2 instruction can be found in the "6. L1 to L0 (LoadData)" section of that example's readme.
+  In this example, the A matrix in scenarioNum=3 and 4 is consistent with scenarioNum=12 and 13 in the [load_data_l12l0](../load_data_l12l0/README_en.md) example respectively, and the B matrix is consistent with scenarioNum=13 in that example. Therefore, the specific parameter configuration and diagrams of the load3dv2 instruction can be found in the "6. L1 to L0 (LoadData)" section of that example's readme.
 
   Since the input data type differences have minimal impact on load3dv2 instruction parameter configuration, the remaining scenarios in this example can reference scenarioNum=3 and 4.
 
@@ -60,7 +60,7 @@ Note: For Atlas A3 Training Series Products/Atlas A3 Inference Series Products a
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables  
-  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

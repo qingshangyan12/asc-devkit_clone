@@ -11,29 +11,35 @@
 #define __TESTS_C_API_STUB__
 #include <cstdint>
 #include "stub_fun.h"
+#include "c_api/defs/enum.h"
+
+template <typename C, typename A, typename B>
+inline void mad(
+    __cc__ C* c_matrix, __ca__ A* a_matrix, __cb__ B* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, asc_unit_flag_mode unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    mad(c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, static_cast<uint8_t>(unit_flag), disable_gemv,
+        c_matrix_source, c_matrix_init_val);
+}
+
+template <typename C, typename A, typename B>
+inline void mad_mx(
+    __cc__ C* c_matrix, __ca__ A* a_matrix, __cb__ B* b_matrix, uint16_t left_height, uint16_t n_dim,
+    uint16_t right_width, asc_unit_flag_mode unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
+{
+    mad_mx(
+        c_matrix, a_matrix, b_matrix, left_height, n_dim, right_width, static_cast<uint8_t>(unit_flag), disable_gemv,
+        c_matrix_source, c_matrix_init_val);
+}
+
+// The compiler supports this overload, but it is missing from the CPU debug stub header.
+int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
+
+// The compiler supports this overload, but it is missing from the CPU debug stub header.
+inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
 
 #ifndef ULL
 #define ULL unsigned long long
-#endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
-using vector_uint8_t = uint8_t;
-using vector_uint16_t = uint8_t;
-using vector_uint32_t = uint8_t;
-using vector_uint64_t = uint8_t;
-using vector_int8_t = uint8_t;
-using vector_int16_t = uint8_t;
-using vector_int32_t = uint8_t;
-using vector_int64_t = uint8_t;
-using vector_bfloat16_t = uint8_t;
-using vector_half = uint8_t;
-using vector_float = uint8_t;
-using vector_hifloat8_t = uint8_t;
-using vector_fp8_e4m3fn_t = uint8_t;
-using vector_fp8_e5m2_t = uint8_t;
-using vector_fp8_e8m0_t = uint8_t;
-using vector_int4x2_t = uint8_t;
-using vector_fp4x2_e2m1_t = uint8_t;
-using vector_fp4x2_e1m2_t = uint8_t;
 #endif
 
 static bool is_mock_copy_matrix_cc_to_gm = false;
@@ -44,6 +50,7 @@ static uint16_t src_stride_global = 0;
 static bool NZ2ND_en_global = false;
 static bool NZ2DN_en_global = false;
 static void* gm_addr_global = nullptr;
+static void* l0c_addr_global = nullptr;
 static bool is_mock_copy_matrix_cc_to_ub = false;
 static void* ub_addr_global = nullptr;
 static uint64_t quant_pre_global = 0;
@@ -67,6 +74,9 @@ static uint64_t quant_pre_global = 0;
             if (gm_addr_global != nullptr) {                                                                    \
                 EXPECT_EQ(dst_addr, gm_addr_global);                                                            \
             }                                                                                                   \
+            if (l0c_addr_global != nullptr) {                                                                   \
+                EXPECT_EQ(src_addr, l0c_addr_global);                                                           \
+            }                                                                                                   \
             EXPECT_EQ(quant_pre, quant_pre_global);                                                             \
         }                                                                                                       \
     }
@@ -78,6 +88,10 @@ mock_copy_matrix_cc_to_gm(int8_t, int32_t);
 #ifndef __biasbuf__
 #define __biasbuf__
 #endif
+
+inline void sprsts(Literal, __ubuf__ uint32_t*, int32_t) {}
+
+inline void sprsts(Literal, __ubuf__ uint32_t*&, int32_t, Literal) {}
 
 void vsts(
     vector_f8e4m3 data, __ubuf__ fp8_e4m3fn_t* base, int32_t offset, Literal dist, vector_bool mask, Literal mode);
@@ -144,6 +158,13 @@ inline void copy_matrix_cc_to_cbuf(
     bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
 {}
 inline void copy_matrix_cc_to_cbuf(
+    __cbuf__ bfloat16_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
+    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
+    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+    bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{}
+inline void copy_matrix_cc_to_cbuf(
     __cbuf__ int8_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
     uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
@@ -192,6 +213,52 @@ inline void copy_matrix_cc_to_cbuf(
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
 {}
+inline void copy_matrix_cc_to_cbuf(
+    __cbuf__ bfloat16_t* dst_addr, __cc__ int32_t* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
+    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
+    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+    bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{}
+inline void copy_matrix_cc_to_cbuf(
+    __cbuf__ hifloat8_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
+    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
+    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+    bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{}
+inline void copy_matrix_cc_to_cbuf(
+    __cbuf__ fp8_e4m3fn_t* dst_addr, __cc__ float* src_addr, uint8_t sid, uint16_t n_size, uint16_t m_size,
+    uint32_t loop_dst_stride, uint16_t loop_src_stride, uint8_t l2_cache_ctl, uint8_t clip_relu_pre,
+    uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post,
+    uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
+    bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)
+{}
+
+// npu_arch_9201: no sid, bool quant_pre_rnd as 7th arg
+#define stub_copy_matrix_cc_to_cbuf_no_sid(DstT, SrcT)                                                              \
+    inline void copy_matrix_cc_to_cbuf(                                                                             \
+        __cbuf__ DstT* dst_addr, __cc__ SrcT* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride, \
+        uint16_t loop_src_stride, bool quant_pre_rnd, uint8_t clip_relu_pre, uint8_t unit_flag_ctl,                 \
+        uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool NZ2ND_en, uint64_t quant_post, uint8_t relu_post, \
+        bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,                        \
+        bool loop_enhance_merge_en, bool C0_pad_en, bool wino_post_en, bool broadcast_en, bool NZ2DN_en)            \
+    {}
+
+stub_copy_matrix_cc_to_cbuf_no_sid(half, float);
+stub_copy_matrix_cc_to_cbuf_no_sid(bfloat16_t, float);
+stub_copy_matrix_cc_to_cbuf_no_sid(int8_t, float);
+stub_copy_matrix_cc_to_cbuf_no_sid(uint8_t, float);
+stub_copy_matrix_cc_to_cbuf_no_sid(float, float);
+stub_copy_matrix_cc_to_cbuf_no_sid(half, int32_t);
+stub_copy_matrix_cc_to_cbuf_no_sid(int8_t, int32_t);
+stub_copy_matrix_cc_to_cbuf_no_sid(uint8_t, int32_t);
+stub_copy_matrix_cc_to_cbuf_no_sid(int32_t, int32_t);
+stub_copy_matrix_cc_to_cbuf_no_sid(bfloat16_t, int32_t);
+stub_copy_matrix_cc_to_cbuf_no_sid(hifloat8_t, float);
+stub_copy_matrix_cc_to_cbuf_no_sid(fp8_e4m3fn_t, float);
+
+#undef stub_copy_matrix_cc_to_cbuf_no_sid
 
 // ==========copy_matrix_cc_to_cbuf_s4===========
 inline void copy_matrix_cc_to_cbuf_s4(
@@ -208,6 +275,23 @@ inline void copy_matrix_cc_to_cbuf_s4(
     uint8_t unit_flag_ctl, uint64_t quant_pre, uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post,
     uint8_t relu_post, bool clip_relu_post, bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en,
     bool loop_enhance_merge_en, bool c0_pad_en, bool wino_post_en, bool broadcast_en, bool nz2dn_en)
+{}
+
+// npu_arch_9201: no sid, bool quant_pre_rnd
+inline void copy_matrix_cc_to_cbuf_s4(
+    __cbuf__ void* dst_addr, __cc__ float* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, bool quant_pre_rnd, uint8_t clip_relu_pre, uint8_t unit_flag_ctl, uint64_t quant_pre,
+    uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en, bool loop_enhance_merge_en, bool c0_pad_en,
+    bool wino_post_en, bool broadcast_en, bool nz2dn_en)
+{}
+
+inline void copy_matrix_cc_to_cbuf_s4(
+    __cbuf__ void* dst_addr, __cc__ int32_t* src_addr, uint16_t n_size, uint16_t m_size, uint32_t loop_dst_stride,
+    uint16_t loop_src_stride, bool quant_pre_rnd, uint8_t clip_relu_pre, uint8_t unit_flag_ctl, uint64_t quant_pre,
+    uint8_t relu_pre, bool split_en, bool nz2nd_en, uint64_t quant_post, uint8_t relu_post, bool clip_relu_post,
+    bool loop_enhance_en, uint8_t eltwise_op, bool eltwise_antq_en, bool loop_enhance_merge_en, bool c0_pad_en,
+    bool wino_post_en, bool broadcast_en, bool nz2dn_en)
 {}
 
 // ==========copy_matrix_cc_to_gm===========
@@ -614,6 +698,8 @@ inline void vgather2_bc(vector_bf16& dst, __ubuf__ bfloat16_t* src, vector_u32 i
 inline void vbr(vector_f8e4m3& dst, fp8_e4m3fn_t value) {}
 inline void vbr(vector_f8e5m2& dst, fp8_e5m2_t value) {}
 inline void vbr(vector_f8e8m0& dst, fp8_e8m0_t value) {}
+inline void vdup(vector_f8e8m0& dst, fp8_e8m0_t value, vector_bool mask, Literal mode) {}
+inline void vdup(vector_f8e8m0& dst, vector_f8e8m0 src, vector_bool mask, int32_t type, Literal mode) {}
 
 inline void copy_gm_to_cbuf_v2(
     __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
@@ -642,12 +728,22 @@ inline void img2colv2_cbuf_to_cb(
 inline void wait_flag_dev(pipe_t pipe, uint8_t flag_id) {}
 inline void wait_intra_block(pipe_t pipe, uint8_t flag_id) {}
 inline void set_intra_block(pipe_t pipe, uint8_t sync_id) {}
+inline void wait_intra_block(pipe_t pipe, uint16_t flag_id) {}
+inline void set_intra_block(pipe_t pipe, uint16_t sync_id) {}
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline void wait_intra_block(pipe_t pipe, int flag_id) {}
+inline void set_intra_block(pipe_t pipe, int sync_id) {}
+#endif
 inline void rls_buf(pipe_t pipe, uint64_t buf_id, bool mode) {}
 
 inline void psts(vector_bool src, __ubuf__ uint32_t*& base, int32_t offset, Literal dist, Literal post) {}
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+inline int64_t get_iqent(pipe_t pipe) { return 0; }
+#endif
+
 #if defined(__DAV_VEC__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-#include "instr_impl/npu_arch_3510/utils_impl/utils_type.h"
+#include "c_api/defs/type.h"
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint16_t*& dst) {}
 inline void pstu(vector_store_unalign& ureg, vector_bool mask, __ubuf__ uint32_t*& dst) {}
 #endif
@@ -665,6 +761,225 @@ inline void copy_ubuf_to_gm_align_v2(
     uint8_t l2_cache_mode, uint64_t burst_dst_stride, uint32_t burst_src_stride)
 {}
 #endif
+
+// ==========asc_prefetch_l2cache stubs (match npu_arch_9201 impl arity)==========
+inline void __prefetch_stop() {}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ int8_t* dst_addr, __gm__ int8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int8_t* dst_addr, __gm__ int8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ int8_t* dst_addr, __gm__ int8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ int8_t* dst_addr, __gm__ int8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ uint8_t* dst_addr, __gm__ uint8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint8_t* dst_addr, __gm__ uint8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ uint8_t* dst_addr, __gm__ uint8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ uint8_t* dst_addr, __gm__ uint8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ hifloat8_t* dst_addr, __gm__ hifloat8_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ fp8_e5m2_t* dst_addr, __gm__ fp8_e5m2_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ fp8_e4m3fn_t* dst_addr, __gm__ fp8_e4m3fn_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ int16_t* dst_addr, __gm__ int16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ uint16_t* dst_addr, __gm__ uint16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ half* dst_addr, __gm__ half* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ bfloat16_t* dst_addr, __gm__ bfloat16_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ int32_t* dst_addr, __gm__ int32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ uint32_t* dst_addr, __gm__ uint32_t* src_addr, uint8_t sid, uint64_t loop1_src_stride,
+    uint8_t l2_cache_ctl, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_align_v2(
+    __cbuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride)
+{}
+inline void copy_gm_to_ubuf_align_v2(
+    __ubuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint32_t burst_num, uint32_t burst_len,
+    uint8_t left_padding_count, uint8_t right_padding_count, bool constant_padding_ctl, bool reserved,
+    uint8_t l2_cache_ctl, uint64_t burst_src_stride, uint32_t burst_dst_stride, bool reserved2)
+{}
+inline void copy_gm_to_cbuf_multi_dn2nz(
+    __cbuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
+inline void copy_gm_to_cbuf_multi_nd2nz(
+    __cbuf__ float* dst_addr, __gm__ float* src_addr, uint8_t sid, uint64_t loop1_src_stride, uint8_t l2_cache_ctl,
+    uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride, bool smallc0_en, bool reserved)
+{}
 
 // ==========vstar===========
 inline void vstar(vector_align data, __ubuf__ fp8_e4m3fn_t* base) {}
@@ -714,143 +1029,5 @@ typedef std::integral_constant<Pos, Pos::LOWEST> Lowest_Type;
 typedef std::integral_constant<Pos, Pos::HIGHEST> Highest_Type;
 constexpr Lowest_Type POS_LOWEST = Lowest_Type();
 constexpr Highest_Type POS_HIGHEST = Highest_Type();
-
-// ========== __builtin_cce_vcvt* stubs for CPU mode ==========
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-inline vector_f32 __builtin_cce_vcvtff_bf162f32_x(vector_bf16 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_f4e1m2x2 __builtin_cce_vcvtff_bf162f4e1m2x2_x(vector_bf16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_f4e1m2x2();
-}
-inline vector_f4e2m1x2 __builtin_cce_vcvtff_bf162f4e2m1x2_x(vector_bf16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_f4e2m1x2();
-}
-inline vector_f32 __builtin_cce_vcvtff_f162f32_x(vector_f16 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_hif8 __builtin_cce_vcvtff_f162hif8_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_hif8();
-}
-inline vector_bf16 __builtin_cce_vcvtff_f322bf16_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_bf16();
-}
-inline vector_f16 __builtin_cce_vcvtff_f322f16_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_f16();
-}
-inline vector_f8e4m3 __builtin_cce_vcvtff_f322f8e4m3_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_f8e4m3();
-}
-inline vector_f8e5m2 __builtin_cce_vcvtff_f322f8e5m2_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_f8e5m2();
-}
-inline vector_hif8 __builtin_cce_vcvtff_f322hif8_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_hif8();
-}
-inline vector_bf16 __builtin_cce_vcvtff_f4e1m2x22bf16_x(vector_f4e1m2x2 src, vector_bool mask, ULL arg0)
-{
-    return vector_bf16();
-}
-inline vector_bf16 __builtin_cce_vcvtff_f4e2m1x22bf16_x(vector_f4e2m1x2 src, vector_bool mask, ULL arg0)
-{
-    return vector_bf16();
-}
-inline vector_f32 __builtin_cce_vcvtff_f8e4m32f32_x(vector_f8e4m3 src, vector_bool mask, ULL arg0)
-{
-    return vector_f32();
-}
-inline vector_f32 __builtin_cce_vcvtff_f8e5m22f32_x(vector_f8e5m2 src, vector_bool mask, ULL arg0)
-{
-    return vector_f32();
-}
-inline vector_f16 __builtin_cce_vcvtff_hif82f16_x(vector_hif8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
-inline vector_f32 __builtin_cce_vcvtff_hif82f32_x(vector_hif8 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_s32 __builtin_cce_vcvtfi_bf162s32_x(vector_bf16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s32();
-}
-inline vector_s32 __builtin_cce_vcvtfi_f162s32_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_s32();
-}
-inline vector_s4x2 __builtin_cce_vcvtfi_f162s4x2_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s4x2();
-}
-inline vector_s8 __builtin_cce_vcvtfi_f162s8_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s8();
-}
-inline vector_u8 __builtin_cce_vcvtfi_f162u8_x(vector_f16 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_u8();
-}
-inline vector_s16 __builtin_cce_vcvtfi_f322s16_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s16();
-}
-inline vector_s64 __builtin_cce_vcvtfi_f322s64_x(vector_f32 src, vector_bool mask, ULL arg0, ULL arg1, ULL arg2)
-{
-    return vector_s64();
-}
-inline vector_f32 __builtin_cce_vcvtif_s162f32_x(vector_s16 src, vector_bool mask, ULL arg0) { return vector_f32(); }
-inline vector_bf16 __builtin_cce_vcvtif_s4x22bf16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_bf16(); }
-inline vector_f16 __builtin_cce_vcvtif_s4x22f16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
-inline vector_f32 __builtin_cce_vcvtif_s642f32_x(vector_s64 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_f32();
-}
-inline vector_f16 __builtin_cce_vcvtif_s82f16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
-inline vector_f16 __builtin_cce_vcvtif_u82f16_x(vector_u8 src, vector_bool mask, ULL arg0) { return vector_f16(); }
-inline vector_s32 __builtin_cce_vcvtii_s162s32_x(vector_s16 src, vector_bool mask, ULL arg0) { return vector_s32(); }
-inline vector_u32 __builtin_cce_vcvtii_s162u32_x(vector_s16 src, vector_bool mask, ULL arg0) { return vector_u32(); }
-inline vector_u8 __builtin_cce_vcvtii_s162u8_x(vector_s16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u8();
-}
-inline vector_s16 __builtin_cce_vcvtii_s322s16_x(vector_s32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_s16();
-}
-inline vector_s64 __builtin_cce_vcvtii_s322s64_x(vector_s32 src, vector_bool mask, ULL arg0) { return vector_s64(); }
-inline vector_u16 __builtin_cce_vcvtii_s322u16_x(vector_s32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u16();
-}
-inline vector_u8 __builtin_cce_vcvtii_s322u8_x(vector_s32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u8();
-}
-inline vector_s16 __builtin_cce_vcvtii_s4x22s16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s16(); }
-inline vector_s32 __builtin_cce_vcvtii_s642s32_x(vector_s64 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_s32();
-}
-inline vector_s16 __builtin_cce_vcvtii_s82s16_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s16(); }
-inline vector_s32 __builtin_cce_vcvtii_s82s32_x(vector_s8 src, vector_bool mask, ULL arg0) { return vector_s32(); }
-inline vector_u32 __builtin_cce_vcvtii_u162u32_x(vector_u16 src, vector_bool mask, ULL arg0) { return vector_u32(); }
-inline vector_u8 __builtin_cce_vcvtii_u162u8_x(vector_u16 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u8();
-}
-inline vector_s16 __builtin_cce_vcvtii_u322s16_x(vector_u32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_s16();
-}
-inline vector_u16 __builtin_cce_vcvtii_u322u16_x(vector_u32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u16();
-}
-inline vector_u8 __builtin_cce_vcvtii_u322u8_x(vector_u32 src, vector_bool mask, ULL arg0, ULL arg1)
-{
-    return vector_u8();
-}
-inline vector_u16 __builtin_cce_vcvtii_u82u16_x(vector_u8 src, vector_bool mask, ULL arg0) { return vector_u16(); }
-inline vector_u32 __builtin_cce_vcvtii_u82u32_x(vector_u8 src, vector_bool mask, ULL arg0) { return vector_u32(); }
-#endif
 
 #endif

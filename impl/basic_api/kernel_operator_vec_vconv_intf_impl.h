@@ -42,6 +42,8 @@
 #include "dav_3510/kernel_operator_vec_vconv_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_vconv_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_vec_vconv_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_vconv_impl.h"
 #elif __NPU_ARCH__ == 3113
@@ -97,7 +99,7 @@ __aicore__ inline void Cast(
     } else if constexpr (Std::is_same<SrcPrimType, int4b_t>::value) {
         Int4Setter::Instance().SetSrcInt4();
     }
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     if (!CheckFunVecBinaryScalarDiffType(
             dst, src, static_cast<SrcPrimType>(0), mask, repeatTime, repeatParams, "Cast")) {
         ASCENDC_REPORT_CHECK_ERROR("Cast", KernelFuncType::MASK_BIT_MODE);
@@ -134,7 +136,7 @@ __aicore__ inline void Cast(
     } else if constexpr (Std::is_same<SrcPrimType, int4b_t>::value) {
         Int4Setter::Instance().SetSrcInt4();
     }
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     if (!CheckFunVecBinaryScalarDiffType(
             dst, src, static_cast<SrcPrimType>(0), mask, repeatTime, repeatParams, "Cast")) {
         ASCENDC_REPORT_CHECK_ERROR("Cast", KernelFuncType::MASK_COUNT_MODE);
@@ -173,7 +175,7 @@ __aicore__ inline void Cast(
     } else if constexpr (Std::is_same<SrcPrimType, int4b_t>::value) {
         Int4Setter::Instance().SetSrcInt4();
     }
-#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if !((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     if (!CheckFunVecBinaryScalarDiffType(dst, src, static_cast<SrcPrimType>(0), count, "Cast")) {
         ASCENDC_REPORT_CHECK_ERROR("Cast", KernelFuncType::CALCOUNT_MODE);
     }
@@ -649,12 +651,13 @@ __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& v
                           "current api support dtype combination is vdeq: uint64_t");
     });
     CheckTensorAlign<T>(vdeq, ONE_BLK_SIZE, "vdeq", "SetDeqScale");
-    CheckTensorPos<T>(vdeq, Hardware::UB, "vdeq", "VECIN / VECCALC / VECOUT", "SetDeqScale");
+    CheckTensorPos<T>(vdeq, Hardware::UB, "vdeq", "VECIN/VECCALC/VECOUT", "SetDeqScale");
 #endif
     SetDeqScaleImpl<T>(vdeq, vdeqInfo);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+    (__NPU_ARCH__ == 3113)
 /*
  * @ingroup Truncate Level 2
  * @brief dst[i] = Precision conversion
@@ -666,8 +669,8 @@ template <typename T, RoundMode roundMode>
 __aicore__ inline void Truncate(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-    CheckTensorPos<T>(dst, Hardware::UB, "dst", "VECIN / VECCALC / VECOUT", "Truncate");
-    CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN / VECCALC / VECOUT", "Truncate");
+    CheckTensorPos<T>(dst, Hardware::UB, "dst", "VECIN/VECCALC/VECOUT", "Truncate");
+    CheckTensorPos<T>(src, Hardware::UB, "src", "VECIN/VECCALC/VECOUT", "Truncate");
     ASCENDC_ASSERT((count <= src.GetSize() && count <= dst.GetSize()), {
         KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src", count);
     });

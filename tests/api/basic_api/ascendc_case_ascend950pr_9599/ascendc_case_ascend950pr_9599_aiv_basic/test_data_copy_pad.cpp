@@ -7,12 +7,19 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include <cstdint>
+#include <type_traits>
 #include <gtest/gtest.h>
 #include "kernel_operator.h"
 // #include "api_check/kernel_cpu_check.h"
+#include "mockcpp/mockcpp.hpp"
 
 using namespace std;
 using namespace AscendC;
+
+static_assert(
+    std::is_same<decltype(DataCopyExtParams::blockCount), uint16_t>::value,
+    "DataCopyExtParams::blockCount must be uint16_t on NPU architecture 3510");
 
 struct TestDataCopyPadParams {
     uint32_t dataSize;
@@ -97,4 +104,79 @@ TEST_P(TestDataCopyPadSuite, TestDataCopyPadCases)
         EXPECT_EQ(dstGm[i], 0x00);
     }
     SetGCoreType(0);
+}
+
+TEST(DataCopyExtParamsSuite, BlockCountSupports16BitValue)
+{
+    constexpr uint16_t blockCount = UINT16_MAX;
+    DataCopyExtParams copyParams{blockCount, 1, 0, 0, 0};
+
+    EXPECT_EQ(copyParams.blockCount, blockCount);
+}
+
+class DataCopyPadStrideBoundarySuite : public testing::Test {
+protected:
+    static constexpr int64_t STRIDE_UPPER_BOUND = static_cast<int64_t>(1ULL << 40);
+
+    void SetUp() override
+    {
+        SetGCoreType(2);
+        KernelRaise::GetInstance().SetRaiseMode(false);
+        OOMInit();
+    }
+
+    void TearDown() override
+    {
+        KernelRaise::GetInstance().SetRaiseMode(true);
+        GlobalMockObject::verify();
+        SetGCoreType(0);
+    }
+
+    void ExpectSrcStrideRaiseCount(int64_t srcStride, uint64_t expectedRaiseCount)
+    {
+        DataCopyExtParams copyParams{1, 1, srcStride, 0, 0};
+        const uint64_t startRaiseCount = KernelRaise::GetInstance().GetRaiseCount();
+
+        CheckSrcGmDataCopyExtParamsRange(copyParams);
+
+        EXPECT_EQ(KernelRaise::GetInstance().GetRaiseCount() - startRaiseCount, expectedRaiseCount);
+    }
+
+    void ExpectDstStrideRaiseCount(int64_t dstStride, uint64_t expectedRaiseCount)
+    {
+        MOCKER_CPP(GetSysWorkSpacePtr).expects(once()).will(returnValue(static_cast<__gm__ uint8_t*>(nullptr)));
+        MOCKER_CPP(
+            copy_ubuf_to_gm_align_v2,
+            void(__gm__ void*, __ubuf__ void*, uint8_t, uint32_t, uint32_t, uint8_t, uint64_t, uint32_t))
+            .expects(once());
+        uint8_t src = 0;
+        uint8_t dst = 0;
+        DataCopyExtParams copyParams{1, 1, 0, dstStride, 0};
+        const uint64_t startRaiseCount = KernelRaise::GetInstance().GetRaiseCount();
+
+        DataCopyPadUB2GMImpl(
+            reinterpret_cast<__gm__ uint8_t*>(&dst), reinterpret_cast<__ubuf__ uint8_t*>(&src), copyParams);
+
+        EXPECT_EQ(KernelRaise::GetInstance().GetRaiseCount() - startRaiseCount, expectedRaiseCount);
+    }
+};
+
+TEST_F(DataCopyPadStrideBoundarySuite, SrcStrideBelowUpperBoundDoesNotRaise)
+{
+    ExpectSrcStrideRaiseCount(STRIDE_UPPER_BOUND - 1, 0);
+}
+
+TEST_F(DataCopyPadStrideBoundarySuite, SrcStrideAtUpperBoundRaises)
+{
+    ExpectSrcStrideRaiseCount(STRIDE_UPPER_BOUND, 1);
+}
+
+TEST_F(DataCopyPadStrideBoundarySuite, DstStrideBelowUpperBoundDoesNotRaise)
+{
+    ExpectDstStrideRaiseCount(STRIDE_UPPER_BOUND - 1, 0);
+}
+
+TEST_F(DataCopyPadStrideBoundarySuite, DstStrideAtUpperBoundRaises)
+{
+    ExpectDstStrideRaiseCount(STRIDE_UPPER_BOUND, 1);
 }

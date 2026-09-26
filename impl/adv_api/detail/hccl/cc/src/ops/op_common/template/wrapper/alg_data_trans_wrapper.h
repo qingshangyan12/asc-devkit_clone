@@ -14,6 +14,10 @@
 
 namespace mc2_ops_hccl {
 
+HcclResult InitHcommBatchTransferOnThreadSupported(bool isSupported);
+
+bool IsHcommBatchTransferOnThreadSupported();
+
 HcclResult SendWrite(const DataInfo& sendInfo, const ThreadHandle& thread);
 
 HcclResult SendBatchWrite(const DataInfo& sendInfo, const ThreadHandle& thread);
@@ -24,9 +28,12 @@ HcclResult SendRecvWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& t
 
 HcclResult SendRecvBatchWrite(const SendRecvInfo& sendRecvInfo, const ThreadHandle& thread);
 
-HcclResult SendRecvBatchWriteReduce(const SendRecvReduceInfo& sendRecvInfo, const ThreadHandle& thread);
+HcclResult SendRecvBatchWriteReduce(
+    const SendRecvReduceInfo& sendRecvInfo, const ThreadHandle& thread, bool fusePostNotify = false);
 
 HcclResult SendWriteReduce(const DataReduceInfo& sendInfo, const ThreadHandle& thread);
+
+HcclResult SendBatchWriteReduce(const DataReduceInfo& sendInfo, const ThreadHandle& thread);
 
 HcclResult RecvWriteReduce(const DataReduceInfo& recvInfo, const ThreadHandle& thread);
 
@@ -45,6 +52,8 @@ HcclResult SendRecvBatchRead(const SendRecvInfo& sendRecvInfo, const ThreadHandl
 HcclResult SendReadReduce(const DataReduceInfo& sendInfo, const ThreadHandle& thread);
 
 HcclResult RecvReadReduce(const DataReduceInfo& recvInfo, const ThreadHandle& thread);
+
+HcclResult RecvBatchReadReduce(const DataReduceInfo& recvInfo, const ThreadHandle& thread);
 
 HcclResult SendRecvReadReduce(const SendRecvReduceInfo& sendRecvInfo, const ThreadHandle& thread);
 

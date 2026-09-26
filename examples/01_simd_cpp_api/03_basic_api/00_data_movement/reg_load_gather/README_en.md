@@ -1,4 +1,4 @@
-# gather_ld_reg Example
+# reg_load_gather Example
 
 ## Overview
 This example implements the functionality of transferring discrete data from UB (Unified Buffer) into a RegTensor (the basic unit of Reg vector computation) based on the Reg programming interface. It supports two scenarios. Select a scenario through the CMake build parameter `SCENARIO_NUM`.
@@ -21,7 +21,7 @@ This example implements the functionality of transferring discrete data from UB 
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
@@ -76,7 +76,7 @@ This example implements the functionality of transferring discrete data from UB 
 ## Build and Run
 Run the following steps in the root directory of this example to build and run it.
 - Configure environment variables
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

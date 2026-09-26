@@ -12,19 +12,29 @@ cmake_minimum_required(VERSION 3.16.0)
 set(CMAKE_CXX_STANDARD 17)
 find_package(tikicpulib REQUIRED)
 
+add_subdirectory(ascendc_host_header_checker)
+
 set(ASCENDC_UT_PRODUCT_TYPE_LIST
     ascend910B1_AIC
     ascend910B1_AIV
     ascend950pr_9599_AIC
     ascend950pr_9599_AIV
+    ascend960dt_AIC
+    ascend960dt_AIV
 )
 
 set(ASCENDC_UT_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/..
     ${ASCENDC_DIR}
     ${ASCENDC_DIR}/include
+    ${ASCENDC_DIR}/include/basic_api
     ${ASCENDC_DIR}/include/c_api
+    ${ASCENDC_DIR}/include/simt_api
+    ${ASCENDC_DIR}/include/utils
+    ${ASCENDC_DIR}/impl
+    ${ASCENDC_DIR}/impl/basic_api
     ${ASCENDC_DIR}/impl/c_api
+    ${ASCENDC_DIR}/impl/simt_api
     ${ASCENDC_DIR}/
 )
 
@@ -54,6 +64,9 @@ file(GLOB ASCENDC_UT_ascend910B1_AIV_CASE_SRC
 file(GLOB ASCENDC_UT_ascend950pr_9599_AIC_CASE_SRC
     npu_arch_3510/cube_compute/*.cpp
     npu_arch_3510/cube_datamove/*.cpp
+    npu_arch_3510/sys_var/test_asc_get_pipe_idle_slot_count.cpp
+    npu_arch_3510/sys_var/test_asc_set_l13d_padding.cpp
+    npu_arch_3510/sys_var/test_asc_set_l12l0_padding_val.cpp
 )
 
 file(GLOB ASCENDC_UT_ascend950pr_9599_AIV_CASE_SRC
@@ -65,6 +78,16 @@ file(GLOB ASCENDC_UT_ascend950pr_9599_AIV_CASE_SRC
     npu_arch_3510/sys_var/*.cpp
     npu_arch_3510/vector_compute/*.cpp
     npu_arch_3510/vector_datamove/*.cpp
+)
+
+file(GLOB ASCENDC_UT_ascend960dt_AIC_CASE_SRC
+    npu_arch_9201/cube_compute/*.cpp
+    npu_arch_9201/cube_datamove/*.cpp
+)
+
+file(GLOB ASCENDC_UT_ascend960dt_AIV_CASE_SRC
+    npu_arch_9201/vector_compute/*.cpp
+    npu_arch_9201/vector_datamove/*.cpp
 )
 
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
@@ -83,7 +106,10 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_VEC__;__DAV_VEC__>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_CUBE__;__DAV_CUBE__>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:__NPU_ARCH__=3510;__DAV_C310__;__DAV_C310_VEC__;__DAV_VEC__>
+        $<$<STREQUAL:${product_type},ascend960dt_AIC>:__NPU_ARCH__=9201;__DAV_CUBE__>
+        $<$<STREQUAL:${product_type},ascend960dt_AIV>:__NPU_ARCH__=9201;__DAV_VEC__>
         __disable_kernel_type_autoinfer__=
+        __callee__=
     )
 
     target_include_directories(ascendc_ut_c_api_${product_type} PRIVATE
@@ -104,6 +130,8 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
         $<$<STREQUAL:${product_type},ascend910B1_AIV>:tikicpulib::ascend910B1>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIC>:tikicpulib::ascend950pr_9599>
         $<$<STREQUAL:${product_type},ascend950pr_9599_AIV>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend960dt_AIC>:tikicpulib::ascend950pr_9599>
+        $<$<STREQUAL:${product_type},ascend960dt_AIV>:tikicpulib::ascend950pr_9599>
         -Wl,--no-as-needed
         error_manager
         mmpa

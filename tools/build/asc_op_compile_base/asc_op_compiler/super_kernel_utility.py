@@ -15,12 +15,13 @@ super kernel utility
 
 # import all func or types for sk, if need delete grep super kernel code in 4.1.2
 import enum
+import re
 from asc_op_compile_base.common.platform.platform_info import get_soc_spec
 from asc_op_compile_base.common.buildcfg import get_current_build_config
 from asc_op_compile_base.common.buildcfg.buildcfg_mapping import op_debug_config
 from .ascendc_constants import KernelMetaType, STR_TO_KERNEL_TYPE_V220
 from .ascendc_common_utility import CommonUtility, gen_func_align_attribute
-from .ascendc_compile_base import search_in_line, extract_file_path
+from .ascendc_compile_base import extract_file_path
 from asc_op_compile_base.common.utils.log_utils import AscendCLogLevel, CompileStage
 from .super_kernel_constants import ERR_CODE
 
@@ -31,9 +32,7 @@ def get_op_debug_config():
 
 def run_local_cmd(cmds, compile_log_path=None):
     output, ret_code = CommonUtility.run_cmd_ascendc(cmds, "compile")
-    CommonUtility.dump_build_log(
-        output.decode(), cmds, CompileStage.SPLIT_SUB_OBJS, ret_code
-    )
+    CommonUtility.dump_build_log(output.decode(), cmds, CompileStage.SPLIT_SUB_OBJS, ret_code)
     CommonUtility.dump_compile_log(cmds, CompileStage.SPLIT_SUB_OBJS, compile_log_path)
 
 
@@ -46,25 +45,27 @@ def get_wait_flag_for_chip(flag_id):
 def check_exist_forbidden_symbols(dst_i_file, forbidden_symbols, allow_path):
     need_check: bool = True
     block_file_path = ""
-    err_str = ""
     result_symbol_list = []
     path_list = []
     line_result = []
+    forbidden_pattern = re.compile(r"\b(" + "|".join(re.escape(symbol) for symbol in forbidden_symbols) + r")\b")
+    allow_path_pattern = re.compile(r"\b(" + "|".join(re.escape(path) for path in allow_path) + r")\b")
     with open(dst_i_file, "r") as f:
-        lines = f.readlines()
-        for line in lines:
+        for line in f:
             if line.startswith("#"):
+                # Track the current preprocessed source context for subsequent lines.
                 need_check = True
-                result, result_instrs = search_in_line(line, allow_path)
-                if result:
+                if allow_path_pattern.search(line):
                     need_check = False
                 block_file_path = line
                 continue
             if not need_check:
                 continue
-            result, result_instrs = search_in_line(line, forbidden_symbols)
-            if result:
-                result_symbol_list.append(result_instrs)
+            if not any(symbol in line for symbol in forbidden_symbols):
+                continue
+            matches = forbidden_pattern.findall(line)
+            if matches:
+                result_symbol_list.append(", ".join(matches))
                 path_list.append(extract_file_path(block_file_path))
                 line_result.append(line)
     return result_symbol_list, path_list, line_result
@@ -87,6 +88,7 @@ def check_exist_instrinsic_when_super_kernel(dst_i_file):
         "asc/impl",
         "impl/basic_api",
         "impl/c_api",
+        "include/c_api",
     ]
     result_symbol_list, path_list, line_result = check_exist_forbidden_symbols(
         dst_i_file, forbidden_apis, allow_path_mark
@@ -99,11 +101,7 @@ def check_exist_instrinsic_when_super_kernel(dst_i_file):
             apis = list(dict.fromkeys([a.strip() for a in result.split(",")]))
             replacements = list(
                 dict.fromkeys(
-                    [
-                        _FORBIDDEN_API_REPLACEMENT.get(api, "")
-                        for api in apis
-                        if _FORBIDDEN_API_REPLACEMENT.get(api, "")
-                    ]
+                    [_FORBIDDEN_API_REPLACEMENT.get(api, "") for api in apis if _FORBIDDEN_API_REPLACEMENT.get(api, "")]
                 )
             )
             apis_str = " or ".join(apis)

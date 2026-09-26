@@ -197,6 +197,66 @@ run_llt_test(
     TASK_NUM 1
 )
 
+# ================ asc_compile_exporter ================
+add_executable(ascendc_ut_asc_compile_exporter
+    ${ASCENDC_DIR}/tests/main.cpp
+    asc_compile_exporter/test_asc_compile_exporter_unit.cpp
+    asc_compile_exporter/test_asc_compile_exporter.cpp
+    asc_compile_exporter/test_bundle_source_generator.cpp
+    asc_compile_exporter/test_collected_manifest_repository.cpp
+    asc_compile_exporter/test_file_utils.cpp
+    asc_compile_exporter/test_manifest_bundle_types.cpp
+    common/test_process_executor.cpp
+    common/test_manifest_constant.cpp
+    asc_compile_exporter/test_resource_manifest_validator.cpp
+    common/test_directory_cleanup_guard.cpp
+    asc_compile_exporter/test_ascendc_tool_log.cpp
+    ${ASCENDC_DIR}/tools/build/asc_compile_exporter/bundle_source_generator.cpp
+    ${ASCENDC_DIR}/tools/build/asc_compile_exporter/collected_manifest_repository.cpp
+    ${ASCENDC_DIR}/tools/build/asc_compile_exporter/manifest_bundle_compiler.cpp
+    ${ASCENDC_DIR}/tools/build/asc_compile_exporter/resource_manifest_validator.cpp
+    ${ASCENDC_DIR}/tools/build/common/manifest_constant.cpp
+    ${ASCENDC_DIR}/tools/build/common/file_utils.cpp
+    ${ASCENDC_DIR}/tools/build/common/process_executor.cpp
+    ${ASCENDC_DIR}/tools/build/common/directory_cleanup_guard.cpp
+)
+
+function(configure_asc_compile_exporter_test target_name)
+    target_compile_definitions(${target_name} PRIVATE
+        UT_TEST
+    )
+
+    target_include_directories(${target_name} PRIVATE
+        ${ASCENDC_DIR}/tools/build/asc_compile_exporter
+        ${ASCENDC_DIR}/tools/build/common
+        ${ASC_COMPILE_EXPORTER_GENERATED_DIR}
+    )
+
+    target_compile_options(${target_name} PRIVATE
+        -Werror
+    )
+
+    target_link_options(${target_name} PRIVATE
+        -Wl,--wrap=rename
+    )
+
+    target_link_libraries(${target_name} PRIVATE
+        Boost::filesystem
+        $<BUILD_INTERFACE:intf_llt_pub_basic>
+        json
+        mmpa_headers
+        metadef_headers
+        dl
+    )
+endfunction()
+
+configure_asc_compile_exporter_test(ascendc_ut_asc_compile_exporter)
+
+run_llt_test(
+    TARGET ascendc_ut_asc_compile_exporter
+    TASK_NUM 1
+)
+
 
 # ###################################opbuild ut#################################
 add_library(ops_utest SHARED ${ASCENDC_DIR}/tests/tools/utils/opbuild/test_ops.cpp)

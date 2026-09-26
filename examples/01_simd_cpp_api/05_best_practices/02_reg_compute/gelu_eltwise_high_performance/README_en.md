@@ -4,7 +4,7 @@
 
 This example uses Gelu+Element-wise computation (introducing a series of Element-wise computation operations after Gelu to increase computation depth) to introduce RegBase vector performance tuning methods. The example demonstrates performance benefits from parallelism adjustment, loop splitting, and loop unrolling.
 
-> **Recommendation**: Before reading this example, it is recommended to first read the [Gelu Performance Optimization Example](../gelu_high_performance/README.md) to understand the basic VF fusion optimization principles, then learn the more complex loop splitting optimization methods in this example.
+> **Recommendation**: Before reading this example, it is recommended to first read the [Gelu Performance Optimization Example](../gelu_high_performance/README_en.md) to understand the basic VF fusion optimization principles, then learn the more complex loop splitting optimization methods in this example.
 
 **Optimization Path**:
 - Case 0: Single loop computation, parallelism adjusted to 128 bytes
@@ -16,7 +16,7 @@ This example uses Gelu+Element-wise computation (introducing a series of Element
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -546,7 +546,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -606,7 +606,7 @@ Run the following steps in the root directory of this example to build and run t
     msopprof ./demo
     ```
 
-    - Performance data description  
+    - Performance data description
       After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
       ```bash

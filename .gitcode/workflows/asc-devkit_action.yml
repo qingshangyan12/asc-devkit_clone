@@ -1,0 +1,308 @@
+name: PR-pipeline_asc-devkit
+
+concurrency:
+  max: 18
+  exceed-action: QUEUE
+  enable: true
+  preemption:
+    enable: true
+    events: [mr_id]
+
+on:
+  pull_request_comment:
+    types: [created]
+    branches: [ '**' ]
+    comments: [ '^(?:\/)?compile*' ]
+  pr_comment:
+      types: [ created ]
+      keyword: '^(?:\/)?compile*'
+
+env:
+  org_name: "${{ vars.ORG_NAME }}"
+  repo_name: ${{atomgit.event.repository.name}}
+  MERGE_ID: ${{atomgit.event.pull_request.number}}
+  obs_path: "${{ env.org_name }}/${{ env.repo_name }}/ci/package/${{ env.MERGE_ID }}"
+  TARGET_BRANCH: ${{atomgit.ref_name}}
+  SOURCE_BRANCH: ${{atomgit.head_ref}}
+  obs_smoke_path: "${{ env.obs_path }}/presmoke/2"
+  online: ${{ vars.APPLY_LABEL }}
+
+
+stages:
+  stage1:
+    name: PreBuild
+    jobs:
+      JOB_image:
+        name: Test_image
+        steps:
+          - name: revise_image
+            identifier: revise_image
+            uses: cann/.gitcode/actions/revise-img@master
+            with:
+              repo_name: ${{ env.repo_name }}
+              target_branch: ${{ env.TARGET_BRANCH }}
+              comment: ${{ atomgit.event.comment.body }}
+              token: ${{ secrets.TESTTOKEN }}
+          -
+            name: show_output
+            run: |
+              echo "image: ${{ steps.revise_image.outputs.Compile_Ascend_X86 }}"
+        if: "${{ default() }}"
+        runs-on: ["self-hosted", "arch=x64", "spec=small"]
+        container:
+          image: swr.cn-north-4.myhuaweicloud.com/ci_cann/ubuntu20.04.05_x86:k8s_v1.1006
+      JOB_pre:
+        name: Test_PreBuild
+        uses: cann/.gitcode/.gitcode/workflows/pre_action.yml@master
+    pre:
+    - type: auto
+    fail-fast: true
+  stage2:
+    name: Compile
+    jobs:
+      JOB_x86_compile_ubuntu24:
+        name: Compile_x86_ubuntu24
+        uses: .gitcode/workflows/compile_action.yml
+        with:
+          task_name: 'x86_compile_ubuntu24'
+          image_version: ${{ jobs.JOB_image.outputs.Compile_Ascend_X86_ubuntu24 }}
+          arch: 'x64'
+          package_name: 'cann-asc-devkit_linux-x86_64_ubuntu24.run'
+      JOB_x86_compile:
+        name: Compile_x86
+        uses: .gitcode/workflows/compile_action.yml
+        with:
+          task_name: 'x86_compile'
+          image_version: ${{ jobs.JOB_image.outputs.Compile_Ascend_X86 }}
+          arch: 'x64'
+          package_name: 'cann-asc-devkit_linux-x86_64.run'
+      JOB_arm_compile_ubuntu24:
+        name: Compile_arm_ubuntu24
+        uses: .gitcode/workflows/compile_action.yml
+        with:
+          task_name: 'arm_compile_24'
+          image_version: ${{ jobs.JOB_image.outputs.Compile_Ascend_ARM_ubuntu24 }}
+          arch: 'arm64'
+          package_name: 'cann-asc-devkit_linux-aarch64_ubuntu24.run'
+      JOB_arm_compile:
+        name: Compile_arm
+        uses: .gitcode/workflows/compile_action.yml
+        with:
+          task_name: 'arm_compile'
+          image_version: ${{ jobs.JOB_image.outputs.Compile_Ascend_ARM }}
+          arch: 'arm64'
+          package_name: 'cann-asc-devkit_linux-aarch64.run'
+      JOB_codecheck:
+        name: CodeCheck
+        uses: cann/.gitcode/.gitcode/workflows/codecheck_action.yml@master
+        with:
+          precommit_image_version: ${{ jobs.JOB_image.outputs.precommit }}
+          codecheck_image_version: ${{ jobs.JOB_image.outputs.codecheck }}
+      JOB_staticcheck_md_check:
+        name: staticcheck_md_check
+        uses: .gitcode/workflows/staticcheck_action.yml
+        with:
+          check_type: 'md_check'
+          image_version: ${{ jobs.JOB_image.outputs.staticcheck }}
+    pre:
+    - type: auto
+    fail-fast: false
+  stage3:
+    name: UT
+    jobs:
+      JOB_api_check:
+        name: API_Check
+        steps:
+          -
+            name: api-check
+            identifier: api-check
+            uses: cann/.gitcode/actions/api-check@master
+            with:
+              org_name: ${{ env.org_name }}
+              mode: check
+              repo_name: ${{ env.repo_name }}
+              merge_id: ${{ env.MERGE_ID }}
+        if: env.TARGET_BRANCH == 'master'
+        runs-on: [self-hosted, arch=x64, spec=small]
+        container:
+          image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.API_Check }}
+      JOB_UT_Test_adv_test_one:
+        name: UT_Test_adv_test_one
+        uses: .gitcode/workflows/ut_action.yml
+        with:
+          ut_type: 'adv_test'
+          ut_package: 'coverage_*.info'
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+          arch: 'x64'
+      JOB_UT_Test_adv_test_two:
+        name: UT_Test_adv_test_two
+        uses: .gitcode/workflows/ut_action.yml
+        with:
+          ut_type: 'adv_test_two'
+          ut_package: 'coverage_*.info'
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+          arch: 'x64'
+      JOB_UT_Test_basic_test_one:
+        name: UT_Test_basic_test_one
+        uses: .gitcode/workflows/ut_action.yml
+        with:
+          ut_type: 'basic_test_one'
+          ut_package: 'coverage_*.info'
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+          arch: 'x64'
+      JOB_UT_Test_basic_test_two:
+        name: UT_Test_basic_test_two
+        uses: .gitcode/workflows/ut_action.yml
+        with:
+          ut_type: 'basic_test_two'
+          ut_package: 'coverage_*.info'
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+          arch: 'x64'
+      JOB_UT_Test_basic_test_three:
+        name: UT_Test_basic_test_three
+        uses: .gitcode/workflows/ut_action.yml
+        with:
+          ut_type: 'basic_test_three'
+          ut_package: 'coverage_*.info'
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+          arch: 'x64'
+      JOB_UT_Test_basic_test_four:
+        name: UT_Test_basic_test_four
+        uses: .gitcode/workflows/ut_action.yml
+        with:
+          ut_type: 'basic_test_four'
+          ut_package: 'coverage_*.info'
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+          arch: 'x64'
+      JOB_UT_Test_basic_test_five:
+        name: UT_Test_basic_test_five
+        uses: .gitcode/workflows/ut_action.yml
+        with:
+          ut_type: 'basic_test_five'
+          ut_package: 'coverage_*.info'
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test }}
+          arch: 'x64'
+      JOB_UT_Test_arm:
+        name: UT_Test_arm
+        uses: .gitcode/workflows/ut_action.yml
+        with:
+          ut_type: 'arm_test'
+          ut_package: 'coverage_*.info'
+          image_version: ${{ jobs.JOB_image.outputs.UT_Test_arm }}
+          arch: 'arm64'
+    pre:
+    - type: auto
+    fail-fast: false
+  stage4:
+    name: UT_report
+    jobs:
+      JOB_ut_report_lcov:
+        name: UT_report
+        steps:
+          -
+            name: Checkout
+            identifier: process_checkout
+            uses: checkout
+            with:
+              ref: ${{ atomgit.event.pull_request.merge_commit_sha }}
+              allow-unsafe-pr-checkout: true
+          -
+            name: download
+            uses: obs-download
+            with:
+              endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
+              bucket: "ascend-ci"
+              key: |
+                ${{ env.obs_path }}/pr_filelist.txt
+                ${{ env.obs_path }}/pr_filelist_mod.txt
+              path: ${{ steps.process_checkout.outputs.path }}
+          -
+            name: ut_report
+            identifier: ut-report
+            uses: cann/.gitcode/actions/ut-cov-report@master
+            with:
+              workspace: ${{ steps.process_checkout.outputs.path }}
+              cov_mode: "report"
+              ut_field: "asc-devkit"
+              modules: "adv_test adv_test_two basic_test_one basic_test_two basic_test_three basic_test_four basic_test_five"
+              source_branch: ${{ env.SOURCE_BRANCH }}
+              target_branch: ${{ env.TARGET_BRANCH }}
+              obs_path: ${{ env.obs_path }}
+              git_token: ${{secrets.GIT_TOKEN}}
+          -
+            name: upload
+            uses: obs-upload
+            with:
+              endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
+              bucket: "ascend-ci"
+              access-key: ${{secrets.AK}}
+              secret-key: ${{secrets.SK}}
+              artifact-path: |
+                ${{ steps.process_checkout.outputs.path }}/ut_cov_*.tar.gz
+              object-prefix: ${{ env.obs_path }}/
+        if: "${{ default() }}"
+        runs-on: [self-hosted, arch=x64, spec=large]
+        container:
+          image: swr.cn-north-4.myhuaweicloud.com/ci_cann/${{ jobs.JOB_image.outputs.UT_Test }}
+  stage5:
+    name: PreSmoke
+    jobs:
+      A2_smoke:
+        name: PreSmoke_A2
+        steps:
+          -
+            name: Checkout
+            identifier: process_checkout
+            uses: checkout
+            with:
+              allow-unsafe-pr-checkout: true
+          -
+            name: download
+            uses: obs-download
+            with:
+              endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
+              bucket: "ascend-ci"
+              access-key: ${{ secrets.AK }}
+              secret-key: ${{ secrets.SK }}
+              key: |
+                ${{ env.obs_path }}/pr_filelist.txt
+                ${{ env.obs_path }}/pr_filelist_mod.txt
+                ${{ env.obs_path }}/update_file_detail.txt
+                ${{ env.obs_path }}/pre_smoke.sh
+              path: ${{ steps.process_checkout.outputs.path }}
+          -
+            name: smoke executor
+            timeout-minutes: 30
+            run: |
+                set -e
+                # set env
+                export WORKSPACE=${{ steps.process_checkout.outputs.path }}
+                export repo_name=${{env.repo_name}}
+                export pr_id=${{ env.MERGE_ID }}
+                export obs_path=${{env.obs_path}}
+                export AK=${{secrets.AK}}
+                export SK=${{secrets.SK}}
+                export obs_smoke_path=${{ env.obs_smoke_path }}
+                bash ${{ steps.process_checkout.outputs.path }}/pre_smoke.sh
+          - name: upload
+            uses: obs-upload
+            with:
+              endpoint: "https://obs.cn-north-4.myhuaweicloud.com"
+              bucket: "ascend-ci"
+              access-key: ${{ secrets.AK }}
+              secret-key: ${{ secrets.SK }}
+              artifact-path: "${{ steps.process_checkout.outputs.path }}/slog*.tar.gz"
+              object-prefix: ${obs_smoke_path}/plog/
+        if: env.TARGET_BRANCH == 'master'
+        runs-on: ['self-hosted','npu=8','smoke=204']
+        container:
+          image: swr.cn-south-1.myhuaweicloud.com/pre_smoke/${{ jobs.JOB_image.outputs.Presmoke_A900_npupool }}
+    pre:
+    - type: auto
+    fail-fast: true
+
+post:
+  jobs:
+    job_post:
+      name: Test_post
+      uses: cann/.gitcode/.gitcode/workflows/post_action.yml@master

@@ -2,15 +2,15 @@
 
 ## Overview
 
-This example demonstrates Cube-Vector (CV) fusion implementation based on the static Tensor programming paradigm, fusing Matmul matrix multiplication with GELU activation function to execute in parallel within the same AI Core. The AIC side completes Matmul computation and outputs results to GM or UB through Fixpipe, while the AIV side reads data from GM or UB to complete GELU vector computation. The Matmul optimization details refer to the [Matmul Basic API Best Practice Example](../../01_matrix_compute/matmul_basic_api_high_performance/README.md), and the GELU optimization details refer to the [Gelu Performance Tuning Example](../../02_reg_compute/gelu_high_performance/README_en.md).
+This example demonstrates Cube-Vector (CV) fusion implementation based on the static Tensor programming paradigm, fusing Matmul matrix multiplication with GELU activation function to execute in parallel within the same AI Core. The AIC side completes Matmul computation and outputs results to GM or UB through Fixpipe, while the AIV side reads data from GM or UB to complete GELU vector computation. The Matmul optimization details refer to the [Matmul Basic API Best Practice Example](../../01_matrix_compute/matmul_basic_api_high_performance/README_en.md), and the GELU optimization details refer to the [Gelu Performance Tuning Example](../../02_reg_compute/gelu_high_performance/README_en.md).
 
 ## Supported Products and CANN Versions
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -99,7 +99,7 @@ GM ──(MTE2)──> L1 ──(MTE1)──> L0A/L0B ──(Cube)──> L0C �
 
 ### Intermediate Performance Optimization
 
-The Matmul part of this example uses the same optimization methods as the [Matmul Basic API Best Practice Example](../../01_matrix_compute/matmul_basic_api_high_performance/README.md) (L1/L0 double buffering, large packet transfer, fine-grained pipeline synchronization, UnitFlag, etc.). The GELU part uses RegBase method on Ascend 950PR architecture and MemBase method on A2/A3 architecture. For detailed GELU formula simplification, RegBase API and VF fusion optimization analysis, please refer to the [Gelu Performance Tuning Example](../../02_reg_compute/gelu_high_performance/README_en.md).
+The Matmul part of this example uses the same optimization methods as the [Matmul Basic API Best Practice Example](../../01_matrix_compute/matmul_basic_api_high_performance/README_en.md) (L1/L0 double buffering, large packet transfer, fine-grained pipeline synchronization, UnitFlag, etc.). The GELU part uses RegBase method on Ascend 950PR architecture and MemBase method on A2/A3 architecture. For detailed GELU formula simplification, RegBase API and VF fusion optimization analysis, please refer to the [Gelu Performance Tuning Example](../../02_reg_compute/gelu_high_performance/README_en.md).
 
 #### Matmul Optimization Methods
 
@@ -189,7 +189,7 @@ After the AIC side completes Fixpipe output of one (baseM × baseN) sub-block, i
 AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // Notify AIV data ready
 
 // AIV side GeluAndCopyOutAivSeparate() / GeluAndCopyOutAiv():
-AscendC::CrossCoreWaitFlag(0x8);  // Wait for AIC side Fixpipe completion
+AscendC::CrossCoreWaitFlag<0x2>(0x8);  // Wait for AIC side Fixpipe completion
 ```
 
 #### 3. Multi-Core Splitting in `__mix__(1,2)` Mode
@@ -317,7 +317,7 @@ The figure below shows the pipeline parallel execution process of AIC and AIV in
 
 ![Scenario1 CV Fusion-GM Relay Pipeline Parallelism](figures/CVParallell_L0C_GM_UB.png)
 
-> 💡 The msOpProf tool requires the CANN commercial or community edition. For details, see the [msOpProf Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md). The pipeline diagram was collected on device with `msopprof --aic-metrics=PipeTimeline ./demo`.
+>  The msOpProf tool requires the CANN commercial or community edition. For details, see the [msOpProf Tool Installation Guide](https://www.hiascend.com/document/detail/zh/canncommercial/900/devaids/optool/docs/zh/install_guide/msopprof_install_guide.md). The pipeline diagram was collected on device with `msopprof --aic-metrics=PipeTimeline ./demo`.
 
 **Reason for Significant MTE2 Time Reduction:**
 
@@ -346,7 +346,7 @@ Fixpipe L0C → UB (Enable dual destination mode through `dualDstCtl=0b01`, spli
 
 ```cpp
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = DivCeil(curM, 2) * 2;
+fixpipeParams.mSize = AscendC::Std::ceil_div(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
@@ -406,7 +406,7 @@ Run the following steps in the root directory of this example to build and run t
 
 - Configure environment variables
 
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -467,7 +467,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-For operators developed based on operator projects, this interface can be used to dump the content of a specified [LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md). It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
+For operators developed based on operator projects, this interface can be used to dump the content of a specified [LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md). It also supports printing custom additional information (only uint32\_t data type information is supported), such as printing the current line number.
 
 Call the DumpTensor interface in the operator kernel implementation code where Tensor data needs to be printed. Example:
 
@@ -477,7 +477,7 @@ AscendC::Div(yLocal, xLocal, yLocal, n);
 AscendC::DumpTensor(yLocal, 1, 16);
 ```
 
-> **Notice:** The [DumpTensor](../../../../../docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md) interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC_DUMP=0 as needed.
+> **Notice:** The [DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md) interface printing functionality will impact actual operator running performance and is typically used during the debugging phase. Developers can disable printing by setting ASCENDC_DUMP=0 as needed.
 
 ## Performance Debugging
 
@@ -495,7 +495,7 @@ AscendC::DumpTensor(yLocal, 1, 16);
     msopprof ./demo
     ```
 
-    - Performance data description  
+    - Performance data description
       After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
 
       ```bash

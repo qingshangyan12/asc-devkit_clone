@@ -814,9 +814,9 @@ __aicore__ inline void DataCopyUB2L1ND2NZImpl(__cbuf__ T* dst, __ubuf__ T* src, 
         uint64_t absL1Addr = (uint8_t*)dst - (uint8_t*)(GetTPipePtr()->GetBaseAddr((int8_t)TPosition::TSCM));
         ASCENDC_ASSERT((absL1Addr % ONE_BLK_SIZE == 0), {
             KERNEL_LOG(
-                KERNEL_ERROR,
-                "Failed to check dst tensor address "
-                "alignment in DataCopy with Nd2NzParams from VECIN / VECOUT to TSCM, it should be 32B aligned");
+                KERNEL_ERROR, "Failed to check dst tensor address "
+                              "alignment in DataCopy with Nd2NzParams from UB(VECIN/VECOUT) to L1 Buffer(TSCM), it "
+                              "should be 32B aligned");
         });
         ASCENDC_ASSERT((intriParams.ndNum == 1), {
             KERNEL_LOG(KERNEL_ERROR, "intriParams.ndNum is %hu, which can only be 1", intriParams.ndNum);
@@ -883,8 +883,8 @@ __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const
 #else
     ASCENDC_ASSERT((false), {
         KERNEL_LOG(
-            KERNEL_ERROR,
-            "unsupported data copy from A1 / B1 to VECIN / VECOUT on current device when AIC:AIV ratio is 1:1");
+            KERNEL_ERROR, "unsupported data copy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT) on current device when "
+                          "AIC:AIV ratio is 1:1");
     });
 #endif
 }
@@ -989,10 +989,13 @@ __aicore__ inline void VecCopyLevel0Template(
 {
     BasicAPIMaskStruct maskArrayStruct;
     if constexpr (isMaskBitMode) {
-        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        ASCENDC_ASSERT(
+            maskCount == 0, { KERNEL_LOG(KERNEL_ERROR, "maskCount must be 0 when isMaskBitMode is true."); });
         maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
     } else {
-        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+        ASCENDC_ASSERT(maskArray == nullptr, {
+            KERNEL_LOG(KERNEL_ERROR, "maskArray must be nullptr when isMaskBitMode is false.");
+        });
     }
     __ubuf__ uint64_t* maskBuf = nullptr;
 
@@ -1095,8 +1098,8 @@ __aicore__ inline void DataCopySliceUB2GMImpl(
  * ************************************************************************************************* */
 __aicore__ inline void CheckSrcGmDataCopyExtParamsRange(const DataCopyExtParams& intriParams)
 {
-    ASCENDC_ASSERT((intriParams.srcStride <= static_cast<int64_t>(1ul << 40 - 1)), {
-        KERNEL_LOG(KERNEL_ERROR, "srcStride is %ld, which should be no more than 2^40-1", intriParams.srcStride);
+    ASCENDC_ASSERT((intriParams.srcStride < static_cast<int64_t>(1ul << 40)), {
+        KERNEL_LOG(KERNEL_ERROR, "srcStride is %ld, which should be less than 2^40", intriParams.srcStride);
     });
     ASCENDC_ASSERT((intriParams.srcStride >= (-static_cast<int64_t>(intriParams.blockLen))), {
         KERNEL_LOG(
@@ -1239,8 +1242,8 @@ __aicore__ inline void DataCopyPadUB2GMImpl(
         __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
         AscendCUtils::CheckGmMemOverflowNormal(dst, workSpace, false, true, intriParams);
     }
-    ASCENDC_ASSERT((intriParams.dstStride <= static_cast<int64_t>(1ul << 40 - 1)), {
-        KERNEL_LOG(KERNEL_ERROR, "dstStride is %ld, which should be no more than 2^40-1", intriParams.dstStride);
+    ASCENDC_ASSERT((intriParams.dstStride < static_cast<int64_t>(1ul << 40)), {
+        KERNEL_LOG(KERNEL_ERROR, "dstStride is %ld, which should be less than 2^40", intriParams.dstStride);
     });
     ASCENDC_ASSERT((intriParams.dstStride >= static_cast<int64_t>(0)), {
         KERNEL_LOG(KERNEL_ERROR, "dstStride is %ld, which should be no less than 0", intriParams.dstStride);
@@ -1269,8 +1272,8 @@ __aicore__ inline void DataCopyPadUB2L1ImplCommon(
         ASCENDC_DEBUG_ASSERT(
             (TransUBAddr<TPosition::VECIN>(reinterpret_cast<uint64_t>(src)) % ONE_BLK_SIZE == 0),
             KERNEL_LOG_INTERNAL(
-                KERNEL_ERROR, "Failed to check src tensor address alignment in DataCopyPad from VECIN / VECOUT to "
-                              "TSCM, it should be 32B "
+                KERNEL_ERROR, "Failed to check src tensor address alignment in DataCopyPad from UB(VECIN/VECOUT) to "
+                              "L1 Buffer(TSCM), it should be 32B "
                               "aligned.\n"));
         uint32_t tensorSize = nd2nzParams.nValue * nd2nzParams.dValue;
         int32_t ubAddr = -1;
@@ -1281,8 +1284,9 @@ __aicore__ inline void DataCopyPadUB2L1ImplCommon(
         ValidateUbL1Address(absUbAddr, absL1Addr, tensorSize);
         ASCENDC_ASSERT((absL1Addr % ONE_BLK_SIZE == 0), {
             KERNEL_LOG(
-                KERNEL_ERROR, "Failed to check dst tensor address "
-                              "alignment in DataCopyPad from VECIN / VECOUT to TSCM, it should be 32B aligned");
+                KERNEL_ERROR,
+                "Failed to check dst tensor address "
+                "alignment in DataCopyPad from UB(VECIN/VECOUT) to L1 Buffer(TSCM), it should be 32B aligned");
         });
         ASCENDC_ASSERT((nd2nzParams.ndNum == 1), {
             KERNEL_LOG(KERNEL_ERROR, "nd2nzParams.ndNum is %hu, which can only be 1", nd2nzParams.ndNum);
@@ -1342,7 +1346,7 @@ __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const 
                 Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
                 Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
             "Failed to check dtype in "
-            "DataCopy from CO1 to A1 / B1, current api support dtype combination is "
+            "DataCopy from L0C Buffer(CO1) to L1 Buffer(A1/B1), current api support dtype combination is "
             "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
             "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
         if (IsSupportQuantMode(intriParams.quantPre)) {
@@ -1358,10 +1362,10 @@ __aicore__ inline void DataCopyL0C2L1Impl(__cbuf__ T* dst, __cc__ U* src, const 
         } else {
             ASCENDC_ASSERT(false, {
                 KERNEL_LOG(
-                    KERNEL_ERROR,
-                    "Failed to check quantPre value in DataCopy from CO1 "
-                    "to A1 / B1, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
-                    "VQF322B8_PRE / REQ8 / VREQ8.");
+                    KERNEL_ERROR, "Failed to check quantPre value in DataCopy from L0C Buffer(CO1) "
+                                  "to L1 Buffer(A1/B1), supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / "
+                                  "VDEQF16 / QF322B8_PRE / "
+                                  "VQF322B8_PRE / REQ8 / VREQ8.");
             });
         }
     }
@@ -1378,7 +1382,7 @@ __aicore__ inline void DataCopyL0C2GMImpl(
                 Tuple<float, uint8_t>, Tuple<int32_t, int32_t>, Tuple<int32_t, int16_t>, Tuple<int32_t, int8_t>,
                 Tuple<int32_t, uint8_t>, Tuple<int32_t, half>>()),
             "Failed to check dtype in "
-            "DataCopy from CO1 to GM, current api support dtype combination is "
+            "DataCopy from L0C Buffer(CO1) to GM, current api support dtype combination is "
             "src: float, dst: half / bfloat16_t / float / int8_t / uint8_t; "
             "src: int32_t, dst: half / int32_t / int16_t / int8_t / uint8_t.");
         if (IsSupportQuantMode(intriParams.quantPre)) {
@@ -1395,7 +1399,7 @@ __aicore__ inline void DataCopyL0C2GMImpl(
             ASCENDC_ASSERT(false, {
                 KERNEL_LOG(
                     KERNEL_ERROR,
-                    "Failed to check quantPre value in DataCopy from CO1 "
+                    "Failed to check quantPre value in DataCopy from L0C Buffer(CO1) "
                     "to GM, supported values are NoQuant / F322F16 / F322BF16 / DEQF16 / VDEQF16 / QF322B8_PRE / "
                     "VQF322B8_PRE / REQ8 / VREQ8.");
             });
@@ -1408,7 +1412,7 @@ __aicore__ inline __in_pipe__(MTE1) __out_pipe__(MTE1) void DataCopyL12UBIntf(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
 {
     ASCENDC_ASSERT((false), {
-        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from A1 / B1 to VECIN / VECOUT on current device");
+        KERNEL_LOG(KERNEL_ERROR, "unsupported data copy from L1 Buffer(A1/B1) to UB(VECIN/VECOUT) on current device");
     });
 }
 

@@ -42,7 +42,7 @@ uint64_t GetLoadDataLocalLen(const uint64_t tensorSize)
     // tensorSize is tensor.GetSize()
     if constexpr (IsSameType<PrimT<T>, int4b_t>::value) {
         return tensorSize / INT4_TWO;
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     } else if constexpr (IsSameType<PrimT<T>, int2b_t>::value) {
         return tensorSize / INT2_FOUR;
     } else if constexpr (IsSameType<PrimT<T>, uint1b_t>::value) {
@@ -230,6 +230,8 @@ bool CheckFuncLoadData3dv2Pro(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2Pro& loadDataParams,
     const char* intriName)
 {
+    uint64_t dstLen = GetLoadDataLocalLen<T>(dst.GetSize());
+    uint64_t srcLen = GetLoadDataLocalLen<T>(src.GetSize());
     check::LoadData3dv2ProApiParams chkParams{
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(dst.GetPhyAddr())),
         static_cast<uint64_t>(reinterpret_cast<uintptr_t>(src.GetPhyAddr())),
@@ -248,8 +250,8 @@ bool CheckFuncLoadData3dv2Pro(
         static_cast<bool>(loadDataParams.enSmallK),
         static_cast<uint32_t>(sizeof(PrimT<T>)),
         static_cast<uint32_t>(sizeof(PrimT<T>)),
-        static_cast<uint64_t>(dst.GetLength()),
-        static_cast<uint64_t>(src.GetLength()),
+        static_cast<uint64_t>(dstLen),
+        static_cast<uint64_t>(srcLen),
         static_cast<uint8_t>(dst.GetPosition()),
         static_cast<uint8_t>(src.GetPosition())};
     return check::CheckFuncLoadData3dv2ProImpl(chkParams, intriName);
@@ -362,8 +364,8 @@ __aicore__ inline void CheckTensorPos(
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     const Hardware scope = GetPhyType(static_cast<TPosition>(input.GetPosition()));
     ASCENDC_CHECK_TPOSITION(
-        scope == expectPos, tensorName, tPosName, apiMsg,
-        ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(input.GetPosition())));
+        scope == expectPos, tensorName, GetPositionDisplay(expectPos, tPosName).c_str(), apiMsg,
+        GetPositionDisplay(static_cast<TPosition>(input.GetPosition())));
 #endif
 }
 } // namespace AscendC

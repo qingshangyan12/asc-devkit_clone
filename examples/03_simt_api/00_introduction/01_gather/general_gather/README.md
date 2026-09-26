@@ -4,13 +4,11 @@
 
 本样例基于Ascend C SIMT编程方式实现支持泛化shape的Gather算子，包括基础版gather和增强版gather_v2。gather算子从二维输入张量中采集指定索引的行数据，gather_v2算子支持从多维输入张量中按指定维度收集数据，并支持batch_dims批量处理模式。样例展示了泛化场景下离散内存访问类算子的开发方法。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.0.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -53,7 +51,7 @@
   gather算子的实现流程为从输入input（Global Memory）中获取指定索引的数据。基于上述数据切分，首先计算线程应处理数据的索引，然后通过赋值操作将一行数据存储到Global Memory上。由于计算过程相对简单，设置核函数的最大线程数限制为2048。
 
 - 调用实现：   
-  使用内核调用符<<<>>>调用核函数。
+  使用内核调用符`<<<>>>`调用核函数。
 
 ### 2. gather_v2算子
 
@@ -116,6 +114,7 @@
   <tr><td rowspan="1" align="center">算子输出</td><td align="center">output</td><td align="center">[128,2048,512]</td><td align="center">float</td><td align="center">ND</td><td align="center">收集后的输出张量</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="5" align="center">gather_custom_v2</td></tr>
   </table>
+
 - 约束说明：
   * indices：indices的前batch_dims维必须与input的前batch_dims维相同，即indices.shape[0:batch_dims] = input.shape[0:batch_dims]
   * axis：收集维度axis不能小于batch_dims，且必须小于input的维度数，即batch_dims <= axis < input.rank
@@ -133,7 +132,7 @@
 - 算子实现：   
   gather_v2算子的实现流程为从多维输入张量input中按照指定维度axis收集数据。基于上述数据切分策略，每个线程会动态处理一部分数据，对每个输出索引进行分解，将输出的一维索引转换为逻辑坐标，从而根据indices找到对应的收集位置，最后计算input的线性索引并完成数据搬运。
 - 调用实现：   
-  使用内核调用符<<<>>>调用核函数。
+  使用内核调用符`<<<>>>`调用核函数。
 
 ## 编译运行
 
@@ -145,7 +144,7 @@
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
 
 - 样例执行
 
@@ -158,10 +157,20 @@
   ./gather_v2                   # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
   编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
 
   执行结果如下，说明精度对比成功：

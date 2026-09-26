@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example uses the [AscendDequant](../../../../../docs/zh/api/SIMD-API/高阶API/量化操作/AscendDequant.md) high-level API to implement dequantization computation, which restores quantized low-precision data to high-precision data. The example demonstrates the PER_CHANNEL scenario (per-channel quantization), where int32_t type input data is multiplied by a scale factor and converted to float type output. On the 950 series, while the AscendDequant API is compatible, it is recommended to prefer the [Dequantize](../../../../../docs/zh/api/SIMD-API/高阶API/量化操作/Dequantize.md) API, which adapts to various quantization scenarios through a unified struct configuration.
+This example uses the [AscendDequant](../../../../../docs/zh/api/SIMD-API/adv_api/quantization/AscendDequant.md) high-level API to implement dequantization computation, which restores quantized low-precision data to high-precision data. The example demonstrates the PER_CHANNEL scenario (per-channel quantization), where int32_t type input data is multiplied by a scale factor and converted to float type output. On the 950 series, while the AscendDequant API is compatible, it is recommended to prefer the [Dequantize](../../../../../docs/zh/api/SIMD-API/adv_api/quantization/Dequantize.md) API, which adapts to various quantization scenarios through a unified struct configuration.
 
 ## Supported Products and CANN Software Versions
 
@@ -30,23 +30,16 @@ This example uses the [AscendDequant](../../../../../docs/zh/api/SIMD-API/高阶
   This example performs element-wise dequantization on the input tensor, converting int32_t data type to float and other data types.
 
 - Example specifications:
-  <table border="2" align="left">
-  <caption>Table 1: Example Input/Output Specifications</caption>
-  <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center"> dequant </td></tr>
 
-  <tr><td rowspan="4" align="center">Example Input</td></tr>
-  <tr><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-   <tr><td align="center">inputGm</td><td align="center">[128, 32]</td><td align="center">int32_t</td><td align="center">ND</td></tr>
-   <tr><td align="center">deqScaleGm</td><td align="center">[1, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
+  **Table 1: Example Input/Output Specifications**
 
-   <tr><td rowspan="2" align="center">Example Output</td></tr>
-   <tr><td align="center">outputGm</td><td align="center">[128, 32]</td><td align="center">float</td><td align="center">ND</td></tr>
-
-
-  <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">dequant_custom</td></tr>
-  </table>
-  <br clear="left" />
-<br />
+  | Category | name | shape | data type | format |
+  | --- | --- | --- | --- | --- |
+  | Example Type (OpType) | dequant | - | - | - |
+  | Example Input | inputGm | [128, 32] | int32_t | ND |
+  | Example Input | deqScaleGm | [1, 32] | float | ND |
+  | Example Output | outputGm | [128, 32] | float | ND |
+  | Kernel Function Name | dequant_custom | - | - | - |
 
 - Example implementation:  
    This example implements a fixed shape with input inputGm[128, 32], scaleGm[1, 32], and output outputGm[128, 32]. It performs element-wise dequantization, converting int32_t data type to float and other data types.
@@ -64,7 +57,7 @@ This example uses the [AscendDequant](../../../../../docs/zh/api/SIMD-API/高阶
 
 Run the following steps in the root directory of this example to build and run the example.
 - Configure environment variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

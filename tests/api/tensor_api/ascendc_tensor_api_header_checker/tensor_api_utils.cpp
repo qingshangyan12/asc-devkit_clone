@@ -11,6 +11,7 @@
 #ifndef VERIFY_SINGLE_HEADER
 #include "tensor_api/tensor.h"
 #else
+#include "tensor_api/tensor/tensor_interface.h"
 #include "tensor_api/utils/utils.h"
 #endif
 

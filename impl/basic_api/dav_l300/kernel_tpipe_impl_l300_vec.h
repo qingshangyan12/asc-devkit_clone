@@ -47,7 +47,7 @@ __aicore__ inline constexpr void ValidateQueConfig()
     if constexpr (config.enableStaticEvtId) {
         static_assert(
             dstType == Hardware::L1 && srcType != Hardware::UB,
-            "enableStaticEvtId currently only supports A1/B1 que or TSCM from GM");
+            "enableStaticEvtId currently only supports GM to L1 Buffer(A1/B1/TSCM)");
     }
 }
 
@@ -212,11 +212,11 @@ __aicore__ inline bool TQueBind<src, dst, depth, mask>::EnQue(TBufHandle buf)
     static_assert(
         ((srcUserPos == TPosition::GM) || (srcUserPos == TPosition::VECIN) || (srcUserPos == TPosition::VECOUT) ||
          (srcUserPos == TPosition::VECCALC)) &&
-        "enque only support src position GM/VECIN/VECOUT/VECCALC currently.");
+        "enque only support src position GM/UB(VECIN/VECOUT/VECCALC) currently.");
     static_assert(
         ((dstUserPos == TPosition::GM) || (dstUserPos == TPosition::VECIN) || (dstUserPos == TPosition::VECOUT) ||
          (dstUserPos == TPosition::VECCALC)) &&
-        "enque only support dst position GM/VECIN/VECOUT/VECCALC currently.");
+        "enque only support dst position GM/UB(VECIN/VECOUT/VECCALC) currently.");
     static_assert(
         !((srcUserPos == TPosition::GM) && (dstUserPos == TPosition::GM)) &&
         "enque src and dst position cannot be GM at the same time.");
@@ -510,11 +510,11 @@ __aicore__ inline TBufHandle TQueBind<src, dst, depth, mask>::DeQue()
     static_assert(
         ((srcUserPos == TPosition::GM) || (srcUserPos == TPosition::VECIN) || (dstUserPos == TPosition::VECOUT) ||
          (dstUserPos == TPosition::VECCALC)),
-        "DeQue only support src position GM/VECIN/VECOUT/VECCALC currently.");
+        "DeQue only support src position GM/UB(VECIN/VECOUT/VECCALC) currently.");
     static_assert(
         ((dstUserPos == TPosition::GM) || (dstUserPos == TPosition::VECIN) || (dstUserPos == TPosition::VECOUT) ||
          (dstUserPos == TPosition::VECCALC)) &&
-        "DeQue only support dst position GM/VECIN/VECOUT/VECCALC currently.");
+        "DeQue only support dst position GM/UB(VECIN/VECOUT/VECCALC) currently.");
     static_assert(
         !((srcUserPos == TPosition::GM) && (dstUserPos == TPosition::GM)) &&
         "DeQue src and dst position cannot be GM at the same time.");
@@ -986,7 +986,19 @@ template <typename T>
 __aicore__ inline __sync_noalias__ LocalTensor<T> TBuf<pos>::GetWithOffset(uint32_t size, uint32_t bufOffset)
 {
     auto ptr = this->bufStart;
-    ptr->dataLen = size * sizeof(T);
+    using PrimType = PrimT<T>;
+    uint32_t dataLen;
+    if constexpr (IsSameType<PrimType, int4b_t>::value) {
+        dataLen = size / INT4_TWO;
+    } else {
+        dataLen = size * sizeof(PrimType);
+    }
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    ASCENDC_ASSERT((size > 0), { KERNEL_LOG(KERNEL_ERROR, "size should be larger than 0"); });
+    ASCENDC_ASSERT((bufOffset % ONE_BLK_SIZE == 0), { KERNEL_LOG(KERNEL_ERROR, "bufOffset should be 32B aligned"); });
+    ASCENDC_ASSERT((dataLen <= bufLen - bufOffset), { KERNEL_LOG(KERNEL_ERROR, "data range exceeds TBuf length"); });
+#endif
+    ptr->dataLen = dataLen;
     TBuffAddr addr;
     addr.logicPos = static_cast<uint8_t>(pos);
     addr.bufferHandle = reinterpret_cast<TBufHandle>(ptr);
@@ -1429,7 +1441,8 @@ __aicore__ inline TBufId TPipe::AllocBufId()
         ASCENDC_ASSERT((bufId < this->g_tpipeImpl.tscmBufIdPool_), {
             KERNEL_LOG(
                 KERNEL_ERROR,
-                "TSCM Buffer source from GM and A1/B1 buffer with staticEvtID used is out of limits 20, current A1/B1 "
+                "L1 Buffer(TSCM) source from GM and L1 Buffer(A1/B1) with staticEvtID used is out of limits 20, "
+                "current L1 Buffer(A1/B1) "
                 "uses %u buffer",
                 static_cast<uint32_t>(bufId + 1));
         });
@@ -1452,12 +1465,13 @@ __aicore__ inline TBufId TPipe::AllocTscmBufId()
     ASCENDC_ASSERT((bufId <= MAX_TBUFID), {
         KERNEL_LOG(
             KERNEL_ERROR,
-            "TSCM Buffer source from GM with staticEvtID used is out of limits, allocates over 20 buffers");
+            "L1 Buffer(TSCM) source from GM with staticEvtID used is out of limits, allocates over 20 buffers");
     });
     ASCENDC_ASSERT((bufId >= this->g_tpipeImpl.bufIdPool_), {
         KERNEL_LOG(
             KERNEL_ERROR,
-            "TSCM Buffer source from GM and A1/B1 buffer with staticEvtID used is out of limits 20, current TSCM uses "
+            "L1 Buffer(TSCM) source from GM and L1 Buffer(A1/B1) with staticEvtID used is out of limits 20, current L1 "
+            "Buffer(TSCM) uses "
             "%u buffer",
             static_cast<uint32_t>(TSCM_BUFID_MAX - bufId));
     });
@@ -2042,7 +2056,7 @@ __aicore__ inline TBufPoolExtImpl<pos, bufIDSize>::TBufPoolExtImpl()
     constexpr auto pool = GetPhyType(pos);
     static_assert(
         (pool == Hardware::L1 || pool == Hardware::UB || pool == Hardware::L0C),
-        "TbufPool Position should be one of A1/B1/C1/VECIN/VECOUT/VECCALC");
+        "TbufPool Position should be one of L1 Buffer(A1/B1/C1)/UB(VECIN/VECOUT/VECCALC)");
     ResetPool(); // init buf size and other variables
     tBufPoolImpl.isReset_ = false;
 }

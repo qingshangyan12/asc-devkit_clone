@@ -63,20 +63,20 @@ TEST_F(TestSyncInstrCAPI, c_api_sync_wait_Succ)
     GlobalMockObject::verify();
 }
 
-TEST_F(TestSyncInstrCAPI, c_api_sync_pipe_Succ)
-{
-    pipe_t pipe = pipe_t::PIPE_ALL;
-    MOCKER_CPP(pipe_barrier, void(pipe_t)).times(1).will(invoke(pipe_barrier_all_stub));
-
-    asc_sync_pipe(pipe);
-    GlobalMockObject::verify();
-}
-
 TEST_F(TestSyncInstrCAPI, asc_sync_vec_Succ)
 {
     MOCKER_CPP(pipe_barrier, void(pipe_t)).times(1).will(invoke(pipe_barrier_all_stub));
 
     asc_sync_vec();
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestSyncInstrCAPI, asc_sync_vec_new_Succ)
+{
+    MOCKER_CPP(set_flag, void(pipe_t, pipe_t, event_t)).times(3).will(returnValue(0));
+    MOCKER_CPP(wait_flag, void(pipe_t, pipe_t, event_t)).times(3).will(returnValue(0));
+
+    asc_sync_vec(0);
     GlobalMockObject::verify();
 }
 

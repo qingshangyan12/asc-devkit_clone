@@ -29,9 +29,16 @@
 #include "hcomm_diag.h"
 #include "hccl_comm.h"
 #include "hccl_res_expt.h"
+#include "hcomm_primitives_dl.h"
+#include "task_cache_test_stub.h"
 
 using namespace mc2_ops_hccl;
 using namespace HcclSim;
+
+namespace mc2_ops_hccl {
+uint32_t g_hcclEngineCtxCopyCallCount = 0;
+uint32_t g_stubEndpointBwCoeff = 0;
+} // namespace mc2_ops_hccl
 
 namespace {
 struct SymWinStub {
@@ -88,6 +95,14 @@ HcclResult GetSymWinStubByPtr(HcclComm comm, void* ptr, size_t size, HcclCommSym
     return HCCL_E_NOT_SUPPORT;
 }
 } // namespace
+
+Mc2TaskCacheTestStubState& GetMc2TaskCacheTestStubState()
+{
+    static Mc2TaskCacheTestStubState state;
+    return state;
+}
+
+void ResetMc2TaskCacheTestStubState() { GetMc2TaskCacheTestStubState() = Mc2TaskCacheTestStubState{}; }
 
 #ifdef __cplusplus
 extern "C" {
@@ -181,7 +196,13 @@ HcclResult HcclRankGraphGetEndpointInfo(
     void* info)
 {
     uint32_t* intInfo = static_cast<uint32_t*>(info);
-    *intInfo = 0;
+    if (endpointAttr == EndpointAttr::ENDPOINT_ATTR_DIE_ID) {
+        *intInfo = (endpointDesc->loc.device.devPhyId >= 4) ? 1 : 0;
+    } else if (endpointAttr == EndpointAttr::ENDPOINT_ATTR_BW_COEFF) {
+        *intInfo = mc2_ops_hccl::g_stubEndpointBwCoeff;
+    } else {
+        *intInfo = 0;
+    }
     return HCCL_SUCCESS;
 }
 
@@ -375,6 +396,29 @@ HcclResult HcclChannelAcquire(
         simComm->GetIdentifier(), channelTag.c_str(), engine, channelDescList, listNum, channelList);
 }
 
+HcclResult HcclChannelQuery(
+    HcclComm comm, CommEngine engine, const HcclChannelDesc* channelDescList, uint32_t listNum,
+    ChannelHandle* channelList)
+{
+    CHK_PTR_NULL(comm);
+    (void)engine;
+    for (uint32_t i = 0; i < listNum; i++) {
+        channelList[i] = 0; // 全部视为新建
+    }
+    return HCCL_SUCCESS;
+}
+
+HcclResult HcclChannelDestroy(HcclComm comm, const ChannelHandle* channels, uint32_t channelNum)
+{
+    CHK_PTR_NULL(comm);
+    (void)channels;
+    (void)channelNum;
+    return HCCL_SUCCESS;
+}
+
+bool HcommIsSupportHcclChannelQuery() { return true; }
+bool HcommIsSupportHcclChannelDestroy() { return true; }
+
 HcclResult HcclEngineCtxCreate(HcclComm comm, const char* ctxTag, CommEngine engine, uint64_t size, void** ctx)
 {
     auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
@@ -415,16 +459,21 @@ HcclResult HcclEngineCtxGet(HcclComm comm, const char* engineTag, CommEngine eng
 HcclResult HcclEngineCtxCopy(
     HcclComm comm, CommEngine engine, const char* ctxTag, const void* srcCtx, uint64_t size, uint64_t dstCtxOffset)
 {
+    ++mc2_ops_hccl::g_hcclEngineCtxCopyCallCount;
     // HOST场景下srcCtx就是创建的EngineCtx内存地址，无需拷贝
     if (engine == CommEngine::COMM_ENGINE_AICPU_TS || engine == CommEngine::COMM_ENGINE_AICPU) {
-        uint64_t size = 0;
+        uint64_t ctxSize = 0;
         void* ctx = nullptr;
         auto simComm = static_cast<HcclSim::SimCommunicator*>(comm);
         CHK_PTR_NULL(simComm);
-        simComm->contextManager_->GetCommEngineCtx(std::string(ctxTag), engine, &ctx, &size);
-        if (ctx != nullptr && size > 0) {
-            memcpy(ctx, srcCtx, size);
-        }
+        CHK_RET(simComm->contextManager_->GetCommEngineCtx(std::string(ctxTag), engine, &ctx, &ctxSize));
+        CHK_PRT_RET(
+            ctx == nullptr || srcCtx == nullptr || dstCtxOffset > ctxSize || size > ctxSize - dstCtxOffset,
+            HCCL_ERROR(
+                "[%s] invalid copy, ctx[%p], srcCtx[%p], ctxSize[%llu], size[%llu], offset[%llu]", __func__, ctx,
+                srcCtx, ctxSize, size, dstCtxOffset),
+            HCCL_E_PARA);
+        memcpy(static_cast<uint8_t*>(ctx) + dstCtxOffset, srcCtx, size);
     }
     return HCCL_SUCCESS;
 }
@@ -819,14 +868,18 @@ HcclResult CommFence(ThreadHandle thread, ChannelHandle channel)
 
 int32_t HcommBatchModeStart(const char* batchTag)
 {
-    HCCL_WARNING("[%s] not support.", __func__);
-    return HCCL_SUCCESS;
+    (void)batchTag;
+    auto& state = GetMc2TaskCacheTestStubState();
+    ++state.batchStartCalls;
+    return state.batchStartRet;
 }
 
 int32_t HcommBatchModeEnd(const char* batchTag)
 {
-    HCCL_WARNING("[%s] not support.", __func__);
-    return HCCL_SUCCESS;
+    (void)batchTag;
+    auto& state = GetMc2TaskCacheTestStubState();
+    ++state.batchEndCalls;
+    return state.batchEndRet;
 }
 
 int32_t HcommAcquireComm(const char* commId) { return 0; }
@@ -900,6 +953,12 @@ int32_t HcommWaitResponse(uint64_t handle, void* dst, size_t sizeByte, uint32_t*
 HcclResult HcclChannelGetRemoteMems(
     HcclComm comm, ChannelHandle channel, uint32_t* memNum, CommMem** remoteMems, char*** memTags)
 {
+    CHK_PTR_NULL(memNum);
+    CHK_PTR_NULL(remoteMems);
+    CHK_PTR_NULL(memTags);
+    *memNum = 0U;
+    *remoteMems = nullptr;
+    *memTags = nullptr;
     HCCL_WARNING("[%s] not support.", __func__);
     return HCCL_SUCCESS;
 }

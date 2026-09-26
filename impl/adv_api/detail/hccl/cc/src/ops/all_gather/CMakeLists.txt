@@ -10,11 +10,3 @@
 add_subdirectory(executor)
 add_subdirectory(selector)
 add_subdirectory(template)
-
-set(src_list
-    ${CMAKE_CURRENT_SOURCE_DIR}/all_gather_op.cc
-)
-
-target_sources(mc2_client PRIVATE
-    ${src_list}
-)

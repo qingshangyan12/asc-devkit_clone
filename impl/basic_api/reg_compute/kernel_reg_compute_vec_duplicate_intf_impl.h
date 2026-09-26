@@ -27,8 +27,12 @@
 #include "../../basic_api/reg_compute/dav_l300/kernel_reg_compute_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "../../basic_api/reg_compute/dav_l311/kernel_reg_compute_vec_duplicate_impl.h"
+#elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5165)
+#include "../../basic_api/reg_compute/dav_5161/kernel_reg_compute_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_vec_duplicate_impl.h"
+#elif __NPU_ARCH__ == 5162
+#include "../../basic_api/reg_compute/dav_v516/kernel_reg_compute_vec_duplicate_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_duplicate_impl.h"
 #endif
@@ -53,17 +57,6 @@ __simd_callee__ inline void Duplicate(U& dstReg, U& srcReg, MaskReg& mask)
     DuplicateImpl<T, pos, mode, U>(dstReg, srcReg, mask);
 }
 
-template <typename T, typename U>
-__simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1)
-{
-    InterleaveImpl<T, U>(dstReg0, dstReg1, srcReg0, srcReg1);
-}
-
-template <typename T, typename U>
-__simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1)
-{
-    DeInterleaveImpl<T, U>(dstReg0, dstReg1, srcReg0, srcReg1);
-}
 } // namespace Reg
 } // namespace AscendC
 

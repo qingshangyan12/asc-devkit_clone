@@ -1,6 +1,6 @@
 # Matmul Constant Tiling Example
 ## Overview
-A Matmul example with constant Tiling. Constant Tiling converts some or all Tiling parameters from variables to constant values during compilation, and the constant Tiling parameters are used during example execution.
+A Matmul example with constant Tiling. Constant Tiling converts some or all Tiling parameters from variables to constant values at compile time. The example uses these constant Tiling parameters during execution.
 
 ## Supported Products and CANN Versions
 
@@ -96,7 +96,7 @@ A Matmul example with constant Tiling. Constant Tiling converts some or all Tili
 ## Build and Run
 Run the following steps in the root directory of this example to build and run the example.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

@@ -14,6 +14,7 @@
 import html as html_mod
 import pathlib
 import re
+from urllib.parse import unquote
 import cmarkgfm
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
@@ -30,17 +31,9 @@ def _load_css():
     if _CSS is not None:
         return _CSS
     candidates = [
-        pathlib.Path(__file__).parent.parent.parent
-        / "node_modules"
-        / "github-markdown-css"
-        / "github-markdown.css",
-        pathlib.Path(__file__).parent.parent
-        / "node_modules"
-        / "github-markdown-css"
-        / "github-markdown.css",
-        pathlib.Path(
-            "/home/zjj/md-parser/node_modules/github-markdown-css/github-markdown.css"
-        ),
+        pathlib.Path(__file__).parent.parent.parent / "node_modules" / "github-markdown-css" / "github-markdown.css",
+        pathlib.Path(__file__).parent.parent / "node_modules" / "github-markdown-css" / "github-markdown.css",
+        pathlib.Path("/home/zjj/md-parser/node_modules/github-markdown-css/github-markdown.css"),
     ]
     for p in candidates:
         if p.exists():
@@ -54,32 +47,17 @@ _OPTIONS = cmarkgfm.Options.CMARK_OPT_UNSAFE
 
 _MD_LINK_RE = re.compile(r'(href|src)="((?!https?:|//)[^"]+)\.md(#[^"]*)?"')
 
-_CANN_OPEN_RE = re.compile(
-    r'<cann-filter\b[^>]*npu[_-]type\s*=\s*"([^"]+)"[^>]*>',
-    re.IGNORECASE,
-)
+_CANN_OPEN_RE = re.compile(r'<cann-filter\b[^>]*npu[_-]type\s*=\s*"([^"]+)"[^>]*>', re.IGNORECASE)
 
-_CANN_CLOSE_RE = re.compile(
-    r"</cann-filter\b[^>]*>",
-    re.IGNORECASE,
-)
+_CANN_CLOSE_RE = re.compile(r"</cann-filter\b[^>]*>", re.IGNORECASE)
 
 _OTHER_TAG_NAMES = r"term|ph|__gm__|__ubuf__"
 
-_OTHER_TAG_LINE_RE = re.compile(
-    r"^[ \t]*</?(" + _OTHER_TAG_NAMES + r")\b[^>]*>[ \t]*$",
-    re.IGNORECASE,
-)
+_OTHER_TAG_LINE_RE = re.compile(r"^[ \t]*</?(" + _OTHER_TAG_NAMES + r")\b[^>]*>[ \t]*$", re.IGNORECASE)
 
-_OTHER_TAG_WRAP_RE = re.compile(
-    r"<(" + _OTHER_TAG_NAMES + r")\b[^>]*>([\s\S]*?)</\1>",
-    re.IGNORECASE,
-)
+_OTHER_TAG_WRAP_RE = re.compile(r"<(" + _OTHER_TAG_NAMES + r")\b[^>]*>([\s\S]*?)</\1>", re.IGNORECASE)
 
-_OTHER_TAG_ANY_RE = re.compile(
-    r"</?(" + _OTHER_TAG_NAMES + r")\b[^>]*>",
-    re.IGNORECASE,
-)
+_OTHER_TAG_ANY_RE = re.compile(r"</?(" + _OTHER_TAG_NAMES + r")\b[^>]*>", re.IGNORECASE)
 
 
 _FENCE_OPEN_RE = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})", re.MULTILINE)
@@ -87,6 +65,65 @@ _FENCE_OPEN_RE = re.compile(r"^[ \t]{0,3}(`{3,}|~{3,})", re.MULTILINE)
 _INLINE_CODE_SPAN_RE = re.compile(r"`+[^\n]*?`+")
 
 _LONE_TILDE_RE = re.compile(r"(?<!\\)(?<!~)~(?!~)")
+
+
+_HTML_BLOCK_TAG_NAMES = (
+    r"address|article|aside|base|basefont|blockquote|body|caption|center|col|"
+    r"colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|"
+    r"footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|"
+    r"li|link|main|menu|menuitem|nav|noframes|ol|optgroup|option|p|param|"
+    r"search|section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul"
+)
+
+_HTML_BLOCK_TAG_RE = re.compile(rf"^</?(?:{_HTML_BLOCK_TAG_NAMES})(?:[ \t\n\f\r]|/?>)", re.IGNORECASE)
+
+_HTML_BLOCK_TYPE1_RE = re.compile(r"^<(script|pre|style|textarea)(?:[ \t\n\f\r]|>|$)", re.IGNORECASE)
+
+_HTML_BLOCK_TYPE1_END_RE = {
+    tag: re.compile(rf"</{tag}[ \t]*>", re.IGNORECASE) for tag in ("script", "pre", "style", "textarea")
+}
+
+_HTML_BLOCK_SPECIAL_RE = (
+    (re.compile(r"^<!--"), re.compile(r"-->")),
+    (re.compile(r"^<\?"), re.compile(r"\?>")),
+    (re.compile(r"^<![A-Z]"), re.compile(r">")),
+    (re.compile(r"^<!\[CDATA\["), re.compile(r"\]\]>")),
+)
+
+_HTML_ATTRIBUTE_NAME = r"[A-Za-z_:][A-Za-z0-9_.:-]*"
+_HTML_ATTRIBUTE_VALUE = r"""(?:[^\s"'=<>`]+|'[^']*'|"[^"]*")"""
+_HTML_ATTRIBUTE = (
+    rf"(?:[ \t]+{_HTML_ATTRIBUTE_NAME}"
+    rf"(?:[ \t]*=[ \t]*{_HTML_ATTRIBUTE_VALUE})?)"
+)
+_HTML_BLOCK_TYPE7_RE = re.compile(
+    rf"^(?:<[A-Za-z][A-Za-z0-9-]*{_HTML_ATTRIBUTE}*[ \t]*/?>|"
+    rf"</[A-Za-z][A-Za-z0-9-]*[ \t]*>)[ \t]*$"
+)
+
+
+def _html_block_end_pattern(line: str, can_start_type7: bool):
+    """Return the HTML block terminator for a block starting on this line.
+
+    ``None`` means the line is Markdown. An empty string means the block ends at
+    the next blank line; regex values identify the explicit terminator used by
+    CommonMark HTML block types 1 through 5.
+    """
+    type1_match = _HTML_BLOCK_TYPE1_RE.match(line)
+    if type1_match:
+        return _HTML_BLOCK_TYPE1_END_RE[type1_match.group(1).lower()]
+
+    for start_re, end_re in _HTML_BLOCK_SPECIAL_RE:
+        if start_re.match(line):
+            return end_re
+
+    if _HTML_BLOCK_TAG_RE.match(line):
+        return ""
+
+    if can_start_type7 and _HTML_BLOCK_TYPE7_RE.match(line):
+        return ""
+
+    return None
 
 
 def _escape_lone_tildes_in_line(line: str) -> str:
@@ -107,17 +144,33 @@ def _escape_lone_tildes(md_text: str) -> str:
     result = []
     in_fence = False
     fence_char = None
+    html_end_pattern = None
+    in_html_until_blank = False
+    previous_line_blank = True
 
     for line in lines:
         stripped = line.lstrip(" \t")
 
         if in_fence:
             result.append(line)
-            if fence_char and re.match(
-                rf"^{re.escape(fence_char)}{{3,}}[ \t]*$", stripped
-            ):
+            if fence_char and re.match(rf"^{re.escape(fence_char)}{{3,}}[ \t]*$", stripped):
                 in_fence = False
                 fence_char = None
+            previous_line_blank = not stripped
+            continue
+
+        if in_html_until_blank:
+            result.append(line)
+            if not stripped:
+                in_html_until_blank = False
+            previous_line_blank = not stripped
+            continue
+
+        if html_end_pattern is not None:
+            result.append(line)
+            if html_end_pattern.search(line):
+                html_end_pattern = None
+            previous_line_blank = not stripped
             continue
 
         fence_match = re.match(r"^(`{3,}|~{3,})", stripped)
@@ -125,16 +178,28 @@ def _escape_lone_tildes(md_text: str) -> str:
             in_fence = True
             fence_char = fence_match.group(1)[0]
             result.append(line)
+            previous_line_blank = False
+            continue
+
+        end_pattern = _html_block_end_pattern(stripped, previous_line_blank)
+        if end_pattern is not None:
+            result.append(line)
+            if end_pattern == "":
+                in_html_until_blank = True
+            elif not end_pattern.search(line):
+                html_end_pattern = end_pattern
+            previous_line_blank = not stripped
             continue
 
         result.append(_escape_lone_tildes_in_line(line))
+        previous_line_blank = not stripped
 
     return "\n".join(result)
 
 
 _MATH_BLOCK_RE = re.compile(r"(?<!\\)\$\$[\s\S]*?(?<!\\)\$\$")
 
-_MATH_INLINE_RE = re.compile(r"(?<!\\)(?<!\$)\$(?!\$)[^\n$]+?(?<!\\)\$(?!\$)")
+_MATH_INLINE_RE = re.compile(r"(?<!\\)(?<!\$)\$(?![\${])[^\n$]+?(?<!\\)\$(?!\$)")
 
 _MATH_PLACEHOLDER_FMT = "@@MATH{n}@@"
 
@@ -151,9 +216,7 @@ def _split_by_fences(md_text: str):
 
         if is_code:
             current.append(line)
-            if fence_char and re.match(
-                rf"^{re.escape(fence_char)}{{3,}}[ \t]*$", stripped
-            ):
+            if fence_char and re.match(rf"^{re.escape(fence_char)}{{3,}}[ \t]*$", stripped):
                 is_code = False
                 fence_char = None
                 segments.append((True, "\n".join(current)))
@@ -258,8 +321,7 @@ def _strip_other_tags(md_text: str) -> str:
 
 
 _CALLOUT_RE = re.compile(
-    r"<blockquote>\s*\n<p>\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](.*?)</p>\s*\n(.*?)</blockquote>",
-    re.DOTALL,
+    r"<blockquote>\s*\n<p>\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](.*?)</p>\s*\n(.*?)</blockquote>", re.DOTALL
 )
 
 _CALLOUT_ICONS = {
@@ -391,14 +453,43 @@ def gfm_to_html(text: str) -> str:
     return cmarkgfm.github_flavored_markdown_to_html(text, options=_OPTIONS)
 
 
-def _fix_links(html: str) -> str:
+def _is_within(path: pathlib.Path, parent: pathlib.Path) -> bool:
+    try:
+        path.relative_to(parent)
+        return True
+    except ValueError:
+        return False
+
+
+def _repository_roots(source_path):
+    if source_path is None:
+        return None, None
+    source = pathlib.Path(source_path).resolve()
+    for parent in source.parents:
+        if parent.name in ("zh", "en") and parent.parent.name == "docs":
+            return parent.parent.parent, parent.parent
+    return None, None
+
+
+def _fix_links(html: str, source_path=None) -> str:
     html = re.sub(
         r'(href|src)="https://gitcode\.com/cann/asc-devkit/blob/master/docs/(api|guide)/([^"]+)\.md(#[^"]*)?"',
         r'\1="/\2/\3.html\4"',
         html,
         flags=re.IGNORECASE,
     )
-    return _MD_LINK_RE.sub(r'\1="\2.html\3"', html)
+
+    repo_root, docs_root = _repository_roots(source_path)
+
+    def _replace_markdown_link(match):
+        link_path = match.group(2)
+        if match.group(1).lower() == "href" and repo_root is not None:
+            target = (pathlib.Path(source_path).resolve().parent / unquote(link_path)).resolve()
+            if _is_within(target, repo_root) and not _is_within(target, docs_root):
+                return match.group(0)
+        return f'{match.group(1)}="{link_path}.html{match.group(3) or ""}"'
+
+    return _MD_LINK_RE.sub(_replace_markdown_link, html)
 
 
 def _fix_callouts(html: str) -> str:
@@ -408,13 +499,9 @@ def _fix_callouts(html: str) -> str:
         title = m.group(2).strip()
         body_content = m.group(3).strip()
         icon = _CALLOUT_ICONS.get(callout_type, "")
-        type_label = dict(
-            NOTE="Note",
-            TIP="Tip",
-            IMPORTANT="Important",
-            WARNING="Warning",
-            CAUTION="Caution",
-        ).get(callout_type, callout_type)
+        type_label = dict(NOTE="Note", TIP="Tip", IMPORTANT="Important", WARNING="Warning", CAUTION="Caution").get(
+            callout_type, callout_type
+        )
         if not body_content and "\n" in title:
             title, body_content = title.split("\n", 1)
             title = title.strip()
@@ -479,9 +566,7 @@ def _get_pygments_css() -> str:
     global _PYGMENTS_CSS
     if _PYGMENTS_CSS is not None:
         return _PYGMENTS_CSS
-    _PYGMENTS_CSS = HtmlFormatter(style="default").get_style_defs(
-        ".markdown-body .highlight"
-    )
+    _PYGMENTS_CSS = HtmlFormatter(style="default").get_style_defs(".markdown-body .highlight")
     return _PYGMENTS_CSS
 
 
@@ -542,16 +627,17 @@ _HIGHLIGHT_CSS = """
 }
 """
 
-_CODEFENCE_RE = re.compile(
-    r'<pre(?:\s+lang="([^"]*)")?>\s*<code>(.*?)</code>\s*</pre>',
-    re.DOTALL,
-)
+_CODEFENCE_RE = re.compile(r'<pre(?:\s+lang="([^"]*)")?>\s*<code>(.*?)</code>\s*</pre>', re.DOTALL)
 
 
 def _highlight_code(html: str) -> str:
     def _replace(m):
         lang = m.group(1)
         code = m.group(2)
+        if lang and lang.lower() == "mermaid":
+            source = code.strip()
+            return f'<div class="mermaid-diagram" data-mermaid-diagram><pre class="mermaid">{source}</pre></div>'
+
         text = html_mod.unescape(code)
         text = re.sub(r"<br\s*/?>", "\n", text)
         if not lang:
@@ -586,7 +672,7 @@ def _highlight_code(html: str) -> str:
     return _CODEFENCE_RE.sub(_replace, html)
 
 
-def parse_string(text: str, gfm: bool = True) -> str:
+def parse_string(text: str, gfm: bool = True, source_path=None) -> str:
     text = _convert_cann_filter(text)
     text = _escape_lone_tildes(text)
     text, math_blocks = _extract_math_blocks(text)
@@ -595,7 +681,7 @@ def parse_string(text: str, gfm: bool = True) -> str:
     else:
         html = markdown_to_html(text)
     html = _restore_math_blocks(html, math_blocks)
-    html = _fix_links(html)
+    html = _fix_links(html, source_path=source_path)
     html = _fix_callouts(html)
     html = _highlight_code(html)
     return html
@@ -604,7 +690,7 @@ def parse_string(text: str, gfm: bool = True) -> str:
 def parse_file(filepath: str, gfm: bool = True) -> str:
     with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
-    return parse_string(content, gfm=gfm)
+    return parse_string(content, gfm=gfm, source_path=filepath)
 
 
 def render_html(body: str) -> str:

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example, based on the Gather operator, demonstrates the separate compilation flow where Device code in a Host + Device mixed .asc file is split into **multiple .asc files**. The separate compilation code structure and call relationship are shown in Figure 1 below, where `gather_compute.asc` is the **Device-side execution function** (defines the `gather_element` function and exposes it through extern for cross-file invocation), `gather_kernel.asc` is the **Host + Device mixed file** (containing the Kernel definition and <<<>>> kernel invocation, and calling the Device-side execution function in gather_compute.asc through extern), and `main.cpp` is pure Host-side code (calling the <<<>>> kernel launch function exposed by gather_kernel.asc through extern).
+This example, based on the Gather operator, demonstrates the separate compilation flow where Device code in a Host + Device mixed .asc file is split into **multiple .asc files**. The separate compilation code structure and call relationship are shown in Figure 1 below, where `gather_compute.asc` is the **Device-side execution function** (defines the `gather_element()` function and exposes it through extern for cross-file invocation), `gather_kernel.asc` is the **Host + Device mixed file** (containing the Kernel definition and `<<<>>>` kernel invocation, and calling the Device-side execution function in gather_compute.asc through extern), and `main.cpp` is pure Host-side code (calling the `<<<>>>` kernel launch function exposed by gather_kernel.asc through extern).
 
 <p align="center">
   <img src="./figures/separate_compile.png" width="50%">
@@ -11,13 +11,11 @@ This example, based on the Gather operator, demonstrates the separate compilatio
 Figure 1: Code structure and call relationship
 </p>
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -54,9 +52,9 @@ bisheng -c main.cpp -o main.o -I${ASCEND_HOME_PATH}/include
 bisheng gather_compute.o gather_kernel.o main.o -o demo
 ```
 
-Where `--npu-arch` specifies the AI processor architecture at compile time. This example only supports `dav-3510`. For the architecture version corresponding to each product model, refer to the [correspondence table](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMD-BuiltIn关键字.md#table65291052154114). `--enable-simt` is used to specify SIMT compilation mode.
+Where `--npu-arch` specifies the AI processor architecture at compile time. This example only supports `dav-3510`. For the architecture version corresponding to each product model, refer to the [correspondence table](../../../../../docs/zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch). `--enable-simt` is used to specify SIMT compilation mode.
 
-For more bisheng compilation options and usage, refer to [AI-Core Operator Compilation Basic Usage](../../../../../docs/zh/guide/编程指南/编译与运行/算子编译/AI-Core算子编译基本用法.md).
+For more bisheng compilation options and usage, refer to [AI-Core Operator Compilation Basic Usage](../../../../../docs/zh/guide/programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md).
 
 ### CMake Compilation
 
@@ -66,6 +64,8 @@ In a project, CMake can be used to more conveniently compile Ascend C SIMT opera
 # 1. Set compilation configuration variables
 # CMAKE_ASC_ARCHITECTURES: Specify NPU architecture version, this example only supports dav-3510, configurable via -DCMAKE_ASC_ARCHITECTURES=dav-xxxx
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
+# CMAKE_ASC_ENABLE_SIMT: Enable SIMT compilation mode
+set(CMAKE_ASC_ENABLE_SIMT ON)
 
 # 2. find_package(ASC) is the CMake command for finding and configuring the Ascend C compilation toolchain
 find_package(ASC)
@@ -82,23 +82,18 @@ add_executable(demo
 # 5. Set linker language to ASC
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE ASC)
 
-# 6. Configure compilation options: -dc enables separate compilation, --npu-arch specifies architecture version, --enable-simt enables SIMT mode
+# 6. Configure compilation options: -dc enables separate compilation
 target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:-dc --npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>)
+    $<$<COMPILE_LANGUAGE:ASC>:-dc>)
 ```
 
-In future versions, SIMT mode can be enabled by setting `CMAKE_ASC_ENABLE_SIMT` to ON instead of the `--enable-simt` compilation option in step 6 above:
 
-```cmake
-# Enable SIMT compilation mode
-set(CMAKE_ASC_ENABLE_SIMT ON)
-```
 
 ## Build and Run
 
 Run the following steps in the root directory of this example to build and execute the example.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -134,7 +129,7 @@ Run the following steps in the root directory of this example to build and execu
     cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
     ```
 
-    > **Notice:** Before switching build modes, clean the cmake cache by running `rm CMakeCache.txt` in the build directory and then re-run cmake.
+    > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
 
 - Execution Result
 

@@ -9,10 +9,15 @@
 -->
 
 <script setup>
-import { ref, watch, onMounted, nextTick } from 'vue'
-import { useRoute } from 'vitepress'
+import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
+import { useData, useRoute } from 'vitepress'
+import {
+  isApiRouteUnsupported,
+} from '../../../scripts/api-support.mjs'
+import { selectedFilter } from './filter-state.js'
 
 const route = useRoute()
+const { theme } = useData()
 const isApiPage = ref(false)
 
 const filterOptions = [
@@ -27,8 +32,6 @@ const filterOptions = [
   { value: '9030', label: 'Kirin 9030' },
 ]
 
-const selectedFilter = ref('all')
-
 function loadSavedFilter() {
   try {
     const saved = localStorage.getItem('cann-filter-selection')
@@ -38,19 +41,47 @@ function loadSavedFilter() {
   } catch {}
 }
 
+function applyPageSupportFilter(content) {
+  content.querySelectorAll('.api-page-support-hidden').forEach(el => {
+    el.classList.remove('api-page-support-hidden')
+  })
+
+  const unsupported = isApiRouteUnsupported(
+    theme.value.apiUnsupportedIndex,
+    route.path,
+    selectedFilter.value
+  )
+  if (!unsupported) return
+
+  const supportHeading = Array.from(content.querySelectorAll('h2')).find(
+    heading => heading.id === '产品支持情况' ||
+      heading.textContent.replace(/\u200b/g, '').trim() === '产品支持情况'
+  )
+  if (!supportHeading) return
+
+  let section = supportHeading.nextElementSibling
+  while (section && section.tagName !== 'H2') {
+    section = section.nextElementSibling
+  }
+  while (section) {
+    section.classList.add('api-page-support-hidden')
+    section = section.nextElementSibling
+  }
+}
+
 function applyFilter() {
   if (typeof document === 'undefined') return
 
   const content = document.querySelector('.vp-doc')
   if (!content) return
 
-  const allFilterDivs = content.querySelectorAll('[data-filter]')
+  const allFilterElements = content.querySelectorAll('[data-filter]')
   content.querySelectorAll('tr').forEach(tr => { tr.style.display = '' })
 
   if (selectedFilter.value === 'all') {
-    allFilterDivs.forEach(el => { el.style.display = '' })
+    allFilterElements.forEach(el => { el.style.display = '' })
   } else {
-    allFilterDivs.forEach(el => {
+    allFilterElements.forEach(el => {
       if (el.tagName === 'TR') return
       const filterValue = el.getAttribute('data-filter')
       const match = filterValue.split(',').map(s => s.trim()).includes(selectedFilter.value)
@@ -69,6 +100,8 @@ function applyFilter() {
       tr.style.display = anyVisible ? '' : 'none'
     })
   }
+
+  applyPageSupportFilter(content)
 }
 
 function onFilterChange() {
@@ -76,22 +109,25 @@ function onFilterChange() {
   applyFilter()
 }
 
+let filterTimer = null
+
 onMounted(async () => {
   loadSavedFilter()
-  if (route.path.startsWith('/api/')) {
-    isApiPage.value = true
-  }
+  isApiPage.value = route.path.startsWith('/api/')
   await nextTick()
-  setTimeout(applyFilter, 100)
+  filterTimer = setTimeout(applyFilter, 100)
 })
 
 watch(() => route.path, async (path) => {
   isApiPage.value = path.startsWith('/api/')
   if (isApiPage.value) {
     await nextTick()
-    setTimeout(applyFilter, 200)
+    clearTimeout(filterTimer)
+    filterTimer = setTimeout(applyFilter, 200)
   }
-}, { immediate: true })
+})
+
+onUnmounted(() => clearTimeout(filterTimer))
 </script>
 
 <template>

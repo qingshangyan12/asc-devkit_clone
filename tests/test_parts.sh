@@ -11,12 +11,15 @@
 
 set -e
 
+# @target_arrays_begin
 adv_test_targets=(
     ascendc_ut_adv_api_kernel_ascend310p
     ascendc_ut_adv_api_kernel_ascend610
     ascendc_ut_adv_api_kernel_ascend310B1
     ascendc_ut_adv_api_kernel_ascend910B1_AIC
     ascendc_ut_adv_api_kernel_ascend910B1_AIV
+    ascendc_ut_adv_api_kernel_KirinX90_AIV
+    ascendc_ut_adv_api_kernel_Kirin9030_AIV
     ascendc_ut_adv_api_tiling_ascend310p
     ascendc_ut_adv_api_tiling_ascend310B1
     ascendc_ut_adv_api_tiling_ascend910B1_AIC
@@ -28,6 +31,11 @@ adv_test_targets=(
 adv_test_two_targets=(
     ascendc_ut_adv_api_tiling_ascend610
     ascendc_ut_adv_api_hccl_cc_algorithm_ascend950pr_9599_AIC
+    ascendc_ut_hccl_cc_external_alg
+    ascendc_ut_adv_api_ccu_st
+    ascendc_ut_adv_api_hccl_cc_aicpu_alloc_ctx
+    ascendc_ut_adv_api_hccl_cc_aicpu_mc2
+    ascendc_ut_adv_api_hccl_ccu_mc2
 )
 
 basic_test_one_targets=(
@@ -79,6 +87,7 @@ basic_test_three_targets=(
     ascendc_ut_asc_runtime
     ascendc_ut_elf_tool
     ascendc_ut_pack_kernel
+    ascendc_ut_asc_compile_exporter
     ascendc_ut_tpl_tiling_debug
     ascendc_ut_tpl_tiling_release
     ascendc_ut_aicpu_api
@@ -99,6 +108,7 @@ basic_test_four_targets=(
     install_adapter_api_ut
     run_all_tests_and_clean
     asc_opc_unittest
+    ascendc_ut_fwk_modules
     ascendc_ut_basic_api_ascend950pr_9599_AIV_BASIC
 )
 
@@ -107,12 +117,23 @@ basic_test_five_targets=(
     ascendc_ut_c_api_ascend910B1_AIV
     ascendc_ut_c_api_ascend950pr_9599_AIC
     ascendc_ut_c_api_ascend950pr_9599_AIV
+    ascendc_ut_c_api_ascend960dt_AIC
+    ascendc_ut_c_api_ascend960dt_AIV
     ascendc_ut_reg_compute_ascend950pr_9599
     ascendc_ut_tensor_api_NPU_ARCH_3510_AIC
     ascendc_ut_tensor_api_NPU_ARCH_3510_AIV
     ascendc_run_all_tensor_api_header_checks_npu
     ascendc_run_all_tensor_api_header_checks_npu_single
     ascendc_ut_simt_api_ascend950pr_9599
+    ascendc_ut_simt_subnormal_ftz_false_prec_false
+    ascendc_ut_simt_subnormal_ftz_false_prec_true
+    ascendc_ut_simt_subnormal_ftz_true_prec_false
+    ascendc_ut_simt_subnormal_ftz_true_prec_true
+)
+
+c_api_test_9201_targets=(
+    ascendc_ut_c_api_ascend960dt_AIC
+    ascendc_ut_c_api_ascend960dt_AIV
 )
 
 arm_test_targets=(
@@ -120,9 +141,28 @@ arm_test_targets=(
     ascendc_ut_elf_tool
     ascendc_ut_pack_kernel
     ascendc_ut_simt_api_ascend950pr_9599
+    ascendc_ut_simt_subnormal_ftz_false_prec_false
+    ascendc_ut_simt_subnormal_ftz_false_prec_true
+    ascendc_ut_simt_subnormal_ftz_true_prec_false
+    ascendc_ut_simt_subnormal_ftz_true_prec_true
     ascendc_run_all_host_header_checks
     ascendc_run_all_host_header_checks_npu
     ascendc_run_all_host_header_checks_npu_single
+    c_api_run_all_host_header_checks
     adv_api_run_all_host_header_checks_npu
     adv_api_run_all_host_header_checks_npu_single
 )
+# @target_arrays_end
+
+all_test_targets=()
+while IFS= read -r arr_name; do
+    ref="${arr_name}[@]"
+    all_test_targets+=("${!ref}")
+done < <(awk '/^# @target_arrays_begin$/{f=1;next} /^# @target_arrays_end$/{f=0} f' "${BASH_SOURCE[0]}" | sed -n 's/^\([a-zA-Z_][a-zA-Z0-9_]*\)=(.*/\1/p')
+
+all_test_targets_exclude_kirin=()
+for target in "${all_test_targets[@]}"; do
+    if [[ ! "$target" =~ [Kk]irin ]]; then
+        all_test_targets_exclude_kirin+=("$target")
+    fi
+done

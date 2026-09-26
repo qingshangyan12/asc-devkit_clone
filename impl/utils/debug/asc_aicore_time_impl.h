@@ -51,10 +51,10 @@ __aicore__ inline void asc_write_time_stamp_tlv(
     update_write_info(write_info, tlv_len);
 }
 
-__aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
+__aicore__ inline void asc_time_stamp_impl(uint32_t desc_id, uint64_t time)
 {
+    enable_asc_diagnostics();
 #ifdef ASCENDC_TIME_STAMP_ON
-    const uint64_t time = asc_debug_get_system_cycle();
     const uint64_t entry = static_cast<uint64_t>(__get_entry_sys_cnt());
     __gm__ DebugBlockHeadInfo* block_info = get_block_info();
     if (block_info == nullptr) {
@@ -69,10 +69,16 @@ __aicore__ inline void asc_time_stamp_impl(uint32_t desc_id)
 #endif
 }
 
-__aicore__ inline void asc_time_stamp(uint32_t desc_id)
+__aicore__ inline uint64_t asc_capture_time_stamp_cycle() { return asc_debug_get_system_cycle(); }
+
+__aicore__ static __attribute__((noinline)) void asc_time_stamp(uint32_t desc_id)
 {
+#ifdef ASCENDC_TIME_STAMP_ON
+    const uint64_t time = asc_debug_get_system_cycle();
+    asc_time_stamp_impl(desc_id, time);
+#else
     enable_asc_diagnostics();
-    asc_time_stamp_impl(desc_id);
+#endif
 }
 
 __aicore__ inline void asc_prof_start() { bisheng::cce::metrics_prof_start(); }
@@ -87,13 +93,22 @@ __aicore__ inline uint64_t clock(void) { return clock_impl(); }
 template <pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
-    bisheng::cce::mark_stamp<pipe>(idx);
+    if constexpr (pipe == PIPE_S || pipe == PIPE_V || pipe == PIPE_MTE2 || pipe == PIPE_MTE3) {
+        if ASCEND_IS_AIV {
+            bisheng::cce::mark_stamp<pipe>(idx);
+        }
+    }
+    if constexpr (pipe == PIPE_S || pipe == PIPE_MTE1 || pipe == PIPE_MTE2 || pipe == PIPE_FIX || pipe == PIPE_M) {
+        if ASCEND_IS_AIC {
+            bisheng::cce::mark_stamp<pipe>(idx);
+        }
+    }
 }
 
 template <pipe_t pipe, uint16_t idx>
 __aicore__ inline void asc_mark_stamp()
 {
-    bisheng::cce::mark_stamp<pipe>(idx);
+    asc_mark_stamp<pipe>(idx);
 }
 #endif
 } // namespace __asc_aicore
@@ -101,10 +116,14 @@ __aicore__ inline void asc_mark_stamp()
 #include <cstdio>
 
 namespace __asc_aicore {
-__aicore__ inline void asc_time_stamp(uint32_t desc_id)
+__aicore__ static __attribute__((noinline)) void asc_time_stamp(uint32_t desc_id)
 {
     assert(false && "asc_time_stamp is not supported in cpu mode.");
 }
+
+__aicore__ inline uint64_t asc_capture_time_stamp_cycle() { return 0; }
+
+__aicore__ inline void asc_time_stamp_impl(uint32_t desc_id, uint64_t) { asc_time_stamp(desc_id); }
 } // namespace __asc_aicore
 
 using namespace __asc_aicore;
@@ -156,7 +175,8 @@ __aicore__ inline void TRACE_STOP_1(TraceId apid) {}
 #define TRACE_START_1(apid) __asc_aicore::asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0x400)
 #define TRACE_STOP_1(apid) __asc_aicore::asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0xc00)
 
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
+                                __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #define TRACE_START_1(apid)                                                \
     do {                                                                   \
         uint32_t v = (ASC_PROF_START_EVENT | static_cast<uint32_t>(apid)); \

@@ -110,10 +110,11 @@ __aicore__ inline void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-template <typename T, typename U>
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <typename T, typename U, typename V>
 __aicore__ inline void LoadData(
-    const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<fp8_e8m0_t>& srcMx,
+    const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<V>& srcMx,
     const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
 {
     LoadDataImpl(dst, src0, srcMx, loadDataParams, loadMxDataParams);
@@ -182,7 +183,7 @@ __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV1<U>& loadDataParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckTensorPhyPosition<Hardware::L1>(src, "src", "A1 / B1", "LoadData with LoadData3DParamsV1");
+    CheckTensorPhyPosition<Hardware::L1>(src, "src", "L1 Buffer(A1/B1)", "LoadData with LoadData3DParamsV1");
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "LoadData with LoadData3DParamsV1");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L0A || dstScope == Hardware::L0B) {
@@ -230,7 +231,7 @@ __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams)
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
-    CheckTensorPhyPosition<Hardware::L1>(src, "src", "A1 / B1", "LoadData with LoadData3DParamsV2");
+    CheckTensorPhyPosition<Hardware::L1>(src, "src", "L1 Buffer(A1/B1)", "LoadData with LoadData3DParamsV2");
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "LoadData with LoadData3DParamsV2");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L0A || dstScope == Hardware::L0B) {
@@ -371,6 +372,23 @@ __aicore__ inline void LoadDataWithTranspose(
 }
 
 /* **************************************************************************************************
+ * LoadDataWithDecomp                                             *
+ * ************************************************************************************************* */
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+__aicore__ inline void EnableS4ToS8() { EnableS4ToS8Impl(); }
+
+__aicore__ inline void EnableS3ToS8() { EnableS3ToS8Impl(); }
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DDecompParamsV2& loadDataDecompParams)
+{
+    LoadDataImpl<T>(dst, src, loadDataDecompParams);
+}
+#endif
+
+/* **************************************************************************************************
  * Mmad                                             *
  * ************************************************************************************************* */
 /*
@@ -437,7 +455,7 @@ __aicore__ inline void MmadMx(
     MmadMxImpl(dst, fm, filter, bias, mmadParams);
 }
 
-template <typename T, typename U, typename S, typename R>
+template <typename T, typename U, typename S>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
     const MmadBitModeParams& mmadParams)
@@ -445,7 +463,7 @@ __aicore__ inline void MmadMx(
     MmadMxImpl(dst, fm, filter, mmadParams);
 }
 
-template <typename T, typename U, typename S, typename V, typename R>
+template <typename T, typename U, typename S, typename V>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams)
@@ -653,8 +671,8 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(
         LoadImageToLocalCal((__cbuf__ PrimT<T>*)dst.GetPhyAddr(), loadDataParams);
     } else {
         ASCENDC_CHECK_TPOSITION(
-            false, "dst", "A1 / B1", "LoadImageToLocal",
-            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+            false, "dst", "L1 Buffer(A1/B1)", "LoadImageToLocal",
+            GetPositionDisplay(static_cast<TPosition>(dst.GetPosition())));
     }
 }
 
@@ -697,14 +715,14 @@ __aicore__ inline void SetHF32Mode(bool hf32Mode) { SetHF32ModeImpl(hf32Mode); }
  */
 __aicore__ inline void SetHF32TransMode(HF32TransMode mode)
 {
-    SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_ZERO);
+    SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_AWAY);
 }
 
 /*
  * @brief Sets the rounding method for HF32 rounding mode
  * @param [in] hf32TransMode Control parameter for Mmad HF32 mode
  * @note Must Call SetHF32Mode to enable HF32 rounding mode first.When hf32TransMode is true, FP32 is rounded to HF32
- * with rounding towards zero; when false, rounded to nearest even
+ * with rounding to nearest, with ties away from zero; when false, rounded to nearest, with ties to even
  */
 // SetHF32TransMode(bool hf32TransMode) has been updated, please use SetHF32TransMode(HF32TransMode mode) instead.
 __aicore__ inline void SetHF32TransMode(bool hf32TransMode) { SetHF32TransModeImpl(hf32TransMode); }

@@ -11,11 +11,14 @@ add_subdirectory(executor)
 add_subdirectory(selector)
 add_subdirectory(template)
 add_subdirectory(topo)
+add_subdirectory(external_alg)
 
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/op_common.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_log.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/dlhcomm_function.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/cann_host_bridge.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/omnipipe_data_slice_calc.cc
 )
 
 target_sources(mc2_client PRIVATE

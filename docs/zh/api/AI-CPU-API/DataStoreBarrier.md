@@ -2,13 +2,13 @@
 
 ## 产品支持情况
 
-- Ascend 950PR/Ascend 950DT：支持
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
-- Atlas 200I/500 A2 推理产品：不支持
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
-- Atlas 训练系列产品：不支持
+- Ascend 950PR&950DT系列产品：支持
+- Atlas A3系列产品：支持
+- Atlas A2系列产品：支持
+- Atlas 200I/500 A2推理产品：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
+- Atlas训练系列产品：不支持
 
 
 ## 功能说明<a name="section259105813316"></a>
@@ -41,7 +41,7 @@ DataStoreBarrier(void)
 
 ## 调用示例<a name="section82241477610"></a>
 
-在AI CPU算子Kernel侧实现代码中调用AscendC::DataStoreBarrier\(\)，确保AI CPU算子对Tiling数据的修改写入内存，使得AI Core算子能够正确读取Tiling数据：
+在AI CPU算子核函数（Kernel）侧实现代码中调用AscendC::DataStoreBarrier\(\)，确保AI CPU算子对Tiling数据的修改写入内存，使得AI Core算子能够正确读取Tiling数据：
 
 ```
 namespace KernelInfo {

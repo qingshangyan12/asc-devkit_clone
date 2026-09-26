@@ -8,9 +8,9 @@
 
 | 产品                                        | CANN软件版本  |
 | ------------------------------------------- | ------------- |
-| Ascend 950PR/Ascend 950DT                   | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT                   | >= CANN 9.2.0 |
+| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.2.0 |
+| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -189,7 +189,7 @@ AIC侧每完成一个 (baseM × baseN)大小子块的Fixpipe输出后，通过 `
 AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(0x8);  // 通知AIV数据就绪
 
 // AIV侧 GeluFromGM() / GeluFromUB():
-AscendC::CrossCoreWaitFlag(0x8);  // 等待AIC侧Fixpipe完成
+AscendC::CrossCoreWaitFlag<0x2>(0x8);  // 等待AIC侧Fixpipe完成
 ```
 
 #### 3. `__mix__(1,2)` 模式下的多核切分
@@ -350,7 +350,7 @@ Fixpipe L0C → UB（通过 `dualDstCtl=0b01` 开启双目标模式，按M维度
 
 ```cpp
 AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams;
-fixpipeParams.mSize = DivCeil(curM, 2) * 2;
+fixpipeParams.mSize = AscendC::Std::ceil_div(curM, 2) * 2;
 fixpipeParams.nSize = curN;
 fixpipeParams.srcStride = curMAlign;
 fixpipeParams.dstStride = curN;
@@ -476,7 +476,7 @@ AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 
 ### DumpTensor
 
-基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](../../../../../docs/zh/api/SIMD-API/基础API/数据结构/LocalTensor和GlobalTensor定义/LocalTensor/LocalTensor简介.md)的内容。同时支持打印自定义的附加信息（仅支持uint32_t数据类型的信息），比如打印当前行号等。
+基于算子工程开发的算子，可以使用该接口Dump指定[LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md)的内容。同时支持打印自定义的附加信息（仅支持uint32_t数据类型的信息），比如打印当前行号等。
 
 在算子kernel侧实现代码中需要打印Tensor数据的地方调用DumpTensor接口打印相关内容。样例如下：
 
@@ -486,7 +486,7 @@ AscendC::Div(yLocal, xLocal, yLocal, n);
 AscendC::DumpTensor(yLocal, 1, 16);
 ```
 
-> **注意：** [DumpTensor](../../../../../docs/zh/api/SIMD-API/基础API/调试接口/上板打印/DumpTensor.md)接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
+> **注意：** [DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md)接口打印功能会对算子实际运行的性能带来一定影响，通常在调测阶段使用。开发者可以按需通过设置ASCENDC_DUMP=0来关闭打印功能。
 
 ## 性能调试
 

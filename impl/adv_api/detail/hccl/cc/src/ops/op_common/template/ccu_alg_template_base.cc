@@ -9,6 +9,7 @@
  */
 #include "ccu_alg_template_base.h"
 #include "log.h"
+#include "ccu_assist_pub.h"
 
 namespace mc2_ops_hccl {
 CcuAlgTemplateBase::CcuAlgTemplateBase() {}
@@ -106,8 +107,8 @@ HcclResult CcuAlgTemplateBase::GetChannelDieId(
 /* nhr算法，需要遍历得到的channelDesc，判断使用几个die，如果是1个die，则还需要得到dieId。
    以便于算法挑选相应dieId的channelDesc */
 HcclResult CcuAlgTemplateBase::GetDieInfoFromChannelDescs(
-    HcclComm comm, const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, u32 myRankId,
-    uint32_t& dieNum, uint32_t& dieId)
+    const HcclComm comm, const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, u32 myRankId,
+    uint32_t& dieNum, uint32_t& dieId) const
 {
     constexpr u32 LINK_NUM_1 = 1;
     constexpr u32 LINK_NUM_2 = 2;
@@ -155,7 +156,7 @@ HcclResult CcuAlgTemplateBase::GetDieInfoFromChannelDescs(
 HcclResult CcuAlgTemplateBase::SelectChannelToVec(
     const HcclComm comm, const u32 myRankId, const u32 rmtRankId,
     const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, const u32 dieId,
-    std::map<u32, u32>& rank2ChannelIdx, std::vector<HcclChannelDesc>& channels)
+    std::map<u32, u32>& rank2ChannelIdx, std::vector<HcclChannelDesc>& channels) const
 {
     auto it = rank2ChannelIdx.find(rmtRankId);
     if (it != rank2ChannelIdx.end()) {

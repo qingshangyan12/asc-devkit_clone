@@ -218,7 +218,7 @@ struct Rt91095StarsNotifySqe {
     /* word5 */
     uint32_t waitModeBit : 2;   // bit 0:equal, bit 1:bigger
     uint32_t recordModeBit : 3; // bit 0:add, bit 1:write, bit 2:clear
-    uint32_t bitmap : 1;        // only use for conut notify wait, 1 means comapre with count value by bit
+    uint32_t bitmap : 1;        // only use for count notify wait, 1 means compare with count value by bit
     uint32_t res5 : 26;
 
     /* word6 */
@@ -477,7 +477,7 @@ struct Rt91095StarsMemcpySqe {
     uint8_t mpamns : 1;
     uint8_t pmg : 2;
     uint8_t qos : 4;
-    uint8_t d2dOffsetFlag : 1; // use reserved filed
+    uint8_t d2dOffsetFlag : 1; // use reserved field
 
     /* word6 */
     uint16_t srcStreamId;
@@ -517,7 +517,7 @@ struct Rt91095StarsWriteValueSqe {
 
     /* word6-7 */
     uint32_t res5;
-    uint32_t subType; // use reserved filed
+    uint32_t subType; // use reserved field
 
     /* word8-15 */
     uint32_t writeValuePart[8]; // write value field

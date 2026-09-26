@@ -218,7 +218,7 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, const Std::tuple<U, V>& addr0, 
             KERNEL_ERROR, "buffer number is %u, which should be the same as TQueConfig::bufferNumber(%u)", num,
             que.config.bufferNumber);
     });
-    static_assert(T::dstPosition != TPosition::TSCM, "Init Buffer is not supported Postion TSCM");
+    static_assert(T::dstPosition != TPosition::TSCM, "Init Buffer is not supported Postion L1 Buffer(TSCM)");
     Hardware pool = GetBufferPos(T::srcPosition, T::dstPosition);
     que.bufStart = this->g_tpipeImpl.buf_ + this->g_tpipeImpl.curBufSize_;
     que.value = num;
@@ -233,9 +233,6 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, const Std::tuple<U, V>& addr0, 
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n",
             this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
-#ifdef ASCENDC_TIME_STAMP_ON
-    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
-#endif
     return true;
 }
 

@@ -30,24 +30,25 @@
 #include "../../api_check/kernel_check/pad/broadcast/broadcast_check.h"
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "broadcast_3510_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #include "broadcast_v220_impl.h"
 #else
 #include "broadcast_v200_impl.h"
 #endif
-#if (                                                                                                 \
-    defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 3510 || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
+#if (                                                                                                  \
+    defined(__NPU_ARCH__) &&                                                                           \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 2002 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || \
+     __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
 
 namespace AscendC {
 constexpr uint32_t TWO_DIM = 2;
 constexpr uint32_t HALF_ONE_BLK_SIZE = 16;
 
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T, int constRank = -1, uint32_t* constDstShape = nullptr, uint32_t* constSrcShape = nullptr>
 __aicore__ inline void GetBroadcastTilingInfoImpl(
     uint32_t rank, const uint32_t* dstShape, const uint32_t* srcShape, bool srcInnerPad, BroadcastTiling& tiling)
@@ -279,13 +280,13 @@ __aicore__ inline void BroadcastImpl(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t* dstShape, const uint32_t* srcShape,
     BroadcastTiling* tiling)
 {
-    CheckTensorPos<T>(dst, Hardware::UB, "dstTensor", "VECIN / VECCALC / VECOUT", "Broadcast");
-    CheckTensorPos<T>(src, Hardware::UB, "srcTensor", "VECIN / VECCALC / VECOUT", "Broadcast");
+    CheckTensorPos<T>(dst, Hardware::UB, "dstTensor", "VECIN/VECCALC/VECOUT", "Broadcast");
+    CheckTensorPos<T>(src, Hardware::UB, "srcTensor", "VECIN/VECCALC/VECOUT", "Broadcast");
     static_assert(
         (constRank == -1) || (constRank <= 9 && constRank > 0),
         "constRank only supports -1 and the range between 1 and 9");
     static_assert(SupportBytes<T, 1, 2, 4, 8>(), "Broadcast only supports type b8/b16/b32/b64 on current device");
-    ASCENDC_ASSERT((tiling != nullptr), "BroadcastTiling could not be empty!");
+    ASCENDC_ASSERT((tiling != nullptr), { KERNEL_LOG(KERNEL_ERROR, "BroadcastTiling could not be empty!"); });
     if constexpr (constRank != -1) {
         ASCENDC_ASSERT((tiling->oriRank == constRank), {
             KERNEL_LOG(KERNEL_ERROR, "Tilling original rank and constRank should be equal!");
@@ -380,8 +381,8 @@ __aicore__ inline void BroadCast(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],
     const uint32_t srcShape[dim], LocalTensor<uint8_t>& sharedTmpBuffer);
 
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 template <typename T, int32_t dim, int32_t axis, bool isReuseSource = false>
 __aicore__ inline void BroadCastCommon(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const uint32_t dstShape[dim],

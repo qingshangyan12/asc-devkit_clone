@@ -44,7 +44,7 @@ HcclResult SimContextMgr::CreateCommEngineCtx(const std::string& tag, CommEngine
     // 暂时只支持HOST类型
     HcclMemType type;
     if (engine == COMM_ENGINE_CPU || engine == COMM_ENGINE_CPU_TS || engine == COMM_ENGINE_AICPU_TS ||
-        engine == COMM_ENGINE_AICPU) {
+        engine == COMM_ENGINE_AICPU || engine == COMM_ENGINE_AIV || engine == COMM_ENGINE_CCU) {
         type = HCCL_MEM_TYPE_HOST; // LLT模式AICPU也分配HOST内存
         ctxMem = malloc(size);
         CHK_PTR_NULL(ctxMem);
@@ -68,12 +68,12 @@ HcclResult SimContextMgr::GetCommEngineCtx(const std::string& tag, CommEngine en
     // Ctx未创建返回
     if (contextMap_.find(tag) == contextMap_.end()) {
         HCCL_INFO("[%s] not exist a context with tag[%s]", __func__, tag.c_str());
-        return HCCL_E_PARA;
+        return HCCL_E_NOT_FOUND;
     } else {
         auto engineCtxMap = contextMap_[tag];
         if (engineCtxMap.find(engine) == engineCtxMap.end()) {
             HCCL_INFO("[%s] not exist a context with tag[%s], engine[%d]", __func__, tag.c_str(), engine);
-            return HCCL_E_PARA;
+            return HCCL_E_NOT_FOUND;
         }
     }
 

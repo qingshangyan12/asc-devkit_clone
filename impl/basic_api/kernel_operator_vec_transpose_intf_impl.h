@@ -41,10 +41,14 @@
 #include "dav_3510/kernel_operator_vec_transpose_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_transpose_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_vec_transpose_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_transpose_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_transpose_impl.h"
+#elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5165)
+#include "dav_5161/kernel_operator_vec_transpose_impl.h"
 #endif
 
 namespace AscendC {
@@ -57,7 +61,7 @@ __aicore__ inline void CheckTransDataTo5HDParams(const TransDataTo5HDParams& nch
 {
     using PrimType = PrimT<T>;
 
-#if (__NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     ASCENDC_DEBUG_ASSERT(
         (SupportType<PrimType, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>()),
         KERNEL_LOG_INTERNAL(
@@ -137,8 +141,8 @@ __aicore__ inline void TransDataTo5HD(
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckTransDataTo5HDParams<T>(nchwconvParams);
     for (int32_t i = 0; i < NCHW_CONV_ADDR_LIST_SIZE; i++) {
-        CheckTensorPhyPosition<Hardware::UB>(dstList[i], "dstList", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
-        CheckTensorPhyPosition<Hardware::UB>(srcList[i], "srcList", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
+        CheckTensorPhyPosition<Hardware::UB>(dstList[i], "dstList", "UB(VECIN/VECCALC/VECOUT)", "TransDataTo5HD");
+        CheckTensorPhyPosition<Hardware::UB>(srcList[i], "srcList", "UB(VECIN/VECCALC/VECOUT)", "TransDataTo5HD");
         CheckTensorAlignment(dstList[i], ONE_BLK_SIZE, "dstList", "TransDataTo5HD");
         CheckTensorAlignment(srcList[i], ONE_BLK_SIZE, "srcList", "TransDataTo5HD");
     }
@@ -207,7 +211,7 @@ __aicore__ inline void Transpose(
 #endif
     if ((transposeParams.transposeType == TransposeType::TRANSPOSE_ND2ND_B16) &&
         (transposeParams.hSize == NCHW_CONV_ADDR_LIST_SIZE) && (transposeParams.wSize == NCHW_CONV_ADDR_LIST_SIZE)) {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
         ASCENDC_ASSERT((SupportType<PrimT<T>, int16_t, uint16_t, half>()), {
             KERNEL_LOG(
                 KERNEL_ERROR, "Failed to check dtype in Transpose when transposeType is TRANSPOSE_ND2ND_B16, "
@@ -255,8 +259,8 @@ __aicore__ inline __in_pipe__(S) __out_pipe__(V) void TransDataTo5HD(
 {
 #if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
     CheckTransDataTo5HDParams<T>(nchwconvParams);
-    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
-    CheckTensorPhyPosition<Hardware::UB>(src, "src", "VECIN / VECCALC / VECOUT", "TransDataTo5HD");
+    CheckTensorPhyPosition<Hardware::UB>(dst, "dst", "UB(VECIN/VECCALC/VECOUT)", "TransDataTo5HD");
+    CheckTensorPhyPosition<Hardware::UB>(src, "src", "UB(VECIN/VECCALC/VECOUT)", "TransDataTo5HD");
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", "TransDataTo5HD");
     CheckTensorAlignment(src, ONE_BLK_SIZE, "src", "TransDataTo5HD");
 #endif

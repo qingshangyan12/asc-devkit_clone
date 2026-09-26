@@ -86,34 +86,24 @@ else()
     add_subdirectory(src)
 
     if(DEVICE_MODE AND KERNEL_MODE)
-        pack_targets_and_files(
+        cann_pack_targets_and_files(
             OUTPUT_TARGET "generate_device_aicpu_package"
             OUTPUT "mc2_server.tar.gz"
             TARGETS mc2_server mc2_kernel_compat
             MANIFEST "bin_hash.cfg"
             TAR_ROOT_DIR "aicpu_kernels_device"
         )
-        sign_file(
+        add_cann_sign_file(
             INPUT "mc2_server.tar.gz"
-            CONFIG "${HCCL_CC_DIR}/scripts/sign/hccl_check_cfg.xml"
+            CONFIG "${HCCL_CC_DIR}/sign.xml"
             RESULT_VAR "mc2_server_sign_file"
+            VERSION "${CANN_VERSION_asc-devkit_VERSION}"
             DEPENDS generate_device_aicpu_package
         )
-        install(FILES ${CMAKE_BINARY_DIR}/signatures/mc2_server.tar.gz
+        install(FILES ${mc2_server_sign_file}
             DESTINATION opp/built-in/op_impl/aicpu/kernel
             COMPONENT asc-devkit
         )
     endif()
 
-    if(PRODUCT_SIDE STREQUAL "host")
-        set(HCCL_HEAD
-            ${HCCL_CC_INCLUDE_DIR}/hccl.h
-            ${HCCL_CC_INCLUDE_DIR}/hccl_mc2.h
-        )
-        install(FILES
-            ${HCCL_HEAD}
-            DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/include/hccl
-            COMPONENT asc-devkit
-        )
-    endif()
 endif()

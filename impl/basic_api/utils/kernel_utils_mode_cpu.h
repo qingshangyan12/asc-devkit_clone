@@ -131,6 +131,10 @@ public:
         {static_cast<uint8_t>(TPosition::TSCM), "TSCM"},
         {static_cast<uint8_t>(TPosition::C2PIPE2GM), "C2PIPE2GM"},
         {static_cast<uint8_t>(TPosition::C2PIPE2LOCAL), "C2PIPE2LOCAL"},
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+        {static_cast<uint8_t>(TPosition::C2PT), "C2PT"},
+#endif
         {static_cast<uint8_t>(TPosition::MAX), "MAX"},
     };
 
@@ -157,8 +161,13 @@ public:
         {Hardware::L0B, "L0B"}, {Hardware::L0C, "L0C"},   {Hardware::UB, "UB"},
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
+     (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+     (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
         {Hardware::BIAS, "BT"}, {Hardware::FIXBUF, "FB"},
+#endif
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+        {Hardware::PT, "PT"},
 #endif
     };
 
@@ -178,7 +187,7 @@ public:
     };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     const std::map<std::string, uint16_t> srcBurstLenUnitMap{
         {"L0C16UB", 512},    {"L0C32UB", 1024},    {"UBL0C16", 512},   {"UBL0C32", 1024},
         {"L1L0C16", 512},    {"L1L0C32", 1024},    {"L0CV16UB", 512},  {"L0CV32UB", 1024},
@@ -208,7 +217,7 @@ public:
         {"L0CDPf32UB", 1024}, {"L1BT", 32},       {"L1FB", 32},
     };
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     const std::map<TPosition, Hardware> positionHardMap = {
         {TPosition::GM, Hardware::GM},      {TPosition::A1, Hardware::L1},
         {TPosition::B1, Hardware::L1},      {TPosition::TSCM, Hardware::L1},
@@ -223,7 +232,7 @@ public:
         {TPosition::GM, Hardware::GM},      {TPosition::A1, Hardware::L1},    {TPosition::B1, Hardware::L1},
         {TPosition::TSCM, Hardware::L1},    {TPosition::VECIN, Hardware::UB}, {TPosition::VECOUT, Hardware::UB},
         {TPosition::VECCALC, Hardware::UB}, {TPosition::A2, Hardware::L0A},   {TPosition::B2, Hardware::L0B},
-        {TPosition::C1, Hardware::L1},      {TPosition::C2, Hardware::BIAS},  {TPosition::CO1, Hardware::L0C},
+        {TPosition::C1, Hardware::UB},      {TPosition::C2, Hardware::L0C},   {TPosition::CO1, Hardware::L0C},
         {TPosition::CO2, Hardware::UB},
     };
 #elif __NPU_ARCH__ == 2201
@@ -262,10 +271,18 @@ public:
         {TPosition::C1, Hardware::L1},      {TPosition::C2, Hardware::BIAS},  {TPosition::CO1, Hardware::L0C},
         {TPosition::CO2, Hardware::GM},
     };
-
+#elif defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    const std::map<TPosition, Hardware> positionHardMap = {
+        {TPosition::GM, Hardware::GM},      {TPosition::A1, Hardware::L1},    {TPosition::B1, Hardware::L1},
+        {TPosition::TSCM, Hardware::L1},    {TPosition::VECIN, Hardware::UB}, {TPosition::VECOUT, Hardware::UB},
+        {TPosition::VECCALC, Hardware::UB}, {TPosition::A2, Hardware::L1},    {TPosition::B2, Hardware::L0B},
+        {TPosition::C1, Hardware::L1},      {TPosition::C2, Hardware::BIAS},  {TPosition::C2PIPE2GM, Hardware::FIXBUF},
+        {TPosition::C2PT, Hardware::PT},    {TPosition::CO1, Hardware::L1},   {TPosition::CO2, Hardware::GM},
+    };
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     const std::map<Hardware, uint32_t> bufferInitLen = {
         {Hardware::GM, 1024 * 1024}, {Hardware::UB, 1024 * 256},    {Hardware::L1, 1024 * 512},
         {Hardware::L0A, 1024 * 64},  {Hardware::L0B, 1024 * 64},    {Hardware::L0C, 1024 * 256},
@@ -303,6 +320,30 @@ public:
         {Hardware::L0A, 1024 * 32},  {Hardware::L0B, 1024 * 32},    {Hardware::L0C, 1024 * 64},
         {Hardware::BIAS, 1024 * 1},  {Hardware::FIXBUF, 1024 * 6},
     };
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5101))
+    const std::map<Hardware, uint32_t> bufferInitLen = {
+        {Hardware::GM, 1024 * 1024}, {Hardware::UB, TOTAL_UB_SIZE}, {Hardware::L1, TOTAL_L1_SIZE},
+        {Hardware::L0A, 0},          {Hardware::L0B, 1024 * 128},   {Hardware::L0C, 0},
+        {Hardware::BIAS, 1024 * 1},  {Hardware::FIXBUF, 1024 * 6},  {Hardware::PT, 256},
+    };
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5161))
+    const std::map<Hardware, uint32_t> bufferInitLen = {
+        {Hardware::GM, 1024 * 1024}, {Hardware::UB, TOTAL_UB_SIZE}, {Hardware::L1, TOTAL_L1_SIZE},
+        {Hardware::L0A, 0},          {Hardware::L0B, 1024 * 64},    {Hardware::L0C, 0},
+        {Hardware::BIAS, 1024 * 1},  {Hardware::FIXBUF, 1024 * 6},  {Hardware::PT, 256},
+    };
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5165))
+    const std::map<Hardware, uint32_t> bufferInitLen = {
+        {Hardware::GM, 1024 * 1024}, {Hardware::UB, TOTAL_UB_SIZE}, {Hardware::L1, TOTAL_L1_SIZE},
+        {Hardware::L0A, 0},          {Hardware::L0B, 1024 * 16},    {Hardware::L0C, 0},
+        {Hardware::BIAS, 1024 * 1},  {Hardware::FIXBUF, 1024 * 6},  {Hardware::PT, 256},
+    };
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5163))
+    const std::map<Hardware, uint32_t> bufferInitLen = {
+        {Hardware::GM, 1024 * 1024}, {Hardware::UB, TOTAL_UB_SIZE}, {Hardware::L1, TOTAL_L1_SIZE},
+        {Hardware::L0A, 0},          {Hardware::L0B, 1024 * 64},    {Hardware::L0C, 0},
+        {Hardware::BIAS, 1024 * 1},  {Hardware::FIXBUF, 1024 * 6},  {Hardware::PT, 256},
+    };
 #endif
     uint8_t* cpuGM = nullptr;
     uint8_t* cpuUB = nullptr;
@@ -312,8 +353,12 @@ public:
     uint8_t* cpuL0C = nullptr;
     uint8_t* cpuBIAS = nullptr;
     uint8_t* cpuFIXBUF = nullptr;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     uint8_t* cpuSSbuf = nullptr;
+#endif
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    uint8_t* cpuPT = nullptr;
 #endif
     std::map<Hardware, uint8_t*> hardwareCpuBufferMap;
 
@@ -328,13 +373,17 @@ private:
         hardwareCpuBufferMap = {{Hardware::UB, cpuUB},        {Hardware::L1, cpuL1},   {Hardware::L0A, cpuL0A},
                                 {Hardware::L0B, cpuL0B},      {Hardware::L0C, cpuL0C}, {Hardware::BIAS, cpuBIAS},
                                 {Hardware::FIXBUF, cpuFIXBUF}};
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+        hardwareCpuBufferMap.insert({Hardware::PT, cpuPT});
+#endif
     }
 
     ~ConstDefiner() { Free(); }
 
 public:
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
     void Allocate()
     {
         cpuGM = new uint8_t[bufferInitLen.at(Hardware::GM)];
@@ -343,7 +392,7 @@ public:
         cpuL0C = new uint8_t[bufferInitLen.at(Hardware::L0C)];
         cpuBIAS = new uint8_t[bufferInitLen.at(Hardware::BIAS)];
         cpuFIXBUF = new uint8_t[bufferInitLen.at(Hardware::FIXBUF)];
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
         cpuSSbuf = nullptr;
         if (g_kernelMode != KernelMode::MIX_MODE) {
             cpuUB = new uint8_t[bufferInitLen.at(Hardware::UB)];
@@ -387,6 +436,10 @@ public:
         cpuL0C = new uint8_t[bufferInitLen.at(Hardware::L0C)];
         cpuBIAS = new uint8_t[bufferInitLen.at(Hardware::BIAS)];
         cpuFIXBUF = new uint8_t[bufferInitLen.at(Hardware::FIXBUF)];
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+        cpuPT = new uint8_t[bufferInitLen.at(Hardware::PT)];
+#endif
     }
 #endif
     void Free()
@@ -399,7 +452,7 @@ public:
         };
         safeDelete(cpuGM);
         if (cpuUB != nullptr) {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
             if (g_kernelMode == KernelMode::MIX_MODE) {
                 if (g_coreType == AscendC::MIX && block_idx == 0 && sub_block_idx == 0) {
                     GmFree(cpuUB);
@@ -413,7 +466,7 @@ public:
             cpuUB = nullptr;
         }
         if (cpuL1 != nullptr) {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
             if (g_kernelMode == KernelMode::MIX_MODE) {
                 if (g_coreType == AscendC::MIX && block_idx == 0 && sub_block_idx == 0) {
                     GmFree(cpuL1);
@@ -431,7 +484,11 @@ public:
         safeDelete(cpuL0C);
         safeDelete(cpuBIAS);
         safeDelete(cpuFIXBUF);
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+        safeDelete(cpuPT);
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
         if (cpuSSbuf != nullptr) {
             if (g_kernelMode == KernelMode::MIX_MODE) {
                 if (g_coreType == AscendC::MIX && block_idx == 0 && sub_block_idx == 0) {
@@ -447,6 +504,58 @@ public:
 #endif
     }
 };
+
+inline std::string GetPositionDisplay(Hardware hardPos, const std::string& logicName)
+{
+    if (hardPos == Hardware::GM && logicName == "GM") {
+        return "GM";
+    }
+
+    const char* hardName = "UNKNOWN";
+    switch (hardPos) {
+        case Hardware::GM:
+            hardName = "GM";
+            break;
+        case Hardware::UB:
+            hardName = "UB";
+            break;
+        case Hardware::L1:
+            hardName = "L1 Buffer";
+            break;
+        case Hardware::L0A:
+            hardName = "L0A Buffer";
+            break;
+        case Hardware::L0B:
+            hardName = "L0B Buffer";
+            break;
+        case Hardware::L0C:
+            hardName = "L0C Buffer";
+            break;
+        case Hardware::BIAS:
+            hardName = "BiasTable Buffer";
+            break;
+        case Hardware::FIXBUF:
+            hardName = "Fixpipe Buffer";
+            break;
+#if defined(__NPU_ARCH__) && \
+    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+        case Hardware::PT:
+            hardName = "PaddingTable Buffer";
+            break;
+#endif
+        default:
+            break;
+    }
+    return std::string(hardName) + "(" + logicName + ")";
+}
+
+inline std::string GetPositionDisplay(TPosition pos)
+{
+    const auto& definer = ConstDefiner::Instance();
+    const auto hardPos = definer.positionHardMap.find(pos);
+    const Hardware hardware = hardPos == definer.positionHardMap.end() ? GetPhyType(pos) : hardPos->second;
+    return GetPositionDisplay(hardware, definer.logicNameMap.at(static_cast<uint8_t>(pos)));
+}
 #endif
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))

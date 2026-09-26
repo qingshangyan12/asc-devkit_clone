@@ -4,7 +4,7 @@
 
 本样例以Gelu计算为例，介绍RegBase的向量性能调优方法，样例展示使能VF融合和循环展开之后的性能收益情况。
 
-> **前置阅读**：[Gelu算子入门样例](https://gitcode.com/cann/asc-devkit/blob/master/examples/01_simd_cpp_api/00_introduction/04_reg_compute/gelu/README.md)，本样例基于入门样例进行性能优化，建议先阅读入门样例了解基础概念。
+> **前置阅读**：[Gelu算子入门样例](../../../00_introduction/04_reg_compute/gelu/README.md)，本样例基于入门样例进行性能优化，建议先阅读入门样例了解基础概念。
 
 **优化路径**：
 - Case 0: Gelu未使能VF融合能力（基准）
@@ -15,7 +15,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -272,19 +272,19 @@ __aicore__ inline void GeluCompute(
 
 | 关键字/概念 | 含义 | 详细文档 |
 |:---|:---|:---|
-| `__simd_vf__` | VF 函数声明修饰符，表示该函数运行在 VF（Vector Function）执行域 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `__ubuf__` | UB 地址空间限定符，标记指针指向 UB 内存区域 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `RegTensor<T>` | 寄存器级 Tensor 对象，数据驻留在向量寄存器中（区别于驻留 UB 的 `LocalTensor`） | [RegTensor](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/RegTensor.md) |
-| `MaskReg` | 向量掩码寄存器，控制每次计算参与运算的元素数量 | [MaskReg](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
-| `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) |
-| `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md) |
-| `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) |
-| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [UpdateMask](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/寄存器数据类型/MaskReg.md) |
+| `__simd_vf__` | VF 函数声明修饰符，表示该函数运行在 VF（Vector Function）执行域 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `__ubuf__` | UB 地址空间限定符，标记指针指向 UB 内存区域 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `RegTensor<T>` | 寄存器级 Tensor 对象，数据驻留在向量寄存器中（区别于驻留 UB 的 `LocalTensor`） | [RegTensor](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/RegTensor.md) |
+| `MaskReg` | 向量掩码寄存器，控制每次计算参与运算的元素数量 | [MaskReg](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md) |
+| `LoadAlign` | 连续对齐搬运，将数据从 UB 加载到寄存器 | [连续对齐搬入](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md) |
+| `StoreAlign` | 连续对齐搬运，将数据从寄存器写回 UB | [连续对齐搬出](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous.md) |
+| `asc_vf_call` | VF 函数调用入口，在核函数中调用 VF 函数 | [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) |
+| `UpdateMask` | 根据剩余元素数更新掩码寄存器 | [UpdateMask](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/register_data_types/MaskReg.md) |
 
 **原理解析**：
 
-RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/VF调用/asc_vf_call.md) 调用 VF 函数，可实现 VF 融合。VF 融合的核心优势：
-- 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬入/连续对齐搬入（LoadAlign）.md) 和一次 [StoreAlign](../../../../../docs/zh/api/SIMD-API/基础API/Reg矢量计算/Reg数据搬出/连续对齐搬出（StoreAlign）.md)，消除中间结果的 Load/Store 开销
+RegBase API 提供寄存器级别的向量计算接口，配合 [asc_vf_call](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/vf_call/asc_vf_call.md) 调用 VF 函数，可实现 VF 融合。VF 融合的核心优势：
+- 在 VF 函数内，数据从 UB 加载到寄存器后，所有中间计算均在寄存器中完成，仅需一次 [LoadAlign](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_continuous.md) 和一次 [StoreAlign](../../../../../docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_store/StoreAlign_continuous.md)，消除中间结果的 Load/Store 开销
 - 支持 VF 双发特性，常规计算指令并行度可达 512 bytes/cycle，指令发射效率（IPC）大幅提升
 
 ```
@@ -345,7 +345,7 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 ```cpp
 // 核函数中调用 VF 函数的代码片段
 constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-uint32_t loopNum = DivCeil(n, oneRepeatSize);
+uint32_t loopNum = AscendC::Std::ceil_div(n, oneRepeatSize);
 __ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
 __ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
 // 通过 asc_vf_call 调用 VF 函数，传入 UB 地址、元素数 n 和循环次数

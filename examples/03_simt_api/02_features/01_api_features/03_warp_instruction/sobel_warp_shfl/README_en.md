@@ -2,15 +2,13 @@
 
 ## Overview
 
-This example uses Sobel edge detection to demonstrate how to reuse data loaded by adjacent threads through Warp shuffle instructions to complete 3x3 convolution computation, and how to implement compact output of edge pixels in combination with [asc_ballot()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Vote类函数/asc_ballot.md).
+This example uses Sobel edge detection to demonstrate how to reuse data loaded by adjacent threads through Warp shuffle instructions to complete 3x3 convolution computation, and how to implement compact output of edge pixels in combination with [asc_ballot()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_vote_functions/asc_ballot.md).
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -78,13 +76,13 @@ int y = warp_id / tiles_x;                          // Pixel row: which Warp row
 </p>
 
 
-As shown in the figure above, computing the Sobel magnitude requires obtaining 9 pixel values from the 3x3 neighborhood around the current pixel. When adjacent threads compute their respective Sobel magnitudes, they also need the pixel values from their 3x3 neighborhoods, so the 3x3 neighborhoods of different threads overlap. Leveraging this characteristic, each thread first reads three pixel values at the same x coordinate (top, middle, bottom) from Global Memory, and saves them to register variables top, mid, and bot, corresponding to the middle column of the current pixel's 3x3 neighborhood. Then, [asc_shfl_up()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_up.md) and [asc_shfl_down()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl_down.md) are used to obtain the left and right column data from adjacent thread registers, avoiding additional reads from Global Memory.
+As shown in the figure above, computing the Sobel magnitude requires obtaining 9 pixel values from the 3x3 neighborhood around the current pixel. When adjacent threads compute their respective Sobel magnitudes, they also need the pixel values from their 3x3 neighborhoods, so the 3x3 neighborhoods of different threads overlap. Leveraging this characteristic, each thread first reads three pixel values at the same x coordinate (top, middle, bottom) from Global Memory, and saves them to register variables top, mid, and bot, corresponding to the middle column of the current pixel's 3x3 neighborhood. Then, [asc_shfl_up()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_up.md) and [asc_shfl_down()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl_down.md) are used to obtain the left and right column data from adjacent thread registers, avoiding additional reads from Global Memory.
 
 
 
 ```cpp
 // Each thread first reads the top, middle, and bottom pixels in the current pixel's column.
-// in_image indicates whether the current thread coordinate is within the valid image range (non-boundary pixel); when false, pixel value is set to 0.
+// in_image indicates whether the current thread coordinate is within the valid image range; when false, pixel value is set to 0.
 int top = in_image ? input[(y - 1) * width + x] : 0;
 int mid = in_image ? input[y * width + x] : 0;
 int bot = in_image ? input[(y + 1) * width + x] : 0;
@@ -114,7 +112,7 @@ After obtaining all 9 pixels of the 3x3 neighborhood, compute the horizontal gra
 
 **asc_ballot for Compact Output**
 
-Compact output requires writing edge pixels that meet the threshold condition consecutively to edge_list. For the same Warp, only some threads may have edge magnitudes that meet the threshold condition. If each edge thread independently executes [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/原子操作/asc_atomic_add.md) to request an output position, up to 32 atomic operations would be generated within one Warp.
+Compact output requires writing edge pixels that meet the threshold condition consecutively to edge_list. For the same Warp, only some threads may have edge magnitudes that meet the threshold condition. If each edge thread independently executes [asc_atomic_add()](../../../../../../docs/zh/api/SIMT-API/atomic_operations/asc_atomic_add.md) to request an output position, up to 32 atomic operations would be generated within one Warp.
 
 This example uses `asc_ballot()` to collect whether each thread in the Warp meets the threshold condition and generate edge_mask. The i-th bit in edge_mask being 1 indicates that thread i in the Warp has an edge magnitude that meets the threshold condition:
 
@@ -124,10 +122,10 @@ uint32_t edge_mask = asc_ballot(strength >= THRESHOLD);
 
 edge_mask is used to complete two operations:
 
-- Thread 0 counts the number of edge threads in this Warp through [__popc(edge_mask)](../../../../../../docs/zh/api/SIMT-API/数学函数/整型数学库函数/__popc.md), and requests consecutive output positions for the entire Warp through a single `asc_atomic_add()`.
+- Thread 0 counts the number of edge threads in this Warp through [__popc(edge_mask)](../../../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/__popc.md), and requests consecutive output positions for the entire Warp through a single `asc_atomic_add()`.
 - Each edge thread computes its local offset within the Warp based on edge_mask and writes to the corresponding position in edge_list.
 
-After thread 0 requests the output position, it broadcasts the base position to all threads in the Warp through [asc_shfl()](../../../../../../docs/zh/api/SIMT-API/Warp函数/Warp-Shfl类函数/asc_shfl.md):
+After thread 0 requests the output position, it broadcasts the base position to all threads in the Warp through [asc_shfl()](../../../../../../docs/zh/api/SIMT-API/Warp_functions/Warp_shfl_functions/asc_shfl.md):
 
 ```cpp
 uint32_t warp_base = 0;
@@ -161,7 +159,7 @@ Compared to each edge thread independently executing `asc_atomic_add()`, this ap
 
 Run the following steps in the root directory of this example to build and execute the operator.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -178,10 +176,20 @@ Run the following steps in the root directory of this example to build and execu
   ./demo                                                   # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Build Options Description
 
   | Option | Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The following output indicates that the accuracy verification is successful.

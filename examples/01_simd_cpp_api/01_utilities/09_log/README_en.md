@@ -75,7 +75,7 @@ For more log function details, refer to: [Ascend Log Function Reference](https:/
 Run the following steps in the root directory of this example to build and execute the example.
 
 - Configure Environment Variables
-  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -134,7 +134,7 @@ Run the following steps in the root directory of this example to build and execu
   rtDeviceSynchronize execution failed, reason=aicore exception
   ...
 
-  [ASSERT] <your_path>/09_log/log.asc:<line>: : Assertion `M < 100 && "M exceeds expected limit!"' failed.
+  [ASSERT] <your_path>/09_log/log.asc:<line>: : Assertion 'M < 100 && "M exceeds expected limit!"' failed.
   [INFO] Execution completed. Check for error messages above.
   ```
 

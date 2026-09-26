@@ -103,6 +103,9 @@ class OpcOptions:
     RELOCATABLE_BIN = "op_relocatable_kernel_binary"
     SPK_OPT = "op_super_kernel_options"
     KERNEL_TEMPLATE_INPUT = "kernel-template-input"
+    KERNEL_SPEC = "kernel-spec"
+    KERNEL_SPEC_DIR = "kernel-spec-dir"
+    DETERMINISTIC_LEVEL = "deterministic_level"
 
     OpcOptionDefaultValueDict = {
         OUTPUT: "",
@@ -122,6 +125,8 @@ class OpcOptions:
         DETERMINISTIC: "all",
         SIMPLE_KEY_MODE: None,
         DYNAMIC_PARAM_MODE: None,
+        KERNEL_SPEC: "None",
+        KERNEL_SPEC_DIR: None,
     }
 
 
@@ -383,9 +388,7 @@ class OpFormatType:
     FORMAT_CHWN = "CHWN"  # CHWN  #14
     FORMAT_FRACTAL_DECONV_SP_STRIDE8_TRANS = "FRACTAL_DECONV_SP_STRIDE8_TRANS"  # 15
     FORMAT_HWCN = "HWCN"  # HWCN  #16
-    FORMAT_NC1KHKWHWC0 = (
-        "NC1KHKWHWC0"  # KH,KW kernel h& kernel w maxpooling max output format #17
-    )
+    FORMAT_NC1KHKWHWC0 = "NC1KHKWHWC0"  # KH,KW kernel h& kernel w maxpooling max output format #17
     FORMAT_BN_WEIGHT = "BN_WEIGHT"  # BN_WEIGHT  #18
     FORMAT_FILTER_HWCK = "FILTER_HWCK"  # filter input tensor format   #19
     FORMAT_HASHTABLE_LOOKUP_LOOKUPS = "HASHTABLE_LOOKUP_LOOKUPS"  # 20
@@ -405,9 +408,7 @@ class OpFormatType:
     FORMAT_CN = "CN"  # 34
     FORMAT_NC = "NC"  # 35
     FORMAT_DHWNC = ("DHWNC",)  # 36
-    FORMAT_FRACTAL_Z_3D_TRANSPOSE = (
-        "FRACTAL_Z_3D_TRANSPOSE"  # 3D filter(transpose) input tensor format  # 37
-    )
+    FORMAT_FRACTAL_Z_3D_TRANSPOSE = "FRACTAL_Z_3D_TRANSPOSE"  # 3D filter(transpose) input tensor format  # 37
     FORMAT_FRACTAL_ZN_LSTM = "FRACTAL_ZN_LSTM"  # 38
     FORMAT_FRACTAL_Z_G = "FRACTAL_Z_G"  # 39
     FORMAT_RESERVED = "RESERVED"  # 40

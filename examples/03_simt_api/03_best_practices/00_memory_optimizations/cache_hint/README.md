@@ -4,13 +4,11 @@
 
 本样例以查表法计算sin值为例，介绍Ascend C SIMT编程方式下的数据缓存优化思路。样例包含1个基线版本以及1个优化版本，基线版本中所有数据使用默认方式加载，输入、输出和sin表数据共同竞争DCache空间；优化版本为不同类型的数据指定不同的缓存策略，确保频繁访问的sin查找表常驻DCache，减少Global Memory访问次数，展示SIMT编程方式下数据缓存优化的调优路径。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -19,7 +17,8 @@
 │   ├── CMakeLists.txt              // cmake编译文件
 │   ├── data_cache_hint.asc         // SIMT数据缓存样例实现
 │   ├── figures                     // README中的图片资源
-│   └── README.md
+│   ├── README.md                   // 样例说明文档
+│   └── README_en.md                // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -72,12 +71,12 @@
 
 默认情况下，加载的数据会在DCache中保存。在计算过程中，部分热点数据会被多个线程多次使用，但另一部分数据在计算的过程中仅使用一次，这类数据不需要进行缓存，不应让这类数据与热点数据竞争DCache空间
 
-- **`asc_ldcg`**：加载数据时从Global Memory加载，适用于仅遍历一次的输入数据，减少其对DCache空间的占用
-- **`asc_ldca`**：加载数据时优先从DCache加载，适用于需要频繁访问的热点数据（如查找表），确保热点数据常驻DCache，减少从Global Memory重新加载的次数
-- **`asc_stcg`**：存储数据时直接写入Global Memory空间，适用于数据写到GM后不会再被使用，不需要使用Cache缓存，避免输出数据占用DCache空间影响热点数据的缓存
-- input数据通过`asc_ldcg`直接从GM加载，不缓存到DCache
-- sin_table数据通过`asc_ldca`优先从DCache加载，确保常驻DCache
-- output数据通过`asc_stcg`直接写入GM，不经过DCache缓存
+- **`asc_ldcg()`**：加载数据时从Global Memory加载，适用于仅遍历一次的输入数据，减少其对DCache空间的占用
+- **`asc_ldca()`**：加载数据时优先从DCache加载，适用于需要频繁访问的热点数据（如查找表），确保热点数据常驻DCache，减少从Global Memory重新加载的次数
+- **`asc_stcg()`**：存储数据时直接写入Global Memory空间，适用于数据写到GM后不会再被使用，不需要使用Cache缓存，避免输出数据占用DCache空间影响热点数据的缓存
+- input数据通过`asc_ldcg()`直接从GM加载，不缓存到DCache
+- sin_table数据通过`asc_ldca()`优先从DCache加载，确保常驻DCache
+- output数据通过`asc_stcg()`直接写入GM，不经过DCache缓存
 
 由于sin_table大小为32KB，可以缓存到DCache后不会被挤出，热点数据持续驻留DCache，可减少sin_table数据从GM→DCache的反复加载。
 
@@ -146,9 +145,9 @@ Case 0的场景中，加载input，output时会把数据缓存在DCache上，替
 **优化目标**：通过访存函数区分不同数据的缓存策略，确保sin查找表常驻DCache，减少GM访问次数，降低端到端耗时
 
 **核心优化**：
-- 使用`asc_ldcg`读取数据：每个输入数据仅访问一次，不需要使用DCache
-- 使用`asc_ldca`读取sin表数据：sin表是热点数据，需要频繁访问，确保数据常驻DCache
-- 使用`asc_stcg`写出数据：输出数据写到GM后不会再被使用，不需要使用DCache
+- 使用`asc_ldcg()`读取数据：每个输入数据仅访问一次，不需要使用DCache
+- 使用`asc_ldca()`读取sin表数据：sin表是热点数据，需要频繁访问，确保数据常驻DCache
+- 使用`asc_stcg()`写出数据：输出数据写到GM后不会再被使用，不需要使用DCache
 
 **关键代码**：
 
@@ -183,8 +182,6 @@ asc_stcg(&output[idx], y);
 
 ## 性能对比总结
 
-### Ascend 950PR性能数据
-
 **综合优化效果**：
 - 从Case 0基线版本到Case 1优化版本，Task Duration从56.82μs降低到50.895μs，耗时下降约10.4%
 - DCache Read GM从5064次降至3531次，减少约30.2%，减少1533次Global Memory访问
@@ -197,8 +194,8 @@ asc_stcg(&output[idx], y);
 ## 调优建议
 
 1. **识别热点数据**：在查表类算子中，查找表是频繁访问的热点数据，应优先保证其常驻DCache。
-2. **区分数据访问模式**：对于仅访问一次的数据（如输入数据），使用`asc_ldcg`避免其对DCache空间的占用；对于需要频繁访问的数据（如查找表），使用`asc_ldca`优先分配Cache空间。
-3. **避免写出数据占用Cache**：对于写入后不再读取的输出数据，使用`asc_stcg`避免其占用DCache空间。
+2. **区分数据访问模式**：对于仅访问一次的数据（如输入数据），使用`asc_ldcg()`避免其对DCache空间的占用；对于需要频繁访问的数据（如查找表），使用`asc_ldca()`优先分配Cache空间。
+3. **避免写出数据占用Cache**：对于写入后不再读取的输出数据，使用`asc_stcg()`避免其占用DCache空间。
 4. **关注DCache Read GM指标**：DCache Read GM次数的减少直接反映了Cache命中率提升和Global Memory访问延迟降低的效果。
 
 ## 编译运行
@@ -211,7 +208,7 @@ asc_stcg(&output[idx], y);
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **说明：** `${install_path}` 为CANN包安装目录，未指定安装目录时默认安装至 `/usr/local/Ascend` 下。
+  > **说明：** `${install_path}`为CANN包安装目录，未指定安装目录时默认安装至`/usr/local/Ascend`下。
 
 - 样例执行
 
@@ -224,10 +221,20 @@ asc_stcg(&output[idx], y);
   ./data_cache_hint                    # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 - 编译选项说明
 
   | 选项                        | 可选值        | 说明                                                |
   |---------------------------|------------|---------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
   | `SCENARIO_NUM`            | `0`-`1`    | 样例类型，默认为0，0:基线版本，1：数据缓存优化版本                 |
 
@@ -237,7 +244,11 @@ asc_stcg(&output[idx], y);
   [Success] Case accuracy is verification passed.
   ```
 
-## 性能分析
+## 性能调试
+
+### msOpProf工具介绍
+
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 使用 `msOpProf` 工具获取详细性能数据：
 

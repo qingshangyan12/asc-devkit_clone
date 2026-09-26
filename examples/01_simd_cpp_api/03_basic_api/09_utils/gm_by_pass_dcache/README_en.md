@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example combines calls to the `ReadGmByPassDCache` and `WriteGmByPassDCache` interfaces to read and write data from GM addresses without going through DCache. This example adds 100 to the read values and writes them to the output address.
+This example combines calls to the `ReadGmBypassDCache` and `WriteGmBypassDCache` interfaces to read and write data from GM addresses without going through DCache. This example adds 100 to the read values and writes them to the output address.
 
 When multiple cores operate on GM addresses, if the data cannot be aligned to Cache Line boundaries, the DCache path reads and writes in Cache Line sizes, which causes random data overwriting between cores. In this case, the approach of reading and writing GM addresses directly without going through DCache can be adopted to avoid the random overwriting issue.
 
@@ -30,9 +30,9 @@ When multiple cores operate on GM addresses, if the data cannot be aligned to Ca
 ## Example Description
 
 - Example function:  
-  Combine calls to `ReadGmByPassDCache` and `WriteGmByPassDCache` to implement:
-  1. Use `ReadGmByPassDCache` to read int32_t elements one by one from GM addresses
-  2. Use `WriteGmByPassDCache` to write the read values plus 100 to the output GM addresses
+  Combine calls to `ReadGmBypassDCache` and `WriteGmBypassDCache` to implement:
+  1. Use `ReadGmBypassDCache` to read int32_t elements one by one from GM addresses
+  2. Use `WriteGmBypassDCache` to write the read values plus 100 to the output GM addresses
 
 - Example specifications:
   <table>
@@ -48,7 +48,7 @@ When multiple cores operate on GM addresses, if the data cannot be aligned to Ca
 Run the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables  
-  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

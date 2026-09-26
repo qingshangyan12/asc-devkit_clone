@@ -22,14 +22,19 @@
 #include "impl/utils/debug/npu_arch_2002/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_printf_utils.h"
+#elif __NPU_ARCH__ == 3002
+#include "impl/utils/debug/npu_arch_3002/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 5102
 #include "impl/utils/debug/npu_arch_5102/asc_aicore_printf_utils.h"
+#elif __NPU_ARCH__ == 5162
+#include "impl/utils/debug/npu_arch_5162/asc_aicore_printf_utils.h"
 #endif
 
 namespace __asc_aicore {
-#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
+    (__NPU_ARCH__ == 5102)
 template <typename T>
 __aicore__ inline void set_scalar_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {
@@ -238,7 +243,7 @@ __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 }
 
 template <class... Args>
-__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     enable_asc_assert();
@@ -247,7 +252,7 @@ __aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args
 }
 
 template <typename... Args>
-inline __aicore__ void printf_impl_assert_msg(
+static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args)
 {
@@ -257,11 +262,11 @@ inline __aicore__ void printf_impl_assert_msg(
     set_atomic_none();
 #ifdef __DAV_VEC__
     scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[AIV Block %u/%u] [ASSERT] %s:%u: %s: Assertion `%s' failed. ",
+        DumpType::DUMP_ASSERT, fmt, "[AIV Block %u/%u] [ASSERT] %s:%u: %s: Assertion '%s' failed. ",
         asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion, args...);
 #else
     scalar_printf_impl(
-        DumpType::DUMP_ASSERT, fmt, "[AIC Block %u/%u] [ASSERT] %s:%u: %s: Assertion `%s' failed. ",
+        DumpType::DUMP_ASSERT, fmt, "[AIC Block %u/%u] [ASSERT] %s:%u: %s: Assertion '%s' failed. ",
         asc_debug_get_block_idx(), asc_debug_get_block_total_num(), __file, __line, __function, __assertion, args...);
 #endif
     set_ctrl(ctrlValue);
@@ -300,7 +305,7 @@ __aicore__ inline void printf_impl(__gm__ const char* fmt, Args&&... args)
 }
 
 template <class... Args>
-__aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf_impl_assert(__gm__ const char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
     std::printf(fmt, args...);
@@ -308,12 +313,12 @@ __aicore__ inline void printf_impl_assert(__gm__ const char* fmt, Args&&... args
 }
 
 template <typename... Args>
-inline __aicore__ void printf_impl_assert_msg(
+static __attribute__((noinline)) __aicore__ void printf_impl_assert_msg(
     const __gm__ char* __assertion, const __gm__ char* __file, unsigned int __line, const __gm__ char* __function,
     const __gm__ char* fmt, Args&&... args)
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0)
-    std::printf("[ASSERT] %s:%u: %s: Assertion `%s' failed. ", __file, __line, __function, __assertion);
+    std::printf("[ASSERT] %s:%u: %s: Assertion '%s' failed. ", __file, __line, __function, __assertion);
     std::printf(fmt, args...);
 #endif
 }
@@ -326,13 +331,13 @@ using namespace __asc_aicore;
 #if !defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__) && !defined(__CHECK_FEATURE_AT_PRECOMPILE)
 namespace __asc_aicore {
 template <class... Args>
-__aicore__ inline void printf(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void printf(__gm__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);
 }
 
 template <class... Args>
-__aicore__ inline void PRINTF(__gm__ const char* fmt, Args&&... args)
+__aicore__ static __attribute__((noinline)) void PRINTF(__gm__ const char* fmt, Args&&... args)
 {
     printf_impl(fmt, args...);
 }

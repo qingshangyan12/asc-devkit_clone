@@ -1,11 +1,14 @@
-# C_API Sample Introduction
+# C_API Example Introduction
 
 ## Overview
 
-This sample introduces the usage of Ascend C C_API, including  matrix computation APIs.
+This directory introduces how to use Ascend C C_API, including data movement and matrix computation APIs.
 
-## Sample List
+## Example List
 
 | Directory Name  | Description |
 | --------- | --------- |
-| [03_matrix_compute](./03_matrix_compute) | This sample directory uses operators such as Mmad to demonstrate the usage of matrix computation interfaces.|
+| [00_data_movement](./00_data_movement) | This directory contains multiple C API examples related to data movement and demonstrates the use of data movement interfaces. |
+| [01_memory_vector_compute](./01_memory_vector_compute) | This directory contains Memory vector compute examples. |
+| [02_reg_vector_compute](./02_reg_vector_compute) | This directory contains multiple API examples related to vector data computation, implemented based on Reg programming interfaces. |
+| [03_matrix_compute](./03_matrix_compute) | This directory uses operators such as Mmad to demonstrate the use of matrix computation interfaces. |

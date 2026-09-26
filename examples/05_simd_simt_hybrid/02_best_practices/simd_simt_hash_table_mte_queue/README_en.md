@@ -15,11 +15,11 @@ The following figure shows the data processing pipelines of the two cases.
 
 ![HashTable MTE value movement pipeline](./figures/hash_table_mte_pipeline.png)
 
-## Supported Products and CANN Software Version
+## Supported Products and CANN Versions
 
-| Product | CANN Software Version |
+| Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -28,7 +28,8 @@ The following figure shows the data processing pipelines of the two cases.
 │   ├── CMakeLists.txt                // Compilation project file
 │   ├── figures                       // Image resources in the README
 │   ├── hash_table_mte_queue.asc      // Ascend C sample implementation
-│   ├── README.md                     // Sample description document
+│   ├── README.md                     // Sample documentation
+│   ├── README_en.md                  // English sample documentation
 │   └── scripts
 │       └── run.sh                    // Compiles and uses msOpProf to collect performance data of the two cases
 ```
@@ -96,7 +97,7 @@ The performance comparison uses `Task Duration(μs)` in the msOpProf output.
 
 ### Case 0: Direct Value Writes by a SIMT Warp
 
-**Implementation**: For the implementation, refer to the `insert_or_assign_warp_store_vf()` function.
+**Implementation**: For the implementation, refer to the `try_lock_bucket_for_key_case0()` and `insert_or_assign_warp_store_vf()` functions.
 
 In this implementation, each Warp processes one key. Lane 0 performs hash, linear probing, and CAS bucket locking. Threads in the Warp obtain the target bucket index by `asc_shfl` and write the value vector in shards by `WARP_SIZE`. For a transient `LOCKED_KEY` slot encountered during probing, lane 0 in Case 0 keeps retrying on the current slot instead of skipping to the next slot. This prevents the same key from skipping a temporarily locked slot during concurrent insertion and creating duplicate visible entries. SIMT threads directly access GM to complete value movement.
 
@@ -105,27 +106,37 @@ The write sequence is as follows: lock the target bucket by CAS, write the value
 **Key code**:
 
 ```cpp
-__simt_vf__ inline void insert_or_assign_warp_store_vf(__gm__ Bucket* table,
-    __gm__ float* table_values, __gm__ const int64_t* keys, __gm__ const float* values, uint32_t key_num,
-    uint32_t capacity, uint32_t dim, uint32_t block_index, uint32_t num_blocks)
+__simt_callee__ inline bool try_lock_bucket_for_key_case0(__gm__ int64_t* key_addr, int64_t key)
 {
-    const uint32_t lane_id = static_cast<uint32_t>(threadIdx.x) % WARP_SIZE;
-    ...
-    if (lane_id == 0) {
-        if (try_lock_bucket_for_key_case0(key_addr, key)) {
-            success = 1;
-            break;
+    while (true) {
+        int64_t current_key = *reinterpret_cast<__gm__ volatile int64_t*>(key_addr);
+        if (current_key == LOCKED_KEY) {
+            continue;
         }
         ...
     }
+}
+
+__simt_vf__ inline void insert_or_assign_warp_store_vf(
+    __gm__ Bucket* table, __gm__ float* table_values, __gm__ const int64_t* keys, __gm__ const float* values,
+    uint32_t key_num, uint32_t capacity, uint32_t dim, uint32_t block_index, uint32_t num_blocks)
+{
     ...
-    for (uint32_t j = lane_id; j < dim; j += WARP_SIZE) {
-        table_values[dst_base + j] = values[src_base + j];
-    }
-    asc_threadfence();
-    if (lane_id == 0) {
-        *reinterpret_cast<__gm__ volatile int64_t*>(&table[bucket_idx].key) = key;
-    }
+        success = asc_shfl(success, 0, WARP_SIZE);
+        bucket_idx = asc_shfl(bucket_idx, 0, WARP_SIZE);
+        if (success == 1) {
+            uint32_t dst_base = bucket_idx * dim;
+            uint32_t src_base = idx * dim;
+            for (uint32_t j = lane_id; j < dim; j += WARP_SIZE) {
+                table_values[dst_base + j] = values[src_base + j];
+            }
+            // Publish the key only after the value vector is visible.
+            asc_threadfence();
+            if (lane_id == 0) {
+                *reinterpret_cast<__gm__ volatile int64_t*>(&table[bucket_idx].key) = key;
+            }
+        }
+    ...
 }
 ```
 
@@ -166,42 +177,63 @@ The following figure shows the visibility timing of a single task in Case 1. The
 **Key code**:
 
 ```cpp
-class mte_task_queue {
-public:
-    __simt_callee__ inline void assign_warp_task(
-        uint64_t src_addr, uint64_t dst_addr, int64_t key, uint64_t key_addr, bool need_assign)
-    {
-        uint32_t write_mask = asc_ballot(need_assign ? 1 : 0);
-        uint32_t warp_write_count = __popc(write_mask);
-        uint32_t task_start_id = (laneid() == 0) ? apply_id(warp_write_count) : 0;
-        task_start_id = asc_shfl(task_start_id, 0);
-        drain(task_start_id + warp_write_count);
-        if (need_assign) {
-            uint32_t lane_offset = __popc(write_mask & lanemask_lt());
-            fill_task_info(task_start_id + lane_offset, src_addr, dst_addr, key, key_addr);
+__simt_callee__ inline void fill_task_info(
+    uint32_t task_id, uint64_t src_addr, uint64_t dst_addr, int64_t key, uint64_t key_addr) const
+{
+    uint32_t slot = task_id & MTE_TASK_RING_MASK;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(src_addrs_)[slot] = src_addr;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(dst_addrs_)[slot] = dst_addr;
+    reinterpret_cast<__ubuf__ volatile int64_t*>(task_keys_)[slot] = key;
+    reinterpret_cast<__ubuf__ volatile uint64_t*>(key_addrs_)[slot] = key_addr;
+}
+
+...
+
+template <bool drain_all = false>
+__simt_callee__ inline void drain(uint32_t new_task_end_id) const
+{
+    while (true) {
+        ...
+        if (lane_id < publish_count) {
+            uint32_t slot = (key_assign_id + lane_id) & MTE_TASK_RING_MASK;
+            int64_t key = reinterpret_cast<__ubuf__ volatile int64_t*>(task_keys_)[slot];
+            uint64_t key_addr = reinterpret_cast<__ubuf__ volatile uint64_t*>(key_addrs_)[slot];
+            // The slot is still owned by this insert task, so a release store is enough to publish the key.
+            *reinterpret_cast<__gm__ volatile int64_t*>(key_addr) = key;
         }
         asc_threadfence();
-        if (laneid() == 0) {
-            assign_task(task_start_id, task_start_id + warp_write_count);
-        }
+        ...
     }
+}
 
-    __aicore__ inline void run_task() const
-    {
-        while (true) {
-            uint32_t simt_assign_id = *reinterpret_cast<__ubuf__ volatile uint32_t*>(simt_assign_id_);
-            uint32_t proc_count = min(max_proc_batch, simt_assign_id - mte_finish_id);
+...
+
+__aicore__ inline void run_task() const
+{
+    ...
+    while (true) {
+        ...
+        uint32_t available = simt_assign_id - mte_finish_id;
+        uint32_t proc_count = (available < max_proc_batch) ? available : max_proc_batch;
+        for (uint32_t i = 0; i < proc_count; ++i) {
             ...
-            asc_copy_gm2ub_align(value_local_, src_addr, 1, value_bytes, 0, 0, true, values_cache_mode_, 0, 0);
-            asc_sync_notify(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_sync_wait(PIPE_MTE2, PIPE_MTE3, EVENT_ID0);
-            asc_copy_ub2gm_align(dst_addr, value_local_, 1, value_bytes, table_values_cache_mode, 0, 0);
-            asc_sync_notify(PIPE_MTE3, PIPE_S, EVENT_ID0);
-            asc_sync_wait(PIPE_MTE3, PIPE_S, EVENT_ID0);
-            *reinterpret_cast<__ubuf__ volatile uint32_t*>(mte_finish_id_) = mte_finish_id + proc_count;
+            asc_copy_gm2ub_align(
+                value_local_ + i * value_elems_aligned, reinterpret_cast<__gm__ float*>(src_addr), 1, value_bytes,
+                0, 0, true, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
         }
+        ...
+        for (uint32_t i = 0; i < proc_count; ++i) {
+            ...
+            asc_copy_ub2gm_align(
+                reinterpret_cast<__gm__ float*>(dst_addr), value_local_ + i * value_elems_aligned, 1, value_bytes,
+                asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
+        }
+        ...
+        mte_finish_id += proc_count;
+        *reinterpret_cast<__ubuf__ volatile uint32_t*>(mte_finish_id_) = mte_finish_id;
     }
-};
+}
+
 ```
 
 **Performance data**:
@@ -221,8 +253,6 @@ public:
 
 ## Performance Comparison Summary
 
-### Performance Comparison on Ascend 950PR
-
 The performance data of each `dim` configuration is as follows:
 
 | dim | Case 0 Direct value writes by a SIMT Warp (μs) | Case 1 MTE task queue (μs) | Case 1 Speedup |
@@ -233,7 +263,7 @@ The performance data of each `dim` configuration is as follows:
 | 128 | 376.517 | 131.696 | 2.86x |
 | 256 | 585.892 | 204.030 | 2.87x |
 
-### Optimization Summary
+## Tuning Recommendations
 
 | Optimization | Core Principle | Sample Implementation |
 |:---|:---|:---|
@@ -242,7 +272,7 @@ The performance data of each `dim` configuration is as follows:
 
 ---
 
-## Compilation and Running
+## Build and Run
 
 In the sample root directory, perform the following steps to compile and run the sample.
 
@@ -260,7 +290,7 @@ In the sample root directory, perform the following steps to compile and run the
 
 - Configure environment variables.
 
-  Configure environment variables based on the [installation method](../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
+  Configure environment variables based on the [installation method](../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -287,10 +317,20 @@ In the sample root directory, perform the following steps to compile and run the
   ./scripts/run.sh
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Compilation options
 
   | Option | Value | Description |
   |:---|:---|:---|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture, which corresponds to Ascend 950PR/Ascend 950DT. |
   | `SCENARIO_NUM` | `0`, `1` | Case number: 0 = direct value writes by a SIMT Warp; 1 = value movement by an MTE task queue. |
 
@@ -302,43 +342,36 @@ In the sample root directory, perform the following steps to compile and run the
   Verification PASSED
   ```
 
-### Performance Analysis
+## Performance Debugging
 
-Use msOpProf to obtain performance data. The comparison script first runs the sample and checks `Verification PASSED`. After confirming that the result is correct, the script collects target kernel performance data by the `msopprof` command.
+### Introduction to the msOpProf Tool
 
-The Case 0 test method is as follows:
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
+
+On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+
+Use the `msOpProf` tool to obtain detailed performance data:
 
 ```bash
-cmake -DSCENARIO_NUM=0 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
-make -j
-./hash_table_mte_queue 128
 msopprof ./hash_table_mte_queue 128
 ```
 
-The Case 1 test method is as follows:
+After the command completes, a performance data folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The folder structure is as follows:
 
 ```bash
-cmake -DSCENARIO_NUM=1 -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
-make -j
-./hash_table_mte_queue 128
-msopprof ./hash_table_mte_queue 128
+├──dump                       # Raw performance data; users do not need to inspect it
+├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+├──OpBasicInfo.csv            # Basic operator information
+├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+└──visualize_data.bin         # MindStudio Insight presentation file
 ```
 
-A directory with the `OPPROF_` prefix is generated in the current directory to store performance analysis data of the current kernel.
-
-```text
-OPPROF_xxxx_XXXXXXXX
-├── ArithmeticUtilization.csv
-├── L2Cache.csv
-├── Memory.csv
-├── MemoryL0.csv
-├── MemoryUB.csv
-├── OpBasicInfo.csv
-├── PipeUtilization.csv
-└── ResourceConflictRatio.csv
-```
-
-View detailed performance analysis results:
+View performance analysis results:
 
 ```bash
 # View basic information such as Task Duration.

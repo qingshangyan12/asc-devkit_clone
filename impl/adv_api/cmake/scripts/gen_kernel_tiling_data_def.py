@@ -46,6 +46,13 @@ _LEGACY_TILING_STRUCTS = [
 ]
 
 
+def get_tilingdata_list(find_dir, file_set):
+    for root, _, code_files in os.walk(find_dir, followlinks=True):
+        for code_file in code_files:
+            if code_file.endswith("tilingdata.h"):
+                file_set.add(os.path.join(root, code_file))
+
+
 def gen_tiling(tiling_header_file):
     single_tiling_source = ""
     single_legacy_tiling_export = ""
@@ -74,21 +81,15 @@ def gen_tiling(tiling_header_file):
             elif line.startswith("TILING_DATA_FIELD_DEF_ARR"):
                 field_params = re.findall(pattern, line)[0]
                 fds = field_params.split(",")
-                single_tiling_source += "    {} {}[{}] = {{}};\n".format(
-                    fds[0].strip(), fds[2].strip(), fds[1].strip()
-                )
+                single_tiling_source += "    {} {}[{}] = {{}};\n".format(fds[0].strip(), fds[2].strip(), fds[1].strip())
             elif line.startswith("TILING_DATA_FIELD_DEF_STRUCT"):
                 field_params = re.findall(pattern, line)[0]
                 fds = field_params.split(",")
-                single_tiling_source += "    {} {};\n".format(
-                    fds[0].strip(), fds[1].strip()
-                )
+                single_tiling_source += "    {} {};\n".format(fds[0].strip(), fds[1].strip())
             elif line.startswith("TILING_DATA_FIELD_DEF"):
                 field_params = re.findall(pattern, line)[0]
                 fds = field_params.split(",")
-                single_tiling_source += "    {} {} = 0;\n".format(
-                    fds[0].strip(), fds[1].strip()
-                )
+                single_tiling_source += "    {} {} = 0;\n".format(fds[0].strip(), fds[1].strip())
             elif line.startswith("END_TILING_DATA_DEF"):
                 single_tiling_source += "};\n"
                 single_tiling_source += "#pragma pack(pop)\n"
@@ -110,17 +111,16 @@ if __name__ == "__main__":
     res += "namespace AscendC {\nnamespace tiling {\n"
 
     print("[LOG]:  ", sys.argv[1], sys.argv[2])
-    file_list = []
-    for root, dirs, files in os.walk(sys.argv[1]):
-        for file in files:
-            if file.endswith("tilingdata.h"):
-                file_list.append(os.path.join(root, file))
-    file_list.sort()
+    file_set = set()
+    get_tilingdata_list(sys.argv[1], file_set)
+    file_list = sorted(file_set)
 
     tiling_source = ""
     legacy_tiling_export = ""
     for file in file_list:
         src, exp = gen_tiling(file)
+        if src in tiling_source:
+            continue
         tiling_source += src
         legacy_tiling_export += exp
 
@@ -135,7 +135,5 @@ if __name__ == "__main__":
     if not os.path.exists(generate_dir):
         os.makedirs(generate_dir, exist_ok=True)
 
-    with os.fdopen(
-        os.open(absolute_file, os.O_RDWR | os.O_CREAT | os.O_TRUNC), "w"
-    ) as ofd:
+    with os.fdopen(os.open(absolute_file, os.O_RDWR | os.O_CREAT | os.O_TRUNC), "w") as ofd:
         ofd.write(res)

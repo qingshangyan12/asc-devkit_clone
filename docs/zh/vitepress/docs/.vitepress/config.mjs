@@ -9,13 +9,74 @@
  */
 
 import { defineConfig } from 'vitepress'
-import { existsSync, readFileSync, copyFileSync, cpSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { existsSync, readFileSync, copyFileSync, cpSync, readdirSync } from 'node:fs'
+import { execFileSync } from 'node:child_process'
+import { relative, resolve } from 'node:path'
 import { load as cheerioLoad } from 'cheerio'
-import { execSync } from 'node:child_process'
 import { pagefindPlugin } from 'vitepress-plugin-pagefind'
+import {
+  installRepositoryLinkRewrite,
+  rewriteRepositoryLinks,
+} from '../../scripts/rewrite-repository-links.mjs'
+import { renderCannFilterTags } from '../../scripts/filter-tags.mjs'
+import {
+  extractUnsupportedProducts,
+  normalizeApiRoute,
+} from '../../scripts/api-support.mjs'
+import { loadGitTimestamps } from '../../scripts/git-timestamps.mjs'
+import { installMermaidFence } from '../../scripts/mermaid-fence.mjs'
+import { shellQuote } from '../../scripts/shell-utils.mjs'
+import { patchVitePressSidebarItem } from '../../scripts/vitepress-sidebar-patch.mjs'
+import {
+  createBaiduAnalyticsHead,
+  resolveBaiduAnalyticsSiteId,
+} from './baidu-analytics.mjs'
 
 const docsRoot = resolve(import.meta.dirname, '..')
+const repoRoot = resolve(import.meta.dirname, '..', '..', '..', '..', '..')
+const sourceDocsRoot = resolve(repoRoot, 'docs', 'zh')
+const baiduAnalyticsHead = createBaiduAnalyticsHead(
+  resolveBaiduAnalyticsSiteId(process.env)
+)
+
+function buildApiUnsupportedIndex(apiRoot) {
+  const index = {}
+
+  function visit(directory) {
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const fullPath = resolve(directory, entry.name)
+      if (entry.isDirectory()) {
+        visit(fullPath)
+        continue
+      }
+      if (!entry.isFile() || !entry.name.endsWith('.md')) continue
+
+      const unsupported = extractUnsupportedProducts(readFileSync(fullPath, 'utf-8'))
+      if (unsupported.length === 0) continue
+      const sourceRelativePath = relative(sourceDocsRoot, fullPath).replace(/\\/g, '/')
+      const route = normalizeApiRoute('/' + sourceRelativePath)
+      index[route] = unsupported
+    }
+  }
+
+  visit(apiRoot)
+  return index
+}
+
+const apiUnsupportedIndex = buildApiUnsupportedIndex(resolve(sourceDocsRoot, 'api'))
+
+function getOriginalSourceFile(relativePath) {
+  if (!relativePath) return null
+  const normalizedPath = relativePath.replace(/\\/g, '/')
+  if (normalizedPath.startsWith('en/')) {
+    return resolve(repoRoot, 'docs', normalizedPath)
+  }
+  return resolve(repoRoot, 'docs', 'zh', normalizedPath)
+}
+
+const distDir = resolve(docsRoot, '.vitepress', 'dist')
+const pagefindTitleScript = resolve(import.meta.dirname, 'build-pagefind-title-index.mjs')
+const pagefindIndexingCommand = `npx pagefind --site ${shellQuote(distDir)} --exclude-selectors ${shellQuote('div.aside, a.header-anchor')} --force-language zh --include-characters ${shellQuote('_:')} && node ${shellQuote(pagefindTitleScript)} ${shellQuote(distDir)}`
 
 function removeSelfRefItems(items) {
   return items.map(item => {
@@ -35,9 +96,11 @@ function removeSelfRefItems(items) {
 function addNumbering(items, prefix = '') {
   return items.map((item, i) => {
     const num = prefix ? `${prefix}${i + 1}.` : `${i + 1}.`
+    const unnumberedText = item.unnumberedText || item.text
     return {
       ...item,
-      text: `${num} ${item.text}`,
+      unnumberedText,
+      text: `${num} ${unnumberedText}`,
       ...(item.items ? { items: addNumbering(item.items, num) } : {}),
     }
   })
@@ -122,7 +185,59 @@ function filterEmptyPages(items, docsRoot) {
   }, [])
 }
 
-const repoRoot = resolve(import.meta.dirname, '../../../../..')
+function runGit(args) {
+  try {
+    return execFileSync('git', args, {
+      cwd: repoRoot,
+      encoding: 'utf-8',
+      maxBuffer: 16 * 1024 * 1024,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim()
+  } catch {
+    return ''
+  }
+}
+
+function resolveBuildDate() {
+  const configured = process.env.DOCS_BUILD_TIME
+  if (configured) {
+    const date = new Date(configured)
+    if (!Number.isNaN(date.getTime())) return date
+  }
+
+  const sourceDateEpoch = Number(process.env.SOURCE_DATE_EPOCH)
+  if (Number.isFinite(sourceDateEpoch) && sourceDateEpoch > 0) {
+    return new Date(sourceDateEpoch * 1000)
+  }
+  return new Date()
+}
+
+const buildDate = resolveBuildDate()
+const buildCommit = process.env.DOCS_COMMIT || process.env.CI_COMMIT_SHA ||
+  process.env.GIT_COMMIT || runGit(['rev-parse', 'HEAD'])
+const buildRef = process.env.DOCS_REF || process.env.CI_COMMIT_REF_NAME ||
+  process.env.GITHUB_REF_NAME || runGit(['branch', '--show-current'])
+const buildVersion = process.env.DOCS_VERSION || process.env.CI_COMMIT_TAG ||
+  buildRef || buildCommit.slice(0, 12) || '未知'
+const documentationBuild = {
+  version: buildVersion,
+  ref: buildRef,
+  commit: buildCommit,
+  shortCommit: buildCommit.slice(0, 12),
+  dirty: Boolean(runGit(['status', '--porcelain', '--untracked-files=no'])),
+  builtAt: buildDate.toISOString(),
+  builtAtText: new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(buildDate),
+}
+const gitTimestamps = loadGitTimestamps(runGit)
 
 const sidebarConfigs = [
   { prefix: '/guide/', sourceFileName: 'index.md' },
@@ -143,20 +258,66 @@ for (const { prefix, sourceFileName } of sidebarConfigs) {
   filteredSidebars[prefix] = filterEmptyPages(items, docsRoot)
 }
 
+function normalizeDocRoute(route) {
+  let normalized = decodeURIComponent(String(route || '').split('#')[0])
+  normalized = normalized.replace(/\.html?$/, '').replace(/\.md$/, '')
+  normalized = normalized.replace(/\/$/, '')
+  return normalized.startsWith('/') ? normalized : `/${normalized}`
+}
+
+function stripSidebarNumber(text) {
+  return String(text || '').replace(/^\d+(?:\.\d+)*\.\s*/, '')
+}
+
+function buildBreadcrumbMap() {
+  const roots = {
+    '/api/': { text: 'Ascend C API', link: '/api/api_list' },
+    '/guide/': { text: 'Ascend C算子开发指南', link: '/guide/getting_started/ascend_c_overview_and_learning_path' },
+  }
+  const breadcrumbs = new Map()
+
+  function visit(items, trail, rootLink) {
+    for (const item of items) {
+      const link = item.link ? normalizeDocRoute(item.link) : ''
+      const isRootItem = link && link === rootLink
+      const nextTrail = isRootItem
+        ? trail
+        : [...trail, { text: stripSidebarNumber(item.text), ...(item.link ? { link: item.link } : {}) }]
+      if (link) breadcrumbs.set(link, nextTrail)
+      if (item.items?.length) visit(item.items, nextTrail, rootLink)
+    }
+  }
+
+  for (const [prefix, items] of Object.entries(filteredSidebars)) {
+    const root = roots[prefix]
+    const trail = root ? [root] : []
+    const rootLink = root ? normalizeDocRoute(root.link) : ''
+    if (rootLink) breadcrumbs.set(rootLink, trail)
+    visit(items, trail, rootLink)
+  }
+  return breadcrumbs
+}
+
+function resolveSourceTimestamp(relativePath) {
+  const path = String(relativePath || '').replace(/\\/g, '/')
+  const candidates = path.startsWith('en/')
+    ? [`docs/${path}`]
+    : [`docs/zh/${path}`, `docs/${path}`]
+  for (const candidate of candidates) {
+    const timestamp = gitTimestamps.get(candidate)
+    if (timestamp) return timestamp
+  }
+}
+
+const breadcrumbMap = buildBreadcrumbMap()
+
 function extractBodyContent(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i)
   if (bodyMatch) return bodyMatch[1]
   return html
 }
 
-function escapeCodeAngleBrackets(html) {
-  return html
-    .replace(/`([^`]+)`/g, (_, content) => '`' + content.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '`')
-    .replace(/``([\s\S]*?)``/g, (_, content) => '``' + content.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '``')
-}
-
 function normalizeHtml(html) {
-  html = escapeCodeAngleBrackets(html)
   html = html.replace(/<!--cann-filter:([\w,]+)-->/g, '<cann-filter npu-type="$1">')
   html = html.replace(/<!--\/cann-filter-->/g, '</cann-filter>')
   html = html.replace(/<!--\s*npu\s*=\s*"([^"]*)"\s+(\w+)\s*-->/g, '<cann-filter npu-type="$1">')
@@ -299,48 +460,18 @@ function replaceNpuCommentTags(html) {
     if (closeId) {
       if (stack.length > 0 && stack[stack.length - 1].id === closeId) {
         stack.pop()
-        parts.push('</div>')
+        parts.push('</cann-filter>')
       }
     } else if (npuType && openId) {
       stack.push({ id: openId })
-      parts.push(`<div data-filter="${npuType}">`)
+      parts.push(`<cann-filter npu-type="${npuType}">`)
     }
   }
   parts.push(html.slice(lastIdx))
   while (stack.length > 0) {
     stack.pop()
-    parts.push('</div>')
+    parts.push('</cann-filter>')
   }
-  return parts.join('')
-}
-
-function replaceCannFilterTags(src, replacer) {
-  const tagRegex = /<(\/?)(cann-filter)((?:\s[^>]*)?)>/gi
-  const stack = []
-  const parts = []
-  let lastIdx = 0
-  let match
-  while ((match = tagRegex.exec(src)) !== null) {
-    const pos = match.index
-    const isClose = match[1] === '/'
-    const attrs = match[3]
-    parts.push(src.slice(lastIdx, pos))
-    lastIdx = pos + match[0].length
-    if (isClose) {
-      if (stack.length > 0) {
-        const opener = stack.pop()
-        parts.push(replacer.end(opener.type, opener.contentStart, lastIdx))
-      }
-    } else {
-      const attrMatch = attrs.match(/npu[_-]type\s*=\s*"([^"]+)"/i)
-      if (attrMatch) {
-        stack.push({ type: attrMatch[1], contentStart: lastIdx })
-        parts.push(replacer.start(attrMatch[1]))
-      }
-    }
-  }
-  const end = src.slice(lastIdx)
-  parts.push(end)
   return parts.join('')
 }
 
@@ -490,6 +621,12 @@ export default defineConfig({
   markdown: {
     math: true,
     config(md) {
+      installMermaidFence(md)
+      installRepositoryLinkRewrite(
+        md,
+        env => getOriginalSourceFile(env?.relativePath),
+        repoRoot
+      )
       const originalRender = md.render.bind(md)
       const originalRenderAsync = md.renderAsync ? md.renderAsync.bind(md) : null
       const processSource = (src) => {
@@ -505,11 +642,11 @@ export default defineConfig({
         }
         return src
       }
-      const processHtml = (html) => {
+      const processHtml = (html, env) => {
         if (html.includes('{{')) {
           html = escapeVueInterpolations(html)
         }
-        return html
+        return rewriteRepositoryLinks(html, getOriginalSourceFile(env?.relativePath), repoRoot)
       }
       const renderFn = (src, env) => {
         if (src.includes('<!-- RAW_HTML -->')) {
@@ -536,21 +673,18 @@ function balanceDivTags(html) {
 }
 
           html = replaceNpuCommentTags(html)
-          html = replaceCannFilterTags(html, {
-            start(type) { return `<div data-filter="${type}">` },
-            end() { return '</div>' },
-          })
+          html = renderCannFilterTags(html)
           html = html.replace(
             /<tr\b[^>]*>((?:(?!<\/tr>)[\s\S])*?)<\/tr>/gi,
             (rowMatch) => {
-              const divOpen = rowMatch.match(/<td\b[^>]*>\s*<div\s+data-filter\s*=\s*"([^"]+)">/i)
-              if (!divOpen) return rowMatch
-              const divClose = rowMatch.match(/<\/div>\s*<\/td>/)
-              if (!divClose) return rowMatch
-              const filterVal = divOpen[1]
+              const filterOpen = rowMatch.match(/<td\b[^>]*>\s*<(?:div|span)\s+data-filter\s*=\s*"([^"]+)">/i)
+              if (!filterOpen) return rowMatch
+              const filterClose = rowMatch.match(/<\/(?:div|span)>\s*<\/td>/)
+              if (!filterClose) return rowMatch
+              const filterVal = filterOpen[1]
               let newRow = rowMatch
-                .replace(/<div\s+data-filter\s*=\s*"[^"]*">\s*/ig, '')
-                .replace(/\s*<\/div>/ig, '')
+                .replace(/<(?:div|span)\s+data-filter\s*=\s*"[^"]*">\s*/ig, '')
+                .replace(/\s*<\/(?:div|span)>/ig, '')
               newRow = newRow.replace(
                 /<tr\b([^>]*)>/i,
                 (m, attrs) => {
@@ -615,12 +749,13 @@ function balanceDivTags(html) {
           )
 
           html = balanceDivTags(html)
+          html = rewriteRepositoryLinks(html, getOriginalSourceFile(env?.relativePath), repoRoot)
 
           return `<div v-pre>\n${html}\n</div>`
         }
         src = processSource(src)
         let html = originalRender(src, env)
-        html = processHtml(html)
+        html = processHtml(html, env)
         return `<div v-pre>${html}</div>`
       }
       md.render = function (src, env) {
@@ -639,24 +774,24 @@ function balanceDivTags(html) {
     if (cache && cache.length > 0) {
       pageData.outlineHeaders = cache
     }
+    const route = normalizeDocRoute(pageData.relativePath)
+    const breadcrumbs = breadcrumbMap.get(route)
+    if (breadcrumbs?.length) {
+      pageData.frontmatter.breadcrumbs = breadcrumbs
+    }
+    const sourceTimestamp = resolveSourceTimestamp(pageData.relativePath)
+    if (sourceTimestamp) {
+      pageData.lastUpdated = sourceTimestamp
+    }
   },
 
   buildConcurrency: 1,
+  metaChunk: true,
 
   transformHtml(code) {
     code = code.replace(/href="\/\/pagefind/g, 'href="/pagefind')
-    code = code.replace(/<body\b/, '<body data-pagefind-body')
+    code = code.replace('<article class="markdown-body">', '<article class="markdown-body" data-pagefind-body>')
     return code
-  },
-
-  async buildEnd(siteConfig) {
-    const distDir = resolve(docsRoot, '.vitepress', 'dist')
-    const scriptPath = resolve(import.meta.dirname, 'build-cjk-index.mjs')
-    try {
-      execSync(`node "${scriptPath}" "${distDir}"`, { stdio: 'inherit' })
-    } catch (e) {
-      console.warn('[cjk-index] Failed to build CJK search index:', e.message)
-    }
   },
 
   vite: {
@@ -681,6 +816,7 @@ function balanceDivTags(html) {
       emptyText: '未找到结果',
       heading: '共: {{searchResult}} 条结果',
       forceLanguage: 'zh',
+      indexingCommand: pagefindIndexingCommand,
     }), {
       name: 'copy-figures-to-dist',
       closeBundle() {
@@ -689,6 +825,13 @@ function balanceDivTags(html) {
           const src = resolve(docsRoot, sub)
           if (existsSync(src)) cpSync(src, dst, { recursive: true })
         }
+      },
+    }, {
+      name: 'copy-mermaid-browser-bundle',
+      closeBundle() {
+        const src = resolve(docsRoot, '..', 'node_modules', 'mermaid', 'dist', 'mermaid.min.js')
+        const dst = resolve(distDir, 'assets', 'mermaid.min.js')
+        copyFileSync(src, dst)
       },
     }, {
       name: 'vitepress-override-search-vue',
@@ -701,13 +844,48 @@ function balanceDivTags(html) {
         },
       }),
     }, {
-      name: 'patch-vpsidebar-item-depth',
+      name: 'patch-vitepress-api-navigation',
+      enforce: 'pre',
+      resolveId(source) {
+        if (source === 'virtual:api-navigation-filter') {
+          return resolve(import.meta.dirname, 'theme', 'api-navigation-filter.mjs')
+        }
+      },
+      transform(code, id) {
+        const normalizedId = id.replace(/\\/g, '/')
+        const importLine = "import { getProductFilteredNavigationCandidates, getProductFilteredSidebarConfig } from 'virtual:api-navigation-filter';\n"
+
+        if (normalizedId.includes('vitepress/dist/client/theme-default/composables/sidebar.js')) {
+          const result = code.replace(
+            'const sidebarConfig = theme.value.sidebar;',
+            'const sidebarConfig = getProductFilteredSidebarConfig(theme.value);'
+          )
+          return result === code ? null : importLine + result
+        }
+
+        if (normalizedId.includes('vitepress/dist/client/theme-default/composables/prev-next.js')) {
+          const original = "const candidates = uniqBy(links, (link) => link.link.replace(/[?#].*$/, ''));"
+          const replacement = "const candidates = getProductFilteredNavigationCandidates(uniqBy(links, (link) => link.link.replace(/[?#].*$/, '')), page.value.relativePath, theme.value);"
+          const result = code.replace(original, replacement)
+          return result === code ? null : importLine + result
+        }
+
+        return null
+      },
+    }, {
+      name: 'patch-vitepress-sidebar',
       enforce: 'pre',
       transform(code, id) {
-        if (!id.includes('VPSidebarItem') || !id.includes('vitepress')) return null
+        if (!id.includes('vitepress')) return null
         let result = code
-        result = result.replace('depth < 5', 'true')
-        result = result.replace('props.depth + 2 === 7', 'props.depth + 2 >= 7')
+        if (id.includes('VPSidebar.vue')) {
+          result = result.replace(
+            '<VPSidebarGroup :items="sidebarGroups" :key="key" />',
+            '<ClientOnly><VPSidebarGroup :items="sidebarGroups" :key="key" /></ClientOnly>'
+          )
+        } else if (id.includes('VPSidebarItem')) {
+          result = patchVitePressSidebarItem(result)
+        }
         if (result === code) return null
         return result
       },
@@ -724,13 +902,15 @@ function balanceDivTags(html) {
     },
   },
 
-  head: [],
+  head: baiduAnalyticsHead,
 
   themeConfig: {
+    documentationBuild,
+
     nav: [
       { text: '首页', link: '/' },
-      { text: 'AscendC算子开发指南', link: '/guide/入门教程/Ascend-C概述与学习路径' },
-      { text: 'Ascend C API', link: '/api/Ascend-C-API列表' },
+      { text: 'AscendC算子开发指南', link: '/guide/getting_started/ascend_c_overview_and_learning_path' },
+      { text: 'Ascend C API', link: '/api/README' },
     ],
 
     search: {
@@ -738,12 +918,22 @@ function balanceDivTags(html) {
     },
 
     sidebar: filteredSidebars,
+    apiUnsupportedIndex,
 
     outline: false,
 
     docFooter: {
       prev: '上一页',
       next: '下一页',
+    },
+
+    lastUpdated: {
+      text: '源文档更新于',
+      formatOptions: {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        forceLocale: true,
+      },
     },
 
     footer: {

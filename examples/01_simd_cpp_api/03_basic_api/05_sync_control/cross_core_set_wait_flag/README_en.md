@@ -31,9 +31,9 @@ This example first introduces the three synchronization modes supported by the i
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -179,7 +179,7 @@ C = \sum_{i=1}^{8} A_i \cdot B_i
 $$
 
         // Mode 2: within each AI Core, AIC waits for 2 AIVs
-        AscendC::CrossCoreWaitFlag(SYNC_AIV_AIC_FLAG);
+        AscendC::CrossCoreWaitFlag<2>(SYNC_AIV_AIC_FLAG);
 
         CopyIn(a1Local, b1Local);
         SplitA(a1Local, a2Local);
@@ -188,7 +188,7 @@ $$
         CopyOut(c1Local);
         // Mode 0: 8 AICs from 8 AI Cores synchronize
         AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);  
-        AscendC::CrossCoreWaitFlag(SYNC_AIC_FLAG);  
+        AscendC::CrossCoreWaitFlag<0>(SYNC_AIC_FLAG);
 
         // Mode 2: within each AI Core, 2 AIVs wait for AIC
         AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);  
@@ -205,7 +205,7 @@ Within each AI Core, 2 AIVs need to wait for AIC to complete block matrix multip
 Specifically, the accumulated C matrix is split into 16 parts along the M axis, assigned to 16 AIVs for LeakyRelu computation respectively. As shown in Figure 4, based on the above description, inter-core synchronization mode 2 (2 AIVs wait for one AIC within a single AI Core) is required. The code segment corresponding to the above description is as follows:
 
         // Mode 2: within each AI Core, 2 AIVs wait for AIC
-        AscendC::CrossCoreWaitFlag(SYNC_AIC_AIV_FLAG);
+        AscendC::CrossCoreWaitFlag<2>(SYNC_AIC_AIV_FLAG);
 
         // Perform LeakyRelu operation
         float alpha = 0.001;
@@ -247,7 +247,7 @@ As shown in Figure 6 below, the overall logic of mode 0 is divided into the foll
         // After this AIV completes the preceding PIPE_MTE3 (DataCopy) pipeline operation, notify other AIV cores that this AIV has completed
         AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);  
         // Block this AIV from continuing to execute instructions until all other AIVs complete the PIPE_MTE3 pipeline operation, then unblock and continue execution
-        AscendC::CrossCoreWaitFlag(0); 
+        AscendC::CrossCoreWaitFlag<0>(0);
 
 After the above synchronization is complete, atomicResultGm already contains the accumulated value of vector computation results from 16 AIVs.
 If the synchronization in the previous step is not inserted correctly, the data transferred from atomicResultGm to AIV may be the accumulated value of vector computation results from only some AIVs, resulting in inaccurate results.
@@ -299,7 +299,7 @@ if ASCEND_IS_AIV {
 Run the following steps in the root directory of this example to build and run the example.
 
 - Configure environment variables  
-  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```

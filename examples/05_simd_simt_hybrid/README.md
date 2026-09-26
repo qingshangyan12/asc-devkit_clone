@@ -7,11 +7,11 @@ SIMD与SIMT混合编程适用于同一个Kernel中同时需要向量化计算能
 
 SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，相关样例主要分布在以下路径：
 
-- `examples/05_simd_simt_hybrid`路径下提供混合编程入门样例，以及使用SIMD和SIMT协同进行性能优化的样例。
+- `examples/05_simd_simt_hybrid`路径下提供混合编程入门样例、问题定位样例，以及使用SIMD和SIMT协同进行性能优化的样例。
 - 由于混合编程的Kernel入口与SIMD编程方式一致，端到端维测相关样例可参考`examples/01_simd_cpp_api`路径下的样例。
 - 混合编程通过启动SIMT VF实现SIMT线程级操作，SIMT VF相关的重点特性、维测和性能优化样例可参考`examples/03_simt_api`路径下的样例。
 
-后文将分别介绍混合编程场景下涉及到introduction、utilities、features和best_practices样例。
+后文将分别介绍混合编程场景下涉及到introduction、utilities、features、trouble_shooting和best_practices样例。
 
 ## introduction
 
@@ -48,6 +48,13 @@ SIMD与SIMT混合编程是基于SIMD编程和SIMT编程的高阶编程方式，�
 | atomic_operation | 展示原子操作接口的使用方法，适用于混合编程中多线程累加、计数或冲突写入处理。样例链接：[atomic_operation](../03_simt_api/02_features/01_api_features/02_atomic_operation)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
 | warp_instruction | 展示Warp级数据交换能力，可用于了解Warp内线程协作和数据传递方式。样例链接：[warp_instruction](../03_simt_api/02_features/01_api_features/03_warp_instruction)。 | 该样例为SIMT编程方式实现的参考样例，可转换为混合编程对应的样例实现，方法详见[SIMT参考样例转换说明](#simt参考样例转换说明)。 |
 
+## trouble_shooting
+
+[01_trouble_shooting](./01_trouble_shooting)是SIMD与SIMT混合编程场景的问题定位参考目录，该目录下包含以下样例。
+
+| 样例名 | 样例描述 |
+| ------------------------------------------------------------ | ---------------------------------------------------- |
+| simd_simt_ub_usage_limit | 以UB访问越界导致输出精度异常为例，展示混合编程场景下UB静态内存、动态内存、预留空间、Data Cache布局，以及UB越界问题定位方法。样例链接：[simd_simt_ub_usage_limit](./01_trouble_shooting/simd_simt_ub_usage_limit)。 |
 
 ## best_practices
 
@@ -67,7 +74,8 @@ SIMD与SIMT混合编程场景的常用性能优化路径如下：
 | 样例名 | 样例描述 |
 | ------------------------------------------------------------ | ---------------------------------------------------- |
 | simd_simt_matrix_transpose | 以矩阵转置为例介绍UB中转和全局访存合并优化方法。样例链接：[simd_simt_matrix_transpose](./02_best_practices/simd_simt_matrix_transpose)。 |
-| simd_simt_high_performance | 以FloorMod计算为例，对比SIMT直接访问GM、SIMD RegBase计算、SIMT访问UB以及连续线程映射等实现方式。样例链接：[simd_simt_high_performance](./02_best_practices/simd_simt_high_performance)。 |
+| simd_simt_softmax | 以softmax为例，介绍行内归约场景下数据访问从SIMT直接读GM、经MTE搬入UB中转双缓冲、到中间值驻留寄存器的调优方法。样例链接：[simd_simt_softmax](./02_best_practices/simd_simt_softmax)。 |
+| simd_simt_high_performance | 以FloorMod计算为例，对比SIMT直接访问GM、SIMD Reg矢量计算、SIMT访问UB以及连续线程映射等实现方式。样例链接：[simd_simt_high_performance](./02_best_practices/simd_simt_high_performance)。 |
 | simd_simt_grid_dim_config | 以Gather计算为例介绍线程块数量配置和VF函数调用优化思路。样例链接：[simd_simt_grid_dim_config](./02_best_practices/simd_simt_grid_dim_config)。 |
 | simd_simt_integer_fast_div | 以固定除数整数除法为例，展示使用乘法和移位替代普通除法的优化方式。样例链接：[simd_simt_integer_fast_div](./02_best_practices/simd_simt_integer_fast_div)。 |
 

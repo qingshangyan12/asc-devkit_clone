@@ -4,13 +4,11 @@
 
 This example implements a generalized shape Gather operator based on the Ascend C SIMT programming model, including the basic gather and enhanced gather_v2. The gather operator collects specified rows from a two-dimensional input tensor, while the gather_v2 operator supports collecting data along a specified dimension from multi-dimensional input tensors and supports batch_dims batch processing mode. This example demonstrates the development method for operators with discrete memory access in generalized scenarios.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Versions
-
-- \>= CANN 9.0.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -53,7 +51,7 @@ This example implements a generalized shape Gather operator based on the Ascend 
   The gather operator retrieves data at specified indices from the input (Global Memory). Based on the data partitioning described above, the implementation first calculates the data index that each thread should process, then stores one row of data to Global Memory through an assignment operation. Since the computation process is relatively simple, the kernel function limits the maximum number of threads to 2048.
 
 - Invocation Implementation:   
-  The kernel function is invoked using the kernel call operator <<<>>>.
+  The kernel function is invoked using the kernel call operator `<<<>>>`.
 
 ### 2. gather_v2 Operator
 
@@ -116,6 +114,7 @@ This example implements a generalized shape Gather operator based on the Ascend 
   <tr><td rowspan="1" align="center">Operator Output</td><td align="center">output</td><td align="center">[128,2048,512]</td><td align="center">float</td><td align="center">ND</td><td align="center">output tensor after collection</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="5" align="center">gather_custom_v2</td></tr>
   </table>
+
 - Constraint Description:
   * indices: The first batch_dims dimensions of indices must match the first batch_dims dimensions of input, that is, indices.shape[0:batch_dims] = input.shape[0:batch_dims]
   * axis: The collection dimension axis cannot be less than batch_dims and must be less than the number of dimensions of input, that is, batch_dims <= axis < input.rank
@@ -133,14 +132,14 @@ This example implements a generalized shape Gather operator based on the Ascend 
 - Operator Implementation:   
   The gather_v2 operator collects data along a specified dimension axis from a multi-dimensional input tensor. Based on the data partitioning strategy described above, each thread dynamically processes a portion of data. For each output index, it decomposes the one-dimensional output index into logical coordinates, finds the corresponding collection position based on indices, and finally calculates the linear index of the input and completes the data transfer.
 - Invocation Implementation:   
-  The kernel function is invoked using the kernel call operator <<<>>>.
+  The kernel function is invoked using the kernel call operator `<<<>>>`.
 
 ## Compilation and Execution
 
 Execute the following steps in the root directory of this example to compile and run the operator.
 
 - Configure Environment Variables  
-  Configure environment variables according to the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit on the current environment.
+  Configure environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit on the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
@@ -158,10 +157,20 @@ Execute the following steps in the root directory of this example to compile and
   ./gather_v2                   # Execute the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Compilation Option Description
 
   | Option | Available Values | Description |
   |------|--------|------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU Architecture: This example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
 
   The execution result is as follows, indicating that the accuracy comparison succeeds:

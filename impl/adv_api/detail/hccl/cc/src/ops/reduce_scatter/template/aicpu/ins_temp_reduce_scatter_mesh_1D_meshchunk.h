@@ -47,12 +47,13 @@ public:
     void GetNotifyIdxSubToMain(std::vector<u32>& notifyIdxSubToMain) override;
 
 private:
+    HcclResult PrepareSlicesAndValidate(const TemplateDataParams& params, const TemplateResource& resources);
     HcclResult RunReduceScatter(
         const std::map<u32, std::vector<ChannelInfo>>& channels, const std::vector<ThreadHandle>& threads,
-        const TemplateDataParams& tempAlgParams, RankSliceInfo& sliceInfoVec);
+        const TemplateDataParams& tempAlgParams, const RankSliceInfo& sliceInfoVec);
     HcclResult DoMeshChunk(
         const std::map<u32, std::vector<ChannelInfo>>& channels, const std::vector<ThreadHandle>& threads,
-        const TemplateDataParams& tempAlgParams, const std::vector<uint64_t>& sliceSize, const u32& repeatIdx,
+        const TemplateDataParams& tempAlgParams, const std::vector<uint64_t>& sliceSize, const u32& repeatNum,
         const u32& myAlgRank, uint64_t& sliceSendOffset_, uint64_t& sliceRecvOffset_,
         const uint64_t& sliceRecvBaseOffset);
     void NotifyIdxMainToSubInMeshChunk(std::vector<u32>& notifyIdxMainToSub);
@@ -61,6 +62,7 @@ private:
     u32 rankIdx_{0};
     u64 count_{0};
     u64 dataTypeSize_{0};
+    std::vector<uint64_t> chunkSizes_;
 };
 
 } // namespace mc2_ops_hccl

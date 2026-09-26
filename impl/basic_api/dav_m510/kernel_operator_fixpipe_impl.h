@@ -260,7 +260,7 @@ __aicore__ inline void FixpipeL0cToL1(
         (!(intriParams.isChannelSplit)),
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Failed to check isChannelSplit in Fixpipe, when src position is "
-                          "CO1 and dst position is C1, isChannelSplit must be set as false \n"));
+                          "L0C Buffer(CO1) and dst position is L1 Buffer(C1), isChannelSplit must be set as false \n"));
 
     uint16_t cburstNum = fixpipeTiling.nSize / BLOCK_CUBE;
     // Loop1_src_stride in unit of C0_size
@@ -282,15 +282,15 @@ __aicore__ inline void FixpipeL0cToL1(
     // LOC -> L1 only n direction need fixpipeTiling, m no need fixpipeTiling
     if (intriParams.reluEn == true && intriParams.preReluMode == ReluMode::NO_RELU) {
         return copy_matrix_cc_to_cbuf(
-            (__cbuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
-            intriParams.dstStride, intriParams.srcStride, 0, static_cast<uint8_t>(intriParams.preClipReluMode),
+            (__cbuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), calNSize, intriParams.mSize,
+            intriParams.dstStride, intriParams.srcStride, static_cast<uint8_t>(intriParams.preClipReluMode),
             intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre), static_cast<uint8_t>(intriParams.reluEn),
             false, nz2ndEn, static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false,
             false, false, nz2dnEn);
     } else {
         return copy_matrix_cc_to_cbuf(
-            (__cbuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), 0, calNSize, intriParams.mSize,
-            intriParams.dstStride, intriParams.srcStride, 0, static_cast<uint8_t>(intriParams.preClipReluMode),
+            (__cbuf__ DstT*)(dst + dstOffset), (__cc__ SrcT*)(src + srcOffset), calNSize, intriParams.mSize,
+            intriParams.dstStride, intriParams.srcStride, static_cast<uint8_t>(intriParams.preClipReluMode),
             intriParams.unitFlag, static_cast<uint64_t>(intriParams.quantPre),
             static_cast<uint8_t>(intriParams.preReluMode), false, nz2ndEn,
             static_cast<uint64_t>(QuantMode_post::NoConv), 0, false, false, 0, false, false, false, false, false,
@@ -309,7 +309,8 @@ __aicore__ inline void FixpipeL0cToUB(
         (!(intriParams.isChannelSplit)),
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Failed to check isChannelSplit in Fixpipe, when src position is "
-                          "CO1 and dst position is VECIN/VECCALC/VECOUT, isChannelSplit must be set as false \n"));
+                          "L0C Buffer(CO1) and dst position is UB(VECIN/VECCALC/VECOUT), isChannelSplit must be set "
+                          "as false \n"));
 
     // dual destination mode limit
     ASCENDC_ASSERT(

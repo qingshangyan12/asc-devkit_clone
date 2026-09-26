@@ -9,24 +9,24 @@ This example uses vector addition to demonstrate performance tuning methods for 
 - Case 1: half-type data processing (baseline)
 - Case 2: half2-type data processing
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
 
 ## Directory Structure
 
-```
-short_vector_add
+```text
+├── short_vector_add
 │   ├── scripts/             // Test script directory
 │   │   ├── gen_data.py      // Generate test input and golden data
 │   │   └── verify_result.py // Verify output results
 │   ├── CMakeLists.txt       // Build project file
 │   ├── data_utils.h         // Data read/write utility functions
-│   └── short_vector_add.asc // Ascend C operator implementation & invocation example
+│   ├── short_vector_add.asc // Ascend C operator implementation & invocation example
+│   ├── README.md            // Sample documentation
+│   └── README_en.md         // English sample documentation
 ```
 
 ## Example Description
@@ -133,16 +133,19 @@ __global__ void add2(T* x, T* y, T* z, uint64_t size)
     const U* y2 = reinterpret_cast<const U*>(y);
     U* z2 = reinterpret_cast<U*>(z);
 
-    uint64_t vectorSize = size / 2;
+    // Compute the for-loop boundary once via division here
+    uint64_t vector_size = size / 2;
     int32_t stride = gridDim.x * blockDim.x;
-    // Short vector loop processes even pairs (stride is still total threads)
-    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vectorSize; idx += stride) {
+
+    // Vectorized loop processes even pairs (stride is still the total number of threads)
+    for (int32_t idx = blockIdx.x * blockDim.x + threadIdx.x; idx < vector_size; idx += stride) {
         z2[idx] = x2[idx] + y2[idx];
     }
+
     // Handle last odd element (if size is odd, processed by global thread 0 at the end)
     if (blockIdx.x == 0 && threadIdx.x == 0 && (size % 2 != 0)) {
-        uint64_t lastIdx = size - 1;
-        z[lastIdx] = x[lastIdx] + y[lastIdx];
+        uint64_t last_idx = size - 1;
+        z[last_idx] = x[last_idx] + y[last_idx];
     }
 }
 ```
@@ -184,6 +187,8 @@ In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 by
   This width covers an entire physical Cache Line boundary, achieving 100% bandwidth utilization and maximizing transfer efficiency. Under the same physical fetch cycles, read bandwidth increases from 7.77 GB/s to 14.51 GB/s.
 
 
+## Performance Comparison Summary
+
 **Final Performance Summary**:
 - **Latency**: Decreases from **86.478 us** to **45.371 us**, a reduction of **47.5%**, equivalent to an overall performance improvement of **1.91x**.
 - **Cycle count**: Total CPU cycles decrease from **8,832,432** to **4,584,309**, a reduction of **48.1%**, confirming improved instruction issue density.
@@ -191,11 +196,11 @@ In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 by
 
 ---
 
-### Optimization Key Points Summary
+## Tuning Recommendations
 
 | Optimization Method | Core Principle              | Applicable Scenarios                                                                                                                                                                                                                                                                                                                                               |
 |:-----|:------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Short vector  | Underlying instructions support computing two data elements at once | 1. half/bfloat16_t type elements performing [basic operations](../../../../../docs/zh/guide/编程指南/语言扩展层/SIMT-BuiltIn关键字.md#运算符), more short vector types see [complete type list](../../../../../docs/zh/api/SIMT-API/SIMT编程简介/扩展语法/内置数据类型-139.md#短向量类型) |
+| Short vector  | Underlying instructions support computing two data elements at once | 1. half/bfloat16_t type elements performing [basic operations](../../../../../docs/zh/guide/programming_guide/language_extension/simt_builtin_keywords.md#运算符), more short vector types see [complete type list](../../../../../docs/zh/api/SIMT-API/SIMT_programming_intro/extended_syntax/builtin_data_types.md#短向量类型) |
 
 ---
 
@@ -203,7 +208,7 @@ In SIMT programming mode, L2 Cache accesses data in units of Cache Line = 128 by
 
 Run the following steps in the root directory of this example to build and execute the example.
 - Configure Environment Variables  
-  Configure environment variables based on the [installation method](../../../../../docs/zh/quick_start.md#prepare&install) of the CANN development kit in the current environment.
+  Configure environment variables based on the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit in the current environment.
 
   ```bash
   source ${install_path}/cann/set_env.sh
@@ -228,10 +233,10 @@ Run the following steps in the root directory of this example to build and execu
   Example:
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
   ```
 
-  > **Notice:** Before switching build modes, clean the cmake cache by running `rm CMakeCache.txt` in the build directory and then re-run cmake.
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
 
 - Build Options Description
 
@@ -248,7 +253,11 @@ Run the following steps in the root directory of this example to build and execu
   test pass!
   ```
 
-## Performance Data Collection
+## Performance Debugging
+
+### Introduction to the msOpProf Tool
+
+`msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
 Use the `msOpProf` tool to collect performance data on a single component:
 
