@@ -54,25 +54,6 @@ __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
 #endif
 #endif
 
-namespace sk {
-struct SkSystemArgs {
-    uint16_t skBlockIdx;
-    uint16_t skNumBlocks;
-    uint16_t skTaskSyncCfg;
-    uint8_t reserve[10];
-
-    inline __aicore__ uint16_t SkGetBlockIdx() { return skBlockIdx; }
-    inline __aicore__ uint16_t SkGetNumBlocks() { return skNumBlocks; }
-    inline __aicore__ uint16_t SkGetTaskSyncCfg() { return skTaskSyncCfg; }
-    inline __aicore__ void SkRestoreTaskSyncCfg() const
-    {
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-        g_super_kernel_early_start_config = skTaskSyncCfg;
-#endif
-    }
-};
-} // namespace sk
-
 namespace AscendC {
 __aicore__ inline int64_t GetTaskRation() { return GetTaskRatio(); }
 
