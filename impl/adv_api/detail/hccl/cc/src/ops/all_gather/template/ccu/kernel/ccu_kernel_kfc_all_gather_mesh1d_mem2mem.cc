@@ -16,6 +16,8 @@ constexpr int AG_M2M_TOKEN_XN_ID = 2;
 constexpr int AG_M2M_CKE_IDX = 0;
 constexpr int AG_M2M_POST_SYNC_ID = 3;
 constexpr uint32_t AG_M2M_BITS_PER_EVENT = 16;
+constexpr uint32_t AG_M2M_LOCAL_COPY_PARALLEL_NUM = 8;
+constexpr uint32_t AG_M2M_LOCAL_COPY_SLICE_SIZE = LOCAL_COPY_MS_PER_LOOP * CCU_MS_SIZE;
 constexpr uint16_t AG_M2M_FULL_EVENT_MASK = static_cast<uint16_t>(0xFFFFU);
 
 struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
@@ -35,15 +37,14 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable normalSliceSize;
     ccu::Variable lastSliceSize;
     ccu::Variable isInputOutputEqual;
-    // GroupCopy uses goSize to describe its chunk loop. LocalCopy ignores
-    // these four variables.
+    // GroupCopy uses goSize to describe its chunk loop.
     GroupOpSizeVars goSize;
     ccu::LocalAddr srcLocCopy;
     ccu::LocalAddr localDst;
     std::vector<ccu::Event> events;
-    ccu::Event localCopyEvent;
 
     ccu::Variable constVar1;
+    ccu::Variable constVarMinus1;
     ccu::Variable repeatTimeFlag;
     ccu::Variable remoteRepeatTimeFlag;
     ccu::Variable waitRepeatNum;
@@ -77,6 +78,7 @@ static CcuResult InitResource(KfcAllGatherMesh1DMem2MemContext& ctx)
     const uint32_t eventNumPerIter = (ctx.rankSize + AG_M2M_BITS_PER_EVENT - 1) / AG_M2M_BITS_PER_EVENT;
     ctx.events.resize(AG_M2M_UNROLL_NUM * eventNumPerIter);
     ctx.constVar1 = 1;
+    ctx.constVarMinus1 = UINT64_MAX;
     ctx.repeatTimeFlag = 0;
     ctx.remoteRepeatTimeFlag = 0;
     ctx.resourceAllocated = false;
@@ -196,33 +198,137 @@ static CcuResult DoAllGatherWait(KfcAllGatherMesh1DMem2MemContext& ctx, uint32_t
     return CCU_SUCCESS;
 }
 
-static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, bool useGroupCopy)
+// Reuse the original GroupCopy buffer pipeline and its per-context resource pool.
+static CcuResult LocalGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
-    CCU_IF(ctx.isInputOutputEqual == 0)
+    CCU_CHK_RET(AllocGoResource(
+        ctx.moConfig, ctx.moRes, ctx.resourceAllocated, AG_M2M_LOCAL_COPY_PARALLEL_NUM, LOCAL_COPY_MS_PER_LOOP));
+    CCU_IF(ctx.goSize.addrOffset != 0)
     {
-        for (uint32_t unrollIdx = 0; unrollIdx < AG_M2M_UNROLL_NUM; ++unrollIdx) {
-            CCU_IF(ctx.localCopyRepeatNum != UINT64_MAX)
-            {
-                ctx.localCopyRepeatNum += ctx.constVar1;
-                CCU_IF(ctx.repeatTimeFlag != 0)
-                {
-                    ctx.localDst.addr += ctx.outputRepeatStride;
-                    ctx.srcLocCopy.addr += ctx.inputRepeatStride;
-                }
-                if (useGroupCopy) {
-                    CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
-                } else {
-                    CCU_CHK_RET(ccu::LocalCopy(ctx.localDst, ctx.srcLocCopy, ctx.sliceSize, ctx.localCopyEvent, 1));
-                    CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
-                }
-                ctx.repeatTimeFlag = 1;
-            }
+        ccu::Variable sliceSize;
+        ccu::Variable loopParam;
+        sliceSize = AG_M2M_LOCAL_COPY_SLICE_SIZE;
+        loopParam = GetLoopParam(0, AG_M2M_LOCAL_COPY_SLICE_SIZE * AG_M2M_LOCAL_COPY_PARALLEL_NUM, 0);
+        loopParam += ctx.goSize.loopParam;
+        ccu::Func body([&]() {
+            CCU_THROW_IF_FAILED(
+                ccu::LocalCopy(ctx.moRes.ccuBuf[0], ctx.srcLocCopy, sliceSize, ctx.moRes.completedEvent[0], 1),
+                "LocalGroupCopy: buffer read failed");
+            CCU_THROW_IF_FAILED(ccu::EventWait(ctx.moRes.completedEvent[0], 1), "LocalGroupCopy: read wait failed");
+            CCU_THROW_IF_FAILED(
+                ccu::LocalCopy(ctx.localDst, ctx.moRes.ccuBuf[0], sliceSize, ctx.moRes.completedEvent[0], 1),
+                "LocalGroupCopy: buffer write failed");
+            CCU_THROW_IF_FAILED(ccu::EventWait(ctx.moRes.completedEvent[0], 1), "LocalGroupCopy: write wait failed");
+        });
+        ccu::Loop loop(loopParam, body);
+        ccu::Variable parallelCfg;
+        ccu::Variable offsetCfg;
+        // One Loop plus seven clones gives eight concurrent instances.
+        // maxLoopNum reserves capacity; parallelCfg determines concurrency.
+        parallelCfg = GetParallelParam(AG_M2M_LOCAL_COPY_PARALLEL_NUM - 1, 0, 1);
+        offsetCfg = GetOffsetParam(AG_M2M_LOCAL_COPY_SLICE_SIZE, CCU_MS_INTERLEAVE, 1);
+        ccu::LoopGroup group(parallelCfg, offsetCfg, AG_M2M_LOCAL_COPY_PARALLEL_NUM, {loop});
+    }
+
+    CCU_IF(ctx.goSize.parallelParam != 0)
+    {
+        ccu::LocalAddr src;
+        ccu::LocalAddr dst;
+        src = ctx.srcLocCopy;
+        dst = ctx.localDst;
+        src.addr += ctx.goSize.addrOffset;
+        dst.addr += ctx.goSize.addrOffset;
+        ccu::Variable singleLoop;
+        singleLoop = 0U;
+        // CalGoSize emits one Loop for whole slices only or a lone residual;
+        // it emits two Loops for a residual followed by whole slices.
+        CCU_IF(ctx.goSize.residual == AG_M2M_LOCAL_COPY_SLICE_SIZE) { singleLoop = 1U; }
+        CCU_IF(ctx.goSize.parallelParam == GetParallelParam(0, 0, 1)) { singleLoop = 1U; }
+        ccu::Variable loopParam;
+        loopParam = GetLoopParam(0, 0, 1);
+        ccu::Variable offsetCfg;
+        offsetCfg = GetOffsetParam(AG_M2M_LOCAL_COPY_SLICE_SIZE, CCU_MS_INTERLEAVE, 1);
+        CCU_IF(singleLoop == 1U)
+        {
+            ccu::Func body([&]() {
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(ctx.moRes.ccuBuf[0], src, ctx.goSize.residual, ctx.moRes.completedEvent[0], 1),
+                    "LocalGroupCopy: buffer read failed");
+                CCU_THROW_IF_FAILED(ccu::EventWait(ctx.moRes.completedEvent[0], 1), "LocalGroupCopy: read wait failed");
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(dst, ctx.moRes.ccuBuf[0], ctx.goSize.residual, ctx.moRes.completedEvent[0], 1),
+                    "LocalGroupCopy: buffer write failed");
+                CCU_THROW_IF_FAILED(
+                    ccu::EventWait(ctx.moRes.completedEvent[0], 1), "LocalGroupCopy: write wait failed");
+            });
+            ccu::Loop loop(loopParam, body);
+            ccu::LoopGroup group(ctx.goSize.parallelParam, offsetCfg, AG_M2M_LOCAL_COPY_PARALLEL_NUM, {loop});
+        }
+        CCU_IF(singleLoop == 0U)
+        {
+            ccu::LocalAddr fullSrc;
+            ccu::LocalAddr fullDst;
+            fullSrc = src;
+            fullDst = dst;
+            fullSrc.addr += ctx.goSize.residual;
+            fullDst.addr += ctx.goSize.residual;
+            ccu::Variable fullSize;
+            fullSize = AG_M2M_LOCAL_COPY_SLICE_SIZE;
+            ccu::Func residualBody([&]() {
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(ctx.moRes.ccuBuf[0], src, ctx.goSize.residual, ctx.moRes.completedEvent[0], 1),
+                    "LocalGroupCopy: buffer read failed");
+                CCU_THROW_IF_FAILED(ccu::EventWait(ctx.moRes.completedEvent[0], 1), "LocalGroupCopy: read wait failed");
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(dst, ctx.moRes.ccuBuf[0], ctx.goSize.residual, ctx.moRes.completedEvent[0], 1),
+                    "LocalGroupCopy: buffer write failed");
+                CCU_THROW_IF_FAILED(
+                    ccu::EventWait(ctx.moRes.completedEvent[0], 1), "LocalGroupCopy: write wait failed");
+            });
+            ccu::Func fullBody([&]() {
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(
+                        ctx.moRes.ccuBuf[CCU_MS_INTERLEAVE], fullSrc, fullSize, ctx.moRes.completedEvent[1], 1),
+                    "LocalGroupCopy: buffer read failed");
+                CCU_THROW_IF_FAILED(ccu::EventWait(ctx.moRes.completedEvent[1], 1), "LocalGroupCopy: read wait failed");
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(
+                        fullDst, ctx.moRes.ccuBuf[CCU_MS_INTERLEAVE], fullSize, ctx.moRes.completedEvent[1], 1),
+                    "LocalGroupCopy: buffer write failed");
+                CCU_THROW_IF_FAILED(
+                    ccu::EventWait(ctx.moRes.completedEvent[1], 1), "LocalGroupCopy: write wait failed");
+            });
+            ccu::Loop residualLoop(loopParam, residualBody);
+            ccu::Loop fullLoop(loopParam, fullBody);
+            ccu::LoopGroup group(
+                ctx.goSize.parallelParam, offsetCfg, AG_M2M_LOCAL_COPY_PARALLEL_NUM, {residualLoop, fullLoop});
         }
     }
     return CCU_SUCCESS;
 }
 
-static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool useGroupCopy)
+static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
+{
+    CCU_IF(ctx.isInputOutputEqual == 0)
+    {
+        // Count the remote writes issued in this batch. Emit the local copy
+        // body once, then run it for exactly that many repeats.
+        CCU_WHILE(ctx.localCopyRepeatNum != 0U)
+        {
+            ctx.localCopyRepeatNum += ctx.constVarMinus1;
+            CCU_IF(ctx.repeatTimeFlag != 0)
+            {
+                ctx.localDst.addr += ctx.outputRepeatStride;
+                ctx.srcLocCopy.addr += ctx.inputRepeatStride;
+            }
+            CCU_CHK_RET(LocalGroupCopy(ctx));
+            ctx.repeatTimeFlag = 1;
+        }
+    }
+    return CCU_SUCCESS;
+}
+
+static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_CHK_RET(InitAllGatherAddr(ctx));
     ctx.repeatTimeFlag = 0;
@@ -234,7 +340,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool u
     CCU_WHILE(ctx.tmpRepeatNum != UINT64_MAX)
     {
         ctx.waitRepeatNum = ctx.tmpRepeatNum;
-        ctx.localCopyRepeatNum = ctx.tmpRepeatNum;
+        ctx.localCopyRepeatNum = 0U;
 
         // Phase 1: issue at most one event group per unrolled repeat.
         for (uint32_t unrollIdx = 0; unrollIdx < AG_M2M_UNROLL_NUM; ++unrollIdx) {
@@ -250,13 +356,14 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool u
                     }
                 }
                 ctx.tmpRepeatNum += ctx.constVar1;
+                ctx.localCopyRepeatNum += ctx.constVar1;
                 CCU_CHK_RET(DoAllGatherWrite(ctx, ctx.src, ctx.dst, ctx.normalSliceSize, unrollIdx));
                 ctx.remoteRepeatTimeFlag = 1;
             }
         }
 
         // Phase 2: copy this rank's slice locally while remote writes are in flight.
-        CCU_CHK_RET(DoAllGatherGroupCopy(ctx, useGroupCopy));
+        CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
 
         // Phase 3: wait before the corresponding event group is reused by
         // the next batch.
@@ -306,7 +413,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
 
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, true)); }
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
@@ -354,7 +461,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
         part0GoSize2, part0GoSize3, zero, phase0RepeatNumInv, zero, zero, part0Size, zero));
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = part0Size;
-    CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
+    CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
 
     // Both missions must finish stage 0 before either reads its stage-0 output.
@@ -371,7 +478,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
         part1Size, one));
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = part1Size;
-    CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
+    CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }

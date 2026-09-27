@@ -389,12 +389,12 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForParallelAllGatherM2M(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    // Keep the split identical to InsV2AllGatherParallelExecutor: split by
-    // element count so neither half can cut through an element.
+    // Split Mesh-first : NHR-first as 1:2 by whole elements.
+    // Any remainder belongs to part1 so the two parts cover the full input.
     constexpr uint64_t nhrJettyNum = 1U;
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
     const uint64_t totalSize = commParam->count * dataTypeSize;
-    const uint64_t part0Size = (commParam->count / 2U) * dataTypeSize;
+    const uint64_t part0Size = (commParam->count / 3U) * dataTypeSize;
     const uint64_t part1Size = totalSize - part0Size;
     const uint64_t repeatOffset = totalSize * ccuParam_.repeatIndex;
     const uint64_t outputStride = commParam->strideCount == 0U ? totalSize : commParam->strideCount * dataTypeSize;
