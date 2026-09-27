@@ -53,8 +53,13 @@ const uint16_t MASK_ARRAY_SIZE = 4;
                               __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 const int32_t B32_BIT_SIZE = 32;
 #endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+const uint32_t TOTAL_L0A_SIZE = 32 * 1024;
+const uint32_t TOTAL_L0B_SIZE = 32 * 1024;
+#else
 const uint32_t TOTAL_L0A_SIZE = 64 * 1024;
 const uint32_t TOTAL_L0B_SIZE = 64 * 1024;
+#endif
 const uint32_t TMP_UB_SIZE = 8 * 1024;
 const uint32_t MAX_SLICE_SIZE = 6 * 256;
 const uint32_t F32_INF = 0x7f800000;
@@ -169,6 +174,12 @@ const uint32_t SINGLE_MSG_SIZE = 64;
 const uint32_t CACHE_LINE_SIZE = 64;
 const uint32_t TOTAL_L0C_SIZE = 128 * 1024;
 const uint32_t VECTOR_REG_WIDTH = 256;
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3103)
+const uint32_t TOTAL_UB_SIZE = 128 * 1024;
+const uint32_t TMP_UB_OFFSET = 128 * 1024;
+const uint32_t TOTAL_L1_SIZE = 512 * 1024;
+const uint32_t TOTAL_L0C_SIZE = 32 * 1024;
+const uint32_t ONE_BLOCK_SIZE = 32;
 #elif (__NPU_ARCH__ == 3510)
 const int32_t TOTAL_VEC_LOCAL_SIZE = 248 * 1024;
 const uint32_t TOTAL_UB_SIZE = 248 * 1024;

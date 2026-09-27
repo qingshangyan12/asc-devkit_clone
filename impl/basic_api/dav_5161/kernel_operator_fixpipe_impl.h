@@ -26,7 +26,15 @@
 #include "../../../include/basic_api/kernel_struct_fixpipe.h"
 
 namespace AscendC {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+__aicore__ inline void SetFixPipeClipReluImpl(uint64_t config)
+{
+    (void)(config);
+    ASCENDC_REPORT_NOT_SUPPORT(false, "SetFixPipeClipRelu");
+}
+#else
 __aicore__ inline void SetFixPipeClipReluImpl(uint64_t config) { set_m_clip_relu(config); }
+#endif
 
 template <typename T>
 __aicore__ inline void SetFixPipeAddrImpl(const LocalTensor<T>& eleWiseTensor, uint16_t c0ChStride)
