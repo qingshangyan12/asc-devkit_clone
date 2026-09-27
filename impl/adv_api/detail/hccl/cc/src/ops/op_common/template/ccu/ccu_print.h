@@ -24,7 +24,7 @@ namespace AscendC {
 namespace ccu {
 namespace dfx {
 
-constexpr uint64_t CCU_PRINT_RING_DEPTH = 64;
+constexpr uint64_t CCU_PRINT_RING_DEPTH = 1024;
 
 struct PrintInfoKey {
     const char* filename;
