@@ -12,6 +12,8 @@
 #include <atomic>
 #include <cstring>
 #include <iostream>
+#include <mutex>
+#include <set>
 #include "acl/acl_rt.h"
 #include "acl/acl_base.h"
 #include "runtime/base.h"
@@ -37,6 +39,9 @@ uint32_t g_aclrtMemcpyCallCount = 0;
 
 namespace {
 Mc2AicpuLaunchStubState g_mc2AicpuLaunchStubState;
+std::mutex g_genericDeviceMemoryMutex;
+std::set<void*> g_genericDeviceMemory;
+int g_testContext;
 } // namespace
 
 Mc2AicpuLaunchStubState& GetMc2AicpuLaunchStubState() { return g_mc2AicpuLaunchStubState; }
@@ -75,14 +80,53 @@ aclError aclrtMallocHost(void** hostPtr, size_t size)
 // 打桩实现，仿真运行需标记内存是INPUT和OUTPUT
 aclError aclrtMalloc(void** devPtr, size_t size, aclrtMemMallocPolicy policy)
 {
+    if (devPtr == nullptr || size == 0) {
+        return ACL_ERROR_INVALID_PARAM;
+    }
     u32 memType = static_cast<u32>(policy);
-    HcclSim::SimNpu& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(curr_dev_id);
     if (memType == BUFFER_INPUT_MARK) {
+        HcclSim::SimNpu& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(curr_dev_id);
         *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(HcclSim::BufferType::INPUT, size));
     } else if (memType == BUFFER_OUTPUT_MARK) {
+        HcclSim::SimNpu& simNpu = HcclSim::SimWorld::Global()->GetSimNpuByRankId(curr_dev_id);
         *devPtr = reinterpret_cast<void*>(simNpu.AllocMemory(HcclSim::BufferType::OUTPUT, size));
+    } else {
+        *devPtr = malloc(size);
+        if (*devPtr == nullptr) {
+            return ACL_ERROR_INTERNAL_ERROR;
+        }
+        std::lock_guard<std::mutex> lock(g_genericDeviceMemoryMutex);
+        g_genericDeviceMemory.insert(*devPtr);
     }
     return ACL_SUCCESS;
+}
+
+aclError aclrtFree(void* devPtr)
+{
+    if (devPtr == nullptr) {
+        return ACL_SUCCESS;
+    }
+    std::lock_guard<std::mutex> lock(g_genericDeviceMemoryMutex);
+    auto found = g_genericDeviceMemory.find(devPtr);
+    if (found != g_genericDeviceMemory.end()) {
+        free(devPtr);
+        g_genericDeviceMemory.erase(found);
+    }
+    return ACL_SUCCESS;
+}
+
+aclError aclrtGetCurrentContext(aclrtContext* context)
+{
+    if (context == nullptr) {
+        return ACL_ERROR_INVALID_PARAM;
+    }
+    *context = &g_testContext;
+    return ACL_SUCCESS;
+}
+
+aclError aclrtSetCurrentContext(aclrtContext context)
+{
+    return context == nullptr ? ACL_ERROR_INVALID_PARAM : ACL_SUCCESS;
 }
 
 aclError aclrtStreamGetId(aclrtStream stream, int32_t* streamId_)

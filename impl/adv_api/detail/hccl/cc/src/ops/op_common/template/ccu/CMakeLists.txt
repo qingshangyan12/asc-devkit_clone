@@ -8,6 +8,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 set(src_list
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_print.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_utils.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/ccu_kernel_alg_base.cc
 )

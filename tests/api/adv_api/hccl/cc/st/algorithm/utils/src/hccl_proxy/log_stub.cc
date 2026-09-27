@@ -11,8 +11,11 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdint>
+#include <cstring>
 #include <map>
+#include <mutex>
 #include <string>
+#include <vector>
 #include <sys/time.h>
 #include <time.h>
 #include <stdio.h>
@@ -34,10 +37,24 @@ static uint32_t InitLogLevel()
 }
 
 static uint32_t g_runtimeLogLevel = InitLogLevel();
+static std::mutex g_testLogMutex;
+static std::vector<std::string> g_testLogs;
 constexpr int TIME_FROM_1900 = 1900;
 constexpr int LOG_STUB_BUFFER_SIZE = 1024;
 std::map<int, std::string> LOG_LEVEL_STR_MAP = {
     {0x00, "[DEBUG]"}, {0x01, "[INFO]"}, {0x02, "[WARNING]"}, {0x03, "[ERROR]"}, {0x10, "[EVENT]"}};
+
+void ClearTestLogs()
+{
+    std::lock_guard<std::mutex> lock(g_testLogMutex);
+    g_testLogs.clear();
+}
+
+std::vector<std::string> GetTestLogs()
+{
+    std::lock_guard<std::mutex> lock(g_testLogMutex);
+    return g_testLogs;
+}
 
 #ifdef __cplusplus
 extern "C" {
@@ -84,6 +101,10 @@ void DlogPrintStub(int level, char* logBuffer)
 
     char timeBuffer[LOG_STUB_BUFFER_SIZE] = {0};
     GetCurTimeStr(timeBuffer, LOG_STUB_BUFFER_SIZE);
+    if (std::strstr(logBuffer, "[CCU_PRINT]") != nullptr) {
+        std::lock_guard<std::mutex> lock(g_testLogMutex);
+        g_testLogs.emplace_back(logBuffer);
+    }
     printf("[%-26s][pid:%u]%s%s\n", timeBuffer, getpid(), logLevelStr.c_str(), logBuffer);
 }
 
