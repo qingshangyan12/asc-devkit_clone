@@ -52,7 +52,7 @@ class GlobalTensor;
 } // namespace AscendC
 
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
-__BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
+__BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config = 0;
 #endif
 
 // disabled on CPU mode for compatiablilty
@@ -67,28 +67,28 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr = nullptr;
 __BLOCK_LOCAL__ __inline__ uint64_t g_lastTpipeInitPos = 0;
 #else // end ASCENDC_DEBUG
 #ifdef SPLIT_CORE_CUBE
-__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_cubeTPipePtr;
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_cubeTPipePtr = nullptr;
 #elif defined(SPLIT_CORE_VEC)
-__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_vecTPipePtr;
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_vecTPipePtr = nullptr;
 #else
-__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
+__BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr = nullptr;
 #endif
 #endif // end ASCENDC_DEBUG
 
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || \
     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163
-__BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
+__BLOCK_LOCAL__ __inline__ uint64_t g_maskCount = 0;
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113
-__BLOCK_LOCAL__ __inline__ half g_deqValue;
+__BLOCK_LOCAL__ __inline__ half g_deqValue = 0;
 #endif
 #endif
 #if __NPU_ARCH__ == 2201
-__BLOCK_LOCAL__ __inline__ half g_deqValue;
+__BLOCK_LOCAL__ __inline__ half g_deqValue = 0;
 #endif
 
-__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved;
-__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_hcclContextReserved[2];
+__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_dumpWorkspaceReserved = nullptr;
+__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_hcclContextReserved[2] = {nullptr, nullptr};
 
 #if defined(UT_TEST) || defined(ST_TEST)
 __aicore__ AscendC::TPipe* GetTPipePtr();

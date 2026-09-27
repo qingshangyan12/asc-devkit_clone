@@ -29,7 +29,7 @@ namespace AscendC {
 namespace Impl {
 namespace Detail {
 
-__BLOCK_LOCAL__ __inline__ uint64_t gA2B2DBFlag_;
+__BLOCK_LOCAL__ __inline__ uint64_t gA2B2DBFlag_ = 0;
 /*
     TBufPoolL0 is considered entirely experimental.
     We retain the freedom to make incompatible changes, but do not guarantee the stability.

@@ -57,7 +57,7 @@ constexpr TQueConfig gCO1Config = {
     .bufferNumber = L0C_BUF_BLOCK_NUM};
 
 using gCO1QueType = TQue<QuePosition::CO1, 1, &gCO1Config>;
-__BLOCK_LOCAL__ __inline__ void* gCO1Que;
+__BLOCK_LOCAL__ __inline__ void* gCO1Que = nullptr;
 
 // kfc<->impl
 struct MatrixL1Addr {
