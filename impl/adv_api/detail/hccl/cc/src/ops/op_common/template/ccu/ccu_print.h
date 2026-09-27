@@ -32,8 +32,8 @@ struct PrintInfoKey {
     const char* fmtstr;
 };
 
-// head and tail are byte offsets in argvArray. Each CCU_PRINTF call site owns
-// one PrintInfoValue, so every record in the flexible array has the same argc.
+// head and tail are byte offsets in argvArray. Each record contains a shared
+// sequence followed by the call site's fixed number of arguments.
 struct PrintInfoValue {
     uint64_t tail;
     uint64_t head;
@@ -43,6 +43,7 @@ struct PrintInfoValue {
 struct PrintInfoHandle {
     PrintInfoValue* value;
     uint64_t* valueAddressCell;
+    uint64_t* sequenceAddressCell;
     uint64_t argc;
     uint64_t recordBytes;
     uint64_t ringBytes;
@@ -133,7 +134,32 @@ CcuResult EmitPrintf(PrintInfoHandle* handle, const Args&... args)
     address = buffer + value;
     address += tail;
 
+    // All printf call sites and missions share this best-effort sequence.
+    // CCU has no atomic read-modify-write primitive for local GM, so
+    // concurrent emitters may observe the same value. Equal sequence values
+    // are intentionally allowed: those records were emitted close enough
+    // together that their relative order cannot be established here.
+    result = static_cast<CcuResult>(ccu::Load(reinterpret_cast<uint64_t>(handle->sequenceAddressCell), tail));
+    if (result != CCU_SUCCESS) {
+        return result;
+    }
+    result = static_cast<CcuResult>(ccu::Load(tail, buffer));
+    if (result != CCU_SUCCESS) {
+        return result;
+    }
+    value = 1;
+    buffer += value;
+    result = static_cast<CcuResult>(ccu::Store(tail, buffer));
+    if (result != CCU_SUCCESS) {
+        return result;
+    }
+    result = static_cast<CcuResult>(ccu::Store(address, buffer));
+    if (result != CCU_SUCCESS) {
+        return result;
+    }
+
     value = sizeof(uint64_t);
+    address += value;
     result = detail::StoreArgs(address, value, args...);
     if (result != CCU_SUCCESS) {
         return result;
@@ -142,7 +168,10 @@ CcuResult EmitPrintf(PrintInfoHandle* handle, const Args&... args)
     // Publishing tail after argvArray keeps partially written records hidden
     // from the Host consumer. The ring is best-effort and may overwrite old
     // records when the consumer falls behind.
-    address = buffer;
+    result = static_cast<CcuResult>(ccu::Load(reinterpret_cast<uint64_t>(handle->valueAddressCell), address));
+    if (result != CCU_SUCCESS) {
+        return result;
+    }
     return static_cast<CcuResult>(ccu::Store(address, nextTail));
 }
 

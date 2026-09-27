@@ -12,6 +12,7 @@
 
 #include <acl/acl_rt.h>
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -22,6 +23,7 @@
 #include <new>
 #include <thread>
 #include <utility>
+#include <vector>
 
 #include "log.h"
 
@@ -30,6 +32,10 @@ namespace ccu {
 namespace dfx {
 
 namespace {
+
+constexpr std::chrono::microseconds CCU_PRINT_IDLE_POLL_INTERVAL(1000);
+constexpr std::chrono::microseconds CCU_PRINT_ACTIVE_POLL_INTERVAL(100);
+constexpr uint32_t CCU_PRINT_POST_UPDATE_DRAIN_ROUNDS = 4;
 
 struct PrintInfoKeyLess {
     bool operator()(const PrintInfoKey& lhs, const PrintInfoKey& rhs) const
@@ -155,6 +161,12 @@ bool Format(const char* fmtstr, const uint64_t* argv, size_t argc, std::string& 
 } // namespace detail
 
 struct CcuPrintStream::Impl {
+    struct PendingRecord {
+        PrintInfoKey key;
+        uint64_t sequence;
+        std::vector<uint64_t> argv;
+    };
+
     std::map<PrintInfoKey, PrintInfoHandle*, PrintInfoKeyLess> fmtMap;
     std::mutex mapMutex;
     std::atomic<bool> running{false};
@@ -162,6 +174,49 @@ struct CcuPrintStream::Impl {
     std::mutex waitMutex;
     std::condition_variable wakeup;
     aclrtContext context{nullptr};
+    uint64_t* sequence{nullptr};
+    uint64_t* sequenceAddressCell{nullptr};
+
+    bool InitSequenceLocked()
+    {
+        if (sequence != nullptr) {
+            return true;
+        }
+        if (!CheckAcl(
+                aclrtMalloc(reinterpret_cast<void**>(&sequence), sizeof(uint64_t), ACL_MEM_MALLOC_HUGE_FIRST),
+                "aclrtMalloc print sequence")) {
+            return false;
+        }
+        if (!CheckAcl(
+                aclrtMalloc(
+                    reinterpret_cast<void**>(&sequenceAddressCell), sizeof(uint64_t), ACL_MEM_MALLOC_HUGE_FIRST),
+                "aclrtMalloc print sequence address cell")) {
+            (void)aclrtFree(sequence);
+            sequence = nullptr;
+            return false;
+        }
+        if (!CheckAcl(aclrtMemset(sequence, sizeof(uint64_t), 0, sizeof(uint64_t)), "aclrtMemset print sequence")) {
+            (void)aclrtFree(sequenceAddressCell);
+            (void)aclrtFree(sequence);
+            sequenceAddressCell = nullptr;
+            sequence = nullptr;
+            return false;
+        }
+
+        const uint64_t sequenceAddress = reinterpret_cast<uint64_t>(sequence);
+        if (!CheckAcl(
+                aclrtMemcpy(
+                    sequenceAddressCell, sizeof(uint64_t), &sequenceAddress, sizeof(uint64_t),
+                    ACL_MEMCPY_HOST_TO_DEVICE),
+                "aclrtMemcpy print sequence address")) {
+            (void)aclrtFree(sequenceAddressCell);
+            (void)aclrtFree(sequence);
+            sequenceAddressCell = nullptr;
+            sequence = nullptr;
+            return false;
+        }
+        return true;
+    }
 
     bool StartLocked()
     {
@@ -202,10 +257,41 @@ struct CcuPrintStream::Impl {
             return;
         }
 
+        uint64_t observedSequence = 0;
+        uint32_t postUpdateDrainRounds = 0;
         while (running.load()) {
-            ConsumeOnce();
+            uint64_t currentSequence = observedSequence;
+            const bool sequenceRead = CheckAcl(
+                aclrtMemcpy(&currentSequence, sizeof(uint64_t), sequence, sizeof(uint64_t), ACL_MEMCPY_DEVICE_TO_HOST),
+                "aclrtMemcpy print sequence device-to-host");
+            if (sequenceRead && currentSequence != observedSequence) {
+                if (currentSequence > observedSequence + 1) {
+                    HCCL_RUN_WARNING(
+                        "[CCU_PRINT] sequence advanced by %llu between scans; increase ring depth if records are "
+                        "missing",
+                        currentSequence - observedSequence);
+                } else if (currentSequence < observedSequence) {
+                    // The shared sequence is deliberately non-atomic. A late
+                    // store from another mission can temporarily move it back.
+                    HCCL_RUN_WARNING(
+                        "[CCU_PRINT] non-atomic sequence moved backward from %llu to %llu", observedSequence,
+                        currentSequence);
+                }
+                observedSequence = currentSequence;
+                ConsumeOnce();
+                postUpdateDrainRounds = CCU_PRINT_POST_UPDATE_DRAIN_ROUNDS;
+            } else if (postUpdateDrainRounds != 0) {
+                // CCU updates sequence before publishing the per-call-site
+                // tail. Rescan briefly so the notification cannot race the
+                // record publication.
+                ConsumeOnce();
+                --postUpdateDrainRounds;
+            }
+
+            const std::chrono::microseconds interval =
+                postUpdateDrainRounds == 0 ? CCU_PRINT_IDLE_POLL_INTERVAL : CCU_PRINT_ACTIVE_POLL_INTERVAL;
             std::unique_lock<std::mutex> lock(waitMutex);
-            wakeup.wait_for(lock, std::chrono::milliseconds(20), [this] { return !running.load(); });
+            wakeup.wait_for(lock, interval, [this] { return !running.load(); });
         }
         ConsumeOnce();
     }
@@ -213,12 +299,26 @@ struct CcuPrintStream::Impl {
     void ConsumeOnce()
     {
         std::lock_guard<std::mutex> lock(mapMutex);
+        std::vector<PendingRecord> records;
         for (const auto& entry : fmtMap) {
-            ConsumeOne(entry.first, *entry.second);
+            ConsumeOne(entry.first, *entry.second, records);
+        }
+        std::stable_sort(records.begin(), records.end(), [](const PendingRecord& lhs, const PendingRecord& rhs) {
+            return lhs.sequence < rhs.sequence;
+        });
+        for (const PendingRecord& record : records) {
+            std::string output;
+            if (detail::Format(record.key.fmtstr, record.argv.data(), record.argv.size(), output)) {
+                HCCL_RUN_INFO(
+                    "[CCU_PRINT][%s:%d][seq=%llu] %s", record.key.filename, record.key.lineno, record.sequence,
+                    output.c_str());
+            } else {
+                HCCL_RUN_WARNING("[CCU_PRINT] failed to format %s:%d", record.key.filename, record.key.lineno);
+            }
         }
     }
 
-    void ConsumeOne(const PrintInfoKey& key, const PrintInfoHandle& handle)
+    void ConsumeOne(const PrintInfoKey& key, const PrintInfoHandle& handle, std::vector<PendingRecord>& records)
     {
         std::unique_ptr<uint8_t[]> snapshot(new (std::nothrow) uint8_t[handle.allocationBytes]);
         if (snapshot == nullptr) {
@@ -245,13 +345,14 @@ struct CcuPrintStream::Impl {
         }
 
         while (head != tail) {
-            const uint64_t* argv =
+            const uint64_t* record =
                 reinterpret_cast<const uint64_t*>(reinterpret_cast<const uint8_t*>(value->argvArray) + head);
-            std::string output;
-            if (detail::Format(key.fmtstr, argv, handle.argc, output)) {
-                HCCL_RUN_INFO("[CCU_PRINT][%s:%d] %s", key.filename, key.lineno, output.c_str());
-            } else {
-                HCCL_RUN_WARNING("[CCU_PRINT] failed to format %s:%d", key.filename, key.lineno);
+            try {
+                records.push_back(
+                    PendingRecord{key, record[0], std::vector<uint64_t>(record + 1, record + 1 + handle.argc)});
+            } catch (...) {
+                HCCL_RUN_WARNING("[CCU_PRINT] failed to collect record at %s:%d", key.filename, key.lineno);
+                break;
             }
 
             head += handle.recordBytes;
@@ -291,6 +392,8 @@ CcuPrintStream::~CcuPrintStream()
         (void)aclrtFree(entry.second->value);
         delete entry.second;
     }
+    (void)aclrtFree(impl_->sequenceAddressCell);
+    (void)aclrtFree(impl_->sequence);
 }
 
 PrintInfoHandle* CcuPrintStream::AllocPrintInfo(const char* filename, int lineno, const char* fmtstr, size_t argc)
@@ -300,14 +403,17 @@ PrintInfoHandle* CcuPrintStream::AllocPrintInfo(const char* filename, int lineno
         return nullptr;
     }
 
-    const size_t minArgc = argc == 0 ? 1 : argc;
-    if (minArgc >
-        (std::numeric_limits<size_t>::max() - sizeof(PrintInfoValue)) / sizeof(uint64_t) / CCU_PRINT_RING_DEPTH) {
+    if (argc == std::numeric_limits<size_t>::max() ||
+        argc + 1 >
+            (std::numeric_limits<size_t>::max() - sizeof(PrintInfoValue)) / sizeof(uint64_t) / CCU_PRINT_RING_DEPTH) {
         HCCL_RUN_WARNING("[CCU_PRINT] allocation size overflow at %s:%d", filename, lineno);
         return nullptr;
     }
 
     std::lock_guard<std::mutex> lock(impl_->mapMutex);
+    if (!impl_->InitSequenceLocked()) {
+        return nullptr;
+    }
     PrintInfoKey key{filename, lineno, fmtstr};
     auto found = impl_->fmtMap.find(key);
     if (found != impl_->fmtMap.end()) {
@@ -323,9 +429,10 @@ PrintInfoHandle* CcuPrintStream::AllocPrintInfo(const char* filename, int lineno
         return nullptr;
     }
     handle->argc = argc;
-    handle->recordBytes = sizeof(uint64_t) * minArgc;
+    handle->recordBytes = sizeof(uint64_t) * (argc + 1);
     handle->ringBytes = handle->recordBytes * CCU_PRINT_RING_DEPTH;
     handle->allocationBytes = sizeof(PrintInfoValue) + handle->ringBytes;
+    handle->sequenceAddressCell = impl_->sequenceAddressCell;
 
     if (!CheckAcl(
             aclrtMalloc(reinterpret_cast<void**>(&handle->value), handle->allocationBytes, ACL_MEM_MALLOC_HUGE_FIRST),

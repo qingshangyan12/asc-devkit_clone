@@ -12,8 +12,10 @@
 
 #include <chrono>
 #include <cstring>
+#include <limits>
 #include <map>
 #include <thread>
+#include <vector>
 
 #include "ccu_print.h"
 #include "ccu_primitives_stub.h"
@@ -121,6 +123,24 @@ CcuResult BuildCcuPrintProgram(Program& program)
     return CCU_SUCCESS;
 }
 
+CcuResult BuildFirstOrderingProgram(Program& program)
+{
+    CompilerContext compiler(program);
+    CompilerContext::SetCurrent(&compiler);
+    CCU_PRINTF("ordering-first");
+    CompilerContext::SetCurrent(nullptr);
+    return CCU_SUCCESS;
+}
+
+CcuResult BuildSecondOrderingProgram(Program& program)
+{
+    CompilerContext compiler(program);
+    CompilerContext::SetCurrent(&compiler);
+    CCU_PRINTF("ordering-second");
+    CompilerContext::SetCurrent(nullptr);
+    return CCU_SUCCESS;
+}
+
 } // namespace
 
 TEST(CcuPrintMockTest, EmitsCcuStoresAndHostConsumerLogsFormattedRecord)
@@ -132,6 +152,38 @@ TEST(CcuPrintMockTest, EmitsCcuStoresAndHostConsumerLogsFormattedRecord)
     ASSERT_EQ(BuildCcuPrintProgram(program), CCU_SUCCESS);
     ASSERT_TRUE(ExecuteCcuPrintProgram(program));
     EXPECT_TRUE(WaitForLog("u=42 x=abc p=0x123 v=99 %"));
+}
+
+TEST(CcuPrintMockTest, OrdersDifferentCallSitesBySharedSequence)
+{
+    SetTestLogLevel(0);
+    Program firstProgram;
+    Program secondProgram;
+    Program restartProgram;
+
+    ASSERT_EQ(BuildFirstOrderingProgram(firstProgram), CCU_SUCCESS);
+    ASSERT_EQ(BuildSecondOrderingProgram(secondProgram), CCU_SUCCESS);
+    AscendC::ccu::dfx::CcuPrintStream::GetInstance()->Stop();
+    ClearTestLogs();
+
+    ASSERT_TRUE(ExecuteCcuPrintProgram(secondProgram));
+    ASSERT_TRUE(ExecuteCcuPrintProgram(firstProgram));
+    ASSERT_EQ(BuildCcuPrintProgram(restartProgram), CCU_SUCCESS);
+    ASSERT_TRUE(WaitForLog("ordering-first"));
+    ASSERT_TRUE(WaitForLog("ordering-second"));
+
+    size_t firstIndex = std::numeric_limits<size_t>::max();
+    size_t secondIndex = std::numeric_limits<size_t>::max();
+    const std::vector<std::string> logs = GetTestLogs();
+    for (size_t index = 0; index < logs.size(); ++index) {
+        if (logs[index].find("ordering-first") != std::string::npos) {
+            firstIndex = index;
+        }
+        if (logs[index].find("ordering-second") != std::string::npos) {
+            secondIndex = index;
+        }
+    }
+    EXPECT_LT(secondIndex, firstIndex);
 }
 
 TEST(CcuPrintFormatTest, FormatsSupportedVariableConversions)
