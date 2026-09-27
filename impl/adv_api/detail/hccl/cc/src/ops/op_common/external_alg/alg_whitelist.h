@@ -45,7 +45,6 @@ constexpr std::array<const char*, 36> ALG_WHITELIST = {
     "AicpuAllReduceSoleMeshTwoShot",
     "AicpuAllReduceSoleMeshChunkTwoShot",
     "AicpuAllReduceParallelMeshNHR",
-    "AicpuAllReducePipeLinePcie",
     "CcuSchedAllReduceSoleMesh",
     // AllToAll / AllToAllV
     "AicpuAllToAllSoleMesh",
