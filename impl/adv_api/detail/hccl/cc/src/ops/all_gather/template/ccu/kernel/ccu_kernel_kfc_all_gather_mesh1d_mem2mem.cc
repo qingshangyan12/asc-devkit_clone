@@ -16,6 +16,8 @@ constexpr int AG_M2M_TOKEN_XN_ID = 2;
 constexpr int AG_M2M_CKE_IDX = 0;
 constexpr int AG_M2M_POST_SYNC_ID = 3;
 constexpr uint32_t AG_M2M_BITS_PER_EVENT = 16;
+constexpr uint32_t AG_M2M_LOCAL_COPY_PARALLEL_NUM = 8;
+constexpr uint32_t AG_M2M_LOCAL_COPY_SLICE_SIZE = LOCAL_COPY_MS_PER_LOOP * CCU_MS_SIZE;
 constexpr uint16_t AG_M2M_FULL_EVENT_MASK = static_cast<uint16_t>(0xFFFFU);
 
 struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
@@ -35,13 +37,12 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable normalSliceSize;
     ccu::Variable lastSliceSize;
     ccu::Variable isInputOutputEqual;
-    // GroupCopy uses goSize to describe its chunk loop. LocalCopy ignores
-    // these four variables.
+    // GroupCopy uses goSize to describe its chunk loop.
     GroupOpSizeVars goSize;
     ccu::LocalAddr srcLocCopy;
     ccu::LocalAddr localDst;
     std::vector<ccu::Event> events;
-    ccu::Event localCopyEvent;
+    ccu::Array<ccu::Event> localCopyEvents{AG_M2M_LOCAL_COPY_PARALLEL_NUM};
 
     ccu::Variable constVar1;
     ccu::Variable repeatTimeFlag;
@@ -196,7 +197,93 @@ static CcuResult DoAllGatherWait(KfcAllGatherMesh1DMem2MemContext& ctx, uint32_t
     return CCU_SUCCESS;
 }
 
-static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, bool useGroupCopy)
+// Local memory-to-memory copy: no intermediate CcuBuffer is required.
+static CcuResult LocalGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
+{
+    CCU_IF(ctx.goSize.addrOffset != 0)
+    {
+        ccu::Variable sliceSize;
+        ccu::Variable loopParam;
+        sliceSize = AG_M2M_LOCAL_COPY_SLICE_SIZE;
+        loopParam = GetLoopParam(0, AG_M2M_LOCAL_COPY_SLICE_SIZE * AG_M2M_LOCAL_COPY_PARALLEL_NUM, 0);
+        loopParam += ctx.goSize.loopParam;
+        ccu::Func body([&]() {
+            CCU_THROW_IF_FAILED(
+                ccu::LocalCopy(ctx.localDst, ctx.srcLocCopy, sliceSize, ctx.localCopyEvents[0], 1),
+                "LocalGroupCopy: LocalCopy failed");
+            CCU_THROW_IF_FAILED(ccu::EventWait(ctx.localCopyEvents[0], 1), "LocalGroupCopy: EventWait failed");
+        });
+        ccu::Loop loop(loopParam, body);
+        ccu::Variable parallelCfg;
+        ccu::Variable offsetCfg;
+        // One Loop plus seven clones gives eight concurrent instances.
+        // maxLoopNum reserves capacity; parallelCfg determines concurrency.
+        parallelCfg = GetParallelParam(AG_M2M_LOCAL_COPY_PARALLEL_NUM - 1, 0, 1);
+        offsetCfg = GetOffsetParam(AG_M2M_LOCAL_COPY_SLICE_SIZE, 0, 1);
+        ccu::LoopGroup group(parallelCfg, offsetCfg, AG_M2M_LOCAL_COPY_PARALLEL_NUM, {loop});
+    }
+
+    CCU_IF(ctx.goSize.parallelParam != 0)
+    {
+        ccu::LocalAddr src;
+        ccu::LocalAddr dst;
+        src = ctx.srcLocCopy;
+        dst = ctx.localDst;
+        src.addr += ctx.goSize.addrOffset;
+        dst.addr += ctx.goSize.addrOffset;
+        ccu::Variable singleLoop;
+        singleLoop = 0U;
+        // CalGoSize emits one Loop for whole slices only or a lone residual;
+        // it emits two Loops for a residual followed by whole slices.
+        CCU_IF(ctx.goSize.residual == AG_M2M_LOCAL_COPY_SLICE_SIZE) { singleLoop = 1U; }
+        CCU_IF(ctx.goSize.parallelParam == GetParallelParam(0, 0, 1)) { singleLoop = 1U; }
+        ccu::Variable loopParam;
+        loopParam = GetLoopParam(0, 0, 1);
+        ccu::Variable offsetCfg;
+        offsetCfg = GetOffsetParam(AG_M2M_LOCAL_COPY_SLICE_SIZE, 0, 1);
+        CCU_IF(singleLoop == 1U)
+        {
+            ccu::Func body([&]() {
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(dst, src, ctx.goSize.residual, ctx.localCopyEvents[0], 1),
+                    "LocalGroupCopy: LocalCopy failed");
+                CCU_THROW_IF_FAILED(ccu::EventWait(ctx.localCopyEvents[0], 1), "LocalGroupCopy: EventWait failed");
+            });
+            ccu::Loop loop(loopParam, body);
+            ccu::LoopGroup group(ctx.goSize.parallelParam, offsetCfg, AG_M2M_LOCAL_COPY_PARALLEL_NUM, {loop});
+        }
+        CCU_IF(singleLoop == 0U)
+        {
+            ccu::LocalAddr fullSrc;
+            ccu::LocalAddr fullDst;
+            fullSrc = src;
+            fullDst = dst;
+            fullSrc.addr += ctx.goSize.residual;
+            fullDst.addr += ctx.goSize.residual;
+            ccu::Variable fullSize;
+            fullSize = AG_M2M_LOCAL_COPY_SLICE_SIZE;
+            ccu::Func residualBody([&]() {
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(dst, src, ctx.goSize.residual, ctx.localCopyEvents[0], 1),
+                    "LocalGroupCopy: LocalCopy failed");
+                CCU_THROW_IF_FAILED(ccu::EventWait(ctx.localCopyEvents[0], 1), "LocalGroupCopy: EventWait failed");
+            });
+            ccu::Func fullBody([&]() {
+                CCU_THROW_IF_FAILED(
+                    ccu::LocalCopy(fullDst, fullSrc, fullSize, ctx.localCopyEvents[1], 1),
+                    "LocalGroupCopy: LocalCopy failed");
+                CCU_THROW_IF_FAILED(ccu::EventWait(ctx.localCopyEvents[1], 1), "LocalGroupCopy: EventWait failed");
+            });
+            ccu::Loop residualLoop(loopParam, residualBody);
+            ccu::Loop fullLoop(loopParam, fullBody);
+            ccu::LoopGroup group(
+                ctx.goSize.parallelParam, offsetCfg, AG_M2M_LOCAL_COPY_PARALLEL_NUM, {residualLoop, fullLoop});
+        }
+    }
+    return CCU_SUCCESS;
+}
+
+static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_IF(ctx.isInputOutputEqual == 0)
     {
@@ -209,12 +296,7 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, boo
                     ctx.localDst.addr += ctx.outputRepeatStride;
                     ctx.srcLocCopy.addr += ctx.inputRepeatStride;
                 }
-                if (useGroupCopy) {
-                    CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
-                } else {
-                    CCU_CHK_RET(ccu::LocalCopy(ctx.localDst, ctx.srcLocCopy, ctx.sliceSize, ctx.localCopyEvent, 1));
-                    CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
-                }
+                CCU_CHK_RET(LocalGroupCopy(ctx));
                 ctx.repeatTimeFlag = 1;
             }
         }
@@ -222,7 +304,7 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, boo
     return CCU_SUCCESS;
 }
 
-static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool useGroupCopy)
+static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_CHK_RET(InitAllGatherAddr(ctx));
     ctx.repeatTimeFlag = 0;
@@ -256,7 +338,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool u
         }
 
         // Phase 2: copy this rank's slice locally while remote writes are in flight.
-        CCU_CHK_RET(DoAllGatherGroupCopy(ctx, useGroupCopy));
+        CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
 
         // Phase 3: wait before the corresponding event group is reused by
         // the next batch.
@@ -306,7 +388,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
 
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, true)); }
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
@@ -354,7 +436,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
         part0GoSize2, part0GoSize3, zero, phase0RepeatNumInv, zero, zero, part0Size, zero));
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = part0Size;
-    CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
+    CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
 
     // Both missions must finish stage 0 before either reads its stage-0 output.
@@ -371,7 +453,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
         part1Size, one));
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = part1Size;
-    CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
+    CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
