@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "ccu_print.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -299,6 +300,7 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     uint32_t rankIdxLevel1, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
     const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
 {
+    CCU_PRINTF("[AG_PARALLEL][NHR] enter, part1Size=%v", part1Size);
     KfcAllGatherNhrContext ctx;
     ctx.channels = channels;
     ctx.channelCount = channelCount;

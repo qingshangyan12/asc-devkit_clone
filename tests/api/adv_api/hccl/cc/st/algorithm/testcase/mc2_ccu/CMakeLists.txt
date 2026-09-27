@@ -82,6 +82,7 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/template_utils.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_kernel_alg_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_kernel_utils.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_print.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/channel/channel.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/channel/channel_request.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/topo/topo.cc
@@ -105,6 +106,7 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
 add_executable(
     ${HCCL_CCU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_print_testcase.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/all_to_all_v_testcase.cpp
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/ccu_all_to_all_v_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_V_DIR}/ccu_all_to_all_v.cc
