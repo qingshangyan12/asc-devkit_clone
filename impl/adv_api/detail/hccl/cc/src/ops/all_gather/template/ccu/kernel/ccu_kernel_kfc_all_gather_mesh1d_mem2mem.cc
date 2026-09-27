@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
+#include "ccu_print.h"
 
 namespace mc2_ops_hccl {
 
@@ -35,13 +36,10 @@ struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     ccu::Variable normalSliceSize;
     ccu::Variable lastSliceSize;
     ccu::Variable isInputOutputEqual;
-    // GroupCopy uses goSize to describe its chunk loop. LocalCopy ignores
-    // these four variables.
     GroupOpSizeVars goSize;
     ccu::LocalAddr srcLocCopy;
     ccu::LocalAddr localDst;
     std::vector<ccu::Event> events;
-    ccu::Event localCopyEvent;
 
     ccu::Variable constVar1;
     ccu::Variable repeatTimeFlag;
@@ -196,7 +194,7 @@ static CcuResult DoAllGatherWait(KfcAllGatherMesh1DMem2MemContext& ctx, uint32_t
     return CCU_SUCCESS;
 }
 
-static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, bool useGroupCopy)
+static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_IF(ctx.isInputOutputEqual == 0)
     {
@@ -209,12 +207,14 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, boo
                     ctx.localDst.addr += ctx.outputRepeatStride;
                     ctx.srcLocCopy.addr += ctx.inputRepeatStride;
                 }
-                if (useGroupCopy) {
-                    CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
-                } else {
-                    CCU_CHK_RET(ccu::LocalCopy(ctx.localDst, ctx.srcLocCopy, ctx.sliceSize, ctx.localCopyEvent, 1));
-                    CCU_CHK_RET(ccu::EventWait(ctx.localCopyEvent, 1));
-                }
+                CCU_PRINTF(
+                    "[AG_PARALLEL][MESH][GROUP_COPY] begin sliceSize=%v repeatNum=%v goSize={%v,%v,%v,%v}",
+                    ctx.sliceSize, ctx.localCopyRepeatNum, ctx.goSize.addrOffset, ctx.goSize.loopParam,
+                    ctx.goSize.parallelParam, ctx.goSize.residual);
+                CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcLocCopy, ctx.goSize));
+                CCU_PRINTF(
+                    "[AG_PARALLEL][MESH][GROUP_COPY] end sliceSize=%v repeatNum=%v", ctx.sliceSize,
+                    ctx.localCopyRepeatNum);
                 ctx.repeatTimeFlag = 1;
             }
         }
@@ -222,7 +222,7 @@ static CcuResult DoAllGatherGroupCopy(KfcAllGatherMesh1DMem2MemContext& ctx, boo
     return CCU_SUCCESS;
 }
 
-static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool useGroupCopy)
+static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
 {
     CCU_CHK_RET(InitAllGatherAddr(ctx));
     ctx.repeatTimeFlag = 0;
@@ -256,7 +256,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool u
         }
 
         // Phase 2: copy this rank's slice locally while remote writes are in flight.
-        CCU_CHK_RET(DoAllGatherGroupCopy(ctx, useGroupCopy));
+        CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
 
         // Phase 3: wait before the corresponding event group is reused by
         // the next batch.
@@ -267,6 +267,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx, bool u
                 CCU_CHK_RET(DoAllGatherWait(ctx, unrollIdx));
             }
         }
+        CCU_PRINTF("[AG_PARALLEL][MESH] remote write wait end");
     }
 
     return CCU_SUCCESS;
@@ -306,7 +307,7 @@ CcuResult CcuKfcAllGatherMesh1DMem2MemKernel(
 
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = (ctx.rankId == ctx.rankSize - 1) ? ctx.lastSliceSize : ctx.normalSliceSize;
-    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, true)); }
+    CCU_IF(ctx.sliceSize != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
@@ -354,14 +355,17 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
         part0GoSize2, part0GoSize3, zero, phase0RepeatNumInv, zero, zero, part0Size, zero));
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = part0Size;
-    CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
+    CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
+    CCU_PRINTF("[AG_PARALLEL][MESH] stage0 post sync end");
 
     // Both missions must finish stage 0 before either reads its stage-0 output.
     CCU_CHK_RET(ccu::Store(meshPhaseDoneAddr, one));
+    CCU_PRINTF("[AG_PARALLEL][MESH] mesh phase signal stored");
     ccu::Variable nhrDone;
     nhrDone = 0U;
     CCU_WHILE(nhrDone != 1U) { CCU_CHK_RET(ccu::Load(nhrPhaseDoneAddr, nhrDone)); }
+    CCU_PRINTF("[AG_PARALLEL][MESH] nhr phase wait end");
 
     // Stage 1: Mesh propagates part1 (already gathered by NHR) across all
     // level-1 groups. Input and output are the same gathered output buffer.
@@ -371,7 +375,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
         part1Size, one));
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = part1Size;
-    CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
+    CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
     return CCU_SUCCESS;
 }
