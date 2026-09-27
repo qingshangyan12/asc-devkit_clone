@@ -9,6 +9,7 @@
  */
 
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "ccu_print.h"
 
 namespace mc2_ops_hccl {
 namespace {
@@ -18,6 +19,29 @@ constexpr uint16_t NHR_POST_SYNC_BIT = 1U << 3U;
 constexpr uint16_t NHR_STEP_PRE_SYNC_BIT = 1U << 4U;
 constexpr uint16_t NHR_STEP_POST_SYNC_BIT = 1U << 5U;
 constexpr uint16_t NHR_CKE_IDX = 0U;
+
+enum class ParallelNhrCheckpoint : uint32_t {
+    ENTER = 0,
+    STAGE0_ARGS_LOADED = 10,
+    STAGE0_PRE_SYNC_DONE = 11,
+    STAGE0_RUN_DONE = 12,
+    STAGE0_POST_SYNC_DONE = 13,
+    NHR_PHASE_DONE = 20,
+    WAIT_MESH_BEGIN = 21,
+    WAIT_MESH_END = 22,
+    STAGE1_ARGS_LOADED = 30,
+    STAGE1_PRE_SYNC_DONE = 31,
+    STAGE1_RUN_DONE = 32,
+    STAGE1_POST_SYNC_DONE = 33,
+};
+
+CcuResult TraceParallelNhr(ParallelNhrCheckpoint checkpoint, const ccu::Variable& value0, const ccu::Variable& value1)
+{
+    ccu::Variable checkpointValue;
+    checkpointValue = static_cast<uint32_t>(checkpoint);
+    CCU_PRINTF("[AG_PARALLEL][NHR] checkpoint=%v value0=%v value1=%v", checkpointValue, value0, value1);
+    return CCU_SUCCESS;
+}
 
 struct KfcAllGatherNhrContext : CcuKernelCtxBase {
     const ChannelHandle* channels = nullptr;
@@ -327,29 +351,41 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     phase0Output += part1Offset;
     phase1RepeatNumInv = UINT64_MAX - rankSizeLevel0;
     phase0RepeatNumInv = UINT64_MAX - 1U;
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::ENTER, part0Size, part1Size));
 
     // Stage 0: NHR gathers part1 along the level-1 (CLOS) dimension.
     CCU_CHK_RET(LoadNhrArgs(
         ctx, phase0Input, phase0Output, tokenInfo, part1Size, part1SliceSizePerJetty, part1LastSliceSizePerJetty,
         phase0RepeatNumInv, zero, level1Stride, zero, zero, zero, part1GoSize0, part1GoSize1, part1GoSize2,
         part1GoSize3));
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::STAGE0_ARGS_LOADED, phase0Input, phase0Output));
     CCU_CHK_RET(PreSync(ctx));
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::STAGE0_PRE_SYNC_DONE, part1Size, level1Stride));
     CCU_IF(part1Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::STAGE0_RUN_DONE, part1Size, level1Stride));
     CCU_CHK_RET(PostSync(ctx));
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::STAGE0_POST_SYNC_DONE, part1Size, level1Stride));
 
     CCU_CHK_RET(ccu::Store(nhrPhaseDoneAddr, one));
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::NHR_PHASE_DONE, nhrPhaseDoneAddr, one));
     ccu::Variable meshDone;
     meshDone = 0U;
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::WAIT_MESH_BEGIN, meshPhaseDoneAddr, meshDone));
     CCU_WHILE(meshDone != 1U) { CCU_CHK_RET(ccu::Load(meshPhaseDoneAddr, meshDone)); }
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::WAIT_MESH_END, meshPhaseDoneAddr, meshDone));
 
     // Stage 1: NHR propagates part0, which stage-0 Mesh has already gathered.
     CCU_CHK_RET(LoadNhrArgs(
         ctx, outputBase, outputBase, tokenInfo, part0Size, part0SliceSizePerJetty, part0LastSliceSizePerJetty,
         phase1RepeatNumInv, level1Stride, level1Stride, outputStride, outputStride, one, part0GoSize0, part0GoSize1,
         part0GoSize2, part0GoSize3));
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::STAGE1_ARGS_LOADED, outputBase, part0Size));
     CCU_CHK_RET(PreSync(ctx));
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::STAGE1_PRE_SYNC_DONE, part0Size, level1Stride));
     CCU_IF(part0Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::STAGE1_RUN_DONE, part0Size, level1Stride));
     CCU_CHK_RET(PostSync(ctx));
+    CCU_CHK_RET(TraceParallelNhr(ParallelNhrCheckpoint::STAGE1_POST_SYNC_DONE, part0Size, level1Stride));
     return CCU_SUCCESS;
 }
 
