@@ -8,7 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
-#include "ccu_print.h"
 
 namespace mc2_ops_hccl {
 
@@ -18,29 +17,6 @@ constexpr int AG_M2M_CKE_IDX = 0;
 constexpr int AG_M2M_POST_SYNC_ID = 3;
 constexpr uint32_t AG_M2M_BITS_PER_EVENT = 16;
 constexpr uint16_t AG_M2M_FULL_EVENT_MASK = static_cast<uint16_t>(0xFFFFU);
-
-enum class ParallelMeshCheckpoint : uint32_t {
-    ENTER = 0,
-    STAGE0_ARGS_LOADED = 10,
-    STAGE0_PRE_SYNC_DONE = 11,
-    STAGE0_RUN_DONE = 12,
-    STAGE0_POST_SYNC_DONE = 13,
-    MESH_PHASE_DONE = 20,
-    WAIT_NHR_BEGIN = 21,
-    WAIT_NHR_END = 22,
-    STAGE1_ARGS_LOADED = 30,
-    STAGE1_PRE_SYNC_DONE = 31,
-    STAGE1_RUN_DONE = 32,
-    STAGE1_POST_SYNC_DONE = 33,
-};
-
-CcuResult TraceParallelMesh(ParallelMeshCheckpoint checkpoint, const ccu::Variable& value0, const ccu::Variable& value1)
-{
-    ccu::Variable checkpointValue;
-    checkpointValue = static_cast<uint32_t>(checkpoint);
-    CCU_PRINTF("[AG_PARALLEL][MESH] checkpoint=%v value0=%v value1=%v", checkpointValue, value0, value1);
-    return CCU_SUCCESS;
-}
 
 struct KfcAllGatherMesh1DMem2MemContext : CcuKernelCtxBase {
     const ChannelHandle* channels{nullptr};
@@ -371,29 +347,21 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     phase1RepeatNumInv = UINT64_MAX - rankSizeLevel1;
     phase0RepeatNumInv = UINT64_MAX - 1U;
     AddVariableNTimes(phase1RepeatStride, outputStride, rankSizeLevel0);
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::ENTER, part0Size, part1Size));
 
     // Stage 0: Mesh gathers part0 inside each level-0 group.
     CCU_CHK_RET(LoadArgs(
         ctx, inputBase, phase0Output, tokenInfo, phase0OutputOffset, part0Size, part0GoSize0, part0GoSize1,
         part0GoSize2, part0GoSize3, zero, phase0RepeatNumInv, zero, zero, part0Size, zero));
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::STAGE0_ARGS_LOADED, phase0Output, phase0OutputOffset));
     CCU_CHK_RET(PreSync(ctx));
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::STAGE0_PRE_SYNC_DONE, part0Size, zero));
     ctx.sliceSize = part0Size;
     CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::STAGE0_RUN_DONE, part0Size, zero));
     CCU_CHK_RET(PostSync(ctx));
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::STAGE0_POST_SYNC_DONE, part0Size, zero));
 
     // Both missions must finish stage 0 before either reads its stage-0 output.
     CCU_CHK_RET(ccu::Store(meshPhaseDoneAddr, one));
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::MESH_PHASE_DONE, meshPhaseDoneAddr, one));
     ccu::Variable nhrDone;
     nhrDone = 0U;
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::WAIT_NHR_BEGIN, nhrPhaseDoneAddr, nhrDone));
     CCU_WHILE(nhrDone != 1U) { CCU_CHK_RET(ccu::Load(nhrPhaseDoneAddr, nhrDone)); }
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::WAIT_NHR_END, nhrPhaseDoneAddr, nhrDone));
 
     // Stage 1: Mesh propagates part1 (already gathered by NHR) across all
     // level-1 groups. Input and output are the same gathered output buffer.
@@ -401,14 +369,10 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
         ctx, phase1Buffer, phase1Buffer, tokenInfo, phase1RankOffset, part1Size, part1GoSize0, part1GoSize1,
         part1GoSize2, part1GoSize3, phase1RankOffset, phase1RepeatNumInv, phase1RepeatStride, phase1RepeatStride,
         part1Size, one));
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::STAGE1_ARGS_LOADED, phase1Buffer, phase1RankOffset));
     CCU_CHK_RET(PreSync(ctx));
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::STAGE1_PRE_SYNC_DONE, part1Size, zero));
     ctx.sliceSize = part1Size;
     CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::STAGE1_RUN_DONE, part1Size, zero));
     CCU_CHK_RET(PostSync(ctx));
-    CCU_CHK_RET(TraceParallelMesh(ParallelMeshCheckpoint::STAGE1_POST_SYNC_DONE, part1Size, zero));
     return CCU_SUCCESS;
 }
 
