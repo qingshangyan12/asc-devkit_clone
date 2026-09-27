@@ -267,6 +267,7 @@ static CcuResult DoRepeatAllGather(KfcAllGatherMesh1DMem2MemContext& ctx)
                 CCU_CHK_RET(DoAllGatherWait(ctx, unrollIdx));
             }
         }
+        CCU_PRINTF("[AG_PARALLEL][MESH] remote write wait end");
     }
 
     return CCU_SUCCESS;
@@ -356,12 +357,15 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     ctx.sliceSize = part0Size;
     CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
+    CCU_PRINTF("[AG_PARALLEL][MESH] stage0 post sync end");
 
     // Both missions must finish stage 0 before either reads its stage-0 output.
     CCU_CHK_RET(ccu::Store(meshPhaseDoneAddr, one));
+    CCU_PRINTF("[AG_PARALLEL][MESH] mesh phase signal stored");
     ccu::Variable nhrDone;
     nhrDone = 0U;
     CCU_WHILE(nhrDone != 1U) { CCU_CHK_RET(ccu::Load(nhrPhaseDoneAddr, nhrDone)); }
+    CCU_PRINTF("[AG_PARALLEL][MESH] nhr phase wait end");
 
     // Stage 1: Mesh propagates part1 (already gathered by NHR) across all
     // level-1 groups. Input and output are the same gathered output buffer.
