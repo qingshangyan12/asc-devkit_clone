@@ -31,7 +31,7 @@ enable_exception_dump(kernel_name)
 |---------|--------------|
 | Ascend 910B4 | >= CANN 9.2.0 (tested baseline) |
 
-Exception callback registration relies on the public interfaces `aclrtExceptionInfoCallbackRegister` / `aclrtExceptionInfoCallbackUnregister` (older CANN versions only provide the deprecated `aclrtSetExceptionInfoCallback` and are not supported); other product and CANN combinations must first confirm interface availability via `scripts/check_env.sh` and be re-verified.
+Exception callback registration relies on the public interfaces `aclrtExceptionInfoCallbackRegister` / `aclrtExceptionInfoCallbackUnregister` (older CANN versions only provide the deprecated `aclrtSetExceptionInfoCallback` and are not supported); other product and CANN combinations must first confirm interface availability via `scripts/setup.sh check` and be re-verified.
 
 End-to-end cases support **physical NPU only** (CPU / simulator modes are not supported); the exception scope covers AICore task failures (the chain does not differentiate exception types), while AICPU operator exceptions, CPU_DEBUG, and unified graph-mode exception collection are out of scope.
 
@@ -51,17 +51,14 @@ End-to-end cases support **physical NPU only** (CPU / simulator modes are not su
 │   │   ├── test_public_dump.py                 //   test entry (scene1/scene2/baseline/all)
 │   │   └── patches                             //   build adaptation patches (unrelated to the dump capability)
 │   ├── scripts
-│   │   ├── check_env.sh                        // environment check (including new callback API availability)
-│   │   ├── build_callback.sh                   // compile the callback library + nm symbol check
-│   │   ├── build_ifa.sh                        // build & install the external IFA wheel (zero operator change)
-│   │   ├── run.sh                              // case execution entry
-│   │   └── clean.sh                            // clean artifacts of the current round
+│   │   ├── setup.sh                            // environment check, callback build, external IFA wheel build
+│   │   └── run.sh                              // scenarios, full regression, artifact cleanup
 │   ├── CMakeLists.txt                          // build project file (callback library)
 │   ├── README.md                               // sample documentation (Chinese)
 │   └── README_en.md                            // sample documentation (English)
 ```
 
-Tested baseline: Ascend 910B4 + CANN 9.2.0; Python 3.11 + torch + torch_npu + the ascend_ops wheel (built from a fixed ops-transformer commit, baseline `ecfc11431`, via `scripts/build_ifa.sh`). Static checks only (syntax / callback library compilation) do not require an NPU.
+Tested baseline: Ascend 910B4 + CANN 9.2.0; Python 3.11 + torch + torch_npu + the ascend_ops wheel (built from a fixed ops-transformer commit, baseline `ecfc11431`, via `scripts/setup.sh ifa`). Static checks only (syntax / callback library compilation) do not require an NPU.
 
 ## Usage
 
@@ -69,19 +66,20 @@ Tested baseline: Ascend 910B4 + CANN 9.2.0; Python 3.11 + torch + torch_npu + th
 # 1. Environment preparation (run each time you enter the environment)
 source /usr/local/Ascend/ascend-toolkit/set_env.sh       # set ASCEND_HOME_PATH / headers / library paths
 export NPU_SOC_VERSION=ascend910_93                      # the build system matches <op>/<SOC>/ directories
-./scripts/check_env.sh                                   # CANN version, new callback API, NPU, Python stack
+./scripts/setup.sh check                                 # callback API, NPU, Python stack
 
 # 2. Compile the callback library (mandatory in a new environment / after a CANN upgrade; the .so is not committed)
-./scripts/build_callback.sh
+./scripts/setup.sh callback
 #   Expected: nm -D exports exactly AddInputInfo / ClearInputInfo / RegisterPublicExceptionDump
 
 # 3. Build and install the external IFA wheel (before running end-to-end cases; zero operator change)
 export OPS_TRANSFORMER_ROOT=<ops-transformer repository root>
-./scripts/build_ifa.sh
+./scripts/setup.sh ifa
 
-# 4. Run the cases (artifacts are written under test/; exit code 2 is the expected success path of injection scenarios)
+# 4. Run cases (artifacts are written under test/; run.sh accepts injected exit code 2 and returns 0)
 ./scripts/run.sh scene1        # block-table corruption injection -> exception callback dump
 ./scripts/run.sh full          # full regression: scene1 + verify + parse + all + baseline
+./scripts/run.sh clean         # remove dumps and CANN crash logs
 ```
 
 Offline verification can also run standalone: `python3 python/verify_dump.py` (bit-exact verification of dumped data) and `python3 python/parse_tiling.py` (args pointer-region and tiling parsing). The 8-input args slot table (ptrIndex) of the IFA cases is `INPUT_PTR_INDEX` in `python/ifa_exception_dump.py`; the tiling is inlined in the args region starting at offset 256.
@@ -139,22 +137,22 @@ The callback library (`runtime/exception_dump_public.cpp`) is a pure plug-in imp
 
 ## Execution Notes (Read Before Automating Verdicts)
 
-1. **Exit-code semantics**: in injection scenarios the script ends with exit code 2 after the kernel exception is caught — this is the **expected success path**; the baseline ends normally with 0. Automated gating must be based on logs and dump artifacts, not exit codes.
+1. **Exit-code semantics**: after a kernel exception is caught, `test_public_dump.py` exits with 2; `run.sh` accepts only that code for an injection scenario and returns 0 itself. An injection that exits with 0 is treated as a failure. The baseline exits normally with 0. End-to-end results also require callback logs and dump artifacts.
 2. **verify's reference is pinned to scene1**: `verify_dump.py` only back-fills `block_table[0,0]=0x7FFFFFFF` and verifies the latest `dev*` directory by default. To verify scene2 artifacts, pass the directory explicitly and manually check `actual_seq_kvlen[0]=0x7FFFFFFF`.
 3. **Run scenarios in separate processes**: after an AICore error, the device stream state is not restored, and subsequent launches in the same process fail host-side (observed as 507057, ERR00100, etc., varying with the CANN version; exceptions in later segments of `all` mode are this phenomenon, not false callback triggers). Run scene1/baseline in separate processes; verifying per-binary takeover is the exception and uses `all` mode in a single process, judged by the "double dump by both callbacks" criterion; host-side errors in its trailing baseline are not evidence for the baseline scenario.
 4. **Double dump by two callbacks**: after the per-binary chain is automatically armed, the same exception may be dumped once each by global-cb and binary-cb (identical content, distinguished by timestamp directories); this is expected.
-5. **Artifact directory is script-relative**: run `./scripts/clean.sh` before re-running; the baseline "zero artifacts" criterion is **no new `dev*_ts*` directories in the current round** (compare timestamps), not an empty directory.
+5. **Artifact directory is script-relative**: run `./scripts/run.sh clean` before re-running; the baseline "zero artifacts" criterion is **no new `dev*_ts*` directories in the current round** (compare timestamps), not an empty directory.
 6. **`extra-info/` directory (CANN crash logs)**: CANN generates it in the CWD on AICore errors; it is a normal by-product, not a dump deliverable; when generated by root inside a container, deletion from the host may fail due to permissions and must be done inside the container.
-7. **The .so is environment-bound**: the `.so` under `runtime/` is a build artifact and not committed; in a new environment or after a CANN upgrade, `scripts/build_callback.sh` must be re-run.
+7. **The .so is environment-bound**: the `.so` under `runtime/` is a build artifact and not committed; in a new environment or after a CANN upgrade, `scripts/setup.sh callback` must be re-run.
 8. **Exception-code layers**: the device-side callback `retcode=0x7bc87` and the Python-side `error code 507057` are error representations of different layers and are not converted numerically; exception codes may change across CANN versions — **gate on callback triggering (kernel-name match) and whether the dump lands on disk**.
 
 ## CANN Version Upgrade Re-check List
 
 | # | Re-check item | Reason | Action |
 |---|---------------|--------|--------|
-| 1 | **The callback .so must be recompiled** | The .so links against the old CANN libraries; the ABI may be incompatible | Run `scripts/build_callback.sh` before running the cases |
+| 1 | **The callback .so must be recompiled** | The .so links against the old CANN libraries; the ABI may be incompatible | Run `scripts/setup.sh callback` before running the cases |
 | 2 | **Args layout table / tiling offset** | Changes in the launch parameter order or `BaseParams` field order shift ptrIndex/tiling parsing wholesale | After running scene1, compare the callback probe log `probe args[N]` with the printed `data_ptr()`; recalibrate the layout table if inconsistent |
 | 3 | **Kernel mangled-name matching** | Operator renames / template-argument changes may break the match | The log line `Kernel name mismatch (got=..., expected=...)` is directly diagnostic; on mismatch, update the registered kernel name |
-| 4 | **Callback registration API availability** | The sample depends on `aclrtExceptionInfoCallbackRegister`/`Unregister`; older versions only provide the deprecated `aclrtSetExceptionInfoCallback` | `scripts/check_env.sh` inspects the header automatically; on undefined-symbol errors during build/registration, confirm interface availability with the CANN side |
+| 4 | **Callback registration API availability** | The sample depends on `aclrtExceptionInfoCallbackRegister`/`Unregister`; older versions only provide the deprecated `aclrtSetExceptionInfoCallback` | `scripts/setup.sh check` inspects the header automatically; on undefined-symbol errors during build/registration, confirm interface availability with the CANN side |
 | 5 | **Exception-triggering behavior itself** | Fault injection relies on out-of-bounds access being trapped by hardware; if a new version front-loads validation, scene1 may no longer trigger an AICore error | This is an expected behavior change; record it. Capability validity is judged by the "exception occurs -> dump complete" chain |
 | 6 | **Exception-code values** | 0x7bc87 / 507057 are measured values and may differ across versions | Gate on callback triggering (kernel-name match) and dump landing, not on exception-code values |

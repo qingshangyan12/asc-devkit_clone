@@ -31,7 +31,7 @@ enable_exception_dump(kernel_name)
 |------|-------------|
 | Ascend 910B4 | >= CANN 9.2.0（实测基线） |
 
-异常回调注册依赖公开接口 `aclrtExceptionInfoCallbackRegister` / `aclrtExceptionInfoCallbackUnregister`（旧 CANN 仅有已废弃的 `aclrtSetExceptionInfoCallback`，不支持本样例）；其他产品与 CANN 组合需先经 `scripts/check_env.sh` 确认接口存在性并重新回归。
+异常回调注册依赖公开接口 `aclrtExceptionInfoCallbackRegister` / `aclrtExceptionInfoCallbackUnregister`（旧 CANN 仅有已废弃的 `aclrtSetExceptionInfoCallback`，不支持本样例）；其他产品与 CANN 组合需先经 `scripts/setup.sh check` 确认接口存在性并重新回归。
 
 端到端用例仅支持 **NPU 实机**运行（CPU / sim 仿真模式不支持）；异常范围覆盖 AICore 任务失败（链路不区分异常类型），AICPU 算子异常、CPU_DEBUG、图模式统一异常采集不在覆盖范围内。
 
@@ -51,17 +51,14 @@ enable_exception_dump(kernel_name)
 │   │   ├── test_public_dump.py                 //   用例入口（scene1/scene2/baseline/all）
 │   │   └── patches                             //   构建适配补丁（与 dump 能力无关）
 │   ├── scripts
-│   │   ├── check_env.sh                        // 环境检查（含新回调接口存在性）
-│   │   ├── build_callback.sh                   // 编译回调库 + nm 符号校验
-│   │   ├── build_ifa.sh                        // 外部仓 IFA wheel 构建安装（算子零改动）
-│   │   ├── run.sh                              // 用例执行入口
-│   │   └── clean.sh                            // 清理本轮产物
+│   │   ├── setup.sh                            // 环境检查、回调库编译、外部 IFA wheel 构建
+│   │   └── run.sh                              // 场景执行、完整回归、产物清理
 │   ├── CMakeLists.txt                          // 编译工程文件（回调库）
 │   ├── README.md                               // 样例说明文档
 │   └── README_en.md                            // 样例说明文档（英文）
 ```
 
-环境基线（实测）：Ascend 910B4 + CANN 9.2.0；Python 3.11 + torch + torch_npu + ascend_ops wheel（由 `scripts/build_ifa.sh` 从 ops-transformer 固定 commit 构建，基线 `ecfc11431`）。仅静态检查（语法 / 回调库编译）不依赖 NPU。
+环境基线（实测）：Ascend 910B4 + CANN 9.2.0；Python 3.11 + torch + torch_npu + ascend_ops wheel（由 `scripts/setup.sh ifa` 从 ops-transformer 固定 commit 构建，基线 `ecfc11431`）。仅静态检查（语法 / 回调库编译）不依赖 NPU。
 
 ## 使用方法
 
@@ -69,19 +66,20 @@ enable_exception_dump(kernel_name)
 # 1. 环境准备（每次进入环境先执行）
 source /usr/local/Ascend/ascend-toolkit/set_env.sh       # 设置 ASCEND_HOME_PATH / 头文件 / 库路径
 export NPU_SOC_VERSION=ascend910_93                      # 构建体系按 <op>/<SOC>/ 匹配目录
-./scripts/check_env.sh                                   # CANN 版本、新回调接口、NPU、Python 栈
+./scripts/setup.sh check                                 # 新回调接口、NPU、Python 栈
 
 # 2. 编译回调库（新环境 / CANN 升级后必须重做；产物 .so 不入仓）
-./scripts/build_callback.sh
+./scripts/setup.sh callback
 #   预期：nm -D 恰好导出 AddInputInfo / ClearInputInfo / RegisterPublicExceptionDump
 
 # 3. 构建安装外部 IFA wheel（跑端到端用例前；算子零改动）
 export OPS_TRANSFORMER_ROOT=<ops-transformer 仓根目录>
-./scripts/build_ifa.sh
+./scripts/setup.sh ifa
 
-# 4. 执行用例（在 test/ 产物目录落盘；退出码 2 为注入场景的预期成功路径）
+# 4. 执行用例（在 test/ 产物目录落盘；run.sh 验证注入场景的退出码 2 后返回 0）
 ./scripts/run.sh scene1        # 块表损坏注入 -> 异常回调 dump
 ./scripts/run.sh full          # 完整回归：scene1 + verify + parse + all + baseline
+./scripts/run.sh clean         # 清理 dump 和 CANN 崩溃日志
 ```
 
 离线验证也可单独执行：`python3 python/verify_dump.py`（dump 数据 bit-exact 校验）、`python3 python/parse_tiling.py`（args 指针区与 tiling 解析）。IFA 用例的 8 输入 args 槽位表（ptrIndex）见 `python/ifa_exception_dump.py` 的 `INPUT_PTR_INDEX`，tiling 内联于 args 区 offset 256 起。
@@ -138,22 +136,22 @@ register_input("metadata", metadata, ptr_index=8)
 
 ## 执行注意事项（自动化判定前必读）
 
-1. **退出码语义**：注入场景中 kernel 异常被捕获后脚本以退出码 2 结束——这是**预期成功路径**；baseline 正常结束退出码 0。自动化看护以日志与 dump 产物判定，勿按退出码判失败。
+1. **退出码语义**：注入场景中 kernel 异常被捕获后 `test_public_dump.py` 以退出码 2 结束；`run.sh` 仅将此码判为成功并自身返回 0，未触发异常的退出码 0 会判失败。baseline 正常结束退出码 0。端到端结果还需结合回调日志与 dump 产物判定。
 2. **verify 的比对基准固化 scene1**：`verify_dump.py` 的注入回填只含 `block_table[0,0]=0x7FFFFFFF`，且默认验证最新 `dev*` 目录。验证 scene2 产物需显式传目录参数并人工核对 `actual_seq_kvlen[0]=0x7FFFFFFF`。
 3. **多场景分进程执行**：同进程 AICore error 后设备流状态未恢复，紧接的后续 launch 会在主机侧失败（实测现象有 507057、ERR00100 等，随 CANN 版本而异；`all` 模式下后续场景段的异常属此现象，非回调误触发）。scene1/baseline 建议独立进程执行；验证 per-binary 接管时例外，用 `all` 模式同进程完成，其判定以"双回调双写 dump"为 per-binary 生效判据，末段 baseline 的主机侧错误不作为 baseline 场景的判定依据。
 4. **双回调各 dump 一次**：per-binary 链路自动挂载完成后，同一次异常 global-cb 与 binary-cb 可能各 dump 一次（内容一致，以时间戳目录区分），属预期现象。
-5. **产物目录以脚本目录为基准**：复跑前执行 `./scripts/clean.sh`；baseline 的"零产物"判定标准是**本轮无新增 `dev*_ts*` 目录**（对照时间戳），而非目录为空。
+5. **产物目录以脚本目录为基准**：复跑前执行 `./scripts/run.sh clean`；baseline 的"零产物"判定标准是**本轮无新增 `dev*_ts*` 目录**（对照时间戳），而非目录为空。
 6. **`extra-info/` 目录（CANN 崩溃日志）**：AICore error 时 CANN 在 CWD 自动生成，属正常副产物而非 dump 交付物；docker 内 root 生成时，宿主机删除可能报权限不够，需在容器内处理。
-7. **so 与环境绑定**：`runtime/` 下的 `.so` 为编译产物不入仓，新环境或 CANN 升级后必须重新执行 `scripts/build_callback.sh`。
+7. **so 与环境绑定**：`runtime/` 下的 `.so` 为编译产物不入仓，新环境或 CANN 升级后必须重新执行 `scripts/setup.sh callback`。
 8. **异常码分层**：设备侧回调 `retcode=0x7bc87` 与 Python 侧 `error code 507057` 是不同层的错误表示，不做数值换算；异常码可能随 CANN 版本变化，**以回调触发（kernel 名匹配）与 dump 是否落盘为判定标准**。
 
 ## CANN 版本升级复查清单
 
 | # | 复查项 | 原因 | 动作 |
 |---|--------|------|------|
-| 1 | **回调 so 必须重编译** | so 链接旧版本 CANN 库，ABI 可能不兼容 | 执行 `scripts/build_callback.sh` 后再跑用例 |
+| 1 | **回调 so 必须重编译** | so 链接旧版本 CANN 库，ABI 可能不兼容 | 执行 `scripts/setup.sh callback` 后再跑用例 |
 | 2 | **args 布局表 / tiling 偏移** | launch 形参序或 `BaseParams` 字段序变化会导致 ptrIndex/tiling 解析整体错位 | 跑 scene1 后对照回调探测日志 `probe args[N]` 与脚本打印的 `data_ptr()`；不一致则重新校准布局表 |
 | 3 | **kernel mangled 名匹配** | 算子改名/模板实参变化可能导致失配 | 日志 `Kernel name mismatch (got=..., expected=...)` 直接可判；失配时改注册的 kernel 名 |
-| 4 | **回调注册接口可用性** | 样例依赖 `aclrtExceptionInfoCallbackRegister`/`Unregister`；旧版本仅有已废弃的 `aclrtSetExceptionInfoCallback` | `scripts/check_env.sh` 会自动检查头文件；编译/注册报未定义符号时向 CANN 侧确认接口存在性 |
+| 4 | **回调注册接口可用性** | 样例依赖 `aclrtExceptionInfoCallbackRegister`/`Unregister`；旧版本仅有已废弃的 `aclrtSetExceptionInfoCallback` | `scripts/setup.sh check` 会自动检查头文件；编译/注册报未定义符号时向 CANN 侧确认接口存在性 |
 | 5 | **异常触发行为本身** | 故障注入依赖越界访问被硬件捕获；新版本若校验前置化，scene1 可能不再触发 AICore error | 属预期行为变化，记录即可；能力有效性以"异常发生 -> dump 完整"链路为准 |
 | 6 | **异常码值** | 0x7bc87 / 507057 为实测值，版本间可能不同 | 以回调触发（kernel 名匹配）与 dump 落盘为判定标准，不比对异常码数值 |

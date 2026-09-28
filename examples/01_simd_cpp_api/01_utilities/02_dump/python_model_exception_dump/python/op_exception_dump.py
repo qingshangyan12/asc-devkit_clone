@@ -13,7 +13,7 @@
 """Exception Dump 能力的 Python API：enable_exception_dump / register_input / clear_inputs。
 
 内部经 ctypes 加载回调库（默认 <样例>/runtime/exception_dump_public.so，可用 lib_path
-参数或 EXC_DUMP_LIB 环境变量覆盖），库不存在时先执行 scripts/build_callback.sh。"""
+参数或 EXC_DUMP_LIB 环境变量覆盖），库不存在时先执行 scripts/setup.sh callback。"""
 
 import ctypes
 import os
@@ -39,7 +39,7 @@ def _load_lib(lib_path=None):
     if not os.path.isfile(path):
         raise FileNotFoundError(
             "exception dump 回调库不存在: %s\n"
-            "请先执行 scripts/build_callback.sh 编译回调库，"
+            "请先执行 scripts/setup.sh callback 编译回调库，"
             "或通过 lib_path 参数 / EXC_DUMP_LIB 环境变量指定路径。" % path
         )
     lib = ctypes.CDLL(path)
@@ -58,7 +58,7 @@ def _load_lib(lib_path=None):
         lib.RegisterPublicExceptionDump.restype = ctypes.c_int
     except AttributeError as e:
         raise RuntimeError(
-            "回调库 %s 缺少 C ABI 符号（%s）；请重新执行 scripts/build_callback.sh "
+            "回调库 %s 缺少 C ABI 符号（%s）；请重新执行 scripts/setup.sh callback "
             "编译与本样例配套的回调库。" % (path, e)
         ) from e
     _LIB = lib
