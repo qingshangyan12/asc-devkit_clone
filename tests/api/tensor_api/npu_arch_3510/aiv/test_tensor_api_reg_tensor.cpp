@@ -121,6 +121,37 @@ __simd_vf__ inline void compile_reg_local_tensor_broadcast(__ubuf__ float* src)
     value.with_mask(asc::te::experimental::all_mask<float>());
 }
 
+template <typename TensorDataType, typename IndexDataType, typename DstDataType = TensorDataType>
+__simd_vf__ inline void compile_reg_local_tensor_gather(__ubuf__ TensorDataType* src, vector_bool mask)
+{
+    auto layout = asc::te::make_layout(asc::te::make_shape(64));
+    auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
+    asc::te::experimental::reg_tensor<IndexDataType> index {mask};
+
+    auto value = asc::te::experimental::gather<DstDataType>(src_tensor, asc::te::make_coord(0), index);
+    static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<DstDataType>>);
+
+    auto value_without_coord = asc::te::experimental::gather<DstDataType>(src_tensor, index);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(value_without_coord), asc::te::experimental::reg_tensor<DstDataType>>);
+
+    if constexpr (AscendC::Std::is_same_v<TensorDataType, DstDataType>) {
+        auto inferred_value = asc::te::experimental::gather(src_tensor, asc::te::make_coord(0), index);
+        static_assert(
+            AscendC::Std::is_same_v<decltype(inferred_value), asc::te::experimental::reg_tensor<TensorDataType>>);
+        (void)inferred_value;
+    }
+}
+
+template <typename DataType, typename IndexDataType>
+__simd_vf__ inline void compile_reg_register_gather(vector_bool mask)
+{
+    asc::te::experimental::reg_tensor<DataType> src {mask};
+    asc::te::experimental::reg_tensor<IndexDataType> index {mask};
+    auto value = asc::te::experimental::gather(src, index);
+    static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<DataType>>);
+}
+
 template <asc::te::experimental::store_sideband_mode sideband_mode>
 __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* dst, vector_bool mask)
 {
@@ -171,6 +202,72 @@ __simd_vf__ inline void compile_reg_mask_data_reorder(vector_bool src0, vector_b
     (void)restored;
 }
 
+template <typename SrcType, typename PackedType>
+__simd_vf__ inline void compile_reg_data_pack_unpack(vector_bool mask)
+{
+    asc::te::experimental::reg_tensor<SrcType> src {mask};
+    auto packed_default = asc::te::experimental::pack(src);
+    auto packed_low = asc::te::experimental::pack<asc::te::experimental::high_low_part::low>(src);
+    auto packed_high = asc::te::experimental::pack<asc::te::experimental::high_low_part::high>(src);
+    static_assert(AscendC::Std::is_same_v<decltype(packed_default), asc::te::experimental::reg_tensor<PackedType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(packed_low), asc::te::experimental::reg_tensor<PackedType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(packed_high), asc::te::experimental::reg_tensor<PackedType>>);
+
+    auto unpacked_default = asc::te::experimental::unpack(packed_default);
+    auto unpacked_low = asc::te::experimental::unpack<asc::te::experimental::high_low_part::low>(packed_low);
+    auto unpacked_high = asc::te::experimental::unpack<asc::te::experimental::high_low_part::high>(packed_high);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_default), asc::te::experimental::reg_tensor<SrcType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_low), asc::te::experimental::reg_tensor<SrcType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_high), asc::te::experimental::reg_tensor<SrcType>>);
+}
+
+template <typename SrcType, typename UnpackedType>
+__simd_vf__ inline void compile_reg_data_unpack(vector_bool mask)
+{
+    asc::te::experimental::reg_tensor<SrcType> src {mask};
+    auto unpacked_low = asc::te::experimental::unpack<asc::te::experimental::high_low_part::low>(src);
+    auto unpacked_high = asc::te::experimental::unpack<asc::te::experimental::high_low_part::high>(src);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_low), asc::te::experimental::reg_tensor<UnpackedType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_high), asc::te::experimental::reg_tensor<UnpackedType>>);
+}
+
+__simd_vf__ inline void compile_reg_mask_pack_unpack(vector_bool mask)
+{
+    asc::te::experimental::reg_tensor<bool> src {mask};
+    auto packed_default = asc::te::experimental::pack(src);
+    auto packed_low = asc::te::experimental::pack<asc::te::experimental::high_low_part::low>(src);
+    auto packed_high = asc::te::experimental::pack<asc::te::experimental::high_low_part::high>(src);
+    auto unpacked_default = asc::te::experimental::unpack(packed_default);
+    auto unpacked_low = asc::te::experimental::unpack<asc::te::experimental::high_low_part::low>(packed_low);
+    auto unpacked_high = asc::te::experimental::unpack<asc::te::experimental::high_low_part::high>(packed_high);
+    static_assert(AscendC::Std::is_same_v<decltype(packed_default), asc::te::experimental::reg_tensor<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(packed_low), asc::te::experimental::reg_tensor<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(packed_high), asc::te::experimental::reg_tensor<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_default), asc::te::experimental::reg_tensor<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_low), asc::te::experimental::reg_tensor<bool>>);
+    static_assert(AscendC::Std::is_same_v<decltype(unpacked_high), asc::te::experimental::reg_tensor<bool>>);
+}
+
+template <typename T>
+__simd_vf__ inline void compile_reg_compress(vector_bool mask)
+{
+    asc::te::experimental::reg_tensor<T> src {mask};
+    asc::te::experimental::reg_tensor<bool> select_mask {mask};
+    auto compressed = asc::te::experimental::compress(src, select_mask);
+    static_assert(AscendC::Std::is_same_v<decltype(compressed), asc::te::experimental::reg_tensor<T>>);
+}
+
+template <typename T>
+__simd_vf__ inline void compile_reg_compress_expand(vector_bool mask)
+{
+    asc::te::experimental::reg_tensor<T> src {mask};
+    asc::te::experimental::reg_tensor<bool> select_mask {mask};
+    auto compressed = asc::te::experimental::compress(src, select_mask);
+    auto expanded = asc::te::experimental::expand(compressed, select_mask);
+    static_assert(AscendC::Std::is_same_v<decltype(compressed), asc::te::experimental::reg_tensor<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(expanded), asc::te::experimental::reg_tensor<T>>);
+}
+
 TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
 {
     asc::te::experimental::reg_tensor<float> value {};
@@ -211,6 +308,25 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_broadcast_datablock;
     (void)compile_broadcast_elem2datablock;
 
+    auto compile_gather_ub_b8 = &compile_reg_local_tensor_gather<int8_t, uint16_t>;
+    auto compile_gather_ub_b16 = &compile_reg_local_tensor_gather<half, uint16_t>;
+    auto compile_gather_ub_b16_uint32_index = &compile_reg_local_tensor_gather<half, uint32_t>;
+    auto compile_gather_ub_b32 = &compile_reg_local_tensor_gather<float, uint32_t>;
+    auto compile_gather_ub_widen_s8 = &compile_reg_local_tensor_gather<int8_t, uint16_t, int16_t>;
+    auto compile_gather_ub_widen_u8 = &compile_reg_local_tensor_gather<uint8_t, uint16_t, uint16_t>;
+    auto compile_gather_reg_b8 = &compile_reg_register_gather<int8_t, uint8_t>;
+    auto compile_gather_reg_b16 = &compile_reg_register_gather<half, uint16_t>;
+    auto compile_gather_reg_b32 = &compile_reg_register_gather<uint32_t, uint32_t>;
+    (void)compile_gather_ub_b8;
+    (void)compile_gather_ub_b16;
+    (void)compile_gather_ub_b16_uint32_index;
+    (void)compile_gather_ub_b32;
+    (void)compile_gather_ub_widen_s8;
+    (void)compile_gather_ub_widen_u8;
+    (void)compile_gather_reg_b8;
+    (void)compile_gather_reg_b16;
+    (void)compile_gather_reg_b32;
+
     auto compile_store_direct =
         &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::direct>;
     auto compile_store_1st =
@@ -237,9 +353,27 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     auto compile_reg_mask_data_reorder_b8 = &compile_reg_mask_data_reorder<uint8_t>;
     auto compile_reg_mask_data_reorder_b16 = &compile_reg_mask_data_reorder<half>;
     auto compile_reg_mask_data_reorder_b32 = &compile_reg_mask_data_reorder<float>;
+    auto compile_data_pack_b16 = &compile_reg_data_pack_unpack<uint16_t, uint8_t>;
+    auto compile_data_pack_b32 = &compile_reg_data_pack_unpack<uint32_t, uint16_t>;
+    auto compile_data_unpack_s8 = &compile_reg_data_unpack<int8_t, int16_t>;
+    auto compile_data_unpack_s16 = &compile_reg_data_unpack<int16_t, int32_t>;
+    auto compile_mask_pack_unpack = &compile_reg_mask_pack_unpack;
+    auto compile_compress_float = &compile_reg_compress<float>;
+    auto compile_compress_expand_b8 = &compile_reg_compress_expand<int8_t>;
+    auto compile_compress_expand_b16 = &compile_reg_compress_expand<half>;
+    auto compile_compress_expand_b32 = &compile_reg_compress_expand<uint32_t>;
     (void)compile_reg_mask_data_reorder_b8;
     (void)compile_reg_mask_data_reorder_b16;
     (void)compile_reg_mask_data_reorder_b32;
+    (void)compile_data_pack_b16;
+    (void)compile_data_pack_b32;
+    (void)compile_data_unpack_s8;
+    (void)compile_data_unpack_s16;
+    (void)compile_mask_pack_unpack;
+    (void)compile_compress_float;
+    (void)compile_compress_expand_b8;
+    (void)compile_compress_expand_b16;
+    (void)compile_compress_expand_b32;
 }
 
 } // namespace

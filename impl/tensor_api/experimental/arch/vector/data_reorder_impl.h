@@ -59,6 +59,7 @@ __simd_callee__ inline reg_pair<T> deinterleave(reg_tensor<T> src0, reg_tensor<T
     dst.second.mask = dst.first.mask;
     return dst;
 }
+
 } // namespace experimental
 } // namespace te
 } // namespace asc
