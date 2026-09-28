@@ -352,7 +352,7 @@ REGISTER_EXEC_V2(
     CcuTempAllToAllMesh1DMultiJetty);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLTOALL, CcuSchedAllToAllMesh1DMultiJetty, AlgEngine::CCU, "sole[mesh.multi_channel]",
-    COND_NONE, FLAG_NONE, 0);
+    COND_NONE, FLAG_UBX, 0);
 #endif
 #ifndef AICPU_COMPILE
 REGISTER_EXEC_V2(

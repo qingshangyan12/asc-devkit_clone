@@ -592,6 +592,6 @@ REGISTER_EXEC_V2_MULTI(
     TopoMatchPcieMix, InsTempReduceScatterOmniPipeMesh1D, InsTempReduceScatterOmniPipeNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterPipeLinePcie, AlgEngine::AICPU, "pipeline[mesh,nhr]",
-    COND_NONE, FLAG_NONE, 0);
+    COND_NONE, FLAG_PCIE_MIX, 0);
 
 } // namespace mc2_ops_hccl

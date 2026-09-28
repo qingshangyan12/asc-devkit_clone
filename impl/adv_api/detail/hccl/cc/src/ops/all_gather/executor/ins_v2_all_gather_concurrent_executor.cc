@@ -405,7 +405,7 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
     InsTempAllGatherMesh1D, InsTempAllGatherNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherConcurMeshNHR, AlgEngine::AICPU, "concur[mesh,nhr]", COND_NONE,
-    FLAG_NONE, 0);
+    FLAG_UBX, 0);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
@@ -413,7 +413,7 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
     TopoMatchUBX, CcuTempKfcAllGatherMesh1DMem2Mem, CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherConcurMeshNHRMultiLink, AlgEngine::CCU,
-    "concur[mesh,nhr.multi_channel]", COND_NONE, FLAG_NONE, 0);
+    "concur[mesh,nhr.multi_channel]", COND_NONE, FLAG_UBX, 0);
 #endif
 
 } // namespace mc2_ops_hccl

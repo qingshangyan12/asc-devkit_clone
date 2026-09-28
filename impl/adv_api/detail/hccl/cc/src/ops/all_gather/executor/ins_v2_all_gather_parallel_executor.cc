@@ -597,7 +597,7 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
     TopoMatchUBX, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherParallelMesh1DNHRMultiJetty, AlgEngine::AICPU,
-    "parallel[mesh,nhr.multi_channel]", COND_NONE, FLAG_NONE, 0);
+    "parallel[mesh,nhr.multi_channel]", COND_NONE, FLAG_UBX, 0);
 REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherParallelMesh1DNHRPcie, InsV2AllGatherParallelExecutor,
     TopoMatchPcieMix, InsTempAllGatherMesh1D, InsTempAllGatherNHR);
@@ -610,7 +610,7 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
     TopoMatchUBX, CcuTempKfcAllGatherMesh1DMem2Mem, CcuTempKfcAllGatherNHR1DMultiJettyMem2Mem);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherParallelMeshNHRMultiLink, AlgEngine::CCU,
-    "parallel[mesh,nhr.multi_channel]", COND_NONE, FLAG_NONE, 0);
+    "parallel[mesh,nhr.multi_channel]", COND_NONE, FLAG_UBX, 0);
 #endif
 } // namespace mc2_ops_hccl
 // 算法注册
