@@ -596,6 +596,10 @@ TEST_F(CcuMc2TestSuite, algorithmMap_AllEntries)
     EXPECT_EQ(
         algorithmMap.at("CcuSchedReduceScatterConcurMeshNHRMultiLink"),
         AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink);
+    // AICPU algorithms are dispatched by name through CollAlgExecRegistryV2.
+    // They have no CCU AlgorithmType and must not change this map's size.
+    EXPECT_EQ(algorithmMap.count("InsReduceScatterNHR"), 0U);
+    EXPECT_EQ(algorithmMap.count("AicpuReduceScatterSoleNHRMultiChannel"), 0U);
     EXPECT_EQ(algorithmMap.at("CcuSchedReduceScatterSoleNHR"), AlgorithmType::CcuSchedReduceScatterSoleNHR);
     EXPECT_EQ(algorithmMap.size(), 16U);
 }
