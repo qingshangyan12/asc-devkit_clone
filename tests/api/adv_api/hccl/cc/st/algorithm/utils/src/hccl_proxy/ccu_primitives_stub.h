@@ -47,10 +47,6 @@ public:
     ResourceHandle CreateLoopGroup(
         ResourceHandle parallelCfg, ResourceHandle offsetCfg, uint32_t maxLoopNum,
         const std::vector<ResourceHandle>& loopHandles, const std::vector<ResourceHandle>& loopParamHandles);
-    ResourceHandle CreateLoopGroupV2(
-        ResourceHandle parallelCfg, ResourceHandle offsetCfg, ResourceHandle varOffsetCfg, uint32_t maxLoopNum,
-        const std::vector<ResourceHandle>& loopHandles, const std::vector<ResourceHandle>& loopParamHandles,
-        const std::vector<ResourceHandle>& addrOffsetHandles);
 
     static CompilerContext& Current();
     static void SetCurrent(CompilerContext* context);
@@ -92,21 +88,15 @@ using HcclSim::CcuSt::Condition;
 using HcclSim::CcuSt::ResourceHandle;
 using HcclSim::CcuSt::Result;
 
-enum class ArithmeticOp { ADD, SUB, MUL };
-
 class VariableExpr {
 public:
-    VariableExpr(ResourceHandle lhs, ResourceHandle rhs, ArithmeticOp op = ArithmeticOp::ADD)
-        : lhsHandle(lhs), rhsHandle(rhs), op(op)
-    {}
+    VariableExpr(ResourceHandle lhs, ResourceHandle rhs) : lhsHandle(lhs), rhsHandle(rhs) {}
     ResourceHandle LhsHandle() const { return lhsHandle; }
     ResourceHandle RhsHandle() const { return rhsHandle; }
-    ArithmeticOp Op() const { return op; }
 
 private:
     ResourceHandle lhsHandle{0};
     ResourceHandle rhsHandle{0};
-    ArithmeticOp op{ArithmeticOp::ADD};
 };
 
 class Variable {
@@ -122,8 +112,6 @@ public:
     void operator=(uint64_t immediate) const;
     void operator+=(const Variable& other) const;
     VariableExpr operator+(const Variable& other) const;
-    VariableExpr operator-(const Variable& other) const;
-    VariableExpr operator*(const Variable& other) const;
     Condition operator==(uint64_t immediate) const;
     Condition operator!=(uint64_t immediate) const;
 
@@ -249,11 +237,10 @@ private:
 };
 
 template <typename T>
-T GetResByChannel(ChannelHandle channel, uint32_t varIndex);
+T GetResByChannel(ChannelHandle channel, uint32_t varIndex) = delete;
 
 template <>
 Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t varIndex);
-
 Result LoadArg(Variable variable, uint32_t argId);
 Result Load(Variable address, Variable destination);
 Result Load(Variable address, Array<Variable>& destinations, uint32_t count);
@@ -316,20 +303,15 @@ class Loop {
 public:
     Loop();
     Loop(Variable& loopParam, const Func& func);
-    Loop(Variable& iterNum, Variable& addrOffset, const Func& func);
     Loop(const Loop&) = default;
     ResourceHandle handle{0};
     ResourceHandle loopParamHandle{0};
-    ResourceHandle addrOffsetHandle{0};
 };
 
 class LoopGroup {
 public:
     LoopGroup();
     LoopGroup(Variable& parallelCfg, Variable& offsetCfg, uint32_t maxLoopNum, const std::vector<Loop>& loops);
-    LoopGroup(
-        Variable& parallelCfg, Variable& offsetCfg, Variable& varOffsetCfg, uint32_t maxLoopNum,
-        const std::vector<Loop>& loops);
     ResourceHandle handle{0};
 };
 } // namespace ccu
