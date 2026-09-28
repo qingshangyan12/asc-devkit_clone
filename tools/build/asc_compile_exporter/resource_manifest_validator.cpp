@@ -373,9 +373,14 @@ bool ResourceManifestValidator::ValidateConstants(const Json& constantInfos)
 
 bool ResourceManifestValidator::ValidateObjectOutputs(const Json& outputs)
 {
+    std::set<std::string> outputNames;
     for (const Json& output : outputs) {
         if (!CheckAndLog(output.is_string(), __LINE__, "invalid object output: expected a string") ||
             !ValidateOutputMarker(output.get_ref<const std::string&>())) {
+            return false;
+        }
+        const std::string& value = output.get_ref<const std::string&>();
+        if (!CheckAndLog(outputNames.insert(value).second, __LINE__, "duplicate object output: value=" + value)) {
             return false;
         }
     }

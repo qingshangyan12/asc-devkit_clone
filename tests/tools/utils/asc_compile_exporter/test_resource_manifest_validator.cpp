@@ -313,6 +313,9 @@ TEST_F(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
     ExpectInvalid("object output is not a string", [](Json& manifest) { Object(manifest)["outputs"][0U] = 1U; });
     ExpectInvalid(
         "object output has invalid syntax", [](Json& manifest) { Object(manifest)["outputs"][0U] = "kernel.o"; });
+    ExpectInvalid("object output is duplicated", [](Json& manifest) {
+        Object(manifest)["outputs"] = Json::array({"${output}/kernel.o", "${output}/kernel.o"});
+    });
     ExpectInvalid("object output is not referenced", [](Json& manifest) {
         Object(manifest)["outputs"][0U] = "${output}/other.o";
     });
