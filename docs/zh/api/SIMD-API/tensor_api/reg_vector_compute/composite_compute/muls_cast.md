@@ -83,7 +83,8 @@ src和scalar的数据类型为float，返回值的元素类型为half。
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void muls_cast_example(InputTensor input, OutputTensor output)
 {
-    auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(asc::te::experimental::all_mask<float>());
+    auto mask = asc::te::experimental::update_mask<float>(48);
+    auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
     auto dst = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one, half>(src, 1.5f);
     asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }

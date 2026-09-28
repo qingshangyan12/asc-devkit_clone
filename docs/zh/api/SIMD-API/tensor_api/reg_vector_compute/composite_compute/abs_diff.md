@@ -81,7 +81,7 @@ template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void abs_diff_example(
     InputTensor input0, InputTensor input1, OutputTensor output)
 {
-    auto mask = asc::te::experimental::all_mask<float>();
+    auto mask = asc::te::experimental::update_mask<float>(48);
     auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
     auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0)).with_mask(mask);
     auto dst = asc::te::experimental::abs_diff(src0, src1);
