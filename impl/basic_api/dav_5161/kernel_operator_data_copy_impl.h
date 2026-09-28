@@ -218,7 +218,8 @@ __aicore__ inline void DataCopyL12UBImpl(__ubuf__ T* dst, __cbuf__ T* src, const
     fix_cbuf_to_ubuf((__ubuf__ int8_t*)dst, (__cbuf__ int8_t*)src, xm, xt);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101)
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 template <typename T>
 __aicore__ inline void DataCopyL12UBIntf(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
@@ -226,6 +227,24 @@ __aicore__ inline void DataCopyL12UBIntf(
     DataCopyL12UBImpl((__ubuf__ T*)dstLocal.GetPhyAddr(), (__cbuf__ T*)srcLocal.GetPhyAddr(), intriParams);
 }
 #endif
+
+template <typename T>
+__aicore__ inline void DataCopyUB2L0CIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams,
+    const DataCopyEnhancedParams& enhancedParams)
+{
+    ASCENDC_REPORT_NOT_SUPPORT(false, "DataCopy from UB(CO2) to L0C Buffer(CO1)");
+}
+
+#pragma begin_pipe(V)
+template <typename T>
+__aicore__ inline void DataCopyUB2UBIntf(
+    const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
+{
+    DataCopyUB2UBImpl(
+        (__ubuf__ PrimT<T>*)dstLocal.GetPhyAddr(), (__ubuf__ PrimT<T>*)srcLocal.GetPhyAddr(), intriParams);
+}
+#pragma end_pipe
 
 template <typename T>
 __aicore__ inline void DataCopyL12GMImpl(__gm__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)

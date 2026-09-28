@@ -77,6 +77,26 @@ __aicore__ inline void SetFixpipeNz2ndFlagImpl(uint16_t ndNum, uint16_t srcNdStr
 }
 
 __aicore__ inline void SetFixpipePreQuantFlagImpl(uint64_t config) { set_m_quant_pre(config); }
+
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void FixpipeL0C2UBImpl(__ubuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams)
+{
+    (void)(dst);
+    (void)(src);
+    (void)(intriParams);
+    ASCENDC_REPORT_NOT_SUPPORT(false, "Fixpipe L0C to UB");
+}
+
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void FixpipeL0C2UBImpl(
+    __ubuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams)
+{
+    (void)(dst);
+    (void)(src);
+    (void)(cbufWorkspace);
+    (void)(intriParams);
+    ASCENDC_REPORT_NOT_SUPPORT(false, "Fixpipe L0C to UB");
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_IMPL_H
 
