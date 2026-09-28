@@ -1000,60 +1000,120 @@ inline void load_gm_to_cbuf_2dv2(
     __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
 {}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ bfloat16_t* dst, __gm__ bfloat16_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
+{}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ float* dst, __gm__ float* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+{}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ float* dst, __gm__ float* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, bool enable_pre_load_ignore_sync,
+    uint8_t l2_cache_ctl)
 {}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ float8_e4m3_t* dst, __gm__ float8_e4m3_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
 {}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ float8_e4m3_t* dst, __gm__ float8_e4m3_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
+{}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ float8_e5m2_t* dst, __gm__ float8_e5m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+{}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ float8_e5m2_t* dst, __gm__ float8_e5m2_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
 {}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ half* dst, __gm__ half* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
 {}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ half* dst, __gm__ half* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, bool enable_pre_load_ignore_sync,
+    uint8_t l2_cache_ctl)
+{}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+{}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ hifloat8_t* dst, __gm__ hifloat8_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
 {}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
 {}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ int16_t* dst, __gm__ int16_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
+{}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+{}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ int32_t* dst, __gm__ int32_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
 {}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
 {}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ int8_t* dst, __gm__ int8_t* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, bool enable_pre_load_ignore_sync,
+    uint8_t l2_cache_ctl)
+{}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+{}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ uint16_t* dst, __gm__ uint16_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
 {}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
 {}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ uint32_t* dst, __gm__ uint32_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
+{}
 
 inline void load_gm_to_cbuf_2dv2(
     __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+{}
+inline void load_gm_to_cbuf_2dv2(
+    __cbuf__ uint8_t* dst, __gm__ uint8_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
 {}
 
 // ==========load_gm_to_cbuf_2dv2_s4===========
@@ -1061,15 +1121,30 @@ inline void load_gm_to_cbuf_2dv2_s4(
     __cbuf__ float4_e1m2x2_t* dst, __gm__ float4_e1m2x2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
 {}
+inline void load_gm_to_cbuf_2dv2_s4(
+    __cbuf__ float4_e1m2x2_t* dst, __gm__ float4_e1m2x2_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
+{}
 
 inline void load_gm_to_cbuf_2dv2_s4(
     __cbuf__ float4_e2m1x2_t* dst, __gm__ float4_e2m1x2_t* src, uint32_t m_start_position, uint32_t k_start_position,
     uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
 {}
+inline void load_gm_to_cbuf_2dv2_s4(
+    __cbuf__ float4_e2m1x2_t* dst, __gm__ float4_e2m1x2_t* src, uint32_t m_start_position, uint32_t k_start_position,
+    uint16_t dst_stride, uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode,
+    bool enable_pre_load_ignore_sync, uint8_t l2_cache_ctl)
+{}
 
 inline void load_gm_to_cbuf_2dv2_s4(
     __cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, uint8_t l2_cache_ctl)
+{}
+inline void load_gm_to_cbuf_2dv2_s4(
+    __cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
+    uint16_t m_step, uint16_t k_step, uint8_t sid, uint8_t decomp_mode, bool enable_pre_load_ignore_sync,
+    uint8_t l2_cache_ctl)
 {}
 
 // ==========copy_cbuf_to_ubuf===========
@@ -1126,6 +1201,10 @@ inline void vdup(vector_f8e8m0& dst, vector_f8e8m0 src, vector_bool mask, int32_
 inline void copy_gm_to_cbuf_v2(
     __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
     uint8_t l2_cache_ctl, uint64_t src_stride, uint32_t dst_stride)
+{}
+inline void copy_gm_to_cbuf_v2(
+    __cbuf__ void* dst, __gm__ void* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst, uint8_t pad_func_mode,
+    uint8_t l2_cache_ctl, uint64_t src_stride, uint32_t dst_stride, bool enable_pre_load_ignore_sync)
 {}
 inline void img2colv2_cbuf_to_ca(
     __ca__ int16_t* dst, __cbuf__ int16_t* src, uint16_t step_k, uint16_t step_m, uint16_t pos_k, uint16_t pos_m,
