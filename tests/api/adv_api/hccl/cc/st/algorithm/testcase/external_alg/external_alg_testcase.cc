@@ -185,7 +185,7 @@ const HcclCMDType COLL_CMDS[] = {
 
 // 不变量：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
 // （15 个 executor 文件，-DMC2_CLIENT_ENABLE_CCU=1 且无 AICPU_COMPILE 守卫裁剪），可见全部
-// 43 行 sidecar——按 cmd 分布：AG 12 / RS 16 / AR 5 / A2A 7 / A2AV 3（9.2.0 无 AR Parallel/SoleNHR 注册）。
+// 44 行 sidecar——按 cmd 分布：AG 12 / RS 17 / AR 5 / A2A 7 / A2AV 3（9.2.0 无 AR Parallel/SoleNHR 注册）。
 TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 {
     for (HcclCMDType cmd : COLL_CMDS) {
@@ -200,13 +200,13 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
         std::sort(metaNames.begin(), metaNames.end());
         EXPECT_EQ(v2Tags, metaNames) << "cmd=" << static_cast<u32>(cmd);
     }
-    // 各 cmd 精确分布锚（AG 12 / RS 16 / AR 5 / A2A 7 / A2AV 3 = 43），失败时定位更直接
+    // 各 cmd 精确分布锚（AG 12 / RS 17 / AR 5 / A2A 7 / A2AV 3 = 44），失败时定位更直接
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER).size(), 12U);
-    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_REDUCE_SCATTER).size(), 16U);
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_REDUCE_SCATTER).size(), 17U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLREDUCE).size(), 5U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALL).size(), 7U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALLV).size(), 3U);
-    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：43 行精确锚
+    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：44 行精确锚
     size_t total = 0;
     for (HcclCMDType cmd : COLL_CMDS) {
         for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
@@ -215,7 +215,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
             }
         }
     }
-    EXPECT_EQ(total, 43U);
+    EXPECT_EQ(total, 44U);
 }
 
 // 不变量：注册行 externalName 字面量必须自身就是规范形（"与 parser 产出同构"的机器契约）。
@@ -224,7 +224,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
 {
     const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
-    ASSERT_FALSE(rows.empty()); // 全量编译目标：43 行产品 sidecar + 测试夹具
+    ASSERT_FALSE(rows.empty()); // 全量编译目标：44 行产品 sidecar + 测试夹具
     for (const AlgMetaRow& row : rows) {
         ExternalAlgSpec spec;
         std::string errMsg;
@@ -617,8 +617,8 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
             }
         }
     }
-    // 覆盖数锚（限 5 个集合通信 CMD）：29 个 (op,外部名) 键（43 行归并）；
-    // 35 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
+    // 覆盖数锚（限 5 个集合通信 CMD）：29 个 (op,外部名) 键（44 行归并）；
+    // 36 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
     // 限定 COLL_CMDS 范围使锚不受测试内注册行（如 KFC cmd 的宏验证行）影响。
     const std::set<HcclCMDType> collCmds(std::begin(COLL_CMDS), std::end(COLL_CMDS));
     size_t keyCount = 0;
@@ -637,7 +637,7 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
         comboCount += engines.size();
     }
     EXPECT_EQ(keyCount, 29U);
-    EXPECT_EQ(comboCount, 35U);
+    EXPECT_EQ(comboCount, 36U);
 }
 
 TEST(ExtAlgResolver, SpecificityOrdering)
@@ -775,7 +775,7 @@ TEST(ExtAlgWhitelist, IsAlgAllowedMatchesNameList)
         EXPECT_FALSE(IsAlgAllowed(name)) << name;
     }
     EXPECT_FALSE(IsAlgAllowed("NotAnAlgorithm"));
-    EXPECT_EQ(ALG_WHITELIST.size(), 33U);
+    EXPECT_EQ(ALG_WHITELIST.size(), 34U);
 }
 
 // 改名漏改防线：白名单出现死名即红
@@ -803,7 +803,7 @@ TEST(ExtAlgWhitelist, DifferentialProductionView)
             kept.push_back(row);
         }
     }
-    EXPECT_EQ(kept.size(), 33U);
+    EXPECT_EQ(kept.size(), 34U);
     const auto prodTable = BuildCandidateTable(kept);
 
     const std::pair<HcclCMDType, const char*> deadKeys[] = {
@@ -868,6 +868,10 @@ TEST(ExtAlgWhitelist, DifferentialProductionView)
          HCCL_DATA_TYPE_FP64, 1U, "InsReduceScatterNHR"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
          HCCL_DATA_TYPE_FP32, 1U, "CcuSchedReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &multi, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32,
+         1U, "CcuSchedReduceScatterSoleNHR"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
+         nullptr},
         // MULTI_LEVEL 被滤：多层网全灭
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterParallelMeshNHRUBX"},
