@@ -9,17 +9,19 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_set_l0c2gm_lrelu_alpha__Rf16
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_set_l0c2gm_lrelu_alpha__Rf32
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
+    kind: configures
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
+    kind: configures
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md
     kind: related
-    condition: '`asc_set_l0c2gm_lrelu_alpha`接口已废弃。请使用[asc_set_l0c_copy_lrelu_alpha](../cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)接口替代。'
+    condition: 该接口已废弃，作为替代接口使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_set_l0c2gm_lrelu_alpha（废弃）
 

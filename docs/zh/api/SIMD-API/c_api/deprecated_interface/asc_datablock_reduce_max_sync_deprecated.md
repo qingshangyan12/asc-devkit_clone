@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_datablock_reduce_max_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_datablock_reduce_max_sync_deprecated.md
-description: 已废弃接口，执行数据块内的求最大值规约操作，请使用asc_datablock_reduce_max配合asc_sync替代。
+description: 已废弃接口，执行数据块内的求最大值规约操作，请使用asc_datablock_reduce_max配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -15,18 +15,18 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_datablock_reduce_max_sync__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_datablock_reduce_max_sync__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 已废弃接口的替代实现
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_max.md
     kind: related
+    condition: 已废弃接口的替代实现
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_datablock_reduce_max_sync（废弃）
 

@@ -1,13 +1,55 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.concept.cpp
 title: 系统同步能力概述
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
-description: 系统同步能力概述页，说明同步对协调多个执行单元访问共享资源顺序的意义，将AI Core的同步分为核内同步与核间同步两类，以表格汇总各类同步接口的功能简述，并配合示意图描述四种核间同步控制模式。
+description: 系统同步能力概述页，说明同步通过协调多个执行单元对共享资源的访问顺序来保证程序正确性，将AI Core同步分为核内同步与核间同步两类，并以表格和示意图介绍四种核间同步控制模式。
 tag:
   - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - roles: [control]
+  - operations: [synchronization]
+  - traits: [inter_core_synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md
+    kind: related
+timestamp: '2026-09-28'
 ---
 # 系统同步能力概述
 

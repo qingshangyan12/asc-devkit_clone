@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_float2float_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md
-description: 已废弃接口，对float类型数据进行精度转换处理，支持多种舍入模式，请使用asc_float2float与asc_sync组合替代。
+description: 已废弃的同步精度转换接口，对float类型数据进行精度转换处理，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请使用对应的非同步接口和同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,29 +12,21 @@ tag:
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_float2float_rn_sync__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_float2float_rd_sync__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_float2float_ru_sync__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_float2float_rna_sync__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_float2float_rz_sync__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_float2float_rn_sync`、`asc_float2float_rd_sync`、`asc_float2float_ru_sync`、`asc_float2float_rna_sync`和`asc_float2float_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2float.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md
     kind: related
-    condition: '`asc_float2float_rn_sync`、`asc_float2float_rd_sync`、`asc_float2float_ru_sync`、`asc_float2float_rna_sync`和`asc_float2float_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2float.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_float2float_sync（废弃）
 

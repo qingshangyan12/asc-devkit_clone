@@ -2,20 +2,20 @@
 okftype: reference.api.cpp
 title: asc_get_ctrl
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md
-description: 读取CTRL寄存器（控制寄存器）特定比特位上的值并返回，返回值的比特位含义可参考asc_set_ctrl中的描述。
+description: 读取CTRL寄存器（控制寄存器）特定比特位上的值并返回，返回值具体含义可参考asc_set_ctrl接口中的描述。
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
   - execution_models: [scalar]
 signature:
   - override_id: asc_get_ctrl__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/spr/spr.h]
+archs: ['2201', '3510']
+header: [/include/c_api/spr/spr.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_ctrl
 

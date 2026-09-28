@@ -1,19 +1,21 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.concept.cpp
 title: 矩阵搬入总体说明
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load_overall_description.md
-description: 矩阵计算搬入接口的总体说明，介绍Global Memory到L1、L0A、L0B等数据通路，以及GM到L1、L1到L0A/L0B的接口分类、使用场景和辅助配置接口。
+description: 矩阵计算搬入接口的总体说明，介绍GM到L1、L1到L0A/L0B等数据通路及地址对齐要求，按通路分类各搬入接口并说明辅助配置接口的使用场景。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, img2col, layout_transform, transpose]
   - objects: [matrix]
-  - source_locations: [global_memory, l1_buffer]
+  - source_locations: [global_memory, l1_buffer, unified_buffer]
   - destination_locations: [bias_table_buffer, fixpipe_buffer, l0a_buffer, l0b_buffer,
       l0c_buffer, l1_buffer]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - traits: [sparse_input]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
+    kind: related
+timestamp: '2026-09-28'
 ---
 # 矩阵搬入总体说明
 

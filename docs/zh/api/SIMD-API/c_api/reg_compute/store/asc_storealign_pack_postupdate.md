@@ -2,31 +2,30 @@
 okftype: reference.api.cpp
 title: asc_storealign_pack_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_postupdate.md
-description: 将矢量数据寄存器或掩码寄存器中的数据压缩搬出到Unified Buffer（UB），写入完成后启用Post Update模式自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址。
+description: 将矢量数据寄存器或掩码寄存器中的数据压缩搬出到Unified Buffer（UB），写入完成后启用Post Update模式自动累加目的地址指针，便于硬件循环内连续多次调用时无需手动维护目的地址，矢量场景按mask将有效元素低半部分bit写入压缩后位置。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [compression, store]
+  - objects: [mask, vector]
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]
   - traits: [masked, post_update]
 signature:
   - prototype_id: asc_storealign_pack_postupdate__RPU<dtype>_v<dtype>_i32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t,
       uint64_t]
   - prototype_id: asc_storealign_pack_postupdate__RPU<dtype>_vb_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [uint8_t, uint16_t, uint32_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/store/storealign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
     condition: 如果本指令与其他指令存在UB地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_storealign_pack_postupdate
 

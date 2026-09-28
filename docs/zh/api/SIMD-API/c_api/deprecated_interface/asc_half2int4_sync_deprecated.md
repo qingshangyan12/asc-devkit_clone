@@ -12,32 +12,22 @@ tag:
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_half2int4_sync__PUi4x2_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2int4_rn_sync__PUi4x2_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2int4_rd_sync__PUi4x2_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2int4_rna_sync__PUi4x2_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2int4_ru_sync__PUi4x2_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2int4_rz_sync__PUi4x2_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_half2int4_sync`、`asc_half2int4_rn_sync`、`asc_half2int4_rd_sync`、`asc_half2int4_rna_sync`、`asc_half2int4_ru_sync`和`asc_half2int4_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_half2int4.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，需要同步接口配合替代时
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md
     kind: related
-    condition: '`asc_half2int4_sync`、`asc_half2int4_rn_sync`、`asc_half2int4_rd_sync`、`asc_half2int4_rna_sync`、`asc_half2int4_ru_sync`和`asc_half2int4_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_half2int4.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，需要非同步转换接口替代时
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_half2int4_sync（废弃）
 

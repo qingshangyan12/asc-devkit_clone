@@ -9,8 +9,8 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_get_squeeze_status__z
-    archs: ['3510']
-    headers: [/include/c_api/spr/spr.h]
+archs: ['3510']
+header: [/include/c_api/spr/spr.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
     kind: requires
@@ -19,7 +19,7 @@ dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
     kind: requires
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_squeeze_status
 

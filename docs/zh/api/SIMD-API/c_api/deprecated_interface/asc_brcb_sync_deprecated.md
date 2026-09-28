@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_brcb_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_brcb_sync_deprecated.md
-description: 每次取输入矢量中的8个数填充到结果矢量的8个datablock，每个数对应一个datablock实现元素广播；接口已废弃，请使用对应的非同步接口asc_brcb和同步接口asc_sync替代。
+description: 每一次取输入矢量中的8个数填充到结果矢量的8个datablock，每个数对应一个datablock；接口已废弃，请使用对应的非同步接口和同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -11,18 +11,16 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_brcb_sync__PUu16_PUu16_u16_u16_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_brcb_sync__PUu32_PUu32_u16_u16_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_brcb_sync（废弃）
 

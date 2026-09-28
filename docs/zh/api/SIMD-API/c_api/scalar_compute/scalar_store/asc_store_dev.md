@@ -11,9 +11,9 @@ tag:
   - destination_locations: [global_memory]
 signature:
   - prototype_id: asc_store_dev__PG<dtype>_<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_store.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t]
+archs: ['3510']
+header: [/include/c_api/scalar_compute/scalar_store.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
     kind: requires
@@ -22,7 +22,7 @@ dependencies:
     kind: requires
     condition: 若其他核或其他通路通过缓存访问同一GM地址
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_store_dev
 

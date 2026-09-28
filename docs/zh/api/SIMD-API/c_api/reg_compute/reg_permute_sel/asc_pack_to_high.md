@@ -2,28 +2,25 @@
 okftype: reference.api.cpp
 title: asc_pack_to_high
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md
-description: 将源操作数中元素的低8位或低16位压缩写入目的操作数的高半部分，源为掩码寄存器时按每2bit取低位bit压缩，结果写入dst或通过函数返回值返回，仅在AIV上生效。
+description: 将源操作数中元素的低8位或低16位压缩写入目的操作数的高半部分，源为掩码寄存器时每2bit取低位bit压缩存储，结果写入dst或通过函数返回值返回，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [compression]
+  - objects: [mask, vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
 signature:
   - prototype_id: asc_pack_to_high__Rv<dtype_dst>_v<dtype_src>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: asc_pack_to_high__v<dtype_src>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_pack_to_high__Rvb_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_pack_to_high__vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_pack_to_high
 

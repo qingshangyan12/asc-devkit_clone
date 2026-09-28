@@ -10,11 +10,11 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_sync_data_barrier__memdsb
-    archs: ['2201', '3510']
-    headers: [/include/c_api/sync/sync.h]
+archs: ['2201', '3510']
+header: [/include/c_api/sync/sync.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_sync_data_barrier
 

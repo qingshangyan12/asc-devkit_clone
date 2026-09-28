@@ -9,23 +9,23 @@ tag:
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [masked, rounding_mode]
 signature:
   - prototype_id: asc_floor__v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
     dtype: [half, bfloat16_t, float]
   - prototype_id: asc_floor__Rv<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
     dtype: [half, bfloat16_t, float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies: []
 examples:
   - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate
     file: truncate.asc
     archs: ['3510']
     override_id: asc_floor__Rvf32_vf32_vb
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_floor
 

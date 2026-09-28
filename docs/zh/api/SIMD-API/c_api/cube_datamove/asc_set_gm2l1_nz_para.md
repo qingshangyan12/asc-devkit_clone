@@ -2,17 +2,15 @@
 okftype: reference.api.cpp
 title: asc_set_gm2l1_nz_para
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md
-description: 配置从Global Memory搬运至L1 Buffer过程中ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量和相邻行、相邻Z矩阵、相邻Nz矩阵的步长；本接口只完成参数配置，不执行数据搬运。
+description: 配置从Global Memory搬运至L1 Buffer过程中ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量和相邻行、相邻Z矩阵、相邻Nz矩阵的步长；本接口只完成参数配置，不执行数据搬运，仅在AIC上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
 signature:
   - override_id: asc_set_gm2l1_nz_para__u16_u16_u16_u16
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_set_gm2l1_nz_para__u64
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md
     kind: configures
@@ -63,7 +61,7 @@ examples:
     file: mmad_mx.asc
     archs: ['3510']
     override_id: asc_set_gm2l1_nz_para__u64
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_gm2l1_nz_para
 

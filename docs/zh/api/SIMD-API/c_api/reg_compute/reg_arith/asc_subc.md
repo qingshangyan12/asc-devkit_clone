@@ -2,25 +2,28 @@
 okftype: reference.api.cpp
 title: asc_subc
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md
-description: 根据mask对源操作数src0、src1及输入借位carry_src进行按元素求差，减法在硬件底层通过补码加法实现，结果写入dst，每个元素的进位标志写入carry掩码寄存器。
+description: 根据mask对源操作数src0、src1及输入借位carry_src进行按元素求差，减法在硬件底层通过补码加法实现，结果写入dst，每个元素的进位标志写入carry掩码寄存器，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [subtract]
+  - objects: [carry_flag, vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [carry_input, elementwise, masked, supports_carry_output]
 signature:
   - prototype_id: asc_subc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int32_t, uint32_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_arith.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_subc
 

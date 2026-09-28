@@ -9,14 +9,14 @@ tag:
   - traits: [atomic, deprecated]
 signature:
   - override_id: asc_set_store_atomic_config_v2__u16_u16
-    archs: ['3510']
-    headers: [/include/c_api/atomic/scalar_atomic.h]
+archs: ['3510']
+header: [/include/c_api/atomic/scalar_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md
     kind: related
-    condition: 该接口已废弃。原子加操作请使用[asc_atomic_add](../atomic/scalar_atomic/asc_atomic_add.md)实现。
+    condition: 接口已废弃，原子加操作的替代实现
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_set_store_atomic_config_v2（废弃）
 

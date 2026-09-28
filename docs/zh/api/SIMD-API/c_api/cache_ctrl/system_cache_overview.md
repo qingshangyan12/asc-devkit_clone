@@ -1,13 +1,34 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.concept.cpp
 title: 系统缓存概述
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/system_cache_overview.md
 description: 系统缓存概述页，介绍L2 Cache、DCache、ICache、SIMT DCache、NDDMA Cache的类型与功能，Prefetch、Preload、Invalid、Clean四种缓存操作，Cache写策略与多核一致性问题，并按Cache类型汇总缓存控制接口。
 tag:
   - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - roles: [control]
+  - families: [cache_management]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: related
+timestamp: '2026-09-28'
 ---
 # 系统缓存概述
 

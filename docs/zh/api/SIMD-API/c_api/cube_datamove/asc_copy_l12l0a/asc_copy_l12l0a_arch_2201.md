@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_l12l0a
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md
-description: 将存放在L1 Buffer里的512B大小矩阵搬运到L0A Buffer，包含2D格式搬运和3D格式搬运两类高维切分搬运方式。
+description: 将存放在L1 Buffer的512B大小矩阵搬运到L0A Buffer，包含2D格式与3D格式两类高维切分搬运，3D格式按卷积参数完成img2col展开并支持对目标矩阵转置。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,56 +12,26 @@ tag:
   - traits: [high_dimensional]
 signature:
   - override_id: asc_copy_l12l0a__PCAi4x2_PL1i4x2_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAu8_PL1u8_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAi8_PL1i8_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAf16_PL1f16_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAbf16_PL1bf16_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAu32_PL1u32_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAi32_PL1i32_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAf32_PL1f32_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAi4x2_PL1i4x2_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAu8_PL1u8_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAi8_PL1i8_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAf16_PL1f16_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAbf16_PL1bf16_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAu32_PL1u32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAi32_PL1i32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0a__PCAf32_PL1f32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0a
 

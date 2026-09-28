@@ -2,81 +2,45 @@
 okftype: reference.api.cpp
 title: asc_float2int32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md
-description: 在矢量数据寄存器中将float类型数据转换为int32_t类型，支持多种舍入模式与饱和/非饱和模式，结果可通过引用参数或函数返回值输出。
+description: 在矢量数据寄存器中将float类型数据转换为int32_t类型，支持多种舍入模式与饱和/非饱和模式，可通过引用参数或函数返回值输出结果，mask未筛选的元素在输出中置零。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2int32_rn__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rn_sat__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rna__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rna_sat__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rd__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rd_sat__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_ru__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_ru_sat__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rz__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rz_sat__Rvi32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rn__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rn_sat__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rna__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rna_sat__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rd__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rd_sat__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_ru__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_ru_sat__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rz__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int32_rz_sat__vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
+    condition: 使用饱和或非饱和模式时
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_float2int32
 

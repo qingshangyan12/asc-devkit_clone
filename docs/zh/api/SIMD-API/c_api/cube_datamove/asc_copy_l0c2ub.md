@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy_l0c2ub
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
-description: 将矩阵计算结果从L0C Buffer搬运至Unified Buffer（UB），搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合，支持双目标模式写入两个Vector
+description: 将矩阵计算结果从L0C Buffer搬运至Unified Buffer，搬运过程中可同步支持随路量化、随路激活、随路格式转换（Nz2ND/Nz2DN）等能力组合，支持双目标模式将矩阵拆分写入两个Vector
   Core的UB，仅在AIC上执行有效。
 tag:
   - api_surfaces: [c_api]
@@ -11,6 +11,10 @@ tag:
   - source_locations: [l0c_buffer]
   - destination_locations: [unified_buffer]
   - traits: [quantization]
+signature:
+  - prototype_id: asc_copy_l0c2ub__PU<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
     kind: requires
@@ -37,7 +41,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本指令与其他指令存在目的地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l0c2ub
 

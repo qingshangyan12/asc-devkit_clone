@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_gm2l1_nd2nz
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md
-description: 将数据从Global Memory (GM)搬运到Level 1 cache (L1)，支持在数据搬运时进行ND格式到NZ格式的转换，通过目的NZ矩阵各方向步长参数控制转换后的排布。
+description: 将数据从Global Memory搬运到Level 1 cache，支持在数据搬运时进行ND格式到NZ格式的转换，通过目的NZ矩阵各方向步长参数控制转换后的数据排布，多条指令目的地址重叠时需插入同步指令。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -11,32 +11,18 @@ tag:
   - destination_locations: [l1_buffer]
 signature:
   - override_id: asc_copy_gm2l1_nd2nz__PL1i8_PGi8_u16_u16_u16_u16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l1_nd2nz__PL1u8_PGu8_u16_u16_u16_u16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l1_nd2nz__PL1bf16_PGbf16_u16_u16_u16_u16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l1_nd2nz__PL1f16_PGf16_u16_u16_u16_u16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l1_nd2nz__PL1i16_PGi16_u16_u16_u16_u16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l1_nd2nz__PL1f32_PGf32_u16_u16_u16_u16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l1_nd2nz__PL1i32_PGi32_u16_u16_u16_u16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l1_nd2nz__PL1u32_PGu32_u16_u16_u16_u16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_gm2l1_nd2nz
 

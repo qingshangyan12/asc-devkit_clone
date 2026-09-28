@@ -12,14 +12,12 @@ tag:
   - traits: [padding]
 signature:
   - override_id: asc_load_image_to_cbuf__PL1i8_u16_u16_u16_u16_u16_u8_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_load_image_to_cbuf__PL1f16_u16_u16_u16_u16_u16_u8_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_load_image_to_cbuf
 

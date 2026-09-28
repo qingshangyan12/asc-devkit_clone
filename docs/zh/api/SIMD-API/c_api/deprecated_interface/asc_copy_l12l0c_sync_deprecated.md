@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy_l12l0c_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0c_sync_deprecated.md
-description: 已废弃接口，将矩阵由L1 Buffer搬运到L0C Buffer，支持多种源与目的数据类型组合，请使用asc_copy_l12l0c配合asc_sync替代。
+description: 已废弃的同步搬运接口，将矩阵由L1 Buffer搬运到L0C Buffer中，支持float到half、bfloat16_t等源与目的数据类型组合，请使用非同步接口配合asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,33 +12,21 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_copy_l12l0c_sync__PCCbf16_PL1bf16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_copy_l12l0c_sync__PCCf16_PL1f16_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_copy_l12l0c_sync__PCCf16_PL1f32_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_copy_l12l0c_sync__PCCbf16_PL1f32_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_copy_l12l0c_sync__PCCf32_PL1f32_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_copy_l12l0c_sync__PCCi32_PL1i32_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_copy_l12l0c_sync__PCCu32_PL1u32_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0c_sync（废弃）
 

@@ -2,44 +2,37 @@
 okftype: reference.api.cpp
 title: asc_int162uint8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint8.md
-description: 将源操作数中int16_t类型的元素转换为uint8_t类型并写入目的操作数，支持非饱和与饱和两种模式，位宽比为2:1，按位置标签选择写入目的操作数偶数或奇数索引位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+description: 将源操作数中int16_t元素转换为uint8_t类型写入目的操作数，支持饱和与非饱和两种模式，位宽比为2:1，按位置标签选择写入目的操作数偶数或奇数索引位置，仅在AIV上生效的Reg矢量计算接口。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, saturation_mode]
 signature:
   - override_id: asc_int162uint8__Rvu8_vi16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int162uint8_sat__Rvu8_vi16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int162uint8__Rvu8_vi16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int162uint8_sat__Rvu8_vi16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int162uint8__vi16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int162uint8_sat__vi16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int162uint8__vi16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int162uint8_sat__vi16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: requires
-    condition: 使用饱和或非饱和模式时，需要配置`ctrl`寄存器
+    condition: 使用饱和或非饱和模式时
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_int162uint8
 

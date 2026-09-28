@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_lock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
-description: 与asc_unlock配对使用，实现核内异步流水指令之间的同步处理。根据mutex_id获取Mutex，若Mutex已被锁定则阻塞指定流水上的后续指令，直到所有流水中相同mutex_id的Mutex均被释放，可选mode参数指定是否阻塞流水。
+description: 与asc_unlock配对使用，实现核内异步流水指令之间的同步。根据mutex_id获取Mutex，若Mutex已被锁定则阻塞指定流水上后续指令的执行，直到所有流水中相同mutex_id的Mutex均被asc_unlock释放，可选mode参数指定是否阻塞流水。
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
@@ -10,17 +10,17 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_lock__pipe_u8
-    archs: ['3510']
-    headers: [/include/c_api/sync/sync.h]
-  - override_id: asc_lock__pipe_u8_mutexexec
-    archs: ['3510']
-    headers: [/include/c_api/sync/sync.h]
+  - override_id: asc_lock__pipe_u8_mutexmode
+archs: ['3510']
+header: [/include/c_api/sync/sync.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: related
+    condition: 单流水内多个指令之间的同步
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
     kind: related
-    condition: '`asc_lock`与`asc_unlock`必须严格成对使用，并使用相同的`pipe`、`mutex_id`和`mode`。'
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_lock
 

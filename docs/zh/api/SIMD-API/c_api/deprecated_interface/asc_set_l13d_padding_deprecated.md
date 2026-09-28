@@ -6,29 +6,23 @@ description: 该接口已废弃，用于设置Pad属性描述，在调用asc_cop
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - traits: [deprecated]
+  - traits: [deprecated, padding]
 signature:
   - override_id: asc_set_l13d_padding__u64
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_set_l13d_padding__f16
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_set_l13d_padding__i16
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_set_l13d_padding__u16
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md
-    kind: related
-    condition: 设置Pad属性描述，用于在调用[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。
+    kind: configures
+    condition: 在调用asc_copy_l12l0a接口时
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md
     kind: related
-    condition: '`asc_set_l13d_padding`接口已废弃。请使用[asc_set_l12l0a_3d_padding](../cube_datamove/asc_set_l12l0a_3d_padding.md)接口替代。'
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_set_l13d_padding（废弃）
 

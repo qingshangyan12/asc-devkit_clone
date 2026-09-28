@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_get_sub_block_num
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md
-description: 在分离模式下读取当前AI Core上Cube Core或Vector Core的数量，该值保存在只读特殊寄存器中，由系统控制器在核函数启动前配置，运行期间不可修改，连续两次调用返回值相同。
+description: 在分离模式下读取当前AI Core上Cube Core或Vector Core的数量并按int64_t返回，该值保存在只读特殊寄存器中，由系统控制器在核函数启动前配置，核函数运行期间不可修改，连续两次调用返回值相同。
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
@@ -10,11 +10,11 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_get_sub_block_num__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/utils/sys_var.h]
+archs: ['2201', '3510']
+header: [/include/c_api/utils/sys_var.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_sub_block_num
 

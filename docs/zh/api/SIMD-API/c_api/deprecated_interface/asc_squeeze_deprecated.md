@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_squeeze_v2 (废弃)
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md
-description: 该接口已废弃，将src中被mask选择的有效元素依次复制到dst并连续排列，剩余位置元素置0，请使用asc_squeeze_and_storeunalign接口实现筛选并连续搬出有效元素的功能。
+description: 已废弃的矢量计算接口，将src中被mask选择的有效元素依次复制到dst并连续排列，剩余位置元素置0，请改用asc_squeeze_and_storeunalign实现筛选并连续搬出有效元素的功能。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -11,53 +11,31 @@ tag:
   - traits: [deprecated, masked]
 signature:
   - override_id: asc_squeeze_v2__Rvi8_vi8_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvu8_vu8_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvhf8_vhf8_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvf8e5m2_vf8e5m2_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvf8e4m3_vf8e4m3_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvf8e8m0_vf8e8m0_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvi16_vi16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvu16_vu16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvf16_vf16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvbf16_vbf16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvi32_vi32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvu32_vu32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_squeeze_v2__Rvf32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
     kind: related
-    condition: 该接口已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现筛选并连续搬出有效元素的功能。
+    condition: 实现筛选并连续搬出有效元素的功能
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
     kind: related
-    condition: asc_squeeze_v2接口搭配[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md)接口使用时，会将有效数据大小保存至AR寄存器，搬出时使用该值作为存储偏移量。
+    condition: 搬出时使用该值作为存储偏移量
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
+    kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_squeeze_v2 (废弃)
 

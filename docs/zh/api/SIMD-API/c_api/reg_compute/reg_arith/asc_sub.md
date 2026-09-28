@@ -7,28 +7,29 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [subtract]
+  - objects: [carry_flag, vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, supports_carry_output]
 signature:
   - prototype_id: asc_sub__Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_sub__v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_sub__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int32_t, uint32_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_arith.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md
     kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_sub
 

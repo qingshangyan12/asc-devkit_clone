@@ -11,32 +11,18 @@ tag:
   - destination_locations: [l0b_buffer]
 signature:
   - override_id: asc_copy_gm2l0b__PCBi4x2_PGi4x2_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l0b__PCBi8_PGi8_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l0b__PCBu8_PGu8_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l0b__PCBf16_PGf16_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l0b__PCBbf16_PGbf16_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l0b__PCBi32_PGi32_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l0b__PCBu32_PGu32_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_gm2l0b__PCBf32_PGf32_u16_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_gm2l0b
 

@@ -2,121 +2,63 @@
 okftype: reference.api.cpp
 title: asc_loadalign (废弃)
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_loadalign_v4_deprecated.md
-description: 已废弃的对齐搬入接口：从Unified Buffer连续对齐搬入矢量寄存器，支持UNPACKV2解压缩与BRCV2、BRCV3广播等模式，通过int32_t传入偏移并由硬件自动Post
-  Update更新地址，请使用asc_loadalign_brc_datablock_postupdate等新接口替代。
+description: 已废弃的对齐数据搬入接口，从Unified Buffer连续对齐搬入数据到矢量数据寄存器，支持UNPACKV2解压缩、BRCV2和BRCV3广播等搬入模式，硬件自动Post
+  Update无需用户更新偏移或源地址，请改用新接口实现此功能。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [broadcast, load]
+  - execution_models: [register_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]
   - traits: [deprecated, post_update]
 signature:
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvi8_RPUi8_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvu8_RPUu8_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvf4e2m1x2_RPUf4e2m1x2_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvf4e1m2x2_RPUf4e1m2x2_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvf8e8m0_RPUf8e8m0_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvf8e5m2_RPUf8e5m2_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvf8e4m3_RPUf8e4m3_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvhf8_RPUhf8_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_unpack_postupdate_v2__Rvi4x2_RPUi4x2_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvi8_RPUi8_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvu8_RPUu8_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvf4e2m1x2_RPUf4e2m1x2_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvf4e1m2x2_RPUf4e1m2x2_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvf8e8m0_RPUf8e8m0_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvf8e5m2_RPUf8e5m2_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvf8e4m3_RPUf8e4m3_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvhf8_RPUhf8_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvi16_RPUi16_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvu16_RPUu16_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvf16_RPUf16_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvbf16_RPUbf16_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvi32_RPUi32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvu32_RPUu32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvf32_RPUf32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v2__Rvi4x2_RPUi4x2_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v3__Rvi16_RPUi16_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v3__Rvu16_RPUu16_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v3__Rvf16_RPUf16_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v3__Rvbf16_RPUbf16_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v3__Rvi32_RPUi32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v3__Rvu32_RPUu32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - override_id: asc_loadalign_brc_postupdate_v3__Rvf32_RPUf32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/load/loadalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md
     kind: related
+    condition: asc_loadalign_brc_postupdate_v2已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md
     kind: related
+    condition: asc_loadalign_brc_postupdate_v3已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md
     kind: related
+    condition: asc_loadalign_unpack_postupdate_v2已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_loadalign (废弃)
 

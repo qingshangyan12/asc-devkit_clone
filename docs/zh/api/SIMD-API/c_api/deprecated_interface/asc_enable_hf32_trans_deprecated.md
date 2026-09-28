@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_enable_hf32_trans（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md
-description: 已废弃接口，用于设置HF32模式舍入方式，需先开启HF32模式并在矩阵乘加指令执行前调用，请使用asc_set_hf32_round_mode接口替代。
+description: 已废弃的矩阵计算模式配置接口：设置HF32模式的舍入方式，需先开启HF32模式并在矩阵乘加指令执行前调用，请使用asc_set_hf32_round_mode接口替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
@@ -10,20 +10,20 @@ tag:
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_enable_hf32_trans__u32
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md
     kind: requires
-    condition: 使用该接口前需要先使用[asc_enable_hf32](../cube_compute/asc_enable_hf32.md)开启HF32模式。
+    condition: 需先开启HF32模式再调用本接口
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
-    condition: 本接口需在矩阵乘加指令（[asc_mmad](../cube_compute/asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
+    condition: 需在矩阵乘加指令执行前调用
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md
     kind: related
-    condition: '`asc_enable_hf32_trans`接口已废弃。请使用[asc_set_hf32_round_mode](../cube_compute/asc_set_hf32_round_mode.md)接口替代。'
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_enable_hf32_trans（废弃）
 

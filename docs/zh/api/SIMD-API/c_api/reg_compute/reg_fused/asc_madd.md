@@ -2,21 +2,28 @@
 okftype: reference.api.cpp
 title: asc_madd
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md
-description: 根据mask对目的操作数dst与源操作数src0按元素相乘后，与src1中的对应元素相加并将结果写回dst，dst既作为输入参与计算又存储最终结果，支持half、bfloat16_t与float类型，仅在AIV上生效。
+description: 根据mask对目的操作数dst与源操作数src0按元素相乘后与src1中的对应元素相加并将结果写回dst，dst既作为输入参与计算又用于存储最终结果，支持half、bfloat16_t与float类型，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [fused_multiply_add]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_madd__Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
     dtype: [half, bfloat16_t, float]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_fused.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_madd
 

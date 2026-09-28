@@ -9,14 +9,14 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_set_l0c2gm_relu_alpha__u64
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
     kind: related
-    condition: '`asc_set_l0c2gm_relu_alpha`接口已废弃。请使用[asc_set_l0c_copy_relu_alpha](../cube_datamove/asc_set_l0c_copy_relu_alpha.md)接口替代。'
+    condition: 该接口已废弃，作为替代接口使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_set_l0c2gm_relu_alpha（废弃）
 

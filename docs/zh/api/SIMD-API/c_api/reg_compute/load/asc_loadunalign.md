@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_loadunalign
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
-description: 从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度连续数据，将非对齐寄存器缓存的前置数据与从UB读取的后续数据拼接后搬入矢量数据寄存器。
+description: 从Unified Buffer（UB）按dtype对齐的起始地址读取VL长度连续数据，将非对齐寄存器缓存的前置数据与从UB读取的后续数据拼接后搬入矢量数据寄存器，每次搬入前必须先调用asc_loadunalign_pre初始化。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -13,11 +13,11 @@ tag:
   - traits: [unaligned_transfer]
 signature:
   - prototype_id: asc_loadunalign__Rv<dtype>_Rvloadunalign_PU<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadunalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/load/loadunalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
     kind: requires
@@ -25,7 +25,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本指令与其他指令存在UB地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_loadunalign
 

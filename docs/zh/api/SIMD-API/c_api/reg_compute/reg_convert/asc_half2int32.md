@@ -9,75 +9,39 @@ tag:
   - operations: [conversion]
   - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [masked, rounding_mode, widening_result]
 signature:
   - override_id: asc_half2int32_rd__Rvi32_vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rn__Rvi32_vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rna__Rvi32_vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_ru__Rvi32_vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rz__Rvi32_vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rd__Rvi32_vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rn__Rvi32_vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rna__Rvi32_vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_ru__Rvi32_vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rz__Rvi32_vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rd__vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rn__vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rna__vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_ru__vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rz__vf16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rd__vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rn__vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rna__vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_ru__vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2int32_rz__vf16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies: []
 examples:
   - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast
     file: cast.asc
     archs: ['3510']
     override_id: asc_half2int32_rd__Rvi32_vf16_vb_icposeven
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_half2int32
 

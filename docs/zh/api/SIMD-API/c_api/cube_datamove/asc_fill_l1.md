@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_fill_l1
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md
-description: 将一个标量填充值写入L1 Buffer的目的地址并广播到多个32字节分形块，可用于L1 Buffer的内存初始化，重复次数、单次分形块数与相邻重复间隔由asc_fill_value_config配置。
+description: 将一个标量填充值写入L1 Buffer的目的地址并广播到多个32字节分形块中，可用于L1 Buffer的内存初始化，重复次数、单次分形块数与相邻重复间隔由asc_fill_value_config配置，仅在AIC上执行有效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_initialization]
@@ -10,17 +10,19 @@ tag:
   - destination_locations: [l1_buffer]
 signature:
   - prototype_id: asc_fill_l1__PL1<dst_dtype>_<value_dtype>_RCfillcfg
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
+    kind: related
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠，需要插入同步指令
+    condition: 如果本指令与其他指令存在目的地址重叠
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠，需要插入同步指令
+    condition: 如果本指令与其他指令存在目的地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_fill_l1
 

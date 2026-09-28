@@ -2,47 +2,25 @@
 okftype: reference.api.cpp
 title: asc_update_addr_reg
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-description: 更新地址寄存器addr_reg用于迭代寻址，支持1~4维偏移量设置和b8、b16、b32三种位宽模式，按各维循环迭代变量与步长计算地址偏移，供Reg搬运接口在循环中按设定偏移自动递增UB地址。
+description: 更新地址寄存器addr_reg用于迭代寻址，支持1~4维偏移量设置和b8、b16、b32三种位宽模式，按各维循环迭代变量与步长计算地址偏移，配合Reg搬运接口在循环中按设定偏移自动递增UB地址。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
 signature:
   - override_id: asc_update_addr_reg_b8__u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b16__u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b32__u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b8__u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b16__u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b32__u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b8__u32_u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b16__u32_u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b32__u32_u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b8__u32_u32_u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b16__u32_u32_u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
   - override_id: asc_update_addr_reg_b32__u32_u32_u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
     kind: configures
@@ -53,7 +31,7 @@ examples:
     file: reg_load_store_align.asc
     archs: ['3510']
     override_id: asc_update_addr_reg_b16__u32
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_update_addr_reg
 

@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_ge_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ge_sync_deprecated.md
-description: 已废弃的同步矢量比较接口：逐元素比较src0 >= src1是否成立，成立则输出结果为1否则输出0，每个元素的比较结果占一个bit，请使用非同步接口asc_ge并配合同步接口asc_sync替代。
+description: 已废弃的同步矢量比较接口：逐元素比较src0是否大于等于src1，成立则输出结果为1，否则输出结果为0，每个元素的比较结果占一个bit，请使用非同步接口asc_ge配合asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,32 +12,26 @@ tag:
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_ge_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_ge_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_ge_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_ge_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_ge_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_ge.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md
     kind: related
-    condition: '`asc_ge_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_ge.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
     kind: related
-    condition: 使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](../vector_compute/vector_compare/asc_get_cmp_mask.md)获取比较结果。
+    condition: 使用寄存器形式的接口时
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
     kind: related
-    condition: 如果要初始化寄存器，可以调用[asc_set_cmp_mask](../vector_compute/vector_compare/asc_set_cmp_mask.md)接口。
+    condition: 如果要初始化寄存器
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_ge_sync（废弃）
 

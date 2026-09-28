@@ -13,11 +13,11 @@ tag:
   - traits: [masked]
 signature:
   - prototype_id: asc_loadalign_datablock_strided__PU<dtype>_u16_u16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/load/loadalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
     kind: related
@@ -25,7 +25,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本指令与其他指令存在UB地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_loadalign_datablock_strided
 

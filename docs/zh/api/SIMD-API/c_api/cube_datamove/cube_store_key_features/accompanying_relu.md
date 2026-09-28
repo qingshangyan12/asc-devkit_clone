@@ -1,23 +1,22 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.concept.cpp
 title: 随路ReLU
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md
-description: 介绍矩阵搬出过程中支持的随路ReLU能力：通过asc_relu_pre_mode枚举区分不启用激活、Normal ReLU、全矩阵共享激活系数的SCALAR与每N通道独立系数的VECTOR四种模式，SCALAR和VECTOR分别经asc_set_l0c_copy_relu_alpha与asc_set_l0c_copy_config配置。
+description: 介绍矩阵计算搬出过程中支持的随路ReLU能力，通过asc_relu_pre_mode枚举区分不启用激活、Normal ReLU、全矩阵共享激活系数的SCALAR与每N通道独立激活系数的VECTOR四种模式，并说明各自的配置方式。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
-  - operations: [copy]
+  - operations: [relu]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
     kind: related
-    condition: 每个N通道独立激活系数，先将系数搬入，再用[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)配置`relu_pre_addr`
+    condition: 每个N通道独立激活系数
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
     kind: related
-    condition: 全矩阵共享激活系数，使用[asc_set_l0c_copy_relu_alpha](../asc_set_l0c_copy_relu_alpha.md)配置
+    condition: 全矩阵共享激活系数
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
     kind: related
-examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # 随路ReLU
 

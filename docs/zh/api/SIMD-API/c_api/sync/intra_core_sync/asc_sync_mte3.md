@@ -10,14 +10,16 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_sync_mte3__i
-    archs: ['2201', '3510']
-    headers: [/include/c_api/sync/sync.h]
+archs: ['2201', '3510']
+header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: related
-    condition: 其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: related
+    condition: 若手工同步
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_sync_mte3
 

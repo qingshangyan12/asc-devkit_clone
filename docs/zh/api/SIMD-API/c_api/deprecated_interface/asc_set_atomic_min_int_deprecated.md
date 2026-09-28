@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_set_atomic_min_int（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_min_int_deprecated.md
-description: 已废弃接口，设置计算结果以原子比较方式传输到GM，拷贝前将int32_t数据与GM已有数据逐元素比较并将最小值写入GM，请使用asc_set_atomic_min_int32替代。
+description: 已废弃的原子搬运配置接口，设置计算结果以原子比较方式传输到GM，拷贝前将int32_t数据与GM中已有数据逐元素比较并将最小值写入GM，请使用asc_set_atomic_min_int32替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
@@ -11,16 +11,17 @@ tag:
   - traits: [atomic, deprecated]
 signature:
   - override_id: asc_set_atomic_min_int__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/atomic/datamove_atomic.h]
+archs: ['2201', '3510']
+header: [/include/c_api/atomic/datamove_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
     kind: related
-    condition: 使用结束后，建议通过asc_disable_dma_atomic关闭原子最小操作
+    condition: 使用结束后，建议关闭原子最小操作
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_set_atomic_min_int（废弃）
 

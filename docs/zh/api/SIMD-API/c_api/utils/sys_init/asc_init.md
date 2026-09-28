@@ -2,16 +2,19 @@
 okftype: reference.api.cpp
 title: asc_init
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_init/asc_init.md
-description: 将当前AI Core上可能由前序算子遗留的全局状态恢复为接口约定的初始状态，覆盖原子累加状态、Mask工作模式和CTRL寄存器等，仅初始化控制状态，不会清零用户数据。
+description: 将当前AI Core上可能由前序算子遗留的全局状态恢复为接口约定的初始状态，覆盖原子累加状态、Mask工作模式、CTRL寄存器等，仅初始化控制状态，不会清零用户数据。
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
+  - families: [system]
   - execution_models: [scalar]
 signature:
   - override_id: asc_init__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/utils/sys_init.h]
-dependencies: []
+archs: ['2201', '3510']
+header: [/include/c_api/utils/sys_init.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md
+    kind: configures
 examples:
   - path: /examples/02_simd_c_api/00_introduction/01_add/c_api_async_add
     file: c_api_add.asc
@@ -205,7 +208,7 @@ examples:
     file: ssbuf_aiv_aic_comm.asc
     archs: ['3510']
     override_id: asc_init__z
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_init
 

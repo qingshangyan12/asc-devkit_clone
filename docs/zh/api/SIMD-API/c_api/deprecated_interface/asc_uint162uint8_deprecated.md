@@ -2,34 +2,28 @@
 okftype: reference.api.cpp
 title: asc_uint162uint8（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md
-description: 已废弃接口，将uint16_t类型数据转化为uint8_t类型，支持饱和与非饱和模式，请改用asc_uint162uint8的显式位置参数重载替代。
+description: 已废弃的矢量寄存器数据类型转换接口，将uint16_t类型数据转化为uint8_t类型，无舍入模式，支持饱和与非饱和模式，写入时按索引奇偶位置分两部分，请改用显式位置参数重载替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
   - execution_models: [register_vector]
-  - traits: [deprecated, saturation_mode]
+  - traits: [deprecated, masked, saturation_mode]
 signature:
   - override_id: asc_uint162uint8__Rvu8_vu16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint162uint8_sat__Rvu8_vu16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint162uint8_v2__Rvu8_vu16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint162uint8_sat_v2__Rvu8_vu16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。
+    condition: 开启饱和模式和非饱和模式时
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_uint162uint8（废弃）
 

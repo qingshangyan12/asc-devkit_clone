@@ -2,19 +2,18 @@
 okftype: reference.api.cpp
 title: asc_set_gm2l1_padding
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md
-description: 用于设置asc_copy_gm2l1高维切分数据搬运接口padding模式使用的padding值，该值因寄存器共用同时作为3D矩阵搬运的填充值，仅在AIC上生效。
+description: 设置asc_copy_gm2l1高维切分数据搬运接口padding模式使用的padding值，因底层寄存器与asc_set_l12l0a_3d_padding共用，该值同时作为3D矩阵搬运asc_copy_l12l0a的填充值，仅在AIC上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
+  - traits: [padding]
 signature:
   - prototype_id: asc_set_gm2l1_padding__<dtype>
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - override_id: asc_set_gm2l1_padding__u64
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md
     kind: configures
@@ -23,7 +22,7 @@ dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md
     kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_gm2l1_padding
 

@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_load_image_to_cbuf_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_load_image_to_cbuf_sync_deprecated.md
-description: 已废弃的同步图像搬运接口：将图像数据从Global Memory搬运到L1 Buffer，支持指定加载区域及上下左右填充像素，请使用非同步接口asc_load_image_to_cbuf并配合同步接口asc_sync替代。
+description: 已废弃的同步图像搬运接口：将图像数据从Global Memory搬运到L1 Buffer，可指定源图加载区域及目的图片上下左右填充像素数，请使用非同步接口asc_load_image_to_cbuf并配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,18 +12,18 @@ tag:
   - traits: [deprecated, padding]
 signature:
   - override_id: asc_load_image_to_cbuf_sync__PL1i8_u16_u16_u16_u16_u16_u8_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_load_image_to_cbuf_sync__PL1f16_u16_u16_u16_u16_u16_u8_u8_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_load_image_to_cbuf_sync（废弃）
 

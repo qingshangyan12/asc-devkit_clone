@@ -2,12 +2,12 @@
 okftype: reference.index.cpp
 title: 关键分形格式详解
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
-description: 详解矩阵计算的关键分形格式，说明ND、DN、Zz、Zn、Nz与NC1HWC0格式的定义、物理位置、设计原理、分形大小约束和转换过程，并给出矩阵乘法场景下各格式组合的要求。
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md
+    title: 矩阵搬入数据搬运 DN2Nz接口
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md
+    title: 数据搬运（GMToL1随路转换-ND2Nz搬运）
+timestamp: '2026-09-28'
 ---
 # 关键分形格式详解
 

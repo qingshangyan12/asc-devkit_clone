@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy_l0c2ub（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2ub_deprecated.md
-description: asc_copy_l0c2ub旧参数形式及同步接口已废弃，将矩阵计算结果从L0C Buffer搬运至Unified Buffer，支持随路量化、随路激活与Nz2ND等格式转换组合，请改用新接口和asc_sync替代。
+description: 已废弃的旧参数形式及同步搬运接口，将矩阵计算结果从L0C Buffer搬运至Unified Buffer，支持随路量化、随路激活与Nz2ND/Nz2DN格式转换组合，需配套接口预先配置后调用，请改用asc_copy_l0c2ub和asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,11 +12,10 @@ tag:
   - traits: [deprecated, quantization]
 signature:
   - prototype_id: asc_copy_l0c2ub__PU<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_b_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+    header: [/include/c_api/cube_datamove/cube_datamove.h]
   - prototype_id: asc_copy_l0c2ub_sync__PU<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_b_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
-    archs: ['3510']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
+    header: [/include/c_api/composite/cube_datamove_composite.h]
+archs: ['3510']
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
     kind: related
@@ -47,7 +46,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本指令与其他指令存在目的地址重叠
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l0c2ub（废弃）
 

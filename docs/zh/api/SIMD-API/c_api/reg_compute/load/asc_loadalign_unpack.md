@@ -2,42 +2,38 @@
 okftype: reference.api.cpp
 title: asc_loadalign_unpack
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md
-description: 从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度连续数据，在每个源元素后补1个值为0的元素，得到VL长度数据搬入矢量数据寄存器。
+description: 从Unified Buffer中32字节对齐的起始地址读取VL/2长度连续数据，在每个源元素后补1个值为0的元素得到VL长度数据搬入矢量数据寄存器，提供对齐、立即数偏移和地址寄存器偏移三种搬入模式。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [load]
+  - objects: [vector]
   - execution_models: [register_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]
 signature:
   - prototype_id: asc_loadalign_unpack__PU<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_loadalign_unpack__Rv<dtype>_PU<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_loadalign_unpack__Rv<dtype>_PU<dtype>_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_loadalign_unpack__Rv<dtype>_PU<dtype>_ar
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/load/loadalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: related
+    kind: requires
+    condition: 地址寄存器偏移搬入模式
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
     condition: 如果本指令与其他指令存在UB地址重叠
@@ -50,7 +46,7 @@ examples:
     file: elu.asc
     archs: ['3510']
     override_id: asc_loadalign_unpack__Rvf16_PUf16
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_loadalign_unpack
 

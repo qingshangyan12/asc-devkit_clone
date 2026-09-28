@@ -2,7 +2,8 @@
 okftype: reference.api.cpp
 title: asc_squeeze_and_storeunalign_finalize
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
-description: Reg矢量数据搬运接口，用于结束一组连续非对齐搬出操作，将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB），每组连续搬出操作仅执行一次本接口。
+description: Reg矢量数据搬运接口，用于结束一组asc_squeeze_and_storeunalign连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified
+  Buffer，每组连续搬出操作仅执行一次本接口。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -13,19 +14,18 @@ tag:
   - traits: [unaligned_transfer]
 signature:
   - prototype_id: asc_squeeze_and_storeunalign_finalize__PU<dtype>_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, fp8_e8m0_t, fp8_e5m2_t,
       fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
     kind: requires
-    condition: 调用本接口前，需先调用一次或多次asc_squeeze_and_storeunalign
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
     condition: 如果本接口与其他指令存在UB地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_squeeze_and_storeunalign_finalize
 

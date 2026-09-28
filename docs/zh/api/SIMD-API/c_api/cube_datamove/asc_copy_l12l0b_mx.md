@@ -8,13 +8,14 @@ tag:
   - roles: [data_movement]
   - operations: [copy]
   - source_locations: [l1_buffer]
+  - traits: [quantization]
 signature:
   - override_id: asc_copy_l12l0b_mx__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md
-    kind: related
+    kind: requires
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: constrained_by
     condition: 如果本指令与其他指令存在目的地址重叠，需要插入同步指令
@@ -22,7 +23,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本指令与其他指令存在目的地址重叠，需要插入同步指令
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0b_mx
 

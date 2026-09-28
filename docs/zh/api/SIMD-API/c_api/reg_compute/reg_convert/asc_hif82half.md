@@ -7,24 +7,21 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, widening_result]
 signature:
   - override_id: asc_hif82half__Rvf16_vhf8_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_hif82half__Rvf16_vhf8_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_hif82half__vhf8_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_hif82half__vhf8_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_hif82half
 

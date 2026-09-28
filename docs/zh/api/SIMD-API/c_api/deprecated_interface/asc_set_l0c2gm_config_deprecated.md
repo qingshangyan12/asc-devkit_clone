@@ -2,21 +2,21 @@
 okftype: reference.api.cpp
 title: asc_set_l0c2gm_config（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md
-description: 该接口已废弃，用于在数据搬运过程中进行随路量化时设置量化流程中的矢量量化参数，请使用asc_set_l0c_copy_config接口替代。
+description: 该接口已废弃，用于在数据搬运过程中进行随路量化时设置量化流程中的矢量量化参数，量化参数不能为inf/nan和非规格化数，请使用asc_set_l0c_copy_config接口替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
   - traits: [deprecated]
 signature:
   - override_id: asc_set_l0c2gm_config__u64_u64_b
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
     kind: related
-    condition: '`asc_set_l0c2gm_config`接口已废弃。请使用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)接口替代。'
+    condition: 该接口已废弃，作为替代接口使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_set_l0c2gm_config（废弃）
 ## 产品支持情况

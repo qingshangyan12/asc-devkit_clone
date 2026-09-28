@@ -2,25 +2,23 @@
 okftype: reference.api.cpp
 title: asc_uint82uint16（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md
-description: 已废弃接口，根据mask将源操作数中的uint8_t类型元素转为uint16_t类型并写入目的操作数，请改用asc_uint82uint16的显式位置参数重载替代。
+description: 该接口已废弃，根据mask将uint8_t类型元素逐个转为uint16_t类型并写入目的矢量数据寄存器，通过接口后缀选择源操作数奇偶读取位置，请使用显式位置参数重载替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
   - execution_models: [register_vector]
-  - traits: [deprecated]
+  - traits: [deprecated, masked]
 signature:
   - override_id: asc_uint82uint16__Rvu16_vu8_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint82uint16__Rvu16_vu8_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_uint82uint16（废弃）
 

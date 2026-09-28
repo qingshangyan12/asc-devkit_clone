@@ -6,19 +6,24 @@ description: 在L0C Buffer搬出过程中进行随路Scalar激活时，配置激
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
+  - families: [activation]
+  - operations: [relu]
 signature:
   - override_id: asc_set_l0c_copy_relu_alpha__f32
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
     kind: configures
+    condition: 需要与搬出接口的`relu_pre_mode`搭配使用
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
     kind: configures
+    condition: 需要与搬出接口的`relu_pre_mode`搭配使用
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
     kind: configures
+    condition: 需要与搬出接口的`relu_pre_mode`搭配使用
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_l0c_copy_relu_alpha
 

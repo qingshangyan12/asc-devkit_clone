@@ -10,8 +10,8 @@ tag:
   - execution_models: [matrix_compute]
 signature:
   - override_id: asc_disable_hif8__z
-    archs: ['3510']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+archs: ['3510']
+header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md
     kind: related
@@ -23,7 +23,7 @@ dependencies:
     kind: configures
     condition: 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_disable_hif8
 

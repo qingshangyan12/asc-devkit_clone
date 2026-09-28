@@ -6,21 +6,21 @@ description: 设置3D格式分形矩阵搬运（im2col展开）指令使用的�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
+  - operations: [img2col]
+  - traits: [padding]
 signature:
   - prototype_id: asc_set_l12l0b_3d_padding__<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - override_id: asc_set_l12l0b_3d_padding__u64
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md
     kind: configures
-    condition: 当`asc_copy_l12l0b`接口中的`f_matrix_ctrl`参数设置为`true`时，3D格式分形矩阵搬运（im2col展开）场景会使用本接口设置的值作为填充值。
+    condition: 当`asc_copy_l12l0b`接口中的`f_matrix_ctrl`参数设置为`true`时
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_l12l0b_3d_padding
 

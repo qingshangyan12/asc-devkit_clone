@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy_gm2l1_dn2nz
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md
-description: 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式的转换，使其满足后续矩阵计算对分形列连续性的要求，搬运前需先配置Nz矩阵步长与搬运个数。
+description: 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式的转换，使其满足后续矩阵计算对分形列连续性的要求，调用前需先配置Nz矩阵步长与DN矩阵搬运个数，仅在AIC上执行有效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -11,10 +11,10 @@ tag:
   - destination_locations: [l1_buffer]
 signature:
   - prototype_id: asc_copy_gm2l1_dn2nz__PL1<dtype>_PG<dtype>_u64_loadl2_u16_u32_u64_b
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
     dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
       half, bfloat16_t, int32_t, uint32_t, float]
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md
     kind: requires
@@ -29,7 +29,7 @@ examples:
     file: matmul.asc
     archs: ['3510']
     override_id: asc_copy_gm2l1_dn2nz__PL1f32_PGf32_u64_loadl2_u16_u32_u64_b
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_gm2l1_dn2nz
 

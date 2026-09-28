@@ -2,24 +2,24 @@
 okftype: reference.api.cpp
 title: asc_get_ffts_base_addr
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md
-description: 获取核间同步寄存器的基地址，该基地址需在Host侧获取并经asc_set_ffts_base_addr配置后使用，本接口为只读查询，常用于设置后的回读校验。
+description: 获取核间同步寄存器的基地址，本接口为只读查询接口，调用方不可直接设置或修改返回的基地址值，基地址需通过asc_set_ffts_base_addr预先配置后方可用于核间同步。
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - execution_models: [scalar]
+  - families: [system]
 signature:
   - override_id: asc_get_ffts_base_addr__z
-    archs: ['2201']
-    headers: [/include/c_api/utils/sys_var.h]
+archs: ['2201']
+header: [/include/c_api/utils/sys_var.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md
-    kind: related
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_ffts_base_addr
 

@@ -2,41 +2,35 @@
 okftype: reference.api.cpp
 title: asc_shiftright_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md
-description: 该接口已废弃，用于对src中的每个元素执行右移，有符号类型做算术右移、无符号类型做逻辑右移，请使用非同步接口asc_shiftright和同步接口asc_sync替代。
+description: 对src中的每个元素执行右移，有符号类型做算术右移、无符号类型做逻辑右移，value不支持负数且不能超过源数据类型位宽，接口已废弃，请使用非同步接口asc_shiftright和同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
+  - families: [bitwise]
   - operations: [bitwise_shift]
+  - objects: [vector]
   - execution_models: [memory_vector]
-  - traits: [deprecated]
+  - source_locations: [unified_buffer]
+  - destination_locations: [unified_buffer]
+  - traits: [deprecated, elementwise, scalar_operand]
 signature:
   - override_id: asc_shiftright_sync__PUi16_PUi16_i32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_shiftright_sync__PUu16_PUu16_u32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_shiftright_sync__PUi32_PUi32_i32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_shiftright_sync__PUu32_PUu32_u32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_shiftright_round_sync__PUi16_PUi16_i32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_shiftright_round_sync__PUi32_PUi32_i32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_shiftright_sync`和`asc_shiftright_round_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_logic/asc_shiftright.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
     kind: related
-    condition: '`asc_shiftright_sync`和`asc_shiftright_round_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_logic/asc_shiftright.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_shiftright_sync（废弃）
 

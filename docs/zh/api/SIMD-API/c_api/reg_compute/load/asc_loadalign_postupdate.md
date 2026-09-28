@@ -2,37 +2,34 @@
 okftype: reference.api.cpp
 title: asc_loadalign_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md
-description: 从Unified Buffer（UB）中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，Post Update模式下搬运完成后自动更新源地址指针，提供立即数偏移和非连续对齐两种模式。
+description: 从Unified Buffer中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，Post Update模式下搬运完成后自动更新源地址指针，提供立即数偏移和非连续对齐两种搬入模式。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [load]
+  - objects: [mask, vector]
   - execution_models: [register_vector]
   - source_locations: [unified_buffer]
   - destination_locations: [vector_register]
   - traits: [masked, post_update]
 signature:
   - prototype_id: asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t, uint64_t]
   - override_id: asc_loadalign_postupdate__Rvb_RPUu32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: asc_loadalign_postupdate__Rv<dtype>_RPU<dtype>_u16_u16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/load/loadalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md
-    kind: related
+    kind: requires
     condition: 当dtype为`int64_t`时
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
-    kind: related
+    kind: requires
     condition: 当dtype为`int64_t`时
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
@@ -42,7 +39,7 @@ examples:
     file: reg_load_store_align.asc
     archs: ['3510']
     override_id: asc_loadalign_postupdate__Rvf16_RPUf16_u16_u16_vb
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_loadalign_postupdate
 

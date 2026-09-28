@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_atomic_or
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md
-description: 对Global Memory中address指向的单个元素执行原子按位或操作：读取旧值并与输入标量值进行按位或运算，将结果写回该地址并返回旧值，整个读取、计算和写回过程为原子操作。该接口运行在标量流水PIPE_S上，访问GM时绕过DCache，不维护缓存一致性。
+description: 对Global Memory中address指向的单个元素执行原子按位或操作，读取旧值并与输入标量值进行按位或运算，将结果写回该地址并返回旧值，整个读取、计算和写回过程为原子操作，接口运行在标量流水PIPE_S上，访问GM时绕过DCache。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -13,9 +13,9 @@ tag:
   - traits: [atomic]
 signature:
   - prototype_id: asc_atomic_or__PG<dtype>_<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/atomic/scalar_atomic.h]
     dtype: [int32_t, uint32_t, int64_t, uint64_t]
+archs: ['3510']
+header: [/include/c_api/atomic/scalar_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
     kind: requires
@@ -33,7 +33,7 @@ dependencies:
     kind: requires
     condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_atomic_or
 

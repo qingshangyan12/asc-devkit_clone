@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_set_mmad_direction_n
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
-description: 设置矩阵乘加计算时逐行生成矩阵计算结果分形，该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，适用于UnitFlag开启且搬出时进行Nz2ND随路格式转换等场景。
+description: 设置矩阵乘加计算时逐行生成矩阵计算结果分形，该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，需在矩阵乘加指令执行前调用。
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
@@ -10,8 +10,8 @@ tag:
   - destination_locations: [l0c_buffer]
 signature:
   - override_id: asc_set_mmad_direction_n__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
@@ -27,7 +27,7 @@ examples:
     file: mmad_direction.asc
     archs: ['3510']
     override_id: asc_set_mmad_direction_n__z
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_mmad_direction_n
 

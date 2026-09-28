@@ -13,17 +13,15 @@ tag:
   - traits: [unaligned_transfer]
 signature:
   - prototype_id: asc_store__PU<dtype>_v<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/composite/storeunalign_composite.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e4m3fn_t,
       fp8_e5m2_t, fp8_e8m0_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t]
   - prototype_id: asc_store__PU<dtype>_v<dtype>_u32
-    archs: ['3510']
-    headers: [/include/c_api/composite/storeunalign_composite.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e4m3fn_t,
       fp8_e5m2_t, fp8_e8m0_t, int16_t, uint16_t, bfloat16_t, int32_t, uint32_t, float,
       int64_t]
+archs: ['3510']
+header: [/include/c_api/composite/storeunalign_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
@@ -39,7 +37,7 @@ examples:
     file: set_l2_cache_mode.h
     archs: ['3510', '2201']
     override_id: asc_store__PUf16_vf16
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_store
 

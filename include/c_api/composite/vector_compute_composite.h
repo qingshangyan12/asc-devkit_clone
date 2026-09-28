@@ -33,6 +33,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
@@ -43,6 +45,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
@@ -53,6 +57,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_sync(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -64,6 +70,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_sync(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count);
@@ -1659,6 +1667,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_max and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_max_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
@@ -1669,6 +1679,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_max and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_max_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
@@ -1679,6 +1691,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_max and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_max_sync(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -1690,6 +1704,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_max and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_max_sync(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count);
@@ -1749,6 +1765,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_min and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_min_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
@@ -1759,6 +1777,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_min and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_min_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
@@ -1769,6 +1789,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_min and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_min_sync(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -1780,6 +1802,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_min and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_min_sync(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count);
@@ -1827,6 +1851,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mul and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_mul_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
@@ -1837,6 +1863,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mul and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_mul_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
@@ -1847,6 +1875,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mul and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_mul_sync(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -1858,6 +1888,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_mul and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_mul_sync(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count);
@@ -1941,6 +1973,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sub and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_sub_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
@@ -1951,6 +1985,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sub and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_sub_sync(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
@@ -1961,6 +1997,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sub and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_sub_sync(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -1972,6 +2010,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_sub and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_sub_sync(
     __ubuf__ int32_t* dst, __ubuf__ int32_t* src0, __ubuf__ int32_t* src1, uint32_t count);
@@ -2560,6 +2600,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_and_sync(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -2571,6 +2613,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_and and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_and_sync(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint32_t count);
@@ -2796,6 +2840,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add_relu and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu_sync(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
@@ -2806,6 +2852,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add_relu and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu_sync(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
@@ -2817,6 +2865,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add_relu and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu_sync(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -2833,6 +2883,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_ge and asc_sync)
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_ge_sync(
     __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
@@ -2850,6 +2902,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_ge and asc_sync)
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_ge_sync(
     __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride, uint8_t src0_block_stride,
@@ -2868,6 +2922,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_ge and asc_sync)
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_ge_sync(
     __ubuf__ uint8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -2887,6 +2943,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_ge and asc_sync)
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_ge_sync(
     __ubuf__ uint8_t* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -3157,11 +3215,37 @@ __aicore__ inline void asc_lt_sync(
     uint8_t src1_repeat_stride);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_ne_scalar and asc_sync)
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_ne_scalar_sync__PUu8_PUf16_f16_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_ne_scalar_sync(
     __ubuf__ uint8_t* dst, __ubuf__ half* src, half value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_ne_scalar and asc_sync)
+/**
+ * @ingroup simd_c_api.deprecated_interface
+ * @override_id asc_ne_scalar_sync__PUu8_PUf32_f32_u8_u16_u16_u16_u16
+ * @archs 2201
+ * @param [out] dst 目的操作数（矢量）的起始地址。
+ * @param [in] src 源操作数（矢量）的起始地址。
+ * @param [in] value 源操作数（标量）。
+ * @param [in] repeat 迭代次数。
+ * @param [in] dst_block_stride 目的操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] src_block_stride 源操作数单次迭代内不同DataBlock间地址步长。
+ * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src_repeat_stride 源操作数相邻迭代间相同DataBlock的地址步长。
+ */
 __aicore__ inline void asc_ne_scalar_sync(
     __ubuf__ uint8_t* dst, __ubuf__ float* src, float value, uint8_t repeat, uint16_t dst_block_stride,
     uint16_t src_block_stride, uint16_t dst_repeat_stride, uint16_t src_repeat_stride);
@@ -3319,6 +3403,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add_relu and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu_sync(
     __ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
@@ -3330,6 +3416,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add_relu and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu_sync(
     __ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
@@ -3341,6 +3429,8 @@ ASC_DEPRECATED(9.2.0, "2027/09/07", asc_add_relu and asc_sync)
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu_sync(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);

@@ -9,8 +9,8 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_get_saturation_flag__saturation
-    archs: ['3510']
-    headers: [/include/c_api/spr/spr.h]
+archs: ['3510']
+header: [/include/c_api/spr/spr.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
     kind: related
@@ -19,7 +19,7 @@ dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
     kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_saturation_flag
 

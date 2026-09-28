@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_deq_int162b8_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_deq_int162b8_sync_deprecated.md
-description: 已废弃接口，将int16_t类型转换为int8_t或uint8_t类型并存放于每个DataBlock的高半块或低半块，需先调用asc_set_deq_scale设置量化参数，请使用asc_deq_int162b8配合asc_sync替代。
+description: 已废弃接口，将int16_t类型转换为int8_t或uint8_t类型并存放于每个DataBlock的高半块或低半块，需先调用asc_set_deq_scale设置量化参数，请使用asc_deq_int162b8配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,26 +12,23 @@ tag:
   - traits: [deprecated, quantization]
 signature:
   - override_id: asc_deq_int162b8_h_sync__PUi8_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_deq_int162b8_h_sync__PUu8_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_deq_int162b8_l_sync__PUi8_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_deq_int162b8_l_sync__PUu8_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 已废弃接口的替代实现
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md
     kind: related
+    condition: 已废弃接口的替代实现
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
     kind: requires
+    condition: 使用该接口前
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_deq_int162b8_sync（废弃）
 

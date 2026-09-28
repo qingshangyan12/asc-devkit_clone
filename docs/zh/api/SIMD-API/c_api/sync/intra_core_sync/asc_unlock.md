@@ -10,17 +10,17 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_unlock__pipe_u8
-    archs: ['3510']
-    headers: [/include/c_api/sync/sync.h]
-  - override_id: asc_unlock__pipe_u8_mutexexec
-    archs: ['3510']
-    headers: [/include/c_api/sync/sync.h]
+  - override_id: asc_unlock__pipe_u8_mutexmode
+archs: ['3510']
+header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
     kind: related
-    condition: '`asc_lock`与`asc_unlock`必须严格成对使用，并使用相同的`pipe`、`mutex_id`和`mode`。'
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: related
+    condition: 单流水内多个指令之间的同步
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_unlock
 

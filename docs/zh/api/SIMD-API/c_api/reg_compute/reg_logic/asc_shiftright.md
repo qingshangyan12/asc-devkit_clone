@@ -7,18 +7,23 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [bitwise_shift]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_shiftright__v<dtype0>_v<dtype1>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - prototype_id: asc_shiftright__Rv<dtype0>_v<dtype0>_v<dtype1>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_logic.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_shiftright
 

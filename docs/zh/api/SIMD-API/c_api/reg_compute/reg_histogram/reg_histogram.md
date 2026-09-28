@@ -2,12 +2,12 @@
 okftype: reference.index.cpp
 title: 直方图
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/reg_histogram.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md
+    title: asc_cumulative_histogram
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md
+    title: asc_frequency_histogram
+timestamp: '2026-09-28'
 ---
 # 直方图
 

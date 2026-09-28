@@ -6,17 +6,17 @@ description: 该接口已废弃，用于对PADDING_B寄存器中的值进行设�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - traits: [deprecated]
+  - traits: [deprecated, padding]
 signature:
   - override_id: asc_set_l12l0_padding_val__u64
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md
     kind: related
-    condition: '`asc_set_l12l0_padding_val`接口已废弃。请使用[asc_set_l12l0b_3d_padding](../cube_datamove/asc_set_l12l0b_3d_padding.md)接口替代。'
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_set_l12l0_padding_val（废弃）
 

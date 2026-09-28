@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy_l12l0b_sparse_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sparse_sync_deprecated.md
-description: 已废弃接口，搬运L1 Buffer里512B大小的稠密权重矩阵到L0B Buffer并读取128B索引矩阵实现稀疏化，请使用asc_copy_l12l0b_sparse配合asc_sync替代。
+description: 已废弃的同步搬运接口，将L1 Buffer里512B大小的稠密权重矩阵搬运到L0B Buffer，同时读取128B索引矩阵实现稀疏化，请改用非同步接口和asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,15 +12,15 @@ tag:
   - traits: [deprecated, sparse_input]
 signature:
   - override_id: asc_copy_l12l0b_sparse_sync__PCBi8_PL1i8_PL1i8_u16_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0b_sparse_sync（废弃）
 

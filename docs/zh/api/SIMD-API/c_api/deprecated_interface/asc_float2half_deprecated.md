@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_float2half（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md
-description: 已废弃接口，将float类型数据转换成half类型，并支持多种舍入模式与饱和模式并按后缀选择写入奇偶位置，请使用显式位置参数重载替代。
+description: 已废弃的矢量转换接口，将float类型数据转换成half类型，支持多种舍入模式与饱和模式，位宽比为2:1并按接口后缀写入奇偶位置，需使用显式位置参数重载替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,86 +12,40 @@ tag:
   - traits: [deprecated, masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2half_rn__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rn_sat__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rn_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rn_sat_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rna__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rna_sat__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rna_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rna_sat_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rd__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rd_sat__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rd_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rd_sat_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_ru__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_ru_sat__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_ru_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_ru_sat_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rz__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rz_sat__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rz_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_rz_sat_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_ro__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_ro_sat__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_ro_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2half_ro_sat_v2__Rvf16_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md
     kind: related
-    condition: 该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2half](../reg_compute/reg_convert/asc_float2half.md)的显式位置参数重载替代。
+    condition: 接口后缀控制写入位置的原型已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。
+    condition: 开启饱和模式和非饱和模式时
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_float2half（废弃）
 

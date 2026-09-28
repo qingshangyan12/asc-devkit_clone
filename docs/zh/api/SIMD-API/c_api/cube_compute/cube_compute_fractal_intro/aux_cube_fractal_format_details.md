@@ -2,12 +2,12 @@
 okftype: reference.index.cpp
 title: 辅助矩阵分形格式详解
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md
-description: 介绍矩阵计算的辅助矩阵分形格式，包括MX系数矩阵scaleA与scaleB的分形排布、设计原理与格式转换过程，以及4选2稀疏索引矩阵的定义、生成规则和Zn分形格式约束。
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md
+    title: asc_copy_l12l0a_mx
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md
+    title: asc_copy_l12l0b_mx
+timestamp: '2026-09-28'
 ---
 # 辅助矩阵分形格式详解
 

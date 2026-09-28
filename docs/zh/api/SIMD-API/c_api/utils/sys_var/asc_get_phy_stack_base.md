@@ -6,14 +6,14 @@ description: 获取物理堆栈基地址并返回，常用于调试时定位当�
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - execution_models: [scalar]
+  - families: [system]
 signature:
   - override_id: asc_get_phy_stack_base__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/utils/sys_var.h]
+archs: ['2201', '3510']
+header: [/include/c_api/utils/sys_var.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_phy_stack_base
 

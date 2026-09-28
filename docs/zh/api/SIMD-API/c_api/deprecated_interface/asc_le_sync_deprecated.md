@@ -7,28 +7,31 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
+  - objects: [vector]
   - execution_models: [memory_vector]
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_le_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_le_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_le_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_le_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    kind: related
+    condition: 使用寄存器形式的接口时
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    kind: related
+    condition: 如果要初始化寄存器
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_le_sync（废弃）
 

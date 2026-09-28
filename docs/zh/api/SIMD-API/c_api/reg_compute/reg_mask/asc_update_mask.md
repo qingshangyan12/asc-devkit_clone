@@ -6,17 +6,18 @@ description: 根据元素个数value生成掩码寄存器，调用后自动将va
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
+  - objects: [mask]
 signature:
   - override_id: asc_update_mask_b8__Ru32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
   - override_id: asc_update_mask_b16__Ru32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
   - override_id: asc_update_mask_b32__Ru32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_mask.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples:
   - path: /examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
     file: c_api_add.asc
@@ -78,7 +79,7 @@ examples:
     file: truncate.asc
     archs: ['3510']
     override_id: asc_update_mask_b32__Ru32
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_update_mask
 

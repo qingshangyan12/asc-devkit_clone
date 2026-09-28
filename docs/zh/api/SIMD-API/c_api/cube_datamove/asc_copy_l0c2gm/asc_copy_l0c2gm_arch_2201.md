@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_l0c2gm
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_2201.md
-description: 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中，支持九种量化模式，并可通过参数开启ReLU、通道拆分和NZ2ND格式转换。
+description: 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中，支持九种量化模式，并可通过参数开启ReLU、通道拆分和NZ2ND格式转换功能。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -11,35 +11,19 @@ tag:
   - traits: [quantization]
 signature:
   - override_id: asc_copy_l0c2gm__PGf16_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l0c2gm__PGbf16_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l0c2gm__PGi8_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l0c2gm__PGu8_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l0c2gm__PGf32_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l0c2gm__PGf16_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l0c2gm__PGi16_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l0c2gm__PGi8_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l0c2gm__PGi32_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l0c2gm
 

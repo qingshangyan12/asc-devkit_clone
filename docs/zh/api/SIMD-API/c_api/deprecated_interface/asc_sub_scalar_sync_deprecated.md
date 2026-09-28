@@ -11,17 +11,11 @@ tag:
   - traits: [deprecated, scalar_operand]
 signature:
   - override_id: asc_sub_scalar_sync__PUi16_PUi16_i16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_sub_scalar_sync__PUf16_PUf16_f16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_sub_scalar_sync__PUi32_PUi32_i32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_sub_scalar_sync__PUf32_PUf32_f32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
@@ -30,7 +24,7 @@ dependencies:
     kind: related
     condition: '`asc_sub_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sub_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_sub_scalar_sync（废弃）
 

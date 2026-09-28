@@ -1,8 +1,8 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.concept.cpp
 title: 随路量化
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md
-description: 介绍矩阵搬出支持的随路量化能力：包括无需量化系数的Cast（F322F16/F322BF16）与带系数量化，带系数量化分Scalar和Tensor/Vector两种粒度；文档说明各产品支持的量化模式、系数配置接口及量化参数比特位含义。
+description: 介绍矩阵搬出支持的随路量化能力：包括无需量化系数的Cast（F322F16/F322BF16）与带系数量化，带系数量化分Scalar和Tensor/Vector两种粒度；说明各产品支持的量化模式、系数配置接口及量化参数比特位含义。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -11,17 +11,13 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb.md
     kind: related
-    condition: 先用[asc_copy_l12fb](../asc_copy_l12fb/asc_copy_l12fb.md)从L1 Buffer搬入量化区，再设置起始地址索引。
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
     kind: related
-    condition: Vector地址使用[asc_set_l0c_copy_config](../asc_set_l0c_copy_config.md)配置
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md
     kind: related
-    condition: Scalar系数使用[asc_set_l0c_copy_prequant(scale, offset, is_signed)](../asc_set_l0c_copy_prequant.md)配置
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
     kind: related
-examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # 随路量化
 

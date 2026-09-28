@@ -2,24 +2,27 @@
 okftype: reference.api.cpp
 title: asc_int42half_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int42half_sync_deprecated.md
-description: 已废弃的同步类型转换接口，将int4_t类型数据转换为half类型，请改用对应的非同步接口和同步接口asc_sync替代。
+description: 已废弃的同步类型转换接口，将int4_t类型数据转换为half类型，操作数起始地址需32字节对齐且src为int4b_t时count必须为偶数，请改用对应非同步接口和同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
+  - objects: [vector]
   - execution_models: [memory_vector]
   - traits: [deprecated]
 signature:
   - override_id: asc_int42half_sync__PUf16_PUi4x2_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 该接口已废弃，作为替代使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md
     kind: related
+    condition: 该接口已废弃，作为替代使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_int42half_sync（废弃）
 

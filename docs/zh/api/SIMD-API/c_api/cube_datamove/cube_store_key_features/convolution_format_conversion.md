@@ -2,20 +2,12 @@
 okftype: reference.index.cpp
 title: 卷积格式转换
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/convolution_format_conversion.md
-description: 介绍卷积运算中L0C Buffer上NC1HWC0格式数据的输出转换：Fixpipe指令通过Nz2ND能力将数据转为NHWC格式输出；针对Ascend
-  950PR&950DT系列产品，还支持通过Nz2DN能力将数据转为NCHW格式输出。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement]
-  - operations: [copy, layout_transform]
-  - source_locations: [l0c_buffer]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
-    kind: related
+navigation:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
-    kind: related
-examples: []
-timestamp: '2026-09-23'
+    title: Nz2ND
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
+    title: Nz2DN
+timestamp: '2026-09-28'
 ---
 # 卷积格式转换
 

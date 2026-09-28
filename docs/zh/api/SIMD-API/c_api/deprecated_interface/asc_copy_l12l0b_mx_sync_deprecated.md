@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy_l12l0b_mx_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_mx_sync_deprecated.md
-description: 已废弃接口，完成MX矩阵计算所需右矩阵量化系数从L1 Buffer到L0B_MX Buffer的搬运，请使用asc_copy_l12l0b_mx配合asc_sync替代。
+description: 已废弃的同步搬运接口，负责完成MX矩阵计算所需右矩阵量化系数从L1 Buffer到L0B_MX Buffer的搬运，需与asc_copy_l12l0b配合使用，请改用非同步接口和asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -11,8 +11,8 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_copy_l12l0b_mx_sync__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16
-    archs: ['3510']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
+archs: ['3510']
+header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md
     kind: related
@@ -27,7 +27,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本指令与其他指令存在目的地址重叠
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0b_mx_sync（废弃）
 

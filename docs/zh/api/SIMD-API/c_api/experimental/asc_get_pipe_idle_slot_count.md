@@ -10,26 +10,16 @@ tag:
   - families: [system]
 signature:
   - override_id: asc_get_pipe_mte2_idle_slot_count__z
-    archs: ['3510']
-    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: asc_get_pipe_mte3_idle_slot_count__z
-    archs: ['3510']
-    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: asc_get_pipe_v_idle_slot_count__z
-    archs: ['3510']
-    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: asc_get_pipe_m_idle_slot_count__z
-    archs: ['3510']
-    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: asc_get_pipe_mte1_idle_slot_count__z
-    archs: ['3510']
-    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
   - override_id: asc_get_pipe_fix_idle_slot_count__z
-    archs: ['3510']
-    headers: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
+archs: ['3510']
+header: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # 指令发射队列空闲槽位查询
 

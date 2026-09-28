@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_mul_cast_half2uint8_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mul_cast_half2uint8_sync_deprecated.md
-description: 已废弃的同步融合运算接口：按元素将两个half源操作数求积并转换为uint8_t类型，乘积按RINT舍入模式处理且溢出做饱和处理，请使用非同步接口asc_mul_cast_half2uint8并配合同步接口asc_sync替代。
+description: 已废弃的同步融合运算接口，按元素求两个half源操作数的积并将结果转换为uint8_t类型，乘积按RINT舍入模式处理且溢出做饱和处理，请使用非同步接口asc_mul_cast_half2uint8并配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -11,15 +11,17 @@ tag:
   - traits: [deprecated, elementwise, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_mul_cast_half2uint8_sync__PUu8_PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_mul_cast_half2uint8_sync（废弃）
 

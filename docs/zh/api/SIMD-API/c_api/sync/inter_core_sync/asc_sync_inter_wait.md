@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_sync_inter_wait
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md
-description: 与asc_sync_inter_arrive配对使用，实现不同AI Core之间全部AIC或全部AIV的同步。检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水与NPU架构有关。
+description: 与asc_sync_inter_arrive配对使用，实现不同AI Core之间全部AIC或全部AIV的核间同步（模式0）。检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水与NPU架构有关。
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
@@ -11,14 +11,16 @@ tag:
   - traits: [inter_core_synchronization]
 signature:
   - override_id: asc_sync_inter_wait__pipe_i64
-    archs: ['2201', '3510']
-    headers: [/include/c_api/sync/sync.h]
+archs: ['2201', '3510']
+header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md
     kind: related
-    condition: 用户需要确保配套使用（`flag_id`必须完全一致）`asc_sync_inter_arrive`和`asc_sync_inter_wait`，否则会出现未定义行为。
+    condition: 用户需要确保配套使用（`flag_id`必须完全一致）
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md
+    kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_sync_inter_wait
 

@@ -26,13 +26,18 @@ types:
   LoadData2DParams: load2d
   cache_mode: cachemode
   addr_reg: ar
+  asc_channel_pad_mode: channelpad
+  asc_dual_dst_mode: dualdst
   asc_fill_value_config: fillcfg
   asc_hf32_round_mode: hfround
   asc_l13d_fmatrix_config: l13dcfg
+  asc_l13d_repeat_direction: l13ddir
   asc_load3d_v2_config: load3dcfg
   asc_load_l2_cache_mode: loadl2
   asc_ndim_pad_count_config: padcountcfg
   asc_override_strategy: strategy
+  asc_quant_mode: quantmode
+  asc_relu_pre_mode: relupre
   asc_saturation_mode: saturation
   asc_store_atomic_config: atomiccfg
   asc_store_l2_cache_mode: storel2
@@ -104,6 +109,7 @@ types:
   VdeqInfo: vdeqinfo
 aliases:
   AscendC::Te::CacheMode: cache_mode
+  asc_mutex_execute_mode: ascMutexExecuteMode
   int4b_t: int4x2_t
   MaskReg: vector_bool
   UnalignRegForLoad: vector_align
@@ -134,6 +140,7 @@ exact_types:
   GM_ADDR: GPU8
   TBufHandle: PU8
   FixpipeParamsArch3510<config.format>: fixpipeparamsarch3510cfg
+  std::integral_constant<asc_position_mode,<src_pos>>: icpos
   std::integral_constant<asc_position_mode,asc_position_mode::EVEN>: icposeven
   std::integral_constant<asc_position_mode,asc_position_mode::ODD>: icposodd
   std::integral_constant<asc_position_quarter_mode,<quarter_pos>>: icposquarter

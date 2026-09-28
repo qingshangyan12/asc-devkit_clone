@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_half2uint8_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2uint8_sync_deprecated.md
-description: 已废弃的同步矢量转换接口：将half类型数据转换为uint8_t类型，支持NONE、RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请使用非同步接口asc_half2uint8并配合同步接口asc_sync替代。
+description: 已废弃的同步矢量转换接口，将half类型数据转换为uint8_t类型，支持NONE、RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请使用非同步接口asc_half2uint8并配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,32 +12,22 @@ tag:
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_half2uint8_sync__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2uint8_rn_sync__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2uint8_rd_sync__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2uint8_rna_sync__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2uint8_ru_sync__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_half2uint8_rz_sync__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_half2uint8_sync`、`asc_half2uint8_rn_sync`、`asc_half2uint8_rd_sync`、`asc_half2uint8_rna_sync`、`asc_half2uint8_ru_sync`和`asc_half2uint8_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_half2uint8.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md
     kind: related
-    condition: '`asc_half2uint8_sync`、`asc_half2uint8_rn_sync`、`asc_half2uint8_rd_sync`、`asc_half2uint8_rna_sync`、`asc_half2uint8_ru_sync`和`asc_half2uint8_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_half2uint8.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_half2uint8_sync（废弃）
 

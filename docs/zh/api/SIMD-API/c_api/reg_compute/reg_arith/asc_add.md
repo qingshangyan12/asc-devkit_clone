@@ -7,25 +7,26 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [add]
+  - objects: [carry_flag, vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, supports_carry_output]
 signature:
   - prototype_id: asc_add__Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_add__v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_add__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int32_t, uint32_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_arith.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
 examples:
   - path: /examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
@@ -48,7 +49,7 @@ examples:
     file: reduce.asc
     archs: ['3510']
     override_id: asc_add__Rvf32_vf32_vf32_vb
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_add
 

@@ -12,14 +12,15 @@ tag:
   - traits: [deprecated, elementwise, masked]
 signature:
   - prototype_id: asc_or__Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
     dtype: [half, float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_logic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md
     kind: related
+    condition: 该接口的浮点类型重载已废弃
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_or（废弃）
 

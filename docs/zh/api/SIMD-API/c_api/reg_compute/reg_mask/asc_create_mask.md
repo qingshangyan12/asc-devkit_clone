@@ -6,19 +6,18 @@ description: 根据传入的pat_mode生成对应的掩码寄存器，支持b8、
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
+  - objects: [mask]
 signature:
   - override_id: asc_create_mask_b8__pattern
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
   - override_id: asc_create_mask_b16__pattern
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
   - override_id: asc_create_mask_b32__pattern
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_mask.h]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_mask.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_create_mask
 

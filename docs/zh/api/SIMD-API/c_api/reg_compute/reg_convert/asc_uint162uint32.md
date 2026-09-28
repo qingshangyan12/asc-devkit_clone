@@ -2,29 +2,30 @@
 okftype: reference.api.cpp
 title: asc_uint162uint32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md
-description: 将uint16_t类型数据转为uint32_t类型，位宽比为1:2，根据位置标签选择读取源操作数偶数或奇数索引位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+description: 将源操作数中uint16_t类型数据转换为uint32_t类型写入目的操作数，位宽比为1:2，通过位置标签选择读取源操作数偶数或奇数索引位置，未被掩码筛选的元素置零，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, widening_result]
 signature:
   - override_id: asc_uint162uint32__Rvu32_vu16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint162uint32__Rvu32_vu16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint162uint32__vu16_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint162uint32__vu16_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_uint162uint32
 

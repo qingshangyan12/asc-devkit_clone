@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_l12l0b_trans_sync_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_trans_sync_arch_3510_deprecated.md
-description: 已废弃接口，实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，按分形合并转置与拆分方式组织搬运，请使用asc_copy_l12l0b_trans配合asc_sync替代。
+description: 已废弃的同步搬运接口，实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，支持int4b_t、half、float等多种数据类型，请使用非同步接口配合asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,17 +12,17 @@ tag:
   - traits: [deprecated]
 signature:
   - prototype_id: asc_copy_l12l0b_trans_sync__PCB<dtype>_PL1<dtype>_u16_u8_u16_u16_u16_u16
-    archs: ['3510']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
       fp8_e4m3fn_t, half, bfloat16_t, int32_t, uint32_t, float]
+archs: ['3510']
+header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0b_trans_sync_arch_3510（废弃）
 

@@ -11,32 +11,18 @@ tag:
   - source_locations: [global_memory]
 signature:
   - override_id: asc_load_dev__PGi8
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: asc_load_dev__PGu8
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: asc_load_dev__PGi16
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: asc_load_dev__PGu16
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: asc_load_dev__PGi32
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: asc_load_dev__PGu32
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: asc_load_dev__PGi64
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_load.h]
   - override_id: asc_load_dev__PGu64
-    archs: ['3510']
-    headers: [/include/c_api/scalar_compute/scalar_load.h]
+archs: ['3510']
+header: [/include/c_api/scalar_compute/scalar_load.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_load_dev
 

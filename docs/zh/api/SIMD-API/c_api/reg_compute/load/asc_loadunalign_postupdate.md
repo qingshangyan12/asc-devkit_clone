@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_loadunalign_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md
-description: 从Unified Buffer按dtype对齐的起始地址读取VL长度连续数据，将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接后搬入矢量数据寄存器，搬入完成后同步更新源地址和非对齐寄存器。
+description: 从Unified Buffer按dtype对齐的起始地址读取VL长度连续数据，将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接后搬入矢量数据寄存器，搬入完成后同步更新源地址和非对齐寄存器，支持连续非对齐搬入和地址寄存器偏移搬入两种模式。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -13,29 +13,27 @@ tag:
   - traits: [post_update, unaligned_transfer]
 signature:
   - prototype_id: asc_loadunalign_postupdate__Rv<dtype>_Rvloadunalign_RPU<dtype>_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadunalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t]
   - prototype_id: asc_loadunalign_postupdate__Rv<dtype>_Rvloadunalign_PU<dtype>_Rar_u32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadunalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/load/loadunalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
     kind: requires
-    condition: 首次搬入前必须调用[asc_loadunalign_pre](asc_loadunalign_pre.md)进行初始化，该初始化接口与紧随其后的首次搬入必须使用相同的`src1`。
+    condition: 首次搬入前
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
-    condition: 地址寄存器偏移搬入模式下，每次循环迭代中，必须先调用`asc_update_addr_reg`生成该次迭代的起始偏移。
+    condition: 地址寄存器偏移搬入模式
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: requires
+    kind: constrained_by
     condition: 如果本指令与其他指令存在UB地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_loadunalign_postupdate
 

@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_mem_bar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-description: Reg矢量计算内不同流水线之间的同步指令，通过mem_type指定源流水线和目的流水线，目的流水线将等待源流水线上所有指令完成后再执行。
+description: Reg矢量计算内不同流水线之间的同步指令，通过mem_type指定源流水线和目的流水线，目的流水线将等待源流水线上所有指令完成后再执行，UB数据存在依赖时才需要插入同步。
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
@@ -10,11 +10,25 @@ tag:
   - execution_models: [register_vector]
 signature:
   - override_id: asc_mem_bar__mem
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_sync.h]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_sync.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md
+    kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_mem_bar
 

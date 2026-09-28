@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_get_system_clock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md
-description: 读取当前系统时钟计数器，按当前芯片的时钟频率换算后直接返回微秒级的int64_t时间值，无需调用方自行换算；返回值随系统时钟持续递增，在AIC与AIV上均可调用且含义一致。
+description: 读取当前系统时钟计数器，按当前芯片的时钟频率换算后直接返回微秒级的int64_t时间值，无需调用方自行换算，返回值随系统时钟持续递增，同一核函数内多次调用返回值单调不减，在AIC与AIV上均可调用且含义一致。
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
@@ -10,14 +10,13 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_get_system_clock__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/utils/sys_var.h]
+archs: ['2201', '3510']
+header: [/include/c_api/utils/sys_var.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md
     kind: related
-    condition: 本接口与[asc_get_system_cycle](asc_get_system_cycle.md)的区别在于：`asc_get_system_cycle`返回原始cycle计数值，需要调用方根据芯片频率自行换算为时间；`asc_get_system_clock`在接口内部完成换算，直接返回微秒级时间值。
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_system_clock
 

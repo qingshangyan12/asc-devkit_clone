@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_storealign_squeeze_status_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status_postupdate.md
-description: 将asc_squeeze_and_storeunalign操作后保存在AR特殊寄存器中的有效数据长度写入Unified Buffer（UB），写入后按offset字节自动更新目的地址指针，适用于硬件循环中连续保存squeeze状态的场景。
+description: 将asc_squeeze_and_storeunalign操作后保存在AR特殊寄存器中的有效数据长度写入Unified Buffer（UB），写入后按offset字节自动更新目的地址指针，适用于硬件循环中连续保存squeeze状态的场景，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,8 +12,8 @@ tag:
   - traits: [post_update]
 signature:
   - override_id: asc_storealign_squeeze_status_postupdate__RPUu32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/store/storealign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
     kind: requires
@@ -21,7 +21,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本接口与其他指令存在UB地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_storealign_squeeze_status_postupdate
 

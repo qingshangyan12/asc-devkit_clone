@@ -1,5 +1,5 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_l12l0b_trans
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md
 description: 将数据从L1 Buffer搬运到L0B Buffer，以512字节的数据分形为单位在搬运过程中完成二维分形矩阵转置，按分形索引、重复次数和源、目的间隔等参数组织搬运。
@@ -11,10 +11,10 @@ tag:
   - destination_locations: [l0b_buffer]
 signature:
   - prototype_id: asc_copy_l12l0b_trans__PCB<dtype>_PL1<dtype>_u16_u8_u16_u16_u16_u16
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
       fp8_e4m3fn_t, half, bfloat16_t, int32_t, uint32_t, float]
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: constrained_by
@@ -51,7 +51,7 @@ examples:
     file: mmad_s1.h
     archs: ['3510']
     override_id: asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0b_trans
 

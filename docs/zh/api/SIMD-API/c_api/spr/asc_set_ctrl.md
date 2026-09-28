@@ -9,13 +9,13 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_set_ctrl__u64
-    archs: ['2201', '3510']
-    headers: [/include/c_api/spr/spr.h]
+archs: ['2201', '3510']
+header: [/include/c_api/spr/spr.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md
     kind: requires
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_ctrl
 

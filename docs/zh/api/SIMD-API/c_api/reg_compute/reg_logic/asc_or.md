@@ -2,31 +2,32 @@
 okftype: reference.api.cpp
 title: asc_or
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md
-description: 根据mask对两个矢量数据寄存器或掩码寄存器执行按位或操作，结果写入目的操作数或通过函数返回值返回，掩码为0的对应比特位写0，仅在AIV上生效。
+description: 根据mask对两个矢量数据寄存器或掩码寄存器执行按位或操作，结果通过函数返回值返回或写入目的操作数，掩码比特位为0时结果对应位写0，仅在AIV上生效的Reg矢量计算接口。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [bitwise_or]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_or__v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
   - prototype_id: asc_or__Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
   - override_id: asc_or__vb_vb_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
   - override_id: asc_or__Rvb_vb_vb_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_logic.h]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_logic.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_or
 

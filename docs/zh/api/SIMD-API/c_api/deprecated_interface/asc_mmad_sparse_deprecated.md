@@ -7,24 +7,26 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [matrix_multiply_accumulate]
+  - objects: [matrix]
   - execution_models: [matrix_compute]
   - source_locations: [l0a_buffer, l0b_buffer]
   - destination_locations: [l0c_buffer]
   - traits: [deprecated, sparse_input]
 signature:
   - override_id: asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+    header: [/include/c_api/cube_compute/cube_compute.h]
   - override_id: asc_mmad_sparse_sync__PCCi32_PCAi8_PCBi8_u16_u16_u16_u8_b_b
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_compute_composite.h]
+    header: [/include/c_api/composite/cube_compute_composite.h]
+archs: ['2201']
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_mmad_sparse（废弃）
 

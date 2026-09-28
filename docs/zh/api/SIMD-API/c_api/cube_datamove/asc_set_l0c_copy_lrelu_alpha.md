@@ -2,23 +2,26 @@
 okftype: reference.api.cpp
 title: asc_set_l0c_copy_lrelu_alpha
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md
-description: 在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数，由后续L0C搬出接口与relu_pre_mode搭配使用，仅在AIC上生效。
+description: 在L0C Buffer搬出过程中进行随路Scalar激活时配置激活计算所需的缩放系数，由后续asc_copy_l0c2gm、asc_copy_l0c2l1或asc_copy_l0c2ub接口与relu_pre_mode搭配使用，仅在AIC上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
 signature:
   - override_id: asc_set_l0c_copy_lrelu_alpha__f32
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
     kind: configures
+    condition: 进行随路Scalar激活时
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
     kind: configures
+    condition: 进行随路Scalar激活时
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
     kind: configures
+    condition: 进行随路Scalar激活时
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_l0c_copy_lrelu_alpha
 

@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_gm2ub_align_sync_arch_2201（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_sync_arch_2201_deprecated.md
-description: 已废弃的同步搬运接口，提供GM到UB的非对齐数据搬运，支持前n个数据搬运和高维切分搬运两种方式并可手动或自动填充，请改用非同步接口和asc_sync替代。
+description: 提供GM到UB的非对齐数据同步搬运，支持前n个数据搬运和高维切分搬运两种方式，非32字节对齐时可手动或自动填充补齐；接口已废弃，请使用非同步接口和同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,35 +12,20 @@ tag:
   - traits: [deprecated, high_dimensional, padding, unaligned_transfer]
 signature:
   - override_id: asc_copy_gm2ub_align_sync__PUi8_PGi8_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_gm2ub_align_sync__PUu8_PGu8_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_gm2ub_align_sync__PUi16_PGi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_gm2ub_align_sync__PUu16_PGu16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_gm2ub_align_sync__PUf16_PGf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_gm2ub_align_sync__PUbf16_PGbf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_gm2ub_align_sync__PUi32_PGi32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_gm2ub_align_sync__PUu32_PGu32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_gm2ub_align_sync__PUf32_PGf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
     condition: 如果本指令与其他指令存在UB地址重叠
@@ -49,10 +34,12 @@ dependencies:
     condition: 如果本指令与其他指令存在UB地址重叠
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
     kind: requires
+    condition: 手动填充时
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_gm2ub_align_sync_arch_2201（废弃）
 

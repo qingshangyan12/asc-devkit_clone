@@ -7,28 +7,25 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [minimum]
+  - objects: [scalar, vector]
   - execution_models: [memory_vector]
   - traits: [deprecated, elementwise, scalar_operand]
 signature:
   - override_id: asc_min_scalar_sync__PUf16_PUf16_f16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_min_scalar_sync__PUf32_PUf32_f32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_min_scalar_sync__PUi16_PUi16_i16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_min_scalar_sync__PUi32_PUi32_i32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_min_scalar_sync（废弃）
 

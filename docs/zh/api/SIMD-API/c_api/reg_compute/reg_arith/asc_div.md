@@ -8,24 +8,27 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [divide]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_div__Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
   - prototype_id: asc_div__v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_arith.h]
+dependencies:
+  - path: docs/zh/api/appendix/reg_vector_compute_interface_boundary_value_summary.md
+    kind: constrained_by
 examples:
   - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div
     file: div.asc
     archs: ['3510']
     override_id: asc_div__Rvf32_vf32_vf32_vb
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_div
 

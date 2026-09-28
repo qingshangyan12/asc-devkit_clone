@@ -7,20 +7,23 @@ tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
+  - objects: [mask, vector]
   - execution_models: [register_vector]
   - source_locations: [vector_register]
 signature:
   - override_id: asc_extract_mask__vu16_i16
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_copy.h]
   - override_id: asc_extract_mask__vu32_i16
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_copy.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_copy.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
     kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_extract_mask
 

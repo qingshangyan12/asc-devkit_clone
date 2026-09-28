@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_fill_l1_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md
-description: 已废弃接口，将标量填充值写入L1 Buffer目的地址并广播到多个32字节分形块，可用于L1 Buffer内存初始化，请使用asc_fill_l1与asc_sync组合替代。
+description: 已废弃接口，将标量填充值写入L1 Buffer目的地址并广播到多个32字节分形块，用于L1 Buffer内存初始化，请使用asc_fill_l1与asc_sync组合替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_initialization]
@@ -11,17 +11,15 @@ tag:
   - traits: [deprecated]
 signature:
   - prototype_id: asc_fill_l1_sync__PL1<dst_dtype>_<value_dtype>_RCfillcfg
-    archs: ['2201', '3510']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
+archs: ['2201', '3510']
+header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md
     kind: related
-    condition: '`asc_fill_l1_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l1.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_fill_l1_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l1.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_fill_l1_sync（废弃）
 

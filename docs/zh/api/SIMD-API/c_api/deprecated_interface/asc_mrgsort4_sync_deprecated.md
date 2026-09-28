@@ -2,27 +2,28 @@
 okftype: reference.api.cpp
 title: asc_mrgsort4_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mrgsort4_sync_deprecated.md
-description: 已废弃的同步归并排序接口：将已经排好序的最多4条队列合并排列成1条队列，结果按照score域由大到小排序，请使用非同步接口asc_mrgsort4并配合同步接口asc_sync替代。
+description: 已废弃的同步归并排序接口：将已经排好序的最多4条队列合并排列成1条队列，结果按照score域由大到小排序；请使用非同步接口asc_mrgsort4并配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [sort]
+  - objects: [vector]
   - execution_models: [memory_vector]
   - traits: [deprecated]
 signature:
   - override_id: asc_mrgsort4_sync__PUf16_AmrgPUf16_u8_u16_u16_u16_u16_b_u8
-    archs: ['2201', '3510']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_mrgsort4_sync__PUf32_AmrgPUf32_u8_u16_u16_u16_u16_b_u8
-    archs: ['2201', '3510']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201', '3510']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_mrgsort4_sync（废弃）
 

@@ -1,11 +1,13 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.concept.cpp
 title: Reg数据搬出概述
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/reg_store_overview.md
-description: Reg数据搬出概述页：说明该类接口将矢量数据寄存器、掩码寄存器或非对齐寄存器中的数据写入Unified Buffer（UB），按对齐、非对齐及压缩、交织等模式给出接口选择表，并对比手动偏移、立即数偏移、地址寄存器偏移与Post
+description: 介绍Reg数据搬出接口的分类与选择：将矢量数据寄存器、掩码寄存器或非对齐寄存器中的数据写入Unified Buffer（UB），按对齐与非对齐汇总各接口模式与目的地址对齐要求，并对比手动偏移、立即数偏移、地址寄存器偏移与Post
   Update四种目的地址维护方式。
 tag:
   - api_surfaces: [c_api]
+  - roles: [data_movement]
+  - operations: [store]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: related
@@ -17,8 +19,7 @@ dependencies:
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
     kind: related
-examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # Reg数据搬出概述
 

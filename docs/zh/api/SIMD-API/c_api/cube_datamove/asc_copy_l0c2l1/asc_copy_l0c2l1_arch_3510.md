@@ -1,5 +1,5 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_l0c2l1
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
 description: 将矩阵计算结果从L0C Buffer搬运到L1 Buffer，搬运过程中可组合随路量化、ReLU、Nz2ND格式转换和通道拆分能力，需通过配套接口预先配置相关参数，仅在AIC上执行有效。
@@ -10,6 +10,10 @@ tag:
   - source_locations: [l0c_buffer]
   - destination_locations: [l1_buffer]
   - traits: [quantization]
+signature:
+  - prototype_id: asc_copy_l0c2l1__PL1<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+archs: ['3510']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
     kind: requires
@@ -36,7 +40,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本指令与其他指令存在目的地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l0c2l1
 

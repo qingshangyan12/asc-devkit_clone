@@ -10,17 +10,15 @@ tag:
   - traits: [rounding_mode]
 signature:
   - override_id: asc_set_hf32_round_mode__hfround
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md
     kind: requires
-    condition: 使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
-    condition: 本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_hf32_round_mode
 

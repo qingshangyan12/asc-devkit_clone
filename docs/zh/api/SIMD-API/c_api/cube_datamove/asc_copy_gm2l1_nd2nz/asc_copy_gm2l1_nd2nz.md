@@ -2,12 +2,12 @@
 okftype: reference.index.cpp
 title: asc_copy_gm2l1_nd2nz
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md
+    title: asc_copy_gm2l1_nd2nz_arch_2201
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md
+    title: asc_copy_gm2l1_nd2nz_arch_3510
+timestamp: '2026-09-28'
 ---
 # asc_copy_gm2l1_nd2nz
 

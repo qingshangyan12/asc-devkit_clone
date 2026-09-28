@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_l12l0a_sync_3d_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_3d_arch_3510_deprecated.md
-description: 已废弃的同步搬运接口，将NC1HWC0格式Feature Map完成Image to Column展开后从L1 Buffer搬入L0A Buffer，也可用于2D格式数据搬运，请改用非同步接口和asc_sync替代。
+description: 已废弃的同步搬运接口，将NC1HWC0格式Feature Map完成Image to Column展开后从L1 Buffer搬入L0A Buffer，也可用于2D格式数据搬运，需先调用寄存器配置接口预先配置。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,28 +12,31 @@ tag:
   - traits: [deprecated, padding]
 signature:
   - prototype_id: asc_copy_l12l0a_sync__PCA<dtype>_PL1<dtype>_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    archs: ['3510']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
     dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
       half, bfloat16_t, int32_t, uint32_t, float]
+archs: ['3510']
+header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md
     kind: requires
+    condition: 3D img2col搬运模式下
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md
     kind: related
-    condition: f_matrix_ctrl为true时配合使用
+    condition: f_matrix_ctrl为true时
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md
     kind: requires
+    condition: 3D img2col搬运模式下
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md
     kind: related
-    condition: f_matrix_ctrl为true时配合使用
+    condition: f_matrix_ctrl为true时
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md
     kind: requires
+    condition: 3D img2col搬运模式下
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md
     kind: related
-    condition: f_matrix_ctrl为true时配合使用
+    condition: f_matrix_ctrl为true时
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
@@ -43,7 +46,7 @@ dependencies:
     kind: constrained_by
     condition: 如果本指令与其他指令存在目的地址重叠
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0a_sync_3d_arch_3510（废弃）
 

@@ -13,40 +13,32 @@ tag:
   - destination_locations: [l0c_buffer]
 signature:
   - prototype_id: asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b
-    archs: ['3510']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
   - prototype_id: asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b
-    archs: ['3510']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+archs: ['3510']
+header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md
     kind: constrained_by
-    condition: 矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)。
+    condition: 开启UnitFlag时
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
     kind: constrained_by
-    condition: 矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)。
+    condition: 矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
     kind: requires
-    condition: 调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n
-      * sizeof(float)`向上补齐到64字节。
+    condition: 仅显式传入Bias起始地址的接口包含该参数
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md
     kind: requires
-    condition: 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX
-      Buffer和L0B_MX Buffer。
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md
     kind: requires
-    condition: 调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX
-      Buffer和L0B_MX Buffer。
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
     kind: related
-    condition: 需要清除UnitFlag产生的残留状态时，可调用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)，并将`enable_unit_flag`设置为true，将L0C
-      Buffer中所有内存块的单元标志位设置为0并关闭UnitFlag。
+    condition: 需要清除UnitFlag产生的残留状态时
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
-    condition: 浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\[48\]比特位控制计算时的模式：
+    condition: 浮点类型的输入或输出包含inf/nan时
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
     kind: constrained_by
-    condition: 当`(m / 16) * (n / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/intra_core_sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。
+    condition: 当`(m / 16) * (n / 16) < 10`时
 examples:
   - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx
     file: mmad_mx.asc
@@ -60,7 +52,7 @@ examples:
     file: mmad_mx.asc
     archs: ['3510']
     override_id: asc_mmad_mx__PCCf32_PCAf8e4m3_PCBf8e5m2_u16_u16_u16_unitflag_b_b_b
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_mmad_mx
 

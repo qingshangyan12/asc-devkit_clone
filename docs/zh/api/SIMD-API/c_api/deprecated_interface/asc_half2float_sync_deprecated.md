@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_half2float_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2float_sync_deprecated.md
-description: 已废弃的同步矢量转换接口：将half类型转化为float类型，无舍入模式，请使用非同步接口asc_half2float并配合同步接口asc_sync替代。
+description: 已废弃的同步矢量转换接口，将half类型转化为float类型且无舍入模式，请使用非同步接口asc_half2float并配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,17 +12,17 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_half2float_sync__PUf32_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_half2float_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_half2float.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md
     kind: related
-    condition: '`asc_half2float_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_half2float.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_half2float_sync（废弃）
 

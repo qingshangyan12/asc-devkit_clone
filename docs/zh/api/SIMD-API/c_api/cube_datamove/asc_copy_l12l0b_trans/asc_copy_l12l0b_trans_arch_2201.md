@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_l12l0b_trans
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md
-description: 实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，按数据类型以不同的方块矩阵迭代方式完成分形的合并转置与拆分。
+description: 实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，按数据类型将源分形合并为方块矩阵转置后再拆分，并通过间隔参数控制目的操作数排布。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,29 +12,17 @@ tag:
   - traits: [high_dimensional]
 signature:
   - override_id: asc_copy_l12l0b_trans__PCBu8_PL1u8_u16_u8_u16_u16_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0b_trans__PCBf16_PL1f16_u16_u8_u16_u16_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0b_trans__PCBbf16_PL1bf16_u16_u8_u16_u16_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0b_trans__PCBu32_PL1u32_u16_u8_u16_u16_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0b_trans__PCBi32_PL1i32_u16_u8_u16_u16_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
   - override_id: asc_copy_l12l0b_trans__PCBf32_PL1f32_u16_u8_u16_u16_b_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l12l0b_trans
 

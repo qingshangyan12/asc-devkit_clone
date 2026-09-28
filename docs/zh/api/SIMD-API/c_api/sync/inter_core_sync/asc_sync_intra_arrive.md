@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_sync_intra_arrive
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md
-description: 与asc_sync_intra_wait配对使用，实现单AI Core内AIC与单个AIV之间的同步。指定流水的前序指令执行完成后向调度模块发送通知，调度模块将对应sync_id的计数器增加1，本接口不阻塞流水中的后续指令。
+description: 与asc_sync_intra_wait配对使用，实现单AI Core内AIC与单个AIV之间的核间同步（模式4）。指定流水的前序指令执行完成后向调度模块发送通知，调度模块将对应sync_id的计数器增加1，本接口不阻塞流水中的后续指令。
 tag:
   - api_surfaces: [c_api]
   - roles: [control]
@@ -11,14 +11,16 @@ tag:
   - traits: [inter_core_synchronization]
 signature:
   - override_id: asc_sync_intra_arrive__pipe_u64
-    archs: ['3510']
-    headers: [/include/c_api/sync/sync.h]
+archs: ['3510']
+header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md
     kind: related
-    condition: 本接口与`asc_sync_intra_wait`配对使用时，**不要求**`arrive`与`wait`传入的`sync_id`相同，而是要求二者符合如下跨核ID映射关系，否则会出现未定义行为。
+    condition: 而是要求二者符合如下跨核ID映射关系
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md
+    kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_sync_intra_arrive
 

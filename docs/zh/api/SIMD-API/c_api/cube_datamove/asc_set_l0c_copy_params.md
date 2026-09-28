@@ -6,13 +6,14 @@ description: 在数据从L0C Buffer搬运到Global Memory或L1 Buffer并进行�
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
+  - operations: [layout_transform]
 signature:
   - override_id: asc_set_l0c_copy_params__u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+archs: ['2201']
+header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_l0c_copy_params
 

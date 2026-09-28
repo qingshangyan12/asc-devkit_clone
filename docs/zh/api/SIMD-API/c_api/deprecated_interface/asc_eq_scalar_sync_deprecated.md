@@ -2,32 +2,29 @@
 okftype: reference.api.cpp
 title: asc_eq_scalar_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md
-description: 已废弃接口，按元素判断src与标量value是否相等，成立时输出对应比特位为1，否则为0，请使用asc_eq_scalar与asc_sync组合替代。
+description: 已废弃的同步矢量比较接口：按元素判断src与标量value是否相等，成立则输出结果的对应比特位为1，否则为0，请使用非同步接口asc_eq_scalar配合asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
+  - objects: [scalar, vector]
   - execution_models: [memory_vector]
   - traits: [deprecated, elementwise, scalar_operand]
 signature:
   - override_id: asc_eq_scalar_sync__PUu8_PUf16_f16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_eq_scalar_sync__PUu8_PUi32_i32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_eq_scalar_sync__PUu8_PUf32_f32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_eq_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_eq_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md
     kind: related
-    condition: '`asc_eq_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_eq_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_eq_scalar_sync（废弃）
 

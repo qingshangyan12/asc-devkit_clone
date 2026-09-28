@@ -11,59 +11,29 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_fill_l0b_sync__PCBi16_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBi16_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBu16_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBu16_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBf16_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBf16_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBbf16_bf16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBbf16_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBbf16_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBi32_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBi32_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBu32_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBu32_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBf32_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
   - override_id: asc_fill_l0b_sync__PCBf32_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md
     kind: related
-    condition: '`asc_fill_l0b_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0b.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: '`asc_fill_l0b_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0b.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_fill_l0b_sync（废弃）
 

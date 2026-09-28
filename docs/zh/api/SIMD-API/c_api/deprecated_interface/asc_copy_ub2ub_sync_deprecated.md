@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy_ub2ub_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_ub2ub_sync_deprecated.md
-description: 已废弃接口，将数据从Unified Buffer（UB）搬运到UB，请使用asc_copy_ub2ub配合asc_sync替代。
+description: 已废弃的同步搬运接口，将数据从Unified Buffer搬运到UB，同步计算包含同步等待，前n个数据搬运时搬运数据大小要求32字节对齐，请改用非同步asc_copy_ub2ub接口和asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,21 +12,23 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_copy_ub2ub_sync__PUv_PUv_u32
-    archs: ['2201', '3510']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201', '3510']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
+    kind: requires
     condition: 如果本指令与其他指令存在UB地址重叠
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
+    kind: requires
     condition: 如果本指令与其他指令存在UB地址重叠
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_ub2ub_sync（废弃）
 

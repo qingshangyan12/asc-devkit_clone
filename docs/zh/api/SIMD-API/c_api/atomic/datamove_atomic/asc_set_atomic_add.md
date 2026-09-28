@@ -11,32 +11,23 @@ tag:
   - traits: [atomic]
 signature:
   - override_id: asc_set_atomic_add_int8__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/atomic/datamove_atomic.h]
   - override_id: asc_set_atomic_add_int16__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/atomic/datamove_atomic.h]
   - override_id: asc_set_atomic_add_int32__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/atomic/datamove_atomic.h]
   - override_id: asc_set_atomic_add_float16__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/atomic/datamove_atomic.h]
   - override_id: asc_set_atomic_add_bfloat__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/atomic/datamove_atomic.h]
   - override_id: asc_set_atomic_add_float__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/atomic/datamove_atomic.h]
+archs: ['2201', '3510']
+header: [/include/c_api/atomic/datamove_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
     kind: related
-    condition: 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)接口关闭原子操作。
   - path: docs/zh/api/SIMD-API/c_api/atomic/key_features.md
     kind: constrained_by
-    condition: 本接口不能保证后续搬运指令的执行顺序，若需保证确定性的执行顺序请参考[关键特性说明](../key_features.md)。
+    condition: 若需保证确定性的执行顺序
+  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
+    kind: related
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_atomic_add
 

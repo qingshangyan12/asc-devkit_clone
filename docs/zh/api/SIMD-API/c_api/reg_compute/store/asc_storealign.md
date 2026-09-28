@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_storealign
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
-description: 将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB），矢量场景单次搬出256字节并支持掩码控制，提供连续、立即数偏移、地址寄存器偏移和非连续对齐四种搬出模式。
+description: 将矢量数据寄存器或掩码寄存器中的数据以对齐方式搬出到Unified Buffer（UB），矢量场景单次搬出256字节并支持掩码控制，提供连续、立即数偏移、地址寄存器偏移和非连续对齐四种搬出模式。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -13,43 +13,32 @@ tag:
   - traits: [masked]
 signature:
   - prototype_id: asc_storealign__PU<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_storealign__PU<dtype>_v<dtype>_i32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_storealign__PU<dtype>_v<dtype>_ar_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_storealign__PU<dtype>_v<dtype>_u16_u16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [int8_t, uint8_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
       uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
   - prototype_id: asc_storealign__PU<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [uint8_t, uint16_t, uint32_t]
   - prototype_id: asc_storealign__PU<dtype>_vb_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [uint8_t, uint16_t, uint32_t]
   - prototype_id: asc_storealign__PU<dtype>_vb_ar
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [uint8_t, uint16_t, uint32_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/store/storealign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: related
+    kind: requires
+    condition: 地址寄存器偏移搬出模式
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
     condition: 如果本指令与其他指令存在UB地址重叠
@@ -154,7 +143,7 @@ examples:
     file: truncate.asc
     archs: ['3510']
     override_id: asc_storealign__PUf32_vf32_vb
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_storealign
 

@@ -7,20 +7,21 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [sqrt]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_sqrt__Rv<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [half, float]
   - prototype_id: asc_sqrt__v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [half, float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_arith.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_sqrt
 

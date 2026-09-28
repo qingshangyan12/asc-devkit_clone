@@ -1,5 +1,5 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_gm2ub_sync_arch_2201（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_sync_arch_2201_deprecated.md
 description: 已废弃的同步搬运接口，将数据从Global Memory搬运到Unified Buffer，请改用非同步asc_copy_gm2ub接口和asc_sync替代。
@@ -12,8 +12,8 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_copy_gm2ub_sync__PUv_PGv_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
@@ -26,7 +26,7 @@ dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_gm2ub_sync_arch_2201（废弃）
 

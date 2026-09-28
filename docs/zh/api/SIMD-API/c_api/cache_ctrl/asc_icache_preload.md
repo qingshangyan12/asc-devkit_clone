@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_icache_preload
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
-description: 从当前程序所在的Global Memory地址预加载指令到ICache，避免后续取指时出现ICache未命中；预取地址需通过asc_get_program_counter获取PC值并掩码清零高位，预加载长度单位为2K
+description: 从当前程序所在的Global Memory地址预加载指令到ICache（指令缓存），避免后续取指时出现ICache未命中；预加载地址需通过asc_get_program_counter获取PC值并用低48位掩码清零高位，预加载长度单位为2K
   Byte。
 tag:
   - api_surfaces: [c_api]
@@ -10,14 +10,14 @@ tag:
   - families: [cache_management]
 signature:
   - override_id: asc_icache_preload__PCv_i64
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cache_ctrl/cache_ctrl.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cache_ctrl/cache_ctrl.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md
     kind: requires
     condition: 调用本接口时的预加载地址需通过[asc_get_program_counter](../utils/sys_var/asc_get_program_counter.md)接口获取当前程序计数器（PC）值
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_icache_preload
 

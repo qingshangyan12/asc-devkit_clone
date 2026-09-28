@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_sync_deprecated.md
-description: 已废弃接口，将数据从Unified Buffer（UB）搬运到UB，支持高维切分，请使用asc_copy配合asc_sync替代。
+description: 已废弃的同步接口，将数据从Unified Buffer（UB）搬运到UB，支持高维切分，源与目的操作数为矢量，请使用对应的非同步接口和同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,24 +12,18 @@ tag:
   - traits: [deprecated, high_dimensional]
 signature:
   - override_id: asc_copy_sync__PUi16_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_sync__PUu16_PUu16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_sync__PUi32_PUi32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_copy_sync__PUu32_PUu32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_sync（废弃）
 

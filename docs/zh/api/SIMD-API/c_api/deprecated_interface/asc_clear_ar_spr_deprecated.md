@@ -10,15 +10,15 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_clear_ar_spr__z
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_clear_ar_spr（废弃）
 ## 产品支持情况

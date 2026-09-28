@@ -2,27 +2,28 @@
 okftype: reference.api.cpp
 title: asc_rsqrt_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_rsqrt_sync_deprecated.md
-description: 已废弃接口，按元素进行开方后取倒数的计算，计算公式为dst等于1除以src的平方根，请使用非同步接口asc_rsqrt配合asc_sync替代。
+description: 已废弃的同步接口，按元素进行开方后取倒数的计算，计算公式为dst等于1除以src的平方根，请使用非同步接口asc_rsqrt配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [reciprocal_sqrt]
+  - objects: [vector]
   - execution_models: [memory_vector]
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_rsqrt_sync__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_rsqrt_sync__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rsqrt.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_rsqrt_sync（废弃）
 

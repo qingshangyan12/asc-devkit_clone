@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_half2float（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2float_deprecated.md
-description: 已废弃的寄存器矢量转换接口：根据mask将src中参与计算的half类型元素转换为float类型写入dst，源与目的位宽比为1:2，按接口后缀读取源数据偶数或奇数索引位置，请使用asc_half2float的显式位置参数重载替代。
+description: 已废弃的寄存器矢量转换接口，根据mask将src中参与计算的half类型元素转换为float类型写入dst，源与目的位宽比为1:2并按接口后缀读取偶数或奇数索引，请使用显式位置参数重载替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,17 +12,15 @@ tag:
   - traits: [deprecated, masked, widening_result]
 signature:
   - override_id: asc_half2float__Rvf32_vf16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_half2float_v2__Rvf32_vf16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md
     kind: related
-    condition: 该接口通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_half2float](../reg_compute/reg_convert/asc_half2float.md)的显式位置参数重载替代。
+    condition: 原型已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_half2float（废弃）
 

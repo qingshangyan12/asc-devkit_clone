@@ -174,7 +174,9 @@ __aicore__ inline void s2_copy_result_to_gm(__gm__ float* dst, __cc__ float* src
     bool nz2dn_en = false;
     bool clip_relu_pre = false;
 
+    //! [asc_copy_l0c2gm__PGf32_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b]
     asc_copy_l0c2gm(
         dst, src, n_size, m_size, loop_dst_stride, loop_src_stride, l2_cache_ctl, unit_flag_ctl, quant_pre, relu_pre,
         split_en, nz2nd_en, nz2dn_en, clip_relu_pre);
+    //! [asc_copy_l0c2gm__PGf32_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b]
 }

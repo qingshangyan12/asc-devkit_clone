@@ -12,11 +12,10 @@ tag:
   - traits: [deprecated, quantization]
 signature:
   - prototype_id: asc_copy_l0c2gm__PG<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
-    archs: ['3510']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
+    header: [/include/c_api/cube_datamove/cube_datamove.h]
   - prototype_id: asc_copy_l0c2gm_sync__PG<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
-    archs: ['3510']
-    headers: [/include/c_api/composite/cube_datamove_composite.h]
+    header: [/include/c_api/composite/cube_datamove_composite.h]
+archs: ['3510']
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
     kind: related
@@ -41,7 +40,7 @@ dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_copy_l0c2gm（废弃）
 

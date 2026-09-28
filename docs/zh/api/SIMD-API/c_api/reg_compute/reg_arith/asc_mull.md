@@ -7,16 +7,19 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [multiply]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, split_high_low, widening_result]
 signature:
   - prototype_id: asc_mull__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int32_t, uint32_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_arith.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_mull
 

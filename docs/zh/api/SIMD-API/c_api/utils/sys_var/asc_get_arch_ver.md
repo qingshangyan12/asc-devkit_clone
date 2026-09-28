@@ -2,18 +2,18 @@
 okftype: reference.api.cpp
 title: asc_get_arch_ver
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_arch_ver.md
-description: 获取当前AI处理器架构版本号，通过输出参数core_version返回ARCH_VER寄存器中的核心版本字段值，不同产品对应不同版本号取值。
+description: 获取当前AI处理器架构版本号，通过输出参数core_version返回ARCH_VER寄存器中的核心版本字段值，不同型号服务器对应不同的架构版本号取值，调用后core_version被覆写为对应值。
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
-  - execution_models: [scalar]
+  - families: [system]
 signature:
   - override_id: asc_get_arch_ver__Ru32
-    archs: ['2201', '3510']
-    headers: [/include/c_api/utils/sys_var.h]
+archs: ['2201', '3510']
+header: [/include/c_api/utils/sys_var.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_arch_ver
 

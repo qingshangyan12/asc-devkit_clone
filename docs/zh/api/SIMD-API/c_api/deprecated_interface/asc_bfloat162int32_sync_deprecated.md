@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_bfloat162int32_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162int32_sync_deprecated.md
-description: 将bfloat16_t类型数据转换为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式；接口已废弃，请使用对应的非同步接口asc_bfloat162int32和同步接口asc_sync替代。
+description: 将bfloat16_t类型数据转换为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式；接口已废弃，请使用对应的非同步接口和同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -11,27 +11,19 @@ tag:
   - traits: [deprecated, rounding_mode]
 signature:
   - override_id: asc_bfloat162int32_rn_sync__PUi32_PUbf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_bfloat162int32_rna_sync__PUi32_PUbf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_bfloat162int32_rd_sync__PUi32_PUbf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_bfloat162int32_ru_sync__PUi32_PUbf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_bfloat162int32_rz_sync__PUi32_PUbf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_bfloat162int32_sync（废弃）
 

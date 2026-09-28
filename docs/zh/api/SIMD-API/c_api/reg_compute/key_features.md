@@ -1,13 +1,44 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.concept.cpp
 title: 关键特性说明
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md
-description: 介绍Reg矢量计算的关键特性，涵盖Hardware Loop编码规范、指令双发优化、VF融合以及数据搬运接口的选择与优化示例。
+description: 介绍Reg矢量计算关键特性：VF循环满足Hardware Loop编码规范时可被编译器优化提升编码性能，指令双发提升单位时间指令处理效率，VF融合为编译器优化特性，并汇总各场景下数据搬运C
+  API接口的选择与示例。
 tag:
   - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - roles: [compute, data_movement]
+  - operations: [load, store]
+  - execution_models: [register_vector]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md
+    kind: related
+  - path: docs/zh/api/appendix/reg_vector_compute_interface_instruction_single_dual_issue_summary.md
+    kind: related
+timestamp: '2026-09-28'
 ---
 # 关键特性说明
 

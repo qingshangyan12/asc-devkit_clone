@@ -2,36 +2,37 @@
 okftype: reference.api.cpp
 title: asc_arange
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md
-description: 以传入标量value为起始值生成递增或递减的索引序列并保存在矢量数据寄存器中，序列元素按1逐步递增或递减，整型结果超出可表示范围时回绕，仅在AIV上生效。
+description: 以传入标量value为起始值生成递增或递减的索引序列并保存在矢量数据寄存器dst中，序列元素按1逐步递增或递减，整型结果超出可表示范围时回绕且不触发异常，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
+  - operations: [fill]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - destination_locations: [vector_register]
   - traits: [scalar_operand]
 signature:
   - prototype_id: asc_arange__Rv<dtype>_<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_index.h]
     dtype: [int8_t, int16_t, half, int32_t, float]
   - prototype_id: asc_arange__<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_index.h]
     dtype: [int8_t, int16_t, half, int32_t, float]
   - prototype_id: asc_arange_descend__Rv<dtype>_<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_index.h]
     dtype: [int8_t, int16_t, half, int32_t, float]
   - prototype_id: asc_arange_descend__<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_index.h]
     dtype: [int8_t, int16_t, half, int32_t, float]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_index.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples:
   - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange
     file: arange.asc
     archs: ['3510']
     override_id: asc_arange__Rvf32_f32
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_arange
 

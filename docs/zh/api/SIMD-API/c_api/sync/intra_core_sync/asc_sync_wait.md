@@ -10,14 +10,13 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_sync_wait__pipe_pipe_event
-    archs: ['2201', '3510']
-    headers: [/include/c_api/sync/sync.h]
+archs: ['2201', '3510']
+header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: related
-    condition: 本接口需与`asc_sync_notify`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致。
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_sync_wait
 

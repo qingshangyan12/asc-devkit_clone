@@ -2,31 +2,28 @@
 okftype: reference.api.cpp
 title: asc_storealign_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md
-description: 将矢量数据寄存器或掩码寄存器中的数据连续对齐搬出到Unified Buffer（UB），矢量场景支持立即数偏移与非连续DataBlock步长两种模式并可用掩码控制参与搬出的元素；搬出后启用Post
-  Update模式自动累加目的地址指针，硬件循环内连续调用无需手动维护目的地址。
+description: 将矢量数据寄存器或掩码寄存器中的数据连续对齐搬出到Unified Buffer（UB），矢量场景支持立即数偏移与非连续DataBlock步长两种模式并可用掩码控制参与搬出的元素，搬出后启用Post
+  Update模式自动累加目的地址指针。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [store]
+  - objects: [mask, vector]
   - execution_models: [register_vector]
   - source_locations: [vector_register]
   - destination_locations: [unified_buffer]
   - traits: [masked, post_update]
 signature:
   - prototype_id: asc_storealign_postupdate__RPU<dtype>_v<dtype>_i32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_storealign_postupdate__RPU<dtype>_v<dtype>_u16_u16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [int8_t, uint8_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
       uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
   - prototype_id: asc_storealign_postupdate__RPU<dtype>_vb_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
     dtype: [uint8_t, uint16_t, uint32_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/store/storealign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
@@ -36,7 +33,7 @@ examples:
     file: reg_load_store_align.asc
     archs: ['3510']
     override_id: asc_storealign_postupdate__RPUf16_vf16_u16_u16_vb
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_storealign_postupdate
 

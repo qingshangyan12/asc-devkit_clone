@@ -2,33 +2,30 @@
 okftype: reference.api.cpp
 title: asc_max_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_max_sync_deprecated.md
-description: 已废弃的同步矢量运算接口：逐元素取src0与src1的最大值存入dst，请使用非同步接口asc_max并配合同步接口asc_sync替代。
+description: 已废弃的同步矢量运算接口，逐元素计算src0与src1的最大值并存入dst，请使用非同步接口asc_max并配合同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [maximum]
+  - objects: [vector]
   - execution_models: [memory_vector]
   - traits: [deprecated, elementwise]
 signature:
   - override_id: asc_max_sync__PUi16_PUi16_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_max_sync__PUf16_PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_max_sync__PUi32_PUi32_PUi32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_max_sync__PUf32_PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_max_sync（废弃）
 

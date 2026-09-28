@@ -2,12 +2,16 @@
 okftype: reference.index.cpp
 title: 搬运原子操作
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/datamove_atomic.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
+    title: asc_set_atomic_add
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md
+    title: asc_set_atomic_max
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
+    title: asc_set_atomic_min
+  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
+    title: asc_disable_dma_atomic
+timestamp: '2026-09-28'
 ---
 # 搬运原子操作
 

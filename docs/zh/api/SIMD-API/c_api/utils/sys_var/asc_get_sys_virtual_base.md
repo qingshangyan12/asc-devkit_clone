@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_get_sys_virtual_base
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sys_virtual_base.md
-description: 读取系统虚拟基地址特殊寄存器的值并按int64_t返回，该基地址由系统在核函数启动前按核配置完成，用于在核函数内将相对偏移量转换为系统虚拟地址，适用于地址推导、跨核地址对齐等场景。
+description: 读取系统虚拟基地址特殊寄存器的值并按int64_t返回，该基地址由系统在核函数启动前按核配置完成，用于在核函数内将相对偏移量转换为系统虚拟地址，常用于地址推导、跨核地址对齐等场景，本接口为只读查询接口。
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
@@ -10,11 +10,11 @@ tag:
   - execution_models: [scalar]
 signature:
   - override_id: asc_get_sys_virtual_base__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/utils/sys_var.h]
+archs: ['2201', '3510']
+header: [/include/c_api/utils/sys_var.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_sys_virtual_base
 

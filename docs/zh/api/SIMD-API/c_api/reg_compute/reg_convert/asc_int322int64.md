@@ -2,29 +2,30 @@
 okftype: reference.api.cpp
 title: asc_int322int64
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int64.md
-description: 根据掩码将源操作数中每个int32_t类型元素转换为int64_t类型并写入目的操作数，位宽比为1:2，根据位置标签选择读取源操作数偶数或奇数索引位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+description: 根据掩码将源操作数中每个int32_t类型元素转换为int64_t类型写入目的操作数，位宽比为1:2，按位置标签选择读取源操作数偶数或奇数索引位置，掩码位为0时对应元素置0，仅在AIV上生效的Reg矢量计算接口。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, widening_result]
 signature:
   - override_id: asc_int322int64__Rvi64_vi32_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int322int64__Rvi64_vi32_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int322int64__vi32_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_int322int64__vi32_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_int322int64
 

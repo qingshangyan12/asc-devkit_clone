@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_float2int64（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int64_deprecated.md
-description: 已废弃的寄存器矢量转换接口：将float类型数据转换为int64_t类型，支持多种舍入模式与饱和/非饱和模式，源与目的位宽比为1:2，按接口后缀读取源数据偶数或奇数位置，请使用asc_float2int64的显式位置参数重载替代。
+description: 已废弃的寄存器矢量转换接口，将float类型数据转化为int64_t类型，支持多种舍入模式与饱和、非饱和模式，源与目的位宽比为1:2，需分两部分按奇偶索引读取，请使用asc_float2int64的显式位置参数重载替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,74 +12,36 @@ tag:
   - traits: [deprecated, masked, rounding_mode, saturation_mode, widening_result]
 signature:
   - override_id: asc_float2int64_rn__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rn_sat__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rn_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rn_sat_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rna__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rna_sat__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rna_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rna_sat_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rd__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rd_sat__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rd_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rd_sat_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_ru__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_ru_sat__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_ru_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_ru_sat_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rz__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rz_sat__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rz_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2int64_rz_sat_v2__Rvi64_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md
     kind: related
-    condition: 该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2int64](../reg_compute/reg_convert/asc_float2int64.md)的显式位置参数重载替代。
+    condition: 原型已废弃，作为显式位置参数重载的替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。
+    condition: 开启饱和模式和非饱和模式时
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_float2int64（废弃）
 

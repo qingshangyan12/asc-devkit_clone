@@ -6,20 +6,21 @@ description: 对Global Memory中address指向的单个元素执行原子按位�
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
+  - families: [bitwise]
   - operations: [bitwise_and]
   - execution_models: [scalar]
   - traits: [atomic]
 signature:
   - prototype_id: asc_atomic_and__PG<dtype>_<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/atomic/scalar_atomic.h]
     dtype: [int32_t, uint32_t, int64_t, uint64_t]
+archs: ['3510']
+header: [/include/c_api/atomic/scalar_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
     kind: requires
-    condition: Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。
+    condition: Scalar原子操作会绕过DCache
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_atomic_and
 

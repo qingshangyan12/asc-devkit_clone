@@ -11,53 +11,23 @@ tag:
   - traits: [deprecated, unaligned_transfer]
 signature:
   - override_id: asc_storeunalign_post__PUi8_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUu8_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUf4e2m1x2_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUf4e1m2x2_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUi4x2_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUf8e8m0_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUf8e5m2_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUf8e4m3_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUi16_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUu16_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUf16_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUbf16_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUi32_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUu32_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUf32_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_post__PUi64_vstoreunalign
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/store/storeunalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md
     kind: requires
@@ -66,7 +36,7 @@ dependencies:
     kind: related
     condition: 该接口已废弃。请使用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)实现此功能。
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_storeunalign_post（废弃）
 

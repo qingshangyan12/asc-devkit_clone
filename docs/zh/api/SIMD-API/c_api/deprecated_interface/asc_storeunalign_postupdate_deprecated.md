@@ -12,56 +12,24 @@ tag:
   - traits: [deprecated, post_update, unaligned_transfer]
 signature:
   - override_id: asc_storeunalign_postupdate__PUi8_Rvstoreunalign_vi8
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUu8_Rvstoreunalign_vu8
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUi16_Rvstoreunalign_vi16
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUu16_Rvstoreunalign_vu16
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUi32_Rvstoreunalign_vi32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUu32_Rvstoreunalign_vu32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUi64_Rvstoreunalign_vi64
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUf16_Rvstoreunalign_vf16
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUf32_Rvstoreunalign_vf32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUbf16_Rvstoreunalign_vbf16
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUf8e4m3_Rvstoreunalign_vf8e4m3
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUf8e5m2_Rvstoreunalign_vf8e5m2
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUf8e8m0_Rvstoreunalign_vf8e8m0
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUf4e2m1x2_Rvstoreunalign_vf4e2m1x2
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUf4e1m2x2_Rvstoreunalign_vf4e1m2x2
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__PUi4x2_Rvstoreunalign_vi4x2
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
   - override_id: asc_storeunalign_postupdate__RPUu8_Rvstoreunalign_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storeunalign.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/store/storeunalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md
     kind: related
@@ -70,7 +38,7 @@ dependencies:
     kind: related
     condition: 该接口不指定存储偏移量的原型已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现此功能。掩码寄存器搬出模式的b8数据类型原型已废弃，请使用b16或b32数据类型原型。
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_storeunalign_postupdate（废弃）
 

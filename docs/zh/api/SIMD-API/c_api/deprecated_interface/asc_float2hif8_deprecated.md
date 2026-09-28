@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_float2hif8（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md
-description: 已废弃接口，将float类型转化为hifloat8_t类型，并支持多种舍入模式，饱和/非饱和模式，位宽比为4:1，请使用显式位置参数重载替代。
+description: 已废弃的矢量转换接口，将float类型转化为hifloat8_t类型，支持多种舍入模式及饱和与非饱和模式，位宽比为4:1，其无显式位置参数原型已废弃，需使用显式位置参数重载替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,62 +12,32 @@ tag:
   - traits: [deprecated, masked, rounding_mode, saturation_mode]
 signature:
   - override_id: asc_float2hif8_rna__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rna_sat__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rna_v2__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rna_sat_v2__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rna_v3__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rna_sat_v3__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rna_v4__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rna_sat_v4__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rh__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rh_sat__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rh_v2__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rh_sat_v2__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rh_v3__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rh_sat_v3__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rh_v4__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_float2hif8_rh_sat_v4__Rvhf8_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md
     kind: related
-    condition: 该接口的无显式位置参数原型已废弃，请使用[asc_float2hif8](../reg_compute/reg_convert/asc_float2hif8.md)的显式位置参数重载替代。
+    condition: 无显式位置参数原型已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。
+    condition: 开启饱和模式和非饱和模式时
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_float2hif8（废弃）
 

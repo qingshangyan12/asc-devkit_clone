@@ -2,12 +2,14 @@
 okftype: reference.index.cpp
 title: 同步控制
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/sync.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
+    title: 系统同步能力概述
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync.md
+    title: 核内同步
+  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync.md
+    title: 核间同步
+timestamp: '2026-09-28'
 ---
 # 同步控制
 

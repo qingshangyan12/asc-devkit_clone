@@ -12,11 +12,11 @@ tag:
   - traits: [post_update, unaligned_transfer]
 signature:
   - prototype_id: asc_storeunalign_post_postupdate__RPU<dtype>_vstoreunalign_i32
-    archs: ['3510']
-    headers: []
+    header: []
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t]
+archs: ['3510']
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
@@ -24,7 +24,7 @@ dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
     kind: requires
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_storeunalign_post_postupdate
 

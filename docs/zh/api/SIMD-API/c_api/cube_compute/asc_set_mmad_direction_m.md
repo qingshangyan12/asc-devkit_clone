@@ -10,8 +10,8 @@ tag:
   - destination_locations: [l0c_buffer]
 signature:
   - override_id: asc_set_mmad_direction_m__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
@@ -27,7 +27,7 @@ examples:
     file: mmad_direction.asc
     archs: ['3510']
     override_id: asc_set_mmad_direction_m__z
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_set_mmad_direction_m
 

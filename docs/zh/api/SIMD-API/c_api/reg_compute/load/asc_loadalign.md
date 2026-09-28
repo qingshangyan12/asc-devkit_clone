@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_loadalign
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
-description: 从Unified Buffer（UB）中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，提供连续对齐、立即数偏移、地址寄存器偏移和非连续对齐四种搬入模式。
+description: 从Unified Buffer（UB）中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，提供连续对齐、立即数偏移、地址寄存器偏移和非连续对齐搬入四种模式，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -13,56 +13,43 @@ tag:
   - traits: [masked]
 signature:
   - prototype_id: asc_loadalign__PU<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_loadalign__Rv<dtype>_PU<dtype>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t, uint64_t]
   - override_id: asc_loadalign__Rvb_PUu32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: asc_loadalign__Rv<dtype>_PU<dtype>_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t, uint64_t]
   - override_id: asc_loadalign__Rvb_PUu32_i32
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: asc_loadalign__Rv<dtype>_PU<dtype>_ar
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t, uint64_t]
   - override_id: asc_loadalign__Rvb_PUu32_ar
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
   - prototype_id: asc_loadalign__Rv<dtype>_PU<dtype>_u16_u16_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/load/loadalign.h]
     dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
       fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float, int64_t]
+archs: ['3510']
+header: [/include/c_api/reg_compute/load/loadalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: related
+    kind: requires
+    condition: 地址寄存器偏移搬入模式
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md
-    kind: related
+    kind: requires
     condition: 当dtype为`int64_t`时
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
-    kind: related
+    kind: requires
     condition: 当dtype为`int64_t`时
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
     kind: constrained_by
@@ -168,7 +155,7 @@ examples:
     file: truncate.asc
     archs: ['3510']
     override_id: asc_loadalign__Rvf32_PUf32
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_loadalign
 

@@ -2,24 +2,25 @@
 okftype: reference.api.cpp
 title: asc_select
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md
-description: 根据mask从两个源操作数中逐位置选择元素：mask比特位为1时选取src0对应位置的数，为0时选取src1的数，结果写入dst或通过函数返回值返回，仅在AIV上生效。
+description: 根据mask从两个源操作数中逐位置选择元素：mask比特位为1时选取src0对应位置的数、为0时选取src1的数，结果写入dst或通过函数返回值返回，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [selection]
+  - objects: [mask, vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise]
 signature:
   - prototype_id: asc_select__v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
     dtype: [bool, int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
       uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
   - prototype_id: asc_select__Rv<dtype>_v<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
     dtype: [bool, int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
       uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 dependencies: []
 examples:
   - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select
@@ -38,7 +39,7 @@ examples:
     file: elu.asc
     archs: ['3510']
     override_id: asc_select__Rvf32_vf32_vf32_vb
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_select
 

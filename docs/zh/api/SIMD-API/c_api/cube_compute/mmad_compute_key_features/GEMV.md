@@ -1,13 +1,19 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.concept.cpp
 title: GEMV
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/GEMV.md
-description: 介绍矩阵乘加的GEMV特性：当矩阵A的维度M取值为1时接口自动启用Gemv功能，矩阵乘退化为1×K行向量与K×N矩阵的乘法运算，可减少搬运数据量并降低搬运开销。
+description: GEMV特性说明页：当矩阵A的维度M取值为1时asc_mmad自动启用GEMV，矩阵乘退化为1×K行向量与K×N矩阵的乘法运算，可减少搬运开销，Ascend
+  950系列可通过disable_gemv参数关闭该功能。
 tag:
   - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - roles: [compute]
+  - operations: [matrix_multiply_accumulate]
+  - objects: [matrix]
+  - execution_models: [matrix_compute]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
+    kind: related
+timestamp: '2026-09-28'
 ---
 # GEMV
 

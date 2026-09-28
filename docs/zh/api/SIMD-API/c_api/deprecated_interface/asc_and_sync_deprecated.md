@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_and_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_and_sync_deprecated.md
-description: 执行矢量与运算，按元素对两个源矢量操作数做按位与并将结果写入目的操作数；接口已废弃，请使用对应的非同步接口asc_and和同步接口asc_sync替代。
+description: 执行矢量与运算，按元素对两个源矢量操作数做按位与并将结果写入目的操作数；接口已废弃，请使用非同步接口asc_and和同步接口asc_sync替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,18 +12,18 @@ tag:
   - traits: [deprecated]
 signature:
   - override_id: asc_and_sync__PUi16_PUi16_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
   - override_id: asc_and_sync__PUu16_PUu16_PUu16_u32
-    archs: ['2201']
-    headers: [/include/c_api/composite/vector_compute_composite.h]
+archs: ['2201']
+header: [/include/c_api/composite/vector_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
     kind: related
+    condition: 接口已废弃，作为替代方案使用
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_and_sync（废弃）
 

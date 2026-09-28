@@ -2,27 +2,28 @@
 okftype: reference.api.cpp
 title: asc_lt_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_lt_scalar.md
-description: 根据mask将源操作数src按元素与标量value进行小于比较，结果为真时对应位为1，否则为0，每个元素的比较结果占一个比特，仅在AIV上生效。
+description: 根据mask将源矢量数据寄存器按元素与标量value进行小于比较，若src小于value则对应位为1，否则为0，每个元素的比较结果占一个bit，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
+  - objects: [scalar, vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, scalar_operand]
 signature:
   - prototype_id: asc_lt_scalar__v<dtype>_<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
   - prototype_id: asc_lt_scalar__Rvb_v<dtype>_<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_compare.h]
     dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
       float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_compare.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_lt_scalar
 

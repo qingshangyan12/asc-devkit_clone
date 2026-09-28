@@ -7,17 +7,18 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [absolute]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_abs__v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int8_t, int16_t, half, int32_t, float]
   - prototype_id: asc_abs__Rv<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_arith.h]
     dtype: [int8_t, int16_t, half, int32_t, float]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_arith.h]
 dependencies: []
 examples:
   - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs
@@ -28,7 +29,7 @@ examples:
     file: elu.asc
     archs: ['3510']
     override_id: asc_abs__Rvf32_vf32_vb
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_abs
 

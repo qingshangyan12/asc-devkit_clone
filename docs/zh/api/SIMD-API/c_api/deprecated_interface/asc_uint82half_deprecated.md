@@ -2,25 +2,23 @@
 okftype: reference.api.cpp
 title: asc_uint82half（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md
-description: 已废弃接口，将uint8_t类型数据转为half类型，按输入数据索引奇偶位置分部读取，请改用asc_uint82half的显式位置参数重载替代。
+description: 该接口通过接口后缀控制目的操作数写入位置的原型已废弃，将uint8_t类型数据转为half类型，按输入数据索引奇偶位置分部读取，请使用显式位置参数重载替代。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
   - execution_models: [register_vector]
-  - traits: [deprecated]
+  - traits: [deprecated, masked]
 signature:
   - override_id: asc_uint82half__Rvf16_vu8_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint82half_v2__Rvf16_vu8_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md
     kind: related
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_uint82half（废弃）
 

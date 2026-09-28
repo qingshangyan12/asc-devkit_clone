@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_storealign_pack_v2（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md
-description: 该接口已废弃，将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），本接口不传入偏移量，请使用asc_storealign_pack_quarter接口实现此功能。
+description: 已废弃的矢量搬运接口，将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），本接口不传入偏移量，请改用asc_storealign_pack_quarter实现此功能。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,20 +12,16 @@ tag:
   - traits: [deprecated, masked]
 signature:
   - override_id: asc_storealign_pack_v2__PUi32_vi32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
   - override_id: asc_storealign_pack_v2__PUu32_vu32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
   - override_id: asc_storealign_pack_v2__PUf32_vf32_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/store/storealign.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/store/storealign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md
     kind: related
-    condition: 该接口已废弃。请使用[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md)实现此功能。
+    condition: 实现此功能
 examples: []
-timestamp: '2026-09-24'
+timestamp: '2026-09-28'
 ---
 # asc_storealign_pack_v2（废弃）
 

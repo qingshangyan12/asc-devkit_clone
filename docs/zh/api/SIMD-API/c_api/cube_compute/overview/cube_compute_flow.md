@@ -2,12 +2,60 @@
 okftype: reference.index.cpp
 title: 普通矩阵计算流程
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
-description: 介绍C API矩阵计算编程模型的典型流程，涵盖普通矩阵计算的数据搬入、矩阵乘加与结果搬出，以及Mx矩阵计算、4选2稀疏矩阵计算和Conv2D前向计算流程中各接口的使用方式。
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1.md
+    title: asc_copy_gm2l1
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md
+    title: asc_copy_gm2l1_nd2nz
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md
+    title: asc_copy_l12l0a
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md
+    title: asc_copy_l12l0b
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt.md
+    title: asc_copy_l12bt
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb.md
+    title: asc_copy_l12fb
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
+    title: asc_mmad
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md
+    title: asc_copy_l0c2gm
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store_overall_description.md
+    title: 搬出总体说明
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md
+    title: scaleA/scaleB系数矩阵
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md
+    title: asc_copy_l12l0a
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md
+    title: asc_copy_l12l0b
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md
+    title: asc_copy_l12l0a_mx
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md
+    title: asc_copy_l12l0b_mx
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md
+    title: asc_mmad_mx
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
+    title: asc_copy_l0c2gm
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md
+    title: 索引矩阵
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md
+    title: asc_copy_l12l0b_sparse接口
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md
+    title: asc_mmad_sparse计算
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md
+    title: asc_copy_l0c2gm（L0C Buffer到GM数据搬运）
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md
+    title: asc_copy_l12l0a的3D重载
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md
+    title: NC1HWC0格式
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load_overall_description.md
+    title: 搬入总体说明
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
+    title: Nz2ND
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/convolution_format_conversion.md
+    title: 卷积格式转换
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
+    title: Nz2DN
+timestamp: '2026-09-28'
 ---
 # 普通矩阵计算流程
 

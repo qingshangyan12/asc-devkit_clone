@@ -12,14 +12,13 @@ tag:
   - traits: [sparse_input]
 signature:
   - override_id: asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_unitflag_b_b
-    archs: ['2201']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+archs: ['2201']
+header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md
     kind: requires
-    condition: 稠密矩阵B需要通过[asc_copy_l12l0b_sparse](../cube_datamove/asc_copy_l12l0b_sparse.md)载入，同时加载索引矩阵，索引矩阵在矩阵B稠密化的过程中生成，再用于矩阵A的稠密化。
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_mmad_sparse
 

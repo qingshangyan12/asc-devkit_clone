@@ -10,20 +10,19 @@ tag:
   - traits: [rounding_mode]
 signature:
   - override_id: asc_enable_hf32__z
-    archs: ['2201', '3510']
-    headers: [/include/c_api/cube_compute/cube_compute.h]
+archs: ['2201', '3510']
+header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md
     kind: related
-    condition: 如需关闭HF32模式，请重新调用[asc_disable_hf32](asc_disable_hf32.md)接口。
+    condition: 如需关闭HF32模式
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
-    condition: 本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md
     kind: related
-    condition: HF32模式启用后，FP32转换为HF32格式的舍入模式由配套的[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置，须在本接口之后调用该配套接口配置舍入模式，否则舍入模式沿用上次配置或默认值。
+    condition: HF32模式启用后
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_enable_hf32
 

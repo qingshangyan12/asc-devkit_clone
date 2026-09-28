@@ -7,36 +7,25 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
+  - objects: [mask, vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, widening_result]
 signature:
   - prototype_id: asc_unpack_lower__v<dtype_src>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: asc_unpack_upper__v<dtype_src>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: asc_unpack_lower__Rv<dtype_dst>_v<dtype_src>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - prototype_id: asc_unpack_upper__Rv<dtype_dst>_v<dtype_src>
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_unpack_lower__vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_unpack_upper__vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_unpack_lower__Rvb_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
   - override_id: asc_unpack_upper__Rvb_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_unpack
 

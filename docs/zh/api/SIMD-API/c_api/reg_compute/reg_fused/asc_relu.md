@@ -2,25 +2,30 @@
 okftype: reference.api.cpp
 title: asc_relu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md
-description: 根据mask对源操作数src按元素执行ReLU操作，大于等于0的元素保留、小于0的元素置0，支持half、int32_t与float类型，结果写入dst或通过函数返回值返回，仅在AIV上生效。
+description: 根据mask对源操作数src按元素执行ReLU操作，大于等于0的元素保留原值、小于0的元素置0，结果写入dst或通过函数返回值返回，支持half、int32_t与float类型，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [relu]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked]
 signature:
   - prototype_id: asc_relu__v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
     dtype: [half, int32_t, float]
   - prototype_id: asc_relu__Rv<dtype>_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_fused.h]
     dtype: [half, int32_t, float]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/compute/reg_fused.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_relu
 

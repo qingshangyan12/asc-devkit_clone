@@ -29,10 +29,36 @@
 
 #include "c_api/composite/cube_datamove_composite.h"
 
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_set_l13d_rpt__Rload3dcfg
+ * @archs 2201 3510
+ * @param [in] config repeat配置，仅传入config位域类型参数的接口使用，位域结构体配置说明请参考[asc_load3d_v2_config](../defs/union/asc_load3d_v2_config.md)。
+ */
 __aicore__ inline void asc_set_l13d_rpt(asc_load3d_v2_config& config);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_set_l13d_rpt__u16_u8_l13ddir_u16_u16
+ * @archs 2201 3510
+ * @param [in] repeat_stride 相邻两次迭代起始位置的距离，取值范围：[0, 65535]。当`repeat_direction`为`M_DIRECTION`时，单位为16个元素；为`K_DIRECTION`时，单位为`32 / sizeof(data_type)`个元素，`data_type`为源操作数的数据类型。
+ * @param [in] repeat_times M或K方向的迭代次数，取值范围：[0, 255]。`0`表示不执行搬运，3D搬运接口被视为NOP（空操作）。
+ * @param [in] repeat_direction [asc_l13d_repeat_direction](../defs/enum/asc_l13d_repeat_direction.md)类型枚举值，表示repeat方向。&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::M_DIRECTION`：沿height（M）方向迭代；&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::K_DIRECTION`：沿width（K）方向迭代。
+ * @param [in] dst_stride_k 目的矩阵K方向的步长，取值范围：[0, 65535]，单位为512字节的分形。
+ * @param [in] dst_start_pos_m 目的矩阵M方向的起始位置，取值范围：[0, 65535]，单位为512字节的分形。
+ */
 __aicore__ inline void asc_set_l13d_rpt(
     uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
     uint16_t dst_start_pos_m);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_set_l13d_rpt_b__u16_u8_l13ddir_u16_u16
+ * @archs 3510
+ * @param [in] repeat_stride 相邻两次迭代起始位置的距离，取值范围：[0, 65535]。当`repeat_direction`为`asc_l13d_repeat_direction::M_DIRECTION`时，单位为16个元素；为`asc_l13d_repeat_direction::K_DIRECTION`时，单位为`32 / sizeof(data_type)`个元素，`data_type`为源操作数的数据类型。
+ * @param [in] repeat_times M或K方向的迭代次数，取值范围：[0, 255]。`0`表示不执行搬运，3D搬运接口被视为NOP（空操作）。
+ * @param [in] repeat_direction [asc_l13d_repeat_direction](../defs/enum/asc_l13d_repeat_direction.md)类型枚举值，表示repeat方向。&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::M_DIRECTION`：沿height（M）方向迭代；&nbsp;&nbsp;&bull; `asc_l13d_repeat_direction::K_DIRECTION`：沿width（K）方向迭代。
+ * @param [in] dst_stride_k 目的矩阵K方向的步长，取值范围：[0, 65535]，单位为512字节的分形。
+ * @param [in] dst_start_pos_m 目的矩阵M方向的起始位置，取值范围：[0, 65535]，单位为512字节的分形。
+ */
 __aicore__ inline void asc_set_l13d_rpt_b(
     uint16_t repeat_stride, uint8_t repeat_times, asc_l13d_repeat_direction repeat_direction, uint16_t dst_stride_k,
     uint16_t dst_start_pos_m);
@@ -4248,6 +4274,18 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(
 
 // ==========asc_copy_gm2l1==========
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_gm2l1
+ * @override_id asc_copy_gm2l1__PL1v_PGv_u32_u32_channelpad_u64_u32
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。目的地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为GM。起始地址需要按照1字节对齐。
+ * @param [in] n_burst 搬运的数据块的个数。取值范围：[1, $2^{17}-1$]。
+ * @param [in] len_burst 搬运的每个数据块长度，单位32字节。取值范围：[1, $2^{17}-1$]。
+ * @param [in] pad_mode 使用[asc_channel_pad_mode](../../defs/enum/asc_channel_pad_mode.md)枚举值指示通道padding模式。
+ * @param [in] src_stride 源操作数相邻数据块之间的间隔（即前一个数据块起始地址与后一个数据块起始地址的差值），取值范围：[0, $2^{36}-1$]，单位32字节。&nbsp;&nbsp;&bull; n_burst = 1时，`src_stride`无意义，设置为0即可。
+ * @param [in] dst_stride 目的操作数相邻数据块之间的间隔（即前一个数据块起始地址与后一个数据块起始地址的差值），取值范围：[0, $2^{17}-1$]，单位32字节。&nbsp;&nbsp;&bull; n_burst = 1时，`dst_stride`无意义，设置为0即可。
+ */
 __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ void* dst, __gm__ void* src, uint32_t n_burst, uint32_t len_burst, asc_channel_pad_mode pad_mode,
     uint64_t src_stride, uint32_t dst_stride);
@@ -4635,71 +4673,141 @@ __aicore__ inline void asc_copy_gm2l1(
 // bfloat16_t/fp8_e4m3fn_t/fp8_e5m2_t/half/float/hifloat8_t/int32_t/int8_t/uint32_t/uint8_t/fp4x2_e1m2_t/fp4x2_e2m1_t/int4b_t==========
 
 // ==========asc_copy_l0c2gm==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGbf16_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGf16_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGf8e4m3_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGhf8_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGi8_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGu8_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGf32_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGbf16_PCCi32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGf16_PCCi32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGi8_PCCi32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGu8_PCCi32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGi32_PCCi32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGi4x2_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2gm
+ * @override_id asc_copy_l0c2gm__PGi4x2_PCCi32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_store_l2_cache_mode l2_cache_mode, asc_unit_flag_mode unit_flag_mode,
@@ -4707,70 +4815,322 @@ __aicore__ inline void asc_copy_l0c2gm(
     bool enable_nz2dn, bool enable_clip_relu_pre);
 
 // ==========asc_copy_l0c2l1==========
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1f16_PCCf32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
     bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1bf16_PCCf32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1i8_PCCf32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
     bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1u8_PCCf32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1f32_PCCf32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
     bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1f16_PCCi32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode,
     bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1i8_PCCi32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1u8_PCCi32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1i32_PCCi32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1i4x2_PCCf32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1i4x2_PCCi32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1hf8_PCCf32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1f8e4m3_PCCf32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
     asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd, bool enable_nz2dn,
     bool enable_clip_relu_pre);
 
+/**
+ * @ingroup simd_c_api.cube_datamove.asc_copy_l0c2l1
+ * @override_id asc_copy_l0c2l1__PL1bf16_PCCi32_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ * @param [out] dst 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。
+ * @param [in] src 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。
+ * @param [in] n_size 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。对于Nz输出场景：&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。对于ND输出场景：&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。
+ * @param [in] m_size 源Nz矩阵在M方向上的大小。&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。
+ * @param [in] dst_stride &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。
+ * @param [in] src_stride 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。
+ * @param [in] unit_flag_mode unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。
+ * @param [in] quant_pre_mode 预处理阶段量化参数。取值见[功能说明](#功能说明)。
+ * @param [in] relu_pre_mode 预处理阶段ReLU模式控制，取值如下：&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU；&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。
+ * @param [in] enable_channel_split 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2nd 是否开启Nz2ND功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_nz2dn 是否开启Nz2DN功能。&nbsp;&nbsp;&bull; false：不开启；&nbsp;&nbsp;&bull; true：开启。
+ * @param [in] enable_clip_relu_pre 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU；&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar 模式）。
+ */
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, asc_unit_flag_mode unit_flag_mode, asc_quant_mode quant_pre_mode,
@@ -4778,71 +5138,141 @@ __aicore__ inline void asc_copy_l0c2l1(
     bool enable_clip_relu_pre);
 
 // ==========asc_copy_l0c2ub==========
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUbf16_PCCf32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUf16_PCCf32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUf8e4m3_PCCf32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ fp8_e4m3fn_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUhf8_PCCf32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ hifloat8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUi8_PCCf32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUu8_PCCf32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ uint8_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUf32_PCCf32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ float* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUbf16_PCCi32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ bfloat16_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUf16_PCCi32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ half* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
     int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUi8_PCCi32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUu8_PCCi32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ uint8_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUi32_PCCi32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int32_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUi4x2_PCCf32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int4b_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,
     asc_quant_mode quant_pre_mode, asc_relu_pre_mode relu_pre_mode, bool enable_channel_split, bool enable_nz2nd,
     bool enable_nz2dn, bool enable_clip_relu_pre);
+/**
+ * @ingroup simd_c_api.cube_datamove
+ * @override_id asc_copy_l0c2ub__PUi4x2_PCCi32_u16_u16_u32_u16_i8_dualdst_unitflag_quantmode_relupre_b_b_b_b
+ * @archs 3510
+ */
 __aicore__ inline void asc_copy_l0c2ub(
     __ubuf__ int4b_t* dst, __cc__ int32_t* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
     uint16_t src_stride, int8_t sub_blockid, asc_dual_dst_mode dual_dst_ctrl, asc_unit_flag_mode unit_flag_mode,

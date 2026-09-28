@@ -2,29 +2,30 @@
 okftype: reference.api.cpp
 title: asc_uint82half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md
-description: 将uint8_t类型数据转为half类型；因源与目的类型位宽比为1:2，读取时通过src_pos选择源矢量数据寄存器中偶数或奇数索引位置的元素参与转换，仅在AIV上生效。
+description: 将uint8_t类型数据转为half类型写入目的操作数，位宽比为1:2，通过位置标签选择读取源操作数偶数或奇数索引位置的元素参与转换，未被掩码筛选的元素置零，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
+  - objects: [vector]
   - execution_models: [register_vector]
+  - source_locations: [vector_register]
+  - destination_locations: [vector_register]
   - traits: [elementwise, masked, widening_result]
 signature:
   - override_id: asc_uint82half__Rvf16_vu8_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint82half__Rvf16_vu8_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint82half__vu8_vb_icposeven
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
   - override_id: asc_uint82half__vu8_vb_icposodd
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
+archs: ['3510']
+header: [/include/c_api/reg_compute/reg_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_uint82half
 
