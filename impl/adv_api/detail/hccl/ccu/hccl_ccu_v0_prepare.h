@@ -198,6 +198,7 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForReduceScatter(
     __gm__ CommonPrepareParamCcu* commParam)
 {
+    // test
     CcuPrepareForAllGather(commParam);
 }
 
