@@ -319,7 +319,6 @@ __simd_callee__ inline void asc_pack_to_high(vector_uint16_t& dst, vector_int32_
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline void asc_pack_to_low(vector_uint32_t& dst, vector_uint64_t src)
 {
     if ASC_IS_AIV {
@@ -347,7 +346,6 @@ __simd_callee__ inline void asc_pack_to_high(vector_uint32_t& dst, vector_int64_
         vpack(dst, src, HIGHER);
     }
 }
-#endif
 
 __simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src)
 {
@@ -356,7 +354,6 @@ __simd_callee__ inline void asc_pack_to_high(vector_bool& dst, vector_bool src)
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline void asc_pack_datablock(vector_uint16_t& dst, vector_uint16_t src)
 {
     if ASC_IS_AIV {
@@ -412,7 +409,6 @@ __simd_callee__ inline void asc_pack_datablock(vector_int64_t& dst, vector_int64
         vpackv2(dst, src);
     }
 }
-#endif
 
 __simd_callee__ inline void asc_unpack_upper(vector_uint16_t& dst, vector_uint8_t src)
 {
@@ -861,7 +857,6 @@ __simd_callee__ inline vector_uint16_t asc_pack_to_low(vector_int32_t src)
     return dst;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline vector_uint32_t asc_pack_to_low(vector_uint64_t src)
 {
     vector_uint32_t dst;
@@ -875,7 +870,6 @@ __simd_callee__ inline vector_uint32_t asc_pack_to_low(vector_int64_t src)
     asc_pack_to_low(dst, src);
     return dst;
 }
-#endif
 
 __simd_callee__ inline vector_bool asc_pack_to_low(vector_bool src)
 {
@@ -912,7 +906,6 @@ __simd_callee__ inline vector_uint16_t asc_pack_to_high(vector_int32_t src)
     return dst;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline vector_uint32_t asc_pack_to_high(vector_uint64_t src)
 {
     vector_uint32_t dst;
@@ -926,7 +919,6 @@ __simd_callee__ inline vector_uint32_t asc_pack_to_high(vector_int64_t src)
     asc_pack_to_high(dst, src);
     return dst;
 }
-#endif
 
 __simd_callee__ inline vector_bool asc_pack_to_high(vector_bool src)
 {
@@ -935,7 +927,6 @@ __simd_callee__ inline vector_bool asc_pack_to_high(vector_bool src)
     return dst;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline vector_uint16_t asc_pack_datablock(vector_uint16_t src)
 {
     vector_uint16_t dst;
@@ -991,7 +982,6 @@ __simd_callee__ inline vector_int64_t asc_pack_datablock(vector_int64_t src)
     asc_pack_datablock(dst, src);
     return dst;
 }
-#endif
 
 __simd_callee__ inline void asc_deintlv(
     vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1)
