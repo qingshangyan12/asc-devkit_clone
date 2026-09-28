@@ -324,6 +324,21 @@ TEST_F(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
     });
 }
 
+TEST_F(ResourceManifestValidatorTest, ValidatesCommandOutputReferencesAreDeclared)
+{
+    Json multipleOutputs = MakeValidManifest();
+    Command(multipleOutputs)["cmd"].push_back("-o${output}/extra.o");
+    Object(multipleOutputs)["outputs"].push_back("${output}/extra.o");
+    EXPECT_TRUE(Validate(multipleOutputs));
+
+    ExpectInvalid("command references undeclared output", [](Json& manifest) {
+        Command(manifest)["cmd"].push_back("${output}/extra.o");
+    });
+    ExpectInvalid("embedded command reference is undeclared", [](Json& manifest) {
+        Command(manifest)["cmd"].push_back("-o${output}/extra.o");
+    });
+}
+
 TEST_F(ResourceManifestValidatorTest, ValidatesCommands)
 {
     ExpectInvalid("command is not an object", [](Json& manifest) { Object(manifest)["commands"][0U] = "compile"; });

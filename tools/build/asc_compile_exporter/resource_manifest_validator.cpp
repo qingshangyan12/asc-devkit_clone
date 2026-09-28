@@ -390,11 +390,20 @@ bool ResourceManifestValidator::ValidateObjectOutputs(const Json& outputs)
 bool ResourceManifestValidator::ValidateObjectOutputReferences(
     const Json& outputs, const std::set<std::string>& referencedOutputs) const
 {
+    std::set<std::string> declaredOutputs;
     for (const Json& output : outputs) {
         const std::string value = output.get_ref<const std::string&>();
+        declaredOutputs.insert(value);
         if (!CheckAndLog(
                 referencedOutputs.count(value) != 0U, __LINE__,
                 "invalid object output: output is not referenced by its commands, value=" + value)) {
+            return false;
+        }
+    }
+    for (const std::string& value : referencedOutputs) {
+        if (!CheckAndLog(
+                declaredOutputs.count(value) != 0U, __LINE__,
+                "invalid object output: command references undeclared output, value=" + value)) {
             return false;
         }
     }
