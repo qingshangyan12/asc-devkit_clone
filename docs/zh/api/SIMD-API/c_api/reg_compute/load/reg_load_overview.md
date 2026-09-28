@@ -75,20 +75,20 @@ Reg数据搬入接口用于将Unified Buffer（UB）中的数据搬入矢量数�
 
 | 接口名称 | 模式 | 功能简述 | 地址对齐要求 |
 | --- | --- | --- | --- |
-| [asc_loadalign](asc_loadalign.md) | 连续对齐搬入 | 连续搬入VL/8长度的数据，由用户更新源地址。 | 32字节 |
-| [asc_loadalign](asc_loadalign.md) | 立即数偏移搬入模式 | 从源起始地址偏移指定距离后搬入VL/8长度的数据。 | 32字节 |
-| [asc_loadalign](asc_loadalign.md) | 地址寄存器偏移搬入模式 | 按地址寄存器指定的偏移搬入VL/8长度的数据。 | 32字节 |
-| [asc_loadalign_postupdate](asc_loadalign_postupdate.md) | 立即数偏移搬入模式 | 搬入VL/8长度的数据，并按立即数偏移更新源地址。 | 32字节 |
+| [asc_loadalign](asc_loadalign_mask.md) | 连续对齐搬入 | 连续搬入VL/8长度的数据，由用户更新源地址。 | 32字节 |
+| [asc_loadalign](asc_loadalign_mask.md) | 立即数偏移搬入模式 | 从源起始地址偏移指定距离后搬入VL/8长度的数据。 | 32字节 |
+| [asc_loadalign](asc_loadalign_mask.md) | 地址寄存器偏移搬入模式 | 按地址寄存器指定的偏移搬入VL/8长度的数据。 | 32字节 |
+| [asc_loadalign_postupdate](asc_loadalign_mask_postupdate.md) | 立即数偏移搬入模式 | 搬入VL/8长度的数据，并按立即数偏移更新源地址。 | 32字节 |
 | [asc_loadalign_mask](asc_loadalign_mask.md) | 连续对齐搬入 | 连续搬入VL/8长度的数据，通过返回值返回结果。 | 32字节 |
-| [asc_loadalign_downsample](asc_loadalign_downsample.md) | 对齐搬入模式 | 读取VL/4长度的数据，保留偶数下标bit。 | 32字节 |
-| [asc_loadalign_downsample](asc_loadalign_downsample.md) | 立即数偏移搬入模式 | 从立即数偏移位置读取数据并进行2倍下采样。 | 32字节 |
-| [asc_loadalign_downsample](asc_loadalign_downsample.md) | 地址寄存器偏移搬入模式 | 从地址寄存器偏移位置读取数据并进行2倍下采样。 | 32字节 |
-| [asc_loadalign_downsample_postupdate](asc_loadalign_downsample_postupdate.md) | Post Update搬入模式 | 读取数据并进行2倍下采样，同时自动更新源地址。 | 32字节 |
+| [asc_loadalign_downsample](asc_loadalign_mask_downsample.md) | 对齐搬入模式 | 读取VL/4长度的数据，保留偶数下标bit。 | 32字节 |
+| [asc_loadalign_downsample](asc_loadalign_mask_downsample.md) | 立即数偏移搬入模式 | 从立即数偏移位置读取数据并进行2倍下采样。 | 32字节 |
+| [asc_loadalign_downsample](asc_loadalign_mask_downsample.md) | 地址寄存器偏移搬入模式 | 从地址寄存器偏移位置读取数据并进行2倍下采样。 | 32字节 |
+| [asc_loadalign_downsample_postupdate](asc_loadalign_mask_downsample_postupdate.md) | Post Update搬入模式 | 读取数据并进行2倍下采样，同时自动更新源地址。 | 32字节 |
 | [asc_loadalign_mask_downsample](asc_loadalign_mask_downsample.md) | 对齐搬入模式 | 读取VL/4长度的数据，保留偶数下标bit，通过返回值返回结果。 | 32字节 |
-| [asc_loadalign_upsample](asc_loadalign_upsample.md) | 对齐搬入模式 | 读取VL/16长度的数据，将每个bit重复两次。 | 16字节 |
-| [asc_loadalign_upsample](asc_loadalign_upsample.md) | 立即数偏移搬入模式 | 从立即数偏移位置读取数据并进行2倍上采样。 | 16字节 |
-| [asc_loadalign_upsample](asc_loadalign_upsample.md) | 地址寄存器偏移搬入模式 | 从地址寄存器偏移位置读取数据并进行2倍上采样。 | 16字节 |
-| [asc_loadalign_upsample_postupdate](asc_loadalign_upsample_postupdate.md) | Post Update搬入模式 | 读取数据并进行2倍上采样，同时自动更新源地址。 | 16字节 |
+| [asc_loadalign_upsample](asc_loadalign_mask_upsample.md) | 对齐搬入模式 | 读取VL/16长度的数据，将每个bit重复两次。 | 16字节 |
+| [asc_loadalign_upsample](asc_loadalign_mask_upsample.md) | 立即数偏移搬入模式 | 从立即数偏移位置读取数据并进行2倍上采样。 | 16字节 |
+| [asc_loadalign_upsample](asc_loadalign_mask_upsample.md) | 地址寄存器偏移搬入模式 | 从地址寄存器偏移位置读取数据并进行2倍上采样。 | 16字节 |
+| [asc_loadalign_upsample_postupdate](asc_loadalign_mask_upsample_postupdate.md) | Post Update搬入模式 | 读取数据并进行2倍上采样，同时自动更新源地址。 | 16字节 |
 | [asc_loadalign_mask_upsample](asc_loadalign_mask_upsample.md) | 对齐搬入模式 | 读取VL/16长度的数据，将每个bit重复两次，通过返回值返回结果。 | 16字节 |
 
 ## 通用约束
@@ -117,7 +117,7 @@ Reg数据搬入接口用于将Unified Buffer（UB）中的数据搬入矢量数�
 
 调用`asc_loadalign`的连续对齐搬入形式。源地址通过`src + i * one_repeat_size`计算，`one_repeat_size`为128个`half`元素。
 
-```cpp
+```c
 __simd_vf__ inline void load_align_continuous_vf(__ubuf__ half* dst, __ubuf__ half* src,
                                                  uint16_t one_repeat_size, uint16_t repeat_times)
 {
@@ -134,7 +134,7 @@ __simd_vf__ inline void load_align_continuous_vf(__ubuf__ half* dst, __ubuf__ ha
 
 调用`asc_loadalign`的立即数偏移搬入模式。`offset`相对`src`基地址，单位为元素；本示例通过`i * one_repeat_size`计算每次搬入的偏移。
 
-```cpp
+```c
 __simd_vf__ inline void load_align_immediate_offset_vf(__ubuf__ half* dst, __ubuf__ half* src,
                                                        uint16_t one_repeat_size, uint16_t repeat_times)
 {
@@ -151,7 +151,7 @@ __simd_vf__ inline void load_align_immediate_offset_vf(__ubuf__ half* dst, __ubu
 
 调用`asc_loadalign`的地址寄存器偏移搬入模式。`addr_reg`须在最内层循环中赋值并使用，b16模式下偏移单位为元素。
 
-```cpp
+```c
 __simd_vf__ inline void load_align_addr_reg_offset_vf(__ubuf__ half* dst, __ubuf__ half* src,
                                                       uint16_t one_repeat_size, uint16_t repeat_times)
 {
@@ -170,7 +170,7 @@ __simd_vf__ inline void load_align_addr_reg_offset_vf(__ubuf__ half* dst, __ubuf
 
 调用`asc_loadalign_postupdate`的立即数偏移搬入模式。源地址以引用方式传入，接口在每次搬入后将其向后更新`one_repeat_size`个元素。
 
-```cpp
+```c
 __simd_vf__ inline void load_align_post_update_vf(__ubuf__ half* dst, __ubuf__ half* src,
                                                   uint16_t one_repeat_size, uint16_t repeat_times)
 {
@@ -290,7 +290,7 @@ __simd_vf__ inline void load_store_unalign_vf(__ubuf__ uint32_t* dst, __ubuf__ u
 
 以下示例以`asc_loadalign`为例，展示b64掩码的构造方式以及地址寄存器偏移量的换算方法。
 
-```cpp
+```c
 vector_int64_t src_reg;
 vector_bool mask_b32 = asc_create_mask_b32(PAT_ALL);
 vector_bool mask_b64;

@@ -28,10 +28,12 @@
 
 头文件路径为：`"c_api/reg_compute/load/loadalign.h"`。
 
-从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并搬入矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。接口采用Post Update模式，搬运完成后自动更新源地址指针。本接口提供两种功能模式：
+从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并搬入矢量数据寄存器，搬运过程中数据格式和内容保持不变。接口采用Post Update模式，搬运完成后自动更新源地址指针。本接口提供两种功能模式：
 
 - **立即数偏移搬入模式**：从当前源地址搬入数据，搬入完成后按照指定步长自动更新源地址。
 - **非连续对齐搬入模式**：按照指定的数据块间隔，从当前源地址非连续搬入8个`DataBlock`，每个`DataBlock`的数据量为32字节。搬入完成后按照指定步长自动更新源地址。
+
+掩码寄存器Post Update搬入请使用[asc_loadalign_mask_postupdate](asc_loadalign_mask_postupdate.md)。
 
 **图1** 立即数偏移搬入模式
 
@@ -47,10 +49,6 @@
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_postupdate(vector_<dtype>& dst,
                                                      __ubuf__ <dtype>*& src,
-                                                     int32_t offset)
-// 搬入掩码寄存器。
-__simd_callee__ inline void asc_loadalign_postupdate(vector_bool& dst,
-                                                     __ubuf__ uint32_t*& src,
                                                      int32_t offset)
 ```
 
@@ -100,9 +98,9 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
+| dst | 输出 | 目的矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 |
 | src | 输入/输出 | 源UB地址，实际读取地址必须按32字节对齐。 |
-| offset | 输入 | Post Update步长。接口从当前`src`地址完成搬入后更新`src`。<br>&bull; 当`dst`为矢量数据寄存器时，单位为元素个数，`src`增加`offset × sizeof(dtype)`字节。<br>&bull; 当`dst`为掩码寄存器时，单位为字节，`src`指针增加`offset`字节。 |
+| offset | 输入 | Post Update步长，单位为元素个数。接口从当前`src`地址完成搬入后，`src`增加`offset × sizeof(dtype)`字节。 |
 
 ### 非连续对齐搬入模式
 
@@ -116,7 +114,7 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 | repeat_stride | 输入 | Post Update步长，单位为32字节。接口完成本次搬入后，将`src`地址增加`repeat_stride × 32`字节。 |
 | mask | 输入 | 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。<br>&bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。<br>&bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。其中，`mask`为执行掩码，不是本接口搬入的数据。
 
 ## 返回值说明
 
@@ -133,7 +131,6 @@ __simd_callee__ inline void asc_loadalign_postupdate(vector_float& dst,
 
 ### 非连续对齐搬入模式
 
-- 该模式不支持目的操作数为掩码寄存器。
 - 当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_mask/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。展开后的掩码以连续8个bit为一组，仅每组最低位的bit有效，用于控制对应的一个b64元素。
 
     ```c
@@ -164,7 +161,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>

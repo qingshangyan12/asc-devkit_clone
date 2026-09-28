@@ -45,13 +45,14 @@ Reg向量计算C API提供了下表所示多种搬运指令，合理选择搬运
 
 | 场景 | C API接口 | 描述 |
 | :-- | :-- | :-- |
-| 连续对齐搬入 | [asc_loadalign](./load/asc_loadalign.md) | 从32字节对齐的UB起始地址连续搬入到向量数据寄存器或掩码寄存器。|
+| 连续对齐搬入 | [asc_loadalign](./load/asc_loadalign.md) | 从32字节对齐的UB起始地址连续搬入到向量数据寄存器。|
 | 非连续对齐搬入 | [asc_loadalign](./load/asc_loadalign.md) | 从32字节对齐的UB起始地址非连续搬入多个DataBlock。|
 | 连续非对齐搬入 | [asc_loadunalign](./load/asc_loadunalign.md) | 从非32字节对齐的UB起始地址连续搬入到向量数据寄存器。|
-| 掩码寄存器搬入 | [asc_loadalign](./load/asc_loadalign.md)、[asc_loadalign_mask](./load/asc_loadalign_mask.md) | 从UB连续搬入掩码寄存器。|
+| 掩码寄存器搬入 | [asc_loadalign_mask](./load/asc_loadalign_mask.md) | 从UB连续搬入掩码寄存器。|
 | 离散搬入 | [asc_gather](./ub_gather/asc_gather.md) | 根据索引值将UB中的元素收集到向量数据寄存器。|
 | DataBlock离散搬入 | [asc_gather_datablock](./ub_gather/asc_gather_datablock.md) | 根据索引值将UB中的元素按DataBlock（32B）收集到向量数据寄存器。|
-| 连续对齐搬出 | [asc_storealign](./store/asc_storealign.md) | 将向量数据寄存器或掩码寄存器连续搬出到32字节对齐的UB地址。|
+| 连续对齐搬出 | [asc_storealign](./store/asc_storealign.md) | 将向量数据寄存器连续搬出到32字节对齐的UB地址。|
+| 掩码寄存器搬出 | [asc_storealign_mask](./store/asc_storealign_mask.md) | 将掩码寄存器连续搬出到32字节对齐的UB地址。|
 | 连续非对齐搬出 | [asc_storeunalign](./store/asc_storeunalign.md) | 将向量数据寄存器连续搬出到非32字节对齐的UB地址。|
 | 离散搬出 | [asc_scatter](./scatter/asc_scatter.md) | 根据索引值将向量数据寄存器中的元素离散搬出到UB。|
 | 寄存器间搬运 | [asc_copy](./reg_copy/asc_copy.md) | 支持向量数据寄存器复制到向量数据寄存器，掩码寄存器复制到掩码寄存器，向量数据寄存器复制到掩码寄存器三种模式。|
@@ -66,7 +67,7 @@ Reg向量计算C API提供了下表所示多种搬运指令，合理选择搬运
 
   ![](../figures/capi_half_to_int32_conversion.png "half转int32_t类型转换过程")
 
-  ```cpp
+  ```c
   __simd_vf__ inline void half_to_int32_vf(__ubuf__ int32_t* y_addr, __ubuf__ half* x_addr)
   {
       vector_half x_reg;
@@ -88,7 +89,7 @@ Reg向量计算C API提供了下表所示多种搬运指令，合理选择搬运
 
   ![](../figures/capi_float_to_int16_conversion.png "float转int16_t类型转换过程")
 
-  ```cpp
+  ```c
   __simd_vf__ inline void float_to_int16_vf(__ubuf__ int16_t* y_addr, __ubuf__ float* x_addr)
   {
       vector_float x_reg;

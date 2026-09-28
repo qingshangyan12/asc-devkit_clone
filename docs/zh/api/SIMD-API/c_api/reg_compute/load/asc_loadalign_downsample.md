@@ -28,22 +28,15 @@
 
 头文件路径为：`"c_api/reg_compute/load/loadalign.h"`。
 
-从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，结果通过函数返回值返回或写入目的寄存器。
-
-- 当`dst`为矢量数据寄存器时，读取2×VL（512字节）长度数据，保留偶数下标元素后写入VL长度数据。
-- 当`dst`为掩码寄存器时，读取VL/4（64字节）长度数据，保留偶数下标bit后写入VL/8长度数据。
+从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL（512字节）长度的连续数据，保留偶数下标元素，并通过函数返回值返回或写入VL长度的目的矢量数据寄存器。
 
 本接口提供三种功能模式：
 
-- **对齐搬入模式**：将UB源地址的数据下采样后搬入到矢量数据寄存器或掩码寄存器，由用户自行更新源地址。
+- **对齐搬入模式**：将UB源地址的数据下采样后搬入到矢量数据寄存器，由用户自行更新源地址。
 - **立即数偏移搬入模式**：从相对源起始地址偏移指定距离的位置搬入数据。本接口不会自动更新源地址。
 - **地址寄存器偏移搬入模式**：通过地址寄存器指定相对源起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬入场景。需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。
 
-对齐搬入模式中，通过函数返回值返回掩码寄存器时，请使用[asc_loadalign_mask_downsample](asc_loadalign_mask_downsample.md)。
-
-**图1** 下采样搬入掩码寄存器
-
-![](../../figures/capi_loadalign_mask_downsample.png)
+掩码寄存器下采样搬入请使用[asc_loadalign_mask_downsample](asc_loadalign_mask_downsample.md)。
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
@@ -58,9 +51,6 @@ __simd_callee__ inline vector_<dtype> asc_loadalign_downsample(__ubuf__ <dtype>*
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_downsample(vector_<dtype>& dst,
                                                      __ubuf__ <dtype>* src)
-// 搬入掩码寄存器。
-__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst,
-                                                     __ubuf__ uint32_t* src)
 ```
 
 #### dtype支持数据类型
@@ -84,10 +74,6 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 __simd_callee__ inline void asc_loadalign_downsample(vector_<dtype>& dst,
                                                      __ubuf__ <dtype>* src,
                                                      int32_t offset)
-// 搬入掩码寄存器。
-__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst,
-                                                     __ubuf__ uint32_t* src,
-                                                     int32_t offset)
 ```
 
 #### dtype支持数据类型
@@ -109,10 +95,6 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_downsample(vector_<dtype>& dst,
                                                      __ubuf__ <dtype>* src,
-                                                     addr_reg offset)
-// 搬入掩码寄存器。
-__simd_callee__ inline void asc_loadalign_downsample(vector_bool& dst,
-                                                     __ubuf__ uint32_t* src,
                                                      addr_reg offset)
 ```
 
@@ -137,7 +119,7 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
+| dst | 输出 | 目的矢量数据寄存器，仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。 |
 | src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
 
 ### 立即数偏移搬入模式
@@ -146,9 +128,9 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
+| dst | 输出 | 目的矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 |
 | src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
-| offset | 输入 | 相对`src`起始地址的偏移。<br>&bull; 当`dst`为矢量数据寄存器，单位为元素个数。<br>&bull; 当`dst`为掩码寄存器，单位为字节。 |
+| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。 |
 
 ### 地址寄存器偏移搬入模式
 
@@ -156,11 +138,11 @@ __simd_callee__ inline void asc_loadalign_downsample(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
+| dst | 输出 | 目的矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 |
 | src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
-| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录相对`src`起始地址的偏移，单位为元素个数。b8、b16、b32模式分别表示每个元素占1字节、2字节、4字节。当`dst`为`vector_bool`时，应使用b32模式。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录相对`src`起始地址的偏移，单位为元素个数。b8、b16、b32模式分别表示每个元素占1字节、2字节、4字节。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+矢量数据寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -191,7 +173,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>
