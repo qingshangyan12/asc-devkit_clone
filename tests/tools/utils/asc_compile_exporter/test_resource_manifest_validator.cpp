@@ -102,6 +102,11 @@ TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
 {
     EXPECT_TRUE(Validate(MakeValidManifest()));
 
+    Json optionalFields = MakeValidManifest();
+    Command(optionalFields)["stage"] = "compile";
+    optionalFields["options"]["custom_compile"] = Json::array({"-O2"});
+    EXPECT_TRUE(Validate(optionalFields));
+
     Json skManifest = MakeValidManifest();
     Object(skManifest)["object_type"] = "sk";
     EXPECT_TRUE(Validate(skManifest));
@@ -163,6 +168,12 @@ TEST_F(ResourceManifestValidatorTest, RejectsInvalidTopLevelFields)
     ExpectInvalid("missing kernels", [](Json& manifest) { manifest.erase("kernels"); });
     ExpectInvalid("kernels has wrong type", [](Json& manifest) { manifest["kernels"] = Json::object(); });
     ExpectInvalid("kernels is empty", [](Json& manifest) { manifest["kernels"] = Json::array(); });
+    ExpectInvalid("unknown manifest field", [](Json& manifest) {
+        manifest["resouce_id"] = manifest["resource_id"];
+    });
+    ExpectInvalid("schema_version is an input field", [](Json& manifest) {
+        manifest["schema_version"] = "1.0";
+    });
 }
 
 TEST_F(ResourceManifestValidatorTest, ValidatesManifestPathsAndCommonOptions)
@@ -248,6 +259,9 @@ TEST_F(ResourceManifestValidatorTest, ValidatesConstants)
     ExpectInvalid("constant name is duplicated", [](Json& manifest) {
         Kernel(manifest)["constant_infos"].push_back(Constant(manifest));
     });
+    ExpectInvalid("unknown constant field", [](Json& manifest) {
+        Constant(manifest)["templat"] = "weight_template";
+    });
 }
 
 TEST_F(ResourceManifestValidatorTest, ValidatesKernelStructure)
@@ -261,6 +275,9 @@ TEST_F(ResourceManifestValidatorTest, ValidatesKernelStructure)
     ExpectInvalid("objects is missing", [](Json& manifest) { Kernel(manifest).erase("objects"); });
     ExpectInvalid("objects has wrong type", [](Json& manifest) { Kernel(manifest)["objects"] = Json::object(); });
     ExpectInvalid("objects is empty", [](Json& manifest) { Kernel(manifest)["objects"] = Json::array(); });
+    ExpectInvalid("unknown kernel field", [](Json& manifest) {
+        Kernel(manifest)["kernal_name"] = "test_kernel";
+    });
     ExpectInvalid(
         "link_options has wrong type", [](Json& manifest) { Kernel(manifest)["link_options"] = Json::object(); });
     ExpectInvalid("kernel name is duplicated", [](Json& manifest) { manifest["kernels"].push_back(Kernel(manifest)); });
@@ -290,6 +307,9 @@ TEST_F(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
     ExpectInvalid("object output is not referenced", [](Json& manifest) {
         Object(manifest)["outputs"][0U] = "${output}/other.o";
     });
+    ExpectInvalid("unknown object field", [](Json& manifest) {
+        Object(manifest)["outpus"] = Object(manifest)["outputs"];
+    });
 }
 
 TEST_F(ResourceManifestValidatorTest, ValidatesCommands)
@@ -311,6 +331,9 @@ TEST_F(ResourceManifestValidatorTest, ValidatesCommands)
     });
     ExpectInvalid("options marker is embedded", [](Json& manifest) {
         Command(manifest)["cmd"][0U] = "prefix${options:common_compile}";
+    });
+    ExpectInvalid("unknown command field", [](Json& manifest) {
+        Command(manifest)["stgae"] = "compile";
     });
 }
 

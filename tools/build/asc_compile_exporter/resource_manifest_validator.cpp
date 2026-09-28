@@ -40,6 +40,14 @@ const std::map<std::string, MarkerRequirement> GENERIC_MARKER_REQUIREMENTS = {
     {SOURCE_FILE_PATH_MARKER, MarkerRequirement::SourceFile},
 };
 
+using FieldSet = std::set<std::string>;
+const FieldSet MANIFEST_FIELDS = {
+    "resource_id", "soc_version", "source_file", "resource_path", "options", "kernels"};
+const FieldSet KERNEL_FIELDS = {"kernel_name", "constant_infos", "link_options", "objects"};
+const FieldSet CONSTANT_FIELDS = {"name", "parameter_index", "arg_type", "byte_size", "file", "template"};
+const FieldSet OBJECT_FIELDS = {"object_name", "object_type", "commands", "outputs"};
+const FieldSet COMMAND_FIELDS = {"type", "cmd", "stage"};
+
 bool CheckAndLog(bool condition, int lineNumber, const std::string& message) noexcept
 {
     if (condition) {
@@ -49,6 +57,18 @@ bool CheckAndLog(bool condition, int lineNumber, const std::string& message) noe
     return false;
 }
 
+bool ValidateObjectFields(const Json& object, const FieldSet& allowedFields, const std::string& level)
+{
+    if (!CheckAndLog(object.is_object(), __LINE__, "invalid " + level + ": expected an object")) {
+        return false;
+    }
+    for (const auto& item : object.items()) {
+        if (allowedFields.count(item.key()) == 0U) {
+            return CheckAndLog(false, __LINE__, "unknown " + level + " field: " + item.key());
+        }
+    }
+    return true;
+}
 } // namespace
 
 ResourceManifestValidator::ResourceManifestValidator(const Json& manifest, const std::string& manifestPath)
@@ -95,6 +115,9 @@ std::string ResourceManifestValidator::ExtractNamedMarkerName(const std::string&
 
 bool ResourceManifestValidator::ValidateManifestBaseFields()
 {
+    if (!ValidateObjectFields(manifest_, MANIFEST_FIELDS, "manifest")) {
+        return false;
+    }
     return CheckAndLog(manifest_.is_object(), __LINE__, "invalid manifest: expected an object") &&
            CheckAndLog(manifest_.contains("resource_id"), __LINE__, "missing required field: resource_id") &&
            CheckAndLog(manifest_.at("resource_id").is_string(), __LINE__, "invalid resource_id: expected a string") &&
@@ -314,6 +337,9 @@ bool ResourceManifestValidator::ValidateOptionArray(const std::string& name)
 
 bool ResourceManifestValidator::ValidateConstant(const Json& constant, std::set<std::string>& constantNames)
 {
+    if (!ValidateObjectFields(constant, CONSTANT_FIELDS, "constant")) {
+        return false;
+    }
     ManifestConstant parsed;
     if (!parsed.ParseDefinition(constant)) {
         return false;
@@ -391,6 +417,9 @@ bool ResourceManifestValidator::ValidateCommandOptions(
 
 bool ResourceManifestValidator::ValidateCommand(const Json& command, std::set<std::string>& referencedOutputs)
 {
+    if (!ValidateObjectFields(command, COMMAND_FIELDS, "command")) {
+        return false;
+    }
     if (!CheckAndLog(command.is_object(), __LINE__, "invalid command: expected an object") ||
         !CheckAndLog(command.contains("type"), __LINE__, "missing required command field: type") ||
         !CheckAndLog(command.at("type").is_string(), __LINE__, "invalid command type: expected a string") ||
@@ -419,6 +448,9 @@ bool ResourceManifestValidator::ValidateCommands(const Json& commands, std::set<
 
 bool ResourceManifestValidator::ValidateObject(const Json& object, std::set<std::string>& objectNames)
 {
+    if (!ValidateObjectFields(object, OBJECT_FIELDS, "object")) {
+        return false;
+    }
     if (!CheckAndLog(object.is_object(), __LINE__, "invalid object: expected an object") ||
         !CheckAndLog(object.contains("object_name"), __LINE__, "missing required object field: object_name") ||
         !CheckAndLog(object.at("object_name").is_string(), __LINE__, "invalid object_name: expected a string") ||
@@ -471,6 +503,9 @@ bool ResourceManifestValidator::ValidateObjects(const Json& objects)
 
 bool ResourceManifestValidator::ValidateKernel(const Json& kernel, std::set<std::string>& kernelNames)
 {
+    if (!ValidateObjectFields(kernel, KERNEL_FIELDS, "kernel")) {
+        return false;
+    }
     if (!CheckAndLog(kernel.is_object(), __LINE__, "invalid kernel: expected an object") ||
         !CheckAndLog(kernel.contains("kernel_name"), __LINE__, "missing required kernel field: kernel_name") ||
         !CheckAndLog(kernel.at("kernel_name").is_string(), __LINE__, "invalid kernel_name: expected a string") ||
