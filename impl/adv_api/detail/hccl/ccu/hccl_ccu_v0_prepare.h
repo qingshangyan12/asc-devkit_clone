@@ -660,6 +660,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     constexpr uint64_t localCopyLoopCount = 8U;
     CalcGoSize(sliceSize, localCopyLoopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_NORMAL_0]);
     CalcGoSize(sliceSize, localCopyLoopCount, CCU_MEMSLICE_SIZE * 8, &xnData_[KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_0]);
+    // test
     KERNEL_LOG(
         KERNEL_INFO, "RS sole-NHR-2die prepare: slice=0x%llx, stride=0x%llx, die0=0x%llx, die1=0x%llx, eq=%llu\n",
         sliceSize, sliceStride, die0Size, die1Size, isInputOutputEqual);
