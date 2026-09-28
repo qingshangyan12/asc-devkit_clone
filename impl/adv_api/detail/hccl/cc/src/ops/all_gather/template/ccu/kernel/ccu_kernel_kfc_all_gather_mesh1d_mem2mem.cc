@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "ccu_timestamp.h"
 #include "ccu_kernel_kfc_all_gather_mesh1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
@@ -352,16 +353,22 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     CCU_CHK_RET(LoadArgs(
         ctx, inputBase, phase0Output, tokenInfo, phase0OutputOffset, part0Size, part0GoSize0, part0GoSize1,
         part0GoSize2, part0GoSize3, zero, phase0RepeatNumInv, zero, zero, part0Size, zero));
+    const uint64_t clockAddress = ccu::dfx::StartAicpuTimestamp();
+    ccu::Variable time0, time1, time2, time3;
+    CCU_CHK_RET(ccu::dfx::ReadTimestamp(clockAddress, time0));
     CCU_CHK_RET(PreSync(ctx));
     ctx.sliceSize = part0Size;
     CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
     CCU_CHK_RET(PostSync(ctx));
+    CCU_CHK_RET(ccu::dfx::ReadTimestamp(clockAddress, time1));
 
     // Both missions must finish stage 0 before either reads its stage-0 output.
     CCU_CHK_RET(ccu::Store(meshPhaseDoneAddr, one));
     ccu::Variable nhrDone;
     nhrDone = 0U;
     CCU_WHILE(nhrDone != 1U) { CCU_CHK_RET(ccu::Load(nhrPhaseDoneAddr, nhrDone)); }
+
+    CCU_CHK_RET(ccu::dfx::ReadTimestamp(clockAddress, time2));
 
     // Stage 1: Mesh propagates part1 (already gathered by NHR) across all
     // level-1 groups. Input and output are the same gathered output buffer.
@@ -373,6 +380,11 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     ctx.sliceSize = part1Size;
     CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
     CCU_CHK_RET(PostSync(ctx));
+    CCU_CHK_RET(ccu::dfx::ReadTimestamp(clockAddress, time3));
+    // One print per invocation; host computes differences to save CCU XNs.
+    CCU_PRINTF(
+        "[CCU_TIMING][asc-devkit][mesh1d] stage0_ns=%t phase_wait_ns=%t stage1_ns=%t", time0, time1, time1, time2,
+        time2, time3);
     return CCU_SUCCESS;
 }
 

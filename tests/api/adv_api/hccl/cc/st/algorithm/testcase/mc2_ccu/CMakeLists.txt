@@ -80,6 +80,8 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/alg_v2_template_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/alg_template_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/template_utils.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_print.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_timestamp_st_stub.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_kernel_alg_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_kernel_utils.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/channel/channel.cc
