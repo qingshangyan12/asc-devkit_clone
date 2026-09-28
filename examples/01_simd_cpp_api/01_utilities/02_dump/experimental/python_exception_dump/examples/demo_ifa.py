@@ -18,7 +18,7 @@
 #       构造非法 block_table 触发核内越界异常（dump 污染输入）->
 #       callback 自动 dump 公共信息 + kernel args -> 校验产物
 #
-# 产物（均在 XPUOPS_DUMP_DIR 目录）：
+# 产物（均在 NPUOPS_DUMP_DIR 目录）：
 #   input_*.bin/.json    输入 tensor 数据与元信息（调用边界，Python 侧 dump）
 #   output_*.bin/.json   输出 tensor 数据与元信息（正常返回后，Python 侧 dump）
 #   *_args.bin / *_info.txt  异常公共信息与原始 kernel args（C++ 回调 dump）
@@ -29,16 +29,16 @@ import glob
 
 # dump 配置（环境变量说明见 README 1.5 节）
 DUMP_DIR = os.path.abspath("./exception_dump_ifa")
-os.environ["XPUOPS_DUMP_DIR"] = DUMP_DIR
-os.environ["XPUOPS_DUMP_LEVEL"] = "1"  # 1 = 公共信息 + args
+os.environ["NPUOPS_DUMP_DIR"] = DUMP_DIR
+os.environ["NPUOPS_DUMP_LEVEL"] = "1"  # 1 = 公共信息 + args
 
-PKG_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "xpuops_exception_dump", "python"))
+PKG_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "npuops_exception_dump", "python"))
 sys.path.insert(0, PKG_ROOT)
 
 import torch
 import torch_npu
 import ascend_ops  # noqa: F401  # 注册 ascend_ops torch 算子库
-from xpuops.debug import enable_exception_dump, run_with_tensor_dump
+from npuops.debug import enable_exception_dump, run_with_tensor_dump
 
 # ============================== 配置 ==============================
 B = 2  # batch

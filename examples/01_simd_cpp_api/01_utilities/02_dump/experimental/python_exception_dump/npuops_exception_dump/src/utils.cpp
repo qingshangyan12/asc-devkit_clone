@@ -9,7 +9,7 @@
  */
 
 /**
- * xpuops_exception_dump - 工具函数实现 (log/dump/文件/时间)
+ * npuops_exception_dump - 工具函数实现 (log/dump/文件/时间)
  */
 #include "utils.h"
 
@@ -22,13 +22,13 @@
 #include <ctime>
 #include <chrono>
 
-namespace xpuops {
+namespace npuops {
 
 void LogInfo(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    fputs("[XPUOPS][INFO] ", stdout);
+    fputs("[NPUOPS][INFO] ", stdout);
     vfprintf(stdout, fmt, ap);
     fputc('\n', stdout);
     va_end(ap);
@@ -39,7 +39,7 @@ void LogWarn(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    fputs("[XPUOPS][WARN] ", stdout);
+    fputs("[NPUOPS][WARN] ", stdout);
     vfprintf(stdout, fmt, ap);
     fputc('\n', stdout);
     va_end(ap);
@@ -50,7 +50,7 @@ void LogError(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    fputs("[XPUOPS][ERROR] ", stdout);
+    fputs("[NPUOPS][ERROR] ", stdout);
     vfprintf(stdout, fmt, ap);
     fputc('\n', stdout);
     va_end(ap);
@@ -74,7 +74,7 @@ std::string GetTimestamp()
 
 std::string GetDumpDir()
 {
-    const char* dir = getenv("XPUOPS_DUMP_DIR");
+    const char* dir = getenv("NPUOPS_DUMP_DIR");
     if (dir != nullptr && dir[0] != '\0') {
         return std::string(dir);
     }
@@ -83,7 +83,7 @@ std::string GetDumpDir()
 
 int GetDumpLevel()
 {
-    const char* lv = getenv("XPUOPS_DUMP_LEVEL");
+    const char* lv = getenv("NPUOPS_DUMP_LEVEL");
     if (lv != nullptr && lv[0] != '\0') {
         return atoi(lv);
     }
@@ -150,4 +150,4 @@ void LogHexDump(const char* tag, const void* data, size_t size, size_t maxBytes)
     }
 }
 
-} // namespace xpuops
+} // namespace npuops

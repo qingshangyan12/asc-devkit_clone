@@ -9,16 +9,16 @@
  */
 
 /**
- * xpuops_exception_dump - 初始化入口
+ * npuops_exception_dump - 初始化入口
  */
-#include "xpuops_exception_dump.h"
+#include "npuops_exception_dump.h"
 
 #include "exception_callback.h"
 #include "utils.h"
 
-extern "C" int xpuopsExceptionDumpInit(const char* kernels[], size_t count)
+extern "C" int npuopsExceptionDumpInit(const char* kernels[], size_t count)
 {
-    using namespace xpuops;
+    using namespace npuops;
 
     // 1. 注册 Runtime exception callback（幂等）
     if (RegisterExceptionCallback() != 0) {
@@ -35,6 +35,6 @@ extern "C" int xpuopsExceptionDumpInit(const char* kernels[], size_t count)
             LogInfo("exception dump enabled for kernel prefix: %s", kernels[i] == nullptr ? "(null)" : kernels[i]);
         }
     }
-    LogInfo("dump dir: %s (XPUOPS_DUMP_DIR), level: %d (XPUOPS_DUMP_LEVEL)", GetDumpDir().c_str(), GetDumpLevel());
+    LogInfo("dump dir: %s (NPUOPS_DUMP_DIR), level: %d (NPUOPS_DUMP_LEVEL)", GetDumpDir().c_str(), GetDumpLevel());
     return 0;
 }

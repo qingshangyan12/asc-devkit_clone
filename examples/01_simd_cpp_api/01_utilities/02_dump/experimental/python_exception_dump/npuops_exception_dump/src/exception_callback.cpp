@@ -9,7 +9,7 @@
  */
 
 /**
- * xpuops_exception_dump - 通用 Exception Callback（单层设计）
+ * npuops_exception_dump - 通用 Exception Callback（单层设计）
  * 注册 AscendCL Runtime 异常回调，捕获异常后获取公共信息与 kernel args，
  * D2H 后按 kernel name 前缀过滤统一落盘（公共信息 + raw args），无需任何算子级 C++ 代码。
  */
@@ -28,7 +28,7 @@
 #include <string>
 #include <vector>
 
-namespace xpuops {
+namespace npuops {
 
 static bool g_callbackRegistered = false;
 static bool g_inCallback = false; // 防止 dump 过程中再次异常导致递归
@@ -71,7 +71,7 @@ static bool KernelEnabled(const char* kernelName)
 // 公共信息写入 _info.txt（单层统一产出：公共信息 + args 摘要）
 static void AppendDumpInfo(const DumpContext* ctx, const char* rawKernelName, uint32_t argsBytes, bool argsAvailable)
 {
-    std::string info = std::string("===== XPU Exception Dump =====\n") + "timestamp   : " + ctx->timestamp + "\n" +
+    std::string info = std::string("===== NPU Exception Dump =====\n") + "timestamp   : " + ctx->timestamp + "\n" +
                        "device_id   : " + std::to_string(ctx->deviceId) + "\n" +
                        "task_id     : " + std::to_string(ctx->taskId) + "\n" +
                        "stream_id   : " + std::to_string(ctx->streamId) + "\n" +
@@ -122,7 +122,7 @@ static void ExtractKernelName(const char* rawName, char* out, size_t outLen)
 }
 
 // Callback 主实现
-static void XpuopsExceptionCallback(aclrtExceptionInfo* info)
+static void NpuopsExceptionCallback(aclrtExceptionInfo* info)
 {
     if (g_inCallback) {
         return; // 递归保护
@@ -175,7 +175,7 @@ static void XpuopsExceptionCallback(aclrtExceptionInfo* info)
     }
     ctx.filePrefix = safeName + "_dev" + std::to_string(ctx.deviceId) + "_task" + std::to_string(ctx.taskId) + "_" + ts;
 
-    LogInfo("========== XPU Exception Dump ==========");
+    LogInfo("========== NPU Exception Dump ==========");
     LogInfo("Timestamp:    %s", ctx.timestamp);
     LogInfo("Device ID:    %u", ctx.deviceId);
     LogInfo("Task ID:      %u", ctx.taskId);
@@ -271,7 +271,7 @@ int RegisterExceptionCallback()
             "no exception callback API available (aclrtExceptionInfoCallbackRegister / aclrtSetExceptionInfoCallback)");
         return -1;
     }
-    aclError ret = regFn(XpuopsExceptionCallback);
+    aclError ret = regFn(NpuopsExceptionCallback);
     if (ret != ACL_SUCCESS) {
         LogError("%s failed, ret=%d", apiName, static_cast<int>(ret));
         return -1;
@@ -283,4 +283,4 @@ int RegisterExceptionCallback()
 
 bool IsCallbackRegistered() { return g_callbackRegistered; }
 
-} // namespace xpuops
+} // namespace npuops

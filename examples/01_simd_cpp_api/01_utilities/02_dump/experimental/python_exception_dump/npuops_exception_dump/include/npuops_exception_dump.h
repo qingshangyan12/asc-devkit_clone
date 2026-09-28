@@ -9,11 +9,11 @@
  */
 
 /**
- * xpuops_exception_dump - NPU Runtime 异常信息自动 Dump 外挂库
+ * npuops_exception_dump - NPU Runtime 异常信息自动 Dump 外挂库
  * 公开 C 接口
  */
-#ifndef XPUOPS_EXCEPTION_DUMP_H_
-#define XPUOPS_EXCEPTION_DUMP_H_
+#ifndef NPUOPS_EXCEPTION_DUMP_H_
+#define NPUOPS_EXCEPTION_DUMP_H_
 
 #include <stddef.h>
 
@@ -33,10 +33,10 @@ extern "C" {
  *      - count > 0:  仅对 kernels 中指定前缀的 kernel dump
  * 接入无需修改任何 C++ 代码，注册动作在 Python 侧（enable_exception_dump）或本接口完成。
  */
-int xpuopsExceptionDumpInit(const char* kernels[], size_t count);
+int npuopsExceptionDumpInit(const char* kernels[], size_t count);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* XPUOPS_EXCEPTION_DUMP_H_ */
+#endif /* NPUOPS_EXCEPTION_DUMP_H_ */

@@ -9,16 +9,16 @@
  */
 
 /**
- * xpuops_exception_dump 内部头文件 - 通用 Exception Callback（单层设计）
+ * npuops_exception_dump 内部头文件 - 通用 Exception Callback（单层设计）
  */
-#ifndef XPUOPS_EXCEPTION_CALLBACK_H_
-#define XPUOPS_EXCEPTION_CALLBACK_H_
+#ifndef NPUOPS_EXCEPTION_CALLBACK_H_
+#define NPUOPS_EXCEPTION_CALLBACK_H_
 
 #include <stddef.h>
 #include <stdint.h>
 #include <string>
 
-namespace xpuops {
+namespace npuops {
 
 // 异常 dump 上下文（公共信息 + 落盘要素）
 struct DumpContext {
@@ -42,6 +42,6 @@ bool IsCallbackRegistered();
 // 设置 kernel name 前缀启用列表（kernels==NULL 或 count==0 时对所有 kernel 生效）
 void SetEnabledKernels(const char* kernels[], size_t count);
 
-} // namespace xpuops
+} // namespace npuops
 
-#endif /* XPUOPS_EXCEPTION_CALLBACK_H_ */
+#endif /* NPUOPS_EXCEPTION_CALLBACK_H_ */
