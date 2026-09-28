@@ -103,8 +103,8 @@ template <typename SrcTensor, typename InitialTensor, typename OutputTensor>
 __simd_vf__ inline void histograms_example(
     SrcTensor input, InitialTensor initial_input, OutputTensor output)
 {
-    auto src_mask = asc::te::experimental::all_mask<uint8_t>();
-    auto dst_mask = asc::te::experimental::all_mask<uint16_t>();
+    auto src_mask = asc::te::experimental::update_mask<uint8_t>(192);
+    auto dst_mask = asc::te::experimental::update_mask<uint16_t>(128);
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(src_mask);
     auto initial_low = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
     auto initial_high = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
