@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/composite_compute.h"`。
 
 逐元素计算两个输入之差的绝对值：
 
@@ -44,18 +44,18 @@ __simd_callee__ inline reg_tensor<T> abs_diff(
 
 ## 参数说明
 
-**表1**  模板参数说明
+**表1**模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
 | T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
-**表2**  参数说明
+**表2**参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src0` | 输入 | 被减数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `src1` | 输入 | 减数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
+| src0 | 输入 | 被减数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| src1 | 输入 | 减数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
 
 ## 数据类型
 
@@ -63,11 +63,12 @@ __simd_callee__ inline reg_tensor<T> abs_diff(
 
 ## 返回值说明
 
-返回`reg_tensor<T>`。`reg`保存两个输入逐元素作差后的绝对值，`src0.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src0.mask`相同。
+返回`reg_tensor<T>`。`reg`保存两个输入逐元素作差后的绝对值，返回值的`mask`与`src0.mask`相同。
 
 ## 约束说明
 
-src0.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- `src0.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- `src0.mask`对应位置为`0`时，返回值`reg`的对应位置置零。
 
 ## 调用示例
 
@@ -83,7 +84,7 @@ __simd_vf__ inline void abs_diff_example(
     auto mask = asc::te::experimental::all_mask<float>();
     auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
     auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0)).with_mask(mask);
-    auto result = asc::te::experimental::abs_diff(src0, src1);
-    asc::te::experimental::store(output, asc::te::make_coord(0), result);
+    auto dst = asc::te::experimental::abs_diff(src0, src1);
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```

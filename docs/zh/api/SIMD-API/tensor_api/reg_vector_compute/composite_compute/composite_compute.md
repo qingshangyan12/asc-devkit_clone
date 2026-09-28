@@ -4,12 +4,11 @@
 
 ## 接口列表
 
-| 接口 | 功能 |
+| 接口 | 描述 |
 | --- | --- |
-| [axpy](axpy.md) | 标量乘与累加融合。 |
-| [abs_diff](abs_diff.md) | 减法与绝对值融合。 |
-| [exp_diff](exp_diff.md) | 减法与自然指数融合。 |
-| [madd](madd.md) | 目的操作数乘与加法融合。 |
-| [mula](mula.md) | 两个源操作数相乘并累加到目的操作数。 |
-| [fma](fma.md) | 融合乘加。 |
-| [muls_cast](muls_cast.md) | 标量乘与`float`到`half`转换融合。 |
+| [axpy](axpy.md) | $dst_i = scalar \times src_i + dst_i$ |
+| [abs_diff](abs_diff.md) | $dst_i = \lvert src0_i - src1_i \rvert$ |
+| [exp_diff](exp_diff.md) | • 输入数据类型为`float`时：<br>$dst_i = e^{src0_i - src1_i}$<br>• 输入数据类型为`half`时：<br>$dst_i = e^{cast\_f16\_to\_f32(src0_i) - cast\_f16\_to\_f32(src1_i)}$ |
+| [madd](madd.md) | $dst_i = dst_i \times src0_i + src1_i$ |
+| [mula](mula.md) | $dst_i = src0_i \times src1_i + dst_i$ |
+| [muls_cast](muls_cast.md) | $dst_i = cast\_round\_to\_f16(src_i \times scalar)$ |

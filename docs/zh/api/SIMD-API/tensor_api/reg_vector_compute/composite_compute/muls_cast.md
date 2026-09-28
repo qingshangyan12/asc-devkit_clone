@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/composite_compute.h"`。
 
 将`float`输入与标量逐元素相乘，并将结果按指定布局转换为`half`。默认写入返回寄存器的偶数`half`位置。
 
@@ -44,20 +44,20 @@ __simd_callee__ inline reg_tensor<T> muls_cast(
 
 ## 参数说明
 
-**表1**  模板参数说明
+**表1**模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
-| `Layout` | 结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
-| `T` | 返回值元素类型，当前仅支持`half`。 |
-| `U` | 源操作数和标量类型，从输入自动推导，当前仅支持`float`。 |
+| Layout | 结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
+| T | 返回值元素类型，当前仅支持`half`。 |
+| U | 源操作数和标量类型，从输入自动推导，当前仅支持`float`。 |
 
-**表2**  参数说明
+**表2**参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src` | 输入 | 源操作数，类型为`reg_tensor<float>`。`src.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| `scalar` | 输入 | `float`标量乘数。 |
+| src | 输入 | 源操作数，类型为`reg_tensor<float>`。`src.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| scalar | 输入 | `float`标量乘数。 |
 
 ## 数据类型
 
@@ -65,13 +65,13 @@ src和scalar的数据类型为float，返回值的元素类型为half。
 
 ## 返回值说明
 
-返回`reg_tensor<half>`。`reg`保存乘法及类型转换结果。`Layout`为`cast_layout::zero`时结果写入偶数位置，为`cast_layout::one`时结果写入奇数位置，另一组位置置零。`src.mask`对应位置为`0`时，`reg`的对应位置置零。返回值的`mask`与`src.mask`相同。
+返回`reg_tensor<half>`。`reg`保存乘法及类型转换结果。`Layout`为`cast_layout::zero`时结果写入偶数位置，为`cast_layout::one`时结果写入奇数位置，另一组位置置零。返回值的`mask`与`src.mask`相同。
 
 ## 约束说明
 
-- src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
-- `T`必须为`half`，`U`必须为`float`。
-- `Layout`仅支持`cast_layout::zero`和`cast_layout::one`。
+- `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- `src.mask`对应位置为`0`时，返回值`reg`的对应位置置零。
+- 类型转换按照CAST_ROUND模式舍入。
 
 ## 调用示例
 
@@ -84,7 +84,7 @@ template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void muls_cast_example(InputTensor input, OutputTensor output)
 {
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(asc::te::experimental::all_mask<float>());
-    auto result = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one, half>(src, 1.5f);
-    asc::te::experimental::store(output, asc::te::make_coord(0), result);
+    auto dst = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one, half>(src, 1.5f);
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```

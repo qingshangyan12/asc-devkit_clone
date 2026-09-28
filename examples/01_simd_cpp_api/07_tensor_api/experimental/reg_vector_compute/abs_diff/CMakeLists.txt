@@ -19,7 +19,7 @@ if(NOT CMAKE_ASC_RUN_MODE STREQUAL "npu" AND NOT CMAKE_ASC_RUN_MODE STREQUAL "si
 endif()
 
 if(NOT CMAKE_ASC_ARCHITECTURES STREQUAL "dav-3510")
-    message(FATAL_ERROR "fma only supports CMAKE_ASC_ARCHITECTURES=dav-3510")
+    message(FATAL_ERROR "abs_diff only supports CMAKE_ASC_ARCHITECTURES=dav-3510")
 endif()
 
 find_package(ASC REQUIRED)
@@ -35,7 +35,7 @@ if(NOT SCENARIO_NUM EQUAL 1 AND NOT SCENARIO_NUM EQUAL 2)
 endif()
 
 add_executable(demo
-    fma.asc
+    abs_diff.asc
 )
 
 target_compile_definitions(demo PRIVATE

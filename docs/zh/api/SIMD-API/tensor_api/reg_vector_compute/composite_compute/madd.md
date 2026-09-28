@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/composite_compute.h"`。
 
 将`dst`与`src0`逐元素相乘，再与`src1`相加：
 
@@ -46,11 +46,19 @@ __simd_callee__ inline reg_tensor<T> madd(
 
 ## 参数说明
 
+**表1**模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+
+**表2**参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `dst` | 输入/输出 | 第一个乘数和结果。接口直接更新`dst.reg`，`dst.mask`控制参与计算的元素。 |
-| `src0` | 输入 | 第二个乘数。`src0.mask`不参与本次计算。 |
-| `src1` | 输入 | 加数。`src1.mask`不参与本次计算。 |
+| dst | 输入/输出 | 第一个乘数和结果。接口直接更新`dst.reg`，`dst.mask`控制参与计算的元素。 |
+| src0 | 输入 | 第二个乘数。`src0.mask`不参与本次计算。 |
+| src1 | 输入 | 加数。`src1.mask`不参与本次计算。 |
 
 ## 数据类型
 
@@ -62,7 +70,8 @@ __simd_callee__ inline reg_tensor<T> madd(
 
 ## 约束说明
 
-调用前必须初始化`dst.mask`。`dst.mask`为0的对应结果位置置零。
+- `dst.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- `dst.mask`对应位置为`0`时，返回值`reg`的对应位置置零。
 
 ## 调用示例
 

@@ -52,14 +52,14 @@ __simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const r
     return dst;
 }
 
-template <typename T, typename U, typename position_type>
+template <typename T, typename U, typename PositionType>
 __simd_callee__ inline reg_tensor<T> exp_diff(
-    const reg_tensor<U>& src0, const reg_tensor<U>& src1, position_type src_pos)
+    const reg_tensor<U>& src0, const reg_tensor<U>& src1, PositionType src_pos)
 {
     static_assert(
         ::AscendC::Std::is_same_v<T, float> && ::AscendC::Std::is_same_v<U, half>,
         "exp_diff with a position only supports half input and float output");
-    using pos_type = ::AscendC::Std::remove_cvref_t<position_type>;
+    using pos_type = ::AscendC::Std::remove_cvref_t<PositionType>;
     static_assert(
         ::AscendC::Std::is_one_of_v<
             pos_type, ::AscendC::Std::remove_cvref_t<decltype(ASC_POSITION_EVEN)>,
@@ -83,17 +83,6 @@ __simd_callee__ inline reg_tensor<T> mula(reg_tensor<T>& dst, const reg_tensor<T
 {
     static_assert(detail::supports_mula_v<T>, "mula does not support this element type");
     asc_mula(dst.reg, src0.reg, src1.reg, dst.mask);
-    return dst;
-}
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> fma(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2)
-{
-    static_assert(detail::supports_fma_v<T>, "fma does not support this element type");
-    reg_tensor<T> dst;
-    dst.reg = asc_fma(src0.reg, src1.reg, src2.reg, src0.mask);
-    dst.mask = src0.mask;
     return dst;
 }
 

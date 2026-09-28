@@ -42,27 +42,19 @@ __aicore__ inline void check_common_composite()
 }
 
 template <typename T>
-__aicore__ inline void check_float_fused()
+__aicore__ inline void check_madd()
 {
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::madd(
                       AscendC::Std::declval<reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
                       AscendC::Std::declval<const reg_type<T>&>())),
                   reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::fma(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
-
     reg_type<T> dst{};
     reg_type<T> src0{};
     reg_type<T> src1{};
     dst.mask = asc::te::experimental::all_mask<T>().reg;
     auto madd_result = asc::te::experimental::madd(dst, src0, src1);
-    auto fma_result = asc::te::experimental::fma(dst, src0, src1);
     EXPECT_EQ(madd_result.mask, dst.mask);
-    EXPECT_EQ(fma_result.mask, dst.mask);
 }
 
 template <typename T>
@@ -133,9 +125,9 @@ TEST(test_tensor_api_composite_compute, compile_public_apis_and_supported_types)
     check_common_composite<half>();
     check_common_composite<float>();
 
-    check_float_fused<half>();
-    check_float_fused<bfloat16_t>();
-    check_float_fused<float>();
+    check_madd<half>();
+    check_madd<bfloat16_t>();
+    check_madd<float>();
 
     check_mula<int16_t>();
     check_mula<uint16_t>();

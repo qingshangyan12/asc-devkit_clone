@@ -26,7 +26,7 @@
 
 ## 功能说明
 
-头文件路径：`"tensor_api/experimental/vector_compute.h"`。
+头文件路径：`"tensor_api/experimental/arch/vector/histogram_compute.h"`。
 
 统计`uint8_t`输入值的频率分布或累计分布，并在`dst`初始值上累加结果。
 
@@ -57,7 +57,7 @@ __simd_callee__ inline reg_tensor<T> histograms(
 
 ## 参数说明
 
-**表1**  模板参数说明
+**表1**模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -65,12 +65,12 @@ __simd_callee__ inline reg_tensor<T> histograms(
 | T | 输出元素类型。目前支持`uint16_t`。 |
 | U | 输入元素类型。目前支持`uint8_t`。 |
 
-**表2**  参数说明
+**表2**参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `dst` | 输入/输出 | 统计初值和结果，类型为`reg_tensor<uint16_t>`。接口直接更新`dst.reg`，返回值的`mask`与`dst.mask`相同。 |
-| `src` | 输入 | 待统计数据，类型为`reg_tensor<uint8_t>`。`src.mask`用于标记参与统计的元素，对应位置为`1`时参与统计，为`0`时不参与统计。 |
+| dst | 输入/输出 | 统计初值和结果，类型为`reg_tensor<uint16_t>`。接口直接更新`dst.reg`，返回值的`mask`与`dst.mask`相同。 |
+| src | 输入 | 待统计数据，类型为`reg_tensor<uint8_t>`。`src.mask`用于标记参与统计的元素，对应位置为`1`时参与统计，为`0`时不参与统计。 |
 
 ## 数据类型
 
@@ -82,12 +82,10 @@ dst和返回值的元素类型为uint16_t，src的元素类型为uint8_t。
 
 ## 约束说明
 
-- `options.half`只能取`histogram_half::low`或`histogram_half::high`，`options.mode`只能取`histogram_mode::frequency`或`histogram_mode::cumulative`。
-- src.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与统计的元素位置错误。
+- `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与统计的元素位置错误。
 - `src.mask`只用于筛选参与统计的输入元素，不用于筛选返回值中的统计位置。返回值中的所有位置都会在`dst`原值的基础上更新。
 - 统计结果在`dst`原有数据的基础上累加。调用前必须初始化`dst.reg`，多次调用时后一次结果累加到前一次结果中。返回值的`mask`继承`dst.mask`，将返回值用于`store`前需要通过`with_mask`设置`dst.mask`。
 - `dst`的元素类型为`uint16_t`，单个统计结果的最大值为65535。用户需要保证累加结果不超过该范围，否则会发生溢出。
-- 完整统计`[0, 255]`需要分别选择`low`和`high`，并使用两个独立的目标寄存器保存结果。
 - 非默认配置必须先定义具名的`constexpr histogram_options`，再作为模板实参传入。
 
 ## 调用示例

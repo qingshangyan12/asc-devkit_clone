@@ -32,19 +32,15 @@ __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const r
 template <typename T, typename U>
 __simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const reg_tensor<U>& src1);
 
-template <typename T, typename U, typename position_type>
+template <typename T, typename U, typename PositionType>
 __simd_callee__ inline reg_tensor<T> exp_diff(
-    const reg_tensor<U>& src0, const reg_tensor<U>& src1, position_type src_pos);
+    const reg_tensor<U>& src0, const reg_tensor<U>& src1, PositionType src_pos);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> mula(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> fma(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
 
 template <cast_layout Layout = cast_layout::zero, typename T, typename U>
 __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U& scalar);
