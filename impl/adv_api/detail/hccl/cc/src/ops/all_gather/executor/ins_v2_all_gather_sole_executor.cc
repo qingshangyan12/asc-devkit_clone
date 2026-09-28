@@ -18,6 +18,25 @@
 #include "alg_meta_registry.h"
 #include "external_alg_rules.h"
 #include <cstddef>
+#include <type_traits>
+
+namespace {
+
+template <typename InsAlgTemplate>
+typename std::enable_if<std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
+SetChannelsPerRankIfSupported(InsAlgTemplate& algTemplate, const std::map<u32, std::vector<ChannelInfo>>& channels)
+{
+    return algTemplate.SetchannelsPerRank(channels);
+}
+
+template <typename InsAlgTemplate>
+typename std::enable_if<!std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
+SetChannelsPerRankIfSupported(InsAlgTemplate&, const std::map<u32, std::vector<ChannelInfo>>&)
+{
+    return HCCL_SUCCESS;
+}
+} // namespace
+
 namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
@@ -131,6 +150,10 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         templateAlgRes.channels.size(), templateAlgRes.threads.size());
     // 构建template
     InsAlgTemplate algTemplate(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+    if (param.engine == COMM_ENGINE_AICPU_TS
+        && (resCtx.topoInfo.isPod || std::string(param.algName) != "AicpuAllGatherSoleNHR")) {
+        CHK_RET(SetChannelsPerRankIfSupported(algTemplate, templateAlgRes.channels));
+    }
     u32 templateScratchMultiplier =
         algTemplate.CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
     maxTmpMemSize_ = tempAlgParams.buffInfo.hcclBuff.size;
@@ -202,6 +225,11 @@ REGISTER_EXEC_V2(
     InsTempAllGatherNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHR, AlgEngine::AICPU, "sole[nhr]", COND_NONE, FLAG_NONE, 0);
+
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHRMultiLink, InsV2AllGatherSoleExecutor, TopoMatch1D,
+    InsTempAllGatherNHR);
+REGISTER_ALG_META(HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHRMultiLink, AlgEngine::AICPU, "sole[nhr]", COND_NONE, FLAG_NONE, 0);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 
