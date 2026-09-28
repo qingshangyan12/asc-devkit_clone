@@ -41,7 +41,7 @@ using vector_int4x2_t = vector_s4x2;
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
 
-#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 using vector_fp8_e6m2_t = vector_f8e6m2;
 #endif
 
