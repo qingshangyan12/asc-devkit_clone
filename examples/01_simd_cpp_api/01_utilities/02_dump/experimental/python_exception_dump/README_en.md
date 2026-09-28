@@ -6,11 +6,14 @@
 
 This example demonstrates an NPU operator exception info auto-dump solution based on the AscendCL Runtime exception callback. When an NPU kernel hits a runtime exception, the plugin library automatically dumps the exception context of the failing operator (timestamp, device/task/stream/thread ID, error code, kernel name) and the kernel args for offline analysis (inputs/outputs can be reconstructed from the operator's args layout); a pure-Python input/output tensor dump is also provided, which automatically saves input/output tensors at the operator call boundary and can be cross-checked against the device pointers in the exception products. The solution requires zero changes to operator source code.
 
+> **Note:** This example is experimental and currently implemented as an external plugin library. The capability is planned to be integrated into CANN (Python-side automatic exception info dump, operator input/output tensor dump, etc.), and this example will be simplified accordingly. Refer to the latest CANN version for updates.
+
 ## Supported Products and CANN Versions
 
 | Products | CANN Versions |
 |---|---|
 | Atlas A2 training series products/Atlas A2 inference series products | \>= CANN 9.1.0 |
+| Atlas A3 training series products/Atlas A3 inference series products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -18,13 +21,13 @@ This example demonstrates an NPU operator exception info auto-dump solution base
 ├── python_exception_dump
 │   ├── examples
 │   │   └── demo_ifa.py                  // Demo: normal call + fault injection + product self-check
-│   ├── xpuops_exception_dump
+│   ├── npuops_exception_dump
 │   │   ├── CMakeLists.txt               // Build project file
 │   │   ├── build.sh                     // One-shot build script (output to lib/)
 │   │   ├── include
-│   │   │   └── xpuops_exception_dump.h  // Public C interface of the plugin library
+│   │   │   └── npuops_exception_dump.h  // Public C interface of the plugin library
 │   │   ├── src                          // C++ exception callback implementation
-│   │   └── python/xpuops                // Python API (debug.py, etc.)
+│   │   └── python/npuops                // Python API (debug.py, etc.)
 │   ├── README_en.md
 │   └── README.md
 ```
@@ -44,9 +47,9 @@ Configuration (environment variables):
 
 | Environment variable | Description | Default |
 |---|---|---|
-| `XPUOPS_DUMP_DIR` | Dump directory (shared by both capabilities) | `./exception_dump/` |
-| `XPUOPS_DUMP_LEVEL` | Dump level: 0 = common info only, 1 = common info + args (exception dump only) | `1` |
-| `XPUOPS_DUMP_LIB_DIR` | Directory of the plugin-library .so | `lib/` inside the project |
+| `NPUOPS_DUMP_DIR` | Dump directory (shared by both capabilities) | `./exception_dump/` |
+| `NPUOPS_DUMP_LEVEL` | Dump level: 0 = common info only, 1 = common info + args (exception dump only) | `1` |
+| `NPUOPS_DUMP_LIB_DIR` | Directory of the plugin-library .so | `lib/` inside the project |
 
 ## Build and Run
 
@@ -75,7 +78,7 @@ Configuration (environment variables):
   In the root directory of this example, build the plugin library and run the demo.
 
   ```bash
-  cd xpuops_exception_dump && bash build.sh && cd ..    # Build the plugin .so (output to lib/)
+  cd npuops_exception_dump && bash build.sh && cd ..    # Build the plugin .so (output to lib/)
   python3 examples/demo_ifa.py                          # Run the demo
   ```
 
@@ -99,17 +102,17 @@ Configuration (environment variables):
 | Symptom | Fix |
 |---|---|
 | Log `kernel '...' not in enabled prefix list, skip dump` | Correct the prefix per the actual kernel name in logs, or pass nothing (all kernels) |
-| No `_args.bin` in the dump directory | `XPUOPS_DUMP_LEVEL` was set to 0 (common info only); set it back to 1 |
+| No `_args.bin` in the dump directory | `NPUOPS_DUMP_LEVEL` was set to 0 (common info only); set it back to 1 |
 | No `output_*` after an exceptional call | Expected: outputs are not written back on exception; dump output baselines on the normal path (see the key points in Example Description) |
 | `args_dumped : no` in `_info.txt` / log `args unavailable` | CANN exception info lacks args; check the CANN version |
-| `FileNotFoundError: libxpuops_exception_dump.so not found` | Build first: `cd xpuops_exception_dump && bash build.sh` (the .so binary is not committed); or set `XPUOPS_DUMP_LIB_DIR` to its directory (only exception dump needs the .so; tensor dump is unaffected) |
-| `xpuops` module not found | Add `xpuops_exception_dump/python` to `PYTHONPATH` (the demo script handles this automatically) |
+| `FileNotFoundError: libnpuops_exception_dump.so not found` | Build first: `cd npuops_exception_dump && bash build.sh` (the .so binary is not committed); or set `NPUOPS_DUMP_LIB_DIR` to its directory (only exception dump needs the .so; tensor dump is unaffected) |
+| `npuops` module not found | Add `npuops_exception_dump/python` to `PYTHONPATH` (the demo script handles this automatically) |
 | Read back `input_*` / `output_*` tensors offline | Any environment with torch (no NPU needed): restore via the `.json` meta + `torch.frombuffer` byte view |
 
 ## Integrate with Your Own Operator
 
 ```python
-from xpuops.debug import enable_exception_dump, run_with_tensor_dump, dump_tensors
+from npuops.debug import enable_exception_dump, run_with_tensor_dump, dump_tensors
 
 # 1) Enable exception dump: prefix = demangled kernel function name (template
 #    parameters stripped); when unsure, use the Kernel Name printed in exception

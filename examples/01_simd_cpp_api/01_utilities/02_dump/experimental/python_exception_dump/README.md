@@ -6,11 +6,14 @@
 
 本样例展示一种基于AscendCL Runtime异常回调的NPU算子异常信息自动dump方案。当NPU kernel运行时发生异常时，通过外挂库自动dump问题算子的异常上下文（时间戳、device/task/stream/thread ID、错误码、kernel名）与kernel参数（args），用于离线问题定位（可按算子args布局还原输入输出tensor）；另提供纯Python实现的输入/输出tensor dump能力，在算子调用边界自动落盘输入/输出tensor，可与异常产物中的device指针交叉验证。整个方案无需修改算子源码。
 
+> **说明：** 本样例为实验特性（experimental），当前通过外挂库方式实现。后续该能力规划合入CANN（支持Python侧自动dump异常信息、dump算子输入/输出tensor等），届时本样例将简化，请以CANN最新版本为准。
+
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |---|---|
 | Atlas A2训练系列产品/Atlas A2推理系列产品 | \>= CANN 9.1.0 |
+| Atlas A3训练系列产品/Atlas A3推理系列产品 | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -18,13 +21,13 @@
 ├── python_exception_dump
 │   ├── examples
 │   │   └── demo_ifa.py                  // demo：正常调用 + 故障注入 + 产物自检
-│   ├── xpuops_exception_dump
+│   ├── npuops_exception_dump
 │   │   ├── CMakeLists.txt               // 编译工程文件
 │   │   ├── build.sh                     // 一键编译脚本（产物输出到 lib/）
 │   │   ├── include
-│   │   │   └── xpuops_exception_dump.h  // 外挂库对外C接口
+│   │   │   └── npuops_exception_dump.h  // 外挂库对外C接口
 │   │   ├── src                          // C++ 异常回调实现
-│   │   └── python/xpuops                // Python API（debug.py 等）
+│   │   └── python/npuops                // Python API（debug.py 等）
 │   ├── README_en.md
 │   └── README.md
 ```
@@ -44,9 +47,9 @@
 
 | 环境变量 | 说明 | 默认值 |
 |---|---|---|
-| `XPUOPS_DUMP_DIR` | dump目录（两类能力共用） | `./exception_dump/` |
-| `XPUOPS_DUMP_LEVEL` | dump级别：0=仅公共信息，1=公共信息+args（仅影响异常dump） | `1` |
-| `XPUOPS_DUMP_LIB_DIR` | 外挂库so所在目录 | 工程内`lib/` |
+| `NPUOPS_DUMP_DIR` | dump目录（两类能力共用） | `./exception_dump/` |
+| `NPUOPS_DUMP_LEVEL` | dump级别：0=仅公共信息，1=公共信息+args（仅影响异常dump） | `1` |
+| `NPUOPS_DUMP_LIB_DIR` | 外挂库so所在目录 | 工程内`lib/` |
 
 ## 编译运行
 
@@ -75,7 +78,7 @@
   在本样例根目录下执行如下步骤，编译外挂库并运行demo。
 
   ```bash
-  cd xpuops_exception_dump && bash build.sh && cd ..    # 编译外挂库so（产物输出到 lib/）
+  cd npuops_exception_dump && bash build.sh && cd ..    # 编译外挂库so（产物输出到 lib/）
   python3 examples/demo_ifa.py                          # 执行demo
   ```
 
@@ -99,17 +102,17 @@
 | 现象 | 处理 |
 |---|---|
 | 日志`kernel '...' not in enabled prefix list, skip dump` | 按日志实际kernel名修正前缀，或不传参（对全部kernel生效） |
-| dump目录没有`_args.bin` | `XPUOPS_DUMP_LEVEL`被设为0（仅公共信息），改回1 |
+| dump目录没有`_args.bin` | `NPUOPS_DUMP_LEVEL`被设为0（仅公共信息），改回1 |
 | 异常调用后没有`output_*`产物 | 正常行为：异常时输出未写回；输出基准需在正常路径dump（见样例描述要点） |
 | `_info.txt`中`args_dumped : no` / 日志`args unavailable` | CANN异常信息缺args，检查CANN版本 |
-| `FileNotFoundError: libxpuops_exception_dump.so not found` | 先编译：`cd xpuops_exception_dump && bash build.sh`（so二进制不入库）；或设`XPUOPS_DUMP_LIB_DIR`指向so目录（仅异常dump需要so，tensor dump不受影响） |
-| 找不到`xpuops`模块 | 将`xpuops_exception_dump/python`加入`PYTHONPATH`（demo脚本已自动处理） |
+| `FileNotFoundError: libnpuops_exception_dump.so not found` | 先编译：`cd npuops_exception_dump && bash build.sh`（so二进制不入库）；或设`NPUOPS_DUMP_LIB_DIR`指向so目录（仅异常dump需要so，tensor dump不受影响） |
+| 找不到`npuops`模块 | 将`npuops_exception_dump/python`加入`PYTHONPATH`（demo脚本已自动处理） |
 | 离线读回`input_*` / `output_*` tensor | 任意有torch的环境即可（无需NPU）：按`.json`元信息用`torch.frombuffer`以字节视角还原 |
 
 ## 接入自己的算子
 
 ```python
-from xpuops.debug import enable_exception_dump, run_with_tensor_dump, dump_tensors
+from npuops.debug import enable_exception_dump, run_with_tensor_dump, dump_tensors
 
 # 1) 开启异常dump：前缀取demangle后的kernel函数名（模板参数已去掉），
 #    不确定时以异常日志Kernel Name打印值为准；不传参则对全部kernel生效；幂等

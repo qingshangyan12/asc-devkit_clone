@@ -24,7 +24,7 @@ tensor dump 产物命名（与 C++ 侧异常产物风格对齐）：
     {stage}_{tag}_{name}_dev{idx}_{timestamp}.bin   tensor 原始数据
     {stage}_{tag}_{name}_dev{idx}_{timestamp}.json  元信息（shape/dtype/device/data_ptr 等）
 其中 stage 为 input/output（dump_tensor 单独调用时可省略），name 中的非法字符替换为 '_'。
-dump 目录决策链与 C++ 侧 GetDumpDir 一致：入参 dump_dir > 环境变量 XPUOPS_DUMP_DIR > ./exception_dump/
+dump 目录决策链与 C++ 侧 GetDumpDir 一致：入参 dump_dir > 环境变量 NPUOPS_DUMP_DIR > ./exception_dump/
 """
 
 import json
@@ -60,17 +60,17 @@ def enable_exception_dump(kernels=None):
     """
     ret = _init(kernels)
     if ret != 0:
-        raise RuntimeError(f"xpuopsExceptionDumpInit failed, ret={ret}")
+        raise RuntimeError(f"npuopsExceptionDumpInit failed, ret={ret}")
 
 
 # ============================== 内部工具 ==============================
 
 
 def _get_dump_dir(dump_dir=None):
-    """dump 目录决策链：入参 > XPUOPS_DUMP_DIR 环境变量 > 默认目录（与 C++ 侧一致）。"""
+    """dump 目录决策链：入参 > NPUOPS_DUMP_DIR 环境变量 > 默认目录（与 C++ 侧一致）。"""
     if dump_dir:
         return dump_dir
-    env = os.environ.get("XPUOPS_DUMP_DIR", "")
+    env = os.environ.get("NPUOPS_DUMP_DIR", "")
     if env:
         return env
     return _DEFAULT_DUMP_DIR
@@ -145,7 +145,7 @@ def dump_tensor(tensor, name, stage=None, dump_dir=None):
         tensor:    待 dump 的 tensor（NPU 或 CPU 均可）
         name:      tensor 名称（用于产物命名，非法字符自动替换为 '_'）
         stage:     阶段标签，文件名前缀，常用 "input" / "output"；None 时无前缀
-        dump_dir:  输出目录；缺省走 XPUOPS_DUMP_DIR 环境变量 -> ./exception_dump/
+        dump_dir:  输出目录；缺省走 NPUOPS_DUMP_DIR 环境变量 -> ./exception_dump/
 
     元信息 (.json) 记录：name/stage/shape/dtype/itemsize/numel/nbytes/
     device/data_ptr/bin_file/timestamp，其中 data_ptr 为 dump 时刻 device 端地址，
@@ -188,7 +188,7 @@ def dump_tensor(tensor, name, stage=None, dump_dir=None):
         json.dump(meta, fp, indent=2, ensure_ascii=False)
 
     print(
-        "[XPUOPS][INFO] dumped %s tensor '%s' (%d bytes) -> %s"
+        "[NPUOPS][INFO] dumped %s tensor '%s' (%d bytes) -> %s"
         % (stage if stage else "tensor", name, len(data), bin_path)
     )
     return bin_path
@@ -242,7 +242,7 @@ def run_with_tensor_dump(func, *args, tag=None, dump_inputs=True, dump_outputs=T
             try:
                 dump_tensor(tensor, "%s_%s" % (tag, name), stage=stage, dump_dir=dump_dir)
             except Exception as e:  # 单个 tensor dump 失败不影响业务调用
-                print("[XPUOPS][WARN] dump %s tensor '%s' failed: %s" % (stage, name, e))
+                print("[NPUOPS][WARN] dump %s tensor '%s' failed: %s" % (stage, name, e))
 
     if dump_inputs:
         named = {}

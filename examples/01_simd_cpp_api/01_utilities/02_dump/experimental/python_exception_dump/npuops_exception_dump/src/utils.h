@@ -9,16 +9,16 @@
  */
 
 /**
- * xpuops_exception_dump 内部头文件 - 工具函数 (log/dump/文件/时间)
+ * npuops_exception_dump 内部头文件 - 工具函数 (log/dump/文件/时间)
  */
-#ifndef XPUOPS_UTILS_H_
-#define XPUOPS_UTILS_H_
+#ifndef NPUOPS_UTILS_H_
+#define NPUOPS_UTILS_H_
 
 #include <stddef.h>
 #include <stdint.h>
 #include <string>
 
-namespace xpuops {
+namespace npuops {
 
 // 日志输出（stdout，带统一前缀，便于筛选）
 void LogInfo(const char* fmt, ...);
@@ -29,8 +29,8 @@ void LogError(const char* fmt, ...);
 std::string GetTimestamp();
 
 // 读环境变量配置
-std::string GetDumpDir(); // XPUOPS_DUMP_DIR, 默认 ./exception_dump/
-int GetDumpLevel();       // XPUOPS_DUMP_LEVEL, 默认 1 (0=仅公共信息, 1=公共信息+args)
+std::string GetDumpDir(); // NPUOPS_DUMP_DIR, 默认 ./exception_dump/
+int GetDumpLevel();       // NPUOPS_DUMP_LEVEL, 默认 1 (0=仅公共信息, 1=公共信息+args)
 
 // 递归建目录 (mkdir -p)
 int EnsureDir(const std::string& dir);
@@ -44,6 +44,6 @@ bool AppendTextFile(const std::string& path, const std::string& text);
 // hex dump 日志（前 maxBytes 字节）
 void LogHexDump(const char* tag, const void* data, size_t size, size_t maxBytes);
 
-} // namespace xpuops
+} // namespace npuops
 
-#endif /* XPUOPS_UTILS_H_ */
+#endif /* NPUOPS_UTILS_H_ */

@@ -9,7 +9,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-# 编译 libxpuops_exception_dump.so（在已安装 CANN 的容器/环境内执行）
+# 编译 libnpuops_exception_dump.so（在已安装 CANN 的容器/环境内执行）
 set -e
 cd "$(dirname "$0")"
 
@@ -23,5 +23,5 @@ source "$TOOLKIT/set_env.sh" 2>/dev/null || true
 rm -rf build && mkdir -p build && cd build
 cmake .. && make -j
 mkdir -p ../lib
-cp -f libxpuops_exception_dump.so ../lib/
-echo "build output: $(dirname "$PWD")/lib/libxpuops_exception_dump.so"
+cp -f libnpuops_exception_dump.so ../lib/
+echo "build output: $(dirname "$PWD")/lib/libnpuops_exception_dump.so"
