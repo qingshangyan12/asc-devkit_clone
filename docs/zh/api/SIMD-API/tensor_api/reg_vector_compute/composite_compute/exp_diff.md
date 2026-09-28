@@ -70,6 +70,8 @@ __simd_callee__ inline reg_tensor<T> exp_diff(
 
 ## 数据类型
 
+**表3**数据类型组合
+
 | src0 | src1 | dst |
 | --- | --- | --- |
 | half | half | float |

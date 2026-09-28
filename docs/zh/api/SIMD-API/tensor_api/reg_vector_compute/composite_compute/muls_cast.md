@@ -61,7 +61,11 @@ __simd_callee__ inline reg_tensor<T> muls_cast(
 
 ## 数据类型
 
-src和scalar的数据类型为float，返回值的元素类型为half。
+**表3**数据类型组合
+
+| src | scalar | dst |
+| --- | --- | --- |
+| float | float | half |
 
 ## 返回值说明
 

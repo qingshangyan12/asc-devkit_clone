@@ -40,8 +40,8 @@ This sample demonstrates how to use the experimental Tensor API `asc::te::experi
   asc::te::experimental::reg_tensor<uint16_t> initial;
   initial.mask = asc::te::experimental::all_mask<uint16_t>().reg;
   asc_duplicate_scalar(initial.reg, initial_value, initial.mask);
-  auto result = asc::te::experimental::histograms<histogram_config>(initial, src);
-  asc::te::experimental::store(dst_tensor, coord, result);
+  auto dst = asc::te::experimental::histograms<histogram_config>(initial, src);
+  asc::te::experimental::store(dst_tensor, coord, dst);
   ```
 
 ## Build and Run
