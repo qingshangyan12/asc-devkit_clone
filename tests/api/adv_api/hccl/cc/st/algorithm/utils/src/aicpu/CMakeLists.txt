@@ -12,7 +12,6 @@ set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${HCCL_DEV_BASE}/src/common
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
-    ${HCCL_DEV_BASE}/src/common/hcomm_dlsym/ccu
 
     ${HCCL_DEV_BASE}/src/ops
     ${HCCL_DEV_BASE}/src/ops/op_common
@@ -59,7 +58,6 @@ set(INCLUDE_LIST
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu
 
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
-    ${HCCL_DEV_BASE}/src/common/hcomm_dlsym/ccu
 )
 
 list(APPEND INCLUDE_LIST

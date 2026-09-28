@@ -11,8 +11,11 @@
 #ifndef CCU_ADDRESS_DL_HPP
 #define CCU_ADDRESS_DL_HPP
 
+#if CANN_VERSION_NUM >= 90100000
+#include "ccu_address.hpp"
+#else
 #include <cstdint>
-#include <type_traits>
+
 #include "ccu_types_dl.h"
 #include "ccu_utils_dl.hpp"
 #include "ccu_primitives_impl_dl.h"
@@ -76,13 +79,6 @@ public:
             "Address::operator=(Var+Addr): CcuAddressAddVarToAddr failed");
     }
 
-    void operator=(detail::CcuArithmeticOperator<Address, uint16_t> op) const
-    {
-        CCU_THROW_IF_FAILED(
-            CcuAddressAddImmToAddr(this->handle, op.lhs.handle, op.rhs),
-            "Address::operator=(Addr+Imm): CcuAddressAddImmToAddr failed");
-    }
-
     // addr + addr
     detail::CcuArithmeticOperator<Address, Address> operator+(const Address& that) const
     {
@@ -95,13 +91,6 @@ public:
     {
         return detail::CcuArithmeticOperator<Address, Variable>(
             *this, var, detail::CcuArithmeticOperatorType::ADDITION);
-    }
-
-    // addr + immediate
-    detail::CcuArithmeticOperator<Address, uint16_t> operator+(const uint16_t imm) const
-    {
-        return detail::CcuArithmeticOperator<Address, uint16_t>(
-            *this, imm, detail::CcuArithmeticOperatorType::ADDITION);
     }
 
     void operator+=(const Variable& var) const
@@ -147,8 +136,6 @@ inline void AscendC::ccu::detail::CcuArithmeticOperator<AscendC::ccu::Address, A
 template <>
 inline void AscendC::ccu::detail::CcuArithmeticOperator<AscendC::ccu::Variable, AscendC::ccu::Address>::Check() const
 {}
-template <>
-inline void AscendC::ccu::detail::CcuArithmeticOperator<AscendC::ccu::Address, uint16_t>::Check() const
-{}
+#endif // CANN_VERSION_NUM >= 90100000
 
 #endif // CCU_ADDRESS_DL_HPP
