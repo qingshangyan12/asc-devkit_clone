@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include "ccu_timestamp.h"
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 
 namespace mc2_ops_hccl {
@@ -333,14 +334,20 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
         ctx, phase0Input, phase0Output, tokenInfo, part1Size, part1SliceSizePerJetty, part1LastSliceSizePerJetty,
         phase0RepeatNumInv, zero, level1Stride, zero, zero, zero, part1GoSize0, part1GoSize1, part1GoSize2,
         part1GoSize3));
+    const uint64_t clockAddress = ccu::dfx::StartAicpuTimestamp();
+    ccu::Variable time0, time1, time2, time3;
+    CCU_CHK_RET(ccu::dfx::ReadTimestamp(clockAddress, time0));
     CCU_CHK_RET(PreSync(ctx));
     CCU_IF(part1Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
+    CCU_CHK_RET(ccu::dfx::ReadTimestamp(clockAddress, time1));
 
     CCU_CHK_RET(ccu::Store(nhrPhaseDoneAddr, one));
     ccu::Variable meshDone;
     meshDone = 0U;
     CCU_WHILE(meshDone != 1U) { CCU_CHK_RET(ccu::Load(meshPhaseDoneAddr, meshDone)); }
+
+    CCU_CHK_RET(ccu::dfx::ReadTimestamp(clockAddress, time2));
 
     // Stage 1: NHR propagates part0, which stage-0 Mesh has already gathered.
     CCU_CHK_RET(LoadNhrArgs(
@@ -350,6 +357,11 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     CCU_CHK_RET(PreSync(ctx));
     CCU_IF(part0Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
     CCU_CHK_RET(PostSync(ctx));
+    CCU_CHK_RET(ccu::dfx::ReadTimestamp(clockAddress, time3));
+    // One print per invocation; host computes differences to save CCU XNs.
+    CCU_PRINTF(
+        "[CCU_TIMING][asc-devkit][nhr1d_multi_jetty] stage0_ns=%t phase_wait_ns=%t stage1_ns=%t", time0, time1, time1,
+        time2, time2, time3);
     return CCU_SUCCESS;
 }
 

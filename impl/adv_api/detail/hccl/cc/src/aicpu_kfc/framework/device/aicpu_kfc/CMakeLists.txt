@@ -8,7 +8,8 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 if(TARGET mc2_server)
-    add_library(mc2_server_kernel_entry OBJECT mc2_server_kernel_entry.cc)
+    add_library(mc2_server_kernel_entry OBJECT mc2_server_kernel_entry.cc
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../../ops/op_common/template/aicpu/ccu_timestamp_kernel.cc)
     set_target_properties(mc2_server_kernel_entry PROPERTIES
         POSITION_INDEPENDENT_CODE ON
     )
