@@ -858,10 +858,10 @@ constexpr int32_t SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE = 0x5A5A5A5A;
 #endif
 
 #if defined(__ASCENDC_SUPERKERNEL_AUTO_SYNC_ALL__)
-__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmBaseAddr = nullptr;
-__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmAddr = nullptr;
-__BLOCK_LOCAL__ __inline__ uint32_t g_superKernelAutoSyncAllSyncIdx = 0;
-__BLOCK_LOCAL__ __inline__ uint32_t g_superKernelAutoSyncAllEnable = 0;
+__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmBaseAddr;
+__BLOCK_LOCAL__ __inline__ __gm__ uint8_t* g_superKernelAutoSyncAllConfigGmAddr;
+__BLOCK_LOCAL__ __inline__ uint32_t g_superKernelAutoSyncAllSyncIdx;
+__BLOCK_LOCAL__ __inline__ uint32_t g_superKernelAutoSyncAllEnable;
 constexpr uint8_t SK_AUTO_SYNC_ALL_VALID_MAGIC_NUM = 0x0;
 // |    32bits  |   16bits  |   8bits   |   8bits   |
 // |  sync idx  | sync type |   is end  | is valid  |

@@ -31,9 +31,9 @@ class KfcCommClient;
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #ifdef SPLIT_CORE_CUBE
 #elif defined(SPLIT_CORE_VEC)
-__BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient = nullptr;
+__BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient;
 #else
-__BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient = nullptr;
+__BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient;
 #endif
 #endif
 class KfcCommClient {

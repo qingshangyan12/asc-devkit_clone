@@ -29,7 +29,7 @@ namespace AscendC {
 namespace Impl {
 namespace Detail {
 
-__BLOCK_LOCAL__ __inline__ uint64_t gA2B2DBFlag_ = 0;
+__BLOCK_LOCAL__ __inline__ uint64_t gA2B2DBFlag_;
 /*
     TBufPoolL0 is considered entirely experimental.
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
@@ -46,6 +46,16 @@ public:
     using BASE_MODULE = AscendC::Impl::Detail::TBufPoolL0Base<IMPL, A_TYPE, B_TYPE, MM_CFG>;
     __aicore__ inline TBufPoolL0() = default;
     __aicore__ inline ~TBufPoolL0() = default;
+
+    __aicore__ inline void Init()
+    {
+        BASE_MODULE::Init();
+        // gA2B2DBFlag_ cannot have a static initializer: block-local variables with initializers are
+        // rejected by the backend under separate compilation (-dc). Reset the A2B2 double-buffer
+        // ping-pong flag at runtime instead. Both buffer halves are signalled in TPipe::Init, so any
+        // initial parity is valid; this only makes the first read deterministic.
+        gA2B2DBFlag_ = 0;
+    }
 
     __aicore__ inline TBufPoolL0& Allocate()
     {

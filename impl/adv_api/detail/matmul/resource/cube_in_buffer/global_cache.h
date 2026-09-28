@@ -29,7 +29,7 @@ class GlobalCache;
 } // namespace Detail
 } // namespace Impl
 } // namespace AscendC
-__BLOCK_LOCAL__ __inline__ AscendC::Impl::Detail::GlobalCache* gL1Cache = nullptr;
+__BLOCK_LOCAL__ __inline__ AscendC::Impl::Detail::GlobalCache* gL1Cache;
 __aicore__ inline AscendC::Impl::Detail::GlobalCache* GetGlobalCachePtr() { return gL1Cache; }
 
 namespace AscendC {
