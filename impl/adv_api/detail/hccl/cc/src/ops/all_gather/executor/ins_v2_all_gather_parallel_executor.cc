@@ -8,6 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ins_v2_all_gather_parallel_executor.h"
+#include <cerrno>
+#include <cstdlib>
 #include <cstring>
 #include <cmath>
 #include "alg_data_trans_wrapper.h"
@@ -28,6 +30,29 @@
 namespace mc2_ops_hccl {
 namespace {
 constexpr u32 REQUIRED_HIERARCHY_INFO_NUM = 2;
+#if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
+constexpr const char* PARALLEL_ALL_GATHER_STAGE_MASK_ENV = "HCCL_CCU_PARALLEL_ALLGATHER_STAGE_MASK";
+
+HcclResult GetParallelAllGatherStageMask(uint32_t& stageMask)
+{
+    stageMask = KFC_PARALLEL_AG_STAGE_ALL;
+    const char* value = std::getenv(PARALLEL_ALL_GATHER_STAGE_MASK_ENV);
+    if (value == nullptr || value[0] == '\0') {
+        return HCCL_SUCCESS;
+    }
+    errno = 0;
+    char* end = nullptr;
+    const unsigned long parsed = std::strtoul(value, &end, 0);
+    CHK_PRT_RET(
+        errno != 0 || end == value || *end != '\0' || parsed > KFC_PARALLEL_AG_STAGE_ALL,
+        HCCL_ERROR("[%s] invalid %s[%s], expected a mask in [0, 0xf]", __func__,
+            PARALLEL_ALL_GATHER_STAGE_MASK_ENV, value),
+        HCCL_E_PARA);
+    stageMask = static_cast<uint32_t>(parsed);
+    HCCL_INFO("[ParallelAllGatherStageMeasure] stageMask[0x%x]", stageMask);
+    return HCCL_SUCCESS;
+}
+#endif
 } // namespace
 
 template <typename AlgTopoMatch, typename InsAlgTemplate0, typename InsAlgTemplate1>
@@ -121,6 +146,7 @@ HcclResult InsV2AllGatherParallelExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgT
                 HCCL_ERROR("[ParallelAllGather] non-contiguous NHR ranks"), HCCL_E_PARA);
         }
         arg->jettyNum = nhr->jettyNum;
+        CHK_RET(GetParallelAllGatherStageMask(arg->stageMask));
         arg->stepInfoVector = nhr->stepInfoVector;
         arg->rank2ChannelIdx = nhr->rank2ChannelIdx;
         mesh->algSubType = nhr->algSubType = KFC_PARALLEL_ALL_GATHER_SUB_TYPE;

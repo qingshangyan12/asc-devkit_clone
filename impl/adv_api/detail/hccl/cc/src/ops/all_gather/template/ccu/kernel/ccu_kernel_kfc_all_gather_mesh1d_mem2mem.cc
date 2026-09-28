@@ -11,6 +11,13 @@
 
 namespace mc2_ops_hccl {
 
+namespace {
+constexpr uint32_t PARALLEL_AG_STAGE_MESH_FIRST = 1U << 0;
+constexpr uint32_t PARALLEL_AG_STAGE_NHR_FIRST = 1U << 1;
+constexpr uint32_t PARALLEL_AG_STAGE_NHR_SECOND = 1U << 2;
+constexpr uint32_t PARALLEL_AG_STAGE_MESH_SECOND = 1U << 3;
+} // namespace
+
 constexpr int AG_M2M_OUTPUT_XN_ID = 1;
 constexpr int AG_M2M_TOKEN_XN_ID = 2;
 constexpr int AG_M2M_CKE_IDX = 0;
@@ -317,7 +324,7 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     ccu::Variable nhrPhaseDoneAddr, ccu::Variable part0GoSize0, ccu::Variable part0GoSize1, ccu::Variable part0GoSize2,
     ccu::Variable part0GoSize3, ccu::Variable part1GoSize0, ccu::Variable part1GoSize1, ccu::Variable part1GoSize2,
     ccu::Variable part1GoSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSizeLevel0,
-    uint32_t rankIdxLevel0, uint32_t rankSizeLevel1, uint32_t rankIdxLevel1)
+    uint32_t rankIdxLevel0, uint32_t rankSizeLevel1, uint32_t rankIdxLevel1, uint32_t stageMask)
 {
     KfcAllGatherMesh1DMem2MemContext ctx;
     ctx.channels = channels;
@@ -348,31 +355,40 @@ CcuResult CcuKfcParallelAllGatherMesh1DMem2MemKernel(
     phase0RepeatNumInv = UINT64_MAX - 1U;
     AddVariableNTimes(phase1RepeatStride, outputStride, rankSizeLevel0);
 
-    // Stage 0: Mesh gathers part0 inside each level-0 group.
-    CCU_CHK_RET(LoadArgs(
-        ctx, inputBase, phase0Output, tokenInfo, phase0OutputOffset, part0Size, part0GoSize0, part0GoSize1,
-        part0GoSize2, part0GoSize3, zero, phase0RepeatNumInv, zero, zero, part0Size, zero));
-    CCU_CHK_RET(PreSync(ctx));
-    ctx.sliceSize = part0Size;
-    CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
-    CCU_CHK_RET(PostSync(ctx));
+    if ((stageMask & PARALLEL_AG_STAGE_MESH_FIRST) != 0U) {
+        // Stage 0: Mesh gathers part0 inside each level-0 group.
+        CCU_CHK_RET(LoadArgs(
+            ctx, inputBase, phase0Output, tokenInfo, phase0OutputOffset, part0Size, part0GoSize0, part0GoSize1,
+            part0GoSize2, part0GoSize3, zero, phase0RepeatNumInv, zero, zero, part0Size, zero));
+        CCU_CHK_RET(PreSync(ctx));
+        ctx.sliceSize = part0Size;
+        CCU_IF(part0Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
+        CCU_CHK_RET(PostSync(ctx));
+    }
 
-    // Both missions must finish stage 0 before either reads its stage-0 output.
-    CCU_CHK_RET(ccu::Store(meshPhaseDoneAddr, one));
-    ccu::Variable nhrDone;
-    nhrDone = 0U;
-    CCU_WHILE(nhrDone != 1U) { CCU_CHK_RET(ccu::Load(nhrPhaseDoneAddr, nhrDone)); }
+    if ((stageMask & PARALLEL_AG_STAGE_MESH_FIRST) != 0U &&
+        (stageMask & PARALLEL_AG_STAGE_NHR_SECOND) != 0U) {
+        CCU_CHK_RET(ccu::Store(meshPhaseDoneAddr, one));
+    }
+    if ((stageMask & PARALLEL_AG_STAGE_MESH_SECOND) != 0U &&
+        (stageMask & PARALLEL_AG_STAGE_NHR_FIRST) != 0U) {
+        ccu::Variable nhrDone;
+        nhrDone = 0U;
+        CCU_WHILE(nhrDone != 1U) { CCU_CHK_RET(ccu::Load(nhrPhaseDoneAddr, nhrDone)); }
+    }
 
-    // Stage 1: Mesh propagates part1 (already gathered by NHR) across all
-    // level-1 groups. Input and output are the same gathered output buffer.
-    CCU_CHK_RET(LoadArgs(
-        ctx, phase1Buffer, phase1Buffer, tokenInfo, phase1RankOffset, part1Size, part1GoSize0, part1GoSize1,
-        part1GoSize2, part1GoSize3, phase1RankOffset, phase1RepeatNumInv, phase1RepeatStride, phase1RepeatStride,
-        part1Size, one));
-    CCU_CHK_RET(PreSync(ctx));
-    ctx.sliceSize = part1Size;
-    CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
-    CCU_CHK_RET(PostSync(ctx));
+    if ((stageMask & PARALLEL_AG_STAGE_MESH_SECOND) != 0U) {
+        // Stage 1: Mesh propagates part1 (already gathered by NHR) across all
+        // level-1 groups. Input and output are the same gathered output buffer.
+        CCU_CHK_RET(LoadArgs(
+            ctx, phase1Buffer, phase1Buffer, tokenInfo, phase1RankOffset, part1Size, part1GoSize0, part1GoSize1,
+            part1GoSize2, part1GoSize3, phase1RankOffset, phase1RepeatNumInv, phase1RepeatStride, phase1RepeatStride,
+            part1Size, one));
+        CCU_CHK_RET(PreSync(ctx));
+        ctx.sliceSize = part1Size;
+        CCU_IF(part1Size != 0) { CCU_CHK_RET(DoRepeatAllGather(ctx, false)); }
+        CCU_CHK_RET(PostSync(ctx));
+    }
     return CCU_SUCCESS;
 }
 
