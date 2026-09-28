@@ -22,7 +22,7 @@ namespace mc2_ops_hccl {
 //   layer    := atom ('.' attr)*
 //   atom     := mesh | nhr
 //   attr     := chunk | one_shot | two_shot | multi_channel | single_channel
-//   （multi_channel：原始需求文档误写为 muti_channel；hccl/devkit 注册名从来都是 Multi 拼写）
+//   muti_channel is accepted as an alias and normalized to multi_channel.
 // 约束:
 //   - 空格/制表符全部忽略
 //   - 层数 1~3（系统最大 3 层物理拓扑，超过即语法错）
@@ -182,14 +182,17 @@ inline bool ParseExternalAlg(const std::string& algConfig, ExternalAlgSpec& spec
                 layer.atom = seg;
                 atomSeen = true;
             } else {
+                // Accept the external mapping's spelling without changing existing candidate keys.
+                const std::string attr = seg == "muti_channel" ? "multi_channel" : seg;
                 static const char* const ATTRS[] = {"chunk", "one_shot", "two_shot", "multi_channel", "single_channel"};
-                if (!external_alg_internal::WordInTable(seg, ATTRS, sizeof(ATTRS) / sizeof(ATTRS[0]))) {
+                if (!external_alg_internal::WordInTable(attr, ATTRS, sizeof(ATTRS) / sizeof(ATTRS[0]))) {
                     errMsg = "unknown attribute \"" + seg + "\" in layer " + std::to_string(layerNo) +
-                             " (expected one of: chunk, one_shot, two_shot, multi_channel, single_channel) in \"" +
+                             " (expected one of: chunk, one_shot, two_shot, multi_channel/muti_channel, "
+                             "single_channel) in \"" +
                              algConfig + "\"";
                     return false;
                 }
-                layer.attrs.push_back(seg);
+                layer.attrs.push_back(attr);
             }
             segStart = dot + 1;
         }
