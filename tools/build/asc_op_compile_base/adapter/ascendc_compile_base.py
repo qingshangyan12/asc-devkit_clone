@@ -25,6 +25,7 @@ from tbe.tvm.runtime import cce_runtime
 from tbe.common.buildcfg import get_current_build_config
 from tbe.tvm.error_mgr import raise_tbe_python_err, TBE_DEFAULT_PYTHON_ERROR_CODE
 from tbe.tvm.contrib.ccec import CCECInfo
+from tbe.common.platform.platform_info import COMPILER_ARCH, get_soc_spec
 from .ascendc_common_utility import (
     CommonUtility,
     write_mk,
@@ -105,6 +106,17 @@ SingleTilingKeyCompileParams = namedtuple(
     "SingleTilingKeyCompileParams",
     ["tiling_key", "compile_info", "sub_arch", "tiling_info", "code_channel", "compile_option_tuple"],
 )
+
+
+def link_resource_id_obj(bin_file_path, resource_object, is_debug, compile_log_path=None):
+    """Merge the Resource ID metadata object into the kernel object."""
+    link_cmd = [CCECInfo.get_exe("ld.lld"), "-m", "aicorelinux", "-r", "-Ttext=0", "-q"]
+    if not is_debug:
+        link_cmd.append("-x")
+    link_cmd += ["%s" % bin_file_path, "%s" % resource_object, "-static", "-o", "%s" % bin_file_path]
+    CommonUtility.run_cmd_inner(link_cmd, CompileStage.SPECIALIZATION, compile_log_path)
+    if not global_var_storage.get_variable("ascendc_compile_debug_config"):
+        CommonUtility.remove_temp_file(resource_object)
 
 
 def fatbin_objs(obj_files: list, dst_file: str, is_debug: bool, compile_log_path=None):
@@ -197,8 +209,12 @@ def link_sk_norm_combine(sk_bin_file, norm_bin_file, sk_bind_dst_file, meta_file
         # Step 2: 将解压的 .o 文件、norm_bin_file、sk_bind_dst_file 和可选的 meta_file_path 合并
         merged_obj = os.path.join(temp_extract_dir, "merged_sk_norm_bind.o")
         link_cmd = [CCECInfo.get_exe("ld.lld"), "-r", "-o", merged_obj]
-        link_cmd.extend(extracted_objs)
-        link_cmd.extend([norm_bin_file, sk_bind_dst_file])
+        if CommonUtility.is_c310():
+            link_cmd.extend([norm_bin_file, sk_bind_dst_file])
+            link_cmd.extend(extracted_objs)
+        else:
+            link_cmd.extend(extracted_objs)
+            link_cmd.extend([norm_bin_file, sk_bind_dst_file])
         if meta_file_path:
             link_cmd.append(meta_file_path)
         CommonUtility.dump_compile_log(link_cmd, CompileStage.LINKRELOCATE, compile_log_path)
