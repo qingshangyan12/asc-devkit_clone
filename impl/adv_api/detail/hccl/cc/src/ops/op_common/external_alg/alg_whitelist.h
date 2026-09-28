@@ -32,6 +32,7 @@ constexpr std::array<const char*, 37> ALG_WHITELIST = {
     "InsReduceScatterMesh1D",
     "InsReduceScatterMesh1DMeshChunk",
     "InsReduceScatterNHR",
+    "AicpuReduceScatterSoleNHRMutiChannel",
     "InsReduceScatterParallelMesh1DNHRPcie",
     "AicpuReduceScatterParallelMeshNHRUBX",
     "AicpuReduceScatterConcurMeshNHR",

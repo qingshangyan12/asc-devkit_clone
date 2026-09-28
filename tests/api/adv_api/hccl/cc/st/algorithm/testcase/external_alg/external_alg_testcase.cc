@@ -46,6 +46,9 @@ const struct {
     {"sole[mesh.single_channel]", "sole[mesh.single_channel]"},
     {"sole[mesh.multi_channel]", "sole[mesh.multi_channel]"},
     {"sole[nhr.multi_channel]", "sole[nhr.multi_channel]"},
+    {"sole[nhr.muti_channel]", "sole[nhr.multi_channel]"},
+    {"sole[mesh.muti_channel]", "sole[mesh.multi_channel]"},
+    {"parallel[mesh, nhr.muti_channel]", "parallel[mesh,nhr.multi_channel]"},
     {"sequence[mesh,nhr]", "sequence[mesh,nhr]"},
     {"sequence[mesh,mesh]", "sequence[mesh,mesh]"},
     {"parallel[mesh,nhr]", "parallel[mesh,nhr]"},
@@ -86,6 +89,18 @@ TEST(ExtAlgParser, SpacesEverywhereAreStripped)
     EXPECT_EQ(spec.layers[1].attrs[0], "multi_channel");
 }
 
+TEST(ExtAlgParser, MutiChannelAliasStaysOnItsLayer)
+{
+    ExternalAlgSpec spec;
+    std::string errMsg;
+    ASSERT_TRUE(ParseExternalAlg("parallel[mesh, nhr.muti_channel]", spec, errMsg));
+    ASSERT_EQ(spec.layers.size(), 2U);
+    EXPECT_TRUE(spec.layers[0].attrs.empty());
+    ASSERT_EQ(spec.layers[1].attrs.size(), 1U);
+    EXPECT_EQ(spec.layers[1].attrs[0], "multi_channel");
+    EXPECT_EQ(spec.canonical(), "parallel[mesh,nhr.multi_channel]");
+}
+
 TEST(ExtAlgParser, OrderStrongIsPartOfCanonical)
 {
     ExternalAlgSpec spec;
@@ -106,7 +121,7 @@ TEST(ExtAlgParser, IllegalNamesAreRejectedWithReason)
         {"ring[mesh]", "executor"},
         {"sole[ring]", "atom"},
         {"sole[mesh.bigstep]", "attribute"},
-        {"sole[mesh.muti_channel]", "attribute"}, // 需求文档笔误的旧拼写
+        {"sole[muti_channel]", "atom"}, // The alias is an attribute, not an atom.
         {"sole[mesh", "missing"},
         {"sole[]", "layer"},
         {"sole[mesh,]", "layer"},
@@ -472,6 +487,10 @@ TEST(ExtAlgResolver, GoldenAllEngines)
          "CcuSchedAllGatherConcurMeshNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuReduceScatterSoleNHRMutiChannel"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.muti_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuReduceScatterSoleNHRMutiChannel"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterConcurMeshNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
@@ -737,6 +756,7 @@ TEST(ExtAlgWhitelist, IsAlgAllowedMatchesNameList)
              "InsReduceScatterMesh1D",
              "InsReduceScatterMesh1DMeshChunk",
              "InsReduceScatterNHR",
+             "AicpuReduceScatterSoleNHRMutiChannel",
              "InsReduceScatterParallelMesh1DNHRPcie",
              "AicpuReduceScatterParallelMeshNHRUBX",
              "AicpuReduceScatterConcurMeshNHR",
@@ -871,6 +891,8 @@ TEST(ExtAlgWhitelist, DifferentialProductionView)
          HCCL_DATA_TYPE_FP64, 1U, "InsReduceScatterNHR"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
          HCCL_DATA_TYPE_FP32, 1U, "CcuSchedReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterSoleNHRMutiChannel"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &multi, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32,
          1U, "CcuSchedReduceScatterSoleNHR"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
