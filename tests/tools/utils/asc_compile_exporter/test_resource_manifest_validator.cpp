@@ -102,6 +102,10 @@ TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
 {
     EXPECT_TRUE(Validate(MakeValidManifest()));
 
+    Json objcopyManifest = MakeValidManifest();
+    Command(objcopyManifest)["type"] = "objcopy";
+    EXPECT_TRUE(Validate(objcopyManifest));
+
     Json optionalFields = MakeValidManifest();
     Command(optionalFields)["stage"] = "compile";
     optionalFields["options"]["custom_compile"] = Json::array({"-O2"});
@@ -322,6 +326,9 @@ TEST_F(ResourceManifestValidatorTest, ValidatesCommands)
     ExpectInvalid("command is not an object", [](Json& manifest) { Object(manifest)["commands"][0U] = "compile"; });
     ExpectInvalid("command type is missing", [](Json& manifest) { Command(manifest).erase("type"); });
     ExpectInvalid("command type has wrong type", [](Json& manifest) { Command(manifest)["type"] = 1U; });
+    ExpectInvalid("command type is unsupported", [](Json& manifest) { Command(manifest)["type"] = "link"; });
+    ExpectInvalid("command type has wrong case", [](Json& manifest) { Command(manifest)["type"] = "Compile"; });
+    ExpectInvalid("command type is empty", [](Json& manifest) { Command(manifest)["type"] = ""; });
     ExpectInvalid("command cmd is missing", [](Json& manifest) { Command(manifest).erase("cmd"); });
     ExpectInvalid("command cmd has wrong type", [](Json& manifest) { Command(manifest)["cmd"] = Json::object(); });
     ExpectInvalid("command option is not a string", [](Json& manifest) { Command(manifest)["cmd"][0U] = 1U; });

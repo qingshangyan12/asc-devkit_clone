@@ -49,6 +49,8 @@ const FieldSet OBJECT_FIELDS = {"object_name", "object_type", "commands", "outpu
 const FieldSet COMMAND_FIELDS = {"type", "cmd", "stage"};
 constexpr const char* BASIC_OBJECT_TYPE = "basic";
 constexpr const char* SK_OBJECT_TYPE = "sk";
+constexpr const char* COMPILE_COMMAND_TYPE = "compile";
+constexpr const char* OBJCOPY_COMMAND_TYPE = "objcopy";
 
 bool CheckAndLog(bool condition, int lineNumber, const std::string& message) noexcept
 {
@@ -431,6 +433,11 @@ bool ResourceManifestValidator::ValidateCommand(const Json& command, std::set<st
     }
 
     const std::string type = command.at("type").get_ref<const std::string&>();
+    if (!CheckAndLog(
+            type == COMPILE_COMMAND_TYPE || type == OBJCOPY_COMMAND_TYPE, __LINE__,
+            "invalid command type: expected compile or objcopy, value=" + type)) {
+        return false;
+    }
     if (!ValidateCommandOptions(command.at("cmd"), referencedOutputs)) {
         return false;
     }
