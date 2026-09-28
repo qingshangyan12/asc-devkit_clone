@@ -84,7 +84,8 @@ template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void axpy_example(
     InputTensor initial_input, InputTensor src_input, OutputTensor output)
 {
-    auto mask = asc::te::experimental::all_mask<float>();
+    uint32_t count = 48;
+    auto mask = asc::te::experimental::update_mask<float>(count);
     auto dst = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(mask);
     auto src_reg = asc::te::experimental::load(src_input, asc::te::make_coord(0)).with_mask(mask);
 

@@ -75,11 +75,21 @@ __simd_callee__ inline reg_tensor<T> mula(
 
 ## 调用示例
 
+以下示例展示接口在AIV计算函数中的典型调用方式。
+
 ```cpp
-auto mask = asc::te::experimental::all_mask<int32_t>();
-auto dst = asc::te::experimental::load(input0).with_mask(mask);
-auto src0 = asc::te::experimental::load(input1);
-auto src1 = asc::te::experimental::load(input2);
-auto result = asc::te::experimental::mula(dst, src0, src1);
-asc::te::experimental::store(output, result);
+#include "tensor_api/experimental/vector_compute.h"
+
+template <typename InputTensor, typename OutputTensor>
+__simd_vf__ inline void mula_example(
+    InputTensor initial_input, InputTensor input0, InputTensor input1, OutputTensor output)
+{
+    uint32_t count = 48;
+    auto mask = asc::te::experimental::update_mask<int32_t>(count);
+    auto dst = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(mask);
+    auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
+    auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0)).with_mask(mask);
+    dst = asc::te::experimental::mula(dst, src0, src1);
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
+}
 ```

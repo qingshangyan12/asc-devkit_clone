@@ -101,17 +101,19 @@ constexpr asc::te::experimental::histogram_options high_options {
 
 template <typename SrcTensor, typename InitialTensor, typename OutputTensor>
 __simd_vf__ inline void histograms_example(
-    SrcTensor input, InitialTensor initial_input, OutputTensor output)
+    SrcTensor input, InitialTensor initial_input, OutputTensor low_output, OutputTensor high_output)
 {
-    auto src_mask = asc::te::experimental::all_mask<uint8_t>();
-    auto dst_mask = asc::te::experimental::all_mask<uint16_t>();
+    uint32_t src_count = 192;
+    uint32_t dst_count = 128;
+    auto src_mask = asc::te::experimental::update_mask<uint8_t>(src_count);
+    auto dst_mask = asc::te::experimental::update_mask<uint16_t>(dst_count);
     auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(src_mask);
     auto initial_low = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
     auto initial_high = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
     auto low = asc::te::experimental::histograms(initial_low, src);
     auto high = asc::te::experimental::histograms<high_options>(initial_high, src);
 
-    asc::te::experimental::store(output, asc::te::make_coord(0), low);
-    asc::te::experimental::store(output, asc::te::make_coord(1), high);
+    asc::te::experimental::store(low_output, asc::te::make_coord(0), low);
+    asc::te::experimental::store(high_output, asc::te::make_coord(0), high);
 }
 ```
