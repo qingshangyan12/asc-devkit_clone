@@ -224,7 +224,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
 {
     const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
-    ASSERT_FALSE(rows.empty()); // 全量编译目标：46 行产品 sidecar + 测试夹具
+    ASSERT_FALSE(rows.empty()); // 全量编译目标：48 行产品 sidecar + 测试夹具
     for (const AlgMetaRow& row : rows) {
         ExternalAlgSpec spec;
         std::string errMsg;
@@ -472,8 +472,8 @@ TEST(ExtAlgResolver, GoldenAllEngines)
          "CcuSchedAllGatherConcurMeshNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterSoleNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat,
-         CommEngine::COMM_ENGINE_AICPU_TS, "AicpuReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuReduceScatterSoleNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterConcurMeshNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
@@ -623,8 +623,8 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
             }
         }
     }
-    // 覆盖数锚（限 5 个集合通信 CMD）：30 个 (op,外部名) 键（46 行归并）；
-    // 36 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
+    // 覆盖数锚（限 5 个集合通信 CMD）：31 个 (op,外部名) 键（48 行归并）；
+    // 38 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
     // 限定 COLL_CMDS 范围使锚不受测试内注册行（如 KFC cmd 的宏验证行）影响。
     const std::set<HcclCMDType> collCmds(std::begin(COLL_CMDS), std::end(COLL_CMDS));
     size_t keyCount = 0;
@@ -874,9 +874,12 @@ TEST(ExtAlgWhitelist, DifferentialProductionView)
          HCCL_DATA_TYPE_FP64, 1U, "InsReduceScatterNHR"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
          HCCL_DATA_TYPE_FP32, 1U, "CcuSchedReduceScatterSoleNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat,
-         CommEngine::COMM_ENGINE_AICPU_TS, HCCL_DATA_TYPE_FP32, 1U,
-         "AicpuReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &multi, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32,
+         1U, "CcuSchedReduceScatterSoleNHR"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
+         nullptr},
         // MULTI_LEVEL 被滤：多层网全灭
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterParallelMeshNHRUBX"},

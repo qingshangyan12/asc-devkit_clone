@@ -218,6 +218,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         const Mc2InitTilingInner* tilingInner = static_cast<const Mc2InitTilingInner*>(initTiling);
         if (tilingInner->version == INIT_TILING_CCU_NEW_VERSION) {
             newCcuFlag_ = true;
+            if (tilingInner->devType == HCCL_CCU_DEV_TYPE_A5) {
+                ccuProtocolVersion_ = CcuProtocolVersion::CCU_V1;
+            } else if (tilingInner->devType == HCCL_CCU_DEV_TYPE_A6) {
+                ccuProtocolVersion_ = CcuProtocolVersion::CCU_V2;
+            } else {
+                ccuProtocolVersion_ = CcuProtocolVersion::INVALID;
+                KERNEL_LOG(KERNEL_ERROR, "ApiClient InitV2 invalid CCU devType:%d", tilingInner->devType);
+            }
         }
     } else if (context != nullptr) {
         __gm__ const HcclApi::OpResCtx* opResCtx = reinterpret_cast<__gm__ const HcclApi::OpResCtx*>(context);
@@ -319,6 +327,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink)) {
             ccuUsedXnNum_ = KFC_RS_SOLE_NHR_PARAM_NUM;
             CcuPrepareForReduceScatterSoleNhrM2M(&handleParamGM_[handleId]);
+        } else if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR)) {
+            ccuUsedXnNum_ = KFC_RS_SOLE_NHR_2DIE_PARAM_NUM;
+            CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamGM_[handleId]);
         } else {
             ccuUsedXnNum_ = 24;
             CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
