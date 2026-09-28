@@ -169,6 +169,7 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
 
     AlgResourceCtxSerializable tempCtx;
     tempCtx.DeSerialize(seq);
+    resCtxHost->dieSplitRatio = tempCtx.dieSplitRatio;
     if (!resCtxHost->kfcServerArgs.empty()) {
         tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
         tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
@@ -1520,6 +1521,7 @@ HcclResult HcclAllocAlgResourceCcu(
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
     resCtxHost->parallelPortInfo = resRequest.parallelPortInfo;
+    resCtxHost->dieSplitRatio = resRequest.dieSplitRatio;
     if (!param.checkRes) {
         CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
         CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
