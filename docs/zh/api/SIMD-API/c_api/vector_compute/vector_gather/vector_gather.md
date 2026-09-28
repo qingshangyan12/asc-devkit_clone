@@ -2,12 +2,12 @@
 okftype: reference.index.cpp
 title: 聚合操作
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/vector_gather.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
+    title: asc_gather
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
+    title: asc_gather_datablock
+timestamp: '2026-09-28'
 ---
 # 聚合操作
 

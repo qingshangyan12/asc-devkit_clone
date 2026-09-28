@@ -2,41 +2,30 @@
 okftype: reference.api.cpp
 title: asc_sub_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub_scalar.md
-description: 将源矢量各元素减去给定标量value并逐元素写入目的矢量，支持前n个数据连续计算与非连续数据计算。
+description: 执行矢量和标量的减法运算，将源矢量各元素减去标量value后逐元素写入目的矢量，支持前n个数据连续计算与非连续数据计算两种模式。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [subtract]
+  - objects: [tensor]
   - execution_models: [memory_vector]
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_sub_scalar__PUi16_PUi16_i16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_sub_scalar__PUf16_PUf16_f16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_sub_scalar__PUi32_PUi32_i32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_sub_scalar__PUf32_PUf32_f32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_sub_scalar__PUi16_PUi16_i16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_sub_scalar__PUf16_PUf16_f16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_sub_scalar__PUi32_PUi32_i32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_sub_scalar__PUf32_PUf32_f32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_arith.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_sub_scalar
 

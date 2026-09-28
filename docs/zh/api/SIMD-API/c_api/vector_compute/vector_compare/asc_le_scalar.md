@@ -2,24 +2,24 @@
 okftype: reference.api.cpp
 title: asc_le_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md
-description: 按元素判断src是否小于等于标量value，成立时输出结果为1，否则为0，每个元素的比较结果占1个bit。
+description: 按元素判断矢量src是否小于等于标量value，若成立则输出结果为1，否则为0，每个元素的比较结果占1个bit。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
-  - objects: [scalar, vector]
+  - objects: [scalar, tensor]
   - execution_models: [memory_vector]
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_le_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
   - override_id: asc_le_scalar__PUu8_PUf32_f32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_compare.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_le_scalar
 

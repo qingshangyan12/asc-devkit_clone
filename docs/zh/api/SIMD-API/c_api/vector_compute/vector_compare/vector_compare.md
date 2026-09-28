@@ -2,12 +2,36 @@
 okftype: reference.index.cpp
 title: 比较计算
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/vector_compare.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md
+    title: asc_eq
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md
+    title: asc_eq_scalar
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md
+    title: asc_ge
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md
+    title: asc_ge_scalar
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
+    title: asc_get_cmp_mask
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md
+    title: asc_gt
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md
+    title: asc_gt_scalar
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md
+    title: asc_le
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md
+    title: asc_le_scalar
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md
+    title: asc_lt
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md
+    title: asc_lt_scalar
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md
+    title: asc_ne
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md
+    title: asc_ne_scalar
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
+    title: asc_set_cmp_mask
+timestamp: '2026-09-28'
 ---
 # 比较计算
 

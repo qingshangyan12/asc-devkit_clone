@@ -2,48 +2,31 @@
 okftype: reference.api.cpp
 title: asc_int642float
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md
-description: 将int64_t类型数据逐元素转换为float类型，提供前n个数据计算和高维切分计算两类函数原型，操作数起始地址需32字节对齐。
+description: 将int64_t类型数据转换为float类型，提供前n个数据计算与高维切分计算两类函数原型，操作数起始地址需32字节对齐。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
-  - traits: [high_dimensional]
 signature:
   - override_id: asc_int642float_rd__PUf32_PUi64_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_rn__PUf32_PUi64_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_rna__PUf32_PUi64_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_ru__PUf32_PUi64_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_rz__PUf32_PUi64_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_rd__PUf32_PUi64_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_rn__PUf32_PUi64_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_rna__PUf32_PUi64_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_ru__PUf32_PUi64_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int642float_rz__PUf32_PUi64_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_int642float
 

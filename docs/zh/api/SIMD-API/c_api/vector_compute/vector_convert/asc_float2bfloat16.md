@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_float2bfloat16
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md
-description: 将float类型数据转换为bfloat16_t类型，支持多种舍入模式。
+description: 将float类型矢量数据转换为bfloat16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式，操作数起始地址需32字节对齐。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,38 +12,22 @@ tag:
   - traits: [rounding_mode]
 signature:
   - override_id: asc_float2bfloat16_rn__PUbf16_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_rna__PUbf16_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_rd__PUbf16_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_ru__PUbf16_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_rz__PUbf16_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_rn__PUbf16_PUf32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_rna__PUbf16_PUf32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_rd__PUbf16_PUf32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_ru__PUbf16_PUf32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_float2bfloat16_rz__PUbf16_PUf32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_float2bfloat16
 

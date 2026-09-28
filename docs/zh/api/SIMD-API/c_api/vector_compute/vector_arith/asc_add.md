@@ -2,39 +2,28 @@
 okftype: reference.api.cpp
 title: asc_add
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md
-description: 对两个源矢量执行逐元素加法运算并将结果写入目的矢量，支持前n个数据计算与高维切分计算两种模式。
+description: 对两个源矢量执行逐元素加法运算并将结果写入目的矢量，支持前n个数据计算与高维切分计算两种模式，起始地址需32字节对齐。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [add]
+  - objects: [tensor]
   - execution_models: [memory_vector]
   - traits: [elementwise]
 signature:
   - override_id: asc_add__PUi16_PUi16_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_add__PUf16_PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_add__PUi32_PUi32_PUi32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_add__PUf32_PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_add__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_add__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_add__PUi32_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_add__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_arith.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples:
   - path: /examples/02_simd_c_api/00_introduction/01_add/c_api_async_add
     file: c_api_add.asc
@@ -44,7 +33,7 @@ examples:
     file: c_api_add.asc
     archs: ['2201']
     override_id: asc_add__PUf32_PUf32_PUf32_u32
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_add
 

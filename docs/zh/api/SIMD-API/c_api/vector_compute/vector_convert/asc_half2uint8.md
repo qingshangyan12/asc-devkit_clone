@@ -2,54 +2,34 @@
 okftype: reference.api.cpp
 title: asc_half2uint8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md
-description: 将half类型数据逐元素转换为uint8_t类型，支持NONE、RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，操作数起始地址需32字节对齐。
+description: 将half类型矢量数据转换为uint8_t类型，支持NONE、RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
   - traits: [high_dimensional, rounding_mode]
 signature:
   - override_id: asc_half2uint8__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_rn__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_rd__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_rna__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_ru__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_rz__PUu8_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8__PUu8_PUf16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_rn__PUu8_PUf16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_rd__PUu8_PUf16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_rna__PUu8_PUf16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_ru__PUu8_PUf16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_half2uint8_rz__PUu8_PUf16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_half2uint8
 

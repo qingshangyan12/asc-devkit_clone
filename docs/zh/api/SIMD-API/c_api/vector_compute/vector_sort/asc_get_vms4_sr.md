@@ -2,21 +2,21 @@
 okftype: reference.api.cpp
 title: asc_get_vms4_sr
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
-description: 获取执行asc_mrgsort4操作后4个队列中每个队列已处理过的Region Proposal个数，需将if_exhausted_suspension配置为true并在同步完成后调用。
+description: 获取执行asc_mrgsort4操作后4个队列中每个队列已经处理过的Region Proposal个数，需将asc_mrgsort4中的if_exhausted_suspension参数配置为true并在asc_mrgsort4同步完成后调用。
 tag:
   - api_surfaces: [c_api]
   - roles: [query]
   - execution_models: [scalar]
 signature:
   - override_id: asc_get_vms4_sr__Amrgu16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_sort.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
     kind: requires
-    condition: 需和[asc_mrgsort4](asc_mrgsort4.md)操作配合使用，且需asc_mrgsort4中的if_exhausted_suspension参数配置为true。
+    condition: 需asc_mrgsort4中的if_exhausted_suspension参数配置为true
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_vms4_sr
 

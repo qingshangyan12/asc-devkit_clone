@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_relu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md
-description: 按元素做线性整流Relu，负数输出0、非负数保持原值，结果写入dst，支持half、int32_t、float类型。
+description: 按元素做线性整流Relu，负数输出0、非负数保持原值，结果写入目的矢量，支持half、int32_t、float类型。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -13,26 +13,16 @@ tag:
   - traits: [elementwise, high_dimensional]
 signature:
   - override_id: asc_relu__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_relu__PUi32_PUi32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_relu__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_relu__PUf16_PUf16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_relu__PUi32_PUi32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_relu__PUf32_PUf32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_fused.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_relu
 

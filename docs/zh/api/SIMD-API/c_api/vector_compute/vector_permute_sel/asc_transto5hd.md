@@ -2,31 +2,26 @@
 okftype: reference.api.cpp
 title: asc_transto5hd
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md
-description: 数据格式转换接口，一般用于将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，单次Repeat可处理512Byte数据。
+description: 数据格式转换接口，一般用于将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，单次Repeat内可处理512Byte数据，支持多次Repeat操作。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion, layout_transform, transpose]
-  - objects: [matrix]
+  - objects: [matrix, tensor]
   - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
 signature:
   - override_id: asc_transto5hd_b32__uba8_uba8_u8_u16_u16
-    archs: ['2201', '3510']
-    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: asc_transto5hd_b16__uba8_uba8_u8_u16_u16
-    archs: ['2201', '3510']
-    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
   - override_id: asc_transto5hd_b8__uba8_uba8_u8_u16_u16_b_b
-    archs: ['2201', '3510']
-    headers: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+archs: ['2201', '3510']
+header: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md
     kind: related
-    condition: '`dst`和`src`仅支持VA0、VA2、VA4、VA6，且不能相同，配置方式请参考[asc_set_va_reg](./asc_set_va_reg.md)'
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_transto5hd
 

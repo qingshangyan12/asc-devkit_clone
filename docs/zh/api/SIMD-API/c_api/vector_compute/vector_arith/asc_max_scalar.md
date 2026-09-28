@@ -2,41 +2,30 @@
 okftype: reference.api.cpp
 title: asc_max_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max_scalar.md
-description: 逐元素比较源矢量与标量value的大小并取最大值存入目的矢量，支持前n个数据计算与高维切分计算。
+description: 源矢量逐元素与标量value比较大小并取最大值写入目的矢量，支持前n个数据计算和高维切分计算两种模式。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [maximum]
+  - objects: [scalar, tensor]
   - execution_models: [memory_vector]
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_max_scalar__PUi16_PUi16_i16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_max_scalar__PUf16_PUf16_f16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_max_scalar__PUi32_PUi32_i32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_max_scalar__PUf32_PUf32_f32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_max_scalar__PUi16_PUi16_i16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_max_scalar__PUf16_PUf16_f16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_max_scalar__PUi32_PUi32_i32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
   - override_id: asc_max_scalar__PUf32_PUf32_f32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_arith.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_arith.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_max_scalar
 

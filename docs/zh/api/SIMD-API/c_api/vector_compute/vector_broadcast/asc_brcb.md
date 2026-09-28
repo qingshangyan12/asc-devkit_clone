@@ -2,22 +2,21 @@
 okftype: reference.api.cpp
 title: asc_brcb
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md
-description: 每次取输入矢量中的8个数填充到结果矢量的8个datablock（每个32字节）中，每个数对应一个datablock。
+description: 每次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中，每个数对应一个datablock，实现矢量元素到数据块的广播复制，且不支持src与dst为同一块内存地址。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [broadcast]
+  - objects: [tensor]
   - execution_models: [memory_vector]
 signature:
   - override_id: asc_brcb__PUu16_PUu16_u16_u16_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
   - override_id: asc_brcb__PUu32_PUu32_u16_u16_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_broadcast.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_broadcast.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_brcb
 

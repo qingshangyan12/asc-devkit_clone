@@ -1,5 +1,5 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_ub2gm
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md
 description: 将数据从Unified Buffer（UB）搬运到Global Memory（GM），支持连续数据搬运和高维切分数据搬运，可通过loop功能实现Broadcast，仅在AIV上生效。
@@ -12,11 +12,9 @@ tag:
   - traits: [high_dimensional]
 signature:
   - override_id: asc_copy_ub2gm__PGv_PUv_u32@3510
-    archs: ['3510']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy_ub2gm__PGv_PUv_u16_u16_u16_u16@3510
-    archs: ['3510']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+archs: ['3510']
+header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
@@ -35,7 +33,7 @@ examples:
     file: asc_copy_l0c2ub.asc
     archs: ['3510']
     override_id: asc_copy_ub2gm__PGv_PUv_u16_u16_u16_u16@3510
-timestamp: '2026-09-23'
+timestamp: '2026-09-24'
 ---
 # asc_copy_ub2gm
 

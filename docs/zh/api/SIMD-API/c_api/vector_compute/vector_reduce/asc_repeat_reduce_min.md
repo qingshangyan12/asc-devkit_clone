@@ -7,66 +7,36 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [reduction]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
   - traits: [high_dimensional]
 signature:
   - override_id: asc_repeat_reduce_min_index_value__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_index_value__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_value_index__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_value_index__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_only_value__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_only_value__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_only_index__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_only_index__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_index_value__PUf16_PUf16_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_index_value__PUf32_PUf32_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_value_index__PUf16_PUf16_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_value_index__PUf32_PUf32_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_only_value__PUf16_PUf16_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_only_value__PUf32_PUf32_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_only_index__PUf16_PUf16_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_min_only_index__PUf32_PUf32_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_reduce.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md
     kind: related
-    condition: 执行此接口后，可以继续执行[asc_get_reduce_min_cnt](asc_get_reduce_min_cnt.md)获取全部repeat内的最小值，以及第一个最小值时的索引。
+    condition: 执行此接口后
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_repeat_reduce_min
 

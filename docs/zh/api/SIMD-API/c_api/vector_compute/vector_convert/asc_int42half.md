@@ -2,24 +2,23 @@
 okftype: reference.api.cpp
 title: asc_int42half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md
-description: 将int4_t类型数据逐元素转换为half类型，当src为int4b_t时count必须为偶数，操作数起始地址需32字节对齐。
+description: 将int4_t类型数据转换为half类型，提供前n个数据计算与高维切分计算两种接口形式，当src为int4b_t时count必须为偶数，操作数起始地址需32字节对齐。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
-  - traits: [high_dimensional]
 signature:
   - override_id: asc_int42half__PUf16_PUi4x2_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_int42half__PUf16_PUi4x2_u8_u16_u16_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_int42half
 

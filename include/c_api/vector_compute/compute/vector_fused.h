@@ -799,6 +799,8 @@ __aicore__ inline void asc_sub_relu(
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(
     __ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -811,6 +813,8 @@ __aicore__ inline void asc_add_relu(
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
@@ -826,6 +830,8 @@ __aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ half* src0, __u
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(
     __ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -838,6 +844,8 @@ __aicore__ inline void asc_add_relu(
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
@@ -853,6 +861,8 @@ __aicore__ inline void asc_add_relu(__ubuf__ float* dst, __ubuf__ float* src0, _
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -865,6 +875,8 @@ __aicore__ inline void asc_add_relu(
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int16_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -1063,6 +1075,8 @@ __aicore__ inline void asc_axpy(
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(__ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint32_t count);
 
@@ -1078,6 +1092,8 @@ __aicore__ inline void asc_add_relu(__ubuf__ int8_t* dst, __ubuf__ half* src0, _
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int8_t* dst, __ubuf__ half* src0, __ubuf__ half* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -1090,6 +1106,8 @@ __aicore__ inline void asc_add_relu(
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint32_t count);
 
@@ -1105,6 +1123,8 @@ __aicore__ inline void asc_add_relu(__ubuf__ half* dst, __ubuf__ float* src0, __
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(
     __ubuf__ half* dst, __ubuf__ float* src0, __ubuf__ float* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -1117,6 +1137,8 @@ __aicore__ inline void asc_add_relu(
  * @archs 2201
  * @param [out] dst 目的操作数（矢量）的起始地址。
  * @param [in] count 参与计算的元素个数。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint32_t count);
@@ -1133,6 +1155,8 @@ __aicore__ inline void asc_add_relu(
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_add_relu(
     __ubuf__ int8_t* dst, __ubuf__ int16_t* src0, __ubuf__ int16_t* src1, uint8_t repeat, uint8_t dst_block_stride,

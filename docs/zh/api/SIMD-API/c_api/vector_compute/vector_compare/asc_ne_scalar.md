@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_ne_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md
-description: 将src中每个元素逐个与标量value比较，不等于value时输出结果对应比特位为1，否则为0。
+description: 将src中每个元素逐个与标量value比较，不等于value时输出结果dst对应比特位为1，否则为0，比较结果按小端序排布。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,14 +12,12 @@ tag:
   - traits: [elementwise, scalar_operand]
 signature:
   - override_id: asc_ne_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
   - override_id: asc_ne_scalar__PUu8_PUf32_f32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_compare.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_ne_scalar
 

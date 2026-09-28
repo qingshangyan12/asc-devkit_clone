@@ -2,12 +2,14 @@
 okftype: reference.index.cpp
 title: 排序计算
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/vector_sort.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
+    title: asc_bitsort
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
+    title: asc_get_vms4_sr
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+    title: asc_mrgsort4
+timestamp: '2026-09-28'
 ---
 # 排序计算
 

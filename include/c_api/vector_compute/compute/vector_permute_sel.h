@@ -218,6 +218,8 @@ __aicore__ inline void asc_select(
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_squeeze(
     __ubuf__ uint16_t* dst, __ubuf__ uint16_t* src0, __ubuf__ uint16_t* src1, uint8_t repeat, uint8_t dst_block_stride,
@@ -236,6 +238,8 @@ __aicore__ inline void asc_squeeze(
  * @param [in] dst_repeat_stride 目的操作数相邻迭代间相同DataBlock的地址步长。
  * @param [in] src0_repeat_stride 源操作数0相邻迭代间相同DataBlock的地址步长。
  * @param [in] src1_repeat_stride 源操作数1相邻迭代间相同DataBlock的地址步长。
+ * @param [in] src0 源操作数（矢量）的起始地址。
+ * @param [in] src1 源操作数（矢量）的起始地址。
  */
 __aicore__ inline void asc_squeeze(
     __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src0, __ubuf__ uint32_t* src1, uint8_t repeat, uint8_t dst_block_stride,

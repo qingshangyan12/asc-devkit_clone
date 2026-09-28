@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_ub2gm_align
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
-description: 提供数据非对齐搬运的功能，将数据从Unified Buffer（UB）搬运到Global Memory (GM)，支持连续和高维切分数据搬运，非对齐时自动补充dummy假数据且写入GM时丢弃，仅在AIV上生效。
+description: 提供数据非对齐搬运功能，将数据从Unified Buffer（UB）搬运到Global Memory（GM），支持连续数据搬运与高维切分数据搬运，非32字节对齐时自动补充dummy假数据补齐且写入GM时丢弃，仅在AIV上生效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,15 +12,13 @@ tag:
   - traits: [high_dimensional, unaligned_transfer]
 signature:
   - prototype_id: asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32
-    archs: ['3510']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
     dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
       half, bfloat16_t, int32_t, uint32_t, float]
   - prototype_id: asc_copy_ub2gm_align__PG<dtype>_PU<dtype>_u32_u32_storel2_u64_u32
-    archs: ['3510']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
     dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
       half, bfloat16_t, int32_t, uint32_t, float]
+archs: ['3510']
+header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
@@ -30,10 +28,13 @@ dependencies:
     condition: 如果本指令与其他指令存在UB地址重叠
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
     kind: related
+    condition: Broadcast场景
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
     kind: related
+    condition: Broadcast场景
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
     kind: related
+    condition: Broadcast场景
 examples:
   - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1
     file: data_copy_l0c2l1.asc
@@ -123,7 +124,7 @@ examples:
     file: truncate.asc
     archs: ['3510']
     override_id: asc_copy_ub2gm_align__PGf32_PUf32_u32_u32_storel2_u64_u32
-timestamp: '2026-09-23'
+timestamp: '2026-09-24'
 ---
 # asc_copy_ub2gm_align
 

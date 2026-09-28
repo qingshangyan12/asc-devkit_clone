@@ -7,17 +7,18 @@ tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [sort]
+  - objects: [tensor]
   - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
 signature:
   - prototype_id: asc_bitsort__PU<dtype>_PU<dtype>_PUu32_i32
-    archs: ['2201', '3510']
-    headers: [/include/c_api/vector_compute/compute/vector_sort.h]
     dtype: [half, float]
-dependencies: []
+archs: ['2201', '3510']
+header: [/include/c_api/vector_compute/compute/vector_sort.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_bitsort
 

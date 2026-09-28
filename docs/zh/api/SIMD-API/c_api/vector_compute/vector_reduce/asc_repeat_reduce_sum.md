@@ -2,37 +2,31 @@
 okftype: reference.api.cpp
 title: asc_repeat_reduce_sum
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md
-description: 对每个Repeat内所有元素求和，源操作数采用二叉树方式两两相加，half类型中间计算结果大于65504时保存为65504。
+description: 对每个Repeat内所有元素求和，源操作数采用二叉树方式两两相加，计算过程中结果大于65504时保存为65504，支持前n个数据计算与高维切分计算两种模式。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - families: [arithmetic]
   - operations: [add, reduction]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
   - traits: [high_dimensional, saturation_mode]
 signature:
   - override_id: asc_repeat_reduce_sum__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_sum__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_sum__PUf16_PUf16_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_repeat_reduce_sum__PUf32_PUf32_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_reduce.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples:
   - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/reduce
     file: reduce.asc
     archs: ['2201']
     override_id: asc_repeat_reduce_sum__PUf32_PUf32_u32
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_repeat_reduce_sum
 

@@ -8,27 +8,21 @@ tag:
   - roles: [compute]
   - families: [arithmetic]
   - operations: [add, reduction]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
   - traits: [high_dimensional]
 signature:
   - override_id: asc_pair_reduce_sum__PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_pair_reduce_sum__PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_pair_reduce_sum__PUf16_PUf16_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_pair_reduce_sum__PUf32_PUf32_u8_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_reduce.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_pair_reduce_sum
 

@@ -2,33 +2,27 @@
 okftype: reference.api.cpp
 title: asc_and
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
-description: 对两个源矢量按元素执行按位与运算，结果存入目的矢量。
+description: 对两个源矢量的对应元素执行按位与运算并将结果写入目的矢量，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - families: [bitwise]
   - operations: [bitwise_and]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
   - traits: [elementwise, high_dimensional]
 signature:
   - override_id: asc_and__PUi16_PUi16_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: asc_and__PUu16_PUu16_PUu16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: asc_and__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
   - override_id: asc_and__PUu16_PUu16_PUu16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_logic.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_logic.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_and
 

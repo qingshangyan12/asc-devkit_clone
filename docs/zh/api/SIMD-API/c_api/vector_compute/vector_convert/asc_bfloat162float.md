@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_bfloat162float
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md
-description: 将bfloat16_t类型数据转换为float类型，该转换无舍入模式。
+description: 将bfloat16_t类型矢量数据转换为float类型，无舍入模式，支持前n个数据计算和高维切分计算，目的与源操作数起始地址需32字节对齐。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -11,14 +11,14 @@ tag:
   - execution_models: [memory_vector]
 signature:
   - override_id: asc_bfloat162float__PUf32_PUbf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
   - override_id: asc_bfloat162float__PUf32_PUbf16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_convert.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_convert.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_bfloat162float
 

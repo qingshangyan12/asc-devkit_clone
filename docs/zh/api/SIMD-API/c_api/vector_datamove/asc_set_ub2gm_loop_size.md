@@ -2,27 +2,26 @@
 okftype: reference.api.cpp
 title: asc_set_ub2gm_loop_size
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
-description: 设置asc_copy_ub2gm_align使用循环搬运模式时内层循环loop1和外层循环loop2的迭代次数，配置持续生效直至重新配置。
+description: 设置asc_copy_ub2gm_align使用循环搬运模式时内层loop1与外层loop2的迭代次数，仅AIV生效，配置持续有效直至重新配置，循环次数为0时对应循环不执行、不搬运数据。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - execution_models: [scalar]
 signature:
   - override_id: asc_set_ub2gm_loop_size__u32_u32
-    archs: ['3510']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+archs: ['3510']
+header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md
     kind: configures
-    condition: 本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时的两层循环迭代次数。
+    condition: 使用循环搬运模式时
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
     kind: related
-    condition: 使用循环搬运模式时，还需通过[asc_set_ub2gm_loop1_stride](./asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](./asc_set_ub2gm_loop2_stride.md)分别设置内层循环和外层循环中，相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。
+    condition: 使用循环搬运模式时
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
     kind: related
-    condition: 使用循环搬运模式时，还需通过[asc_set_ub2gm_loop1_stride](./asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](./asc_set_ub2gm_loop2_stride.md)分别设置内层循环和外层循环中，相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。
+    condition: 使用循环搬运模式时
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-24'
 ---
 # asc_set_ub2gm_loop_size
 

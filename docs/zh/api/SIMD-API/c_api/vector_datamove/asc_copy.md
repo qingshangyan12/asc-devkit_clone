@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_copy
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md
-description: 将数据从Unified Buffer（UB）搬运到UB，支持高维切分，源和目的起始地址需32字节对齐。
+description: 将数据从Unified Buffer（UB）搬运到UB，支持前n个数据与高维切分两种形式，目的和源操作数起始地址需32字节对齐。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,32 +12,18 @@ tag:
   - traits: [high_dimensional]
 signature:
   - override_id: asc_copy__PUi16_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy__PUu16_PUu16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy__PUi32_PUi32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy__PUu32_PUu32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy__PUi16_PUi16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy__PUu16_PUu16_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy__PUi32_PUi32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy__PUu32_PUu32_u8_u16_u16_u16_u16
-    archs: ['2201']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+archs: ['2201']
+header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-24'
 ---
 
 # asc_copy

@@ -2,23 +2,26 @@
 okftype: reference.api.cpp
 title: asc_set_ub2gm_loop1_stride
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
-description: 设置asc_copy_ub2gm_align使用循环搬运模式时，内层循环中相邻两次迭代源操作数与目的操作数数据块起始地址之间的偏移量，仅在AIV上执行有效。
+description: 设置asc_copy_ub2gm_align使用循环搬运模式时内层循环中相邻两次迭代的源操作数和目的操作数数据块起始地址偏移量，源步长必须32字节对齐，配置持续生效直至重新配置，仅在AIV上执行有效。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
 signature:
   - override_id: asc_set_ub2gm_loop1_stride__u64_u64
-    archs: ['3510']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+archs: ['3510']
+header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md
     kind: configures
+    condition: 使用循环搬运模式时
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
     kind: related
+    condition: 使用循环搬运模式时
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
     kind: related
+    condition: 使用循环搬运模式时
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-24'
 ---
 # asc_set_ub2gm_loop1_stride
 

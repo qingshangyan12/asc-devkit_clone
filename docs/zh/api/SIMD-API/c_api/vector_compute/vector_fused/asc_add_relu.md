@@ -2,55 +2,34 @@
 okftype: reference.api.cpp
 title: asc_add_relu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md
-description: 按元素求和后再进行Relu计算（结果和0对比取较大值），并提供s162s8、f322f16、f162s8的最终结果类型转换功能，结果存入dst。
+description: 按元素求和，再进行Relu计算（结果和0对比取较大值），并提供s162s8、f322f16、f162s8的结果类型转换功能，支持前n个数据计算和高维切分计算。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [activation, arithmetic]
   - operations: [add, conversion, relu]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
   - traits: [elementwise, high_dimensional]
 signature:
   - override_id: asc_add_relu__PUf16_PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUf32_PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUi16_PUi16_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUi8_PUi16_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUf16_PUf32_PUf32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUi8_PUf16_PUf16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUi8_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUf16_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_add_relu__PUi8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
-dependencies: []
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_fused.h]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_add_relu
 

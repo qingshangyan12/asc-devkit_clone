@@ -8,11 +8,11 @@ tag:
   - roles: [query]
 signature:
   - override_id: asc_get_cmp_mask__PUv
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_compare.h]
 dependencies: []
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_get_cmp_mask
 

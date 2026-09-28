@@ -2,45 +2,32 @@
 okftype: reference.api.cpp
 title: asc_deq_int162b8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md
-description: 将int16_t类型数据量化转换为int8_t或uint8_t类型，结果存放在每个DataBlock的高半块或低半块，使用前需调用asc_set_deq_scale设置量化参数。
+description: 将int16_t类型数据转换为int8_t或uint8_t类型并将结果存放在每个DataBlock的高半块或低半块，使用前需调用asc_set_deq_scale接口设置量化参数。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
+  - objects: [tensor]
   - execution_models: [memory_vector]
   - traits: [high_dimensional, quantization]
 signature:
   - override_id: asc_deq_int162b8_h__PUi8_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_deq_int162b8_h__PUu8_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_deq_int162b8_l__PUi8_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_deq_int162b8_l__PUu8_PUi16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_deq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_deq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_deq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
   - override_id: asc_deq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_fused.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_fused.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
     kind: requires
-    condition: 使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 
 # asc_deq_int162b8

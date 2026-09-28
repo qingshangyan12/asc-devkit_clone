@@ -1,8 +1,8 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api.cpp
 title: asc_copy_gm2ub
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md
-description: 将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持连续数据搬运和高维切分数据搬运，连续搬运按size指定字节数进行，仅在AIV上生效。
+description: 将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持连续数据搬运和高维切分数据搬运，仅在AIV上生效，非AIV上调用直接返回。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
@@ -12,11 +12,9 @@ tag:
   - traits: [high_dimensional]
 signature:
   - override_id: asc_copy_gm2ub__PUv_PGv_u32@3510
-    archs: ['3510']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
   - override_id: asc_copy_gm2ub__PUv_PGv_u16_u16_u16_u16@3510
-    archs: ['3510']
-    headers: [/include/c_api/vector_datamove/vector_datamove.h]
+archs: ['3510']
+header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
@@ -25,7 +23,7 @@ dependencies:
     kind: requires
     condition: 如果本指令与其他指令存在UB地址重叠
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-24'
 ---
 # asc_copy_gm2ub
 

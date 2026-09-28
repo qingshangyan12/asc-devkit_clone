@@ -7,30 +7,24 @@ tag:
   - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [gather]
-  - objects: [mask, vector]
+  - objects: [mask, tensor]
   - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
   - traits: [high_dimensional, masked]
 signature:
   - override_id: asc_reduce__PUu16_PUu16_PUu16_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_reduce__PUu32_PUu32_PUu32_u32
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_reduce__PUu16_PUu16_PUu16_u16_u8_u8_u16_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
   - override_id: asc_reduce__PUu32_PUu32_PUu32_u16_u8_u8_u16_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_reduce.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_reduce.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
     kind: constrained_by
-    condition: 接口不支持通过[asc_set_vector_mask](../vector_mask_config/asc_set_vector_mask.md)配置掩码。
+    condition: 接口不支持通过asc_set_vector_mask配置掩码。
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_reduce
 

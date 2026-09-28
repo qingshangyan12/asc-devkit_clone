@@ -2,16 +2,12 @@
 okftype: reference.index.cpp
 title: asc_copy_ub2gm
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies:
+navigation:
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md
-    kind: related
+    title: asc_copy_ub2gm_arch_2201
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md
-    kind: related
-examples: []
-timestamp: '2026-09-23'
+    title: asc_copy_ub2gm_arch_3510
+timestamp: '2026-09-24'
 ---
 # asc_copy_ub2gm
 

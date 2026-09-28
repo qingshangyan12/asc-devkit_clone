@@ -2,7 +2,7 @@
 okftype: reference.api.cpp
 title: asc_lt
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md
-description: 按元素判断src0是否小于src1，成立时输出结果dst上的对应比特位为1，否则为0。
+description: 按元素判断src0是否小于src1，成立时输出结果dst对应比特位为1，否则为0，结果可存入寄存器或输出到目标地址，寄存器形式固定处理256B数据且需配合asc_get_cmp_mask读取结果。
 tag:
   - api_surfaces: [c_api]
   - roles: [compute]
@@ -12,25 +12,20 @@ tag:
   - traits: [elementwise]
 signature:
   - override_id: asc_lt__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
   - override_id: asc_lt__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
   - override_id: asc_lt__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
   - override_id: asc_lt__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-    archs: ['2201']
-    headers: [/include/c_api/vector_compute/compute/vector_compare.h]
+archs: ['2201']
+header: [/include/c_api/vector_compute/compute/vector_compare.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
     kind: requires
-    condition: 使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。
+    condition: 使用寄存器形式的接口时
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
     kind: related
+    condition: 如果要初始化寄存器
 examples: []
-timestamp: '2026-09-23'
+timestamp: '2026-09-28'
 ---
 # asc_lt
 
