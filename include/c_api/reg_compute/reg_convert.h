@@ -5888,8 +5888,6 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat(
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
         dst_quarter_pos);
 
-
-
 #if (ASC_DEVKIT_VERSION_NUM >= 902000000)
 // ==========asc_cast_merge half to int4x2==========
 
