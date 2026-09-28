@@ -64,9 +64,24 @@ unsigned int __hnex2_mask(half2 x, half2 y)
     <td>0x0</td>
   </tr>
   <tr>
-    <td>±inf</td>
-    <td>±inf</td>
+    <td>+inf</td>
+    <td>+inf</td>
     <td>0x0</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>-inf</td>
+    <td>0x0</td>
+  </tr>
+  <tr>
+    <td>+inf</td>
+    <td>-inf</td>
+    <td>0xFFFF</td>
+  </tr>
+  <tr>
+    <td>-inf</td>
+    <td>+inf</td>
+    <td>0xFFFF</td>
   </tr>
 </table>
 

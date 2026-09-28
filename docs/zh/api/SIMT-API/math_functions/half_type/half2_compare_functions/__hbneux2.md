@@ -48,11 +48,14 @@ bool __hbneux2(half2 x, half2 y)
 
 比较输入数据各分量是否均不相等的结果。特殊值如下：
 
-| x分量 | y分量 | 返回值（该分量） |
+| x分量 | y分量 | 返回值 |
 | --- | --- | --- |
 | nan | 任意值 | true |
 | ±0 | ±0 | false |
-| ±inf | ±inf | false |
+| +inf | +inf | false |
+| -inf | -inf | false |
+| +inf | -inf | true |
+| -inf | +inf | true |
 
 ## 约束说明
 

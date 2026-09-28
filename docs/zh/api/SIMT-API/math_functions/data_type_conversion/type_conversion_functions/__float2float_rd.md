@@ -27,7 +27,7 @@
 
 头文件路径为：`"simt_api/device_functions.h"`。
 
-将浮点数向下取整（向负无穷方向），并遵循CAST\_FLOOR模式。
+将float类型数据遵循CAST\_FLOOR模式取整。
 
 ## 函数原型
 

@@ -50,6 +50,7 @@ inline float scalbnf(float x, int32_t n)
 
 输入数据x乘以2的n次幂的结果。
 
+-   当n为0时，返回值为x。
 -   当x为nan时，返回值为nan。
 -   当x为inf时，返回值为inf。
 -   当x为-inf时，返回值为-inf。
