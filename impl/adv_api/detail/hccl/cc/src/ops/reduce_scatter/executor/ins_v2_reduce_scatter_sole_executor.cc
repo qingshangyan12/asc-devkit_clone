@@ -293,7 +293,7 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleMeshConcur, InsV2ReduceScatterSoleExecutor,
     TopoMatch1D, InsTempReduceScatterMesh1DZAxisDetour);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DZAxisDetour, AlgEngine::AICPU, "sole[mesh]",
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleMeshConcur, AlgEngine::AICPU, "sole[mesh]",
     COND_Z_AXIS, FLAG_NONE, 0);
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXEC_V2(
