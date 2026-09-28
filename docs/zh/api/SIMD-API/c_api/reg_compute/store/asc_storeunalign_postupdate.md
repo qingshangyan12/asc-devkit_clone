@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/reg_compute/store/storeunalign.h"`。
 
-将矢量数据寄存器中的数据连续搬出到非32字节对齐的Unified Buffer（UB）地址，启用Post Update模式在搬出后自动累加目的地址指针或地址寄存器，便于Hardware Loop内连续多次调用时无需手动维护目的地址。
+将矢量数据寄存器或掩码寄存器中的数据连续搬出到非32字节对齐的Unified Buffer（UB）地址，启用Post Update模式在搬出后自动累加目的地址指针或地址寄存器，便于硬件循环内连续多次调用时无需手动维护目的地址。
 
 针对矢量数据寄存器，本接口提供以下两种模式：
 
@@ -42,7 +42,9 @@
 - 32字节对齐的主块部分`UB[dst_start, dst_end - unalign_count * sizeof(dtype)]`。
 - 非32字节对齐的尾块部分`UB[dst_end - unalign_count * sizeof(dtype), dst_end]`。
 
-掩码寄存器非对齐搬出请使用[asc_storeunalign_mask_postupdate](asc_storeunalign_mask_postupdate.md)。
+针对掩码寄存器，本接口提供一种模式：
+
+- **掩码寄存器搬出模式：** UB地址上数据类型为`b16`时，硬件指令从每2bit数据中提取最低有效位（LSB），将掩码寄存器中32B数据打包成16B写入UB。搬运完成后UB地址按16B偏移量更新。UB地址上数据类型为`b32`时，硬件指令从每4bit数据中提取最低有效位（LSB），将掩码寄存器中32B数据打包成8B，写入UB。搬运完成后UB地址按8B偏移量更新。需配合后处理接口[asc_storeunalign_post](asc_storeunalign_post.md)使用。
 
 本接口可以拼接上一段**连续的尾块**和本次搬运主块部分，并同时更新本次尾块数据至非对齐寄存器中。首次搬运可以使用未初始化的非对齐寄存器。若上一次搬运的尾块和本次搬运主块不连续，则每一次尾块处理都需要调用后处理接口。若连续，仅最后一次尾块处理需要调用后处理接口。
 
@@ -96,6 +98,27 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t* dst,
                                                         addr_reg& count)
 ```
 
+### 掩码寄存器搬出模式
+
+```c
+// 占位符形式
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ <dtype>*& dst,
+                                                        vector_store_unalign& unalign_reg,
+                                                        vector_bool src)
+```
+
+#### dtype支持数据类型
+
+`dtype`支持的数据类型为`uint16_t`、`uint32_t`。
+
+#### 函数原型典型示例
+
+```c
+__simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint16_t*& dst,
+                                                        vector_store_unalign& unalign_reg,
+                                                        vector_bool src)
+```
+
 ## 参数说明
 
 ### 立即数偏移搬出模式
@@ -120,7 +143,17 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t* dst,
 | src | 输入 | 源操作数（矢量数据寄存器），类型为`vector_<dtype>`，`dtype`须与`dst`指向的数据类型一致。 |
 | count | 输入/输出 | 目的地址的迭代偏移，类型为`addr_reg&`，由配套的地址寄存器构造接口预先构造。该参数用于更新目的地址，不控制单次搬出的数据量；指令执行后，地址寄存器中的偏移累加一个VL（256字节）。 |
 
-矢量数据寄存器、非对齐寄存器和地址寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+### 掩码寄存器搬出模式
+
+**表3** 参数说明
+
+| 参数名 | 输入/输出 | 描述 |
+|---|---|---|
+| dst | 输入/输出 | 目的操作数在UB中的起始地址，类型为`__ubuf__ <dtype>*&`。`b16`类型目的地址需16字节对齐，`b32`类型目的地址需8字节对齐。搬出后，`dst`自动更新至本次搬出的结束地址。 |
+| unalign_reg | 输入/输出 | 非对齐寄存器，类型为`vector_store_unalign&`，长度为32字节。 |
+| src | 输入 | 源操作数（掩码寄存器），类型为`vector_bool`。 |
+
+矢量数据寄存器、掩码寄存器、非对齐寄存器和地址寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -137,10 +170,12 @@ __simd_callee__ inline void asc_storeunalign_postupdate(__ubuf__ uint8_t* dst,
 ### 指令约束
 
 - 连续调用时须复用同一个`unalign_reg`。
+- 掩码寄存器连续搬出模式须使用[asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式收尾，复用同一个`unalign_reg`。
 - 立即数偏移搬出模式须使用[asc_storeunalign_post_postupdate](asc_storeunalign_post_postupdate.md)收尾，并复用同一个`unalign_reg`。
 - 地址寄存器偏移搬出模式的`addr_reg`须通过[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)预先构造，并在内层循环体内赋值使用。须使用[asc_storeunalign_post](asc_storeunalign_post.md)收尾，并复用同一个`unalign_reg`及地址寄存器。
 - 立即数偏移搬出模式下，`count`最大值不超过单个矢量数据寄存器可容纳的元素个数。
 - 矢量数据寄存器搬出场景目的地址无需32字节对齐，但须按`sizeof(dtype)`字节对齐。
+- 掩码寄存器搬出场景，`b16`类型目的地址需16字节对齐，`b32`类型目的地址需8字节对齐。
 
 ## 调用示例
 

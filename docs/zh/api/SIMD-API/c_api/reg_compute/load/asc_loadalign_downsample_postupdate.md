@@ -28,9 +28,14 @@
 
 头文件路径为：`"c_api/reg_compute/load/loadalign.h"`。
 
-从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL（512字节）长度的连续数据，保留偶数下标元素后写入VL长度的目的矢量数据寄存器。接口采用Post Update模式，搬运完成后自动更新源地址指针。
+从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样。接口采用Post Update模式，搬运完成后自动更新源地址指针。
 
-掩码寄存器下采样Post Update搬入请使用[asc_loadalign_mask_downsample_postupdate](asc_loadalign_mask_downsample_postupdate.md)。
+- 当`dst`为矢量数据寄存器时，读取2×VL（512字节）长度数据，保留偶数下标元素后写入VL长度数据。
+- 当`dst`为掩码寄存器时，读取VL/4（64字节）长度数据，保留偶数下标bit后写入VL/8长度数据。
+
+**图1** 下采样搬入掩码寄存器
+
+![](../../figures/capi_loadalign_mask_downsample.png)
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
@@ -40,6 +45,10 @@
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_<dtype>& dst,
                                                                 __ubuf__ <dtype>*& src,
+                                                                int32_t offset)
+// 搬入掩码寄存器。
+__simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_bool& dst,
+                                                                __ubuf__ uint32_t*& src,
                                                                 int32_t offset)
 ```
 
@@ -62,11 +71,11 @@ __simd_callee__ inline void asc_loadalign_downsample_postupdate(vector_int16_t& 
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 |
+| dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
 | src | 输入/输出 | 源UB地址，实际读取地址必须按32字节对齐。 |
-| offset | 输入 | Post Update步长，单位为元素个数。接口从当前`src`地址完成搬入后，`src`增加`offset × sizeof(dtype)`字节。 |
+| offset | 输入 | Post Update步长。接口从当前`src`地址完成搬入后更新`src`。<br>&bull; 当`dst`为矢量数据寄存器时，单位为元素个数，`src`增加`offset × sizeof(dtype)`字节。<br>&bull; 当`dst`为掩码寄存器时，单位为字节，`src`增加`offset`字节。 |
 
-矢量数据寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
