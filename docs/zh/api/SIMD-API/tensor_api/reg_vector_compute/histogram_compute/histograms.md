@@ -99,9 +99,9 @@ constexpr asc::te::experimental::histogram_options high_options {
     asc::te::experimental::histogram_half::high,
     asc::te::experimental::histogram_mode::frequency};
 
-template <typename SrcTensor, typename InitialTensor, typename OutputTensor>
+template <typename InputTensor, typename InitialInputTensor, typename OutputTensor>
 __simd_vf__ inline void histograms_example(
-    SrcTensor input, InitialTensor initial_input, OutputTensor low_output, OutputTensor high_output)
+    InputTensor input, InitialInputTensor initial_input, OutputTensor low_output, OutputTensor high_output)
 {
     uint32_t src_count = 192;
     uint32_t dst_count = 128;
