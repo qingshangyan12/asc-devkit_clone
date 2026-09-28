@@ -63,7 +63,7 @@ Doxygen 仍按旧生成器合并为 canonical ID 和汇总的 `@archs`；不同�
    所有阶段的 dry-run。缺少语义输入、未解决问题或生成器无法处理的合法结构都会使校验阻断，
    不得以空 description/tag/dependencies 继续写入。
 6. 只有 `validate` 成功后，使用相同 run directory 执行 `write`。写入前再次确认输入 hash 未变化。
-7. Index Profile 只生成 `okftype`、`title`、`resource`、`navigation` 和 `timestamp`，不生成 description、tag、dependencies 或 examples。
+7. Index Profile 按注册表中的 `reference.index.cpp.fields` 生成；当前配置为 `okftype`、`title`、`resource`、`navigation` 和 `timestamp`，不生成 description、tag、dependencies 或 examples。
 8. 运行结束必须生成机器可读 `error-report.json` 和中文 `error-report.md`。同一文档的所有问题必须
    合并在同一个报告章节中。
 
@@ -129,9 +129,9 @@ python3 scripts/controller.py write \
 
 ## 字段和降级规则
 
-基础 YAML 字段按固定顺序为 `okftype`、`title`、`resource`、`description`、`tag`、`signature`、
-`header`、`declaration`、`type_catalog`、`dependencies`、`examples`、`timestamp`。`c_api/defs` 实体页还可有 source-derived 的 `header`、
-`declaration` 或 `type_catalog`；这些字段不由 worker 猜测，也不用于普通函数页。
+基础 YAML 字段、Profile 允许字段、公共必填字段和输出顺序均以
+`config/document-profile-registry.yaml` 为准。当前注册表中的 `c_api/defs` 实体页还允许
+source-derived 的 `header`、`declaration` 或 `type_catalog`；这些字段不由 worker 猜测，也不用于普通函数页。
 
 问题只影响对应字段：
 

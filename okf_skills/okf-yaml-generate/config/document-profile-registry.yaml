@@ -90,9 +90,14 @@ profiles:
     fields: [description, tag, signature, archs, header, dependencies, examples]
     outputs: [front_matter, doxygen, example_markers]
 
+  reference.arch.cpp:
+    说明: C++ 或 AscendC 可调用接口的架构专属页面。
+    fields: [description, tag, signature, archs, header, dependencies, examples]
+    outputs: [front_matter, doxygen, example_markers]
+
   reference.type.cpp:
     说明: C++ 或 AscendC 的类型、定义实体和宏定义页。
-    fields: [description, tag, header]
+    fields: [description, tag, header, declaration, type_catalog]
     outputs: [front_matter, doxygen]
 
   reference.index.cpp:

@@ -67,15 +67,11 @@ from model_registry import (
 API_ROOT = Path("docs/zh/api/SIMD-API")
 DOCUMENT_ROOT = Path("docs/zh/api")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
-# Backward-compatible exports used by the repository's index builder. The
-# registry remains the source of truth for controller rendering and validation.
-OKF_TYPES = (
-    "reference.api.cpp", "reference.arch.cpp", "reference.index.cpp", "reference.type.cpp",
-)
-ALLOWED_FIELDS = (
-    "okftype", "title", "resource", "description", "tag", "signature", "archs", "header",
-    "declaration", "type_catalog", "dependencies", "examples", "navigation", "timestamp",
-)
+# Backward-compatible exports. Their values come from the registry so callers
+# cannot accidentally keep a second Profile or field allowlist.
+_MODEL = load_model()
+OKF_TYPES = tuple(_MODEL["profiles"])
+ALLOWED_FIELDS = tuple(_MODEL["field_order"])
 DEFINITION_CATEGORIES = {"constant", "enum", "macro", "type", "union"}
 DEFINITIONS_ROOT = API_ROOT / "c_api" / "defs"
 MACRO_DEFINITION_SECTION_RE = re.compile(r"^\s{0,3}#{2,6}\s+宏定义(?:\s|<|$)", re.MULTILINE)
@@ -85,10 +81,17 @@ SEMANTIC_RESULT_PURPOSE = "okf_yaml_semantic_result"
 SIGNATURE_KEYS = {"prototype_id", "override_id", "macro_id", "archs", "header", "dtype"}
 DEFAULT_WRITE_CONTRACTS = ("front_matter",)
 # Registry fields must have both an emission path and a validation path before
-# a run can start. The YAML registry remains the source of truth for profile
-# membership; these sets declare code capability for those fields.
-GENERATED_FIELDS = frozenset(ALLOWED_FIELDS)
-VALIDATED_FIELDS = frozenset(ALLOWED_FIELDS)
+# a run can start. This is an implementation capability declaration, not a
+# second field contract; Profile membership and ordering come from the YAML
+# registry above.
+_IMPLEMENTED_FIELDS = frozenset(
+    {
+        "okftype", "title", "resource", "description", "tag", "signature", "archs", "header",
+        "declaration", "type_catalog", "dependencies", "examples", "navigation", "timestamp",
+    }
+)
+GENERATED_FIELDS = _IMPLEMENTED_FIELDS
+VALIDATED_FIELDS = _IMPLEMENTED_FIELDS
 ISSUE_TYPES = {"document_defect", "source_defect", "tool_defect", "unresolved"}
 RESOLUTIONS = {
     "blank_field", "report_source_defect", "report_unresolved", "tool_change_required",
