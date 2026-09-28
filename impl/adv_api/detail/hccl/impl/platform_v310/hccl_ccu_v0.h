@@ -389,6 +389,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
     ccuParam_.rankId = newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId;
     ccuParam_.scratchAddr = newCcuFlag_ ? hcclNewContext_->res[0] : hcclContext_->windowsOut[0];
+    // res[1]=die 切分千分比（1000/0=不切分），host 侧 GetCcuOpParamResCtx 写入
+    ccuParam_.dieSplitRatioPermille = newCcuFlag_ ? hcclNewContext_->res[1] : 1000U;
 }
 
 template <const auto& config>

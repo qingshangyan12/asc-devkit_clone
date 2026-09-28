@@ -961,6 +961,8 @@ HcclResult GetCcuOpParamResCtx(
         executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
     CHK_RET(AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, opResCtx, resCtxOut));
+    // die 切分比例走 res[1] 预留槽（不动 OpResCtx 布局：新旧 op 包/host lib 混搭时旧侧读 0=不切分，安全降级）
+    opResCtx.res[1] = DieSplitRatioToPermille(resCtxHost->dieSplitRatio);
     // 校验路径不申请device ctx，resCtxOut保持nullptr
     if (!opParam.checkRes) {
         CHK_PTR_NULL(*resCtxOut);
