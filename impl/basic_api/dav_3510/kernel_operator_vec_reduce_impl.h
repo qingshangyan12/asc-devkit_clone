@@ -23,8 +23,8 @@
 
 namespace AscendC {
 
-__BLOCK_LOCAL__ static __inline__ float accValFloat = 0;
-__BLOCK_LOCAL__ static __inline__ half accValHalf = 0;
+__BLOCK_LOCAL__ static __inline__ float accValFloat;
+__BLOCK_LOCAL__ static __inline__ half accValHalf;
 
 template <bool isBitMask, typename T>
 __simd_callee__ inline void GenPredicate(Reg::MaskReg& preg, uint32_t maskReg)

@@ -235,7 +235,7 @@ public:
 };
 
 #if (defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 && !defined(__DAV_CUBE__))
-__BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient = nullptr;
+__BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient;
 #endif
 
 __aicore__ inline AscendC::KfcCommClient* GetKfcClient()

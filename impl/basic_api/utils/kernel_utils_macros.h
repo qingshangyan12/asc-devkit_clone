@@ -438,7 +438,7 @@ struct OomAddrRange {
     uint8_t isLevelOnePointer[g_oomAddrRangeMaxSize];
     uint64_t count;
 };
-__BLOCK_LOCAL__ __inline__ OomAddrRange g_oomAddrArange = {};
+__BLOCK_LOCAL__ __inline__ OomAddrRange g_oomAddrArange;
 #else
 constexpr bool g_gm_overflow_check = false;
 #endif

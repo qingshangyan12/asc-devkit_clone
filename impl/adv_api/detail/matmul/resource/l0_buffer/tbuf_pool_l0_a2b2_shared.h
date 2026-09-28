@@ -28,14 +28,12 @@
 namespace AscendC {
 namespace Impl {
 namespace Detail {
-
-__BLOCK_LOCAL__ __inline__ uint64_t gA2B2DBFlag_ = 0;
 /*
     TBufPoolL0 is considered entirely experimental.
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     TBufPoolL0 is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, typename A_TYPE, typename B_TYPE, const auto& MM_CFG>
+template <typename IMPL, class A_TYPE, class B_TYPE, const auto& MM_CFG>
 class TBufPoolL0<
     IMPL, A_TYPE, B_TYPE, MM_CFG,
     enable_if_t<
@@ -47,9 +45,20 @@ public:
     __aicore__ inline TBufPoolL0() = default;
     __aicore__ inline ~TBufPoolL0() = default;
 
+    __aicore__ inline void Init()
+    {
+        BASE_MODULE::Init();
+        // Reset the A2B2 double-buffer ping-pong flag. The flag is a per-object member instead of a
+        // block-local global: a block-local variable without a static initializer is reported as an
+        // uninitialized read by the sanitizer, while a static initializer is rejected by the backend
+        // under separate compilation (-dc). Both buffer halves are signalled in TPipe::Init, so each
+        // matmul object can start its ping-pong from either parity.
+        a2b2DBFlag_ = 0;
+    }
+
     __aicore__ inline TBufPoolL0& Allocate()
     {
-        WaitFlag<HardEvent::M_MTE1>(gA2B2DBFlag_ & 0x1);
+        WaitFlag<HardEvent::M_MTE1>(a2b2DBFlag_ & 0x1);
         return *this;
     }
 
@@ -60,7 +69,7 @@ public:
         LocalTensor<T> tempTensor;
         if constexpr (Pos == TPosition::A2) {
             tempTensor = BASE_MODULE::l0aBuf_.template Get<T>();
-            if ((gA2B2DBFlag_ & 0x1) != 0) {
+            if ((a2b2DBFlag_ & 0x1) != 0) {
                 if constexpr (IsSameType<T, int4b_t>::value) {
                     tempTensor = tempTensor[L0AUF_SIZE / sizeof(T)];
                 } else {
@@ -69,7 +78,7 @@ public:
             }
         } else {
             tempTensor = BASE_MODULE::l0bBuf_.template Get<T>();
-            if ((gA2B2DBFlag_ & 0x1) != 0) {
+            if ((a2b2DBFlag_ & 0x1) != 0) {
                 if constexpr (IsSameType<T, int4b_t>::value) {
                     tempTensor = tempTensor[L0BUF_SIZE / sizeof(T)];
                 } else {
@@ -80,15 +89,18 @@ public:
         return tempTensor;
     }
 
-    __aicore__ inline void EnQue() { SetFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1); }
+    __aicore__ inline void EnQue() { SetFlag<HardEvent::MTE1_M>(a2b2DBFlag_ & 0x1); }
 
-    __aicore__ inline void DeQue() { WaitFlag<HardEvent::MTE1_M>(gA2B2DBFlag_ & 0x1); }
+    __aicore__ inline void DeQue() { WaitFlag<HardEvent::MTE1_M>(a2b2DBFlag_ & 0x1); }
 
     __aicore__ inline void Free()
     {
-        SetFlag<HardEvent::M_MTE1>(gA2B2DBFlag_ & 0x1);
-        ++gA2B2DBFlag_;
+        SetFlag<HardEvent::M_MTE1>(a2b2DBFlag_ & 0x1);
+        ++a2b2DBFlag_;
     }
+
+private:
+    uint64_t a2b2DBFlag_ = 0;
 };
 
 } // namespace Detail

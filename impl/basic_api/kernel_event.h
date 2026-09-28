@@ -299,7 +299,7 @@ __aicore__ inline void PipeBarrierInternal()
 }
 
 #if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
-__BLOCK_LOCAL__ __inline__ int32_t g_superKernelSetWaitFlagCountDifference = 0;
+__BLOCK_LOCAL__ __inline__ int32_t g_superKernelSetWaitFlagCountDifference;
 #endif
 
 template <pipe_t srcPipe, pipe_t dstPipe>

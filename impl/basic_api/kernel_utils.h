@@ -51,13 +51,13 @@ inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 namespace Internal {
-__BLOCK_LOCAL__ __inline__ half g_deqValue = 0;
+__BLOCK_LOCAL__ __inline__ half g_deqValue;
 }
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 namespace Internal {
-__BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig = 0;
+__BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig;
 }
 #endif
 
@@ -67,33 +67,33 @@ __BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig = 0;
 namespace Internal {
 // global variables g_cmpMaskLow and g_cmpMaskHigh are used to simulate the register CMPMASK in 1971
 // both of them are 64 bits and they are used to store the result of API Compare
-__BLOCK_LOCAL__ __inline__ uint64_t g_cmpMaskLow = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_cmpMaskHigh = 0;
+__BLOCK_LOCAL__ __inline__ uint64_t g_cmpMaskLow;
+__BLOCK_LOCAL__ __inline__ uint64_t g_cmpMaskHigh;
 // the global variable g_deqScale is used to store the scale offset and signMode of API CastDeq
 // when you are using API "SetDeqScaleImpl(float scale, int16_t offset, bool signMode)", g_deqScale will save
 // the result of the transformation of three variable data
 // otherwise, if you are using API "SetDeqScaleImpl(const LocalTensor<T> &vdeq, const VdeqInfo &vdeqInfo)"
 // g_deqScale will store the UB address of vdeq, and the data of vdeqInfo will be stored in vdeq
-__BLOCK_LOCAL__ __inline__ uint64_t g_deqScale = 0;
+__BLOCK_LOCAL__ __inline__ uint64_t g_deqScale;
 // manage the global id for get/rls buff.
-__BLOCK_LOCAL__ __inline__ uint32_t g_bufId = 0;
-__BLOCK_LOCAL__ __inline__ uint32_t g_sharedEvtId = 0;
+__BLOCK_LOCAL__ __inline__ uint32_t g_bufId;
+__BLOCK_LOCAL__ __inline__ uint32_t g_sharedEvtId;
 // global variables g_aipp* are used to simulate the spr for SetAippFunctions and LoadImageToLocal, they will save
 // the configs and apply them to pre-process the input image in LoadImageToLocal function.
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippSrc0 = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippSrc1 = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippCscRc0 = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippCscRc1 = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippCscBias = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippDtcMean = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippDtcMin = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippDtcVar = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippPaddingVal = 0;
-__BLOCK_LOCAL__ __inline__ uint64_t g_aippArgs = 0;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippSrc0;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippSrc1;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippCscRc0;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippCscRc1;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippCscBias;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippDtcMean;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippDtcMin;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippDtcVar;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippPaddingVal;
+__BLOCK_LOCAL__ __inline__ uint64_t g_aippArgs;
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
                               __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
-__BLOCK_LOCAL__ __inline__ int64_t g_accVal = 0;
+__BLOCK_LOCAL__ __inline__ int64_t g_accVal;
 #endif
 } // namespace Internal
 #endif
