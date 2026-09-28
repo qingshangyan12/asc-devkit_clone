@@ -2,41 +2,16 @@
 okftype: reference.type.cpp
 title: asc_store_l2_cache_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md
-description: 表示数据从Unified Buffer搬运到GM时L2 Cache策略的枚举，可用于向量搬运接口及标量访存路径的store策略配置与查询。
+description: 该枚举表示Unified Buffer（UB）到GM搬运时的L2 Cache策略，也用于标量访存路径的store策略配置与查询。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
-    kind: related
-examples: []
-headers: [/include/c_api/defs/enum.h]
+  - families: [cache_management]
 declaration:
   symbol: asc_store_l2_cache_mode
-  cpp: "enum class asc_store_l2_cache_mode : uint8_t {\n    NORMAL_FIRST_VICTIM =\
-    \ 0,\n    NORMAL_LAST_VICTIM = 1,\n    NORMAL_PERSISTENT = 2,\n    NOTALLOC_CLEAN\
-    \ = 4\n};"
-  members:
-    - name: NORMAL_FIRST_VICTIM
-      value: '0'
-      description: 启用L2 Cache，并且将分配的Cache Line标记为高替换优先级。
-    - name: NORMAL_LAST_VICTIM
-      value: '1'
-      description: 启用L2 Cache，并且将分配的Cache Line标记为低替换优先级。
-    - name: NORMAL_PERSISTENT
-      value: '2'
-      description: 启用L2 Cache。已存入L2 Cache中的数据可能被替换，若需确保特定数据始终保留在L2 Cache中，可采用驻留模式。&bull;
-        注意，被标记为驻留模式的Cache Line只能被其他同样被标记为驻留模式的Cache Line替换。
-    - name: NOTALLOC_CLEAN
-      value: '4'
-      description: 不启用L2 Cache，若L2 Cache中已有同地址缓存会被保留并标记为Clean，标记为Clean的Cache Line被移出L2
-        Cache时会被直接丢弃。
   underlying_type: uint8_t
-timestamp: '2026-09-23'
+header: [/include/c_api/defs/enum.h]
+timestamp: '2026-09-28'
 ---
 # asc_store_l2_cache_mode
 

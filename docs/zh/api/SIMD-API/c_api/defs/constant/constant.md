@@ -2,12 +2,10 @@
 okftype: reference.index.cpp
 title: 常量
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/constant.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-24'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md
+  - path: docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md
+timestamp: '2026-09-28'
 ---
 # 常量
 

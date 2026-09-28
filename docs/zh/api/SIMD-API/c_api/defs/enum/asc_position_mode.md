@@ -2,23 +2,14 @@
 okftype: reference.type.cpp
 title: asc_position_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md
-description: 表示源或目的操作数在寄存器中奇偶位置的枚举，供Reg类型转换和融合计算接口选择数据位置。
+description: 该枚举表示寄存器中源或目的操作数的奇偶位置，供Reg类型转换和融合计算接口选择数据位置。
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-dependencies: []
-examples: []
-headers: [/include/c_api/defs/enum.h]
 declaration:
   symbol: asc_position_mode
-  cpp: "enum class asc_position_mode {\n    EVEN = 0,\n    ODD\n};"
-  members:
-    - name: EVEN
-      value: '0'
-      description: ASC_POSITION_EVEN
-    - name: ODD
-      description: ASC_POSITION_ODD
-timestamp: '2026-09-23'
+header: [/include/c_api/defs/enum.h]
+timestamp: '2026-09-28'
 ---
 # asc_position_mode
 
