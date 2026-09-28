@@ -348,7 +348,8 @@ std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType op
 
 HcclResult HcclGetAlgRes(
     HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxDevice, bool& isResourceReused)
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxDevice, bool& isResourceReused,
+    uint32_t /* boundaryTurns */)
 {
     if (resCtxDevice == nullptr) {
         return HCCL_E_PTR;

@@ -39,7 +39,8 @@ inline void ClearMc2TaskCacheBestEffort(
 template <typename Func>
 HcclResult RunWithMc2TaskCache(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx, Func func,
-    Mc2AicpuTaskCacheManager& manager = Mc2AicpuTaskCacheManager::Instance())
+    Mc2AicpuTaskCacheManager& manager = Mc2AicpuTaskCacheManager::Instance(),
+    const std::string& boundaryTag = std::string())
 {
     if (!IsMc2TaskCacheOp(param.opType)) {
         return func();
@@ -71,6 +72,7 @@ HcclResult RunWithMc2TaskCache(
         return endRet;
     }
 
+    plan.tag += boundaryTag;
     const Mc2TaskCacheReserveResult reserveResult = manager.TryReserve(plan.comm, plan.tag);
     if (reserveResult == Mc2TaskCacheReserveResult::FULL) {
         HcclResult execRet = func();
