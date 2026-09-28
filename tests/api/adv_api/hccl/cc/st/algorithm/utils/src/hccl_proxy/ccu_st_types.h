@@ -47,8 +47,6 @@ enum class OpCode {
     ASSIGN_IMM,
     ASSIGN_VAR,
     ADD_VAR,
-    SUB_VAR,
-    MUL_VAR,
     ADDRESS_ASSIGN_VAR,
     ADDRESS_ASSIGN_ADDRESS,
     ADDRESS_ADD_VAR,
@@ -112,13 +110,11 @@ struct GroupCopyLoopGroupDescriptor {
     ResourceHandle dynamicLoopParamVariable{0};
     ResourceHandle parallelParamVariable{0};
     ResourceHandle addressOffsetVariable{0};
-    ResourceHandle varOffsetVariable{0};
     ResourceHandle residualVariable{0};
     uint32_t maxLoopNum{0};
     std::vector<uint32_t> loopIndices;
     std::vector<ResourceHandle> loopHandles;
     std::vector<ResourceHandle> loopParamHandles;
-    std::vector<ResourceHandle> addrOffsetHandles;
 };
 
 struct GroupCopyDescriptor {
