@@ -47,6 +47,8 @@ const FieldSet KERNEL_FIELDS = {"kernel_name", "constant_infos", "link_options",
 const FieldSet CONSTANT_FIELDS = {"name", "parameter_index", "arg_type", "byte_size", "file", "template"};
 const FieldSet OBJECT_FIELDS = {"object_name", "object_type", "commands", "outputs"};
 const FieldSet COMMAND_FIELDS = {"type", "cmd", "stage"};
+constexpr const char* BASIC_OBJECT_TYPE = "basic";
+constexpr const char* SK_OBJECT_TYPE = "sk";
 
 bool CheckAndLog(bool condition, int lineNumber, const std::string& message) noexcept
 {
@@ -471,6 +473,9 @@ bool ResourceManifestValidator::ValidateObject(const Json& object, std::set<std:
     const std::string objectName = object.at("object_name").get_ref<const std::string&>();
     const std::string objectType = object.at("object_type").get_ref<const std::string&>();
     if (!CheckAndLog(
+            objectType == BASIC_OBJECT_TYPE || objectType == SK_OBJECT_TYPE, __LINE__,
+            "invalid object_type: expected basic or sk, value=" + objectType) ||
+        !CheckAndLog(
             FileUtils::IsSafeRelativePath(objectName) && FileUtils::FileName(objectName) == objectName, __LINE__,
             "invalid object_name: expected a plain name") ||
         !CheckAndLog(
@@ -493,12 +498,14 @@ bool ResourceManifestValidator::ValidateObject(const Json& object, std::set<std:
 bool ResourceManifestValidator::ValidateObjects(const Json& objects)
 {
     std::set<std::string> objectNames;
+    bool hasBasicObject = false;
     for (const Json& object : objects) {
         if (!ValidateObject(object, objectNames)) {
             return false;
         }
+        hasBasicObject = hasBasicObject || object.at("object_type").get_ref<const std::string&>() == BASIC_OBJECT_TYPE;
     }
-    return true;
+    return CheckAndLog(hasBasicObject, __LINE__, "missing required basic object");
 }
 
 bool ResourceManifestValidator::ValidateKernel(const Json& kernel, std::set<std::string>& kernelNames)

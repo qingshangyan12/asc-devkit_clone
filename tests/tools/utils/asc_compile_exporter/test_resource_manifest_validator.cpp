@@ -108,7 +108,10 @@ TEST_F(ResourceManifestValidatorTest, AcceptsCompleteAndMinimalValidManifests)
     EXPECT_TRUE(Validate(optionalFields));
 
     Json skManifest = MakeValidManifest();
-    Object(skManifest)["object_type"] = "sk";
+    Json skObject = Object(skManifest);
+    skObject["object_name"] = "sk";
+    skObject["object_type"] = "sk";
+    Kernel(skManifest)["objects"].push_back(skObject);
     EXPECT_TRUE(Validate(skManifest));
 
     Json embeddedOutput = MakeValidManifest();
@@ -291,6 +294,8 @@ TEST_F(ResourceManifestValidatorTest, ValidatesObjectStructureAndOutputs)
     ExpectInvalid("object name is empty", [](Json& manifest) { Object(manifest)["object_name"] = ""; });
     ExpectInvalid("object type is missing", [](Json& manifest) { Object(manifest).erase("object_type"); });
     ExpectInvalid("object type has wrong type", [](Json& manifest) { Object(manifest)["object_type"] = 1U; });
+    ExpectInvalid("object type is unsupported", [](Json& manifest) { Object(manifest)["object_type"] = "basik"; });
+    ExpectInvalid("kernel has only sk object", [](Json& manifest) { Object(manifest)["object_type"] = "sk"; });
     ExpectInvalid("commands is missing", [](Json& manifest) { Object(manifest).erase("commands"); });
     ExpectInvalid("commands has wrong type", [](Json& manifest) { Object(manifest)["commands"] = Json::object(); });
     ExpectInvalid("commands is empty", [](Json& manifest) { Object(manifest)["commands"] = Json::array(); });
