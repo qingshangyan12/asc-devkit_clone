@@ -1,4 +1,16 @@
-# -*- coding: UTF-8 -*-
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 """NPU 异常 dump 与输入/输出 tensor dump 对外接口。
 
 能力分两类：
@@ -14,6 +26,7 @@ tensor dump 产物命名（与 C++ 侧异常产物风格对齐）：
 其中 stage 为 input/output（dump_tensor 单独调用时可省略），name 中的非法字符替换为 '_'。
 dump 目录决策链与 C++ 侧 GetDumpDir 一致：入参 dump_dir > 环境变量 XPUOPS_DUMP_DIR > ./exception_dump/
 """
+
 import json
 import os
 import re
@@ -51,6 +64,7 @@ def enable_exception_dump(kernels=None):
 
 
 # ============================== 内部工具 ==============================
+
 
 def _get_dump_dir(dump_dir=None):
     """dump 目录决策链：入参 > XPUOPS_DUMP_DIR 环境变量 > 默认目录（与 C++ 侧一致）。"""
@@ -123,6 +137,7 @@ def _tensor_to_bytes(tensor):
 
 # ============================== tensor dump API ==============================
 
+
 def dump_tensor(tensor, name, stage=None, dump_dir=None):
     """dump 单个 tensor：数据落 .bin、元信息落 .json，返回 .bin 路径。
 
@@ -172,8 +187,10 @@ def dump_tensor(tensor, name, stage=None, dump_dir=None):
     with open(os.path.join(out_dir, "%s_%s_%s.json" % (prefix, dev_tag, ts)), "w", encoding="utf-8") as fp:
         json.dump(meta, fp, indent=2, ensure_ascii=False)
 
-    print("[XPUOPS][INFO] dumped %s tensor '%s' (%d bytes) -> %s"
-          % (stage if stage else "tensor", name, len(data), bin_path))
+    print(
+        "[XPUOPS][INFO] dumped %s tensor '%s' (%d bytes) -> %s"
+        % (stage if stage else "tensor", name, len(data), bin_path)
+    )
     return bin_path
 
 

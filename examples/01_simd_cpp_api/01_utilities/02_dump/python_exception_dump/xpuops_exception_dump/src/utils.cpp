@@ -1,4 +1,14 @@
 /**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+/**
  * xpuops_exception_dump - 工具函数实现 (log/dump/文件/时间)
  */
 #include "utils.h"
@@ -14,7 +24,7 @@
 
 namespace xpuops {
 
-void LogInfo(const char *fmt, ...)
+void LogInfo(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -25,7 +35,7 @@ void LogInfo(const char *fmt, ...)
     fflush(stdout);
 }
 
-void LogWarn(const char *fmt, ...)
+void LogWarn(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -36,7 +46,7 @@ void LogWarn(const char *fmt, ...)
     fflush(stdout);
 }
 
-void LogError(const char *fmt, ...)
+void LogError(const char* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -56,14 +66,15 @@ std::string GetTimestamp()
     struct tm tmBuf;
     localtime_r(&t, &tmBuf);
     char buf[64] = {0};
-    snprintf(buf, sizeof(buf), "%04d%02d%02d_%02d%02d%02d_%03d", tmBuf.tm_year + 1900, tmBuf.tm_mon + 1,
-             tmBuf.tm_mday, tmBuf.tm_hour, tmBuf.tm_min, tmBuf.tm_sec, static_cast<int>(ms.count()));
+    snprintf(
+        buf, sizeof(buf), "%04d%02d%02d_%02d%02d%02d_%03d", tmBuf.tm_year + 1900, tmBuf.tm_mon + 1, tmBuf.tm_mday,
+        tmBuf.tm_hour, tmBuf.tm_min, tmBuf.tm_sec, static_cast<int>(ms.count()));
     return std::string(buf);
 }
 
 std::string GetDumpDir()
 {
-    const char *dir = getenv("XPUOPS_DUMP_DIR");
+    const char* dir = getenv("XPUOPS_DUMP_DIR");
     if (dir != nullptr && dir[0] != '\0') {
         return std::string(dir);
     }
@@ -72,14 +83,14 @@ std::string GetDumpDir()
 
 int GetDumpLevel()
 {
-    const char *lv = getenv("XPUOPS_DUMP_LEVEL");
+    const char* lv = getenv("XPUOPS_DUMP_LEVEL");
     if (lv != nullptr && lv[0] != '\0') {
         return atoi(lv);
     }
     return 1; // 默认 level=1：公共信息 + args
 }
 
-int EnsureDir(const std::string &dir)
+int EnsureDir(const std::string& dir)
 {
     if (dir.empty()) {
         return -1;
@@ -96,9 +107,9 @@ int EnsureDir(const std::string &dir)
     return stat(dir.c_str(), &st) == 0 ? 0 : -1;
 }
 
-bool WriteBinFile(const std::string &path, const void *data, size_t size)
+bool WriteBinFile(const std::string& path, const void* data, size_t size)
 {
-    FILE *fp = fopen(path.c_str(), "wb");
+    FILE* fp = fopen(path.c_str(), "wb");
     if (fp == nullptr) {
         LogError("open file for write failed: %s", path.c_str());
         return false;
@@ -111,9 +122,9 @@ bool WriteBinFile(const std::string &path, const void *data, size_t size)
     return ok;
 }
 
-bool AppendTextFile(const std::string &path, const std::string &text)
+bool AppendTextFile(const std::string& path, const std::string& text)
 {
-    FILE *fp = fopen(path.c_str(), "a");
+    FILE* fp = fopen(path.c_str(), "a");
     if (fp == nullptr) {
         LogError("open file for append failed: %s", path.c_str());
         return false;
@@ -123,9 +134,9 @@ bool AppendTextFile(const std::string &path, const std::string &text)
     return ok;
 }
 
-void LogHexDump(const char *tag, const void *data, size_t size, size_t maxBytes)
+void LogHexDump(const char* tag, const void* data, size_t size, size_t maxBytes)
 {
-    const uint8_t *p = static_cast<const uint8_t *>(data);
+    const uint8_t* p = static_cast<const uint8_t*>(data);
     size_t n = size < maxBytes ? size : maxBytes;
     LogInfo("%s hexdump (total %zu bytes, show %zu):", tag, size, n);
     char line[128];

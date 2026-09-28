@@ -1,3 +1,16 @@
+#!/usr/bin/python3
+# coding=utf-8
+
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
 # ----------------------------------------------------------------------------
 # demo_ifa.py - IFA (incre_flash_attention) 异常自动 dump demo
 #
@@ -28,13 +41,13 @@ import ascend_ops  # noqa: F401  # 注册 ascend_ops torch 算子库
 from xpuops.debug import enable_exception_dump, run_with_tensor_dump
 
 # ============================== 配置 ==============================
-B = 2              # batch
-Q_HEAD = 8         # query head num
-KV_HEAD = 1        # kv head num
-Q_SEQ = 1          # query seq len
+B = 2  # batch
+Q_HEAD = 8  # query head num
+KV_HEAD = 1  # kv head num
+Q_SEQ = 1  # query seq len
 BLOCK_SIZE = 128
 HEAD_DIM = 128
-KV_SEQ = 512       # kv seq len
+KV_SEQ = 512  # kv seq len
 MAX_BLK_PER_BATCH = KV_SEQ // BLOCK_SIZE + 1
 BLOCK_NUM = B * MAX_BLK_PER_BATCH
 
@@ -56,9 +69,7 @@ def gen_inputs(poison_block_table=False):
         # 故意构造非法 block table（块索引巨大 -> 核内 GM 越界 -> Runtime 异常）
         block_table = torch.full((B, MAX_BLK_PER_BATCH), 0x0FFFFFF0, dtype=torch.int32).npu()
     else:
-        block_table = (
-            torch.arange(B * MAX_BLK_PER_BATCH, dtype=torch.int32).view(B, MAX_BLK_PER_BATCH).npu()
-        )
+        block_table = torch.arange(B * MAX_BLK_PER_BATCH, dtype=torch.int32).view(B, MAX_BLK_PER_BATCH).npu()
     actual_seq_kvlen = torch.tensor([KV_SEQ] * B, dtype=torch.int64).npu()
     dequant_scale_key = torch.randn(KV_HEAD, 1, HEAD_DIM).to(dtype=torch.bfloat16).npu()
     dequant_scale_value = torch.randn(KV_HEAD, 1, HEAD_DIM).to(dtype=torch.bfloat16).npu()
@@ -86,7 +97,7 @@ def gen_inputs(poison_block_table=False):
         "dequant_scale_value": dequant_scale_value,
         "num_query_heads": Q_HEAD,
         "num_key_value_heads": KV_HEAD,
-        "softmax_scale": 1.0 / (HEAD_DIM ** 0.5),
+        "softmax_scale": 1.0 / (HEAD_DIM**0.5),
         "block_size": BLOCK_SIZE,
         "input_layout": "BNSD",
         "sparse_mode": 0,
@@ -190,9 +201,7 @@ def main():
 
     # 2. 正常跑通算子（验证环境与输入构造正确），调用边界 dump 输入/输出 tensor
     print("\n===== step1: normal run (dump input & output tensors) =====")
-    out, lse = run_with_tensor_dump(
-        torch.ops.ascend_ops.npu_fused_infer_attention_score, tag=OP_TAG, **gen_inputs()
-    )
+    out, lse = run_with_tensor_dump(torch.ops.ascend_ops.npu_fused_infer_attention_score, tag=OP_TAG, **gen_inputs())
     torch.npu.synchronize()
     print(f"normal run OK, output shape: {tuple(out.shape)}")
 
@@ -200,9 +209,7 @@ def main():
     print("\n===== step2: trigger exception (poisoned block_table) =====")
     fa_param = gen_inputs(poison_block_table=True)
     try:
-        out, lse = run_with_tensor_dump(
-            torch.ops.ascend_ops.npu_fused_infer_attention_score, tag=OP_TAG, **fa_param
-        )
+        out, lse = run_with_tensor_dump(torch.ops.ascend_ops.npu_fused_infer_attention_score, tag=OP_TAG, **fa_param)
         torch.npu.synchronize()
         print("[WARN] no exception raised?!")
     except RuntimeError as e:
