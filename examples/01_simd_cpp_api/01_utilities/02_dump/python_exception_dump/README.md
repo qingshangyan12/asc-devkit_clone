@@ -2,7 +2,7 @@
 
 > NPU kernel 运行时异常发生时，自动 dump 问题算子的异常上下文与 kernel 参数（args），用于离线问题定位（可按算子 args 布局还原输入输出 tensor）；另提供纯 Python 的输入/输出 tensor dump，可与异常产物中的 device 指针交叉验证。外挂库方案，算子源码零改动。
 >
-> English version: [README_EN.md](README_EN.md) ｜ 换服务器复现手册（步骤 + 预期输出）：`docs/VERIFICATION_GUIDE.md`
+> English version: [README_en.md](README_en.md)
 
 ## 1. 能力一览
 
@@ -17,7 +17,7 @@
 
 ## 2. 快速开始（复现 demo）
 
-环境要求：Ascend 910（910_93）｜CANN（cann-9.1.T103 已验证）｜PyTorch / torch_npu 2.7.1｜pip 包 `ascend_ops`（demo 调用的 IFA 算子，未安装见 `docs/VERIFICATION_GUIDE.md` 2.4，含源码编译路径）。
+环境要求：Atlas A2 训练系列产品 / Atlas A2 推理系列产品 ｜ 已安装并完成环境配置的 CANN（source `set_env.sh` 后生效） ｜ 与所装 CANN 版本匹配的 PyTorch / torch_npu ｜ pip 包 `ascend_ops`（demo 调用的 IFA 算子所在包）。
 
 ```bash
 source /usr/local/Ascend/ascend-toolkit/set_env.sh     # CANN 环境
@@ -34,7 +34,7 @@ demo 流程：正常调用 IFA 算子（调用边界自动 dump 输入/输出）
 [PASS] IFA exception dump OK
 ```
 
-产物输出至包根 `./exception_dump_ifa/`。错误码与 CANN 版本相关（910_93 + cann-9.1.T103 实测 `0x7bc87`；判定以 kernel_name 命中 + args 落盘为准，不同版本错误码可能不同）。外挂库 so 为环境相关二进制、不入库，运行前须先编译（见上文命令；tensor dump 为纯 Python、无此要求）。
+产物输出至包根 `./exception_dump_ifa/`。错误码具体数值与 CANN 版本相关（不同版本可能不同，判定以 kernel_name 命中 + args 落盘为准）。外挂库 so 为环境相关二进制、不入库，运行前须先编译（见上文命令；tensor dump 为纯 Python、无此要求）。
 
 ## 3. 接入自己的算子
 
@@ -64,16 +64,13 @@ dump_tensors({"query": q, "block_table": bt}, stage="input")
 | `_info.txt` 中 `args_dumped : no` / 日志 `args unavailable` | CANN 异常信息缺 args，检查 CANN 版本 |
 | `FileNotFoundError: libxpuops_exception_dump.so not found` | 先编译：`cd xpuops_exception_dump && bash build.sh`（so 二进制不入库）；或设 `XPUOPS_DUMP_LIB_DIR` 指向 so 目录（仅异常 dump 需要 so，tensor dump 不受影响） |
 | 找不到 `xpuops` 模块 | 将 `xpuops_exception_dump/python` 加入 `PYTHONPATH`（demo 脚本已自动处理） |
-| 离线读回 `input_*` / `output_*` tensor | 任意有 torch 的环境即可（无需 NPU）：`.json` 元信息 + `torch.frombuffer` 字节视角还原，可运行脚本见 `docs/VERIFICATION_GUIDE.md` 5.2 |
+| 离线读回 `input_*` / `output_*` tensor | 任意有 torch 的环境即可（无需 NPU）：按 `.json` 元信息用 `torch.frombuffer` 以字节视角还原 |
 
-## 5. 目录结构与相关文档
+## 5. 目录结构
 
 ```text
-README.md / README_EN.md      本文档（中文 / English）
+README.md / README_en.md      本文档（中文 / English）
 examples/demo_ifa.py          demo：正常调用 + 故障注入 + 产物自检（可直接运行）
 xpuops_exception_dump/        外挂库工程：src/（C++ 回调）、python/xpuops/（Python API）、
                               build.sh（产物输出到 lib/，so 需自行编译、二进制不入库）
-docs/VERIFICATION_GUIDE.md    换服务器复现手册：V1~V10 步骤与预期输出、产物字段模板、
-                              读回与交叉验证脚本、配置分项验证
-docs/RELEASE_NOTES.md         交付说明：完整文件清单、机制速览、源码文件说明、变更记录
 ```
