@@ -40,7 +40,7 @@
 
 ## 函数原型
 
-```c
+```cpp
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_half2e5m2_rn<sat_mode>(vector_fp8_e5m2_t& dst,
                                                      vector_half src,
@@ -67,7 +67,7 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_half2e5m2_rn<sat_mode>(vector_half 
 
 ### 函数原型典型示例
 
-```c
+```cpp
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_half2e5m2_rn(vector_fp8_e5m2_t& dst,
                                              vector_half src,
@@ -84,7 +84,7 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_half2e5m2_rn(vector_half src,
 
 本接口还提供`_v2`变体，省略`dst_pos`参数，固定将结果写入目的操作数索引为奇数的位置，其他位置清零：
 
-```c
+```cpp
 // _v2 变体（固定 PART_ODD，无 dst_pos 参数）
 __simd_callee__ inline void asc_half2e5m2_rn_v2(vector_fp8_e5m2_t& dst, vector_half src, vector_bool mask)
 __simd_callee__ inline void asc_half2e5m2_rn_sat_v2(vector_fp8_e5m2_t& dst, vector_half src, vector_bool mask)
@@ -130,7 +130,7 @@ __simd_callee__ inline void asc_half2e5m2_rn_sat_v2(vector_fp8_e5m2_t& dst, vect
 bisheng example.asc -o main --npu-arch=dav-9201 && ./main
 ```
 <!-- end id9 -->
-```c
+```cpp
 #include <cstdint>
 #include <iostream>
 #include <vector>
