@@ -299,11 +299,12 @@ REGISTER_EXEC_V2(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHRMultiLink, AlgEngine::CCU,
     "sole[nhr.multi_channel]", COND_NONE, FLAG_NONE, 0);
-// SoleNHR（两级拓扑 L1 NHR 中继，双 die 自适应）：forced-only（selector 两级拓扑分支未放开，
-// PeerOnly 先例），mission 数由 dieNum 动态决定（CcuTempKfcServer::CalcRes 按源 kernel 数修正）
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHR, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     CcuTempKfcReduceScatterNHR1D2DieMem2Mem);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHR, AlgEngine::CCU, "sole[nhr]", COND_NONE,
+    FLAG_MULTI_LEVEL, 0);
 #endif
 
 } // namespace mc2_ops_hccl
