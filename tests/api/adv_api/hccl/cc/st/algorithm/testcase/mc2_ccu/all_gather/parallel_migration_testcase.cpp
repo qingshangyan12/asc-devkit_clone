@@ -61,7 +61,9 @@ protected:
     // 当前 RuntimeWorld 每 rank 只有一个执行上下文，故分别验证 Mesh/NHR
     // mission，预填另一 mission 的 phase-0 结果和完成标志。此测试不声称
     // 覆盖双 mission 的真实并发、GM 可见性或硬件资源容量。
-    void VerifyMission(uint32_t meshSize, uint32_t nhrSize, uint64_t count, uint64_t elementSize, bool mesh)
+    void VerifyMission(
+        uint32_t meshSize, uint32_t nhrSize, uint64_t count, uint64_t elementSize, bool mesh,
+        uint32_t stageMask = mc2_ops_hccl::KFC_PARALLEL_AG_STAGE_ALL, bool verifyOutput = true)
     {
         const uint32_t ranks = meshSize * nhrSize;
         const uint64_t bytes = count * elementSize;
@@ -105,6 +107,9 @@ protected:
                         }
                     }
                 }
+            }
+            if (stageMask == 0U) {
+                expected[rank] = memory.output;
             }
             for (uint32_t entry = 0; entry < 2; ++entry) {
                 auto* p = memory.parameter.data() + entry * QUEUE_WORDS;
@@ -154,6 +159,7 @@ protected:
             arg.rankSize = mesh ? meshSize : nhrSize;
             arg.rankId = mesh ? m : n;
             parallel->jettyNum = 1;
+            parallel->stageMask = stageMask;
             parallel->stepInfoVector = NhrSteps(n, nhrSize);
             std::vector<ChannelHandle> channels;
             for (uint32_t peer = 0; peer < arg.rankSize; ++peer) {
@@ -188,13 +194,15 @@ protected:
         RuntimeWorld runtime;
         ASSERT_EQ(runtime.Launch(launches), Result::SUCCESS) << runtime.LastError();
         for (uint32_t rank = 0; rank < ranks; ++rank) {
-            const auto mismatch =
-                std::mismatch(memories[rank].output.begin(), memories[rank].output.end(), expected[rank].begin());
-            ASSERT_TRUE(mismatch.first == memories[rank].output.end())
-                << "rank=" << rank << " mesh=" << mesh
-                << " byte=" << std::distance(memories[rank].output.begin(), mismatch.first)
-                << " actual=" << static_cast<uint32_t>(*mismatch.first)
-                << " expected=" << static_cast<uint32_t>(*mismatch.second);
+            if (verifyOutput) {
+                const auto mismatch =
+                    std::mismatch(memories[rank].output.begin(), memories[rank].output.end(), expected[rank].begin());
+                ASSERT_TRUE(mismatch.first == memories[rank].output.end())
+                    << "rank=" << rank << " mesh=" << mesh
+                    << " byte=" << std::distance(memories[rank].output.begin(), mismatch.first)
+                    << " actual=" << static_cast<uint32_t>(*mismatch.first)
+                    << " expected=" << static_cast<uint32_t>(*mismatch.second);
+            }
             for (uint32_t entry = 0; entry < 2; ++entry) {
                 EXPECT_EQ(memories[rank].parameter[CKE_WORD + (mission * 2 + 1) * CKE_REGION + entry], 1U);
             }
@@ -233,6 +241,21 @@ TEST_F(ParallelAllGatherMigrationTest, LargeCopyWithTail)
     // per-rank >512 KiB，跨越 GroupCopy 整块边界，并带非对齐尾块。
     VerifyMission(4, 2, 262147, 2, true);
     VerifyMission(4, 2, 262147, 2, false);
+}
+
+TEST_F(ParallelAllGatherMigrationTest, EmptyStageMaskDoesNotWait)
+{
+    VerifyMission(4, 2, 65, 2, true, 0U);
+    VerifyMission(4, 2, 65, 2, false, 0U);
+}
+
+TEST_F(ParallelAllGatherMigrationTest, PartialStageMasksComplete)
+{
+    constexpr uint32_t masks[] = {0x1U, 0x2U, 0x4U, 0x8U, 0x3U, 0xcU, 0x9U, 0x6U};
+    for (const auto mask : masks) {
+        VerifyMission(4, 2, 9, 1, true, mask, false);
+        VerifyMission(4, 2, 9, 1, false, mask, false);
+    }
 }
 } // namespace
 } // namespace CcuSt

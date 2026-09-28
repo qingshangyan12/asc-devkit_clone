@@ -18,6 +18,11 @@
 namespace mc2_ops_hccl {
 
 constexpr uint32_t KFC_PARALLEL_ALL_GATHER_SUB_TYPE = 4U;
+constexpr uint32_t KFC_PARALLEL_AG_STAGE_MESH_FIRST = 1U << 0;
+constexpr uint32_t KFC_PARALLEL_AG_STAGE_NHR_FIRST = 1U << 1;
+constexpr uint32_t KFC_PARALLEL_AG_STAGE_NHR_SECOND = 1U << 2;
+constexpr uint32_t KFC_PARALLEL_AG_STAGE_MESH_SECOND = 1U << 3;
+constexpr uint32_t KFC_PARALLEL_AG_STAGE_ALL = (1U << 4) - 1U;
 
 // 只在 Host 上构建两阶段 CCU 程序时读取。运行时地址/长度仍从 XN 队列读取。
 struct KfcParallelAllGatherArg {
@@ -26,6 +31,7 @@ struct KfcParallelAllGatherArg {
     uint32_t rankSizeLevel1 = 0;
     uint32_t rankIdxLevel1 = 0;
     uint32_t jettyNum = 1;
+    uint32_t stageMask = KFC_PARALLEL_AG_STAGE_ALL;
     std::vector<KfcNhrStepInfo> stepInfoVector;
     std::map<uint32_t, uint32_t> rank2ChannelIdx;
 };

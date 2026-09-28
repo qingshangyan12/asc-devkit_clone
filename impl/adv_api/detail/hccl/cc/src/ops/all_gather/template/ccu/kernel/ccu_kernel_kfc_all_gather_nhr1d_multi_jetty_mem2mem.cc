@@ -11,7 +11,12 @@
 #include "ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
 
 namespace mc2_ops_hccl {
+
 namespace {
+constexpr uint32_t PARALLEL_AG_STAGE_MESH_FIRST = 1U << 0;
+constexpr uint32_t PARALLEL_AG_STAGE_NHR_FIRST = 1U << 1;
+constexpr uint32_t PARALLEL_AG_STAGE_NHR_SECOND = 1U << 2;
+constexpr uint32_t PARALLEL_AG_STAGE_MESH_SECOND = 1U << 3;
 constexpr uint16_t NHR_OUTPUT_XN_ID = 1U;
 constexpr uint16_t NHR_TOKEN_XN_ID = 2U;
 constexpr uint16_t NHR_POST_SYNC_BIT = 1U << 3U;
@@ -297,7 +302,7 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     ccu::Variable part1GoSize1, ccu::Variable part1GoSize2, ccu::Variable part1GoSize3, const ChannelHandle channels[],
     uint32_t channelCount, uint32_t rankSizeLevel0, uint32_t rankIdxLevel0, uint32_t rankSizeLevel1,
     uint32_t rankIdxLevel1, uint32_t jettyNum, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+    const std::map<uint32_t, uint32_t>& rank2ChannelIdx, uint32_t stageMask)
 {
     KfcAllGatherNhrContext ctx;
     ctx.channels = channels;
@@ -328,28 +333,38 @@ CcuResult CcuKfcParallelAllGatherNHR1DMultiJettyMem2MemKernel(
     phase1RepeatNumInv = UINT64_MAX - rankSizeLevel0;
     phase0RepeatNumInv = UINT64_MAX - 1U;
 
-    // Stage 0: NHR gathers part1 along the level-1 (CLOS) dimension.
-    CCU_CHK_RET(LoadNhrArgs(
-        ctx, phase0Input, phase0Output, tokenInfo, part1Size, part1SliceSizePerJetty, part1LastSliceSizePerJetty,
-        phase0RepeatNumInv, zero, level1Stride, zero, zero, zero, part1GoSize0, part1GoSize1, part1GoSize2,
-        part1GoSize3));
-    CCU_CHK_RET(PreSync(ctx));
-    CCU_IF(part1Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
-    CCU_CHK_RET(PostSync(ctx));
+    if ((stageMask & PARALLEL_AG_STAGE_NHR_FIRST) != 0U) {
+        // Stage 0: NHR gathers part1 along the level-1 (CLOS) dimension.
+        CCU_CHK_RET(LoadNhrArgs(
+            ctx, phase0Input, phase0Output, tokenInfo, part1Size, part1SliceSizePerJetty, part1LastSliceSizePerJetty,
+            phase0RepeatNumInv, zero, level1Stride, zero, zero, zero, part1GoSize0, part1GoSize1, part1GoSize2,
+            part1GoSize3));
+        CCU_CHK_RET(PreSync(ctx));
+        CCU_IF(part1Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
+        CCU_CHK_RET(PostSync(ctx));
+    }
 
-    CCU_CHK_RET(ccu::Store(nhrPhaseDoneAddr, one));
-    ccu::Variable meshDone;
-    meshDone = 0U;
-    CCU_WHILE(meshDone != 1U) { CCU_CHK_RET(ccu::Load(meshPhaseDoneAddr, meshDone)); }
+    if ((stageMask & PARALLEL_AG_STAGE_NHR_FIRST) != 0U &&
+        (stageMask & PARALLEL_AG_STAGE_MESH_SECOND) != 0U) {
+        CCU_CHK_RET(ccu::Store(nhrPhaseDoneAddr, one));
+    }
+    if ((stageMask & PARALLEL_AG_STAGE_NHR_SECOND) != 0U &&
+        (stageMask & PARALLEL_AG_STAGE_MESH_FIRST) != 0U) {
+        ccu::Variable meshDone;
+        meshDone = 0U;
+        CCU_WHILE(meshDone != 1U) { CCU_CHK_RET(ccu::Load(meshPhaseDoneAddr, meshDone)); }
+    }
 
-    // Stage 1: NHR propagates part0, which stage-0 Mesh has already gathered.
-    CCU_CHK_RET(LoadNhrArgs(
-        ctx, outputBase, outputBase, tokenInfo, part0Size, part0SliceSizePerJetty, part0LastSliceSizePerJetty,
-        phase1RepeatNumInv, level1Stride, level1Stride, outputStride, outputStride, one, part0GoSize0, part0GoSize1,
-        part0GoSize2, part0GoSize3));
-    CCU_CHK_RET(PreSync(ctx));
-    CCU_IF(part0Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
-    CCU_CHK_RET(PostSync(ctx));
+    if ((stageMask & PARALLEL_AG_STAGE_NHR_SECOND) != 0U) {
+        // Stage 1: NHR propagates part0, which stage-0 Mesh has already gathered.
+        CCU_CHK_RET(LoadNhrArgs(
+            ctx, outputBase, outputBase, tokenInfo, part0Size, part0SliceSizePerJetty, part0LastSliceSizePerJetty,
+            phase1RepeatNumInv, level1Stride, level1Stride, outputStride, outputStride, one, part0GoSize0, part0GoSize1,
+            part0GoSize2, part0GoSize3));
+        CCU_CHK_RET(PreSync(ctx));
+        CCU_IF(part0Size != 0) { CCU_CHK_RET(RunNhr(ctx)); }
+        CCU_CHK_RET(PostSync(ctx));
+    }
     return CCU_SUCCESS;
 }
 
