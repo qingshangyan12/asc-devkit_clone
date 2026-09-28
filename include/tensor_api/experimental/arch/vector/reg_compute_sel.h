@@ -53,14 +53,13 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src, reg_tensor<bool> mask);
 
 /**
- * @brief Expands compact low-lane data back to the lanes selected by mask.
- * @tparam T Element type of the source register tensor.
- * @param src Source register tensor containing compact data in low lanes.
- * @param mask Lane-selection mask that defines expanded positions.
- * @return A register tensor containing expanded data. The result mask is mask.
+ * @brief Generates exclusive prefix-count indexes from a mask.
+ * @tparam T Element type of the generated index register tensor.
+ * @param mask Lane-selection mask.
+ * @return A register tensor containing prefix-count indexes. The result mask is mask.
  */
 template <typename T>
-__simd_callee__ inline reg_tensor<T> expand(reg_tensor<T> src, reg_tensor<bool> mask);
+__simd_callee__ inline reg_tensor<T> expand(reg_tensor<bool> mask);
 } // namespace experimental
 } // namespace te
 } // namespace asc

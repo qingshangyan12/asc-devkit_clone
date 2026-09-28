@@ -91,6 +91,47 @@ inline constexpr bool is_compress_support_type_v = AscendC::Std::is_one_of_v<
     T, uint8_t, int8_t, fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, hifloat8_t, uint16_t, int16_t, half, bfloat16_t,
     uint32_t, int32_t, float>;
 
+template <typename T>
+struct expand_index_type {
+    using type = void;
+};
+
+template <>
+struct expand_index_type<int8_t> {
+    using type = uint8_t;
+};
+
+template <>
+struct expand_index_type<uint8_t> {
+    using type = uint8_t;
+};
+
+template <>
+struct expand_index_type<int16_t> {
+    using type = uint16_t;
+};
+
+template <>
+struct expand_index_type<uint16_t> {
+    using type = uint16_t;
+};
+
+template <>
+struct expand_index_type<int32_t> {
+    using type = uint32_t;
+};
+
+template <>
+struct expand_index_type<uint32_t> {
+    using type = uint32_t;
+};
+
+template <typename T>
+using expand_index_t = typename expand_index_type<T>::type;
+
+template <typename T>
+inline constexpr bool is_expand_support_type_v = AscendC::Std::is_one_of_v<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t>;
+
 } // namespace detail
 
 template <high_low_part part, typename T>
@@ -150,13 +191,12 @@ __simd_callee__ inline reg_tensor<T> compress(reg_tensor<T> src, reg_tensor<bool
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> expand(reg_tensor<T> src, reg_tensor<bool> mask)
+__simd_callee__ inline reg_tensor<T> expand(reg_tensor<bool> mask)
 {
     static_assert(
         detail::is_expand_support_type_v<T>,
         "expand with reg_tensor<T> only supports "
-        "uint8_t, int8_t, fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, hifloat8_t, uint16_t, int16_t, half, "
-        "bfloat16_t, uint32_t and int32_t.");
+        "int8_t, uint8_t, int16_t, uint16_t, int32_t and uint32_t.");
 
     reg_tensor<T> dst;
     asc_unsqueeze(dst.reg, mask.reg);
