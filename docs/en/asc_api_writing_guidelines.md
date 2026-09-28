@@ -613,11 +613,11 @@ For scenarios with too many function prototypes, using only unordered lists woul
     <!-- end id19 -->
 
     <!-- npu="x90" id20 -->
-    Kirin X90 Processor Series Products 
+    Kirin X90 
     <!-- end id20 -->
 
     <!-- npu="9030" id21 -->
-    Kirin 9030 Processor Series Products 
+    Kirin 9030 
     <!-- end id21 -->
 
     ```cpp
