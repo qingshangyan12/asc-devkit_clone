@@ -483,15 +483,12 @@ DuplicateUbMultiChannelDescs(std::vector<HcclChannelDesc>& channels, size_t chan
 
 HcclResult GetUbMultiChannelNum(HcclComm comm, u32& multiChannelNum)
 {
-    // 值对齐 CANN hcomm 侧 HCCL_CONFIG_TYPE_UB_MULTI_CHANNEL_NUM（hccl_host_comm_dl.h 同值）；
-    // 本地 hccl_comm.h 尚未收敛该成员，为避免对 include/adv_api 对外头的变更，此处使用局部常量直传。
     constexpr HcclConfigType kCfgTypeUbMultiChannelNum = static_cast<HcclConfigType>(2);
     multiChannelNum = 1;
     u32 cfgNum = 0;
     uint32_t infoLen = sizeof(u32);
     HcclResult ret = HcclConfigGetInfo(comm, kCfgTypeUbMultiChannelNum, infoLen, &cfgNum);
     if (ret != HCCL_SUCCESS) {
-        // 旧版本 hcomm 不支持该配置项时保持默认单通道，不阻塞建链
         HCCL_INFO("[GetUbMultiChannelNum] HcclConfigGetInfo failed, ret[%d], use default.", ret);
         return HCCL_SUCCESS;
     }
@@ -535,8 +532,6 @@ HcclResult CalcChannelRequestNhr(
         std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
 
         for (auto netLayer : netLayersVector) {
-            // A one-level NHR over a multi-level graph must use the upper full-domain
-            // link. Keep level 0 only for the single-server PCIE-SW special case.
             const bool isNeedLevel0NhrChannel =
                 ((topoInfo->level0Topo == Level0Shape::CLOS || topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS) &&
                  topoInfo->level0PcieMix && topoInfo->serverNum == 1);

@@ -81,7 +81,6 @@ TopoInfoWithNetLayerDetails MakeMultiJettyTopo(u32 userRank = 0U)
     return topo;
 }
 
-// 大禹跨机形态：每框一个 CLOS 实例（如 2 框 x 8 卡），跨框形成两级拓扑
 TopoInfoWithNetLayerDetails MakeMultiLevelClosTopo(u32 rankSize = 16U, u32 serverNum = 2U)
 {
     TopoInfoWithNetLayerDetails topo{};
@@ -92,7 +91,6 @@ TopoInfoWithNetLayerDetails MakeMultiLevelClosTopo(u32 rankSize = 16U, u32 serve
     topo.topoLevelNums = 2U;
     topo.level0PcieMix = false;
     const u32 rankSizePerServer = rankSize / serverNum;
-    // level0：每框一个 CLOS 实例；level1：单个全域实例
     topo.netLayerDetails.localNetInsSizeOfLayer = {rankSizePerServer, rankSize};
     topo.topoInstDetailsOfLayer.resize(1U);
     topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {rankSizePerServer};
@@ -221,7 +219,6 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_selector_uses_algorithm_for_uneven_m
     EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHRMultiJetty");
 }
 
-// 对齐 hccl：多级 + CLOS（大禹跨机）选 AicpuAllGatherSoleNHRMultiLink；单级 + CLOS 同样选 MultiLink
 TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_uses_nhr_multilink_for_clos_topo)
 {
     AllGatherAutoSelector selector;
@@ -229,12 +226,10 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_uses_nhr_multilink_for_clos_topo
     param.DataDes.count = 1U;
     std::string algName;
 
-    // 多级（跨框）：前置条件全不命中，链尾 CLOS case 兜住
     TopoInfoWithNetLayerDetails topo = MakeMultiLevelClosTopo();
     EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
     EXPECT_EQ(algName, "AicpuAllGatherSoleNHRMultiLink");
 
-    // 单级 CLOS（单机大禹/A2 或 UBX 4P 划分兜底）
     TopoInfoWithNetLayerDetails singleLevelTopo = MakeMultiLevelClosTopo(8U, 1U);
     singleLevelTopo.topoLevelNums = 1U;
     singleLevelTopo.netLayerDetails.localNetInsSizeOfLayer = {8U};
