@@ -400,4 +400,4 @@
             -   [C++11限制](./technical_appendix/cpp_standard_support/simt_cpp_language_support/cpp11_restrictions/cpp11_restrictions.md)
             -   [C++14语言特性](./technical_appendix/cpp_standard_support/simt_cpp_language_support/cpp14_language_feature/cpp14_language_feature.md)
             -   [C++17语言特性](./technical_appendix/cpp_standard_support/simt_cpp_language_support/cpp17_language_feature/cpp17_language_feature.md)
-            -   [Lambda表达式](./technical_appendix/cpp_standard_support/simt_cpp_language_support/lamda_expressions/lamda_expressions.md)
+            -   [Lambda表达式](./technical_appendix/cpp_standard_support/simt_cpp_language_support/lambda_expressions/lambda_expressions.md)

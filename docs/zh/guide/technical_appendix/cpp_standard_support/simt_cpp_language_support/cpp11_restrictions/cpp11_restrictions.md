@@ -29,7 +29,7 @@ C++11并发特性的标准形式在Device侧均不可用，报错形态见[限�
 | --- | --- | --- |
 | 动态内存分配（new/delete/malloc/free） | ❌ | 编译通过但链接失败，Device堆管理符号`dpp_alloc`/`dpp_dealloc`未定义。 |
 | 运行时typeid | ❌ | `typeid`本身可取，但`type_info::name()`/`operator==`被标记为`__host__`，无法调用。 |
-| STL（标准模板库） | ❌ | 纯SIMT模式下`utils/std/*.h`均带`--enable-simt`编译保护；`std::tuple`构造、`std::move`等被标记为`__host__`。SIMD/SIMT混合编程场景可使用`AscendC::Std`命名空间下的标准库设施，见[Lambda表达式](../lamda_expressions/lamda_expressions.md)与[C++标准库](../../../../../api/Utils-API/cpp_stdlib/cpp_stdlib.md)。 |
+| STL（标准模板库） | ❌ | 纯SIMT模式下`utils/std/*.h`均带`--enable-simt`编译保护；`std::tuple`构造、`std::move`等被标记为`__host__`。SIMD/SIMT混合编程场景可使用`AscendC::Std`命名空间下的标准库设施，见[Lambda表达式](../lambda_expressions/lambda_expressions.md)与[C++标准库](../../../../../api/Utils-API/cpp_stdlib/cpp_stdlib.md)。 |
 
 ## 限制根因分类<a name="section_cpp11_restriction_root_causes"></a>
 
