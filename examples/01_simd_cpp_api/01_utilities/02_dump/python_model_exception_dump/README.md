@@ -48,35 +48,30 @@ enable_exception_dump(kernel_name)
 │   │   ├── verify_dump.py                      //   dump 数据 bit-exact 离线验证
 │   │   └── parse_tiling.py                     //   args 指针区 + tiling 离线解析
 │   ├── test                                    // IFA 真实算子看护用例
-│   │   ├── test_public_dump.py                 //   用例入口（scene1/scene2/baseline/all）
-│   │   └── patches                             //   构建适配补丁（与 dump 能力无关）
+│   │   └── test_public_dump.py                 //   用例入口（scene1/scene2/baseline/all）
 │   ├── scripts
-│   │   ├── setup.sh                            // 环境检查、回调库编译、外部 IFA wheel 构建
+│   │   ├── setup.sh                            // 环境检查、回调库编译
 │   │   └── run.sh                              // 场景执行、完整回归、产物清理
 │   ├── CMakeLists.txt                          // 编译工程文件（回调库）
 │   ├── README.md                               // 样例说明文档
 │   └── README_en.md                            // 样例说明文档（英文）
 ```
 
-环境基线（实测）：Ascend 910B4 + CANN 9.2.0；Python 3.11 + torch + torch_npu + ascend_ops wheel（由 `scripts/setup.sh ifa` 从 ops-transformer 固定 commit 构建，基线 `ecfc11431`）。仅静态检查（语法 / 回调库编译）不依赖 NPU。
+环境基线（原样例实测）：Ascend 910B4 + CANN 9.2.0；Python 3.11 + torch + torch_npu + 含 IFA 和 metadata 算子的 ascend_ops wheel（原构建基线为 ops-transformer `ecfc11431`）。本样例不构建或修改外部算子源码；运行前需安装与当前 CANN、torch_npu 和目标 NPU 匹配的 wheel。仅静态检查（语法 / 回调库编译）不依赖 NPU。
 
 ## 使用方法
 
 ```bash
 # 1. 环境准备（每次进入环境先执行）
-source /usr/local/Ascend/ascend-toolkit/set_env.sh       # 设置 ASCEND_HOME_PATH / 头文件 / 库路径
-export NPU_SOC_VERSION=ascend910_93                      # 构建体系按 <op>/<SOC>/ 匹配目录
-./scripts/setup.sh check                                 # 新回调接口、NPU、Python 栈
+source /data/chu/Ascend/cann/set_env.sh                  # 按实际 CANN 安装路径修改
+# 预先安装兼容的 torch、torch_npu 和 ascend_ops wheel，须含两个 IFA 算子
+./scripts/setup.sh check                                 # 回调接口、NPU、Python 栈及算子注册
 
 # 2. 编译回调库（新环境 / CANN 升级后必须重做；产物 .so 不入仓）
 ./scripts/setup.sh callback
 #   预期：nm -D 恰好导出 AddInputInfo / ClearInputInfo / RegisterPublicExceptionDump
 
-# 3. 构建安装外部 IFA wheel（跑端到端用例前；算子零改动）
-export OPS_TRANSFORMER_ROOT=<ops-transformer 仓根目录>
-./scripts/setup.sh ifa
-
-# 4. 执行用例（在 test/ 产物目录落盘；run.sh 验证注入场景的退出码 2 后返回 0）
+# 3. 执行用例（在 test/ 产物目录落盘；run.sh 验证注入场景的退出码 2 后返回 0）
 ./scripts/run.sh scene1        # 块表损坏注入 -> 异常回调 dump
 ./scripts/run.sh full          # 完整回归：scene1 + verify + parse + all + baseline
 ./scripts/run.sh clean         # 清理 dump 和 CANN 崩溃日志

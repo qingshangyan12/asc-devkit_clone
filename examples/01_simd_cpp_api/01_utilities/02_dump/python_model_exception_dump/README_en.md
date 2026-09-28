@@ -48,35 +48,30 @@ End-to-end cases support **physical NPU only** (CPU / simulator modes are not su
 │   │   ├── verify_dump.py                      //   offline bit-exact verification of dumped data
 │   │   └── parse_tiling.py                     //   offline parsing of the args pointer region + tiling
 │   ├── test                                    // IFA real-operator guard cases
-│   │   ├── test_public_dump.py                 //   test entry (scene1/scene2/baseline/all)
-│   │   └── patches                             //   build adaptation patches (unrelated to the dump capability)
+│   │   └── test_public_dump.py                 //   test entry (scene1/scene2/baseline/all)
 │   ├── scripts
-│   │   ├── setup.sh                            // environment check, callback build, external IFA wheel build
+│   │   ├── setup.sh                            // environment check, callback build
 │   │   └── run.sh                              // scenarios, full regression, artifact cleanup
 │   ├── CMakeLists.txt                          // build project file (callback library)
 │   ├── README.md                               // sample documentation (Chinese)
 │   └── README_en.md                            // sample documentation (English)
 ```
 
-Tested baseline: Ascend 910B4 + CANN 9.2.0; Python 3.11 + torch + torch_npu + the ascend_ops wheel (built from a fixed ops-transformer commit, baseline `ecfc11431`, via `scripts/setup.sh ifa`). Static checks only (syntax / callback library compilation) do not require an NPU.
+Previously tested baseline: Ascend 910B4 + CANN 9.2.0; Python 3.11 + torch + torch_npu + an ascend_ops wheel containing the IFA and metadata operators (original ops-transformer build baseline `ecfc11431`). This sample neither builds nor modifies external operator sources. Install a wheel compatible with the current CANN, torch_npu, and target NPU before running it. Static checks only (syntax / callback library compilation) do not require an NPU.
 
 ## Usage
 
 ```bash
 # 1. Environment preparation (run each time you enter the environment)
-source /usr/local/Ascend/ascend-toolkit/set_env.sh       # set ASCEND_HOME_PATH / headers / library paths
-export NPU_SOC_VERSION=ascend910_93                      # the build system matches <op>/<SOC>/ directories
-./scripts/setup.sh check                                 # callback API, NPU, Python stack
+source /data/chu/Ascend/cann/set_env.sh                  # adjust to the actual CANN installation path
+# Install compatible torch, torch_npu and ascend_ops wheels with both IFA operators first
+./scripts/setup.sh check                                 # callback API, NPU, Python stack and operator registration
 
 # 2. Compile the callback library (mandatory in a new environment / after a CANN upgrade; the .so is not committed)
 ./scripts/setup.sh callback
 #   Expected: nm -D exports exactly AddInputInfo / ClearInputInfo / RegisterPublicExceptionDump
 
-# 3. Build and install the external IFA wheel (before running end-to-end cases; zero operator change)
-export OPS_TRANSFORMER_ROOT=<ops-transformer repository root>
-./scripts/setup.sh ifa
-
-# 4. Run cases (artifacts are written under test/; run.sh accepts injected exit code 2 and returns 0)
+# 3. Run cases (artifacts are written under test/; run.sh accepts injected exit code 2 and returns 0)
 ./scripts/run.sh scene1        # block-table corruption injection -> exception callback dump
 ./scripts/run.sh full          # full regression: scene1 + verify + parse + all + baseline
 ./scripts/run.sh clean         # remove dumps and CANN crash logs
