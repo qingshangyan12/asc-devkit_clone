@@ -75,21 +75,23 @@ dst、src、scalar与返回值的数据类型保持一致。支持的数据类�
 
 ## 调用示例
 
-以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，再执行计算并将结果写回UB。
+以下示例展示接口在AIV计算函数中的典型调用方式，`count`表示待处理的元素个数。
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void axpy_example(
-    InputTensor initial_input, InputTensor src_input, OutputTensor output)
+    InputTensor initial_input, InputTensor src_input, OutputTensor output, uint32_t count)
 {
-    uint32_t count = 48;
-    auto mask = asc::te::experimental::update_mask<float>(count);
-    auto dst = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(mask);
-    auto src_reg = asc::te::experimental::load(src_input, asc::te::make_coord(0)).with_mask(mask);
-
-    dst = asc::te::experimental::axpy(dst, src_reg, 0.25f);
-    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
+    constexpr uint32_t vector_length = asc_get_vf_len() / sizeof(float);
+    for (uint32_t offset = 0; count > 0; offset += vector_length) {
+        auto coord = asc::te::make_coord(offset);
+        auto mask = asc::te::experimental::update_mask<float>(count);
+        auto dst = asc::te::experimental::load(initial_input, coord).with_mask(mask);
+        auto src = asc::te::experimental::load(src_input, coord).with_mask(mask);
+        dst = asc::te::experimental::axpy(dst, src, 0.25f);
+        asc::te::experimental::store(output, coord, dst);
+    }
 }
 ```

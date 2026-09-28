@@ -89,20 +89,26 @@ __simd_callee__ inline reg_tensor<T> exp_diff(
 
 ## 调用示例
 
-以下示例展示half输入的调用方式。
+以下示例展示half输入的调用方式，`count`表示待计算的float输出元素个数。
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
 __simd_vf__ inline void exp_diff_example(
-    InputTensor input0, InputTensor input1, OutputTensor output)
+    InputTensor input0, InputTensor input1, OutputTensor output, uint32_t count)
 {
-    uint32_t count = 48;
-    auto mask = asc::te::experimental::update_mask<float>(count);
-    auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
-    auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0)).with_mask(mask);
-    auto dst = asc::te::experimental::exp_diff<float, half>(src0, src1, ASC_POSITION_ODD);
-    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
+    constexpr uint32_t input_vector_length = asc_get_vf_len() / sizeof(half);
+    constexpr uint32_t output_vector_length = asc_get_vf_len() / sizeof(float);
+    for (uint32_t input_offset = 0, output_offset = 0; count > 0;
+         input_offset += input_vector_length, output_offset += output_vector_length) {
+        auto input_coord = asc::te::make_coord(input_offset);
+        auto output_coord = asc::te::make_coord(output_offset);
+        auto mask = asc::te::experimental::update_mask<float>(count);
+        auto src0 = asc::te::experimental::load(input0, input_coord).with_mask(mask);
+        auto src1 = asc::te::experimental::load(input1, input_coord).with_mask(mask);
+        auto dst = asc::te::experimental::exp_diff<float, half>(src0, src1, ASC_POSITION_ODD);
+        asc::te::experimental::store(output, output_coord, dst);
+    }
 }
 ```

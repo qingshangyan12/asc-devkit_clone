@@ -90,7 +90,7 @@ dst和返回值的元素类型为uint16_t，src的元素类型为uint8_t。
 
 ## 调用示例
 
-以下示例分别统计输入数据低半区和高半区的频率分布。
+以下示例分别统计输入数据低半区和高半区的频率分布，`count`表示参与统计的`uint8_t`元素个数。
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
@@ -101,19 +101,22 @@ constexpr asc::te::experimental::histogram_options high_options {
 
 template <typename InputTensor, typename InitialInputTensor, typename OutputTensor>
 __simd_vf__ inline void histograms_example(
-    InputTensor input, InitialInputTensor initial_input, OutputTensor low_output, OutputTensor high_output)
+    InputTensor input, InitialInputTensor initial_input, OutputTensor low_output, OutputTensor high_output,
+    uint32_t count)
 {
-    uint32_t src_count = 192;
     uint32_t dst_count = 128;
-    auto src_mask = asc::te::experimental::update_mask<uint8_t>(src_count);
     auto dst_mask = asc::te::experimental::update_mask<uint16_t>(dst_count);
-    auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(src_mask);
     auto initial_low = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
     auto initial_high = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
-    auto low = asc::te::experimental::histograms(initial_low, src);
-    auto high = asc::te::experimental::histograms<high_options>(initial_high, src);
+    constexpr uint32_t vector_length = asc_get_vf_len() / sizeof(uint8_t);
+    for (uint32_t offset = 0; count > 0; offset += vector_length) {
+        auto mask = asc::te::experimental::update_mask<uint8_t>(count);
+        auto src = asc::te::experimental::load(input, asc::te::make_coord(offset)).with_mask(mask);
+        initial_low = asc::te::experimental::histograms(initial_low, src);
+        initial_high = asc::te::experimental::histograms<high_options>(initial_high, src);
+    }
 
-    asc::te::experimental::store(low_output, asc::te::make_coord(0), low);
-    asc::te::experimental::store(high_output, asc::te::make_coord(0), high);
+    asc::te::experimental::store(low_output, asc::te::make_coord(0), initial_low);
+    asc::te::experimental::store(high_output, asc::te::make_coord(0), initial_high);
 }
 ```
