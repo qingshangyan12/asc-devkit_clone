@@ -2,33 +2,16 @@
 okftype: reference.type.cpp
 title: asc_override_strategy
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
-description: 表示饱和控制策略的枚举，在调用asc_set_saturation_strategy和asc_get_saturation_strategy时使用，影响CAST类全局饱和配置是否生效。
+description: 该枚举表示饱和控制策略，用于设置或查询单指令/API路径与全局CAST饱和配置的生效方式。
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
   - traits: [saturation_mode]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
-    kind: related
-examples: []
-headers: [/include/c_api/defs/enum.h]
 declaration:
   symbol: asc_override_strategy
-  cpp: "enum class asc_override_strategy : uint8_t {\n    USE_API = 0,\n    USE_GLOBAL\
-    \ = 1\n};"
-  members:
-    - name: USE_API
-      value: '0'
-      description: 按单指令/API路径配置饱和。此时通过[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)配置的全局`CAST`饱和不生效。
-    - name: USE_GLOBAL
-      value: '1'
-      description: 使用全局饱和配置。此时通过[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)配置的`CAST`模式才会在精度转换中生效。
   underlying_type: uint8_t
-timestamp: '2026-09-23'
+header: [/include/c_api/defs/enum.h]
+timestamp: '2026-09-28'
 ---
 # asc_override_strategy
 

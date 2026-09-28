@@ -2,42 +2,15 @@
 okftype: reference.type.cpp
 title: asc_fill_value_config
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
-description: fill_value的初始化参数联合体，包含asc_fill_l0a、asc_fill_l0b、asc_fill_l1接口需要配置的各种初始化参数。
+description: 表示 fill_value 初始化参数，配置 L1、L0A 或 L0B 目标的迭代次数、数据块数量和目标间隔。
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md
-    kind: related
-examples: []
-headers: [/include/c_api/defs/union.h]
 declaration:
   symbol: asc_fill_value_config
-  cpp: "union asc_fill_value_config {\n    uint64_t config = ASC_FILL_VALUE_DEFAULT_VALUE;\n\
-    \    struct {\n        uint64_t repeat : 15;\n        uint64_t reserved1 : 1;\n\
-    \        uint64_t blk_num : 15;\n        uint64_t reserved2 : 1;\n        uint64_t\
-    \ dst_gap : 15;\n        uint64_t reserved3 : 17;\n    };\n};"
-  fields:
-    - name: repeat
-      description: 迭代次数，默认值：0。取值范围：[0, 32767]。
-      type: uint64_t
-      bits: '15'
-    - name: blk_num
-      description: 每次迭代初始化的数据块个数，默认值：0。取值范围：[0, 32767]。目的操作数位于L1 Buffer时，数据块大小是32B；目的操作数位于L0A
-        Buffer/L0B Buffer时，数据块大小是512B。
-      type: uint64_t
-      bits: '15'
-    - name: dst_gap
-      description: 目的操作数前一个迭代结束地址到后一个迭代起始地址之间的距离，默认值：0。取值范围：[0, 32767]。目的操作数位于L1 Buffer时，单位是32B；目的操作数位于L0A
-        Buffer/L0B Buffer时，单位是512B。
-      type: uint64_t
-      bits: '15'
   record_kind: union
-timestamp: '2026-09-23'
+header: [/include/c_api/defs/union.h]
+timestamp: '2026-09-28'
 ---
 # asc_fill_value_config
 

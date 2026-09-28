@@ -2,12 +2,10 @@
 okftype: reference.index.cpp
 title: 宏
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/macro.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-24'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md
+  - path: docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md
+timestamp: '2026-09-28'
 ---
 # 宏
 

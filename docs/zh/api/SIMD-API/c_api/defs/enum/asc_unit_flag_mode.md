@@ -2,29 +2,15 @@
 okftype: reference.type.cpp
 title: asc_unit_flag_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md
-description: 配置矩阵计算或矩阵搬出接口执行后UnitFlag行为的枚举，作为相关接口unit_flag_mode参数的类型。
+description: 该枚举用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口unit_flag_mode参数的类型。
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-dependencies: []
-examples: []
-headers: [/include/c_api/defs/enum.h]
 declaration:
   symbol: asc_unit_flag_mode
-  cpp: "enum class asc_unit_flag_mode : uint8_t {\n    DISABLE = 0,\n    ENABLE_KEEP\
-    \ = 2,\n    ENABLE_UPDATE = 3\n};"
-  members:
-    - name: DISABLE
-      value: '0'
-      description: 不使能UnitFlag。
-    - name: ENABLE_KEEP
-      value: '2'
-      description: 使能UnitFlag，硬件执行完指令后不改变单元标志位。
-    - name: ENABLE_UPDATE
-      value: '3'
-      description: 使能UnitFlag，硬件执行完指令后改变单元标志位。
   underlying_type: uint8_t
-timestamp: '2026-09-23'
+header: [/include/c_api/defs/enum.h]
+timestamp: '2026-09-28'
 ---
 # asc_unit_flag_mode
 

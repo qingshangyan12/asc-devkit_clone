@@ -2,29 +2,14 @@
 okftype: reference.type.cpp
 title: asc_position_quarter_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md
-description: 表示源或目的操作数四分之一位置的枚举，供Reg类型转换接口选择数据位置。
+description: 该枚举表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。
 tag:
   - api_surfaces: [c_api]
   - roles: [configuration]
-dependencies: []
-examples: []
-headers: [/include/c_api/defs/enum.h]
 declaration:
   symbol: asc_position_quarter_mode
-  cpp: "enum class asc_position_quarter_mode {\n    DISPERSE_FIRST_QUARTER = 0,\n\
-    \    DISPERSE_SECOND_QUARTER,\n    DISPERSE_THIRD_QUARTER,\n    DISPERSE_FOURTH_QUARTER\n\
-    };"
-  members:
-    - name: DISPERSE_FIRST_QUARTER
-      value: '0'
-      description: ASC_DISPERSE_FIRST_QUARTER
-    - name: DISPERSE_SECOND_QUARTER
-      description: ASC_DISPERSE_SECOND_QUARTER
-    - name: DISPERSE_THIRD_QUARTER
-      description: ASC_DISPERSE_THIRD_QUARTER
-    - name: DISPERSE_FOURTH_QUARTER
-      description: ASC_DISPERSE_FOURTH_QUARTER
-timestamp: '2026-09-23'
+header: [/include/c_api/defs/enum.h]
+timestamp: '2026-09-28'
 ---
 # asc_position_quarter_mode
 

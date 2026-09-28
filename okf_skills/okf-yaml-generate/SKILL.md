@@ -47,8 +47,11 @@ Doxygen 仍按旧生成器合并为 canonical ID 和汇总的 `@archs`；不同�
 
 ## 总控流程
 
-1. 执行 `prepare`，解析范围、计算输入 hash、建立批次和 worker 任务包。
-   每个批次必须先由语义取证 agent 生成 `semantic-input.json`：为批次内每个文档提供哈希绑定的
+1. 执行 `prepare`。首先对本次选中的每个 Markdown 完成结构分类，确认其 `okftype` 已在
+   `config/document-profile-registry.yaml` 注册；同时检查注册表声明的公共字段和 Profile 字段
+   都有对应的代码生成能力和校验能力。任一文件无法分类、Profile 未注册、字段缺少生成器或校验器时，
+   `prepare` 立即中止，不建立可执行批次。随后计算输入 hash、建立批次和 worker 任务包。
+ 每个批次必须先由语义取证 agent 生成 `semantic-input.json`：为批次内每个文档提供哈希绑定的
    `description`、完整必需 `tag` 及其逐值 evidence、`dependencies`。description 必须来自已通过
    `okf-description-generate validate` 的结果；不能用 worker scaffold 代替。
 2. 目录超过 25 个文档时按最多 25 个一批；每波最多 6 个 worker。worker 只读证据并输出结果，
@@ -60,7 +63,7 @@ Doxygen 仍按旧生成器合并为 canonical ID 和汇总的 `@archs`；不同�
    所有阶段的 dry-run。缺少语义输入、未解决问题或生成器无法处理的合法结构都会使校验阻断，
    不得以空 description/tag/dependencies 继续写入。
 6. 只有 `validate` 成功后，使用相同 run directory 执行 `write`。写入前再次确认输入 hash 未变化。
-7. Index Profile 只生成 `okftype`、`title`、`resource`、`navigation` 和 `timestamp`，不生成 description、tag、dependencies 或 examples。
+7. Index Profile 按注册表中的 `reference.index.cpp.fields` 生成；当前配置为 `okftype`、`title`、`resource`、`navigation` 和 `timestamp`，不生成 description、tag、dependencies 或 examples。
 8. 运行结束必须生成机器可读 `error-report.json` 和中文 `error-report.md`。同一文档的所有问题必须
    合并在同一个报告章节中。
 
@@ -126,9 +129,9 @@ python3 scripts/controller.py write \
 
 ## 字段和降级规则
 
-基础 YAML 字段按固定顺序为 `okftype`、`title`、`resource`、`description`、`tag`、`signature`、
-`header`、`declaration`、`type_catalog`、`dependencies`、`examples`、`timestamp`。`c_api/defs` 实体页还可有 source-derived 的 `header`、
-`declaration` 或 `type_catalog`；这些字段不由 worker 猜测，也不用于普通函数页。
+基础 YAML 字段、Profile 允许字段、公共必填字段和输出顺序均以
+`config/document-profile-registry.yaml` 为准。当前注册表中的 `c_api/defs` 实体页还允许
+source-derived 的 `header`、`declaration` 或 `type_catalog`；这些字段不由 worker 猜测，也不用于普通函数页。
 
 问题只影响对应字段：
 

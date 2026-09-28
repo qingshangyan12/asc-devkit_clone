@@ -2,67 +2,24 @@
 okftype: reference.type.cpp
 title: Reg数据类型定义
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-description: Reg数据类型定义总览，说明矢量数据寄存器、掩码寄存器、非对齐寄存器与地址寄存器的类型、位宽类别、数量上限及配套接口。
+description: 总览 Reg 数据类型，说明矢量数据、掩码、非对齐和地址寄存器的类别、容量限制及使用方式。
 tag:
   - api_surfaces: [c_api]
+  - roles: [query]
   - objects: [mask, vector]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
-    kind: related
-examples: []
 type_catalog:
   groups:
     - name: b8
-      types:
-        - vector_int8_t
-        - vector_uint8_t
-        - vector_int4x2_t
-        - vector_fp4x2_e2m1_t
-        - vector_fp4x2_e1m2_t
-        - vector_hifloat8_t
-        - vector_fp8_e4m3fn_t
-        - vector_fp8_e5m2_t
-        - vector_fp8_e8m0_t
+      types: [vector_int8_t, vector_uint8_t, vector_int4x2_t, vector_fp4x2_e2m1_t,
+        vector_fp4x2_e1m2_t, vector_hifloat8_t, vector_fp8_e4m3fn_t, vector_fp8_e5m2_t,
+        vector_fp8_e8m0_t]
     - name: b16
-      types:
-        - vector_int16_t
-        - vector_uint16_t
-        - vector_half
-        - vector_bfloat16_t
+      types: [vector_int16_t, vector_uint16_t, vector_half, vector_bfloat16_t]
     - name: b32
-      types:
-        - vector_int32_t
-        - vector_uint32_t
-        - vector_float
+      types: [vector_int32_t, vector_uint32_t, vector_float]
     - name: b64
-      types:
-        - vector_int64_t
-        - vector_uint64_t
-timestamp: '2026-09-23'
+      types: [vector_int64_t, vector_uint64_t]
+timestamp: '2026-09-28'
 ---
 # Reg数据类型定义
 

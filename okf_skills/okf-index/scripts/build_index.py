@@ -25,9 +25,9 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "okf-yaml-generate" / "scripts"))
 from controller import (  # noqa: E402
-    ALLOWED_FIELDS,
     DEPENDENCY_KINDS,
     ValidationError,
+    load_model,
     split_front_matter,
     taxonomy,
 )
@@ -38,7 +38,6 @@ INDEX_DIR = SKILL_ROOT / "index"
 SCOPE_DIRS = (
     "docs/zh/api/SIMD-API/c_api",
 )
-OKFTYPES = {"reference.api.cpp", "reference.arch.cpp", "reference.index.cpp", "reference.type.cpp"}
 STAGES = ("in", "out", "compute")
 ARCH_RE = re.compile(r"(?P<family>.+)_arch_(?P<arch>\d+)(?:_deprecated)?$")
 CONVERT_RE = re.compile(r"asc_(?P<src>[a-z0-9]+)2(?P<dst>[a-z0-9]+)$")
@@ -72,6 +71,9 @@ def normalize_dtype(value: str) -> str:
 
 
 def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+    model = load_model()
+    allowed_fields = set(model["field_order"])
+    okftypes = set(model["profiles"])
     namespaces, tax_values = taxonomy(TAXONOMY_PATH)
     taxonomy_payload = json.loads(TAXONOMY_PATH.read_text(encoding="utf-8"))
     # Only api_surfaces is hard-required here: it is the navigation anchor proved by
@@ -91,32 +93,35 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
             if not fm:
                 pending.append(rel)
                 continue
-            if set(fm) - set(ALLOWED_FIELDS):
-                errors.append(f"{rel}: unknown fields: {sorted(set(fm) - set(ALLOWED_FIELDS))}")
+            if set(fm) - allowed_fields:
+                errors.append(f"{rel}: unknown fields: {sorted(set(fm) - allowed_fields)}")
                 continue
-            if fm["okftype"] not in OKFTYPES:
+            if fm["okftype"] not in okftypes:
                 errors.append(f"{rel}: invalid okftype {fm['okftype']!r}")
                 continue
+            profile_fields = set(model["profiles"][fm["okftype"]].get("fields", ()))
+            tag_enabled = "tag" in profile_fields or "tag" in model["common_required_fields"]
             if not str(fm["resource"]).endswith(rel):
                 errors.append(f"{rel}: resource does not match path")
             tags: dict[str, list[str]] = {}
-            for item in fm["tag"]:
-                for ns, values in item.items():
-                    if ns not in namespaces:
-                        errors.append(f"{rel}: unknown tag namespace {ns}")
-                        continue
-                    if not values:
-                        # Reverse guard: inapplicable namespaces must be omitted, never
-                        # rendered as empty arrays (OKF 字段规范 / 最小标签集设计说明).
-                        errors.append(f"{rel}: empty tag namespace rendered: {ns}")
-                        continue
-                    unknown = sorted(set(values) - tax_values.get(ns, set()))
-                    if unknown:
-                        errors.append(f"{rel}: tag {ns} values outside taxonomy: {unknown}")
-                    tags[ns] = sorted(set(values))
-            missing_ns = sorted(required_namespaces - set(tags))
-            if missing_ns:
-                errors.append(f"{rel}: missing tag namespaces: {missing_ns}")
+            if tag_enabled:
+                for item in fm.get("tag", []):
+                    for ns, values in item.items():
+                        if ns not in namespaces:
+                            errors.append(f"{rel}: unknown tag namespace {ns}")
+                            continue
+                        if not values:
+                            # Reverse guard: inapplicable namespaces must be omitted, never
+                            # rendered as empty arrays (OKF 字段规范 / 最小标签集设计说明).
+                            errors.append(f"{rel}: empty tag namespace rendered: {ns}")
+                            continue
+                        unknown = sorted(set(values) - tax_values.get(ns, set()))
+                        if unknown:
+                            errors.append(f"{rel}: tag {ns} values outside taxonomy: {unknown}")
+                        tags[ns] = sorted(set(values))
+                missing_ns = sorted(required_namespaces - set(tags))
+                if missing_ns:
+                    errors.append(f"{rel}: missing tag namespaces: {missing_ns}")
             signatures = []
             for sig in fm.get("signature") or []:
                 if not isinstance(sig, dict):
@@ -172,7 +177,7 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
                     entry = {"path": f"/{base}", "archs": sorted(ex.get("archs", []))}
                 examples.append(entry)
             documents[rel] = {
-                "okftype": fm["okftype"], "title": fm["title"], "description": fm["description"],
+                "okftype": fm["okftype"], "title": fm["title"], "description": fm.get("description", ""),
                 "tags": tags, "signatures": signatures, "deps_out": deps, "examples": examples,
                 "family": "", "arch_of": "", "category": "", "nav_page": "", "arch_variants": [],
                 "standalone_primary": False,

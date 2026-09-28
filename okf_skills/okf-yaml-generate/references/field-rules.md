@@ -2,8 +2,9 @@
 
 ## 公共字段
 
-所有 Profile 只共享 `okftype`、`title`、`resource`、`timestamp`。字段是否可用由
-`config/document-profile-registry.yaml` 的 Profile `fields` 决定，不能从其他 Profile 或旧 front matter 继承。
+字段契约唯一来源是 `config/document-profile-registry.yaml`：公共必填字段由
+`common_required_fields` 决定，Profile 专属字段由对应 Profile 的 `fields` 决定，输出顺序由
+`field_order` 决定。不能从其他 Profile 或旧 front matter 继承字段。
 
 `resource` 必须是 `asc-devkit/` 加仓库相对 Markdown 路径；`timestamp` 必须是 ISO 日期。
 
@@ -16,7 +17,7 @@
 
 ## Index
 
-`reference.index.cpp` 只生成：
+当前注册表中的 `reference.index.cpp` 只生成：
 
 ```text
 okftype, title, resource, navigation, timestamp

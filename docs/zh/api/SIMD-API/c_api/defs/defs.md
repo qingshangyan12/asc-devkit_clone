@@ -2,12 +2,13 @@
 okftype: reference.index.cpp
 title: 基础定义
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/defs.md
-description: ''
-tag:
-  - api_surfaces: [c_api]
-dependencies: []
-examples: []
-timestamp: '2026-09-24'
+navigation:
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/union.md
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/enum.md
+  - path: docs/zh/api/SIMD-API/c_api/defs/type/type.md
+  - path: docs/zh/api/SIMD-API/c_api/defs/macro/macro.md
+  - path: docs/zh/api/SIMD-API/c_api/defs/constant/constant.md
+timestamp: '2026-09-28'
 ---
 # 基础定义
 

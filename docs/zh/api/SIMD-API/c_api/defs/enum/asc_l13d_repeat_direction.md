@@ -2,30 +2,16 @@
 okftype: reference.type.cpp
 title: asc_l13d_repeat_direction
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md
-description: 表示3D img2col搬运repeat迭代方向的枚举，作为asc_set_l13d_rpt和asc_set_l13d_rpt_b接口repeat_direction参数的类型。
+description: 描述3D img2col搬运repeat迭代的方向选择，作为两个repeat配置接口的repeat_direction参数类型。
 tag:
   - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md
-    kind: related
-examples: []
-headers: [/include/c_api/defs/enum.h]
+  - operations: [img2col]
 declaration:
   symbol: asc_l13d_repeat_direction
-  cpp: "enum class asc_l13d_repeat_direction : uint8_t {\n    M_DIRECTION = 0,\n \
-    \   K_DIRECTION = 1\n};"
-  members:
-    - name: M_DIRECTION
-      value: '0'
-      description: 16个元素。
-    - name: K_DIRECTION
-      value: '1'
-      description: 32 / sizeof(data_type)`个元素。其中，`data_type`为3D搬运接口源操作数的数据类型。
   underlying_type: uint8_t
-timestamp: '2026-09-23'
+header: [/include/c_api/defs/enum.h]
+timestamp: '2026-09-28'
 ---
 # asc_l13d_repeat_direction
 

@@ -631,7 +631,9 @@ constexpr uint8_t ASC_SIZE = 16;
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             path = "docs/zh/api/SIMD-API/c_api/vector_compute/asc_add.md"
-            namespaces, values = module.taxonomy(ROOT / "taxonomy/releases/core-v9-frozen.json")
+            namespaces, values = module.taxonomy(
+                ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
+            )
             fields = {
                 "okftype": "reference.api.cpp",
                 "title": "asc_add",
@@ -710,7 +712,10 @@ constexpr uint8_t ASC_SIZE = 16;
             )
             payload = json.loads(output.read_text(encoding="utf-8"))
             self.assertEqual(payload["documents"][0]["path"], "docs/zh/api/SIMD-API/c_api/foo/foo.md")
-            self.assertEqual(len(payload["documents"][0]["issues"]), 10)
+            self.assertEqual(
+                {issue["field"] for issue in payload["documents"][0]["issues"]},
+                {"description", "tag.roles", "semantic_input"},
+            )
             self.assertNotIn("usage_dependencies", payload["documents"][0]["fields"])
 
     def test_dependency_evidence_is_required(self):
@@ -996,22 +1001,19 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             "okftype": "reference.index.cpp",
             "title": "foo index",
             "resource": f"asc-devkit/{document_path}",
-            "description": "这是一个用于测试索引页字段规则的描述。",
-            "tag": [
-                {namespace: ["c_api"] if namespace == "api_surfaces" else []}
-                for namespace in namespaces
+            "navigation": [
+                {"path": "docs/zh/api/SIMD-API/c_api/foo/bar.md", "title": "bar"}
             ],
-            "dependencies": [],
             "timestamp": "2026-09-23",
-        }
-        index_evidence = {
-            "api_surfaces:c_api": [{"source_path": document_path, "excerpt": document_path}]
         }
         index_rendered = module.render_yaml(
             index_fields, namespaces, values, Path("/tmp"), document_path,
-            body, index_evidence, set(),
+            body, {}, set(),
         )
-        self.assertIn("api_surfaces: [c_api]", index_rendered)
+        self.assertIn("navigation:", index_rendered)
+        self.assertIn("path: docs/zh/api/SIMD-API/c_api/foo/bar.md", index_rendered)
+        self.assertNotIn("description:", index_rendered)
+        self.assertNotIn("tag:", index_rendered)
 
     def test_base_and_example_fields_follow_the_okf_contract(self):
         module = self._controller_module()
