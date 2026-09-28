@@ -287,6 +287,15 @@ TEST_F(ResourceManifestValidatorTest, ValidatesKernelStructure)
     });
     ExpectInvalid(
         "link_options has wrong type", [](Json& manifest) { Kernel(manifest)["link_options"] = Json::object(); });
+    ExpectInvalid("link_options contains a number", [](Json& manifest) {
+        Kernel(manifest)["link_options"] = Json::array({"-z", 1U});
+    });
+    ExpectInvalid("link_options contains a boolean", [](Json& manifest) {
+        Kernel(manifest)["link_options"] = Json::array({"-z", true});
+    });
+    ExpectInvalid("link_options contains an object", [](Json& manifest) {
+        Kernel(manifest)["link_options"] = Json::array({"-z", Json::object()});
+    });
     ExpectInvalid("kernel name is duplicated", [](Json& manifest) { manifest["kernels"].push_back(Kernel(manifest)); });
 }
 

@@ -552,6 +552,14 @@ bool ResourceManifestValidator::ValidateKernel(const Json& kernel, std::set<std:
         return false;
     }
 
+    if (kernel.contains("link_options")) {
+        for (const Json& option : kernel.at("link_options")) {
+            if (!CheckAndLog(option.is_string(), __LINE__, "invalid link_options item: expected a string")) {
+                return false;
+            }
+        }
+    }
+
     const std::string kernelName = kernel.at("kernel_name").get_ref<const std::string&>();
     if (!CheckAndLog(
             kernelNames.insert(kernelName).second, __LINE__, "duplicate kernel_name: kernel_name=" + kernelName) ||
