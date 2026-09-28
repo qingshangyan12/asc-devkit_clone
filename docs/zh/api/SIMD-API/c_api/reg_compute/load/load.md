@@ -18,9 +18,7 @@
 - **[asc_loadalign_downsample](asc_loadalign_downsample.md)**
 - **[asc_loadalign_mask_downsample](asc_loadalign_mask_downsample.md)**
 - **[asc_loadalign_downsample_postupdate](asc_loadalign_downsample_postupdate.md)**
-- **[asc_loadalign_mask_downsample_postupdate](asc_loadalign_mask_downsample_postupdate.md)**
 - **[asc_loadalign_postupdate](asc_loadalign_postupdate.md)**
-- **[asc_loadalign_mask_postupdate](asc_loadalign_mask_postupdate.md)**
 - **[asc_loadalign_unpack](asc_loadalign_unpack.md)**
 - **[asc_loadalign_unpack4](asc_loadalign_unpack4.md)**
 - **[asc_loadalign_unpack4_postupdate](asc_loadalign_unpack4_postupdate.md)**
@@ -28,7 +26,6 @@
 - **[asc_loadalign_upsample](asc_loadalign_upsample.md)**
 - **[asc_loadalign_mask_upsample](asc_loadalign_mask_upsample.md)**
 - **[asc_loadalign_upsample_postupdate](asc_loadalign_upsample_postupdate.md)**
-- **[asc_loadalign_mask_upsample_postupdate](asc_loadalign_mask_upsample_postupdate.md)**
 
 ## Reg非对齐搬入
 

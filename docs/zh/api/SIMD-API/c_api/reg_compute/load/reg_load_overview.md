@@ -78,17 +78,17 @@ Reg数据搬入接口用于将Unified Buffer（UB）中的数据搬入矢量数�
 | [asc_loadalign](asc_loadalign_mask.md) | 连续对齐搬入 | 连续搬入VL/8长度的数据，由用户更新源地址。 | 32字节 |
 | [asc_loadalign](asc_loadalign_mask.md) | 立即数偏移搬入模式 | 从源起始地址偏移指定距离后搬入VL/8长度的数据。 | 32字节 |
 | [asc_loadalign](asc_loadalign_mask.md) | 地址寄存器偏移搬入模式 | 按地址寄存器指定的偏移搬入VL/8长度的数据。 | 32字节 |
-| [asc_loadalign_postupdate](asc_loadalign_mask_postupdate.md) | 立即数偏移搬入模式 | 搬入VL/8长度的数据，并按立即数偏移更新源地址。 | 32字节 |
+| [asc_loadalign_postupdate](asc_loadalign_postupdate.md) | 立即数偏移搬入模式 | 搬入VL/8长度的数据，并按立即数偏移更新源地址。 | 32字节 |
 | [asc_loadalign_mask](asc_loadalign_mask.md) | 连续对齐搬入 | 连续搬入VL/8长度的数据，通过返回值返回结果。 | 32字节 |
 | [asc_loadalign_downsample](asc_loadalign_mask_downsample.md) | 对齐搬入模式 | 读取VL/4长度的数据，保留偶数下标bit。 | 32字节 |
 | [asc_loadalign_downsample](asc_loadalign_mask_downsample.md) | 立即数偏移搬入模式 | 从立即数偏移位置读取数据并进行2倍下采样。 | 32字节 |
 | [asc_loadalign_downsample](asc_loadalign_mask_downsample.md) | 地址寄存器偏移搬入模式 | 从地址寄存器偏移位置读取数据并进行2倍下采样。 | 32字节 |
-| [asc_loadalign_downsample_postupdate](asc_loadalign_mask_downsample_postupdate.md) | Post Update搬入模式 | 读取数据并进行2倍下采样，同时自动更新源地址。 | 32字节 |
+| [asc_loadalign_downsample_postupdate](asc_loadalign_downsample_postupdate.md) | Post Update搬入模式 | 读取数据并进行2倍下采样，同时自动更新源地址。 | 32字节 |
 | [asc_loadalign_mask_downsample](asc_loadalign_mask_downsample.md) | 对齐搬入模式 | 读取VL/4长度的数据，保留偶数下标bit，通过返回值返回结果。 | 32字节 |
 | [asc_loadalign_upsample](asc_loadalign_mask_upsample.md) | 对齐搬入模式 | 读取VL/16长度的数据，将每个bit重复两次。 | 16字节 |
 | [asc_loadalign_upsample](asc_loadalign_mask_upsample.md) | 立即数偏移搬入模式 | 从立即数偏移位置读取数据并进行2倍上采样。 | 16字节 |
 | [asc_loadalign_upsample](asc_loadalign_mask_upsample.md) | 地址寄存器偏移搬入模式 | 从地址寄存器偏移位置读取数据并进行2倍上采样。 | 16字节 |
-| [asc_loadalign_upsample_postupdate](asc_loadalign_mask_upsample_postupdate.md) | Post Update搬入模式 | 读取数据并进行2倍上采样，同时自动更新源地址。 | 16字节 |
+| [asc_loadalign_upsample_postupdate](asc_loadalign_upsample_postupdate.md) | Post Update搬入模式 | 读取数据并进行2倍上采样，同时自动更新源地址。 | 16字节 |
 | [asc_loadalign_mask_upsample](asc_loadalign_mask_upsample.md) | 对齐搬入模式 | 读取VL/16长度的数据，将每个bit重复两次，通过返回值返回结果。 | 16字节 |
 
 ## 通用约束
