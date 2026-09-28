@@ -133,3 +133,17 @@ TEST_F(MathComputeTestsuite, CppApiMathAlgorithms)
 
     EXPECT_NEAR(Simt::Yn(8, 2.0f), -1853.9222f, 1e-3f);
 }
+
+TEST_F(MathComputeTestsuite, TrigLargeArgPayneHanekTestCase)
+{
+    const float largeAngles[] = {71477.0f, -71477.0f, 1.0e10f,  -1.0e10f,     1.0e20f,
+                                 -1.0e20f, 1.0e30f,   -1.0e30f, 0x1.7cp+120f, -0x1.7cp+120f};
+    for (float x : largeAngles) {
+        double refCos = std::cos(static_cast<double>(x));
+        double refSin = std::sin(static_cast<double>(x));
+        EXPECT_FLOAT_EQ(cosf(x), static_cast<float>(refCos));
+        EXPECT_FLOAT_EQ(sinf(x), static_cast<float>(refSin));
+    }
+    EXPECT_FLOAT_EQ(tanf(1.0e6f), static_cast<float>(std::tan(static_cast<double>(1.0e6f))));
+    EXPECT_FLOAT_EQ(tanf(-1.0e6f), static_cast<float>(std::tan(static_cast<double>(-1.0e6f))));
+}
