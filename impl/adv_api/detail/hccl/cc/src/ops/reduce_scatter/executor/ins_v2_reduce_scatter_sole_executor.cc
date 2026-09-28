@@ -17,6 +17,7 @@
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
+#include "ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.h"
 // Legacy direct-launch CCU headers are retained in source but are incompatible with the current hcomm API.
 #endif
 #include "alg_meta_registry.h"
@@ -298,6 +299,11 @@ REGISTER_EXEC_V2(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHRMultiLink, AlgEngine::CCU,
     "sole[nhr.multi_channel]", COND_NONE, FLAG_NONE, 0);
+// SoleNHR（两级拓扑 L1 NHR 中继，双 die 自适应）：forced-only（selector 两级拓扑分支未放开，
+// PeerOnly 先例），mission 数由 dieNum 动态决定（CcuTempKfcServer::CalcRes 按源 kernel 数修正）
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHR, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
+    CcuTempKfcReduceScatterNHR1D2DieMem2Mem);
 #endif
 
 } // namespace mc2_ops_hccl
