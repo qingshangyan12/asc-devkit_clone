@@ -18,8 +18,9 @@
 #include <cstddef>
 #include <type_traits>
 
-namespace {
+namespace mc2_ops_hccl {
 
+namespace {
 // CCU KFC 模板不继承 InsAlgTemplateBase（无 SetchannelsPerRank），SFINAE 分发保底成功
 template <typename InsAlgTemplate>
 typename std::enable_if<std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
@@ -35,8 +36,6 @@ SetChannelsPerRankIfSupported(InsAlgTemplate&, const std::map<u32, std::vector<C
     return HCCL_SUCCESS;
 }
 } // namespace
-
-namespace mc2_ops_hccl {
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::InsV2AllGatherSoleExecutor()
