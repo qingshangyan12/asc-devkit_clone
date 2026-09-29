@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "mc2_resource_dfx.h"
 #include "hccl_alloc_ctx_res.h"
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
@@ -41,38 +42,38 @@ HcclResult CheckInputParam(const void* comm, const void* mc2Tiling, const void* 
     RPT_INPUT_ERR(
         comm == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
         std::vector<std::string>({"HcclAllocComResourceByTiling", "nullptr", "comm", "non-null pointer"}));
-    CHK_PTR_NULL(comm);
+    MC2_DFX_CHK_PTR_NULL(comm);
 
     // 检查sendBuf是否为空指针
     RPT_INPUT_ERR(
         mc2Tiling == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
         std::vector<std::string>({"HcclAllocComResourceByTiling", "nullptr", "mc2Tiling", "non-null pointer"}));
-    CHK_PTR_NULL(mc2Tiling);
+    MC2_DFX_CHK_PTR_NULL(mc2Tiling);
 
     // 检查stream是否为空指针
     RPT_INPUT_ERR(
         stream == nullptr, "EI0003", std::vector<std::string>({"ccl_op", "value", "parameter", "expect"}),
         std::vector<std::string>({"HcclAllocComResourceByTiling", "nullptr", "stream", "non-null pointer"}));
-    CHK_PTR_NULL(stream);
+    MC2_DFX_CHK_PTR_NULL(stream);
 
     return HCCL_SUCCESS;
 }
 
 HcclResult HcclGetTilingList(const void* mc2Tiling, const void* p[], uint32_t& cnt)
 {
-    CHK_PTR_NULL(mc2Tiling);
-    CHK_PTR_NULL(p);
+    MC2_DFX_CHK_PTR_NULL(mc2Tiling);
+    MC2_DFX_CHK_PTR_NULL(p);
     const u32* versionPtr = static_cast<const u32*>(mc2Tiling);
     const u32 version = *(versionPtr++);
-    CHK_PRT_RET(version < MC2_TILING_VERSION, HCCL_ERROR("Invalid tiling version %u.", version), HCCL_E_PARA);
+    MC2_DFX_CHK_PRT_RET(version < MC2_TILING_VERSION, HCCL_ERROR("Invalid tiling version %u.", version), HCCL_E_PARA);
 
     cnt = *(versionPtr++);
-    CHK_PRT_RET(cnt == 0U || cnt > MAX_HCOM_NUM, HCCL_ERROR("Invalid hcom tiling number %u.", cnt), HCCL_E_PARA);
+    MC2_DFX_CHK_PRT_RET(cnt == 0U || cnt > MAX_HCOM_NUM, HCCL_ERROR("Invalid hcom tiling number %u.", cnt), HCCL_E_PARA);
 
     constexpr uint32_t offsetTableEnd = sizeof(uint32_t) * (2U + MAX_CC_TILING_NUM);
     for (uint32_t i = 0U; i < cnt; ++i) {
         const uint32_t offset = versionPtr[i];
-        CHK_PRT_RET(
+        MC2_DFX_CHK_PRT_RET(
             offset < offsetTableEnd || offset % alignof(Mc2CcTilingInner) != 0U,
             HCCL_ERROR("Invalid hcom tiling offset %u at index %u.", offset, i), HCCL_E_PARA);
         p[i] = reinterpret_cast<const void*>(reinterpret_cast<const u8*>(mc2Tiling) + offset);
@@ -114,27 +115,27 @@ HcclResult CheckCommEngine(const void* ccTilingList[], uint32_t tilingNum)
 
 HcclResult ObtainCommEngine(const void* ccTilingList[], uint32_t tilingNum, uint8_t& commEngine)
 {
-    CHK_PTR_NULL(ccTilingList);
-    CHK_PRT_RET(
+    MC2_DFX_CHK_PTR_NULL(ccTilingList);
+    MC2_DFX_CHK_PRT_RET(
         tilingNum == 0U || tilingNum > MAX_HCOM_NUM, HCCL_ERROR("Invalid hcom tiling number %u.", tilingNum),
         HCCL_E_PARA);
     commEngine = static_cast<uint8_t>(OpExecuteConfig::DEFAULT);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
-        CHK_PTR_NULL(ccTiling);
+        MC2_DFX_CHK_PTR_NULL(ccTiling);
         if (commEngine == static_cast<uint8_t>(OpExecuteConfig::DEFAULT)) {
             commEngine = ccTiling->commEngine;
         }
         if (ccTiling->commEngine != commEngine) {
             HCCL_ERROR("Invalid commEngine %u.", ccTiling->commEngine);
-            return HCCL_E_NOT_SUPPORT;
+            return MC2_DFX_RESULT(HCCL_E_NOT_SUPPORT);
         }
     }
 
     if (commEngine != static_cast<uint8_t>(OpExecuteConfig::AICPU_TS) &&
         commEngine != static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
         HCCL_ERROR("Invalid commEngine %u.", commEngine);
-        return HCCL_E_NOT_SUPPORT;
+        return MC2_DFX_RESULT(HCCL_E_NOT_SUPPORT);
     }
     return HCCL_SUCCESS;
 }
@@ -357,15 +358,15 @@ HcclResult HcclAllocOpResCtx(
     const HcclComm comm, const std::string& ctxTag, const std::vector<OpParam>& opParamVec, const void* mc2Tiling,
     const void* ccTilingList[], void** opResCtxPtr)
 {
-    CHK_PTR_NULL(opResCtxPtr);
+    MC2_DFX_CHK_PTR_NULL(opResCtxPtr);
     OpResCtx resCtx{};
     const auto* initTiling = static_cast<const Mc2InitTilingInner*>(mc2Tiling);
     const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[0]);
 
-    CHK_RET(AllocOpParamMemory(comm, ctxTag, opParamVec, initTiling, ccTilingList, resCtx));
-    CHK_RET(AllocWorkspaceMemory(comm, ctxTag, ccTiling, resCtx));
-    CHK_RET(FillRankInfo(comm, resCtx));
-    return AllocAndCopyOpResCtx(comm, ctxTag, ccTiling, resCtx, opResCtxPtr);
+    MC2_DFX_CHK_RET(AllocOpParamMemory(comm, ctxTag, opParamVec, initTiling, ccTilingList, resCtx));
+    MC2_DFX_CHK_RET(AllocWorkspaceMemory(comm, ctxTag, ccTiling, resCtx));
+    MC2_DFX_CHK_RET(FillRankInfo(comm, resCtx));
+    return MC2_DFX_RESULT(AllocAndCopyOpResCtx(comm, ctxTag, ccTiling, resCtx, opResCtxPtr));
 }
 
 // AllToAll适配AllToAllV
@@ -591,8 +592,8 @@ HcclResult InitOpParamByTiling(
         opParam.commOpExpansionMode = HcclOpExpansionMode::HCCL_OP_EXPANSION_CCU_SCHED;
     }
 
-    CHK_RET(HcclGetCommName(comm, opParam.commName));
-    CHK_RET(PrepareOpParams(comm, tag, ccTiling, opParam));
+    MC2_DFX_CHK_RET(HcclGetCommName(comm, opParam.commName));
+    MC2_DFX_CHK_RET(PrepareOpParams(comm, tag, ccTiling, opParam));
     if (opParam.opType == HcclCMDType::HCCL_CMD_ALLTOALL) {
         opParam.all2AllVDataDes.sendType = static_cast<HcclDataType>(ccTiling->srcDataType);
         // sendCounts指向的host侧数组由调用方(GetOpParam)持有并填充，此处保持nullptr，
@@ -605,27 +606,27 @@ HcclResult PrepareTopoInfoForOp(HcclComm comm, OpParam& opParam, std::unique_ptr
 {
     HCCL_INFO("[SelectAlgAndPrepareEngine]start SelectAlgAndPrepareEngine!");
     opParam.hcclComm = comm;
-    CHK_RET(HcclGetOpExpansionMode(comm, opParam));
+    MC2_DFX_CHK_RET(HcclGetOpExpansionMode(comm, opParam));
     HCCL_INFO("[SelectAlgAndPrepareEngine]  successfully!");
-    CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
+    MC2_DFX_CHK_RET(HcclCalcTopoInfo(comm, opParam, topoInfo));
     HCCL_INFO("[SelectAlgAndPrepareEngine]HcclCalcTopoInfo successfully!");
     return HCCL_SUCCESS;
 }
 
 HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName)
 {
-    CHK_RET(SetCommEngine(opParam));
+    MC2_DFX_CHK_RET(SetCommEngine(opParam));
     if (GetExternalInputHcclAivOnlyMode() && opParam.engine != COMM_ENGINE_AIV) {
         HCCL_ERROR(
             "[HcclExecOp] opType[%d] currently do not select aiv mode, aiv only not support.",
             static_cast<int>(opParam.opType));
-        return HCCL_E_NOT_SUPPORT;
+        return MC2_DFX_RESULT(HCCL_E_NOT_SUPPORT);
     }
     if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
         HCCL_DEBUG("[Selector] is aicpu mode");
-        CHK_RET(LoadAICPUKernel());
+        MC2_DFX_CHK_RET(LoadAICPUKernel());
     }
-    CHK_RET(SetOpParamAlgTag(opParam, algName));
+    MC2_DFX_CHK_RET(SetOpParamAlgTag(opParam, algName));
     return HCCL_SUCCESS;
 }
 
@@ -751,7 +752,7 @@ HcclResult TryForcedAlgAndPrepareEngine(
         }
     } else if (kind == ForcedAlgKind::BARE_NAME) {
         forcedAlgName = bareName;
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+        MC2_DFX_CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
     } else {
         if (kind == ForcedAlgKind::LEGACY) {
             HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig);
@@ -765,7 +766,7 @@ HcclResult TryForcedAlgAndPrepareEngine(
         HCCL_ERROR(
             "[MC2_FORCE_ALG] prepare engine failed, algName[%s], ret[%d].", forcedAlgName.c_str(),
             static_cast<int>(ret));
-        return ret;
+        return MC2_DFX_RESULT(ret);
     }
 
     ret = CheckForcedAlgResource(comm, opParam, topoInfo.get(), forcedAlgName);
@@ -789,23 +790,23 @@ HcclResult TryForcedAlgAndPrepareEngine(
 HcclResult SelectAlgAndPrepareEngine(
     HcclComm comm, OpParam& opParam, std::string& algName, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo)
 {
-    CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
+    MC2_DFX_CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
 
     std::shared_ptr<ExecuteSelector> collAlgSelector = std::make_shared<ExecuteSelector>(ExecuteSelector());
-    CHK_RET(collAlgSelector->Run(opParam, topoInfo.get(), algName));
+    MC2_DFX_CHK_RET(collAlgSelector->Run(opParam, topoInfo.get(), algName));
     if (algName.empty()) {
         HCCL_ERROR("[Selector] select algname fail!");
-        return HCCL_E_PTR;
+        return MC2_DFX_RESULT(HCCL_E_PTR);
     }
 
-    CHK_RET(PrepareEngineForAlg(opParam, algName));
+    MC2_DFX_CHK_RET(PrepareEngineForAlg(opParam, algName));
     return HCCL_SUCCESS;
 }
 
 HcclResult FillOpParamAlgName(OpParam& opParam, const std::string& algName)
 {
     int result = sprintf_s(opParam.algName, sizeof(opParam.algName), "%s", algName.c_str());
-    CHK_PRT_RET(result <= 0, HCCL_ERROR("failed to fill opParam.algName"), HCCL_E_INTERNAL);
+    MC2_DFX_CHK_PRT_RET(result <= 0, HCCL_ERROR("failed to fill opParam.algName"), HCCL_E_INTERNAL);
     HCCL_INFO(
         "[GetOpParam] prepared opParam, opType[%u], algName[%s], algTag[%s].", static_cast<u32>(opParam.opType),
         opParam.algName, opParam.algTag);
@@ -815,10 +816,10 @@ HcclResult FillOpParamAlgName(OpParam& opParam, const std::string& algName)
 HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam& opParam, bool& skipGetRes)
 {
     uint32_t userRankSize = 0;
-    CHK_RET(HcclGetRankSize(comm, &userRankSize));
+    MC2_DFX_CHK_RET(HcclGetRankSize(comm, &userRankSize));
     if (userRankSize == 1) {
         HCCL_WARNING("[%s] ranksize == 1, enter SingleRankProc", __func__);
-        CHK_RET(SingleRankProc(opParam));
+        MC2_DFX_CHK_RET(SingleRankProc(opParam));
         skipGetRes = true;
         return HCCL_SUCCESS;
     }
@@ -828,7 +829,7 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam& opParam, bool& sk
     auto ret = sprintf_s(opParam.commModeTag, sizeof(opParam.commModeTag), "%s_%s", opParam.commName, opModeStr);
     if (ret <= 0) {
         HCCL_ERROR("[%s] failed to fill opParam.commModeTag", __func__);
-        return HCCL_E_INTERNAL;
+        return MC2_DFX_RESULT(HCCL_E_INTERNAL);
     }
     skipGetRes = false;
     return HCCL_SUCCESS;
@@ -879,8 +880,8 @@ HcclResult GetOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
     void** resCtxOut)
 {
-    CHK_PTR_NULL(topoInfo);
-    CHK_PTR_NULL(resCtxOut);
+    MC2_DFX_CHK_PTR_NULL(topoInfo);
+    MC2_DFX_CHK_PTR_NULL(resCtxOut);
     *resCtxOut = nullptr;
     bool useCannResCtx = UseCannBridge(opParam);
     std::unique_ptr<InsCollAlgBase> executor = nullptr;
@@ -889,7 +890,7 @@ HcclResult GetOpParamResCtx(
     } else {
         executor = CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
     }
-    CHK_PRT_RET(
+    MC2_DFX_CHK_PRT_RET(
         executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
     resCtxHost->isHcommBatchTransferOnThreadSupported = HcommIsSupportHcommBatchTransferOnThread();
@@ -902,11 +903,11 @@ HcclResult GetOpParamResCtx(
     ThreadHandle cpuTsThread{0};
     ThreadHandle exportedAicpuTsThread{0};
     if ((opParam.engine == COMM_ENGINE_AICPU_TS) || (opParam.engine == COMM_ENGINE_CPU)) {
-        CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
-        CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
+        MC2_DFX_CHK_RET(HcclThreadAcquireWithStream(comm, COMM_ENGINE_CPU_TS, opParam.stream, 1, &cpuTsThread));
+        MC2_DFX_CHK_RET(HcclThreadExportToCommEngine(comm, 1, &cpuTsThread, COMM_ENGINE_AICPU_TS, &exportedAicpuTsThread));
     }
-    CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
-    CHK_PTR_NULL(*resCtxOut);
+    MC2_DFX_CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
+    MC2_DFX_CHK_PTR_NULL(*resCtxOut);
     if (opParam.engine == COMM_ENGINE_AICPU_TS && !isResourceReused) {
         SaveMc2CommInfoForProfiling(comm, opParam, *resCtxHost);
     }
@@ -955,30 +956,30 @@ static HcclResult PrepareAlltoAllSendCounts(HcclComm comm, OpParam& opParam, std
 HcclResult GetOpParam(
     HcclComm comm, void* stream, const std::string& tag, const Mc2CcTilingInner* ccTiling, OpParam& opParam)
 {
-    CHK_PTR_NULL(comm);
-    CHK_PTR_NULL(stream);
-    CHK_PTR_NULL(ccTiling);
-    CHK_RET(InitOpParamByTiling(comm, stream, tag, ccTiling, opParam));
+    MC2_DFX_CHK_PTR_NULL(comm);
+    MC2_DFX_CHK_PTR_NULL(stream);
+    MC2_DFX_CHK_PTR_NULL(ccTiling);
+    MC2_DFX_CHK_RET(InitOpParamByTiling(comm, stream, tag, ccTiling, opParam));
 
     // ALLTOALL场景下sendCounts需指向host侧真实数组，且必须在整个GetOpParam调用链
     // (含SelectAlgAndPrepareEngine、GetOpParamResCtx中的GetAlgExecViaCann)期间保持存活。
     // 该数组持有在本函数栈帧，覆盖opParam的全部使用范围。
     std::vector<uint64_t> sendCounts;
     void* origSendCounts = opParam.all2AllVDataDes.sendCounts;
-    CHK_RET(PrepareAlltoAllSendCounts(comm, opParam, sendCounts));
+    MC2_DFX_CHK_RET(PrepareAlltoAllSendCounts(comm, opParam, sendCounts));
 
     std::string algName;
     std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
     bool forcedAlgAccepted = false;
     OpParam opParamBeforeAlg = opParam;
-    CHK_RET(TryForcedAlgAndPrepareEngine(comm, ccTiling, opParam, algName, topoInfo, forcedAlgAccepted));
+    MC2_DFX_CHK_RET(TryForcedAlgAndPrepareEngine(comm, ccTiling, opParam, algName, topoInfo, forcedAlgAccepted));
     if (!forcedAlgAccepted) {
-        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+        MC2_DFX_CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
     }
-    CHK_RET(FillOpParamAlgName(opParam, algName));
+    MC2_DFX_CHK_RET(FillOpParamAlgName(opParam, algName));
 
     bool skipGetRes = false;
-    CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
+    MC2_DFX_CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
     if (skipGetRes) {
         opParam.all2AllVDataDes.sendCounts = origSendCounts;
         return HCCL_SUCCESS;
@@ -993,16 +994,16 @@ HcclResult GetOpParam(
         opParam = opParamBeforeAlg;
         algName.clear();
         topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
-        CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
-        CHK_RET(FillOpParamAlgName(opParam, algName));
-        CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
+        MC2_DFX_CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));
+        MC2_DFX_CHK_RET(FillOpParamAlgName(opParam, algName));
+        MC2_DFX_CHK_RET(HandleSingleRankAndCommMode(comm, opParam, skipGetRes));
         if (skipGetRes) {
             opParam.all2AllVDataDes.sendCounts = origSendCounts;
             return HCCL_SUCCESS;
         }
-        CHK_RET(GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
+        MC2_DFX_CHK_RET(GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxSequence));
     } else {
-        CHK_RET(resRet);
+        MC2_DFX_CHK_RET(resRet);
     }
     // GetOpParamResCtx执行结束，sendCounts的临时host数组已不再需要，
     // 将指向恢复为原值(大概率为nullptr)，避免遗留指向本函数栈内vector的悬空指针。

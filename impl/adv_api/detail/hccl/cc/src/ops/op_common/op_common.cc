@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "mc2_resource_dfx.h"
 #include <algorithm>
 #include <future>
 #include <map>
@@ -758,12 +759,12 @@ HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoI
     // 若获取Context失败，表示对应Context尚未缓存
     if (HcclEngineCtxGet(comm, param.tag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size) != HCCL_SUCCESS) {
         // 初始化topoInfo
-        CHK_RET(InitRankInfo(comm, topoInfo.get()));
+        MC2_DFX_CHK_RET(InitRankInfo(comm, topoInfo.get()));
         // 序列化
         std::vector<char> seq = topoInfo->Serialize();
         size = seq.size();
         // 创建新的Context保存
-        CHK_RET(HcclEngineCtxCreate(comm, param.tag, CommEngine::COMM_ENGINE_CPU_TS, size, &ctx));
+        MC2_DFX_CHK_RET(HcclEngineCtxCreate(comm, param.tag, CommEngine::COMM_ENGINE_CPU_TS, size, &ctx));
         CHK_SAFETY_FUNC_RET(memcpy_s(ctx, size, seq.data(), size));
         return HCCL_SUCCESS;
     }
@@ -799,8 +800,8 @@ HcclResult HcclGetAlgRes(
     HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused)
 {
-    CHK_PTR_NULL(topoInfo);
-    CHK_PTR_NULL(resCtxSequence);
+    MC2_DFX_CHK_PTR_NULL(topoInfo);
+    MC2_DFX_CHK_PTR_NULL(resCtxSequence);
     *resCtxSequence = nullptr;
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] start, opType[%d], algName[%s], algTag[%s], engine[%d], opMode[%d].",
@@ -839,7 +840,7 @@ HcclResult HcclGetAlgRes(
             param.ctxSize = size;
 
             if (param.engine == COMM_ENGINE_CCU) {
-                CHK_RET(UpdateCcuCtxTokenOnReuse(comm, ctx, size, resCtxHost));
+                MC2_DFX_CHK_RET(UpdateCcuCtxTokenOnReuse(comm, ctx, size, resCtxHost));
             }
 
             return HCCL_SUCCESS;
@@ -864,13 +865,13 @@ HcclResult HcclGetAlgRes(
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfoV2, ret[%d], levelNum[%zu].",
             calcHierarchyRet, algHierarchyInfo.infos.size());
-        CHK_RET(calcHierarchyRet);
+        MC2_DFX_CHK_RET(calcHierarchyRet);
     } else {
         HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfo(comm, topoInfo, algHierarchyInfo);
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after CalcAlgHierarchyInfo, ret[%d], levelNum[%zu].", calcHierarchyRet,
             algHierarchyInfo.infos.size());
-        CHK_RET(calcHierarchyRet);
+        MC2_DFX_CHK_RET(calcHierarchyRet);
     }
     // 资源计算
     AlgResourceRequest resRequest;
@@ -882,7 +883,7 @@ HcclResult HcclGetAlgRes(
         "[asc][AlgoResource][HcclGetAlgRes] after CalcRes, ret[%d], slaveThreadNum[%u], "
         "notifyNumOnMainThread[%u], channelLevels[%zu].",
         calcResRet, resRequest.slaveThreadNum, resRequest.notifyNumOnMainThread, resRequest.channels.size());
-    CHK_RET(calcResRet);
+    MC2_DFX_CHK_RET(calcResRet);
 
     // kfc算法kernel资源准备 - 仅当isKfc为true时执行
     if (param.isKfc && param.engine == COMM_ENGINE_CCU) {
@@ -893,9 +894,9 @@ HcclResult HcclGetAlgRes(
         std::unique_ptr<InsCollAlgBase> ccuKfcExecutor =
             CollAlgExecRegistryV2::Instance().GetAlgExec(HcclCMDType::HCCL_CMD_KFC_SERVER, "CcuKfcServer");
         HCCL_INFO("[asc][AlgoResource][HcclGetAlgRes] generated ccuKfcExecutor!");
-        CHK_PRT_RET(
+        MC2_DFX_CHK_PRT_RET(
             ccuKfcExecutor.get() == nullptr, HCCL_ERROR("Fail to find ccuKfcExecutor for CcuKfcServer"), HCCL_E_PARA);
-        CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
+        MC2_DFX_CHK_RET(ccuKfcExecutor->CalcRes(comm, param, topoInfo, algHierarchyInfo, resRequest));
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after CcuKfcServer CalcRes, "
             "ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
@@ -916,7 +917,7 @@ HcclResult HcclGetAlgRes(
             "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResDPU, ret[%d], ctxSize[%llu], "
             "resCtxSequence[%p].",
             dpuRet, size, *resCtxSequence);
-        CHK_RET(dpuRet);
+        MC2_DFX_CHK_RET(dpuRet);
     } else if (param.engine == COMM_ENGINE_CPU_TS) {
         // COMM_ENGINE_CPU_TS
     } else if (param.engine == COMM_ENGINE_AICPU) {
@@ -932,7 +933,7 @@ HcclResult HcclGetAlgRes(
             "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResAICPU, ret[%d], ctxSize[%llu], "
             "resCtxSequence[%p].",
             aicpuRet, size, *resCtxSequence);
-        CHK_RET(aicpuRet);
+        MC2_DFX_CHK_RET(aicpuRet);
     } else if (param.engine == COMM_ENGINE_CCU) {
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] before GetAlgResCcu, opType[%d], algTag[%s].", param.opType,
@@ -943,7 +944,7 @@ HcclResult HcclGetAlgRes(
             "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResCcu, ret[%d], ctxSize[%llu], "
             "resCtxSequence[%p].",
             ccuRet, size, *resCtxSequence);
-        CHK_RET(ccuRet);
+        MC2_DFX_CHK_RET(ccuRet);
     } else {
         HCCL_ERROR("fail to get engine.", HCCL_E_PARA);
     }
@@ -980,7 +981,7 @@ HcclResult GetAlgResAICPU(
             "[asc][AlgoResource][GetAlgResAICPU] after HcclAllocAlgResourceAICPU, ret[%d], "
             "slaveThreadNum[%u], channelLevels[%zu].",
             ret, resCtxHost->slaveThreadNum, resCtxHost->channels.size());
-        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to alloc alg resource."), ret);
+        MC2_DFX_CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to alloc alg resource."), ret);
         // 在device侧创建Ctx，并将host资源拷贝到device侧
         HCCL_INFO(
             "[asc][AlgoResource][GetAlgResAICPU] before HcclMemcpyCtxHostToDevice, opType[%d], "
@@ -991,7 +992,7 @@ HcclResult GetAlgResAICPU(
             "[asc][AlgoResource][GetAlgResAICPU] after HcclMemcpyCtxHostToDevice, ret[%d], "
             "ctxSize[%llu], resCtxSequence[%p].",
             ret, ctxSize, *resCtxSequence);
-        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to memcpy hostCtx to device."), ret);
+        MC2_DFX_CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to memcpy hostCtx to device."), ret);
         // 如果是增量建链模式，转移hostCtx的所有权
         if (increCreateChannelFlag) {
             g_hostCtx[tagStr] = std::move(resCtxHost);
@@ -1013,16 +1014,16 @@ HcclResult GetAlgResAICPU(
             } else {
                 HCCL_ERROR("failed to get device ctx.");
             }
-            return ret;
+            return MC2_DFX_RESULT(ret);
         }
         // 资源不能直接复用，需要增量建链(会直接在已有的hostCtx中填充)
         HcclResult ret = HcclGetChannel(comm, param, resRequest, g_hostCtx.at(tagStr));
-        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to incrementally create channel."), ret);
+        MC2_DFX_CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to incrementally create channel."), ret);
         // 把device侧此tag的ctx销毁
         ret = HcclEngineCtxDestroy(comm, param.algTag, param.engine);
-        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to destroy device Ctx."), ret);
+        MC2_DFX_CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to destroy device Ctx."), ret);
         ret = HcclMemcpyCtxHostToDevice(comm, param, g_hostCtx.at(tagStr), resCtxSequence, ctxSize);
-        CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to memcpy hostCtx to device."), ret);
+        MC2_DFX_CHK_PRT_RET(ret != HCCL_SUCCESS, HCCL_ERROR("failed to memcpy hostCtx to device."), ret);
         HCCL_INFO("Incrementally add channel success");
     }
 
@@ -1042,9 +1043,9 @@ HcclResult HcclMemcpyCtxHostToDevice(
     uint64_t size = seq.size();
     void* ctx = nullptr;
     // 创建Context, aicpu和host dpu申请device内存
-    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AICPU_TS, size, &ctx));
+    MC2_DFX_CHK_RET(HcclEngineCtxCreate(comm, param.algTag, COMM_ENGINE_AICPU_TS, size, &ctx));
     // 从Host内存拷贝到Device Context内存上
-    CHK_RET(HcclEngineCtxCopy(comm, COMM_ENGINE_AICPU_TS, param.algTag, seq.data(), size, 0));
+    MC2_DFX_CHK_RET(HcclEngineCtxCopy(comm, COMM_ENGINE_AICPU_TS, param.algTag, seq.data(), size, 0));
     // 将内存强转为AlgResourceCtx结构体
     *resCtxSequence = ctx;
     ctxSize = size;
@@ -1060,14 +1061,14 @@ HcclResult HcclAllocAlgResourceAICPU(
     void* cclBufferAddr;
     uint64_t cclBufferSize;
     // 从通信域获取CCL buffer
-    CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
+    MC2_DFX_CHK_RET(HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize));
     // CCL IN使用所有的CCL Buffer，这个其实就是scratch buffer
     resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
-    CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
-    CHK_RET(HcclGetChannel(comm, param, resRequest, resCtxHost));
+    MC2_DFX_CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
+    MC2_DFX_CHK_RET(HcclGetChannel(comm, param, resRequest, resCtxHost));
     return HCCL_SUCCESS;
 }
 
@@ -1085,15 +1086,15 @@ HcclResult HcclGetThread(
         u32 threadNum = resRequest.slaveThreadNum + 1;
         std::vector<ThreadHandle> threads(threadNum);
         // maxNotifyNum需要再增加一个用于host-device同步
-        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
-        CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
+        MC2_DFX_CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
+        MC2_DFX_CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
         // MC2 and HCCL share the communication-domain unfold thread. Resource preparation is serialized.
         const auto unfoldRet = GetUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread);
         if (unfoldRet == HCCL_E_NOT_FOUND) {
-            CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
-            CHK_RET(SaveUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread));
+            MC2_DFX_CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
+            MC2_DFX_CHK_RET(SaveUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread));
         } else {
-            CHK_RET(unfoldRet);
+            MC2_DFX_CHK_RET(unfoldRet);
         }
         HCCL_INFO("[HcclGetThread] unfoldThread [%lu]", resCtxHost->unfoldThread);
         HCCL_DEBUG("threads ptr is %p\n", threads.data());
@@ -1111,19 +1112,19 @@ HcclResult HcclGetThread(
             const u32 threadNum = resRequest.slaveThreadNum + 1U;
             const u32 notifyNum = std::max(resRequest.notifyNumOnMainThread, maxNotifyNum);
             std::vector<ThreadHandle> threads(threadNum);
-            CHK_RET(HcclThreadAcquire(comm, param.engine, threadNum, notifyNum, threads.data()));
+            MC2_DFX_CHK_RET(HcclThreadAcquire(comm, param.engine, threadNum, notifyNum, threads.data()));
             resCtxHost->threads.insert(resCtxHost->threads.end(), threads.begin(), threads.end());
             HCCL_INFO("[HcclGetThread] acquired [%u] CCU KFC threads in one request.", threadNum);
         } else {
             ThreadHandle thread;
             // host模式下，将主流封装为thread，并创建主流上的notify
-            CHK_RET(HcclThreadAcquireWithStream(
+            MC2_DFX_CHK_RET(HcclThreadAcquireWithStream(
                 comm, param.engine, param.stream, resRequest.notifyNumOnMainThread, &thread));
             resCtxHost->threads.push_back(thread);
             const u32 threadNum = resRequest.slaveThreadNum;
             if (threadNum > 0) {
                 std::vector<ThreadHandle> threads(threadNum);
-                CHK_RET(HcclThreadAcquire(comm, param.engine, threadNum, maxNotifyNum, threads.data()));
+                MC2_DFX_CHK_RET(HcclThreadAcquire(comm, param.engine, threadNum, maxNotifyNum, threads.data()));
                 resCtxHost->threads.insert(resCtxHost->threads.end(), threads.begin(), threads.end());
             }
         }
@@ -1142,8 +1143,8 @@ HcclResult SaveMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle 
     uint64_t size = sizeof(ThreadHandle) + sizeof(u32);
     void* ctx = nullptr;
     // 申请一块host类型内存，保存主流信息
-    CHK_RET(HcclEngineCtxCreate(comm, param.algTag, CommEngine::COMM_ENGINE_CPU_TS, size, &ctx));
-    CHK_PTR_NULL(ctx);
+    MC2_DFX_CHK_RET(HcclEngineCtxCreate(comm, param.algTag, CommEngine::COMM_ENGINE_CPU_TS, size, &ctx));
+    MC2_DFX_CHK_PTR_NULL(ctx);
     // 填充主流handle信息
     ThreadHandle* threadPtr = reinterpret_cast<ThreadHandle*>(ctx);
     *threadPtr = thread;
@@ -1160,15 +1161,15 @@ HcclResult SaveMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle 
 
 HcclResult SaveUnfoldThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle unfoldThread)
 {
-    CHK_PRT_RET(unfoldThread == 0, HCCL_ERROR("[%s] invalid unfold thread", __func__), HCCL_E_PARA);
+    MC2_DFX_CHK_PRT_RET(unfoldThread == 0, HCCL_ERROR("[%s] invalid unfold thread", __func__), HCCL_E_PARA);
     uint64_t size = sizeof(ThreadHandle);
     void* ctx = nullptr;
     // 申请一块host类型内存，保存展开流信息
     char unfoldAlgTag[ALG_TAG_LENGTH] = {0};
     int ret = snprintf_s(unfoldAlgTag, sizeof(unfoldAlgTag), sizeof(unfoldAlgTag) - 1, "%s_unfold", param.commName);
-    CHK_PRT_RET(ret <= 0, HCCL_ERROR("[%s] failed to fill unfoldAlgTag", __func__), HCCL_E_INTERNAL);
-    CHK_RET(HcclEngineCtxCreate(comm, unfoldAlgTag, CommEngine::COMM_ENGINE_CPU_TS, size, &ctx));
-    CHK_PTR_NULL(ctx);
+    MC2_DFX_CHK_PRT_RET(ret <= 0, HCCL_ERROR("[%s] failed to fill unfoldAlgTag", __func__), HCCL_E_INTERNAL);
+    MC2_DFX_CHK_RET(HcclEngineCtxCreate(comm, unfoldAlgTag, CommEngine::COMM_ENGINE_CPU_TS, size, &ctx));
+    MC2_DFX_CHK_PTR_NULL(ctx);
     // 填充主流handle信息
     ThreadHandle* threadPtr = reinterpret_cast<ThreadHandle*>(ctx);
     *threadPtr = unfoldThread;
@@ -1184,21 +1185,21 @@ HcclResult GetUnfoldThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle
     void* ctx = nullptr;
     char unfoldAlgTag[ALG_TAG_LENGTH] = {0};
     int ret = snprintf_s(unfoldAlgTag, sizeof(unfoldAlgTag), sizeof(unfoldAlgTag) - 1, "%s_unfold", param.commName);
-    CHK_PRT_RET(ret <= 0, HCCL_ERROR("[%s] failed to fill unfoldAlgTag", __func__), HCCL_E_INTERNAL);
+    MC2_DFX_CHK_PRT_RET(ret <= 0, HCCL_ERROR("[%s] failed to fill unfoldAlgTag", __func__), HCCL_E_INTERNAL);
     const auto ctxRet = HcclEngineCtxGet(comm, unfoldAlgTag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size);
     if (ctxRet == HCCL_E_NOT_FOUND) {
         // The caller creates the unfold thread when its context does not exist yet.
         return ctxRet;
     }
-    CHK_RET(ctxRet);
-    CHK_PTR_NULL(ctx);
-    CHK_PRT_RET(
+    MC2_DFX_CHK_RET(ctxRet);
+    MC2_DFX_CHK_PTR_NULL(ctx);
+    MC2_DFX_CHK_PRT_RET(
         size != sizeof(ThreadHandle), HCCL_ERROR("[%s] invalid unfold context size[%llu]", __func__, size),
         HCCL_E_PARA);
     // 获取展开流handle信息
     ThreadHandle* threadPtr = reinterpret_cast<ThreadHandle*>(ctx);
     unfoldThread = *threadPtr;
-    CHK_PRT_RET(unfoldThread == 0, HCCL_ERROR("[%s] invalid unfold thread", __func__), HCCL_E_PARA);
+    MC2_DFX_CHK_PRT_RET(unfoldThread == 0, HCCL_ERROR("[%s] invalid unfold thread", __func__), HCCL_E_PARA);
     HCCL_INFO(
         "[GetUnfoldThreadInfo]unfoldAlgTag[%s], threadPtr[%p], unfoldThread[%lu]", unfoldAlgTag, threadPtr,
         unfoldThread);
@@ -1209,7 +1210,7 @@ HcclResult GetMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle& 
 {
     uint64_t size = sizeof(ThreadHandle) + sizeof(u32);
     void* ctx = nullptr;
-    CHK_RET(HcclEngineCtxGet(comm, param.algTag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size));
+    MC2_DFX_CHK_RET(HcclEngineCtxGet(comm, param.algTag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size));
 
     // 获取主流handle信息
     ThreadHandle* threadPtr = reinterpret_cast<ThreadHandle*>(ctx);
@@ -1243,9 +1244,9 @@ HcclResult HcclGetChannel(
             }
         }
         // device建链
-        CHK_RET(HcclGetChannelImpl(level, comm, param, deviceChannelRequest, COMM_ENGINE_AICPU_TS, resCtxHost));
+        MC2_DFX_CHK_RET(HcclGetChannelImpl(level, comm, param, deviceChannelRequest, COMM_ENGINE_AICPU_TS, resCtxHost));
         // host建链
-        CHK_RET(HcclGetChannelImpl(level, comm, param, hostChannelRequest, COMM_ENGINE_CPU, resCtxHost));
+        MC2_DFX_CHK_RET(HcclGetChannelImpl(level, comm, param, hostChannelRequest, COMM_ENGINE_CPU, resCtxHost));
     }
     return HCCL_SUCCESS;
 }
@@ -1267,14 +1268,14 @@ HcclResult HcclGetChannelImpl(
     std::vector<HcclMemHandle> memHandles;
     if (param.opMode == OpMode::OFFLOAD) {
         HCCL_INFO("[HcclGetChannelImpl] start to RegGraphModeBuffers");
-        CHK_RET(RegGraphModeBuffers(comm, param, channelRequest, inputBuffTag, outputBuffTag, memHandles));
+        MC2_DFX_CHK_RET(RegGraphModeBuffers(comm, param, channelRequest, inputBuffTag, outputBuffTag, memHandles));
         for (auto& channelDesc : channelRequest) {
             channelDesc.memHandles = memHandles.data();
             channelDesc.memHandleNum = memHandles.size();
         }
     }
     if (channelNum > 0) {
-        CHK_RET(HcclChannelAcquire(comm, commEngine, channelRequest.data(), channelNum, levelNChannels.data()));
+        MC2_DFX_CHK_RET(HcclChannelAcquire(comm, commEngine, channelRequest.data(), channelNum, levelNChannels.data()));
     }
 
     for (u32 idx = 0; idx < channelNum; idx++) {
@@ -1292,11 +1293,11 @@ HcclResult HcclGetChannelImpl(
         using portSizeType = uint32_t;
         const uint32_t portSizeTypeSize = sizeof(portSizeType);
         portSizeType portSize = 0;
-        CHK_RET(HcclRankGraphGetEndpointInfo(
+        MC2_DFX_CHK_RET(HcclRankGraphGetEndpointInfo(
             comm, resCtxHost->topoInfo.userRank, &localEndpoint, ENDPOINT_ATTR_BW_COEFF, portSizeTypeSize,
             static_cast<void*>(&portSize)));
         channel.portGroupSize = portSize;
-        CHK_PRT_RET(
+        MC2_DFX_CHK_PRT_RET(
             portSize == 0,
             HCCL_ERROR(
                 "[HcclGetChannelImpl] userRank [%d], portSize [%u] is 0.", resCtxHost->topoInfo.userRank, portSize),
@@ -1305,11 +1306,11 @@ HcclResult HcclGetChannelImpl(
 
         void* remoteCclBufferAddr;
         uint64_t remoteCclBufferSize;
-        CHK_RET(HcclChannelGetHcclBuffer(comm, levelNChannels[idx], &remoteCclBufferAddr, &remoteCclBufferSize));
+        MC2_DFX_CHK_RET(HcclChannelGetHcclBuffer(comm, levelNChannels[idx], &remoteCclBufferAddr, &remoteCclBufferSize));
         channel.remoteCclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, remoteCclBufferAddr, remoteCclBufferSize};
 
         if (param.opMode == OpMode::OFFLOAD) {
-            CHK_RET(GetGraphModeBuffers(comm, levelNChannels[idx], inputBuffTag, outputBuffTag, channel));
+            MC2_DFX_CHK_RET(GetGraphModeBuffers(comm, levelNChannels[idx], inputBuffTag, outputBuffTag, channel));
         }
 
         resCtxHost->channels[level].push_back(channel);
