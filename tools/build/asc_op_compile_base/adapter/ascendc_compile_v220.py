@@ -541,11 +541,11 @@ def set_dynamic_sub_func_names_of_super_kernel(tiling_key, compile_info, arch, k
         compile_info.hard_sync and compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE]
     ):
         kernel_type = (
-            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2.name
-            if (compile_info.code_channel == CORE_TYPE_MIX and CommonUtility.is_c310())
+            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1.name
+            if (compile_info.code_channel == CORE_TYPE_MIX and (CommonUtility.is_920r1() or CommonUtility.is_920r2()))
             else (
-                KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1.name
-                if (compile_info.code_channel == CORE_TYPE_MIX and CommonUtility.is_920r1())
+                KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2.name
+                if (compile_info.code_channel == CORE_TYPE_MIX)
                 else (
                     KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0.name
                     if compile_info.code_channel == CORE_TYPE_VEC
