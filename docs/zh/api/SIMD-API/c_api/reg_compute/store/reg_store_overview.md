@@ -14,12 +14,12 @@ Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对�
 
 | 接口名称 | 模式 | 功能简述 | 目的地址对齐要求 |
 | --- | --- | --- | --- |
-| [asc_storealign](asc_storealign.md) | 连续对齐搬出 | 按`mask`将一个VL（256字节）矢量数据寄存器的数据连续写入UB。 | 32字节对齐。 |
-| [asc_storealign](asc_storealign.md) | 立即数偏移搬出 | 按`mask`将一个VL的数据写入`dst + offset`，`offset`单位为元素。 | 32字节对齐。 |
-| [asc_storealign](asc_storealign.md) | 地址寄存器偏移搬出 | 按`mask`将一个VL的数据写入由`addr_reg`指定的偏移地址。 | 32字节对齐。 |
-| [asc_storealign](asc_storealign.md) | 非连续对齐搬出 | 按`block_stride`和`repeat_stride`配置8个DataBlock的写入位置。 | 32字节对齐。 |
-| [asc_storealign_postupdate](asc_storealign_postupdate.md) | 立即数偏移Post Update搬出 | 按`mask`连续搬出一个VL，并按元素偏移自动更新目的地址指针。 | 32字节对齐。 |
-| [asc_storealign_postupdate](asc_storealign_postupdate.md) | 非连续对齐Post Update搬出 | 按步长配置8个DataBlock的写入位置，并按32字节单位自动更新目的地址指针。 | 32字节对齐。 |
+| [asc_storealign](asc_storealign_continuous.md) | 连续对齐搬出 | 按`mask`将一个VL（256字节）矢量数据寄存器的数据连续写入UB。 | 32字节对齐。 |
+| [asc_storealign](asc_storealign_continuous.md) | 立即数偏移搬出 | 按`mask`将一个VL的数据写入`dst + offset`，`offset`单位为元素。 | 32字节对齐。 |
+| [asc_storealign](asc_storealign_continuous.md) | 地址寄存器偏移搬出 | 按`mask`将一个VL的数据写入由`addr_reg`指定的偏移地址。 | 32字节对齐。 |
+| [asc_storealign](asc_storealign_noncontinuous.md) | 非连续对齐搬出 | 按`block_stride`和`repeat_stride`配置8个DataBlock的写入位置。 | 32字节对齐。 |
+| [asc_storealign_postupdate](asc_storealign_postupdate_continuous.md) | 立即数偏移Post Update搬出 | 按`mask`连续搬出一个VL，并按元素偏移自动更新目的地址指针。 | 32字节对齐。 |
+| [asc_storealign_postupdate](asc_storealign_postupdate_noncontinuous.md) | 非连续对齐Post Update搬出 | 按步长配置8个DataBlock的写入位置，并按32字节单位自动更新目的地址指针。 | 32字节对齐。 |
 | [asc_storealign_1st](asc_storealign_1st.md) | 首元素搬出 | 将矢量数据寄存器的首个元素写入UB。 | `dtype`对齐。 |
 | [asc_storealign_1st](asc_storealign_1st.md) | 首元素立即数偏移搬出 | 将首个元素写入`dst + offset`，`offset`单位为元素。 | `dtype`对齐。 |
 | [asc_storealign_1st](asc_storealign_1st.md) | 首元素地址寄存器偏移搬出 | 将首个元素写入由`addr_reg`指定的偏移地址。 | `dtype`对齐。 |
@@ -60,14 +60,14 @@ Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对�
 
 | 接口名称 | 模式 | 功能简述 | 目的地址对齐要求 |
 | --- | --- | --- | --- |
-| [asc_storealign](asc_storealign.md) | 连续对齐搬出 | 直接将32字节掩码寄存器数据写入UB。 | 32字节对齐。 |
-| [asc_storealign](asc_storealign.md) | 立即数偏移搬出 | 将掩码数据写入`dst + offset`，`offset`单位为字节。 | 32字节对齐。 |
-| [asc_storealign](asc_storealign.md) | 地址寄存器偏移搬出 | 将掩码数据写入由`addr_reg`指定的偏移地址。 | 32字节对齐。 |
-| [asc_storealign_postupdate](asc_storealign_postupdate.md) | 立即数偏移Post Update搬出 | 直接搬出掩码数据后，按字节偏移自动更新目的地址指针。 | 32字节对齐。 |
-| [asc_storealign_pack](asc_storealign_pack.md) | 压缩连续搬出 | 每间隔1bit丢弃1bit，将保留bit压缩后写入UB。 | 16字节对齐。 |
-| [asc_storealign_pack](asc_storealign_pack.md) | 压缩立即数偏移搬出 | 将压缩结果写入`dst + offset`，`offset`单位为字节。 | 16字节对齐。 |
-| [asc_storealign_pack](asc_storealign_pack.md) | 压缩地址寄存器偏移搬出 | 将压缩结果写入由`addr_reg`指定的偏移地址。 | 16字节对齐。 |
-| [asc_storealign_pack_postupdate](asc_storealign_pack_postupdate.md) | 压缩Post Update搬出 | 压缩搬出后，按字节偏移自动更新目的地址指针。 | 16字节对齐。 |
+| [asc_storealign](asc_storealign_mask.md) | 连续对齐搬出 | 直接将32字节掩码寄存器数据写入UB。 | 32字节对齐。 |
+| [asc_storealign](asc_storealign_mask.md) | 立即数偏移搬出 | 将掩码数据写入`dst + offset`，`offset`单位为字节。 | 32字节对齐。 |
+| [asc_storealign](asc_storealign_mask.md) | 地址寄存器偏移搬出 | 将掩码数据写入由`addr_reg`指定的偏移地址。 | 32字节对齐。 |
+| [asc_storealign_postupdate](asc_storealign_mask_postupdate.md) | 立即数偏移Post Update搬出 | 直接搬出掩码数据后，按字节偏移自动更新目的地址指针。 | 32字节对齐。 |
+| [asc_storealign_pack](asc_storealign_mask_pack.md) | 压缩连续搬出 | 每间隔1bit丢弃1bit，将保留bit压缩后写入UB。 | 16字节对齐。 |
+| [asc_storealign_pack](asc_storealign_mask_pack.md) | 压缩立即数偏移搬出 | 将压缩结果写入`dst + offset`，`offset`单位为字节。 | 16字节对齐。 |
+| [asc_storealign_pack](asc_storealign_mask_pack.md) | 压缩地址寄存器偏移搬出 | 将压缩结果写入由`addr_reg`指定的偏移地址。 | 16字节对齐。 |
+| [asc_storealign_pack_postupdate](asc_storealign_mask_pack_postupdate.md) | 压缩Post Update搬出 | 压缩搬出后，按字节偏移自动更新目的地址指针。 | 16字节对齐。 |
 
 #### 非对齐搬出
 
@@ -77,7 +77,7 @@ Reg数据搬出接口用于将矢量数据寄存器、掩码寄存器或非对�
 
 | 接口名称 | 模式 | 功能简述 | 目的地址对齐要求 | 配套使用的后处理接口 |
 | --- | --- | --- | --- | --- |
-| [asc_storeunalign_postupdate](asc_storeunalign_postupdate.md) | 掩码寄存器Post Update搬出 | `uint16_t`目的地址时，每2bit提取LSB并打包为16字节；`uint32_t`目的地址时，每4bit提取LSB并打包为8字节。搬出后自动更新目的地址指针，尾块暂存至非对齐寄存器。 | `uint16_t`目的地址16字节对齐；`uint32_t`目的地址8字节对齐。 | [asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式。 |
+| [asc_storeunalign_postupdate](asc_storeunalign_mask_postupdate.md) | 掩码寄存器Post Update搬出 | `uint16_t`目的地址时，每2bit提取LSB并打包为16字节；`uint32_t`目的地址时，每4bit提取LSB并打包为8字节。搬出后自动更新目的地址指针，尾块暂存至非对齐寄存器。 | `uint16_t`目的地址16字节对齐；`uint32_t`目的地址8字节对齐。 | [asc_storeunalign_post](asc_storeunalign_post.md)的立即数偏移搬出模式。 |
 
 ## 关键特性
 

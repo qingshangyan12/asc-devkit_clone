@@ -12,30 +12,33 @@ NPU架构版本3510的矢量数据寄存器长度（VL）为256字节，掩码�
 
 | 接口模式 | 代表接口 | 选择说明 |
 | --- | --- | --- |
-| 连续/立即数/地址寄存器偏移搬入 | [asc_loadalign](../reg_compute/load/asc_loadalign.md) | 搬入一个VL，可由调用方计算地址，也可使用立即数偏移或地址寄存器偏移。 |
-| 立即数偏移/非连续对齐Post Update搬入 | [asc_loadalign_postupdate](../reg_compute/load/asc_loadalign_postupdate.md) | 搬入后自动更新源地址，适合连续迭代；不提供地址寄存器偏移原型。 |
-| 非连续对齐搬入 | [asc_loadalign](../reg_compute/load/asc_loadalign.md)、[asc_loadalign_datablock_strided](../reg_compute/load/asc_loadalign_datablock_strided.md) | 按配置的DataBlock步长非连续搬入8个DataBlock。 |
+| 连续/立即数/地址寄存器偏移搬入 | [asc_loadalign](../reg_compute/load/asc_loadalign_continuous.md) | 搬入一个VL，可由调用方计算地址，也可使用立即数偏移或地址寄存器偏移。 |
+| 连续对齐Post Update搬入 | [asc_loadalign_postupdate](../reg_compute/load/asc_loadalign_postupdate_continuous.md) | 连续搬入一个VL后自动更新源地址，适合连续迭代；不提供地址寄存器偏移原型。 |
+| 非连续对齐搬入 | [asc_loadalign](../reg_compute/load/asc_loadalign_noncontinuous.md)、[asc_loadalign_datablock_strided](../reg_compute/load/asc_loadalign_datablock_strided.md) | 按配置的DataBlock步长非连续搬入8个DataBlock。 |
+| 非连续对齐Post Update搬入 | [asc_loadalign_postupdate](../reg_compute/load/asc_loadalign_postupdate_noncontinuous.md) | 非连续搬入8个DataBlock后自动更新源地址。 |
 | 广播搬入 | [asc_loadalign_brc_datablock](../reg_compute/load/asc_loadalign_brc_datablock.md)、[asc_loadalign_brc_elem](../reg_compute/load/asc_loadalign_brc_elem.md)、[asc_loadalign_brc_elem2datablock](../reg_compute/load/asc_loadalign_brc_elem2datablock.md) | 分别支持DataBlock广播、单元素广播以及将8个元素分别广播到8个DataBlock。 |
 | 解交织/采样/解包搬入 | [asc_loadalign_deintlv](../reg_compute/load/asc_loadalign_deintlv.md)、[asc_loadalign_downsample](../reg_compute/load/asc_loadalign_downsample.md)、[asc_loadalign_upsample](../reg_compute/load/asc_loadalign_upsample.md)、[asc_loadalign_unpack](../reg_compute/load/asc_loadalign_unpack.md)、[asc_loadalign_unpack4](../reg_compute/load/asc_loadalign_unpack4.md) | 支持解交织、2倍下采样、2倍上采样、二分之一解包和四分之一解包。 |
 | 连续非对齐搬入（易用形式） | [asc_load](../reg_compute/load/asc_load.md) | 源地址按`dtype`对齐即可，接口负责完成一个VL的连续搬入。 |
 | 连续非对齐搬入（高性能形式） | [asc_loadunalign_pre](../reg_compute/load/asc_loadunalign_pre.md)、[asc_loadunalign](../reg_compute/load/asc_loadunalign.md)、[asc_loadunalign_postupdate](../reg_compute/load/asc_loadunalign_postupdate.md) | 使用`vector_load_unalign`保存跨32字节边界的数据，适合需要显式复用非对齐状态的场景。 |
-| 掩码寄存器连续对齐搬入 | [asc_loadalign](../reg_compute/load/asc_loadalign_mask.md)、[asc_loadalign_postupdate](../reg_compute/load/asc_loadalign_postupdate.md)、[asc_loadalign_mask](../reg_compute/load/asc_loadalign_mask.md) | 支持直接搬入、Post Update搬入或通过返回值搬入。 |
-| 掩码寄存器采样搬入 | [asc_loadalign_downsample](../reg_compute/load/asc_loadalign_mask_downsample.md)、[asc_loadalign_downsample_postupdate](../reg_compute/load/asc_loadalign_downsample_postupdate.md)、[asc_loadalign_mask_downsample](../reg_compute/load/asc_loadalign_mask_downsample.md)、[asc_loadalign_upsample](../reg_compute/load/asc_loadalign_mask_upsample.md)、[asc_loadalign_upsample_postupdate](../reg_compute/load/asc_loadalign_upsample_postupdate.md)、[asc_loadalign_mask_upsample](../reg_compute/load/asc_loadalign_mask_upsample.md) | 支持2倍下采样和2倍上采样，可选择Post Update或返回值形式。 |
+| Mask连续对齐搬入 | [asc_loadalign、asc_loadalign_mask](../reg_compute/load/asc_loadalign_mask.md)、[asc_loadalign_postupdate](../reg_compute/load/asc_loadalign_mask_postupdate.md) | 支持直接搬入、Post Update搬入或通过返回值搬入。 |
+| Mask采样搬入 | [asc_loadalign_downsample、asc_loadalign_mask_downsample](../reg_compute/load/asc_loadalign_mask_downsample.md)、[asc_loadalign_downsample_postupdate](../reg_compute/load/asc_loadalign_mask_downsample_postupdate.md)、[asc_loadalign_upsample、asc_loadalign_mask_upsample](../reg_compute/load/asc_loadalign_mask_upsample.md)、[asc_loadalign_upsample_postupdate](../reg_compute/load/asc_loadalign_mask_upsample_postupdate.md) | 支持2倍下采样和2倍上采样，可选择Post Update或返回值形式。 |
 
 ### Reg搬出UB
 
 | 接口模式 | 代表接口 | 选择说明 |
 | --- | --- | --- |
-| 连续/立即数/地址寄存器偏移/非连续对齐搬出 | [asc_storealign](../reg_compute/store/asc_storealign.md) | 按`mask`连续写入一个VL，或按DataBlock步长写入。 |
-| 立即数偏移/非连续对齐Post Update搬出 | [asc_storealign_postupdate](../reg_compute/store/asc_storealign_postupdate.md) | 搬出后自动更新目的地址，适合连续迭代；不提供地址寄存器偏移原型。 |
+| 连续/立即数/地址寄存器偏移搬出 | [asc_storealign](../reg_compute/store/asc_storealign_continuous.md) | 按`mask`连续写入一个VL。 |
+| 连续对齐Post Update搬出 | [asc_storealign_postupdate](../reg_compute/store/asc_storealign_postupdate_continuous.md) | 连续搬出一个VL后自动更新目的地址，适合连续迭代；不提供地址寄存器偏移原型。 |
+| 非连续对齐搬出 | [asc_storealign](../reg_compute/store/asc_storealign_noncontinuous.md) | 按DataBlock步长非连续写入8个DataBlock。 |
+| 非连续对齐Post Update搬出 | [asc_storealign_postupdate](../reg_compute/store/asc_storealign_postupdate_noncontinuous.md) | 非连续搬出8个DataBlock后自动更新目的地址。 |
 | 搬出首元素 | [asc_storealign_1st](../reg_compute/store/asc_storealign_1st.md)、[asc_storealign_1st_postupdate](../reg_compute/store/asc_storealign_1st_postupdate.md) | 仅将矢量数据寄存器的首个元素写入UB，可选择是否自动更新目的地址。 |
 | 交织搬出 | [asc_storealign_intlv](../reg_compute/store/asc_storealign_intlv.md) | 将两个矢量数据寄存器按元素交织后写入UB。 |
 | 压缩搬出 | [asc_storealign_pack](../reg_compute/store/asc_storealign_pack.md)、[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md) | 分别将有效元素的低半部分bit或32位元素的低8bit压缩后写入UB。 |
 | 连续搬出（易用形式） | [asc_store](../reg_compute/store/asc_store.md) | 可搬出整个矢量数据寄存器或前`count`个元素；具体对齐场景按接口文档选择`asc_storealign`或非对齐接口。 |
 | 非对齐搬出 | [asc_storeunalign](../reg_compute/store/asc_storeunalign.md)、[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md) | 使用`vector_store_unalign`暂存不能立即写出的尾块，并在连续搬出结束后调用配套后处理接口。 |
-| 掩码寄存器连续对齐搬出 | [asc_storealign](../reg_compute/store/asc_storealign.md)、[asc_storealign_postupdate](../reg_compute/store/asc_storealign_postupdate.md) | 支持直接搬出和Post Update搬出。 |
-| 掩码寄存器压缩搬出 | [asc_storealign_pack](../reg_compute/store/asc_storealign_pack.md)、[asc_storealign_pack_postupdate](../reg_compute/store/asc_storealign_pack_postupdate.md) | 每间隔1bit丢弃1bit，将保留bit压缩后写入UB。 |
-| 掩码寄存器非对齐搬出 | [asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md) | 提取掩码寄存器中的有效bit并打包写入UB，结束后调用配套后处理接口。 |
+| Mask连续对齐搬出 | [asc_storealign](../reg_compute/store/asc_storealign_mask.md)、[asc_storealign_postupdate](../reg_compute/store/asc_storealign_mask_postupdate.md) | 支持直接搬出和Post Update搬出。 |
+| Mask压缩搬出 | [asc_storealign_pack](../reg_compute/store/asc_storealign_mask_pack.md)、[asc_storealign_pack_postupdate](../reg_compute/store/asc_storealign_mask_pack_postupdate.md) | 每间隔1bit丢弃1bit，将保留bit压缩后写入UB。 |
+| Mask非对齐搬出 | [asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_mask_postupdate.md) | 提取掩码寄存器中的有效bit并打包写入UB，结束后调用配套后处理接口。 |
 
 ## 地址维护方式
 

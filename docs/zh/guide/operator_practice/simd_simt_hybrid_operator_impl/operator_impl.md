@@ -190,4 +190,4 @@ __simd_vf__ inline void simd_adds(
 
 simd\_adds函数实现对UB上的数据做加1计算。函数中循环repeat\_times次完成单核数据处理。input为SIMT阶段写入UB的gather结果，output为加1后的UB输出；本样例调用时input和output均传入local\_output。one\_repeat\_size表示每轮处理的float元素个数，repeat\_times表示完成count个元素所需的循环次数。
 
-循环中，使用[asc_loadalign](../../../api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md)接口将数据从UB搬运到SIMD矢量数据寄存器，使用[asc_add_scalar](../../../api/SIMD-API/c_api/reg_compute/reg_arith/asc_add_scalar.md)接口完成数据加1运算，使用[asc_storealign](../../../api/SIMD-API/c_api/reg_compute/store/asc_storealign.md)接口将数据从SIMD矢量数据寄存器搬运到UB。
+循环中，使用[asc_loadalign](../../../api/SIMD-API/c_api/reg_compute/load/asc_loadalign_continuous.md)接口将数据从UB搬运到SIMD矢量数据寄存器，使用[asc_add_scalar](../../../api/SIMD-API/c_api/reg_compute/reg_arith/asc_add_scalar.md)接口完成数据加1运算，使用[asc_storealign](../../../api/SIMD-API/c_api/reg_compute/store/asc_storealign_continuous.md)接口将数据从SIMD矢量数据寄存器搬运到UB。

@@ -37,7 +37,7 @@ Reg矢量计算内不同流水线之间的同步指令。该同步指令指定�
 
 ## 函数原型
 
-```cpp
+```c
 __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 ```
 
@@ -70,8 +70,8 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 | 流水线 | 含义 |
 | ------ | -------- |
-| `VEC_STORE` | `SIMD_VF`函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_storealign](../store/asc_storealign.md)。 |
-| `VEC_LOAD` | `SIMD_VF`函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_loadalign](../load/asc_loadalign.md)。 |
+| `VEC_STORE` | `SIMD_VF`函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_storealign](../store/asc_storealign_continuous.md)。 |
+| `VEC_LOAD` | `SIMD_VF`函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_loadalign](../load/asc_loadalign_continuous.md)。 |
 | `SCALAR_STORE` | `SIMD_VF`函数内标量写UB流水线。 |
 | `SCALAR_LOAD` | `SIMD_VF`函数内标量读UB流水线。 |
 | `VEC_ALL` | `SIMD_VF`函数内所有矢量读写UB流水线。 |
@@ -102,14 +102,14 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构版本为3510）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cmath>
 #include <cstdint>
 #include <iostream>
