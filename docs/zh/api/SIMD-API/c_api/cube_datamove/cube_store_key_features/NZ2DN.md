@@ -39,7 +39,7 @@ for (int h = 0; h < matrix_num; h++) {
 - 在上述源自DN矩阵的每一组数据中，再以每行元素为一组数据，每一组数据的起始地址为dst\_block\_addr。
 - src\_ele\_addr为Nz矩阵一列的每个元素的地址，dst\_ele\_addr为DN矩阵一行的每个元素的地址，二者为一一对应关系，对应完成Nz2DN格式转换。
 
-以下参数为Nz2DN用户可配置参数，含义取值范围参见[asc_copy_l0c2gm](../asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)：
+以下参数为Nz2DN用户可配置参数，含义取值范围参见[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm_arch_3510.md)：
 
 - matrix_num表示需要做Nz2DN转化的矩阵个数。
 - m_size与n_size分别表示矩阵m方向和n方向上的维度。

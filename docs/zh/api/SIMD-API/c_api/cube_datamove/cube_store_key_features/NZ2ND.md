@@ -32,7 +32,7 @@ for (i = 0; i < matrix_num; i++) {
 - 目的操作数每个ND矩阵中每一行的起始地址为dst\_temp\_n\_addr。
 - 在每一行中，以16个数据为一个数据块，源操作数每块数据块的起始地址为src\_block\_addr，目的操作数中每一块数据块的起始地址为dst\_block\_addr。
 
-以下参数为Nz2ND用户可配置参数，含义及取值范围参见[C API搬出参数](../asc_copy_l0c2gm/asc_copy_l0c2gm.md)：
+以下参数为Nz2ND用户可配置参数，含义及取值范围参见[C API搬出参数](../cube_compute_store/asc_copy_l0c2gm.md)：
 
 - m_size与n_size分别表示矩阵m方向和n方向上的维度。
 - src_stride表示Nz矩阵中不同Z分形列的间隔，单位为C0\_Size。

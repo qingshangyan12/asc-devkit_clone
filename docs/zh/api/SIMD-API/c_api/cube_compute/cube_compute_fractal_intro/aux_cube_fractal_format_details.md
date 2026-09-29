@@ -67,7 +67,7 @@ MX矩阵乘法为带有量化系数X的矩阵乘法，即左矩阵和右矩阵�
     **图4** scaleB矩阵在不同位置上的排布格式  
     ![](../../../../figures/mx_scaleB_format.png "scaleB矩阵在不同位置上的排布格式")
 
-系数搬运接口见[asc_copy_l12l0a_mx](../../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../../cube_datamove/asc_copy_l12l0b_mx.md)。
+系数搬运接口见[asc_copy_l12l0a_mx](../../cube_datamove/cube_compute_load/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../../cube_datamove/cube_compute_load/asc_copy_l12l0b_mx.md)。
 <!-- end id1 -->
 
 <!-- npu="A3,910b" id2 -->

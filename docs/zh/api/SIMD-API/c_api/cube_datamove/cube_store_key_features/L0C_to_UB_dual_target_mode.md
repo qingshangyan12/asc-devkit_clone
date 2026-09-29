@@ -49,4 +49,4 @@ M方向切分：
 
 ![](../../../../figures/nz2nd_l0c2ub_dual_dst_c_api.png)
 
-图中`nd_num`、`src_nd_stride`、`dst_nd_stride`分别对应[asc_set_l0c_copy_nz_para](../asc_set_l0c_copy_nz_para.md)的`matrix_num`、`src_nz_matrix_stride`、`dst_matrix_stride`，本例取2、240、4096。`asc_copy_l0c2ub`通过`asc_dual_dst_mode::DUAL_DST_SPLIT_M`或`DUAL_DST_SPLIT_N`选择切分方向。Nz输出示例中的C0为16，`dst_stride`按目标元素计数。
+图中`nd_num`、`src_nd_stride`、`dst_nd_stride`分别对应[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)的`matrix_num`、`src_nz_matrix_stride`、`dst_matrix_stride`，本例取2、240、4096。`asc_copy_l0c2ub`通过`asc_dual_dst_mode::DUAL_DST_SPLIT_M`或`DUAL_DST_SPLIT_N`选择切分方向。Nz输出示例中的C0为16，`dst_stride`按目标元素计数。

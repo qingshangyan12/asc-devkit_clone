@@ -29,7 +29,7 @@ asc_mmad通过`asc_unit_flag_mode::ENABLE_KEEP`或`ENABLE_UPDATE`启用单元标
 
 当开启unitFlag后，asc_mmad和L0C Buffer搬出接口会对同一块分形的L0C Buffer进行读写操作，因此asc_mmad计算和L0C Buffer搬出接口保持一致的读写顺序，有助于获得更优的性能表现。
 
-在调用asc_mmad接口时，通过[asc_set_mmad_direction_m](../asc_set_mmad_direction_m.md)或[asc_set_mmad_direction_n](../asc_set_mmad_direction_n.md)配置计算方向，计算方向与推荐场景的具体说明请参考对应接口文档。
+在调用asc_mmad接口时，通过[asc_set_mmad_direction_m](../mmad_compute_aux_config/asc_set_mmad_direction_m.md)或[asc_set_mmad_direction_n](../mmad_compute_aux_config/asc_set_mmad_direction_n.md)配置计算方向，计算方向与推荐场景的具体说明请参考对应接口文档。
 
 **图1** asc_mmad和L0C Buffer搬出接口同时沿M方向写/读
 
