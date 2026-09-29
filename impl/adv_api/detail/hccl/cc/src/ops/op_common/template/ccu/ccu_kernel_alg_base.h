@@ -232,9 +232,19 @@ CcuResult GroupCopy(
 CcuResult CreateReduceLoop(
     CcuKernelCtxBase& ctx, GroupLocalReduceVar& var, uint32_t size, HcclDataType dataType, HcclDataType outputDataType,
     HcclReduceOp opType);
+static CcuResult CreateReduceLoopV2(
+    AllReduceMeshMem2Mem1DContext& ctx, GroupReduceMem2MemVar& var, uint32_t size, HcclDataType dataType,
+    HcclDataType outputDataType, HcclReduceOp opType);
 CcuResult GroupLocalReduce(
     CcuKernelCtxBase& ctx, ccu::LocalAddr outDstOrg, std::vector<ccu::LocalAddr>& scratchOrg, GroupOpSizeVars goSize,
+    HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType,
+    CcuVersion ccuVersion);
+CcuResult GroupLocalReduceV1(
+    CcuKernelCtxBase& ctx, ccu::LocalAddr outDstOrg, std::vector<ccu::LocalAddr>& scratchOrg, GroupOpSizeVars goSize,
     HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType);
+CcuResult GroupLocalReduceV2(
+    CcuKernelCtxBase& ctx, ccu::LocalAddr outDstOrg, std::vector<ccu::LocalAddr>& scratchOrg, GroupOpSizeVars goSize,
+    HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType)
 
 CcuResult CreateMultiOpBroadcastWithoutMyRank(
     CcuKernelCtxBase& ctx, GroupBroadcastVar& var, const size_t channels[], uint32_t channelCount);
