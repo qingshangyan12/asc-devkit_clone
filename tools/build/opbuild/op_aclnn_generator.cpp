@@ -60,7 +60,7 @@ constexpr const char* OP_ACLNN_SOC_INFO = "enum SocType {\n"
                                           "    SOC_VERSION_MC61AM21A = 10, // 9 is deprecated\n"
                                           "    SOC_VERSION_MC62CM12A = 11,\n"
                                           "    SOC_VERSION_BS9SX2A = 12,\n"
-                                          "    SOC_VERSION_ASCEND910_96 = 13,\n"
+                                          "    SOC_VERSION_ASCEND960DT = 13,\n"
                                           "    SOC_VERSION_KIRINX90 = 14,\n"
                                           "    SOC_VERSION_KIRIN9020 = 15,\n"
                                           "    SOC_VERSION_KIRIN9030 = 16,\n"
@@ -69,6 +69,7 @@ constexpr const char* OP_ACLNN_SOC_INFO = "enum SocType {\n"
                                           "    SOC_VERSION_KIRINDEV0001 = 19,\n"
                                           "    SOC_VERSION_KIRINDEV0002 = 20,\n"
                                           "    SOC_VERSION_KIRINDEV0003 = 21,\n"
+                                          "    SOC_VERSION_ASCEND960PR = 22,\n"
                                           "    SOC_VERSION_INVALID = 99\n"
                                           "};\n";
 constexpr const char* OP_ACLNN_SOC_MATCH_HELPER =
@@ -162,7 +163,7 @@ const std::map<std::string, std::string> SOC_SUPPORT_MAP = {
     {"ascend910_55", "SOC_VERSION_ASCEND910_55"},
     {"mc61am21a", "SOC_VERSION_MC61AM21A"},
     {"mc62cm12a", "SOC_VERSION_MC62CM12A"},
-    {"ascend910_96", "SOC_VERSION_ASCEND910_96"},
+    {"ascend960DT", "SOC_VERSION_ASCEND960DT"},
     {"kirinx90", "SOC_VERSION_KIRINX90"},
     {"kirin9020", "SOC_VERSION_KIRIN9020"},
     {"kirin9030", "SOC_VERSION_KIRIN9030"},
@@ -170,7 +171,8 @@ const std::map<std::string, std::string> SOC_SUPPORT_MAP = {
     {"kirindev0001", "SOC_VERSION_KIRINDEV0001"},
     {"kirindev0002", "SOC_VERSION_KIRINDEV0002"},
     {"kirindev0003", "SOC_VERSION_KIRINDEV0003"},
-    {"ascend350", "SOC_VERSION_ASCEND350"}};
+    {"ascend350", "SOC_VERSION_ASCEND350"},
+    {"ascend960PR", "SOC_VERSION_ASCEND960PR"}};
 
 const std::map<int, std::string> DTYPE_SUPPORT_MAP = {
     {ge::DT_FLOAT, "ge::DT_FLOAT"},
@@ -212,7 +214,9 @@ const std::map<int, std::string> DTYPE_SUPPORT_MAP = {
     {ge::DT_FLOAT6_E3M2, "ge::DT_FLOAT6_E3M2"},
     {ge::DT_FLOAT6_E2M3, "ge::DT_FLOAT6_E2M3"},
     {ge::DT_FLOAT4_E2M1, "ge::DT_FLOAT4_E2M1"},
-    {ge::DT_FLOAT4_E1M2, "ge::DT_FLOAT4_E1M2"}};
+    {ge::DT_FLOAT4_E1M2, "ge::DT_FLOAT4_E1M2"},
+    {ge::DT_HIFLOAT4, "ge::DT_HIFLOAT4"},
+    {ge::DT_HIFLOAT4_SCALE, "ge::DT_HIFLOAT4_SCALE"}};
 const std::map<int, std::string> FORMAT_SUPPORT_MAP = {
     {ge::FORMAT_NCHW, "ge::FORMAT_NCHW"},
     {ge::FORMAT_NHWC, "ge::FORMAT_NHWC"},

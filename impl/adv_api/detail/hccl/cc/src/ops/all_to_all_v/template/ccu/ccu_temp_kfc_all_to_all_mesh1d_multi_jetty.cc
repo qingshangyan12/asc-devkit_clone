@@ -36,6 +36,12 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::CalcRes(
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestMeshClosMultiJetty(comm, param, topoInfo, subCommRanks_, channelDescs));
 
+    return CalcResByChannelDescsImpl(param, channelDescs, resourceRequest);
+}
+
+HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::CalcResByChannelDescsImpl(
+    const OpParam& param, const std::vector<HcclChannelDesc>& channelDescs, AlgResourceRequest& resourceRequest) const
+{
     auto kernelArg = std::make_shared<CcuKernelArgKfcAllToAllMesh1DMultiJetty>();
     kernelArg->rankSize = tempRankSize_;
     kernelArg->rankId = mySubCommRank_;
@@ -77,7 +83,7 @@ HcclResult CcuTempKfcAllToAllMesh1DMultiJetty::KernelRun(
     config.msInterleave = CCU_MS_INTERLEAVE;
     config.loopCount = CCU_MS_LOCAL_COPY_LOOP_COUNT;
     config.memSlice = CCU_MS_SIZE * LOCAL_COPY_MS_PER_LOOP;
-    const auto goSize = CalGoSize(sliceSize, config);
+    const auto goSize = CalGoSize(sliceSize, config, GetCcuVersion());
 
     CcuKernelSubmitInfo submitInfo{};
     submitInfo.kernelHandle = templateResource.ccuKernels[0];

@@ -38,3 +38,9 @@ file(
     CREATE_LINK ../../utils/sys_macros_impl.h
     ${ASCENDC_INSTALL_BASE_PATH}/asc/impl/basic_api/utils/sys_macros_impl.h
     SYMBOLIC)
+
+# Preserve the legacy internal header path in installed packages.
+file(
+    CREATE_LINK ../../utils/sys_macros_impl.h
+    ${ASCENDC_INSTALL_BASE_PATH}/asc/impl/basic_api/utils/sys_macros.h
+    SYMBOLIC)

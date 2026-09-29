@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <algorithm>
+#include <cmath>
 #include <future>
 #include <map>
 #include <numeric>
@@ -46,6 +47,7 @@
 #include "ccu_launch_dl.h"
 #include "ccu_res_dl.h"
 #include "hccl_ccu_res_dl.h"
+#include "hccl_res_dl.h"
 #include "ccu_log.h"
 #include "hcomm/ccu/ccu_assist_pub.h"
 #include "kfc_server_protocol.h"
@@ -84,8 +86,17 @@ struct HcclDfxOpInfo {
     uint64_t cpuTsThread = 0;                      // host侧算子主流的threadhandle
     uint32_t cpuWaitAicpuNotifyIdx = INVALID_UINT; // host wait device notifyIdx
     uint32_t cpuWaitAicpuNotifyId = INVALID_UINT;  // host wait device notifyId
-    int8_t reserve[128];                           // 预留扩展字段
+    // 算子内存信息
+    uint64_t inputMemAddr = 0;
+    uint64_t inputMemSize = 0;
+    uint64_t outputMemAddr = 0;
+    uint64_t outputMemSize = 0;
+    int8_t reserve[96]; // 预留扩展字段
 };
+
+static_assert(sizeof(HcclDfxOpInfo) == 504U, "HcclDfxOpInfo size must match HCOMM ABI");
+static_assert(offsetof(HcclDfxOpInfo, inputMemAddr) == 376U, "HcclDfxOpInfo inputMemAddr offset mismatch");
+static_assert(offsetof(HcclDfxOpInfo, reserve) == 408U, "HcclDfxOpInfo reserve offset mismatch");
 
 #ifdef __cplusplus
 }
@@ -95,6 +106,9 @@ namespace mc2_ops_hccl {
 // 用于维护增量建链算子的host ctx信息
 thread_local std::map<std::string, std::unique_ptr<AlgResourceCtxSerializable>> g_hostCtx;
 constexpr u32 HOST_WAIT_AICPU_NOTIFYIDX = 0; // host主流wait aicpu流的notify idx
+
+// Selector 在文件前部调用，具体实现位于本文件末尾。
+HcclResult SetMultipleDimensionSplitRatio(HcclComm comm, OpParam& param);
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
 {
@@ -224,6 +238,7 @@ HcclResult Selector(
         CHK_RET(LoadAICPUKernel()); // 该函数内部有防止重复加载的逻辑
     }
     CHK_RET(SetOpParamAlgTag(param, algName));
+    CHK_RET(SetMultipleDimensionSplitRatio(comm, param));
     HCCL_INFO(
         "[asc][AlgoSelect][Selector] end, opType[%d], algName[%s], algTag[%s], engine[%d], "
         "opExecuteConfig[%d].",
@@ -410,6 +425,12 @@ HcclResult HcclExecOp(
         return HCCL_E_INTERNAL;
     }
 
+    // HcclExecOp 在资源准备前需要知道最终 algName，才能对迁移后的 PCIe 算法选择本地 registry。
+    ret = sprintf_s(param.algName, sizeof(param.algName), "%s", algName.c_str());
+    if (ret <= 0) {
+        HCCL_ERROR("[%s] failed to fill param.algName", __func__);
+        return HCCL_E_INTERNAL;
+    }
     bool useCannResCtx = UseCannBridge(param);
 
     std::unique_ptr<InsCollAlgBase> executor = nullptr;
@@ -475,6 +496,10 @@ HcclResult HcclExecOp(
     hcclDfxOpInfo.engine = param.engine;
     hcclDfxOpInfo.cpuTsThread = cpuTsThread;
     hcclDfxOpInfo.cpuWaitAicpuNotifyIdx = HOST_WAIT_AICPU_NOTIFYIDX;
+    hcclDfxOpInfo.inputMemAddr = reinterpret_cast<uint64_t>(param.inputPtr);
+    hcclDfxOpInfo.inputMemSize = param.inputSize;
+    hcclDfxOpInfo.outputMemAddr = reinterpret_cast<uint64_t>(param.outputPtr);
+    hcclDfxOpInfo.outputMemSize = param.outputSize;
     s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
     CHK_PRT_RET(
         sRet != EOK,
@@ -843,8 +868,7 @@ HcclResult HcclGetAlgRes(
         param.algTag);
     const bool useCannBridge =
         (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
-        (param.opType == HcclCMDType::HCCL_CMD_ALLTOALL || param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV ||
-         param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+        (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV || param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
         AlgAttrs algAttrs = executor->GetAlgoMeta(std::string(param.algName));
         HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
@@ -887,6 +911,29 @@ HcclResult HcclGetAlgRes(
             "[asc][AlgoResource][HcclGetAlgRes] after CcuKfcServer CalcRes, "
             "ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
             resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size());
+        // SoleNHR 2Die：mission 数由 dieNum（模板 CalcRes 通道探测）决定，AcquireAlgResources 构造
+        // kfcServerArgs 时按静态 GetKfcServerMissionNum（=1）生成——双 die 时此处按源 kernel 数修正
+        // missionNum 与 dieNum（ccuKernelNum 尾值即模板 push 的 kernelNum=dieNum）
+        if (std::strcmp(param.algName, KFC_RS_SOLE_NHR_2DIE_ALG_NAME) == 0 && !resRequest.ccuKernelNum.empty() &&
+            resCtxHost->kfcServerArgs.size() >= KFC_SERVER_ARG_NUM) {
+            const uint32_t dieNum = std::min<uint32_t>(resRequest.ccuKernelNum.back(), KFC_MAX_MISSION_NUM);
+            const uint32_t staticMissionNum = GetKfcServerMissionNum(param.algName);
+            if (dieNum != staticMissionNum) {
+                HCCL_INFO(
+                    "[asc][AlgoResource][HcclGetAlgRes] SoleNHR 2Die regen kfcServerArgs, dieNum[%u] -> "
+                    "missionNum[%u] (static[%u])",
+                    dieNum, dieNum, staticMissionNum);
+                const uint64_t xnAddr = resCtxHost->kfcServerArgs[0];
+                const uint64_t ckeAddr = resCtxHost->kfcServerArgs[1];
+                const uint64_t token = resCtxHost->kfcServerArgs[KFC_SERVER_TOKEN_ARG_INDEX];
+                resCtxHost->kfcServerArgs.clear();
+                resCtxHost->kfcServerArgs.reserve(dieNum * KFC_SERVER_ARG_NUM);
+                for (uint32_t missionIndex = 0; missionIndex < dieNum; ++missionIndex) {
+                    resCtxHost->kfcServerArgs.insert(
+                        resCtxHost->kfcServerArgs.end(), {xnAddr, ckeAddr, dieNum, dieNum, missionIndex, token});
+                }
+            }
+        }
     }
 
     // host侧资源
@@ -1074,9 +1121,14 @@ HcclResult HcclGetThread(
         // maxNotifyNum需要再增加一个用于host-device同步
         CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
         CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
-        // 申请展开流对应的Thread
-        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
-        CHK_RET(SaveUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread));
+        // MC2 and HCCL share the communication-domain unfold thread. Resource preparation is serialized.
+        const auto unfoldRet = GetUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread);
+        if (unfoldRet == HCCL_E_NOT_FOUND) {
+            CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
+            CHK_RET(SaveUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread));
+        } else {
+            CHK_RET(unfoldRet);
+        }
         HCCL_INFO("[HcclGetThread] unfoldThread [%lu]", resCtxHost->unfoldThread);
         HCCL_DEBUG("threads ptr is %p\n", threads.data());
         for (u32 i = 0; i < threadNum; i++) {
@@ -1142,11 +1194,12 @@ HcclResult SaveMainThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle 
 
 HcclResult SaveUnfoldThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle unfoldThread)
 {
+    CHK_PRT_RET(unfoldThread == 0, HCCL_ERROR("[%s] invalid unfold thread", __func__), HCCL_E_PARA);
     uint64_t size = sizeof(ThreadHandle);
     void* ctx = nullptr;
     // 申请一块host类型内存，保存展开流信息
     char unfoldAlgTag[ALG_TAG_LENGTH] = {0};
-    int ret = snprintf_s(unfoldAlgTag, sizeof(unfoldAlgTag), sizeof(unfoldAlgTag) - 1, "%s_unfold", param.algTag);
+    int ret = snprintf_s(unfoldAlgTag, sizeof(unfoldAlgTag), sizeof(unfoldAlgTag) - 1, "%s_unfold", param.commName);
     CHK_PRT_RET(ret <= 0, HCCL_ERROR("[%s] failed to fill unfoldAlgTag", __func__), HCCL_E_INTERNAL);
     CHK_RET(HcclEngineCtxCreate(comm, unfoldAlgTag, CommEngine::COMM_ENGINE_CPU_TS, size, &ctx));
     CHK_PTR_NULL(ctx);
@@ -1164,12 +1217,22 @@ HcclResult GetUnfoldThreadInfo(HcclComm comm, const OpParam& param, ThreadHandle
     uint64_t size = sizeof(ThreadHandle);
     void* ctx = nullptr;
     char unfoldAlgTag[ALG_TAG_LENGTH] = {0};
-    int ret = snprintf_s(unfoldAlgTag, sizeof(unfoldAlgTag), sizeof(unfoldAlgTag) - 1, "%s_unfold", param.algTag);
+    int ret = snprintf_s(unfoldAlgTag, sizeof(unfoldAlgTag), sizeof(unfoldAlgTag) - 1, "%s_unfold", param.commName);
     CHK_PRT_RET(ret <= 0, HCCL_ERROR("[%s] failed to fill unfoldAlgTag", __func__), HCCL_E_INTERNAL);
-    CHK_RET(HcclEngineCtxGet(comm, unfoldAlgTag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size));
+    const auto ctxRet = HcclEngineCtxGet(comm, unfoldAlgTag, CommEngine::COMM_ENGINE_CPU_TS, &ctx, &size);
+    if (ctxRet == HCCL_E_NOT_FOUND) {
+        // The caller creates the unfold thread when its context does not exist yet.
+        return ctxRet;
+    }
+    CHK_RET(ctxRet);
+    CHK_PTR_NULL(ctx);
+    CHK_PRT_RET(
+        size != sizeof(ThreadHandle), HCCL_ERROR("[%s] invalid unfold context size[%llu]", __func__, size),
+        HCCL_E_PARA);
     // 获取展开流handle信息
     ThreadHandle* threadPtr = reinterpret_cast<ThreadHandle*>(ctx);
     unfoldThread = *threadPtr;
+    CHK_PRT_RET(unfoldThread == 0, HCCL_ERROR("[%s] invalid unfold thread", __func__), HCCL_E_PARA);
     HCCL_INFO(
         "[GetUnfoldThreadInfo]unfoldAlgTag[%s], threadPtr[%p], unfoldThread[%lu]", unfoldAlgTag, threadPtr,
         unfoldThread);
@@ -1400,6 +1463,22 @@ HcclResult GetAlgResCcu(
 #endif
 }
 
+static HcclResult ReleaseCcuAcquiredChannels(HcclComm comm, AlgResourceRequest& resRequest)
+{
+    if (!HcommIsSupportHcclChannelDestroy() || resRequest.acquiredChannels.empty()) {
+        return HCCL_SUCCESS;
+    }
+    HcclResult ret = HcclChannelDestroy(comm, resRequest.acquiredChannels.data(), resRequest.acquiredChannels.size());
+    if (ret != HCCL_SUCCESS) {
+        HCCL_WARNING(
+            "[ReleaseCcuAcquiredChannels] HcclChannelDestroy failed, ret[%d], channelNum[%zu].", ret,
+            resRequest.acquiredChannels.size());
+    }
+    HCCL_INFO("[ReleaseCcuAcquiredChannels] release [%zu] channels.", resRequest.acquiredChannels.size());
+    resRequest.acquiredChannels.clear();
+    return HCCL_SUCCESS;
+}
+
 HcclResult HcclAllocAlgResourceCcu(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
@@ -1440,11 +1519,20 @@ HcclResult HcclAllocAlgResourceCcu(
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
+    resCtxHost->parallelPortInfo = resRequest.parallelPortInfo;
     if (!param.checkRes) {
         CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
+        CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
+        CHK_RET(HcclGetCcuKernel(comm, param, resRequest, resCtxHost));
+        return HCCL_SUCCESS;
     }
-    CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
-    CHK_RET(HcclGetCcuKernel(comm, param, resRequest, resCtxHost));
+    HcclResult ret = HcclGetChannelForCcu(comm, param, resRequest);
+    if (ret == HCCL_SUCCESS) {
+        ret = HcclGetCcuKernel(comm, param, resRequest, resCtxHost);
+    }
+    // 资源预检查场景下，释放本次新建的channel
+    ReleaseCcuAcquiredChannels(comm, resRequest);
+    CHK_RET(ret);
     return HCCL_SUCCESS;
 #endif
 }
@@ -1470,14 +1558,35 @@ HcclResult HcclGetChannelForCcu(HcclComm comm, const OpParam& param, AlgResource
         kernelChannels.resize(channelNum);
 
         if (channelNum > 0) {
+            // 查询已存在的通道，existingChannels[i]非0表示通道已存在可复用，为0表示需新建；
+            std::vector<ChannelHandle> existingChannels;
+            if (HcommIsSupportHcclChannelQuery()) {
+                existingChannels.assign(channelNum, 0);
+                auto queryRet = HcclChannelQuery(
+                    comm, param.engine, kernelChannelRequest.data(), channelNum, existingChannels.data());
+                if (queryRet != HCCL_SUCCESS) {
+                    HCCL_WARNING("[HcclChannelQuery] failed, ret[%d], treat all as new channels.", queryRet);
+                }
+            }
             // 需要资源回退。返回资源不够
             auto ret =
                 HcclChannelAcquire(comm, param.engine, kernelChannelRequest.data(), channelNum, kernelChannels.data());
             if (ret == HCCL_E_UNAVAIL) {
                 HCCL_WARNING("[HcclChannelAcquire] channel unavailable, channel num[%u].", channelNum);
+                // 释放当前kernel之前已申请的新增通道
+                ReleaseCcuAcquiredChannels(comm, resRequest);
                 return HCCL_E_UNAVAIL;
             } else {
                 CHK_RET(ret);
+            }
+
+            if (!existingChannels.empty()) {
+                // 记录新增通道（existingChannels[i]为0表示该通道是本次HcclChannelAcquire新建的）
+                for (u32 i = 0; i < existingChannels.size(); ++i) {
+                    if (existingChannels[i] == 0) {
+                        resRequest.acquiredChannels.push_back(kernelChannels[i]);
+                    }
+                }
             }
             // 从首条channel获取dieId，作为kernel所属dieId保存（同一kernel的所有channel在同一die上）
             EndpointDesc localEndpoint = kernelChannelRequest[0].localEndpoint;
@@ -1533,6 +1642,10 @@ HcclResult RegisterCcuDfxOpInfo(HcclComm comm, const OpParam& param)
     CHK_RET(HcclGetRankSize(comm, &userRankSize));
     hcclDfxOpInfo.root = param.root;
     hcclDfxOpInfo.engine = param.engine;
+    hcclDfxOpInfo.inputMemAddr = reinterpret_cast<uint64_t>(param.inputPtr);
+    hcclDfxOpInfo.inputMemSize = param.inputSize;
+    hcclDfxOpInfo.outputMemAddr = reinterpret_cast<uint64_t>(param.outputPtr);
+    hcclDfxOpInfo.outputMemSize = param.outputSize;
     s32 sRet = strncpy_s(hcclDfxOpInfo.algTag, ALG_TAG_LENGTH, param.algTag, ALG_TAG_LENGTH);
     CHK_PRT_RET(
         sRet != EOK, HCCL_ERROR("%s call strncpy_s failed, param.algTag %s,  return %d.", __func__, param.algTag, sRet),
@@ -1631,7 +1744,8 @@ static bool IsCcuDynamicResApiSupported()
            HcommIsSupportHcommCcuInsResDescSetNum() && HcommIsSupportHcommCcuInsResDescQueryNum() &&
            HcommIsSupportHcommCcuInsCreate() && HcommIsSupportHcommCcuInsDestroy() &&
            HcommIsSupportHcommCcuInsQueryResDesc() && HcommIsSupportHcommCcuQueryRemainResDesc() &&
-           HcommIsSupportHcommCcuKernelQueryResReq() && HcommIsSupportHcclCommAssignCcuIns();
+           HcommIsSupportHcommCcuKernelQueryResReq() && HcommIsSupportHcclCommAssignCcuIns() &&
+           HcommIsSupportHcclChannelDestroy() && HcommIsSupportHcclChannelQuery();
 }
 
 // 按 dieId 维护资源描述符集合；HcommCcuInsResDescCreate 接口要求每个 desc 必须绑定一个 dieId，
@@ -2680,6 +2794,76 @@ HcclResult CheckHostDPUOnly(const HcclComm comm, const TopoInfoWithNetLayerDetai
         HCCL_INFO("Using host dpu trans.");
         hostDPUOnly = true;
     }
+    return HCCL_SUCCESS;
+}
+
+static HcclResult GetCommMultipleDimensionSplitRatio(HcclComm comm, double& ratio, bool& isConfigured)
+{
+    // 值对齐 CANN >= 9.1 头文件中 HcclConfigType::HCCL_CONFIG_TYPE_MULTIPLE_DIMENSION_SPLIT_RATIO；
+    // 本地 hccl_comm.h 尚未收敛该成员，为避免对 include/adv_api 对外头的变更，此处使用局部常量直传。
+    constexpr HcclConfigType kCfgTypeSplitRatio = static_cast<HcclConfigType>(1);
+    ratio = 0.0;
+    isConfigured = false;
+    double commRatio = 0.0;
+    const uint32_t infoLen = sizeof(commRatio);
+    HcclResult ret = HcclConfigGetInfo(comm, kCfgTypeSplitRatio, infoLen, &commRatio);
+    if (ret == HCCL_E_NOT_SUPPORT) {
+        HCCL_INFO("[GetCommMultipleDimensionSplitRatio] comm config not set or not supported, ret[%d].", ret);
+        return HCCL_SUCCESS;
+    }
+    if (ret != HCCL_SUCCESS) {
+        HCCL_ERROR("[GetCommMultipleDimensionSplitRatio] HcclConfigGetInfo failed, ret[%d].", ret);
+        return ret;
+    }
+    if (!std::isfinite(commRatio) || commRatio < 0.0 || commRatio > 1.0) {
+        HCCL_ERROR(
+            "[GetCommMultipleDimensionSplitRatio] comm ratio[%f] is not finite or out of range[0, 1].", commRatio);
+        return HCCL_E_PARA;
+    }
+    if (commRatio == 0.0) {
+        HCCL_INFO("[GetCommMultipleDimensionSplitRatio] comm split ratio is not configured.");
+        return HCCL_SUCCESS;
+    }
+    ratio = commRatio;
+    isConfigured = true;
+    HCCL_INFO("[GetCommMultipleDimensionSplitRatio] comm ratio[%f] is configured.", commRatio);
+    return HCCL_SUCCESS;
+}
+
+HcclResult SetMultipleDimensionSplitRatio(HcclComm comm, OpParam& param)
+{
+    constexpr double defaultRatio = 0.5;
+
+    double commRatio = 0.0;
+    bool isCommConfigured = false;
+    HcclResult ret = GetCommMultipleDimensionSplitRatio(comm, commRatio, isCommConfigured);
+    if (ret != HCCL_SUCCESS) {
+        return ret;
+    }
+    if (isCommConfigured) {
+        param.opConfig.multipleDimensionSplitRatio = commRatio;
+        param.opConfig.multipleDimensionSplitRatioSource = MultipleDimensionSplitRatioSource::COMM_CONFIG;
+        HCCL_INFO("[SetMultipleDimensionSplitRatio] ratioSource[COMM_CONFIG], configuredRatio[%f]", commRatio);
+        return HCCL_SUCCESS;
+    }
+
+    double envRatio = 0.0;
+    if (GetExternalInputMultipleDimensionSplitRatio(envRatio)) {
+        if (!std::isfinite(envRatio) || envRatio < 0.0 || envRatio > 1.0) {
+            HCCL_WARNING(
+                "[SetMultipleDimensionSplitRatio] env ratio[%f] is out of range, use default ratio[%f]", envRatio,
+                defaultRatio);
+            envRatio = defaultRatio;
+        }
+        param.opConfig.multipleDimensionSplitRatio = envRatio;
+        param.opConfig.multipleDimensionSplitRatioSource = MultipleDimensionSplitRatioSource::ENV_CONFIG;
+        HCCL_INFO("[SetMultipleDimensionSplitRatio] ratioSource[ENV_CONFIG], configuredRatio[%f]", envRatio);
+        return HCCL_SUCCESS;
+    }
+
+    param.opConfig.multipleDimensionSplitRatio = defaultRatio;
+    param.opConfig.multipleDimensionSplitRatioSource = MultipleDimensionSplitRatioSource::BUILTIN_FORMULA;
+    HCCL_INFO("[SetMultipleDimensionSplitRatio] ratioSource[BUILTIN_FORMULA], configuredRatio[%f]", defaultRatio);
     return HCCL_SUCCESS;
 }
 } // namespace mc2_ops_hccl

@@ -24,7 +24,9 @@ import {
   normalizeApiRoute,
 } from '../../scripts/api-support.mjs'
 import { loadGitTimestamps } from '../../scripts/git-timestamps.mjs'
+import { installMermaidFence } from '../../scripts/mermaid-fence.mjs'
 import { shellQuote } from '../../scripts/shell-utils.mjs'
+import { patchVitePressSidebarItem } from '../../scripts/vitepress-sidebar-patch.mjs'
 import {
   createBaiduAnalyticsHead,
   resolveBaiduAnalyticsSiteId,
@@ -619,6 +621,7 @@ export default defineConfig({
   markdown: {
     math: true,
     config(md) {
+      installMermaidFence(md)
       installRepositoryLinkRewrite(
         md,
         env => getOriginalSourceFile(env?.relativePath),
@@ -824,6 +827,13 @@ function balanceDivTags(html) {
         }
       },
     }, {
+      name: 'copy-mermaid-browser-bundle',
+      closeBundle() {
+        const src = resolve(docsRoot, '..', 'node_modules', 'mermaid', 'dist', 'mermaid.min.js')
+        const dst = resolve(distDir, 'assets', 'mermaid.min.js')
+        copyFileSync(src, dst)
+      },
+    }, {
       name: 'vitepress-override-search-vue',
       enforce: 'post',
       config: () => ({
@@ -874,12 +884,7 @@ function balanceDivTags(html) {
             '<ClientOnly><VPSidebarGroup :items="sidebarGroups" :key="key" /></ClientOnly>'
           )
         } else if (id.includes('VPSidebarItem')) {
-          result = result.replace('depth < 5', 'true')
-          result = result.replace('props.depth + 2 === 7', 'props.depth + 2 >= 7')
-          result = result.replace(
-            '<div v-if="item.items && item.items.length" class="items">',
-            '<div v-if="item.items && item.items.length && !collapsed" class="items">'
-          )
+          result = patchVitePressSidebarItem(result)
         }
         if (result === code) return null
         return result
