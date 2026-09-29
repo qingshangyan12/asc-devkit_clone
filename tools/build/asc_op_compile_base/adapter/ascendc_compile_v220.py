@@ -42,6 +42,85 @@ from .ascendc_compile_dfx import DFXSectionGenerator
 from .super_kernel_sub_op_compile import gen_sub_kernel_name
 
 
+def _gen_compile_cmd_920r1(
+    src_file: str,
+    dst_file: str,
+    compile_option_tuple,
+    sub_arch: str,
+    tiling_file: str,
+    with_tiling_file: bool = True,
+):
+    """
+    Generate the compile command for the c310 compiler.
+    :param src_file: the source file
+    :param dst_file: the destination file
+    :param extra_options: the extra options
+    :param with_tiling_file: whether with the tiling file
+    :return: the compile command
+    """
+    if global_var_storage.get_variable("ascendc_enable_ccache") == True:
+        compile_cmd = [
+            os.environ.get("ASCENDC_CCACHE_EXECUTABLE"),
+            global_var_storage.get_variable("ascendc_compiler_path"),
+            "-c",
+            "-O3",
+        ]
+    else:
+        compile_cmd = [
+            global_var_storage.get_variable("ascendc_compiler_path"),
+            "-c",
+            "-O3",
+        ]
+
+    for option in compile_option_tuple.compile_options:
+        compile_cmd += [option]
+
+    define = "-D__DAV_VEC__"
+    if sub_arch == "dav-920r1-cube":
+        define = "-D__DAV_CUBE__"
+
+    compile_cmd += [
+        src_file,
+        "--cce-aicore-arch=%s" % sub_arch,
+        define,
+        "-D__NPU_ARCH__=9201",
+        "--cce-aicore-only",
+        "-o",
+        dst_file,
+        "-mllvm",
+        "-cce-aicore-stack-size=0x8000",
+        "-mllvm",
+        "-cce-aicore-function-stack-size=0x8000",
+        "-mllvm",
+        "-cce-aicore-record-overflow=false",
+        "-mllvm",
+        "-cce-aicore-addr-transform",
+        "-mllvm",
+        "--cce-aicore-jump-expand=true",
+        "-mllvm",
+        "-cce-aicore-dcci-insert-for-scalar=false",
+    ]
+    if global_var_storage.get_variable("ascendc_enable_sanitizer"):
+        compile_cmd += ["--cce-enable-sanitizer", "-gline-tables-only"]
+        compile_cmd += [
+            "-mllvm",
+            "-cce-aicore-long-call",
+            "-mllvm",
+            "-cce-aicore-jump-expand=true",
+        ]
+
+    for opt in compile_option_tuple.mllvm_options:
+        compile_cmd += [opt]
+
+    if with_tiling_file and tiling_file != "":
+        compile_cmd += ["-include", tiling_file]
+    compile_cmd += ["-std=c++17"]
+    if "oom" in get_current_build_config("tir.op_debug_config"):
+        compile_cmd += ["-mllvm", "-cce-block-local-relocate=false"]
+        compile_cmd += [f"-D{ASCENDC_OOM}={1}"]
+    return compile_cmd
+
+
 def _gen_compile_cmd_c310(
     src_file: str, dst_file: str, compile_option_tuple, sub_arch: str, tiling_file: str, with_tiling_file: bool = True
 ):
@@ -233,7 +312,23 @@ def gen_compile_cmd_v220(
     :return: the compile command
     """
     if CommonUtility.is_c310():
-        return _gen_compile_cmd_c310(src_file, dst_file, compile_option_tuple, sub_arch, tiling_file, with_tiling_file)
+        return _gen_compile_cmd_c310(
+            src_file,
+            dst_file,
+            compile_option_tuple,
+            sub_arch,
+            tiling_file,
+            with_tiling_file,
+        )
+    elif CommonUtility.is_920r1():
+        return _gen_compile_cmd_920r1(
+            src_file,
+            dst_file,
+            compile_option_tuple,
+            sub_arch,
+            tiling_file,
+            with_tiling_file,
+        )
     elif CommonUtility.is_m510():
         return _gen_compile_cmd_m510(src_file, dst_file, compile_option_tuple, tiling_file, with_tiling_file)
     else:
@@ -336,7 +431,9 @@ def gen_compile_cmd_for_meta_info(src_file: str, dst_file: str, compile_option_t
 
 
 def get_v220_kernel_type_mix_flag(compile_info: CompileInfo, tiling_info: TilingInfo):
-    is_v220_flag = CommonUtility.is_v220() or CommonUtility.is_c310()
+    is_v220_flag = (
+        CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_920r1()
+    )
     kernel_type_res = 0
     is_single_and_using_hard_sync = (
         is_v220_flag and compile_info.hard_sync and compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE]
