@@ -288,6 +288,7 @@ __simd_callee__ inline void asc_or(vector_half& dst, vector_half src0, vector_ha
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_or integer overload)
 __simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
 //=================asc_shiftleft (unsigned shift overloads, 9201)==================
 __simd_callee__ inline void asc_shiftleft(
     vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
@@ -411,6 +412,7 @@ __simd_callee__ inline vector_int16_t asc_shiftright_scalar(vector_int16_t src, 
 __simd_callee__ inline vector_uint32_t asc_shiftright_scalar(vector_uint32_t src, uint32_t value, vector_bool mask);
 
 __simd_callee__ inline vector_int32_t asc_shiftright_scalar(vector_int32_t src, uint32_t value, vector_bool mask);
+#endif
 
 #endif
 
