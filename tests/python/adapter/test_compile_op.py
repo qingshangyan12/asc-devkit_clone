@@ -1684,12 +1684,13 @@ class TestCompileOp(unittest.TestCase):
         global_var_storage.set_variable("ascendc_enable_super_kernel", True)
         DFXSectionGenerator().dfx_info_reset(op_info)
 
-        with TemporaryDirectory() as temp_dir, mock.patch.object(
-            CommonUtility, "is_c310", return_value=True
-        ), mock.patch.object(CommonUtility, "is_support_workspace_offset", return_value=True), mock.patch.object(
-            compile_op_module, "get_v220_kernel_type_mix_flag", return_value=(False, False)
-        ), mock.patch.object(compile_op_module, "get_context", return_value=None), mock.patch.object(
-            compile_op_module, "get_current_build_config", return_value=False
+        with (
+            TemporaryDirectory() as temp_dir,
+            mock.patch.object(CommonUtility, "is_c310", return_value=True),
+            mock.patch.object(CommonUtility, "is_support_workspace_offset", return_value=True),
+            mock.patch.object(compile_op_module, "get_v220_kernel_type_mix_flag", return_value=(False, False)),
+            mock.patch.object(compile_op_module, "get_context", return_value=None),
+            mock.patch.object(compile_op_module, "get_current_build_config", return_value=False),
         ):
             compile_info.gen_kernel_func_file = os.path.join(temp_dir, "wrapper.cpp")
             for workspace_size in (0, 1024):
