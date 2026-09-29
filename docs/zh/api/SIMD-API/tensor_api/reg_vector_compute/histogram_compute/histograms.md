@@ -98,7 +98,7 @@ __simd_callee__ inline reg_tensor<T> histograms(
 - `src.mask`只用于筛选参与统计的输入元素，不用于筛选返回值中的统计位置。返回值中的所有位置都会在`dst`原值的基础上更新。
 - 统计结果在`dst`原有数据的基础上累加。调用前必须初始化`dst.reg`；多次调用时，需要将前一次返回值作为后一次调用的`dst`输入。返回值的`mask`继承`dst.mask`，将返回值用于`store`前需要通过`with_mask`设置`dst.mask`。
 - `dst`的元素类型为`uint16_t`，单个统计结果的最大值为65535。用户需要保证累加结果不超过该范围，否则会发生溢出。
-- 非默认配置必须先定义具名的`constexpr histogram_options`，再作为模板实参传入。
+- 使用非默认配置时，需要在命名空间作用域定义具名的`constexpr histogram_options`对象，并将该对象作为模板实参传入。
 
 ## 调用示例
 
