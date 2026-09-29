@@ -38,6 +38,8 @@
 #include "dav_3510/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_mm_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_mm_impl.h"
 #elif (__NPU_ARCH__ == 3113)
@@ -550,9 +552,11 @@ __aicore__ inline void MmadImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+    // Keep backend updates local to this call.
+    MmadBitModeParams localMmadParams = mmadParams;
     MmadCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        (uint64_t)bias.GetPhyAddr(), mmadParams);
+        (uint64_t)bias.GetPhyAddr(), localMmadParams);
 }
 #endif
 
@@ -606,9 +610,11 @@ __aicore__ inline void MmadMxImpl(
     }
     CheckMmadAlign(dst, fm, filter);
 #endif
+    // Keep backend updates local to this call.
+    MmadBitModeParams localMmadParams = mmadParams;
     MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        mmadParams);
+        localMmadParams);
 }
 
 template <typename T, typename U, typename S, typename V>
@@ -636,9 +642,11 @@ __aicore__ inline void MmadMxImpl(
                               "L0C Buffer(CO1)/BiasTable Buffer(C2)");
         });
     }
+    // Keep backend updates local to this call.
+    MmadBitModeParams localMmadParams = mmadParams;
     MmadMxCal(
         (__cc__ PrimT<T>*)dst.GetPhyAddr(), (__ca__ PrimT<U>*)fm.GetPhyAddr(), (__cb__ PrimT<S>*)filter.GetPhyAddr(),
-        (uint64_t)bias.GetPhyAddr(), mmadParams);
+        (uint64_t)bias.GetPhyAddr(), localMmadParams);
 }
 #endif
 

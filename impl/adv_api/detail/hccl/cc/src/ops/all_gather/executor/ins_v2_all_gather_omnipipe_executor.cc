@@ -19,6 +19,8 @@
 #include "ins_temp_all_gather_omnipipe_mesh_1D.h"
 #include "ins_temp_all_gather_omnipipe_nhr.h"
 #include "omnipipe_template_utils.h"
+#include "alg_meta_registry.h"
+#include "external_alg_rules.h"
 
 namespace mc2_ops_hccl {
 constexpr u32 ALG_HIERARCHY_NUM3 = 3;
@@ -550,9 +552,9 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     const u64 processedDataCount, int step) const
 {
     HCCL_DEBUG("do localcopy, parallel with step %u", step);
-    for (int k = 0; k < rankSizeLevel_[OMNIPIPE_LEVEL0]; k++) {
-        for (int rpt = 0; rpt < omniPipeSliceLocalcopyInfo.dataSliceLevel0[step - 1].inputOmniPipeSliceStride[k].size();
-             rpt++) {
+    for (uint64_t k = 0; k < rankSizeLevel_[OMNIPIPE_LEVEL0]; k++) {
+        for (size_t rpt = 0;
+             rpt < omniPipeSliceLocalcopyInfo.dataSliceLevel0[step - 1].inputOmniPipeSliceStride[k].size(); rpt++) {
             void* txSrcPtr0 = tempAlgParamMap[OMNIPIPE_LEVEL0].buffInfo.hcclBuff.addr;
             void* txDstPtr0 = param.outputPtr;
             u64 txBaseOff0 = tempAlgParamMap[OMNIPIPE_LEVEL0].buffInfo.inBuffBaseOff +
@@ -572,9 +574,9 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
             CHK_RET(LocalCopy(controlThread_, txSrcSlice0, txDstSlice0));
         }
     }
-    for (int k = 0; k < rankSizeLevel_[OMNIPIPE_LEVEL1]; k++) {
-        for (int rpt = 0; rpt < omniPipeSliceLocalcopyInfo.dataSliceLevel1[step - 1].inputOmniPipeSliceStride[k].size();
-             rpt++) {
+    for (uint64_t k = 0; k < rankSizeLevel_[OMNIPIPE_LEVEL1]; k++) {
+        for (size_t rpt = 0;
+             rpt < omniPipeSliceLocalcopyInfo.dataSliceLevel1[step - 1].inputOmniPipeSliceStride[k].size(); rpt++) {
             void* txSrcPtr1 = tempAlgParamMap[OMNIPIPE_LEVEL1].buffInfo.hcclBuff.addr;
             void* txDstPtr1 = param.outputPtr;
             u64 txBaseOff1 = tempAlgParamMap[OMNIPIPE_LEVEL1].buffInfo.inBuffBaseOff +
@@ -604,8 +606,8 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     const OmniPipeSliceInfo& omniPipeSliceLocalcopyInfo, std::map<u32, TemplateDataParams>& tempAlgParamMap,
     const u64 processedDataCount, int step) const
 {
-    int k = rankIdxLevel_[OMNIPIPE_LEVEL0];
-    for (int rpt = 0; rpt < omniPipeSliceLocalcopyInfo.dataSliceLevel0[step - 1].inputOmniPipeSliceStride[k].size();
+    uint64_t k = rankIdxLevel_[OMNIPIPE_LEVEL0];
+    for (size_t rpt = 0; rpt < omniPipeSliceLocalcopyInfo.dataSliceLevel0[step - 1].inputOmniPipeSliceStride[k].size();
          rpt++) {
         void* txSrcPtr0 = tempAlgParamMap[OMNIPIPE_LEVEL0].buffInfo.hcclBuff.addr;
         void* txDstPtr0 = param.outputPtr;
@@ -626,7 +628,7 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
     }
 
     k = rankIdxLevel_[OMNIPIPE_LEVEL1];
-    for (int rpt = 0; rpt < omniPipeSliceLocalcopyInfo.dataSliceLevel1[step - 1].inputOmniPipeSliceStride[k].size();
+    for (size_t rpt = 0; rpt < omniPipeSliceLocalcopyInfo.dataSliceLevel1[step - 1].inputOmniPipeSliceStride[k].size();
          rpt++) {
         void* txSrcPtr1 = tempAlgParamMap[OMNIPIPE_LEVEL1].buffInfo.hcclBuff.addr;
         void* txDstPtr1 = param.outputPtr;
@@ -651,5 +653,8 @@ InsV2AllGatherOmniPipeExecutor<AlgTopoMatch, InsAlgTemplate0, InsAlgTemplate1, I
 REGISTER_EXEC_V2_MULTI(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLinePcie, InsV2AllGatherOmniPipeExecutor, TopoMatchPcieMix,
     InsTempAllGatherOmniPipeMesh1D, InsTempAllGatherOmniPipeNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherPipeLinePcie, AlgEngine::AICPU, "pipeline[mesh,nhr]", COND_NONE,
+    FLAG_NONE, 0);
 
 } // namespace mc2_ops_hccl

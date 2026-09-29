@@ -42,6 +42,8 @@
 #include "dav_3510/kernel_operator_vec_sel_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_cmpsel_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_vec_cmpsel_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_cmpsel_impl.h"
 #elif __NPU_ARCH__ == 3113
@@ -193,7 +195,7 @@ __aicore__ inline void Compare(
         ASCENDC_REPORT_CHECK_ERROR("Compare", KernelFuncType::CALCOUNT_MODE);
     }
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     ASCENDC_ASSERT(((count * sizeof(T)) % ONE_REPEAT_BYTE_SIZE == 0), {
         KERNEL_LOG(
             KERNEL_ERROR,
@@ -665,8 +667,8 @@ __aicore__ inline void Select(
         (__ubuf__ DataPrimType*)src0.GetPhyAddr(), src1, selMode, count);
 }
 
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103))
 /* **************************************************************************************************
  * Compares                                           *
  * ************************************************************************************************* */
@@ -793,8 +795,8 @@ __aicore__ inline void Compares(const T2& dst, const T3& src0, const T4& src1, C
     static_assert(SupportType<T2, LocalTensor<uint8_t>>());
 
     using ActualU = typename T2::PrimType;
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3103))
     ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0), {
         KERNEL_LOG(
             KERNEL_ERROR,
@@ -835,7 +837,7 @@ __aicore__ inline void CompareScalar(const T2& dst, const T3& src0, const T4& sr
     static_assert(SupportType<T2, LocalTensor<uint8_t>>());
 
     using ActualU = typename T2::PrimType;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     ASCENDC_ASSERT(((count * sizeof(T3)) % ONE_REPEAT_BYTE_SIZE == 0), {
         KERNEL_LOG(
             KERNEL_ERROR,

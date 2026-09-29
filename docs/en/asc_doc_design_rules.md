@@ -282,10 +282,10 @@ For details, see [C Programming Overview](../../../guide/programming_guide/progr
 - Atlas training series products: Supported
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90: Supported
+- Kirin X90 Processor Series Products: Supported
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030: Supported
+- Kirin 9030 Processor Series Products: Supported
 <!-- end id9 -->
 
 ### Prototype with config
@@ -312,10 +312,10 @@ For details, see [C Programming Overview](../../../guide/programming_guide/progr
 - Atlas training series products: Not supported
 <!-- end id16 -->
 <!-- npu="x90" id17 -->
-- Kirin X90: Not supported
+- Kirin X90 Processor Series Products: Not supported
 <!-- end id17 -->
 <!-- npu="9030" id18 -->
-- Kirin 9030: Not supported
+- Kirin 9030 Processor Series Products: Not supported
 <!-- end id18 -->
 
 >[!NOTE]Description
@@ -437,7 +437,7 @@ inQueueY.FreeTensor(yLocal);
 | SPMD vs SIMD vs SIMT | SPMD=programming model, SIMD=instruction execution mode, SIMT=thread execution mode | Hierarchy diagram |
 | Four-step (Tiling→Transfer→Compute→Transfer) vs TPipe four steps (Alloc→EnQue→...) | Programming flow vs pipeline management paradigm | Comparison table |
 | DMA vs MTE vs DataCopy | Three-layer name for the same operation | Terminology mapping table |
-| MemBase (Basic API) vs RegBase (VF fusion API) | Different compute locations (UB vs register), different Load/Store counts | Comparison table + scenario recommendation |
+| MemBase (Basic API) vs RegBase (VF fusion API) | Different compute locations (Unified Buffer (UB) vs register), different Load/Store counts | Comparison table + scenario recommendation |
 | Block vs CTA | Ascend C programming unit vs CUDA equivalent concept | Competitive mapping table |
 | `LocalTensor` vs `GlobalTensor` vs `TBuf` | Compute buffer / external buffer / temporary buffer | Comparison table + scenario recommendation |
 | `__ubuf__` vs `__cbuf__` vs `__gm__` | UB space / L1 space / GM space address qualifiers | Comparison table |
@@ -635,9 +635,9 @@ A custom aclnn operator project usually requires three types of code.
 
 The first type of code is the **operator prototype definition**, which declares operator interface information, including inputs, outputs, attributes, and supported dtype and format values.
 
-The second type of code is the **Host-side Tiling implementation**, which prepares runtime parameters before Kernel execution. Before the Kernel runs on the AI Core, it must know the total amount of input data, how to partition the computation across cores and how many Blocks to launch, how to continue partitioning within each Block, whether additional workspace is required, and whether launch configurations such as the scheduling mode must be set.
+The second type of code is the **Host-side Tiling implementation**, which prepares runtime parameters before kernel function execution. Before the kernel function runs on the AI Core, it must know the total amount of input data, how to partition the computation across cores and how many Blocks to launch, how to continue partitioning within each Block, whether additional workspace is required, and whether launch configurations such as the scheduling mode must be set.
 
-The third type of code is the **Kernel-side operator implementation**, which performs the actual computation on the AI Core. Based on the parameters passed by Tiling, the Kernel side transfers data from GM to UB, performs computation on UB, and writes the result back to GM.
+The third type of code is the **kernel function implementation**, which performs the actual computation on the AI Core. Based on the parameters passed by Tiling, the kernel function transfers data from GM to UB, performs computation on UB, and writes the result back to GM.
 
 The functional design described in this document determines what each type of code must express before these three types of code are written.
 ```
@@ -673,7 +673,7 @@ The functional design described in this document determines what each type of co
 | Element count range | Specify the minimum value, maximum value, and alignment granularity | The "eight-element" constraint is undocumented |
 | Format restrictions | Support for formats such as ND/NZ/FRACTAL | Differences in offset calculations when switching formats |
 | Usage mode restrictions | Differences between direct-call/engineering/debug modes | PipeBarrier is available only in specific modes |
-| Multi-core/multi-instance restrictions | Read-only semantics within the kernel and inter-core synchronization requirements | Read-only semantics of configuration parameters are not explained |
+| Multi-core/multi-instance restrictions | Read-only semantics within the kernel function and inter-core synchronization requirements | Read-only semantics of configuration parameters are not explained |
 | API combination restrictions | Mutually exclusive APIs/required companion APIs | A combination recommended by the documentation is not actually supported |
 
 **Operational requirement**: Extract constraint information from specifications and assertion code and present it centrally where the relevant item is first defined.
@@ -714,11 +714,11 @@ The source and destination operands must use the same data type. The Global Memo
 <!-- end id26 -->
 
 <!-- npu="x90" id27 -->
-- Kirin X90 supports the following data types: int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float, int64_t, uint64_t, and double.
+- Kirin X90 Processor Series Products supports the following data types: int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float, int64_t, uint64_t, and double.
 <!-- end id27 -->
 
 <!-- npu="9030" id28 -->
-- Kirin 9030 supports the following data types: int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float, int64_t, uint64_t, and double.
+- Kirin 9030 Processor Series Products supports the following data types: int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float, int64_t, uint64_t, and double.
 <!-- end id28 -->
 
 ## Return Value

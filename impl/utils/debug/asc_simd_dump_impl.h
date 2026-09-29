@@ -15,7 +15,7 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_SIMD_DUMP_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_SIMD_DUMP_IMPL_H
 
-#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
 
 #ifndef ASCENDC_CPU_DEBUG
 
@@ -188,8 +188,6 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 } // namespace __asc_simd_vf
 
 #else
-
-#include <cassert>
 
 namespace __asc_simd_vf {
 template <typename T, typename U>

@@ -3,31 +3,31 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id3 -->
-- Ascend 950PR/Ascend 950DT：不支持
+- Ascend 950PR&950DT系列产品：不支持
 <!-- end id3 -->
 <!-- npu="A3" id4 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id4 -->
 <!-- npu="910b" id5 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id5 -->
 <!-- npu="310b" id6 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id6 -->
 <!-- npu="310p" id7 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id7 -->
 <!-- npu="310p" id8 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id8 -->
 <!-- npu="910" id9 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id9 -->
 <!-- npu="x90" id1 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id1 -->
 <!-- npu="9030" id2 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id2 -->
 
 ## 功能说明<a name="section259105813316"></a>
@@ -73,7 +73,7 @@
 ```cpp
 #include "kernel_operator.h"
 
-// 原普通kernel保留（用于非SuperKernel场景）
+// 原普通核函数（Kernel）保留（用于非SuperKernel场景）
 __global__ __vector__ void add_custom(GM_ADDR x, GM_ADDR y, GM_ADDR z, uint32_t totalLength) 
 { 
     KernelAdd op; 

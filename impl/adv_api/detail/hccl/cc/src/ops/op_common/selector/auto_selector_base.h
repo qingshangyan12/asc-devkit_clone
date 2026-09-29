@@ -31,7 +31,7 @@ enum class SelectorStatus { MATCH, NOT_MATCH };
 const std::map<HcclCMDType, std::string> OP_TYPE_TO_AICPU_SOLE_ALG_MAP = {
     {HcclCMDType::HCCL_CMD_ALLGATHER, "InsAllGatherMesh"},
     {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterNHR"},
-    {HcclCMDType::HCCL_CMD_ALLREDUCE, "InsAllReduceNHR"},
+    {HcclCMDType::HCCL_CMD_ALLREDUCE, "AicpuAllReduceSoleNHR"},
     {HcclCMDType::HCCL_CMD_ALLTOALL, "InsAlltoAllMesh"},
     {HcclCMDType::HCCL_CMD_ALLTOALLV, "InsAlltoAllvMesh"},
     {HcclCMDType::HCCL_CMD_ALLTOALLVC, "InsAlltoAllvcMesh"},
@@ -61,7 +61,7 @@ const std::map<HcclCMDType, std::string> OP_TYPE_TO_DPU_ALG_MAP = {
 
 const std::unordered_map<std::string, std::string> RES_RESUSE_ALG = {
     {"InsReduceScatterMesh1D", "InsReduceScatterMeshClass"},
-    {"InsReduceScatterMesh1DMeshChunk", "InsReduceScatterMeshClass"},
+    {"AicpuReduceScatterSoleMeshChunk", "InsReduceScatterMeshClass"},
     {"AicpuAllReduceSoleMeshOneShot", "InsAllReduceMeshClass"},
     {"AicpuAllReduceSoleMeshTwoShot", "InsAllReduceMeshClass"},
     {"AicpuAllReduceSoleMeshChunkTwoShot", "InsAllReduceMeshClass"},

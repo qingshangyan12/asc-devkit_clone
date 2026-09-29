@@ -113,8 +113,13 @@ enum class DumpType : uint8_t {
     DUMP_SIMT,
     DUMP_BUFI,
     DUMP_BUFO,
-    DUMP_SKIP
+    DUMP_SKIP,
+    DUMP_SUPER_TENSOR,
+    DUMP_SUPER_TENSOR_BODY
 };
+
+static_assert(static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR) == 11U, "unexpected super tensor dump type");
+static_assert(static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR_BODY) == 12U, "unexpected super tensor body dump type");
 
 struct DebugBlockHeadInfo {
     uint32_t length = 0U;       // total size per block (include head and r/w info)
@@ -180,6 +185,33 @@ struct DumpShapeTlv {
     uint32_t resv;
 };
 
+struct DumpSuperTensorTlv {
+    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR);
+    uint32_t length = 0U;
+    uint32_t tensorAddr = 0U;
+    uint32_t dataType = 0U;
+    uint32_t desc = 0U;
+    uint32_t bufferId = 0U;
+    uint16_t position = 0U;
+    uint16_t blockIdx = 0U;
+    uint32_t dim = 0U;
+    uint32_t shape[8];
+    uint32_t resv = 0U;
+    uint64_t tensorLength = 0U;
+    uint64_t tensorOffset = 0U;
+    uint32_t dumpSize = 0U;
+};
+
+struct DumpSuperTensorBodyTlv {
+    uint32_t type = static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR_BODY);
+    uint32_t length = 0U;
+    uint32_t resv1 = 0U;
+    uint32_t resv2 = 0U;
+    uint64_t tensorLength = 0U;
+    uint64_t tensorOffset = 0U;
+    uint32_t dumpSize = 0U;
+};
+
 struct TimeStampTlv {
     uint32_t type = static_cast<uint32_t>(DumpType::DUMP_TIME_STAMP); // DumpType = DUMP_TIME_STAMP
     uint32_t length = 0U;                                             // Length of (descId resv cycle pc entry)
@@ -190,18 +222,6 @@ struct TimeStampTlv {
     uint64_t pc = 0U;                                                 // get pc
     uint64_t entry = 0U;                                              // entry system cycle
     uint32_t resvMem[2];                                              // reserved
-};
-
-struct BlockRingBufInfo {
-    uint32_t length = 0U;      // total size per block (include head and r/w info)
-    uint32_t coreId = 0U;      // current core id
-    uint32_t blockNum = 0U;    // total core num
-    uint32_t ringBufLen = 0U;  // fifo buff size (print tlv storage)
-    uint16_t magic = 0U;       // magic number
-    uint16_t flag = 0U;        // 0: simd, 1: simt
-    uint32_t rsv = 0U;         // reserve
-    uint64_t ringBufAddr = 0U; // start addr of fifo buff
-    uint32_t resvMem[6];       // reserved
 };
 
 struct RingBufWriteInfo {
@@ -263,18 +283,6 @@ enum class DumpType : uint8_t {
     DUMP_BUFI,
     DUMP_BUFO,
     DUMP_SKIP
-};
-
-struct BlockRingBufInfo {
-    uint32_t length = 0U;      // total size per block (include head and r/w info)
-    uint32_t coreId = 0U;      // current core id
-    uint32_t blockNum = 0U;    // total core num
-    uint32_t ringBufLen = 0U;  // fifo buff size (print tlv storage)
-    uint16_t magic = 0U;       // magic number
-    uint16_t flag = 0U;        // 0: simd, 1: simt
-    uint32_t rsv = 0U;         // reserve
-    uint64_t ringBufAddr = 0U; // start addr of fifo buff
-    uint32_t resvMem[6];       // reserved
 };
 
 struct RingBufWriteInfo {

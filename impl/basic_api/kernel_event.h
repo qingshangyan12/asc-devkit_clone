@@ -298,7 +298,7 @@ __aicore__ inline void PipeBarrierInternal()
 #endif
 }
 
-#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
 __BLOCK_LOCAL__ __inline__ int32_t g_superKernelSetWaitFlagCountDifference;
 #endif
 
@@ -308,7 +308,7 @@ __aicore__ inline void SetFlagInternal(event_t evt)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
         if ASCEND_IS_AIV {
-#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
             g_superKernelSetWaitFlagCountDifference += 1;
 #endif
             set_flag(srcPipe, dstPipe, evt);
@@ -316,14 +316,14 @@ __aicore__ inline void SetFlagInternal(event_t evt)
     }
     if constexpr (IsSplitCubePipe<srcPipe>() && IsSplitCubePipe<dstPipe>()) {
         if ASCEND_IS_AIC {
-#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
             g_superKernelSetWaitFlagCountDifference += 1;
 #endif
             set_flag(srcPipe, dstPipe, evt);
         }
     }
 #else
-#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
     g_superKernelSetWaitFlagCountDifference += 1;
 #endif
     set_flag(srcPipe, dstPipe, evt);
@@ -337,7 +337,7 @@ __aicore__ inline void WaitFlagInternal(event_t evt)
     (void)evt;
     if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
         if ASCEND_IS_AIV {
-#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
             g_superKernelSetWaitFlagCountDifference -= 1;
 #endif
             wait_flag(srcPipe, dstPipe, evt);
@@ -345,14 +345,14 @@ __aicore__ inline void WaitFlagInternal(event_t evt)
     }
     if constexpr (IsSplitCubePipe<srcPipe>() && IsSplitCubePipe<dstPipe>()) {
         if ASCEND_IS_AIC {
-#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
             g_superKernelSetWaitFlagCountDifference -= 1;
 #endif
             wait_flag(srcPipe, dstPipe, evt);
         }
     }
 #else
-#if defined(__ENABLE_SUPER_KERNEL_INNER_CORE_SYNC_CHECK__)
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
     g_superKernelSetWaitFlagCountDifference -= 1;
 #endif
     wait_flag(srcPipe, dstPipe, evt);
@@ -725,7 +725,7 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
 
 using TBufId = uint8_t;
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 #ifdef ASCENDC_CPU_DEBUG
 class BufIdTracker {
 public:
@@ -1254,6 +1254,13 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
         default:
             break;
     }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+    if (event == HardEvent::S_V || event == HardEvent::S_MTE2) {
+        dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_UB);
+    } else if (event == HardEvent::S_MTE3) {
+        dcci((__gm__ uint64_t*)0, cache_line_t::ENTIRE_DATA_CACHE, dcci_dst_t::CACHELINE_OUT);
+    }
+#endif
     return;
 }
 } // namespace AscendC

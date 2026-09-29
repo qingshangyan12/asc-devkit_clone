@@ -290,7 +290,7 @@ public:
      * @param [in] initTiling: Address of InitTilingData
      * @note Must be called first to initialize Hccl instance.
      */
-    __aicore__ inline void InitV2(GM_ADDR context, const void* initTiling);
+    __aicore__ inline void InitV2(GM_ADDR context, const void* initTiling = nullptr);
 
     /*!
      * @class Hccl
@@ -415,8 +415,8 @@ private:
 };
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 1001 || \
-                              __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 1001 || __NPU_ARCH__ == 2002 || \
+                              __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #include "../../../impl/adv_api/detail/hccl/impl/hccl_impl.h"
 #endif
 #endif // LIB_HCCL_HCCL_H
