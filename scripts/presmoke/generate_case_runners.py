@@ -66,7 +66,6 @@ NO_CMAKE_ARCH_INJECTION_CASES = {
     "01_simd_cpp_api/02_features/99_acl_based/01_acl_invocation/aclop_invocation",
     "02_simd_c_api/00_introduction/00_quickstart/hello_world_npu",
     "02_simd_c_api/00_introduction/01_add/c_api_delicacy_async_add",
-    "02_simd_c_api/00_introduction/01_add/c_api_sync_add",
 }
 
 TENSORFLOW_SKIP_REASON = "requires TensorFlow 2.6.5 environment; skipped by presmoke"
