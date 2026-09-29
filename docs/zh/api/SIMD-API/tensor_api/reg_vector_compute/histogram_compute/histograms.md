@@ -71,8 +71,7 @@ $$
 
 ```cpp
 template <const histogram_options& options = default_histogram_options, typename T, typename U>
-__simd_callee__ inline reg_tensor<T> histograms(
-    const reg_tensor<T>& dst, const reg_tensor<U>& src)
+__simd_callee__ inline reg_tensor<T> histograms(const reg_tensor<T>& dst, const reg_tensor<U>& src)
 ```
 
 ## 参数说明

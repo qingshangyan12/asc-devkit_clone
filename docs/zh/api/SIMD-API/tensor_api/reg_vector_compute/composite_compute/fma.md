@@ -38,10 +38,7 @@ $$
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> fma(
-    const reg_tensor<T>& src0,
-    const reg_tensor<T>& src1,
-    const reg_tensor<T>& src2)
+__simd_callee__ inline reg_tensor<T> fma(const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2)
 ```
 
 ## 参数说明

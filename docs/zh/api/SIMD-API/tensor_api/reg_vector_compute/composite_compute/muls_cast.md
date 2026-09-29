@@ -40,8 +40,7 @@ $$
 
 ```cpp
 template <cast_layout Layout = cast_layout::zero, typename T, typename U>
-__simd_callee__ inline reg_tensor<T> muls_cast(
-    const reg_tensor<U>& src, const U& scalar)
+__simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U& scalar)
 ```
 
 ## 参数说明

@@ -38,10 +38,7 @@ $$
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> axpy(
-    reg_tensor<T>& dst,
-    const reg_tensor<T>& src,
-    const T& scalar)
+__simd_callee__ inline reg_tensor<T> axpy(reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar)
 ```
 
 ## 参数说明

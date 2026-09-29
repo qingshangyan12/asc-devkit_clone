@@ -38,8 +38,7 @@ $$
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_tensor<T> abs_diff(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 ```
 
 ## 参数说明

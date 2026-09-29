@@ -48,14 +48,10 @@ $$
 
 ```cpp
 template <typename T, typename U>
-__simd_callee__ inline reg_tensor<T> exp_diff(
-    const reg_tensor<U>& src0, const reg_tensor<U>& src1)
+__simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const reg_tensor<U>& src1)
 
 template <typename T, typename U, typename PositionType>
-__simd_callee__ inline reg_tensor<T> exp_diff(
-    const reg_tensor<U>& src0,
-    const reg_tensor<U>& src1,
-    PositionType src_pos)
+__simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const reg_tensor<U>& src1, PositionType src_pos)
 ```
 
 ## 参数说明
