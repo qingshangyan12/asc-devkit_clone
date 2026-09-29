@@ -2411,6 +2411,8 @@ class TestCompileOp(unittest.TestCase):
         with (
             TemporaryDirectory() as temp_dir,
             mock.patch.object(CommonUtility, "is_c310", return_value=True),
+            mock.patch.object(CommonUtility, "is_v100", return_value=False),
+            mock.patch.object(CommonUtility, "is_v200", return_value=False),
             mock.patch.object(CommonUtility, "is_support_workspace_offset", return_value=True),
             mock.patch.object(compile_op_module, "get_v220_kernel_type_mix_flag", return_value=(False, False)),
             mock.patch.object(compile_op_module, "get_context", return_value=None),
@@ -2425,7 +2427,7 @@ class TestCompileOp(unittest.TestCase):
                         source = source_file.read()
                     if workspace_size == 0:
                         self.assertIn(
-                            "GM_ADDR usrWorkspace = reinterpret_cast<GM_ADDR>(0xFFFFFFFF00000000ULL);", source
+                            "GM_ADDR usrWorkspace = reinterpret_cast<GM_ADDR>(0xFFFFFFFFFFFFFFFFULL);", source
                         )
                         self.assertNotIn("GM_ADDR workspace = param_base", source)
                         self.assertNotIn("SetSysWorkspaceForce", source)
