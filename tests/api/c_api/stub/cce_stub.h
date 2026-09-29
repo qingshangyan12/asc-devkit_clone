@@ -20,6 +20,7 @@ struct Fp8e6m2T {
 } // namespace float8_e6m2
 using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
 using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
+using vector_fp8_e6m2_t = vector_f8e6m2;
 
 inline void vcvt(
     vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
