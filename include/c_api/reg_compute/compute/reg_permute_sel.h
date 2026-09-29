@@ -528,7 +528,7 @@ __simd_callee__ inline void asc_pack_v2(vector_bool& dst, vector_bool src);
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign_init)
 __simd_callee__ inline void asc_clear_ar_spr();
 
-#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 //=================asc_intlv_half (for 9201)==================
 __simd_callee__ inline void asc_intlv_half_low_b8(vector_bool& dst, vector_bool src0, vector_bool src1);
 
