@@ -34,7 +34,7 @@ $$
 dst_i = cast\_round\_to\_f16(src_i \times scalar)
 $$
 
-默认将结果写入返回寄存器的偶数`half`位置。
+默认布局为`cast_layout::zero`，转换结果写入返回寄存器中每组两个`half`元素的第0个位置（偶数索引），第1个位置置零。
 
 ## 函数原型
 
@@ -62,7 +62,7 @@ __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U
 
 ## 返回值说明
 
-返回`reg_tensor<T>`。`Layout`为`cast_layout::zero`时结果写入偶数位置，为`cast_layout::one`时结果写入奇数位置，另一组位置置零。返回值的`mask`与`src.mask`相同。
+返回`reg_tensor<T>`。`Layout`为`cast_layout::zero`时，转换结果写入每组两个`half`元素的第0个位置（偶数索引），第1个位置置零；`Layout`为`cast_layout::one`时，转换结果写入第1个位置（奇数索引），第0个位置置零。返回值的`mask`与`src.mask`相同。
 
 ## 数据类型
 
