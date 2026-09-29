@@ -26,7 +26,7 @@ annotation 必须覆盖 batch 中的每个普通 API 文档，路径和 hash 必
 Index 不进入普通语义 annotation 流程。worker 从正文 Markdown 链接生成：
 
 ```json
-{"navigation": [{"path": "docs/zh/api/.../child.md", "title": "Child"}]}
+{"navigation": [{"path": "docs/zh/api/.../child.md"}]}
 ```
 
 链接必须是仓内 API Markdown 路径，保留正文出现顺序并去除重复项。

@@ -17,14 +17,14 @@
 
 ## Index
 
-当前注册表中的 `reference.index.cpp` 只生成：
+当前注册表中的 `reference.index` 只生成：
 
 ```text
 okftype, title, resource, navigation, timestamp
 ```
 
 Index 不生成 `description`、`tag`、`dependencies`、`examples`、`signature` 或 `header`。
-`navigation` 是按 Markdown 正文出现顺序提取的子页面列表，每项包含 `path` 和 `title`。
+`navigation` 是按 Markdown 正文出现顺序提取的子页面路径列表，每项只包含 `path`；标题从目标路径对应的文档提取。
 
 ## 生成边界
 

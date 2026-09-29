@@ -40,6 +40,13 @@ SCOPE_DIRS = (
 )
 STAGES = ("in", "out", "compute")
 ARCH_RE = re.compile(r"(?P<family>.+)_arch_(?P<arch>\d+)(?:_deprecated)?$")
+
+
+def is_arch_page(path: str) -> bool:
+    """Identify architecture variants from their stable filename convention."""
+    return ARCH_RE.fullmatch(PurePosixPath(path).stem) is not None
+
+
 CONVERT_RE = re.compile(r"asc_(?P<src>[a-z0-9]+)2(?P<dst>[a-z0-9]+)$")
 DTYPE_ALIASES = {
     "f16": "half", "fp16": "half", "f32": "float", "fp32": "float", "bf16": "bfloat16",
@@ -105,7 +112,7 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
                 errors.append(f"{rel}: resource does not match path")
             tags: dict[str, list[str]] = {}
             if tag_enabled:
-                for item in fm.get("tag") or []:
+                for item in fm.get("tag", []):
                     for ns, values in item.items():
                         if ns not in namespaces:
                             errors.append(f"{rel}: unknown tag namespace {ns}")
@@ -132,9 +139,7 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
                     errors.append(f"{rel}: signature entry without prototype_id/override_id/macro_id")
                     continue
                 sig_headers = []
-                # New front matter renders the singular `header` key; legacy pages
-                # (e.g. blocked asc_transpose) still carry `headers`. Accept both.
-                for header in sig.get("header") or sig.get("headers") or []:
+                for header in sig.get("headers", []):
                     header_value = str(header)
                     for prefix in ("/include/", "include/"):
                         if header_value.startswith(prefix):
@@ -151,14 +156,11 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
                     dtype_values = dtype_field.get("values", [])
                 else:
                     dtype_values = dtype_field or []
-                # New front matter promotes shared archs to the document level;
-                # merge them into every signature entry for the by-arch views.
-                sig_archs = sorted(set(sig.get("archs", [])) | set(fm.get("archs") or []))
                 signatures.append({
                     "prototype_id": identifier,
                     "id_kind": "macro_id" if sig.get("macro_id") else ("override_id" if sig.get("override_id") else "prototype_id"),
                     "headers": sorted(set(sig_headers)),
-                    "archs": sig_archs,
+                    "archs": sorted(sig.get("archs", [])),
                     "dtypes": sorted({normalize_dtype(v) for v in dtype_values}),
                 })
             deps = []
@@ -182,8 +184,7 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
                     entry = {"path": f"/{base}", "archs": sorted(ex.get("archs", []))}
                 examples.append(entry)
             documents[rel] = {
-                "okftype": fm["okftype"], "title": fm["title"],
-                "description": fm.get("description") or "",
+                "okftype": fm["okftype"], "title": fm["title"], "description": fm.get("description", ""),
                 "tags": tags, "signatures": signatures, "deps_out": deps, "examples": examples,
                 "family": "", "arch_of": "", "category": "", "nav_page": "", "arch_variants": [],
                 "standalone_primary": False,
@@ -204,31 +205,19 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str], warnings: 
         if len(parts) != 7:
             continue
         sub = parts[6]
-        index_pages = [r for r in members if documents[r]["okftype"] == "reference.index.cpp"]
-        # Concept pages with prose overviews can serve as a sub-directory landing
-        # page when no dedicated index page exists (e.g. overview.md, *_key_features.md).
-        concept_pages = [r for r in members if documents[r]["okftype"] == "reference.concept.cpp"]
+        index_pages = [r for r in members if documents[r]["okftype"] == "reference.index"]
         exact = [r for r in index_pages if PurePosixPath(r).stem == sub]
-        exact_concept = [r for r in concept_pages if PurePosixPath(r).stem == sub]
         if len(exact) > 1:
             errors.append(f"{directory}: multiple landing-page candidates named {sub}.md")
         elif exact:
             landing[directory] = exact[0]
-        elif len(exact_concept) == 1:
-            landing[directory] = exact_concept[0]
         elif len(index_pages) == 1:
             landing[directory] = index_pages[0]
         elif index_pages:
             errors.append(f"{directory}: cannot determine landing page for sub directory")
         # Directories without any index page (e.g. single-API dirs like reg_compute/vf_call)
         # have no landing page; their members fall back to the category page for navigation.
-        # New-pipeline front matter types _arch_* variant pages as reference.api.cpp, so
-        # arch detection is filename-driven and accepts both the new and legacy okftypes.
-        if any(
-            documents[r]["okftype"] in {"reference.api.cpp", "reference.arch.cpp"}
-            and ARCH_RE.fullmatch(PurePosixPath(r).stem)
-            for r in members
-        ):
+        if any(is_arch_page(r) for r in members):
             family_dirs.add(directory)
     for rel, doc in documents.items():
         parts = PurePosixPath(rel).parts
@@ -244,13 +233,16 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str], warnings: 
             doc["nav_page"] = f"{scope_root}/{parts[5]}/{parts[5]}.md"
         else:
             doc["nav_page"] = landing.get(directory, "") or f"{scope_root}/{parts[5]}/{parts[5]}.md"
-        if doc["okftype"] in {"reference.api.cpp", "reference.arch.cpp"} and ARCH_RE.fullmatch(stem):
+        if is_arch_page(rel):
             match = ARCH_RE.fullmatch(stem)
+            if not match:
+                errors.append(f"{rel}: arch page does not match family_arch_<n> naming")
+                continue
             if len(parts) == 8 and (match["family"] == parts[6] or match["family"].startswith(parts[6] + "_")):
                 doc["family"] = doc["arch_of"] = parts[6]
             else:
                 doc["family"] = doc["arch_of"] = match["family"]
-        elif doc["okftype"] == "reference.index.cpp":
+        elif doc["okftype"] == "reference.index":
             if (len(parts) == 6 and stem == "c_api") or (len(parts) == 7 and stem == parts[5]):
                 doc["family"] = "__nav__"
             elif len(parts) == 8 and landing.get(directory) == rel:
@@ -259,9 +251,9 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str], warnings: 
                 doc["family"] = stem
         else:
             doc["family"] = stem
-        if doc["okftype"] in {"reference.api.cpp", "reference.arch.cpp"} and not doc["signatures"]:
-            warnings.append(f"{rel}: api/arch page without signature (sanctioned blank, degraded indexing)")
-        if doc["okftype"] == "reference.type.cpp" and any(
+        if (doc["okftype"] == "reference.api" or is_arch_page(rel)) and not doc["signatures"]:
+            warnings.append(f"{rel}: api page without signature (sanctioned blank, degraded indexing)")
+        if doc["okftype"] == "reference.type" and any(
             sig.get("id_kind") != "macro_id" for sig in doc["signatures"]
         ):
             errors.append(f"{rel}: type page with signature")
@@ -270,10 +262,10 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str], warnings: 
 def rollup_families(documents: dict[str, dict[str, Any]]) -> None:
     hosted_families = {
         doc["family"] for doc in documents.values()
-        if doc["okftype"] == "reference.index.cpp" and doc["family"] != "__nav__"
+        if doc["okftype"] == "reference.index" and doc["family"] != "__nav__"
     }
     for rel, doc in documents.items():
-        if doc["okftype"] != "reference.index.cpp" or doc["family"] == "__nav__":
+        if doc["okftype"] != "reference.index" or doc["family"] == "__nav__":
             continue
         variants = sorted(
             (path, other) for path, other in documents.items() if other["arch_of"] == doc["family"]
@@ -297,11 +289,7 @@ def rollup_families(documents: dict[str, dict[str, Any]]) -> None:
             (e["path"], e.get("file", "")): e for e in doc["examples"]
         }.values())
     for rel, doc in documents.items():
-        if (
-            doc["okftype"] in {"reference.api.cpp", "reference.arch.cpp"}
-            and doc["arch_of"]
-            and doc["family"] not in hosted_families
-        ):
+        if is_arch_page(rel) and doc["family"] not in hosted_families:
             doc["standalone_primary"] = True
 
 
@@ -381,10 +369,7 @@ def check_graph(root: Path, documents: dict[str, dict[str, Any]], errors: list[s
 def primary_documents(documents: dict[str, dict[str, Any]]) -> list[str]:
     return sorted(
         rel for rel, doc in documents.items()
-        if doc["standalone_primary"] or (
-            doc["okftype"] in {"reference.api.cpp", "reference.index.cpp", "reference.type.cpp", "reference.concept.cpp"}
-            and doc["family"] != "__nav__"
-        )
+        if doc["standalone_primary"] or doc["family"] != "__nav__"
     )
 
 

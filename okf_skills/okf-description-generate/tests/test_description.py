@@ -28,7 +28,7 @@ class DescriptionSkillTest(unittest.TestCase):
         document.parent.mkdir(parents=True)
         document.write_text(
             "---\n"
-            "okftype: reference.api.cpp\n"
+            "okftype: reference.api\n"
             "title: asc_add\n"
             "resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md\n"
             "description: \"\"\n"

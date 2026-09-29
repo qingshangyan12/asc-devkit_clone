@@ -45,10 +45,10 @@ class DocImpactTest(unittest.TestCase):
     def test_known_doc(self):
         documents = {
             "x/a.md": {
-                "okftype": "reference.api.cpp", "title": "asc_a", "category": "cat",
+                "okftype": "reference.api", "title": "asc_a", "category": "cat",
                 "family": "asc_a", "deps_out": [{"path": "x/b.md", "kind": "requires"}],
             },
-            "x/b.md": {"okftype": "reference.api.cpp", "title": "asc_b", "category": "cat", "family": "asc_b", "deps_out": []},
+            "x/b.md": {"okftype": "reference.api", "title": "asc_b", "category": "cat", "family": "asc_b", "deps_out": []},
         }
         edges = [{"from": "x/b.md", "to": "x/a.md", "kind": "related"}]
         result = impact.doc_impact("x/a.md", documents, edges, {"asc_a": ["x/a.md"]})

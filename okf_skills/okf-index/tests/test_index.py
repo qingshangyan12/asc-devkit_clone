@@ -45,7 +45,7 @@ def build_to_tmp() -> Path:
 class EmptyTagGuardTest(unittest.TestCase):
     def test_empty_tag_namespace_rejected_and_clean_doc_passes(self):
         front_matter = (
-            "okftype: reference.api.cpp\n"
+            "okftype: reference.api\n"
             "title: {title}\n"
             "resource: asc-devkit/docs/zh/api/SIMD-API/c_api/foo.md\n"
             "description: 测试。\n"
@@ -111,9 +111,9 @@ class BuildTest(unittest.TestCase):
         meta = self.index["meta"]
         scope = self.index["scope"]
         self.assertEqual(meta["doc_count"], 838)
-        self.assertEqual(meta["nav_page_count"], 62)
+        self.assertEqual(meta["nav_page_count"], 65)
         self.assertEqual(meta["arch_page_count"], 59)
-        self.assertEqual(meta["primary_count"], 774)
+        self.assertEqual(meta["primary_count"], 773)
         self.assertEqual(len(scope["all_docs"]), 838)
         nav = set(scope["navigation_pages"])
         arch = set(scope["arch_pages"])
@@ -132,7 +132,7 @@ class BuildTest(unittest.TestCase):
 
     def test_stage_views(self):
         views = self.index["views"]["by_stage"]
-        self.assertEqual({k: len(v) for k, v in views.items()}, {"in": 72, "out": 38, "compute": 394})
+        self.assertEqual({k: len(v) for k, v in views.items()}, {"in": 71, "out": 36, "compute": 385})
         self.assertIn(f"{BASE}/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md", views["in"])
         self.assertIn(f"{BASE}/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md", views["out"])
         # cube 搬运（gm→l0a/l1 入、l0c→gm 出）与寄存器 load/store 进入阶段视图。
@@ -153,7 +153,7 @@ class BuildTest(unittest.TestCase):
         self.assertIn(f"{BASE}/cube_compute/asc_mmad_mx.md", views["by_operation"]["matrix_multiply_accumulate"])
         self.assertIn(f"{BASE}/sync/intra_core_sync/asc_sync_notify.md", views["by_operation"]["synchronization"])
         self.assertIn(f"{BASE}/sync/intra_core_sync/asc_sync_wait.md", views["by_operation"]["synchronization"])
-        # 类型页（reference.type.cpp）参与 defs 分类检索，但不进入任何阶段桶。
+        # 类型页（reference.type）参与 defs 分类检索，但不进入任何阶段桶。
         self.assertIn(f"{BASE}/defs/union/asc_store_atomic_config.md", views["by_category"]["defs"])
         self.assertIn(f"{BASE}/defs/enum/asc_saturation_mode.md", views["by_category"]["defs"])
         self.assertEqual(len(views["by_category"]["defs"]), 24)

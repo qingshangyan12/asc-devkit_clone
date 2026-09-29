@@ -22,7 +22,7 @@ class FieldManagerTest(unittest.TestCase):
                 "common_required_fields": ["okftype"],
                 "field_order": ["okftype"],
                 "field_catalog": {"okftype": {}},
-                "profiles": {"reference.api.cpp": {"fields": ["missing"]}},
+                "profiles": {"reference.api": {"fields": ["missing"]}},
             }
             result = module.check()
             self.assertFalse(result["ok"])

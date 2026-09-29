@@ -20,6 +20,24 @@ class ControllerSmokeTest(unittest.TestCase):
         spec.loader.exec_module(module)
         return module
 
+    def test_okftype_uses_document_family_and_page_kind(self):
+        module = self._controller_module()
+        path = "docs/zh/api/SIMD-API/c_api/foo.md"
+        classification = module.classify_document(path, "## 函数原型\n\n```c\nvoid foo();\n```\n")
+        self.assertEqual(classification.okftype, "reference.api")
+        self.assertEqual(set(module.load_model()["context"]), {"family"})
+
+        fields = {
+            "okftype": "reference.api",
+            "title": "foo",
+            "resource": f"asc-devkit/{path}",
+            "timestamp": "2026-09-29",
+        }
+        module.validate_base_fields(fields, path)
+        fields["okftype"] = "reference.api.cpp"
+        with self.assertRaisesRegex(module.ValidationError, "okftype must be one of"):
+            module.validate_base_fields(fields, path)
+
     def test_source_analysis_uses_legacy_header_closure_and_macro_rules(self):
         module = self._controller_module()
         with tempfile.TemporaryDirectory() as temp:
@@ -575,7 +593,7 @@ constexpr uint8_t ASC_SIZE = 16;
                 "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mode.md",
                 ("api_surfaces",),
             )
-            self.assertEqual(worker["fields"]["okftype"], "reference.type.cpp")
+            self.assertEqual(worker["fields"]["okftype"], "reference.type")
 
     def test_non_callable_page_uses_index_role(self):
         module = self._controller_module()
@@ -589,7 +607,7 @@ constexpr uint8_t ASC_SIZE = 16;
                 "docs/zh/api/SIMD-API/c_api/foo/foo.md",
                 ("api_surfaces",),
             )
-            self.assertEqual(worker["fields"]["okftype"], "reference.index.cpp")
+            self.assertEqual(worker["fields"]["okftype"], "reference.index")
 
     def test_definition_yaml_omits_legacy_api_kind_without_signature(self):
         module = self._controller_module()
@@ -601,7 +619,7 @@ constexpr uint8_t ASC_SIZE = 16;
             document.write_text("# asc_mode\n", encoding="utf-8")
             namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
             fields = {
-                "okftype": "reference.type.cpp",
+                "okftype": "reference.type",
                 "title": "asc_mode",
                 "resource": f"asc-devkit/{path}",
                 "description": "枚举模式。",
@@ -624,7 +642,28 @@ constexpr uint8_t ASC_SIZE = 16;
             self.assertNotIn("api_kind:", rendered)
             self.assertIn("header: [/include/c_api/defs/enum.h]", rendered)
             self.assertIn("declaration:", rendered)
+            self.assertNotIn("members:", rendered)
+            self.assertNotIn("cpp:", rendered)
+            self.assertNotIn("name: DEFAULT", rendered)
             self.assertNotIn("signature:", rendered)
+
+    def test_definition_validator_accepts_compact_enum_and_preserves_enum_alias_shape(self):
+        module = self._controller_module()
+        enum_fields = {
+            "okftype": "reference.type",
+            "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_mode.md",
+            "declaration": {"symbol": "asc_mode"},
+        }
+        module.validate_definition_fields(enum_fields, "asc_mode.md", set())
+        self.assertEqual(module._definition_kind_from_fields(enum_fields), "enum")
+
+        alias_fields = {
+            "okftype": "reference.type",
+            "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+            "declaration": {"symbol": "asc_quant_mode", "target": "QuantMode_t"},
+        }
+        module.validate_definition_fields(alias_fields, "asc_quant_mode.md", set())
+        self.assertEqual(module._definition_kind_from_fields(alias_fields), "type_alias")
 
     def test_render_omits_empty_tag_namespaces(self):
         module = self._controller_module()
@@ -635,7 +674,7 @@ constexpr uint8_t ASC_SIZE = 16;
                 ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
             )
             fields = {
-                "okftype": "reference.api.cpp",
+                "okftype": "reference.api",
                 "title": "asc_add",
                 "resource": f"asc-devkit/{path}",
                 "description": "矢量加法。",
@@ -685,7 +724,7 @@ constexpr uint8_t ASC_SIZE = 16;
             document.parent.mkdir(parents=True)
             document.write_text(
                 "---\n"
-                "okftype: reference.api.cpp\n"
+                "okftype: reference.api\n"
                 "title: foo\n"
                 "resource: asc-devkit/docs/zh/api/SIMD-API/c_api/foo/foo.md\n"
                 "description: 已确认\n"
@@ -849,7 +888,7 @@ example: true
 
             namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
             fields = {
-                "okftype": "reference.api.cpp",
+                "okftype": "reference.api",
                 "title": "asc_foo",
                 "resource": f"asc-devkit/{path}",
                 "description": "执行测试计算。",
@@ -968,7 +1007,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         )
         document_path = "docs/zh/api/SIMD-API/c_api/foo/foo.md"
         fields = {
-            "okftype": "reference.api.cpp",
+            "okftype": "reference.api",
             "title": "foo",
             "resource": f"asc-devkit/{document_path}",
             "description": "这是一个用于测试字段顺序的接口描述。",
@@ -998,11 +1037,11 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         self.assertNotIn("applicability", rendered)
 
         index_fields = {
-            "okftype": "reference.index.cpp",
+            "okftype": "reference.index",
             "title": "foo index",
             "resource": f"asc-devkit/{document_path}",
             "navigation": [
-                {"path": "docs/zh/api/SIMD-API/c_api/foo/bar.md", "title": "bar"}
+                {"path": "docs/zh/api/SIMD-API/c_api/foo/bar.md"}
             ],
             "timestamp": "2026-09-23",
         }
@@ -1012,8 +1051,24 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         )
         self.assertIn("navigation:", index_rendered)
         self.assertIn("path: docs/zh/api/SIMD-API/c_api/foo/bar.md", index_rendered)
+        self.assertNotIn("title: bar", index_rendered)
         self.assertNotIn("description:", index_rendered)
         self.assertNotIn("tag:", index_rendered)
+
+    def test_navigation_stores_paths_without_redundant_titles(self):
+        module = self._controller_module()
+        body = "- [中文标题](child/asc_child.md)\n- [另一个标题](other.md)\n"
+        navigation = module._source_navigation_fields(
+            body,
+            "docs/zh/api/SIMD-API/c_api/foo/foo.md",
+        )
+        self.assertEqual(
+            navigation,
+            [
+                {"path": "docs/zh/api/SIMD-API/c_api/foo/child/asc_child.md"},
+                {"path": "docs/zh/api/SIMD-API/c_api/foo/other.md"},
+            ],
+        )
 
     def test_base_and_example_fields_follow_the_okf_contract(self):
         module = self._controller_module()
@@ -1028,7 +1083,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             sample.write_text("asc_foo();\n", encoding="utf-8")
 
             fields = {
-                "okftype": "reference.api.cpp",
+                "okftype": "reference.api",
                 "title": "foo",
                 "resource": f"asc-devkit/{document_path}",
                 "description": "说明。",
@@ -1094,7 +1149,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                     "sha256": hashlib.sha256(document.read_bytes()).hexdigest(),
                     "semantic_verified": True,
                     "fields": {
-                        "okftype": "reference.api.cpp",
+                        "okftype": "reference.api",
                         "title": "foo",
                         "resource": f"asc-devkit/{document_path}",
                         "description": "关联文档。",
@@ -1241,7 +1296,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                 "sha256": hashlib.sha256(document.read_bytes()).hexdigest(),
                 "semantic_verified": True,
                 "fields": {
-                    "okftype": "reference.api.cpp",
+                    "okftype": "reference.api",
                     "title": "foo",
                     "resource": f"asc-devkit/{document_path}",
                     "description": "关联文档。",

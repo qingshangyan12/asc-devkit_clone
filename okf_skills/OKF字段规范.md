@@ -10,14 +10,14 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 
 | 字段 | 类型 | 必需 | 适用范围 | 含义 |
 | --- | --- | --- | --- | --- |
-| okftype | string | 是 | 全部 | 文档角色和 API 语言类型：reference.api.cpp、reference.arch.cpp、reference.index.cpp 或 reference.type.cpp。 |
+| okftype | string | 是 | 全部 | 文档四象限中的文档族与该族内的页面种类，格式为 `文档族.页面种类`。 |
 | title | string | 是 | 全部 | 文档一级标题或 API 名称。 |
 | resource | string | 是 | 全部 | 从 asc-devkit 开始的仓库相对路径，使用 /。 |
-| description | string | API/架构页必需，索引页可省略 | API/架构页 | 由 description Agent 基于功能说明等正文证据生成的检索摘要，不得引入正文没有的能力。 |
-| tag | object[] | 是 | API/架构页 | 受控检索标签，每项为 namespace 及其标签内容数组。 |
-| signature | object[] | API/架构页可选 | API/架构页 | 调用模式或 overload 组。函数项包含 prototype_id 或 override_id、archs、header；含 `<dtype>` 的 prototype_id 在同一条目中添加 dtype；函数宏项只包含 macro_id。 |
+| description | string | API 页必需，索引页可省略 | API 页 | 由 description Agent 基于功能说明等正文证据生成的检索摘要，不得引入正文没有的能力。 |
+| tag | object[] | 是 | API 页 | 受控检索标签，每项为 namespace 及其标签内容数组。 |
+| signature | object[] | API 页可选 | API 页 | 调用模式或 overload 组。函数项包含 prototype_id 或 override_id、archs、header；含 `<dtype>` 的 prototype_id 在同一条目中添加 dtype；函数宏项只包含 macro_id。 |
 | dependencies | object[] | 含明确关联时填写 | 全部 | 有正文依据的关联文档，包含 path、kind，必要时包含 condition。 |
-| examples | object[] | 含示例时填写 | API/架构页 | 样例工程或源码位置和明确的示例架构，包含样例 path，可选 file、archs、override_id。 |
+| examples | object[] | 含示例时填写 | API 页 | 样例工程或源码位置和明确的示例架构，包含样例 path，可选 file、archs、override_id。 |
 | header | string[] | 可选 | 非 callable 定义页 | 唯一确认的真实声明头文件，使用 `/include/...` 路径。 |
 | declaration | object | 定义页可选 | enum、record、constant、type_alias、对象宏 | 从正文定义代码块提取的受限声明结构。 |
 | type_catalog | object | 类型目录页可选 | `c_api/defs/type` | 正文表格中的数据类型分组。 |
@@ -25,12 +25,39 @@ YAML front matter 放在 Markdown 文件第一行，以 --- 包围。只使用�
 
 空的可选数组或映射可以省略。不得添加未在本规范定义的顶层字段。
 
+### okftype 分类
+
+第一段是文档四象限中的文档族，以 Agent 为读者，按文档对 Agent 完成任务的主要价值划分：
+
+| 文档族 | Agent 的目标 | 对 Agent 的价值 |
+| --- | --- | --- |
+| `tutorial` | 复用已验证的实践过程 | 抽取步骤、输入、输出和成功判据，形成可复用的工作流模板。 |
+| `guide` | 为当前任务选择执行路径 | 提供适用条件、决策分支、失败检测和兜底路径信号。 |
+| `reference` | 构造准确的工具调用 | 将接口能力、参数、类型和约束表达为可直接转换成工具调用 schema 的结构化契约。 |
+| `explanation` | 快速形成关键判断 | 将关键结论前置，再提供机制、依据和权衡，支持 Agent 判断方案是否适用。 |
+
+文档族取决于页面的主要用途，不因参考页含有示例、指南含有原理说明而改变。
+当前源集合都是供 Agent 查询接口、类型和相关事实的参考资料，因此统一使用 `reference`；
+它不表示 C API、编程语言、架构或废弃状态。当前只有 `reference` 已在源上下文和 Profile 注册表中
+配置并由生成器支持；`tutorial`、`guide`、`explanation` 目前仅有上述概念定义，尚无对应的
+页面种类、Profile、分类规则或 YAML 生成流程。表中所述工具调用 schema 是 `reference` 的目标用途，
+现有生成器尚不直接输出工具调用 schema。
+
+第二段表示参考资料中的页面种类：`api` 是可调用接口，`type` 是定义实体，`index` 是导航页，
+`concept` 是当前仍作为参考资料提供的说明页。注册表还预留 `catalog` 和 `release`，但当前分类器
+不会自动产出这两种类型。完整值必须在 Profile 注册表中登记，不能任意拼接。
+
+例如 `reference.api` 表示接口参考页，`reference.type` 表示类型或定义参考页。
+接口表面（如 `c_api`）在带语义标签的页面中由 `tag.api_surfaces` 表示，不在 `okftype` 中附加 `cpp`。
+架构变体和废弃接口仍按页面内容选择页面种类；废弃状态由有正文证据的 `tag.traits: [deprecated]` 表示。
+
 ## 定义页
 
 `c_api/defs` 的实体页不是函数 API。enum、struct/union、constant 和 `using` 类型别名仅在正文定义与唯一
 声明 header 同时确认时写 `declaration` 和 `header`。`declaration` 至少包含
-`symbol`、`cpp`；enum 包含 `members`，record 包含 `fields` 和 `record_kind`，constant 可包含 `type`、`value`，
-type alias 包含 `target`。数据类型目录使用 `type_catalog.groups`，不要求 header。
+`symbol`；enum 可省略 `members`，record 可保留 `fields` 和 `record_kind`，constant 可包含 `type`、`value`，
+type alias 包含 `target`。为控制 YAML 体积，枚举成员和 record 字段的详细说明、类型和位宽不写入 front matter；数据类型目录使用
+`type_catalog.groups`，其中 `types` 使用单行数组，不要求 header。
 
 函数宏仍使用 `signature` 中唯一的 `macro_id`，不附加 header；对象宏使用 `header` 和
 `declaration.macros`。定义页没有函数原型、不可调用样例或 Doxygen 目标是正常情况，不能由此伪造 `signature`、
@@ -63,7 +90,7 @@ header 保存真实声明文件路径，例如 /include/c_api/vector_compute/com
 同一物理 header 声明，include 按旧规则合并为一个 canonical `@override_id` 并汇总 `@archs`；若命中不同物理声明，
 include 则保留各自带 `@型号` 后缀的 ID。
 
-## 类型定义页（reference.type.cpp）
+## 类型定义页（reference.type）
 
 适用 `defs/` 下的常量、枚举、宏、类型别名、联合体定义页。规则：
 
@@ -126,7 +153,7 @@ archs。override_id 必须与 signature 和样例源码中的调用标记对应�
 ## 示例
 
     ---
-    okftype: reference.api.cpp
+    okftype: reference.api
     title: asc_div
     resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md
     description: 执行矢量除法运算。

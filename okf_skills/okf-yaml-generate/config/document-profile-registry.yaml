@@ -1,7 +1,7 @@
 # OKF 文档 Profile 注册表。
 #
-# Profile 直接使用完整 okftype 作为唯一键。分类器从文档事实得到一个
-# okftype，Profile 只声明公共字段之外允许生成的字段和输出契约。
+# Profile 直接使用“文档族.页面种类”的完整 okftype 作为唯一键。
+# 分类器从文档事实得到页面种类；文档族由源上下文确定。
 # 不在这里维护路径规则、实体层级、字段能力依赖或 okftype 组合表。
 
 schema_version: 4
@@ -10,13 +10,13 @@ registry_id: okf-document-profile-v3
 taxonomy: ../okf-tag-generate/taxonomy/tag-taxonomy.json
 
 common_required_fields: [okftype, title, resource, timestamp]
-common_fields: [okftype, title, resource, description, tag, signature, archs, header,
-                declaration, type_catalog, dependencies, examples, navigation, timestamp]
+common_fields: [okftype, title, resource, description, tag, signature, declaration, type_catalog, archs, header,
+                dependencies, examples, navigation, timestamp]
 
 # YAML 字段顺序是输出契约，不能由 common/profile 字段拼接顺序间接决定。
 field_order:
-  [okftype, title, resource, description, tag, signature, archs, header, declaration,
-   type_catalog, dependencies, examples, navigation, timestamp]
+  [okftype, title, resource, description, tag, signature, declaration,
+   type_catalog, archs, header, dependencies, examples, navigation, timestamp]
 
 unknown_policy:
   unclassified_document: report_only
@@ -55,8 +55,8 @@ field_catalog:
     含义: 已确认的样例工程或调用位置。
     事实来源: 样例索引和实际调用。
   navigation:
-    含义: 导航页直接链接的子页面及其标题。
-    事实来源: Markdown 中的相对链接和链接文本。
+    含义: 导航页直接链接的子页面路径。
+    事实来源: Markdown 中的相对链接；页面标题可从目标路径对应的文档提取。
   header:
     含义: 定义或声明所在的头文件。
     事实来源: 唯一的头文件匹配结果。
@@ -85,37 +85,32 @@ output_contracts:
 # fields 表示该 Profile 允许解析器生成的字段，不表示每个字段都必须出现。
 # 公共字段由 common_required_fields 提供；Profile 字段不会继承 common_fields 中的全部可选字段。
 profiles:
-  reference.api.cpp:
+  reference.api:
     说明: C++ 或 AscendC 的单个可调用接口、类或成员接口。
     fields: [description, tag, signature, archs, header, dependencies, examples]
     outputs: [front_matter, doxygen, example_markers]
 
-  reference.arch.cpp:
-    说明: C++ 或 AscendC 可调用接口的架构专属页面。
-    fields: [description, tag, signature, archs, header, dependencies, examples]
-    outputs: [front_matter, doxygen, example_markers]
-
-  reference.type.cpp:
+  reference.type:
     说明: C++ 或 AscendC 的类型、定义实体和宏定义页。
     fields: [description, tag, header, declaration, type_catalog]
     outputs: [front_matter, doxygen]
 
-  reference.index.cpp:
+  reference.index:
     说明: C++ 或 AscendC API 的导航目录页。
     fields: [navigation]
     outputs: [front_matter]
 
-  reference.concept.cpp:
+  reference.concept:
     说明: C++ 或 AscendC API 的概述、约束、特性或机制说明。
     fields: [description, tag, dependencies]
     outputs: [front_matter]
 
-  reference.catalog.cpp:
+  reference.catalog:
     说明: C++ 或 AscendC API 的汇总、能力矩阵和对照表。
     fields: [description, tag, dependencies]
     outputs: [front_matter]
 
-  reference.release.cpp:
+  reference.release:
     说明: C++ 或 AscendC API 的版本发布和变更说明。
     fields: [description, tag, dependencies]
     outputs: [front_matter]
