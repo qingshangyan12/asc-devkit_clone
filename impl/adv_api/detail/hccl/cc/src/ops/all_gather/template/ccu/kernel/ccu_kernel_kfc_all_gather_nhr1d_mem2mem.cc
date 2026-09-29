@@ -60,6 +60,9 @@ struct KfcAllGatherNhr1DContext : CcuKernelCtxBase {
 };
 
 // 对应 hccl ParseKernelArg + InitResource：localSize/myRankIdx == channelCount（每 peer 一条通道）。
+// 通道绑定变量必须以拷贝构造（句柄共享）保存：ccu::Variable 的 operator= 是寄存器值搬运指令，
+// 会在 PreSync 握手完成前执行，快照到对端写入前的旧槽位值（对端 output 地址/token 陈旧，
+// 远端写将落到错误目的或因 token 失配被丢弃）。hccl 原版 InitResource 即用 push_back 活绑定。
 CcuResult InitResource(KfcAllGatherNhr1DContext& ctx)
 {
     if (ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.channelCount == 0U || ctx.rank2ChannelIdx == nullptr ||
@@ -69,12 +72,13 @@ CcuResult InitResource(KfcAllGatherNhr1DContext& ctx)
             ctx.rankSize, ctx.rankId, ctx.channelCount);
         return CCU_E_INTERNAL;
     }
-    ctx.output.resize(ctx.channelCount + 1U);
-    ctx.token.resize(ctx.channelCount + 1U);
     for (uint32_t channelIdx = 0; channelIdx < ctx.channelCount; ++channelIdx) {
-        ctx.output[channelIdx] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], AG_NHR_OUTPUT_XN_ID);
-        ctx.token[channelIdx] = ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], AG_NHR_TOKEN_XN_ID);
+        ctx.output.push_back(ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], AG_NHR_OUTPUT_XN_ID));
+        ctx.token.push_back(ccu::GetResByChannel<ccu::Variable>(ctx.channels[channelIdx], AG_NHR_TOKEN_XN_ID));
     }
+    // 本地槽 [channelCount]：值来自本轮参数帧（kernel 启动前已写入），LoadNhr1DArgs 值赋值无竞争。
+    ctx.output.push_back(ccu::Variable());
+    ctx.token.push_back(ccu::Variable());
     ctx.outputSliceOffset.resize(ctx.rankSize);
     ctx.myrankInputSliceOffset = 0;
     ctx.repeatTimeflag = 0;
