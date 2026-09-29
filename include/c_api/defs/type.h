@@ -19,6 +19,7 @@
 #include "version/asc_devkit_version.h"
 #include "c_api/defs/macro.h"
 #include "utils/common_types.h"
+#include "version/asc_devkit_version.h"
 
 using vector_uint8_t = vector_u8;
 using vector_uint16_t = vector_u16;
