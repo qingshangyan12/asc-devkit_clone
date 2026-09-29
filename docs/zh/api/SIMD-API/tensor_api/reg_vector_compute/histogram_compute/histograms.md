@@ -30,21 +30,33 @@
 
 该接口根据`src.mask`统计`uint8_t`输入值的频率分布或累计分布，并在`dst`原值上累加统计结果。计算公式如下：
 
-令$h$表示统计区间的起始值：`low`模式下$h=0$，`high`模式下$h=128$；$r_i$表示返回结果的第$i$个元素，$d_i$表示输入`dst`的第$i$个元素，$x_j$表示输入`src`的第$j$个元素，$m_j$表示`src.mask`的第$j$位。对于输出位置$i\in[0,127]$，两种统计模式分别为：
+对于返回值中的第$i$个元素（$i\in[0,127]$），两种统计模式分别为：
 
 频数模式：
 
 $$
-r_i = d_i + \sum_j m_j\mathbf{1}\{x_j=h+i\}
+\left[\operatorname{histograms}(dst, src)\right]_i =
+\begin{cases}
+dst_i + \displaystyle\sum_j (\mathrm{src.mask})_j\mathbf{1}\{src_j=i\},
+    & \mathrm{options.half}=\mathrm{histogram\_half::low} \\
+dst_i + \displaystyle\sum_j (\mathrm{src.mask})_j\mathbf{1}\{src_j=128+i\},
+    & \mathrm{options.half}=\mathrm{histogram\_half::high}
+\end{cases}
 $$
 
 累计模式：
 
 $$
-r_i = d_i + \sum_j m_j\mathbf{1}\{x_j\le h+i\}
+\left[\operatorname{histograms}(dst, src)\right]_i =
+\begin{cases}
+dst_i + \displaystyle\sum_j (\mathrm{src.mask})_j\mathbf{1}\{src_j\le i\},
+    & \mathrm{options.half}=\mathrm{histogram\_half::low} \\
+dst_i + \displaystyle\sum_j (\mathrm{src.mask})_j\mathbf{1}\{src_j\le 128+i\},
+    & \mathrm{options.half}=\mathrm{histogram\_half::high}
+\end{cases}
 $$
 
-其中，$m_j$为`1`时对应输入元素参与统计，为`0`时不参与统计。`high`与`cumulative`组合使用时，第$i$个输出统计所有不大于$128+i$的输入值，因此包含`[0, 127]`范围内的输入值。
+其中，$(\mathrm{src.mask})_j$为`1`时，`src`的第$j$个元素参与统计；为`0`时不参与统计。`high`与`cumulative`组合使用时，第$i$个输出统计所有不大于$128+i$的输入值，因此包含`[0, 127]`范围内的输入值。
 
 **表1**配置项说明
 
