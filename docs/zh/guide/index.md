@@ -304,6 +304,7 @@
             -   [L2 Cache切分](operator_practice/simd_operator_optimization/memory_access/l2_cache_split.md)
 
         -   [矢量计算](operator_practice/simd_operator_optimization/vector_compute/vector_compute.md)
+            -   [hifloat8_t数据类型算子实践](operator_practice/simd_operator_optimization/vector_compute/hifloat8_operator.md)
             -   [通过Unified Buffer融合实现连续vector计算](operator_practice/simd_operator_optimization/vector_compute/ub_fusion_vector_compute.md)
             -   [Vector算子灵活运用Counter模式](operator_practice/simd_operator_optimization/vector_compute/vector_counter_mode.md)
             -   [选择低延迟指令，优化归约操作性能](operator_practice/simd_operator_optimization/vector_compute/low_latency_instruction.md)
