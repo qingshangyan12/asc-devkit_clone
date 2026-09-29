@@ -81,24 +81,25 @@ __simd_callee__ inline reg_tensor<T> muls_cast(
 
 ## 调用示例
 
-以下示例展示接口在AIV计算函数中的典型调用方式，`count`表示待处理的float输入元素个数。
+以下示例展示接口在AIV计算函数中的典型调用方式。
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
 
-template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void muls_cast_example(InputTensor input, OutputTensor output, uint32_t count)
+template <typename SrcTensor, typename DstTensor>
+__simd_vf__ inline void muls_cast_vf(
+    const SrcTensor src, DstTensor dst, float scalar, uint16_t repeat_times, uint32_t total,
+    uint32_t src_one_repeat, uint32_t dst_one_repeat)
 {
-    constexpr uint32_t input_vector_length = asc_get_vf_len() / sizeof(float);
-    constexpr uint32_t output_vector_length = asc_get_vf_len() / sizeof(half);
-    for (uint32_t input_offset = 0, output_offset = 0; count > 0;
-         input_offset += input_vector_length, output_offset += output_vector_length) {
-        auto input_coord = asc::te::make_coord(input_offset);
-        auto output_coord = asc::te::make_coord(output_offset);
-        auto mask = asc::te::experimental::update_mask<float>(count);
-        auto src = asc::te::experimental::load(input, input_coord).with_mask(mask);
-        auto dst = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one, half>(src, 1.5f);
-        asc::te::experimental::store(output, output_coord, dst);
+    uint32_t remain = total;
+    for (uint16_t i = 0; i < repeat_times; ++i) {
+        const auto src_coord = asc::te::make_coord(i * src_one_repeat);
+        const auto dst_coord = asc::te::make_coord(i * dst_one_repeat);
+        auto mask = asc::te::experimental::update_mask<float>(remain);
+        auto src_reg = asc::te::experimental::load(src, src_coord).with_mask(mask);
+        auto dst_reg = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one, half>(
+            src_reg, scalar);
+        asc::te::experimental::store(dst, dst_coord, dst_reg);
     }
 }
 ```

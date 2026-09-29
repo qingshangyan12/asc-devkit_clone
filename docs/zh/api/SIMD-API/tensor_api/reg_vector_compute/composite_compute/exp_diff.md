@@ -97,26 +97,25 @@ __simd_callee__ inline reg_tensor<T> exp_diff(
 
 ## 调用示例
 
-以下示例展示half输入的调用方式，`count`表示待计算的float输出元素个数。
+以下示例展示`half`输入的典型调用方式。
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
 
-template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void exp_diff_example(
-    InputTensor input0, InputTensor input1, OutputTensor output, uint32_t count)
+template <typename Src0Tensor, typename Src1Tensor, typename DstTensor>
+__simd_vf__ inline void exp_diff_vf(
+    const Src0Tensor src0, const Src1Tensor src1, DstTensor dst, uint16_t repeat_times, uint32_t total,
+    uint32_t src_one_repeat, uint32_t dst_one_repeat)
 {
-    constexpr uint32_t input_vector_length = asc_get_vf_len() / sizeof(half);
-    constexpr uint32_t output_vector_length = asc_get_vf_len() / sizeof(float);
-    for (uint32_t input_offset = 0, output_offset = 0; count > 0;
-         input_offset += input_vector_length, output_offset += output_vector_length) {
-        auto input_coord = asc::te::make_coord(input_offset);
-        auto output_coord = asc::te::make_coord(output_offset);
-        auto mask = asc::te::experimental::update_mask<float>(count);
-        auto src0 = asc::te::experimental::load(input0, input_coord).with_mask(mask);
-        auto src1 = asc::te::experimental::load(input1, input_coord).with_mask(mask);
-        auto dst = asc::te::experimental::exp_diff<float, half>(src0, src1, ASC_POSITION_ODD);
-        asc::te::experimental::store(output, output_coord, dst);
+    uint32_t remain = total;
+    for (uint16_t i = 0; i < repeat_times; ++i) {
+        const auto src_coord = asc::te::make_coord(i * src_one_repeat);
+        const auto dst_coord = asc::te::make_coord(i * dst_one_repeat);
+        auto mask = asc::te::experimental::update_mask<float>(remain);
+        auto src0_reg = asc::te::experimental::load(src0, src_coord).with_mask(mask);
+        auto src1_reg = asc::te::experimental::load(src1, src_coord).with_mask(mask);
+        auto dst_reg = asc::te::experimental::exp_diff<float, half>(src0_reg, src1_reg, ASC_POSITION_ODD);
+        asc::te::experimental::store(dst, dst_coord, dst_reg);
     }
 }
 ```

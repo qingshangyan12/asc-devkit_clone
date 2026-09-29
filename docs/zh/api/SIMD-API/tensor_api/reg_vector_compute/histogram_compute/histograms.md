@@ -95,7 +95,7 @@ __simd_callee__ inline reg_tensor<T> histograms(
 
 ## 调用示例
 
-以下示例分别统计输入数据低半区和高半区的频率分布，`count`表示参与统计的`uint8_t`元素个数。
+以下示例分别统计输入数据低半区和高半区的频率分布。
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
@@ -104,24 +104,26 @@ constexpr asc::te::experimental::histogram_options high_options {
     asc::te::experimental::histogram_half::high,
     asc::te::experimental::histogram_mode::frequency};
 
-template <typename InputTensor, typename InitialInputTensor, typename OutputTensor>
-__simd_vf__ inline void histograms_example(
-    InputTensor input, InitialInputTensor initial_input, OutputTensor low_output, OutputTensor high_output,
-    uint32_t count)
+template <typename SrcTensor, typename InitialTensor, typename DstTensor>
+__simd_vf__ inline void histograms_vf(
+    const SrcTensor src, const InitialTensor initial, DstTensor low_dst, DstTensor high_dst, uint16_t repeat_times,
+    uint32_t total, uint32_t one_repeat)
 {
-    uint32_t dst_count = 128;
-    auto dst_mask = asc::te::experimental::update_mask<uint16_t>(dst_count);
-    auto initial_low = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
-    auto initial_high = asc::te::experimental::load(initial_input, asc::te::make_coord(0)).with_mask(dst_mask);
-    constexpr uint32_t vector_length = asc_get_vf_len() / sizeof(uint8_t);
-    for (uint32_t offset = 0; count > 0; offset += vector_length) {
-        auto mask = asc::te::experimental::update_mask<uint8_t>(count);
-        auto src = asc::te::experimental::load(input, asc::te::make_coord(offset)).with_mask(mask);
-        initial_low = asc::te::experimental::histograms(initial_low, src);
-        initial_high = asc::te::experimental::histograms<high_options>(initial_high, src);
+    uint32_t dst_remain = 128;
+    auto dst_mask = asc::te::experimental::update_mask<uint16_t>(dst_remain);
+    auto low_reg = asc::te::experimental::load(initial, asc::te::make_coord(0)).with_mask(dst_mask);
+    auto high_reg = asc::te::experimental::load(initial, asc::te::make_coord(0)).with_mask(dst_mask);
+    uint32_t remain = total;
+    for (uint16_t i = 0; i < repeat_times; ++i) {
+        const uint32_t offset = i * one_repeat;
+        const auto coord = asc::te::make_coord(offset);
+        auto mask = asc::te::experimental::update_mask<uint8_t>(remain);
+        auto src_reg = asc::te::experimental::load(src, coord).with_mask(mask);
+        low_reg = asc::te::experimental::histograms(low_reg, src_reg);
+        high_reg = asc::te::experimental::histograms<high_options>(high_reg, src_reg);
     }
 
-    asc::te::experimental::store(low_output, asc::te::make_coord(0), initial_low);
-    asc::te::experimental::store(high_output, asc::te::make_coord(0), initial_high);
+    asc::te::experimental::store(low_dst, asc::te::make_coord(0), low_reg);
+    asc::te::experimental::store(high_dst, asc::te::make_coord(0), high_reg);
 }
 ```

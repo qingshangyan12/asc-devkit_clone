@@ -80,23 +80,25 @@ __simd_callee__ inline reg_tensor<T> axpy(
 
 ## 调用示例
 
-以下示例展示接口在AIV计算函数中的典型调用方式，`count`表示待处理的元素个数。
+以下示例展示接口在AIV计算函数中的典型调用方式。
 
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
 
-template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void axpy_example(
-    InputTensor initial_input, InputTensor src_input, OutputTensor output, uint32_t count)
+template <typename DstTensor, typename SrcTensor>
+__simd_vf__ inline void axpy_vf(
+    DstTensor dst, const SrcTensor src, float scalar, uint16_t repeat_times, uint32_t total, uint32_t one_repeat)
 {
-    constexpr uint32_t vector_length = asc_get_vf_len() / sizeof(float);
-    for (uint32_t offset = 0; count > 0; offset += vector_length) {
-        auto coord = asc::te::make_coord(offset);
-        auto mask = asc::te::experimental::update_mask<float>(count);
-        auto dst = asc::te::experimental::load(initial_input, coord).with_mask(mask);
-        auto src = asc::te::experimental::load(src_input, coord).with_mask(mask);
-        dst = asc::te::experimental::axpy(dst, src, 0.25f);
-        asc::te::experimental::store(output, coord, dst);
+    using data_type = typename DstTensor::data_type;
+    uint32_t remain = total;
+    for (uint16_t i = 0; i < repeat_times; ++i) {
+        const uint32_t offset = i * one_repeat;
+        const auto coord = asc::te::make_coord(offset);
+        auto mask = asc::te::experimental::update_mask<data_type>(remain);
+        auto dst_reg = asc::te::experimental::load(dst, coord).with_mask(mask);
+        auto src_reg = asc::te::experimental::load(src, coord).with_mask(mask);
+        dst_reg = asc::te::experimental::axpy(dst_reg, src_reg, scalar);
+        asc::te::experimental::store(dst, coord, dst_reg);
     }
 }
 ```

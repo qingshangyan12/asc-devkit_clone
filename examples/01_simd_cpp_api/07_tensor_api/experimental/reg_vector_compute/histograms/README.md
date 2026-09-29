@@ -34,14 +34,24 @@
   核心计算代码如下：
 
   ```cpp
-  const auto coord = asc::te::make_coord(0);
-  auto src = asc::te::experimental::load(src_tensor, coord)
-                 .with_mask(asc::te::experimental::all_mask<uint8_t>());
-  asc::te::experimental::reg_tensor<uint16_t> initial;
-  initial.mask = asc::te::experimental::all_mask<uint16_t>().reg;
-  asc_duplicate_scalar(initial.reg, initial_value, initial.mask);
-  auto dst = asc::te::experimental::histograms<histogram_config>(initial, src);
-  asc::te::experimental::store(dst_tensor, coord, dst);
+  template <typename SrcTensor, typename DstTensor>
+  __simd_vf__ inline void histograms_vf(
+      const SrcTensor src, DstTensor dst, uint16_t repeat_times, uint32_t total, uint32_t one_repeat)
+  {
+      uint32_t remain = total;
+      asc::te::experimental::reg_tensor<uint16_t> dst_reg;
+      uint32_t dst_remain = bin_length;
+      dst_reg.mask = asc::te::experimental::update_mask<uint16_t>(dst_remain).reg;
+      asc_duplicate_scalar(dst_reg.reg, initial_value, dst_reg.mask);
+      for (uint16_t i = 0; i < repeat_times; ++i) {
+          const uint32_t offset = i * one_repeat;
+          const auto coord = asc::te::make_coord(offset);
+          auto mask = asc::te::experimental::update_mask<uint8_t>(remain);
+          auto src_reg = asc::te::experimental::load(src, coord).with_mask(mask);
+          dst_reg = asc::te::experimental::histograms<histogram_config>(dst_reg, src_reg);
+      }
+      asc::te::experimental::store(dst, asc::te::make_coord(0), dst_reg);
+  }
   ```
 
 ## 编译运行

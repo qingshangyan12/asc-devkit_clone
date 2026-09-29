@@ -45,14 +45,22 @@ dst[i] = |src0[i] - src1[i]|
   The core computation is as follows:
 
   ```cpp
-  uint32_t count = total_length;
-  for (uint32_t offset = 0; count > 0; offset += vector_length) {
-      const auto coord = asc::te::make_coord(offset);
-      auto mask = asc::te::experimental::update_mask<float>(count);
-      auto src0 = asc::te::experimental::load(src0_tensor, coord).with_mask(mask);
-      auto src1 = asc::te::experimental::load(src1_tensor, coord);
-      auto dst = asc::te::experimental::abs_diff(src0, src1);
-      asc::te::experimental::store(dst_tensor, coord, dst);
+  template <typename Src0Tensor, typename Src1Tensor, typename DstTensor>
+  __simd_vf__ inline void abs_diff_vf(
+      const Src0Tensor src0, const Src1Tensor src1, DstTensor dst, uint16_t repeat_times, uint32_t total,
+      uint32_t one_repeat)
+  {
+      using data_type = typename Src0Tensor::data_type;
+      uint32_t remain = total;
+      for (uint16_t i = 0; i < repeat_times; ++i) {
+          const uint32_t offset = i * one_repeat;
+          const auto coord = asc::te::make_coord(offset);
+          auto mask = asc::te::experimental::update_mask<data_type>(remain);
+          auto src0_reg = asc::te::experimental::load(src0, coord).with_mask(mask);
+          auto src1_reg = asc::te::experimental::load(src1, coord).with_mask(mask);
+          auto dst_reg = asc::te::experimental::abs_diff(src0_reg, src1_reg);
+          asc::te::experimental::store(dst, coord, dst_reg);
+      }
   }
   ```
 
