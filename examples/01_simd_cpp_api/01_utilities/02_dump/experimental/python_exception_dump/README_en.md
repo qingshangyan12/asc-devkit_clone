@@ -12,8 +12,9 @@ This example demonstrates an NPU operator exception info auto-dump solution base
 
 | Products | CANN Versions |
 |---|---|
-| Atlas A2 training series products/Atlas A2 inference series products | \>= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 | Atlas A3 training series products/Atlas A3 inference series products | \>= CANN 9.1.0 |
+| Atlas A2 training series products/Atlas A2 inference series products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -22,12 +23,12 @@ This example demonstrates an NPU operator exception info auto-dump solution base
 │   ├── examples
 │   │   └── demo_ifa.py                  // Demo: normal call + fault injection + product self-check
 │   ├── npuops_exception_dump
-│   │   ├── CMakeLists.txt               // Build project file
-│   │   ├── build.sh                     // One-shot build script (output to lib/)
 │   │   ├── include
 │   │   │   └── npuops_exception_dump.h  // Public C interface of the plugin library
+│   │   ├── python/npuops                // Python API (debug.py, etc.)
 │   │   ├── src                          // C++ exception callback implementation
-│   │   └── python/npuops                // Python API (debug.py, etc.)
+│   │   ├── build.sh                     // One-shot build script (output to lib/)
+│   │   └── CMakeLists.txt               // Build project file
 │   ├── README_en.md
 │   └── README.md
 ```
