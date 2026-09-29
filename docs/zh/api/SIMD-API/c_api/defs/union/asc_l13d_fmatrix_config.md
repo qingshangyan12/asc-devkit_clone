@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_l13d_fmatrix_config
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md
 description: 配置 L12 到 L0A 或 L0B 的 3D Feature map 搬运属性，包括尺寸和四个方向的 padding 大小。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_vf_len
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_vf_len.md
 description: 获取当前芯片的矢量寄存器位宽VL，即矢量计算单元单次Repeat可处理的元素个数，常用于推导mask长度、循环次数、单次搬运元素数等参数；该接口不触发硬件指令、不依赖任何特殊寄存器或前置setter接口配置，同一核函数内多次调用返回值相同。

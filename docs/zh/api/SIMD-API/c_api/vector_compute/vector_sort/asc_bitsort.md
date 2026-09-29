@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_bitsort
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
 description: 一次迭代内对32个数做降序排列，src0和src1分别为待排序的score及对应索引，排序后以score和index结构存入dst，不同迭代之间不进行排序。

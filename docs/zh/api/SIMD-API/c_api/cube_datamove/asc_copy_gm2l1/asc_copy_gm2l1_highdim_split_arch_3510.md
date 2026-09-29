@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_arch_3510（高维切分数据搬运）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md
 description: 将数据从Global Memory搬运到L1 Buffer且格式和内容保持不变，通过配置数据块个数、单个数据块长度和地址偏移实现高维切分的非连续搬运，并支持按通道padding模式插入或移除padding，仅在AIC上执行有效。

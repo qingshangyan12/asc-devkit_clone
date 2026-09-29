@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_ndim_pad_count_config
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md
 description: 为 asc_ndim_copy_gm2ub 搬运配置各维度左侧和右侧的 padding 元素数量。

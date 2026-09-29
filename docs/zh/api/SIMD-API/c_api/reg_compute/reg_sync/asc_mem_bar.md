@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mem_bar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
 description: Reg矢量计算内不同流水线之间的同步指令，通过mem_type指定源流水线和目的流水线，目的流水线将等待源流水线上所有指令完成后再执行，UB数据存在依赖时才需要插入同步。

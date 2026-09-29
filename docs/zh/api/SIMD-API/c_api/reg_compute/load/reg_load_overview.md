@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: Reg数据搬入概述
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/reg_load_overview.md
 description: 介绍Reg数据搬入接口的分类与选择：将Unified Buffer（UB）中的数据搬入矢量数据寄存器、掩码寄存器或非对齐寄存器，涵盖对齐与非对齐搬入接口、非对齐搬入搬出原理及b64数据类型的搬运方法。

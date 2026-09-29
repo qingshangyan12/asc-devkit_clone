@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_gm2l1_padding
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md
 description: 设置asc_copy_gm2l1高维切分数据搬运接口padding模式使用的padding值，因底层寄存器与asc_set_l12l0a_3d_padding共用，该值同时作为3D矩阵搬运asc_copy_l12l0a的填充值，仅在AIC上生效。

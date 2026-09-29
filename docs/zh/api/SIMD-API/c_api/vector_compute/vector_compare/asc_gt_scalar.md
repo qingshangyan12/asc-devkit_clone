@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gt_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md
 description: src中每个元素逐个与标量value比较大小，元素大于value时输出结果对应比特位为1，否则为0。

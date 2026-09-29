@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_vec
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md
 description: 针对PIPE_V执行同步操作的易用性接口，保证PIPE_V中前序指令（如矢量计算）全部完成后，PIPE_MTE2、PIPE_MTE3与PIPE_S的后续指令才能开始执行。无入参函数原型已废弃，请使用asc_sync执行针对所有流水的同步操作。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gather
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md
 description: 根据索引矢量中保存的逐元素索引，将Unified Buffer中的源操作数按元素收集到目的矢量数据寄存器，受mask掩码控制且掩码为0的位置写0，提供引用参数输出与函数返回值两种形式，仅在AIV上生效。

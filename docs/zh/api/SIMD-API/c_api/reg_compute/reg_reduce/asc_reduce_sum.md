@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_reduce_sum
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md
 description: 根据mask对源矢量数据寄存器中所有参与计算的元素进行归约求和，指令内累加顺序采用二叉树累加方式，结果保存于dst第0个元素，其余元素置0，16位输入会提升精度到32位计算。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_atomic_inc
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md
 description: 对Global Memory中address指向的uint32_t或uint64_t元素执行原子递增操作，读取旧值，旧值大于等于val时写回0，否则写回旧值加1，接口返回旧值，读取、判断和写回过程为原子操作。

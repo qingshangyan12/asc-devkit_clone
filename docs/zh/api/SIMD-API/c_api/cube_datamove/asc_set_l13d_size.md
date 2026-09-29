@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l13d_size
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md
 description: 设置asc_copy_l12l0a和asc_copy_l12l0b的3D格式搬运接口在L1 Buffer的边界值，源操作数地址超出边界时将从L1

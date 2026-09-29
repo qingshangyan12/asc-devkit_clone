@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: Reg聚合搬入
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/gather.md
 navigation:

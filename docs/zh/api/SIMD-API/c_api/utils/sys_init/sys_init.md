@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 系统初始化
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_init/sys_init.md
 navigation:

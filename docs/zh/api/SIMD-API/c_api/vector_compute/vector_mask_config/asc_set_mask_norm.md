@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_mask_norm
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
 description: 设置Mask模式为系统默认的Normal模式，该模式下Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素，需和asc_set_vector_mask配合使用。

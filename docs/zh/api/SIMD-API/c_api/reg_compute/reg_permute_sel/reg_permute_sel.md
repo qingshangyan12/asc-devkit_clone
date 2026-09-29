@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 排布变换
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/reg_permute_sel.md
 navigation:

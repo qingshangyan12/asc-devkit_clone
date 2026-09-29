@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_pack_quarter_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md
 description: 将矢量数据寄存器中有效的32位元素按低8bit压缩后搬出到Unified Buffer（UB），mask为0的元素不搬出且目的位置保持原值，写入完成后启用Post

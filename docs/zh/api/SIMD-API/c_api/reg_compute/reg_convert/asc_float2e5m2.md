@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2e5m2
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md
 description: 根据mask将矢量数据寄存器中参与计算的float元素转换为fp8_e5m2_t类型并写入dst，涉及舍入模式和饱和/非饱和模式，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引写入一组，其他位置置零。

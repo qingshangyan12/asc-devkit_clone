@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2int32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md
 description: 将float类型数据转化为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。

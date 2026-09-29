@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_pack_v2（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md
 description: 已废弃的矢量搬运接口，将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），本接口不传入偏移量，请改用asc_storealign_pack_quarter实现此功能。

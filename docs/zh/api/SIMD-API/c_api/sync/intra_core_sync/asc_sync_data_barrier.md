@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_data_barrier
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
 description: 阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。通过arg参数指定阻塞作用的内存范围，可等待全部内存访问指令，或仅等待GM、UB的访问指令。

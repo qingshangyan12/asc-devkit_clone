@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l0a
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l0a.md
 description: 将数据从GM搬运到L0A Buffer，通过分形矩阵ID、迭代次数以及相邻迭代间的源步长和目的间隔控制搬运过程。

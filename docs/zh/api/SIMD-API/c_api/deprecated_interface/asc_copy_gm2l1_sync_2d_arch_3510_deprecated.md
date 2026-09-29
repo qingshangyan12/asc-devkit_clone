@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_sync_2d_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_sync_2d_arch_3510_deprecated.md
 description: 以512字节的分形为单位从GM按行列方向的起始位置和步长切分提取多个分形矩阵搬运到L1 Buffer，用于矩阵计算所需的2D格式数据加载；接口已废弃，请使用非同步接口和同步接口asc_sync替代。

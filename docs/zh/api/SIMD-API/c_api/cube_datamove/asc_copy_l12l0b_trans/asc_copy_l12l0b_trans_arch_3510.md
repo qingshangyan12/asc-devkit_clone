@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_trans
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md
 description: 将数据从L1 Buffer搬运到L0B Buffer，以512字节的数据分形为单位在搬运过程中完成二维分形矩阵转置，按分形索引、重复次数和源、目的间隔等参数组织搬运。

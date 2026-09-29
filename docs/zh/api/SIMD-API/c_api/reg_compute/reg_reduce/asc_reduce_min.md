@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_reduce_min
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min.md
 description: 根据mask对源矢量数据寄存器执行归约最小值操作，最小值保存于dst第0个元素，其索引的原始位模式保存于第1个元素，其余元素置0，存在多个最小值时保留最小索引。

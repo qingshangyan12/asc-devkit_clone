@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_atomic_or
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md
 description: 对Global Memory中address指向的单个元素执行原子按位或操作，读取旧值并与输入标量值进行按位或运算，将结果写回该地址并返回旧值，整个读取、计算和写回过程为原子操作，接口运行在标量流水PIPE_S上，访问GM时绕过DCache。

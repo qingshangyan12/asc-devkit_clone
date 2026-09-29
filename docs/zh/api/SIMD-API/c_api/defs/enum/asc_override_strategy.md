@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_override_strategy
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
 description: 该枚举表示饱和控制策略，用于设置或查询单指令/API路径与全局CAST饱和配置的生效方式。

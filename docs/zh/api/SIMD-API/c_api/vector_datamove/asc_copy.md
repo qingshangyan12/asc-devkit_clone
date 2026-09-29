@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md
 description: 将数据从Unified Buffer（UB）搬运到UB，支持前n个数据与高维切分两种形式，目的和源操作数起始地址需32字节对齐。

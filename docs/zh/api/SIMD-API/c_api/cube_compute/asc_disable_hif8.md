@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_disable_hif8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md
 description: 设置Mmad计算关闭HiF8模式，作用与asc_enable_hif8相反且二者不同时生效。关闭后左右矩阵均为fp8_e4m3fn_t输入时，L0A

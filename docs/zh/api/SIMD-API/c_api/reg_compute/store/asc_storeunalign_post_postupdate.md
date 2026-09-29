@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storeunalign_post_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
 description: 将非对齐寄存器中暂存的尾块写入Unified Buffer（UB），为asc_storeunalign_postupdate立即数偏移搬出模式收尾；搬出后按立即数offset个元素自动累加目的地址指针，硬件循环内连续调用无需手动维护目的地址。

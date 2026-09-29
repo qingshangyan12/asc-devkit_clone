@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_fma_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fma_sync_deprecated.md
 description: 已废弃的同步矢量计算接口，按元素将src0和src1相乘并与dst相加，最终结果存放进dst，支持half与float类型数据，请使用非同步接口asc_fma配合同步接口asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 通用说明和约束
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
 description: C API通用说明与约束页，介绍GM、UB、L1、L0A、L0B、L0C等存储单元的用途与容量注意事项，说明高维切分计算的地址重叠约束、dataBlockStride、repeatStride与掩码配置方法，以及以数组方式申请内存的约束。

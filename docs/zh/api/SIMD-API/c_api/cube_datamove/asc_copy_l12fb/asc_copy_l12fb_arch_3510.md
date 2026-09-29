@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12fb
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md
 description: 将L1 Buffer中的随路Vector量化与随路ReLU参数搬运到Fixpipe Buffer，供后续Fixpipe流水使用，通过dst地址高4位区分量化参数和ReLU参数的独立地址空间，仅在AIC上执行有效。

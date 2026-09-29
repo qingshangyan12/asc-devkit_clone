@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_store_l2_cache_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md
 description: 该枚举表示Unified Buffer（UB）到GM搬运时的L2 Cache策略，也用于标量访存路径的store策略配置与查询。

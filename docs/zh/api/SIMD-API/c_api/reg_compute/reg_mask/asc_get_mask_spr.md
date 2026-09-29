@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_mask_spr
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md
 description: 从SPR特殊寄存器中读取mask值并按数据类型格式化后返回，b16模式将128bit数据每个bit扩展为2bit、b32模式将64bit数据每个bit扩展为4bit，拼成256bit掩码寄存器，需在Vector

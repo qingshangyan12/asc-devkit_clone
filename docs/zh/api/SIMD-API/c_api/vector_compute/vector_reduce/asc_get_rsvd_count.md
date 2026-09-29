@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_rsvd_count
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md
 description: 获取执行asc_reduce操作后剩余的元素数量，需与asc_reduce操作配合使用，并通过同步操作确保其执行完成后再调用。

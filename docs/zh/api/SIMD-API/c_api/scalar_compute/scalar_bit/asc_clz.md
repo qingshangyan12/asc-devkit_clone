@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_clz
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clz.md
 description: 计算uint64_t类型整数二进制表示下的前导零个数，即从二进制最高位开始到第一个出现1为止中间连续0的数量，输入为0时返回64，返回值范围为0到64，运行在标量流水上。

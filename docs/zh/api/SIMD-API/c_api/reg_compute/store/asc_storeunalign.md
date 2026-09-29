@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storeunalign
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
 description: 将矢量数据寄存器中的前count个元素连续搬出到非32字节对齐的Unified Buffer（UB）地址，主块直接写入UB、尾块暂存至非对齐寄存器供连续调用拼接，尾块需调用后处理接口收尾，每次调用后由用户手动更新目的地址。

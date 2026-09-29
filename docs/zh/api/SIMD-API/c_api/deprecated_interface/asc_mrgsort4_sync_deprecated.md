@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mrgsort4_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mrgsort4_sync_deprecated.md
 description: 已废弃的同步归并排序接口：将已经排好序的最多4条队列合并排列成1条队列，结果按照score域由大到小排序；请使用非同步接口asc_mrgsort4并配合同步接口asc_sync替代。

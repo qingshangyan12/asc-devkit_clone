@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_vdeq_int162b8_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md
 description: 该接口已废弃，将int16_t类型转化为int8_t或uint8_t类型并存放在每个DataBlock的上半块或下半块，使用前需先调用asc_set_deq_scale设置量化参数，请使用非同步接口配合asc_sync替代。

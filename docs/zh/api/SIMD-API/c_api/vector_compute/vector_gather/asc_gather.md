@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gather
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
 description: 将src按照src_offset给定的偏移按元素收集到dst中，偏移量相对于源操作数起始基地址且单位为Bytes，偏移后地址不能超出Unified

@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: asc_copy_l12l0b
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md
 navigation:

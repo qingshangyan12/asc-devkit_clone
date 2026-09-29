@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sqrt
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sqrt.md
 description: 按元素计算源矢量的平方根并写入目的矢量，源操作数只支持设置为正数，提供前n个数据计算与高维切分计算两种原型，操作数起始地址需32字节对齐。

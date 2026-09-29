@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int642int32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md
 description: 将矢量数据寄存器中的int64_t类型源操作数转换成int32_t类型，支持饱和与非饱和模式；源与目的位宽比为2:1，根据dst_pos选择写入目的索引为偶数或奇数的位置，未写入位置清零，仅在AIV上生效。

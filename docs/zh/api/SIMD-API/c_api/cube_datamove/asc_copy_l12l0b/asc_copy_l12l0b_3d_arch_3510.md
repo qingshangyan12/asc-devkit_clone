@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_arch_3510（3D矩阵搬运）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md
 description: 将NC1HWC0格式的Feature Map按卷积步长、卷积核大小和膨胀系数完成Image to Column展开生成img2col二维矩阵，再从L1

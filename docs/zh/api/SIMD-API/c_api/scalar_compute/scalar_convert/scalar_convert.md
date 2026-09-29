@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 类型转换
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/scalar_convert.md
 navigation:

@@ -1,16 +1,17 @@
 ---
 name: okf-retrieve
-description: 从用户算子需求出发，经 okf-index 持久化索引定位分阶段候选 C API 文档（范围：整个 c_api 目录，800 篇）。索引优先、按需核对、如实标注 c_api 范围外缺口；输出对齐评测口径的固定答案格式。
+description: 从用户算子需求出发，经 okf-index 持久化索引（c_api 实例，index/c_api/）定位分阶段候选 C API 文档（范围：整个 c_api 目录，838 篇）。索引优先、按需核对、如实标注 c_api 范围外缺口；输出对齐评测口径的固定答案格式。
 ---
 
 # OKF 知识检索
 
 本 Skill 打通「算子需求 → 索引查询 → 分阶段候选文档」链路，验证 okf-index 索引可被日常检索直接复用。
-检索入口是 `okf-index/scripts/query.py`，本 Skill 只定义检索流程与输出规范，不新建索引数据。
+检索入口是 `okf-index/scripts/query.py`（`--surface` 选择 API surface 索引实例，默认 c_api），
+本 Skill 只定义检索流程与输出规范，不新建索引数据。
 
 ## 检索范围
 
-整个 `docs/zh/api/SIMD-API/c_api`（800 篇）：vector/reg 双流水计算与搬运、cube 矩阵计算与搬运、
+整个 `docs/zh/api/SIMD-API/c_api`（838 篇）：vector/reg 双流水计算与搬运、cube 矩阵计算与搬运、
 sync 同步、atomic 原子、spr、cache_ctrl、utils、scalar_compute、defs 类型/枚举/宏/常量/联合定义页、
 deprecated_interface 废弃接口及顶层说明页。"文档范围内"= c_api 目录内。
 
@@ -68,7 +69,7 @@ deprecated_interface 废弃接口及顶层说明页。"文档范围内"= c_api �
 - 能力描述（及源码或范围外线索，若有）
 ```
 
-## 检索子代理提示模板 v6.0-retrieve（冒烟与后续对照复用）
+## 检索子代理提示模板 v6.1-retrieve（冒烟与后续对照复用）
 
 ```text
 你是 AscendC C API 检索助手。请完成以下算子需求的 API 检索任务。
@@ -79,11 +80,12 @@ deprecated_interface 废弃接口及顶层说明页。"文档范围内"= c_api �
 【检索资产】
 1. 持久化索引（必须最先使用）：在仓库根目录执行
    python3 /mnt/workspace/asc-devkit/okf-skills/okf-index/scripts/query.py <查询>
+   （--surface 选择 API surface 索引实例，默认 c_api；当前仅注册 c_api）
    常用查询：--stage in,out,compute（分阶段候选）；--operation add,matrix_multiply_accumulate,synchronization,…（计算意图）；
    --kw 矩阵,非对齐,填充,…（能力关键词）；--convert bfloat16 float（类型转换对）；
    --api asc_copy_l12l0a（某 API 的主页/架构变体/家族成员）；--deps-of <API>（配套配置）；
    --gap <关键词>（c_api 范围外能力缺口，命中即"c_api 范围内无文档"）。
-   加 --json 可得机器可读输出。索引数据：okf-skills/okf-index/index/{index.json,gaps.json}。
+   加 --json 可得机器可读输出。索引数据：okf-skills/okf-index/index/c_api/{index.json,gaps.json}。
 2. API 文档（检索与计分主目标）：/mnt/workspace/asc-devkit/docs/zh/api/SIMD-API/c_api 整目录及其子目录
    （含 vector/reg/cube 计算与搬运、sync、atomic、spr、cache_ctrl、utils、scalar_compute、defs、
    deprecated_interface）。
@@ -112,3 +114,4 @@ deprecated_interface 废弃接口及顶层说明页。"文档范围内"= c_api �
 | --- | --- |
 | v5.0 | 双目录范围（140 篇）+ 索引资产 + 索引优先要求（stage5-v1 实测） |
 | v6.0 | 范围扩展到整个 c_api（800 篇）：语料路径、矩阵/寄存器双流水线策略、同步/类型/deprecated 导航、缺口语义改为 c_api 范围外（登记为空） |
+| v6.1 | 索引实例按 API surface 隔离：index/c_api/、query.py --surface（默认 c_api）；c_api 索引数据路径更新，语料 838 篇 |

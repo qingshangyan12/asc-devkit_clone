@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2bfloat16_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md
 description: 已废弃接口，将float类型数据转换为bfloat16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请使用asc_float2bfloat16与asc_sync组合替代。

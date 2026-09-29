@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_ar_spr (废弃)
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_ar_spr_deprecated.md
 description: 已废弃的特殊寄存器读取接口：读取指定特殊寄存器的值并返回int64_t类型的数值，运行于标量流水，请使用asc_get_squeeze_status实现此功能。

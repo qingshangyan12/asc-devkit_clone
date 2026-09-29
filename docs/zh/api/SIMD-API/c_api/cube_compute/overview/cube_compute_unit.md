@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 矩阵计算单元
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_unit.md
 navigation: []

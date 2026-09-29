@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l0c2gm
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_2201.md
 description: 矩阵计算完成后，对结果进行量化处理，之后将处理结果搬运到GM中，支持九种量化模式，并可通过参数开启ReLU、通道拆分和NZ2ND格式转换功能。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_clear_nthbit
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clear_nthbit.md
 description: 对64位无符号整数执行位清除操作，将指定位索引的二进制位清零、其余位保持不变，返回修改后的64位无符号整数；接口为标量位运算，运行在标量流水上，实际位索引按取模规则计算，范围为0到63。

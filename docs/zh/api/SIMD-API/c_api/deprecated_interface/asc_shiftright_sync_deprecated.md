@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_shiftright_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md
 description: 对src中的每个元素执行右移，有符号类型做算术右移、无符号类型做逻辑右移，value不支持负数且不能超过源数据类型位宽，接口已废弃，请使用非同步接口asc_shiftright和同步接口asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_min_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_min_sync_deprecated.md
 description: 已废弃的同步矢量运算接口：按元素求src0与src1的最小值存入dst，请使用非同步接口asc_min并配合同步接口asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_load_l2_cache_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
 description: 描述GM到Unified Buffer搬运及标量load路径使用的L2 Cache管理策略枚举，覆盖启用、替换和不分配等模式。

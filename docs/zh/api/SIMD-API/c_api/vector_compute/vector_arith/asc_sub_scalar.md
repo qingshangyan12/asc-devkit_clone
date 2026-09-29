@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sub_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub_scalar.md
 description: 执行矢量和标量的减法运算，将源矢量各元素减去标量value后逐元素写入目的矢量，支持前n个数据连续计算与非连续数据计算两种模式。

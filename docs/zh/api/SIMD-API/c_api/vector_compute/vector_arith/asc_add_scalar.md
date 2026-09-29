@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_add_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add_scalar.md
 description: 将源矢量各元素与给定标量逐元素相加并写入目的矢量，支持连续数据计算与高维切分计算两种模式。

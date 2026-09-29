@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_ffts_base_addr
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md
 description: 获取核间同步寄存器的基地址，本接口为只读查询接口，调用方不可直接设置或修改返回的基地址值，基地址需通过asc_set_ffts_base_addr预先配置后方可用于核间同步。

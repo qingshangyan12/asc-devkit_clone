@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_round
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_round.md
 description: 将源操作数中的浮点数元素按照ROUND舍入模式（四舍五入，中间值向远离0方向）舍入到整数值，结果保持原浮点数据类型，未被掩码筛选的元素置零，仅在AIV上生效。

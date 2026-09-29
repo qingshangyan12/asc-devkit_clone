@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_trans_sync_arch_2201（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_trans_sync_arch_2201_deprecated.md
 description: 已废弃的同步搬运接口，实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，支持uint8_t、half、float等多种数据类型，请使用非同步接口配合asc_sync替代。

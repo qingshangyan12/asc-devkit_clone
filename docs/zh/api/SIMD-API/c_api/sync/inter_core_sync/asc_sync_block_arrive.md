@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_block_arrive
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
 description: 与asc_sync_block_wait配对使用，实现单AI Core内AIC与全部AIV之间的核间同步（模式2）。指定流水的前序指令执行完成后向调度模块发送通知，调度模块将对应flag_id的计数器增加1，本接口不阻塞后续指令。

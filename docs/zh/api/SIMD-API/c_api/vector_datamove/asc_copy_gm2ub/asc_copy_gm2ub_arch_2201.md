@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2ub
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md
 description: 将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持前n个数据搬运和高维切分搬运，前n个数据搬运时搬运数据大小要求32字节对齐。

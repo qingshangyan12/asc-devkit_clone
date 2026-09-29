@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sqrt_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md
 description: 按元素对源矢量做开方运算并将结果写入目的矢量，src只支持设置为正数，接口已废弃，请使用非同步接口asc_sqrt和同步接口asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md
 description: 将float类型的标量转换为half类型并返回，舍入模式固定为ODD最近邻奇数舍入，饱和与非饱和模式可通过asc_set_saturation_flag接口配置，接口运行在标量流水上。

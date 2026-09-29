@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2float_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md
 description: 已废弃的同步精度转换接口，对float类型数据进行精度转换处理，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请使用对应的非同步接口和同步接口asc_sync替代。

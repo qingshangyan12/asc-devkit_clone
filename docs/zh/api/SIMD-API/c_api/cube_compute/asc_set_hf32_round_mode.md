@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_hf32_round_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md
 description: 设置HF32模式的舍入方式，支持NEAREST_AWAY与NEAREST_EVEN两种枚举值，使用前需先开启HF32模式，且需在矩阵乘加指令执行前调用以确保配置生效，配置在HF32模式开启期间持续有效。

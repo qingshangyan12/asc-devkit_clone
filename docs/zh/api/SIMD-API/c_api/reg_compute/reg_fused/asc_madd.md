@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_madd
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md
 description: 根据mask对目的操作数dst与源操作数src0按元素相乘后与src1中的对应元素相加并将结果写回dst，dst既作为输入参与计算又用于存储最终结果，支持half、bfloat16_t与float类型，仅在AIV上生效。

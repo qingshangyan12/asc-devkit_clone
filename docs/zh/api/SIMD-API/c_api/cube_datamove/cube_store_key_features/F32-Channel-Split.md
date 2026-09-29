@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: F32 Channel Split
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/F32-Channel-Split.md
 description: 介绍矩阵搬出过程中的F32 Channel Split特性：目标类型为f32且开启通道拆分时，硬件将每个16×16分形矩阵拆分为2个16×8小z分形矩阵；该特性要求输入输出均为float、Nz输出到GM且未开启Nz2ND等特性，开启后源Nz矩阵的n_size须为8的倍数。

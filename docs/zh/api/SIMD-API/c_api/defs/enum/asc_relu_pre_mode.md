@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_relu_pre_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md
 description: 该枚举表示L0C Buffer数据搬出时的随路ReLU模式，并作为矩阵搬出接口relu_pre_mode参数的类型。

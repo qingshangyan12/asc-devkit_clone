@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_unpack
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
 description: 将矢量数据寄存器或掩码寄存器中低半部分或高半部分的元素以扩充位宽的方式解压缩写入目的寄存器或通过函数返回值返回，无符号整型高位填0，有符号整型保持符号位扩充。

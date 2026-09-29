@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mul_add
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md
 description: 执行矢量的乘加运算，将src0与dst相乘后加上src1并把结果存回dst，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。

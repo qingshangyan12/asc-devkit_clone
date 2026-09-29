@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int162half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md
 description: 将源操作数中int16_t类型的元素转换为half类型，源与目的操作数位宽相同、转换后元素数量不变，支持5种舍入模式，可通过引用参数或函数返回值输出结果。本接口为Reg矢量计算接口，仅在AIV上生效。

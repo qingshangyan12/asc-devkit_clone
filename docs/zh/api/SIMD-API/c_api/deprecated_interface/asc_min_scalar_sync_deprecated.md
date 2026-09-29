@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_min_scalar_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_min_scalar_sync_deprecated.md
 description: 已废弃的同步矢量运算接口：将矢量src逐元素与标量value比较并将较小值存入dst，请使用非同步接口asc_min_scalar并配合同步接口asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_sub_block_id
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md
 description: 在分离模式下获取逻辑AI Core上Cube Core或Vector Core的逻辑索引并按int64_t返回，SubBlockIdx取值范围为0到SubBlockNum，SubBlockNum可通过GetSubBlockNum获取，本接口只读且不修改任何寄存器或存储状态。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_floor
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md
 description: 将矢量数据寄存器中的浮点数元素按FLOOR模式（向负无穷方向舍入）舍入到整数值，结果保持原浮点数据类型，支持函数返回值或引用参数输出，未被mask筛选的元素置零。

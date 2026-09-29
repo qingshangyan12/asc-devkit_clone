@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mula
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md
 description: 根据mask对源操作数src0、src1按元素相乘后与目的操作数dst中的对应元素相加并将结果写回dst，dst既作为输入累加器参与计算又用于存储最终结果，支持多种整型与浮点类型，仅在AIV上生效。

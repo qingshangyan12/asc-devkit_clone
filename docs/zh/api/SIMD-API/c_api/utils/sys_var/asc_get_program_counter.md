@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_program_counter
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md
 description: 获取程序计数器的指针，程序计数器用于记录当前程序执行的位置，常用于调试时定位当前执行位置，也可配合asc_icache_preload将当前指令地址作为指令预取的起始地址。

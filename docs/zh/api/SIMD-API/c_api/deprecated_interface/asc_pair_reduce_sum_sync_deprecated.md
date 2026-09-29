@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_pair_reduce_sum_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_pair_reduce_sum_sync_deprecated.md
 description: 已废弃的同步归约接口，对输入数据做归约操作，相邻奇偶元素两两求和得到数据总和，请使用非同步接口asc_pair_reduce_sum配合asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ne
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ne.md
 description: 在mask控制下逐元素比较两个源矢量数据寄存器是否不等，为真时对应比特位为1，否则为0，结果以掩码寄存器返回或写入目的操作数dst，浮点比较输入含nan时计算结果对应比特位写1，仅在AIV上生效。

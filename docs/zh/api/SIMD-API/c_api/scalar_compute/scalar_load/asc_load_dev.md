@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_load_dev
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md
 description: 不经过DCache直接从GM地址读取整型数据并返回，可在多核操作GM且数据无法对齐到Cache Line时避免Cache Line粒度的数据覆盖。

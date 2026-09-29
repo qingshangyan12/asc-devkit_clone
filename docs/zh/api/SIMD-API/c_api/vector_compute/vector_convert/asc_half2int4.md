@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2int4
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md
 description: 将half类型矢量数据转换为int4类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐，dst为int4b_t时前n个数据计算接口的count必须为偶数。

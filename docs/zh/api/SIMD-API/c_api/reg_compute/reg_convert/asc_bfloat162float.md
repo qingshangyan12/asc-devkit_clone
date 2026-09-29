@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_bfloat162float
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md
 description: 根据mask将矢量数据寄存器中参与计算的bfloat16_t元素转换为float类型并写入dst，源与目的位宽比为1:2，通过src_pos选择读取源数据的偶数或奇数位置。

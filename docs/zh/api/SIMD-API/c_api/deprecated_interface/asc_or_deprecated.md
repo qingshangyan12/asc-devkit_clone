@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_or（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_or_deprecated.md
 description: 该接口的浮点类型重载已废弃，根据mask对矢量数据寄存器src0、src1执行按位或操作并将结果写入dst，仅在AIV上生效，请使用等位宽的asc_or整数重载替代。

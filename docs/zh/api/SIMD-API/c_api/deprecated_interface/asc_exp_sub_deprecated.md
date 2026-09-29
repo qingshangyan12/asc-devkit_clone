@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_exp_sub（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md
 description: 已废弃的寄存器矢量计算接口：将src0与src1按元素相减，并计算以差值为指数的自然指数函数写入dst，输入为half且不带src_pos参数的原型及asc_exp_sub_v2原型已废弃，请使用asc_exp_sub新原型替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_unpack_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md
 description: 从Unified Buffer（UB）32字节对齐起始地址读取VL/2长度连续数据，在每个源元素后补1个0得到VL长度数据写入矢量数据寄存器，Post

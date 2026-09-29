@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_intlv
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_intlv.md
 description: 将两个矢量数据寄存器中的数据按元素顺序交织后连续对齐搬出到Unified Buffer（UB），单次搬出量为2×VL共512字节，不支持配置掩码，提供对齐、立即数偏移和地址寄存器偏移三种搬出模式，仅在AIV上生效。

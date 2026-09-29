@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_duplicate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md
 description: 将源矢量数据寄存器src的最低位元素（下标为0的元素）广播到目的操作数dst中被mask筛选的位置，未被mask筛选的位置置零，mask不影响从src读取的元素，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_icache_preload_status
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md
 description: 调试接口，在asc_icache_preload之后调用以获取ICache预取状态，返回0表示上一次预取已完成，返回1表示预取正在进行中；仅用于调试与性能分析，不影响预取本身的执行流程。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_reduce_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_reduce_sync_deprecated.md
 description: 已废弃的同步接口，依据内置固定模式或用户自定义数值对应的gather掩码从源操作数中选取元素写入目的操作数，请使用非同步接口asc_reduce配合asc_sync替代。

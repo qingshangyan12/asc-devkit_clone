@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_pair_reduce_sum
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md
 description: 对输入数据做归约操作，将相邻两个奇偶元素两两求和得到数据总和，支持前n个数据连续计算和高维切分计算两种模式。

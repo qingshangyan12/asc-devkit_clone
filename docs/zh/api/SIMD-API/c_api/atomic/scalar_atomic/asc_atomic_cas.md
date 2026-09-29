@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_atomic_cas
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md
 description: 对Global Memory中address指向的单个元素执行原子比较交换操作，读取该元素的旧值old_value，若旧值等于compare则将val写回该地址，否则保持不变，接口返回修改前的旧值，整个读取、比较和条件写回过程为原子操作。

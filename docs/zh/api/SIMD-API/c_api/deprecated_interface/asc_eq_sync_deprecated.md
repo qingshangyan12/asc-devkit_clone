@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_eq_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md
 description: 已废弃的同步矢量比较接口：比较src0与src1在对应索引位置的元素是否相等，比较结果为真时对应比特位设为1，否则设为0，结果可存入寄存器或目的地址，请使用非同步接口asc_eq配合asc_sync替代。

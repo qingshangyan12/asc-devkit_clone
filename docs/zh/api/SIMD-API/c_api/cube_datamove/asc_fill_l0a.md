@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_fill_l0a
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md
 description: 将value的二进制值赋值给目的操作数dst，完成L0A Buffer本地存储（Local Memory）的初始化。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 索引操作
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/reg_index.md
 navigation:

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_relu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md
 description: 根据mask对源操作数src按元素执行ReLU操作，大于等于0的元素保留原值、小于0的元素置0，结果写入dst或通过函数返回值返回，支持half、int32_t与float类型，仅在AIV上生效。

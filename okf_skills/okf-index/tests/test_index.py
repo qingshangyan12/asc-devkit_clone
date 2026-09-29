@@ -1,4 +1,4 @@
-"""Tests for okf-index: build determinism, view correctness, and the 20-task dry-run."""
+"""Tests for okf-index: surface isolation, build determinism, view correctness, and the 20-task dry-run."""
 
 from __future__ import annotations
 
@@ -17,7 +17,8 @@ import build_index  # noqa: E402
 import query  # noqa: E402
 
 REPO = build_index.SKILL_ROOT.parent.parent
-INDEX_DIR = build_index.INDEX_DIR
+C_API = build_index.SCOPES["c_api"]
+INDEX_DIR = build_index.scope_index_dir("c_api")
 TASKS_PATH = REPO / "okf_skills/okf-evaluate/testset/tasks.yaml"
 DRYRUN_PATH = Path(__file__).resolve().parent / "dryrun.yaml"
 BASE = "docs/zh/api/SIMD-API/c_api"
@@ -37,9 +38,20 @@ RESOLVED_GAP_DOCS = {
 def build_to_tmp() -> Path:
     with tempfile.TemporaryDirectory() as tmp:
         out = Path(tmp)
-        build_index.build(REPO, out)
+        build_index.build(REPO, C_API, out)
         payload = {p.name: p.read_text(encoding="utf-8") for p in out.iterdir()}
     return payload
+
+
+class SurfaceRegistryTest(unittest.TestCase):
+    def test_scope_index_dir_per_surface(self):
+        self.assertEqual(build_index.scope_index_dir("c_api"), build_index.INDEX_DIR / "c_api")
+        with self.assertRaises(KeyError):
+            build_index.scope_index_dir("bogus")
+
+    def test_query_surface_choices_enforced(self):
+        with self.assertRaises(SystemExit):
+            query.parser().parse_args(["--surface", "bogus", "--kw", "x"])
 
 
 class EmptyTagGuardTest(unittest.TestCase):
@@ -66,7 +78,7 @@ class EmptyTagGuardTest(unittest.TestCase):
                 encoding="utf-8",
             )
             errors: list[str] = []
-            documents, _ = build_index.load_raw_documents(root, errors)
+            documents, _ = build_index.load_raw_documents(root, C_API, errors)
             self.assertEqual(errors, [])
             self.assertEqual(documents[doc.relative_to(root).as_posix()]["tags"]["api_surfaces"], ["c_api"])
 
@@ -75,7 +87,7 @@ class EmptyTagGuardTest(unittest.TestCase):
                 encoding="utf-8",
             )
             errors = []
-            build_index.load_raw_documents(root, errors)
+            build_index.load_raw_documents(root, C_API, errors)
             self.assertTrue(
                 any("empty tag namespace rendered: families" in error for error in errors), errors
             )
@@ -107,6 +119,11 @@ class BuildTest(unittest.TestCase):
             else:
                 self.assertEqual(payload, fresh[name], name)
 
+    def test_scope_identity(self):
+        self.assertEqual(self.index["schema"], "okf-index/2")
+        self.assertEqual(self.index["meta"]["surface"], "c_api")
+        self.assertEqual(INDEX_DIR, build_index.INDEX_DIR / "c_api")
+
     def test_scope_alignment(self):
         meta = self.index["meta"]
         scope = self.index["scope"]
@@ -132,7 +149,7 @@ class BuildTest(unittest.TestCase):
 
     def test_stage_views(self):
         views = self.index["views"]["by_stage"]
-        self.assertEqual({k: len(v) for k, v in views.items()}, {"in": 71, "out": 36, "compute": 385})
+        self.assertEqual({k: len(v) for k, v in views.items()}, {"in": 71, "out": 37, "compute": 388})
         self.assertIn(f"{BASE}/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md", views["in"])
         self.assertIn(f"{BASE}/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md", views["out"])
         # cube 搬运（gm→l0a/l1 入、l0c→gm 出）与寄存器 load/store 进入阶段视图。

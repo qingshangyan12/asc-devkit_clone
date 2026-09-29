@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sub_relu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md
 description: 对两个矢量操作数按元素求差后再做Relu计算（结果和0对比取较大值），并提供s162s8、f322f16、f162s8的结果类型转换功能，结果存入目的矢量。

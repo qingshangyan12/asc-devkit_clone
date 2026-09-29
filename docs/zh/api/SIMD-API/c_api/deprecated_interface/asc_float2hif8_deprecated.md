@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2hif8（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md
 description: 已废弃的矢量转换接口，将float类型转化为hifloat8_t类型，支持多种舍入模式及饱和与非饱和模式，位宽比为4:1，其无显式位置参数原型已废弃，需使用显式位置参数重载替代。

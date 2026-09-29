@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_1st_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st_postupdate.md
 description: 将源矢量数据寄存器中的第一个元素写入Unified Buffer（UB）中目的地址，采用Post Update模式在搬运完成后自动更新目的地址，便于硬件循环内连续多次调用，不支持配置掩码。

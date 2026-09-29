@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_eq_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_eq_scalar.md
 description: 根据mask将源操作数src按元素与标量value进行二进制比较，相等时结果对应位为1否则为0，每个元素的比较结果占一个bit，仅在AIV上生效。

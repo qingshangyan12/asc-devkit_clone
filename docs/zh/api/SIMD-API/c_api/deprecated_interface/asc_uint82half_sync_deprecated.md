@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint82half_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md
 description: 该接口已废弃，将uint8_t类型数据转换为half类型的同步计算接口，按指定元素个数对矢量数据进行转换，请使用对应的非同步接口和同步接口asc_sync替代。

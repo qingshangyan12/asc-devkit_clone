@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_fill_l0b_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md
 description: 已废弃接口，将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化，请使用asc_fill_l0b与asc_sync组合替代。

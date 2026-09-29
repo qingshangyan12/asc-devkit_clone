@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_gm2ub_pad（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_gm2ub_pad_deprecated.md
 description: 已废弃的搬运配置接口，在数据从GM非对齐搬运到Unified Buffer（UB）时设置连续搬运数据块左右两侧需要填补的数据值，请使用asc_set_copy_pad_val进行设置。

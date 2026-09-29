@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: NZ2NZ
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md
 description: 介绍矩阵计算搬出过程中的Nz2Nz特性：矩阵计算结果搬出前后保持Nz大分形排布，输出类型转换及Channel Split/Channel

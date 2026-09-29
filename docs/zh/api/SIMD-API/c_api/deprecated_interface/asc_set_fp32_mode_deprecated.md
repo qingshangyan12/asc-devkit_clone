@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_fp32_mode（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_fp32_mode_deprecated.md
 description: 已废弃的配置接口，用于设置Mmad计算关闭HF32模式，关闭后L0A Buffer与L0B Buffer中的float数据参与Mmad计算前不做舍入处理，请使用asc_disable_hf32接口替代。

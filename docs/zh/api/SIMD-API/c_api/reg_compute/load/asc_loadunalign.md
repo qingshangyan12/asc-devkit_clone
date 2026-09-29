@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadunalign
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
 description: 从Unified Buffer（UB）按dtype对齐的起始地址读取VL长度连续数据，将非对齐寄存器缓存的前置数据与从UB读取的后续数据拼接后搬入矢量数据寄存器，每次搬入前必须先调用asc_loadunalign_pre初始化。

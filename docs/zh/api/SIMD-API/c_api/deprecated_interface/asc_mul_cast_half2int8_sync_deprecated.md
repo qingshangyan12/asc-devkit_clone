@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mul_cast_half2int8_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mul_cast_half2int8_sync_deprecated.md
 description: 已废弃的同步融合运算接口，按元素求两个half源操作数的积并将结果转换为int8_t类型，乘积按RINT舍入模式处理且溢出做饱和处理，请使用非同步接口asc_mul_cast_half2int8并配合同步接口asc_sync替代。

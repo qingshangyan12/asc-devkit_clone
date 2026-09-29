@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_ndim_loop_stride
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
 description: 设置asc_ndim_copy_gm2ub进行NDDMA多维数据搬运时loop0至loop4各循环维度的源操作数步长和目的操作数步长，配置持续生效直至重新配置，调用搬运接口前必须先完成配置，仅在AIV上执行有效。

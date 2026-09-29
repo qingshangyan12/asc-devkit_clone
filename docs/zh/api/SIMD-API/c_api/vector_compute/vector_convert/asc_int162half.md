@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int162half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md
 description: 将int16_t类型矢量数据转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，不指定舍入模式时无舍入，操作数起始地址需32字节对齐。

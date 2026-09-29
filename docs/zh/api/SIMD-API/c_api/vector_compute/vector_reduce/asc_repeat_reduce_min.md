@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_repeat_reduce_min
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md
 description: 对每个Repeat内所有元素求最小值以及Repeat内首个最小值元素的索引，一次Repeat计算256字节，之后可继续调用asc_get_reduce_min_cnt获取全部repeat内的最小值和首个最小值索引。

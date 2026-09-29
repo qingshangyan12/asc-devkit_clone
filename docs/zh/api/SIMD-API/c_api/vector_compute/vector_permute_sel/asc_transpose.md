@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_transpose
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md
 description: 实现16*16的二维矩阵数据块转置，支持int16_t和uint16_t数据类型。

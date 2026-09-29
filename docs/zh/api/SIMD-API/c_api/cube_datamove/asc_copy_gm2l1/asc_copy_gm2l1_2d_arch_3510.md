@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_2d_arch_3510.md
 description: 将数据从Global Memory搬运到L1 Buffer，以512字节的分形为单位按行列方向切分提取多个分形矩阵，用于矩阵计算所需的2D格式数据加载，搬运过程中不支持分形格式转换，仅在AIC上执行有效。

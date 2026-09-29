@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_channel_pad_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md
 description: 描述GM到L1 Buffer搬运时通道块的填充或压缩模式，枚举值控制每个32字节通道数据块的处理方式。

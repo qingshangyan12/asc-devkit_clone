@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_squeeze_status
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status.md
 description: 将asc_squeeze_and_storeunalign操作后保存在AR特殊寄存器中的有效数据长度写入Unified Buffer（UB），无offset重载写入dst基地址，带offset重载写入dst加字节偏移的位置，调用前需先完成squeeze操作，仅在AIV上生效。

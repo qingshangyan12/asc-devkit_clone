@@ -1,5 +1,5 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api
 title: asc_copy_l0c2l1_sync_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2l1_sync_arch_3510_deprecated.md
 description: 已废弃的同步搬运接口，将矩阵计算结果从L0C Buffer搬运至L1 Buffer，搬运中可组合随路量化、ReLU与格式转换等能力，请改用非同步接口和asc_sync替代。

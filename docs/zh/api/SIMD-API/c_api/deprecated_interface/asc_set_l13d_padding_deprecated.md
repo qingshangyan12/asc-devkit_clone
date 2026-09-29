@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l13d_padding（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md
 description: 该接口已废弃，用于设置Pad属性描述，在调用asc_copy_l12l0a接口时配置填充数值，请使用asc_set_l12l0a_3d_padding接口替代。

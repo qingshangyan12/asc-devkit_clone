@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int82half（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82half_deprecated.md
 description: 已废弃的类型转换接口，将int8_t类型数据转换为half类型，源与目的类型位宽比为1:2，读取数据时需将一个VL大小的数据分为两部分并根据接口选择索引为奇数或偶数的位置，请使用显式位置参数重载替代。

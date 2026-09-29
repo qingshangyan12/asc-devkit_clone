@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_mutex_execute_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md
 description: 描述互斥锁的阻塞和非阻塞执行模式，作为asc_lock与asc_unlock接口mode参数的类型并提供兼容别名。

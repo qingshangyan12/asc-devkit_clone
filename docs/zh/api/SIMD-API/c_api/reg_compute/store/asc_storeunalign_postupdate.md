@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storeunalign_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
 description: 将矢量数据寄存器或掩码寄存器中的数据连续搬出到非32字节对齐的Unified Buffer（UB）地址，提供立即数偏移、地址寄存器偏移与掩码寄存器三种模式，搬出后自动累加目的地址指针或地址寄存器，尾块暂存至非对齐寄存器并由后处理接口收尾。

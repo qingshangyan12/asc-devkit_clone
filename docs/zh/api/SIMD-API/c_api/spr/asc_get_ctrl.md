@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_ctrl
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md
 description: 读取CTRL寄存器（控制寄存器）特定比特位上的值并返回，返回值具体含义可参考asc_set_ctrl接口中的描述。

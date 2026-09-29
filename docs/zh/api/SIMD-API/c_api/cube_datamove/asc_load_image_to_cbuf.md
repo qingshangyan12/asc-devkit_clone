@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_load_image_to_cbuf
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md
 description: 将图像数据从Global Memory搬运到L1 Buffer，可指定加载图片的宽高与源图上的起始位置，并支持在目的图片四周填充指定数量的像素。

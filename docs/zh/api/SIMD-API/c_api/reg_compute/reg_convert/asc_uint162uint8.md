@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint162uint8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md
 description: 将源操作数中uint16_t类型数据转换为uint8_t类型，无舍入模式，支持饱和与非饱和模式，位宽比为2:1，通过位置标签选择写入目的操作数偶数或奇数索引位置，仅在AIV上生效。

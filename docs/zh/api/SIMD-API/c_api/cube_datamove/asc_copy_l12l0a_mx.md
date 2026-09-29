@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0a_mx
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md
 description: 完成MX矩阵计算中左矩阵量化系数从L1 Buffer到L0A_MX Buffer的搬运，量化系数固定为fp8_e8m0_t类型并以32字节分形为最小搬运粒度，需与asc_copy_l12l0a数据搬运接口配合使用。

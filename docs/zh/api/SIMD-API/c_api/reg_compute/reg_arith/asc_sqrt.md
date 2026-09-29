@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sqrt
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sqrt.md
 description: 根据mask对源矢量数据寄存器按元素求开方并写入目的操作数，支持half与float数据类型，输入为负数时结果为nan，输入为-0时结果为-0。

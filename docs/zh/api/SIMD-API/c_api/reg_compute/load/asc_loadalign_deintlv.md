@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_deintlv
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md
 description: 从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据并解交织，偶数下标元素写入矢量数据寄存器dst0，奇数下标元素写入矢量数据寄存器dst1，提供对齐搬入、立即数偏移和地址寄存器偏移三种模式。

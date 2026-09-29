@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 复合计算
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/reg_fused.md
 navigation:

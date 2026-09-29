@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_select
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md
 description: 执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素得到目的操作数dst，sel_mask比特位为1时从src0选取，为0时从src1选择，需配合asc_set_cmp_mask接口使用。

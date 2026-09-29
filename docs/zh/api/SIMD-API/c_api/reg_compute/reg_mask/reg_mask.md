@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 掩码寄存器操作
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/reg_mask.md
 navigation:

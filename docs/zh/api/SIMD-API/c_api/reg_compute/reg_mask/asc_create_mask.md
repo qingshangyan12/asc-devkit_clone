@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_create_mask
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md
 description: 根据传入的pat_mode生成对应的掩码寄存器，支持b8、b16、b32三种位宽模式，pat_mode指定哪些位置的元素参与计算，返回vector_bool掩码寄存器，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mul_scalar_float2half_rn
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md
 description: 根据mask将float类型的源操作数src按元素与标量value相乘后按照ROUND舍入模式转换为half类型，并通过dst_pos参数指定结果写入dst中偶数或奇数索引位置，未写入的位置置0，仅在AIV上生效。

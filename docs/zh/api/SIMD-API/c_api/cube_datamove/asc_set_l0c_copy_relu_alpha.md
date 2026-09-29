@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c_copy_relu_alpha
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
 description: 在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数，由后续L0C搬出接口与relu_pre_mode搭配使用，仅在AIC上生效。

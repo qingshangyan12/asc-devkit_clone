@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_reduce_sum_datablock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md
 description: 根据mask将每个DataBlock（32B）中参与计算的元素相加，得到各DataBlock的归约结果并依次保存在dst最低位，块内采用二叉树累加，其余位置置0。

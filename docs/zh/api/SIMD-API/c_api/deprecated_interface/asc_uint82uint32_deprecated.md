@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint82uint32（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint32_deprecated.md
 description: 该接口已废弃，将uint8_t类型转化为uint32_t类型，因位宽比为1:4按索引0至3分部读取源数据，请使用asc_uint82uint32的显式位置参数重载替代。

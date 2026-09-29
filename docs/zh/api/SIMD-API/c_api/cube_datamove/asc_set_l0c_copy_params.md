@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c_copy_params
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_params.md
 description: 在数据从L0C Buffer搬运到Global Memory或L1 Buffer并进行随路NZ转ND格式转换时，设置ND矩阵数量、源步长和目的步长等格式转换相关配置。

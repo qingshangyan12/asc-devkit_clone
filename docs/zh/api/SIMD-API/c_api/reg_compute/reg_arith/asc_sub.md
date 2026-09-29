@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sub
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md
 description: 根据mask对两个源矢量数据寄存器按元素求差并写入目的操作数，另提供带借位输出减法形式，硬件按32位无符号补码加法处理，差值低32位写入矢量数据寄存器、无借位标志写入目的掩码寄存器。

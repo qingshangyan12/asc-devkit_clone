@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 概述
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/overview/overview.md
 description: 矩阵计算概述目录页，汇总矩阵计算单元与矩阵计算流程两篇概述文档的入口链接，提供导航查阅入口。

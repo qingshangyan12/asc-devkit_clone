@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_shiftright
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
 description: 对src中的每个元素右移value位，有符号类型做算术右移并复制符号位，无符号类型做逻辑右移最高位补0，value不支持负数且不能超过位宽。

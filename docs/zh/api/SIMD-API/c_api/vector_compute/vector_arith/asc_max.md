@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_max
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max.md
 description: 逐元素比较两个源矢量并取最大值写入目的矢量，支持前n个数据计算和高维切分计算两种模式。

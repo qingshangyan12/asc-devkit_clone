@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_shiftleft_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftleft_sync_deprecated.md
 description: 将源矢量的所有元素左移distance位并写入目的矢量，distance不支持负数且不能超过源数据类型位宽，接口已废弃，请使用非同步接口asc_shiftleft和同步接口asc_sync替代。

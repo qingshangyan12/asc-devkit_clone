@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_arch_ver
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_arch_ver.md
 description: 获取当前AI处理器架构版本号，通过输出参数core_version返回ARCH_VER寄存器中的核心版本字段值，不同型号服务器对应不同的架构版本号取值，调用后core_version被覆写为对应值。

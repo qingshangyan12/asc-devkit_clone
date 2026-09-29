@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int4x22half（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22half_deprecated.md
 description: 已废弃的类型转换接口，根据mask将int4x2_t存储单元中打包的两个4bit有符号整数转换为half类型，掩码位为1时两个4bit整数同时转换、为0时对应结果置0，请使用显式位置参数重载替代。

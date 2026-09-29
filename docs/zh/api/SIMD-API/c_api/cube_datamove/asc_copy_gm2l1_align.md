@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_align
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md
 description: 将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力，支持Compact、Normal及左右填充等padding模式，填充值可预先配置或由硬件自动填充，循环填充模式须配合loop配置接口使用。

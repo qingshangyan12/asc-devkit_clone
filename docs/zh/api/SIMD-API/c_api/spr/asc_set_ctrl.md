@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_ctrl
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
 description: 对CTRL寄存器（控制寄存器）的特定比特位进行设置，可配置饱和模式、标量单元访问UB是否经过DCache、MASK模式等控制位，使用前需先获取当前值。

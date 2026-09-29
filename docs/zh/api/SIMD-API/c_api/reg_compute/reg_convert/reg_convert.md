@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 类型转换
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/reg_convert.md
 navigation:

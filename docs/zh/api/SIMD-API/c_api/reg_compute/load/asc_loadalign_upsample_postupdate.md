@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_upsample_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md
 description: 从Unified Buffer（UB）满足对齐要求的起始地址读取连续数据并进行2倍上采样，写入矢量数据寄存器时每个源元素重复两次，写入掩码寄存器时每个bit重复两次，Post

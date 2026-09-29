@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storeunalign_postupdate（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md
 description: 该接口不指定存储偏移量的原型及掩码寄存器b8搬出原型已废弃，用于从矢量数据寄存器或掩码寄存器向Unified Buffer（UB）非32B对齐起始地址连续搬出并更新目的地址，请使用asc_squeeze_and_storeunalign接口实现此功能。

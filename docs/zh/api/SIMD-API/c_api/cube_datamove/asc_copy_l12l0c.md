@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0c
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md
 description: 将矩阵由L1 Buffer搬运到L0C Buffer中，支持bfloat16_t、half、float、int32_t、uint32_t等多种源与目的数据类型组合，多条指令目的地址重叠时需插入同步指令保证串行化。

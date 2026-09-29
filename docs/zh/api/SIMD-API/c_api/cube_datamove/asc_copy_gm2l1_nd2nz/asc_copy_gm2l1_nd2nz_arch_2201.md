@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_nd2nz
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md
 description: 将数据从Global Memory搬运到Level 1 cache，支持在数据搬运时进行ND格式到NZ格式的转换，通过目的NZ矩阵各方向步长参数控制转换后的数据排布，多条指令目的地址重叠时需插入同步指令。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_eq_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md
 description: 按元素判断源矢量元素与标量value是否相等，成立时对应输出比特位为1，否则为0。

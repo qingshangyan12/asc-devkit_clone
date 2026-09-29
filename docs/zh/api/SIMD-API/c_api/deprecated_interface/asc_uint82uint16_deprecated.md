@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint82uint16（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md
 description: 该接口已废弃，根据mask将uint8_t类型元素逐个转为uint16_t类型并写入目的矢量数据寄存器，通过接口后缀选择源操作数奇偶读取位置，请使用显式位置参数重载替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gather_datablock_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_gather_datablock_sync_deprecated.md
 description: 已废弃的同步矢量收集接口，给定输入矢量与地址偏移矢量，按DataBlock粒度根据偏移地址将输入矢量收集到目的矢量中，请使用非同步接口asc_gather_datablock配合同步接口asc_sync替代。

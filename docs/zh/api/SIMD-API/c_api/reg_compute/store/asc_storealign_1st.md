@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_1st
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st.md
 description: 将矢量数据寄存器中的首个元素搬出到Unified Buffer（UB），单次搬出量为一个元素，不支持设置掩码，目的地址需按数据类型对齐，提供对齐、立即数偏移和地址寄存器偏移三种搬出模式。

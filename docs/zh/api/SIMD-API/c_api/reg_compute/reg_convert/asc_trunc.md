@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_trunc
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_trunc.md
 description: 将源操作数中的浮点数元素按照TRUNC模式向零方向截断到整数值，即丢弃小数部分取整，结果保持原浮点数据类型，未被掩码筛选的元素置零，仅在AIV上生效。

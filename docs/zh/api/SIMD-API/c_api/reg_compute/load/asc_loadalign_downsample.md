@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_downsample
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md
 description: 从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，矢量数据寄存器结果保留偶数下标元素，掩码寄存器结果保留偶数下标bit，提供对齐、立即数偏移和地址寄存器偏移三种搬入模式。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc\_vf\_call
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/vf_call/asc_vf_call.md
 description: 在SIMD C API编程场景下于Kernel中启动Vector Function（VF）子任务，VF函数内可调用Reg矢量计算C API完成寄存器级搬运和计算；入口函数须用__simd_vf__修饰，入参仅支持内置数据类型及其指针、数组、结构体，传入的地址指针须指向Unified

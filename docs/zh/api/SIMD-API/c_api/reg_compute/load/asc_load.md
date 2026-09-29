@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_load
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md
 description: 从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据并写入矢量数据寄存器，搬运过程中数据格式和内容保持不变；连续搬入需在每次调用前手动更新源地址，对性能有要求时可改用asc_loadunalign，仅在AIV上生效。

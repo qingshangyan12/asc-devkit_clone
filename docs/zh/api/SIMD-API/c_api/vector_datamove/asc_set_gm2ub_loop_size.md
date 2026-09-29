@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_gm2ub_loop_size
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
 description: 设置asc_copy_gm2ub_align使用循环搬运模式时的两层循环迭代次数，loop1_size设置内层循环次数，loop2_size设置外层循环次数，配置持续生效直至重新配置，任务完成后需将两层循环次数复位为1，仅在AIV上生效。

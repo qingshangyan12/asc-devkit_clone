@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c2gm_relu_alpha（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md
 description: 该接口已废弃，用于对RELU_ALPHA寄存器中的值进行设置，该64bit寄存器存储fixpipe或cube指令中进行Scalar ReLU时使用的alpha值，请使用asc_set_l0c_copy_relu_alpha接口替代。

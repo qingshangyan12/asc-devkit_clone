@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_scalar_cache_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
 description: 配置标量单元访问Global Memory时的L2 Cache管理策略：传入asc_load_l2_cache_mode枚举设置标量load策略，传入asc_store_l2_cache_mode枚举设置标量store策略，设置后持续生效直至再次调用本接口修改。

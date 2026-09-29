@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 矩阵计算搬运
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_datamove.md
 navigation:

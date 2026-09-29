@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 矩阵搬出总体说明
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store_overall_description.md
 description: 矩阵计算搬出接口的总体说明，实现从L0C Buffer到Global Memory和L1 Buffer的数据传输，支持随路量化、随路ReLU、随路格式转换与通道拆分合并等随路搬运场景。

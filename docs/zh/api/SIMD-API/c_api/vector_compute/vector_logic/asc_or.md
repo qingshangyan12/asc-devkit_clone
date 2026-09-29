@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_or
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
 description: 对两个源矢量的每对元素执行按位或运算并将结果写入目的矢量，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。

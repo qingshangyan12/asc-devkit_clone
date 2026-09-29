@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: Memory矢量计算
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compute.md
 navigation:

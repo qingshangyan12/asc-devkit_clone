@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_transto5hd_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md
 description: 已废弃的同步数据格式转换接口，一般将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块的转置，单次Repeat内可处理512Byte数据，请使用asc_transto5hd和asc_sync接口替代。

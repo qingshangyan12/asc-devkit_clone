@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_deq_int322half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md
 description: 对输入的int32_t类型数据按元素做量化并转换为half类型，量化参数scale需通过asc_set_deq_scale接口的非向量模式设置，dst与src起始地址需32字节对齐。

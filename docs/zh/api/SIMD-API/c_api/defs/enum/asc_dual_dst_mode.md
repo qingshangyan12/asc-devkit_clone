@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_dual_dst_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md
 description: 描述L0C Buffer数据搬出时的双目标拆分模式，供矩阵搬出接口通过dual_dst_ctrl参数选择拆分方向。

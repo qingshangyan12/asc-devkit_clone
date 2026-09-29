@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mul_add_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mul_add_sync_deprecated.md
 description: 已废弃的同步矢量乘加运算接口，执行矢量的乘加运算，将src0与dst的乘积加上src1后把结果存回dst，请使用非同步接口asc_mul_add并配合同步接口asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
 description: 将存放在L1 Buffer里的512B大小的矩阵搬运到L0B Buffer，包含2D格式搬运和3D格式搬运两类高维切分搬运方式，3D格式支持转置与img2col展开。

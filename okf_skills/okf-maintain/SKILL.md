@@ -27,7 +27,7 @@ description: OKF 知识建设流水线的复用入口：为新 API 文档范围�
 | --- | --- | --- | --- |
 | 1 调研 | `okf-tag-research` | 冻结词表（当前 core-v9） | 双盲发现、确定性校验、人工批准后冻结 |
 | 2 添加头 | `okf-yaml-generate`（description 语义工件来自 `okf-description-generate`，依赖关系内联生成） | 范围内全部文档的 OKF YAML 头、include Doxygen、example marker | prepare→worker→resolve-issues→validate→write；validate 阻断不得写入 |
-| 3 建立索引 | `okf-index` | `index/index.json`、`gaps.json`、`build-meta.json` 与查询 CLI | 校验不过不出索引；单测 + dryrun 全过 |
+| 3 建立索引 | `okf-index` | `index/<surface>/{index.json,gaps.json,build-meta.json}` 与查询 CLI（`--surface`） | 校验不过不出索引；单测 + dryrun 全过 |
 
 ## 新范围接入清单
 
@@ -39,22 +39,23 @@ description: OKF 知识建设流水线的复用入口：为新 API 文档范围�
    调研轮次，人工批准后冻结，再进入标注。
 4. **分批生成 YAML 头**：目录超过 25 篇按批组织，每波最多 6 个 worker；
    运行约定见 `okf-yaml-generate` 总控流程。
-5. **索引接入**：`build_index.py` 当前范围配置固化在 c_api——接入新范围时须先
-   参数化范围配置（SCOPE）并校准分类与导航规则、dryrun 查询清单，再构建。
-   该代码改造在接入时实施，不改变既有 c_api 资产。
+5. **索引接入**：在 `okf-index` 的 SCOPES 注册表登记新 surface（scope 根目录、根导航页），
+   校准分类/导航规则与该 surface 的 dryrun 查询清单后执行
+   `build_index.py --scope <surface>`。索引实例按 surface 隔离（`index/<surface>/`，
+   含独立的缺口登记与漂移检测），不影响既有实例。
 6. **复核**：`okf-index` 单测与 dryrun 全过；必要时按 `okf-evaluate` 口径回归
    检索质量。
 
 ## 当前应用实例
 
-- **c_api**（`docs/zh/api/SIMD-API/c_api`，800 篇）：三段已全部交付——core-v9
-  冻结词表、800 篇 OKF YAML 头、持久化索引与查询 CLI。范围与角色判定见
+- **c_api**（`docs/zh/api/SIMD-API/c_api`，838 篇）：三段已全部交付——core-v9
+  冻结词表、838 篇 OKF YAML 头、持久化索引与查询 CLI（`index/c_api/` 实例）。范围与角色判定见
   [`../范围清单.md`](../范围清单.md)。
 
 ## 强制约束
 
 - 禁止跳过任一段直接为文档写头或建索引；词表未冻结不得进入标注。
 - 禁止为新范围临时创造未定义标签值、绕过冻结词表或另建词表。
-- 禁止手改 `okf-index/index/` 构建产物（`index.json`、`build-meta.json`、`概览.md`），
+- 禁止手改 `okf-index/index/<surface>/` 构建产物（`index.json`、`build-meta.json`、`概览.md`），
   漂移以重建解决。
 - 任一校验失败必须回到对应步骤重做，不得编辑校验结果或跳过门禁。

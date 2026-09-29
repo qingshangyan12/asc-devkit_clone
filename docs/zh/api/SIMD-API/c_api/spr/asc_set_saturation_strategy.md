@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_saturation_strategy
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
 description: 设置饱和控制策略为USE_API或USE_GLOBAL，该策略影响CAST类饱和是否生效，切换策略不会自动修改各模式的饱和开关。

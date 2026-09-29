@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_rsqrt
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rsqrt.md
 description: 按元素对源矢量先开方再取倒数，将平方根倒数结果写入目的矢量，提供前n个数据计算与高维切分计算两种原型，操作数起始地址需32字节对齐。

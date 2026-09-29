@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_store_atomic_config
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md
 description: 获取原子操作启用位与原子操作类型的值，可用于校验asc_set_store_atomic_config_v1等接口设置的值是否符合预期；该接口在Ascend

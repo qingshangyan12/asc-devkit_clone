@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_squeeze_and_storeunalign_finalize
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
 description: Reg矢量数据搬运接口，用于结束一组asc_squeeze_and_storeunalign连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified

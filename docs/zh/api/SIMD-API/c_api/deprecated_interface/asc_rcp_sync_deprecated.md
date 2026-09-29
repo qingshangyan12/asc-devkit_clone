@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_rcp_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_rcp_sync_deprecated.md
 description: 已废弃的同步计算接口，对矢量数据按元素执行取倒数运算，计算公式为dst等于1除以src，请使用非同步接口asc_rcp配合asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_phy_buf_addr
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_buf_addr.md
 description: 基于偏移量offset获取片上实际物理地址，常用于调试、地址推导或tiling数据地址计算场景，把相对偏移量转换为硬件上可直接使用的物理地址形式，不能与以数组方式申请内存的方法混用。

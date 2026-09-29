@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: Reg数据搬出
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/store.md
 navigation:

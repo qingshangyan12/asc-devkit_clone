@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md
 description: 将矩阵数据从Global Memory搬运到L1 Buffer中，并支持不同类型的pad模式，提供普通搬运、高维切分搬运和2D搬运等多种函数原型。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_vms4_sr
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
 description: 获取执行asc_mrgsort4操作后4个队列中每个队列已经处理过的Region Proposal个数，需将asc_mrgsort4中的if_exhausted_suspension参数配置为true并在asc_mrgsort4同步完成后调用。

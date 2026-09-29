@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_exp
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_exp.md
 description: 按元素计算源矢量的自然指数并写入目的矢量，支持前n个数据计算与高维切分计算两种模式，起始地址需32字节对齐。

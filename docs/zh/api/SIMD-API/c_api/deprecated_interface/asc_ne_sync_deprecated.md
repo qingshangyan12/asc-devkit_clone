@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ne_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ne_sync_deprecated.md
 description: 已废弃的同步比较接口，按元素判断src0与src1是否不相等，成立时输出1否则为0，每个元素比较结果占1个bit，请使用非同步接口asc_ne配合asc_sync替代。

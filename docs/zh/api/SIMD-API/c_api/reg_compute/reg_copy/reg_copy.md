@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: Reg间搬运
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/reg_copy.md
 navigation:

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int162float
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md
 description: 将int16_t类型矢量数据转换为float类型，提供前n个数据计算与高维切分计算两类原型，源和目的操作数起始地址需32字节对齐。

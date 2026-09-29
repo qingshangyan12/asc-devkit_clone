@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sub_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_sync_deprecated.md
 description: 该接口已废弃，用于执行矢量减法运算，请使用非同步接口asc_sub和同步接口asc_sync替代。

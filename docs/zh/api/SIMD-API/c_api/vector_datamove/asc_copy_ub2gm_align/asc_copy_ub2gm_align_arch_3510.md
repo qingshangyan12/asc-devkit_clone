@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_ub2gm_align
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
 description: 提供数据非对齐搬运功能，将数据从Unified Buffer（UB）搬运到Global Memory（GM），支持连续数据搬运与高维切分数据搬运，非32字节对齐时自动补充dummy假数据补齐且写入GM时丢弃，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 基础定义
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/defs.md
 navigation:

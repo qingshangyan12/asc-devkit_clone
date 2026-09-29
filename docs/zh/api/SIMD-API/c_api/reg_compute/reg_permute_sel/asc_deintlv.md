@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_deintlv
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md
 description: 将src0和src1中的元素解交织后分别存入dst0和dst1，支持矢量数据按元素逐对解交织和掩码寄存器按位宽解交织两种模式，偶数索引写入dst0、奇数索引写入dst1，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_bfloat162int32（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162int32_deprecated.md
 description: 根据掩码将bfloat16_t元素逐个转换为int32_t类型，支持多种舍入与饱和或非饱和模式，并通过接口后缀选择读取源操作数偶数或奇数索引位置；该类原型已废弃，请使用显式位置参数重载替代。

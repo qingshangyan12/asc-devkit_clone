@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l0b_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l0b_sync_deprecated.md
 description: 将矩阵数据从Global Memory搬运到L0B Buffer，按起始分块ID、迭代次数及相邻迭代间的源步长和目的间隔控制搬运；接口已废弃，请使用非同步接口asc_copy_gm2l0b和asc_sync替代。

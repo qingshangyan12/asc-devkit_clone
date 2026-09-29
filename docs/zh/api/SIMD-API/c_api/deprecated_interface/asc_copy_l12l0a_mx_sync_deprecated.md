@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0a_mx_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_mx_sync_deprecated.md
 description: 已废弃的同步搬运接口，负责完成MX矩阵计算所需左矩阵量化系数从L1 Buffer到L0A_MX Buffer的搬运，需与asc_copy_l12l0a配合使用，请改用对应的非同步接口和asc_sync替代。

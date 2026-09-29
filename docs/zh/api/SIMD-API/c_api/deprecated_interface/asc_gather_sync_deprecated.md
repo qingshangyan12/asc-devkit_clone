@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gather_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_gather_sync_deprecated.md
 description: 已废弃的同步矢量收集接口：将src按照src_offset给定的偏移按元素收集到dst中，偏移后地址不能超出Unified Buffer范围，请使用非同步接口asc_gather并配合同步接口asc_sync替代。

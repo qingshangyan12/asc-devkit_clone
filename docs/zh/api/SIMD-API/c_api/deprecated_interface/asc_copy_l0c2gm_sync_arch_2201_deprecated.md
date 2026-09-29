@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l0c2gm_sync_arch_2201（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2gm_sync_arch_2201_deprecated.md
 description: 已废弃的同步搬运接口，矩阵计算完成后对结果进行量化处理，再将处理结果搬运到GM，请改用非同步asc_copy_l0c2gm接口和asc_sync替代。

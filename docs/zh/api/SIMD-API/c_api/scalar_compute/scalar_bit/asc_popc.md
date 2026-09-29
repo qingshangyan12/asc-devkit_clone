@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_popc
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_popc.md
 description: 获取输入uint64_t数据的二进制表示中值为1的位数并返回int64_t结果，取值范围为0到64，接口运行在标量流水上，流水内数据依赖由指令执行顺序保证，无需额外同步。

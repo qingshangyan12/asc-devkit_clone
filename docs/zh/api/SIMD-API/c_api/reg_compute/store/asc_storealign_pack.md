@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_pack
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md
 description: 将矢量数据寄存器或掩码寄存器中的数据压缩搬出到Unified Buffer（UB）：矢量场景按mask将有效元素低半部分bit数据写入压缩后目的位置，掩码场景每间隔1bit丢弃1bit后连续压缩存储，提供六种功能模式，仅在AIV上生效。

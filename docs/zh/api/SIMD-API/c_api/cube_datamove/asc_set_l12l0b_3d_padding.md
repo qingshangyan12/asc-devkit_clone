@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l12l0b_3d_padding
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md
 description: 设置3D格式分形矩阵搬运（im2col展开）指令使用的填充值，供f_matrix_ctrl为true的asc_copy_l12l0b 3D矩阵搬运接口使用，仅在AIC上生效。

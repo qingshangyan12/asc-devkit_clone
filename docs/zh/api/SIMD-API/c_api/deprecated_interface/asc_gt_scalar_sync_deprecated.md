@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gt_scalar_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_gt_scalar_sync_deprecated.md
 description: 已废弃的同步矢量比较接口，将src中每个元素逐个与标量value比较大小，大于value时输出对应比特位为1否则为0，请使用非同步接口asc_gt_scalar并配合同步接口asc_sync替代。

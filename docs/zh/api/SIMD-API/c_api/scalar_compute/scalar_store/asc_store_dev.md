@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_store_dev
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
 description: 不经过DCache向GM地址写入数据，当多核操作GM且数据无法对齐到Cache Line时，可避免按Cache Line读写导致的多核数据随机覆盖问题。

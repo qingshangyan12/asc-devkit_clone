@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_atomic_none（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_none_deprecated.md
 description: 已废弃的配置接口，与原子累加及原子比较接口配合使用，在完成原子操作后关闭原子操作以避免影响后续搬运，请使用asc_disable_dma_atomic替代。

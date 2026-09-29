@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 矩阵搬出关键特性说明
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/cube_store_key_features.md
 description: 矩阵搬出关键特性说明导航页，汇总NZ2NZ、NZ2ND、NZ2DN、卷积格式转换、F32 Channel Split、Int8 Channel

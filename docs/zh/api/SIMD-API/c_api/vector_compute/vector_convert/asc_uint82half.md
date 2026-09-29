@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint82half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md
 description: 将uint8_t类型数据转换为half类型，支持前n个数据计算和高维切分计算两种接口形式，操作数起始地址需32字节对齐。

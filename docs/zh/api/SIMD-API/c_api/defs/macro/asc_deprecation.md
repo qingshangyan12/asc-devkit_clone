@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: ASC_DEPRECATED
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md
 description: 为 C API 声明添加 C++ 弃用属性，在编译调用时输出包含废弃版本、移除日期和替代接口的告警。

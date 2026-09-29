@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_sync_arch_2201（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_sync_arch_2201_deprecated.md
 description: 将矩阵数据从Global Memory搬运到L1 Buffer中并支持不同类型的pad模式，提供普通搬运与2D搬运等同步原型；接口已废弃，请使用非同步接口和同步接口asc_sync替代。

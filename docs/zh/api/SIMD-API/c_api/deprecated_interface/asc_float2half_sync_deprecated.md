@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2half_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_sync_deprecated.md
 description: 已废弃的同步转换接口，将float类型数据转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC、ODD多种舍入模式，请使用对应的非同步接口和同步接口asc_sync替代。

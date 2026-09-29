@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: NZ2DN
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
 description: 介绍矩阵搬出过程中的Nz2DN特性：将Nz格式矩阵转化为DN格式矩阵，文档给出转化伪代码、可配置参数说明及特性约束；该功能与Channel

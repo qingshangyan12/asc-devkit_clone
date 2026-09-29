@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_zero_bits_cnt
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_zero_bits_cnt.md
 description: 统计输入uint64_t数据二进制表示中值为0的位数并返回int64_t结果，取值范围0到64，接口运行在标量流水上，流水内数据依赖由指令执行顺序保证，无需额外同步。

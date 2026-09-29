@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 废弃接口
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/deprecated_interface.md
 navigation:

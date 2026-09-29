@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 概述
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
 description: 介绍Reg矢量计算C API的寄存器级矢量计算能力与基于寄存器的编程模型：数据从UB经搬入指令加载到寄存器完成计算后再搬出到UB，并给出矢量加法编程示例与Vector

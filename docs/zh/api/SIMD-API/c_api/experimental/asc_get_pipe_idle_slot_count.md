@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: 指令发射队列空闲槽位查询
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md
 description: 试验接口，提供六个函数分别查询PIPE_MTE2、PIPE_MTE3、PIPE_V、PIPE_M、PIPE_MTE1、PIPE_FIX发射队列当前的空闲槽位数量，用于观察队列占用情况；不支持的AI

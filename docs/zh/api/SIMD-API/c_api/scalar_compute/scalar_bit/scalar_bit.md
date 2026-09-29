@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 位运算
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/scalar_bit.md
 navigation:

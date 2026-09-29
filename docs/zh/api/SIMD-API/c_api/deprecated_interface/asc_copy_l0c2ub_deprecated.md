@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l0c2ub（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2ub_deprecated.md
 description: 已废弃的旧参数形式及同步搬运接口，将矩阵计算结果从L0C Buffer搬运至Unified Buffer，支持随路量化、随路激活与Nz2ND/Nz2DN格式转换组合，需配套接口预先配置后调用，请改用asc_copy_l0c2ub和asc_sync替代。

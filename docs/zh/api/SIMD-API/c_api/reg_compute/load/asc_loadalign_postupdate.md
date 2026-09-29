@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md
 description: 从Unified Buffer中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，Post Update模式下搬运完成后自动更新源地址指针，提供立即数偏移和非连续对齐两种搬入模式。

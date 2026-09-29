@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_squeeze_with_status（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md
 description: 已废弃的矢量计算接口，将src中被mask选择的有效元素依次复制到dst连续排列，剩余位置置0，并将有效数据大小保存至AR寄存器，请改用asc_squeeze_and_storeunalign实现筛选并连续搬出功能。

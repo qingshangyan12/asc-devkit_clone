@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_squeeze
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md
 description: 通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中，操作数起始地址需要32字节对齐。

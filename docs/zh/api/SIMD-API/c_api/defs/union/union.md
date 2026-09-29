@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 联合体
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/union.md
 navigation:

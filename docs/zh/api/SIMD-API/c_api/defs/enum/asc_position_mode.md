@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_position_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md
 description: 该枚举表示寄存器中源或目的操作数的奇偶位置，供Reg类型转换和融合计算接口选择数据位置。

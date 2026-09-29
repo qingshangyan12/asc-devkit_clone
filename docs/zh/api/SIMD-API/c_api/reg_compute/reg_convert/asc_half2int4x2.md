@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2int4x2
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md
 description: 根据mask将矢量数据寄存器中参与计算的half元素转换为int4x2_t类型，两个连续half元素打包为一对4bit有符号整数，支持舍入和饱和/非饱和模式，按dst_quarter_pos每隔4个存储单元写入，其他位置置零。

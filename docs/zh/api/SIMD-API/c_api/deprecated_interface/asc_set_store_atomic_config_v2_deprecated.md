@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_store_atomic_config_v2（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md
 description: 该接口已废弃，用于设置原子操作启用位与原子操作类型的值，原子加操作请使用asc_atomic_add接口实现。

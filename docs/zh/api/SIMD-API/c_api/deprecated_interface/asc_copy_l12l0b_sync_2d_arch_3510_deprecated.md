@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_sync_2d_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sync_2d_arch_3510_deprecated.md
 description: 已废弃的同步搬运接口，以512字节分形为粒度完成矩阵计算所需2D格式数据从L1 Buffer到L0B Buffer的搬运，支持非转置与转置矩阵，请改用对应的非同步接口和asc_sync替代。

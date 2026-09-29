@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_saturation_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
 description: 该枚举表示饱和控制所作用的模式类型，用于asc_set_saturation_flag和asc_get_saturation_flag接口。

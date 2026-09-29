@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 数据搬出
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/scalar_store.md
 navigation:

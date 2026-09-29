@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_lt_scalar_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_lt_scalar_sync_deprecated.md
 description: 已废弃的同步矢量比较接口，将矢量每个位置的元素与标量value比较，小于标量值则为1否则为0，结果按bit位小端序排布，请使用非同步接口asc_lt_scalar并配合同步接口asc_sync替代。

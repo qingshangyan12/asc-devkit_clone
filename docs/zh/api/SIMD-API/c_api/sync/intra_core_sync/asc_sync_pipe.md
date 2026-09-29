@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_pipe
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
 description: 完成同一流水内的同步控制，约束同一流水内部的执行顺序。传入PIPE_ALL时等待所有流水的前序指令全部完成后才解除阻塞，功能等价于asc_sync；传入其他合法流水值时仅阻塞该流水的后续指令，不影响其他流水。

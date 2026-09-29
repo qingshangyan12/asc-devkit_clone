@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_sync_deprecated.md
 description: 已废弃的同步接口，将数据从Unified Buffer（UB）搬运到UB，支持高维切分，源与目的操作数为矢量，请使用对应的非同步接口和同步接口asc_sync替代。

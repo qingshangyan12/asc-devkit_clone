@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_gm2ub_loop1_stride
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
 description: 设置asc_copy_gm2ub_align使用循环搬运模式时内层循环中相邻两次迭代源操作数与目的操作数数据块起始地址之间的偏移量，配置持续生效直至重新配置，还需配合设置循环次数与外层循环步长，仅在AIV上生效。

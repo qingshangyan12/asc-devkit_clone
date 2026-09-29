@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_unsqueeze
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md
 description: 根据mask对目的矢量数据寄存器进行解压缩，dst第0个元素置为0，第i个元素等于mask中前i个元素中1的数量，mask最高位被忽略，结果也可通过函数返回值返回。

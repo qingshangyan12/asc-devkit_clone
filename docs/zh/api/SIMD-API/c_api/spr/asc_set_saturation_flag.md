@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_saturation_flag
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
 description: 按饱和模式类型设置对应饱和开关，FLOAT、FLOAT8、INT、CAST各模式下开关的语义不同，CAST模式还需饱和策略为USE_GLOBAL才会生效。

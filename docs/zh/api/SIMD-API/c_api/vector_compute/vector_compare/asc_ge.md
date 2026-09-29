@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ge
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md
 description: 逐元素比较src0是否大于等于src1，成立时输出结果为1，否则输出结果为0，每个元素的比较结果占一个bit。

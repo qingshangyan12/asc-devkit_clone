@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_deq_int322half_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_deq_int322half_sync_deprecated.md
 description: 已废弃接口，对输入的int32_t类型数据按元素做量化并转换为half类型，scale需通过asc_set_deq_scale的非向量模式设置，请使用asc_deq_int322half配合同步接口asc_sync替代。

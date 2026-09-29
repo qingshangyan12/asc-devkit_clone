@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ndim_copy_dci
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
 description: 刷新NDDMA DataCache。多核场景下多个AI Core读取同一块GM地址时缓存可能为旧数据，需在使用asc_ndim_copy_gm2ub前调用本接口，保证多核间数据一致性。仅在AIV上生效。

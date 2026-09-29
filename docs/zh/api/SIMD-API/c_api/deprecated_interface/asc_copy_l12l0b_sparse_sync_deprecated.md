@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_sparse_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sparse_sync_deprecated.md
 description: 已废弃的同步搬运接口，将L1 Buffer里512B大小的稠密权重矩阵搬运到L0B Buffer，同时读取128B索引矩阵实现稀疏化，请改用非同步接口和asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sub_relu_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md
 description: 该接口已废弃，按元素求差后再进行Relu计算，并提供转换最终结果数据类型的功能，请使用非同步接口asc_sub_relu和同步接口asc_sync替代。

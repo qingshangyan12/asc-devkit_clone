@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_min
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min.md
 description: 根据mask对两个源矢量数据寄存器按元素求最小值并写入目的操作数，结果可通过引用参数或函数返回值输出，支持整型与浮点等多种数据类型。

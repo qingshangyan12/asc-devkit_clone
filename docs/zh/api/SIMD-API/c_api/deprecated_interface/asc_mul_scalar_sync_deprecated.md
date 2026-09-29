@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mul_scalar_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mul_scalar_sync_deprecated.md
 description: 已废弃的同步矢量运算接口，执行矢量与标量的乘法运算，将src各元素与标量value相乘后写入dst，请使用非同步接口asc_mul_scalar并配合同步接口asc_sync替代。

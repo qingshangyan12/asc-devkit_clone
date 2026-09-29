@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 直方图
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/reg_histogram.md
 navigation:

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_hif82half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md
 description: 将源操作数中hifloat8_t数据类型的元素转换为half数据类型并写入目的操作数，位宽比为1:2，根据位置标签选择读取源操作数偶数或奇数索引位置。本接口为Reg矢量计算接口，仅在AIV上生效。

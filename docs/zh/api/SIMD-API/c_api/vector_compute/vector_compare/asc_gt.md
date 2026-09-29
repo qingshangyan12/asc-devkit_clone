@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gt
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md
 description: 按元素比较两个矢量的大小关系，结果为真时对应比特位为1，否则为0，比较结果可存入寄存器或输出到目的地址。

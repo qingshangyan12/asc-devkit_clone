@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_cmp_mask
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
 description: 为asc_select操作设置作用于选择的Mask掩码，该接口需与asc_select操作配合使用。

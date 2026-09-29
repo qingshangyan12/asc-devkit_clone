@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_load3d_v2_config
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md
 description: 配置 Load3Dv2 repeat 参数，控制 height 或 width 方向的迭代步长、迭代次数和迭代方向。

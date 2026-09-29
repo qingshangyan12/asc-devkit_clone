@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_e2m1x22bfloat16（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e2m1x22bfloat16_deprecated.md
 description: 将fp4x2_e2m1_t类型转化为bfloat16_t类型，源与目的操作数位宽比为1:4，读取时将一个VL大小的数据分为四部分并根据接口选取索引位置；无显式位置参数原型已废弃，请使用显式位置参数重载替代。

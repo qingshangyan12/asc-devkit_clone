@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 特殊寄存器访问
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/spr.md
 navigation:

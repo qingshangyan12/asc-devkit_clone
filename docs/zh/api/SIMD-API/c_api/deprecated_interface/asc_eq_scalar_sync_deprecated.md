@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_eq_scalar_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md
 description: 已废弃的同步矢量比较接口：按元素判断src与标量value是否相等，成立则输出结果的对应比特位为1，否则为0，请使用非同步接口asc_eq_scalar配合asc_sync替代。

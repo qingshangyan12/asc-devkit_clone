@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c_copy_channel_para
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
 description: 在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移，由后续开启Nz2DN功能的asc_copy_l0c2gm、asc_copy_l0c2l1或asc_copy_l0c2ub搬出接口使用，未开启Nz2DN功能时不生效，仅在AIC上生效。

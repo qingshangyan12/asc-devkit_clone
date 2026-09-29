@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_lt_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md
 description: 将矢量每个位置的元素与给定标量值比较，小于标量值时结果对应比特位为1，否则为0，比较结果按小端序逐bit排布。

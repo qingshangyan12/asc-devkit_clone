@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_hf32_round_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md
 description: 描述Mmad开启HF32模式时将FP32舍入为HF32的舍入策略，供相关配置接口选择舍入方式。

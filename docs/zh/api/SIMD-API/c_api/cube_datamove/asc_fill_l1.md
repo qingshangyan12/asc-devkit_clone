@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_fill_l1
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md
 description: 将一个标量填充值写入L1 Buffer的目的地址并广播到多个32字节分形块中，可用于L1 Buffer的内存初始化，重复次数、单次分形块数与相邻重复间隔由asc_fill_value_config配置，仅在AIC上执行有效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_vdeq_int162b8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md
 description: 将int16_t类型数据转化为int8_t或uint8_t类型，并按变体将结果存放到每个DataBlock的上半块或下半块，使用前需调用asc_set_deq_scale设置量化参数。

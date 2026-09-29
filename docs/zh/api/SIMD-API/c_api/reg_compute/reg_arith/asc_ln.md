@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ln
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_ln.md
 description: 根据mask将源矢量数据寄存器按元素取自然对数并写入目的矢量数据寄存器，掩码位为0的元素不参与计算且结果置0，支持half与float数据类型。

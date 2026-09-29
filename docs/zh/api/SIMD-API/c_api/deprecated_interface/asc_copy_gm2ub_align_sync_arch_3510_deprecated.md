@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2ub_align_sync_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_sync_arch_3510_deprecated.md
 description: 已废弃的同步搬运接口，提供GM到UB的非对齐数据搬运，数据长度非32字节对齐时补齐并支持手动或自动填充，请改用asc_copy_gm2ub_align连续数据搬运接口和asc_sync替代。

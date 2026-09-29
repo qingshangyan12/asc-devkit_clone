@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 常量
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/constant.md
 navigation:

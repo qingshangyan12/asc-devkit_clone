@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_bfloat162float_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162float_sync_deprecated.md
 description: 将bfloat16_t类型数据转换为float类型，无舍入模式，按指定元素个数对矢量数据进行转换；接口已废弃，请使用对应的非同步接口和同步接口asc_sync替代。

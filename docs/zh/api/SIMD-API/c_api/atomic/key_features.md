@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.concept
 title: 关键特性说明
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/key_features.md
 description: 关键特性说明页，阐述原子操作场景下的确定性计算：分析带随路原子操作的搬运指令乱序与开启原子操作前后指令乱序两类非确定性结果的产生原因，并给出通过核内同步及基于GM信号量的软件核间同步保证确定性执行顺序的实现方案。

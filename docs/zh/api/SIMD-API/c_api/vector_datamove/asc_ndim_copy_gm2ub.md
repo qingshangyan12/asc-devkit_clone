@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ndim_copy_gm2ub
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
 description: 将多维数据从Global Memory（GM）搬运到Unified Buffer（UB），最多支持5个维度，每个维度均可单独配置Stride，并支持随路Padding功能，仅在AIV上生效。

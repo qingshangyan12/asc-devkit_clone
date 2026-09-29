@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 搬运原子操作
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/datamove_atomic.md
 navigation:

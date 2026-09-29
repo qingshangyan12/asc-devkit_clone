@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_rsqrt_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_rsqrt_sync_deprecated.md
 description: 已废弃的同步接口，按元素进行开方后取倒数的计算，计算公式为dst等于1除以src的平方根，请使用非同步接口asc_rsqrt配合同步接口asc_sync替代。

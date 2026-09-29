@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_ffts_base_addr
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md
 description: 设置核间同步寄存器的基地址，地址需在Host侧通过aclrtGetHardwareSyncAddr获取后作为config参数传入，取值范围0至2^48-1，且必须在使用asc_sync_block_wait和asc_sync_block_arrive之前完成设置。

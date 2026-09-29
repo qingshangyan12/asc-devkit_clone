@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2e4m3（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md
 description: 已废弃接口，将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式与饱和、非饱和模式，位宽比为4:1需分四部分按索引写入，请使用显式位置参数重载替代。

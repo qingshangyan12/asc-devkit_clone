@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2int4x2（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int4x2_deprecated.md
 description: 已废弃的寄存器矢量转换接口：将half类型数据转为int4x2类型，支持多种舍入模式与饱和/非饱和模式，请使用asc_half2int4x2的显式位置参数重载替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_inter_arrive
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md
 description: 与asc_sync_inter_wait配对使用，实现不同AI Core之间全部AIC或全部AIV的核间同步（模式0）。所有参与同步的AIC或AIV执行本接口后向调度模块发送通知，调度模块将各核对应flag_id的计数器增加1，本接口不阻塞后续指令。

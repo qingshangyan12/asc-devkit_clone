@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_wait
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
 description: 与asc_sync_notify配对使用，实现AI Core内部不同流水之间的同步控制。目的流水执行到该指令时，若对应标志位为0则阻塞后续指令，为1则将标志位清0并放行后续指令，配对调用的参数必须完全一致。

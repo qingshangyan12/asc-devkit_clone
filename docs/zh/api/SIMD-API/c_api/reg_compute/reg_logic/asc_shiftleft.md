@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_shiftleft
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md
 description: 根据掩码对矢量数据寄存器中的元素执行左移，左移位数由shift矢量数据寄存器中对应元素指定，无符号整数执行逻辑左移、有符号整数执行算术左移，掩码为0的元素置零，仅在AIV上生效。

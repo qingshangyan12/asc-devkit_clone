@@ -1,5 +1,5 @@
 ---
-okftype: reference.arch.cpp
+okftype: reference.api
 title: asc_copy_gm2ub_align_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_arch_3510_deprecated.md
 description: 已废弃的高维切分搬运接口旧形式，提供GM到UB的非对齐数据搬运，支持手动或自动填充补齐至32字节对齐，请改用asc_copy_gm2ub_align高维切分新接口及asc_load_l2_cache_mode枚举配置。

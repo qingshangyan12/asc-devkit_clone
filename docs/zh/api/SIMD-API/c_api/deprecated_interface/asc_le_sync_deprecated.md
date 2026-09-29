@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_le_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_le_sync_deprecated.md
 description: 已废弃的同步矢量比较接口：按元素判断src0是否小于等于src1，成立则输出结果为1否则为0，每个元素的比较结果占1个bit，请使用非同步接口asc_le并配合同步接口asc_sync替代。

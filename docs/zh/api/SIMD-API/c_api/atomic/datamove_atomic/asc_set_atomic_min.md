@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_atomic_min
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
 description: 对后续目的地址为GM的数据搬运指令开启原子比较取小，搬运时将待搬运数据与GM上已有数据进行比较并将两者中的最小值写入GM，可通过选择不同函数原型设定比较取小数据类型，调用asc_disable_dma_atomic接口可关闭该原子操作。

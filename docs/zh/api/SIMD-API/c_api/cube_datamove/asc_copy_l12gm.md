@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12gm
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12gm.md
 description: 将数据从L1 Buffer搬运到Global Memory，通过连续传输数据块个数、单个数据块长度以及源端和目的端间隔参数组织搬运过程，多条指令目的地址存在重叠时需插入同步指令保证串行化。

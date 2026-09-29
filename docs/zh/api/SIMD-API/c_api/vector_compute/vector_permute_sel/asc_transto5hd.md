@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_transto5hd
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md
 description: 数据格式转换接口，一般用于将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，单次Repeat内可处理512Byte数据，支持多次Repeat操作。

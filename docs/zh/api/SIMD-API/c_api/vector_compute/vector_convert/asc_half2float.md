@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2float
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md
 description: 将half类型矢量数据转换为float类型，无舍入模式，支持前n个数据计算和高维切分计算，目的与源操作数起始地址需32字节对齐。

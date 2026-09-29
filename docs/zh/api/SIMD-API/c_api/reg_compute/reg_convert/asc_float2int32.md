@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2int32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md
 description: 在矢量数据寄存器中将float类型数据转换为int32_t类型，支持多种舍入模式与饱和/非饱和模式，可通过引用参数或函数返回值输出结果，mask未筛选的元素在输出中置零。

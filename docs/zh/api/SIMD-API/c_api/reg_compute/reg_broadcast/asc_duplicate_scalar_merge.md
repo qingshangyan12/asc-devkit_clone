@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_duplicate_scalar_merge
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar_merge.md
 description: 将标量value广播到目的操作数dst中被mask筛选的位置，未被筛选的元素保留原值（合并模式），调用前需初始化dst，仅在AIV上生效的Reg矢量计算接口。

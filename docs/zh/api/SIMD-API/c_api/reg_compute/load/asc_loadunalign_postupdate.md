@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadunalign_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md
 description: 从Unified Buffer按dtype对齐的起始地址读取VL长度连续数据，将非对齐寄存器中缓存的前置数据与从UB读取的后续数据拼接后搬入矢量数据寄存器，搬入完成后同步更新源地址和非对齐寄存器，支持连续非对齐搬入和地址寄存器偏移搬入两种模式。

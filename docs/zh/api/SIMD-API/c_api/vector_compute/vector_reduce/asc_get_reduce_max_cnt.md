@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_reduce_max_cnt
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md
 description: 获取执行asc_repeat_reduce_max操作后的最大值以及第一个最大值时的索引，需通过同步操作确保asc_repeat_reduce_max执行完成后再调用本接口获取结果。

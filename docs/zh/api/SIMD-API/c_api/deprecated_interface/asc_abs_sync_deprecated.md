@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_abs_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md
 description: 按元素计算源矢量操作数的绝对值并写入目的操作数，该接口已废弃，请通过asc_abs和同步接口asc_sync实现精细化调优以达成最优性能。

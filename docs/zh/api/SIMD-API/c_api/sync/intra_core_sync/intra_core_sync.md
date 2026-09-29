@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 核内同步
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync.md
 navigation:

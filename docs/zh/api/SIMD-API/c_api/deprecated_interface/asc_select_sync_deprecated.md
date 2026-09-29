@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_select_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_select_sync_deprecated.md
 description: 已废弃的同步接口，执行矢量选择操作，依据sel_mask比特位从src0或src1中选取元素得到目的操作数dst，需配合asc_set_cmp_mask使用，请使用非同步接口asc_select配合同步接口asc_sync替代。

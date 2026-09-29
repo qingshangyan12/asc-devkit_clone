@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ffs
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffs.md
 description: FindFirstSet接口，在输入uint64_t数据的二进制表示中从最低位向最高位查找第一个值为1的比特并返回其位索引，未找到时返回-1，返回值取值范围为0到63或-1，运行在标量流水上。

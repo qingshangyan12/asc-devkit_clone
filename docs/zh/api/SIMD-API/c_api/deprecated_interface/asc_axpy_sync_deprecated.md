@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_axpy_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_axpy_sync_deprecated.md
 description: 将源操作数每个元素与标量value求积后和目的操作数对应元素相加，按count指定的元素个数连续计算；接口已废弃，请使用非同步接口asc_axpy和同步接口asc_sync替代。

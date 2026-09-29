@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_dcci
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
 description: 用于维护DCache与GM间的缓存一致性：Clean将缓存中脏数据写回GM避免丢失，Invalid将指定地址范围的Cache Line标记无效并从缓存移除，下次访问时从GM重新加载数据，提供按单个地址或整个目标域刷新的多组接口。

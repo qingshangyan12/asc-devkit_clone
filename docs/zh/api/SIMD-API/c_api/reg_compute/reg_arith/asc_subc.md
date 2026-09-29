@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_subc
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md
 description: 根据mask对源操作数src0、src1及输入借位carry_src进行按元素求差，减法在硬件底层通过补码加法实现，结果写入dst，每个元素的进位标志写入carry掩码寄存器，仅在AIV上生效。

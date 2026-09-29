@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0a_arch_3510（3D矩阵搬运）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md
 description: 将NC1HWC0格式的Feature Map完成Image to Column展开后，从L1 Buffer中选取指定数据块搬入L0A Buffer，以512字节分形为单位搬运，也可用于普通矩阵计算的2D格式数据搬运。

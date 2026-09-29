@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_update_mask
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md
 description: 根据元素个数value生成掩码寄存器，调用后自动将value减去当前向量处理单元的元素个数，支持b8、b16、b32三种位宽模式，重复调用可按剩余元素个数逐次生成掩码，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int642float（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642float_deprecated.md
 description: 已废弃的类型转换接口，将int64_t类型数据转换为float并支持多种舍入模式，源与目的类型位宽比为2:1，按接口后缀选择数据写入奇数或偶数索引位置，请使用显式位置参数重载替代。

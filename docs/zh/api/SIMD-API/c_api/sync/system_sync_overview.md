@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 系统同步能力概述
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
 description: 系统同步能力概述页，说明同步通过协调多个执行单元对共享资源的访问顺序来保证程序正确性，将AI Core同步分为核内同步与核间同步两类，并以表格和示意图介绍四种核间同步控制模式。

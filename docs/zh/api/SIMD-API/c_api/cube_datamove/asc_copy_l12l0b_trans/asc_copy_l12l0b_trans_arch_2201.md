@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_trans
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md
 description: 实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，按数据类型将源分形合并为方块矩阵转置后再拆分，并通过间隔参数控制目的操作数排布。

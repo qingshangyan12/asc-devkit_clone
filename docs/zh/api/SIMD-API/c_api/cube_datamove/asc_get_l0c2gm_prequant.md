@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_l0c2gm_prequant
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_prequant.md
 description: 在数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址，无输入参数，返回值即为该起始地址。

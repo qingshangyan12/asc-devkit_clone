@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_hif82half（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_hif82half_deprecated.md
 description: 已废弃的寄存器矢量转换接口，将src中hifloat8_t元素转换为half类型写入dst，源与目的位宽比为1:2并按后缀读取偶数或奇数索引，请使用显式位置参数重载替代。

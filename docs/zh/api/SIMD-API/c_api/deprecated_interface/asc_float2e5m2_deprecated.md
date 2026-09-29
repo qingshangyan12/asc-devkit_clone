@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2e5m2（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md
 description: 已废弃的矢量转换接口，将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式及饱和与非饱和模式，其无显式位置参数原型已废弃，需使用显式位置参数重载替代。

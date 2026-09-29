@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: L0C Buffer内存结构介绍
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/L0C_memory_structure_intro.md
 navigation:

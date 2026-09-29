@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md
 description: 将矢量数据寄存器或掩码寄存器中的数据连续对齐搬出到Unified Buffer（UB），矢量场景支持立即数偏移与非连续DataBlock步长两种模式并可用掩码控制参与搬出的元素，搬出后启用Post

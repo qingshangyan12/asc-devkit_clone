@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_ub2l1_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_ub2l1_sync_deprecated.md
 description: 已废弃的同步搬运接口，将一段连续数据从Unified Buffer搬运到L1 Buffer并在搬运完成后执行同步，仅在AIV上生效、非AIV上调用直接返回，请改用asc_copy_ub2l1接口和asc_sync替代。

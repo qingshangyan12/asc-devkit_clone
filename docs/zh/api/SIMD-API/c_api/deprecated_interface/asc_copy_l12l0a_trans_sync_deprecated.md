@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0a_trans_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_trans_sync_deprecated.md
 description: 已废弃的同步搬运接口，实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载，请改用非同步接口asc_copy_l12l0a_trans配合asc_sync替代。

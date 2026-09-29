@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_enable_hf32_trans（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md
 description: 已废弃的矩阵计算模式配置接口：设置HF32模式的舍入方式，需先开启HF32模式并在矩阵乘加指令执行前调用，请使用asc_set_hf32_round_mode接口替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_scatter（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md
 description: 已废弃的数据分散接口，根据索引值index将源操作数src中的元素分散到目的操作数dst中，index中的值必须唯一，请使用asc_scatter接口实现此功能。

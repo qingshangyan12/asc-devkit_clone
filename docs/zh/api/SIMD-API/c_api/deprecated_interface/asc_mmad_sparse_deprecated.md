@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mmad_sparse（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md
 description: 已废弃的稀疏矩阵乘加接口：左矩阵A为稀疏矩阵、右矩阵B为稠密矩阵，矩阵A在计算时完成稠密化，仅在AIC上生效；请使用asc_unit_flag_mode类型入参的新asc_mmad_sparse接口替代，同步功能通过asc_sync实现。

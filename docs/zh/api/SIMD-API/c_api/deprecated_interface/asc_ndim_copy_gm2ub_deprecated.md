@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ndim_copy_gm2ub（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ndim_copy_gm2ub_deprecated.md
 description: 已废弃的多维数据搬运接口，将数据从Global Memory搬运到Unified Buffer，最多支持5个维度，每个维度可单独配置Stride并支持随路Padding，新接口形式请参见asc_ndim_copy_gm2ub。

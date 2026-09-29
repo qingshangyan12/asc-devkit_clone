@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int642int32_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642int32_sync_deprecated.md
 description: 已废弃的同步类型转换接口，将int64_t类型数据转换为int32_t类型，目的和源矢量起始地址需32字节对齐，请使用对应的非同步接口和同步接口asc_sync替代。

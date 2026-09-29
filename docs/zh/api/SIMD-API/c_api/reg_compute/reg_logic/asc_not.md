@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_not
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md
 description: 根据mask对矢量数据寄存器或掩码寄存器执行按位取反操作，结果通过函数返回值返回或写入目的操作数，掩码比特位为0时结果对应位写0，仅在AIV上生效的Reg矢量计算接口。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_squeeze_status
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
 description: 读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，需先清空AR寄存器并完成数据筛选后再调用，用于获取已连续搬出的有效数据量。

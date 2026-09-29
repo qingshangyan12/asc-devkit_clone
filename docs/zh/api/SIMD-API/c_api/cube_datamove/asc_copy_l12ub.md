@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12ub
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md
 description: 将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、单个数据块长度以及源目间隔实现连续与非连续搬运，搬运过程中格式和内容保持不变，仅在AIC上执行有效。

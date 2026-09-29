@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: K方向对齐约束
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/k_direction_alignment_constraint.md
 description: K方向对齐约束说明页：asc_mmad在float数据类型场景下通过k_direction_align参数控制L0A/L0B Buffer矩阵在K方向的对齐方式，开启后对齐到ceil(K/16)*16；Ascend

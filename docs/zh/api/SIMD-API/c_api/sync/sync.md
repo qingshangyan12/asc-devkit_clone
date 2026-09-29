@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 同步控制
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/sync.md
 navigation:

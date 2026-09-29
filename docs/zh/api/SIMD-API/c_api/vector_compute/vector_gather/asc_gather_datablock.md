@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gather_datablock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
 description: 给定输入矢量和地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中，仅提供高维切分计算原型，偏移后地址不能超出Unified

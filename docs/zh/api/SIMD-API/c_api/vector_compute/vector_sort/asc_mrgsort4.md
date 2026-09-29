@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mrgsort4
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
 description: 将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按score从大到小排序，输入一般是经过asc_bitsort指令处理后的输出数据。

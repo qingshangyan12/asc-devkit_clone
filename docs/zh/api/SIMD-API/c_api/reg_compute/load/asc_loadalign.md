@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
 description: 从Unified Buffer（UB）中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，提供连续对齐、立即数偏移、地址寄存器偏移和非连续对齐搬入四种模式，仅在AIV上生效。

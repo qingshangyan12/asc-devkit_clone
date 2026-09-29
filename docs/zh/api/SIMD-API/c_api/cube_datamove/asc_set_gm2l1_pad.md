@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_gm2l1_pad
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md
 description: 设置asc_copy_gm2l1_align接口的常量填充值，在Normal或Compact填充模式以及左右填充模式下作为填充数据使用，仅在AIC上生效。

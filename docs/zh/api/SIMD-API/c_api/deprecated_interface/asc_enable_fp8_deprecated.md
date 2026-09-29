@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_enable_fp8（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md
 description: 已废弃的矩阵计算模式配置接口：设置Mmad计算开启FP8模式，该接口会关闭HiF8模式，与asc_enable_hif8不同时生效，需在asc_mmad执行前调用，请使用asc_disable_hif8接口替代。

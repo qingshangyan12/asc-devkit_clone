@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_xor
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md
 description: 根据mask对两个矢量数据寄存器或掩码寄存器执行按位异或操作，结果通过函数返回值返回或写入目的操作数，未被mask筛选的位置置0，仅在AIV上生效的Reg矢量计算接口。

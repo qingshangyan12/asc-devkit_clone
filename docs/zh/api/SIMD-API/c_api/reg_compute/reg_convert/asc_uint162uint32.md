@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint162uint32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md
 description: 将源操作数中uint16_t类型数据转换为uint32_t类型写入目的操作数，位宽比为1:2，通过位置标签选择读取源操作数偶数或奇数索引位置，未被掩码筛选的元素置零，仅在AIV上生效。

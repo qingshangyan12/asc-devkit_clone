@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_reduce_max_datablock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md
 description: 根据mask对每个DataBlock（32B）内的元素求最大值，得到各DataBlock的归约结果并依次保存在dst低位，仅输出最大值不输出索引，其余元素置0。

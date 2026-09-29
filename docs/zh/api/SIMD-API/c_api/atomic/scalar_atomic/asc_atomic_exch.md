@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_atomic_exch
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md
 description: 对Global Memory中address指向的单个元素执行原子交换操作，读取旧值并将val写回该地址以替换旧值，接口返回旧值，整个读取和写回过程为原子操作。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_va_reg
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md
 description: 用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，前8个和后8个地址序列需分别关联，每个地址寄存器只能关联8个地址。

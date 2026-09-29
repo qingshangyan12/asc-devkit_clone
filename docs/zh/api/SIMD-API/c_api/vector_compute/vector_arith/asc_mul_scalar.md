@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mul_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul_scalar.md
 description: 将源矢量各元素与给定标量逐元素相乘并把结果写入目的矢量，支持前n个数据计算与高维切分计算两种原型，操作数起始地址需32字节对齐。

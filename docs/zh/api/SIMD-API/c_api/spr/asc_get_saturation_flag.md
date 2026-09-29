@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_saturation_flag
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md
 description: 按饱和模式类型读取当前是否开启饱和并返回布尔结果，CAST模式的饱和配置需同时满足饱和策略为USE_GLOBAL才会在精度转换中真正生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_nop
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_misc/asc_nop.md
 description: 生成一条空操作指令，不执行实际计算，每调用一次阻塞一拍流水；需要精确阻塞n拍流水时，须在n个接口调用前后插入asc_sync。

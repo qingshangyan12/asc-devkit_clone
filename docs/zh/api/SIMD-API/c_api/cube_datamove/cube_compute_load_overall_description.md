@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 矩阵搬入总体说明
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load_overall_description.md
 description: 矩阵计算搬入接口的总体说明，介绍GM到L1、L1到L0A/L0B等数据通路及地址对齐要求，按通路分类各搬入接口并说明辅助配置接口的使用场景。

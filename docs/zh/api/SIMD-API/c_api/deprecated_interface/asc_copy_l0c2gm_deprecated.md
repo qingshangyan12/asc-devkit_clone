@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l0c2gm（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2gm_deprecated.md
 description: asc_copy_l0c2gm旧参数形式及同步接口已废弃，将矩阵计算结果从L0C Buffer搬运至Global Memory，支持随路量化、随路激活与Nz2ND等格式转换组合，请改用新接口和asc_sync替代。

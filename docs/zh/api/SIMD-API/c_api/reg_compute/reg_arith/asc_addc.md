@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_addc
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md
 description: 根据mask对源操作数src0、src1及输入进位carry_src按元素求和，结果写入目的矢量数据寄存器，每个元素的进位写入目的掩码寄存器，硬件按32位无符号数处理。

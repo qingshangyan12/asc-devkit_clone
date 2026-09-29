@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_relu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md
 description: 按元素做线性整流Relu，负数输出0、非负数保持原值，结果写入目的矢量，支持half、int32_t、float类型。

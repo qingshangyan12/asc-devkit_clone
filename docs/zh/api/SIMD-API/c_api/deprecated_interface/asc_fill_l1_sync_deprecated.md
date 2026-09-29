@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_fill_l1_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md
 description: 已废弃接口，将标量填充值写入L1 Buffer目的地址并广播到多个32字节分形块，用于L1 Buffer内存初始化，请使用asc_fill_l1与asc_sync组合替代。

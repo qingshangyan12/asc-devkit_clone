@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12ub_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12ub_sync_deprecated.md
 description: 已废弃接口，将数据从L1 Buffer搬运到Unified Buffer（UB），请使用asc_copy_l12ub配合asc_sync替代。

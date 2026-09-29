@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2int16
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md
 description: 根据mask将矢量数据寄存器中参与计算的half元素转换为int16_t类型并写入dst，支持rd、rn、rna、ru、rz多种舍入模式和饱和/非饱和模式。

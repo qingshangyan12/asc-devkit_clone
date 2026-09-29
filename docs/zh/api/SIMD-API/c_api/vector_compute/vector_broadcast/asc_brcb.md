@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_brcb
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md
 description: 每次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中，每个数对应一个datablock，实现矢量元素到数据块的广播复制，且不支持src与dst为同一块内存地址。

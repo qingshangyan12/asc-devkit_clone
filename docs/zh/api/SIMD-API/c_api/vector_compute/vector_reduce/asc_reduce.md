@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_reduce
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md
 description: 以内置固定模式对应的二进制或用户自定义数值对应的gather掩码，从源操作数中选取元素写入目的操作数，且不支持通过asc_set_vector_mask配置掩码。

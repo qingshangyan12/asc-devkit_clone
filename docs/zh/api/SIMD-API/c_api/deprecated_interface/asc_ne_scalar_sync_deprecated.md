@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ne_scalar_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ne_scalar_sync_deprecated.md
 description: 已废弃的同步比较接口，将src中每个元素逐个与标量value比较，元素不等于value时输出结果dst对应比特位为1，请使用非同步接口asc_ne_scalar和同步接口asc_sync替代。

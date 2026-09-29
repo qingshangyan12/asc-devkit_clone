@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_intlv
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md
 description: 将两个源矢量数据寄存器中的数据交织后分别写入两个目的矢量数据寄存器，前半部分元素依次交替写入dst0、后半部分依次交替写入dst1，掩码寄存器按接口后缀指定的粒度分组交织，仅在AIV上生效。

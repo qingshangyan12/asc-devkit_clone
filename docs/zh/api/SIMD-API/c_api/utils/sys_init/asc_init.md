@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_init
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_init/asc_init.md
 description: 将当前AI Core上可能由前序算子遗留的全局状态恢复为接口约定的初始状态，覆盖原子累加状态、Mask工作模式、CTRL寄存器等，仅初始化控制状态，不会清零用户数据。

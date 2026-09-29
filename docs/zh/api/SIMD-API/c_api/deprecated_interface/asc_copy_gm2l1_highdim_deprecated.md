@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_arch_3510（高维切分数据搬运）（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md
 description: 已废弃的高维切分搬运接口，将数据从Global Memory搬运到L1 Buffer且格式和内容保持不变，通过配置数据块个数、块长度与地址偏移实现非连续搬运，并支持按通道padding模式插入或移除padding；请使用带pad_mode参数的新接口替代。

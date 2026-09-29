@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign (废弃)
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_loadalign_v3_deprecated.md
 description: 已废弃的对齐搬入接口：从Unified Buffer连续对齐搬入矢量数据寄存器，支持UNPACKV2解压缩与BRCV2、BRCV3广播等模式，偏移通过int32_t参数传入。

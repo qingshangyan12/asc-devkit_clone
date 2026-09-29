@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_relu_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_relu_sync_deprecated.md
 description: 已废弃的同步计算接口，对矢量数据按元素做线性整流Relu运算，请使用非同步接口asc_relu配合同步接口asc_sync替代。

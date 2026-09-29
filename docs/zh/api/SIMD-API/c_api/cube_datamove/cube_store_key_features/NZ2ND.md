@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: NZ2ND
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md
 description: 介绍矩阵搬出时的Nz2ND功能：实现Nz格式到ND格式的矩阵转换，支持多个矩阵的批量转化，文档给出转化伪代码、可配置参数含义与特性约束；开启Channel

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gather
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md
 description: 根据索引位置index将源操作数src按元素收集到目的操作数dst，寄存器源收集模式下按index矢量寄存器保存的逐元素索引从src矢量数据寄存器中选择元素写入dst对应位置，不使用掩码，仅在AIV上生效。

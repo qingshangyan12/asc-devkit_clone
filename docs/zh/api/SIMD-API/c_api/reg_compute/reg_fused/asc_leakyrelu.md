@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_leakyrelu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md
 description: 根据掩码对源矢量数据寄存器中的元素执行Leaky ReLU操作，大于0的元素直接写入输出结果，小于或等于0的元素乘以标量立即数后写入，掩码为0的元素在输出中置零，支持half与float类型，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 普通矩阵计算流程
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md
 navigation:

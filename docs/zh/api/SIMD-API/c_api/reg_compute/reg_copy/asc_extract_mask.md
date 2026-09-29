@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_extract_mask
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md
 description: 从矢量数据寄存器中提取掩码寄存器并通过函数返回值返回结果：按part选取源矢量数据寄存器中的数据块，将所选数据块的每个bit广播成掩码位，功能与asc_copy的矢量到掩码模式相同，仅在AIV上生效。

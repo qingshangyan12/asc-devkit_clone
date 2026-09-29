@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_mask
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md
 description: 从Unified Buffer中32字节对齐的起始地址读取VL/8长度数据并通过函数返回值返回掩码寄存器，与asc_loadalign连续对齐搬入模式中掩码寄存器原型功能相同。

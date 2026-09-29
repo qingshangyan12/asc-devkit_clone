@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_pair_reduce_sum
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md
 description: 根据mask将源矢量数据寄存器中每两个相邻元素相加，结果连续保存在目的操作数低半部分，高半部分置0，不参与计算的元素被当作0进行累加，支持half和float类型。

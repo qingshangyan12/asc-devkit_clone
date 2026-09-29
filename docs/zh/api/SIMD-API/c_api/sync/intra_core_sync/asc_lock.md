@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_lock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
 description: 与asc_unlock配对使用，实现核内异步流水指令之间的同步。根据mutex_id获取Mutex，若Mutex已被锁定则阻塞指定流水上后续指令的执行，直到所有流水中相同mutex_id的Mutex均被asc_unlock释放，可选mode参数指定是否阻塞流水。

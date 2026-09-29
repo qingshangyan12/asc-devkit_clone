@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint162uint8（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md
 description: 已废弃的矢量寄存器数据类型转换接口，将uint16_t类型数据转化为uint8_t类型，无舍入模式，支持饱和与非饱和模式，写入时按索引奇偶位置分两部分，请改用显式位置参数重载替代。

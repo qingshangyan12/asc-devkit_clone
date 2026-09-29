@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_store_atomic_config
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md
 description: 保存原子操作的启用类型和操作类型配置，供 asc_get_store_atomic_config 接口使用。

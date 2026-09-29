@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_e5m22float（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e5m22float_deprecated.md
 description: 将vector_fp8_e5m2_t类型源操作数以256B为单位分为四部分，读取其中一部分元素并转换成vector_float类型写入目的操作数；无显式位置参数原型已废弃，请使用显式位置参数重载替代。

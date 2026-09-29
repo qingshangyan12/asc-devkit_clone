@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int162uint32（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162uint32_deprecated.md
 description: 已废弃的寄存器矢量转换接口，将src中int16_t元素转换为uint32_t类型写入dst，即把16位有符号整数转换为32位无符号整数，请使用显式位置参数重载替代。

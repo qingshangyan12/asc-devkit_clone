@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 标量原子操作
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/scalar_atomic.md
 navigation:

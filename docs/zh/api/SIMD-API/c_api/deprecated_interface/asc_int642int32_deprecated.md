@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int642int32（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642int32_deprecated.md
 description: 已废弃的类型转换接口，将int64_t类型的源操作数转换成int32_t类型并支持饱和与非饱和模式，源与目的类型位宽比为2:1，按接口后缀选择数据写入奇数或偶数索引位置，请使用显式位置参数重载替代。

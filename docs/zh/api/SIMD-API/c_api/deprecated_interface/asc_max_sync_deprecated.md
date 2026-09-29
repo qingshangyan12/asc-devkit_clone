@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_max_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_max_sync_deprecated.md
 description: 已废弃的同步矢量运算接口，逐元素计算src0与src1的最大值并存入dst，请使用非同步接口asc_max并配合同步接口asc_sync替代。

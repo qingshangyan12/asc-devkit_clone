@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign_pack_quarter
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md
 description: 将矢量数据寄存器中的数据压缩搬出到Unified Buffer（UB），按mask将每个32bit有效元素的低8bit数据写入压缩后对应目的位置，mask为0的元素不搬出且目的位置保持原值，提供对齐、立即数偏移和地址寄存器偏移三种模式。

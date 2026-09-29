@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c2gm_quant_post（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md
 description: 该接口已废弃且暂无替代接口，用于对QUANT_POST寄存器中的值进行设置，该64bit寄存器存储Fixpipe后处理阶段量化信息，不同bit位表示各量化模式下的偏移量、符号位、M3与位移值等字段。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_neg
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_neg.md
 description: 根据mask对源矢量数据寄存器按元素取相反数，结果写入目的操作数或通过函数返回值返回，整数最小负值取反后保留原值，浮点数通过翻转符号位实现取反。

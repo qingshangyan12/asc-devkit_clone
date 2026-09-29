@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_vector_mask
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
 description: 设置矢量计算接口的Mask值以指示哪些数据参与计算，使用前需先调用asc_set_mask_count或asc_set_mask_norm设置Mask模式。

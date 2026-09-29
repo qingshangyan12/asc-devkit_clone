@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: Int8 Channel Merge
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/Int8-Channel-Merge.md
 description: 介绍矩阵搬出过程中的Int8 Channel Merge特性：目标数据类型被转换为int8_t、uint8_t时Nz输出自动启用，硬件将16×16分形矩阵按通道合并为16×32分形矩阵，N为16的奇数倍时最后16个通道保持不变，该特性由硬件自动开启、不能配置。

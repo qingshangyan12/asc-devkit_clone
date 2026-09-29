@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_unpack4
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md
 description: 从Unified Buffer中32字节对齐的起始地址读取VL/4长度连续数据，在每个源元素后补3个值为0的元素得到VL长度数据搬入矢量数据寄存器，提供对齐、立即数偏移和地址寄存器偏移三种搬入模式。

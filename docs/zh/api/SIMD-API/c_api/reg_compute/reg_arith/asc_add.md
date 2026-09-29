@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_add
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md
 description: 根据mask对两个源矢量数据寄存器按元素求和并写入目的操作数，另提供带进位输出加法形式，硬件按32位无符号数处理，加法和的低32位写入矢量数据寄存器、进位写入目的掩码寄存器。

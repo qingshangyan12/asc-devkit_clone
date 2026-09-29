@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_sync_3d_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sync_3d_arch_3510_deprecated.md
 description: 已废弃的同步搬运接口，将NC1HWC0格式Feature Map完成Image to Column展开后从L1 Buffer搬入L0B Buffer供3D卷积矩阵计算使用，也可用于2D格式数据搬运，需先调用寄存器配置接口。

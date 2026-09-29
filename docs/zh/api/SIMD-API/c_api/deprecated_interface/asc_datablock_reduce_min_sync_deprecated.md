@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_datablock_reduce_min_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_datablock_reduce_min_sync_deprecated.md
 description: 已废弃接口，执行数据块内的求最小值规约操作，请使用asc_datablock_reduce_min配合同步接口asc_sync替代。

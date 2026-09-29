@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_sparse
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md
 description: 搬运L1 Buffer中512B大小的稠密权重矩阵到L0B Buffer，同时读取128B大小的索引矩阵实现稠密矩阵的稀疏化，不支持转置功能。

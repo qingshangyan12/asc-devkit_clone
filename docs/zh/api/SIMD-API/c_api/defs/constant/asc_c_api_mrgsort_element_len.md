@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: ASC_C_API_MRGSORT_ELEMENT_LEN
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md
 description: 定义MrgSort4操作支持的队列数量常量，值为4，并用于相关排序接口的数组长度约束。

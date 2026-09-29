@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2hif8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md
 description: 根据mask将矢量数据寄存器中参与计算的float元素转换为hifloat8_t类型并写入dst，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取位置写入结果、其他位置置零，支持舍入和饱和/非饱和模式。

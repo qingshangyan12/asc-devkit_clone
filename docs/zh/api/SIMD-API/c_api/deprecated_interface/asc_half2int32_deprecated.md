@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2int32（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int32_deprecated.md
 description: 已废弃的寄存器矢量转换接口：根据mask将half类型元素转换为int32_t类型写入dst，支持FLOOR、RINT、ROUND、CEIL、TRUNC舍入模式，位宽比为1:2，按后缀读取偶数或奇数索引，请使用asc_half2int32的显式位置参数重载替代。

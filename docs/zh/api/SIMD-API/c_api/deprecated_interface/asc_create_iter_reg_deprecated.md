@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_create_iter_reg (废弃)
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_create_iter_reg_deprecated.md
 description: 已废弃接口，初始化地址寄存器并在循环中存储地址偏移量，支持1-4个offset参数和b8/b16/b32位宽寄存器以适配1-4维Tensor，请使用asc_update_addr_reg实现此功能。

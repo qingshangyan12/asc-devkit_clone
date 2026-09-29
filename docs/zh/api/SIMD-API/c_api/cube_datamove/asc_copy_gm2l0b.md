@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l0b
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l0b.md
 description: 将矩阵数据从Global Memory搬运到L0B Buffer，通过起始分块ID、迭代次数及相邻迭代间的源步长和目的间隔控制搬运过程。

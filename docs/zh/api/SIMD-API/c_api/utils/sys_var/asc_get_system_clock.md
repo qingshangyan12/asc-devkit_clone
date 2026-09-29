@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_system_clock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md
 description: 读取当前系统时钟计数器，按当前芯片的时钟频率换算后直接返回微秒级的int64_t时间值，无需调用方自行换算，返回值随系统时钟持续递增，同一核函数内多次调用返回值单调不减，在AIC与AIV上均可调用且含义一致。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_add
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md
 description: 对两个源矢量执行逐元素加法运算并将结果写入目的矢量，支持前n个数据计算与高维切分计算两种模式，起始地址需32字节对齐。

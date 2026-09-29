@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_l13d_repeat_direction
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md
 description: 描述3D img2col搬运repeat迭代的方向选择，作为两个repeat配置接口的repeat_direction参数类型。

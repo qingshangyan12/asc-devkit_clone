@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0a_trans
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_trans.md
 description: 实现带转置的2D格式数据从L1 Buffer到L0A Buffer的加载，按数据类型以不同大小的方块矩阵迭代，完成分形的合并、转置与拆分，并支持地址递增或递减两种更新方式。

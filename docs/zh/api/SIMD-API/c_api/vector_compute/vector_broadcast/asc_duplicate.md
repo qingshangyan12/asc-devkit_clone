@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_duplicate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md
 description: 执行矢量复制操作，将标量值复制填充到目的矢量的各元素中，支持前n个数据计算与高维切分计算两种模式，dst起始地址需32字节对齐。

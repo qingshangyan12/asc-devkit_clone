@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_datacache_preload
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md
 description: 从Global Memory指定地址预加载一个64字节的Cache Line数据到DCache，为后续Scalar单元读取提前填充缓存、降低首次访问延迟；预取地址由address与offset相加得到，建议连续调用不超过4次。

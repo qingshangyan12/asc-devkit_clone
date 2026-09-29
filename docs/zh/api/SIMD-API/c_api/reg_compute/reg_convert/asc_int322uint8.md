@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int322uint8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint8.md
 description: 根据掩码将源操作数中参与计算的int32_t类型元素转换为uint8_t类型并写入目的操作数，位宽比为4:1，按四分之一位置标签离散选取目的写入位置，其他位置置零。本接口为Reg矢量计算接口，仅在AIV上生效。

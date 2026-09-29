@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2uint8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md
 description: 将half类型矢量数据转换为uint8_t类型，支持NONE、RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。

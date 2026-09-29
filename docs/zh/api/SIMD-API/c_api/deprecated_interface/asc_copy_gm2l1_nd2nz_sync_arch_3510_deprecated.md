@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_nd2nz_sync_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_sync_arch_3510_deprecated.md
 description: 将数据从Global Memory搬运到L1 Buffer并在搬运中将ND格式数据转换为Nz分形排布以支撑后续矩阵计算，需先调用asc_set_gm2l1_nz_para配置搬运参数；接口已废弃，请使用非同步接口和同步接口asc_sync替代。

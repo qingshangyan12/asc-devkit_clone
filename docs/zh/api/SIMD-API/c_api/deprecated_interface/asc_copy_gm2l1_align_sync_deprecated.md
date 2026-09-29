@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_align_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_align_sync_deprecated.md
 description: 已废弃的同步搬运接口，将数据从Global Memory搬运到L1 Buffer，提供非32字节对齐搬运能力，支持Normal与Compact搬运模式以及手动或自动填充，请使用非同步接口asc_copy_gm2l1_align配合同步接口asc_sync替代。

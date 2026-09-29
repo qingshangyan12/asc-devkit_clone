@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_abs_sub
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md
 description: 根据mask对源操作数src0、src1按元素相减后取绝对值得到计算结果，支持half与float类型，结果可写入dst或通过函数返回值返回，掩码为0的元素在结果中置0，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2int64（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int64_deprecated.md
 description: 已废弃的寄存器矢量转换接口，将float类型数据转化为int64_t类型，支持多种舍入模式与饱和、非饱和模式，源与目的位宽比为1:2，需分两部分按奇偶索引读取，请使用asc_float2int64的显式位置参数重载替代。

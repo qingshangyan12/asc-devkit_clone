@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0b_mx
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md
 description: 完成MX矩阵计算中右矩阵量化系数从L1 Buffer到L0B_MX Buffer的搬运，量化系数以fp8_e8m0_t类型的32字节数据分形为单位，需与asc_copy_l12l0b数据搬运接口配合使用。

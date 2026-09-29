@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_arange
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md
 description: 以传入标量value为起始值生成递增或递减的索引序列并保存在矢量数据寄存器dst中，序列元素按1逐步递增或递减，整型结果超出可表示范围时回绕且不触发异常，仅在AIV上生效。

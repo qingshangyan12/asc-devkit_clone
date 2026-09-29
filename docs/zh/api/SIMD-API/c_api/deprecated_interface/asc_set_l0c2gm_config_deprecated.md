@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c2gm_config（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md
 description: 该接口已废弃，用于在数据搬运过程中进行随路量化时设置量化流程中的矢量量化参数，量化参数不能为inf/nan和非规格化数，请使用asc_set_l0c_copy_config接口替代。

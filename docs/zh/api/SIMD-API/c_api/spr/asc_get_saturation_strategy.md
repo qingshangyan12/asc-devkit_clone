@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_saturation_strategy
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md
 description: 读取当前饱和控制策略并返回USE_API或USE_GLOBAL，常用于临时切换策略前保存原配置，或与设置接口配合做回读校验。

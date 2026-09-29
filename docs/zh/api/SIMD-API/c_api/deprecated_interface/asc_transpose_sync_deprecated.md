@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_transpose_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md
 description: 该接口已废弃，用于实现16*16的二维矩阵数据块转置，请使用非同步接口asc_transpose和同步接口asc_sync替代。

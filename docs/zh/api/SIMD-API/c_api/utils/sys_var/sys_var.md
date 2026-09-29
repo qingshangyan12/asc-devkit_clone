@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 系统资源和变量
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/sys_var.md
 navigation:

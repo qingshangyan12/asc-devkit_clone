@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 宏
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/macro.md
 navigation:

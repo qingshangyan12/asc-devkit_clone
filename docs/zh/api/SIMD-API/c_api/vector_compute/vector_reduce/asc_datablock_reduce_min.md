@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_datablock_reduce_min
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md
 description: 执行数据块内的求最小值规约操作，支持前n个数据连续计算和高维切分计算两种模式，目的和源操作数均为矢量，起始地址需32字节对齐。

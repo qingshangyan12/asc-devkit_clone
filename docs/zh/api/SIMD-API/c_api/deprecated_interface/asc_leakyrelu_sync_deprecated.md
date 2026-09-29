@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_leakyrelu_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_leakyrelu_sync_deprecated.md
 description: 已废弃的同步矢量Leaky ReLU运算接口：源矢量元素大于0时保持原值、小于等于0时乘以系数alpha，结果写入目的矢量，请使用非同步接口asc_leakyrelu并配合同步接口asc_sync替代。

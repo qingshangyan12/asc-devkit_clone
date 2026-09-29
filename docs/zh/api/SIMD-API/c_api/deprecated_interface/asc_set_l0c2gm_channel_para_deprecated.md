@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c2gm_channel_para（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md
 description: 该接口已废弃，用于在L0C Buffer搬出并执行Nz2DN格式转换时配置源Nz矩阵中相邻行的地址偏移，配置由后续开启Nz2DN功能的L0C搬出接口使用，仅在AIC上生效，请使用asc_set_l0c_copy_channel_para接口替代。

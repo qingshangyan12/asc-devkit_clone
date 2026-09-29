@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_datablock_strided
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md
 description: 从Unified Buffer（UB）中32字节对齐的起始地址非连续搬入8个DataBlock，每个DataBlock数据量为32字节，支持配置相邻数据块地址步长和起始读取位置，结果通过函数返回值返回。

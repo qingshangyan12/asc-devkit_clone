@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_bfloat162half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162half.md
 description: 根据mask将矢量数据寄存器中参与计算的bfloat16_t元素转换为half类型并写入dst，支持多种舍入模式和饱和/非饱和模式。

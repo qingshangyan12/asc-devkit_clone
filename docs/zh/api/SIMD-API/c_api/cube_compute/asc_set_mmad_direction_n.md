@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_mmad_direction_n
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
 description: 设置矩阵乘加计算时逐行生成矩阵计算结果分形，该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，需在矩阵乘加指令执行前调用。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_l0c2gm_relu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_relu.md
 description: 用于数据搬运随路量化场景下读取ReLU操作前矢量的起始地址，无输入参数，返回该起始地址。

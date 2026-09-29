@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_l0c2gm_unitflag
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_unitflag.md
 description: 用于数据搬运随路量化场景下读取unit_flag设置，该设置实现矩阵计算指令与搬运指令的细粒度并行，不适用于L0C Buffer累加场景。

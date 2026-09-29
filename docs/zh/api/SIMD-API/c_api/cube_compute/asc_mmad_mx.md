@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mmad_mx
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md
 description: 完成带有量化系数的矩阵乘加计算MmadMx，左矩阵A与右矩阵B分别带有量化系数矩阵ScaleA和ScaleB，K维度每连续32个元素共享一个量化系数，经广播乘法后做矩阵乘法并累加到结果矩阵C，仅在AIC上生效。

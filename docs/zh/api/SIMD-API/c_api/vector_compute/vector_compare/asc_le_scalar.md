@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_le_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md
 description: 按元素判断矢量src是否小于等于标量value，若成立则输出结果为1，否则为0，每个元素的比较结果占1个bit。

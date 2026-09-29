@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_brc_datablock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md
 description: 从Unified Buffer（UB）中32字节对齐的起始地址读取一个DataBlock（32字节）并广播到整个矢量数据寄存器，支持对齐搬入、立即数偏移和地址寄存器偏移三种模式，仅在AIV上生效。

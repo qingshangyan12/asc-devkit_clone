@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mmad_mx（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_mx_deprecated.md
 description: 已废弃的带量化系数矩阵乘加接口：左矩阵A与右矩阵B分别配有量化系数矩阵ScaleA和ScaleB，按广播乘法完成MmadMx计算，仅在AIC上生效；请使用asc_unit_flag_mode类型入参的新asc_mmad_mx接口替代，同步功能通过asc_sync实现。

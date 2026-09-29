@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_enable_hif8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md
 description: 启用矩阵乘加计算的HiF8模式，当左矩阵A和右矩阵B均以fp8_e4m3fn_t作为输入数据类型时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法运算前将转换为hifloat8_t类型参与计算，需在矩阵乘加指令执行前调用。

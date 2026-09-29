@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int322float
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322float.md
 description: 根据掩码将源操作数中每个int32_t类型数据转换成float类型并写入目的操作数，支持rd、rn、rna、ru、rz多种舍入模式，可通过引用参数或函数返回值输出结果，仅在AIV上生效的Reg矢量计算接口。

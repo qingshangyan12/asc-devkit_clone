@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int4x22bfloat16
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md
 description: 根据掩码将源操作数中参与计算的4bit有符号整数转换为bfloat16_t类型，单个源数据与目的数据位宽比为1:4，按四分之一位置标签离散选取源读取位置。本接口为Reg矢量计算接口，仅在AIV上生效。

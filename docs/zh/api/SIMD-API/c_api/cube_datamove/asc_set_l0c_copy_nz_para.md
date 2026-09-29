@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c_copy_nz_para
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
 description: 在L0C Buffer搬出接口启用随路Nz转ND/DN格式功能时，配置矩阵数量、源相邻Nz矩阵偏移和目的相邻ND/DN矩阵偏移等格式转换参数，仅在AIC上生效。

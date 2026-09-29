@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mmad_sparse
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md
 description: 完成4选2稀疏矩阵乘加操作，左矩阵A为稀疏矩阵并在计算时完成稠密化，右矩阵B为稠密矩阵且需预先稠密化并通过asc_copy_l12l0b_sparse载入，同时加载的索引矩阵用于矩阵A的稠密化。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_store
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md
 description: 将矢量数据寄存器中的数据搬出到Unified Buffer（UB），底层经非对齐搬出指令完成单次连续写入，支持整矢量连续搬出和按count部分搬出两种模式，搬运过程中数据格式和内容保持不变。

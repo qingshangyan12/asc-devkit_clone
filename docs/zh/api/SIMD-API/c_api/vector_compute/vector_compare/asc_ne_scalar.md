@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ne_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md
 description: 将src中每个元素逐个与标量value比较，不等于value时输出结果dst对应比特位为1，否则为0，比较结果按小端序排布。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_repeat_reduce_min_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_repeat_reduce_min_sync_deprecated.md
 description: 已废弃的同步接口，对每个Repeat内所有元素求最小值以及首个最小值元素的索引，一次Repeat计算256字节，请使用非同步接口asc_repeat_reduce_min配合同步接口asc_sync替代。

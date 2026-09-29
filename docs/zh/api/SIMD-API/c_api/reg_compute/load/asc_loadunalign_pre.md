@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadunalign_pre
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
 description: 根据Unified Buffer中按dtype对齐的起始地址初始化非对齐寄存器，作为后续非对齐搬入的前置数据缓存，该阶段仅完成非对齐寄存器初始化，不会将数据搬入矢量数据寄存器，仅在AIV上生效。

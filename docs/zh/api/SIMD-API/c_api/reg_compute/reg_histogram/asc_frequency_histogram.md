@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_frequency_histogram
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md
 description: 对输入矢量数据寄存器中的元素进行频率统计生成直方图，统计结果在目的矢量数据寄存器原有数据基础上累加，支持低位BIN0与高位BIN1两种模式，掩码为1的元素参与统计，仅在AIV上生效。

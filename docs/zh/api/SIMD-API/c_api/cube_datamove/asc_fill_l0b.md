@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_fill_l0b
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md
 description: 将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化，初始化相关参数通过asc_fill_value_config配置，若dst与value数据类型不同需按dst类型对value的值进行转换。

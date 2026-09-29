@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint82half（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md
 description: 该接口通过接口后缀控制目的操作数写入位置的原型已废弃，将uint8_t类型数据转为half类型，按输入数据索引奇偶位置分部读取，请使用显式位置参数重载替代。

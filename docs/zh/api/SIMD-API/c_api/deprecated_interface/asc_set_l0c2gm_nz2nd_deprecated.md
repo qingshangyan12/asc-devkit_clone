@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c2gm_nz2nd（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md
 description: 该接口已废弃，用于在L0C Buffer搬出接口启用随路Nz转ND格式功能时配置格式转换所需的相关参数，仅在AIC上生效，请使用asc_set_l0c_copy_nz_para接口替代。

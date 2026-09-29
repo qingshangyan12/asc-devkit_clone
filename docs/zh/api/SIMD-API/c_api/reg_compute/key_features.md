@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 关键特性说明
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md
 description: 介绍Reg矢量计算关键特性：VF循环满足Hardware Loop编码规范时可被编译器优化提升编码性能，指令双发提升单位时间指令处理效率，VF融合为编译器优化特性，并汇总各场景下数据搬运C

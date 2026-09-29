@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_eq
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md
 description: 逐元素比较两个源矢量对应元素是否相等，比较结果为真时对应比特位设为1，否则设为0，结果可存入寄存器或目的矢量。

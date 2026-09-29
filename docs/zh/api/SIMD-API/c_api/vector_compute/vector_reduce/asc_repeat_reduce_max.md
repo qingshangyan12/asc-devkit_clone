@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_repeat_reduce_max
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md
 description: 对每个Repeat内所有元素求最大值以及Repeat内首个最大值元素的索引，一次Repeat计算256字节，之后可继续调用asc_get_reduce_max_cnt获取全部repeat内的最大值和首个最大值索引。

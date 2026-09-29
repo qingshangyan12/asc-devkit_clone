@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_downsample_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md
 description: 从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，Post Update模式下搬运完成后自动更新源地址指针，结果可写入矢量数据寄存器或掩码寄存器。

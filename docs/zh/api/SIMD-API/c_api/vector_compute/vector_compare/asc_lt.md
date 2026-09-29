@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_lt
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md
 description: 按元素判断src0是否小于src1，成立时输出结果dst对应比特位为1，否则为0，结果可存入寄存器或输出到目标地址，寄存器形式固定处理256B数据且需配合asc_get_cmp_mask读取结果。

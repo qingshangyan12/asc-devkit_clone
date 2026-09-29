@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: API列表
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/c_api.md
 navigation:

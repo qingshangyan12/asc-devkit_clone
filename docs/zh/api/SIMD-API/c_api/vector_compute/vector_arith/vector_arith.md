@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 基础算术
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/vector_arith.md
 navigation:

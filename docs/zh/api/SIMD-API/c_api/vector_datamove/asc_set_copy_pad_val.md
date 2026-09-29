@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_copy_pad_val
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
 description: 与asc_copy_gm2ub_align配合使用，设置连续搬运数据块左右两侧的填充值；须在调用搬运接口前写入配置，配置持续生效直至再次调用覆盖，填充值仅在enable_constant_pad参数为true时被取用，仅在AIV上生效。

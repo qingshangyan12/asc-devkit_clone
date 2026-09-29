@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_block_wait
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
 description: 与asc_sync_block_arrive配对使用，实现单AI Core内AIC与全部AIV之间的核间同步（模式2）。检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水与NPU架构有关。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_shiftleft
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
 description: 将源矢量的所有元素左移distance位并存入目的矢量，distance不支持负数且取值不能超过源数据类型的位宽，操作数起始地址需32字节对齐。

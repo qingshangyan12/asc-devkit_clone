@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mmad
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
 description: 矩阵乘加核心计算接口，完成左矩阵A与右矩阵B的乘法并累加到结果矩阵C，C矩阵可通过参数初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，仅在AIC上生效。

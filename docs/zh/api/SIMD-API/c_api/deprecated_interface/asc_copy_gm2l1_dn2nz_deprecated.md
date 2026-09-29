@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_dn2nz（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_dn2nz_deprecated.md
 description: 将数据从Global Memory搬运到L1 Buffer并在搬运过程中进行DN到Nz格式转换，满足后续矩阵计算对分形列连续性的要求；旧常规重载与asc_copy_gm2l1_dn2nz_sync接口已废弃，请使用带l2_cache_mode参数的新接口，同步场景请额外调用asc_sync。

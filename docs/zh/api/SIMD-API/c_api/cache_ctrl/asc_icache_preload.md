@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_icache_preload
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
 description: 从当前程序所在的Global Memory地址预加载指令到ICache（指令缓存），避免后续取指时出现ICache未命中；预加载地址需通过asc_get_program_counter获取PC值并用低48位掩码清零高位，预加载长度单位为2K

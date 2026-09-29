@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ge_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ge_sync_deprecated.md
 description: 已废弃的同步矢量比较接口：逐元素比较src0是否大于等于src1，成立则输出结果为1，否则输出结果为0，每个元素的比较结果占一个bit，请使用非同步接口asc_ge配合asc_sync替代。

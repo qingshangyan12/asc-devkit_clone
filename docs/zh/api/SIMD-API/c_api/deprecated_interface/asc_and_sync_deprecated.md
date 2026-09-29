@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_and_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_and_sync_deprecated.md
 description: 执行矢量与运算，按元素对两个源矢量操作数做按位与并将结果写入目的操作数；接口已废弃，请使用非同步接口asc_and和同步接口asc_sync替代。

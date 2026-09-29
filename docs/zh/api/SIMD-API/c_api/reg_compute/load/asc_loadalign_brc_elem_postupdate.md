@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_brc_elem_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md
 description: 从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素并广播到整个矢量数据寄存器，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int322int16（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322int16_deprecated.md
 description: 已废弃的寄存器矢量转换接口，根据mask将src中每个int32_t元素转化为int16_t类型写入dst，支持饱和与非饱和模式，请使用显式位置参数重载替代。

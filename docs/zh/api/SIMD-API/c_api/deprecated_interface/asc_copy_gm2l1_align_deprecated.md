@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_align（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_align_deprecated.md
 description: 将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力并支持Normal、Compact及左右填充等padding模式，循环填充模式须配合loop配置接口使用；旧常规重载和同步接口已废弃，需改用带l2_cache_mode参数的新接口。

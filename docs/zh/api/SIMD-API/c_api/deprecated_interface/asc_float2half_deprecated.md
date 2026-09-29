@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2half（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md
 description: 已废弃的矢量转换接口，将float类型数据转换成half类型，支持多种舍入模式与饱和模式，位宽比为2:1并按接口后缀写入奇偶位置，需使用显式位置参数重载替代。

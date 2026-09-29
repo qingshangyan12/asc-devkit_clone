@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_axpy
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md
 description: 将源操作数src中每个元素与标量value求积，再与目的操作数dst中的对应元素相加后写回dst，支持连续数据计算和高维切分计算两种接口形式。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_datablock_reduce_sum
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md
 description: 对每个DataBlock内所有元素求和，源操作数以二叉树方式两两相加，计算结果大于65504时结果保存为65504，支持前n个数据计算和高维切分计算。

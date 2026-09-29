@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l0c2l1
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
 description: 将矩阵计算结果从L0C Buffer搬运到L1 Buffer，搬运过程中可组合随路量化、ReLU、Nz2ND格式转换和通道拆分能力，需通过配套接口预先配置相关参数，仅在AIC上执行有效。

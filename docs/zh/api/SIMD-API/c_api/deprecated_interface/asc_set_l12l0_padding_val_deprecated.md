@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l12l0_padding_val（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l12l0_padding_val_deprecated.md
 description: 该接口已废弃，用于对PADDING_B寄存器中的值进行设置，该64bit寄存器存储搬运过程中使用的padding值，请使用asc_set_l12l0b_3d_padding接口替代。

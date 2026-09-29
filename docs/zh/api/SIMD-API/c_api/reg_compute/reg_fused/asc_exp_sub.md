@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_exp_sub
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md
 description: 根据mask将src0与src1按元素相减，并计算以差值为指数的自然指数函数：float输入直接计算，half输入由asc_exp_sub_half2float按偶数或奇数索引读取并转为float后计算，结果写入dst或通过返回值返回，仅在AIV上生效。

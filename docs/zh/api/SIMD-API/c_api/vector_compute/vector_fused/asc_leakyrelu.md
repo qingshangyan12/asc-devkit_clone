@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_leakyrelu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md
 description: 执行矢量Leaky Relu运算，源元素大于0时保持原值，小于等于0时乘以alpha系数，alpha值由标量参数value指定，结果写入dst。

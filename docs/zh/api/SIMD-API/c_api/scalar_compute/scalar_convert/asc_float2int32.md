@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2int32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md
 description: 将float类型的标量按指定舍入模式转换为int32_t并返回，支持rd、rn、rna、ru四种舍入模式，超范围输入在饱和模式下钳位到最大值或最小值，非饱和模式下截断为低32位，nan或inf输入返回0。

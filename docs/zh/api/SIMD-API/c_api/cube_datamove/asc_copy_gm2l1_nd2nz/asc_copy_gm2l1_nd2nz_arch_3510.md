@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_gm2l1_nd2nz_arch_3510
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md
 description: 将数据从Global Memory搬运到L1 Buffer，搬运过程中将源端按N维连续排布的ND格式数据转换为Nz分形排布，也适用于NHWC转换为NC1HWC0等场景，需先配置ND2Nz搬运参数，仅在AIC上执行有效。

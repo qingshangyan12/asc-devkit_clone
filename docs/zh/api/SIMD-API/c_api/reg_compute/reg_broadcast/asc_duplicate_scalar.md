@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_duplicate_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_scalar.md
 description: 将标量value广播到目的操作数，带mask时仅被筛选位置写入value、未筛选位置置0，不带mask时写入全部元素位置，仅在AIV上生效的Reg矢量计算接口。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_block_idx（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md
 description: 已废弃的核索引查询接口：获取当前运行核（逻辑核）的索引并返回int64_t结果，运行于标量流水，请使用内置变量block_idx结合asc_get_sub_block_num和asc_get_sub_block_id接口替代。

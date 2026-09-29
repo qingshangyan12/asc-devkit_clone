@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_add_scalar_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_add_scalar_sync_deprecated.md
 description: 执行矢量加法运算，将源矢量每个元素与标量value相加后写入目的操作数；接口已废弃，请使用非同步接口asc_add_scalar和同步接口asc_sync替代。

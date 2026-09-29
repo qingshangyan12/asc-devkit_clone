@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_gm2l1_nz_para
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md
 description: 配置从Global Memory搬运至L1 Buffer过程中ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量和相邻行、相邻Z矩阵、相邻Nz矩阵的步长；本接口只完成参数配置，不执行数据搬运，仅在AIC上生效。

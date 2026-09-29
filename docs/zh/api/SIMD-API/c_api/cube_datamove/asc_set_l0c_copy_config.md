@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l0c_copy_config
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
 description: 设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活参数在Fixpipe Buffer中的起始地址索引以及UnitFlag全局状态，配置由后续L0C搬出接口使用，仅在AIC上生效。

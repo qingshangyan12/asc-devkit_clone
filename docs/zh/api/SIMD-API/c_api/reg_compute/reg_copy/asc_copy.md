@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
 description: 完成数据在寄存器间的搬运，支持矢量数据寄存器到矢量数据寄存器、掩码寄存器到掩码寄存器以及矢量数据寄存器到掩码寄存器三种模式，可按mask筛选元素或按part选取数据块，仅在AIV上生效。

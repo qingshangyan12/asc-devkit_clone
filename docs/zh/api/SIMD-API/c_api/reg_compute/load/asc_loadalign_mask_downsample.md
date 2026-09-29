@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_mask_downsample
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md
 description: 从Unified Buffer中32字节对齐的起始地址读取VL/4长度数据，保留偶数下标bit得到VL/8长度数据，通过函数返回值返回掩码寄存器，与asc_loadalign_downsample掩码原型功能相同。

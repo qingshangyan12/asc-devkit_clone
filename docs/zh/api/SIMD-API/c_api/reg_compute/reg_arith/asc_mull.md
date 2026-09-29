@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mull
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mull.md
 description: 根据掩码将两个源矢量数据寄存器中的有效元素相乘，32位元素相乘得到64位乘积，并拆分为低32位与高32位分别写入两个目的矢量数据寄存器。

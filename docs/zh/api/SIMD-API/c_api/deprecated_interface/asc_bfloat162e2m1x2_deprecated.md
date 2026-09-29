@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_bfloat162e2m1x2（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162e2m1x2_deprecated.md
 description: 将bfloat16_t类型转化为fp4x2_e2m1_t类型，支持多种舍入模式并按索引位置写入；无显式位置参数的原型已废弃，需使用显式位置参数重载替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_phy_stack_base
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_stack_base.md
 description: 获取物理堆栈基地址并返回，常用于调试时定位当前核的堆栈在物理内存中的位置。

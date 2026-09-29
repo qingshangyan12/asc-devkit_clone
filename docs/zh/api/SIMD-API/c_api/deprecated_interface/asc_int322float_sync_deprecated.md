@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int322float_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322float_sync_deprecated.md
 description: 已废弃的同步类型转换接口，将int32_t类型数据转换为float类型，支持多种舍入模式，请使用对应的非同步接口并配合同步接口asc_sync替代。

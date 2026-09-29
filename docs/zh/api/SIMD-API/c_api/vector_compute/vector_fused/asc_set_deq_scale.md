@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_deq_scale
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
 description: 设置DEQSCALE（量化参数）寄存器的值，可用数组一次设置一组大小为16的量化参数，或设置单个scale、offset及符号模式，half类型scale适用于cast_deq等接口的int32_t转化为half场景。

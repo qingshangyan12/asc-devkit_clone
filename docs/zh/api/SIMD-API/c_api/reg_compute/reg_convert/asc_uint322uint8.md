@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint322uint8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md
 description: 根据mask将src中参与计算的uint32_t类型元素转换为uint8_t类型并写入dst；因类型位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取写入位置，其余位置置零，仅在AIV上生效。

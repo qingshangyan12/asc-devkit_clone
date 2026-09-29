@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_l13d_rpt_b
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md
 description: 配置3D img2col搬运模式下repeat模式搬运右矩阵所需的重复步长、迭代次数、方向与目的步长等参数，供f_matrix_ctrl为true的asc_copy_l12l0b

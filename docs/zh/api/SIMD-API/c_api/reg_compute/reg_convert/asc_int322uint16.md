@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int322uint16
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint16.md
 description: 根据掩码将源操作数中每个int32_t类型元素转换为uint16_t类型写入目的操作数，支持不同的饱和模式，位宽比为2:1，按位置标签选择写入目的操作数偶数或奇数索引位置，仅在AIV上生效的Reg矢量计算接口。

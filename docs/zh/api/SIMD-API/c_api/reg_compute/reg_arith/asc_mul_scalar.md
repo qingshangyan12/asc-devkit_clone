@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mul_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md
 description: 根据mask对源矢量数据寄存器按元素与标量value相乘，结果写入目的矢量数据寄存器或通过函数返回值返回，掩码位为0的元素在结果中置0。

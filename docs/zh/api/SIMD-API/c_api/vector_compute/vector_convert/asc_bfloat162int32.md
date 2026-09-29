@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_bfloat162int32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md
 description: 将bfloat16_t类型矢量数据转换为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式，操作数起始地址需32字节对齐。

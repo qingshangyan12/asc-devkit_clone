@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ne
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md
 description: 按元素判断src0是否不等于src1，成立时输出结果为1，否则为0，每个元素的比较结果占1个bit，结果可存入寄存器或输出到目标地址。

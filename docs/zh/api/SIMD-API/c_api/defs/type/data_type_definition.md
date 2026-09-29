@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: Reg数据类型定义
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
 description: 总览 Reg 数据类型，说明矢量数据、掩码、非对齐和地址寄存器的类别、容量限制及使用方式。

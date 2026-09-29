@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_unit_flag_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md
 description: 该枚举用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口unit_flag_mode参数的类型。

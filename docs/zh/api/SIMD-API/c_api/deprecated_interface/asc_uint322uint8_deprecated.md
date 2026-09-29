@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint322uint8（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md
 description: 已废弃的矢量寄存器数据类型转换接口，将uint32_t类型数据转换为uint8_t类型，支持饱和与非饱和模式，写入时将一个VL大小的数据分为四部分按索引选取，请改用显式位置参数重载替代。

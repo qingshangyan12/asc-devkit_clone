@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_atomic_max_int（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_max_int_deprecated.md
 description: 已废弃的原子搬运配置接口，设置计算结果以原子比较方式传输到GM，拷贝前将int32_t数据与GM中已有数据逐元素比较并将最大值写入GM，请使用asc_set_atomic_max_int32替代。

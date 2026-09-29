@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gather_datablock
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md
 description: 给定源操作数在Unified Buffer（UB）中的基地址和索引，按DataBlock（32字节）粒度将数据收集到目的矢量数据寄存器，index仅前8个元素有效且每个元素对应一个DataBlock，支持掩码控制与非掩码两种形式，仅在AIV上生效。

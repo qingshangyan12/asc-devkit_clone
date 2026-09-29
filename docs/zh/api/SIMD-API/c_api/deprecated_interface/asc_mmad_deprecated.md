@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mmad（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md
 description: 已废弃的矩阵乘加接口：完成结果矩阵C等于A乘B加C的Mmad计算，C可初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，仅在AIC上生效；请使用asc_unit_flag_mode类型入参的新asc_mmad接口替代，同步功能通过asc_sync实现。

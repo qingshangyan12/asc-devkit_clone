@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: Reg矢量计算
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compute.md
 navigation:

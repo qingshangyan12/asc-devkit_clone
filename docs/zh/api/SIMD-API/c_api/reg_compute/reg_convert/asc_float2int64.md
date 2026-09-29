@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2int64
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md
 description: 将矢量数据寄存器中的float类型数据转换为int64_t类型，支持多种舍入模式与饱和/非饱和模式；源与目的位宽比为1:2，根据src_pos选择读取源数据索引为偶数或奇数的位置。

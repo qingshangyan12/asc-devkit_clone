@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_le
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md
 description: 按元素判断矢量src0是否小于等于src1，若成立则输出结果为1，否则为0，每个元素的比较结果占1个bit。

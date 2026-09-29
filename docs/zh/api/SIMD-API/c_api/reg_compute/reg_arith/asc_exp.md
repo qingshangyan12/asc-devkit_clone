@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_exp
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md
 description: 根据mask对源矢量数据寄存器按元素求自然指数，结果写入目的矢量数据寄存器或通过函数返回值返回，支持half与float数据类型。

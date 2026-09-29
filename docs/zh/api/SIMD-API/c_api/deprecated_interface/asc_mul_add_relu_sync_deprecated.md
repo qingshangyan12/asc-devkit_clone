@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mul_add_relu_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mul_add_relu_sync_deprecated.md
 description: 已废弃的同步融合运算接口，按元素将src0与dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值）后存入dst，请使用非同步接口asc_mul_add_relu并配合同步接口asc_sync替代。

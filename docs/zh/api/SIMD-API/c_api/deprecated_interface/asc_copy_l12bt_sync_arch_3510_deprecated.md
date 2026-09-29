@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12bt_sync_arch_3510（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12bt_sync_arch_3510_deprecated.md
 description: 已废弃的同步搬运接口，将MMAD指令的Bias数据从L1 Buffer搬运到BiasTable Buffer，请改用对应的非同步接口和asc_sync替代。

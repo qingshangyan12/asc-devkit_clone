@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2hif8
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md
 description: 根据mask将矢量数据寄存器中参与计算的half元素转换为hifloat8_t类型并写入dst，支持舍入模式和饱和/非饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的的偶数或奇数位置。

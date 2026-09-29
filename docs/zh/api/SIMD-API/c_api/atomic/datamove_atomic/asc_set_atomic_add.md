@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_atomic_add
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
 description: 对后续目的地址为GM的数据搬运指令开启原子累加，搬运时将待搬运数据与GM上已有数据求和后写入GM，可通过选择不同函数原型设定累加数据类型，调用asc_disable_dma_atomic接口可关闭该原子操作。

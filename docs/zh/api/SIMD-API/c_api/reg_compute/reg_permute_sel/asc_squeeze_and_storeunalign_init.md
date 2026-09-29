@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_squeeze_and_storeunalign_init
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
 description: 对AR特殊寄存器进行清零操作，需在首次调用asc_squeeze_and_storeunalign之前执行；AR寄存器记录有效元素的总字节数，供该接口内自动地址偏移使用。

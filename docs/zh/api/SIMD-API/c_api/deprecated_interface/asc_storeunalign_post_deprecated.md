@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storeunalign_post（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md
 description: 该接口已废弃，将非对齐寄存器中暂存的尾块数据搬出到Unified Buffer（UB），需先调用asc_storeunalign_postupdate接口，请使用asc_squeeze_and_storeunalign_finalize接口实现此功能。

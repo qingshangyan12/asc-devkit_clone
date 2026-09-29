@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_hif82float
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md
 description: 根据掩码将源操作数中参与计算的hifloat8_t类型元素转换为float类型并写入目的操作数，源与目的位宽比为1:4，按四分之一位置标签离散选取源读取位置。本接口为Reg矢量计算接口，仅在AIV上生效。

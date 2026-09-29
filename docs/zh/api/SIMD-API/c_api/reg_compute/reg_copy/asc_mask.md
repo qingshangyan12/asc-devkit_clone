@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_mask
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md
 description: 将src中被mask筛选的有效元素或bit复制到函数返回值：矢量到矢量模式未被筛选的位置值未定义，掩码到掩码模式未被筛选的位置置0，功能与asc_copy的掩码复制模式相同，仅在AIV上生效。

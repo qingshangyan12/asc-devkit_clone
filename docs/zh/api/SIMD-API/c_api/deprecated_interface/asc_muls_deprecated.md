@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_muls (废弃)
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_muls_deprecated.md
 description: 已废弃的矢量乘标量接口，将源操作数src与标量value相乘后按ROUND舍入模式转换为half类型，依mask将结果写入目的矢量数据寄存器dst，请使用asc_mul_scalar_float2half_rn替代。

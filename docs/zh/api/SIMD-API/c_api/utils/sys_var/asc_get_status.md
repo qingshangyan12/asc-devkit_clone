@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_status
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_status.md
 description: 读取当前核上下文中STATUS状态寄存器的64bit整体值并按int64_t返回，该寄存器记录核运行过程中各类告警事件的发生情况，各状态位一旦置位即保持，直到复位或被读取清除，本接口为只读查询接口。

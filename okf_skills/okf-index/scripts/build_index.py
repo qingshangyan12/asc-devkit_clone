@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Build the persistent OKF retrieval index from stage-3 YAML front matter.
 
-The index is a pure derivation of the scoped Markdown front-matter blocks
-(the whole docs/zh/api/SIMD-API/c_api tree):
+Each registered API surface (SCOPES) gets its own isolated index instance
+under index/<surface>/: the index is a pure derivation of that scope's
+Markdown front-matter blocks:
 parse -> validate -> family rollup -> inverted views -> dependency graph.
 Build is deterministic (no wall-clock values); drift is detected via --check.
 
@@ -20,6 +21,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
 
@@ -35,10 +37,30 @@ from controller import (  # noqa: E402
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 TAXONOMY_PATH = SKILL_ROOT.parent / "okf-tag-generate" / "taxonomy" / "tag-taxonomy.json"
 INDEX_DIR = SKILL_ROOT / "index"
-SCOPE_DIRS = (
-    "docs/zh/api/SIMD-API/c_api",
-)
 STAGES = ("in", "out", "compute")
+
+
+@dataclass(frozen=True)
+class Scope:
+    """One API surface: scope root plus its root landing-page filename."""
+
+    name: str
+    root: str
+    root_nav: str
+
+
+# Surface registry: every API surface gets an isolated index instance under
+# index/<name>/. Onboarding a new surface registers its root here after
+# calibrating the classify rules (see the okf-maintain onboarding checklist).
+SCOPES: dict[str, Scope] = {
+    "c_api": Scope("c_api", "docs/zh/api/SIMD-API/c_api", "c_api.md"),
+}
+
+
+def scope_index_dir(surface: str) -> Path:
+    if surface not in SCOPES:
+        raise KeyError(f"unknown scope {surface!r}; registered: {sorted(SCOPES)}")
+    return INDEX_DIR / SCOPES[surface].name
 ARCH_RE = re.compile(r"(?P<family>.+)_arch_(?P<arch>\d+)(?:_deprecated)?$")
 
 
@@ -77,7 +99,7 @@ def normalize_dtype(value: str) -> str:
     return DTYPE_ALIASES.get(token, token)
 
 
-def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[str, Any]], list[str]]:
+def load_raw_documents(root: Path, scope: Scope, errors: list[str]) -> tuple[dict[str, dict[str, Any]], list[str]]:
     model = load_model()
     allowed_fields = set(model["field_order"])
     okftypes = set(model["profiles"])
@@ -93,108 +115,109 @@ def load_raw_documents(root: Path, errors: list[str]) -> tuple[dict[str, dict[st
     )
     documents: dict[str, dict[str, Any]] = {}
     pending: list[str] = []
-    for scope in SCOPE_DIRS:
-        for path in sorted((root / scope).rglob("*.md")):
-            rel = path.relative_to(root).as_posix()
-            fm, _, _ = split_front_matter(path.read_text(encoding="utf-8"))
-            if not fm:
-                pending.append(rel)
-                continue
-            if set(fm) - allowed_fields:
-                errors.append(f"{rel}: unknown fields: {sorted(set(fm) - allowed_fields)}")
-                continue
-            if fm["okftype"] not in okftypes:
-                errors.append(f"{rel}: invalid okftype {fm['okftype']!r}")
-                continue
-            profile_fields = set(model["profiles"][fm["okftype"]].get("fields", ()))
-            tag_enabled = "tag" in profile_fields or "tag" in model["common_required_fields"]
-            if not str(fm["resource"]).endswith(rel):
-                errors.append(f"{rel}: resource does not match path")
-            tags: dict[str, list[str]] = {}
-            if tag_enabled:
-                for item in fm.get("tag", []):
-                    for ns, values in item.items():
-                        if ns not in namespaces:
-                            errors.append(f"{rel}: unknown tag namespace {ns}")
-                            continue
-                        if not values:
-                            # Reverse guard: inapplicable namespaces must be omitted, never
-                            # rendered as empty arrays (OKF 字段规范 / 最小标签集设计说明).
-                            errors.append(f"{rel}: empty tag namespace rendered: {ns}")
-                            continue
-                        unknown = sorted(set(values) - tax_values.get(ns, set()))
-                        if unknown:
-                            errors.append(f"{rel}: tag {ns} values outside taxonomy: {unknown}")
-                        tags[ns] = sorted(set(values))
-                missing_ns = sorted(required_namespaces - set(tags))
-                if missing_ns:
-                    errors.append(f"{rel}: missing tag namespaces: {missing_ns}")
-            signatures = []
-            for sig in fm.get("signature") or []:
-                if not isinstance(sig, dict):
-                    errors.append(f"{rel}: signature entry must be an object")
-                    continue
-                identifier = sig.get("prototype_id") or sig.get("override_id") or sig.get("macro_id")
-                if not identifier:
-                    errors.append(f"{rel}: signature entry without prototype_id/override_id/macro_id")
-                    continue
-                sig_headers = []
-                for header in sig.get("headers", []):
-                    header_value = str(header)
-                    for prefix in ("/include/", "include/"):
-                        if header_value.startswith(prefix):
-                            header_value = header_value[len(prefix):]
-                            break
-                    if header_value.startswith("/"):
-                        header_value = header_value[1:]
-                    if not (root / "include" / header_value).is_file():
-                        errors.append(f"{rel}: header not found: include/{header_value}")
+    for path in sorted((root / scope.root).rglob("*.md")):
+        rel = path.relative_to(root).as_posix()
+        fm, _, _ = split_front_matter(path.read_text(encoding="utf-8"))
+        if not fm:
+            pending.append(rel)
+            continue
+        if set(fm) - allowed_fields:
+            errors.append(f"{rel}: unknown fields: {sorted(set(fm) - allowed_fields)}")
+            continue
+        if fm["okftype"] not in okftypes:
+            errors.append(f"{rel}: invalid okftype {fm['okftype']!r}")
+            continue
+        profile_fields = set(model["profiles"][fm["okftype"]].get("fields", ()))
+        tag_enabled = "tag" in profile_fields or "tag" in model["common_required_fields"]
+        if not str(fm["resource"]).endswith(rel):
+            errors.append(f"{rel}: resource does not match path")
+        tags: dict[str, list[str]] = {}
+        if tag_enabled:
+            for item in fm.get("tag", []):
+                for ns, values in item.items():
+                    if ns not in namespaces:
+                        errors.append(f"{rel}: unknown tag namespace {ns}")
                         continue
-                    sig_headers.append(header_value)
-                dtype_field = sig.get("dtype")
-                if isinstance(dtype_field, dict):
-                    dtype_values = dtype_field.get("values", [])
-                else:
-                    dtype_values = dtype_field or []
-                signatures.append({
-                    "prototype_id": identifier,
-                    "id_kind": "macro_id" if sig.get("macro_id") else ("override_id" if sig.get("override_id") else "prototype_id"),
-                    "headers": sorted(set(sig_headers)),
-                    "archs": sorted(sig.get("archs", [])),
-                    "dtypes": sorted({normalize_dtype(v) for v in dtype_values}),
-                })
-            deps = []
-            for dep in fm.get("dependencies") or []:
-                if dep.get("kind") not in DEPENDENCY_KINDS:
-                    errors.append(f"{rel}: invalid dependency kind {dep.get('kind')!r}")
+                    if not values:
+                        # Reverse guard: inapplicable namespaces must be omitted, never
+                        # rendered as empty arrays (OKF 字段规范 / 最小标签集设计说明).
+                        errors.append(f"{rel}: empty tag namespace rendered: {ns}")
+                        continue
+                    unknown = sorted(set(values) - tax_values.get(ns, set()))
+                    if unknown:
+                        errors.append(f"{rel}: tag {ns} values outside taxonomy: {unknown}")
+                    tags[ns] = sorted(set(values))
+            missing_ns = sorted(required_namespaces - set(tags))
+            if missing_ns:
+                errors.append(f"{rel}: missing tag namespaces: {missing_ns}")
+        signatures = []
+        for sig in fm.get("signature") or []:
+            if not isinstance(sig, dict):
+                errors.append(f"{rel}: signature entry must be an object")
+                continue
+            identifier = sig.get("prototype_id") or sig.get("override_id") or sig.get("macro_id")
+            if not identifier:
+                errors.append(f"{rel}: signature entry without prototype_id/override_id/macro_id")
+                continue
+            sig_headers = []
+            for header in sig.get("headers", []):
+                header_value = str(header)
+                for prefix in ("/include/", "include/"):
+                    if header_value.startswith(prefix):
+                        header_value = header_value[len(prefix):]
+                        break
+                if header_value.startswith("/"):
+                    header_value = header_value[1:]
+                if not (root / "include" / header_value).is_file():
+                    errors.append(f"{rel}: header not found: include/{header_value}")
                     continue
-                deps.append({"path": dep["path"], "kind": dep["kind"], "condition": dep.get("condition", "")})
-            examples = []
-            for ex in fm.get("examples") or []:
-                base = str(ex["path"]).lstrip("/")
-                if "file" in ex:
-                    if not (root / base / str(ex["file"])).is_file():
-                        errors.append(f"{rel}: example not found: {base}/{ex['file']}")
-                        continue
-                    entry = {"path": f"/{base}", "file": str(ex["file"]), "archs": sorted(ex.get("archs", []))}
-                else:
-                    if not (root / base).is_dir():
-                        errors.append(f"{rel}: example directory not found: {base}")
-                        continue
-                    entry = {"path": f"/{base}", "archs": sorted(ex.get("archs", []))}
-                examples.append(entry)
-            documents[rel] = {
-                "okftype": fm["okftype"], "title": fm["title"], "description": fm.get("description", ""),
-                "tags": tags, "signatures": signatures, "deps_out": deps, "examples": examples,
-                "family": "", "arch_of": "", "category": "", "nav_page": "", "arch_variants": [],
-                "standalone_primary": False,
-            }
+                sig_headers.append(header_value)
+            dtype_field = sig.get("dtype")
+            if isinstance(dtype_field, dict):
+                dtype_values = dtype_field.get("values", [])
+            else:
+                dtype_values = dtype_field or []
+            signatures.append({
+                "prototype_id": identifier,
+                "id_kind": "macro_id" if sig.get("macro_id") else ("override_id" if sig.get("override_id") else "prototype_id"),
+                "headers": sorted(set(sig_headers)),
+                "archs": sorted(sig.get("archs", [])),
+                "dtypes": sorted({normalize_dtype(v) for v in dtype_values}),
+            })
+        deps = []
+        for dep in fm.get("dependencies") or []:
+            if dep.get("kind") not in DEPENDENCY_KINDS:
+                errors.append(f"{rel}: invalid dependency kind {dep.get('kind')!r}")
+                continue
+            deps.append({"path": dep["path"], "kind": dep["kind"], "condition": dep.get("condition", "")})
+        examples = []
+        for ex in fm.get("examples") or []:
+            base = str(ex["path"]).lstrip("/")
+            if "file" in ex:
+                if not (root / base / str(ex["file"])).is_file():
+                    errors.append(f"{rel}: example not found: {base}/{ex['file']}")
+                    continue
+                entry = {"path": f"/{base}", "file": str(ex["file"]), "archs": sorted(ex.get("archs", []))}
+            else:
+                if not (root / base).is_dir():
+                    errors.append(f"{rel}: example directory not found: {base}")
+                    continue
+                entry = {"path": f"/{base}", "archs": sorted(ex.get("archs", []))}
+            examples.append(entry)
+        documents[rel] = {
+            "okftype": fm["okftype"], "title": fm["title"], "description": fm.get("description", ""),
+            "tags": tags, "signatures": signatures, "deps_out": deps, "examples": examples,
+            "family": "", "arch_of": "", "category": "", "nav_page": "", "arch_variants": [],
+            "standalone_primary": False,
+        }
     return documents, pending
 
 
-def classify(documents: dict[str, dict[str, Any]], errors: list[str], warnings: list[str]) -> None:
-    scope_root = SCOPE_DIRS[0]
-    root_nav = f"{scope_root}/c_api.md"
+def classify(documents: dict[str, dict[str, Any]], scope: Scope, errors: list[str], warnings: list[str]) -> None:
+    scope_root = scope.root
+    base = len(PurePosixPath(scope_root).parts)
+    root_nav = f"{scope_root}/{scope.root_nav}"
+    root_nav_stem = PurePosixPath(scope.root_nav).stem
     by_dir: dict[str, list[str]] = {}
     for rel in documents:
         by_dir.setdefault(str(PurePosixPath(rel).parent), []).append(rel)
@@ -202,9 +225,9 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str], warnings: 
     family_dirs: set[str] = set()
     for directory, members in by_dir.items():
         parts = PurePosixPath(directory).parts
-        if len(parts) != 7:
+        if len(parts) != base + 2:
             continue
-        sub = parts[6]
+        sub = parts[base + 1]
         index_pages = [r for r in members if documents[r]["okftype"] == "reference.index"]
         exact = [r for r in index_pages if PurePosixPath(r).stem == sub]
         if len(exact) > 1:
@@ -222,30 +245,34 @@ def classify(documents: dict[str, dict[str, Any]], errors: list[str], warnings: 
     for rel, doc in documents.items():
         parts = PurePosixPath(rel).parts
         stem = parts[-1][: -len(".md")]
-        if len(parts) not in (6, 7, 8):
+        if len(parts) not in (base + 1, base + 2, base + 3):
             errors.append(f"{rel}: unexpected path depth under {scope_root}")
             continue
         directory = str(PurePosixPath(rel).parent)
-        doc["category"] = parts[5] if len(parts) > 6 else "__root__"
-        if len(parts) == 6:
+        doc["category"] = parts[base] if len(parts) > base + 1 else "__root__"
+        if len(parts) == base + 1:
             doc["nav_page"] = root_nav
-        elif len(parts) == 7:
-            doc["nav_page"] = f"{scope_root}/{parts[5]}/{parts[5]}.md"
+        elif len(parts) == base + 2:
+            doc["nav_page"] = f"{scope_root}/{parts[base]}/{parts[base]}.md"
         else:
-            doc["nav_page"] = landing.get(directory, "") or f"{scope_root}/{parts[5]}/{parts[5]}.md"
+            doc["nav_page"] = landing.get(directory, "") or f"{scope_root}/{parts[base]}/{parts[base]}.md"
         if is_arch_page(rel):
             match = ARCH_RE.fullmatch(stem)
             if not match:
                 errors.append(f"{rel}: arch page does not match family_arch_<n> naming")
                 continue
-            if len(parts) == 8 and (match["family"] == parts[6] or match["family"].startswith(parts[6] + "_")):
-                doc["family"] = doc["arch_of"] = parts[6]
+            if len(parts) == base + 3 and (
+                match["family"] == parts[base + 1] or match["family"].startswith(parts[base + 1] + "_")
+            ):
+                doc["family"] = doc["arch_of"] = parts[base + 1]
             else:
                 doc["family"] = doc["arch_of"] = match["family"]
         elif doc["okftype"] == "reference.index":
-            if (len(parts) == 6 and stem == "c_api") or (len(parts) == 7 and stem == parts[5]):
+            if (len(parts) == base + 1 and stem == root_nav_stem) or (
+                len(parts) == base + 2 and stem == parts[base]
+            ):
                 doc["family"] = "__nav__"
-            elif len(parts) == 8 and landing.get(directory) == rel:
+            elif len(parts) == base + 3 and landing.get(directory) == rel:
                 doc["family"] = stem if directory in family_dirs else "__nav__"
             else:
                 doc["family"] = stem
@@ -405,8 +432,8 @@ def build_views(documents: dict[str, dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def validate_gaps(root: Path, errors: list[str]) -> dict[str, Any]:
-    gaps = json.loads((INDEX_DIR / "gaps.json").read_text(encoding="utf-8"))
+def validate_gaps(root: Path, scope: Scope, errors: list[str]) -> dict[str, Any]:
+    gaps = json.loads((scope_index_dir(scope.name) / "gaps.json").read_text(encoding="utf-8"))
     for section in ("scope_out_gaps", "relation_gaps"):
         if section not in gaps:
             errors.append(f"gaps.json: missing section {section}")
@@ -452,17 +479,17 @@ def overview(index: dict[str, Any], gaps: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def build(root: Path, out_dir: Path) -> list[Path]:
+def build(root: Path, scope: Scope, out_dir: Path) -> list[Path]:
     errors: list[str] = []
     warnings: list[str] = []
-    documents, pending = load_raw_documents(root, errors)
+    documents, pending = load_raw_documents(root, scope, errors)
     if documents:
-        classify(documents, errors, warnings)
+        classify(documents, scope, errors, warnings)
         rollup_families(documents)
         edges = check_graph(root, documents, errors)
     else:
         edges = []
-    gaps = validate_gaps(root, errors) if not errors else {"scope_out_gaps": [], "relation_gaps": []}
+    gaps = validate_gaps(root, scope, errors) if not errors else {"scope_out_gaps": [], "relation_gaps": []}
     if errors:
         raise BuildError(f"{len(errors)} validation error(s):\n" + "\n".join(f"  - {e}" for e in errors[:30]))
 
@@ -476,8 +503,9 @@ def build(root: Path, out_dir: Path) -> list[Path]:
             reverse[edge["kind"]].setdefault(edge["to"], []).append(edge["from"])
 
     index = {
-        "schema": "okf-index/1",
+        "schema": "okf-index/2",
         "meta": {
+            "surface": scope.name,
             "source_commit": git_output(root, ["rev-parse", "HEAD"]),
             "commit_date": git_output(root, ["log", "-1", "--format=%cI"]),
             "doc_count": len(documents),
@@ -510,7 +538,9 @@ def build(root: Path, out_dir: Path) -> list[Path]:
         "schema": "okf-index-meta/1",
         "source_commit": index["meta"]["source_commit"],
         "taxonomy_sha256": hashlib.sha256(TAXONOMY_PATH.read_bytes()).hexdigest(),
-        "gaps_sha256": hashlib.sha256((INDEX_DIR / "gaps.json").read_bytes()).hexdigest(),
+        "gaps_sha256": hashlib.sha256(
+            (scope_index_dir(scope.name) / "gaps.json").read_bytes()
+        ).hexdigest(),
         "document_sha256": {
             rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in sorted(documents)
         },
@@ -542,26 +572,31 @@ def strip_informational(payload: dict) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=SKILL_ROOT.parents[1])
-    parser.add_argument("--out", type=Path, default=INDEX_DIR)
+    parser.add_argument("--scope", default="c_api", choices=sorted(SCOPES),
+                        help="API surface to build or check (surface registry in this script)")
+    parser.add_argument("--out", type=Path, default=None,
+                        help="output dir (default: index/<scope>)")
     parser.add_argument("--check", action="store_true", help="verify committed index matches a rebuild")
     args = parser.parse_args()
+    scope = SCOPES[args.scope]
+    out_dir = args.out if args.out is not None else scope_index_dir(scope.name)
     try:
         if args.check:
             with tempfile.TemporaryDirectory() as tmp:
-                fresh = build(args.root, Path(tmp))
+                fresh = build(args.root, scope, Path(tmp))
                 for target in fresh:
                     if target.name.endswith(".json"):
-                        committed = strip_informational(json.loads((args.out / target.name).read_text(encoding="utf-8")))
+                        committed = strip_informational(json.loads((out_dir / target.name).read_text(encoding="utf-8")))
                         rebuilt = strip_informational(json.loads(target.read_text(encoding="utf-8")))
                     else:
-                        committed = (args.out / target.name).read_text(encoding="utf-8")
+                        committed = (out_dir / target.name).read_text(encoding="utf-8")
                         rebuilt = target.read_text(encoding="utf-8")
                     if committed != rebuilt:
                         print(f"drift detected in {target.name}: index is stale, rerun build_index.py", file=sys.stderr)
                         return 1
             print("index is up to date")
             return 0
-        for target in build(args.root, args.out):
+        for target in build(args.root, scope, out_dir):
             print(f"written: {target}")
         return 0
     except (BuildError, ValidationError, subprocess.CalledProcessError, OSError, KeyError) as exc:

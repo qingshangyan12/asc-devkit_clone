@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 其他操作
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/experimental/experimental.md
 navigation:

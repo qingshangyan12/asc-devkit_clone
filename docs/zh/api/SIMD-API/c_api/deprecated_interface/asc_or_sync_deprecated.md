@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_or_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_or_sync_deprecated.md
 description: 已废弃的同步计算接口，对每对元素执行按位或运算并将结果写入目的矢量，需改用非同步接口asc_or配合同步接口asc_sync替代。

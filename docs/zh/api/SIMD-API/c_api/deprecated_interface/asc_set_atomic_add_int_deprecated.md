@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_atomic_add_int（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_add_int_deprecated.md
 description: 已废弃的搬运配置接口，设置后续从Unified Buffer（UB）、L0C Buffer或L1 Buffer到Global Memory的数据传输开启int32_t类型的原子累加，请使用asc_set_atomic_add_int32替代。

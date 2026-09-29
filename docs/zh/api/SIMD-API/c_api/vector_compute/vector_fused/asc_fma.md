@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_fma
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md
 description: 按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。

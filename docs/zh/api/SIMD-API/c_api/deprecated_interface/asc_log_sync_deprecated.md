@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_log_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_log_sync_deprecated.md
 description: 已废弃的同步矢量运算接口，按元素对src取自然对数并将结果写入dst，请使用非同步接口asc_log并配合同步接口asc_sync替代。

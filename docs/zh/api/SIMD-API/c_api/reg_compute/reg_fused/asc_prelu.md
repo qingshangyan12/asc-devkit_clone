@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_prelu
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md
 description: 根据掩码对源操作数矢量数据寄存器src0中的元素执行PReLU运算，负半轴斜率由矢量数据寄存器alpha中的对应元素指定，src0大于0时直接写入输出结果，否则与alpha相乘后写入，掩码为0的元素置零，仅在AIV上生效。

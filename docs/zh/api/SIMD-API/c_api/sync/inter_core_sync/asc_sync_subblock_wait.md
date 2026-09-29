@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_subblock_wait
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md
 description: 与asc_sync_subblock_arrive配对使用，实现同一AI Core内全部AIV（subblock）之间的核间同步（模式1）。检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水的后续指令与NPU架构有关。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_repeat_reduce_sum
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md
 description: 对每个Repeat内所有元素求和，源操作数采用二叉树方式两两相加，计算过程中结果大于65504时保存为65504，支持前n个数据计算与高维切分计算两种模式。

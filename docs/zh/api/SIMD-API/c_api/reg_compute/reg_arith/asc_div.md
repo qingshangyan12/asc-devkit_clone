@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_div
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md
 description: 根据mask对两个源矢量数据寄存器按元素求商并写入目的操作数，支持整型与浮点数据类型，浮点计算结果与标准IEEE 754二进制浮点除法相比可能存在1

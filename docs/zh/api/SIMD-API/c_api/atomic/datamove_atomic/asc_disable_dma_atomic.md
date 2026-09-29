@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_disable_dma_atomic
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
 description: 与asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min接口配合使用的关闭接口，用于在完成原子操作后关闭原子操作，避免影响后续搬运。

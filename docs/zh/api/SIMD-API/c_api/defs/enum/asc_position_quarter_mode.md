@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_position_quarter_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md
 description: 该枚举表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。

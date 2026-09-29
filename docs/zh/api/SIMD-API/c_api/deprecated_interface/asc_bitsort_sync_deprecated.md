@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_bitsort_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bitsort_sync_deprecated.md
 description: 位图排序函数，一次迭代完成32个元素的排序，按Score从大到小将Score与对应Index一起存入目的操作数；接口已废弃，请使用对应的非同步接口和同步接口asc_sync替代。

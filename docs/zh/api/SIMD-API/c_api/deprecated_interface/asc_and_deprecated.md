@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_and（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_and_deprecated.md
 description: 根据掩码对两个矢量数据寄存器源操作数执行按位与操作并将结果写入目的寄存器，仅在AIV上生效；其浮点类型重载已废弃，请使用等位宽的asc_and整数重载替代。

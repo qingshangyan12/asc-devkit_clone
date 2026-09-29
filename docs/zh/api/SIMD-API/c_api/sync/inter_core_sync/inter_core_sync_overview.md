@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 核间同步能力概述
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md
 description: 核间同步能力概述页，说明一个核的计算需等待其他相关核计算完成的典型场景，介绍group内block与subblock的结构及算子类型对应的函数执行空间限定符配置，并按四种同步模式汇总各对核间同步接口的同步范围与功能。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_loadalign_brc_elem2datablock_postupdate
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md
 description: 从Unified Buffer（UB）中16字节或32字节对齐的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个DataBlock中，Post

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Query the persistent OKF index.
 
+Each API surface has its own isolated index instance under index/<surface>/,
+selected via --surface (default c_api) or an explicit --index-dir override.
 Filter queries (--stage/--operation/--category/--dtype/--kw/--convert) combine
 with AND across dimensions and OR within comma-separated values. Standalone
 queries (--api/--deps-of/--gap) return structured cards and ignore filters.
@@ -16,7 +18,7 @@ from typing import Any
 
 SCRIPTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS))
-from build_index import INDEX_DIR, STAGES, normalize_dtype  # noqa: E402
+from build_index import INDEX_DIR, SCOPES, STAGES, normalize_dtype  # noqa: E402
 
 FILTER_KEYS = ("stage", "operation", "category", "dtype", "kw", "convert")
 
@@ -206,7 +208,10 @@ def render(index: dict[str, Any], results: list[dict[str, Any]]) -> str:
 
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--index-dir", type=Path, default=INDEX_DIR)
+    p.add_argument("--surface", default="c_api", choices=sorted(SCOPES),
+                   help="API surface index to query (default: c_api); ignored with --index-dir")
+    p.add_argument("--index-dir", type=Path, default=None,
+                   help="explicit index dir (default: index/<surface>)")
     p.add_argument("--json", action="store_true", help="emit machine-readable JSON")
     p.add_argument("--stage", help="comma list: in,out,compute")
     p.add_argument("--operation", help="comma list of operations (e.g. divide,gather)")
@@ -225,7 +230,7 @@ def parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = parser().parse_args()
     try:
-        index, gaps = load(args.index_dir)
+        index, gaps = load(args.index_dir if args.index_dir is not None else INDEX_DIR / args.surface)
         results = run_query(args, index, gaps)
         if args.gap is not None and not results and not gaps.get("scope_out_gaps"):
             print("[]" if args.json else "无登记缺口：原范围外缺口已全部纳入索引范围")

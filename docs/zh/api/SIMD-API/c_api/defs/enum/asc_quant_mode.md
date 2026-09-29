@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_quant_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md
 description: 该类型别名表示L0C Buffer数据搬出时的类型转换或量化模式，并作为矩阵搬出接口quant_pre_mode参数的类型。

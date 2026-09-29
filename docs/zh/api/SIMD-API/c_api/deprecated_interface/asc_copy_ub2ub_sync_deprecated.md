@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_ub2ub_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_ub2ub_sync_deprecated.md
 description: 已废弃的同步搬运接口，将数据从Unified Buffer搬运到UB，同步计算包含同步等待，前n个数据搬运时搬运数据大小要求32字节对齐，请改用非同步asc_copy_ub2ub接口和asc_sync替代。

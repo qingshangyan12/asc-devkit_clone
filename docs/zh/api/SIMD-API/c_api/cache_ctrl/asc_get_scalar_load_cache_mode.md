@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_scalar_load_cache_mode
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md
 description: 读取当前标量load路径的L2 Cache管理策略并返回asc_load_l2_cache_mode枚举值，该值由asc_set_scalar_cache_mode接口设置，常用于临时切换策略前保存原配置或设置后回读校验。

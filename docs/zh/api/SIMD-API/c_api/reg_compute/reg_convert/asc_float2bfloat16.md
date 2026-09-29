@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2bfloat16
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md
 description: 根据mask将矢量数据寄存器中的float元素转换为bfloat16_t类型并写入dst，支持多种舍入模式与饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的的偶数或奇数位置。

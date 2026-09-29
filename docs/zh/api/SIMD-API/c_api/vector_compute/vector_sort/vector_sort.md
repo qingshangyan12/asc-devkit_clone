@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 排序计算
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/vector_sort.md
 navigation:

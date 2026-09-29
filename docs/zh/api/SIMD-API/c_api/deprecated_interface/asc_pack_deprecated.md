@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_pack (废弃)
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_pack_deprecated.md
 description: 已废弃接口，将源操作数中的元素选取低8位、低16位或低32位写入目的操作数的低半部分或高半部分，请使用asc_pack_to_low和asc_pack_to_high替代。

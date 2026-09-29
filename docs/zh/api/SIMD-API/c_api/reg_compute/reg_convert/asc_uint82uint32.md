@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_uint82uint32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md
 description: 根据mask将src中参与计算的uint8_t类型元素转换为uint32_t类型并写入dst；因类型位宽比为1:4，通过src_quarter_pos每隔4个索引离散选取源读取位置，仅在AIV上生效。

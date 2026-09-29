@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_pack_to_high
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md
 description: 将源操作数中元素的低8位或低16位压缩写入目的操作数的高半部分，源为掩码寄存器时每2bit取低位bit压缩存储，结果写入dst或通过函数返回值返回，仅在AIV上生效。

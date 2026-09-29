@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_not_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_not_sync_deprecated.md
 description: 已废弃的同步接口，按元素对矢量做按位取反运算，结果写入dst，请使用非同步接口asc_not配合同步接口asc_sync替代。

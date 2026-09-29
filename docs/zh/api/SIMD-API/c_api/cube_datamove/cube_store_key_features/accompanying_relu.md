@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 随路ReLU
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md
 description: 介绍矩阵计算搬出过程中支持的随路ReLU能力，通过asc_relu_pre_mode枚举区分不启用激活、Normal ReLU、全矩阵共享激活系数的SCALAR与每N通道独立激活系数的VECTOR四种模式，并说明各自的配置方式。

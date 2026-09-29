@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_repeat_reduce_sum_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_repeat_reduce_sum_sync_deprecated.md
 description: 已废弃的同步接口，对每个Repeat内所有元素求和，源操作数以二叉树方式两两相加，计算结果大于65504时保存为65504，请使用非同步接口asc_repeat_reduce_sum配合同步接口asc_sync替代。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: asc_fill_value_config
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
 description: 表示 fill_value 初始化参数，配置 L1、L0A 或 L0B 目标的迭代次数、数据块数量和目标间隔。

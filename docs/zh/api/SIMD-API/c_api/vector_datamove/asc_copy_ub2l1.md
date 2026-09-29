@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_ub2l1
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md
 description: 将数据从Unified Buffer（UB）搬运到L1 Buffer，支持连续数据搬运和高维切分数据搬运两种方式，搬运大小需为32的整数倍，仅在AIV上生效。

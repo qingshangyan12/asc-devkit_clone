@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 矢量数据搬运
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/vector_datamove.md
 navigation:

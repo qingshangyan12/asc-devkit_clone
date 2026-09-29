@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_set_ndim_pad_count
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
 description: 配置NDDMA高维切分搬运中loop1至loop4各维左右两侧的填充元素数，配置结果供后续调用asc_ndim_copy_gm2ub时使用，loop0的填充由搬运接口参数配置，仅在AIV上执行有效。

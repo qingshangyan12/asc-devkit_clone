@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_duplicate_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_duplicate_sync_deprecated.md
 description: 执行矢量复制操作，将标量值复制填充到目的矢量的各元素中；该接口已废弃，请使用非同步接口asc_duplicate和同步接口asc_sync组合替代。

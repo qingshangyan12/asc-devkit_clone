@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_update_addr_reg
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
 description: 更新地址寄存器addr_reg用于迭代寻址，支持1~4维偏移量设置和b8、b16、b32三种位宽模式，按各维循环迭代变量与步长计算地址偏移，配合Reg搬运接口在循环中按设定偏移自动递增UB地址。

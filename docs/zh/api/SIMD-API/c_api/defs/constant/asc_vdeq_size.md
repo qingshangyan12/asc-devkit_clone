@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: ASC_VDEQ_SIZE
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md
 description: 定义反量化缩放接口数组的元素个数常量，规定scale、offset和sign模式数组长度为16。

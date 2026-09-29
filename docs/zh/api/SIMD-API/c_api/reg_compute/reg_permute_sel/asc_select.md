@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_select
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md
 description: 根据mask从两个源操作数中逐位置选择元素：mask比特位为1时选取src0对应位置的数、为0时选取src1的数，结果写入dst或通过函数返回值返回，仅在AIV上生效。

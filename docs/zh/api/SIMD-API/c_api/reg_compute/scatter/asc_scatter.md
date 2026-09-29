@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_scatter
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
 description: 根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB），掩码为1的元素写入对应索引位置，掩码为0的元素保留目的地址原数据，搬运过程中数据格式与内容保持不变。

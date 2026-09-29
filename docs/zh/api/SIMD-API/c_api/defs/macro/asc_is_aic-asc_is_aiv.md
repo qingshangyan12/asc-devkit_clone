@@ -1,5 +1,5 @@
 ---
-okftype: reference.type.cpp
+okftype: reference.type
 title: ASC_IS_AIC/ASC_IS_AIV
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md
 description: 在分离模式中提供 AIC 与 AIV 代码路径的条件判断宏，用于隔离 Cube Core 和 Vector Core 的专属代码。

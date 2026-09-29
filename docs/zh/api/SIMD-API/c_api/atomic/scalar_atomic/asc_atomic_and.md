@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_atomic_and
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md
 description: 对Global Memory中address指向的单个元素执行原子按位与操作，读取该元素的旧值old_value，将old_value与val按位与的结果写回该地址并返回修改前的旧值，整个读取、计算和写回过程为原子操作。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 工具接口
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/utils.md
 navigation:

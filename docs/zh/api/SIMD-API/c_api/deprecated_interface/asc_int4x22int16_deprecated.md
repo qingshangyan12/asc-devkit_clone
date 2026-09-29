@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int4x22int16（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22int16_deprecated.md
 description: 已废弃的类型转换接口，根据mask将int4x2_t中打包的4bit有符号整数转换为int16_t类型，单个源数据与目的数据位宽比为1:4，读取时将一个VL大小的数据分为四部分并按索引选取，请使用显式位置参数重载替代。

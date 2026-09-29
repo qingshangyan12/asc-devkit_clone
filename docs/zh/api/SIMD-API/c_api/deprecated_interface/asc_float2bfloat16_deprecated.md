@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2bfloat16（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md
 description: 已废弃接口，根据mask将float类型数据转换成bfloat16_t类型写入dst，支持多种舍入与饱和模式，按后缀选择写入奇偶索引位置，请使用显式位置参数重载替代。

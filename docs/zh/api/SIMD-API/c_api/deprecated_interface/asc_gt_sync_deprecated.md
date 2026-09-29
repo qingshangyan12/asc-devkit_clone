@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_gt_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_gt_sync_deprecated.md
 description: 已废弃的同步矢量比较接口，按元素比较两个矢量的大小关系，结果为真时输出对应比特位为1否则为0，请使用非同步接口asc_gt并配合同步接口asc_sync替代。

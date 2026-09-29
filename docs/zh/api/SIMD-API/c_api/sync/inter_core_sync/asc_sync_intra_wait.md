@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_sync_intra_wait
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md
 description: 与asc_sync_intra_arrive配对使用，实现单AI Core内AIC与单个AIV之间的核间同步（模式4）。检测到对应sync_id的计数器非0后解除阻塞并将计数器减1，本接口会阻塞pipe流水中的后续指令，arrive与wait传入的sync_id须符合跨核ID映射关系。

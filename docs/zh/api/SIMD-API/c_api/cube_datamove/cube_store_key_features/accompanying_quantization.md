@@ -1,5 +1,5 @@
 ---
-okftype: reference.concept.cpp
+okftype: reference.index
 title: 随路量化
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md
 description: 介绍矩阵搬出支持的随路量化能力：包括无需量化系数的Cast（F322F16/F322BF16）与带系数量化，带系数量化分Scalar和Tensor/Vector两种粒度；说明各产品支持的量化模式、系数配置接口及量化参数比特位含义。

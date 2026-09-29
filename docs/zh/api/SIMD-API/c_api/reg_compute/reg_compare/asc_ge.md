@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_ge
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ge.md
 description: 逐元素比较两个源操作数大小（大于等于），比较结果为真时对应比特位为1否则为0，结果以掩码寄存器返回或写入dst对应比特位，仅在AIV上生效。

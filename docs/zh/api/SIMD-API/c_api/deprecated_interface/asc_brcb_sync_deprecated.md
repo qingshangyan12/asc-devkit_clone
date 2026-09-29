@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_brcb_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_brcb_sync_deprecated.md
 description: 每一次取输入矢量中的8个数填充到结果矢量的8个datablock，每个数对应一个datablock；接口已废弃，请使用对应的非同步接口和同步接口asc_sync替代。

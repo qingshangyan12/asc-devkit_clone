@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0a_arch_3510（2D矩阵搬运）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md
 description: 以512字节的数据分形为搬运粒度，将矩阵计算所需的2D格式数据从L1 Buffer搬运到L0A Buffer，支持非转置与转置矩阵，不同数据类型对应不同大小的分形矩阵，仅在AIC上执行有效。

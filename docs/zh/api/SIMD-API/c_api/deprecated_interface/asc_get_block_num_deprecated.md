@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_get_block_num（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_block_num_deprecated.md
 description: 已废弃的核数查询接口：获取当前任务配置的核数用于代码内部的多核逻辑控制并返回int64_t结果，运行于标量流水，请使用内置变量block_num替代。

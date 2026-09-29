@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_squeeze_and_storeunalign
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
 description: 将被squeeze_mask选中的源矢量数据寄存器元素压缩到目的矢量数据寄存器并连续搬出到Unified Buffer，主块直接写入、未满32B的尾块暂存非对齐寄存器，AR寄存器记录累计搬出字节数，仅在AIV上生效。

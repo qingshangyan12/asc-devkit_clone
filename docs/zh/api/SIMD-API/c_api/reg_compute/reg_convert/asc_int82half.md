@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int82half
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82half.md
 description: 将矢量数据寄存器中的int8_t类型数据转换为half类型；源与目的位宽比为1:2，根据src_pos选择读取源数据索引为偶数或奇数的位置，mask未筛选的元素在输出中置零，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_load_image_to_cbuf_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_load_image_to_cbuf_sync_deprecated.md
 description: 已废弃的同步图像搬运接口：将图像数据从Global Memory搬运到L1 Buffer，可指定源图加载区域及目的图片上下左右填充像素数，请使用非同步接口asc_load_image_to_cbuf并配合同步接口asc_sync替代。

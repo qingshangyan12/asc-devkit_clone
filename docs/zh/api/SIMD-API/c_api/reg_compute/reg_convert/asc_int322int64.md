@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_int322int64
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int64.md
 description: 根据掩码将源操作数中每个int32_t类型元素转换为int64_t类型写入目的操作数，位宽比为1:2，按位置标签选择读取源操作数偶数或奇数索引位置，掩码位为0时对应元素置0，仅在AIV上生效的Reg矢量计算接口。

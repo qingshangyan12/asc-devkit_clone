@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_copy_l12l0c_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0c_sync_deprecated.md
 description: 已废弃的同步搬运接口，将矩阵由L1 Buffer搬运到L0C Buffer中，支持float到half、bfloat16_t等源与目的数据类型组合，请使用非同步接口配合asc_sync替代。

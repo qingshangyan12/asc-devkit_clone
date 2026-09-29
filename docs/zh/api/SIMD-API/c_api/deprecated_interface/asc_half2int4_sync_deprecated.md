@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_half2int4_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int4_sync_deprecated.md
 description: 已废弃的同步矢量转换接口：将half类型数据转换为int4类型，支持多种舍入模式，目的操作数为int4b_t时count必须为偶数，请使用非同步接口asc_half2int4并配合同步接口asc_sync替代。

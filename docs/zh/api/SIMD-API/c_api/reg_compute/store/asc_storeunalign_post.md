@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storeunalign_post
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
 description: 将非对齐寄存器中暂存的尾块写入Unified Buffer（UB）完成连续非对齐搬运收尾，提供立即数偏移与地址寄存器偏移两种模式，须与前序主搬出接口复用同一个非对齐寄存器。

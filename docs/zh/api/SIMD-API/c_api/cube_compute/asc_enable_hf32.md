@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_enable_hf32
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md
 description: 设置Mmad计算开启HF32模式，开启后L0A Buffer与L0B Buffer中的FP32数据在参与Mmad计算之前被舍入为HF32格式，可提升FP32数据计算性能但带来一定精度损失，最终结果仍以FP32格式输出。

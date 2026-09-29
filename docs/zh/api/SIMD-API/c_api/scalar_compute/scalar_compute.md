@@ -1,5 +1,5 @@
 ---
-okftype: reference.index.cpp
+okftype: reference.index
 title: 标量计算
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_compute.md
 navigation:

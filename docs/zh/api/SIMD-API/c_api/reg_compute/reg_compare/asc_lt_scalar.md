@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_lt_scalar
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_lt_scalar.md
 description: 根据mask将源矢量数据寄存器按元素与标量value进行小于比较，若src小于value则对应位为1，否则为0，每个元素的比较结果占一个bit，仅在AIV上生效。

@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_storealign
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
 description: 将矢量数据寄存器或掩码寄存器中的数据以对齐方式搬出到Unified Buffer（UB），矢量场景单次搬出256字节并支持掩码控制，提供连续、立即数偏移、地址寄存器偏移和非连续对齐四种搬出模式。

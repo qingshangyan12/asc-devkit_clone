@@ -1,5 +1,5 @@
 ---
-okftype: reference.api.cpp
+okftype: reference.api
 title: asc_float2int16_sync（废弃）
 resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_sync_deprecated.md
 description: 已废弃的同步矢量转换接口，将float类型数据转换为int16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请使用非同步接口asc_float2int16配合同步接口asc_sync替代。
