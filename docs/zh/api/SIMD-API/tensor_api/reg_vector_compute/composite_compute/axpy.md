@@ -59,7 +59,7 @@ __simd_callee__ inline reg_tensor<T> axpy(reg_tensor<T>& dst, const reg_tensor<T
 
 ## 返回值说明
 
-返回`reg_tensor<T>`。`reg`保存`dst + scalar * src`的逐元素计算结果，返回值的`mask`与`dst.mask`相同。
+返回`reg_tensor<T>`，返回值的`mask`与`dst.mask`相同。
 
 ## 数据类型
 

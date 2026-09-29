@@ -50,19 +50,19 @@ __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U
 | 参数名 | 描述 |
 | --- | --- |
 | Layout | 结果布局。支持`cast_layout::zero`和`cast_layout::one`，默认值为`cast_layout::zero`。 |
-| T | 返回值元素类型，当前仅支持`half`。 |
-| U | 源操作数和标量类型，从输入自动推导，当前仅支持`float`。 |
+| T | 返回值元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+| U | 源操作数和标量类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表2**参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src | 输入 | 源操作数，类型为`reg_tensor<float>`。`src.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
-| scalar | 输入 | `float`标量乘数。 |
+| src | 输入 | 源操作数，类型为`reg_tensor<U>`。`src.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
+| scalar | 输入 | `U`类型的标量乘数。 |
 
 ## 返回值说明
 
-返回`reg_tensor<half>`。`reg`保存乘法及类型转换结果。`Layout`为`cast_layout::zero`时结果写入偶数位置，为`cast_layout::one`时结果写入奇数位置，另一组位置置零。返回值的`mask`与`src.mask`相同。
+返回`reg_tensor<T>`。`Layout`为`cast_layout::zero`时结果写入偶数位置，为`cast_layout::one`时结果写入奇数位置，另一组位置置零。返回值的`mask`与`src.mask`相同。
 
 ## 数据类型
 

@@ -29,31 +29,6 @@ This sample demonstrates how to use the experimental Tensor API `asc::te::experi
   | 1 | One-dimensional, shapes `[256]` and `[128]` | Processes the complete input and output with one-dimensional coordinates. |
   | 2 | Two-dimensional, shapes `[1, 256]` and `[1, 128]` | Processes the complete input and output with two-dimensional coordinates. |
 
-- Sample implementation:
-
-  The core computation is as follows:
-
-  ```cpp
-  template <typename SrcTensor, typename DstTensor>
-  __simd_vf__ inline void histograms_vf(
-      const SrcTensor src, DstTensor dst, uint16_t repeat_times, uint32_t total, uint32_t one_repeat_size)
-  {
-      uint32_t remain = total;
-      asc::te::experimental::reg_tensor<uint16_t> dst_reg;
-      auto dst_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::all, uint16_t>();
-      dst_reg.mask = dst_mask.reg;
-      asc_duplicate_scalar(dst_reg.reg, initial_value, dst_reg.mask);
-      for (uint16_t i = 0; i < repeat_times; ++i) {
-          const uint32_t offset = i * one_repeat_size;
-          const auto coord = asc::te::make_coord(offset);
-          auto mask = asc::te::experimental::update_mask<uint8_t>(remain);
-          auto src_reg = asc::te::experimental::load(src, coord).with_mask(mask);
-          dst_reg = asc::te::experimental::histograms<histogram_config>(dst_reg, src_reg);
-      }
-      asc::te::experimental::store(dst, asc::te::make_coord(0), dst_reg);
-  }
-  ```
-
 ## Build and Run
 
 Perform the following steps in the sample root directory to build and run the sample.

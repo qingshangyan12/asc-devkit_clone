@@ -60,21 +60,21 @@ __simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const r
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | 返回值的元素类型，当前仅支持`float`。调用时必须显式指定。 |
-| U | 源操作数的元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+| T | 返回值的元素类型。支持的数据类型请参考[数据类型](#数据类型)。调用时必须显式指定。 |
+| U | 源操作数的元素类型。`half`表示16位浮点类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 | PositionType | 位置参数类型，由`src_pos`自动推导。 |
 
 **表2**参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| src0 | 输入 | 被减数，类型为`reg_tensor<float>`或`reg_tensor<half>`。`src0.mask`按输出元素编号，对应位置为`1`时该输出元素参与计算，为`0`时不参与计算。 |
+| src0 | 输入 | 被减数，类型为`reg_tensor<U>`。`src0.mask`按输出元素编号，对应位置为`1`时该输出元素参与计算，为`0`时不参与计算。 |
 | src1 | 输入 | 减数，类型与`src0`相同。`src1.mask`不用于本次计算。 |
-| src_pos | 输入 | half输入时必填，支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`，分别表示选择偶数位置和奇数位置。 |
+| src_pos | 输入 | `U`为`half`时必填，仅支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`，分别表示选择偶数位置和奇数位置。 |
 
 ## 返回值说明
 
-返回`reg_tensor<float>`。`reg`保存逐元素计算结果，返回值的`mask`与`src0.mask`相同。输入为`half`时，`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`分别使第`i`个输出元素读取源操作数的第`2 * i`和第`2 * i + 1`个元素。
+返回`reg_tensor<T>`，返回值的`mask`与`src0.mask`相同。`U`为`half`时，`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`分别使第`i`个输出元素读取源操作数的第`2 * i`和第`2 * i + 1`个元素。
 
 ## 数据类型
 
@@ -89,7 +89,7 @@ __simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const r
 
 - `src0.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 - `src0.mask`对应位置为`0`时，返回值`reg`的对应位置置零。
-- 输入为`half`时，`src0.mask`的第`i`位控制第`i`个`float`输出元素。mask应使用`all_mask<float>`、`make_mask<..., float>`或`update_mask<float>`生成。
+- `U`为`half`时，`src0.mask`的第`i`位控制第`i`个`T`输出元素。mask应使用`all_mask<T>`、`make_mask<..., T>`或`update_mask<T>`生成。
 
 ## 调用示例
 
