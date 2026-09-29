@@ -466,8 +466,8 @@ static bool IsUbMultiChannelProtocol(CommProtocol protocol)
     return false;
 }
 
-static void
-DuplicateUbMultiChannelDescs(std::vector<HcclChannelDesc>& channels, size_t channelCountBefore, u32 multiChannelNum)
+static void DuplicateUbMultiChannelDescs(
+    std::vector<HcclChannelDesc>& channels, size_t channelCountBefore, u32 multiChannelNum)
 {
     if (multiChannelNum <= 1) {
         return;
