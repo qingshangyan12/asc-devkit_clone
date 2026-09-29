@@ -105,7 +105,6 @@ graph TD
 
 **参考示例**
 
-- [SIMD Add算子示例（同步一体化计算接口）](../../examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
 - 更多示例详见[examples目录](../../examples)
 
 ### Tensor API：带Layout语义的C++底层编程接口（全自主资源管控）

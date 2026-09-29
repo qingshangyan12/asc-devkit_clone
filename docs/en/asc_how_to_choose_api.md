@@ -97,7 +97,6 @@ As a vectorized programming interface in the Ascend C language extension layer, 
 - Production-grade high-performance operator development scenarios that require in-depth mining of hardware computing power and ultimate performance tuning.
 
 **Reference Examples**
-- [SIMD Add Operator Example (Synchronized Integrated Computing Interface)](../../examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc)
 - For more examples, please refer to the [examples directory](../../examples)
 
 ---
