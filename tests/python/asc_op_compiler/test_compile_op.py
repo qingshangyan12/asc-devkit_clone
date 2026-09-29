@@ -89,6 +89,7 @@ from asc_op_compile_base.asc_op_compiler.ascendc_compile_gen_code import (
     add_op_param_to_workspace,
     get_value,
 )
+from asc_op_compile_base.asc_op_compiler import ascendc_compile_gen_code
 from asc_op_compile_base.asc_op_compiler.super_kernel_constants import SuperKernelStreamFusionMode, SuperKernelLinkMode
 from asc_op_compile_base.asc_op_compiler.ascendc_constants import InferChannelParamsFromIFile, KernelMetaType
 
@@ -228,6 +229,27 @@ def compile_manifest_resources(manifest, manifest_dir, source_file_path):
 
 
 class TestCompileOp(unittest.TestCase):
+    def test_oom_storage_shape_patterns(self):
+        init_source = ascendc_compile_gen_code.OOM_STORAGE_SHAPE_INIT_PATTERN.format(legacy_len_offset=32)
+        tensor_source = ascendc_compile_gen_code.OOM_TENSOR_REGISTER_PATTERN.format(
+            param_name="x", element_size=4, input_shape_len="inputShapeLen"
+        )
+        tensor_list_source = ascendc_compile_gen_code.OOM_TENSOR_LIST_REGISTER_PATTERN.format(
+            param_name="xs", element_size=2
+        )
+
+        self.assertIn("tmpTilingSizeForOOM + 32", init_source)
+        self.assertIn("OOMHasStorageShapeHeader(oomStorageShapeCursor)", init_source)
+        self.assertIn(
+            "OOMTryRegisterTensorWithStorageShape(oomStorageShapeCursor, x, static_cast<uint64_t>(4))", tensor_source
+        )
+        self.assertIn("OOMCheckAddrRange(x, inputShapeLen)", tensor_source)
+        self.assertIn(
+            "OOMTryRegisterTensorListWithStorageShape(oomStorageShapeCursor, xs, static_cast<uint64_t>(2))",
+            tensor_list_source,
+        )
+        self.assertIn("OOMCheckTensorListRange(xs, 2)", tensor_list_source)
+
     def setUp(self):
         # operator before each testcase
         print("-------------------SetUp----------------")
@@ -1879,10 +1901,13 @@ class TestCompileOp(unittest.TestCase):
         old_source = ""
         new_source = add_op_param_to_workspace(op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
+        self.assertIn("OOMHasStorageShapeHeader", new_source)
+        self.assertLess(new_source.rfind("OOMCheckAddrRange(workspace"), new_source.rfind("#endif"))
         tiling_info.static_shape_flag = True
         compile_info.tiling_key_struct_map = {"1": 96, "2": 100}
         new_source = add_op_param_to_workspace(op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
+        self.assertNotIn("OOMHasStorageShapeHeader", new_source)
         tiling_info.tiling_key_data_size = {}
         new_source = add_op_param_to_workspace(op_info, tiling_info, old_source, compile_options, compile_info)
         self.assertNotEqual(new_source, old_source)
@@ -2369,6 +2394,47 @@ class TestCompileOp(unittest.TestCase):
             kernel_func_desc,
         )
         self.assertEqual(idx, 5)
+
+    def test_super_kernel_zero_workspace_wrapper(self):
+        op_info = OpInfo(
+            kernel_name="TestKernel", op_type="TestOp", inputs=[], outputs=[], origin_inputs=[], mc2_ctx=[]
+        )
+        compile_info = CompileInfo()
+        compile_info.src_file = "test.cpp"
+        compile_info.super_kernel_info = {"sp_options": {}}
+        compile_info.tiling_key_list = []
+        tiling_info = TilingInfo()
+        tiling_info.static_shape_flag = True
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        DFXSectionGenerator().dfx_info_reset(op_info)
+
+        with (
+            TemporaryDirectory() as temp_dir,
+            mock.patch.object(CommonUtility, "is_c310", return_value=True),
+            mock.patch.object(CommonUtility, "is_v100", return_value=False),
+            mock.patch.object(CommonUtility, "is_v200", return_value=False),
+            mock.patch.object(CommonUtility, "is_support_workspace_offset", return_value=True),
+            mock.patch.object(compile_op_module, "get_v220_kernel_type_mix_flag", return_value=(False, False)),
+            mock.patch.object(compile_op_module, "get_context", return_value=None),
+            mock.patch.object(compile_op_module, "get_current_build_config", return_value=False),
+        ):
+            compile_info.gen_kernel_func_file = os.path.join(temp_dir, "wrapper.cpp")
+            for workspace_size in (0, 1024):
+                with self.subTest(workspace_size=workspace_size):
+                    tiling_info.raw_run_info = {"workspaces": [workspace_size]}
+                    gen_kernel_fun(compile_info, "test", op_info, tiling_info, CompileOptionTuple([], []))
+                    with open(compile_info.gen_kernel_func_file, encoding="utf-8") as source_file:
+                        source = source_file.read()
+                    if workspace_size == 0:
+                        self.assertIn(
+                            "GM_ADDR usrWorkspace = reinterpret_cast<GM_ADDR>(0xFFFFFFFFFFFFFFFFULL);", source
+                        )
+                        self.assertNotIn("GM_ADDR workspace = param_base", source)
+                        self.assertNotIn("SetSysWorkspaceForce", source)
+                    else:
+                        self.assertIn("GM_ADDR workspace = param_base[args_offset++];", source)
+                        self.assertIn("AscendC::SetSysWorkspaceForce(workspace);", source)
+                        self.assertIn("GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);", source)
 
     def test_compile_ascendc_cce(self):
         SetCurrentSocInfo("Ascend310P1")
@@ -8469,14 +8535,14 @@ void add_custom()
             cfg.current()["tir.op_debug_config"] = ["oom"]
             dfx_string = DFXSectionGenerator()._tran_dfx_info_to_string("tiling")
             compare_string = [
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 56) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 48) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 40) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 32) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 24) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 16) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 8) & 0xff)",
-                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 ) >> 0) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 56) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 48) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 40) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 32) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 24) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 16) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 8) & 0xff)",
+                "(((((sizeof(tiling) + 7) / 8) * 8 + 8 + 8 * 0 + 2) >> 0) & 0xff)",
             ]
             self.assertEqual(dfx_string, compare_string)
 
@@ -8566,7 +8632,7 @@ void add_custom()
             value_string = DFXSectionGenerator()._tran_dfx_info_to_value_string(size_value)
 
             aligned_size = ((size_value + 7) // 8) * 8  # 16 -> 16
-            total_size = aligned_size + 8 + 8 * 0  # 16 + 8 + 0 = 24
+            total_size = aligned_size + 8 + 8 * 0 + 2  # 16 + 8 + 0 + 2 = 26
             expected_string = [
                 str((total_size >> 56) & 0xFF),
                 str((total_size >> 48) & 0xFF),

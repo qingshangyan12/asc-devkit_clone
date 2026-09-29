@@ -245,7 +245,7 @@ Channel merge支持S8、U8、S4和U4数据类型，而Channel split支持FP32数
 
     ![](../../../../figures/fixpipe_f32_1.png)
 
-## 指令序列深度<a name="section1073952984688"></a>
+## 指令队列深度<a name="section1073952984688"></a>
 
 以下是计算单元和搬运单元的指令队列深度：
 
@@ -296,6 +296,8 @@ Channel merge支持S8、U8、S4和U4数据类型，而Channel split支持FP32数
 
     -   不允许连续设置同一个EventID，因为这可能导致事件状态混乱或未被正确处理。
     -   不建议手动插入TEventID，不能手动插入6和7的TEventID，因为它们可能被系统预留或用于特殊用途。
+
+    除SetFlag/WaitFlag外，本架构还支持使用Mutex建立核内多流水同步关系。关于如何通过Mutex满足双缓冲场景下的正向数据依赖和反向数据依赖，并安全复用Buffer，请参考[基于Mutex实现多流水同步](../../advanced_kernel_programming/intra_core_sync/mutex_multi_pipeline_sync.md)。
 
 -   核间同步
 
