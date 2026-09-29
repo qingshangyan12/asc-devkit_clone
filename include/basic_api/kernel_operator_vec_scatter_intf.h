@@ -27,6 +27,7 @@
 
 #include "../../impl/basic_api/kernel_macros.h"
 #include "kernel_tensor.h"
+#include "kernel_struct_gather.h"
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
 #include <cstdint>
@@ -77,7 +78,6 @@ template <typename T>
 __aicore__ inline void Scatter(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset,
     const uint32_t dstBaseAddr, const uint32_t count);
-} // namespace AscendC
 #pragma end_pipe
 
 #if defined(__NPU_ARCH__)

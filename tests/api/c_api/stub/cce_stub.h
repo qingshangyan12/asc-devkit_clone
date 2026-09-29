@@ -1523,4 +1523,15 @@ inline int32_t g_coreType = 1;
 inline int32_t g_coreType = 2;
 #endif
 
+<<<<<<< HEAD
+=======
+#ifndef ASCENDC_POS_CONSTANTS_DEFINED
+#define ASCENDC_POS_CONSTANTS_DEFINED
+typedef std::integral_constant<Pos, Pos::LOWEST> Lowest_Type;
+typedef std::integral_constant<Pos, Pos::HIGHEST> Highest_Type;
+constexpr Lowest_Type POS_LOWEST = Lowest_Type();
+constexpr Highest_Type POS_HIGHEST = Highest_Type();
+#endif
+
+>>>>>>> b0f2e1899 (feat: 新增 dav_v516 架构编译构建工具与调试, ut适配等)
 #endif
