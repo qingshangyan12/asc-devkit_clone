@@ -88,4 +88,6 @@ matrix_compute、defs 类型页、fp8/fp4 转换对、deprecated 家族卡等新
 - 文档新增/修改/删除后：重跑 `build_index.py` 并提交索引 diff；`test_committed_index_fresh`
   会在索引陈旧时失败，这是预期的漂移报警。
 - gaps.json 由人工按证据增补，构建只做存在性校验；查询零重建成本。
-- 新目录并入 scope 时须同步校准 classify 的分类/导航规则与 dryrun 查询清单。
+- 新目录并入 scope 时须同步校准 classify 的分类/导航规则与 dryrun 查询清单；
+  新 API 文档范围的全量接入（含本 skill 索引段的参数化改造）按 `okf-maintain`
+  的接入清单编排。

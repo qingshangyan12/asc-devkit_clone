@@ -1,102 +1,60 @@
 ---
 name: okf-maintain
-description: 执行 OKF 知识资产的具体维护动作：变更对账与影响面分析（impact.py）、文档增删改后的 YAML 头与索引一致更新（复用 okf-yaml-generate 与 okf-index）、缺口登记增补、标签问题升级 okf-tag-research、受影响评测复核，并留存维护记录。变更或问题已确认后使用；触发机制不在职责内，不另建标签、YAML 或索引规则。
+description: OKF 知识建设流水线的复用入口：为新 API 文档范围编排 调研（okf-tag-research）→ 添加 OKF 头（okf-yaml-generate）→ 建立索引（okf-index）三段流水线。首个应用实例为 c_api 全量 800 篇（已交付）；其他 API 文档范围按同一流水线接入。只编排不建规则；既有范围内文档增删改的局部修正由各 skill 自身维护边界承担。
 ---
 
-# OKF 知识维护
+# OKF 知识建设流水线复用
 
-本 Skill 是 OKF 闭环的最后一段：知识资产出现变化或错误后的具体维护动作。它是**协调者**——
-只确定影响范围、分派修正动作、复核结果并留痕；标签、YAML 头与索引的具体建设分别复用
-`okf-tag-research`/`okf-tag-generate`、`okf-yaml-generate`、`okf-index`，不形成第二套规则。
+本 Skill 是 OKF 建设流水线的复用入口：把已在 c_api 全量验证的三段建设流水线
+（调研 → 添加头 → 建立索引）打包为可复用编排，供其他 API 文档范围接入使用。
+它是**编排者**——只确定接入步骤、检查前置条件、分派建设动作并复核结果；
+词表、字段、YAML 头与索引的具体规则分别由对应 skill 承担，不形成第二套规则。
 
 ## 职责与边界
 
-- 只执行已确认的维护动作（文档变更、检索反馈、评测问题的**触发与判定不在范围**）。
-- 维护对象是知识资产：范围内文档的 OKF YAML 头、`okf-index/index/`（含 gaps.json）、维护记录。
-- 不修改其他 skill 的定义与脚本；索引产物更新经 `build_index.py` 重跑产生，不手改 `index.json`。
+- 只负责新 API 文档范围的**全量接入编排**；不处理既有范围内文档增删改的局部修正
+  （受影响文档的头按 `okf-yaml-generate` 单文档重跑，索引经 `build_index.py` 重建，
+  词表问题开 `okf-tag-research` 新轮次，均直接复用对应 skill）。
+- 不新建标签、字段、Profile 或索引规则；词表唯一事实源仍是
+  `../okf-tag-generate/taxonomy/tag-taxonomy.json`。
 - 范围外知识只登记扩展需求，不自动扩大建设范围。
+- 审计痕迹复用各 skill 自带的 run 目录（`okf-tag-research/runs/`、
+  `okf-yaml-generate/tmp/<run-id>/`），不另建记录目录。
 
-## 资产结构
+## 流水线（三段，均在 c_api 全量验证）
 
-```
-okf-maintain/
-  scripts/impact.py      # 变更对账 + 影响面分析（只读，标准库）
-  records/               # 维护记录：每次动作一个 md（命名与模板见下文）
-  tests/test_impact.py   # 纯函数单测 + 真仓冒烟
-```
+| 段 | 复用 skill | 交付物 | 关键门槛 |
+| --- | --- | --- | --- |
+| 1 调研 | `okf-tag-research` | 冻结词表（当前 core-v9） | 双盲发现、确定性校验、人工批准后冻结 |
+| 2 添加头 | `okf-yaml-generate`（description 语义工件来自 `okf-description-generate`，依赖关系内联生成） | 范围内全部文档的 OKF YAML 头、include Doxygen、example marker | prepare→worker→resolve-issues→validate→write；validate 阻断不得写入 |
+| 3 建立索引 | `okf-index` | `index/index.json`、`gaps.json`、`build-meta.json` 与查询 CLI | 校验不过不出索引；单测 + dryrun 全过 |
 
-## 维护动作目录
+## 新范围接入清单
 
-| 动作 | 内容 | 复用机制 |
-| --- | --- | --- |
-| A 文档变更接入 | 修改→核对头与正文一致后按证据修头；新增→按范围清单规则 1-6 判角色后生成头；删除/移动→修正指向旧路径的依赖边 | `okf-yaml-generate`（`--document` 单文档粒度） |
-| B 索引一致性 | 重跑构建（校验不过不出索引）→ 漂移确认 → 单测 | `okf-index/scripts/build_index.py` + tests |
-| C 缺口登记 | gaps.json 按证据增补/清理；hint/evidence 必须是真实路径 | 人工编辑 + 构建强校验 |
-| D 标签/词表问题 | 歧义或词表不足时开新调研轮次，禁止临时造标签 | `okf-tag-research` |
-| E 范围外知识 | 记录扩展需求，待另行确定范围 | 维护记录"遗留项" |
-| F 反馈回流复核 | 受影响 dryrun 查询；必要时重跑受影响评测题，质量不降低门槛 | `okf-index/tests`、`okf-evaluate` |
+1. **确定范围与角色判定**：确认文档根目录，编制该范围的范围清单与角色判定规则
+   （参考 c_api 实例 [`../范围清单.md`](../范围清单.md)）。
+2. **前置检查**：`api_surfaces` 词表值已在冻结 taxonomy 登记；
+   `okf-yaml-generate/config/source-context-v1.yaml` 的 default_tags 已覆盖该目录。
+3. **词表覆盖评估**：现有冻结词表不足以描述新范围时，先执行 `okf-tag-research`
+   调研轮次，人工批准后冻结，再进入标注。
+4. **分批生成 YAML 头**：目录超过 25 篇按批组织，每波最多 6 个 worker；
+   运行约定见 `okf-yaml-generate` 总控流程。
+5. **索引接入**：`build_index.py` 当前范围配置固化在 c_api——接入新范围时须先
+   参数化范围配置（SCOPE）并校准分类与导航规则、dryrun 查询清单，再构建。
+   该代码改造在接入时实施，不改变既有 c_api 资产。
+6. **复核**：`okf-index` 单测与 dryrun 全过；必要时按 `okf-evaluate` 口径回归
+   检索质量。
 
-## 标准维护流程（对齐流程与架构说明书第 6 节）
+## 当前应用实例
 
-1. **变更对账与影响面分析**（仓库根执行）：
-
-   ```bash
-   python3 okf-skills/okf-maintain/scripts/impact.py          # 文本报告
-   python3 okf-skills/okf-maintain/scripts/impact.py --json   # 机器可读
-   ```
-
-   退出码：0 无漂移；1 索引资产缺失/损坏（先跑 build_index.py）；2 有漂移（报告已输出）。
-   产出：变更清单（修改/新增/删除）、指纹漂移（词表/缺口登记）、每篇影响面（家族成员、
-   反向依赖、依赖出边）、受影响评测题与 dryrun 查询、建议动作。
-
-2. **核对原始依据**：逐篇读取变更文档正文，确认正文与 YAML 头差异点；证据规则以
-   `OKF字段规范.md` 为准（逐字证据，不得由名称/目录/架构推断）。
-
-3. **分派修正动作**（按动作目录 A-F）：
-   - 修改/新增：`okf-yaml-generate` 的 prepare→worker→resolve-issues→validate→write，
-     `--document` 限定受影响文档，不整目录重跑；
-   - 删除/移动：先修**指向旧路径**的文档依赖边（impact 报告"反向依赖"列出全部来源），
-     再处理被删文档自身；
-   - 标签歧义/词表缺口：升级 `okf-tag-research`，本轮先按现有冻结词表降级或阻断；
-   - 缺口登记变化：按证据更新 gaps.json。
-
-4. **重建索引**：
-
-   ```bash
-   python3 okf-skills/okf-index/scripts/build_index.py        # 校验不过直接失败，不出索引
-   python3 okf-skills/okf-index/scripts/build_index.py --check
-   ```
-
-5. **复核**：
-
-   ```bash
-   python3 -m unittest discover -s okf-skills/okf-index/tests
-   ```
-
-   再对 impact 报告列出的受影响 dryrun 查询逐条执行 `query.py` 核对候选不缺失；
-   检索/评测反馈触发的维护须重跑对应评测题并与基线对照（质量不降低门槛）。
-
-6. **写维护记录**：按模板在 `records/` 新建 `<YYYY-MM-DD>-<slug>.md`。
-
-## 维护记录模板
-
-```markdown
-# <YYYY-MM-DD>-<slug>
-
-- 日期 / 执行者：
-- 触发来源：文档变更 | 检索反馈 | 评测问题 | 词表轮次 | 其他（附证据链接）
-- 变更清单：impact.py 对账结果摘要
-- 影响面：家族 / 反向依赖 / 受影响评测题
-- 执行动作：分派到哪些 skill、改了哪些文件（含索引 diff 概要）
-- 复核结果：build_index --check / 单测 / dryrun / 受影响评测题
-- 遗留项：升级词表、扩展需求、待人工确认
-```
+- **c_api**（`docs/zh/api/SIMD-API/c_api`，800 篇）：三段已全部交付——core-v9
+  冻结词表、800 篇 OKF YAML 头、持久化索引与查询 CLI。范围与角色判定见
+  [`../范围清单.md`](../范围清单.md)。
 
 ## 强制约束
 
-- 禁止手改 `okf-index/index/index.json`、`build-meta.json`、`概览.md`（纯构建产物，漂移以重建解决）。
-- 禁止临时创造未定义标签值、绕过冻结词表或另建词表。
-- 禁止修改 Markdown 正文、头文件声明、实现代码与样例（维护只动 front matter 与 okf-skills 资产）。
-- 新目录并入 scope 属范围扩展：仅记扩展需求，不自动改 classify 规则与 dryrun 清单。
+- 禁止跳过任一段直接为文档写头或建索引；词表未冻结不得进入标注。
+- 禁止为新范围临时创造未定义标签值、绕过冻结词表或另建词表。
+- 禁止手改 `okf-index/index/` 构建产物（`index.json`、`build-meta.json`、`概览.md`），
+  漂移以重建解决。
 - 任一校验失败必须回到对应步骤重做，不得编辑校验结果或跳过门禁。
-- 每次维护动作必须有记录；无记录的资产变更视为未完成维护。
