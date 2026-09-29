@@ -113,7 +113,11 @@ class DFXSectionGenerator:
     def is_support_dfx(op_info: OpInfo) -> bool:
         # only support david and ascend910B and ascend310p dex section now
         arch_support = (
-            CommonUtility.is_v200() or CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_v300()
+            CommonUtility.is_v200()
+            or CommonUtility.is_v220()
+            or CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_v300()
         )
         option_support = True
         # dfx do not support, because of custom framework is too old or enable super kernel
@@ -279,8 +283,14 @@ class DFXSectionGenerator:
 
     def generate_kernel_type_section(self, compile_info: CompileInfo, kernel_name: str):
         section_var = ""
-        if CommonUtility.is_v220() or CommonUtility.is_c310():
-            short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if (
+            CommonUtility.is_v220()
+            or CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+        ):
+            short_soc_version = global_var_storage.get_variable(
+                "ascendc_short_soc_version"
+            )
             if compile_info.code_channel == CORE_TYPE_MIX:
                 section_var += (
                     f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
