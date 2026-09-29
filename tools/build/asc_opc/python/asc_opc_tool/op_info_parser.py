@@ -327,8 +327,6 @@ class OpInfoParser:
         if attr not in op info store. remove attr
         """
         op_attr_list = self.__resolve_json_attr()
-        if not op_attr_list:
-            return op_attr_list
 
         attr_info_list = get_attr_info_from_opstore(op_type)
         attrs_list = []
