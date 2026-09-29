@@ -878,7 +878,7 @@ struct NhrMultiLinkScenario : NhrScenario {
     }
     void ExpandMultiLink(
         u64 loopCount, u32 repeat = 1, bool defaultStride = false,
-        const char* algName = "AicpuReduceScatterSoleNHRMultiChannel")
+        const char* algName = "AicpuReduceScatterSoleNHRMultiLink")
     {
         for (u32 r = 0; r < ranks; ++r) {
             auto param = Param();
@@ -961,7 +961,7 @@ TEST_F(MeshChunkTest, NhrMultiLinkHostOnlyCalculatesResources)
 {
     NhrMultiLinkScenario scenario(3, 7, 10, HCCL_DATA_TYPE_FP32, 2);
     auto param = scenario.Param();
-    std::strcpy(param.algName, "AicpuReduceScatterSoleNHRMultiChannel");
+    std::strcpy(param.algName, "AicpuReduceScatterSoleNHRMultiLink");
     param.inputPtr = param.outputPtr = nullptr;
     param.DataDes.count = 0; // MC2 host tiling has no device count.
     EXPECT_FALSE(UseCannBridge(param));
@@ -1030,7 +1030,7 @@ TEST_F(MeshChunkTest, NhrMultiLinkKfcDispatchHonorsRepeatsAndExplicitOrDefaultRa
 
 TEST_F(MeshChunkTest, NhrDefaultAndMigratedNamesResolveThroughKfcDispatch)
 {
-    for (const char* algName : {"InsReduceScatterNHR", "AicpuReduceScatterSoleNHRMultiChannel"}) {
+    for (const char* algName : {"InsReduceScatterNHR", "AicpuReduceScatterSoleNHRMultiLink"}) {
         SCOPED_TRACE(algName);
         EXPECT_TRUE(CollAlgExecRegistryV2::Instance().IsRegistered(HCCL_CMD_REDUCE_SCATTER, algName));
         EXPECT_FALSE(CollAlgExecRegistryV2::Instance().IsRegistered(HCCL_CMD_ALLGATHER, algName));

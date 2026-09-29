@@ -102,7 +102,7 @@ HcclResult CalcChannelRequestNhr(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
 {
-    if (std::strcmp(param.algName, "AicpuReduceScatterSoleNHRMultiChannel") != 0) {
+    if (std::strcmp(param.algName, "AicpuReduceScatterSoleNHRMultiLink") != 0) {
         return CalcChannelRequestMesh1D(comm, param, topoInfo, subcommInfo, channels);
     }
     // Model a CLOS peer with three links for the MC2 host resource-allocation test.

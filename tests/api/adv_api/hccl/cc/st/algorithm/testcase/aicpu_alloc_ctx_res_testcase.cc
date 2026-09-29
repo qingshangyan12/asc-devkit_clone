@@ -107,7 +107,7 @@ TEST_F(AicpuAllocCtxResTest, ReduceScatterNamesAreRegisteredInMc2Client)
 {
     // This target links the current mc2_client, rather than the algorithm-test registry.
     auto& registry = CollAlgExecRegistryV2::Instance();
-    for (const char* algName : {"InsReduceScatterNHR", "AicpuReduceScatterSoleNHRMultiChannel"}) {
+    for (const char* algName : {"InsReduceScatterNHR", "AicpuReduceScatterSoleNHRMultiLink"}) {
         EXPECT_TRUE(registry.IsRegistered(HCCL_CMD_REDUCE_SCATTER, algName));
         EXPECT_NE(registry.GetAlgExec(HCCL_CMD_REDUCE_SCATTER, algName), nullptr);
         EXPECT_FALSE(registry.IsRegistered(HCCL_CMD_ALLGATHER, algName));
