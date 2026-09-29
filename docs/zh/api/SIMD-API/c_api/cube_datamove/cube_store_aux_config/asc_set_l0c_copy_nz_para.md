@@ -32,6 +32,8 @@
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
+矩阵数量、源和目的矩阵间隔的图示见[NZ2ND](../cube_store_key_features/NZ2ND.md)和[NZ2DN](../cube_store_key_features/NZ2DN.md)；Nz2DN场景还需配合[asc_set_l0c_copy_channel_para](asc_set_l0c_copy_channel_para.md)设置源Nz分形行间隔。
+
 ## 函数原型
 
 ```c

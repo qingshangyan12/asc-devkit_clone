@@ -32,6 +32,8 @@
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
+`src_nz_fractal_stride`与源矩阵排布的对应关系见[NZ2DN](../cube_store_key_features/NZ2DN.md)；矩阵数量及矩阵间隔由[asc_set_l0c_copy_nz_para](asc_set_l0c_copy_nz_para.md)配置。
+
 ## 函数原型
 
 ```c

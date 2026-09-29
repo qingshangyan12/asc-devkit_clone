@@ -35,6 +35,12 @@ asc_mmad通过`asc_unit_flag_mode::ENABLE_KEEP`或`ENABLE_UPDATE`启用单元标
 
 ![asc_mmad和L0C Buffer搬出接口同时沿M方向写-读](../../../../figures/mmad_unitflag.png "asc_mmad和L0C Buffer搬出接口同时沿M方向写-读")
 
+计算侧接口参见[asc_mmad](../mmad_compute/asc_mmad.md)，搬出侧接口参见[asc_copy_l0c2gm](../../cube_datamove/cube_compute_store/asc_copy_l0c2gm.md)、[asc_copy_l0c2l1](../../cube_datamove/cube_compute_store/asc_copy_l0c2l1.md)。模式定义见[asc_unit_flag_mode](../../defs/enum/asc_unit_flag_mode.md)，状态初始化及配置覆盖行为见[asc_set_l0c_copy_config](../../cube_datamove/cube_store_aux_config/asc_set_l0c_copy_config.md)。
+
+<!-- npu="950" id1 -->
+Ascend 950PR&950DT系列产品还可参见[asc_copy_l0c2ub](../../cube_datamove/cube_compute_store/asc_copy_l0c2ub.md)。
+<!-- end id1 -->
+
 **特性约束：**
 
 - asc_mmad和L0C Buffer搬出接口均提供了UnitFlag控制参数来控制该功能的启用，需确保两者同步开启，才能正常生效。

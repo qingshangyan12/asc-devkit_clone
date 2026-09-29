@@ -32,6 +32,10 @@
 
 索引矩阵在一个int8_t的地址中的排布是逆序排布的，例如：索引矩阵1 2 0 1 0 2 1 0，在地址中的排布为1 0 2 1 0 1 2 0，其中1 0 2 1（对应索引矩阵前四位1 2 0 1）拼成一个int8_t数据，0 1 2 0（对应索引矩阵后四位0 2 1 0）拼成一个int8_t数据。
 
+搬入前的数据排布参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)；地址对齐与搬运粒度要求参见[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)，并结合本接口的参数和约束说明使用。
+
+压缩权重与索引矩阵的配合方式见[辅助矩阵分形格式详解](../../cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md)，后续稀疏矩阵乘加参见[asc_mmad_sparse](../../cube_compute/mmad_compute/asc_mmad_sparse.md)。
+
 ## 函数原型
 
 - 高维切分搬运

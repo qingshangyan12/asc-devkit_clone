@@ -35,6 +35,8 @@
 - UnitFlag开启且搬出时开启Nz2ND随路格式转换。
 - UnitFlag开启且搬出时不进行随路格式转换，且开启B8/B4量化触发Channel Merge功能。
 
+计算方向与结果搬出顺序的配合参见[UnitFlag特性说明](../mmad_compute_key_features/UnitFlag.md)；输出布局的区别参见[NZ2NZ](../../cube_datamove/cube_store_key_features/NZ2NZ.md)、[NZ2ND](../../cube_datamove/cube_store_key_features/NZ2ND.md)和[NZ2DN](../../cube_datamove/cube_store_key_features/NZ2DN.md)，具体可用场景以当前架构的搬出接口为准。
+
 ## 函数原型
 
 ```c

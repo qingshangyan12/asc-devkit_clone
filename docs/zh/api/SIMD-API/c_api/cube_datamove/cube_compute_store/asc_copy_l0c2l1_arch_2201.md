@@ -41,6 +41,12 @@
 
 此外，该搬运指令还支持int4b_t类型的量化，相关量化类型分为两种：int32_t量化为int4b_t；float量化为int4b_t。
 
+随路处理的模式选择、系数准备及限制参见[随路量化](../cube_store_key_features/accompanying_quantization.md)、[随路ReLU](../cube_store_key_features/accompanying_relu.md)和[场景组合](../cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。各特性是否可组合使用，应以本接口支持的数据类型、模式和约束为准。
+
+<!-- npu="A3,910b" id8 -->
+Scalar量化参数通过[asc_set_l0c_copy_prequant(uint64_t config)](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置；Vector量化参数通过[asc_copy_l12fb（Atlas A3系列产品和Atlas A2系列产品）](../cube_compute_load/asc_copy_l12fb_arch_2201.md)搬入，并由[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)配置起始地址索引。Nz2ND的矩阵数量与矩阵间隔通过[asc_set_l0c_copy_params](../cube_store_aux_config/asc_set_l0c_copy_params.md)配置。
+<!-- end id8 -->
+
 ## 函数原型
 
 - 常规搬运
@@ -70,12 +76,11 @@
 | m_size               | 输入    | 源NZ矩阵在M方向上的大小。<br/>&bull; 不开启NZ2ND功能，取值范围：[1, 65535]；<br/>&bull; 开启NZ2ND功能，取值范围：[1, 8192]。                                       |
 | dst_stride           | 输入    | &bull; 不开启NZ2ND功能，目的NZ矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br/>&bull; 开启NZ2ND/NZ2DN功能，目的ND矩阵每一行中的元素个数，取值不为0 ，单位：element。   |
 | src_stride           | 输入    | 源NZ矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位：C0_Size(16*sizeof(T), T为src的数据类型)。  |
-| unit_flag_mode       | 输入    | 与unit_flag参数相关，取值如下：<br/>&bull; 0保留值；<br/>&bull; 2 开启unit_flag，硬件执行完指令之后，不会设置寄存器；<br/>&bull; 3 开启unit_flag，硬件执行完指令后，会将unit_flag关闭。 |
-| quant_pre            | 输入    | 量化参数。取值见[功能说明](asc_copy_l0c2l1_arch_2201.md#功能说明)。                                                                             |
-| relu_pre             | 输入    | 开启relu。                                                                                                                          |
-| enable_channel_split | 输入    | 是否开启通道拆分的功能，默认false，不开启该功能。仅在src和dst都为float时才能开启通道拆分，且不能同时开启channel_split和NZ2ND功能。                                               |
-| enable_nz2nd         | 输入    | 开启NZ2ND开关。<br/>&bull; false：不开启；<br/>&bull; true：开启。                                                                               |
-
+| unit_flag_mode       | 输入    | 与unit_flag参数相关，取值如下：<br/>&bull; 0保留值；<br/>&bull; 2 开启unit_flag，硬件执行完指令之后，不会设置寄存器；<br/>&bull; 3 开启unit_flag，硬件执行完指令后，会将unit_flag关闭。<br>与计算指令的配合方式见[UnitFlag](../../cube_compute/mmad_compute_key_features/UnitFlag.md)。 |
+| quant_pre            | 输入    | 量化参数。取值见[功能说明](asc_copy_l0c2l1_arch_2201.md#功能说明)。<br>系数含义及配置步骤见[随路量化](../cube_store_key_features/accompanying_quantization.md)。 |
+| relu_pre             | 输入    | 开启relu。<br>模式与配置接口见[随路ReLU](../cube_store_key_features/accompanying_relu.md)。 |
+| enable_channel_split | 输入    | 是否开启通道拆分的功能，默认false，不开启该功能。仅在src和dst都为float时才能开启通道拆分，且不能同时开启channel_split和NZ2ND功能。<br>特性及支持通路见[F32 Channel Split](../cube_store_key_features/F32-Channel-Split.md)。 |
+| enable_nz2nd         | 输入    | 开启NZ2ND开关。<br/>&bull; false：不开启；<br/>&bull; true：开启。<br>布局及步长示意见[NZ2ND](../cube_store_key_features/NZ2ND.md)；关闭格式转换时参见[NZ2NZ](../cube_store_key_features/NZ2NZ.md)。 |
 ## 返回值说明
 
 无

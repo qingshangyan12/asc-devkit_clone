@@ -76,6 +76,8 @@
 
 本接口仅在AIC上执行有效。
 
+随路处理的模式选择、系数准备及限制参见[随路量化](../cube_store_key_features/accompanying_quantization.md)、[随路ReLU](../cube_store_key_features/accompanying_relu.md)和[场景组合](../cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。各特性是否可组合使用，应以本接口支持的数据类型、模式和约束为准。
+
 ## 函数原型
 
 ```c
@@ -135,12 +137,12 @@ __aicore__ inline void asc_copy_l0c2gm(__gm__ bfloat16_t* dst,
 | dst_stride | 输入 | 目的矩阵步长，取值范围为$[1, 2^{32}-1]$。<br>&nbsp;&nbsp;&bull; 若不开启Nz2ND功能，`dst_stride`表示目的Nz矩阵中相邻Z排布的起始地址偏移，单位为元素。<br>&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，`dst_stride`表示目的ND/DN矩阵每一行中的元素个数，单位为元素。<br>对于`dst_dtype`设置为`int4b_t`的输出场景，`dst_stride`必须为2的倍数。 |
 | src_stride | 输入 | 源Nz矩阵中相邻Z排布的起始地址偏移，单位为64字节，即$16\times\operatorname{sizeof}(T)$，其中$T$为`src`的数据类型。取值范围为$[0, 2^{16}-1]$。 |
 | l2_cache_mode | 输入 | 配置输出GM数据在L2 Cache中的管理策略。仅支持`asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM`、`asc_store_l2_cache_mode::NORMAL_LAST_VICTIM`、`asc_store_l2_cache_mode::NORMAL_PERSISTENT`和`asc_store_l2_cache_mode::NOTALLOC_CLEAN`。 |
-| unit_flag_mode | 输入 | UnitFlag是MMAD类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启UnitFlag，硬件执行完指令之后，不复位单元标记位。<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启UnitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将MMAD类指令和矩阵搬出类指令的UnitFlag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。 |
-| quant_pre_mode | 输入 | 预处理阶段量化模式，取值见[功能说明](#功能说明)。 |
-| relu_pre_mode | 输入 | 预处理阶段ReLU模式控制，取值如下：<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU。<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU。<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU。<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。<br> |
-| enable_channel_split | 输入 | 是否开启通道拆分功能。仅在`src_dtype`和`dst_dtype`均为`float`且输出为Nz格式时可开启。<br>&nbsp;&nbsp;&bull; `false`：不开启。<br>&nbsp;&nbsp;&bull; `true`：开启。<br> |
-| enable_nz2nd | 输入 | Nz2ND格式转换使能。<br>&nbsp;&nbsp;&bull; `false`：关闭Nz2ND转换。<br>&nbsp;&nbsp;&bull; `true`：开启Nz2ND转换。<br> |
-| enable_nz2dn | 输入 | Nz2DN格式转换使能。<br>&nbsp;&nbsp;&bull; `false`：关闭Nz2DN转换。<br>&nbsp;&nbsp;&bull; `true`：开启Nz2DN转换。<br> |
+| unit_flag_mode | 输入 | UnitFlag是MMAD类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启UnitFlag。<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启UnitFlag，硬件执行完指令之后，不复位单元标记位。<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启UnitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将MMAD类指令和矩阵搬出类指令的UnitFlag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。<br>与计算指令的配合方式见[UnitFlag](../../cube_compute/mmad_compute_key_features/UnitFlag.md)。 |
+| quant_pre_mode | 输入 | 预处理阶段量化模式，取值见[功能说明](#功能说明)。<br>系数含义及配置步骤见[随路量化](../cube_store_key_features/accompanying_quantization.md)。 |
+| relu_pre_mode | 输入 | 预处理阶段ReLU模式控制，取值如下：<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NONE`：不开启ReLU。<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::NORMAL`：开启Normal ReLU。<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::SCALAR`：开启Scalar ReLU。<br>&nbsp;&nbsp;&bull; `asc_relu_pre_mode::VECTOR`：开启Vector ReLU。<br><br>模式与配置接口见[随路ReLU](../cube_store_key_features/accompanying_relu.md)。 |
+| enable_channel_split | 输入 | 是否开启通道拆分功能。仅在`src_dtype`和`dst_dtype`均为`float`且输出为Nz格式时可开启。<br>&nbsp;&nbsp;&bull; `false`：不开启。<br>&nbsp;&nbsp;&bull; `true`：开启。<br><br>特性及支持通路见[F32 Channel Split](../cube_store_key_features/F32-Channel-Split.md)。 |
+| enable_nz2nd | 输入 | Nz2ND格式转换使能。<br>&nbsp;&nbsp;&bull; `false`：关闭Nz2ND转换。<br>&nbsp;&nbsp;&bull; `true`：开启Nz2ND转换。<br><br>布局及步长示意见[NZ2ND](../cube_store_key_features/NZ2ND.md)；关闭格式转换时参见[NZ2NZ](../cube_store_key_features/NZ2NZ.md)。 |
+| enable_nz2dn | 输入 | Nz2DN格式转换使能。<br>&nbsp;&nbsp;&bull; `false`：关闭Nz2DN转换。<br>&nbsp;&nbsp;&bull; `true`：开启Nz2DN转换。<br><br>布局与配置方法见[NZ2DN](../cube_store_key_features/NZ2DN.md)。 |
 | enable_clip_relu_pre | 输入 | 是否开启Clip ReLU，需搭配Normal ReLU一起使用，且需要开启量化功能，取值如下：<br>&nbsp;&nbsp;&bull; `false`：不开启Clip ReLU。<br>&nbsp;&nbsp;&bull; `true`：开启Clip ReLU（scalar模式）。<br> |
 
 ## 返回值说明

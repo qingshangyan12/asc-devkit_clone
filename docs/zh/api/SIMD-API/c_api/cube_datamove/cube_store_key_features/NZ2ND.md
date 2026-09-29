@@ -41,6 +41,14 @@ for (i = 0; i < matrix_num; i++) {
 - src_matrix_stride_64b表示不同Nz矩阵之间的间隔，单位为64B，即16×sizeof(L0C_element)。
 - dst_matrix_stride表示不同目标ND矩阵之间的间隔，单位为元素。
 
+<!-- npu="A3,910b" id1 -->
+Atlas A3系列产品和Atlas A2系列产品通过[asc_copy_l0c2gm（Atlas A3系列产品和Atlas A2系列产品）](../cube_compute_store/asc_copy_l0c2gm_arch_2201.md)的`nz2nd_en`启用本特性，矩阵数量及间隔由[asc_set_l0c_copy_params](../cube_store_aux_config/asc_set_l0c_copy_params.md)配置。
+<!-- end id1 -->
+<!-- npu="950" id2 -->
+Ascend 950PR&950DT系列产品通过[asc_copy_l0c2gm（Ascend 950PR&950DT系列产品）](../cube_compute_store/asc_copy_l0c2gm_arch_3510.md)的`enable_nz2nd`启用本特性，并通过[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)配置矩阵数量及间隔。
+<!-- end id2 -->
+不同架构的参数不能直接复制，尤其需要核对源矩阵间隔的单位。
+
 ## 特性约束
 
 - 当开启Channel Split/Channel Merge功能（Nz2Nz）时，此功能不可用。

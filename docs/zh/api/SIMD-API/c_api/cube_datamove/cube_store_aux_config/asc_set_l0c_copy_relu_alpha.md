@@ -32,6 +32,8 @@
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
+激活模式及配套配置见[随路ReLU](../cube_store_key_features/accompanying_relu.md)；与量化同时使用时，参见[随路量化与随路ReLU场景组合](../cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。
+
 ## 函数原型
 
 ```c

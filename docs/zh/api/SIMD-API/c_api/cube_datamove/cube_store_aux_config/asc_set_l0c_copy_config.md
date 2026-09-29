@@ -36,6 +36,10 @@
 
 本接口为矩阵搬出相关配置接口，仅在AIC上生效。
 
+量化模式、参数编码和准备流程见[随路量化](../cube_store_key_features/accompanying_quantization.md)；量化与激活参数的配合见[随路量化与随路ReLU场景组合](../cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。
+
+Vector参数需先通过[asc_copy_l12fb](../cube_compute_load/asc_copy_l12fb.md)搬入Fixpipe Buffer；地址索引的单位、容量限制及三项配置同时覆盖的行为见本页参数与约束说明。UnitFlag的初始化与读写配合见[UnitFlag](../../cube_compute/mmad_compute_key_features/UnitFlag.md)。
+
 ## 函数原型
 
 ```c

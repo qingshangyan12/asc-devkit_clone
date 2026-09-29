@@ -30,6 +30,10 @@
 
 数据搬运过程中进行随路量化时，通过调用该接口获取ReLU操作前矢量的起始地址。
 
+激活模式及配套配置见[随路ReLU](../cube_store_key_features/accompanying_relu.md)；与量化同时使用时，参见[随路量化与随路ReLU场景组合](../cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。
+
+该状态由[asc_set_l0c_copy_config](asc_set_l0c_copy_config.md)配置，其`relu_pre_addr`参数的含义和配置覆盖行为参见对应接口。返回值是FPC寄存器中的配置字段，不是量化或激活计算后的数据。
+
 ## 函数原型
 
 ```cpp

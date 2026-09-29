@@ -30,6 +30,8 @@
 
 本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。
 
+HF32格式、舍入模式及对计算精度的影响参见[HF32特性说明](../mmad_compute_key_features/HF32.md)。
+
 ## 函数原型
 
 ```c

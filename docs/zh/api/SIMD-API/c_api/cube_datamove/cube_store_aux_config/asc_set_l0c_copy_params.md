@@ -30,6 +30,13 @@
 
 DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。
 
+<!-- npu="A3,910b" id8 -->
+本接口用于Atlas A3系列产品和Atlas A2系列产品对应的[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm_arch_2201.md)和[asc_copy_l0c2l1](../cube_compute_store/asc_copy_l0c2l1_arch_2201.md)；矩阵数量和间隔的图示见[NZ2ND](../cube_store_key_features/NZ2ND.md)。
+<!-- end id8 -->
+<!-- npu="950" id9 -->
+Ascend 950PR&950DT系列产品使用[asc_set_l0c_copy_nz_para](asc_set_l0c_copy_nz_para.md)，参数单位以该接口说明为准。
+<!-- end id9 -->
+
 ## 函数原型
 
 ```cpp

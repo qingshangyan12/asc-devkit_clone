@@ -69,6 +69,8 @@ for (j = 0; j < m_size; j++) {
 - dst_stride表示目标Nz矩阵中不同Z分形列的间隔，单位为element。
 <!-- end id4 -->
 
+本特性用于保持分形输出布局的场景。各架构的搬出参数见[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm.md)和[asc_copy_l0c2l1](../cube_compute_store/asc_copy_l0c2l1.md)；输出类型与小分形宽度的关系见[随路量化](accompanying_quantization.md)、[F32 Channel Split](F32-Channel-Split.md)和[Int8 Channel Merge](Int8-Channel-Merge.md)。
+
 ## 特性约束
 
 - 当Nz2Nz与F32 Channel Split特性组合开启时，搬出到GM的Nz分形中的小分形维度为16\*8，确保小z分形的大小为512B。

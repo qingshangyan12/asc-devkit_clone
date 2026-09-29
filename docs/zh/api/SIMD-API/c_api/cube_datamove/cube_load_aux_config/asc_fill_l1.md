@@ -32,6 +32,8 @@
 
 本接口仅在AIC上执行有效。
 
+填充操作用于准备矩阵输入缓冲区，后续数据搬入及矩阵乘加的衔接参见[矩阵计算流程](../../cube_compute/overview/cube_compute_flow.md)；输入缓冲区布局参见[L1 Buffer、L0A Buffer/L0B Buffer内存结构介绍](../cube_compute_load/L1_L0A_B_memory_structure_intro.md)。
+
 ## 函数原型
 
 ```cpp

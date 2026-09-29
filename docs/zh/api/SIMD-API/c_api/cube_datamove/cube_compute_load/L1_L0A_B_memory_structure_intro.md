@@ -38,3 +38,5 @@ L0B_ADDR[15:0] = { BANK_DEPTH[6:0], BANK_WIDTH[8:0] }
 
 **图2** L0A Buffer/L0B Buffer内存结构图  
 ![](../../../../figures/l0al0b_memory_bank.png "L0A Buffer/L0B Buffer内存结构图")
+
+布局约束与搬入接口选型分别参见[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)和[矩阵搬入总体说明](cube_compute_load_overall_description.md)；矩阵数据的分形排布参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)。

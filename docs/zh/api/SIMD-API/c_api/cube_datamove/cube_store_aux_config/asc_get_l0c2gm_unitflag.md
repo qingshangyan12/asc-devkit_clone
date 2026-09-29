@@ -30,6 +30,8 @@
 
 数据搬运过程中进行随路量化时，通过调用该接口获取unit_flag设置。
 
+该状态由[asc_set_l0c_copy_config](asc_set_l0c_copy_config.md)配置，其`is_clean_unit_flag`参数的含义和配置覆盖行为参见对应接口。UnitFlag与计算、搬出指令的配合见[UnitFlag特性说明](../../cube_compute/mmad_compute_key_features/UnitFlag.md)。
+
 ## 函数原型
 
 ```cpp

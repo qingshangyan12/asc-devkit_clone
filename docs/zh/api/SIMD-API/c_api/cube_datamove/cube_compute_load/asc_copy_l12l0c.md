@@ -37,6 +37,8 @@
 - int32_t->int32_t
 - uint32_t->uint32_t
 
+源、目的矩阵的格式参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)；L0C中的数据作为累加初始值参与矩阵乘加时，参见[asc_mmad](../../cube_compute/mmad_compute/asc_mmad.md)的`c_matrix_source`和`c_matrix_init_val`参数。
+
 ## 函数原型
 
 - 常规搬运

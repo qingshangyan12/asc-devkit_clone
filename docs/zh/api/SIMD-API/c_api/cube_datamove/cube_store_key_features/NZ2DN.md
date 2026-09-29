@@ -49,6 +49,10 @@ for (int h = 0; h < matrix_num; h++) {
 - dst_matrix_stride表示相邻目的DN矩阵起始地址间的间隔，单位为element。
 - src_nz_fractal_stride表示源矩阵Nz分形相邻行的地址偏移，单位为C0\_Size。
 
+<!-- npu="950" id1 -->
+本特性适用于Ascend 950PR&950DT系列产品。以[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm_arch_3510.md)为例，通过`enable_nz2dn`启用；矩阵数量、矩阵间隔由[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)配置，源Nz分形行间隔由[asc_set_l0c_copy_channel_para](../cube_store_aux_config/asc_set_l0c_copy_channel_para.md)配置。通道拆分/合并与[双目标模式](L0C_to_UB_dual_target_mode.md)的互斥关系见下文特性约束。
+<!-- end id1 -->
+
 ## 特性约束
 
 - 当开启Channel Split/Channel Merge功能（Nz2Nz）时，此功能不可用。

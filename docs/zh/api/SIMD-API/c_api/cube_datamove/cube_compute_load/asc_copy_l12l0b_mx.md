@@ -40,6 +40,10 @@ $$
 
 本接口仅在AIC上执行有效。
 
+搬入前的数据排布参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)；地址对齐与搬运粒度要求参见[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)，并结合本接口的参数和约束说明使用。
+
+Scale矩阵的分形布局参见[辅助矩阵分形格式详解](../../cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md)；准备好数据矩阵和对应Scale矩阵后，使用[asc_mmad_mx](../../cube_compute/mmad_compute/asc_mmad_mx.md)完成计算。
+
 ## 函数原型
 
 ```cpp

@@ -260,3 +260,5 @@ MX矩阵的数据和系数分别搬运：A/B数据使用普通2D重载或`_trans
 <!-- npu="950" id12 -->
 针对Ascend 950PR&950DT系列产品，asc_copy_l12l0a/asc_copy_l12l0b（2D）可以支持b4（fp4）/b8/b16/b32数据类型以及转置场景搬运，通过配置m_step和k_step来完成多个方向的数据块搬运，并且相比asc_copy_l12l0a/asc_copy_l12l0b（3D），指令的带宽延时更小，因此不带量化系数的矩阵乘法过程中L1 Buffer->L0A Buffer/L0B Buffer通路，都推荐使用asc_copy_l12l0a/asc_copy_l12l0b（2D）指令来实现数据搬运。而带量化系数的矩阵乘法过程中，需要使用asc_copy_l12l0a_mx/asc_copy_l12l0b_mx（系数搬运）指令来实现数据搬运，其中A/B仍由2D接口搬入；MX接口只完成L1 Buffer->L0A_MX Buffer/L0B_MX Buffer系数搬运，两类接口需分别调用。
 <!-- end id12 -->
+
+具体搬入通路及接口选型参见[矩阵搬入总体说明](cube_compute_load_overall_description.md)；分形格式及其含义参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)。

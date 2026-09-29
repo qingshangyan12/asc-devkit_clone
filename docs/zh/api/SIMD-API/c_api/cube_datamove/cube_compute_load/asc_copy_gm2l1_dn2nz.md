@@ -40,6 +40,8 @@
 
 ![](../../../../figures/gm2l1_dn2nz_concept.png)
 
+搬入前的数据排布参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)；地址对齐与搬运粒度要求参见[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)，并结合本接口的参数和约束说明使用。
+
 ## 函数原型
 
 ### 模板原型（占位符形式）
