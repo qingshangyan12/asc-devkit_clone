@@ -407,7 +407,7 @@ class OpFormatType:
     FORMAT_FRACTAL_Z_3D = "FRACTAL_Z_3D"  # 33
     FORMAT_CN = "CN"  # 34
     FORMAT_NC = "NC"  # 35
-    FORMAT_DHWNC = ("DHWNC",)  # 36
+    FORMAT_DHWNC = "DHWNC"  # 36
     FORMAT_FRACTAL_Z_3D_TRANSPOSE = "FRACTAL_Z_3D_TRANSPOSE"  # 3D filter(transpose) input tensor format  # 37
     FORMAT_FRACTAL_ZN_LSTM = "FRACTAL_ZN_LSTM"  # 38
     FORMAT_FRACTAL_Z_G = "FRACTAL_Z_G"  # 39

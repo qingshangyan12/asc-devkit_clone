@@ -105,7 +105,7 @@ def test_accepts_valid_custom_binary_dtype_and_format(tmp_path, custom_binary_mo
     assert _check(tmp_path, _valid_config(), custom_binary_modules) is True
 
 
-def test_accepts_format_stored_as_tuple_constant(tmp_path, custom_binary_modules):
+def test_accepts_dhwnc_format(tmp_path, custom_binary_modules):
     content = _valid_config()
     content["op_list"][0]["inputs"][0]["format"] = "DHWNC"
 
