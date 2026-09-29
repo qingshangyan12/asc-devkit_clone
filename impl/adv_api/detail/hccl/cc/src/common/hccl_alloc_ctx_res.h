@@ -23,6 +23,7 @@
 #include "mc2_type.h"
 #include "ccu_assist_pub.h"
 #include "hccl_tiling_msg.h"
+#include "external_alg_parser.h"
 
 #include <vector>
 #include <memory>
@@ -109,7 +110,11 @@ enum class AlgorithmType {
     // 153/155 已被 master 尾部隐式编号占用（AllGatherSoleMesh/AllToAllSoleMeshConcurrent），ConcurRS 顺延 156。
     CcuSchedReduceScatterConcurMeshNHRMultiLink = 156,
     CcuSchedAllToAllMesh1DMultiJetty = 157,
-    CcuSchedReduceScatterSoleMeshA5 = 158,
+    // 与设备侧 hccl_ccu_v0_def.h 的 AlgorithmType 同值（158，两级拓扑 L1 NHR 中继 RS）
+    CcuSchedReduceScatterSoleNHR = 158,
+    CcuSchedAllGatherSoleNHR = 159,
+    // 158/159 已被 master 占用（ReduceScatterSoleNHR/AllGatherSoleNHR），SoleMeshA5 顺延 160。
+    CcuSchedReduceScatterSoleMeshA5 = 160,
 };
 
 static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
@@ -126,8 +131,10 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuSchedAllReduceSoleMesh", AlgorithmType::CcuAllReduceMeshMem2Mem1D},
     {"CcuSchedAllGatherMesh1DMem2Mem", AlgorithmType::CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherSoleMesh", AlgorithmType::CcuSchedAllGatherSoleMesh},
+    {"CcuSchedAllGatherSoleNHR", AlgorithmType::CcuSchedAllGatherSoleNHR},
     {"CcuSchedReduceScatterConcurMeshNHRMultiLink", AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink},
     {"CcuSchedReduceScatterSoleNHRMultiLink", AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink},
+    {"CcuSchedReduceScatterSoleNHR", AlgorithmType::CcuSchedReduceScatterSoleNHR},
     {"CcuSchedReduceScatterSoleMeshA5", AlgorithmType::CcuSchedReduceScatterSoleMeshA5}};
 
 typedef HcclResult (*OpParamPrepareFunc)(

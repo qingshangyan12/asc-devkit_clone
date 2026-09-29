@@ -12,6 +12,7 @@ set(INCLUDE_LIST
     ${HCCL_CC_INCLUDE_DIR}
     ${HCCL_DEV_BASE}/src/common
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
+    ${HCCL_DEV_BASE}/src/common/hcomm_dlsym/ccu
 
     ${HCCL_DEV_BASE}/src/ops
     ${HCCL_DEV_BASE}/src/ops/op_common
@@ -22,6 +23,7 @@ set(INCLUDE_LIST
     ${HCCL_DEV_BASE}/src/ops/op_common/executor/registry
 
     ${HCCL_DEV_BASE}/src/ops/op_common/selector
+    ${HCCL_DEV_BASE}/src/ops/op_common/external_alg
 
     ${HCCL_DEV_BASE}/src/ops/op_common/template
     ${HCCL_DEV_BASE}/src/ops/op_common/template/registry
@@ -57,6 +59,7 @@ set(INCLUDE_LIST
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/template/aicpu
 
     ${HCCL_DEV_BASE}/src/common/hcomm_dlsym
+    ${HCCL_DEV_BASE}/src/common/hcomm_dlsym/ccu
 )
 
 list(APPEND INCLUDE_LIST
@@ -202,6 +205,7 @@ target_sources(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
     ${HCCL_DEV_BASE}/src/ops/reduce_scatter/selector/reduce_scatter_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoall_auto_selector.cc
     ${HCCL_DEV_BASE}/src/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
+    ${HCCL_DEV_BASE}/src/ops/op_common/external_alg/alg_meta_registry.cc
 )
 
 target_include_directories(${HCCL_CHECKER_KERNEL_TARGET} PRIVATE
