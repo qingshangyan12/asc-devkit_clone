@@ -72,6 +72,7 @@ int32_t ElfGetSymbolOffset(uint8_t* elf, size_t elfSize, const char* symbolName,
 
 void AicpuDumpPrintBuffer(const void* dumpBuffer, const size_t bufSize)
 {
+    return;
     if (dumpBuffer == nullptr || bufSize == 0) {
         ASCENDLOGE("AicpuDumpPrintBuffer: empty buffer.");
         return;
