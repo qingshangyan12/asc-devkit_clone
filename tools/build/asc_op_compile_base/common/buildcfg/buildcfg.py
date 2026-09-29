@@ -13,8 +13,9 @@
 This module provides the functions about build_config.
 """
 
-import warnings
 import contextvars
+import copy
+import warnings
 
 from .buildcfg_mapping import (
     dynamic_shape,
@@ -26,7 +27,15 @@ from .buildcfg_mapping import (
 from .default_buildcfg import cce_default_static_build_config
 from .global_info import GlobalInfoContainer
 
-_build_cfg = contextvars.ContextVar("_build_cfg", default=cce_default_static_build_config.copy())
+_build_cfg = contextvars.ContextVar("_build_cfg", default=None)
+
+
+def _get_current_build_config():
+    config_dict = _build_cfg.get()
+    if config_dict is None:
+        config_dict = copy.deepcopy(cce_default_static_build_config)
+        _build_cfg.set(config_dict)
+    return config_dict
 
 
 def _check_kwargs(kwargs):
@@ -91,7 +100,7 @@ class BuildConfigWrapper(object):
         _build_cfg.reset(self.token)
 
     def current(self):
-        return _build_cfg.get()
+        return _get_current_build_config()
 
 
 def build_config(**kwargs):
@@ -108,7 +117,7 @@ def build_config(**kwargs):
         The build configuration
     """
     _check_kwargs(kwargs)
-    config_dict = _build_cfg.get().copy()
+    config_dict = copy.deepcopy(_get_current_build_config())
     _update_config_dict(kwargs, config_dict)
     return BuildConfigWrapper(config_dict)
 
@@ -138,7 +147,7 @@ def get_config_value(key, config_dict):
 
 def get_current_build_config(key="all"):
     """Get the current build configuration."""
-    cur_conf = _build_cfg.get()
+    cur_conf = _get_current_build_config()
     return get_config_value(key, cur_conf)
 
 
@@ -150,12 +159,13 @@ def get_default_build_config(key="all"):
 
 def set_current_build_config(key, value):
     """set cce build config just for compatible with old ops."""
+    config_dict = _get_current_build_config()
     if key == "dynamic_shape":
-        _build_cfg.get()[dynamic_shape] = value
-    elif key in _build_cfg.get():
-        _build_cfg.get()[key] = value
-    elif ("tir." + key) in _build_cfg.get():
-        _build_cfg.get()["tir." + key] = value
+        config_dict[dynamic_shape] = value
+    elif key in config_dict:
+        config_dict[key] = value
+    elif ("tir." + key) in config_dict:
+        config_dict["tir." + key] = value
 
     if key in GlobalInfoContainer.global_info:
         GlobalInfoContainer.global_info[key] = value

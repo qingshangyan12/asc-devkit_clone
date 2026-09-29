@@ -53,10 +53,9 @@ class CCECInfo:
 
 def current_build_config():
     """Get the current build configuration."""
-    # 'pylint: disable=protected-access
-    from .buildcfg.buildcfg import _build_cfg
+    from .buildcfg.buildcfg import get_current_build_config
 
-    return _build_cfg.get()
+    return get_current_build_config()
 
 
 def switching_compilation_mode():
