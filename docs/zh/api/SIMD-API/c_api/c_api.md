@@ -2,6 +2,8 @@
 
 C API文档按最细粒度公共头文件归类。除试验接口外，整体使用时可以包含`c_api/asc_simd.h`。
 
+数据搬运接口的概念、硬件通路和选型说明请参见[数据搬运导览](data_move_guide/data_move_guide.md)。
+
 ## 基础定义
 
 ### 联合体
@@ -33,11 +35,12 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_store_l2_cache_mode](defs/enum/asc_store_l2_cache_mode.md)|表示数据从UB搬运到GM时的L2 Cache策略，也可用于标量store策略配置。|`c_api/defs/enum.h`|
 |[asc_unit_flag_mode](defs/enum/asc_unit_flag_mode.md)|表示矩阵计算或矩阵搬出接口执行后的UnitFlag行为。|`c_api/defs/enum.h`|
 
-### 数据类型
+### 寄存器类型
 
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
-|[reg数据类型定义](defs/type/data_type_definition.md)|介绍C API的矢量数据寄存器、掩码寄存器、非对齐寄存器和地址寄存器数据类型。|`c_api/defs/type.h`|
+|[寄存器类型总览](defs/type/reg_data_types.md)|介绍C API寄存器类型、用途及使用入口。|`c_api/defs/type.h`|
+|[寄存器类型定义](defs/type/data_type_definition.md)|介绍C API的矢量数据寄存器、掩码寄存器、非对齐寄存器和地址寄存器数据类型。|`c_api/defs/type.h`|
 
 ### 宏
 
@@ -85,7 +88,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_get_system_cycle](utils/sys_var/asc_get_system_cycle.md)|获取当前系统cycle数。|`c_api/utils/sys_var.h`|
 |[asc_get_system_clock](utils/sys_var/asc_get_system_clock.md)|获取当前系统时钟时间值（微秒）。|`c_api/utils/sys_var.h`|
 |[asc_get_vf_len](utils/sys_var/asc_get_vf_len.md)|获取Tensor位宽VL（Vector Length）的大小。|`c_api/utils/sys_var.h`|
-|[asc_set_ffts_base_addr](utils/sys_var/asc_set_ffts_base_addr.md)|在[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)和[asc_sync_block_wait](sync/asc_sync_block_wait.md)之前使用，设置核间同步寄存器的基地址。|`c_api/utils/sys_var.h`|
+|[asc_set_ffts_base_addr](utils/sys_var/asc_set_ffts_base_addr.md)|在[asc_sync_block_arrive](sync/inter_core_sync/asc_sync_block_arrive.md)和[asc_sync_block_wait](sync/inter_core_sync/asc_sync_block_wait.md)之前使用，设置核间同步寄存器的基地址。|`c_api/utils/sys_var.h`|
 
 ## 矩阵计算
 
@@ -138,7 +141,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_set_l0c_copy_config](cube_datamove/asc_set_l0c_copy_config.md)|设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活和UnitFlag功能的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_lrelu_alpha](cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)|在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_relu_alpha](cube_datamove/asc_set_l0c_copy_relu_alpha.md)|在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。|`c_api/cube_datamove/cube_datamove.h`|
-|[asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)|DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
+|[asc_set_l0c_copy_params](cube_datamove/asc_set_l0c_copy_params.md)|将L0C Buffer数据搬运到Global Memory或L1 Buffer并进行随路格式转换（NZ格式转换为ND格式）时，通过该接口设置格式转换的相关配置。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l0c_copy_prequant](cube_datamove/asc_set_l0c_copy_prequant.md)|数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的标量量化参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix](cube_datamove/asc_set_l13d_fmatrix.md)|配置3D img2col搬运模式下左矩阵的Feature Map属性描述参数。|`c_api/cube_datamove/cube_datamove.h`|
 |[asc_set_l13d_fmatrix_b](cube_datamove/asc_set_l13d_fmatrix_b.md)|配置3D img2col搬运模式下右矩阵的Feature Map属性描述参数。|`c_api/cube_datamove/cube_datamove.h`|
@@ -359,7 +362,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_loadalign_downsample](reg_compute/load/asc_loadalign_downsample.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，2倍下采样模式。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_mask_downsample](reg_compute/load/asc_loadalign_mask_downsample.md)|对齐数据搬运接口，从UB连续对齐搬入掩码数据，2倍下采样模式，通过函数返回值返回掩码寄存器。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_downsample_postupdate](reg_compute/load/asc_loadalign_downsample_postupdate.md)|对齐数据搬运接口，2倍下采样模式，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
-|[asc_loadalign_postupdate](reg_compute/load/asc_loadalign_postupdate.md)|将数据从UB搬入MaskReg，使能post mod。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_postupdate](reg_compute/load/asc_loadalign_postupdate.md)|从UB搬入矢量数据寄存器或掩码寄存器，并在搬运后自动更新源地址。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_unpack](reg_compute/load/asc_loadalign_unpack.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，解压缩模式。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_unpack4](reg_compute/load/asc_loadalign_unpack4.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，解压缩模式。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_unpack4_postupdate](reg_compute/load/asc_loadalign_unpack4_postupdate.md)|对齐数据搬运接口，解压缩模式，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
@@ -685,7 +688,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_atomic_sub](atomic/scalar_atomic/asc_atomic_sub.md)|对Global Memory中的数据与指定数据执行原子减操作。|`c_api/atomic/scalar_atomic.h`|
 |[asc_atomic_xor](atomic/scalar_atomic/asc_atomic_xor.md)|对Global Memory中的数据与指定数据执行原子异或操作。|`c_api/atomic/scalar_atomic.h`|
 |[asc_get_store_atomic_config](atomic/scalar_atomic/asc_get_store_atomic_config.md)|获取原子操作启用位与原子操作类型的值。|`c_api/atomic/scalar_atomic.h`|
-|[asc_set_store_atomic_config_v1](atomic/scalar_atomic/asc_set_store_atomic_config_v1.md)|设置原子操作启用位与原子操作类型的值，适用于Atlas A3 训练系列产品/Atlas A3 推理系列产品和Atlas A2 训练系列产品/Atlas A2 推理系列产品。|`c_api/atomic/scalar_atomic.h`|
+|[asc_set_store_atomic_config_v1](atomic/scalar_atomic/asc_set_store_atomic_config_v1.md)|设置原子操作启用位与原子操作类型的值，适用于Atlas A3系列产品和Atlas A2系列产品。|`c_api/atomic/scalar_atomic.h`|
 
 ## 缓存控制
 
@@ -702,26 +705,33 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 
 ## 同步控制
 
+### 核内同步
+
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
-|[asc_lock](sync/asc_lock.md)|用于AI Core内部异步流水线同步的接口。|`c_api/sync/sync.h`|
-|[asc_sync](sync/asc_sync.md)|等待所有流水线操作完成。|`c_api/sync/sync.h`|
-|[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)|该指令用于发送同步信息数据到核间同步寄存器，设置同步点。|`c_api/sync/sync.h`|
-|[asc_sync_block_wait](sync/asc_sync_block_wait.md)|和[asc_sync_block_arrive](sync/asc_sync_block_arrive.md)配合使用（通过flag_id关联），用于等待所有同步对象到达flag_id对应的同步点。|`c_api/sync/sync.h`|
-|[asc_sync_data_barrier](sync/asc_sync_data_barrier.md)|用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。|`c_api/sync/sync.h`|
-|[asc_sync_inter_arrive](sync/asc_sync_inter_arrive.md)|和[asc_sync_inter_wait](sync/asc_sync_inter_wait.md)配合使用（通过flag_id关联），用于组间block的信号同步。|`c_api/sync/sync.h`|
-|[asc_sync_inter_wait](sync/asc_sync_inter_wait.md)|等待block内同步标志。|`c_api/sync/sync.h`|
-|[asc_sync_intra_arrive](sync/asc_sync_intra_arrive.md)|向核间同步寄存器发送同步信号。|`c_api/sync/sync.h`|
-|[asc_sync_intra_wait](sync/asc_sync_intra_wait.md)|等待核间同步寄存器同步标志。|`c_api/sync/sync.h`|
-|[asc_sync_mte2](sync/asc_sync_mte2.md)|等待PIPE_MTE2流水完成。|`c_api/sync/sync.h`|
-|[asc_sync_mte3](sync/asc_sync_mte3.md)|等待PIPE_MTE3流水完成。|`c_api/sync/sync.h`|
-|[asc_sync_notify](sync/asc_sync_notify.md)|设置同步标志。|`c_api/sync/sync.h`|
-|[asc_sync_pipe](sync/asc_sync_pipe.md)|等待指定流水线操作完成。|`c_api/sync/sync.h`|
-|[asc_sync_subblock_arrive](sync/asc_sync_subblock_arrive.md)|和[asc_sync_subblock_wait](sync/asc_sync_subblock_wait.md)配合使用（通过flag_id关联），用于组内subblock间的信号同步。|`c_api/sync/sync.h`|
-|[asc_sync_subblock_wait](sync/asc_sync_subblock_wait.md)|等待subblock间同步标志。|`c_api/sync/sync.h`|
-|[asc_sync_vec](sync/asc_sync_vec.md)|同步所有流水线。|`c_api/sync/sync.h`|
-|[asc_sync_wait](sync/asc_sync_wait.md)|等待同步标志。|`c_api/sync/sync.h`|
-|[asc_unlock](sync/asc_unlock.md)|释放缓存。|`c_api/sync/sync.h`|
+|[asc_lock](sync/intra_core_sync/asc_lock.md)|用于AI Core内部异步流水线同步的接口。|`c_api/sync/sync.h`|
+|[asc_sync](sync/intra_core_sync/asc_sync.md)|等待所有流水线操作完成。|`c_api/sync/sync.h`|
+|[asc_sync_data_barrier](sync/intra_core_sync/asc_sync_data_barrier.md)|用于阻塞后续的指令执行，直到所有之前的内存访问指令（需要等待的内存位置可以通过参数控制）执行结束。|`c_api/sync/sync.h`|
+|[asc_sync_mte2](sync/intra_core_sync/asc_sync_mte2.md)|等待PIPE_MTE2流水完成。|`c_api/sync/sync.h`|
+|[asc_sync_mte3](sync/intra_core_sync/asc_sync_mte3.md)|等待PIPE_MTE3流水完成。|`c_api/sync/sync.h`|
+|[asc_sync_notify](sync/intra_core_sync/asc_sync_notify.md)|设置同步标志。|`c_api/sync/sync.h`|
+|[asc_sync_pipe](sync/intra_core_sync/asc_sync_pipe.md)|等待指定流水线操作完成。|`c_api/sync/sync.h`|
+|[asc_sync_vec](sync/intra_core_sync/asc_sync_vec.md)|同步所有流水线。|`c_api/sync/sync.h`|
+|[asc_sync_wait](sync/intra_core_sync/asc_sync_wait.md)|等待同步标志。|`c_api/sync/sync.h`|
+|[asc_unlock](sync/intra_core_sync/asc_unlock.md)|释放缓存。|`c_api/sync/sync.h`|
+
+### 核间同步
+
+|API名称|说明|最细粒度公共头文件|
+|---|---|---|
+|[asc_sync_block_arrive](sync/inter_core_sync/asc_sync_block_arrive.md)|该指令用于发送同步信息数据到核间同步寄存器，设置同步点。|`c_api/sync/sync.h`|
+|[asc_sync_block_wait](sync/inter_core_sync/asc_sync_block_wait.md)|和[asc_sync_block_arrive](sync/inter_core_sync/asc_sync_block_arrive.md)配合使用（通过flag_id关联），用于等待所有同步对象到达flag_id对应的同步点。|`c_api/sync/sync.h`|
+|[asc_sync_inter_arrive](sync/inter_core_sync/asc_sync_inter_arrive.md)|和[asc_sync_inter_wait](sync/inter_core_sync/asc_sync_inter_wait.md)配合使用（通过flag_id关联），用于组间block的信号同步。|`c_api/sync/sync.h`|
+|[asc_sync_inter_wait](sync/inter_core_sync/asc_sync_inter_wait.md)|等待block内同步标志。|`c_api/sync/sync.h`|
+|[asc_sync_intra_arrive](sync/inter_core_sync/asc_sync_intra_arrive.md)|向核间同步寄存器发送同步信号。|`c_api/sync/sync.h`|
+|[asc_sync_intra_wait](sync/inter_core_sync/asc_sync_intra_wait.md)|等待核间同步寄存器同步标志。|`c_api/sync/sync.h`|
+|[asc_sync_subblock_arrive](sync/inter_core_sync/asc_sync_subblock_arrive.md)|和[asc_sync_subblock_wait](sync/inter_core_sync/asc_sync_subblock_wait.md)配合使用（通过flag_id关联），用于组内subblock间的信号同步。|`c_api/sync/sync.h`|
+|[asc_sync_subblock_wait](sync/inter_core_sync/asc_sync_subblock_wait.md)|等待subblock间同步标志。|`c_api/sync/sync.h`|
 
 ## 其他操作
 
