@@ -163,6 +163,9 @@ inline void mad_mx(
 {}
 
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
+inline uint64_t ld_dev(__gm__ int64_t* src, int16_t offset) { return 0; }
+
+// The compiler supports this overload, but it is missing from the CPU debug stub header.
 inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
 
 #ifndef ULL
@@ -1516,8 +1519,6 @@ inline void load_cbuf_to_cb_transpose_s4(
     float4_e2m1x2_t* dst, __cbuf__ float4_e2m1x2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride)
 {}
-
-inline int64_t ld_dev(__gm__ int64_t*, int16_t) { return 0; }
 
 #if defined(__DAV_CUBE__)
 inline int32_t g_coreType = 1;

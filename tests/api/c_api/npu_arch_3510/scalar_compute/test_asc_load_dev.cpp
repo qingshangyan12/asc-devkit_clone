@@ -14,8 +14,6 @@
 #include "tests/api/c_api/stub/cce_stub.h"
 #include "include/c_api/asc_simd.h"
 
-uint64_t ld_dev(__gm__ int64_t*, int16_t) { return 0; }
-
 #define TEST_ASC_LOAD_DEV(data_type, cce_type, raw_value, expected_value)                                         \
     namespace {                                                                                                   \
     uint64_t ld_dev_##data_type##_stub(__gm__ cce_type* addr, int16_t offset)                                     \
