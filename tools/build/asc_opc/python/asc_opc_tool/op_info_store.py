@@ -435,6 +435,7 @@ class OpPathParse(object):
         generate_custom_opp_list
         """
         custom_opp_path = os.getenv("ASCEND_CUSTOM_OPP_PATH")
+        self.custom_opp_path_list = []
 
         if custom_opp_path:
             if ":" not in custom_opp_path:
@@ -451,6 +452,7 @@ class OpPathParse(object):
         generate_custom_opp_list
         """
         ascend_opp_path = os.getenv("ASCEND_OPP_PATH")
+        self.vendors_opp_path_list = []
         config_path = "{}/vendors/config.ini".format(ascend_opp_path)
 
         content = ""
@@ -520,8 +522,8 @@ def load_op_info_store(soc_version):
 
     OpPathParse().start_parse()
     custom_opp_path_list = OpPathParse().get_custom_opp_path_list()
+    custom_dict_list = []
     if custom_opp_path_list:
-        custom_dict_list = []
         for custom_opp_path in custom_opp_path_list:
             custom_opp_json_path = "{}/op_impl/ai_core/tbe/config/{}/aic-{}-ops-info.json".format(
                 custom_opp_path, short_soc_version, short_soc_version
@@ -531,11 +533,11 @@ def load_op_info_store(soc_version):
                 logger.debug("json_path is {}.".format(json_path))
                 continue
             custom_dict_list.append(custom_dict)
-        SubOpInfoStore().set_op_custom(custom_dict_list)
+    SubOpInfoStore().set_op_custom(custom_dict_list)
 
     vendors_opp_path_list = OpPathParse().get_vendors_opp_path_list()
+    vendor_dict_list = []
     if vendors_opp_path_list:
-        vendor_dict_list = []
         for vendor_opp_path in vendors_opp_path_list:
             vendor_opp_json_path = "{}/op_impl/ai_core/tbe/config/{}/aic-{}-ops-info.json".format(
                 vendor_opp_path, short_soc_version, short_soc_version
@@ -545,4 +547,4 @@ def load_op_info_store(soc_version):
                 logger.debug("json_path is {}.".format(json_path))
                 continue
             vendor_dict_list.append(vendor_dict)
-        SubOpInfoStore().set_op_vendors(vendor_dict_list)
+    SubOpInfoStore().set_op_vendors(vendor_dict_list)
