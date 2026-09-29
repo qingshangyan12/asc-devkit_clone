@@ -417,7 +417,7 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
         hard = Hardware::L0C;
     } else if (pos == TPosition::CO2) {
         hard = Hardware::UB;
-#elif (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3003)
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3003))
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {
@@ -426,19 +426,19 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
         hard = Hardware::GM;
     } else if (pos == TPosition::C2PIPE2GM) {
         hard = Hardware::FIXBUF;
-#elif (__NPU_ARCH__ == 3002)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3002)
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {
         hard = Hardware::BIAS;
     } else if (pos == TPosition::C2PIPE2GM) {
         hard = Hardware::FIXBUF;
-#elif (__NPU_ARCH__ == 3102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102)
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {
         hard = Hardware::BIAS;
-#elif (__NPU_ARCH__ == 5102)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
     } else if (pos == TPosition::C1) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C2) {
@@ -447,7 +447,7 @@ __aicore__ constexpr Hardware GetPhyType(TPosition pos)
         hard = Hardware::GM;
     } else if (pos == TPosition::C2PIPE2GM) {
         hard = Hardware::FIXBUF;
-#elif (__NPU_ARCH__ == 5162)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
     } else if (pos == TPosition::A2) {
         hard = Hardware::L1;
     } else if (pos == TPosition::C1) {
@@ -580,7 +580,7 @@ __aicore__ constexpr bool IsTQuePositionForVec(TPosition src, TPosition dst)
 template <typename T>
 __aicore__ constexpr bool UseBufIdSync()
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     return IsTQuePositionForVec(T::srcPosition, T::dstPosition) || T::config.enableStaticEvtId;
 #else
     return false;
@@ -589,7 +589,7 @@ __aicore__ constexpr bool UseBufIdSync()
 
 __aicore__ constexpr bool UseBufIdSync(TPosition src, TPosition dst, bool enableStaticEvtId)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     return IsTQuePositionForVec(src, dst) || enableStaticEvtId;
 #else
     return false;
@@ -677,45 +677,25 @@ __aicore__ constexpr HardEvent GetQueEvt(
     } else if (src == Hardware::L0B) {
         ASSERT(dst == Hardware::L0C);
         return fwdDirect ? HardEvent::M_V : HardEvent::V_M;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
     } else if (src == Hardware::L0C) {
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002))
         ASSERT(dst == Hardware::UB);
         return fwdDirect ? HardEvent::M_V : HardEvent::V_M;
-    }
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-    } else if (src == Hardware::L0C) {
+#else
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
         ASSERT(dst == Hardware::GM);
-        return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
-    }
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3003))
-}
-else if (src == Hardware::L0C)
-{
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003)
-    ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
-    return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
-#else
-    ASSERT(dst == Hardware::GM || dst == Hardware::UB);
-    return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
-#endif
-}
-#elif (__NPU_ARCH__ == 3102)
-}
-else if (src == Hardware::L0C)
-{
-    ASSERT(dst == Hardware::GM || dst == Hardware::UB);
-    return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
-}
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3003))
+        ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002))
+        ASSERT(dst == Hardware::GM || dst == Hardware::UB);
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3102))
+        ASSERT(dst == Hardware::GM || dst == Hardware::UB);
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
-}
-else if (src == Hardware::L0C)
-{
-    ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
-    return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
-}
-#else
-}
+        ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
 #endif
+        return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
+#endif
+    }
     return HardEvent::MAX;
 }
 
@@ -742,13 +722,11 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
     } else if (src == TPosition::C1) {
         if (dst == TPosition::C2) {
             return fwdDirect ? HardEvent::MTE1_M : HardEvent::M_MTE1;
-#if (__NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
         } else if (dst == TPosition::GM || dst == TPosition::C2) {
             return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
-        }
-#else
-        }
 #endif
+        }
     } else if (src == TPosition::CO1) {
         if (dst == TPosition::CO2 || dst == TPosition::GM) {
             return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
