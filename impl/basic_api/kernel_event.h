@@ -72,8 +72,6 @@ enum class HardEvent : uint8_t {
     MTE1_FIX,
     FIX_MTE1,
     FIX_FIX,
-    M_MTE3,
-    MTE3_M,
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 5101) || \
      (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
@@ -109,8 +107,6 @@ enum class HardEventAic : uint8_t {
     MTE1_FIX,
     FIX_MTE1,
     FIX_FIX,
-    M_MTE3,
-    MTE3_M,
     MAX,
 };
 
@@ -198,10 +194,6 @@ __aicore__ constexpr uint8_t EventToIndexAic(HardEvent evt)
         return static_cast<uint8_t>(HardEventAic::MTE1_FIX);
     } else if (evt == HardEvent::FIX_FIX) {
         return static_cast<uint8_t>(HardEventAic::FIX_FIX);
-    } else if (evt == HardEvent::M_MTE3) {
-        return static_cast<uint8_t>(HardEventAic::M_MTE3);
-    } else if (evt == HardEvent::MTE3_M) {
-        return static_cast<uint8_t>(HardEventAic::MTE3_M);
     } else {
         return static_cast<uint8_t>(HardEventAic::MAX);
     }
@@ -1292,14 +1284,6 @@ __aicore__ inline void WaitFlagImpl(const HardEvent event, int32_t eventID)
             break;
         case HardEvent::V_V:
             return;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5162))
-        case HardEvent::M_MTE3:
-            WaitFlagInternal<PIPE_M, PIPE_MTE3>(e);
-            break;
-        case HardEvent::MTE3_M:
-            WaitFlagInternal<PIPE_MTE3, PIPE_M>(e);
-            break;
-#endif
         case HardEvent::MAX:
             break;
         default:

@@ -49,7 +49,6 @@ const int32_t DEFAULT_BLOCK_SIZE = 256;
 #endif
 const int32_t MAX_REPEAT_TIMES = 255;
 const int32_t MIN_REPEAT_TIMES = 0;
-const int16_t TWO_BLK_SIZE = 64;
 const bool DEFAULT_REPEAT_STRIDE_MODE = 0;
 const bool STRIDE_SIZE_MODE = 0;
 const int32_t ONE_BYTE_BIT_SIZE = 8;
@@ -293,11 +292,13 @@ const int32_t SRC_GAP_SIZE_BYTE = 32;
 const int32_t DST_BURST_LEN_SIZE_ELE = 256;
 const int32_t VREDUCE_PER_REP_OUTPUT = 2;
 const uint16_t ONE_PARAM_SIZE = 8;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
-                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162)
 const int32_t BLOCK_COUT = 16;
+const uint16_t TWO_BLK_SIZE = 64;
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
 const uint16_t AIV_CORE_NUM = 72;
 #else
 const uint16_t AIV_CORE_NUM = 50;
