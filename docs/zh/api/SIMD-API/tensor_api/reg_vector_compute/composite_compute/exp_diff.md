@@ -105,12 +105,12 @@ __simd_callee__ inline reg_tensor<T> exp_diff(
 template <typename Src0Tensor, typename Src1Tensor, typename DstTensor>
 __simd_vf__ inline void exp_diff_vf(
     const Src0Tensor src0, const Src1Tensor src1, DstTensor dst, uint16_t repeat_times, uint32_t total,
-    uint32_t src_one_repeat, uint32_t dst_one_repeat)
+    uint32_t src_one_repeat_size, uint32_t dst_one_repeat_size)
 {
     uint32_t remain = total;
     for (uint16_t i = 0; i < repeat_times; ++i) {
-        const auto src_coord = asc::te::make_coord(i * src_one_repeat);
-        const auto dst_coord = asc::te::make_coord(i * dst_one_repeat);
+        const auto src_coord = asc::te::make_coord(i * src_one_repeat_size);
+        const auto dst_coord = asc::te::make_coord(i * dst_one_repeat_size);
         auto mask = asc::te::experimental::update_mask<float>(remain);
         auto src0_reg = asc::te::experimental::load(src0, src_coord).with_mask(mask);
         auto src1_reg = asc::te::experimental::load(src1, src_coord).with_mask(mask);

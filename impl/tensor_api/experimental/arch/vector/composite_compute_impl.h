@@ -86,6 +86,16 @@ __simd_callee__ inline reg_tensor<T> mula(reg_tensor<T>& dst, const reg_tensor<T
     return dst;
 }
 
+template <typename T>
+__simd_callee__ inline reg_tensor<T> fma(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2)
+{
+    static_assert(detail::supports_fma_v<T>, "fma does not support this element type");
+    reg_tensor<T> dst(src0.mask);
+    dst.reg = asc_fma(src0.reg, src1.reg, src2.reg, src0.mask);
+    return dst;
+}
+
 template <cast_layout Layout, typename T, typename U>
 __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U& scalar)
 {

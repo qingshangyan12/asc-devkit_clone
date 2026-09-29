@@ -1713,6 +1713,7 @@
                 -   [abs_diff](SIMD-API/tensor_api/reg_vector_compute/composite_compute/abs_diff.md)
                 -   [axpy](SIMD-API/tensor_api/reg_vector_compute/composite_compute/axpy.md)
                 -   [exp_diff](SIMD-API/tensor_api/reg_vector_compute/composite_compute/exp_diff.md)
+                -   [fma](SIMD-API/tensor_api/reg_vector_compute/composite_compute/fma.md)
                 -   [madd](SIMD-API/tensor_api/reg_vector_compute/composite_compute/madd.md)
                 -   [mula](SIMD-API/tensor_api/reg_vector_compute/composite_compute/mula.md)
                 -   [muls_cast](SIMD-API/tensor_api/reg_vector_compute/composite_compute/muls_cast.md)

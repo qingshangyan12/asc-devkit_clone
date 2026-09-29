@@ -49,7 +49,7 @@ srcReg.second.with_mask(mask);
 | --- | --- | --- |
 | 单输入，例如`abs(src)`、`exp(src)`、`cast<DstType>(src)` | `src.mask` | 与`src.mask`保持一致。 |
 | 一个`reg_tensor`与标量计算，例如`src + scalar`、`scalar * src` | `reg_tensor`操作数的`mask` | 与该`reg_tensor`的`mask`保持一致。 |
-| 多个`reg_tensor`计算，例如`src0 + src1`、`abs_diff(src0, src1)` | 第一个`reg_tensor`操作数的`mask` | 与第一个`reg_tensor`操作数的`mask`保持一致。 |
+| 多个`reg_tensor`计算，例如`src0 + src1`、`fma(src0, src1, src2)` | 第一个`reg_tensor`操作数的`mask` | 与第一个`reg_tensor`操作数的`mask`保持一致。 |
 | 带输出参数，例如`add(carry, src0, src1)`、`mull(high, src0, src1)` | `src0.mask` | 返回值以及`carry`或`high`的`mask`均与`src0.mask`保持一致。 |
 | 显式传入mask，例如`fill(value, mask)` | `mask.reg` | 与显式传入的`mask.reg`保持一致。 |
 

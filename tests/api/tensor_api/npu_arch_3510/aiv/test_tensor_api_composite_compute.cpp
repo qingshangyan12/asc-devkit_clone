@@ -14,130 +14,153 @@
 #include "tensor_api/experimental/vector_compute.h"
 #include "tensor_api/tensor.h"
 
-namespace {
+class tensor_api_vector_composite_compute_3510 : public testing::Test {};
 
 template <typename T>
 using reg_type = asc::te::experimental::reg_tensor<T>;
 
 template <typename T>
-__aicore__ inline void check_common_composite()
+__aicore__ inline void test_axpy()
 {
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::axpy(
-                      AscendC::Std::declval<reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const T&>())),
-                  reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::abs_diff(
-                      AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
     reg_type<T> dst{};
     reg_type<T> src{};
-    dst.mask = asc::te::experimental::all_mask<T>().reg;
     T scalar{};
-    auto axpy_result = asc::te::experimental::axpy(dst, src, scalar);
-    auto abs_diff_result = asc::te::experimental::abs_diff(dst, src);
-    EXPECT_EQ(axpy_result.mask, dst.mask);
-    EXPECT_EQ(abs_diff_result.mask, dst.mask);
-}
-
-template <typename T>
-__aicore__ inline void check_madd()
-{
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::madd(
-                      AscendC::Std::declval<reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
-    reg_type<T> dst{};
-    reg_type<T> src0{};
-    reg_type<T> src1{};
     dst.mask = asc::te::experimental::all_mask<T>().reg;
-    auto madd_result = asc::te::experimental::madd(dst, src0, src1);
-    EXPECT_EQ(madd_result.mask, dst.mask);
-}
 
-template <typename T>
-__aicore__ inline void check_mula()
-{
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::mula(
-                      AscendC::Std::declval<reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-                      AscendC::Std::declval<const reg_type<T>&>())),
-                  reg_type<T>>);
-
-    reg_type<T> dst{};
-    reg_type<T> src0{};
-    reg_type<T> src1{};
-    dst.mask = asc::te::experimental::all_mask<T>().reg;
-    auto result = asc::te::experimental::mula(dst, src0, src1);
+    auto result = asc::te::experimental::axpy(dst, src, scalar);
+    static_assert(AscendC::Std::is_same_v<decltype(result), reg_type<T>>);
     EXPECT_EQ(result.mask, dst.mask);
 }
 
-__aicore__ inline void check_exp_diff_positions_and_muls_cast()
+template <typename T>
+__aicore__ inline void test_abs_diff()
 {
-    static_assert(
-        AscendC::Std::is_same_v<
-            decltype(asc::te::experimental::exp_diff<float, float>(
-                AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const reg_type<float>&>())),
-            reg_type<float>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::exp_diff<float, half>(
-                      AscendC::Std::declval<const reg_type<half>&>(), AscendC::Std::declval<const reg_type<half>&>(),
-                      ASC_POSITION_EVEN)),
-                  reg_type<float>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::exp_diff<float, half>(
-                      AscendC::Std::declval<const reg_type<half>&>(), AscendC::Std::declval<const reg_type<half>&>(),
-                      ASC_POSITION_ODD)),
-                  reg_type<float>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::zero, half>(
-                      AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const float&>())),
-                  reg_type<half>>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one, half>(
-                      AscendC::Std::declval<const reg_type<float>&>(), AscendC::Std::declval<const float&>())),
-                  reg_type<half>>);
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    src0.mask = asc::te::experimental::all_mask<T>().reg;
 
-    reg_type<half> half_src0{};
-    reg_type<half> half_src1{};
+    auto dst = asc::te::experimental::abs_diff(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
+}
+
+template <typename T>
+__aicore__ inline void test_madd()
+{
+    reg_type<T> dst{};
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    dst.mask = asc::te::experimental::all_mask<T>().reg;
+
+    auto result = asc::te::experimental::madd(dst, src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(result), reg_type<T>>);
+    EXPECT_EQ(result.mask, dst.mask);
+}
+
+template <typename T>
+__aicore__ inline void test_mula()
+{
+    reg_type<T> dst{};
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    dst.mask = asc::te::experimental::all_mask<T>().reg;
+
+    auto result = asc::te::experimental::mula(dst, src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(result), reg_type<T>>);
+    EXPECT_EQ(result.mask, dst.mask);
+}
+
+template <typename T>
+__aicore__ inline void test_fma()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    reg_type<T> src2{};
+    src0.mask = asc::te::experimental::all_mask<T>().reg;
+
+    auto dst = asc::te::experimental::fma(src0, src1, src2);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
+}
+
+__aicore__ inline void test_exp_diff_float()
+{
+    reg_type<float> src0{};
+    reg_type<float> src1{};
+    src0.mask = asc::te::experimental::all_mask<float>().reg;
+
+    auto dst = asc::te::experimental::exp_diff<float, float>(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<float>>);
+    EXPECT_EQ(dst.mask, src0.mask);
+}
+
+__aicore__ inline void test_exp_diff_half()
+{
+    reg_type<half> src0{};
+    reg_type<half> src1{};
     auto output_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl3, float>();
-    half_src0.mask = output_mask.reg;
-    auto even_exp_diff = asc::te::experimental::exp_diff<float, half>(half_src0, half_src1, ASC_POSITION_EVEN);
-    auto odd_exp_diff = asc::te::experimental::exp_diff<float, half>(half_src0, half_src1, ASC_POSITION_ODD);
-    EXPECT_EQ(even_exp_diff.mask, output_mask.reg);
-    EXPECT_EQ(odd_exp_diff.mask, output_mask.reg);
+    src0.mask = output_mask.reg;
 
-    reg_type<float> float_src{};
-    float_src.mask = asc::te::experimental::all_mask<float>().reg;
-    auto float_exp_diff = asc::te::experimental::exp_diff<float, float>(float_src, float_src);
-    EXPECT_EQ(float_exp_diff.mask, float_src.mask);
-    auto zero_result =
-        asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::zero, half>(float_src, 1.0f);
-    auto one_result = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one, half>(float_src, 1.0f);
-    EXPECT_EQ(zero_result.mask, float_src.mask);
-    EXPECT_EQ(one_result.mask, float_src.mask);
+    auto even_dst = asc::te::experimental::exp_diff<float, half>(src0, src1, ASC_POSITION_EVEN);
+    auto odd_dst = asc::te::experimental::exp_diff<float, half>(src0, src1, ASC_POSITION_ODD);
+    static_assert(AscendC::Std::is_same_v<decltype(even_dst), reg_type<float>>);
+    static_assert(AscendC::Std::is_same_v<decltype(odd_dst), reg_type<float>>);
+    EXPECT_EQ(even_dst.mask, src0.mask);
+    EXPECT_EQ(odd_dst.mask, src0.mask);
 }
 
-TEST(test_tensor_api_composite_compute, compile_public_apis_and_supported_types)
+__aicore__ inline void test_muls_cast()
 {
-    check_common_composite<half>();
-    check_common_composite<float>();
+    reg_type<float> src{};
+    src.mask = asc::te::experimental::all_mask<float>().reg;
 
-    check_madd<half>();
-    check_madd<bfloat16_t>();
-    check_madd<float>();
-
-    check_mula<int16_t>();
-    check_mula<uint16_t>();
-    check_mula<half>();
-    check_mula<bfloat16_t>();
-    check_mula<int32_t>();
-    check_mula<uint32_t>();
-    check_mula<float>();
-
-    check_exp_diff_positions_and_muls_cast();
+    auto even_dst = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::zero, half>(src, 1.0f);
+    auto odd_dst = asc::te::experimental::muls_cast<asc::te::experimental::cast_layout::one, half>(src, 1.0f);
+    static_assert(AscendC::Std::is_same_v<decltype(even_dst), reg_type<half>>);
+    static_assert(AscendC::Std::is_same_v<decltype(odd_dst), reg_type<half>>);
+    EXPECT_EQ(even_dst.mask, src.mask);
+    EXPECT_EQ(odd_dst.mask, src.mask);
 }
 
-} // namespace
+#define COMPOSITE_COMPUTE_TEST(Function, DataType)                          \
+    TEST_F(tensor_api_vector_composite_compute_3510, Function##_##DataType) \
+    {                                                                       \
+        test_##Function<DataType>();                                        \
+        SUCCEED();                                                          \
+    }
+
+COMPOSITE_COMPUTE_TEST(axpy, half)
+COMPOSITE_COMPUTE_TEST(axpy, float)
+COMPOSITE_COMPUTE_TEST(abs_diff, half)
+COMPOSITE_COMPUTE_TEST(abs_diff, float)
+COMPOSITE_COMPUTE_TEST(madd, half)
+COMPOSITE_COMPUTE_TEST(madd, bfloat16_t)
+COMPOSITE_COMPUTE_TEST(madd, float)
+COMPOSITE_COMPUTE_TEST(mula, int16_t)
+COMPOSITE_COMPUTE_TEST(mula, uint16_t)
+COMPOSITE_COMPUTE_TEST(mula, half)
+COMPOSITE_COMPUTE_TEST(mula, bfloat16_t)
+COMPOSITE_COMPUTE_TEST(mula, int32_t)
+COMPOSITE_COMPUTE_TEST(mula, uint32_t)
+COMPOSITE_COMPUTE_TEST(mula, float)
+COMPOSITE_COMPUTE_TEST(fma, half)
+COMPOSITE_COMPUTE_TEST(fma, bfloat16_t)
+COMPOSITE_COMPUTE_TEST(fma, float)
+
+TEST_F(tensor_api_vector_composite_compute_3510, exp_diff_float)
+{
+    test_exp_diff_float();
+    SUCCEED();
+}
+
+TEST_F(tensor_api_vector_composite_compute_3510, exp_diff_half)
+{
+    test_exp_diff_half();
+    SUCCEED();
+}
+
+TEST_F(tensor_api_vector_composite_compute_3510, muls_cast)
+{
+    test_muls_cast();
+    SUCCEED();
+}

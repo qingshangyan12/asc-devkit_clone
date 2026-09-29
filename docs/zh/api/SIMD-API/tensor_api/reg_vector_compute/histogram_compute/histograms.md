@@ -30,14 +30,16 @@
 
 该接口根据`src.mask`统计`uint8_t`输入值的频率分布或累计分布，并在`dst`原值上累加统计结果。计算公式如下：
 
-令$h$表示统计区间的起始值：`low`模式下$h=0$，`high`模式下$h=128$。对于输出位置$i\in[0,127]$，两种统计模式分别为：
+令$h$表示统计区间的起始值：`low`模式下$h=0$，`high`模式下$h=128$；$d_i$表示输入`dst`的第$i$个元素，$x_j$表示输入`src`的第$j$个元素，$m_j$表示`src.mask`的第$j$位。对于输出位置$i\in[0,127]$，两种统计模式分别为：
 
 $$
 \begin{aligned}
-dst_i^{frequency} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j=h+i) \\
-dst_i^{cumulative} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j\le h+i)
+result_i^{(\mathrm{freq})} &= d_i + \sum_j m_j\mathbf{1}\{x_j=h+i\} \\
+result_i^{(\mathrm{cum})} &= d_i + \sum_j m_j\mathbf{1}\{x_j\le h+i\}
 \end{aligned}
 $$
+
+其中，$m_j$为`1`时对应输入元素参与统计，为`0`时不参与统计。`high`与`cumulative`组合使用时，第$i$个输出统计所有不大于$128+i$的输入值，因此包含`[0, 127]`范围内的输入值。
 
 **表1**配置项说明
 
@@ -53,7 +55,7 @@ $$
 ```cpp
 template <const histogram_options& options = default_histogram_options, typename T, typename U>
 __simd_callee__ inline reg_tensor<T> histograms(
-    reg_tensor<T>& dst, const reg_tensor<U>& src)
+    const reg_tensor<T>& dst, const reg_tensor<U>& src)
 ```
 
 ## 参数说明
@@ -70,12 +72,12 @@ __simd_callee__ inline reg_tensor<T> histograms(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| dst | 输入/输出 | 统计初值和结果，类型为`reg_tensor<uint16_t>`。接口直接更新`dst.reg`，返回值的`mask`与`dst.mask`相同。 |
+| dst | 输入 | 统计初值，类型为`reg_tensor<uint16_t>`。接口不修改`dst`，返回值的`mask`与`dst.mask`相同。 |
 | src | 输入 | 待统计数据，类型为`reg_tensor<uint8_t>`。`src.mask`用于标记参与统计的元素，对应位置为`1`时参与统计，为`0`时不参与统计。 |
 
 ## 返回值说明
 
-返回更新后的`reg_tensor<uint16_t>`。频率模式在`dst`上累加每个输入值的出现次数，累计模式累加不大于对应值的输入数量。返回值的`mask`与`dst.mask`相同。
+返回新的`reg_tensor<uint16_t>`。频率模式在`dst`原值上累加每个输入值的出现次数，累计模式在`dst`原值上累加不大于对应值的输入数量。返回值的`mask`与`dst.mask`相同。
 
 ## 数据类型
 
@@ -89,7 +91,7 @@ __simd_callee__ inline reg_tensor<T> histograms(
 
 - `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与统计的元素位置错误。
 - `src.mask`只用于筛选参与统计的输入元素，不用于筛选返回值中的统计位置。返回值中的所有位置都会在`dst`原值的基础上更新。
-- 统计结果在`dst`原有数据的基础上累加。调用前必须初始化`dst.reg`，多次调用时后一次结果累加到前一次结果中。返回值的`mask`继承`dst.mask`，将返回值用于`store`前需要通过`with_mask`设置`dst.mask`。
+- 统计结果在`dst`原有数据的基础上累加。调用前必须初始化`dst.reg`；多次调用时，需要将前一次返回值作为后一次调用的`dst`输入。返回值的`mask`继承`dst.mask`，将返回值用于`store`前需要通过`with_mask`设置`dst.mask`。
 - `dst`的元素类型为`uint16_t`，单个统计结果的最大值为65535。用户需要保证累加结果不超过该范围，否则会发生溢出。
 - 非默认配置必须先定义具名的`constexpr histogram_options`，再作为模板实参传入。
 
@@ -107,15 +109,14 @@ constexpr asc::te::experimental::histogram_options high_options {
 template <typename SrcTensor, typename InitialTensor, typename DstTensor>
 __simd_vf__ inline void histograms_vf(
     const SrcTensor src, const InitialTensor initial, DstTensor low_dst, DstTensor high_dst, uint16_t repeat_times,
-    uint32_t total, uint32_t one_repeat)
+    uint32_t total, uint32_t one_repeat_size)
 {
-    uint32_t dst_remain = 128;
-    auto dst_mask = asc::te::experimental::update_mask<uint16_t>(dst_remain);
+    auto dst_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::all, uint16_t>();
     auto low_reg = asc::te::experimental::load(initial, asc::te::make_coord(0)).with_mask(dst_mask);
     auto high_reg = asc::te::experimental::load(initial, asc::te::make_coord(0)).with_mask(dst_mask);
     uint32_t remain = total;
     for (uint16_t i = 0; i < repeat_times; ++i) {
-        const uint32_t offset = i * one_repeat;
+        const uint32_t offset = i * one_repeat_size;
         const auto coord = asc::te::make_coord(offset);
         auto mask = asc::te::experimental::update_mask<uint8_t>(remain);
         auto src_reg = asc::te::experimental::load(src, coord).with_mask(mask);

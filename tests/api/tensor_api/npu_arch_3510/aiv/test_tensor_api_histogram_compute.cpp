@@ -29,24 +29,24 @@ __aicore__ inline void check_histograms()
     using src_type = asc::te::experimental::reg_tensor<uint8_t>;
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::histograms(
-                      AscendC::Std::declval<dst_type&>(), AscendC::Std::declval<const src_type&>())),
+                      AscendC::Std::declval<const dst_type&>(), AscendC::Std::declval<const src_type&>())),
                   dst_type>);
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::histograms<frequency_high_options>(
-                      AscendC::Std::declval<dst_type&>(), AscendC::Std::declval<const src_type&>())),
+                      AscendC::Std::declval<const dst_type&>(), AscendC::Std::declval<const src_type&>())),
                   dst_type>);
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::histograms<cumulative_low_options>(
-                      AscendC::Std::declval<dst_type&>(), AscendC::Std::declval<const src_type&>())),
+                      AscendC::Std::declval<const dst_type&>(), AscendC::Std::declval<const src_type&>())),
                   dst_type>);
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::histograms<cumulative_high_options>(
-                      AscendC::Std::declval<dst_type&>(), AscendC::Std::declval<const src_type&>())),
+                      AscendC::Std::declval<const dst_type&>(), AscendC::Std::declval<const src_type&>())),
                   dst_type>);
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::histograms<
                            asc::te::experimental::default_histogram_options, uint16_t, uint8_t>(
-                      AscendC::Std::declval<dst_type&>(), AscendC::Std::declval<const src_type&>())),
+                      AscendC::Std::declval<const dst_type&>(), AscendC::Std::declval<const src_type&>())),
                   dst_type>);
 
     dst_type dst{};

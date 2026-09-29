@@ -139,6 +139,9 @@ template <typename T>
 inline constexpr bool supports_mula_v =
     ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
 
+template <typename T>
+inline constexpr bool supports_fma_v = ::AscendC::Std::is_one_of_v<T, half, bfloat16_t, float>;
+
 template <typename T, typename U>
 inline constexpr bool supports_muls_cast_v = ::AscendC::Std::is_same_v<T, half> && ::AscendC::Std::is_same_v<U, float>;
 
