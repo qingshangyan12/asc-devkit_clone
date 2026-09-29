@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "mc2_resource_dfx.h"
 #include "channel.h"
 #include <algorithm>
 #include <cstring>
@@ -467,29 +468,29 @@ HcclResult CalcChannelRequestNhr(
     std::set<u32> connectRanks;
     u32 myRank = topoInfo->userRank;
     auto it = std::find(subcommInfo[0].begin(), subcommInfo[0].end(), myRank);
-    CHK_PRT_RET(
+    MC2_DFX_CHK_PRT_RET(
         (it == subcommInfo[0].end()), HCCL_ERROR("[CollAlgFactory] [channel] Rank [%d] is not in commInfo.", myRank),
         HcclResult::HCCL_E_PARA);
 
     u32 localRank = std::distance(subcommInfo[0].begin(), it);
     u32 localRankSize = subcommInfo[0].size();
-    CHK_RET(CalcNHRChannelConnect(localRank, localRankSize, INVALID_VALUE_RANKID, connectRanks));
+    MC2_DFX_CHK_RET(CalcNHRChannelConnect(localRank, localRankSize, INVALID_VALUE_RANKID, connectRanks));
 
     // 根据engine获取期望的协议类型列表
     std::vector<CommProtocol> expectedProtocols;
-    CHK_RET(GetProtocolByEngine(param, expectedProtocols));
+    MC2_DFX_CHK_RET(GetProtocolByEngine(param, expectedProtocols));
 
     for (u32 rankIdx : connectRanks) {
         size_t channelCountBefore = channels.size();
         uint32_t* netLayers;
         uint32_t netLayerNum;
-        CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
+        MC2_DFX_CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
         std::vector<uint32_t> netLayersVector(netLayers, netLayers + netLayerNum);
 
         for (auto netLayer : netLayersVector) {
             CommLink* linkList = nullptr;
             u32 listSize;
-            CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, subcommInfo[0][rankIdx], &linkList, &listSize));
+            MC2_DFX_CHK_RET(HcclRankGraphGetLinks(comm, netLayer, myRank, subcommInfo[0][rankIdx], &linkList, &listSize));
 
             if (listSize == 0) {
                 continue;
@@ -497,7 +498,7 @@ HcclResult CalcChannelRequestNhr(
 
             std::vector<CommLink> links(linkList, linkList + listSize);
             bool protocolFound = false;
-            CHK_RET(ProcessLinkForProtocolNhr(
+            MC2_DFX_CHK_RET(ProcessLinkForProtocolNhr(
                 comm, expectedProtocols, links, myRank, subcommInfo[0][rankIdx], netLayer, channels, protocolFound));
 
             if (channels.size() > channelCountBefore) {
@@ -505,7 +506,7 @@ HcclResult CalcChannelRequestNhr(
             }
         }
 
-        CHK_PRT_RET(
+        MC2_DFX_CHK_PRT_RET(
             channels.size() == channelCountBefore,
             HCCL_ERROR(
                 "[CalcChannelRequestNhr] Failed to create channel between myRank=%u and rank=%u, there is no link.",
@@ -535,30 +536,39 @@ static bool IsEndPointEqual(const EndpointDesc& endPoint0, const EndpointDesc& e
 HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, const CommLink& link, CommTopo& topoType)
 {
 #ifndef AICPU_COMPILE
-    CHK_PTR_NULL(comm);
+    MC2_DFX_CHK_PTR_NULL(comm);
     uint32_t* topoInstList = nullptr;
     uint32_t listSize;
-    CHK_RET(HcclRankGraphGetTopoInstsByLayer(comm, netLayer, &topoInstList, &listSize)); // 获取当前rank的所有TopoInst
+    const HcclResult topoRet = HcclRankGraphGetTopoInstsByLayer(comm, netLayer, &topoInstList, &listSize);
+    if (topoRet != HCCL_SUCCESS) {
+        MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] HcclRankGraphGetTopoInstsByLayer failed, comm[%p] netLayer[%u] ret[%d]",
+            comm, netLayer, static_cast<int>(topoRet));
+        return MC2_DFX_RESULT(topoRet);
+    }
     HCCL_INFO("[%s][%u] listSize = %u", __func__, __LINE__, listSize);
 
     for (uint32_t topoInstIdx = 0; topoInstIdx < listSize; topoInstIdx++) { // 遍历topoInst
         uint32_t topoInstId = topoInstList[topoInstIdx];
         uint32_t endPointNum;
-        CHK_RET(HcclRankGraphGetEndpointNum(comm, netLayer, topoInstId, &endPointNum));
+        MC2_DFX_CHK_RET(HcclRankGraphGetEndpointNum(comm, netLayer, topoInstId, &endPointNum));
         EndpointDesc* endPointDescs = (EndpointDesc*)malloc(endPointNum * sizeof(EndpointDesc));
         if (endPointDescs == nullptr) {
             HCCL_ERROR("[%s] malloc endPointDescs failed.", __func__);
-            return HCCL_E_MEMORY;
+            return MC2_DFX_RESULT(HCCL_E_MEMORY);
         }
         HcclResult ret = HcclRankGraphGetEndpointDesc(comm, netLayer, topoInstId, &endPointNum, endPointDescs);
         if (ret != HCCL_SUCCESS) {
             free(endPointDescs);
-            return ret;
+            MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] HcclRankGraphGetEndpointDesc failed, comm[%p] netLayer[%u] topoInstId[%u] ret[%d]",
+                comm, netLayer, topoInstId, static_cast<int>(ret));
+            return MC2_DFX_RESULT(ret);
         }
         ret = HcclRankGraphGetTopoType(comm, netLayer, topoInstId, &topoType);
         if (ret != HCCL_SUCCESS) {
             free(endPointDescs);
-            return ret;
+            MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] HcclRankGraphGetTopoType failed, comm[%p] netLayer[%u] topoInstId[%u] ret[%d]",
+                comm, netLayer, topoInstId, static_cast<int>(ret));
+            return MC2_DFX_RESULT(ret);
         }
         HCCL_DEBUG("[%s]topoInstId=%u, endPointNum=%u, topoType=%u", __func__, topoInstId, endPointNum, topoType);
         for (uint32_t endPointIdx = 0; endPointIdx < endPointNum; endPointIdx++) {
@@ -573,7 +583,7 @@ HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, const CommLink& l
         free(endPointDescs);
     }
     HCCL_ERROR("[%s]Cannot get TopoType by Link.", __func__);
-    return HCCL_E_INTERNAL;
+    return MC2_DFX_RESULT(HCCL_E_INTERNAL);
 #else
     return HCCL_SUCCESS;
 #endif
@@ -666,14 +676,14 @@ HcclResult ProcessLinksForChannelMutiJetty(
             continue;
         }
         CommTopo topoType = CommTopo::COMM_TOPO_RESERVED;
-        CHK_RET(GetTopoTypeByLink(comm, netLayer, link, topoType));
+        MC2_DFX_CHK_RET(GetTopoTypeByLink(comm, netLayer, link, topoType));
         if (topoType == CommTopo::COMM_TOPO_CLOS &&
             IsPortEqual(link.srcEndpointDesc, link.dstEndpointDesc, isIsolation)) {
-            CHK_RET(CreateChannelFromLink(
+            MC2_DFX_CHK_RET(CreateChannelFromLink(
                 comm, myRank, remoteRank, netLayer, idx, link, "ProcessLinksForChannelMutiJetty", selectedChannels));
         } else if (topoType == CommTopo::COMM_TOPO_1DMESH && expectMesh) {
             selectedChannels.clear();
-            CHK_RET(CreateChannelFromLink(
+            MC2_DFX_CHK_RET(CreateChannelFromLink(
                 comm, myRank, remoteRank, netLayer, idx, link, "ProcessLinksForChannelMutiJetty", selectedChannels));
             break;
         }
@@ -831,18 +841,18 @@ HcclResult CalcChannelRequestNhrMultiJetty(
 {
 #ifndef AICPU_COMPILE
     channels.clear();
-    CHK_PTR_NULL(topoInfo);
-    CHK_PRT_RET(
+    MC2_DFX_CHK_PTR_NULL(topoInfo);
+    MC2_DFX_CHK_PRT_RET(
         subcommInfo.empty(), HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] subcommInfo is empty."), HCCL_E_PARA);
     const u32 myRank = topoInfo->userRank;
     auto rankIt = std::find(subcommInfo[0].begin(), subcommInfo[0].end(), myRank);
-    CHK_PRT_RET(
+    MC2_DFX_CHK_PRT_RET(
         rankIt == subcommInfo[0].end(),
         HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] rank[%u] is not in subcommInfo.", myRank), HCCL_E_PARA);
 
     const u32 localRank = static_cast<u32>(std::distance(subcommInfo[0].begin(), rankIt));
     std::set<u32> connectRanks;
-    CHK_RET(CalcNHRChannelConnect(localRank, subcommInfo[0].size(), INVALID_VALUE_RANKID, connectRanks));
+    MC2_DFX_CHK_RET(CalcNHRChannelConnect(localRank, subcommInfo[0].size(), INVALID_VALUE_RANKID, connectRanks));
     const CommProtocol expectedProtocol = param.engine == CommEngine::COMM_ENGINE_AIV ?
                                               CommProtocol::COMM_PROTOCOL_UB_MEM :
                                               CommProtocol::COMM_PROTOCOL_UBC_CTP;
@@ -850,23 +860,23 @@ HcclResult CalcChannelRequestNhrMultiJetty(
         const size_t channelCountBefore = channels.size();
         uint32_t* netLayers = nullptr;
         uint32_t netLayerNum = 0;
-        CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
+        MC2_DFX_CHK_RET(HcclRankGraphGetLayers(comm, &netLayers, &netLayerNum));
         for (uint32_t layerIdx = 0; layerIdx < netLayerNum; ++layerIdx) {
             CommLink* linkList = nullptr;
             u32 linkCount = 0;
             const u32 remoteRank = subcommInfo[0][rankIdx];
-            CHK_RET(HcclRankGraphGetLinks(comm, netLayers[layerIdx], myRank, remoteRank, &linkList, &linkCount));
+            MC2_DFX_CHK_RET(HcclRankGraphGetLinks(comm, netLayers[layerIdx], myRank, remoteRank, &linkList, &linkCount));
             if (linkCount == 0U) {
                 continue;
             }
             std::vector<CommLink> links(linkList, linkList + linkCount);
-            CHK_RET(ProcessLinksForChannelMutiJetty(
+            MC2_DFX_CHK_RET(ProcessLinksForChannelMutiJetty(
                 comm, expectedProtocol, links, myRank, remoteRank, netLayers[layerIdx], channels, false, isIsolation));
             if (channels.size() > channelCountBefore) {
                 break;
             }
         }
-        CHK_PRT_RET(
+        MC2_DFX_CHK_PRT_RET(
             channels.size() == channelCountBefore,
             HCCL_ERROR(
                 "[CalcChannelRequestNhrMultiJetty] no CLOS channel between rank[%u] and rank[%u].", myRank,

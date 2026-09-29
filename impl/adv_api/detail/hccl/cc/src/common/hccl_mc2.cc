@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "mc2_resource_dfx.h"
 #include "include/adv_api/hccl/hccl_mc2.h"
 #include "log.h"
 #include "sal.h"
@@ -202,10 +203,10 @@ HcclResult BuildTagsAndValidate(
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         topoTag[i] = std::to_string(ccTiling->opType) + "_" + std::to_string(ccTiling->srcDataType) + "_" +
                      std::string(commName);
-        CHK_RET(HcclCheckTag(topoTag[i].c_str()));
+        MC2_DFX_CHK_RET(HcclCheckTag(topoTag[i].c_str()));
         bool isReduce;
-        CHK_RET(CheckIsReduce(ccTiling, &isReduce));
-        CHK_RET(CheckDataType(static_cast<HcclDataType>(ccTiling->srcDataType), isReduce));
+        MC2_DFX_CHK_RET(CheckIsReduce(ccTiling, &isReduce));
+        MC2_DFX_CHK_RET(CheckDataType(static_cast<HcclDataType>(ccTiling->srcDataType), isReduce));
 
         if (i == 0) {
             ctxTag = std::string(ccTiling->groupName) + "_" + std::to_string(ccTiling->opType) + "_" +
@@ -215,7 +216,7 @@ HcclResult BuildTagsAndValidate(
                       std::to_string(ccTiling->commEngine);
         }
     }
-    CHK_RET(HcomCheckUserRank(rankSize, userRank));
+    MC2_DFX_CHK_RET(HcomCheckUserRank(rankSize, userRank));
     return HCCL_SUCCESS;
 }
 
@@ -310,15 +311,25 @@ HcclResult AllocComResourceByTilingAicpu(
     u32 rankSize, u32 userRank, void** opResCtx, std::string& ctxTag)
 {
     std::string topoTag[Hccl::MC2_MAX_OP_NUM];
-    CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
+    MC2_DFX_CHK_RET(BuildTagsAndValidate(ccTilingList, tilingNum, commName, rankSize, userRank, topoTag, ctxTag));
 
     std::vector<OpParam> opParamVec(tilingNum);
     for (uint32_t i = 0U; i < tilingNum; ++i) {
-        CHK_RET(
-            GetOpParam(comm, stream, topoTag[i], static_cast<const Mc2CcTilingInner*>(ccTilingList[i]), opParamVec[i]));
+        const auto* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
+        const HcclResult paramRet = GetOpParam(comm, stream, topoTag[i], ccTiling, opParamVec[i]);
+        if (paramRet != HCCL_SUCCESS) {
+            MC2_DFX_LOG(
+                "[MC2_ALLOC_DFX_v1] GetOpParam failed, rank[%u/%u] comm[%p] index[%u/%u] "
+                "opType[%u] srcType[%u] dstType[%u] engine[%u] algConfig[%.*s] ret[%d]",
+                userRank, rankSize, comm, i, tilingNum, static_cast<unsigned>(ccTiling->opType),
+                static_cast<unsigned>(ccTiling->srcDataType), static_cast<unsigned>(ccTiling->dstDataType),
+                static_cast<unsigned>(ccTiling->commEngine), static_cast<int>(sizeof(ccTiling->algConfig)),
+                ccTiling->algConfig, static_cast<int>(paramRet));
+            return MC2_DFX_RESULT(paramRet);
+        }
     }
 
-    CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
+    MC2_DFX_CHK_RET(HcclAllocOpResCtx(comm, ctxTag, opParamVec, mc2Tiling, ccTilingList, opResCtx));
 
     for (uint32_t i = 0U; i < tilingNum; ++i) {
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
@@ -395,31 +406,31 @@ HcclResult DispatchAllocByCommEngine(
     std::string ctxTag;
     if (commEngine == static_cast<uint8_t>(OpExecuteConfig::AICPU_TS)) {
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == AICPU_TS!");
-        CHK_RET(AllocComResourceByTilingAicpu(
+        MC2_DFX_CHK_RET(AllocComResourceByTilingAicpu(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag));
     } else if (commEngine == static_cast<uint8_t>(OpExecuteConfig::CCU_SCHED)) {
         HCCL_INFO("[HcclAllocComResourceByTiling]commEngine == CCU_SCHED!");
         if (!CheckCcuAlgorithmsRegistered(ccTilingList, tilingNum)) {
             HCCL_INFO("[HcclAllocComResourceByTiling]Current ccu algorithm is not supported in mc2_client.");
-            return HCCL_E_ALG_NOT_SUPPORTED;
+            return MC2_DFX_RESULT(HCCL_E_ALG_NOT_SUPPORTED);
         }
-        CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum, rankSize));
+        MC2_DFX_CHK_RET(CheckCcuKfcFlow(mc2Tiling, ccTilingList, tilingNum, rankSize));
         HCCL_INFO("[MC2_DEBUG] before AllocComResourceByTilingCcu.");
         HcclResult ret = AllocComResourceByTilingCcu(
             comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, opResCtx, ctxTag,
             checkOnly);
         HCCL_INFO("[MC2_DEBUG] after AllocComResourceByTilingCcu, ret[%d].", ret);
-        CHK_PRT_RET(
+        MC2_DFX_CHK_PRT_RET(
             ret != HCCL_SUCCESS,
             HCCL_ERROR("[MC2_CCU_RESOURCE_ALLOC_FAIL] Failed to allocate CCU resource, please check topo information."),
             ret);
     } else {
         HCCL_ERROR("[%s] unsupported commEngine[%u]", __func__, commEngine);
-        return HCCL_E_NOT_SUPPORT;
+        return MC2_DFX_RESULT(HCCL_E_NOT_SUPPORT);
     }
 
     // 记录退出日志和性能统计信息
-    CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
+    MC2_DFX_CHK_RET(LogHcclExit("HcclAllocComResourceByTiling", ctxTag.c_str(), startut));
     return HCCL_SUCCESS;
 }
 
@@ -428,7 +439,7 @@ HcclResult HcclAllocComResourceByTilingImpl(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx, bool checkOnly = false)
 {
     HCCL_RUN_INFO(
-        "[MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
+        "[MC2_ALLOC_DFX_v1][MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
     // 记录开始时间，用于性能统计
@@ -436,37 +447,37 @@ HcclResult HcclAllocComResourceByTilingImpl(
 
     // 获取设备类型
     DevType deviceType = DevType::DEV_TYPE_COUNT;
-    CHK_RET(hrtGetDeviceType(deviceType));
+    MC2_DFX_CHK_RET(hrtGetDeviceType(deviceType));
     // 检查设备类型是否支持新流程，950或910_95支持新流程，其他设备走老流程
     if (deviceType != DevType::DEV_TYPE_950) {
         HCCL_ERROR("[%s] invalid deviceType[%u]", __func__, deviceType);
-        return HCCL_E_NOT_SUPPORT;
+        return MC2_DFX_RESULT(HCCL_E_NOT_SUPPORT);
     }
     // 初始化环境变量配置，解析HCCL相关的环境变量
     // 包括算子展开模式、确定性计算、通信方式、日志开关等配置
-    CHK_RET(InitEnvConfig());
+    MC2_DFX_CHK_RET(InitEnvConfig());
     // 检查输入参数的合法性（comm、sendBuf、recvBuf、stream不能为空）
-    CHK_RET(CheckInputParam(comm, mc2Tiling, stream));
+    MC2_DFX_CHK_RET(CheckInputParam(comm, mc2Tiling, stream));
 
     // 获取通信域中的rank数量
     u32 rankSize = INVALID_VALUE_RANKSIZE;
-    CHK_RET(HcclGetRankSize(comm, &rankSize));
+    MC2_DFX_CHK_RET(HcclGetRankSize(comm, &rankSize));
 
     // 获取当前rank的ID
     u32 userRank = INVALID_VALUE_RANKID;
-    CHK_RET(HcclGetRankId(comm, &userRank));
+    MC2_DFX_CHK_RET(HcclGetRankId(comm, &userRank));
 
     // 获取通信域名称
     char commName[COMM_INDENTIFIER_MAX_LENGTH];
-    CHK_RET(HcclGetCommName(comm, commName));
+    MC2_DFX_CHK_RET(HcclGetCommName(comm, commName));
 
     const void* ccTilingList[Hccl::MC2_MAX_OP_NUM];
     uint32_t tilingNum;
-    CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
+    MC2_DFX_CHK_RET(HcclGetTilingList(mc2Tiling, ccTilingList, tilingNum));
 
     // 校验commengine
     uint8_t commEngine;
-    CHK_RET(ObtainCommEngine(ccTilingList, tilingNum, commEngine));
+    MC2_DFX_CHK_RET(ObtainCommEngine(ccTilingList, tilingNum, commEngine));
 
     // onlyCheck场景：单rank必然资源充足、非CCU_SCHED引擎（AICPU_TS等）暂不支持，直接返回SUCCESS
     // （rankSize为通信域属性，对所有tiling一致，此处统一提前返回）
@@ -476,16 +487,21 @@ HcclResult HcclAllocComResourceByTilingImpl(
             commEngine);
         return HCCL_SUCCESS;
     }
-    return DispatchAllocByCommEngine(
+    return MC2_DFX_RESULT(DispatchAllocByCommEngine(
         comm, stream, mc2Tiling, ccTilingList, tilingNum, commName, rankSize, userRank, commEngine, opResCtx, checkOnly,
-        startut);
+        startut));
 }
 } // namespace
 
 HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx)
 {
-    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    const HcclResult allocRet = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    if (allocRet != HCCL_SUCCESS) {
+        MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] allocator exit, entry[%s] comm[%p] stream[%p] tiling[%p] ret[%d]",
+            __func__, comm, stream, mc2Tiling, static_cast<int>(allocRet));
+    }
+    return MC2_DFX_RESULT(allocRet);
 }
 
 HcclResult __attribute__((visibility("default"))) CheckOpResSufficient(HcclComm comm, void* stream, void* mc2Tiling)
@@ -504,7 +520,12 @@ extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourc
         "[MC2_CLIENT_A5_AICPU] enter asc-devkit explicit A5 MC2 resource allocator, "
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
-    return HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    const HcclResult allocRet = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
+    if (allocRet != HCCL_SUCCESS) {
+        MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] allocator exit, entry[%s] comm[%p] stream[%p] tiling[%p] ret[%d]",
+            __func__, comm, stream, mc2Tiling, static_cast<int>(allocRet));
+    }
+    return MC2_DFX_RESULT(allocRet);
 }
 
 namespace {
