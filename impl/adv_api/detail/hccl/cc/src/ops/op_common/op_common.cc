@@ -1706,7 +1706,7 @@ static const std::vector<HcommCcuResType>& GetCcuInsCreateResTypes()
 }
 
 // V1(950) 默认资源规格
-static uint32_t GetDefaultResFractionV1(HcommCcuResType resType, HcclOpExpansionMode opExpansionMode)
+static uint32_t GetDefaultResFractionV1(HcommCcuResType resType, OpExecuteConfig opMode)
 {
     bool isCcuMs = (opMode == OpExecuteConfig::CCU_MS);
     switch (resType) {
@@ -1728,9 +1728,9 @@ static uint32_t GetDefaultResFractionV1(HcommCcuResType resType, HcclOpExpansion
 }
 
 // V2(960) 默认资源规格
-static uint32_t GetDefaultResFractionV2(HcommCcuResType resType, HcclOpExpansionMode opExpansionMode)
+static uint32_t GetDefaultResFractionV2(HcommCcuResType resType, OpExecuteConfig opMode)
 {
-    bool isCcuMs = (opExpansionMode == HcclOpExpansionMode::HCCL_OP_EXPANSION_MODE_CCU_MS);
+    bool isCcuMs = (opMode == OpExecuteConfig::CCU_MS);
     switch (resType) {
         case HCOMM_CCU_RES_TYPE_ADDRESS:
             return CCU_DEFAULT_RES_FRACTION_ADDRESS_V2;
@@ -1751,11 +1751,11 @@ static uint32_t GetDefaultResFractionV2(HcommCcuResType resType, HcclOpExpansion
 
 // 根据设备类型分发：960 走 V2，其余走 V1
 // opExpansionMode 为 CCU_MS 时 LOOP/CCU_BUF/EVENT 使用 MS 模式专用阈值，其他资源类型与其他模式保持一致
-static uint32_t GetDefaultResFraction(HcommCcuResType resType, HcclOpExpansionMode opExpansionMode)
+static uint32_t GetDefaultResFraction(HcommCcuResType resType, OpExecuteConfig opMode)
 {
     HcclDevType deviceType;
     bool isV2 = (HcclGetDeviceType(deviceType) == HCCL_SUCCESS) && (deviceType == HcclDevType::DEV_TYPE_960);
-    return isV2 ? GetDefaultResFractionV2(resType, opExpansionMode) : GetDefaultResFractionV1(resType, opExpansionMode);
+    return isV2 ? GetDefaultResFractionV2(resType, opMode) : GetDefaultResFractionV1(resType, opMode);
 }
 
 // 将 HcommCcuResType 转字符串
