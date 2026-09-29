@@ -104,10 +104,14 @@
             -   [硬件约束](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2002.md)
                 -   [NPU架构版本2002](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2002.md)
                 -   [NPU架构版本2201](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2201.md)
+                -   [NPU架构版本3510](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_3510.md)
         
         -   [内存模型](./programming_guide/advanced_programming/memory_model/memory_model.md)
             -   [缓存一致性](./programming_guide/advanced_programming/memory_model/cache_coherence.md)
             -   [内存一致性](./programming_guide/advanced_programming/memory_model/memory_consistency.md)
+
+        -   [核间通信](./programming_guide/advanced_programming/inter_core_communication/inter_core_communication.md)
+            -   [使用SSBuffer实现核间通信](./programming_guide/advanced_programming/inter_core_communication/ssbuffer_inter_core_memory_feature.md)
 
         -   [高级核函数编程](./programming_guide/advanced_programming/advanced_kernel_programming/advanced_kernel_programming.md)
             -   [核内同步](./programming_guide/advanced_programming/advanced_kernel_programming/intra_core_sync/intra_core_sync.md)
@@ -247,6 +251,7 @@
             -   [CV融合](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/basics.md)
                 -   [基础知识](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/basics.md)
                 -   [算子实现](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/operator_impl.md)
+                -   [基于SSBuffer的核间通信特性](operator_practice/simd_operator_impl/fusion_operator_programming/cv_fusion/ssbuffer_feature_scenarios.md)
 
             -   [通算融合](operator_practice/simd_operator_impl/fusion_operator_programming/general_fusion/basics.md)
                 -   [基础知识](operator_practice/simd_operator_impl/fusion_operator_programming/general_fusion/basics.md)
@@ -335,6 +340,7 @@
             -   [同一Warp内避免分支跳转](operator_practice/simt_operator_optimization/control_flow/avoid_warp_branch.md)
         -   [指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
             -   [原子操作指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
+            -   [原地加法指令优化](operator_practice/simt_operator_optimization/instruction_optimization/inplace_add_instruction_optimization.md)
 
     -   [SIMD与SIMT混合算子性能优化](operator_practice/simd_simt_hybrid_optimization/simd_simt_hybrid_optimization.md)
         -   [概述](operator_practice/simd_simt_hybrid_optimization/overview.md)
