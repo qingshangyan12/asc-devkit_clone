@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "run_id": "20260929-defs-classification-audit-02",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "documents": [
+    "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+    "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+    "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+    "docs/zh/api/SIMD-API/c_api/defs/defs.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+    "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+    "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+    "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+    "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+    "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md",
+    "docs/zh/api/SIMD-API/c_api/defs/type/type.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/union.md"
+  ],
+  "batches": [
+    {
+      "id": "batch-01",
+      "documents": [
+        "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+        "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+        "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+        "docs/zh/api/SIMD-API/c_api/defs/defs.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+        "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+        "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+        "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+        "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+        "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md",
+        "docs/zh/api/SIMD-API/c_api/defs/type/type.md"
+      ],
+      "task": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260929-defs-classification-audit-02/batches/batch-01/task.json"
+    },
+    {
+      "id": "batch-02",
+      "documents": [
+        "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+        "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+        "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+        "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+        "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+        "docs/zh/api/SIMD-API/c_api/defs/union/union.md"
+      ],
+      "task": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260929-defs-classification-audit-02/batches/batch-02/task.json"
+    }
+  ],
+  "taxonomy": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-tag-generate/taxonomy/tag-taxonomy.json",
+  "write_contracts": [
+    "front_matter"
+  ]
+}

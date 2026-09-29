@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-data-move-guide-01-data_move_guide",
+  "document_path": "docs/zh/api/SIMD-API/c_api/data_move_guide/data_move_guide.md",
+  "document_sha256": "b802f5653eb1919b25ea730bd1b3de2c28c6b210b8e263062f5c3b5189e9da87",
+  "status": "ready",
+  "description": "按源和目的存储单元、数据排布及随路处理需求组织C API数据搬运接口的选用路线与共同注意事项。",
+  "evidence": [
+    {
+      "excerpt": "本章介绍如何根据源、目的存储单元、数据排布和随路处理需求选择C API数据搬运接口，并以NPU架构版本3510的数据通路和接口能力为例进行说明。其他架构的产品支持情况和接口能力以具体接口文档为准。开发者需要显式管理地址、搬运参数、配置状态和流水同步。使用本章介绍的接口时，除接口文档另有说明外，均可包含头文件`c_api/asc_simd.h`。"
+    }
+  ],
+  "confidence": 0.92
+}

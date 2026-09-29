@@ -34,6 +34,7 @@ types:
   asc_l13d_repeat_direction: l13ddir
   asc_load3d_v2_config: load3dcfg
   asc_load_l2_cache_mode: loadl2
+  asc_mutex_execute_mode: mutexmode
   asc_ndim_pad_count_config: padcountcfg
   asc_override_strategy: strategy
   asc_quant_mode: quantmode
@@ -42,7 +43,6 @@ types:
   asc_store_atomic_config: atomiccfg
   asc_store_l2_cache_mode: storel2
   asc_unit_flag_mode: unitflag
-  ascMutexExecuteMode: mutexmode
   event_t: event
   mem_dsb_t: memdsb
   pat_mode: pattern
@@ -108,6 +108,7 @@ types:
   TransposeParamsExt: transposeparamsext
   VdeqInfo: vdeqinfo
 aliases:
+  ascMutexExecuteMode: asc_mutex_execute_mode
   AscendC::Te::CacheMode: cache_mode
   asc_mutex_execute_mode: ascMutexExecuteMode
   int4b_t: int4x2_t

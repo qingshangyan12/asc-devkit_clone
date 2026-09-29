@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "defs-asc_l13d_fmatrix_config",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+  "document_sha256": "59aaaf7265301ac9ee248b21142530b1ddfe304608041bedacf4456a91af204f",
+  "status": "ready",
+  "description": "配置 L12 到 L0A 或 L0B 的 3D Feature map 搬运属性，包括尺寸和四个方向的 padding 大小。",
+  "evidence": [
+    {"excerpt": "asc_l13d_fmatrix_config用于设置"},
+    {"excerpt": "l1_width | Feature map的width，取值范围：[1, 32767]。"},
+    {"excerpt": "padding_left_size | 左侧填充的大小，取值范围：[0, 255]。"}
+  ],
+  "confidence": 0.97
+}

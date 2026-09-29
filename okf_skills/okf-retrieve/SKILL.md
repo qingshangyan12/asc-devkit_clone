@@ -32,7 +32,7 @@ deprecated_interface 废弃接口及顶层说明页。"文档范围内"= c_api �
    | 能力关键词 | `--kw 非对齐,填充,矩阵,…`（title+description） |
    | 某 API 全貌 | `--api <name>`（主页+架构变体+家族成员，含 deprecated 散置变体） |
    | 配套配置 | `--deps-of <api> [--kind requires|configures] [--reverse]` |
-   | 类型/宏/枚举 | `--kw <类型名>` 或 `--category defs`（reference.type 定义页） |
+   | 类型/宏/枚举 | `--kw <类型名>` 或 `--category defs`（对应的 reference 定义页） |
    | c_api 范围外能力 | `--gap <关键词>`（当前登记为空；命中即说明 c_api 内无文档） |
 
 4. **按需核对**：只读候选文档中支撑推荐所需的章节（功能说明/约束说明），

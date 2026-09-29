@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_run",
+  "run_id": "defs-asc_ndim_pad_count_config",
+  "run_dir": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260928-defs-regen-01/descriptions/asc_ndim_pad_count_config",
+  "created_at": "2026-09-28T06:45:47+00:00",
+  "devkit_root": "/home/hugh/code/asc-devkit_okf_knowledge-fork",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+  "document_sha256": "96b56b97426444b1ab2c0174ab0d36957cb9a1f0ea5e2c86be11445fff33996d"
+}

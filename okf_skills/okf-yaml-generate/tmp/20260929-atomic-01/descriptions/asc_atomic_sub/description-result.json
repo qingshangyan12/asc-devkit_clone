@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-atomic-01-asc_atomic_sub",
+  "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+  "document_sha256": "e40dbfd675482032aee9e191d517c96d523b6bb5bfd641d80d42c0ec8dd123dd",
+  "status": "ready",
+  "description": "从指定GM地址的旧值中减去输入值，原子写回结果，并返回旧值。",
+  "evidence": [
+    {
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子减操作：读取该地址中的旧值`old_value`，计算`old_value`与输入标量值`val`的差，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+    }
+  ],
+  "confidence": 0.91
+}

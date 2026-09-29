@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-defs-01-asc_store_l2_cache_mode",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+  "document_sha256": "eb3fc6f695a5f0656413b418c8981e672659c782272fe109f282007cf03b2500",
+  "status": "ready",
+  "description": "该枚举表示Unified Buffer（UB）到GM搬运时的L2 Cache策略，也用于标量访存路径的store策略配置与查询。",
+  "evidence": [
+    {
+      "excerpt": "asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时的L2 Cache策略，可用于："
+    }
+  ],
+  "confidence": 0.92
+}

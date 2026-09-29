@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 from dataclasses import asdict, replace
-from datetime import date
 from contextlib import contextmanager
 import fcntl
 import hashlib
@@ -25,6 +24,7 @@ if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
 
 from example_snippet_markers import apply_insertions_to_text, candidate_insertions_for_documents
+from yaml_deprecation_evidence import explicitly_deprecates_subject
 from doxygen_annotations import (
     DoxygenValidationError,
     apply_records_to_text,
@@ -34,6 +34,7 @@ from extract_api_yaml_metadata import (
     _compare_signature_header_mappings,
     _is_markdown_table_separator,
     _macro_definitions,
+    _type_catalog,
     _markdown_table_cells,
     _normalized_parameter_list,
     _parameter_name,
@@ -73,12 +74,14 @@ _MODEL = load_model()
 OKF_TYPES = tuple(_MODEL["profiles"])
 ALLOWED_FIELDS = tuple(_MODEL["field_order"])
 DEFINITION_CATEGORIES = {"constant", "enum", "macro", "type", "union"}
+DEFINITION_OKFTYPES = {f"reference.{category}" for category in DEFINITION_CATEGORIES}
 DEFINITIONS_ROOT = API_ROOT / "c_api" / "defs"
 MACRO_DEFINITION_SECTION_RE = re.compile(r"^\s{0,3}#{2,6}\s+宏定义(?:\s|<|$)", re.MULTILINE)
-DEPENDENCY_KINDS = {"requires", "configures", "constrained_by", "related"}
+DEPENDENCY_KINDS = {"requires", "configures", "constrained_by", "related", "replaced_by"}
 SEMANTIC_SCHEMA_VERSION = 1
 SEMANTIC_RESULT_PURPOSE = "okf_yaml_semantic_result"
 SIGNATURE_KEYS = {"prototype_id", "override_id", "macro_id", "archs", "header", "dtype"}
+VERSION_RE = re.compile(r"^(?:unknown|\d+\.\d+(?:\.\d+)?-(?:|\d+\.\d+(?:\.\d+)?))$")
 DEFAULT_WRITE_CONTRACTS = ("front_matter",)
 # Registry fields must have both an emission path and a validation path before
 # a run can start. This is an implementation capability declaration, not a
@@ -87,7 +90,7 @@ DEFAULT_WRITE_CONTRACTS = ("front_matter",)
 _IMPLEMENTED_FIELDS = frozenset(
     {
         "okftype", "title", "resource", "description", "tag", "signature", "archs", "header",
-        "declaration", "type_catalog", "dependencies", "examples", "navigation", "timestamp",
+        "declaration", "type_catalog", "dependencies", "examples", "navigation", "version",
     }
 )
 GENERATED_FIELDS = _IMPLEMENTED_FIELDS
@@ -188,17 +191,6 @@ def repo_relative(root: Path, path: Path) -> str:
     return path.resolve().relative_to(root.resolve()).as_posix()
 
 
-def is_definition_index(root: Path, path: Path) -> bool:
-    relative = Path(repo_relative(root, path))
-    prefix = DEFINITIONS_ROOT.parts
-    if relative.parts[: len(prefix)] != prefix:
-        return False
-    tail = relative.parts[len(prefix) :]
-    if len(tail) == 1:
-        return relative.stem == "defs"
-    return len(tail) == 2 and relative.stem == tail[0]
-
-
 def api_documents(root: Path, source_dir: str | None, document: list[str] | None) -> list[str]:
     if document and source_dir:
         raise ValidationError("--document and --source-dir cannot be combined")
@@ -213,11 +205,7 @@ def api_documents(root: Path, source_dir: str | None, document: list[str] | None
         directory = (root / base).resolve()
         if not directory.is_dir():
             raise ValidationError(f"source directory does not exist: {base}")
-        selected = [
-            repo_relative(root, path)
-            for path in directory.rglob("*.md")
-            if not is_definition_index(root, path)
-        ]
+        selected = [repo_relative(root, path) for path in directory.rglob("*.md")]
     return sorted(set(selected))
 
 
@@ -311,10 +299,13 @@ def _semantic_annotation(
     expected_keys = {
         "document_path", "document_sha256", "description", "tag", "tag_evidence", "dependencies",
     }
-    if not isinstance(annotation, dict) or set(annotation) != expected_keys:
+    if not isinstance(annotation, dict) or not set(annotation).issubset(expected_keys | {"version"}):
         raise ValidationError("semantic annotation has an invalid field set")
     if annotation.get("document_path") != document_path or annotation.get("document_sha256") != digest:
         raise ValidationError(f"semantic annotation does not match {document_path} or its input hash")
+    version = annotation.get("version", "unknown")
+    if not isinstance(version, str) or VERSION_RE.fullmatch(version) is None:
+        raise ValidationError(f"{document_path}: version must be a lifecycle range such as 9.0.0-")
 
     description = annotation["description"]
     if not isinstance(description, dict) or set(description) != {"value", "evidence"}:
@@ -374,6 +365,7 @@ def _semantic_annotation(
         "description": description_value,
         "tag": tags,
         "dependencies": dependencies,
+        "version": version,
         "normalized_dependencies": normalized_dependencies,
     }, {"description": description_evidence, **tag_evidence}
 
@@ -396,7 +388,15 @@ def load_semantic_annotations(
     annotations = payload.get("annotations")
     if not isinstance(annotations, list):
         raise ValidationError("semantic input annotations must be an array")
-    expected = set(task.get("documents", []))
+    expected = set()
+    for path in task.get("documents", []):
+        document = relative_api_path(root, path)
+        body = split_front_matter(document.read_text(encoding="utf-8", errors="replace"))[2]
+        classification = classify_document(path, body)
+        if classification is None:
+            raise ValidationError(f"document cannot be classified from source structure: {path}")
+        if classification.okftype != "reference.index":
+            expected.add(path)
     indexed: dict[str, Any] = {}
     for annotation in annotations:
         path = annotation.get("document_path") if isinstance(annotation, dict) else None
@@ -404,10 +404,12 @@ def load_semantic_annotations(
             raise ValidationError(f"semantic input has duplicate or out-of-scope document: {path}")
         indexed[path] = annotation
     if set(indexed) != expected:
-        raise ValidationError("semantic input must provide exactly one annotation for every batch document")
+        raise ValidationError("semantic input must provide exactly one annotation for every non-index batch document")
 
     result: dict[str, tuple[dict[str, Any], dict[str, list[dict[str, str]]]]] = {}
     for path in task["documents"]:
+        if path not in expected:
+            continue
         document = relative_api_path(root, path)
         body = split_front_matter(document.read_text(encoding="utf-8", errors="replace"))[2]
         classification = classify_document(path, body)
@@ -1210,7 +1212,7 @@ def _source_macro_definition_fields(
     has_object_macro = any(macro.parameters is None for macro in documented)
     if not has_object_macro and signatures:
         return {
-            "header": [],
+            "header": header,
             "declaration": None,
             "type_catalog": None,
             "signature": signatures,
@@ -1238,7 +1240,7 @@ def _source_definition_fields(
         return None
     path = repo_relative(root, document)
     try:
-        metadata = extract_api_metadata(document, date.today().isoformat(), root)
+        metadata = extract_api_metadata(document, "unknown", root)
     except (OSError, ValueError) as exc:
         return {
             "header": [],
@@ -1261,6 +1263,10 @@ def _source_definition_fields(
     declaration = metadata.declaration
     type_catalog = metadata.type_catalog
     issues: list[dict[str, Any]] = []
+    if category == "type" and definition_kind != "type_catalog":
+        type_catalog = _type_catalog(markdown)
+        if type_catalog:
+            definition_kind = "type_catalog"
     if definition_kind not in expected_kinds[category]:
         declaration = None
         type_catalog = None
@@ -1357,7 +1363,7 @@ def build_worker_document(
     if classification is None:
         raise ValidationError(f"document cannot be classified from source structure: {path}")
 
-    definition = _source_definition_fields(root, document, body) if classification.okftype == "reference.type" else None
+    definition = _source_definition_fields(root, document, body) if classification.okftype in DEFINITION_OKFTYPES else None
     plan = compile_execution_plan(classification)
     needs_signature = "signature" in plan.fields
     needs_examples = "examples" in plan.fields
@@ -1407,8 +1413,8 @@ def build_worker_document(
         fields["description"] = semantic_fields.get("description", "")
     if "tag" in plan.fields:
         fields["tag"] = tags
-    if "timestamp" in plan.fields:
-        fields["timestamp"] = date.today().isoformat()
+    if "version" in plan.fields:
+        fields["version"] = semantic_fields.get("version", "unknown")
     if "signature" in plan.fields:
         fields["signature"] = normalize_signature_dtypes(
             source_signature,
@@ -1435,7 +1441,8 @@ def build_worker_document(
     issues: list[dict[str, Any]] = list(source_issues)
     if "description" in fields and not fields["description"]:
         issues.append(issue(path, "description", "document_defect", "缺少由 description agent 生成并验证的 API 描述。"))
-    if "signature" in fields and not fields["signature"] and not re.search(r"函数原型|函数声明", body):
+    if ("signature" in fields and not fields["signature"] and not fields.get("declaration")
+            and not re.search(r"函数原型|函数声明", body)):
         issues.append(issue(path, "signature", "document_defect", "正文没有可确认的函数原型信息。"))
     for signature in fields.get("signature", []):
         identifier_keys = [
@@ -1542,19 +1549,48 @@ def prepare(args: argparse.Namespace) -> int:
     if not root.is_dir():
         raise ValidationError(f"DevKit root does not exist: {root}")
     selected = api_documents(root, args.source_dir, args.document)
+    run_dir = args.run_dir.expanduser().resolve()
+    classifications = []
     unclassified = []
     for path in selected:
         document = (root / path).resolve()
-        body = split_front_matter(document.read_text(encoding="utf-8", errors="replace"))[2]
+        try:
+            body = split_front_matter(document.read_text(encoding="utf-8", errors="replace"))[2]
+        except (OSError, ValidationError, yaml.YAMLError) as exc:
+            unclassified.append(path)
+            classifications.append({
+                "path": path,
+                "status": "unclassified",
+                "reason": f"文档无法解析：{exc}",
+            })
+            continue
         classification = classify_document(path, body, model)
         if classification is None:
             unclassified.append(path)
+            classifications.append({
+                "path": path,
+                "status": "unclassified",
+                "reason": "正文缺少足以确认已注册页面类型的结构证据",
+            })
+        else:
+            classifications.append({
+                "path": path,
+                "status": "classified",
+                "okftype": classification.okftype,
+                "rule": classification.rule,
+            })
+    report_path = run_dir / "classification-report.json"
+    write_json(report_path, {
+        "schema_version": 1,
+        "run_id": run_dir.name,
+        "documents": classifications,
+        "unclassified": unclassified,
+    })
     if unclassified:
         raise ValidationError(
             "selected documents have no registered okftype: " + ", ".join(unclassified)
+            + f"; see {report_path}"
         )
-    run_dir = args.run_dir.expanduser().resolve()
-    run_dir.mkdir(parents=True, exist_ok=True)
     batches = [selected[index:index + 25] for index in range(0, len(selected), 25)]
     manifest = {
         "schema_version": 1,
@@ -1597,7 +1633,7 @@ def worker(args: argparse.Namespace) -> int:
     documents = [
         build_worker_document(
             root, path, namespaces, example_discovery_index,
-            semantic[path] if semantic is not None else None,
+            semantic.get(path) if semantic is not None else None,
         )
         for path in task["documents"]
     ]
@@ -1754,6 +1790,13 @@ def normalize_dependencies(root: Path, document_path: str, dependencies: Any) ->
         source_body = split_front_matter(source.read_text(encoding="utf-8", errors="replace"))[2]
         if not isinstance(excerpt, str) or not excerpt.strip() or excerpt not in source_body:
             raise ValidationError(f"{document_path}: dependency evidence excerpt is not verbatim source text")
+        if kind == "replaced_by" and (
+            source != (root / document_path).resolve()
+            or not any(explicitly_deprecates_subject(source_body, line) for line in source_body.splitlines())
+            or not re.search(r"替代|改用|取代|代替|新接口形式请参见", excerpt)
+            or (target.name not in excerpt and target.stem not in excerpt)
+        ):
+            raise ValidationError(f"{document_path}: replaced_by evidence must name the target and state the replacement")
         identity = (normalized_path, kind, condition or "")
         if identity in seen:
             raise ValidationError(f"{document_path}: duplicate dependency")
@@ -1853,13 +1896,9 @@ def validate_base_fields(fields: dict[str, Any], path: str) -> None:
         raise ValidationError(f"{path}: resource must equal asc-devkit/<document path>")
     if "description" in fields and not isinstance(fields.get("description"), str):
         raise ValidationError(f"{path}: description must be a string")
-    timestamp = fields.get("timestamp")
-    if not isinstance(timestamp, str):
-        raise ValidationError(f"{path}: timestamp must be an ISO date string")
-    try:
-        date.fromisoformat(timestamp)
-    except ValueError as exc:
-        raise ValidationError(f"{path}: timestamp must be an ISO date string") from exc
+    version = fields.get("version")
+    if not isinstance(version, str) or VERSION_RE.fullmatch(version) is None:
+        raise ValidationError(f"{path}: version must be a lifecycle range such as 9.0.0-")
 
 
 def validate_tags(
@@ -1898,6 +1937,8 @@ def validate_tags(
                     raise ValidationError(f"{path}: invalid evidence for tag {key}")
                 if namespace != "api_surfaces" and reference["excerpt"] not in body:
                     raise ValidationError(f"{path}: tag evidence is not verbatim for {key}")
+                if key == "traits:deprecated" and not explicitly_deprecates_subject(body, reference["excerpt"]):
+                    raise ValidationError(f"{path}: deprecated evidence must describe the documented subject")
     return result
 
 
@@ -2081,8 +2122,8 @@ def validate_definition_fields(
             _validate_type_catalog(fields["type_catalog"], path)
         return
     if definition_kind == "function_macro":
-        if fields.get("header") not in (None, []) or fields.get("declaration") not in (None, {}):
-            raise ValidationError(f"{path}: function_macro only uses signature metadata")
+        if fields.get("declaration") not in (None, {}):
+            raise ValidationError(f"{path}: function_macro must not contain declaration metadata")
         if not fields.get("signature") and "signature" not in allowed_empty:
             raise ValidationError(f"{path}: function_macro signature is required")
         return
@@ -2112,7 +2153,7 @@ def _promote_common_signature_fields(fields: dict[str, Any]) -> None:
 
 def _compact_definition_metadata(fields: dict[str, Any]) -> None:
     """Keep definition front matter focused on identity and declaration shape."""
-    if fields.get("okftype") != "reference.type":
+    if fields.get("okftype") not in DEFINITION_OKFTYPES:
         return
     declaration = fields.get("declaration")
     if isinstance(declaration, dict):

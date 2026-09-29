@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-atomic-01-asc_atomic_exch",
+  "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+  "document_sha256": "625ffd5ea03007d886e0017be6aacd78453aea87d5c8311f72afddb97fab9b07",
+  "status": "ready",
+  "description": "将输入值原子写入指定GM地址的单个元素以替换旧值，并返回旧值。",
+  "evidence": [
+    {
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子交换操作。读取该元素的旧值`old_value`，将`val`写回该地址以替换旧值，并返回`old_value`。整个读取和写回过程为原子操作。"
+    }
+  ],
+  "confidence": 0.91
+}

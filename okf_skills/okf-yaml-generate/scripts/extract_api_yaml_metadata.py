@@ -20,7 +20,6 @@ import json
 import re
 import sys
 from dataclasses import dataclass, replace
-from datetime import date
 from pathlib import Path
 from typing import Any, Mapping, Optional, Sequence
 from urllib.parse import unquote, urlsplit
@@ -305,7 +304,7 @@ class ApiMetadata:
     title: str
     description: Optional[str]
     resource: Optional[str]
-    timestamp: str
+    version: str
     header_candidates: Sequence[str] = ()
     document_path: Optional[Path] = None
     description_analysis: Optional[DescriptionAnalysis] = None
@@ -1083,15 +1082,6 @@ EXAMPLE_DECLARATION_RE = re.compile(
     r"(?P<array>(?:\[[^\]]*\])*)\s*(?=[=;,])",
     re.MULTILINE,
 )
-EXAMPLE_VALUE_DECLARATION_RE = re.compile(
-    r"(?:^|[;{}]\s*)\s*"
-    r"(?P<type>(?:(?:const|volatile|constexpr|static|__\w+__)\s+)*"
-    r"(?:[A-Za-z_][A-Za-z0-9_:]*)(?:\s*<[^;{}=]+>)?"
-    r"(?:\s*[*&]\s*)*)\s+"
-    r"(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*"
-    r"(?:\[[^\]]*\])*\s*=\s*(?P<value>[^;{}]+)\s*;",
-    re.MULTILINE,
-)
 EXAMPLE_USING_ALIAS_RE = re.compile(
     r"^\s*using\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*=\s*(?P<type>[^;]+);",
     re.MULTILINE,
@@ -1232,14 +1222,6 @@ def _collect_example_declarations(source_text: str) -> dict[str, str]:
     return declared
 
 
-def _collect_example_values(source_text: str) -> dict[str, str]:
-    values: dict[str, str] = {}
-    for match in EXAMPLE_VALUE_DECLARATION_RE.finditer(source_text):
-        value = " ".join(match.group("value").strip().split())
-        values[match.group("name")] = value
-    return values
-
-
 def _example_declared_types(
     source_text: str,
     call_offset: int,
@@ -1261,16 +1243,6 @@ def _example_declared_types(
         _collect_example_declarations(source_text[body_start:call_offset])
     )
     return declared
-
-
-def _example_declared_values(
-    source_text: str,
-    call_offset: int,
-    body_start: int,
-) -> dict[str, str]:
-    values = _collect_example_values(_masked_top_level_source(source_text, call_offset))
-    values.update(_collect_example_values(source_text[body_start:call_offset]))
-    return values
 
 
 @lru_cache(maxsize=2048)
@@ -1378,17 +1350,6 @@ def _example_argument_type(
         return "bool"
     if EXAMPLE_UINT32_LITERAL_RE.fullmatch(argument):
         return "uint32_t"
-    return None
-
-
-def _example_argument_value(argument: str, values: dict[str, str]) -> Optional[str]:
-    argument = argument.strip()
-    if argument in values:
-        return values[argument]
-    if argument in {"true", "false"}:
-        return argument
-    if re.fullmatch(r"[-+]?(?:0x[0-9A-Fa-f]+|\d+)", argument):
-        return argument
     return None
 
 
@@ -1610,7 +1571,6 @@ def _sanitize_snippet_part(value: str) -> str:
 def _example_role_and_snippet_parts(
     symbol: str,
     argument_parts: Sequence[str],
-    argument_values: Sequence[Optional[str]],
     parameter_names: Sequence[str],
     bindings: Sequence[dict[str, str]],
     include_binding_values: bool = False,
@@ -1628,15 +1588,8 @@ def _example_role_and_snippet_parts(
         if index >= len(argument_parts):
             continue
         name = parameter_name.lower()
-        value = argument_values[index] if index < len(argument_values) else None
         argument = argument_parts[index].strip()
-        if name == "c_matrix_init_val" and value in {"true", "false"}:
-            roles.append("c_matrix_init" if value == "true" else "c_matrix_no_init")
-            parts.append(f"c_matrix_init_val_{value}")
-        elif name == "c_matrix_source" and value in {"true", "false"}:
-            roles.append("c_matrix_source" if value == "true" else "c_matrix_no_source")
-            parts.append(f"c_matrix_source_{value}")
-        elif "flag_id" in name:
+        if "flag_id" in name:
             roles.append("sync_flag")
             if argument:
                 parts.append(_sanitize_snippet_part(argument))
@@ -2050,11 +2003,6 @@ def _example_calls(
             declared = _example_declared_types(
                 source_text, match.start(), function_parameters, body_start
             )
-            argument_values_by_name = _example_declared_values(
-                source_text,
-                match.start(),
-                body_start,
-            )
             inferred_types = tuple(
                 _example_argument_type(
                     argument,
@@ -2064,10 +2012,6 @@ def _example_calls(
                     const_aliases,
                     header_constant_types,
                 )
-                for argument in argument_parts
-            )
-            argument_values = tuple(
-                _example_argument_value(argument, argument_values_by_name)
                 for argument in argument_parts
             )
             signatures = signatures_by_symbol[symbol]
@@ -2098,7 +2042,6 @@ def _example_calls(
             roles, snippet_parts = _example_role_and_snippet_parts(
                 symbol,
                 argument_parts,
-                argument_values,
                 parameter_names,
                 bindings,
                 include_binding_values=canonical_id is None,
@@ -5617,7 +5560,7 @@ def resolve_header_resource(
 
 def extract_api_metadata(
     document_path: Path,
-    timestamp: str,
+    version: str,
     repo_root: Path = REPO_ROOT,
     context_document_path: Optional[Path] = None,
     example_discovery_index: Optional[ExampleDiscoveryIndex] = None,
@@ -5685,7 +5628,7 @@ def extract_api_metadata(
         title=title,
         description=description_analysis.description,
         resource=resource,
-        timestamp=timestamp,
+        version=version,
         header_candidates=header_candidates,
         document_path=path_for_header_rules,
         description_analysis=description_analysis,
@@ -5838,7 +5781,7 @@ def render_report(
         "",
         f"Source directory: `{source_directory}`",
         "",
-        "Notes: `timestamp` is the date this preview was generated. "
+        "Notes: `version` is the API lifecycle range collected from package and release evidence. "
         "`tag` is intentionally omitted until evidence-backed annotation is available.",
         "",
         "## Summary",
@@ -6112,7 +6055,7 @@ def render_report(
             lines[-1] = "  examples: []"
         lines.extend(
             [
-                f"  timestamp: {item.timestamp}",
+                f"  version: {item.version}",
                 "  ```",
                 "",
             ]
@@ -6145,9 +6088,9 @@ def _build_parser() -> argparse.ArgumentParser:
         help=f"Markdown report path (default: {DEFAULT_OUTPUT_PATH})",
     )
     parser.add_argument(
-        "--timestamp",
-        default=date.today().isoformat(),
-        help="YYYY-MM-DD timestamp written into each metadata item",
+        "--version",
+        default="unknown",
+        help="API lifecycle range written into each metadata item",
     )
     return parser
 
@@ -6188,7 +6131,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     metadata_items = [
         extract_api_metadata(
             path,
-            args.timestamp,
+            args.version,
             example_discovery_index=example_discovery_index,
         )
         for path in api_files

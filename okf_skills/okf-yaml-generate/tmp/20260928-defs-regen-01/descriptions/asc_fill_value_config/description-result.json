@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "defs-asc_fill_value_config",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+  "document_sha256": "e92d5c367af794ff0d83e43398eed3b772815fa3ef58969e104fa6cd275e3d8a",
+  "status": "ready",
+  "description": "表示 fill_value 初始化参数，配置 L1、L0A 或 L0B 目标的迭代次数、数据块数量和目标间隔。",
+  "evidence": [
+    {"excerpt": "asc_fill_value_config为fill_value的初始化参数结构体，包含"},
+    {"excerpt": "repeat | 迭代次数，默认值：0。"},
+    {"excerpt": "dst_gap | 目的操作数前一个迭代结束地址到后一个迭代起始地址之间的距离"}
+  ],
+  "confidence": 0.97
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "asc_sync_inter_wait",
+  "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+  "document_sha256": "68a591a4b2cd80bf1e99e6402ce56ed2fd3f271df42de1380ce2c3a7a8bfe6fd",
+  "status": "ready",
+  "description": "与asc_sync_inter_arrive配对使用，实现不同AI Core之间全部AIC或全部AIV的同步。检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水与NPU架构有关。",
+  "evidence": [
+    {
+      "excerpt": "本接口与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下：\n\n- 全部AIC之间的同步场景：\n  - 所有参与同步的AIC都执行`asc_sync_inter_arrive`后向调度模块发送通知，接着调度模块将各AIC对应`flag_id`的计数器增加1。\n  - 各AIC上配对的`asc_sync_inter_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。\n- 全部AIV之间的同步场景：\n  - 所有参与同步的AIV都执行`asc_sync_inter_arrive`后向调度模块发送通知，接着调度模块将各AIV对应`flag_id`的计数器增加1。\n  - 各AIV上配对的`asc_sync_inter_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。\n\n该同步模式的具体执行原理，请参考[多AI Core中AIC或者AIV全核同步（模式0）](key_features.md#multi_ai_core_aic_aiv_full_sync)中的代码片段及配套时序图。"
+    }
+  ],
+  "confidence": 0.9
+}

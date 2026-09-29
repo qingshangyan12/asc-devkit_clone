@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_run",
+  "run_id": "20260929-atomic-01-asc_atomic_and",
+  "run_dir": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260929-atomic-01/descriptions/asc_atomic_and",
+  "created_at": "2026-09-29T09:11:55+00:00",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+  "document_sha256": "f9db2b504fdc47d3b3c263b25389b1b526c3d0533425e25d0b8b50ab8a5d61c3"
+}

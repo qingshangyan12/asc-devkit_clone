@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_run",
+  "run_id": "20260928-defs-regen-01-asc_c_api_mrgsort_element_len",
+  "run_dir": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260928-defs-regen-01/descriptions/asc_c_api_mrgsort_element_len",
+  "created_at": "2026-09-28T06:47:16+00:00",
+  "devkit_root": "/home/hugh/code/asc-devkit_okf_knowledge-fork",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+  "document_sha256": "2779deac0b0ea03096b56a7b6c17213007af9b9c468dfc5d7fab478350ff3743"
+}

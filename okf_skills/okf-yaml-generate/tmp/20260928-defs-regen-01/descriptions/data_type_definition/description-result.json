@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "defs-data_type_definition",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+  "document_sha256": "064defc78c99ad7f8541c4f0b7a6e76bd9772f2b212c9dcd314b34887f44570e",
+  "status": "ready",
+  "description": "总览 Reg 数据类型，说明矢量数据、掩码、非对齐和地址寄存器的类别、容量限制及使用方式。",
+  "evidence": [
+    {"excerpt": "矢量数据寄存器用于存储矢量数据，其长度为`VL`（Vector Length）。"},
+    {"excerpt": "掩码寄存器的类型为`vector_bool`，用于在矢量计算中筛选参与计算的元素"},
+    {"excerpt": "地址寄存器的类型为`addr_reg`，用于存储地址偏移量。"}
+  ],
+  "confidence": 0.96
+}

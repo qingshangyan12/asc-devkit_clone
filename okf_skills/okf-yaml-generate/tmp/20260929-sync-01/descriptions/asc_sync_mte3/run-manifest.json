@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_run",
+  "run_id": "asc_sync_mte3",
+  "run_dir": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260929-sync-01/descriptions/asc_sync_mte3",
+  "created_at": "2026-09-29T07:03:02+00:00",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+  "document_sha256": "1904a73ff124105a0ef03cde9158b2544fb4c24d0d7dbced8681d5765bbf36cf"
+}

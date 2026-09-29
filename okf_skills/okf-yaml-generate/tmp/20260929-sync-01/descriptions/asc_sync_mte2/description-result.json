@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "asc_sync_mte2",
+  "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+  "document_sha256": "ffc156f32355f6925f2c9ba3505fc5fdf77771187a8ac78ce5f52f0c7c380a61",
+  "status": "ready",
+  "description": "针对PIPE_MTE2执行同步操作的易用性接口，保证PIPE_MTE2中前序指令（如GM到UB的数据搬运）全部完成后，PIPE_MTE3与PIPE_V的后续指令才能开始执行，用于简化手工同步的编码，只能在AIV中调用。",
+  "evidence": [
+    {
+      "excerpt": "针对`PIPE_MTE2`执行同步操作。其作用是保证`PIPE_MTE2`中前序指令（如GM到UB的数据搬运）全部完成后，`PIPE_MTE3`与`PIPE_V`的后续指令才能开始执行。\n\n本接口为易用性接口，用于简化手工同步的编码。"
+    }
+  ],
+  "confidence": 0.9
+}

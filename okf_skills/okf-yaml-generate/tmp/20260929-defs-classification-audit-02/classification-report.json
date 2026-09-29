@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "run_id": "20260929-defs-classification-audit-02",
+  "documents": [
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+      "status": "classified",
+      "okftype": "reference.constant",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+      "status": "classified",
+      "okftype": "reference.constant",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+      "status": "classified",
+      "okftype": "reference.index",
+      "rule": "navigation_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/defs.md",
+      "status": "classified",
+      "okftype": "reference.index",
+      "rule": "navigation_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+      "status": "classified",
+      "okftype": "reference.enum",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+      "status": "classified",
+      "okftype": "reference.index",
+      "rule": "navigation_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+      "status": "classified",
+      "okftype": "reference.macro",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+      "status": "classified",
+      "okftype": "reference.macro",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+      "status": "classified",
+      "okftype": "reference.index",
+      "rule": "navigation_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+      "status": "classified",
+      "okftype": "reference.type",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md",
+      "status": "classified",
+      "okftype": "reference.concept",
+      "rule": "prose_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/type/type.md",
+      "status": "classified",
+      "okftype": "reference.index",
+      "rule": "navigation_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+      "status": "classified",
+      "okftype": "reference.union",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+      "status": "classified",
+      "okftype": "reference.union",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+      "status": "classified",
+      "okftype": "reference.union",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+      "status": "classified",
+      "okftype": "reference.union",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+      "status": "classified",
+      "okftype": "reference.union",
+      "rule": "definition_structure"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/union.md",
+      "status": "classified",
+      "okftype": "reference.index",
+      "rule": "navigation_structure"
+    }
+  ],
+  "unclassified": []
+}

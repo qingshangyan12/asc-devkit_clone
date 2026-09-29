@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-atomic-01-asc_disable_dma_atomic",
+  "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+  "document_sha256": "4525fb8922a00d440eeca29fffdb5c1578d76e9737e2b9c4e3d8f128684c1ccc",
+  "status": "ready",
+  "description": "关闭先前开启的数据搬运随路原子操作，避免原子状态影响后续搬运指令。",
+  "evidence": [
+    {
+      "excerpt": "与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。"
+    }
+  ],
+  "confidence": 0.91
+}

@@ -1,0 +1,4505 @@
+{
+  "schema_version": 1,
+  "run_id": "20260929-atomic-01",
+  "batch_id": "batch-01",
+  "worker_id": "worker-a",
+  "documents": [
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/atomic.md",
+      "sha256": "baf53ac9e785cab3244b62ac949d2623d8840cacb111fe1554803b3127b28256",
+      "plan": {
+        "okftype": "reference.index",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index",
+        "title": "原子操作",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/atomic.md",
+        "timestamp": "2026-09-29",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/datamove_atomic.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/scalar_atomic.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+      "sha256": "dad956baefb5f5d87ceb47bbe475c621ee4877b7939fd5ca2d590e9ef0f527c0",
+      "plan": {
+        "okftype": "reference.concept",
+        "rule": "concept_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "dependencies",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.concept",
+        "title": "原子操作概述",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "dependencies": []
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "atomic_operations_overview-description-d794d133",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "atomic_operations_overview-tag.roles-deae8996",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "atomic_operations_overview-semantic_input-a369a360",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+      "sha256": "4525fb8922a00d440eeca29fffdb5c1578d76e9737e2b9c4e3d8f128684c1ccc",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_disable_dma_atomic",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_disable_dma_atomic__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_disable_dma_atomic-description-4f5937fe",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_disable_dma_atomic-tag.roles-c6286a69",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_disable_dma_atomic-semantic_input-b5ba6f53",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_disable_dma_atomic()",
+          "parameters": "asc_disable_dma_atomic()",
+          "override_id": "asc_disable_dma_atomic__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+      "sha256": "acceec1e6c1b983baf8563b1c1732232b4b3b1d322ffb4a0ec4dbc6069bc61e0",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_set_atomic_add",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_set_atomic_add_int8__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_add_int16__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_add_int32__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_add_float16__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_add_bfloat__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_add_float__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_set_atomic_add-description-da70078e",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_set_atomic_add-tag.roles-c18a3eeb",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_set_atomic_add-semantic_input-ff24d00a",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_add_int8()",
+          "parameters": "asc_set_atomic_add_int8()",
+          "override_id": "asc_set_atomic_add_int8__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_add_int16()",
+          "parameters": "asc_set_atomic_add_int16()",
+          "override_id": "asc_set_atomic_add_int16__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_add_int32()",
+          "parameters": "asc_set_atomic_add_int32()",
+          "override_id": "asc_set_atomic_add_int32__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_add_float16()",
+          "parameters": "asc_set_atomic_add_float16()",
+          "override_id": "asc_set_atomic_add_float16__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_add_bfloat()",
+          "parameters": "asc_set_atomic_add_bfloat()",
+          "override_id": "asc_set_atomic_add_bfloat__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_add_float()",
+          "parameters": "asc_set_atomic_add_float()",
+          "override_id": "asc_set_atomic_add_float__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+      "sha256": "891a2303c5d1efbe7cc01cbe90e4f2d53547e27d647ebee0fb5f4879f67387de",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_set_atomic_max",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_set_atomic_max_int8__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_max_int16__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_max_float16__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_max_bfloat__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_max_int32__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_max_float__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_set_atomic_max-description-4232ddee",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_set_atomic_max-tag.roles-187650bb",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_set_atomic_max-semantic_input-dd2d72b1",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_max_int8()",
+          "parameters": "asc_set_atomic_max_int8()",
+          "override_id": "asc_set_atomic_max_int8__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_max_int16()",
+          "parameters": "asc_set_atomic_max_int16()",
+          "override_id": "asc_set_atomic_max_int16__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_max_float16()",
+          "parameters": "asc_set_atomic_max_float16()",
+          "override_id": "asc_set_atomic_max_float16__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_max_bfloat()",
+          "parameters": "asc_set_atomic_max_bfloat()",
+          "override_id": "asc_set_atomic_max_bfloat__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_max_int32()",
+          "parameters": "asc_set_atomic_max_int32()",
+          "override_id": "asc_set_atomic_max_int32__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_max_float()",
+          "parameters": "asc_set_atomic_max_float()",
+          "override_id": "asc_set_atomic_max_float__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+      "sha256": "8a239d0ed2b39b0634269ddd65f4579ee4bc5c59bd3b05c5d67080bcf1fd6315",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_set_atomic_min",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_set_atomic_min_int8__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_min_int16__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_min_float16__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_min_bfloat__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_min_int32__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          },
+          {
+            "override_id": "asc_set_atomic_min_float__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/datamove_atomic.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_set_atomic_min-description-80221621",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_set_atomic_min-tag.roles-07df28e5",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_set_atomic_min-semantic_input-698975e7",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_min_int8()",
+          "parameters": "asc_set_atomic_min_int8()",
+          "override_id": "asc_set_atomic_min_int8__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_min_int16()",
+          "parameters": "asc_set_atomic_min_int16()",
+          "override_id": "asc_set_atomic_min_int16__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_min_float16()",
+          "parameters": "asc_set_atomic_min_float16()",
+          "override_id": "asc_set_atomic_min_float16__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_min_bfloat()",
+          "parameters": "asc_set_atomic_min_bfloat()",
+          "override_id": "asc_set_atomic_min_bfloat__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_min_int32()",
+          "parameters": "asc_set_atomic_min_int32()",
+          "override_id": "asc_set_atomic_min_int32__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+          "header": "include/c_api/atomic/datamove_atomic.h",
+          "function": "asc_set_atomic_min_float()",
+          "parameters": "asc_set_atomic_min_float()",
+          "override_id": "asc_set_atomic_min_float__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/datamove_atomic.md",
+      "sha256": "49beb467d6860f548e09d47ed7049a8bf52d7c0c6935a247ef450077c39a337c",
+      "plan": {
+        "okftype": "reference.index",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index",
+        "title": "搬运原子操作",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/datamove_atomic.md",
+        "timestamp": "2026-09-29",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+      "sha256": "c7fb53c42c7af3865a3f1e9fb28ec8d5a7e3caa5f8818a199a4df2f7b8f0a559",
+      "plan": {
+        "okftype": "reference.concept",
+        "rule": "concept_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "dependencies",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.concept",
+        "title": "关键特性说明",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "dependencies": []
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "key_features-description-94b538a0",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "key_features-tag.roles-79986bba",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "key_features-semantic_input-76547a4c",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+      "sha256": "feb880cb822449640637926cf27205253a3fca9acf557b5418e4d8f87523746e",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_add",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_add__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "float",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_add-description-5afdd11c",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_add-tag.roles-cc235ac7",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_add-semantic_input-53b5bf92",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_add(__gm__ int32_t*,int32_t)",
+          "parameters": "asc_atomic_add(__gm__ int32_t*address,int32_t val)",
+          "override_id": "asc_atomic_add__PGi32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_add(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_add(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_add__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_add(__gm__ float*,float)",
+          "parameters": "asc_atomic_add(__gm__ float*address,float val)",
+          "override_id": "asc_atomic_add__PGf32_f32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_add(__gm__ int64_t*,int64_t)",
+          "parameters": "asc_atomic_add(__gm__ int64_t*address,int64_t val)",
+          "override_id": "asc_atomic_add__PGi64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_add(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_add(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_add__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+      "sha256": "f9db2b504fdc47d3b3c263b25389b1b526c3d0533425e25d0b8b50ab8a5d61c3",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_and",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_and__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_and-description-3e30b8e5",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_and-tag.roles-7bf74cbf",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_and-semantic_input-810392ee",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_and(__gm__ int32_t*,int32_t)",
+          "parameters": "asc_atomic_and(__gm__ int32_t*address,int32_t val)",
+          "override_id": "asc_atomic_and__PGi32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_and(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_and(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_and__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_and(__gm__ int64_t*,int64_t)",
+          "parameters": "asc_atomic_and(__gm__ int64_t*address,int64_t val)",
+          "override_id": "asc_atomic_and__PGi64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_and(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_and(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_and__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+      "sha256": "251ad772d740c1d24aea3bb1e33687ff44a57240b08ad235c82566f6cd56af61",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_cas",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_cas__PG<dtype>_<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "float",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_cas-description-5bbac15f",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_cas-tag.roles-1db8c2ce",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_cas-semantic_input-b619a6e3",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_cas(__gm__ int32_t*,int32_t,int32_t)",
+          "parameters": "asc_atomic_cas(__gm__ int32_t*address,int32_t compare,int32_t val)",
+          "override_id": "asc_atomic_cas__PGi32_i32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "compare",
+                "direction": "in",
+                "description": "源操作数，做比较的值。",
+                "evidence": [
+                  "| compare | 输入 | 源操作数，做比较的值。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数，用于赋值的值。",
+                "evidence": [
+                  "| val | 输入 | 源操作数，用于赋值的值。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_cas(__gm__ uint32_t*,uint32_t,uint32_t)",
+          "parameters": "asc_atomic_cas(__gm__ uint32_t*address,uint32_t compare,uint32_t val)",
+          "override_id": "asc_atomic_cas__PGu32_u32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "compare",
+                "direction": "in",
+                "description": "源操作数，做比较的值。",
+                "evidence": [
+                  "| compare | 输入 | 源操作数，做比较的值。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数，用于赋值的值。",
+                "evidence": [
+                  "| val | 输入 | 源操作数，用于赋值的值。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_cas(__gm__ float*,float,float)",
+          "parameters": "asc_atomic_cas(__gm__ float*address,float compare,float val)",
+          "override_id": "asc_atomic_cas__PGf32_f32_f32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "compare",
+                "direction": "in",
+                "description": "源操作数，做比较的值。",
+                "evidence": [
+                  "| compare | 输入 | 源操作数，做比较的值。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数，用于赋值的值。",
+                "evidence": [
+                  "| val | 输入 | 源操作数，用于赋值的值。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_cas(__gm__ int64_t*,int64_t,int64_t)",
+          "parameters": "asc_atomic_cas(__gm__ int64_t*address,int64_t compare,int64_t val)",
+          "override_id": "asc_atomic_cas__PGi64_i64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "compare",
+                "direction": "in",
+                "description": "源操作数，做比较的值。",
+                "evidence": [
+                  "| compare | 输入 | 源操作数，做比较的值。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数，用于赋值的值。",
+                "evidence": [
+                  "| val | 输入 | 源操作数，用于赋值的值。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_cas(__gm__ uint64_t*,uint64_t,uint64_t)",
+          "parameters": "asc_atomic_cas(__gm__ uint64_t*address,uint64_t compare,uint64_t val)",
+          "override_id": "asc_atomic_cas__PGu64_u64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "compare",
+                "direction": "in",
+                "description": "源操作数，做比较的值。",
+                "evidence": [
+                  "| compare | 输入 | 源操作数，做比较的值。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数，用于赋值的值。",
+                "evidence": [
+                  "| val | 输入 | 源操作数，用于赋值的值。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+      "sha256": "c45065a8782dd8135abc0b1da8ceea8bd744c458fb03b460610ba5d051b6a6bd",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_dec",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_dec__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "uint32_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_dec-description-33149f24",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_dec-tag.roles-106072fd",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_dec-semantic_input-4ef9f76d",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_dec(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_dec(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_dec__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_dec(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_dec(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_dec__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+      "sha256": "625ffd5ea03007d886e0017be6aacd78453aea87d5c8311f72afddb97fab9b07",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_exch",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_exch__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "float",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_exch-description-80359d5e",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_exch-tag.roles-fbc0aa86",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_exch-semantic_input-f06a0e84",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_exch(__gm__ int32_t*,int32_t)",
+          "parameters": "asc_atomic_exch(__gm__ int32_t*address,int32_t val)",
+          "override_id": "asc_atomic_exch__PGi32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_exch(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_exch(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_exch__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_exch(__gm__ float*,float)",
+          "parameters": "asc_atomic_exch(__gm__ float*address,float val)",
+          "override_id": "asc_atomic_exch__PGf32_f32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_exch(__gm__ int64_t*,int64_t)",
+          "parameters": "asc_atomic_exch(__gm__ int64_t*address,int64_t val)",
+          "override_id": "asc_atomic_exch__PGi64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_exch(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_exch(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_exch__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+      "sha256": "d8dbea452b81fbe7a37f2abb090d9f360d5cdaa914ce5487a141c6fa335ccfd0",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_inc",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_inc__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "uint32_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_inc-description-1af70f20",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_inc-tag.roles-1d68aba9",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_inc-semantic_input-23d2ed88",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_inc(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_inc(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_inc__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_inc(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_inc(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_inc__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "源操作数。",
+                "evidence": [
+                  "| val | 输入 | 源操作数。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "sha256": "b3ea0cedcf3c4da933178b3bacd3f3c80f52bab4770319dfdf4a56f0b1d33637",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_max",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_max__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "float",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_max-description-adc9559b",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_max-tag.roles-5c314d46",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_max-semantic_input-79b338db",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_max(__gm__ int32_t*,int32_t)",
+          "parameters": "asc_atomic_max(__gm__ int32_t*address,int32_t val)",
+          "override_id": "asc_atomic_max__PGi32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_max(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_max(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_max__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_max(__gm__ float*,float)",
+          "parameters": "asc_atomic_max(__gm__ float*address,float val)",
+          "override_id": "asc_atomic_max__PGf32_f32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_max(__gm__ int64_t*,int64_t)",
+          "parameters": "asc_atomic_max(__gm__ int64_t*address,int64_t val)",
+          "override_id": "asc_atomic_max__PGi64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_max(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_max(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_max__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "sha256": "2712f3a3c2f543048afea593a04c7ea16d2c1061d39f4eb4722b8fc3952436a9",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_min",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_min__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "float",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_min-description-6ba76c4e",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_min-tag.roles-45021eb8",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_min-semantic_input-43512447",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_min(__gm__ int32_t*,int32_t)",
+          "parameters": "asc_atomic_min(__gm__ int32_t*address,int32_t val)",
+          "override_id": "asc_atomic_min__PGi32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_min(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_min(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_min__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_min(__gm__ float*,float)",
+          "parameters": "asc_atomic_min(__gm__ float*address,float val)",
+          "override_id": "asc_atomic_min__PGf32_f32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_min(__gm__ int64_t*,int64_t)",
+          "parameters": "asc_atomic_min(__gm__ int64_t*address,int64_t val)",
+          "override_id": "asc_atomic_min__PGi64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_min(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_min(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_min__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+      "sha256": "14703a296fa418c8b43e69b4fad72de04fa61cabfa21e4e5cfdfdd290e9d5a34",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_or",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_or__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_or-description-3db6b40c",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_or-tag.roles-03aef8c1",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_or-semantic_input-57b286ec",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_or(__gm__ int32_t*,int32_t)",
+          "parameters": "asc_atomic_or(__gm__ int32_t*address,int32_t val)",
+          "override_id": "asc_atomic_or__PGi32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_or(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_or(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_or__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_or(__gm__ int64_t*,int64_t)",
+          "parameters": "asc_atomic_or(__gm__ int64_t*address,int64_t val)",
+          "override_id": "asc_atomic_or__PGi64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_or(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_or(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_or__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+      "sha256": "e40dbfd675482032aee9e191d517c96d523b6bb5bfd641d80d42c0ec8dd123dd",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_sub",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_sub__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "float",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_sub-description-4445eaf0",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_sub-tag.roles-6851f609",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_sub-semantic_input-34800afb",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_sub(__gm__ int32_t*,int32_t)",
+          "parameters": "asc_atomic_sub(__gm__ int32_t*address,int32_t val)",
+          "override_id": "asc_atomic_sub__PGi32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_sub(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_sub(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_sub__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_sub(__gm__ float*,float)",
+          "parameters": "asc_atomic_sub(__gm__ float*address,float val)",
+          "override_id": "asc_atomic_sub__PGf32_f32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_sub(__gm__ int64_t*,int64_t)",
+          "parameters": "asc_atomic_sub(__gm__ int64_t*address,int64_t val)",
+          "override_id": "asc_atomic_sub__PGi64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_sub(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_sub(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_sub__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+      "sha256": "ea378efb23f234c2902a2ae47fb546512ba5e99366171621df874db2a117f718",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_atomic_xor",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "prototype_id": "asc_atomic_xor__PG<dtype>_<dtype>",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ],
+            "dtype": [
+              "int32_t",
+              "uint32_t",
+              "int64_t",
+              "uint64_t"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_atomic_xor-description-3ffe4d29",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_xor-tag.roles-9f090595",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_atomic_xor-semantic_input-d1e0338c",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_xor(__gm__ int32_t*,int32_t)",
+          "parameters": "asc_atomic_xor(__gm__ int32_t*address,int32_t val)",
+          "override_id": "asc_atomic_xor__PGi32_i32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_xor(__gm__ uint32_t*,uint32_t)",
+          "parameters": "asc_atomic_xor(__gm__ uint32_t*address,uint32_t val)",
+          "override_id": "asc_atomic_xor__PGu32_u32",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_xor(__gm__ int64_t*,int64_t)",
+          "parameters": "asc_atomic_xor(__gm__ int64_t*address,int64_t val)",
+          "override_id": "asc_atomic_xor__PGi64_i64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_atomic_xor(__gm__ uint64_t*,uint64_t)",
+          "parameters": "asc_atomic_xor(__gm__ uint64_t*address,uint64_t val)",
+          "override_id": "asc_atomic_xor__PGu64_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "address",
+                "direction": "in,out",
+                "description": "Global Memory的地址。",
+                "evidence": [
+                  "| address | 输入/输出 | Global Memory的地址。 |"
+                ]
+              },
+              {
+                "name": "val",
+                "direction": "in",
+                "description": "标量值，数据类型与`address`指向元素类型一致。",
+                "evidence": [
+                  "| val | 输入 | 标量值，数据类型与`address`指向元素类型一致。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+      "sha256": "b406e21e444757bba04d13cb7fff5c32842d897cd1250d43268af556cd19d392",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_get_store_atomic_config",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_get_store_atomic_config__Ratomiccfg",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_get_store_atomic_config-description-5d65daf0",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_get_store_atomic_config-tag.roles-6636eab9",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_get_store_atomic_config-semantic_input-e0a1f627",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_get_store_atomic_config(asc_store_atomic_config&)",
+          "parameters": "asc_get_store_atomic_config(asc_store_atomic_config&config)",
+          "override_id": "asc_get_store_atomic_config__Ratomiccfg",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "config",
+                "direction": "out",
+                "description": "用于获取原子操作启用位和原子操作类型的值，详细说明请参考[asc_store_atomic_config](../../defs/union/asc_store_atomic_config.md)。",
+                "evidence": [
+                  "| config | 输出 | 用于获取原子操作启用位和原子操作类型的值，详细说明请参考[asc_store_atomic_config](../../defs/union/asc_store_atomic_config.md)。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+      "sha256": "8b532009f7cb2a300a2ee6209ab1ba7d13af947d4e0341ed718e3d4b924e01f0",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_set_store_atomic_config_v1",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_set_store_atomic_config_v1__u16_u16",
+            "archs": [
+              "2201"
+            ],
+            "header": [
+              "/include/c_api/atomic/scalar_atomic.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_set_store_atomic_config_v1-description-617aea45",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_set_store_atomic_config_v1-tag.roles-e79165d5",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_set_store_atomic_config_v1-semantic_input-59a084db",
+          "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+          "header": "include/c_api/atomic/scalar_atomic.h",
+          "function": "asc_set_store_atomic_config_v1(uint16_t,uint16_t)",
+          "parameters": "asc_set_store_atomic_config_v1(uint16_t type,uint16_t op)",
+          "override_id": "asc_set_store_atomic_config_v1__u16_u16",
+          "archs": [
+            "2201"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "type",
+                "direction": "in",
+                "description": "原子操作启用位。0：无原子操作。1：开启原子操作，进行原子操作的数据类型为float。2：开启原子操作，进行原子操作的数据类型为half。3：开启原子操作，进行原子操作的数据类型为int16_t。4：开启原子操作，进行原子操作的数据类型为int32_t。5：开启原子操作，进行原子操作的数据类型为int8_t。6：开启原子操作，进行原子操作的数据类型为bfloat16_t。",
+                "evidence": [
+                  "| type | 输入 | 原子操作启用位。<br>0：无原子操作。<br>1：开启原子操作，进行原子操作的数据类型为float。<br>2：开启原子操作，进行原子操作的数据类型为half。<br>3：开启原子操作，进行原子操作的数据类型为int16_t。<br>4：开启原子操作，进行原子操作的数据类型为int32_t。<br>5：开启原子操作，进行原子操作的数据类型为int8_t。<br>6：开启原子操作，进行原子操作的数据类型为bfloat16_t。 |"
+                ]
+              },
+              {
+                "name": "op",
+                "direction": "in",
+                "description": "原子操作类型。0：求和操作。",
+                "evidence": [
+                  "| op | 输入 | 原子操作类型。<br>0：求和操作。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/scalar_atomic.md",
+      "sha256": "8fc38b8be24987c8cb0b4c99bf80e399c05f34bd1d5f6d6a9469ff27215d62a9",
+      "plan": {
+        "okftype": "reference.index",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index",
+        "title": "标量原子操作",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/scalar_atomic.md",
+        "timestamp": "2026-09-29",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    }
+  ]
+}

@@ -1,0 +1,1329 @@
+{
+  "schema_version": 1,
+  "run_id": "20260924-spr",
+  "batch_id": "batch-01",
+  "worker_id": "worker-a",
+  "documents": [
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+      "sha256": "77ede401212934406470253644e3ddaa6f9581084f0703a4159b9ae40fc90830",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "title": "asc_get_ar_spr (废弃)",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+        "description": "读取指定特殊寄存器的值，并返回其中的 int64_t 数值；该接口已废弃。",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": [
+              "query"
+            ]
+          },
+          {
+            "families": [
+              "system"
+            ]
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": [
+              "scalar"
+            ]
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": [
+              "deprecated"
+            ]
+          }
+        ],
+        "signature": [
+          {
+            "override_id": "asc_get_ar_spr__z",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/spr/spr.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "excerpt": "该接口已废弃，请使用[asc_get_squeeze_status](asc_get_squeeze_status.md)实现此功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "excerpt": "读取指定特殊寄存器的值。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "excerpt": "返回int64_t类型的特殊寄存器中的数值。"
+          }
+        ],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:query": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "excerpt": "读取指定特殊寄存器的值。"
+          }
+        ],
+        "families:system": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "excerpt": "读取指定特殊寄存器的值。"
+          }
+        ],
+        "execution_models:scalar": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "excerpt": "PIPE_S"
+          }
+        ],
+        "traits:deprecated": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "excerpt": "该接口已废弃，请使用[asc_get_squeeze_status](asc_get_squeeze_status.md)实现此功能。"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+          "header": "include/c_api/spr/spr.h",
+          "function": "asc_get_ar_spr()",
+          "parameters": "asc_get_ar_spr()",
+          "override_id": "asc_get_ar_spr__z",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": true
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+      "sha256": "863814277c85f466a6a37bbc3f470f088732c8455d3147f58d4939ae08597a10",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "title": "asc_get_ctrl",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+        "description": "读取 CTRL 控制寄存器指定比特位的值，并返回 CTRL 寄存器内容。",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": [
+              "query"
+            ]
+          },
+          {
+            "families": [
+              "system"
+            ]
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": [
+              "scalar"
+            ]
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "signature": [
+          {
+            "override_id": "asc_get_ctrl__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/spr/spr.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+            "excerpt": "读取CTRL寄存器（控制寄存器）特定比特位上的值。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+            "excerpt": "CTRL寄存器的值。"
+          }
+        ],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:query": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+            "excerpt": "读取CTRL寄存器（控制寄存器）特定比特位上的值。"
+          }
+        ],
+        "families:system": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+            "excerpt": "读取CTRL寄存器（控制寄存器）特定比特位上的值。"
+          }
+        ],
+        "execution_models:scalar": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+            "excerpt": "PIPE_S"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+          "header": "include/c_api/spr/spr.h",
+          "function": "asc_get_ctrl()",
+          "parameters": "asc_get_ctrl()",
+          "override_id": "asc_get_ctrl__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": true
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+      "sha256": "42ca5331e25ea00045d78e5805848f6e252b4790323c82f833ee517fff2de1fb",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "title": "asc_get_saturation_flag",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+        "description": "按指定饱和模式读取当前饱和开关状态，并返回布尔结果。",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": [
+              "query"
+            ]
+          },
+          {
+            "families": [
+              "system"
+            ]
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": [
+              "scalar"
+            ]
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": [
+              "saturation_mode"
+            ]
+          }
+        ],
+        "signature": [
+          {
+            "override_id": "asc_get_saturation_flag__saturation",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/spr/spr.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "按饱和模式类型读取当前是否开启饱和，并返回布尔类型的结果。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "`true`表示当前该模式下饱和已开启；`false`表示未开启"
+          }
+        ],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:query": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "按饱和模式类型读取当前是否开启饱和，并返回布尔类型的结果。"
+          }
+        ],
+        "families:system": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "按饱和模式类型读取当前是否开启饱和，并返回布尔类型的结果。"
+          }
+        ],
+        "execution_models:scalar": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "PIPE_S"
+          }
+        ],
+        "traits:saturation_mode": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "按饱和模式类型读取当前是否开启饱和"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+          "header": "include/c_api/spr/spr.h",
+          "function": "asc_get_saturation_flag(asc_saturation_mode)",
+          "parameters": "asc_get_saturation_flag(asc_saturation_mode saturation_mode)",
+          "override_id": "asc_get_saturation_flag__saturation",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "saturation_mode",
+                "direction": "in",
+                "description": "饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。",
+                "evidence": [
+                  "| saturation_mode | 输入 | 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": true
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+      "sha256": "2f31e9f53b2fc23626a2ceb126df6b29700dc45631e043d71a74adb9235defd6",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "title": "asc_get_saturation_strategy",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+        "description": "读取当前饱和控制策略，并返回表示按单指令/API路径或全局配置生效的策略枚举值。",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": [
+              "query"
+            ]
+          },
+          {
+            "families": [
+              "system"
+            ]
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": [
+              "scalar"
+            ]
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": [
+              "saturation_mode"
+            ]
+          }
+        ],
+        "signature": [
+          {
+            "override_id": "asc_get_saturation_strategy__z",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/spr/spr.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "读取当前饱和控制策略，默认为开启全局饱和配置："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "当前饱和控制策略，类型为[asc_override_strategy](../defs/enum/asc_override_strategy.md)。"
+          }
+        ],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:query": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "读取当前饱和控制策略"
+          }
+        ],
+        "families:system": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "读取当前饱和控制策略"
+          }
+        ],
+        "execution_models:scalar": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "PIPE_S"
+          }
+        ],
+        "traits:saturation_mode": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "当前饱和控制策略"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+          "header": "include/c_api/spr/spr.h",
+          "function": "asc_get_saturation_strategy()",
+          "parameters": "asc_get_saturation_strategy()",
+          "override_id": "asc_get_saturation_strategy__z",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": true
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+      "sha256": "17e73c20b3dd5dc39c41d391f33a667a441816c4f9c09ff04b2af00bd01e1549",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "title": "asc_get_squeeze_status",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+        "description": "读取 squeeze 操作后保存在 AR 特殊寄存器中的有效数据长度，以获取连续搬出的有效数据量。",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": [
+              "query"
+            ]
+          },
+          {
+            "families": [
+              "system"
+            ]
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": [
+              "scalar"
+            ]
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "signature": [
+          {
+            "override_id": "asc_get_squeeze_status__z",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/spr/spr.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于配合[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口获取已连续搬出的有效数据量。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "返回int64_t类型的squeeze有效数据长度值。"
+          }
+        ],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:query": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "读取squeeze操作后保存至AR特殊寄存器的有效数据长度值"
+          }
+        ],
+        "families:system": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "读取squeeze操作后保存至AR特殊寄存器的有效数据长度值"
+          }
+        ],
+        "execution_models:scalar": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "PIPE_S"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+          "header": "include/c_api/spr/spr.h",
+          "function": "asc_get_squeeze_status()",
+          "parameters": "asc_get_squeeze_status()",
+          "override_id": "asc_get_squeeze_status__z",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": true
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+      "sha256": "3750f10ef6558d8acee3c539942b321ebb263fdfb0bc38252048d73434aaf05c",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "title": "asc_set_ctrl",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+        "description": "设置 CTRL 控制寄存器的特定位，并通过更新后的配置控制相关运行状态。",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": [
+              "configuration"
+            ]
+          },
+          {
+            "families": [
+              "system"
+            ]
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": [
+              "scalar"
+            ]
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "signature": [
+          {
+            "override_id": "asc_set_ctrl__u64",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/spr/spr.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+            "excerpt": "对CTRL寄存器（控制寄存器）的特定比特位进行设置。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+            "excerpt": "使用前需要先用[asc_get_ctrl()](asc_get_ctrl.md)获取当前值，仅对需要变更的bit位进行修改。"
+          }
+        ],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+            "excerpt": "对CTRL寄存器（控制寄存器）的特定比特位进行设置。"
+          }
+        ],
+        "families:system": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+            "excerpt": "对CTRL寄存器（控制寄存器）的特定比特位进行设置。"
+          }
+        ],
+        "execution_models:scalar": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+            "excerpt": "PIPE_S"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "header": "include/c_api/spr/spr.h",
+          "function": "asc_set_ctrl(uint64_t)",
+          "parameters": "asc_set_ctrl(uint64_t config)",
+          "override_id": "asc_set_ctrl__u64",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "config",
+                "direction": "in",
+                "description": "待设置的寄存器值。常用CTRL寄存器比特位说明参考表2。",
+                "evidence": [
+                  "|config   |输入   |待设置的寄存器值。常用CTRL寄存器比特位说明参考表2。|"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": true
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+      "sha256": "6619f03f7878a6039129af85ae7269f86dc30bd5654522fbf4d74a1a524746b5",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "title": "asc_set_saturation_flag",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+        "description": "按指定饱和模式设置对应的饱和开关，并依据模式解释 enable_sat 的语义。",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": [
+              "configuration"
+            ]
+          },
+          {
+            "families": [
+              "system"
+            ]
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": [
+              "scalar"
+            ]
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": [
+              "saturation_mode"
+            ]
+          }
+        ],
+        "signature": [
+          {
+            "override_id": "asc_set_saturation_flag__saturation_b",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/spr/spr.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "本接口仅修改对应模式的饱和配置，不影响其他模式。"
+          }
+        ],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "按饱和模式类型设置对应饱和开关。"
+          }
+        ],
+        "families:system": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "按饱和模式类型设置对应饱和开关。"
+          }
+        ],
+        "execution_models:scalar": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "PIPE_S"
+          }
+        ],
+        "traits:saturation_mode": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "按饱和模式类型设置对应饱和开关。"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+          "header": "include/c_api/spr/spr.h",
+          "function": "asc_set_saturation_flag(asc_saturation_mode,bool)",
+          "parameters": "asc_set_saturation_flag(asc_saturation_mode saturation_mode,bool enable_sat)",
+          "override_id": "asc_set_saturation_flag__saturation_b",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "saturation_mode",
+                "direction": "in",
+                "description": "饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。",
+                "evidence": [
+                  "| saturation_mode | 输入 | 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。 |"
+                ]
+              },
+              {
+                "name": "enable_sat",
+                "direction": "in",
+                "description": "是否开启饱和。`true`表示开启饱和，`false`表示关闭饱和（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断，见上表）。",
+                "evidence": [
+                  "| enable_sat | 输入 | 是否开启饱和。`true`表示开启饱和，`false`表示关闭饱和（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断，见上表）。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": true
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+      "sha256": "9b2fb22b2f11c7ab937e9deab721eeec079461bd9ce7607f3943c8347dd78eff",
+      "plan": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api.cpp",
+        "timestamp": "2026-09-24",
+        "title": "asc_set_saturation_strategy",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+        "description": "设置饱和控制策略，选择按单指令/API路径配置或使用全局饱和配置。",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": [
+              "configuration"
+            ]
+          },
+          {
+            "families": [
+              "system"
+            ]
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": [
+              "scalar"
+            ]
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": [
+              "saturation_mode"
+            ]
+          }
+        ],
+        "signature": [
+          {
+            "override_id": "asc_set_saturation_strategy__strategy",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/spr/spr.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "设置饱和控制策略，默认为开启全局饱和配置："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "`asc_override_strategy::USE_API`：表示按单指令/API路径配置饱和。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "`asc_override_strategy::USE_GLOBAL`：表示使用全局饱和配置。"
+          }
+        ],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "设置饱和控制策略"
+          }
+        ],
+        "families:system": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "设置饱和控制策略"
+          }
+        ],
+        "execution_models:scalar": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "PIPE_S"
+          }
+        ],
+        "traits:saturation_mode": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "设置饱和控制策略"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+          "header": "include/c_api/spr/spr.h",
+          "function": "asc_set_saturation_strategy(asc_override_strategy)",
+          "parameters": "asc_set_saturation_strategy(asc_override_strategy strategy)",
+          "override_id": "asc_set_saturation_strategy__strategy",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "strategy",
+                "direction": "in",
+                "description": "饱和控制策略，取值见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。",
+                "evidence": [
+                  "| strategy | 输入 | 饱和控制策略，取值见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": true
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/spr/spr.md",
+      "sha256": "fb464939458c605c42c0cabf0200f15f9a68eb0b339f9e5bfbe6734b04d71cd0",
+      "plan": {
+        "okftype": "reference.index.cpp",
+        "timestamp": "2026-09-24",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index.cpp",
+        "timestamp": "2026-09-24",
+        "title": "特殊寄存器访问",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/spr/spr.md",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+            "title": "asc_get_ctrl"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "title": "asc_get_saturation_flag"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "title": "asc_get_saturation_strategy"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "title": "asc_get_squeeze_status"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+            "title": "asc_set_ctrl"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "title": "asc_set_saturation_flag"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "title": "asc_set_saturation_strategy"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ar_spr_deprecated.md",
+            "title": "asc_get_ar_spr (废弃)"
+          }
+        ]
+      },
+      "evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/spr.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ],
+        "roles:query": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/spr.md",
+            "excerpt": "# 特殊寄存器访问"
+          }
+        ]
+      },
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": true
+    }
+  ]
+}

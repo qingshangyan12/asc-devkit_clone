@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-defs-01-asc_dual_dst_mode",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+  "document_sha256": "4d53fd76631e9cbf9bd4e5f78a269949cd5ff0494cbe21a0d1d8825e0fe25743",
+  "status": "ready",
+  "description": "描述L0C Buffer数据搬出时的双目标拆分模式，供矩阵搬出接口通过dual_dst_ctrl参数选择拆分方向。",
+  "evidence": [
+    {
+      "excerpt": "`asc_dual_dst_mode`用于表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口中`dual_dst_ctrl`参数的类型。"
+    }
+  ],
+  "confidence": 0.92
+}

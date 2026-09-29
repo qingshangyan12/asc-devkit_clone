@@ -1,0 +1,1274 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_yaml_semantic_result",
+  "run_id": "20260929-target-defs-01",
+  "batch_id": "batch-01",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+      "document_sha256": "d99e4600fb98dd561af7b4b655f656b6bab54b5969622db5dfc894d2b399943e",
+      "description": {
+        "value": "定义MrgSort4操作支持的队列数量常量，值为4，并用于相关排序接口的数组长度约束。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+            "excerpt": "ASC_C_API_MRGSORT_ELEMENT_LEN表示MrgSort4操作支持的队列数量，值为4。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+            "excerpt": "该常量用于[asc_mrgsort4](../../vector_compute/vector_sort/asc_mrgsort4.md)接口的src数组长度，以及[asc_get_vms4_sr](../../vector_compute/vector_sort/asc_get_vms4_sr.md)接口的sorted_num数组长度。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+            "excerpt": "# ASC_C_API_MRGSORT_ELEMENT_LEN"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+            "excerpt": "该常量用于[asc_mrgsort4](../../vector_compute/vector_sort/asc_mrgsort4.md)接口的src数组长度，以及[asc_get_vms4_sr](../../vector_compute/vector_sort/asc_get_vms4_sr.md)接口的sorted_num数组长度。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+      "document_sha256": "a790386c7274f94d20d2e967f6ad7ff85f31bcd8a3aace54cd8325f1046b4807",
+      "description": {
+        "value": "定义反量化缩放接口数组的元素个数常量，规定scale、offset和sign模式数组长度为16。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+            "excerpt": "ASC_VDEQ_SIZE表示[asc_set_deq_scale](../../vector_compute/vector_fused/asc_set_deq_scale.md)接口中scale_arr、offset_arr和sign_mode_arr数组的元素个数，值为16。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+            "excerpt": "# ASC_VDEQ_SIZE"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+            "excerpt": "ASC_VDEQ_SIZE表示[asc_set_deq_scale](../../vector_compute/vector_fused/asc_set_deq_scale.md)接口中scale_arr、offset_arr和sign_mode_arr数组的元素个数，值为16。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+      "document_sha256": "3708abc7942a3a20e0e3aa9fa09fda5a6c6c2827858f5734b3b2953e63aa9919",
+      "description": {
+        "value": "描述GM到L1 Buffer搬运时通道块的填充或压缩模式，枚举值控制每个32字节通道数据块的处理方式。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+            "excerpt": "asc_channel_pad_mode用于表示从GM搬运到L1 Buffer时，每个32字节通道块的填充或压缩模式，可用于[asc_copy_gm2l1](../../cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)高维切分数据搬运接口。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+            "excerpt": "该模式为硬件`pad_func_mode`的类型化定义，对每个32字节通道数据块生效，取值范围为[0, 8]。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+            "excerpt": "# asc_channel_pad_mode"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+            "excerpt": "asc_channel_pad_mode用于表示从GM搬运到L1 Buffer时，每个32字节通道块的填充或压缩模式，可用于[asc_copy_gm2l1](../../cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)高维切分数据搬运接口。"
+          }
+        ],
+        "traits:padding": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+            "excerpt": "`EXPAND_*`为填充模式，在目的数据中插入padding值。通道填充值通过[asc_set_gm2l1_padding](../../cube_datamove/asc_set_gm2l1_padding.md)设置。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+      "document_sha256": "4d53fd76631e9cbf9bd4e5f78a269949cd5ff0494cbe21a0d1d8825e0fe25743",
+      "description": {
+        "value": "描述L0C Buffer数据搬出时的双目标拆分模式，供矩阵搬出接口通过dual_dst_ctrl参数选择拆分方向。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+            "excerpt": "`asc_dual_dst_mode`用于表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口中`dual_dst_ctrl`参数的类型。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [
+          "l0c_buffer"
+        ],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+            "excerpt": "# asc_dual_dst_mode"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+            "excerpt": "`asc_dual_dst_mode`用于表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口中`dual_dst_ctrl`参数的类型。"
+          }
+        ],
+        "source_locations:l0c_buffer": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+            "excerpt": "`asc_dual_dst_mode`用于表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口中`dual_dst_ctrl`参数的类型。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+      "document_sha256": "26421dd66fdd171db579e5fe14aa8b55d4498ba5cc95022dcaa7db134671c1b8",
+      "description": {
+        "value": "描述Mmad开启HF32模式时将FP32舍入为HF32的舍入策略，供相关配置接口选择舍入方式。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+            "excerpt": "asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "rounding_mode"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+            "excerpt": "# asc_hf32_round_mode"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+            "excerpt": "asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。"
+          }
+        ],
+        "traits:rounding_mode": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+            "excerpt": "asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+      "document_sha256": "91fbc6bae351c791cdcef505b415b26edaf05647c956d66aefa9a6ee0b24f470",
+      "description": {
+        "value": "描述3D img2col搬运repeat迭代的方向选择，作为两个repeat配置接口的repeat_direction参数类型。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+            "excerpt": "`asc_l13d_repeat_direction`用于表示3D img2col搬运的repeat迭代方向，作为[asc_set_l13d_rpt](../../cube_datamove/asc_set_l13d_rpt.md)和[asc_set_l13d_rpt_b](../../cube_datamove/asc_set_l13d_rpt_b.md)接口的`repeat_direction`参数类型。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [],
+        "operations": [
+          "img2col"
+        ],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+            "excerpt": "# asc_l13d_repeat_direction"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+            "excerpt": "`asc_l13d_repeat_direction`用于表示3D img2col搬运的repeat迭代方向，作为[asc_set_l13d_rpt](../../cube_datamove/asc_set_l13d_rpt.md)和[asc_set_l13d_rpt_b](../../cube_datamove/asc_set_l13d_rpt_b.md)接口的`repeat_direction`参数类型。"
+          }
+        ],
+        "operations:img2col": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+            "excerpt": "`asc_l13d_repeat_direction`用于表示3D img2col搬运的repeat迭代方向，作为[asc_set_l13d_rpt](../../cube_datamove/asc_set_l13d_rpt.md)和[asc_set_l13d_rpt_b](../../cube_datamove/asc_set_l13d_rpt_b.md)接口的`repeat_direction`参数类型。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "document_sha256": "37b8fa66a4158a6319a3f2ed222e262f333463e0246d2b47f068c8c67e9d0dff",
+      "description": {
+        "value": "描述GM到Unified Buffer搬运及标量load路径使用的L2 Cache管理策略枚举，覆盖启用、替换和不分配等模式。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+            "excerpt": "asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 Cache管理策略，可用于："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+            "excerpt": "标量访存路径的load策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_load_cache_mode](../../cache_ctrl/asc_get_scalar_load_cache_mode.md)。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [
+          "cache_management"
+        ],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+            "excerpt": "# asc_load_l2_cache_mode"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+            "excerpt": "asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 Cache管理策略，可用于："
+          }
+        ],
+        "families:cache_management": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+            "excerpt": "L2 Cache管理策略的影响可见[L2 Cache Mode最佳实践](../../../../../../../examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode/README.md)。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+      "document_sha256": "dd82bd3f8f88d07cf5734185b55436fa27f5ad0b4ebacdfb58e7b87410c48bda",
+      "description": {
+        "value": "描述互斥锁的阻塞和非阻塞执行模式，作为asc_lock与asc_unlock接口mode参数的类型并提供兼容别名。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+            "excerpt": "`asc_mutex_execute_mode`用于选择互斥锁的阻塞或非阻塞执行模式，作为[asc_lock](../../sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../sync/intra_core_sync/asc_unlock.md)接口的`mode`参数类型。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+            "excerpt": "兼容类型名`ascMutexExecuteMode`是该类型的别名。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+            "excerpt": "# asc_mutex_execute_mode"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+            "excerpt": "`asc_mutex_execute_mode`用于选择互斥锁的阻塞或非阻塞执行模式，作为[asc_lock](../../sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../sync/intra_core_sync/asc_unlock.md)接口的`mode`参数类型。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+      "document_sha256": "00ef92a1f1fbcca0f754fc2b4da3584b980f8742e1ea29935f36002500403e31",
+      "description": {
+        "value": "该枚举表示饱和控制策略，用于设置或查询单指令/API路径与全局CAST饱和配置的生效方式。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+            "excerpt": "asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。该策略影响CAST类全局饱和配置是否生效。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "saturation_mode"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+            "excerpt": "# asc_override_strategy"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+            "excerpt": "asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。"
+          }
+        ],
+        "traits:saturation_mode": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+            "excerpt": "asc_override_strategy用于表示饱和控制策略"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+      "document_sha256": "552029ce4f58a4e626e1907401702326403937d96d2a82945d6d1f95192614ba",
+      "description": {
+        "value": "该枚举表示寄存器中源或目的操作数的奇偶位置，供Reg类型转换和融合计算接口选择数据位置。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+            "excerpt": "`asc_position_mode`用于表示源或目的操作数在寄存器中的奇偶位置，供Reg类型转换和融合计算接口选择数据位置。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+            "excerpt": "# asc_position_mode"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+            "excerpt": "`asc_position_mode`用于表示源或目的操作数在寄存器中的奇偶位置，供Reg类型转换和融合计算接口选择数据位置。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+      "document_sha256": "49e2ee8f79bda3d4b7151e35c0b8ff6b804987d44821362dcbe40ae7bb87a75f",
+      "description": {
+        "value": "该枚举表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+            "excerpt": "`asc_position_quarter_mode`用于表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+            "excerpt": "# asc_position_quarter_mode"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+            "excerpt": "`asc_position_quarter_mode`用于表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+      "document_sha256": "b2202256b76d0d6b02a071e851d86e0000bfd2c2476bf08e7f4387954ce23365",
+      "description": {
+        "value": "该类型别名表示L0C Buffer数据搬出时的类型转换或量化模式，并作为矩阵搬出接口quant_pre_mode参数的类型。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+            "excerpt": "`asc_quant_mode`用于表示L0C Buffer数据搬出时的类型转换或量化模式，作为矩阵搬出接口中`quant_pre_mode`参数的类型。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "quantization"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+            "excerpt": "# asc_quant_mode"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+            "excerpt": "`asc_quant_mode`用于表示L0C Buffer数据搬出时的类型转换或量化模式，作为矩阵搬出接口中`quant_pre_mode`参数的类型。"
+          }
+        ],
+        "traits:quantization": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+            "excerpt": "`asc_quant_mode`用于表示L0C Buffer数据搬出时的类型转换或量化模式"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+      "document_sha256": "d049f9729164af4007972a477fafbf3cd10bd1934aebc65e0b3d62fe9001873e",
+      "description": {
+        "value": "该枚举表示L0C Buffer数据搬出时的随路ReLU模式，并作为矩阵搬出接口relu_pre_mode参数的类型。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+            "excerpt": "`asc_relu_pre_mode`用于表示L0C Buffer数据搬出时的随路ReLU模式，作为矩阵搬出接口中`relu_pre_mode`参数的类型。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+            "excerpt": "# asc_relu_pre_mode"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+            "excerpt": "`asc_relu_pre_mode`用于表示L0C Buffer数据搬出时的随路ReLU模式，作为矩阵搬出接口中`relu_pre_mode`参数的类型。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+      "document_sha256": "6b72a0d016a9134aec2bb945a15645a49ea9a233085eb3bc5c3f45cd224c1bfb",
+      "description": {
+        "value": "该枚举表示饱和控制所作用的模式类型，用于asc_set_saturation_flag和asc_get_saturation_flag接口。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+            "excerpt": "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "saturation_mode"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+            "excerpt": "# asc_saturation_mode"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+            "excerpt": "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。"
+          }
+        ],
+        "traits:saturation_mode": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+            "excerpt": "asc_saturation_mode用于表示饱和控制所作用的模式类型"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+      "document_sha256": "eb3fc6f695a5f0656413b418c8981e672659c782272fe109f282007cf03b2500",
+      "description": {
+        "value": "该枚举表示Unified Buffer（UB）到GM搬运时的L2 Cache策略，也用于标量访存路径的store策略配置与查询。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+            "excerpt": "asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时的L2 Cache策略，可用于："
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [
+          "cache_management"
+        ],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+            "excerpt": "# asc_store_l2_cache_mode"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+            "excerpt": "asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时的L2 Cache策略，可用于："
+          }
+        ],
+        "families:cache_management": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+            "excerpt": "asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时的L2 Cache策略"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+      "document_sha256": "aeea6a3d1ca03958a9679792abfc0895435d57ed92561284602e7abfe8f6a488",
+      "description": {
+        "value": "该枚举用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口unit_flag_mode参数的类型。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+            "excerpt": "`asc_unit_flag_mode`用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口中`unit_flag_mode`参数的类型。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+            "excerpt": "# asc_unit_flag_mode"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+            "excerpt": "`asc_unit_flag_mode`用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口中`unit_flag_mode`参数的类型。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+      "document_sha256": "89a915c050f461d7dbf7abbf17471e3d762ed67dd1853d1506548ac7d94303d0",
+      "description": {
+        "value": "为 C API 声明添加 C++ 弃用属性，在编译调用时输出包含废弃版本、移除日期和替代接口的告警。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+            "excerpt": "`ASC_DEPRECATED`用于为C API声明添加C++ `[[deprecated]]`属性。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+            "excerpt": "编译器会生成告警，告警信息包含接口开始废弃的版本、计划移除日期和推荐使用的替代接口。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "deprecated"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+            "excerpt": "# ASC_DEPRECATED"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+            "excerpt": "`ASC_DEPRECATED`用于为C API声明添加C++ `[[deprecated]]`属性。"
+          }
+        ],
+        "traits:deprecated": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+            "excerpt": "`ASC_DEPRECATED`用于为C API声明添加C++ `[[deprecated]]`属性。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+      "document_sha256": "a92df7d21c0e51c6778363638254eef82c10505e42ccaed3707266b2f2516ee5",
+      "description": {
+        "value": "在分离模式中提供 AIC 与 AIV 代码路径的条件判断宏，用于隔离 Cube Core 和 Vector Core 的专属代码。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+            "excerpt": "`ASC_IS_AIC`和`ASC_IS_AIV`用于"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+            "excerpt": "这两个宏分别是`ASCEND_IS_AIC`和`ASCEND_IS_AIV`的C API别名，对应宏的功能相同。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "control"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+            "excerpt": "# ASC_IS_AIC/ASC_IS_AIV"
+          }
+        ],
+        "roles:control": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+            "excerpt": "可作为`if`语句的条件。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+      "document_sha256": "eb88aa4d6fa1a0787cf084c7906d6ce7a629de444449cdf7bc0a515ec969cc90",
+      "description": {
+        "value": "总览 Reg 数据类型，说明矢量数据、掩码、非对齐和地址寄存器的类别、容量限制及使用方式。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+            "excerpt": "矢量数据寄存器用于存储矢量数据，其长度为`VL`（Vector Length）。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+            "excerpt": "掩码寄存器的类型为`vector_bool`，用于在矢量计算中筛选参与计算的元素"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+            "excerpt": "地址寄存器的类型为`addr_reg`，用于存储地址偏移量。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "query"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [
+          "mask",
+          "vector"
+        ],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+            "excerpt": "# 寄存器类型定义"
+          }
+        ],
+        "roles:query": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+            "excerpt": "矢量数据寄存器用于存储矢量数据"
+          }
+        ],
+        "objects:mask": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+            "excerpt": "掩码寄存器的类型为`vector_bool`"
+          }
+        ],
+        "objects:vector": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+            "excerpt": "矢量数据寄存器用于存储矢量数据"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md",
+      "document_sha256": "658d30fdd43b6956beff6371e088d31b6af43e6ab0abac584c309acbb34d73ac",
+      "description": {
+        "value": "汇总NPU架构版本3510的C API寄存器类型及其在Vector Function中的用途，包括矢量数据、掩码、非对齐搬运和地址寄存器。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md",
+            "excerpt": "Ascend 950PR&950DT系列产品（NPU架构版本3510）的C API提供矢量数据寄存器、掩码寄存器、非对齐搬运寄存器和地址寄存器类型。寄存器类型主要在AIV的Vector Function（`__simd_vf__`标记的函数）内使用，最细粒度公共头文件为`c_api/defs/type.h`。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "query"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md"
+          }
+        ],
+        "roles:query": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md",
+            "excerpt": "Ascend 950PR&950DT系列产品（NPU架构版本3510）的C API提供矢量数据寄存器、掩码寄存器、非对齐搬运寄存器和地址寄存器类型。寄存器类型主要在AIV的Vector Function（`__simd_vf__`标记的函数）内使用，最细粒度公共头文件为`c_api/defs/type.h`。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+      "document_sha256": "495db849b34e830aed8580e9648d369f9d2bb9b5577d7fdb3f2f93ec2eca4978",
+      "description": {
+        "value": "表示 fill_value 初始化参数，配置 L1、L0A 或 L0B 目标的迭代次数、数据块数量和目标间隔。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+            "excerpt": "asc_fill_value_config为fill_value的初始化参数结构体，包含"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+            "excerpt": "repeat | 迭代次数，默认值：0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+            "excerpt": "dst_gap | 目的操作数前一个迭代结束地址到后一个迭代起始地址之间的距离"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+            "excerpt": "# asc_fill_value_config"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+            "excerpt": "asc_fill_value_config为fill_value的初始化参数结构体"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+      "document_sha256": "f1b8b4e7cdfea2219413ce2b2e778ec63c16648d22e9f4e40540c70b3d276d91",
+      "description": {
+        "value": "配置 L12 到 L0A 或 L0B 的 3D Feature map 搬运属性，包括尺寸和四个方向的 padding 大小。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+            "excerpt": "asc_l13d_fmatrix_config用于设置"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+            "excerpt": "l1_width | Feature map的width，取值范围：[1, 32767]。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+            "excerpt": "padding_left_size | 左侧填充的大小，取值范围：[0, 255]。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+            "excerpt": "# asc_l13d_fmatrix_config"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+            "excerpt": "3D格式搬运接口的Feature map属性参数"
+          }
+        ],
+        "traits:padding": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+            "excerpt": "padding_left_size | 左侧填充的大小"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+      "document_sha256": "6997fc5a7f5ef0e230c1949eea1e7d4f8c548b9223fe0f7abd1ba3ab3318e844",
+      "description": {
+        "value": "配置 Load3Dv2 repeat 参数，控制 height 或 width 方向的迭代步长、迭代次数和迭代方向。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+            "excerpt": "asc_load3d_v2_config用于设置Load3Dv2接口的repeat参数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+            "excerpt": "rpt_stride | height/width方向上的前一个迭代与后一个迭代起始地址的距离"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+            "excerpt": "rpt_mode | 控制repeat迭代的方向"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": []
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+            "excerpt": "# asc_load3d_v2_config"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+            "excerpt": "用于设置Load3Dv2接口的repeat参数"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+      "document_sha256": "283396b36cfa3d354a32a0c9887cd01523357686739e48060a44552e0d86c7ce",
+      "description": {
+        "value": "为 asc_ndim_copy_gm2ub 搬运配置各维度左侧和右侧的 padding 元素数量。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+            "excerpt": "asc_ndim_pad_count_config用于"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+            "excerpt": "loop1_lp_count | 表示1维左侧需要补齐的元素个数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+            "excerpt": "loop4_rp_count | 表示4维右侧需要补齐的元素个数。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+            "excerpt": "# asc_ndim_pad_count_config"
+          }
+        ],
+        "roles:data_movement_configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+            "excerpt": "各个维度左右侧的padding元素个数"
+          }
+        ],
+        "traits:padding": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+            "excerpt": "padding元素个数"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+      "document_sha256": "eed363197d9e8c03ca27012f0b5f8c8e06a1f3727359539ef0d12107f691d0b6",
+      "description": {
+        "value": "保存原子操作的启用类型和操作类型配置，供 asc_get_store_atomic_config 接口使用。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+            "excerpt": "asc_store_atomic_config参数包含原子操作启用位与原子操作类型"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+            "excerpt": "atomic_type | 原子操作启用位，默认值：0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+            "excerpt": "atomic_op | 原子操作类型，默认值：0。"
+          }
+        ]
+      },
+      "tag": {
+        "api_surfaces": [
+          "c_api"
+        ],
+        "roles": [
+          "configuration"
+        ],
+        "families": [],
+        "operations": [],
+        "objects": [],
+        "execution_models": [],
+        "source_locations": [],
+        "destination_locations": [],
+        "traits": [
+          "atomic"
+        ]
+      },
+      "tag_evidence": {
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+            "excerpt": "# asc_store_atomic_config"
+          }
+        ],
+        "roles:configuration": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+            "excerpt": "参数包含原子操作启用位与原子操作类型"
+          }
+        ],
+        "traits:atomic": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+            "excerpt": "原子操作启用位与原子操作类型"
+          }
+        ]
+      },
+      "dependencies": []
+    }
+  ]
+}

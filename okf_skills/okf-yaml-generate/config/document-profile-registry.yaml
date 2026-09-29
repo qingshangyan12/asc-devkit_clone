@@ -1,22 +1,22 @@
 # OKF 文档 Profile 注册表。
 #
 # Profile 直接使用“文档族.页面种类”的完整 okftype 作为唯一键。
-# 分类器从文档事实得到页面种类；文档族由源上下文确定。
-# 不在这里维护路径规则、实体层级、字段能力依赖或 okftype 组合表。
+# 分类器从文档结构或 defs 实体目录得到页面种类；文档族由源上下文确定。
+# 不在这里维护路径规则、字段能力依赖或 okftype 组合表。
 
 schema_version: 4
 status: active
 registry_id: okf-document-profile-v3
 taxonomy: ../okf-tag-generate/taxonomy/tag-taxonomy.json
 
-common_required_fields: [okftype, title, resource, timestamp]
+common_required_fields: [okftype, title, resource, version]
 common_fields: [okftype, title, resource, description, tag, signature, declaration, type_catalog, archs, header,
-                dependencies, examples, navigation, timestamp]
+                dependencies, examples, navigation, version]
 
 # YAML 字段顺序是输出契约，不能由 common/profile 字段拼接顺序间接决定。
 field_order:
   [okftype, title, resource, description, tag, signature, declaration,
-   type_catalog, archs, header, dependencies, examples, navigation, timestamp]
+   type_catalog, archs, header, dependencies, examples, navigation, version]
 
 unknown_policy:
   unclassified_document: report_only
@@ -28,7 +28,7 @@ unknown_policy:
 
 field_catalog:
   okftype:
-    含义: 文档族、页面种类和技术词元组成的受控页面类型。
+    含义: 文档族、页面种类组成的受控页面类型。
     事实来源: 文档结构分类结果和本次运行上下文。
   title:
     含义: 页面标题。
@@ -42,14 +42,14 @@ field_catalog:
   tag:
     含义: 用于检索的语义标签。
     事实来源: 每个 namespace:value 的逐字证据。
-  timestamp:
-    含义: 本次生成日期。
-    事实来源: 运行元数据。
+  version:
+    含义: 当前接口原型的 CANN 生命周期区间，例如 9.0.0- 或 9.0.0-9.2.0。
+    事实来源: CANN 包原型扫描和 Release Notes。
   signature:
     含义: 函数、函数宏或类成员的原型标识。
     事实来源: Markdown 原型与真实声明的兼容匹配结果。
   dependencies:
-    含义: 当前页面引用的关联 API 或文档。
+    含义: 当前页面引用的关联 API 或文档；replaced_by 表示当前废弃实体指向替代目标。
     事实来源: Markdown 链接和关联语句。
   examples:
     含义: 已确认的样例工程或调用位置。
@@ -90,8 +90,28 @@ profiles:
     fields: [description, tag, signature, archs, header, dependencies, examples]
     outputs: [front_matter, doxygen, example_markers]
 
+  reference.constant:
+    说明: C API 常量定义页。
+    fields: [description, tag, header, declaration, type_catalog]
+    outputs: [front_matter, doxygen]
+
+  reference.enum:
+    说明: C API 枚举和枚举别名定义页。
+    fields: [description, tag, header, declaration, type_catalog]
+    outputs: [front_matter, doxygen]
+
+  reference.macro:
+    说明: C/C++ 预处理器宏定义页，包括带参数的函数式宏和不带参数的对象式宏。
+    fields: [description, tag, signature, header, declaration, type_catalog]
+    outputs: [front_matter, doxygen]
+
+  reference.union:
+    说明: C API 结构体和联合体定义页。
+    fields: [description, tag, header, declaration, type_catalog]
+    outputs: [front_matter, doxygen]
+
   reference.type:
-    说明: C++ 或 AscendC 的类型、定义实体和宏定义页。
+    说明: C API 数据类型目录页。
     fields: [description, tag, header, declaration, type_catalog]
     outputs: [front_matter, doxygen]
 
