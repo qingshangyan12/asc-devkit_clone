@@ -60,6 +60,8 @@ __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 
 ## 调用示例
 
+以下示例展示接口在AIV计算函数中的典型调用方式。
+
 ```cpp
 #include "tensor_api/tensor.h"
 #include "tensor_api/experimental/arch/vector/logical_compute.h"
