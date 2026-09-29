@@ -1223,12 +1223,7 @@ CcuResult CreateReduceLoopV2(
         loops.body[index].reset(new ccu::Func([&ctx, index, bufBase, e0, e1, e2, size, &var, dataType, outputDataType,
                                                opType]() {
             for (uint32_t i = 0; i < size; i++) {
-                if (i == ctx.arg->rankId) {
-                    ccu::LocalCopy(ctx.moRes.ccuBuf[bufBase + i], var.loopSrc[index], var.loopLen[index], e0, 1 << i);
-                } else {
-                    ccu::LocalCopy(
-                        ctx.moRes.ccuBuf[bufBase + i], var.loopScratch[index][i], var.loopLen[index], e0, 1 << i);
-                }
+                ccu::LocalCopy(ctx.moRes.ccuBuf[bufBase + i], var.loopScratch[index][i], var.loopLen[index], e0, 1 << i);
             }
             ccu::EventWait(e0, (1 << size) - 1);
             if (size > 1) {
@@ -1368,7 +1363,7 @@ CcuResult GroupLocalReduceV2(
 {
     const uint32_t size = scratchOrg.size();
 
-    GroupReduceMem2MemVar var;
+    GroupLocalReduceVar var;
     ccu::Variable tmp;
     ccu::Variable sliceSize;
     ccu::Variable paraCfg;
