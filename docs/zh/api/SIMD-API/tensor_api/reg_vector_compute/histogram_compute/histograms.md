@@ -30,13 +30,18 @@
 
 该接口根据`src.mask`统计`uint8_t`输入值的频率分布或累计分布，并在`dst`原值上累加统计结果。计算公式如下：
 
-令$h$表示统计区间的起始值：`low`模式下$h=0$，`high`模式下$h=128$；$d_i$表示输入`dst`的第$i$个元素，$x_j$表示输入`src`的第$j$个元素，$m_j$表示`src.mask`的第$j$位。对于输出位置$i\in[0,127]$，两种统计模式分别为：
+令$h$表示统计区间的起始值：`low`模式下$h=0$，`high`模式下$h=128$；$r_i$表示返回结果的第$i$个元素，$d_i$表示输入`dst`的第$i$个元素，$x_j$表示输入`src`的第$j$个元素，$m_j$表示`src.mask`的第$j$位。对于输出位置$i\in[0,127]$，两种统计模式分别为：
+
+频数模式：
 
 $$
-\begin{aligned}
-result_i^{(\mathrm{freq})} &= d_i + \sum_j m_j\mathbf{1}\{x_j=h+i\} \\
-result_i^{(\mathrm{cum})} &= d_i + \sum_j m_j\mathbf{1}\{x_j\le h+i\}
-\end{aligned}
+r_i = d_i + \sum_j m_j\mathbf{1}\{x_j=h+i\}
+$$
+
+累计模式：
+
+$$
+r_i = d_i + \sum_j m_j\mathbf{1}\{x_j\le h+i\}
 $$
 
 其中，$m_j$为`1`时对应输入元素参与统计，为`0`时不参与统计。`high`与`cumulative`组合使用时，第$i$个输出统计所有不大于$128+i$的输入值，因此包含`[0, 127]`范围内的输入值。
