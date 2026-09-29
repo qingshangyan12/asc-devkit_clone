@@ -1,6 +1,6 @@
 # C++11语言特性<a name="ZH-CN_TOPIC_000000253823119001"></a>
 
-本文介绍C++11语言特性在Ascend C SIMT Device侧的支持情况。部分特性样例请参考[C++11语言特性支持样例](../../../../../../../examples/03_simt_api/02_features/02_language_features/README.md)。
+本文介绍C++11语言特性在Ascend C SIMT Device侧的支持情况。部分特性样例请参考[C++11语言特性支持样例](../../../../../../examples/03_simt_api/02_features/02_language_features/README.md)。
 
 ## 核心语言特性支持列表<a name="section_cpp11_core_features"></a>
 
@@ -16,7 +16,7 @@
 | 静态断言（Static assertions） | [N1720](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1720.html) | ✅ | 支持命名空间级与函数内`static_assert`，可在模板中使用。 |
 | auto类型变量（auto-typed variables） | [N1984](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1984.pdf) | ✅ | 支持从初始化表达式、lambda表达式推导类型。 |
 | 多声明符auto（Multi-declarator auto） | [N1737](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1737.pdf) | ✅ | 一条语句声明多个auto变量，要求各声明符推导类型一致。 |
-| Lambda表达式（Lambda expressions） | [N2927](https://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n2927.pdf) | ✅ | 纯SIMT核函数内直接使用；SIMD/SIMT混合编程场景需显式标记函数属性（标记选择规则与逐项验证见[Lambda表达式](../lambda_expressions/lambda_expressions.md)）。 |
+| Lambda表达式（Lambda expressions） | [N2927](https://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n2927.pdf) | ✅ | 纯SIMT核函数内直接使用；SIMD/SIMT混合编程场景需显式标记函数属性（标记选择规则与逐项验证见[Lambda表达式](./lambda_expressions.md)）。 |
 | 表达式的声明类型（Declared type of an expression，decltype） | [N2343](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2343.pdf) | ✅ | 值类别语义与标准一致：具名实体推导声明类型，表达式按左值/右值推导引用。 |
 | 右尖括号（Right angle brackets） | [N1757](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1757.html) | ✅ | 嵌套模板关闭符`>>`无需空格分隔。 |
 | 别名模板（Alias templates） | [N2258](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2258.pdf) | ✅ | 支持`template <typename T> using Alias = ...`及元函数级联。 |

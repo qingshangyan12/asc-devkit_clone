@@ -1,6 +1,6 @@
 # C++11限制<a name="ZH-CN_TOPIC_000000253823119002"></a>
 
-本文介绍C++11特性在Ascend C SIMT Device侧的限制。受限特性分为并发类与运行时类两类：并发类特性的标准形式不可用，对应能力由SIMT API提供；运行时类特性因Device侧无对应运行时机制而不支持。每个"不支持"结论均有编译期报错作为证据，可通过[验证样例](../../../../../../../examples/03_simt_api/02_features/02_language_features/06_cpp11_unsupported/README.md)中的`SCENARIO_NUM`编译选项逐项复现。
+本文介绍C++11特性在Ascend C SIMT Device侧的限制。受限特性分为并发类与运行时类两类：并发类特性的标准形式不可用，对应能力由SIMT API提供；运行时类特性因Device侧无对应运行时机制而不支持。每个"不支持"结论均有编译期报错作为证据，可通过[验证样例](../../../../../../examples/03_simt_api/02_features/02_language_features/06_cpp11_unsupported/README.md)中的`SCENARIO_NUM`编译选项逐项复现。
 
 ## 并发类特性限制<a name="section_cpp11_concurrency_restrictions"></a>
 
@@ -29,7 +29,7 @@ C++11并发特性的标准形式在Device侧均不可用，报错形态见[限�
 | --- | --- | --- |
 | 动态内存分配（new/delete/malloc/free） | ❌ | 编译通过但链接失败，Device堆管理符号`dpp_alloc`/`dpp_dealloc`未定义。 |
 | 运行时typeid | ❌ | `typeid`本身可取，但`type_info::name()`/`operator==`被标记为`__host__`，无法调用。 |
-| STL（标准模板库） | ❌ | 纯SIMT模式下`utils/std/*.h`均带`--enable-simt`编译保护；`std::tuple`构造、`std::move`等被标记为`__host__`。SIMD/SIMT混合编程场景可使用`AscendC::Std`命名空间下的标准库设施，见[Lambda表达式](../lambda_expressions/lambda_expressions.md)与[C++标准库](../../../../../api/Utils-API/cpp_stdlib/cpp_stdlib.md)。 |
+| STL（标准模板库） | ❌ | 纯SIMT模式下`utils/std/*.h`均带`--enable-simt`编译保护；`std::tuple`构造、`std::move`等被标记为`__host__`。SIMD/SIMT混合编程场景可使用`AscendC::Std`命名空间下的标准库设施，见[Lambda表达式](../cpp_language_feature/lambda_expressions.md)与[C++标准库](../../../../api/Utils-API/cpp_stdlib/cpp_stdlib.md)。 |
 
 ## 限制根因分类<a name="section_cpp11_restriction_root_causes"></a>
 
@@ -59,4 +59,4 @@ Device侧的"不支持"按根因分为三类，排查编译报错时可按此定
 | `std::atomic_thread_fence` | `asc_threadfence`（设备级）、`asc_threadfence_block`（块级） | 双向内存栅栏。 |
 | （C++11无线程块概念） | `asc_syncthreads` | 线程块内同步。 |
 
-API详细说明请参考[原子操作](../../../../../api/SIMT-API/atomic_operations/atomic_operations.md)与[同步与内存栅栏](../../../../../api/SIMT-API/sync_and_memory_fence/sync_and_memory_fence.md)。完整验证代码请参考[C++11并发特性样例](../../../../../../../examples/03_simt_api/02_features/02_language_features/05_cpp11_concurrency/README.md)。
+API详细说明请参考[原子操作](../../../../api/SIMT-API/atomic_operations/atomic_operations.md)与[同步与内存栅栏](../../../../api/SIMT-API/sync_and_memory_fence/sync_and_memory_fence.md)。完整验证代码请参考[C++11并发特性样例](../../../../../../examples/03_simt_api/02_features/02_language_features/05_cpp11_concurrency/README.md)。

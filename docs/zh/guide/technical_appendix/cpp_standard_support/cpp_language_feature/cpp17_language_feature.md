@@ -17,9 +17,9 @@
 | \[\[fallthrough\]\]属性 | [P0188R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0188r1.pdf) | ✅ | — |
 | \[\[nodiscard\]\]属性 | [P0189R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0189r1.pdf) | ✅ | 忽略返回值会产生告警。 |
 | \[\[maybe\_unused\]\]属性 | [P0212R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0212r1.pdf) | ✅ | — |
-| constexpr lambda | [P0170R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0170r1.pdf) | ✅ | `constexpr auto f = [...] constexpr {...}`编译期调用可用；混合编程VF函数内建议先落`constexpr`变量，见[Lambda表达式](../lambda_expressions/lambda_expressions.md)。 |
+| constexpr lambda | [P0170R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0170r1.pdf) | ✅ | `constexpr auto f = [...] constexpr {...}`编译期调用可用；混合编程VF函数内建议先落`constexpr`变量，见[Lambda表达式](./lambda_expressions.md)。 |
 | 一元折叠与空参数包 | [P0036R0](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0036r0.pdf) | ✅ | — |
-| lambda按值捕获\*this | [P0018R3](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0018r3.html) | ✅ | `[*this]`捕获当前对象副本。混合编程场景写法见[Lambda表达式](../lambda_expressions/lambda_expressions.md)。 |
+| lambda按值捕获\*this | [P0018R3](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0018r3.html) | ✅ | `[*this]`捕获当前对象副本。混合编程场景写法见[Lambda表达式](./lambda_expressions.md)。 |
 | enum class构造规则 | [P0138R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0138r2.pdf) | ✅ | 整型可直接列表初始化enum class。 |
 | 十六进制浮点字面量 | [P0245R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0245r1.html) | ✅ | `0x1.8p3`形式可用。 |
 | \_\_has\_include | [P0061R1](https://wg21.link/p0061) | ✅ | — |
