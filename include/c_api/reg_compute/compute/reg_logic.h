@@ -169,7 +169,7 @@ __simd_callee__ inline void asc_or(vector_half& dst, vector_half src0, vector_ha
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_or integer overload)
 __simd_callee__ inline void asc_or(vector_float& dst, vector_float src0, vector_float src1, vector_bool mask);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ != 9201)
 //=================asc_shiftleft (signed shift overloads, 3510)==================
 __simd_callee__ inline void asc_shiftleft(
     vector_uint8_t& dst, vector_uint8_t src, vector_int8_t shift, vector_bool mask);
