@@ -472,6 +472,8 @@ TEST(ExtAlgResolver, GoldenAllEngines)
          "CcuSchedAllGatherConcurMeshNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuReduceScatterSoleNHRMultiChannel"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterConcurMeshNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU,
@@ -737,10 +739,12 @@ TEST(ExtAlgWhitelist, IsAlgAllowedMatchesNameList)
              "InsReduceScatterMesh1D",
              "InsReduceScatterMesh1DMeshChunk",
              "InsReduceScatterNHR",
+             "AicpuReduceScatterSoleNHRMultiChannel",
              "InsReduceScatterParallelMesh1DNHRPcie",
              "AicpuReduceScatterParallelMeshNHRUBX",
              "AicpuReduceScatterConcurMeshNHR",
              "CcuSchedReduceScatterSoleMesh",
+             "CcuSchedReduceScatterSoleNHR",
              "CcuSchedReduceScatterSoleNHRMultiLink",
              "CcuSchedReduceScatterConcurMeshNHRMultiLink",
              "AicpuReduceScatterPipeLinePcie",
@@ -780,7 +784,7 @@ TEST(ExtAlgWhitelist, IsAlgAllowedMatchesNameList)
         EXPECT_FALSE(IsAlgAllowed(name)) << name;
     }
     EXPECT_FALSE(IsAlgAllowed("NotAnAlgorithm"));
-    EXPECT_EQ(ALG_WHITELIST.size(), 37U);
+    EXPECT_EQ(ALG_WHITELIST.size(), 38U);
 }
 
 // 改名漏改防线：白名单出现死名即红
@@ -808,7 +812,7 @@ TEST(ExtAlgWhitelist, DifferentialProductionView)
             kept.push_back(row);
         }
     }
-    EXPECT_EQ(kept.size(), 37U);
+    EXPECT_EQ(kept.size(), 38U);
     const auto prodTable = BuildCandidateTable(kept);
 
     const std::pair<HcclCMDType, const char*> deadKeys[] = {
@@ -871,6 +875,8 @@ TEST(ExtAlgWhitelist, DifferentialProductionView)
          HCCL_DATA_TYPE_FP64, 1U, "InsReduceScatterNHR"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_CCU,
          HCCL_DATA_TYPE_FP32, 1U, "CcuSchedReduceScatterSoleNHRMultiLink"},
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterSoleNHRMultiChannel"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &multi, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32,
          1U, "CcuSchedReduceScatterSoleNHR"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
