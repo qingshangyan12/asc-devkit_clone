@@ -76,9 +76,9 @@ class OpKernelInfo:
     @staticmethod
     def get_inout_flags(op_content, input_list, output_list):
         for key, _ in op_content.items():
-            if key.startswith("input") or key.startswith("Input"):
+            if key.startswith(("input", "Input")) and key[5:].isdigit():
                 input_list.append(key)
-            elif key.startswith("output") or key.startswith("Output"):
+            elif key.startswith(("output", "Output")) and key[6:].isdigit():
                 output_list.append(key)
 
     @staticmethod
