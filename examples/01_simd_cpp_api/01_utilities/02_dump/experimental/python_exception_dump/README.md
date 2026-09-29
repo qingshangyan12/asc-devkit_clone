@@ -12,8 +12,9 @@
 
 | 产品 | CANN软件版本 |
 |---|---|
-| Atlas A2训练系列产品/Atlas A2推理系列产品 | \>= CANN 9.1.0 |
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.1.0 |
 | Atlas A3训练系列产品/Atlas A3推理系列产品 | \>= CANN 9.1.0 |
+| Atlas A2训练系列产品/Atlas A2推理系列产品 | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -22,12 +23,12 @@
 │   ├── examples
 │   │   └── demo_ifa.py                  // demo：正常调用 + 故障注入 + 产物自检
 │   ├── npuops_exception_dump
-│   │   ├── CMakeLists.txt               // 编译工程文件
-│   │   ├── build.sh                     // 一键编译脚本（产物输出到 lib/）
 │   │   ├── include
 │   │   │   └── npuops_exception_dump.h  // 外挂库对外C接口
+│   │   ├── python/npuops                // Python API（debug.py 等）
 │   │   ├── src                          // C++ 异常回调实现
-│   │   └── python/npuops                // Python API（debug.py 等）
+│   │   ├── build.sh                     // 一键编译脚本（产物输出到 lib/）
+│   │   └── CMakeLists.txt               // 编译工程文件
 │   ├── README_en.md
 │   └── README.md
 ```
