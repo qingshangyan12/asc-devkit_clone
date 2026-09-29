@@ -20,6 +20,7 @@
 #ifndef INCLUDE_C_API_ASC_SIMD_H
 #define INCLUDE_C_API_ASC_SIMD_H
 
+#include "version/asc_devkit_version.h"
 #include "impl/c_api/instr_impl/npu_arch_2201/utils_impl/utils_impl.h"
 
 #include "c_api/atomic/atomic.h"

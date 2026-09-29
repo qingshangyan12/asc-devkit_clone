@@ -24,6 +24,7 @@
 #error "this is experimental feature, please set CANN_ASC_USE_EXPERIMENTAL = ON to use it."
 #endif
 
+#include "version/asc_devkit_version.h"
 #include "tensor_api/tensor.h"
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90200000)
