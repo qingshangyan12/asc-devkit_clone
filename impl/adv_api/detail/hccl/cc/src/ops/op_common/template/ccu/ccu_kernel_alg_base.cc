@@ -1198,7 +1198,7 @@ CcuResult CreateReduceLoop(
     return CCU_SUCCESS;
 }
 
-static CcuResult CreateReduceLoopV2(
+CcuResult CreateReduceLoopV2(
     AllReduceMeshMem2Mem1DContext& ctx, GroupReduceMem2MemVar& var, uint32_t size, HcclDataType dataType,
     HcclDataType outputDataType, HcclReduceOp opType)
 {
