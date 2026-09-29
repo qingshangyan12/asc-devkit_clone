@@ -1754,7 +1754,7 @@ static uint32_t GetDefaultResFractionV2(HcommCcuResType resType, OpExecuteConfig
 static uint32_t GetDefaultResFraction(HcommCcuResType resType, OpExecuteConfig opMode)
 {
     DevType deviceType;
-    bool isV2 = (hrtGetDeviceType(deviceType) == HCCL_SUCCESS) && (deviceType == HcclDevType::DEV_TYPE_960);
+    bool isV2 = (hrtGetDeviceType(deviceType) == HCCL_SUCCESS) && (deviceType == DevType::DEV_TYPE_960);
     return isV2 ? GetDefaultResFractionV2(resType, opMode) : GetDefaultResFractionV1(resType, opMode);
 }
 
