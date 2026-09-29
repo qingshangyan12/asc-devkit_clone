@@ -1337,7 +1337,7 @@ def _source_navigation_fields(body: str, document_path: str) -> list[dict[str, s
         if marker not in resolved or not resolved.endswith(".md"):
             continue
         path = resolved.split(marker, 1)[1]
-        entry = {"path": f"docs/zh/api/{path}", "title": match.group(0).split("](", 1)[0][1:]}
+        entry = {"path": f"docs/zh/api/{path}"}
         if entry not in entries:
             entries.append(entry)
     return entries
@@ -1357,7 +1357,7 @@ def build_worker_document(
     if classification is None:
         raise ValidationError(f"document cannot be classified from source structure: {path}")
 
-    definition = _source_definition_fields(root, document, body) if classification.okftype == "reference.type.cpp" else None
+    definition = _source_definition_fields(root, document, body) if classification.okftype == "reference.type" else None
     plan = compile_execution_plan(classification)
     needs_signature = "signature" in plan.fields
     needs_examples = "examples" in plan.fields
@@ -1603,7 +1603,7 @@ def worker(args: argparse.Namespace) -> int:
     ]
     for document in documents:
         document["semantic_verified"] = semantic is not None
-        if semantic is None and document["plan"]["okftype"] != "reference.index.cpp":
+        if semantic is None and document["plan"]["okftype"] != "reference.index":
             document["issues"].append(issue(
                 document["path"],
                 "semantic_input",
@@ -1828,14 +1828,12 @@ def normalize_navigation(navigation: Any, document_path: str) -> list[dict[str, 
         raise ValidationError(f"{document_path}: navigation must be an array")
     result = []
     for index, item in enumerate(navigation):
-        if not isinstance(item, dict) or set(item) != {"path", "title"}:
-            raise ValidationError(f"{document_path}: navigation[{index}] must contain path and title")
-        path, title = item["path"], item["title"]
+        if not isinstance(item, dict) or set(item) != {"path"}:
+            raise ValidationError(f"{document_path}: navigation[{index}] must contain path only")
+        path = item["path"]
         if not isinstance(path, str) or not path.startswith("docs/zh/api/") or not path.endswith(".md"):
             raise ValidationError(f"{document_path}: navigation[{index}].path is invalid")
-        if not isinstance(title, str) or not title.strip():
-            raise ValidationError(f"{document_path}: navigation[{index}].title must be non-empty")
-        result.append({"path": path, "title": title})
+        result.append({"path": path})
     return result
 
 
@@ -1988,8 +1986,6 @@ def _validate_declaration(definition_kind: str, declaration: Any, path: str) -> 
         r"[A-Za-z_][A-Za-z0-9_]*", declaration["symbol"]
     ):
         raise ValidationError(f"{path}: declaration.symbol is invalid")
-    if not isinstance(declaration.get("cpp"), str) or not declaration["cpp"].strip():
-        raise ValidationError(f"{path}: declaration.cpp is required")
     allowed = {
         "constant": {"symbol", "cpp", "value", "type"},
         "enum": {"symbol", "cpp", "members", "underlying_type"},
@@ -2006,6 +2002,8 @@ def _validate_declaration(definition_kind: str, declaration: Any, path: str) -> 
     collection = "members" if definition_kind == "enum" else "fields" if definition_kind in {"struct", "union"} else None
     if collection is not None:
         values = declaration.get(collection)
+        if values is None:
+            return
         if not isinstance(values, list) or any(not isinstance(item, dict) for item in values):
             raise ValidationError(f"{path}: declaration.{collection} must be an object array")
         for index, item in enumerate(values):
@@ -2046,12 +2044,13 @@ def _definition_kind_from_fields(fields: dict[str, Any]) -> str | None:
     record_kind = declaration.get("record_kind")
     if record_kind in {"struct", "union"}:
         return record_kind
-    if "members" in declaration:
-        return "enum"
     if "target" in declaration:
         return "type_alias"
     if "value" in declaration or "type" in declaration:
         return "constant"
+    resource = fields.get("resource")
+    if isinstance(resource, str) and "/defs/enum/" in resource:
+        return "enum"
     return None
 
 
@@ -2061,7 +2060,7 @@ def validate_definition_fields(
     # Callable API profiles legitimately publish common header metadata at
     # document level after signature normalization; definition validation does
     # not apply to those pages.
-    if fields.get("okftype") == "reference.api.cpp":
+    if fields.get("okftype") == "reference.api":
         return
     definition_kind = _definition_kind_from_fields(fields)
     if definition_kind is None:
@@ -2109,6 +2108,24 @@ def _promote_common_signature_fields(fields: dict[str, Any]) -> None:
         fields[key] = list(first)
         for item in signature:
             item.pop(key, None)
+
+
+def _compact_definition_metadata(fields: dict[str, Any]) -> None:
+    """Keep definition front matter focused on identity and declaration shape."""
+    if fields.get("okftype") != "reference.type":
+        return
+    declaration = fields.get("declaration")
+    if isinstance(declaration, dict):
+        declaration.pop("cpp", None)
+        if "members" in declaration:
+            declaration.pop("members")
+        if "fields" in declaration:
+            declaration.pop("fields")
+    catalog = fields.get("type_catalog")
+    if isinstance(catalog, dict):
+        for group in catalog.get("groups", []):
+            if isinstance(group, dict) and isinstance(group.get("types"), list):
+                group["types"] = InlineList(group["types"])
 
 
 def render_yaml(
@@ -2160,8 +2177,9 @@ def render_yaml(
         output["signature"] = validate_signature(output["signature"], path)
     if "examples" in output:
         output["examples"] = normalize_examples(root, path, output["examples"])
+    _compact_definition_metadata(output)
     validate_definition_fields(output, path, allowed_empty)
-    if "signature" in output and not output["signature"] and output.get("okftype") != "reference.api.cpp":
+    if "signature" in output and not output["signature"] and output.get("okftype") != "reference.api":
         output.pop("signature", None)
     for key in ("header", "declaration", "type_catalog"):
         if output.get(key) in (None, [], {}):
@@ -2252,7 +2270,7 @@ def validate(args: argparse.Namespace) -> int:
         allowed_empty: set[str] = set()
         document_blocked = False
         discovered_issues = list(document.get("issues", []))
-        if document.get("plan", {}).get("okftype") != "reference.index.cpp" and not document.get("semantic_verified", False) and not any(
+        if document.get("plan", {}).get("okftype") != "reference.index" and not document.get("semantic_verified", False) and not any(
             found.get("field") == "semantic_input" for found in discovered_issues
         ):
             raise ValidationError(f"{path}: worker result is missing semantic_input issue")

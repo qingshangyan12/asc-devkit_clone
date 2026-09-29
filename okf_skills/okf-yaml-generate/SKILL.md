@@ -14,10 +14,12 @@ description: 集中编排 Ascend DevKit API 的完整 OKF YAML 生成、并发�
 
 ## 分类与 Profile
 
-Profile 使用完整 `okftype` 作为扁平键，例如 `reference.api.cpp`。分类器从文档结构事实
-产出一个 `okftype`：函数原型和真实声明得到 `reference.api.cpp`，定义声明得到
-`reference.type.cpp`，以 Markdown 链接导航为主的页面得到 `reference.index.cpp`。
-`config/source-context-v1.yaml` 只提供源集合根目录、文档族和技术上下文，不维护逐路径
+Profile 使用完整 `okftype` 作为扁平键，格式为“文档族.页面种类”。当前文档族 `reference`
+表示文档四象限中供查询事实的参考资料；不表示 C API、编程语言或接口是否废弃。
+分类器从文档结构事实
+产出一个 `okftype`：函数原型和真实声明得到 `reference.api`，定义声明得到
+`reference.type`，以 Markdown 链接导航为主的页面得到 `reference.index`。
+`config/source-context-v1.yaml` 只提供源集合根目录和文档族，不维护逐路径
 分类规则。`config/document-profile-registry.yaml` 只声明公共必填字段、Profile 允许字段
 和输出契约；实体解析结果（枚举、函数宏、对象宏等）只决定实际有证据的字段，不形成新的
 注册表层级。无法可靠分类时只报告，不继承旧 front matter，也不静默降级。
@@ -63,7 +65,7 @@ Doxygen 仍按旧生成器合并为 canonical ID 和汇总的 `@archs`；不同�
    所有阶段的 dry-run。缺少语义输入、未解决问题或生成器无法处理的合法结构都会使校验阻断，
    不得以空 description/tag/dependencies 继续写入。
 6. 只有 `validate` 成功后，使用相同 run directory 执行 `write`。写入前再次确认输入 hash 未变化。
-7. Index Profile 按注册表中的 `reference.index.cpp.fields` 生成；当前配置为 `okftype`、`title`、`resource`、`navigation` 和 `timestamp`，不生成 description、tag、dependencies 或 examples。
+7. Index Profile 按注册表中的 `reference.index.fields` 生成；当前配置为 `okftype`、`title`、`resource`、`navigation` 和 `timestamp`，不生成 description、tag、dependencies 或 examples。
 8. 运行结束必须生成机器可读 `error-report.json` 和中文 `error-report.md`。同一文档的所有问题必须
    合并在同一个报告章节中。
 

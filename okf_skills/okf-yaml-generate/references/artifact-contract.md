@@ -9,11 +9,11 @@ Index 文档使用独立字段契约：
 ```json
 {
   "fields": {
-    "okftype": "reference.index.cpp",
+    "okftype": "reference.index",
     "title": "Vector Compute",
     "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compute.md",
     "navigation": [
-      {"path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/vector_arith.md", "title": "基础算术"}
+      {"path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/vector_arith.md"}
     ],
     "timestamp": "2026-09-24"
   }
@@ -35,13 +35,13 @@ Index 结果不得包含 `description`、`tag`、`dependencies`、`examples`、`
       "path": "docs/zh/api/SIMD-API/c_api/foo.md",
       "sha256": "...",
       "plan": {
-        "okftype": "reference.api.cpp",
+        "okftype": "reference.api",
         "rule": "callable_structure",
         "fields": ["okftype", "title", "resource", "description", "tag", "signature", "dependencies", "examples", "timestamp"],
         "outputs": ["front_matter", "doxygen", "example_markers"]
       },
       "fields": {
-        "okftype": "reference.api.cpp",
+        "okftype": "reference.api",
         "title": "foo",
         "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/foo.md",
         "description": "...",

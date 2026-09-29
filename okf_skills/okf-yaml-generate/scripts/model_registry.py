@@ -84,7 +84,7 @@ def load_model() -> dict[str, Any]:
         raise ModelValidationError("field_order must contain every registered field exactly once")
 
     for name, profile in profiles.items():
-        if not isinstance(name, str) or not name.count(".") == 2:
+        if not isinstance(name, str) or len(name.split(".")) != 2 or any(not part for part in name.split(".")):
             raise ModelValidationError(f"profile key must be a complete okftype: {name!r}")
         if not isinstance(profile, dict):
             raise ModelValidationError(f"profile {name} must be a mapping")
@@ -102,9 +102,10 @@ def load_model() -> dict[str, Any]:
     if not isinstance(context, dict):
         raise ModelValidationError("source_context.context must be a mapping")
     family = context.get("family")
-    technology = context.get("technology")
-    if not isinstance(family, str) or not family or not isinstance(technology, str) or not technology:
-        raise ModelValidationError("source_context.context requires family and technology")
+    if not isinstance(family, str) or not family:
+        raise ModelValidationError("source_context.context requires family")
+    if set(context) != {"family"}:
+        raise ModelValidationError("source_context.context only supports family")
 
     return {
         "document": document,
@@ -115,7 +116,7 @@ def load_model() -> dict[str, Any]:
         "field_order": tuple(field_order),
         "profiles": profiles,
         "output_contracts": output_contracts,
-        "context": {"family": family, "technology": technology},
+        "context": {"family": family},
     }
 
 
@@ -145,7 +146,7 @@ def classify_document(path: str, body: str, model: dict[str, Any] | None = None)
         return None
     kind, rule = _classify_kind(path, body)
     context = model["context"]
-    okftype = f"{context['family']}.{kind}.{context['technology']}"
+    okftype = f"{context['family']}.{kind}"
     if okftype not in model["profiles"]:
         return None
     return Classification(

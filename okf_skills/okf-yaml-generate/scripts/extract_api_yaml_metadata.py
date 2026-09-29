@@ -6026,7 +6026,7 @@ def render_report(
                 "",
                 "  ```yaml",
                 "  ---",
-                "  okftype: reference.api.cpp",
+                "  okftype: reference.api",
                 f"  api_kind: {_yaml_scalar(item.api_kind)}",
                 f"  title: {_yaml_scalar(item.title)}",
                 f"  path: {_yaml_scalar(_metadata_label(item, REPO_ROOT))}",

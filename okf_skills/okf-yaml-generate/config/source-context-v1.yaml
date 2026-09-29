@@ -1,6 +1,6 @@
 # 源文档上下文配置。
 #
-# 本文件只描述本次源集合的范围、文档族和技术上下文；不为每个目录或文件
+# 本文件只描述本次源集合的范围和文档族；不为每个目录或文件
 # 编写 okftype 映射。页面种类由通用结构分类器从文档事实判断。
 
 schema_version: 1
@@ -9,7 +9,6 @@ document_roots: [docs/zh/api]
 
 context:
   family: reference
-  technology: cpp
 
 # 这些是来源范围标签，不参与页面分类。
 default_tags:
