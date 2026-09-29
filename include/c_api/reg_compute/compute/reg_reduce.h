@@ -177,6 +177,7 @@ __simd_callee__ inline vector_uint32_t asc_reduce_sum_datablock(vector_uint32_t 
 
 __simd_callee__ inline vector_int32_t asc_reduce_sum_datablock(vector_int32_t src, vector_bool mask);
 
+#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
 //=================asc_datablock_reduce_max_stride==================
 __simd_callee__ inline void asc_datablock_reduce_max_stride(vector_half& dst, vector_half src, vector_bool mask);
 
@@ -333,6 +334,7 @@ __simd_callee__ inline vector_uint32_t asc_reduce_sum_last_elem(vector_uint32_t 
 __simd_callee__ inline vector_half asc_reduce_sum_last_elem(vector_half src);
 
 __simd_callee__ inline vector_float asc_reduce_sum_last_elem(vector_float src);
+#endif
 
 #endif
 
