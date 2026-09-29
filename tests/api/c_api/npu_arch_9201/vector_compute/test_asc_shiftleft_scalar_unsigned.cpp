@@ -82,3 +82,17 @@ TEST_SCALAR_SHIFTLEFT_RETURN_INSTR(vector_uint16_t, uint16_t);
 TEST_SCALAR_SHIFTLEFT_RETURN_INSTR(vector_int16_t, uint16_t);
 TEST_SCALAR_SHIFTLEFT_RETURN_INSTR(vector_uint32_t, uint32_t);
 TEST_SCALAR_SHIFTLEFT_RETURN_INSTR(vector_int32_t, uint32_t);
+
+TEST(TestScalarShiftLeftLiteralCApi, asc_shiftleft_scalar_vector_uint16_t_literal_Succ)
+{
+    vector_uint16_t dst;
+    vector_uint16_t src;
+    vector_bool mask;
+
+    MOCKER_CPP(vshls, void(vector_uint16_t&, vector_uint16_t, uint16_t, vector_bool, Literal)).times(2);
+
+    asc_shiftleft_scalar(dst, src, 1, mask);
+    vector_uint16_t result = asc_shiftleft_scalar(src, 1, mask);
+    (void)result;
+    GlobalMockObject::verify();
+}
