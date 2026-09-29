@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "defs-asc_is_aic-asc_is_aiv",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+  "document_sha256": "2fae8e4b49808526292e7b99d7cdf266355b59209bce7f8ab9713b105418665a",
+  "status": "ready",
+  "description": "在分离模式中提供 AIC 与 AIV 代码路径的条件判断宏，用于隔离 Cube Core 和 Vector Core 的专属代码。",
+  "evidence": [
+    {"excerpt": "`ASC_IS_AIC`和`ASC_IS_AIV`用于"},
+    {"excerpt": "这两个宏分别是`ASCEND_IS_AIC`和`ASCEND_IS_AIV`的C API别名，对应宏的功能相同。"}
+  ],
+  "confidence": 0.98
+}

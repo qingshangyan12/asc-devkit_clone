@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "asc_sync",
+  "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+  "document_sha256": "a13b9cd4d6122fc4062b559f0750200add5fa98b021868a202a5811746e11dd0",
+  "status": "ready",
+  "description": "用于同一核内所有流水之间的全部流水同步，功能等价于asc_sync_pipe(PIPE_ALL)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成，适用于等待核内所有并行执行单元到达一致状态后再继续执行的场景。",
+  "evidence": [
+    {
+      "excerpt": "用于同一核内所有流水之间的全部流水同步，功能等价于[asc_sync_pipe(PIPE_ALL)](asc_sync_pipe.md)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。\n\n本接口适用于需要等待核内所有并行执行单元同时到达一个一致状态后再继续执行的场景。"
+    }
+  ],
+  "confidence": 0.9
+}

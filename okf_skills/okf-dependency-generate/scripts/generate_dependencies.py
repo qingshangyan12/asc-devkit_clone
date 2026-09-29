@@ -208,7 +208,7 @@ def replace_dependency_block(raw_front_matter: str, dependencies: list[dict[str,
     )
     insertion = len(lines)
     for index, line in enumerate(lines):
-        if top_level_key(line) in {"examples", "timestamp"}:
+        if top_level_key(line) in {"examples", "version"}:
             insertion = index
             break
     rendered = render_dependencies(dependencies)

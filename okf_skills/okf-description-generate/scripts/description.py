@@ -213,8 +213,6 @@ def cmd_prepare(args: argparse.Namespace) -> None:
         raise ValueError("run-id 只能使用字母、数字、点、下划线和连字符")
     root = Path(args.devkit_root).resolve()
     document_path, document = resolve_document(root, args.document)
-    original = document.read_text(encoding="utf-8", errors="replace")
-    front_matter_bounds(original)
     source_digest = digest(document)
     manifest = {
         "schema_version": SCHEMA_VERSION,

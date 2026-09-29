@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_task",
+  "run_id": "defs-asc_is_aic-asc_is_aiv",
+  "devkit_root": "/home/hugh/code/asc-devkit_okf_knowledge-fork",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+  "document_sha256": "2fae8e4b49808526292e7b99d7cdf266355b59209bce7f8ab9713b105418665a",
+  "instructions": [
+    "阅读指定 Markdown 的正文，并独立撰写中文 description。",
+    "只把目标 Markdown 正文中的逐字摘录作为 evidence。",
+    "没有可靠结论时输出 unresolved，不猜测。"
+  ],
+  "result_path": "description-result.json"
+}

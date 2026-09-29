@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_task",
+  "run_id": "20260929-target-defs-01-asc_channel_pad_mode",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+  "document_sha256": "3708abc7942a3a20e0e3aa9fa09fda5a6c6c2827858f5734b3b2953e63aa9919",
+  "instructions": [
+    "阅读指定 Markdown 的正文，并独立撰写中文 description。",
+    "只把目标 Markdown 正文中的逐字摘录作为 evidence。",
+    "没有可靠结论时输出 unresolved，不猜测。"
+  ],
+  "result_path": "description-result.json"
+}

@@ -13,11 +13,13 @@ from typing import Any
 
 import yaml
 
+from yaml_deprecation_evidence import explicitly_deprecates_subject
+
 
 SCHEMA_VERSION = 1
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
-DEPENDENCY_KINDS = {"requires", "configures", "constrained_by", "related"}
+DEPENDENCY_KINDS = {"requires", "configures", "constrained_by", "related", "replaced_by"}
 TOP_LEVEL_KEY_RE = re.compile(r"^(?P<key>[A-Za-z_][A-Za-z0-9_-]*):(?:\s.*)?(?:\n|$)")
 
 
@@ -162,6 +164,18 @@ def validate_dependencies(
         normalized_entry["evidence"] = validate_evidence(
             item.get("evidence"), entry_location + ".evidence", root
         )
+        if kind == "replaced_by":
+            excerpt = normalized_entry["evidence"]["excerpt"]
+            source_body = strip_front_matter((root / document_path).read_text(encoding="utf-8", errors="replace"))
+            if (
+                normalized_entry["evidence"]["source_path"] != document_path
+                or not any(explicitly_deprecates_subject(source_body, line) for line in source_body.splitlines())
+                or not re.search(r"替代|改用|取代|代替|新接口形式请参见", excerpt)
+                or (target.name not in excerpt and target.stem not in excerpt)
+            ):
+                raise ValidationError(
+                    f"{entry_location}.evidence must name the replacement target and state the replacement"
+                )
         normalized.append(normalized_entry)
     return sorted(normalized, key=dependency_identity)
 
@@ -208,7 +222,7 @@ def replace_dependency_block(raw_front_matter: str, dependencies: list[dict[str,
     )
     insertion = len(lines)
     for index, line in enumerate(lines):
-        if top_level_key(line) in {"examples", "timestamp"}:
+        if top_level_key(line) in {"examples", "version"}:
             insertion = index
             break
     rendered = render_dependencies(dependencies)

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-data-move-guide-01-l1_l0_data_move",
+  "document_path": "docs/zh/api/SIMD-API/c_api/data_move_guide/l1_l0_data_move.md",
+  "document_sha256": "eff434cd0906d9405059edbb418fa0e8ec7ef3497f05f260350ef8a8dac5af7f",
+  "status": "ready",
+  "description": "说明L1向L0A和L0B装载矩阵以及L0C向L1搬出结果的方向、搬运模式与同步边界。",
+  "evidence": [
+    {
+      "excerpt": "L1到L0A/L0B用于为Cube矩阵计算装载左、右矩阵，由PIPE_MTE1执行；矩阵计算结果位于L0C，可由PIPE_FIX搬到L1。NPU架构版本3510的通路具有方向性，不提供L0A/L0B到L1或L1到L0C的通用复制。"
+    }
+  ],
+  "confidence": 0.92
+}

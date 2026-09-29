@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_run",
+  "run_id": "20260929-target-defs-01-asc_l13d_fmatrix_config",
+  "run_dir": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260929-target-defs-01/descriptions/asc_l13d_fmatrix_config",
+  "created_at": "2026-09-29T07:46:47+00:00",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+  "document_sha256": "f1b8b4e7cdfea2219413ce2b2e778ec63c16648d22e9f4e40540c70b3d276d91"
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-defs-01-asc_mutex_execute_mode",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+  "document_sha256": "dd82bd3f8f88d07cf5734185b55436fa27f5ad0b4ebacdfb58e7b87410c48bda",
+  "status": "ready",
+  "description": "描述互斥锁的阻塞和非阻塞执行模式，作为asc_lock与asc_unlock接口mode参数的类型并提供兼容别名。",
+  "evidence": [
+    {
+      "excerpt": "`asc_mutex_execute_mode`用于选择互斥锁的阻塞或非阻塞执行模式，作为[asc_lock](../../sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../sync/intra_core_sync/asc_unlock.md)接口的`mode`参数类型。"
+    },
+    {
+      "excerpt": "兼容类型名`ascMutexExecuteMode`是该类型的别名。"
+    }
+  ],
+  "confidence": 0.92
+}

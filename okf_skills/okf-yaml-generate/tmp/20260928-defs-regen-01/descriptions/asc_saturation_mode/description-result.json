@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260928-defs-regen-01-asc_saturation_mode",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+  "document_sha256": "3695d3023968e2d33118544f2a068a3286475fb5f0f2f8b58914cc836c731a82",
+  "status": "ready",
+  "description": "该枚举表示饱和控制所作用的模式类型，用于asc_set_saturation_flag和asc_get_saturation_flag接口。",
+  "evidence": [
+    {"excerpt": "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。"}
+  ],
+  "confidence": 0.99
+}

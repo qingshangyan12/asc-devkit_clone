@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "run_id": "20260929-sync-01",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "documents": [
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+    "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+    "docs/zh/api/SIMD-API/c_api/sync/sync.md",
+    "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md"
+  ],
+  "batches": [
+    {
+      "id": "batch-01",
+      "documents": [
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+        "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync.md",
+        "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+        "docs/zh/api/SIMD-API/c_api/sync/sync.md",
+        "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md"
+      ],
+      "task": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260929-sync-01/batches/batch-01/task.json"
+    }
+  ],
+  "taxonomy": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-tag-generate/taxonomy/tag-taxonomy.json",
+  "write_contracts": [
+    "front_matter"
+  ]
+}

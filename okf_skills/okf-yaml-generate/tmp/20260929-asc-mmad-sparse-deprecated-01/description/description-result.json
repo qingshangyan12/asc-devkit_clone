@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-asc-mmad-sparse-deprecated-01",
+  "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_sparse_deprecated.md",
+  "document_sha256": "852064063fe41d5edaf74673514a99f1de820aa7b49ee346318df40c9e4ea6a0",
+  "status": "ready",
+  "description": "已废弃的稀疏矩阵乘加接口：左矩阵A为稀疏矩阵、右矩阵B为稠密矩阵，矩阵A在计算时完成稠密化，仅在AIC上生效；请使用asc_unit_flag_mode类型入参的新asc_mmad_sparse接口替代，同步功能通过asc_sync实现。",
+  "evidence": [
+    {"excerpt": "本接口完成稀疏矩阵乘加操作。传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵；矩阵A在计算时完成稠密化，矩阵B需在输入数据准备阶段完成稠密化。"},
+    {"excerpt": "本接口为矩阵计算接口，仅在AIC上生效。"},
+    {"excerpt": "请使用入参`unit_flag_mode`类型为`asc_unit_flag_mode`的[asc_mmad_sparse](../cube_compute/asc_mmad_sparse.md)接口替代；原`asc_mmad_sparse_sync`接口的同步功能请通过新`asc_mmad_sparse`接口和`asc_sync()`实现"}
+  ],
+  "confidence": 0.98
+}

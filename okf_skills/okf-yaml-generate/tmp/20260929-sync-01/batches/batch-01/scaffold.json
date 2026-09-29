@@ -1,0 +1,4716 @@
+{
+  "schema_version": 1,
+  "run_id": "20260929-sync-01",
+  "batch_id": "batch-01",
+  "worker_id": "worker-a",
+  "documents": [
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+      "sha256": "5b2449e95cef38f6730b5dbc29f8e87c7f6e5ceacb9c5805a90521750ac12313",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_block_arrive",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_block_arrive__pipe_i64",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_block_arrive-description-08c551ad",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_block_arrive-tag.roles-8f401404",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_block_arrive-semantic_input-c19c2695",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_block_arrive(pipe_t,int64_t)",
+          "parameters": "asc_sync_block_arrive(pipe_t pipe,int64_t flag_id)",
+          "override_id": "asc_sync_block_arrive__pipe_i64",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "标识在哪条流水的前序指令完成后才允许向调度模块发送通知。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体请参考[约束说明](#supported_pipe_combinations)。",
+                "evidence": [
+                  "| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。<br>不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体请参考[约束说明](#supported_pipe_combinations)。 |"
+                ]
+              },
+              {
+                "name": "flag_id",
+                "direction": "in",
+                "description": "核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。",
+                "evidence": [
+                  "| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+      "sha256": "c05884e50cc6888435ae85d1fbb867c435c04a91bf02f691eba63ba9d53463ec",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_block_wait",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_block_wait__pipe_i64",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_block_wait-description-8f591435",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_block_wait-tag.roles-38f001e4",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_block_wait-semantic_input-d926612f",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_block_wait(pipe_t,int64_t)",
+          "parameters": "asc_sync_block_wait(pipe_t pipe,int64_t flag_id)",
+          "override_id": "asc_sync_block_wait__pipe_i64",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。",
+                "evidence": [
+                  "| pipe | 输入 | 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。<br>本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。 |"
+                ]
+              },
+              {
+                "name": "flag_id",
+                "direction": "in",
+                "description": "核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。",
+                "evidence": [
+                  "| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+      "sha256": "31640543bd15008f9afc3e1f95879e1323c88d876cfe1f81e1cf808373a203d5",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_inter_arrive",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_inter_arrive__pipe_i64",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_inter_arrive-description-1599043c",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_inter_arrive-tag.roles-da604b6c",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_inter_arrive-semantic_input-1f5b58cb",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_inter_arrive(pipe_t,int64_t)",
+          "parameters": "asc_sync_inter_arrive(pipe_t pipe,int64_t flag_id)",
+          "override_id": "asc_sync_inter_arrive__pipe_i64",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "标识在哪条流水的前序指令完成后才允许向调度模块发送通知。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体请参考[约束说明](#supported_pipe_combinations)。",
+                "evidence": [
+                  "| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。不同NPU架构中AIC和AIV支持的`pipe`取值存在差异，具体请参考[约束说明](#supported_pipe_combinations)。 |"
+                ]
+              },
+              {
+                "name": "flag_id",
+                "direction": "in",
+                "description": "核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。",
+                "evidence": [
+                  "| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+      "sha256": "68a591a4b2cd80bf1e99e6402ce56ed2fd3f271df42de1380ce2c3a7a8bfe6fd",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_inter_wait",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_inter_wait__pipe_i64",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_inter_wait-description-df3c0d43",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_inter_wait-tag.roles-54fe76f1",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_inter_wait-semantic_input-ea7d9f62",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_inter_wait(pipe_t,int64_t)",
+          "parameters": "asc_sync_inter_wait(pipe_t pipe,int64_t flag_id)",
+          "override_id": "asc_sync_inter_wait__pipe_i64",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。",
+                "evidence": [
+                  "| pipe | 输入 | 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。<br>本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。 |"
+                ]
+              },
+              {
+                "name": "flag_id",
+                "direction": "in",
+                "description": "核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。",
+                "evidence": [
+                  "| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+      "sha256": "aa291c32b4a2fef201743577ec1c09c0b35ec600f304c5af25558ed3cd4fe12a",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_intra_arrive",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_intra_arrive__pipe_u64",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_intra_arrive-description-19d6f04e",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_intra_arrive-tag.roles-fd529551",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_intra_arrive-semantic_input-2b32c418",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_intra_arrive(pipe_t,uint64_t)",
+          "parameters": "asc_sync_intra_arrive(pipe_t pipe,uint64_t sync_id)",
+          "override_id": "asc_sync_intra_arrive__pipe_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "标识在哪条流水的前序指令完成后才允许向调度模块发送通知。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。AIC和AIV支持的`pipe`取值请参考[约束说明](#supported_pipe_combinations)。",
+                "evidence": [
+                  "| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。<br>AIC和AIV支持的`pipe`取值请参考[约束说明](#supported_pipe_combinations)。 |"
+                ]
+              },
+              {
+                "name": "sync_id",
+                "direction": "in",
+                "description": "核间同步的标记，用于标识同一组同步信号。每个`sync_id`各自拥有独立的4位计数器。一个AI Core由1个AIC与2个AIV构成，AIC侧拥有32个`sync_id`（0~31），每个AIV侧各拥有16个`sync_id`（0~15）。同步时`asc_sync_intra_arrive`与`asc_sync_intra_wait`的`sync_id`对应关系请参考[约束说明](#约束说明)。",
+                "evidence": [
+                  "| sync_id | 输入 | 核间同步的标记，用于标识同一组同步信号。每个`sync_id`各自拥有独立的4位计数器。一个AI Core由1个AIC与2个AIV构成，AIC侧拥有32个`sync_id`（0~31），每个AIV侧各拥有16个`sync_id`（0~15）。<br>同步时`asc_sync_intra_arrive`与`asc_sync_intra_wait`的`sync_id`对应关系请参考[约束说明](#约束说明)。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+      "sha256": "3fd7105c959a109af2a7fdb8314332689113ccc1d7d86ca8dcb7d7e2694f9095",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_intra_wait",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_intra_wait__pipe_u64",
+            "archs": [
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_intra_wait-description-bb20ae65",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_intra_wait-tag.roles-75605df6",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_intra_wait-semantic_input-ef7cc59e",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_intra_wait(pipe_t,uint64_t)",
+          "parameters": "asc_sync_intra_wait(pipe_t pipe,uint64_t sync_id)",
+          "override_id": "asc_sync_intra_wait__pipe_u64",
+          "archs": [
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "标识阻塞哪条流水的后续指令，直到对应`sync_id`的计数器非0。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。AIC和AIV支持的`pipe`取值请参考[约束说明](#supported_pipe_combinations)。",
+                "evidence": [
+                  "| pipe | 输入 | 标识阻塞哪条流水的后续指令，直到对应`sync_id`的计数器非0。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。<br>AIC和AIV支持的`pipe`取值请参考[约束说明](#supported_pipe_combinations)。 |"
+                ]
+              },
+              {
+                "name": "sync_id",
+                "direction": "in",
+                "description": "核间同步的标记，用于标识同一组同步信号。每个`sync_id`各自拥有独立的4位计数器。一个AI Core由1个AIC与2个AIV构成，AIC侧拥有32个`sync_id`（0~31），每个AIV侧各拥有16个`sync_id`（0~15）。同步时`asc_sync_intra_arrive`与`asc_sync_intra_wait`的`sync_id`对应关系请参考[约束说明](#约束说明)。",
+                "evidence": [
+                  "| sync_id | 输入 | 核间同步的标记，用于标识同一组同步信号。每个`sync_id`各自拥有独立的4位计数器。一个AI Core由1个AIC与2个AIV构成，AIC侧拥有32个`sync_id`（0~31），每个AIV侧各拥有16个`sync_id`（0~15）。<br>同步时`asc_sync_intra_arrive`与`asc_sync_intra_wait`的`sync_id`对应关系请参考[约束说明](#约束说明)。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+      "sha256": "38a02ee9e43ad373fc0376d07ede7ff8e1300bade5db7d887bd89773c5fcae7f",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_subblock_arrive",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_subblock_arrive__pipe_i64",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_subblock_arrive-description-de855c8e",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_subblock_arrive-tag.roles-a3cebc9f",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_subblock_arrive-semantic_input-8b9845c4",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_subblock_arrive(pipe_t,int64_t)",
+          "parameters": "asc_sync_subblock_arrive(pipe_t pipe,int64_t flag_id)",
+          "override_id": "asc_sync_subblock_arrive__pipe_i64",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "标识在哪条流水的前序指令完成后才允许向调度模块发送通知。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。本接口仅支持AIV调用，AIV支持的`pipe`取值请参考[约束说明](#约束说明)。",
+                "evidence": [
+                  "| pipe | 输入 | 标识在哪条流水的前序指令完成后才允许向调度模块发送通知。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。本接口仅支持AIV调用，AIV支持的`pipe`取值请参考[约束说明](#约束说明)。 |"
+                ]
+              },
+              {
+                "name": "flag_id",
+                "direction": "in",
+                "description": "核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。",
+                "evidence": [
+                  "| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+      "sha256": "50315eecffa13c0b4eec7bd0f158c0ae28961c19e7b98cdd34be9eecf1c04326",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_subblock_wait",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_subblock_wait__pipe_i64",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_subblock_wait-description-62016864",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_subblock_wait-tag.roles-f75f9acd",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_subblock_wait-semantic_input-9269e65f",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_subblock_wait(pipe_t,int64_t)",
+          "parameters": "asc_sync_subblock_wait(pipe_t pipe,int64_t flag_id)",
+          "override_id": "asc_sync_subblock_wait__pipe_i64",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。",
+                "evidence": [
+                  "| pipe | 输入 | 标识阻塞哪条流水上后续指令，直到对应`flag_id`的计数器非0。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](../intra_core_sync/intra_core_sync_overview.md#硬件流水类型)。<br>本接口对参数`pipe`是否生效与NPU架构有关，具体请参考[约束说明](#约束说明)。 |"
+                ]
+              },
+              {
+                "name": "flag_id",
+                "direction": "in",
+                "description": "核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。",
+                "evidence": [
+                  "| flag_id | 输入 | 核间同步的标记，用于标识同一组同步信号。取值范围为[0, 15]，每个`flag_id`各自拥有独立的4位计数器。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync.md",
+      "sha256": "58bfcfe930a7b9e533626e102ad850b446c6d2485ec855f4ef97e688aae31237",
+      "plan": {
+        "okftype": "reference.index",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index",
+        "title": "核间同步",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync.md",
+        "timestamp": "2026-09-29",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+      "sha256": "53d572fa12f46292ed6820eaeffe744483cf33a715bea1817bc97834976c9d63",
+      "plan": {
+        "okftype": "reference.concept",
+        "rule": "concept_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "dependencies",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.concept",
+        "title": "核间同步能力概述",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "dependencies": []
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "inter_core_sync_overview-description-83c4dd12",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "inter_core_sync_overview-tag.roles-ddbf9c76",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "inter_core_sync_overview-semantic_input-31366223",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+      "sha256": "a3852e2cbbccd88fe124ace17b07233e6ed764db02e404c5930cd1c98044c560",
+      "plan": {
+        "okftype": "reference.concept",
+        "rule": "concept_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "dependencies",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.concept",
+        "title": "关键特性说明<a id=\"inter_core_sync_key_features\"></a>",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "dependencies": []
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "key_features-description-f0eb99ae",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "key_features-tag.roles-c5448c1b",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "key_features-semantic_input-0fce2b48",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+      "sha256": "20e2b3ff4601ea3e130f00653b2482c816a6a7c096431c4981b445efec40da6a",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_lock",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_lock-signature-c2dae312",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+          "field": "signature",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "函数原型或头文件映射无法解析：cannot encode 'asc_lock(pipe_t,uint8_t,asc_mutex_execute_mode)': unregistered type 'asc_mutex_execute_mode'; inspect a safe registry extension with python3 tools/maintain_type_registry.py --prototype 'asc_lock(pipe_t,uint8_t,asc_mutex_execute_mode)'",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_lock-description-45873bf0",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_lock-tag.roles-4705fb12",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_lock-semantic_input-6b31af20",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+      "sha256": "a13b9cd4d6122fc4062b559f0750200add5fa98b021868a202a5811746e11dd0",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [
+          {
+            "path": "/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add",
+            "archs": [
+              "2201"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "c_api_add.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add",
+            "archs": [
+              "2201"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "c_api_add.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "data_copy_ub2l1.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "abs.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "arange.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "cast.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "compare.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "data_relayout.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "div.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "duplicate.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "gather.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "histogram.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "mergemode.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "mul.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "muls.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "reduce.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "reduce_block.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "reduce_pair.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "select.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "squeeze.asc"
+          },
+          {
+            "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate",
+            "archs": [
+              "3510"
+            ],
+            "override_id": "asc_sync__z",
+            "file": "truncate.asc"
+          }
+        ],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync-description-7fc6960d",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync-tag.roles-b2495dd4",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync-semantic_input-df98746e",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync()",
+          "parameters": "asc_sync()",
+          "override_id": "asc_sync__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [
+        {
+          "path": "/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "2201"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add/c_api_add.asc",
+              "line": 46,
+              "symbol": "asc_sync",
+              "snippet": "add_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                46,
+                46
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 1524,
+              "call_end_offset": 1534
+            },
+            {
+              "file": "/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add/c_api_add.asc",
+              "line": 49,
+              "symbol": "asc_sync",
+              "snippet": "add_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                49,
+                49
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 1595,
+              "call_end_offset": 1605
+            },
+            {
+              "file": "/examples/02_simd_c_api/00_introduction/01_add/c_api_async_add/c_api_add.asc",
+              "line": 52,
+              "symbol": "asc_sync",
+              "snippet": "add_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                52,
+                52
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 1677,
+              "call_end_offset": 1687
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "00_introduction/01_add",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "2201"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc",
+              "line": 38,
+              "symbol": "asc_sync",
+              "snippet": "add_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                38,
+                38
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 1313,
+              "call_end_offset": 1323
+            },
+            {
+              "file": "/examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc",
+              "line": 40,
+              "symbol": "asc_sync",
+              "snippet": "add_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                40,
+                40
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 1417,
+              "call_end_offset": 1427
+            },
+            {
+              "file": "/examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc",
+              "line": 43,
+              "symbol": "asc_sync",
+              "snippet": "add_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                43,
+                43
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 1484,
+              "call_end_offset": 1494
+            },
+            {
+              "file": "/examples/02_simd_c_api/00_introduction/01_add/c_api_sync_add/c_api_add.asc",
+              "line": 46,
+              "symbol": "asc_sync",
+              "snippet": "add_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                46,
+                46
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 1589,
+              "call_end_offset": 1599
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "00_introduction/01_add",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1/data_copy_ub2l1.asc",
+              "line": 124,
+              "symbol": "asc_sync",
+              "snippet": "__mix__",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                120,
+                124
+              ],
+              "condition": [
+                "SCENARIO_NUM == 3",
+                "ASC_IS_AIC"
+              ],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 5032,
+              "call_end_offset": 5042
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/00_data_movement",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs/abs.asc",
+              "line": 75,
+              "symbol": "asc_sync",
+              "snippet": "abs_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                75,
+                75
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2670,
+              "call_end_offset": 2680
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange/arange.asc",
+              "line": 66,
+              "symbol": "asc_sync",
+              "snippet": "arange_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                66,
+                66
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2295,
+              "call_end_offset": 2305
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast/cast.asc",
+              "line": 76,
+              "symbol": "asc_sync",
+              "snippet": "cast_custom_s1",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                76,
+                76
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2833,
+              "call_end_offset": 2843
+            },
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast/cast.asc",
+              "line": 122,
+              "symbol": "asc_sync",
+              "snippet": "cast_custom_s2",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                122,
+                122
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 4669,
+              "call_end_offset": 4679
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare/compare.asc",
+              "line": 105,
+              "symbol": "asc_sync",
+              "snippet": "compare_custom_s1",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                105,
+                105
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 3941,
+              "call_end_offset": 3951
+            },
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare/compare.asc",
+              "line": 142,
+              "symbol": "asc_sync",
+              "snippet": "compare_custom_s2",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                142,
+                142
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 5353,
+              "call_end_offset": 5363
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout/data_relayout.asc",
+              "line": 88,
+              "symbol": "asc_sync",
+              "snippet": "interleave_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                88,
+                88
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 3352,
+              "call_end_offset": 3362
+            },
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout/data_relayout.asc",
+              "line": 135,
+              "symbol": "asc_sync",
+              "snippet": "pack_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                135,
+                135
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 5110,
+              "call_end_offset": 5120
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div/div.asc",
+              "line": 81,
+              "symbol": "asc_sync",
+              "snippet": "div_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                81,
+                81
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2993,
+              "call_end_offset": 3003
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate/duplicate.asc",
+              "line": 67,
+              "symbol": "asc_sync",
+              "snippet": "duplicate_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                67,
+                67
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2325,
+              "call_end_offset": 2335
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather/gather.asc",
+              "line": 83,
+              "symbol": "asc_sync",
+              "snippet": "gather_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                83,
+                83
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 3110,
+              "call_end_offset": 3120
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram/histogram.asc",
+              "line": 84,
+              "symbol": "asc_sync",
+              "snippet": "histogram_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                84,
+                84
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2988,
+              "call_end_offset": 2998
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode/mergemode.asc",
+              "line": 80,
+              "symbol": "asc_sync",
+              "snippet": "mergemode_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                80,
+                80
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 3096,
+              "call_end_offset": 3106
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul/mul.asc",
+              "line": 83,
+              "symbol": "asc_sync",
+              "snippet": "mul_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                83,
+                83
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 3021,
+              "call_end_offset": 3031
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls/muls.asc",
+              "line": 76,
+              "symbol": "asc_sync",
+              "snippet": "muls_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                76,
+                76
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2788,
+              "call_end_offset": 2798
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce/reduce.asc",
+              "line": 80,
+              "symbol": "asc_sync",
+              "snippet": "reduce_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                80,
+                80
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2864,
+              "call_end_offset": 2874
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block/reduce_block.asc",
+              "line": 74,
+              "symbol": "asc_sync",
+              "snippet": "reduce_block_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                74,
+                74
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2702,
+              "call_end_offset": 2712
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair/reduce_pair.asc",
+              "line": 76,
+              "symbol": "asc_sync",
+              "snippet": "reduce_pair_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                76,
+                76
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2730,
+              "call_end_offset": 2740
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select/select.asc",
+              "line": 89,
+              "symbol": "asc_sync",
+              "snippet": "select_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                89,
+                89
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 3523,
+              "call_end_offset": 3533
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze/squeeze.asc",
+              "line": 78,
+              "symbol": "asc_sync",
+              "snippet": "squeeze_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                78,
+                78
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2834,
+              "call_end_offset": 2844
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        },
+        {
+          "path": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate",
+          "source_target": "source inference -> source reverse confirmation",
+          "archs": [
+            "3510"
+          ],
+          "calls": [
+            {
+              "file": "/examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate/truncate.asc",
+              "line": 75,
+              "symbol": "asc_sync",
+              "snippet": "truncate_custom",
+              "overload_status": "exact",
+              "snippet_kind": "function",
+              "snippet_start_line": null,
+              "snippet_end_line": null,
+              "canonical_id": "asc_sync()",
+              "candidates": [
+                "asc_sync()"
+              ],
+              "inferred_types": [],
+              "call_template": "asc_sync()",
+              "placeholder_bindings": [],
+              "placeholder_status": "none",
+              "semantic_snippet": "asc_sync",
+              "line_range": [
+                75,
+                75
+              ],
+              "condition": [],
+              "role": [
+                "direct_call"
+              ],
+              "is_statement": true,
+              "call_start_offset": 2651,
+              "call_end_offset": 2661
+            }
+          ],
+          "issues": [],
+          "discovery": "source_inference",
+          "confidence": "authoritative",
+          "candidate_paths": [],
+          "category": "03_c_api/02_reg_vector_compute",
+          "candidate_categories": []
+        }
+      ],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+      "sha256": "1f65dff63ca2e6cb56a8cd1ea0a425443ac05b63ef907307bdf6a050dd188d12",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_data_barrier",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_data_barrier__memdsb",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_data_barrier-description-cc4fa8f2",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_data_barrier-tag.roles-ec8f0e7d",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_data_barrier-semantic_input-9fa31b5d",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_data_barrier(mem_dsb_t)",
+          "parameters": "asc_sync_data_barrier(mem_dsb_t arg)",
+          "override_id": "asc_sync_data_barrier__memdsb",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "arg",
+                "direction": "in",
+                "description": "表示需要等待的内存位置，类型为mem_dsb_t，可取值为： &bull; DSB_ALL：等待所有内存访问指令。 &bull; DSB_DDR：等待GM访问指令。&bull; DSB_UB：等待UB访问指令。&bull; DSB_SEQ：预留参数，暂未启动，为后续的功能扩展做保留。",
+                "evidence": [
+                  "| arg | 输入 | 表示需要等待的内存位置，类型为mem_dsb_t，可取值为： <br>&bull; DSB_ALL：等待所有内存访问指令。 <br>&bull; DSB_DDR：等待GM访问指令。<br>&bull; DSB_UB：等待UB访问指令。<br>&bull; DSB_SEQ：预留参数，暂未启动，为后续的功能扩展做保留。|"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+      "sha256": "ffc156f32355f6925f2c9ba3505fc5fdf77771187a8ac78ce5f52f0c7c380a61",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_mte2",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_mte2__i",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_mte2-description-250d017c",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_mte2-tag.roles-73cd08f2",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_mte2-semantic_input-79cdd2fa",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_mte2(int)",
+          "parameters": "asc_sync_mte2(int id)",
+          "override_id": "asc_sync_mte2__i",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "id",
+                "direction": "in",
+                "description": "核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\\_t枚举定义](asc_sync_notify.md#event_t_enum)。",
+                "evidence": [
+                  "| id | 输入 | 核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\\_t枚举定义](asc_sync_notify.md#event_t_enum)。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+      "sha256": "1904a73ff124105a0ef03cde9158b2544fb4c24d0d7dbced8681d5765bbf36cf",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_mte3",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_mte3__i",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_mte3-description-f69d212b",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_mte3-tag.roles-79a23334",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_mte3-semantic_input-5750abc5",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_mte3(int)",
+          "parameters": "asc_sync_mte3(int id)",
+          "override_id": "asc_sync_mte3__i",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "id",
+                "direction": "in",
+                "description": "核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\\_t枚举定义](asc_sync_notify.md#event_t_enum)。",
+                "evidence": [
+                  "| id | 输入 | 核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\\_t枚举定义](asc_sync_notify.md#event_t_enum)。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+      "sha256": "7b10f804d79a314b44a02d798584338d4b3bf209fcd114faab601a749e38ee01",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_notify",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_notify__pipe_pipe_event",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_notify-description-a8305891",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_notify-tag.roles-a8a421dc",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_notify-semantic_input-282edf33",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_notify(pipe_t,pipe_t,event_t)",
+          "parameters": "asc_sync_notify(pipe_t pipe,pipe_t tpipe,event_t id)",
+          "override_id": "asc_sync_notify__pipe_pipe_event",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "源流水类型，即“等待哪条流水的前序指令完成”。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。",
+                "evidence": [
+                  "| pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。 |"
+                ]
+              },
+              {
+                "name": "tpipe",
+                "direction": "in",
+                "description": "目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。",
+                "evidence": [
+                  "| tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。 |"
+                ]
+              },
+              {
+                "name": "id",
+                "direction": "in",
+                "description": "同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。",
+                "evidence": [
+                  "| id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+      "sha256": "eb0ceee783b719c4fdfb0134afcef24e18ed5e4577d03c66268da77d6d691023",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_pipe",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_pipe__pipe",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_pipe-description-346ab526",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_pipe-tag.roles-3793737d",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_pipe-semantic_input-641b89d5",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_pipe(pipe_t)",
+          "parameters": "asc_sync_pipe(pipe_t pipe)",
+          "override_id": "asc_sync_pipe__pipe",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "阻塞的流水类别。支持的取值有`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`、`PIPE_ALL`，不支持`PIPE_S`。如果不关注流水类别，希望阻塞所有流水，可以传入`PIPE_ALL`。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。",
+                "evidence": [
+                  "| pipe | 输入 | 阻塞的流水类别。支持的取值有`PIPE_V`、`PIPE_M`、`PIPE_MTE1`、`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_FIX`、`PIPE_ALL`，不支持`PIPE_S`。如果不关注流水类别，希望阻塞所有流水，可以传入`PIPE_ALL`。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+      "sha256": "a33f29a3174aa0c99afc3ae8940b597a012107345236815ae00f91ac0d802e7b",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_vec",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_vec__i",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          },
+          {
+            "override_id": "asc_sync_vec__z",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_vec-description-439fa937",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_vec-tag.roles-dea1090b",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_vec-semantic_input-c04ada1f",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_vec(int)",
+          "parameters": "asc_sync_vec(int id)",
+          "override_id": "asc_sync_vec__i",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "id",
+                "direction": "in",
+                "description": "核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\\_t枚举定义](asc_sync_notify.md#event_t_enum)。",
+                "evidence": [
+                  "| id | 输入 | 核内多流水同步的同步ID，取值范围为[0, 7]，其含义与[asc_sync_notify](asc_sync_notify.md)中`id`参数的`event_t`枚举值相同，各枚举取值请参考[event\\_t枚举定义](asc_sync_notify.md#event_t_enum)。 |"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_vec()",
+          "parameters": "asc_sync_vec()",
+          "override_id": "asc_sync_vec__z",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {}
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+      "sha256": "6682372d3adf680dd1cc7d73f54de7474309f6b85f95f4def9cb7a9d9fe89adb",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_sync_wait",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [
+          {
+            "override_id": "asc_sync_wait__pipe_pipe_event",
+            "archs": [
+              "2201",
+              "3510"
+            ],
+            "header": [
+              "/include/c_api/sync/sync.h"
+            ]
+          }
+        ],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_sync_wait-description-8c932da3",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_wait-tag.roles-a646c68d",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_sync_wait-semantic_input-2ad0aa80",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [
+        {
+          "source_document": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "header": "include/c_api/sync/sync.h",
+          "function": "asc_sync_wait(pipe_t,pipe_t,event_t)",
+          "parameters": "asc_sync_wait(pipe_t pipe,pipe_t tpipe,event_t id)",
+          "override_id": "asc_sync_wait__pipe_pipe_event",
+          "archs": [
+            "2201",
+            "3510"
+          ],
+          "template_parameters": [],
+          "doxygen": {
+            "params": [
+              {
+                "name": "pipe",
+                "direction": "in",
+                "description": "源流水类型，即“等待哪条流水的前序指令完成”。参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。",
+                "evidence": [
+                  "| pipe | 输入 | 源流水类型，即“等待哪条流水的前序指令完成”。<br>参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。 |"
+                ]
+              },
+              {
+                "name": "tpipe",
+                "direction": "in",
+                "description": "目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。",
+                "evidence": [
+                  "| tpipe | 输入 | 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。 |"
+                ]
+              },
+              {
+                "name": "id",
+                "direction": "in",
+                "description": "同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。",
+                "evidence": [
+                  "| id | 输入 | 同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。 |"
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+      "sha256": "677db82cbf4554650e3dc11ca41592974b50a8ee15990d2197dd688470aa2044",
+      "plan": {
+        "okftype": "reference.api",
+        "rule": "callable_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "signature",
+          "archs",
+          "header",
+          "dependencies",
+          "examples",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter",
+          "doxygen",
+          "example_markers"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.api",
+        "title": "asc_unlock",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "signature": [],
+        "dependencies": [],
+        "examples": [],
+        "header": null
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "asc_unlock-signature-65a71588",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+          "field": "signature",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "函数原型或头文件映射无法解析：cannot encode 'asc_unlock(pipe_t,uint8_t,asc_mutex_execute_mode)': unregistered type 'asc_mutex_execute_mode'; inspect a safe registry extension with python3 tools/maintain_type_registry.py --prototype 'asc_unlock(pipe_t,uint8_t,asc_mutex_execute_mode)'",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_unlock-description-da2e168c",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_unlock-tag.roles-d4d7ac47",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "asc_unlock-semantic_input-fe69b35a",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync.md",
+      "sha256": "c8bd1bd3c200b8d696bf55734a6ddd91aa4dc1535c158673205e66cd3cfb54c8",
+      "plan": {
+        "okftype": "reference.index",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index",
+        "title": "核内同步",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync.md",
+        "timestamp": "2026-09-29",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+      "sha256": "18ec133392d0354a07019223ea5099d2f20e5440f9551b6981eda89e43f8c029",
+      "plan": {
+        "okftype": "reference.concept",
+        "rule": "concept_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "dependencies",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.concept",
+        "title": "核内同步能力概述",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "dependencies": []
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "intra_core_sync_overview-description-d0fb4262",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "intra_core_sync_overview-tag.roles-d372fe5a",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "intra_core_sync_overview-semantic_input-ff15680b",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/sync.md",
+      "sha256": "c395f81f7f5cfa053c53810115d355b5dd57908d05a7376cf9b84b80b27fdbaf",
+      "plan": {
+        "okftype": "reference.index",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index",
+        "title": "同步控制",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/sync.md",
+        "timestamp": "2026-09-29",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+      "sha256": "45fa87b55a004f60cff8d9b89536aac842eaa9156e73ffb22a9e8c7d5c090945",
+      "plan": {
+        "okftype": "reference.concept",
+        "rule": "concept_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "description",
+          "tag",
+          "dependencies",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.concept",
+        "title": "系统同步能力概述",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+        "description": "",
+        "tag": [
+          {
+            "api_surfaces": [
+              "c_api"
+            ]
+          },
+          {
+            "roles": []
+          },
+          {
+            "families": []
+          },
+          {
+            "operations": []
+          },
+          {
+            "objects": []
+          },
+          {
+            "execution_models": []
+          },
+          {
+            "source_locations": []
+          },
+          {
+            "destination_locations": []
+          },
+          {
+            "traits": []
+          }
+        ],
+        "timestamp": "2026-09-29",
+        "dependencies": []
+      },
+      "evidence": {
+        "description": [],
+        "api_surfaces:c_api": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+            "excerpt": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md"
+          }
+        ]
+      },
+      "issues": [
+        {
+          "issue_id": "system_sync_overview-description-0d7bb036",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+          "field": "description",
+          "issue_type": "document_defect",
+          "severity": "error",
+          "message": "缺少由 description agent 生成并验证的 API 描述。",
+          "evidence": []
+        },
+        {
+          "issue_id": "system_sync_overview-tag.roles-2212ff6b",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+          "field": "tag.roles",
+          "issue_type": "unresolved",
+          "severity": "warning",
+          "message": "当前 worker 没有找到该标签主题的充分正文证据。",
+          "evidence": []
+        },
+        {
+          "issue_id": "system_sync_overview-semantic_input-fd9e8d05",
+          "document_path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+          "field": "semantic_input",
+          "issue_type": "tool_defect",
+          "severity": "error",
+          "message": "缺少经过哈希校验的 description、tag、dependencies 语义工件；禁止进入写入阶段。",
+          "evidence": []
+        }
+      ],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    }
+  ]
+}

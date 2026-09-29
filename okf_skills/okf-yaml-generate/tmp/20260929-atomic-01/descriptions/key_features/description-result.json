@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-atomic-01-key_features",
+  "document_path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+  "document_sha256": "c7fb53c42c7af3865a3f1e9fb28ec8d5a7e3caa5f8818a199a4df2f7b8f0a559",
+  "status": "ready",
+  "description": "分析浮点原子累加的数据搬运乱序及初始化覆盖所致的非确定性，并说明通过核内或核间同步控制执行顺序。",
+  "evidence": [
+    {
+      "excerpt": "核心思想是在指令之间插入适当的同步，使每次程序运行时相关指令都按照预期确定的顺序执行，最终保证每次执行程序输出的结果都相同。"
+    },
+    {
+      "excerpt": "带随路原子操作的搬运指令乱序，由于浮点数加法不满足结合律"
+    }
+  ],
+  "confidence": 0.91
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-defs-01-asc_ndim_pad_count_config",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+  "document_sha256": "283396b36cfa3d354a32a0c9887cd01523357686739e48060a44552e0d86c7ce",
+  "status": "ready",
+  "description": "为 asc_ndim_copy_gm2ub 搬运配置各维度左侧和右侧的 padding 元素数量。",
+  "evidence": [
+    {
+      "excerpt": "asc_ndim_pad_count_config用于"
+    },
+    {
+      "excerpt": "loop1_lp_count | 表示1维左侧需要补齐的元素个数。"
+    },
+    {
+      "excerpt": "loop4_rp_count | 表示4维右侧需要补齐的元素个数。"
+    }
+  ],
+  "confidence": 0.92
+}

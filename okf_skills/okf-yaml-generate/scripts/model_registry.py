@@ -129,6 +129,9 @@ FUNCTION_SECTION_RE = re.compile(
     r"^\s{0,3}#{2,6}\s+函数(?:原型|声明)(?:\s|[<（(]|$)", re.MULTILINE
 )
 MARKDOWN_LINK_RE = re.compile(r"\[[^\]]+\]\([^)]+\.md(?:#[^)]*)?\)")
+NAVIGATION_ENTRY_RE = re.compile(
+    r"(?m)^\s*(?:[-*+]\s+|\d+[.)]\s+|\|).*\[[^\]]+\]\([^)]+\.md(?:#[^)]*)?\)"
+)
 DEFINITION_SECTION_RE = re.compile(
     r"^\s{0,3}#{2,6}\s+(?:宏定义|枚举类具体定义|结构体定义|联合体定义|类型定义|常量定义)",
     re.MULTILINE,
@@ -137,6 +140,22 @@ CONCEPT_HEADING_RE = re.compile(
     r"^\s{0,3}#{1,6}[^\n]*(?:概述|概念|特性|约束|说明|机制|简介|overview|feature|constraint|description)",
     re.IGNORECASE | re.MULTILINE,
 )
+def _prose_lines(body: str) -> list[str]:
+    in_code = False
+    lines = []
+    for line in body.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("```"):
+            in_code = not in_code
+            continue
+        if in_code or not stripped or stripped.startswith(("#", "|", "- ", "* ", "+ ", ">", "<!--", "![")):
+            continue
+        if re.match(r"\d+[.)]\s+", stripped):
+            continue
+        prose = MARKDOWN_LINK_RE.sub("", stripped).strip(" `*_[]():.。；;，,")
+        if len(prose) >= 8:
+            lines.append(prose)
+    return lines
 
 
 def classify_document(path: str, body: str, model: dict[str, Any] | None = None) -> Classification | None:
@@ -156,20 +175,32 @@ def classify_document(path: str, body: str, model: dict[str, Any] | None = None)
     )
 
 
-def _classify_kind(path: str, body: str) -> tuple[str, str]:
+def _classify_kind(path: str, body: str) -> tuple[str | None, str]:
     relative = Path(path)
-    parts = set(relative.parts)
-    # defs is a parser-selection hint for the shared definition extractor, not
-    # a per-directory okftype mapping. Individual entity kinds stay in source evidence.
-    if "defs" in parts and relative.stem != relative.parent.name:
-        return "type", "definition_structure"
+    parts = relative.parts
+    if (
+        len(parts) >= 4
+        and parts[-4:-2] == ("c_api", "defs")
+        and parts[-2] in {"constant", "enum", "macro", "type", "union"}
+        and relative.stem != parts[-2]
+    ):
+        if parts[-2] == "type" and not re.search(r"(?m)^\|\s*b(?:8|16|32|64)\s*\|", body):
+            return "concept", "prose_structure"
+        return parts[-2], "definition_structure"
     if FUNCTION_SECTION_RE.search(body) or DEFINITION_SECTION_RE.search(body) and re.search(r"#define|\benum\b|\b(struct|union|typedef|using)\b", body):
         return "api", "callable_structure"
-    if CONCEPT_HEADING_RE.search(body):
+    has_sections = len(re.findall(r"(?m)^##\s+", body)) >= 2
+    prose = _prose_lines(body)
+    has_prose = bool(prose)
+    if any(len(line) >= 50 for line in prose) or (CONCEPT_HEADING_RE.search(body) and has_prose):
         return "concept", "concept_structure"
-    if MARKDOWN_LINK_RE.search(body):
+    if has_sections and has_prose:
+        return "concept", "concept_structure"
+    if NAVIGATION_ENTRY_RE.search(body):
         return "index", "navigation_structure"
-    return "concept", "prose_structure"
+    if has_prose and not MARKDOWN_LINK_RE.search(body):
+        return "concept", "prose_structure"
+    return None, "insufficient_structure"
 
 
 def _default_tags(path: str, model: dict[str, Any]) -> dict[str, list[str]]:

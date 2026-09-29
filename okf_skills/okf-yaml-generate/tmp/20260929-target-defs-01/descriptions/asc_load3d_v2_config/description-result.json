@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-defs-01-asc_load3d_v2_config",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+  "document_sha256": "6997fc5a7f5ef0e230c1949eea1e7d4f8c548b9223fe0f7abd1ba3ab3318e844",
+  "status": "ready",
+  "description": "配置 Load3Dv2 repeat 参数，控制 height 或 width 方向的迭代步长、迭代次数和迭代方向。",
+  "evidence": [
+    {
+      "excerpt": "asc_load3d_v2_config用于设置Load3Dv2接口的repeat参数。"
+    },
+    {
+      "excerpt": "rpt_stride | height/width方向上的前一个迭代与后一个迭代起始地址的距离"
+    },
+    {
+      "excerpt": "rpt_mode | 控制repeat迭代的方向"
+    }
+  ],
+  "confidence": 0.92
+}

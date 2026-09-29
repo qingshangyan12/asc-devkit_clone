@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_task",
+  "run_id": "key_features",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+  "document_sha256": "a3852e2cbbccd88fe124ace17b07233e6ed764db02e404c5930cd1c98044c560",
+  "instructions": [
+    "阅读指定 Markdown 的正文，并独立撰写中文 description。",
+    "只把目标 Markdown 正文中的逐字摘录作为 evidence。",
+    "没有可靠结论时输出 unresolved，不猜测。"
+  ],
+  "result_path": "description-result.json"
+}

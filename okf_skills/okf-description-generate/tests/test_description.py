@@ -33,7 +33,7 @@ class DescriptionSkillTest(unittest.TestCase):
             "resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md\n"
             "description: \"\"\n"
             "tag: []\n"
-            "timestamp: '2026-09-20'\n"
+            "version: 'unknown'\n"
             "---\n"
             "# asc_add\n\n"
             "## 功能说明\n\n"
@@ -116,6 +116,30 @@ class DescriptionSkillTest(unittest.TestCase):
             validation = json.loads((run / "validation.json").read_text(encoding="utf-8"))
             self.assertFalse(validation["valid"])
             self.assertIn("未逐字出现在目标 Markdown 正文", validation["errors"][0])
+
+    def test_prepare_and_validate_without_front_matter(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "devkit"
+            document = root / DOCUMENT
+            document.parent.mkdir(parents=True)
+            document.write_text("# asc_add\n\n对两个输入向量执行逐元素加法计算。\n", encoding="utf-8")
+            run = Path(directory) / "run"
+            manifest = self.prepare(root, run)
+            result_path = run / "description-result.json"
+            result_path.write_text(json.dumps({
+                "schema_version": 1,
+                "purpose": "okf_api_description_result",
+                "run_id": manifest["run_id"],
+                "document_path": DOCUMENT,
+                "document_sha256": manifest["document_sha256"],
+                "status": "ready",
+                "description": "对两个输入向量逐元素相加。",
+                "evidence": [{"excerpt": "对两个输入向量执行逐元素加法计算。"}],
+                "confidence": 0.9,
+            }, ensure_ascii=False), encoding="utf-8")
+            self.run_cli("validate", "--run-dir", str(run), "--result", str(result_path))
+            self.assertTrue(json.loads((run / "validation.json").read_text())["valid"])
+            self.run_cli("write", "--run-dir", str(run), "--result", str(result_path), expect=2)
 
 
 if __name__ == "__main__":

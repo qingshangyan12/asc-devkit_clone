@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_validation",
+  "validated_at": "2026-09-29T07:03:02+00:00",
+  "result": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260929-sync-01/descriptions/key_features/description-result.json",
+  "valid": true,
+  "errors": []
+}

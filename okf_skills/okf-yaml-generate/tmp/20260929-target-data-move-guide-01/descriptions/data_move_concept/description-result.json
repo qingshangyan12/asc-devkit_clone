@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-data-move-guide-01-data_move_concept",
+  "document_path": "docs/zh/api/SIMD-API/c_api/data_move_guide/overview/data_move_concept.md",
+  "document_sha256": "0f48f1c6e0317b869a6ef92d8216dc4082281f12619c1b908be9183115da8a8f",
+  "status": "ready",
+  "description": "归纳C API数据搬运的连续、切分、多维、非对齐及随路转换等形态，说明选型时需要核对的通路和参数单位。",
+  "evidence": [
+    {
+      "excerpt": "数据搬运接口覆盖从连续复制到多维寻址、格式转换和量化激活等能力。选择接口时，先确定源、目的存储单元和执行核，再判断数据是否连续、是否对齐以及是否需要随路处理。不同接口中的同名参数可能采用不同单位，调用前应核对对应接口文档。"
+    }
+  ],
+  "confidence": 0.92
+}

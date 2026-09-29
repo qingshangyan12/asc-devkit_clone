@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_task",
+  "run_id": "intra_core_sync_overview",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+  "document_sha256": "18ec133392d0354a07019223ea5099d2f20e5440f9551b6981eda89e43f8c029",
+  "instructions": [
+    "阅读指定 Markdown 的正文，并独立撰写中文 description。",
+    "只把目标 Markdown 正文中的逐字摘录作为 evidence。",
+    "没有可靠结论时输出 unresolved，不猜测。"
+  ],
+  "result_path": "description-result.json"
+}

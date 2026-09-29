@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_task",
+  "run_id": "20260928-defs-regen-01-asc_l13d_repeat_direction",
+  "devkit_root": "/home/hugh/code/asc-devkit_okf_knowledge-fork",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+  "document_sha256": "b3992e10668a06a754ab4b789a6dd11c7955bac7fe8c1db86de6cd860b1754f2",
+  "instructions": [
+    "阅读指定 Markdown 的正文，并独立撰写中文 description。",
+    "只把目标 Markdown 正文中的逐字摘录作为 evidence。",
+    "没有可靠结论时输出 unresolved，不猜测。"
+  ],
+  "result_path": "description-result.json"
+}

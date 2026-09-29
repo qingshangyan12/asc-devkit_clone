@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260928-defs-regen-01-asc_override_strategy",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+  "document_sha256": "005a1742b4c5fb220f91f7b85e85f3b4b0a0bd030c735e0418a7e34fa3ce220d",
+  "status": "ready",
+  "description": "该枚举表示饱和控制策略，用于设置或查询单指令/API路径与全局CAST饱和配置的生效方式。",
+  "evidence": [
+    {"excerpt": "asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。该策略影响CAST类全局饱和配置是否生效。"}
+  ],
+  "confidence": 0.98
+}

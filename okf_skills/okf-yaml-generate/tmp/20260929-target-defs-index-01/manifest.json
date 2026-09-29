@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "run_id": "20260929-target-defs-index-01",
+  "devkit_root": "/home/hugh/code/asc-devkit",
+  "documents": [
+    "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+    "docs/zh/api/SIMD-API/c_api/defs/defs.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+    "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+    "docs/zh/api/SIMD-API/c_api/defs/type/type.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/union.md"
+  ],
+  "batches": [
+    {
+      "id": "batch-01",
+      "documents": [
+        "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+        "docs/zh/api/SIMD-API/c_api/defs/defs.md",
+        "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+        "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+        "docs/zh/api/SIMD-API/c_api/defs/type/type.md",
+        "docs/zh/api/SIMD-API/c_api/defs/union/union.md"
+      ],
+      "task": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260929-target-defs-index-01/batches/batch-01/task.json"
+    }
+  ],
+  "taxonomy": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-tag-generate/taxonomy/tag-taxonomy.json",
+  "write_contracts": [
+    "front_matter"
+  ]
+}

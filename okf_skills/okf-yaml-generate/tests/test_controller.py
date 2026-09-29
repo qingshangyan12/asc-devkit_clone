@@ -31,12 +31,49 @@ class ControllerSmokeTest(unittest.TestCase):
             "okftype": "reference.api",
             "title": "foo",
             "resource": f"asc-devkit/{path}",
-            "timestamp": "2026-09-29",
+            "version": "9.0.0-",
         }
         module.validate_base_fields(fields, path)
         fields["okftype"] = "reference.api.cpp"
         with self.assertRaisesRegex(module.ValidationError, "okftype must be one of"):
             module.validate_base_fields(fields, path)
+
+    def test_definition_profiles_follow_entity_directories(self):
+        module = self._controller_module()
+        profiles = module.load_model()["profiles"]
+        for category in ("constant", "enum", "macro", "type", "union"):
+            with self.subTest(category=category):
+                path = f"docs/zh/api/SIMD-API/c_api/defs/{category}/example.md"
+                content = "# Example\n"
+                if category == "type":
+                    content += "\n| 位宽类别 | 类型 |\n| --- | --- |\n| b8 | vector_int8_t |\n"
+                classification = module.classify_document(path, content)
+                self.assertEqual(classification.okftype, f"reference.{category}")
+                expected_fields = set(profiles["reference.type"]["fields"])
+                if category == "macro":
+                    expected_fields.add("signature")
+                self.assertEqual(set(profiles[classification.okftype]["fields"]), expected_fields)
+                index = f"docs/zh/api/SIMD-API/c_api/defs/{category}/{category}.md"
+                self.assertEqual(module.classify_document(index, "# Index\n\n- [Example](example.md)\n").okftype, "reference.index")
+
+    def test_substantive_linked_guide_is_concept(self):
+        module = self._controller_module()
+        guide = "docs/zh/api/SIMD-API/c_api/data_move_guide/guide.md"
+        body = ("# 搬运指南\n\n" + "本节按源和目的存储单元说明数据搬运接口及其参数、对齐要求和流水同步约束。" * 2
+                + "\n\n## 地址要求\n\n说明对齐约束。\n\n## 流水同步\n\n"
+                + "[搬运接口](../vector_datamove/asc_copy.md)\n")
+        self.assertEqual(module.classify_document(guide, body).okftype, "reference.concept")
+        overview = "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md"
+        self.assertEqual(module.classify_document(overview, "# 寄存器类型\n\n用于介绍类型。\n").okftype,
+                         "reference.concept")
+        linked_prose = ("# HF32\n\n"
+                        + "本页详细说明矩阵计算中的精度转换与舍入行为，以及相关接口对计算结果的影响。" * 2
+                        + "\n\n参见[舍入模式](asc_set_hf32_round_mode.md)。\n")
+        self.assertEqual(module.classify_document(guide, linked_prose).okftype, "reference.concept")
+        self.assertIsNone(module.classify_document(guide, "# 待分类\n\n参见[接口](foo.md)。\n"))
+        self.assertIsNone(module.classify_document(
+            guide, "# 待分类\n\n[一个很长但没有正文说明的接口链接](../../vector_datamove/some_long_api_document.md)\n",
+        ))
 
     def test_source_analysis_uses_legacy_header_closure_and_macro_rules(self):
         module = self._controller_module()
@@ -565,6 +602,7 @@ constexpr uint8_t ASC_SIZE = 16;
             self.assertNotIn("api_kind", catalog)
             self.assertEqual(catalog["type_catalog"]["groups"][0]["types"], ["vector_int32_t", "vector_float"])
             self.assertEqual(macro["signature"], [{"macro_id": "ASC_WRAP__value"}])
+            self.assertEqual(macro["header"], ["/include/c_api/defs/macro.h"])
             self.assertEqual(len(macro["doxygen"]), 1)
             self.assertNotIn("api_kind", object_macro)
             self.assertEqual(object_macro["declaration"]["macros"][0]["macro_kind"], "object")
@@ -573,9 +611,22 @@ constexpr uint8_t ASC_SIZE = 16;
                 "docs/zh/api/SIMD-API/c_api/defs/macro/asc_wrap.md",
                 ("api_surfaces",),
             )
+            self.assertEqual(worker["fields"]["signature"], [{"macro_id": "ASC_WRAP__value"}])
+            self.assertEqual(worker["fields"]["header"], ["/include/c_api/defs/macro.h"])
+            module.validate_definition_fields(worker["fields"], "asc_wrap.md", set())
+            fields = {
+                key: value for key, value in worker["fields"].items()
+                if key in {"okftype", "title", "resource", "signature", "header", "version"}
+            }
+            rendered = module.render_yaml(
+                fields, (), {}, root, "docs/zh/api/SIMD-API/c_api/defs/macro/asc_wrap.md",
+                macro_doc.read_text(encoding="utf-8"), {}, set(),
+            )
+            self.assertIn("macro_id: ASC_WRAP__value", rendered)
+            self.assertIn("header: [/include/c_api/defs/macro.h]", rendered)
             self.assertFalse(any(item["field"] == "signature" for item in worker["issues"]))
 
-    def test_definition_directory_skips_index_pages(self):
+    def test_definition_directory_classifies_index_pages(self):
         module = self._controller_module()
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -587,13 +638,59 @@ constexpr uint8_t ASC_SIZE = 16;
                 encoding="utf-8",
             )
             selected = module.api_documents(root, "docs/zh/api/SIMD-API/c_api/defs", None)
-            self.assertEqual(selected, ["docs/zh/api/SIMD-API/c_api/defs/enum/asc_mode.md"])
+            self.assertEqual(selected, [
+                "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mode.md",
+                "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+            ])
+            run = root / "run"
+            subprocess.run(
+                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(root),
+                 "--source-dir", "docs/zh/api/SIMD-API/c_api/defs", "--run-dir", str(run)],
+                check=True, capture_output=True, text=True,
+            )
+            manifest = json.loads((run / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(manifest["documents"], selected)
+            report = json.loads((run / "classification-report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["unclassified"], [])
+            self.assertEqual(report["documents"][1]["okftype"], "reference.index")
+            index = module.build_worker_document(
+                root,
+                "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+                ("api_surfaces",),
+            )
+            self.assertEqual(index["fields"]["okftype"], "reference.index")
             worker = module.build_worker_document(
                 root,
                 "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mode.md",
                 ("api_surfaces",),
             )
-            self.assertEqual(worker["fields"]["okftype"], "reference.type")
+            self.assertEqual(worker["fields"]["okftype"], "reference.enum")
+
+    def test_prepare_reports_unclassified_pages_without_creating_tasks(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            directory = root / "docs/zh/api/SIMD-API/c_api/sample"
+            directory.mkdir(parents=True)
+            (directory / "index.md").write_text("# 索引\n\n- [接口](api.md)\n", encoding="utf-8")
+            (directory / "broken.md").write_text("---\nokftype: [\n---\n# 损坏\n", encoding="utf-8")
+            (directory / "unknown.md").write_text("# 待完善\n", encoding="utf-8")
+            run = root / "run"
+            result = subprocess.run(
+                ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(root),
+                 "--source-dir", "docs/zh/api/SIMD-API/c_api/sample", "--run-dir", str(run)],
+                capture_output=True, text=True,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("unknown.md", result.stderr)
+            report = json.loads((run / "classification-report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["unclassified"], [
+                "docs/zh/api/SIMD-API/c_api/sample/broken.md",
+                "docs/zh/api/SIMD-API/c_api/sample/unknown.md",
+            ])
+            self.assertIn("文档无法解析", report["documents"][0]["reason"])
+            self.assertEqual(report["documents"][1]["okftype"], "reference.index")
+            self.assertFalse((run / "manifest.json").exists())
 
     def test_non_callable_page_uses_index_role(self):
         module = self._controller_module()
@@ -609,6 +706,28 @@ constexpr uint8_t ASC_SIZE = 16;
             )
             self.assertEqual(worker["fields"]["okftype"], "reference.index")
 
+    def test_index_page_does_not_need_semantic_annotation(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = "docs/zh/api/SIMD-API/c_api/foo/foo.md"
+            document = root / path
+            document.parent.mkdir(parents=True)
+            document.write_text("# 分类页\n\n- [接口](asc_foo.md)\n", encoding="utf-8")
+            task = {"run_id": "index-test", "batch_id": "batch-01", "documents": [path]}
+            semantic_input = root / "semantic-input.json"
+            semantic_input.write_text(json.dumps({
+                "schema_version": 1,
+                "purpose": "okf_yaml_semantic_result",
+                "run_id": "index-test",
+                "batch_id": "batch-01",
+                "annotations": [],
+            }), encoding="utf-8")
+            namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
+            self.assertEqual(module.load_semantic_annotations(
+                semantic_input, task, root, namespaces, values,
+            ), {})
+
     def test_definition_yaml_omits_legacy_api_kind_without_signature(self):
         module = self._controller_module()
         with tempfile.TemporaryDirectory() as temp:
@@ -619,7 +738,7 @@ constexpr uint8_t ASC_SIZE = 16;
             document.write_text("# asc_mode\n", encoding="utf-8")
             namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
             fields = {
-                "okftype": "reference.type",
+                "okftype": "reference.enum",
                 "title": "asc_mode",
                 "resource": f"asc-devkit/{path}",
                 "description": "枚举模式。",
@@ -635,7 +754,7 @@ constexpr uint8_t ASC_SIZE = 16;
                     "members": [{"name": "DEFAULT"}],
                 },
                 "type_catalog": None,
-                "timestamp": "2026-09-20",
+                "version": "9.0.0-",
             }
             allowed_empty = {f"tag.{namespace}" for namespace in namespaces}
             rendered = module.render_yaml(fields, namespaces, values, root, path, "# asc_mode\n", {}, allowed_empty)
@@ -650,7 +769,7 @@ constexpr uint8_t ASC_SIZE = 16;
     def test_definition_validator_accepts_compact_enum_and_preserves_enum_alias_shape(self):
         module = self._controller_module()
         enum_fields = {
-            "okftype": "reference.type",
+            "okftype": "reference.enum",
             "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_mode.md",
             "declaration": {"symbol": "asc_mode"},
         }
@@ -658,7 +777,7 @@ constexpr uint8_t ASC_SIZE = 16;
         self.assertEqual(module._definition_kind_from_fields(enum_fields), "enum")
 
         alias_fields = {
-            "okftype": "reference.type",
+            "okftype": "reference.enum",
             "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
             "declaration": {"symbol": "asc_quant_mode", "target": "QuantMode_t"},
         }
@@ -695,7 +814,7 @@ constexpr uint8_t ASC_SIZE = 16;
                 "headers": None,
                 "declaration": None,
                 "type_catalog": None,
-                "timestamp": "2026-09-24",
+                "version": "9.0.0-",
             }
             body = "# asc_add\n\n按元素相加的内存矢量加法运算。\n"
             evidence = {
@@ -733,8 +852,8 @@ constexpr uint8_t ASC_SIZE = 16;
                 "signature: []\n"
                 "dependencies: []\n"
                 "examples: []\n"
-                "timestamp: '2026-09-18'\n"
-                "---\n\n# foo\n\n正文。\n",
+                "version: '9.0.0-'\n"
+                "---\n\n# foo\n\n## 概述\n\n这段正文说明页面的主要内容。\n",
                 encoding="utf-8",
             )
             run = Path(temp) / "run"
@@ -778,6 +897,97 @@ constexpr uint8_t ASC_SIZE = 16;
                     [{"path": "docs/zh/api/SIMD-API/c_api/foo/bar.md", "kind": "requires"}],
                 )
 
+    def test_replaced_by_requires_named_target_in_current_document(self):
+        module = self._controller_module()
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            current_path = "docs/zh/api/SIMD-API/c_api/foo/old.md"
+            target_path = "docs/zh/api/SIMD-API/c_api/foo/new.md"
+            current = root / current_path
+            target = root / target_path
+            current.parent.mkdir(parents=True)
+            excerpt = "old接口已废弃，请使用[new](new.md)替代。"
+            current.write_text(f"---\ntitle: old\n---\n# old（废弃）\n\n{excerpt}\n", encoding="utf-8")
+            target.write_text("# new\n", encoding="utf-8")
+            item = {"path": target_path, "kind": "replaced_by",
+                    "evidence": {"source_path": current_path, "excerpt": excerpt}}
+            self.assertEqual(module.normalize_dependencies(root, current_path, [item]),
+                             [{"path": target_path, "kind": "replaced_by"}])
+            from importlib.util import module_from_spec, spec_from_file_location
+            stage_path = ROOT / "scripts" / "dependency_stage.py"
+            spec = spec_from_file_location("okf_dependency_stage_test", stage_path)
+            stage = module_from_spec(spec)
+            assert spec.loader is not None
+            spec.loader.exec_module(stage)
+            self.assertEqual(stage.validate_dependencies([item], "dependencies", root, current_path)[0]["kind"],
+                             "replaced_by")
+            for validator in (
+                lambda value: module.normalize_dependencies(root, current_path, [value]),
+                lambda value: stage.validate_dependencies([value], "dependencies", root, current_path),
+            ):
+                with self.assertRaisesRegex(ValueError, "replacement|replaced_by"):
+                    validator({**item, "evidence": {"source_path": current_path,
+                                                   "excerpt": "old接口已废弃"}})
+                target.write_text(f"# new\n\n{excerpt}\n", encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, "replacement|replaced_by"):
+                    validator({**item, "evidence": {"source_path": target_path, "excerpt": excerpt}})
+            current.write_text(f"# ASC_DEPRECATED\n\n{excerpt}\n", encoding="utf-8")
+            for validator in (
+                lambda: module.normalize_dependencies(root, current_path, [item]),
+                lambda: stage.validate_dependencies([item], "dependencies", root, current_path),
+            ):
+                with self.assertRaisesRegex(ValueError, "replacement|replaced_by"):
+                    validator()
+
+    def test_deprecated_tag_requires_current_document_subject(self):
+        module = self._controller_module()
+        excerpt = "以下代码使用本宏标记[asc_muls](asc_muls_deprecated.md)接口声明，并推荐使用新接口替代。"
+        body = f"# ASC_DEPRECATED\n\n{excerpt}\n"
+        fields = {"tag": [{"traits": ["deprecated"]}]}
+        evidence = {"traits:deprecated": [{"source_path": "macro.md", "excerpt": excerpt}]}
+        with self.assertRaisesRegex(module.ValidationError, "documented subject"):
+            module.validate_tags(fields, ("traits",), {"traits": {"deprecated"}}, "macro.md",
+                                 body, evidence, {"tag.roles"}, set())
+        old_excerpt = "asc_muls接口已废弃，请使用asc_mul_scalar替代。"
+        old_body = f"# asc_muls（废弃）\n\n{old_excerpt}\n"
+        evidence["traits:deprecated"][0]["excerpt"] = old_excerpt
+        self.assertEqual(module.validate_tags(fields, ("traits",), {"traits": {"deprecated"}},
+                                              "asc_muls.md", old_body, evidence,
+                                              {"tag.roles"}, set()), fields["tag"])
+
+    def test_independent_tag_writer_rejects_deprecation_of_other_api(self):
+        from importlib.util import module_from_spec, spec_from_file_location
+        import sys
+
+        scripts = ROOT.parent / "okf-tag-generate" / "scripts"
+        sys.path.insert(0, str(scripts))
+        try:
+            spec = spec_from_file_location("okf_tag_writer_test", scripts / "write_tags.py")
+            writer = module_from_spec(spec)
+            assert spec.loader is not None
+            spec.loader.exec_module(writer)
+        finally:
+            sys.path.remove(str(scripts))
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            path = "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md"
+            document = root / path
+            document.parent.mkdir(parents=True)
+            excerpt = "该宏只添加废弃属性，接口开始废弃的版本和替代接口会出现在告警中。"
+            document.write_text("---\ntag:\n  - traits: [deprecated]\n---\n"
+                                f"# ASC_DEPRECATED\n\n{excerpt}\n", encoding="utf-8")
+            annotation = {"path": path, "tag": {"traits": ["deprecated"]},
+                          "evidence": {"traits:deprecated": excerpt}}
+            taxonomy = {"mandatory_namespaces": ["traits"]}
+            rules = {"required_namespaces": {"always": []}}
+            with self.assertRaisesRegex(writer.ValidationError, "documented subject"):
+                writer.validate_annotation(annotation, 0, root, ("traits",),
+                                           {"traits": {"deprecated"}}, taxonomy, rules)
+            annotation["evidence"]["traits:deprecated"] = "traits: [deprecated]"
+            with self.assertRaisesRegex(writer.ValidationError, "verbatim excerpt"):
+                writer.validate_annotation(annotation, 0, root, ("traits",),
+                                           {"traits": {"deprecated"}}, taxonomy, rules)
+
     def test_worker_does_not_extract_missing_description(self):
         with tempfile.TemporaryDirectory() as temp:
             devkit = Path(temp) / "devkit"
@@ -816,7 +1026,7 @@ constexpr uint8_t ASC_SIZE = 16;
                 "  - prototype_id: asc_fixed__u32\n"
                 "  - override_id: asc_template__v<dtype>\n"
                 "---\n"
-                "# foo\n",
+                "# foo\n\n## 概述\n\n本文没有提供可确认的接口原型。\n",
                 encoding="utf-8",
             )
             run = Path(temp) / "run"
@@ -904,7 +1114,7 @@ example: true
                 "header": None,
                 "declaration": None,
                 "type_catalog": None,
-                "timestamp": "2026-09-20",
+                "version": "9.0.0-",
             }
             allowed_empty = {f"tag.{namespace}" for namespace in namespaces}
             rendered = module.updated_document(
@@ -971,7 +1181,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             root = Path(temp) / "devkit"
             document = root / "docs/zh/api/SIMD-API/c_api/foo/foo.md"
             document.parent.mkdir(parents=True)
-            document.write_text("# foo\n", encoding="utf-8")
+            document.write_text("# foo\n\n## 概述\n\n这里说明页面所包含的主要内容。\n", encoding="utf-8")
             run = Path(temp) / "run"
             subprocess.run(
                 ["python3", str(CONTROLLER), "prepare", "--devkit-root", str(root),
@@ -980,6 +1190,9 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             )
             manifest = json.loads((run / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(manifest["write_contracts"], list(module.DEFAULT_WRITE_CONTRACTS))
+            report = json.loads((run / "classification-report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["unclassified"], [])
+            self.assertEqual(report["documents"][0]["okftype"], "reference.concept")
 
     def test_profile_order_is_explicit_and_applicability_is_not_generated(self):
         module = self._controller_module()
@@ -995,7 +1208,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             plan.fields,
             (
                 "okftype", "title", "resource", "description", "tag", "signature", "archs", "header",
-                "dependencies", "examples", "timestamp",
+                "dependencies", "examples", "version",
             ),
         )
         self.assertNotIn("applicability", plan.fields)
@@ -1012,17 +1225,17 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             "resource": f"asc-devkit/{document_path}",
             "description": "这是一个用于测试字段顺序的接口描述。",
             "tag": [
-                {namespace: [next(iter(values[namespace]))]}
+                {namespace: [next(value for value in values[namespace] if value != "deprecated")]}
                 for namespace in namespaces
             ],
             "signature": [],
             "dependencies": [],
             "examples": [],
-            "timestamp": "2026-09-23",
+            "version": "9.0.0-",
         }
         body = "# foo\n\n正文证据。\n"
         evidence = {
-            f"{namespace}:{next(iter(values[namespace]))}": [{
+            f"{namespace}:{next(value for value in values[namespace] if value != 'deprecated')}": [{
                 "source_path": document_path,
                 "excerpt": document_path if namespace == "api_surfaces" else "正文证据。",
             }]
@@ -1032,7 +1245,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         keys = [line.split(":", 1)[0] for line in rendered.splitlines() if line and not line[0].isspace()]
         self.assertEqual(
             keys,
-            ["okftype", "title", "resource", "description", "tag", "signature", "dependencies", "examples", "timestamp"],
+            ["okftype", "title", "resource", "description", "tag", "signature", "dependencies", "examples", "version"],
         )
         self.assertNotIn("applicability", rendered)
 
@@ -1043,7 +1256,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             "navigation": [
                 {"path": "docs/zh/api/SIMD-API/c_api/foo/bar.md"}
             ],
-            "timestamp": "2026-09-23",
+            "version": "9.0.0-",
         }
         index_rendered = module.render_yaml(
             index_fields, namespaces, values, Path("/tmp"), document_path,
@@ -1087,7 +1300,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                 "title": "foo",
                 "resource": f"asc-devkit/{document_path}",
                 "description": "说明。",
-                "timestamp": "2026-09-20",
+                "version": "9.0.0-",
             }
             module.validate_base_fields(fields, document_path)
             self.assertEqual(
@@ -1171,7 +1384,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                             "evidence": {"source_path": document_path, "excerpt": "关联文档。"},
                         }],
                         "examples": [],
-                        "timestamp": "2026-09-18",
+                        "version": "9.0.0-",
                     },
                     "evidence": {
                         "api_surfaces:c_api": [{"source_path": document_path, "excerpt": "关联文档。"}],
@@ -1304,7 +1517,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
                     "signature": [],
                     "dependencies": [],
                     "examples": [],
-                    "timestamp": "2026-09-18",
+                    "version": "9.0.0-",
                 },
                 "evidence": evidence,
                 "issues": [],

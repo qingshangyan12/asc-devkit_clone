@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-atomic-01-asc_get_store_atomic_config",
+  "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+  "document_sha256": "b406e21e444757bba04d13cb7fff5c32842d897cd1250d43268af556cd19d392",
+  "status": "ready",
+  "description": "读取原子操作启用位和操作类型，用于核验已设置的原子配置；该接口在Ascend 950系列上已废弃。",
+  "evidence": [
+    {
+      "excerpt": "获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。"
+    },
+    {
+      "excerpt": "该接口已废弃。原子加操作可以直接使用"
+    }
+  ],
+  "confidence": 0.91
+}

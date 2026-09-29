@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "run_id": "20260929-target-defs-index-01",
+  "patches": [
+    {
+      "kind": "document",
+      "path": "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+      "before_sha256": "57f19c169399cdd280cf31e7ed65f21dd025da9eeb10f84549f3ef4bc6c1cb49",
+      "content": "---\nokftype: reference.index\ntitle: 常量\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/constant.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md\ntimestamp: '2026-09-29'\n---\n# 常量\n\n- **[ASC_C_API_MRGSORT_ELEMENT_LEN](asc_c_api_mrgsort_element_len.md)**\n- **[ASC_VDEQ_SIZE](asc_vdeq_size.md)**\n"
+    },
+    {
+      "kind": "document",
+      "path": "docs/zh/api/SIMD-API/c_api/defs/defs.md",
+      "before_sha256": "c3fe00eb1d4d0a1d4d469999aa8a1392ba81feca9336a50a22cecfe82f694186",
+      "content": "---\nokftype: reference.index\ntitle: 基础定义\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/defs.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/union.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/enum.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/type/type.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/macro/macro.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/constant/constant.md\ntimestamp: '2026-09-29'\n---\n# 基础定义\n\n- **[联合体](union/union.md)**\n- **[枚举](enum/enum.md)**\n- **[寄存器类型](type/type.md)**\n- **[宏](macro/macro.md)**\n- **[常量](constant/constant.md)**\n"
+    },
+    {
+      "kind": "document",
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+      "before_sha256": "7d28b31cc6a99080a658837d50ef53b408dbfedd550d94f8566c2307ff86e2a8",
+      "content": "---\nokftype: reference.index\ntitle: 枚举\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/enum.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md\ntimestamp: '2026-09-29'\n---\n# 枚举\n\n- **[asc_channel_pad_mode](asc_channel_pad_mode.md)**\n- **[asc_dual_dst_mode](asc_dual_dst_mode.md)**\n- **[asc_hf32_round_mode](asc_hf32_round_mode.md)**\n- **[asc_l13d_repeat_direction](asc_l13d_repeat_direction.md)**\n- **[asc_load_l2_cache_mode](asc_load_l2_cache_mode.md)**\n- **[asc_mutex_execute_mode](asc_mutex_execute_mode.md)**\n- **[asc_override_strategy](asc_override_strategy.md)**\n- **[asc_position_mode](asc_position_mode.md)**\n- **[asc_position_quarter_mode](asc_position_quarter_mode.md)**\n- **[asc_quant_mode](asc_quant_mode.md)**\n- **[asc_relu_pre_mode](asc_relu_pre_mode.md)**\n- **[asc_saturation_mode](asc_saturation_mode.md)**\n- **[asc_store_l2_cache_mode](asc_store_l2_cache_mode.md)**\n- **[asc_unit_flag_mode](asc_unit_flag_mode.md)**\n"
+    },
+    {
+      "kind": "document",
+      "path": "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+      "before_sha256": "8c6eb35180719bbaa3e7519f79e7fd0952d9e0f32970ccf6ec52f84edf84ee66",
+      "content": "---\nokftype: reference.index\ntitle: 宏\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/macro.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md\ntimestamp: '2026-09-29'\n---\n# 宏\n\n- **[ASC_DEPRECATED](asc_deprecation.md)**\n- **[ASC_IS_AIC/ASC_IS_AIV](asc_is_aic-asc_is_aiv.md)**\n"
+    },
+    {
+      "kind": "document",
+      "path": "docs/zh/api/SIMD-API/c_api/defs/type/type.md",
+      "before_sha256": "742bd34cc75294ef032ef5efa3ae6fdbce5be3b83cf59e910925dacf1885e31f",
+      "content": "---\nokftype: reference.index\ntitle: 寄存器类型\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/type/type.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md\ntimestamp: '2026-09-29'\n---\n# 寄存器类型\n\n- **[寄存器类型总览](reg_data_types.md)**\n- **[寄存器类型定义](data_type_definition.md)**\n"
+    },
+    {
+      "kind": "document",
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/union.md",
+      "before_sha256": "b7fc0cf749bcec95f8c1fa8bf1c79a5af51ff89de57d613d3e2d4ab808e29125",
+      "content": "---\nokftype: reference.index\ntitle: 联合体\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/union.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md\ntimestamp: '2026-09-29'\n---\n# 联合体\n\n- **[asc_fill_value_config](asc_fill_value_config.md)**\n- **[asc_l13d_fmatrix_config](asc_l13d_fmatrix_config.md)**\n- **[asc_load3d_v2_config](asc_load3d_v2_config.md)**\n- **[asc_ndim_pad_count_config](asc_ndim_pad_count_config.md)**\n- **[asc_store_atomic_config](asc_store_atomic_config.md)**\n"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+      "before_sha256": "57f19c169399cdd280cf31e7ed65f21dd025da9eeb10f84549f3ef4bc6c1cb49",
+      "content": "---\nokftype: reference.index\ntitle: 常量\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/constant.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md\ntimestamp: '2026-09-29'\n---\n# 常量\n\n- **[ASC_C_API_MRGSORT_ELEMENT_LEN](asc_c_api_mrgsort_element_len.md)**\n- **[ASC_VDEQ_SIZE](asc_vdeq_size.md)**\n",
+      "kinds": [
+        "document"
+      ]
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/defs.md",
+      "before_sha256": "c3fe00eb1d4d0a1d4d469999aa8a1392ba81feca9336a50a22cecfe82f694186",
+      "content": "---\nokftype: reference.index\ntitle: 基础定义\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/defs.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/union.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/enum.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/type/type.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/macro/macro.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/constant/constant.md\ntimestamp: '2026-09-29'\n---\n# 基础定义\n\n- **[联合体](union/union.md)**\n- **[枚举](enum/enum.md)**\n- **[寄存器类型](type/type.md)**\n- **[宏](macro/macro.md)**\n- **[常量](constant/constant.md)**\n",
+      "kinds": [
+        "document"
+      ]
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+      "before_sha256": "7d28b31cc6a99080a658837d50ef53b408dbfedd550d94f8566c2307ff86e2a8",
+      "content": "---\nokftype: reference.index\ntitle: 枚举\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/enum.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md\ntimestamp: '2026-09-29'\n---\n# 枚举\n\n- **[asc_channel_pad_mode](asc_channel_pad_mode.md)**\n- **[asc_dual_dst_mode](asc_dual_dst_mode.md)**\n- **[asc_hf32_round_mode](asc_hf32_round_mode.md)**\n- **[asc_l13d_repeat_direction](asc_l13d_repeat_direction.md)**\n- **[asc_load_l2_cache_mode](asc_load_l2_cache_mode.md)**\n- **[asc_mutex_execute_mode](asc_mutex_execute_mode.md)**\n- **[asc_override_strategy](asc_override_strategy.md)**\n- **[asc_position_mode](asc_position_mode.md)**\n- **[asc_position_quarter_mode](asc_position_quarter_mode.md)**\n- **[asc_quant_mode](asc_quant_mode.md)**\n- **[asc_relu_pre_mode](asc_relu_pre_mode.md)**\n- **[asc_saturation_mode](asc_saturation_mode.md)**\n- **[asc_store_l2_cache_mode](asc_store_l2_cache_mode.md)**\n- **[asc_unit_flag_mode](asc_unit_flag_mode.md)**\n",
+      "kinds": [
+        "document"
+      ]
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+      "before_sha256": "8c6eb35180719bbaa3e7519f79e7fd0952d9e0f32970ccf6ec52f84edf84ee66",
+      "content": "---\nokftype: reference.index\ntitle: 宏\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/macro.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md\ntimestamp: '2026-09-29'\n---\n# 宏\n\n- **[ASC_DEPRECATED](asc_deprecation.md)**\n- **[ASC_IS_AIC/ASC_IS_AIV](asc_is_aic-asc_is_aiv.md)**\n",
+      "kinds": [
+        "document"
+      ]
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/type/type.md",
+      "before_sha256": "742bd34cc75294ef032ef5efa3ae6fdbce5be3b83cf59e910925dacf1885e31f",
+      "content": "---\nokftype: reference.index\ntitle: 寄存器类型\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/type/type.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md\ntimestamp: '2026-09-29'\n---\n# 寄存器类型\n\n- **[寄存器类型总览](reg_data_types.md)**\n- **[寄存器类型定义](data_type_definition.md)**\n",
+      "kinds": [
+        "document"
+      ]
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/union.md",
+      "before_sha256": "b7fc0cf749bcec95f8c1fa8bf1c79a5af51ff89de57d613d3e2d4ab808e29125",
+      "content": "---\nokftype: reference.index\ntitle: 联合体\nresource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/union.md\nnavigation:\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md\n  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md\ntimestamp: '2026-09-29'\n---\n# 联合体\n\n- **[asc_fill_value_config](asc_fill_value_config.md)**\n- **[asc_l13d_fmatrix_config](asc_l13d_fmatrix_config.md)**\n- **[asc_load3d_v2_config](asc_load3d_v2_config.md)**\n- **[asc_ndim_pad_count_config](asc_ndim_pad_count_config.md)**\n- **[asc_store_atomic_config](asc_store_atomic_config.md)**\n",
+      "kinds": [
+        "document"
+      ]
+    }
+  ],
+  "marker_skips": []
+}

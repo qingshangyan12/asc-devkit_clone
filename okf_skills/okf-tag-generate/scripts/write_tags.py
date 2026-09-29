@@ -12,6 +12,8 @@ from typing import Any
 
 import yaml
 
+from tag_deprecation_evidence import explicitly_deprecates_subject
+
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TAXONOMY = SKILL_ROOT / "taxonomy" / "tag-taxonomy.json"
@@ -121,7 +123,7 @@ def validate_annotation(
     if not document.is_file():
         raise ValidationError(f"{location}.path does not exist: {path}")
     text = document.read_text(encoding="utf-8")
-    split_front_matter(text)
+    _, _, body = split_front_matter(text)
 
     if annotation.get("proposed_tags", []) != []:
         raise ValidationError(f"{location}.proposed_tags must be empty before writing")
@@ -174,12 +176,10 @@ def validate_annotation(
         if namespace == "api_surfaces":
             if excerpt != path or not valid_relative_api_path(excerpt):
                 raise ValidationError(f"{location}.evidence.{key} must be the stable resource path")
-        elif excerpt not in text:
+        elif excerpt not in body:
             raise ValidationError(f"{location}.evidence.{key} is not a verbatim excerpt from the document")
-        if namespace == "traits" and value == "deprecated" and not re.search(
-            r"\bdeprecated\b|废弃", excerpt, re.IGNORECASE
-        ):
-            raise ValidationError(f"{location}.evidence.{key} must explicitly state deprecation")
+        if namespace == "traits" and value == "deprecated" and not explicitly_deprecates_subject(body, excerpt):
+            raise ValidationError(f"{location}.evidence.{key} must deprecate the documented subject")
     roles = set(normalized.get("roles", []))
     requirements = tag_rules["required_namespaces"]
     required_namespaces = set(requirements.get("always", []))
@@ -236,7 +236,7 @@ def replace_tag_block(raw_front_matter: str, tag_block: str) -> str:
         insert_at = len(lines)
         for index, line in enumerate(lines):
             if TOP_LEVEL_KEY_RE.match(line) and line.split(":", 1)[0] in {
-                "signature", "dependencies", "examples", "timestamp"
+                "signature", "dependencies", "examples", "version"
             }:
                 insert_at = index
                 break

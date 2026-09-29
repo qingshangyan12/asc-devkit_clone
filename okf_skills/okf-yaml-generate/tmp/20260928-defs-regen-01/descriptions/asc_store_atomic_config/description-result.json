@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "defs-asc_store_atomic_config",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+  "document_sha256": "919e9d286a869497a18f76b794fec6990f4be4c6ad03c156b1261278718684f9",
+  "status": "ready",
+  "description": "保存原子操作的启用类型和操作类型配置，供 asc_get_store_atomic_config 接口使用。",
+  "evidence": [
+    {"excerpt": "asc_store_atomic_config参数包含原子操作启用位与原子操作类型"},
+    {"excerpt": "atomic_type | 原子操作启用位，默认值：0。"},
+    {"excerpt": "atomic_op | 原子操作类型，默认值：0。"}
+  ],
+  "confidence": 0.98
+}

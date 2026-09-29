@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_task",
+  "run_id": "defs-asc_l13d_fmatrix_config",
+  "devkit_root": "/home/hugh/code/asc-devkit_okf_knowledge-fork",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+  "document_sha256": "59aaaf7265301ac9ee248b21142530b1ddfe304608041bedacf4456a91af204f",
+  "instructions": [
+    "阅读指定 Markdown 的正文，并独立撰写中文 description。",
+    "只把目标 Markdown 正文中的逐字摘录作为 evidence。",
+    "没有可靠结论时输出 unresolved，不猜测。"
+  ],
+  "result_path": "description-result.json"
+}

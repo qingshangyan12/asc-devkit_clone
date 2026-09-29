@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "run_id": "20260928-defs-index-regen-01",
+  "batch_id": "batch-01",
+  "worker_id": "worker-a",
+  "documents": [
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+      "sha256": "34e884b0ac6f117065cdf69bb2a0125b6a1026eddf1f0ea7dbb41f9efd87a285",
+      "plan": {
+        "okftype": "reference.index.cpp",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index.cpp",
+        "title": "常量",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/constant.md",
+        "timestamp": "2026-09-28",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/defs.md",
+      "sha256": "6a044ef1e4f2d4e5e02b3bbbef7b88c6069779f616b5fbef38cb29f3be564c0e",
+      "plan": {
+        "okftype": "reference.index.cpp",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index.cpp",
+        "title": "基础定义",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/defs.md",
+        "timestamp": "2026-09-28",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/union/union.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/type/type.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/constant/constant.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+      "sha256": "451e0a4c6775ff455d926028f6ff5a08b6d75d1e4246ccd4c7e6a2e767fbe765",
+      "plan": {
+        "okftype": "reference.index.cpp",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index.cpp",
+        "title": "枚举",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/enum.md",
+        "timestamp": "2026-09-28",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+      "sha256": "b2fcefbbe746665d48df13e97bcaed981589cbc0455c4c073574017d4567c6a6",
+      "plan": {
+        "okftype": "reference.index.cpp",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index.cpp",
+        "title": "宏",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/macro.md",
+        "timestamp": "2026-09-28",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/type/type.md",
+      "sha256": "5ab4aeceecac96517475dc1d935bc54317907c1d4d5bc8e8d403faff9743d885",
+      "plan": {
+        "okftype": "reference.index.cpp",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index.cpp",
+        "title": "寄存器类型",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/type/type.md",
+        "timestamp": "2026-09-28",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/defs/union/union.md",
+      "sha256": "3614bc175b0f032acbfdbb6a0aa8b2d5857d25f9d11ba6ea90bb7acafe4bd5b7",
+      "plan": {
+        "okftype": "reference.index.cpp",
+        "rule": "navigation_structure",
+        "fields": [
+          "okftype",
+          "title",
+          "resource",
+          "navigation",
+          "timestamp"
+        ],
+        "outputs": [
+          "front_matter"
+        ],
+        "default_tags": {
+          "api_surfaces": [
+            "c_api"
+          ]
+        }
+      },
+      "fields": {
+        "okftype": "reference.index.cpp",
+        "title": "联合体",
+        "resource": "asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/union.md",
+        "timestamp": "2026-09-28",
+        "navigation": [
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md"
+          },
+          {
+            "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md"
+          }
+        ]
+      },
+      "evidence": {},
+      "issues": [],
+      "doxygen": [],
+      "example_markers": [],
+      "semantic_verified": false
+    }
+  ]
+}

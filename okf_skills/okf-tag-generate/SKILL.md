@@ -63,7 +63,8 @@ tag:
 - annotation 中每个选中的 `namespace:value` 都必须有 `evidence` 对应项。
 - 除 `api_surfaces` 这类稳定导航标签外，证据必须是目标 Markdown 中逐字出现的短摘录。
 - 不能仅凭目录、文件名、API 名称、dtype、架构、头文件声明、样例注释或相邻 API 推断语义标签。
-- `traits:deprecated` 只有在目标 Markdown 明确声明废弃时才能选择。
+- `traits:deprecated` 仅在目标 Markdown 明确声明当前页面描述的接口或符号自身已废弃时选择；
+  “用于标注其他废弃接口”的宏不属于废弃实体。
 - 不能为了满足必填 namespace 修改正文、声明、参数名、类型、实现代码、头文件或样例。
 
 ## Annotation artifact

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-atomic-01-asc_atomic_min",
+  "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+  "document_sha256": "2712f3a3c2f543048afea593a04c7ea16d2c1061d39f4eb4722b8fc3952436a9",
+  "status": "ready",
+  "description": "比较指定GM地址的旧值与输入值，原子写回较小值，并返回旧值。",
+  "evidence": [
+    {
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子取小操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较小值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。"
+    }
+  ],
+  "confidence": 0.91
+}

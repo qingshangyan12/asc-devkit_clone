@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_task",
+  "run_id": "defs-asc_fill_value_config",
+  "devkit_root": "/home/hugh/code/asc-devkit_okf_knowledge-fork",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+  "document_sha256": "e92d5c367af794ff0d83e43398eed3b772815fa3ef58969e104fa6cd275e3d8a",
+  "instructions": [
+    "阅读指定 Markdown 的正文，并独立撰写中文 description。",
+    "只把目标 Markdown 正文中的逐字摘录作为 evidence。",
+    "没有可靠结论时输出 unresolved，不猜测。"
+  ],
+  "result_path": "description-result.json"
+}

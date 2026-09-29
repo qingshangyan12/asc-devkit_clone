@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_run",
+  "run_id": "defs-asc_store_atomic_config",
+  "run_dir": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260928-defs-regen-01/descriptions/asc_store_atomic_config",
+  "created_at": "2026-09-28T06:45:47+00:00",
+  "devkit_root": "/home/hugh/code/asc-devkit_okf_knowledge-fork",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+  "document_sha256": "919e9d286a869497a18f76b794fec6990f4be4c6ad03c156b1261278718684f9"
+}

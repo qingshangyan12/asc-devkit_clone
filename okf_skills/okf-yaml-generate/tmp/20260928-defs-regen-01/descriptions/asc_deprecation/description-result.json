@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "defs-asc_deprecation",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+  "document_sha256": "ef51fde3a8a2bbf53674a2ceb0b7b85a3f16d7d53f72e365c0994a6bd6adc182",
+  "status": "ready",
+  "description": "为 C API 声明添加 C++ 弃用属性，在编译调用时输出包含废弃版本、移除日期和替代接口的告警。",
+  "evidence": [
+    {"excerpt": "`ASC_DEPRECATED`用于为C API声明添加C++ `[[deprecated]]`属性。"},
+    {"excerpt": "编译器会生成告警，告警信息包含接口开始废弃的版本、计划移除日期和推荐使用的替代接口。"}
+  ],
+  "confidence": 0.98
+}

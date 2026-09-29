@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-atomic-01-asc_set_atomic_max",
+  "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+  "document_sha256": "891a2303c5d1efbe7cc01cbe90e4f2d53547e27d647ebee0fb5f4879f67387de",
+  "status": "ready",
+  "description": "为后续写入GM的数据搬运开启原子取大，将搬运数据与GM原有数据中的较大值写回GM。",
+  "evidence": [
+    {
+      "excerpt": "原子取大过程：将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最大值写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子比较取大，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+    }
+  ],
+  "confidence": 0.91
+}

@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_api_description_result",
+  "run_id": "20260929-target-defs-01-asc_load_l2_cache_mode",
+  "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+  "document_sha256": "37b8fa66a4158a6319a3f2ed222e262f333463e0246d2b47f068c8c67e9d0dff",
+  "status": "ready",
+  "description": "描述GM到Unified Buffer搬运及标量load路径使用的L2 Cache管理策略枚举，覆盖启用、替换和不分配等模式。",
+  "evidence": [
+    {
+      "excerpt": "asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 Cache管理策略，可用于："
+    },
+    {
+      "excerpt": "标量访存路径的load策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_load_cache_mode](../../cache_ctrl/asc_get_scalar_load_cache_mode.md)。"
+    }
+  ],
+  "confidence": 0.92
+}

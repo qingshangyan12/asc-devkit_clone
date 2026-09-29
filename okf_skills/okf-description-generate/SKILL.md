@@ -29,7 +29,7 @@ description 使用中文单段摘要，准确说明 API 的核心动作、处理
 3. 执行 `validate`。它验证 JSON 结构、输入哈希和 evidence 逐字匹配；校验器不评价或生成摘要语义。
 4. 执行不带 `--write` 的 `write`，检查 `write-plan.json`。通过后才执行带 `--write` 的相同命令。
    写入只修改现有 front matter 的顶层 `description`；若字段不存在则插入到 `resource` 后。它不会创建
-   front matter，也不会改动正文、tag、signature、dependencies、examples 或 timestamp。
+   front matter，也不会改动正文、tag、signature、dependencies、examples 或 version。
 
 ## 命令
 

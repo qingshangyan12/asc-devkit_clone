@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "run_id": "20260929-target-defs-01",
+  "issues": [],
+  "documents": [
+    "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+    "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+    "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+    "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+    "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+    "docs/zh/api/SIMD-API/c_api/defs/type/reg_data_types.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+    "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md"
+  ]
+}
