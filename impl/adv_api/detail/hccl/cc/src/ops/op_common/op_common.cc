@@ -1753,8 +1753,8 @@ static uint32_t GetDefaultResFractionV2(HcommCcuResType resType, OpExecuteConfig
 // opExpansionMode 为 CCU_MS 时 LOOP/CCU_BUF/EVENT 使用 MS 模式专用阈值，其他资源类型与其他模式保持一致
 static uint32_t GetDefaultResFraction(HcommCcuResType resType, OpExecuteConfig opMode)
 {
-    HcclDevType deviceType;
-    bool isV2 = (HcclGetDeviceType(deviceType) == HCCL_SUCCESS) && (deviceType == HcclDevType::DEV_TYPE_960);
+    DevType deviceType;
+    bool isV2 = (hrtGetDeviceType(deviceType) == HCCL_SUCCESS) && (deviceType == HcclDevType::DEV_TYPE_960);
     return isV2 ? GetDefaultResFractionV2(resType, opMode) : GetDefaultResFractionV1(resType, opMode);
 }
 
