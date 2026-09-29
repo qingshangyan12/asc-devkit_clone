@@ -303,22 +303,23 @@ inline void RollbackWriteInfo(RingBufWriteInfo* writeInfo, uint64_t oldBufOff)
 
 static void PrintfLegacy(const char* fmt, va_list otherArgs)
 {
-    std::lock_guard<std::mutex> lock(dump_mutex);
-    void* aicpuDumpBuffer = g_aicpuDumpConfig.dumpBufAddr;
-    size_t aicpuDumpBufSize = g_aicpuDumpConfig.dumpBufSize;
-    size_t aicpuDumpOffSet = 0;
-    if (aicpuDumpBuffer != nullptr) {
-        aicpuDumpOffSet = *reinterpret_cast<size_t*>(aicpuDumpBuffer);
-    } else {
-        return;
-    }
-    if (aicpuDumpOffSet >= aicpuDumpBufSize) {
-        return;
-    }
-    aicpuDumpOffSet += static_cast<size_t>(vsnprintf_s(
-        reinterpret_cast<char*>(aicpuDumpBuffer) + aicpuDumpOffSet, aicpuDumpBufSize - aicpuDumpOffSet,
-        aicpuDumpBufSize - aicpuDumpOffSet, fmt, otherArgs));
-    *reinterpret_cast<size_t*>(g_aicpuDumpConfig.dumpBufAddr) = aicpuDumpOffSet;
+    return;
+    // std::lock_guard<std::mutex> lock(dump_mutex);
+    // void* aicpuDumpBuffer = g_aicpuDumpConfig.dumpBufAddr;
+    // size_t aicpuDumpBufSize = g_aicpuDumpConfig.dumpBufSize;
+    // size_t aicpuDumpOffSet = 0;
+    // if (aicpuDumpBuffer != nullptr) {
+    //     aicpuDumpOffSet = *reinterpret_cast<size_t*>(aicpuDumpBuffer);
+    // } else {
+    //     return;
+    // }
+    // if (aicpuDumpOffSet >= aicpuDumpBufSize) {
+    //     return;
+    // }
+    // aicpuDumpOffSet += static_cast<size_t>(vsnprintf_s(
+    //     reinterpret_cast<char*>(aicpuDumpBuffer) + aicpuDumpOffSet, aicpuDumpBufSize - aicpuDumpOffSet,
+    //     aicpuDumpBufSize - aicpuDumpOffSet, fmt, otherArgs));
+    // *reinterpret_cast<size_t*>(g_aicpuDumpConfig.dumpBufAddr) = aicpuDumpOffSet;
 }
 
 /* ── FIFO write helpers ─────────────────────────────────────────────── */
