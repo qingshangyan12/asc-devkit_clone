@@ -41,6 +41,14 @@ struct hifloat4x2_t {
 using hif4x2_t = hifloat4x2_t;
 
 using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
+namespace float8_e6m2 {
+struct Fp8e6m2T {
+    uint8_t val;
+};
+} // namespace float8_e6m2
+using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
+using vector_fp8_e6m2_t = vector_f8e6m2;
 
 inline void mad(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k, uint16_t n,
@@ -190,7 +198,7 @@ inline void mad_mx(
 inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
 
 // The compiler supports this instruction, but it is missing from the CPU debug stub header.
-inline void vcvt_rcpe6m22bf16(vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask, Literal part) {}
+inline void vcvt_rcpe6m22bf16(vector_bf16& dst, vector_f8e6m2 src, vector_bool mask, Literal part) {}
 
 #ifndef ULL
 #define ULL unsigned long long
