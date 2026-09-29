@@ -18,11 +18,17 @@
 
 // Keep CPU stub types/core selection, but include the real device debug implementation.
 // These device datatype names occur only in uninstantiated traits in the included header.
+#ifndef ASCENDC_FLOAT8_TYPEDEF
+#define ASCENDC_FLOAT8_TYPEDEF
 struct float8_e5m2_t;
 struct float8_e4m3_t;
 struct float8_e8m0_t;
+#endif
+#ifndef ASCENDC_FLOAT4_X2_TYPEDEF
+#define ASCENDC_FLOAT4_X2_TYPEDEF
 struct float4_e2m1x2_t;
 struct float4_e1m2x2_t;
+#endif
 namespace __cce_scalar {
 using ::copy_ubuf_to_ubuf;
 }
