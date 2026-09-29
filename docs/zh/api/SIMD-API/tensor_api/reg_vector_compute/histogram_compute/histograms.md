@@ -102,34 +102,33 @@ __simd_callee__ inline reg_tensor<T> histograms(
 
 ## 调用示例
 
-以下示例分别统计输入数据低半区和高半区的频率分布。
+以下示例统计输入数据高半区的累计分布，并在初值`3`上累加统计结果。
 
 ```cpp
+#include "c_api/asc_simd.h"
 #include "tensor_api/experimental/vector_compute.h"
 
-constexpr asc::te::experimental::histogram_options high_options {
+constexpr uint16_t initial_value = 3;
+constexpr asc::te::experimental::histogram_options histogram_config {
     asc::te::experimental::histogram_half::high,
-    asc::te::experimental::histogram_mode::frequency};
+    asc::te::experimental::histogram_mode::cumulative};
 
-template <typename SrcTensor, typename InitialTensor, typename DstTensor>
+template <typename SrcTensor, typename DstTensor>
 __simd_vf__ inline void histograms_vf(
-    const SrcTensor src, const InitialTensor initial, DstTensor low_dst, DstTensor high_dst, uint16_t repeat_times,
-    uint32_t total, uint32_t one_repeat_size)
+    const SrcTensor src, DstTensor dst, uint16_t repeat_times, uint32_t total, uint32_t one_repeat_size)
 {
-    auto dst_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::all, uint16_t>();
-    auto low_reg = asc::te::experimental::load(initial, asc::te::make_coord(0)).with_mask(dst_mask);
-    auto high_reg = asc::te::experimental::load(initial, asc::te::make_coord(0)).with_mask(dst_mask);
     uint32_t remain = total;
+    asc::te::experimental::reg_tensor<uint16_t> dst_reg;
+    auto dst_mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::all, uint16_t>();
+    dst_reg.mask = dst_mask.reg;
+    asc_duplicate_scalar(dst_reg.reg, initial_value, dst_reg.mask);
     for (uint16_t i = 0; i < repeat_times; ++i) {
         const uint32_t offset = i * one_repeat_size;
         const auto coord = asc::te::make_coord(offset);
         auto mask = asc::te::experimental::update_mask<uint8_t>(remain);
         auto src_reg = asc::te::experimental::load(src, coord).with_mask(mask);
-        low_reg = asc::te::experimental::histograms(low_reg, src_reg);
-        high_reg = asc::te::experimental::histograms<high_options>(high_reg, src_reg);
+        dst_reg = asc::te::experimental::histograms<histogram_config>(dst_reg, src_reg);
     }
-
-    asc::te::experimental::store(low_dst, asc::te::make_coord(0), low_reg);
-    asc::te::experimental::store(high_dst, asc::te::make_coord(0), high_reg);
+    asc::te::experimental::store(dst, asc::te::make_coord(0), dst_reg);
 }
 ```
