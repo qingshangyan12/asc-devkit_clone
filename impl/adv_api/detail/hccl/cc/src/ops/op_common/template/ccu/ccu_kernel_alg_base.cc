@@ -1245,8 +1245,9 @@ static CcuResult CreateReduceLoopV2(
     return CCU_SUCCESS;
 }
 
-static CcuResult GroupLocalReduce(AllReduceMeshMem2Mem1DContext& ctx, GroupReduceMem2MemVar& var, uint32_t size, HcclDataType dataType,
-    HcclDataType outputDataType, CcuVersion ccuVersion)
+CcuResult GroupLocalReduce(
+    CcuKernelCtxBase& ctx, ccu::LocalAddr outDstOrg, std::vector<ccu::LocalAddr>& scratchOrg, GroupOpSizeVars goSize,
+    HcclDataType dataType, HcclDataType outputDataType, HcclReduceOp opType)
 {
     if (ccuVersion == CcuVersion::CCU_V1) {
         HCCL_INFO("select ReduceLoopGroupV1");
