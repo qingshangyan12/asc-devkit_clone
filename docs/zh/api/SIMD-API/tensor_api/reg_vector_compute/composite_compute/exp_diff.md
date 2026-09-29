@@ -28,13 +28,21 @@
 
 头文件路径：`"tensor_api/experimental/arch/vector/composite_compute.h"`。
 
-逐元素计算两个输入之差的自然指数：
+该接口根据`src0.mask`将`src0`与`src1`按元素相减，再以差值作为e的指数，返回计算结果。计算公式如下：
+
+- 输入数据类型为`float`时：
 
 $$
 dst_i = e^{(src0_i - src1_i)}
 $$
 
-float输入按连续元素计算，无需指定`src_pos`。half输入必须指定`src_pos`，选择偶数位置或奇数位置。
+- 输入数据类型为`half`时：
+
+$$
+dst_i = e^{(cast\_f16\_to\_f32(src0_i) - cast\_f16\_to\_f32(src1_i))}
+$$
+
+输入数据类型为`float`时按连续元素计算，无需指定`src_pos`。输入数据类型为`half`时必须指定`src_pos`，选择偶数位置或奇数位置。
 
 ## 函数原型
 
@@ -68,6 +76,10 @@ __simd_callee__ inline reg_tensor<T> exp_diff(
 | src1 | 输入 | 减数，类型与`src0`相同。`src1.mask`不用于本次计算。 |
 | src_pos | 输入 | half输入时必填，支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`，分别表示选择偶数位置和奇数位置。 |
 
+## 返回值说明
+
+返回`reg_tensor<float>`。`reg`保存逐元素计算结果，返回值的`mask`与`src0.mask`相同。输入为`half`时，`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`分别使第`i`个输出元素读取源操作数的第`2 * i`和第`2 * i + 1`个元素。
+
 ## 数据类型
 
 **表3**数据类型组合
@@ -76,10 +88,6 @@ __simd_callee__ inline reg_tensor<T> exp_diff(
 | --- | --- | --- |
 | half | half | float |
 | float | float | float |
-
-## 返回值说明
-
-返回`reg_tensor<float>`。`reg`保存逐元素计算结果，返回值的`mask`与`src0.mask`相同。输入为`half`时，`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`分别使第`i`个输出元素读取源操作数的第`2 * i`和第`2 * i + 1`个元素。
 
 ## 约束说明
 

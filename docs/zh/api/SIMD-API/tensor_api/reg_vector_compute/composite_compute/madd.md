@@ -28,10 +28,10 @@
 
 头文件路径：`"tensor_api/experimental/arch/vector/composite_compute.h"`。
 
-将`dst`与`src0`逐元素相乘，再与`src1`相加：
+该接口根据`dst.mask`将`dst`与`src0`按元素相乘，再与`src1`相加，返回计算结果。计算公式如下：
 
 $$
-result_i = dst_i \times src0_i + src1_i
+dst_i = dst_i \times src0_i + src1_i
 $$
 
 ## 函数原型
@@ -60,13 +60,19 @@ __simd_callee__ inline reg_tensor<T> madd(
 | src0 | 输入 | 第二个乘数。`src0.mask`不参与本次计算。 |
 | src1 | 输入 | 加数。`src1.mask`不参与本次计算。 |
 
-## 数据类型
-
-三个操作数与返回值的数据类型必须一致，支持half、bfloat16_t、float。
-
 ## 返回值说明
 
 返回`reg_tensor<T>`，保存`dst * src0 + src1`的结果，返回值的`mask`与`dst.mask`相同。
+
+## 数据类型
+
+**表3**数据类型组合
+
+| src0 | src1 | dst |
+| --- | --- | --- |
+| half | half | half |
+| bfloat16_t | bfloat16_t | bfloat16_t |
+| float | float | float |
 
 ## 约束说明
 

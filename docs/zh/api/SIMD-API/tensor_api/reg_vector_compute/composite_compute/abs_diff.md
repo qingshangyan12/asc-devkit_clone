@@ -28,10 +28,10 @@
 
 头文件路径：`"tensor_api/experimental/arch/vector/composite_compute.h"`。
 
-逐元素计算两个输入之差的绝对值：
+该接口根据`src0.mask`将`src0`与`src1`按元素相减并求绝对值，返回计算结果。计算公式如下：
 
 $$
-dst_i = |src0_i - src1_i|
+dst_i = \lvert src0_i - src1_i \rvert
 $$
 
 ## 函数原型
@@ -57,13 +57,18 @@ __simd_callee__ inline reg_tensor<T> abs_diff(
 | src0 | 输入 | 被减数，类型为`reg_tensor<T>`。`src0.mask`用于标记参与计算的元素，对应位置为`1`时参与计算，为`0`时不参与计算。 |
 | src1 | 输入 | 减数，类型为`reg_tensor<T>`。`src1.mask`不用于本次计算。 |
 
-## 数据类型
-
-源操作数与返回值的数据类型保持一致。支持的数据类型为：half、float。
-
 ## 返回值说明
 
 返回`reg_tensor<T>`。`reg`保存两个输入逐元素作差后的绝对值，返回值的`mask`与`src0.mask`相同。
+
+## 数据类型
+
+**表3**数据类型组合
+
+| src0 | src1 | dst |
+| --- | --- | --- |
+| half | half | half |
+| float | float | float |
 
 ## 约束说明
 

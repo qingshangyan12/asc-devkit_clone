@@ -28,10 +28,10 @@
 
 头文件路径：`"tensor_api/experimental/arch/vector/composite_compute.h"`。
 
-逐元素将`src`与标量相乘，再与`dst`原值相加：
+该接口根据`dst.mask`将`src`与标量`scalar`按元素相乘，再与`dst`原值相加，返回计算结果。计算公式如下：
 
 $$
-result_i = scalar \times src_i + dst_i
+dst_i = scalar \times src_i + dst_i
 $$
 
 ## 函数原型
@@ -50,7 +50,7 @@ __simd_callee__ inline reg_tensor<T> axpy(
 
 | 参数名 | 描述 |
 | --- | --- |
-| T | reg_tensor元素类型。支持的数据类型请参考[数据类型](#数据类型)。 |
+| T | 操作数数据类型。支持的数据类型请参考[数据类型](#数据类型)。 |
 
 **表2**参数说明
 
@@ -60,13 +60,18 @@ __simd_callee__ inline reg_tensor<T> axpy(
 | src | 输入 | 与标量相乘的源操作数，类型为`reg_tensor<T>`。`src.mask`不用于本次计算。 |
 | scalar | 输入 | 标量乘数，类型必须与`T`完全一致。 |
 
-## 数据类型
-
-dst、src、scalar与返回值的数据类型保持一致。支持的数据类型为：half、float。
-
 ## 返回值说明
 
 返回`reg_tensor<T>`。`reg`保存`dst + scalar * src`的逐元素计算结果，返回值的`mask`与`dst.mask`相同。
+
+## 数据类型
+
+**表3**数据类型组合
+
+| src | scalar | dst |
+| --- | --- | --- |
+| half | half | half |
+| float | float | float |
 
 ## 约束说明
 

@@ -28,17 +28,18 @@
 
 头文件路径：`"tensor_api/experimental/arch/vector/histogram_compute.h"`。
 
-统计`uint8_t`输入值的频率分布或累计分布，并在`dst`初始值上累加结果。
+该接口根据`src.mask`统计`uint8_t`输入值的频率分布或累计分布，并在`dst`原值上累加统计结果。计算公式如下：
 
-令$h$表示统计区间的起始值：`low`模式下$h=0$，`high`模式下$h=128$。对于输出位置
-$i\in[0,127]$，两种统计模式分别为：
+令$h$表示统计区间的起始值：`low`模式下$h=0$，`high`模式下$h=128$。对于输出位置$i\in[0,127]$，两种统计模式分别为：
 
 $$
 \begin{aligned}
-result_i^{frequency} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j=h+i) \\
-result_i^{cumulative} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j\le h+i)
+dst_i^{frequency} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j=h+i) \\
+dst_i^{cumulative} &= dst_i + \sum_{j:\,src.mask_j=1}\mathbf{1}(src_j\le h+i)
 \end{aligned}
 $$
+
+**表1**配置项说明
 
 | 配置项 | 取值 | 含义 |
 | --- | --- | --- |
@@ -57,7 +58,7 @@ __simd_callee__ inline reg_tensor<T> histograms(
 
 ## 参数说明
 
-**表1**模板参数说明
+**表2**模板参数说明
 
 | 参数名 | 描述 |
 | --- | --- |
@@ -65,20 +66,24 @@ __simd_callee__ inline reg_tensor<T> histograms(
 | T | 输出元素类型。目前支持`uint16_t`。 |
 | U | 输入元素类型。目前支持`uint8_t`。 |
 
-**表2**参数说明
+**表3**参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | dst | 输入/输出 | 统计初值和结果，类型为`reg_tensor<uint16_t>`。接口直接更新`dst.reg`，返回值的`mask`与`dst.mask`相同。 |
 | src | 输入 | 待统计数据，类型为`reg_tensor<uint8_t>`。`src.mask`用于标记参与统计的元素，对应位置为`1`时参与统计，为`0`时不参与统计。 |
 
-## 数据类型
-
-dst和返回值的元素类型为uint16_t，src的元素类型为uint8_t。
-
 ## 返回值说明
 
 返回更新后的`reg_tensor<uint16_t>`。频率模式在`dst`上累加每个输入值的出现次数，累计模式累加不大于对应值的输入数量。返回值的`mask`与`dst.mask`相同。
+
+## 数据类型
+
+**表4**数据类型组合
+
+| src | dst |
+| --- | --- |
+| uint8_t | uint16_t |
 
 ## 约束说明
 
