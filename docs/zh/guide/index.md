@@ -109,6 +109,10 @@
             -   [缓存一致性](./programming_guide/advanced_programming/memory_model/cache_coherence.md)
             -   [内存一致性](./programming_guide/advanced_programming/memory_model/memory_consistency.md)
 
+        -   [高级核函数编程](./programming_guide/advanced_programming/advanced_kernel_programming/advanced_kernel_programming.md)
+            -   [核内同步](./programming_guide/advanced_programming/advanced_kernel_programming/intra_core_sync/intra_core_sync.md)
+                -   [基于Mutex实现多流水同步](./programming_guide/advanced_programming/advanced_kernel_programming/intra_core_sync/mutex_multi_pipeline_sync.md)
+
         -   [高级AI Core编程模型](./programming_guide/advanced_programming/advanced_ai_core_programming_model/advanced_ai_core_programming_model.md)
             -   [SIMD与SIMT混合编程](./programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
                 -   [概述](./programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
