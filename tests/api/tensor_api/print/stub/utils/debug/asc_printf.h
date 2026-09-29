@@ -16,6 +16,8 @@
 #include <utility>
 #include <vector>
 
+#include "impl/utils/debug/npu_arch_3510/asc_type_conversion_utils.h"
+
 #if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510)
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
 #endif
