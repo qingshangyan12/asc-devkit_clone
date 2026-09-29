@@ -1517,6 +1517,8 @@ inline void load_cbuf_to_cb_transpose_s4(
     uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride)
 {}
 
+inline int64_t ld_dev(__gm__ int64_t*, int16_t) { return 0; }
+
 #if defined(__DAV_CUBE__)
 inline int32_t g_coreType = 1;
 #else
