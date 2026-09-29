@@ -541,7 +541,7 @@ HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, const CommLink& l
     uint32_t listSize;
     const HcclResult topoRet = HcclRankGraphGetTopoInstsByLayer(comm, netLayer, &topoInstList, &listSize);
     if (topoRet != HCCL_SUCCESS) {
-        MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] HcclRankGraphGetTopoInstsByLayer failed, comm[%p] netLayer[%u] ret[%d]",
+        MC2_DFX_LOG("[MC2_ALLOC_DFX_v2] HcclRankGraphGetTopoInstsByLayer failed, comm[%p] netLayer[%u] ret[%d]",
             comm, netLayer, static_cast<int>(topoRet));
         return MC2_DFX_RESULT(topoRet);
     }
@@ -559,14 +559,14 @@ HcclResult GetTopoTypeByLink(HcclComm comm, uint32_t netLayer, const CommLink& l
         HcclResult ret = HcclRankGraphGetEndpointDesc(comm, netLayer, topoInstId, &endPointNum, endPointDescs);
         if (ret != HCCL_SUCCESS) {
             free(endPointDescs);
-            MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] HcclRankGraphGetEndpointDesc failed, comm[%p] netLayer[%u] topoInstId[%u] ret[%d]",
+            MC2_DFX_LOG("[MC2_ALLOC_DFX_v2] HcclRankGraphGetEndpointDesc failed, comm[%p] netLayer[%u] topoInstId[%u] ret[%d]",
                 comm, netLayer, topoInstId, static_cast<int>(ret));
             return MC2_DFX_RESULT(ret);
         }
         ret = HcclRankGraphGetTopoType(comm, netLayer, topoInstId, &topoType);
         if (ret != HCCL_SUCCESS) {
             free(endPointDescs);
-            MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] HcclRankGraphGetTopoType failed, comm[%p] netLayer[%u] topoInstId[%u] ret[%d]",
+            MC2_DFX_LOG("[MC2_ALLOC_DFX_v2] HcclRankGraphGetTopoType failed, comm[%p] netLayer[%u] topoInstId[%u] ret[%d]",
                 comm, netLayer, topoInstId, static_cast<int>(ret));
             return MC2_DFX_RESULT(ret);
         }

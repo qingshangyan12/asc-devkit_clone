@@ -319,7 +319,7 @@ HcclResult AllocComResourceByTilingAicpu(
         const HcclResult paramRet = GetOpParam(comm, stream, topoTag[i], ccTiling, opParamVec[i]);
         if (paramRet != HCCL_SUCCESS) {
             MC2_DFX_LOG(
-                "[MC2_ALLOC_DFX_v1] GetOpParam failed, rank[%u/%u] comm[%p] index[%u/%u] "
+                "[MC2_ALLOC_DFX_v2] GetOpParam failed, rank[%u/%u] comm[%p] index[%u/%u] "
                 "opType[%u] srcType[%u] dstType[%u] engine[%u] algConfig[%.*s] ret[%d]",
                 userRank, rankSize, comm, i, tilingNum, static_cast<unsigned>(ccTiling->opType),
                 static_cast<unsigned>(ccTiling->srcDataType), static_cast<unsigned>(ccTiling->dstDataType),
@@ -439,7 +439,7 @@ HcclResult HcclAllocComResourceByTilingImpl(
     HcclComm comm, void* stream, void* mc2Tiling, void** opResCtx, bool checkOnly = false)
 {
     HCCL_RUN_INFO(
-        "[MC2_ALLOC_DFX_v1][MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
+        "[MC2_ALLOC_DFX_v2][MC2_CLIENT_A5] enter asc-devkit common HcclAllocComResourceByTiling, "
         "comm[%p], stream[%p], tiling[%p].",
         comm, stream, mc2Tiling);
     // 记录开始时间，用于性能统计
@@ -498,7 +498,7 @@ HcclResult __attribute__((visibility("default"))) HcclAllocComResourceByTiling(
 {
     const HcclResult allocRet = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
     if (allocRet != HCCL_SUCCESS) {
-        MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] allocator exit, entry[%s] comm[%p] stream[%p] tiling[%p] ret[%d]",
+        MC2_DFX_LOG("[MC2_ALLOC_DFX_v2] allocator exit, entry[%s] comm[%p] stream[%p] tiling[%p] ret[%d]",
             __func__, comm, stream, mc2Tiling, static_cast<int>(allocRet));
     }
     return MC2_DFX_RESULT(allocRet);
@@ -522,7 +522,7 @@ extern "C" HcclResult __attribute__((visibility("default"))) HcclAllocComResourc
         comm, stream, mc2Tiling);
     const HcclResult allocRet = HcclAllocComResourceByTilingImpl(comm, stream, mc2Tiling, opResCtx);
     if (allocRet != HCCL_SUCCESS) {
-        MC2_DFX_LOG("[MC2_ALLOC_DFX_v1] allocator exit, entry[%s] comm[%p] stream[%p] tiling[%p] ret[%d]",
+        MC2_DFX_LOG("[MC2_ALLOC_DFX_v2] allocator exit, entry[%s] comm[%p] stream[%p] tiling[%p] ret[%d]",
             __func__, comm, stream, mc2Tiling, static_cast<int>(allocRet));
     }
     return MC2_DFX_RESULT(allocRet);

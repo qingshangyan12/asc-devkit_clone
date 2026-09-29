@@ -10,23 +10,64 @@
 #ifndef ASCENDC_MC2_RESOURCE_DFX_H
 #define ASCENDC_MC2_RESOURCE_DFX_H
 
+#include <cerrno>
+#include <cstdarg>
+#include <cstring>
+#include <sys/syscall.h>
+#include <unistd.h>
 #include "log.h"
 
+namespace Mc2ResourceDfx {
+// Independent failure sink: no Dlog level check, stdio buffering, allocation or
+// business lock. Keep errno unchanged and never replace the original result.
+static inline void WriteStderr(const char* format, ...)
+{
+    const int savedErrno = errno;
+    char buffer[2048] = {};
+    const int prefix = snprintf_s(buffer, sizeof(buffer), sizeof(buffer) - 1,
+        "[MC2_ALLOC_DFX_v2][stderr] pid[%ld] tid[%ld] ",
+        static_cast<long>(getpid()), static_cast<long>(syscall(SYS_gettid)));
+    if (prefix > 0 && static_cast<size_t>(prefix) < sizeof(buffer) - 1) {
+        va_list args;
+        va_start(args, format);
+        // On truncation securec terminates the available buffer and returns -1.
+        const size_t available = sizeof(buffer) - static_cast<size_t>(prefix);
+        (void)vsnprintf_s(buffer + prefix, available, available - 1, format, args);
+        va_end(args);
+        buffer[sizeof(buffer) - 1] = '\0';
+        size_t length = std::strlen(buffer);
+        if (length >= sizeof(buffer) - 1) {
+            length = sizeof(buffer) - 2;
+        }
+        buffer[length++] = '\n';
+        size_t offset = 0;
+        while (offset < length) {
+            const ssize_t written = write(STDERR_FILENO, buffer + offset, length - offset);
+            if (written > 0) {
+                offset += static_cast<size_t>(written);
+            } else if (written < 0 && errno == EINTR) {
+                continue;
+            } else {
+                break; // Closed/full output must not change the allocation result.
+            }
+        }
+    }
+    errno = savedErrno;
+}
+
+// Write the independent sink first, even if Dlog filters or cannot persist logs.
 #define MC2_DFX_LOG(...) \
     do { \
+        Mc2ResourceDfx::WriteStderr(__VA_ARGS__); \
         HCCL_ERROR(__VA_ARGS__); \
         HCCL_RUN_INFO(__VA_ARGS__); \
     } while (0)
 
-// Diagnostic-only return tracing. Success never emits a message. The normal log
-// prefix supplies PID/TID; file/line and expression identify the exact exit edge.
-namespace Mc2ResourceDfx {
-inline HcclResult Result(HcclResult result, const char* file, int line, const char* function, const char* call)
+// Success never emits a message; expressions are evaluated exactly once.
+static inline HcclResult Result(HcclResult result, const char* file, int line, const char* function, const char* call)
 {
     if (result != HCCL_SUCCESS) {
-        HCCL_ERROR("[MC2_ALLOC_DFX_v1] file[%s:%d] function[%s] call[%s] ret[%d]",
-            file, line, function, call, static_cast<int>(result));
-        HCCL_RUN_INFO("[MC2_ALLOC_DFX_v1] file[%s:%d] function[%s] call[%s] ret[%d]",
+        MC2_DFX_LOG("[MC2_ALLOC_DFX_v2] file[%s:%d] function[%s] call[%s] ret[%d]",
             file, line, function, call, static_cast<int>(result));
     }
     return result;
