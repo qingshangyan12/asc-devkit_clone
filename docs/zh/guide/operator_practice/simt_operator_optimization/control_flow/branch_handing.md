@@ -3,7 +3,7 @@
 【优先级】中
 
 【描述】SIMT编程模式下，Warp是基本的调度和执行单位，同一Warp内的32个线程执行同一条指令。流控制语句（if、switch、do、for、while）会产生分支跳转。当同一Warp内不同线程的跳转目标不一致时线程执行路径产生分歧，引起分支发散（Warp Divergence）。各分支只能串行执行，执行某一分支时，未进入该分支的线程被活跃线程掩码屏蔽、空转等待；硬件将汇合点地址与各方向的活跃线程掩码压入分支栈，全部分支执行完毕后在汇合点重新汇合。
-以Warp内一半线程`cond`为真、一半为假的if-else为例，对比predicate和divergence执行流程：
+以一个简单的if语句为例：
 
   ```cpp
   if (cond) {
@@ -12,17 +12,16 @@
       r = a - b;    // else 体
   }
   ```
+
 **图1** divergence与predicate优化对比图
 
 ![](../../../figures/branch_handing.png)
 
-predicate优化（又称if-conversion）是指编译器将较为简单的分支改写为直线执行：分支条件不再控制是否跳转，而是由每个线程各自计算，结果记录为一个谓词位（predicate flag）；分支体内的指令被改写为带谓词的指令，Warp内32个线程全部发射，指令流保持一条直线。此时仅谓词为真的线程写回结果，谓词为假的线程丢弃结果（不写回寄存器、不产生访存副作用）。
+为避免分支切换产生的开销，编译器可通过predicate优化对简单分支进行改写，将分支体内的指令改写为带谓词的指令，Warp内32个线程**全部发射**，指令流保持一条直线，仅谓词为真的线程写回结果，谓词为假的线程丢弃结果（不写回寄存器、不产生访存副作用）。出现warp divergence时，各分支只能串行执行，执行某一分支时，未进入该分支的线程被活跃线程掩码屏蔽、空转等待；硬件将汇合点地址与各方向的活跃线程掩码压入分支栈，全部分支执行完毕后在汇合点重新汇合。predicate优化可以消除跳转和分支栈开销，提高算子性能。
 
-Warp中的32个线程使用同一个PC(程序计数器)，出现分支发散时，各分支只能串行执行，会带来跳转和分支栈开销。当Warp中出现分支链时，使用predicate优化可以消除divergence带来的分支跳转的开销。
+【样例介绍】样例以[hlog10](../../../../api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个half元素为输入。对比不同特殊值处理方式的性能差异，展示predicate优化的收益来源。
 
-【样例介绍】样例以[hlog10](../../../../api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)分支链路为载体。使用`logf(x) / logf(10.0f)`计算输入数据的常用对数，并对6个精度有偏差的特殊值各做一步修正，输入为8192个half元素。样例中通过对比“分支命中即return”和“使用临时变量存储结果，统一return”的性能差异，展示predicate优化的收益来源。
-
-【反例】特殊值修正链置于正常值路径之前，命中即return。
+【反例】通过提前return的方式处理精度异常的特殊值。
 
 ```cpp
 __aicore__ inline half hlog10(half x)
@@ -41,12 +40,12 @@ __aicore__ inline half hlog10(half x)
         return static_cast<half>(3.474609375f);
     }
     float x_fp32 = __half2float(x);
-    float result_fp32 = logf(x_fp32) / logf(10.0f); // log10(x) = log(x) / log(10)
+    float result_fp32 = logf(x_fp32) / logf(10.0f);
     return __float2half_rn(result_fp32);
 }
 ```
 
-上述实现中，每个提前return都隐含一个else分支。将其展开为等价的显式if-else嵌套，其真实控制流为：
+上述提前return写法的实际控制流为：
 
 ```cpp
 __aicore__ inline half hlog10(half x)
@@ -69,7 +68,6 @@ __aicore__ inline half hlog10(half x)
                         if (x == static_cast<half>(2976.0f)) {
                             return static_cast<half>(3.474609375f);
                         } else {
-                            // 正常值路径位于6层嵌套的最内层
                             float x_fp32 = __half2float(x);
                             float result_fp32 = logf(x_fp32) / logf(10.0f);
                             return __float2half_rn(result_fp32);
@@ -82,15 +80,15 @@ __aicore__ inline half hlog10(half x)
 }
 ```
 
-正常值路径位于6级判断链的最内层，需依次通过6个条件判断才能到达，逐级叠加的跳转与分支栈开销无法避免。
-
-反例算子的性能数据如下（execute cycle为30次运行的中位数，Task Duration与aiv_total_cycles为msOpProf采集3次的中位数，下同）：
+接口中有6层分支判断会产生divergence，带来额外的跳转与分支栈开销。
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 | :---------------: | :--------------: | :--------------: |
-|      433        |     2.198       |      2399.50      |
+|      224        |     2.233       |      2498.75      |
 
-【正例】正常值路径前置，修正链统一return、覆盖temp。
+为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程。Task Duration与aiv_total_cycles为msOpProf 3次采集中位数，aiv_total_cycles取8个block的平均值。
+
+【正例】先完整执行正常值路径得到临时变量temp，然后逐级覆盖临时变量处理精度异常的特殊值。
 
 ```cpp
 __aicore__ inline half hlog10(half x)
@@ -115,19 +113,24 @@ __aicore__ inline half hlog10(half x)
 }
 ```
 
-上述实现中，正常值路径位于分支发散区域之外，特殊值修正链使用临时变量存储结果，最后统一return。正例算子的性能数据如下（输入与反例相同）：
+上述实现中，先完整执行正常值路径得到临时变量temp，然后逐级覆盖临时变量处理精度异常的特殊值。正例算子的性能数据如下（输入与反例相同）：
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 | :---------------: | :--------------: | :--------------: |
-|      394.5       |     2.226       |      2385.75      |
+|      190       |     2.259       |      2475.50      |
 
-从execute cycle看，谓词化后从433降至394.5，下降约8.9%。使用predicate优化后，编译器将整个修正链全部谓词化为直线执行，跳转与分支栈开销被完全消除。
+提前return在实际场景中很难触发：SIMT代码实际以warp为单位执行，必须warp内所有线程的数据都是特殊值才能提前return，从概率上可以忽略不计，绝大部分场景下，特殊值线程需要等其他线程完成计算后再一起往下执行。通过临时变量存储中间值，逐级覆盖最后统一return这种写法，可以引导编译器进行predicate优化，消除跳转与分支栈开销，相比反例的224，execute cycle降至190，下降约15.2%；Task Duration基本持平，aiv_total_cycles从2498.75降至2475.50。
 
-对比Case0和Case1可得：Warp 内出现分支发散时，predicate优化相对divergence的收益，主要来自消除跳转与分支栈开销。但若某分支命中率较高，predicate优化会让这部分线程执行完全部指令才返回，多执行大量无用指令，会造成性能损失。后续样例将对不同命中率的分支采用不同处理方式，展示predicate优化的适用范围。
+predicate优化通过消除跳转与分支栈开销提高性能，但复杂逻辑编译器不会用predicate优化，因此异常值处理这类简单分支建议使用predicate优化。predicate优化会执行所有分支的所有指令，divergence机制只执行必要的路径。若某分支命中率较高，使用predicate优化时这部分线程会多执行大量无用指令，会造成性能损失，此时使用divergence可以节省计算开销。后续样例将对不同命中率的分支采用不同处理方式，展示predicate优化的适用范围。
 
-【样例介绍】样例以[j0f](../../../../api/SIMT-API/math_functions/float_math_functions/j0f.md)分支链路为载体。计算输入数据第一类零阶贝塞尔函数。接口按输入数据绝对值分三段计算，并对两个特殊值进行单独处理。样例以8192个float元素为输入，正常情况下数据的取值范围为`ax <= 1.0e13f`；混合批在此基础上加入`ax > 1.0e13f`与NaN/-Inf特殊值。
+【样例介绍】样例以[j0f](../../../../api/SIMT-API/math_functions/float_math_functions/j0f.md)接口为例。j0f接口计算输入数据第一类零阶贝塞尔函数。接口按输入数据绝对值分三段计算，并对两个特殊值进行单独处理。样例以8192个float元素为输入，按分支命中情况构造两批输入：
 
-【反例】全部分支命中即return。
+| 输入数据 | 数据范围 |
+| :---------------: | :--------------------------------------------------- |
+| input1 | 在实数域随机取值，并包含特殊值 |
+| input2 | 在`[-1.0e13f,1.0e13f]`范围内随机取值 |
+
+【反例】使用提前return的方式处理所有分支。
 
 ```cpp
 __aicore__ inline float j0f(float x)
@@ -149,13 +152,13 @@ __aicore__ inline float j0f(float x)
 }
 ```
 
-上述实现中，先判断特殊值并即时返回；再顺序逐段匹配，命中即返回该段结果。各分支独立返回，无统一出口。常规批不含特殊值，两次特殊值判断均未命中；各线程命中对应分段并返回，只执行命中方向的分段体，未命中的判断仍逐级产生跳转与分支栈开销，execute cycle为1221.5。性能数据如下：
+input2取值范围为`[-1.0e13f,1.0e13f]`，各线程只执行命中方向的分支体，未命中的分支仍产生跳转与分支栈开销，execute cycle为1139。性能数据如下：
 
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 | :---------------: | :--------------: | :--------------: |
-|      1221.5        |     2.551       |      3015.88      |
+|      1139        |     2.437       |      2837.75      |
 
-【正例】命中率高的分支命中即提前return，其余分支统一返回。
+【正例】使用提前return的方式处理命中率高的分支，剩余分支使用临时变量处理，最后统一return。
 
 ```cpp
 __aicore__ inline float j0f(float x)
@@ -178,13 +181,13 @@ __aicore__ inline float j0f(float x)
 }
 ```
 
-该实现输入数据在`ax <= 8.0f`及`ax <= 1.0e13f`区间时，命中即提前return，其余分支使用临时变量存储结果，逐级覆盖并统一return。性能数据如下：
+该实现使用提前return处理高命中率分支，用临时变量暂存低命中率分支的计算结果，从而引导编译器对低命中率分支进行predicate优化。性能数据如下：
 
 | 输入数据 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 | :---------------: | :--------------: | :--------------: | :--------------: |
-| input（normal） | 1301 | 2.538 | 2972.25 |
-| input（mixed） | 19260 | 13.136 | 18508.50 |
+| input1 | 4014 | 13.616 | 20727.38 |
+| input2 | 1090 | 2.376 | 2760.50 |
 
-两批输入上，常规批数据落在`ax <= 1.0e13f`区间时execute cycle为1301，与基线Case 2的1221.5接近，整体开销与基线相当；混合批含特殊值时execute cycle为19260，远高于常规批。这是因为命中率高的分支提前return只执行命中方向，避免执行不必要分支，命中率低的分支使用predicate优化，两种机制各取所长。
+input1：输入数据覆盖实数域并混入特殊值，warp内分段跳转分支产生divergence，execute cycle为4014。input2：所有线程都提前return，不执行后续未命中的分支计算，execute cycle为1090，低于反例基线1139；Task Duration与aiv_total_cycles分别为2.376μs与2760.50，均低于反例的2.437μs与2837.75，整体开销低于基线。
 
-【总结】在SIMT算子中，处理分支链路时使用predicate可以消除divergence方法带来的跳转和分支栈开销，带来性能收益，但当某个分支命中率高时应该使用divergence：命中即提前return，只执行命中方向；命中率低的分支用临时变量承接结果、统一出口返回，引导编译器进行predicate优化，可最大程度消除divergence，提高算子性能。
+【总结】当warp divergence出现在简单分支时，可使用临时变量的写法引导编译器进行predicate优化消除分支跳转开销。predicate优化会执行所有分支的所有指令，divergence只执行必要的路径，当分支链路中各分支命中率不同时，命中率高的分支保留divergence，命中率低的分支进行predicate优化，既可以避免执行不必要的指令，又可以消除分支跳转的开销。
