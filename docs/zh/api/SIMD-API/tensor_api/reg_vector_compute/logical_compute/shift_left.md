@@ -79,7 +79,7 @@ __simd_callee__ inline reg_tensor<T> operator<<(
 
 ## 调用示例
 
-以下示例展示接口在AIV计算函数中的典型调用方式。示例先为加载结果绑定mask，
+示例先为加载结果绑定mask，
 再执行计算并将结果写回UB。
 
 ```cpp

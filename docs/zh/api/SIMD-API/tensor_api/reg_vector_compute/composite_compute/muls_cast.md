@@ -80,8 +80,6 @@ __simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U
 
 ## 调用示例
 
-以下示例展示接口在AIV计算函数中的典型调用方式。
-
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
 

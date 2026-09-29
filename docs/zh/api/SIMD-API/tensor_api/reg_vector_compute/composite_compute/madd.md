@@ -78,8 +78,6 @@ __simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T
 
 ## 调用示例
 
-以下示例展示接口在AIV计算函数中的典型调用方式。
-
 ```cpp
 #include "tensor_api/experimental/vector_compute.h"
 
