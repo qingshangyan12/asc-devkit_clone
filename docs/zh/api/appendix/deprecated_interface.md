@@ -113,9 +113,9 @@
 
     此接口后续版本会废弃，请使用[asc_loadalign_unpack4_postupdate](../SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md)接口。
 
-- [asc_loadalign (多模式重载)](../SIMD-API/c_api/reg_compute/load/asc_loadalign.md)接口
+- [asc_loadalign (多模式重载)](../SIMD-API/c_api/reg_compute/load/asc_loadalign_continuous.md)接口
 
-    原 `asc_loadalign(dst, src)` 通过函数名重载实现NORM/BRC/UP2X/DOWN2X/UNPACK/BRCV2/BRCV3/DEINTLV等多种搬入模式，现收窄为仅NORM模式，其他模式拆分到独立函数。请使用[asc_loadalign](../SIMD-API/c_api/reg_compute/load/asc_loadalign.md)的新版本。
+    原 `asc_loadalign(dst, src)` 通过函数名重载实现NORM/BRC/UP2X/DOWN2X/UNPACK/BRCV2/BRCV3/DEINTLV等多种搬入模式，现收窄为仅NORM模式，其他模式拆分到独立函数。请使用[asc_loadalign](../SIMD-API/c_api/reg_compute/load/asc_loadalign_continuous.md)的新版本。
 
 - [asc_loadalign (deintlv模式)](../SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md)接口
 
@@ -171,9 +171,9 @@
 
     此接口后续版本会废弃，请使用[asc_storealign_pack_quarter_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md)接口。
 
-- [asc_storealign (多模式重载)](../SIMD-API/c_api/reg_compute/store/asc_storealign.md)接口
+- [asc_storealign (多模式重载)](../SIMD-API/c_api/reg_compute/store/asc_storealign_continuous.md)接口
 
-    原 `asc_storealign(dst, src, mask)` 通过函数名重载实现NORM/FIRST/PACK/PACKV2/INTLV等多种搬出模式，现收窄为仅NORM模式，其他模式拆分到独立函数。请使用[asc_storealign](../SIMD-API/c_api/reg_compute/store/asc_storealign.md)的新版本。
+    原 `asc_storealign(dst, src, mask)` 通过函数名重载实现NORM/FIRST/PACK/PACKV2/INTLV等多种搬出模式，现收窄为仅NORM模式，其他模式拆分到独立函数。请使用[asc_storealign](../SIMD-API/c_api/reg_compute/store/asc_storealign_continuous.md)的新版本。
 
 - [asc_storealign (1st模式)](../SIMD-API/c_api/reg_compute/store/asc_storealign_1st.md)接口
 
@@ -191,9 +191,9 @@
 
     原asc_storealign重载之一，已拆分为独立函数[asc_storealign_pack_quarter](../SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md)。
 
-- [asc_storealign (postupdate模式)](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)接口
+- [asc_storealign (postupdate模式)](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate_continuous.md)接口
 
-    原asc_storealign重载之一，已拆分为独立函数[asc_storealign_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md)。
+    原asc_storealign重载之一，已拆分为独立函数[asc_storealign_postupdate](../SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate_continuous.md)。
 
 - [asc_scatter (reg_store)](../SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md)接口
 

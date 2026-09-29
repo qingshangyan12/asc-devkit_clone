@@ -37,7 +37,7 @@ Reg矢量计算内不同流水线之间的同步指令。该同步指令指定�
 
 ## 函数原型
 
-```cpp
+```c
 __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 ```
 
@@ -70,8 +70,8 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 | 流水线 | 含义 |
 | ------ | -------- |
-| `VEC_STORE` | `SIMD_VF`函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_storealign](../store/asc_storealign.md)。 |
-| `VEC_LOAD` | `SIMD_VF`函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_loadalign](../load/asc_loadalign.md)。 |
+| `VEC_STORE` | `SIMD_VF`函数内矢量写UB流水线。<br>对应寄存器到UB的搬运指令，例如[asc_storealign](../store/asc_storealign_continuous.md)。 |
+| `VEC_LOAD` | `SIMD_VF`函数内矢量读UB流水线。<br>对应UB到寄存器的搬运指令，例如[asc_loadalign](../load/asc_loadalign_continuous.md)。 |
 | `SCALAR_STORE` | `SIMD_VF`函数内标量写UB流水线。 |
 | `SCALAR_LOAD` | `SIMD_VF`函数内标量读UB流水线。 |
 | `VEC_ALL` | `SIMD_VF`函数内所有矢量读写UB流水线。 |
@@ -109,7 +109,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cmath>
 #include <cstdint>
 #include <iostream>

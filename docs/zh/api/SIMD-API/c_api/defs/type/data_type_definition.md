@@ -73,7 +73,7 @@ asc_unpack_lower(mask_b64, mask_b32);
 | :-- | :------------ | :------------ | :------------ |
 | 1 | 调用接口设置 | [asc_create_mask](../../reg_compute/reg_mask/asc_create_mask.md) | 通过参数指定掩码模式，即指定参与计算的元素位置。 |
 | 2 | 调用接口设置 | [asc_update_mask](../../reg_compute/reg_mask/asc_update_mask.md) | &bull; 在循环外调用时，设置固定掩码，表示每次循环中前`count`个元素参与计算。<br>&bull; 在循环内调用时，根据剩余的`count`生成当前循环的掩码，并自动更新`count`。 |
-| 3 | 从UB搬入 | [asc_loadalign](../../reg_compute/load/asc_loadalign_mask.md)、[asc_loadalign_postupdate](../../reg_compute/load/asc_loadalign_postupdate.md)、[asc_loadalign_mask](../../reg_compute/load/asc_loadalign_mask.md)等接口 | 将掩码从UB搬入掩码寄存器。 |
+| 3 | 从UB搬入 | [asc_loadalign、asc_loadalign_mask](../../reg_compute/load/asc_loadalign_mask.md)、[asc_loadalign_postupdate](../../reg_compute/load/asc_loadalign_mask_postupdate.md)等接口 | 将掩码从UB搬入掩码寄存器。 |
 | 4 | 从矢量数据寄存器搬入 | [asc_copy](../../reg_compute/reg_copy/asc_copy.md) | 从`vector_uint16_t`或`vector_uint32_t`搬运至掩码寄存器。 |
 
 **注意：**

@@ -14,13 +14,13 @@ Reg矢量计算C API提供面向Reg矢量计算架构的寄存器级矢量计算
 - 编写和调用Vector Function（向量函数）。这些函数使用`__simd_vf__`标记，可在核函数（Kernel）中调用；
 - 定义矢量数据寄存器`vector_<dtype>`、掩码寄存器`vector_bool`，更多Reg数据类型请参见[Reg数据类型定义](../defs/type/data_type_definition.md)；
 - 编写循环处理多个VL长度的数据；[asc_update_mask](./reg_mask/asc_update_mask.md)系列接口用于更新参与计算的mask，每次循环都会消耗一个VL长度的元素；
-- 循环内调用Reg数据搬入接口连续对齐搬入（[asc_loadalign](./load/asc_loadalign.md)）从UB中搬入单个VL长度数据；
+- 循环内调用Reg数据搬入接口连续对齐搬入（[asc_loadalign](./load/asc_loadalign_continuous.md)）从UB中搬入单个VL长度数据；
 - 循环内调用Reg计算接口[asc_add](./reg_arith/asc_add.md)完成单次Repeat计算；
-- 循环内调用Reg数据搬出接口连续对齐搬出（[asc_storealign](./store/asc_storealign.md)）往UB中搬出计算后的数据。
+- 循环内调用Reg数据搬出接口连续对齐搬出（[asc_storealign](./store/asc_storealign_continuous.md)）往UB中搬出计算后的数据。
 
 ## Reg矢量计算编程示例
 
-```cpp
+```c
 constexpr uint32_t ELEMENT_COUNT = 64;
 
 __simd_vf__ inline void add_vf(__ubuf__ float* dst, __ubuf__ float* src0, __ubuf__ float* src1)
