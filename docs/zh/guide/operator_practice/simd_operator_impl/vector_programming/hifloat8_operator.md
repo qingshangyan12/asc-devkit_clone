@@ -1,4 +1,4 @@
-# hifloat8_t数据类型算子实践
+# hifloat8数据类型
 
 hifloat8_t是面向低精度量化场景的8-bit浮点存储类型。本文介绍hifloat8_t的类型定位及相关硬件支持能力，包括数据搬运、向量计算、矩阵乘和Fixpipe随路量化，并以SwiGLU激活算子为例，基于静态Tensor编程方式讲解“低精度存储、高精度计算”的完整开发流程与精度验证方法。
 
@@ -31,8 +31,8 @@ hifloat8_t的定位是**低精度存储和搬运类型**，不是计算类型。
 | 数据搬运 | GM与UB之间、UB内部均可按字节搬运 | [DataCopy](../../../../api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMAndUB_continuous.md)系列 |
 | 向量计算 | 不支持hifloat8_t直接参与算术运算，需先转换为half/float | [Cast](../../../../api/SIMD-API/basic_api/memory_vector_compute/type_conversion/Cast.md)+矢量计算API |
 | 矢量量化 | 支持float/half量化输出hifloat8_t | [Cast](../../../../api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Cast.md) |
-| 矩阵乘 | A/B矩阵支持hifloat8_t输入，L0C以float累加，C矩阵支持hifloat8_t输出 | [Matmul](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_usage.md)、[Mmad](../../../../api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md) |
-| Fixpipe随路量化 | L0C的float结果搬出时直接量化为hifloat8_t | [Fixpipe](../../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)、[SetQuantScalar](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantScalar.md) |
+| 矩阵乘 | A/B矩阵支持hifloat8_t输入，L0C Buffer（CO1）以float累加，C矩阵支持hifloat8_t输出 | [Matmul](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/Matmul_usage.md)、[Mmad](../../../../api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md) |
+| Fixpipe随路量化 | L0C Buffer（CO1）中的float结果搬出时直接量化为hifloat8_t | [Fixpipe](../../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)、[SetQuantScalar](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantScalar.md) |
 
 ### 数据搬运
 
@@ -41,7 +41,7 @@ hifloat8_t的定位是**低精度存储和搬运类型**，不是计算类型。
 - 搬运量须为32字节的整数倍，否则实际搬运量会向下取整到32字节边界；
 - UB侧地址须32字节对齐。
 
-UB内部的Copy、GM到UB的ND2NZ等切分搬运同样支持hifloat8_t。注意[DataCopyPad](../../../../api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB.md)不支持hifloat8_t，非对齐数据的处理方式请参见[非对齐场景](../../simd_operator_impl/vector_programming/unaligned_scenario.md)。
+UB内部的Copy、GM到UB的ND2NZ等切分搬运同样支持hifloat8_t。
 
 ### 向量计算与类型转换
 
@@ -58,40 +58,28 @@ UB内部的Copy、GM到UB的ND2NZ等切分搬运同样支持hifloat8_t。注意[
 矩阵乘是HIF8能力最完整的计算域，也是hifloat8_t的核心使用场景：
 
 - **输入**：Matmul高阶API的A、B矩阵支持hifloat8_t（A、B数据类型必须一致），tiling中通过[SetAType](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Tiling/SetAType.md)/SetBType配置`DataType::DT_HIFLOAT8`；bias支持float、half、bfloat16_t。
-- **计算精度**：hifloat8_t输入在Cube中以float完成累加，L0C中的结果为float，量化误差只来自输入端的一次量化。
-- **输出**：C矩阵支持hifloat8_t、half、bfloat16_t、float。当C为hifloat8_t时，L0C的float结果经Fixpipe随路量化直接输出，无需单独的反量化算子。
+- **计算精度**：hifloat8_t输入在Cube中以float完成累加，L0C Buffer（CO1）中的结果为float，量化误差只来自输入端的一次量化。
+- **输出**：C矩阵支持hifloat8_t、half、bfloat16_t、float。当C为hifloat8_t时，L0C Buffer（CO1）中的float结果经Fixpipe随路量化直接输出，无需单独的反量化算子。
 - **Fixpipe量化模式**：`QF322HIF8_PRE`/`VQF322HIF8_PRE`（scalar/tensor量化，Half to Away舍入）和`QF322HIF8_PRE_HYBRID`/`VQF322HIF8_PRE_HYBRID`（Hybrid舍入），量化参数scale/offset的配置请参见[Fixpipe随路量化](../../../../api/SIMD-API/basic_api/cube_compute_ISASI/cube_store_key_features/accompanying_quantization.md)和[SetQuantScalar](../../../../api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/SetQuantScalar.md)。
-- **溢出行为**：hifloat8_t的溢出判断阈值为$1.25 \times 2^{15} = 40960$，量化后的值绝对值不小于40960时输出inf，而不是饱和到最大值。各特殊值的边界行为请参见[矩阵计算结果搬出接口边界值说明](../../../../api/appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
+- **溢出行为**：hifloat8_t的溢出判断阈值为$1.25 \times 2^{15} = 40960$，量化后的值绝对值不小于40960时输出Inf，而不是饱和到最大值。各特殊值的边界行为请参见[矩阵计算结果搬出接口边界值说明](../../../../api/appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
 
 A、B矩阵为hifloat8_t的Matmul完整可运行样例请参见[Matmul FP8直调样例](../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fp8/README.md)。C API场景下，[asc_enable_hif8](../../../../api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md)可以使能fp8_e4m3fn_t位模式输入按hifloat8_t解释参与矩阵乘。
 
-由此可以勾勒出以HIF8执行量化推理的典型数据流：**hif8输入矩阵乘（L0C float累加）→ Fixpipe随路量化输出hif8激活 → 矢量算子以DQ-Compute-Q模式消费hif8激活 → 下一个hif8矩阵乘**。层间激活全程以hifloat8_t流转，访存开销相比half减半。
+由此可以勾勒出以HIF8执行量化推理的典型数据流：**hif8输入矩阵乘（L0C Buffer中以float累加）→ Fixpipe随路量化输出hif8激活 → 矢量算子以DQ-Compute-Q模式消费hif8激活 → 下一个hif8矩阵乘**。层间激活全程以hifloat8_t流转，访存开销相比half减半。
 
 ## 舍入模式：CAST_ROUND与CAST_HYBRID
 
-从hifloat8_t转为half或float属于数据类型小转大，使用CAST_NONE模式，无精度损失。从half或float转为hifloat8_t属于数据类型大转小，支持CAST_ROUND和CAST_HYBRID两种舍入模式，两者的区别是hifloat8_t量化中最关键的决策点。
+从hifloat8_t转为half或float属于数据类型小转大，使用CAST_NONE模式，无精度损失。从half或float转为hifloat8_t属于数据类型大转小，支持CAST_ROUND和CAST_HYBRID两种舍入模式。
 
 ### CAST_ROUND
 
-CAST_ROUND是确定性的四舍五入（Half to Away）模式：按照HIF8转换规则对被截断部分四舍五入，当被截断部分恰好为可表示间隔的一半时，向远离零的方向进位。相同输入和相同控制配置下，输出永远相同，结果可逐比特复现，适合功能验证、逐比特真值比较以及需要稳定输出的推理流程。
+CAST_ROUND是确定性的四舍五入（Half to Away）模式，适用于逐比特真值比较或需要稳定输出的场景。
 
 ### CAST_HYBRID
 
-CAST_HYBRID是HIF8专用的混合随机舍入模式。其舍入行为与数值的指数$E_v$有关：
+CAST_HYBRID是HIF8专用的随机舍入模式，适用于关注量化误差统计特性的场景。验证时应将输出反量化后统计误差，不以固定bit串作为唯一真值。
 
-- 当$|E_v| < 4$时，按保护位（Guard bit）确定性进位，行为与CAST_ROUND一致。
-- 当$4 \leq |E_v| \leq 15$（Normal数）或$-22 \leq E_v \leq -16$（Subnormal数）时，将尾数被截断部分`frac`与阈值`thr`比较：`frac >= thr`则尾数加1并处理进位，否则直接截断。阈值`thr`取自源操作数的低位（float转hifloat8_t时取源数据低14位，half转hifloat8_t时按`{tmp2[0], 1'b1}`拼接），因此舍入结果随源数据低位变化，等价于随机舍入。
-- 当$E_v = -23$时，进位结果决定输出最小Subnormal还是Zero。
-
-随机舍入的价值在于量化噪声的统计特性：当源数据低位近似均匀分布时，进位概率与被截断部分的大小成正比，量化误差在统计上近似无偏（期望趋于0）。对大模型量化而言，逐层累积的系统性量化偏差是影响精度的因素之一，随机舍入可以避免误差方向固定；而确定性舍入在同一数值上永远朝同一方向取整，大量累加后可能引入固定偏置。
-
-使用CAST_HYBRID时注意：
-
-- 输出依赖源数据低位，相同输入数值的舍入结果不可逐比特复现，**不能以固定bit串作为唯一真值**。验证时应将输出反量化后统计误差分布（均值偏差、方差或相对误差）。
-- 需要结果可复现的场景（功能调试、逐比特比对）应使用CAST_ROUND。
-- Fixpipe随路量化提供对应的`QF322HIF8_PRE_HYBRID`/`VQF322HIF8_PRE_HYBRID`模式，舍入行为与CAST_HYBRID一致，矩阵乘结果可直接以混合舍入模式量化输出。
-
-含NaN、inf、下溢等边界处理的完整转换规则请参见[Cast（Reg矢量）的转换规则](../../../../api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Cast.md)，各舍入模式的定义请参见[RoundMode](../../../../api/SIMD-API/basic_api/reg_vector_compute/aux_data_types/RoundMode.md)。
+含NaN、Inf、下溢等边界处理的完整转换规则请参见[Cast（Reg矢量）的转换规则](../../../../api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Cast.md)，各舍入模式的定义请参见[RoundMode](../../../../api/SIMD-API/basic_api/reg_vector_compute/aux_data_types/RoundMode.md)。
 
 ### 类型转换接口选择
 
@@ -250,7 +238,7 @@ AscendC::DataCopy(zGm, zLocal, TOTAL_LENGTH);
 
 #### 完整样例
 
-完整的Kernel、Host调用、输入生成和精度校验代码请参见[hif8_swiglu_high_performance样例](../../../../../../examples/01_simd_cpp_api/05_best_practices/03_fusion_compute/hif8_swiglu_high_performance/README.md)。
+完整的Kernel、Host调用、输入生成和精度校验代码请参见[hif8_swiglu_high_performance样例](../../../../../../examples/01_simd_cpp_api/05_best_practices/02_reg_compute/hif8_swiglu_high_performance/README.md)。
 
 ### 精度验证
 

@@ -3,6 +3,7 @@
 本节将以Add算子为例，带您快速构建Ascend C矢量算子程序，并学习矢量算子开发的典型场景以及处理方式。涉及的场景包括：
 
 -   [基础矢量算子](basic_vector_operator.md)：开发一个简单的Add矢量算子。
+-   [hifloat8数据类型](hifloat8_operator.md)：介绍hifloat8_t相关能力、反量化-计算-再量化开发模式和精度验证方法。
 -   [TBuf的使用](tbuf_usage.md)：在算子计算过程中使用临时空间存储运算的中间结果。
 -   [多核Tiling切分](multi_core_tiling/overview.md)：当算子需要多核并行计算或支持动态shape时，对输入数据进行切分、分块计算，并将不同数据块分配到多个AI Core上处理。
     -   [主块均分](multi_core_tiling/main_block_even_split.md)：算子在AI处理器的多个核上运行，所有核的计算数据量相等且32字节对齐。
