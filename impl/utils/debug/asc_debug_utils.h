@@ -34,6 +34,10 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "impl/utils/debug/npu_arch_9201/asc_debug_utils_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "impl/utils/debug/npu_arch_9202/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "impl/utils/debug/npu_arch_5102/asc_debug_utils_impl.h"
 #else
@@ -203,7 +207,7 @@ __aicore__ inline void do_overlow_skip(
     ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
 }
 
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
 {
     constexpr uint32_t maxCounter = 15;
