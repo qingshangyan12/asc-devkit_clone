@@ -85,6 +85,51 @@ def test_build_command_passes_default_numeric_mode(tmp_path):
     assert "--simplified_key_mode=None" not in command
 
 
+def test_build_command_appends_kernel_spec_options(tmp_path):
+    builder = ascendc_bin_param_build.BinParamBuilder("AddCustomTemplate")
+    builder.op_file = "add_custom_template"
+    builder.op_intf = "add_custom_template"
+    builder.soc = "ascend910b"
+    builder.out_path = str(tmp_path)
+    builder.kernel_spec_options = f" --kernel-spec=Normal --kernel-spec-dir={tmp_path}/kernel_spec/ascend910b"
+
+    builder._write_build_cmd(str(tmp_path / "param.json"), "AddCustomTemplate_FP16", 0, str(tmp_path))
+
+    command = (tmp_path / "AddCustomTemplate-add_custom_template-0.sh").read_text(encoding="utf-8")
+    assert "--kernel-spec=Normal" in command
+    assert f"--kernel-spec-dir={tmp_path}/kernel_spec/ascend910b" in command
+
+
+def test_relocatable_command_skips_kernel_spec_options_and_logs_once(tmp_path, capsys):
+    builder = ascendc_bin_param_build.BinParamBuilder("AddCustomTemplate")
+    builder.op_file = "add_custom_template"
+    builder.op_intf = "add_custom_template"
+    builder.soc = "ascend910b"
+    builder.out_path = str(tmp_path)
+    builder.op_super_config = ["--op_relocatable_kernel_binary=true"]
+    builder.kernel_spec_options = f" --kernel-spec=Normal --kernel-spec-dir={tmp_path}/kernel_spec/ascend910b"
+
+    builder._write_build_cmd(str(tmp_path / "normal.json"), "AddCustomTemplate_FP16", 0, str(tmp_path))
+    builder._write_build_cmd(
+        str(tmp_path / "relocatable.json"), "AddCustomTemplate_FP16_relocatable", 1, str(tmp_path), True
+    )
+    builder._write_build_cmd(
+        str(tmp_path / "relocatable_2.json"), "AddCustomTemplate_FP16_relocatable_2", 2, str(tmp_path), True
+    )
+
+    normal_command = (tmp_path / "AddCustomTemplate-add_custom_template-0.sh").read_text(encoding="utf-8")
+    relocatable_command = (tmp_path / "AddCustomTemplate-add_custom_template-1.sh").read_text(encoding="utf-8")
+    assert "--kernel-spec=Normal" in normal_command
+    assert "--op_relocatable_kernel_binary=true" in relocatable_command
+    assert "--kernel-spec" not in relocatable_command
+    assert (
+        capsys.readouterr().out.count(
+            "INFO: [ascend910b] Skip Kernel Spec options for AddCustomTemplate relocatable binary."
+        )
+        == 1
+    )
+
+
 def test_kernel_json_without_simplified_key_keeps_legacy_behavior(tmp_path, monkeypatch):
     json_file = tmp_path / "legacy.json"
     json_file.write_text(
