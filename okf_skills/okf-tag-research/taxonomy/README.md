@@ -1,13 +1,13 @@
 # Tag 词表工件说明
 
-本目录保存冻结 tag 词表的唯一事实源：
+本目录保存词表调研资产；冻结生产词表位于共享配置 [`../../config/tag-taxonomy.json`](../../config/tag-taxonomy.json)：
 
-- `tag-taxonomy.json`：冻结的 namespace、标签值、定义和选择规则（当前 3 个语义 namespace）。
 - `tag-rules.yaml`：必填、证据与可推导边界规则。
 - `releases/`：经人工批准发布的冻结版本；`core-v8-frozen.json` 为旧基线保留用于回退对照。
 
-调研、标注和写入流程都必须从 `tag-taxonomy.json` 读取 namespace 和值；`okf-yaml-generate`
-同样读取本目录，不得另建并行词表。provisional 文件只存在于对应 `runs/<run-id>/`。
+调研、标注和写入流程都必须从共享配置的 `tag-taxonomy.json` 读取 namespace 和值；
+`okf-yaml-generate` 与 `okf-index` 同样读取该文件，不得另建并行词表。
+provisional 文件只存在于对应 `runs/<run-id>/`。
 
 ## 词表结构（core-v10 起）
 
@@ -35,5 +35,6 @@ destination_locations）与历史 trait 值（masked、deprecated）已改为索
 
 ## 版本规则
 
-- 词表和规则直接维护在本目录唯一事实源文件中；调研 `approve` 的冻结产物写入 `releases/`。
+- 冻结生产词表维护在 `../../config/tag-taxonomy.json`（okf-tag-research 唯一写入）；
+  调研 `approve` 的冻结产物写入本目录 `releases/`。
 - 发布 registry 切换生产版本是单独的人工批准动作，不由调研流程自动完成。

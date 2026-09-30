@@ -1,6 +1,6 @@
 ---
 name: okf-index
-description: 把 slim OKF 头（5字段）+ include Doxygen + examples marker 三类头推导为门控化持久索引（CANN 版本 × 架构 × 层级，默认 9.x 自动检测 × A5 × c_api），提供统一查询 CLI（阶段/操作/分类/参数反查/枚举反查/特性/版本/产品/依赖图/缺口）。脚本为主 + derive-overrides 兜底，构建确定性。
+description: 把 slim OKF 头（5字段）+ include Doxygen + examples marker 三类头推导为门控化持久索引（CANN 版本 × 架构 × 层级，默认 9.x 自动检测 × A5 × c_api），提供前置保障（ensure_index.py：本地环境匹配 + 指纹漂移检测 + 按需原地重建）与统一查询 CLI（阶段/操作/分类/参数反查/枚举反查/特性/版本/产品/依赖图/缺口）。脚本为主 + derive-overrides 兜底，构建确定性。
 ---
 
 # OKF 索引建设
@@ -16,14 +16,15 @@ description: 把 slim OKF 头（5字段）+ include Doxygen + examples marker �
 ```
 okf-index/
   scripts/build_index.py        # 构建 + 校验 + 漂移检测（--check）；--arch/--cann-version 门控
+  scripts/ensure_index.py       # 前置保障（okf-retrieve 步骤 0）：门控匹配 + 指纹新鲜 → 按需原地重建
   scripts/query.py              # 查询 CLI（唯一检索入口）
-  scripts/derive/               # 推导引擎：include_db / docparse / examples_db / gate / overrides
+  scripts/derive/               # 推导引擎：include_db / docparse / examples_db / gate / overrides / slim_header
   derive-overrides/c_api.json   # LLM/人工裁决残留（unresolved.json 的固化结论，可审查可回放）
   index/c_api/index.json        # 索引实例（构建产物）：documents + 16 视图 + 依赖图 + defs 目录
   index/c_api/build-meta.json   # 源 commit、文档 sha256、词表/映射指纹
-  index/c_api/gaps.json         # 缺口登记（人工维护、构建校验）
+  index/c_api/gaps.json         # 缺口登记（人工维护、构建校验、随实例落盘快照）
   index/c_api/概览.md            # 人读概览（构建产物）
-  tests/test_index.py           # 门控 + 推导正确性 + 确定性 + dryrun 回归
+  tests/test_index.py           # 门控 + 推导正确性 + 确定性 + ensure 决策 + dryrun 回归
   tests/dryrun.yaml             # 查询清单（A5/A3 双实例）
 ```
 
@@ -75,12 +76,29 @@ python3 scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] 
 
 输出统一为 `path | API 名 | 命中原因`；枚举反查返回值目录与使用方。
 
+## 前置保障（okf-retrieve 步骤 0）
+
+```bash
+python3 scripts/ensure_index.py [--arch A5] [--cann-version X] [--skip-drift] [--strict] [--json]
+```
+
+检测链与构建同构（surface 默认 c_api）。committed 实例门控匹配且指纹新鲜 → 零动作；
+缺失、门控不符或漂移 → 原地重建。指纹默认轻量档（build-meta `document_sha256` 逐文件 +
+scope 文档数 + 词表/映射/gaps 哈希，毫秒级），`--strict` 走全量重建比对；`--skip-drift`
+只查门控。输出 JSON（`cann_version/arch_label/categories/doc_count/actions`）即检索
+上下文；失败时退出码 1，由检索侧如实转告。
+
 ## 维护边界
 
+- **自含性**：构建与前置保障只依赖三类头（文档 slim 头、include Doxygen、examples
+  marker）与共享配置（`config/tag-taxonomy.json`、`config/product-map.yaml`），不得
+  import 建设侧 skill（用户侧仅分发 okf-index + okf-retrieve + 三类头文件）。
 - 文档头变化（okf-yaml-generate 重跑）或 include/examples 变化后：重跑
   `build_index.py --scope c_api` 并提交索引 diff；`--check` 报漂移属预期报警。
+  检索侧触发 ensure 重建产生的本地 diff 同样只在维护流程确认后提交。
 - `derive-overrides/<surface>.json` 只登记脚本无法裁决、经人工核对的事实，每条附 reason；
   新增推导规则可消除的条目应删除。
-- gaps.json 人工按证据增补（hint/evidence 必须是真实仓库路径），构建只做存在性校验。
-- 词表合法性以 `okf-tag-research/taxonomy/tag-taxonomy.json`（core-v10）校验；
+- gaps.json 人工按证据增补（hint/evidence 必须是真实仓库路径），构建只做存在性校验；
+  `--out` 构建的实例目录会落盘 gaps.json 快照供 query 直接加载。
+- 词表合法性以 `config/tag-taxonomy.json`（共享配置，okf-tag-research 冻结产出）校验；
   全量轮次接入新范围时在 `SCOPES` 登记、放开 categories 并扩充 dryrun 清单。

@@ -39,7 +39,7 @@ from model_registry import (  # noqa: E402
 
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api"}
-TAXONOMY_PATH = SKILL_ROOT.parent / "okf-tag-research" / "taxonomy" / "tag-taxonomy.json"
+TAXONOMY_PATH = SKILL_ROOT.parent / "config" / "tag-taxonomy.json"
 VERSION_OVERRIDES_PATH = SKILL_ROOT / "config" / "version-overrides.yaml"
 DEPENDENCY_KINDS = {"requires", "configures", "constrained_by", "related", "replaced_by"}
 SEMANTIC_PURPOSE = "okf_semantic_annotations"

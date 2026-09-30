@@ -26,7 +26,7 @@ TAG_RE = re.compile(r"^(?P<namespace>[a-z][a-z0-9_]*):(?P<value>[a-z][a-z0-9_]*)
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 TAXONOMY_DIR = SKILL_ROOT / "taxonomy"
-DEFAULT_TAXONOMY = TAXONOMY_DIR / "tag-taxonomy.json"
+DEFAULT_TAXONOMY = SKILL_ROOT.parent / "config" / "tag-taxonomy.json"
 RELEASE_DIR = TAXONOMY_DIR / "releases"
 
 

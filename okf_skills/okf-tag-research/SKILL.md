@@ -18,9 +18,10 @@ description: Ascend C API tag 词表调研：对 API 文档、include 头文件�
 
 ## 词表来源
 
-冻结词表由本 Skill 的 `taxonomy/tag-taxonomy.json` 唯一维护，本 Skill 是词表唯一事实源。
-`taxonomy/tag-rules.yaml` 配套维护必填与证据规则。生产写入方（`okf-yaml-generate`）读取本目录，
-不得另建并行词表。
+冻结词表的生产文件是共享配置 `../config/tag-taxonomy.json`，本 Skill 是词表唯一事实源与
+唯一写入方（调研 `approve` 后人工切换生产版本）。`taxonomy/tag-rules.yaml` 配套维护必填与
+证据规则，`taxonomy/releases/` 保存冻结发布审计。生产消费方（`okf-yaml-generate`、
+`okf-index`）从共享配置读取，不得另建并行词表。
 
 ## 人工关口
 
@@ -45,8 +46,9 @@ description: Ascend C API tag 词表调研：对 API 文档、include 头文件�
    只能批准两个子代理均支持且不属可推导维度的候选。
 5. 执行 `validate-review`、`freeze-provisional`、`build-release-bundle`。provisional taxonomy
    不能被 tag 写入器使用。
-6. 仅向人工审批者展示发布包与 taxonomy diff。收到 approval record 后按批准结果更新
-   `taxonomy/tag-taxonomy.json`（冻结发布产物写入 `taxonomy/releases/`）。
+6. 仅向人工审批者展示发布包与 taxonomy diff。收到 approval record 后按批准结果冻结发布
+   （产物写入 `taxonomy/releases/`），生产词表 `../config/tag-taxonomy.json` 的切换是
+   单独的人工批准动作。
 
 ## 子代理隔离
 

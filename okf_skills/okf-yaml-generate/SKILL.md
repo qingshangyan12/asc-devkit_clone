@@ -9,8 +9,8 @@ description: 建设侧唯一打标记入口：为 Ascend C API 文档生成、�
 字段与推导契约的唯一事实源是 [`../字段与推导规范.md`](../字段与推导规范.md)：
 文档头固定 5 字段（`okftype, description, tag, dependencies, version`），
 可推导字段（signature/archs/header/examples/navigation 等）一律不写。
-标签词表与必填规则以 `../okf-tag-research/taxonomy/tag-taxonomy.json`
-（core-v10，3 语义 namespace）为准；脚本机械校验，无需复述解析器逻辑。
+标签词表与必填规则以 `../config/tag-taxonomy.json`
+（core-v10，3 语义 namespace，okf-tag-research 冻结产出）为准；脚本机械校验，无需复述解析器逻辑。
 
 ## 范围与写入
 

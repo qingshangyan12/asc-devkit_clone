@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
 REPO_ROOT = SCRIPTS.parents[2]
@@ -153,12 +155,6 @@ class DryrunTests(unittest.TestCase):
         scope = build_index.SCOPES["c_api"]
         build_index.build(REPO_ROOT, scope, cls.out / "a5", "9.2.0", "A5")
         build_index.build(REPO_ROOT, scope, cls.out / "a3", "9.2.0", "A3")
-        (cls.out / "a5" / "gaps.json").write_text(
-            (REPO_ROOT / "okf_skills/okf-index/index/c_api/gaps.json").read_text(encoding="utf-8"), encoding="utf-8"
-        )
-        (cls.out / "a3" / "gaps.json").write_text(
-            (REPO_ROOT / "okf_skills/okf-index/index/c_api/gaps.json").read_text(encoding="utf-8"), encoding="utf-8"
-        )
         cls.cases = yaml.safe_load(
             (Path(__file__).parent / "dryrun.yaml").read_text(encoding="utf-8")
         )
@@ -193,6 +189,111 @@ class DryrunTests(unittest.TestCase):
                     joined = json.dumps(results, ensure_ascii=False)
                     for token in case["contains"]:
                         self.assertIn(token, joined, f"{case['name']}: 缺少 {token}")
+
+
+class EnsureTests(unittest.TestCase):
+    """ensure_index 前置检测：门控匹配、指纹漂移与原地重建决策。"""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        import ensure_index
+        cls.ensure_mod = ensure_index
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.out = Path(cls.tmp.name)
+        build_index.build(REPO_ROOT, build_index.SCOPES["c_api"], cls.out / "inst", "9.2.0", "A5")
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.tmp.cleanup()
+
+    def _copy_instance(self, name: str) -> Path:
+        root = self.out / name
+        shutil.copytree(self.out / "inst", root / "c_api")
+        return root / "c_api"
+
+    def _patch_build_forbidden(self):
+        return mock.patch.object(
+            self.ensure_mod.build_index, "build",
+            side_effect=AssertionError("ensure must not rebuild"),
+        )
+
+    def test_gate_reasons(self) -> None:
+        ok = {"surface": "c_api", "cann_version": "9.2.0", "arch_label": "A5"}
+        self.assertEqual(self.ensure_mod.gate_reasons(ok, "c_api", "9.2.0", "A5"), [])
+        reasons = self.ensure_mod.gate_reasons(
+            {"surface": "c_api", "cann_version": "9.1.0", "arch_label": "A3"}, "c_api", "9.2.0", "A5"
+        )
+        self.assertEqual(reasons, ["cann 9.1.0 != 9.2.0", "arch A3 != A5"])
+
+    def test_light_fresh_ok(self) -> None:
+        ok, reasons = self.ensure_mod.light_fresh(self.out / "inst", REPO_ROOT, build_index.SCOPES["c_api"])
+        self.assertTrue(ok, reasons)
+
+    def test_light_fresh_detects_drift(self) -> None:
+        inst = self._copy_instance("drift-meta")
+        meta = json.loads((inst / "build-meta.json").read_text(encoding="utf-8"))
+        meta["taxonomy_sha256"] = "0" * 64
+        first_doc = next(iter(meta["document_sha256"]))
+        meta["document_sha256"][first_doc] = "1" * 64
+        (inst / "build-meta.json").write_text(json.dumps(meta), encoding="utf-8")
+        ok, reasons = self.ensure_mod.light_fresh(inst, REPO_ROOT, build_index.SCOPES["c_api"])
+        self.assertFalse(ok)
+        self.assertIn("taxonomy_sha256 drift: tag-taxonomy.json changed since build", reasons)
+        self.assertIn(f"document changed: {first_doc}", reasons)
+
+    def test_light_fresh_detects_scope_growth(self) -> None:
+        inst = self._copy_instance("drift-count")
+        index = json.loads((inst / "index.json").read_text(encoding="utf-8"))
+        index["meta"]["doc_count"] += 1
+        (inst / "index.json").write_text(json.dumps(index), encoding="utf-8")
+        ok, reasons = self.ensure_mod.light_fresh(inst, REPO_ROOT, build_index.SCOPES["c_api"])
+        self.assertFalse(ok)
+        self.assertTrue(any(r.startswith("scope document count") for r in reasons), reasons)
+
+    def test_committed_instance_ready_noop(self) -> None:
+        """committed c_api 实例与 9.2.0×A5 匹配且新鲜：ensure 零动作。"""
+        with self._patch_build_forbidden():
+            result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A5")
+        self.assertEqual(result["status"], "ready")
+        self.assertEqual(result["actions"], [])
+        self.assertEqual(result["categories"], ["vector_compute", "vector_datamove"])
+
+    def test_skip_drift_avoids_rebuild(self) -> None:
+        inst = self._copy_instance("skip")
+        meta = json.loads((inst / "build-meta.json").read_text(encoding="utf-8"))
+        meta["taxonomy_sha256"] = "0" * 64
+        (inst / "build-meta.json").write_text(json.dumps(meta), encoding="utf-8")
+        with self._patch_build_forbidden():
+            result = self.ensure_mod.ensure(
+                REPO_ROOT, "c_api", "9.2.0", "A5", skip_drift=True, index_root=inst.parent
+            )
+        self.assertEqual(result["actions"], [])
+
+    def test_ensure_rebuilds_on_drift(self) -> None:
+        inst = self._copy_instance("rebuild-drift")
+        meta = json.loads((inst / "build-meta.json").read_text(encoding="utf-8"))
+        meta["product_map_sha256"] = "0" * 64
+        (inst / "build-meta.json").write_text(json.dumps(meta), encoding="utf-8")
+        result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A5", index_root=inst.parent)
+        self.assertEqual(len(result["actions"]), 1)
+        self.assertIn("product_map_sha256 drift", result["actions"][0])
+
+    def test_ensure_rebuilds_on_gate_mismatch(self) -> None:
+        inst = self._copy_instance("rebuild-a3")
+        result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A3", index_root=inst.parent)
+        self.assertEqual(len(result["actions"]), 1)
+        self.assertIn("arch A5 != A3", result["actions"][0])
+        self.assertEqual(result["arch"], "2201")
+
+    def test_ensure_builds_missing_instance(self) -> None:
+        result = self.ensure_mod.ensure(
+            REPO_ROOT, "c_api", "9.2.0", "A3", index_root=self.out / "empty"
+        )
+        self.assertEqual(result["status"], "ready")
+        self.assertEqual(result["actions"], ["rebuilt: index.json missing"])
+        self.assertGreater(result["doc_count"], 0)
+        gaps = json.loads((self.out / "empty" / "c_api" / "gaps.json").read_text(encoding="utf-8"))
+        self.assertIn("scope_out_gaps", gaps)
 
 
 if __name__ == "__main__":

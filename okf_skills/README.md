@@ -8,11 +8,11 @@ Ascend C API 算子开发前的 API 发现基础设施：根据算子需求快�
 
 | 视角 | Skill | 职责 | 关键产物 |
 | --- | --- | --- | --- |
-| 建设侧 | `okf-tag-research` | 词表调研：三类源双盲发现、确定性校验、人工审批冻结；3 语义 namespace（roles/operations/traits） | `okf-tag-research/taxonomy/`（当前 core-v10） |
+| 建设侧 | `okf-tag-research` | 词表调研：三类源双盲发现、确定性校验、人工审批冻结；3 语义 namespace（roles/operations/traits） | `config/tag-taxonomy.json`（当前 core-v10）+ `okf-tag-research/taxonomy/releases/` |
 | 建设侧 | `okf-yaml-generate` | 唯一打标记入口：prepare→标注→validate→write 管线写入 5 字段 slim 头；version 从 Release Notes 推导 | 文档 front matter、`config/version-overrides.yaml` |
 | 建设侧 | `okf-maintain` | 新 API 文档范围接入的三段流水线编排（只编排不建规则） | 接入清单与分派结论 |
-| 用户侧 | `okf-index` | 三类头 → 门控化持久索引（CANN 版本×架构×层级）+ 查询 CLI；脚本为主 + derive-overrides 兜底 | `okf-index/index/<surface>/` |
-| 用户侧 | `okf-retrieve` | 算子需求 → 索引查询 → 分阶段候选 API 文档 | 固定格式检索结果（不落盘） |
+| 用户侧 | `okf-index` | 三类头 → 门控化持久索引（CANN 版本×架构×层级）+ 前置保障 ensure（本地环境匹配、指纹漂移检测、按需原地重建）+ 查询 CLI；脚本为主 + derive-overrides 兜底 | `okf-index/index/<surface>/` |
+| 用户侧 | `okf-retrieve` | 意图分析（不明确先反问）→ 索引前置保障 + 多轮查询 → 分阶段候选 API 文档 | 固定格式检索结果（不落盘） |
 
 ## 2. 端到端流程
 
@@ -28,9 +28,10 @@ flowchart TD
     subgraph S2[用户侧]
         E --> F[okf-index 三源推导 + 门控]
         G[product-map / derive-overrides / gaps] --> F
-        F --> H[持久索引 + 查询 CLI]
-        I[算子需求] --> J[okf-retrieve]
+        F --> H[持久索引 + ensure 前置保障 + 查询 CLI]
+        I[算子需求] --> J[okf-retrieve 意图分析]
         H --> J
+        J -->|意图不明确| U[反问用户] --> I
     end
 ```
 
@@ -39,12 +40,13 @@ flowchart TD
 - **run 目录**：调研 `okf-tag-research/runs/<run-id>/`，标注 `okf-yaml-generate/tmp/<run-id>/`，
   索引 `okf-index/index/<surface>/`；每次运行新目录，禁止复用他人工件。
 - **写入门禁**：validate 未通过不得写入；同一 front matter 串行写入。
-- **唯一事实源**：词表=`okf-tag-research/taxonomy/tag-taxonomy.json`；
+- **唯一事实源**：词表=`config/tag-taxonomy.json`（okf-tag-research 冻结产出，消费方不得
+  另建并行词表）；
   字段与推导=`字段与推导规范.md`；产品映射=`config/product-map.yaml`；
   版本裁决=`okf-yaml-generate/config/version-overrides.yaml`。
 - **只读边界**：索引是三类头的纯派生数据；`docs/` 正文、include、样例不在任何 skill 写入面。
-- **共享资产**：`字段与推导规范.md`、`config/product-map.yaml`、本 README、
-  `document-issues.md`（均在本目录，均在 `okf_skills/` 顶层）。
+- **共享资产**：`字段与推导规范.md`、`config/tag-taxonomy.json`、`config/product-map.yaml`、
+  本 README、`document-issues.md`（均在本目录，均在 `okf_skills/` 顶层）。
 
 ## 4. 当前状态（core-v10 试点轮）
 
@@ -55,6 +57,8 @@ flowchart TD
   重头（123 篇 API 页 5 字段 + 17 篇 index 页；头均 27.4→11.4 行，正文零改动）。
 - **索引**：`index/c_api/` 已按 **CANN 9.2.0 × A5（3510）× c_api** 门控重建（试点内容，
   旧全量索引已替换）；推导残留 12 条记录于 `unresolved.json`，均为静默重载无示例链接级。
+  检索前经 `ensure_index.py` 前置保障（本地 CANN/架构门控匹配 + 指纹漂移检测，
+  不匹配时原地重建）；okf-index 已解除对建设侧 skill 的代码依赖（用户侧自含）。
 - **全量轮次待办**：698 篇其余文档重标注 → `SCOPES` 放开 categories → 重建全量索引 →
   dryrun 清单扩充；详见各 SKILL.md 维护边界。
 

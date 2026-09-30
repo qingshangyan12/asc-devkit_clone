@@ -24,17 +24,21 @@ SCRIPTS_DIR = Path(__file__).resolve().parent
 OKF_ROOT = SCRIPTS_DIR.parents[1]
 REPO_ROOT = OKF_ROOT.parent
 sys.path.insert(0, str(SCRIPTS_DIR))
-sys.path.insert(0, str(OKF_ROOT / "okf-yaml-generate" / "scripts"))
 
-from controller import DEPENDENCY_KINDS, ValidationError, split_front_matter, taxonomy  # noqa: E402
 from derive import docparse, gate, overrides as overrides_mod  # noqa: E402
 from derive.examples_db import build_examples_db  # noqa: E402
 from derive.include_db import Declaration, build_include_db, declarations_for  # noqa: E402
+from derive.slim_header import (  # noqa: E402
+    DEPENDENCY_KINDS,
+    TAXONOMY_PATH,
+    ValidationError,
+    split_front_matter,
+    taxonomy,
+)
 
 SKILL_ROOT = SCRIPTS_DIR.parent
 INDEX_DIR = SKILL_ROOT / "index"
 PRODUCT_MAP_PATH = OKF_ROOT / "config" / "product-map.yaml"
-TAXONOMY_PATH = OKF_ROOT / "okf-tag-research" / "taxonomy" / "tag-taxonomy.json"
 STAGES = ("in", "out", "compute")
 LOCAL_BUFFERS = {
     "unified_buffer", "l1_buffer", "l0a_buffer", "l0b_buffer", "l0c_buffer",
@@ -115,7 +119,7 @@ def load_documents(root: Path, scope: Scope, errors: list[str]) -> tuple[dict[st
         allowed = {"okftype", "description", "tag", "dependencies", "version"}
         extra = sorted(set(fm) - allowed)
         if extra:
-            errors.append(f"{rel}: fields outside slim header (re-run okf-yaml-generate): {extra}")
+            errors.append(f"{rel}: fields outside slim header (violates 字段与推导规范.md): {extra}")
             continue
         tags: dict[str, list[str]] = {}
         for item in fm.get("tag") or []:
@@ -585,7 +589,10 @@ def build(root: Path, scope: Scope, out_dir: Path, cann_version: str, arch_label
         },
     }
     out_dir.mkdir(parents=True, exist_ok=True)
-    written: list[Path] = []
+    # gaps.json 是人工维护的构建输入（始终取自 committed scope 目录），随实例落盘一份
+    # 快照，保证 --out 构建的实例目录可被 query.py 直接加载。
+    (out_dir / "gaps.json").write_bytes((INDEX_DIR / scope.name / "gaps.json").read_bytes())
+    written: list[Path] = [out_dir / "gaps.json"]
     for name, payload in (
         ("index.json", json.dumps(index, ensure_ascii=False, indent=1) + "\n"),
         ("build-meta.json", json.dumps(build_meta, ensure_ascii=False, indent=1) + "\n"),
