@@ -130,6 +130,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     // op.Process();
 }
 ```
+
 假设我们通过add_kernel<<<8, 0, stream>>>(x, y, z);启动了上述核函数（Kernel）（即block_num = 8）。
 -   当block_idx = 0的核执行时，它的offset = 0，将负责处理全局数组中索引从0到1023的数据。
 -   当block_idx = 1的核执行时，它的offset = 1024，将负责处理全局数组中索引从1024到2047的数据。
