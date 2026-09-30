@@ -40,8 +40,37 @@
     ```
 
 - **算子编译与运行**：
+
+    本样例完整代码（hello_world.asc）如下：
+
+    ```cpp
+    #include "acl/acl.h"
+    #include "simt_api/asc_simt.h"
+    #include "utils/debug/asc_printf.h"
+
+    __global__ void hello_world()
+    {
+        if (threadIdx.x < 3) {
+            printf("[blockIdx (%u/%u)][threadIdx (%u/%u)]: Hello World!\n", blockIdx.x, gridDim.x, threadIdx.x, blockDim.x);
+        }
+    }
+
+    int32_t main(int argc, char const* argv[])
+    {
+        aclInit(nullptr);
+        aclrtSetDevice(0);
+        hello_world<<<2, 32, 0, nullptr>>>();
+        aclrtSynchronizeDevice();
+        aclrtResetDevice(0);
+        aclFinalize();
+        return 0;
+    }
+    ```
+
+    运行如下命令进行编译运行：
+
     ```bash
-    bisheng hello_world.asc --npu-arch=dav-3510 -o demo --enable-simt 
+    bisheng hello_world.asc --npu-arch=dav-3510 -o demo --enable-simt
     ./demo
     ```
 
