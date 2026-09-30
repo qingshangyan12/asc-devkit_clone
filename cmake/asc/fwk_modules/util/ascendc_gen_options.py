@@ -14,6 +14,7 @@ import sys
 import stat
 import os
 
+from kernel_spec_options import split_and_write_options
 from opdesc_parser import _trans_short_soc_to_soc_version
 
 
@@ -152,6 +153,8 @@ def _write_input_param_file(opc_config_file, input_param_file, op_type, compute_
 def gen_compile_options(compile_options_file: str, op_type: str, compute_unit: str, compile_options: list):
     base_dir = os.path.dirname(compile_options_file)
     opc_config_file = os.path.join(base_dir, "custom_opc_options.ini")
+
+    compile_options = split_and_write_options(compile_options, opc_config_file, op_type, compute_unit)
 
     (compile_opt, opc_debug_config, opc_kernel_config, opc_tiling_keys, input_param_file, opc_template_kernel_str) = (
         _parse_compile_options(compile_options)

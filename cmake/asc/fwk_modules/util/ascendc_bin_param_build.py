@@ -22,6 +22,7 @@ from typing import Set, NamedTuple
 
 import const_var
 import opdesc_parser
+from kernel_spec_options import shell_options
 from split_opc_json_with_op_list import split_json_files
 
 PYF_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -53,6 +54,7 @@ class BinParamBuilder(opdesc_parser.OpDesc):
         self.op_super_config = []
         self.kernel_template_input = ""
         self.simplified_key_mode = 0
+        self.kernel_spec_options = ""
 
     def set_soc_version(self: any, soc: str):
         self.soc = soc
@@ -485,6 +487,8 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
             kernel_template_input_str = self.kernel_template_input
             build_cmd_var += f" --kernel-template-input={kernel_template_input_str}"
 
+        build_cmd_var += self.kernel_spec_options
+
         build_cmd_var += ")\n"
         build_cmd_var += "\n"
 
@@ -697,6 +701,7 @@ def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str, opc_config_file: st
     for op_desc in op_descs:
         op_desc.set_soc_version(soc)
         op_desc.set_out_path(out_dir)
+        op_desc.kernel_spec_options = shell_options(opc_config_file, op_desc.op_type, soc)
         if op_desc.op_type in debug_config:
             op_desc.set_op_debug_config(debug_config[op_desc.op_type])
         if all_soc_key in debug_config:
