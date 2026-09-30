@@ -429,6 +429,7 @@ param_offset={self.wait_param_offset + index}\n"
                     self.origin_kernel_type_str
                 ]
                 self.block_num: int = sub_operater_infos["blockDim"]
+                self.schedule_mode: int = sub_operater_infos.get("schedule_mode", 0)
                 self.timestamp_option: bool = (
                     "timestamp" in sub_operater_infos.get("debugOptions", "")
                     or "printf" in sub_operater_infos.get("debugOptions", "")
