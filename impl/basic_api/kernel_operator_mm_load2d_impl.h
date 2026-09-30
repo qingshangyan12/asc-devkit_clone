@@ -55,6 +55,28 @@ __aicore__ inline void LoadDataImpl(
     }
 }
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams, const bool enablePreReadIgnoreSync = false)
+{
+#if ASCENDC_CPU_DEBUG
+    if (!CheckFuncLoadData2d(dst, src, loadDataParams, "LoadData with LoadData2DParams")) {
+        ASCENDC_REPORT_CHECK_ERROR("LoadData with LoadData2DParams", KernelFuncType::NONE_MODE);
+    }
+#endif
+    const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
+    if (dstScope == Hardware::L0A) {
+        LoadData2DGM2L0ACal((__ca__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
+    } else if (dstScope == Hardware::L0B) {
+        LoadData2DGM2L0BCal((__cb__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams);
+    } else if (dstScope == Hardware::L1) {
+        const uint8_t cacheMode = ExtractCacheMode(src);
+        LoadData2DGM2L1Cal(
+            (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams, enablePreReadIgnoreSync, cacheMode);
+    }
+}
+#else
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
@@ -79,8 +101,10 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
 #endif
     }
 }
+#endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadDataImpl(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load2DBitModeParam& loadDataParams)
@@ -88,7 +112,7 @@ __aicore__ inline void LoadDataImpl(
     CheckTensorAlign<T>(src, ONE_BLK_SIZE, "src", "LoadData with LoadData2DParams");
     CheckTensorAlign<T>(dst, VALUE_512, "dst", "LoadData with LoadData2DParams");
 
-    if constexpr (Src != TPosition::A1 && Src != TPosition::B1) {
+    if constexpr (Src != TPosition::A1 && Src != TPosition::A2) {
         ASCENDC_CHECK_TPOSITION(
             false, "src", "L1 Buffer(A1/B1)", "LoadData with LoadDataBitModeParams",
             GetPositionDisplay(static_cast<TPosition>(src.GetPosition())));
@@ -202,8 +226,9 @@ __aicore__ inline void LoadDataImpl(
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-template <typename T, typename U, typename V>
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+template <typename T, typename U, typename V = fp8_e8m0_t>
 __aicore__ inline void LoadDataImpl(
     const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<V>& srcMx,
     const LoadData2DParamsV2& loadDataParams, const LoadData2DMxParams& loadMxDataParams)
@@ -211,23 +236,49 @@ __aicore__ inline void LoadDataImpl(
     CheckTensorPos<T>(src, Hardware::L1, "src", "A1/B1", "LoadData with LoadData2DParamsV2");
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
     if (dstScope == Hardware::L0A) {
-#if !(                       \
-    defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)))
         LoadData2DL12L0ACal(
             (__ca__ PrimT<U>*)dst.GetPhyAddr(), (__cbuf__ PrimT<T>*)src.GetPhyAddr(),
-            (__cbuf__ PrimT<V>*)srcMx.GetPhyAddr(), loadDataParams, loadMxDataParams);
-#endif
+            (__cbuf__ fp8_e8m0_t*)srcMx.GetPhyAddr(), loadDataParams, loadMxDataParams);
     } else if (dstScope == Hardware::L0B) {
         LoadData2DL12L0BCal(
             (__cb__ PrimT<U>*)dst.GetPhyAddr(), (__cbuf__ PrimT<T>*)src.GetPhyAddr(),
-            (__cbuf__ PrimT<V>*)srcMx.GetPhyAddr(), loadDataParams, loadMxDataParams);
+            (__cbuf__ fp8_e8m0_t*)srcMx.GetPhyAddr(), loadDataParams, loadMxDataParams);
     } else {
         ASSERT(false);
     }
 }
 #endif
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams,
+    const bool enablePreReadIgnoreSync = false)
+{
+#if ASCENDC_CPU_DEBUG
+    if (!CheckFuncLoadData2dv2(dst, src, loadDataParams, "LoadData with LoadData2DParamsV2")) {
+        ASCENDC_REPORT_CHECK_ERROR("LoadData with LoadData2DParamsV2", KernelFuncType::NONE_MODE);
+    }
+#endif
+    const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
+    const uint8_t cacheMode = ExtractCacheMode(src);
+    if (dstScope == Hardware::L0A) {
+        LoadData2DGM2L0ACal(
+            (__ca__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams, cacheMode);
+    } else if (dstScope == Hardware::L0B) {
+        LoadData2DGM2L0BCal(
+            (__cb__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams, cacheMode);
+    } else if (dstScope == Hardware::L1) {
+        LoadData2DGM2L1Cal(
+            (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams, cacheMode,
+            enablePreReadIgnoreSync);
+    } else {
+        ASCENDC_CHECK_TPOSITION(
+            false, "dst", "L1 Buffer(A1/B1)/L0A Buffer(A2)/L0B Buffer(B2)", "LoadData with LoadData2DParamsV2",
+            ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+    }
+}
+#else
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams)
@@ -238,7 +289,8 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     }
 #endif
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     const uint8_t cacheMode = ExtractCacheMode(src);
     if (dstScope == Hardware::L0A) {
         LoadData2DGM2L0ACal(
@@ -264,33 +316,7 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     }
 #endif
 }
-
-/* **************************************************************************************************
- * LoadDataWithDecomp                                             *
- * ************************************************************************************************* */
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
-__aicore__ inline void EnableS4ToS8Impl() { EnableS4ToS8Cal(); }
-
-__aicore__ inline void EnableS3ToS8Impl() { EnableS3ToS8Cal(); }
-
-template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DDecompParamsV2& loadDataDecompParams)
-{
-    const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-    if (dstScope == Hardware::L0B) {
-        LoadData2DGM2L0BDecompCal(
-            (__cb__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataDecompParams);
-    } else if (dstScope == Hardware::L1) {
-        LoadData2DGM2L1DecompCal(
-            (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataDecompParams);
-    } else {
-        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported LoadData2DDecomp Dst!"); });
-    }
-}
 #endif
-
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_LOAD2D_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_LOAD2D_IMPL_H__)

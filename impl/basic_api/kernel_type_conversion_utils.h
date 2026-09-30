@@ -33,7 +33,7 @@ namespace AscendC {
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
      (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 constexpr uint32_t BF16_TO_FP32_MAN_LEN = 16;
 constexpr uint32_t FP32_EXP_PART_MASK = 0x7F800000u;
 constexpr uint32_t FP32_MAN_PART_MASK = 0x007FFFFFu;
@@ -61,7 +61,8 @@ __aicore__ inline constexpr bool IsBf16NeedRound(uint64_t man)
     return (truncHighBit && (truncLeft || lastBit));
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 namespace FPTranslation {
 // HiFloat8 -> Fp32
 #define HIF8_SIGN_INDEX (7)
@@ -396,7 +397,7 @@ __aicore__ __callee__ inline bfloat16_t Fp4e2m1ToBfloat(const uint8_t fpVal)
 
 // Fp4e1m2 -> Bf16
 constexpr uint16_t Fp4e1m2ToBf16[16] = {0x0,    0x3E80, 0x3F00, 0x3F40, 0x3F80, 0x3FA0, 0x3FC0, 0x3FE0,
-                                        0x8000, 0xBE80, 0xBF00, 0xBF40, 0xBF80, 0xBFA0, 0xBFC0, 0xBFE0};
+                                    0x8000, 0xBE80, 0xBF00, 0xBF40, 0xBF80, 0xBFA0, 0xBFC0, 0xBFE0};
 
 __aicore__ __callee__ inline bfloat16_t Fp4e1m2ToBfloat(const uint8_t fpVal)
 {
