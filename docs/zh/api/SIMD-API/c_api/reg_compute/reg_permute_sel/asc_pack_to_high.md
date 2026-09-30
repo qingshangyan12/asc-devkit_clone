@@ -106,6 +106,7 @@ __simd_callee__ inline vector_uint8_t asc_pack_to_high(vector_uint16_t src)
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

@@ -54,6 +54,7 @@ __aicore__ static __attribute__((noinline)) void printf( const __gm__ char* fmt,
 template <class... Args>
 __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 ```
+
 <!-- end id9 -->
 
 <!-- npu="950" id10 -->
@@ -63,6 +64,7 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 template <class... Args>
 static __attribute__((noinline)) void printf(const char* fmt, Args&&... args);
 ```
+
 <!-- end id10 -->
 
 ## 参数说明

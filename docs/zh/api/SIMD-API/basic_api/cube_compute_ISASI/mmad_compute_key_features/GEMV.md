@@ -80,4 +80,5 @@ mmadParams.k = k;
 mmadParams.disableGemv = true;
 AscendC::Mmad(c, a, b, mmadParams);
 ```
+
 <!-- end id2 -->

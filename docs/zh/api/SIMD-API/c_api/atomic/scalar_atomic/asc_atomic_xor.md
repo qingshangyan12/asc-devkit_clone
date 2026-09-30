@@ -86,6 +86,7 @@ __aicore__ inline int32_t asc_atomic_xor(__gm__ int32_t* address,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

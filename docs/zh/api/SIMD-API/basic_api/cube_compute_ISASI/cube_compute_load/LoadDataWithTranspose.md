@@ -59,6 +59,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams)
 ```
+
 <!-- end id11 -->
 
 ## 参数说明<a id="zh-cn_topic_0000002543851571_section16128134420472"></a>
@@ -545,4 +546,5 @@ for (uint16_t i = 0; i < nStep; i ++) {
 qidB2_.EnQue(b2);
 qidB1_.FreeTensor(rightMatrix);
 ```
+
 <!-- end id20 -->

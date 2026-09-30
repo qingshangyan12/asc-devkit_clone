@@ -100,6 +100,7 @@ __simd_callee__ inline vector_int64_t asc_int322int64(vector_int32_t src,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```c

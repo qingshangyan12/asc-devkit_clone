@@ -41,6 +41,7 @@ VQF322B8_PRE,          // Vector_Quant_Float32_2_B8：float量化成int8_t/uint8
 REQ8,                  // ReQuant_int8：int32_t重量化成int8_t/uint8_t，scalar量化
 VREQ8,                 // Vector_ReQuant_int8：int32_t重量化成int8_t/uint8_t，tensor量化
 ```
+
 <!-- npu="950" id3 -->
 除上述量化模式外，Ascend 950PR&950DT系列产品产品还额外支持以下量化模式：
 
@@ -60,6 +61,7 @@ VQF322BF16_PRE,        // Vector_Quant_Float32_2_BFloat16: float量化成bfloat1
 QF322F32_PRE,          // Quant_Float32_2_Float32: float量化成float，scalar量化，使用有限精度的量化系数，需按输入范围验证误差
 VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，tensor量化，使用有限精度的量化系数，需按输入范围验证误差
 ```
+
 <!-- end id3 -->
 
 不同量化模式的量化算法详细介绍参见[随路量化与随路ReLU场景组合](accompanying_quantization_and_relu_scenario_combination.md)。

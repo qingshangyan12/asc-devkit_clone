@@ -140,6 +140,7 @@ __simd_callee__ inline vector_half asc_arange_descend(half value)
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```c

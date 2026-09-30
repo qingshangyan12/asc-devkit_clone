@@ -246,6 +246,7 @@ __simd_callee__ inline void asc_loadalign(vector_float& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

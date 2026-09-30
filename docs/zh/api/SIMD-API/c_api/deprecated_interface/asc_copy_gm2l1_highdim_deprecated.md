@@ -106,6 +106,7 @@ PIPE_MTE2
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 样例中A、B、C矩阵的shape均为[128,128]，Bias矩阵的shape为[1,128]。Bias通过高维切分搬运接口按两个256字节块从GM搬运到L1 Buffer，再调用[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)搬运到BiasTable Buffer，最后由MMAD完成`A × B + Bias`计算。样例单核占用64.5KB L1 Buffer、32KB L0A Buffer、32KB L0B Buffer、64KB L0C Buffer和512字节BiasTable Buffer。样例依次复用`EVENT_ID0`完成MTE2到MTE1、MTE1到M、M到FIX的同步。

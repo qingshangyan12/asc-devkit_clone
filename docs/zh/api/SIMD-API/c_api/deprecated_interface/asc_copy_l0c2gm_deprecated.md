@@ -239,6 +239,7 @@ PIPE_FIX
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

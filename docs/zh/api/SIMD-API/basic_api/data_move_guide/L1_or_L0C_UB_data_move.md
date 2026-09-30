@@ -173,6 +173,7 @@ src和dst分别为源操作数和目的操作数；count为连续搬运的元素
 template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count)
 ```
+
 <!-- end id2 -->
 
 <!-- npu="950" id3 -->
@@ -198,4 +199,5 @@ src和dst分别为源操作数和目的操作数；repeatParams为搬运参数�
 template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams)
 ```
+
 <!-- end id3 -->

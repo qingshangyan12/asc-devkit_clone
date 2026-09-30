@@ -83,6 +83,7 @@ __aicore__ inline void asc_store_dev(__gm__ uint32_t* addr,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

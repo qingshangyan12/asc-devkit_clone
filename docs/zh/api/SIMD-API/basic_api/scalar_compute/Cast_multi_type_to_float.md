@@ -51,6 +51,7 @@ bfloat16\_t类型转换为float类型：
 ```cpp
 __aicore__ inline float Cast(const bfloat16_t& bVal)
 ```
+
 <!-- end id16 -->
 
 <!-- npu="950" id10 -->
@@ -67,6 +68,7 @@ template <typename T, typename U = float,
         void>>
 __aicore__ constexpr inline U Cast(T bVal)
 ```
+
 <!-- end id10 -->
 
 ## 参数说明<a name="section622mcpsimp"></a>

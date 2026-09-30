@@ -51,6 +51,7 @@ PIPE_S
 ## 约束说明
 
 如果需要精确阻塞n拍流水，需要在n个`asc_nop`接口调用前后插入[`asc_sync`](../../sync/intra_core_sync/asc_sync.md)，例如：
+
 ```c
 // 阻塞3拍流水
 asc_sync();
@@ -70,6 +71,7 @@ asc_sync();
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

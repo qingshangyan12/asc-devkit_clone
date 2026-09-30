@@ -42,10 +42,12 @@ __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride,
 ```
 
 <!-- npu="950" id10 -->
+
 ```cpp
 // 如下原型仅Ascend 950PR&950DT系列产品支持
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
 ```
+
 <!-- end id10 -->
 
 ## 参数说明<a id="zh-cn_topic_0000002516209232_section622mcpsimp"></a>

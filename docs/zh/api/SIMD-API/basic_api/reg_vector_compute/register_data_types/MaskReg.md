@@ -38,11 +38,14 @@ MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度�
 ## 函数原型<a name="section620mcpsimp"></a>
 
 - CreateMask接口
+
   ```cpp
   template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
   __simd_callee__ inline MaskReg CreateMask()
   ```
+
 - UpdateMask接口
+
   ```cpp
   template <typename T, const RegTrait& regTrait = RegTraitNumOne>
   __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue)

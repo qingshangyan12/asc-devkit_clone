@@ -81,6 +81,7 @@ __aicore__ static __attribute__((noinline)) void asc_dump(__biasbuf__ T* input, 
 template<typename T>
 __aicore__ static __attribute__((noinline)) void asc_dump(__fbuf__ T* input, uint32_t desc, uint32_t dump_size)
 ```
+
 <!-- end id13 -->
 
 <!-- npu="950" id7 -->
@@ -103,6 +104,7 @@ __simd_callee__ inline void asc_dump_ubuf(__ubuf__ T* input, uint32_t desc, uint
 template <typename T>
 __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t dump_size)
 ```
+
 <!-- end id7 -->
 
 ## 参数说明

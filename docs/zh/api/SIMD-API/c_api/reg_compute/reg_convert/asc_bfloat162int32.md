@@ -112,6 +112,7 @@ __simd_callee__ inline vector_int32_t asc_bfloat162int32_rn(vector_bfloat16_t sr
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```c

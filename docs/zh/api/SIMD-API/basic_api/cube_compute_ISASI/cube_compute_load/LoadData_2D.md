@@ -67,6 +67,7 @@ __aicore__ inline void LoadData(const LocalTensor<T>& dst, const GlobalTensor<T>
 template <typename T>
 __aicore__ inline void LoadData(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams)
 ```
+
 <!-- end id11 -->
 
 ## 参数说明

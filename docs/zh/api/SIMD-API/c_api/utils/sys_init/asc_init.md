@@ -105,6 +105,7 @@ __aicore__ inline void asc_init()
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id11 -->
 
 ```c

@@ -76,6 +76,7 @@ PIPE_S
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510
 ```
+
 <!-- end id8 -->
 
 以下示例搬运3个48B的`uint8_t`数据块，使用常量`0xA5`填充每个数据块尾部的16B，使每个数据块按64B步长写入L1 Buffer。

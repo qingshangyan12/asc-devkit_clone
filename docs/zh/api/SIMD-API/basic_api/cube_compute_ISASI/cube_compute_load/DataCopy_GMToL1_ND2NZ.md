@@ -57,6 +57,7 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
 ```
+
 <!-- end id10 -->
 
 ## 参数说明<a id="zh-cn_topic_0000002566538879_section16128134420472"></a>

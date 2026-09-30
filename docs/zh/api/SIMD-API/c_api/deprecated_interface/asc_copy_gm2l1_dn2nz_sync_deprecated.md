@@ -119,6 +119,7 @@ PIPE_MTE2
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 样例单核占用64KB L1 Buffer、32KB L0A Buffer、32KB L0B Buffer和64KB L0C Buffer。样例依次复用`EVENT_ID0`完成MTE2到MTE1、MTE1到M、M到FIX的同步。基础API同类场景可参考[data_copy_gm2l1样例](../../../../../../examples/01_simd_cpp_api/03_basic_api/00_data_movement/data_copy_gm2l1)中的场景3。

@@ -91,6 +91,7 @@ __simd_callee__ inline vector_uint8_t asc_loadalign_datablock_strided(__ubuf__ u
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

@@ -62,6 +62,7 @@ __aicore__ inline HcclHandle BatchWrite(GM_ADDR batchWriteInfo, uint32_t itemNum
 | queueID | 输入 | 指定当前通信所在的队列ID，默认值为0。<!-- npu="910b" id12 --><br><br>Atlas A2系列产品，该参数仅支持取值为0。<!-- end id12 --> |
 
 <!-- npu="A3" id14 -->
+
 ```
 // Atlas A3系列产品
 struct BatchWriteItem {
@@ -75,9 +76,11 @@ struct BatchWriteItem {
     uint32_t res2[4];
 };
 ```
+
 <!-- end id14 -->
 
 <!-- npu="910b" id15 -->
+
 ```
 // Atlas A2系列产品
 struct BatchWriteItem {
@@ -88,6 +91,7 @@ struct BatchWriteItem {
     uint32_t remoteRankId;
 };
 ```
+
 <!-- end id15 -->
 
 ## 返回值说明

@@ -87,6 +87,7 @@ __simd_callee__ inline void asc_duplicate_highest(vector_float& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 以下示例将`src`的最高位元素广播到`dst`的前4个元素，未被`mask`筛选的其余元素置0。

@@ -165,6 +165,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock(vector_half& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

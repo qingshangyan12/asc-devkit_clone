@@ -114,7 +114,9 @@ __simd_callee__ inline vector_int8_t asc_half2int8_rn(vector_half src,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
+
 ```c
 #include <cstdint>
 #include <iostream>

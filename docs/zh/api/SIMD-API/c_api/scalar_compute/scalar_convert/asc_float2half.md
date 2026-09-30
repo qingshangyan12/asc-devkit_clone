@@ -64,6 +64,7 @@ __aicore__ inline half asc_float2half_ro(float value)
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

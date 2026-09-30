@@ -62,6 +62,7 @@ __aicore__ inline int64_t asc_clz(uint64_t value_in)
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

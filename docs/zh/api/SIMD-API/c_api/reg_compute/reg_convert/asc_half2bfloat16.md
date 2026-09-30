@@ -92,6 +92,7 @@ __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_rna(vector_half src,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

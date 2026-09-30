@@ -88,7 +88,9 @@ __simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16(
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
+
 ```c
 #include <cstdint>
 #include <iostream>

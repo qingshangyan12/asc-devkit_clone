@@ -120,6 +120,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams)
 ```
+
 <!-- end id10 -->
 
 ## L1ToL0A 3D格式分形矩阵搬运(LoadData（卷积数据搬运）)<a name="ZH-CN_TOPIC_0000002574022819"></a>
@@ -277,6 +278,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 template <typename T>
 __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams)
 ```
+
 <!-- end id11 -->
 
 ## L1ToL0B 3D格式分形矩阵搬运(LoadData（卷积数据搬运）)<a name="ZH-CN_TOPIC_0000002543422580"></a>

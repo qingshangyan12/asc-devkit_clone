@@ -169,6 +169,7 @@
 - **算子编译与运行**：
 
   CMake配置文件示例：
+
   ```cmake
   cmake_minimum_required(VERSION 3.16)
 
@@ -190,12 +191,15 @@
       $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-2201>
   )
   ```
+
   编译与执行示例：
+
   ```bash
   mkdir -p build && cd build;   # 创建并进入build目录
   cmake ..;make -j;             # 编译工程
   ./c_api_add_example           # 运行样例
   ```
+
   > [!NOTE]说明
   > - 编译选项`--npu-arch`用于指定NPU架构版本，`dav-`后面的数字为架构版本号，请替换为您实际使用的版本。各AI处理器型号与架构版本的对应关系请查阅[AI处理器型号和 \_\_NPU_ARCH\_\_ 的对应关系](../../../programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 

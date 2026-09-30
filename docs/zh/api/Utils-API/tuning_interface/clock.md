@@ -45,6 +45,7 @@ __aicore__ inline uint64_t clock(void)
 ```cpp
 inline uint64_t clock(void)
 ```
+
 <!-- end id9 -->
 
 ## 参数说明

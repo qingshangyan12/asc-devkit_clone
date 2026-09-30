@@ -72,6 +72,7 @@ __simd_callee__ inline vector_bool asc_loadalign_mask_downsample(__ubuf__ uint32
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

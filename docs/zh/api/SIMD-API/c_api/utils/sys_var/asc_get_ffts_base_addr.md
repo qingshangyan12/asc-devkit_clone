@@ -64,6 +64,7 @@ PIPE_S
 ```bash
 bisheng example.asc -o main --npu-arch=dav-2201 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

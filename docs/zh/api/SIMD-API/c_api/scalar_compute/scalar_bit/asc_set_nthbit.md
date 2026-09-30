@@ -64,6 +64,7 @@ __aicore__ inline uint64_t asc_set_nthbit(uint64_t bits,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

@@ -106,6 +106,7 @@ Ascend 950PR&950DT系列产品产品对应的NPU架构为`dav-3510`，编译运�
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 样例单核占用33KB L1 Buffer、16KB L0A Buffer、16KB L0B Buffer和64KB L0C Buffer，并分别占用512字节L0A_MX Buffer和L0B_MX Buffer。样例依次复用`EVENT_ID0`完成MTE2到MTE1、MTE1到M、M到FIX的同步。

@@ -82,6 +82,7 @@ PIPE_S
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 以下示例将16B输入数据按`pad_func_mode=5`搬运到L1 Buffer。调用`asc_set_gm2l1_padding`将填充值设置为`0xA5`，再通过L1→UB→GM回读完整32B L1数据块，并在主机侧逐字节校验前16B为输入、后16B为填充值。

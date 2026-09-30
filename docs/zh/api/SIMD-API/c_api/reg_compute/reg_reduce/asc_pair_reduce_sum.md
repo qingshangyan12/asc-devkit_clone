@@ -105,6 +105,7 @@ __simd_callee__ inline void asc_pair_reduce_sum(vector_half& dst,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

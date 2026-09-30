@@ -77,6 +77,7 @@ __aicore__ inline int32_t asc_float2int32_rn(
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

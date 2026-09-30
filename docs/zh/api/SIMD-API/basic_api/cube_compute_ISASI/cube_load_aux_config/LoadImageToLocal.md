@@ -140,4 +140,5 @@ loadParams.sid = 0;
 
 AscendC::LoadImageToLocal(featureMapA1, loadParams);
 ```
+
 <!-- end id14 -->

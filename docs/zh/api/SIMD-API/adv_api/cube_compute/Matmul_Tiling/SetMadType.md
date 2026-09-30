@@ -48,4 +48,5 @@ matmul_tiling::MatmulApiTiling tiling(ascendcPlatform);
 tiling.SetTraverse(MatrixTraverse::FIRSTM); // 设置遍历方式
 tiling.SetMadType(MatrixMadType::MXMODE);   // 开启MxMatmul场景
 ```
+
 <!-- end id3 -->

@@ -201,6 +201,7 @@ asc_set_ub2gm_loop_size(1, 1);
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```c

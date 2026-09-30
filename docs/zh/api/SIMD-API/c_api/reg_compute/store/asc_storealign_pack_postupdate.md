@@ -150,6 +150,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t*& ds
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```c

@@ -141,6 +141,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
                                 asc_unit_flag_mode unit_flag_mode,
                                 bool disable_gemv)
 ```
+
 <!-- end id12 -->
 
 <!-- npu="A3,910b" id13 -->
@@ -171,6 +172,7 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
   ```c
   __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
   ```
+
 <!-- end id13 -->
 
 ## 参数说明
@@ -276,6 +278,7 @@ PIPE_M
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id18 -->
 
 以下调用示例代码仅Ascend 950PR&950DT系列产品产品支持。

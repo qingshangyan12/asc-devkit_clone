@@ -93,6 +93,7 @@ __simd_callee__ inline void asc_frequency_histogram_bin1(vector_uint16_t& dst, v
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```cpp

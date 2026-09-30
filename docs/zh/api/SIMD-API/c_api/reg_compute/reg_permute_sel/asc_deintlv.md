@@ -128,6 +128,7 @@ __simd_callee__ inline void asc_deintlv_b32(vector_bool& dst0,
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id10 -->
 
 ```cpp

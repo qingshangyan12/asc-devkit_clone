@@ -90,6 +90,7 @@ __simd_callee__ inline vector_half asc_int162half_<round_mode>(vector_int16_t sr
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
 <!-- end id8 -->
 
 ```c

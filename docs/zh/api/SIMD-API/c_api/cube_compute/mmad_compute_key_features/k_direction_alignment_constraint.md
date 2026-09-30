@@ -41,4 +41,5 @@ K方向对齐的核心功能是通过k_direction_align参数控制在使用float
 asc_mmad(c, a, b, m, k, n, asc_unit_flag_mode::DISABLE,
          true /* k_direction_align */, false, true);
 ```
+
 <!-- end id3 -->
