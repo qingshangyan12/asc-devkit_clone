@@ -1,16 +1,9 @@
 ---
 okftype: reference.api
-title: asc_set_ndim_pad_count
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
-description: 配置NDDMA高维切分搬运中loop1至loop4各维左右两侧的填充元素数，配置结果供后续调用asc_ndim_copy_gm2ub时使用，loop0的填充由搬运接口参数配置，仅在AIV上执行有效。
+description: "配置NDDMA高维切分搬运中loop1至loop4各维左右两侧的填充元素数，配置结果供后续调用asc_ndim_copy_gm2ub时使用，loop0的填充由搬运接口参数配置，配置持续生效直至重新配置，仅在AIV上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
   - traits: [high_dimensional, padding]
-signature:
-  - override_id: asc_set_ndim_pad_count__Rpadcountcfg
-archs: ['3510']
-header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md
     kind: related
@@ -18,9 +11,8 @@ dependencies:
     kind: configures
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
     kind: related
-    condition: 使用常数填充模式时
-examples: []
-timestamp: '2026-09-24'
+    condition: "使用常数填充模式时"
+version: 9.0.0-
 ---
 # asc_set_ndim_pad_count
 

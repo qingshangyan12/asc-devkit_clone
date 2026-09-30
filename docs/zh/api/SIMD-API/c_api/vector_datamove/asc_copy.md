@@ -1,29 +1,14 @@
 ---
 okftype: reference.api
-title: asc_copy
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md
-description: 将数据从Unified Buffer（UB）搬运到UB，支持前n个数据与高维切分两种形式，目的和源操作数起始地址需32字节对齐。
+description: "在Unified Buffer（UB）内搬运矢量数据，支持前n个数据与高维切分两种形式，目的与源操作数起始地址需32字节对齐，地址重叠须满足通用地址重叠约束。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
-  - traits: [high_dimensional]
-signature:
-  - override_id: asc_copy__PUi16_PUi16_u32
-  - override_id: asc_copy__PUu16_PUu16_u32
-  - override_id: asc_copy__PUi32_PUi32_u32
-  - override_id: asc_copy__PUu32_PUu32_u32
-  - override_id: asc_copy__PUi16_PUi16_u8_u16_u16_u16_u16
-  - override_id: asc_copy__PUu16_PUu16_u8_u16_u16_u16_u16
-  - override_id: asc_copy__PUi32_PUi32_u8_u16_u16_u16_u16
-  - override_id: asc_copy__PUu32_PUu32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_datamove/vector_datamove.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-24'
+  - traits: [aligned_transfer, high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 
 # asc_copy

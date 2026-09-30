@@ -1,27 +1,17 @@
 ---
 okftype: reference.api
-title: asc_transto5hd
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md
-description: 数据格式转换接口，一般用于将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，单次Repeat内可处理512Byte数据，支持多次Repeat操作。
+description: "数据格式转换接口，一般用于将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置；单次Repeat内可处理512字节即16个DataBlock的数据，支持多次Repeat操作，源和目的地址由VA地址寄存器指定。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [conversion, layout_transform, transpose]
-  - objects: [matrix, tensor]
-  - execution_models: [memory_vector]
-signature:
-  - override_id: asc_transto5hd_b32__uba8_uba8_u8_u16_u16
-  - override_id: asc_transto5hd_b16__uba8_uba8_u8_u16_u16
-  - override_id: asc_transto5hd_b8__uba8_uba8_u8_u16_u16_b_b
-archs: ['2201', '3510']
-header: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - operations: [layout_transform, transpose]
+  - traits: [datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "传入的dst/src地址寄存器需先经asc_set_va_reg配置16个DataBlock地址"
+version: 9.0.0-
 ---
 # asc_transto5hd
 

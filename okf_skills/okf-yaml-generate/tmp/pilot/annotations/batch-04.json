@@ -1,0 +1,683 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md",
+      "document_sha256": "aad1472072300b7762ea66239eb17ca6ec3edda8360cd42d3c97f9372f486728",
+      "description": {
+        "value": "将bfloat16_t类型矢量数据转换为float类型，无舍入模式，提供前n个数据计算与高维切分计算两类原型，目的与源操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md", "excerpt": "将bfloat16_t类型数据转为float，无舍入模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将bfloat16_t类型数据转为float，无舍入模式。",
+        "operations:conversion": "将bfloat16_t类型数据转为float"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md",
+      "document_sha256": "e1e4c6539213c1e6e42e9b151ec46482622969dc4d8a31103f2d251cc22dd7bd",
+      "description": {
+        "value": "将bfloat16_t类型矢量数据转换为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md", "excerpt": "将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将bfloat16_t类型数据转换为int32_t类型，并支持多种舍入模式：",
+        "operations:conversion": "将bfloat16_t类型数据转换为int32_t类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md",
+      "document_sha256": "22fafed0a4ef64e54df8628861f60546295522b059b937b75449e69caecaba60",
+      "description": {
+        "value": "将float类型矢量数据转换为bfloat16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md", "excerpt": "将float类型数据转换为bfloat16_t类型，并支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转换为bfloat16_t类型，并支持多种舍入模式：",
+        "operations:conversion": "将float类型数据转换为bfloat16_t类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md",
+      "document_sha256": "9a959da2e1fc012e9504253efe400e3472de63f705e925eb950a98551ba2cbf7",
+      "description": {
+        "value": "对float类型矢量数据进行精度转换处理，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md", "excerpt": "对float类型数据进行精度转换处理,支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "对float类型数据进行精度转换处理,支持多种舍入模式：",
+        "operations:conversion": "对float类型数据进行精度转换处理",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md",
+      "document_sha256": "17bd81c7337cde44bb28563de3de110c11eaba95f925ac0994d69695dda5988f",
+      "description": {
+        "value": "将float类型矢量数据转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC、ODD多种舍入模式，其中ODD为Von Neumann最近邻奇数舍入，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md", "excerpt": "将float类型数据转换为half类型，支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md", "excerpt": "ODD舍入模式：Von Neumann rounding，最近邻奇数舍入。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转换为half类型，支持多种舍入模式：",
+        "operations:conversion": "将float类型数据转换为half类型",
+        "traits:rounding_mode": "ODD舍入模式：Von Neumann rounding，最近邻奇数舍入。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md",
+      "document_sha256": "8006a14275209ea7be34d8cef4ad74ecabcf3e044b813bf74e71df1835dba5b1",
+      "description": {
+        "value": "将float类型矢量数据转换为int16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md", "excerpt": "将float类型数据转换为int16_t类型，支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转换为int16_t类型，支持多种舍入模式：",
+        "operations:conversion": "将float类型数据转换为int16_t类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md",
+      "document_sha256": "cd1b8017297f8f2d9166f27dd00d75ac3e3776a2832c34399a89c830b9490d02",
+      "description": {
+        "value": "将float类型矢量数据转化为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md", "excerpt": "将float类型转化为int32_t类型，并支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将float类型转化为int32_t类型，并支持多种舍入模式：",
+        "operations:conversion": "将float类型转化为int32_t类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md",
+      "document_sha256": "d2da204c32a5492dbbedc524bc7a41e814a4c2101f26d4d5aec01a98d425e845",
+      "description": {
+        "value": "将float类型矢量数据转化为int64_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md", "excerpt": "将float类型转化为int64_t类型，并支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将float类型转化为int64_t类型，并支持多种舍入模式：",
+        "operations:conversion": "将float类型转化为int64_t类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md",
+      "document_sha256": "09df08cefe8a066d31af94edff648f3becf383d2d97446cf90cae0669cd972ae",
+      "description": {
+        "value": "将half类型矢量数据转化为float类型，无舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md", "excerpt": "将half类型转化为float类型，无舍入模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将half类型转化为float类型，无舍入模式。",
+        "operations:conversion": "将half类型转化为float类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+      "document_sha256": "ee3b212b62fce94fdd1cefd07bf6cbfb763933b255e914f1ca174394db0da1bb",
+      "description": {
+        "value": "将half类型矢量数据转换为int16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md", "excerpt": "将half类型数据转换为int16_t，并支持多种舍入模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将half类型数据转换为int16_t，并支持多种舍入模式。",
+        "operations:conversion": "将half类型数据转换为int16_t",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md",
+      "document_sha256": "e4526d7c9f63235bca173e9bbb2bdb846a5f95a8455707f039f29f832775cb25",
+      "description": {
+        "value": "将half类型矢量数据转化为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md", "excerpt": "将half类型转化为int32_t类型，并支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将half类型转化为int32_t类型，并支持多种舍入模式：",
+        "operations:conversion": "将half类型转化为int32_t类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md",
+      "document_sha256": "f7072d3f3f79c81346a6fea602be797e195e8d725dd1039ed9199c9003cda07f",
+      "description": {
+        "value": "将half类型矢量数据转换为int4类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，当dst为int4b_t时前n个数据计算接口的count必须为偶数，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md", "excerpt": "将half类型数据转换为int4类型，支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md", "excerpt": "当dst为int4b_t时，前n个数据计算接口的count必须为偶数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将half类型数据转换为int4类型，支持多种舍入模式：",
+        "operations:conversion": "将half类型数据转换为int4类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md",
+      "document_sha256": "6ffc63c4b6ede066e11291f2ac0d692f84033e5fd7f634b069d343dbe01a8c1e",
+      "description": {
+        "value": "将half类型矢量数据转化为int8_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md", "excerpt": "将half类型转化为int8_t类型，并支持多种舍入模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将half类型转化为int8_t类型，并支持多种舍入模式。",
+        "operations:conversion": "将half类型转化为int8_t类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md",
+      "document_sha256": "268445c9f4cac5271c3e14d458c321af810d93ffce8207a46ef3446f0db4a666",
+      "description": {
+        "value": "将half类型矢量数据转换为uint8_t类型，支持NONE、RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，NONE模式在转换有精度损失时表示RINT舍入，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md", "excerpt": "将half类型数据转换为uint8_t类型，支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md", "excerpt": "NONE舍入模式：在转换有精度损失时表示RINT舍入模式，不涉及精度损失时代表不舍入"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将half类型数据转换为uint8_t类型，支持多种舍入模式：",
+        "operations:conversion": "将half类型数据转换为uint8_t类型",
+        "traits:rounding_mode": "NONE舍入模式：在转换有精度损失时表示RINT舍入模式，不涉及精度损失时代表不舍入"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md",
+      "document_sha256": "287899660fda467f948bd65a53a99ec5ca079da6b02d3c47acea2009eb93efe2",
+      "description": {
+        "value": "将int16_t类型矢量数据转换为float类型，提供前n个数据计算与高维切分计算两类原型，源和目的操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md", "excerpt": "将int16_t类型数据转换为float类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将int16_t类型数据转换为float类型。",
+        "operations:conversion": "将int16_t类型数据转换为float类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md",
+      "document_sha256": "3e99894cd2a0e86144a014c8a102262566f0042dc5a3353394dffcdd28099eac",
+      "description": {
+        "value": "将int16_t类型矢量数据转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，不指定舍入模式时无舍入，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md", "excerpt": "将int16_t类型数据转换为half类型，支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md", "excerpt": "不指定舍入模式：无舍入。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将int16_t类型数据转换为half类型，支持多种舍入模式：",
+        "operations:conversion": "将int16_t类型数据转换为half类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md",
+      "document_sha256": "5d5f7986d2fa4cbd116a32b48cb8a0fc08059e78d6548d9d8b037017065a17ea",
+      "description": {
+        "value": "将int32_t类型矢量数据转换为float类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md", "excerpt": "将int32_t类型数据转换为float类型，支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md", "excerpt": "RINT舍入模式：四舍六入五成双舍入。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["rounding_mode"]},
+      "tag_evidence": {
+        "roles:compute": "将int32_t类型数据转换为float类型，支持多种舍入模式：",
+        "operations:conversion": "将int32_t类型数据转换为float类型",
+        "traits:rounding_mode": "RINT舍入模式：四舍六入五成双舍入。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+      "document_sha256": "cf16c4af1cb417d73c54769c5193d65a4cf0d7224c85bdde8b340ec03ac3cab6",
+      "description": {
+        "value": "将int32_t类型矢量数据转换为int16_t类型，提供前n个数据计算与高维切分计算两类原型，源和目的操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md", "excerpt": "将int32_t类型数据转换为int16_t类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将int32_t类型数据转换为int16_t类型。",
+        "operations:conversion": "将int32_t类型数据转换为int16_t类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int64.md",
+      "document_sha256": "29cd7a752cef8fa98c9e171a91523533eed876afe81e3d54742ac70b071b6b37",
+      "description": {
+        "value": "将int32_t类型矢量数据转换为int64_t类型，提供前n个数据计算与高维切分计算两种接口形式，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int64.md", "excerpt": "将int32_t类型数据转换为int64_t类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int64.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将int32_t类型数据转换为int64_t类型。",
+        "operations:conversion": "将int32_t类型数据转换为int64_t类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int64.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md",
+      "document_sha256": "46049877024c91151574385bbbe156d743427a2468813d911735954245843c43",
+      "description": {
+        "value": "将int4_t类型矢量数据转换为half类型，提供前n个数据计算与高维切分计算两种接口形式，当src为int4b_t时count必须为偶数，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md", "excerpt": "将int4_t类型数据转换为half类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md", "excerpt": "当src为int4b_t时，前n个数据计算接口与同步计算接口的count必须为偶数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将int4_t类型数据转换为half类型。",
+        "operations:conversion": "将int4_t类型数据转换为half类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md",
+      "document_sha256": "cc8cac801eafb4def574c8aa0e90c8241539874ea62c7dc1f752789cdfd18808",
+      "description": {
+        "value": "将int64_t类型矢量数据转换为float类型，提供前n个数据计算与高维切分计算两类函数原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md", "excerpt": "将int64_t类型数据转换为float类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将int64_t类型数据转换为float类型。",
+        "operations:conversion": "将int64_t类型数据转换为float类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642int32.md",
+      "document_sha256": "f6624df4d54352242ed55c2a3cbf21bcb0c5da876891f73d5fda8c40c936ac87",
+      "description": {
+        "value": "将int64_t类型矢量数据转换为int32_t类型，提供前n个数据计算与高维切分计算两种接口形式，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642int32.md", "excerpt": "将int64_t类型数据转换为int32_t类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642int32.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将int64_t类型数据转换为int32_t类型。",
+        "operations:conversion": "将int64_t类型数据转换为int32_t类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642int32.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int82half.md",
+      "document_sha256": "f534f147c57bad16182135b8013612baa7c729200b3cbdb595a2778e2b8c0276",
+      "description": {
+        "value": "将int8_t类型矢量数据转换为half类型，提供前n个数据计算与高维切分计算两种接口形式，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int82half.md", "excerpt": "将int8_t类型数据转换为half类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int82half.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将int8_t类型数据转换为half类型。",
+        "operations:conversion": "将int8_t类型数据转换为half类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int82half.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md",
+      "document_sha256": "de6bc0efc020bbc374742bf6deb71eded8ec9827916e534ee848f8399b60ac00",
+      "description": {
+        "value": "将uint8_t类型矢量数据转换为half类型，提供前n个数据计算和高维切分计算两种接口形式，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md", "excerpt": "将uint8_t类型数据转换为half类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"]},
+      "tag_evidence": {
+        "roles:compute": "将uint8_t类型数据转换为half类型。",
+        "operations:conversion": "将uint8_t类型数据转换为half类型"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "condition": "通用地址重叠约束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    }
+  ]
+}

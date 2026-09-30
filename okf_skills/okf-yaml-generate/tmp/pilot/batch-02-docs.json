@@ -1,0 +1,94 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md",
+  "sha256": "f88267738d1a2b3600e7497d6c8d555384070693885071fef18e3f1c247afe07"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md",
+  "sha256": "6744d7b2de9ab83f166a35c78da898298c607e45b6fff7675f7c9175d8363a96"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add_scalar.md",
+  "sha256": "aded46bcef00b126ab20a2ca19b9afc74c9c8213bc726bb50fc053e627024f2b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md",
+  "sha256": "69322b3a2cbea65081c37e90f9d44ea87c3728bb58b8272a8cc0e19d266de1d3"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_exp.md",
+  "sha256": "b7629869d0e6d8d23d2d6205e8107f092e51b0dfc72f9d337a9a5fc23a707525"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_log.md",
+  "sha256": "2291c4dc8eaf9d608654e8780b8c383664736e967cfb3b3449fa5e05de5b9a66"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max.md",
+  "sha256": "f0e8dff5cc2bd4c81ad2a1d20428fd700a6f9daef16da31618d5b0cc5752d419"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max_scalar.md",
+  "sha256": "b7178cd3a9a7f27b26b3bc38346be0315f310bf3f5e357fe1bd0af67c510bade"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min.md",
+  "sha256": "bf7077a19bb249bd413e57c5f50a46f29b9de17a3ceeff6cab2a3a452e353518"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md",
+  "sha256": "33fb4f569f682c73fc1f675c7826c23512f7029c21f31c71c4e119725d048fbf"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+  "sha256": "119f644ae0181a8e24f4bb3a09db46bff3fdb852879da1641f8a3525e8903f0b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul_scalar.md",
+  "sha256": "4155222110a8b6704d79c12c8e6ac61e6074b1b510e03c6eb44f929f53293731"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md",
+  "sha256": "30fdee91605045ea74a4b29a4a27dbc7b9867768d0e76351c624bfeac9fb8603"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rsqrt.md",
+  "sha256": "bf13d21be736d289130e5ef34435b405a32f35b7ed6df2caff7e74377390894d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sqrt.md",
+  "sha256": "8716e772478e9201f14dc1ad2740244b787210734814859058177cfbc36c03fb"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub.md",
+  "sha256": "0f66b99a26e150613ccd7c967851f580bbb9a7429191fe74329714d24bd4120f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub_scalar.md",
+  "sha256": "f5ee690040dc430a4de8b95a82f7d7b7ded0fceea72d98d548aa3dc3aad029b4"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+  "sha256": "3c12ac80f059567fb68f40117ce105b8a53bbb3b550fdd743f3a5b427a956758"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+  "sha256": "43e1f02fc8894bec432bf5472932c8e13b2d3ad4a0cd2646ffbe492ecc80c0e5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+  "sha256": "294d8bc4efa54737b0f9e1d17902eeace8aa4747128957e7e029de0451872fa6"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+  "sha256": "0679c2e7c4f359161e7257a12b60f76b151739ec293c38f16a8d8df1c379026b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+  "sha256": "2c636d3e81a0415ef7051b029b2b5bca2ebfc6bf5038ef37a89b2dab946b5929"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+  "sha256": "e19ea0387f54bdc8df1af2e17b0a61156975d442db019cb13ae1032e0d0f6175"
+ }
+]

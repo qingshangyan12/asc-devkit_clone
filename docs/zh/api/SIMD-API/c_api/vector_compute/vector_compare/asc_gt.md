@@ -1,33 +1,20 @@
 ---
 okftype: reference.api
-title: asc_gt
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md
-description: 按元素比较两个矢量的大小关系，结果为真时对应比特位为1，否则为0，比较结果可存入寄存器或输出到目的地址。
+description: "按元素比较两个矢量的大小关系，判断src0是否大于src1，结果为真时输出结果的对应比特位为1，否则为0；比较结果可存入寄存器或输出到目的地址。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [elementwise]
-signature:
-  - override_id: asc_gt__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_gt__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_gt__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_gt__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - traits: [aligned_transfer, elementwise, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
     kind: requires
-    condition: 使用寄存器形式的接口时
+    condition: "使用寄存器形式的接口时"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
     kind: related
-    condition: 如果要初始化寄存器
-examples: []
-timestamp: '2026-09-28'
+    condition: "如果要初始化寄存器"
+version: 9.0.0-
 ---
 # asc_gt
 

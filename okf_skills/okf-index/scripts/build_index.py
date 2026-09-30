@@ -1,15 +1,10 @@
 #!/usr/bin/env python3
-"""Build the persistent OKF retrieval index from stage-3 YAML front matter.
+"""OKF 索引构建：slim 头 + include 头 + examples 头 → 门控化持久索引。
 
-Each registered API surface (SCOPES) gets its own isolated index instance
-under index/<surface>/: the index is a pure derivation of that scope's
-Markdown front-matter blocks:
-parse -> validate -> family rollup -> inverted views -> dependency graph.
-Build is deterministic (no wall-clock values); drift is detected via --check.
-
-Markdown files in scope that do not carry an OKF front matter yet are skipped
-and counted as pending (scope.pending_no_okf); they join the index once their
-stage-3 YAML headers are generated and the index is rebuilt.
+管线：解析文档头 → 三源推导（include 声明/Doxygen、examples marker、正文）→
+门控（CANN 版本 × 架构 × 层级）→ 视图 → 依赖图 → 落盘。
+构建以脚本为主，残留进 unresolved.json，由 derive-overrides 裁决后确定性消费；
+同输入两次构建字节一致（meta 中的信息性字段除外）。
 """
 
 from __future__ import annotations
@@ -25,66 +20,61 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "okf-yaml-generate" / "scripts"))
-from controller import (  # noqa: E402
-    DEPENDENCY_KINDS,
-    ValidationError,
-    load_model,
-    split_front_matter,
-    taxonomy,
-)
+SCRIPTS_DIR = Path(__file__).resolve().parent
+OKF_ROOT = SCRIPTS_DIR.parents[1]
+REPO_ROOT = OKF_ROOT.parent
+sys.path.insert(0, str(SCRIPTS_DIR))
+sys.path.insert(0, str(OKF_ROOT / "okf-yaml-generate" / "scripts"))
 
-SKILL_ROOT = Path(__file__).resolve().parents[1]
-TAXONOMY_PATH = SKILL_ROOT.parent / "okf-tag-research" / "taxonomy" / "tag-taxonomy.json"
+from controller import DEPENDENCY_KINDS, ValidationError, split_front_matter, taxonomy  # noqa: E402
+from derive import docparse, gate, overrides as overrides_mod  # noqa: E402
+from derive.examples_db import build_examples_db  # noqa: E402
+from derive.include_db import Declaration, build_include_db, declarations_for  # noqa: E402
+
+SKILL_ROOT = SCRIPTS_DIR.parent
 INDEX_DIR = SKILL_ROOT / "index"
+PRODUCT_MAP_PATH = OKF_ROOT / "config" / "product-map.yaml"
+TAXONOMY_PATH = OKF_ROOT / "okf-tag-research" / "taxonomy" / "tag-taxonomy.json"
 STAGES = ("in", "out", "compute")
-
-
-@dataclass(frozen=True)
-class Scope:
-    """One API surface: scope root plus its root landing-page filename."""
-
-    name: str
-    root: str
-    root_nav: str
-
-
-# Surface registry: every API surface gets an isolated index instance under
-# index/<name>/. Onboarding a new surface registers its root here after
-# calibrating the classify rules (see the okf-maintain onboarding checklist).
-SCOPES: dict[str, Scope] = {
-    "c_api": Scope("c_api", "docs/zh/api/SIMD-API/c_api", "c_api.md"),
+LOCAL_BUFFERS = {
+    "unified_buffer", "l1_buffer", "l0a_buffer", "l0b_buffer", "l0c_buffer",
+    "bias_table_buffer", "fixpipe_buffer", "vector_register", "mask_register", "register_tensor",
 }
-
-
-def scope_index_dir(surface: str) -> Path:
-    if surface not in SCOPES:
-        raise KeyError(f"unknown scope {surface!r}; registered: {sorted(SCOPES)}")
-    return INDEX_DIR / SCOPES[surface].name
-ARCH_RE = re.compile(r"(?P<family>.+)_arch_(?P<arch>\d+)(?:_deprecated)?$")
-
-
-def is_arch_page(path: str) -> bool:
-    """Identify architecture variants from their stable filename convention."""
-    return ARCH_RE.fullmatch(PurePosixPath(path).stem) is not None
-
-
-CONVERT_RE = re.compile(r"asc_(?P<src>[a-z0-9]+)2(?P<dst>[a-z0-9]+)$")
+API_CLASS_TO_MODEL = {
+    "vector_compute": "memory_vector", "vector_datamove": "memory_vector",
+    "reg_compute": "register_vector", "scalar_compute": "scalar",
+    "cube_compute": "matrix_compute", "cube_datamove": "matrix_compute",
+}
+EXECUTION_MODEL_AREAS = {
+    "vector_compute", "vector_datamove", "reg_compute",
+    "scalar_compute", "cube_compute", "cube_datamove",
+}
 DTYPE_ALIASES = {
     "f16": "half", "fp16": "half", "f32": "float", "fp32": "float", "bf16": "bfloat16",
     "int": "int32", "uint": "uint32", "int4b": "int4", "b8": "int8",
     "e4m3": "fp8_e4m3fn", "e5m2": "fp8_e5m2", "e8m0": "fp8_e8m0", "hif8": "hifloat8",
     "e1m2x2": "fp4x2_e1m2", "e2m1x2": "fp4x2_e2m1",
 }
+CONVERT_RE = re.compile(r"asc_(?P<src>[a-z0-9]+)2(?P<dst>[a-z0-9]+)$")
 PAIR_TOKENS = {
-    "half", "float", "bfloat16", "int4", "int8", "uint8",
-    "int16", "uint16", "int32", "uint32", "int64", "uint64",
-    "fp8_e4m3fn", "fp8_e5m2", "fp8_e8m0", "hifloat8",
-    "fp4x2_e1m2", "fp4x2_e2m1",
+    "half", "float", "bfloat16", "int4", "int8", "uint8", "int16", "uint16",
+    "int32", "uint32", "int64", "uint64", "fp8_e4m3fn", "fp8_e5m2", "fp8_e8m0",
+    "hifloat8", "fp4x2_e1m2", "fp4x2_e2m1",
 }
-LOCAL_BUFFERS = {
-    "unified_buffer", "l1_buffer", "l0a_buffer", "l0b_buffer", "l0c_buffer",
-    "bias_table_buffer", "fixpipe_buffer", "vector_register", "register_tensor",
+LOW_PRECISION = {"fp8_e4m3fn", "fp8_e5m2", "fp8_e8m0", "hifloat8", "fp4x2_e1m2", "fp4x2_e2m1"}
+
+
+@dataclass(frozen=True)
+class Scope:
+    name: str
+    root: str
+    root_nav: str
+    categories: tuple[str, ...] | None  # None = 全量；试点期限定子目录
+
+
+SCOPES: dict[str, Scope] = {
+    # 试点范围：vector_compute + vector_datamove；全量轮次改为 categories=None
+    "c_api": Scope("c_api", "docs/zh/api/SIMD-API/c_api", "c_api.md", ("vector_compute", "vector_datamove")),
 }
 
 
@@ -99,241 +89,218 @@ def normalize_dtype(value: str) -> str:
     return DTYPE_ALIASES.get(token, token)
 
 
-def load_raw_documents(root: Path, scope: Scope, errors: list[str]) -> tuple[dict[str, dict[str, Any]], list[str]]:
-    model = load_model()
-    allowed_fields = set(model["field_order"])
-    okftypes = set(model["profiles"])
+def is_arch_page(path: str) -> bool:
+    return re.fullmatch(r".+_arch_\d+(?:_deprecated)?", PurePosixPath(path).stem) is not None
+
+
+# ---------------------------------------------------------------- 文档加载
+
+
+def load_documents(root: Path, scope: Scope, errors: list[str]) -> tuple[dict[str, dict[str, Any]], list[str]]:
     namespaces, tax_values = taxonomy(TAXONOMY_PATH)
-    taxonomy_payload = json.loads(TAXONOMY_PATH.read_text(encoding="utf-8"))
-    # Only api_surfaces is hard-required here: it is the navigation anchor proved by
-    # the resource path and is always rendered. roles (and other mandatory namespaces)
-    # are enforced at the generation gate (okf-yaml-generate validate_tags + resolver
-    # decisions); nav pages and resolver-sanctioned gaps legitimately omit roles, so
-    # the index must not re-enforce its presence on the pure derivation.
-    required_namespaces = {"api_surfaces"} & set(
-        taxonomy_payload.get("mandatory_namespaces", ["api_surfaces", "roles"])
-    )
     documents: dict[str, dict[str, Any]] = {}
     pending: list[str] = []
     for path in sorted((root / scope.root).rglob("*.md")):
         rel = path.relative_to(root).as_posix()
-        fm, _, _ = split_front_matter(path.read_text(encoding="utf-8"))
+        parts = PurePosixPath(rel).parts
+        base = len(PurePosixPath(scope.root).parts)
+        if scope.categories is not None and (
+            len(parts) <= base or parts[base] not in scope.categories
+        ):
+            continue
+        fm, _, body = split_front_matter(path.read_text(encoding="utf-8"))
         if not fm:
             pending.append(rel)
             continue
-        if set(fm) - allowed_fields:
-            errors.append(f"{rel}: unknown fields: {sorted(set(fm) - allowed_fields)}")
+        allowed = {"okftype", "description", "tag", "dependencies", "version"}
+        extra = sorted(set(fm) - allowed)
+        if extra:
+            errors.append(f"{rel}: fields outside slim header (re-run okf-yaml-generate): {extra}")
             continue
-        if fm["okftype"] not in okftypes:
-            errors.append(f"{rel}: invalid okftype {fm['okftype']!r}")
-            continue
-        profile_fields = set(model["profiles"][fm["okftype"]].get("fields", ()))
-        tag_enabled = "tag" in profile_fields or "tag" in model["common_required_fields"]
-        if not str(fm["resource"]).endswith(rel):
-            errors.append(f"{rel}: resource does not match path")
         tags: dict[str, list[str]] = {}
-        if tag_enabled:
-            for item in fm.get("tag", []):
-                for ns, values in item.items():
-                    if ns not in namespaces:
-                        errors.append(f"{rel}: unknown tag namespace {ns}")
-                        continue
-                    if not values:
-                        # Reverse guard: inapplicable namespaces must be omitted, never
-                        # rendered as empty arrays (OKF 字段规范 / 最小标签集设计说明).
-                        errors.append(f"{rel}: empty tag namespace rendered: {ns}")
-                        continue
-                    unknown = sorted(set(values) - tax_values.get(ns, set()))
-                    if unknown:
-                        errors.append(f"{rel}: tag {ns} values outside taxonomy: {unknown}")
-                    tags[ns] = sorted(set(values))
-            missing_ns = sorted(required_namespaces - set(tags))
-            if missing_ns:
-                errors.append(f"{rel}: missing tag namespaces: {missing_ns}")
-        signatures = []
-        for sig in fm.get("signature") or []:
-            if not isinstance(sig, dict):
-                errors.append(f"{rel}: signature entry must be an object")
-                continue
-            identifier = sig.get("prototype_id") or sig.get("override_id") or sig.get("macro_id")
-            if not identifier:
-                errors.append(f"{rel}: signature entry without prototype_id/override_id/macro_id")
-                continue
-            sig_headers = []
-            for header in sig.get("headers", []):
-                header_value = str(header)
-                for prefix in ("/include/", "include/"):
-                    if header_value.startswith(prefix):
-                        header_value = header_value[len(prefix):]
-                        break
-                if header_value.startswith("/"):
-                    header_value = header_value[1:]
-                if not (root / "include" / header_value).is_file():
-                    errors.append(f"{rel}: header not found: include/{header_value}")
+        for item in fm.get("tag") or []:
+            for ns, values in item.items():
+                if ns not in namespaces:
+                    errors.append(f"{rel}: unknown tag namespace {ns}")
                     continue
-                sig_headers.append(header_value)
-            dtype_field = sig.get("dtype")
-            if isinstance(dtype_field, dict):
-                dtype_values = dtype_field.get("values", [])
-            else:
-                dtype_values = dtype_field or []
-            signatures.append({
-                "prototype_id": identifier,
-                "id_kind": "macro_id" if sig.get("macro_id") else ("override_id" if sig.get("override_id") else "prototype_id"),
-                "headers": sorted(set(sig_headers)),
-                "archs": sorted(sig.get("archs", [])),
-                "dtypes": sorted({normalize_dtype(v) for v in dtype_values}),
-            })
+                if not values:
+                    errors.append(f"{rel}: empty tag namespace rendered: {ns}")
+                    continue
+                unknown = sorted(set(values) - tax_values.get(ns, set()))
+                if unknown:
+                    errors.append(f"{rel}: tag {ns} values outside taxonomy: {unknown}")
+                tags[ns] = sorted(set(values))
+        if "roles" in fm.get("tag", [{}]) or tags:
+            pass
         deps = []
         for dep in fm.get("dependencies") or []:
             if dep.get("kind") not in DEPENDENCY_KINDS:
                 errors.append(f"{rel}: invalid dependency kind {dep.get('kind')!r}")
                 continue
             deps.append({"path": dep["path"], "kind": dep["kind"], "condition": dep.get("condition", "")})
-        examples = []
-        for ex in fm.get("examples") or []:
-            base = str(ex["path"]).lstrip("/")
-            if "file" in ex:
-                if not (root / base / str(ex["file"])).is_file():
-                    errors.append(f"{rel}: example not found: {base}/{ex['file']}")
-                    continue
-                entry = {"path": f"/{base}", "file": str(ex["file"]), "archs": sorted(ex.get("archs", []))}
-            else:
-                if not (root / base).is_dir():
-                    errors.append(f"{rel}: example directory not found: {base}")
-                    continue
-                entry = {"path": f"/{base}", "archs": sorted(ex.get("archs", []))}
-            examples.append(entry)
+        stem = PurePosixPath(rel).stem
         documents[rel] = {
-            "okftype": fm["okftype"], "title": fm["title"], "description": fm.get("description", ""),
-            "tags": tags, "signatures": signatures, "deps_out": deps, "examples": examples,
-            "family": "", "arch_of": "", "category": "", "nav_page": "", "arch_variants": [],
-            "standalone_primary": False,
+            "okftype": fm["okftype"],
+            "description": fm.get("description", ""),
+            "tags": tags,
+            "dependencies": deps,
+            "version": fm.get("version", ""),
+            "title": docparse.doc_title(body, stem),
+            "navigation": docparse.doc_navigation(body),
+            "product_support": docparse.doc_product_support(body),
+            "body": body,
         }
     return documents, pending
 
 
-def classify(documents: dict[str, dict[str, Any]], scope: Scope, errors: list[str], warnings: list[str]) -> None:
-    scope_root = scope.root
-    base = len(PurePosixPath(scope_root).parts)
-    root_nav = f"{scope_root}/{scope.root_nav}"
-    root_nav_stem = PurePosixPath(scope.root_nav).stem
-    by_dir: dict[str, list[str]] = {}
-    for rel in documents:
-        by_dir.setdefault(str(PurePosixPath(rel).parent), []).append(rel)
-    landing: dict[str, str] = {}
-    family_dirs: set[str] = set()
-    for directory, members in by_dir.items():
-        parts = PurePosixPath(directory).parts
-        if len(parts) != base + 2:
-            continue
-        sub = parts[base + 1]
-        index_pages = [r for r in members if documents[r]["okftype"] == "reference.index"]
-        exact = [r for r in index_pages if PurePosixPath(r).stem == sub]
-        if len(exact) > 1:
-            errors.append(f"{directory}: multiple landing-page candidates named {sub}.md")
-        elif exact:
-            landing[directory] = exact[0]
-        elif len(index_pages) == 1:
-            landing[directory] = index_pages[0]
-        elif index_pages:
-            errors.append(f"{directory}: cannot determine landing page for sub directory")
-        # Directories without any index page (e.g. single-API dirs like reg_compute/vf_call)
-        # have no landing page; their members fall back to the category page for navigation.
-        if any(is_arch_page(r) for r in members):
-            family_dirs.add(directory)
+# ---------------------------------------------------------------- 三源推导
+
+
+PROTOTYPE_BLOCK_RE = re.compile(r"```(?:cpp|c)\n(?P<body>.*?)```", re.DOTALL)
+PROTO_NAME_RE = re.compile(r"\b(asc_[a-z0-9_]+)\s*\(")
+PROTOTYPE_SECTION_RE = re.compile(
+    r"(?ms)^#{2,6}\s+函数(?:原型|声明)(?P<section>.*?)(?=^#{1,6}\s|\Z)"
+)
+
+
+def _prototype_api_names(body: str) -> list[str]:
+    names: set[str] = set()
+    for section in PROTOTYPE_SECTION_RE.finditer(body):
+        for block in PROTOTYPE_BLOCK_RE.finditer(section.group("section")):
+            names.update(PROTO_NAME_RE.findall(block.group("body")))
+    return sorted(names)
+
+
+def derive_signatures(
+    rel: str, doc: dict[str, Any], include_db: dict[str, Any], area: str, examples_db: dict[str, Any],
+    unresolved: list[dict[str, Any]], page_arch: str = "",
+) -> dict[str, Any]:
+    stem = PurePosixPath(rel).stem
+    family = re.sub(r"_arch_(\d+)(?:_deprecated)?$", "", stem)
+    declarations, mode = declarations_for(family, include_db, area)
+    if mode == "none":
+        # 回退：家族页名不带序号（如 asc_set_ndim_loop_stride 覆盖 loop0-3_stride），
+        # 从正文函数原型代码块提取真实 API 名再查 include。
+        proto_names = [n for n in _prototype_api_names(doc["body"]) if n in include_db["functions"]]
+        if proto_names:
+            declarations = []
+            for name in proto_names:
+                declarations.extend(include_db["functions"][name])
+            mode = "body_prototypes"
+    derived: dict[str, Any] = {
+        "api": family, "api_class": area, "signatures": [], "archs": [],
+        "headers": [], "examples": [], "params": [], "enum_types": [], "deprecated": None,
+    }
+    if mode == "none":
+        unresolved.append({"document": rel, "field": "signatures", "issue": "no declaration found in include/c_api"})
+        return derived
+    silent = 0
+    for declaration in declarations:
+        raw_archs = list(declaration.archs)
+        if page_arch:
+            # 架构变体页只呈现本架构的重载：无 @archs 声明继承页面架构，
+            # 带其他架构注解的声明不属于本页。
+            if raw_archs and page_arch not in raw_archs:
+                continue
+            if not raw_archs:
+                declaration = Declaration(
+                    name=declaration.name, header=declaration.header, signature=declaration.signature,
+                    return_type=declaration.return_type, params=declaration.params,
+                    override_id=declaration.override_id, archs=[page_arch], ingroup=declaration.ingroup,
+                    deprecated=declaration.deprecated,
+                )
+        entry = declaration.to_dict()
+        if not entry["override_id"]:
+            silent += 1
+        derived["signatures"].append(entry)
+        derived["archs"].extend(entry["archs"])
+        derived["headers"].append(declaration.header)
+        if entry["deprecated"]:
+            derived["deprecated"] = entry["deprecated"]
+        for param in entry["params"]:
+            derived["params"].append({
+                "name": param["name"], "type": param["type"],
+                "address_space": param["address_space"], "direction": param["direction"],
+                "override_id": entry["override_id"],
+            })
+            if param["type"] in include_db["enums"]:
+                derived["enum_types"].append(param["type"])
+        if entry["override_id"]:
+            for example in examples_db.get(entry["override_id"], []):
+                derived["examples"].append({**example, "override_id": entry["override_id"]})
+    if silent:
+        unresolved.append({
+            "document": rel, "field": "signatures",
+            "issue": f"{silent} declaration(s) without @override_id (no example link; dtypes/params still derived)",
+        })
+    derived["archs"] = sorted(set(derived["archs"]))
+    derived["headers"] = sorted(set(derived["headers"]))
+    derived["params"] = list({
+        (p["name"], p["type"], p["override_id"]): p for p in derived["params"]
+    }.values())
+    derived["enum_types"] = sorted(set(derived["enum_types"]))
+    derived["examples"] = list({
+        (e["path"], e["file"]): e for e in derived["examples"]
+    }.values())
+    if not derived["archs"]:
+        fallback = []
+        for marker, info in doc["product_support"].items():
+            if info["support"] == "支持":
+                arch = gate.npu_to_arch(marker, gate.load_product_map(PRODUCT_MAP_PATH))
+                if arch:
+                    fallback.append(arch)
+        if fallback:
+            derived["archs"] = sorted(set(fallback))
+            unresolved.append({
+                "document": rel, "field": "archs",
+                "issue": f"archs derived from body npu markers (include has no @archs): {sorted(set(fallback))}",
+            })
+        else:
+            unresolved.append({"document": rel, "field": "archs", "issue": "archs unknown"})
+    return derived
+
+
+def classify_documents(documents: dict[str, dict[str, Any]], scope: Scope) -> None:
+    base = len(PurePosixPath(scope.root).parts)
     for rel, doc in documents.items():
         parts = PurePosixPath(rel).parts
         stem = parts[-1][: -len(".md")]
-        if len(parts) not in (base + 1, base + 2, base + 3):
-            errors.append(f"{rel}: unexpected path depth under {scope_root}")
-            continue
-        directory = str(PurePosixPath(rel).parent)
         doc["category"] = parts[base] if len(parts) > base + 1 else "__root__"
         if len(parts) == base + 1:
-            doc["nav_page"] = root_nav
+            doc["nav_page"] = f"{scope.root}/{scope.root_nav}"
         elif len(parts) == base + 2:
-            doc["nav_page"] = f"{scope_root}/{parts[base]}/{parts[base]}.md"
+            doc["nav_page"] = f"{scope.root}/{parts[base]}/{parts[base]}.md"
         else:
-            doc["nav_page"] = landing.get(directory, "") or f"{scope_root}/{parts[base]}/{parts[base]}.md"
+            directory = str(PurePosixPath(rel).parent)
+            landing = [
+                other for other in documents
+                if str(PurePosixPath(other).parent) == directory
+                and documents[other]["okftype"] == "reference.index"
+                and PurePosixPath(other).stem == PurePosixPath(directory).name
+            ]
+            doc["nav_page"] = landing[0] if landing else f"{scope.root}/{parts[base]}/{parts[base]}.md"
         if is_arch_page(rel):
-            match = ARCH_RE.fullmatch(stem)
-            if not match:
-                errors.append(f"{rel}: arch page does not match family_arch_<n> naming")
-                continue
-            if len(parts) == base + 3 and (
-                match["family"] == parts[base + 1] or match["family"].startswith(parts[base + 1] + "_")
-            ):
-                doc["family"] = doc["arch_of"] = parts[base + 1]
-            else:
-                doc["family"] = doc["arch_of"] = match["family"]
+            match = re.fullmatch(r"(?P<family>.+)_arch_(?P<arch>\d+)(?:_deprecated)?", stem)
+            doc["family"] = doc["arch_of"] = match.group("family")
+            doc["page_arch"] = match.group("arch")
         elif doc["okftype"] == "reference.index":
-            if (len(parts) == base + 1 and stem == root_nav_stem) or (
-                len(parts) == base + 2 and stem == parts[base]
-            ):
-                doc["family"] = "__nav__"
-            elif len(parts) == base + 3 and landing.get(directory) == rel:
-                doc["family"] = stem if directory in family_dirs else "__nav__"
-            else:
-                doc["family"] = stem
+            doc["family"] = stem if len(parts) > base + 2 else "__nav__"
         else:
             doc["family"] = stem
-        if (doc["okftype"] == "reference.api" or is_arch_page(rel)) and not doc["signatures"]:
-            warnings.append(f"{rel}: api page without signature (sanctioned blank, degraded indexing)")
-        if doc["okftype"] == "reference.type" and any(
-            sig.get("id_kind") != "macro_id" for sig in doc["signatures"]
-        ):
-            errors.append(f"{rel}: type page with signature")
-
-
-def rollup_families(documents: dict[str, dict[str, Any]]) -> None:
-    hosted_families = {
-        doc["family"] for doc in documents.values()
-        if doc["okftype"] == "reference.index" and doc["family"] != "__nav__"
-    }
-    for rel, doc in documents.items():
-        if doc["okftype"] != "reference.index" or doc["family"] == "__nav__":
-            continue
-        variants = sorted(
-            (path, other) for path, other in documents.items() if other["arch_of"] == doc["family"]
-        )
-        doc["arch_variants"] = [path for path, _ in variants]
-        if not doc["description"] and variants:
-            doc["description"] = variants[0][1]["description"]
-        for _, variant in variants:
-            for ns, values in variant["tags"].items():
-                doc["tags"][ns] = sorted(set(doc["tags"].get(ns, [])) | set(values))
-            doc["signatures"].extend(variant["signatures"])
-            doc["deps_out"].extend(variant["deps_out"])
-            doc["examples"].extend(variant["examples"])
-        doc["signatures"] = list({
-            sig["prototype_id"]: sig for sig in doc["signatures"]
-        }.values())
-        doc["deps_out"] = list({
-            (d["path"], d["kind"]): d for d in doc["deps_out"]
-        }.values())
-        doc["examples"] = list({
-            (e["path"], e.get("file", "")): e for e in doc["examples"]
-        }.values())
-    for rel, doc in documents.items():
-        if is_arch_page(rel) and doc["family"] not in hosted_families:
-            doc["standalone_primary"] = True
+        doc["standalone_primary"] = False
 
 
 def stage_of(doc: dict[str, Any]) -> list[str]:
-    tags = doc["tags"]
-    roles = set(tags.get("roles", []))
-    src = set(tags.get("source_locations", []))
-    dst = set(tags.get("destination_locations", []))
-    local_src = src & LOCAL_BUFFERS
-    local_dst = dst & LOCAL_BUFFERS
+    roles = set(doc["tags"].get("roles", []))
+    locations = set(doc.get("derived_locations", []))
+    local = locations & LOCAL_BUFFERS
     stages = []
     if "data_movement" in roles and (
-        ("global_memory" in src and local_dst) or ("unified_buffer" in src and "vector_register" in dst)
+        ("global_memory" in locations and local) or ("unified_buffer" in locations and "vector_register" in locations)
     ):
         stages.append("in")
     if "data_movement" in roles and (
-        (local_src and "global_memory" in dst) or ("vector_register" in src and "unified_buffer" in dst)
+        (local and "global_memory" in locations) or ("vector_register" in locations and "unified_buffer" in locations)
     ):
         stages.append("out")
     if "compute" in roles:
@@ -344,14 +311,7 @@ def stage_of(doc: dict[str, Any]) -> list[str]:
 def conversion_pair(rel: str, doc: dict[str, Any]) -> str | None:
     if "conversion" not in doc["tags"].get("operations", []):
         return None
-    stem = Path(rel).stem
-    match = CONVERT_RE.fullmatch(stem)
-    if match:
-        src, dst = normalize_dtype(match.group("src")), normalize_dtype(match.group("dst"))
-        if src in PAIR_TOKENS and dst in PAIR_TOKENS:
-            return f"{src}->{dst}"
-    # Greedy backtrack mis-splits packed-dtype names (e.g. bfloat162e1m2x2 -> src=bfloat162e1m,
-    # dst=x2), so scan every "2" split and keep the first one where both sides are pair tokens.
+    stem = PurePosixPath(rel).stem
     body = stem[len("asc_"):] if stem.startswith("asc_") else ""
     for cut in (i for i, ch in enumerate(body) if ch == "2"):
         src, dst = normalize_dtype(body[:cut]), normalize_dtype(body[cut + 1:])
@@ -360,29 +320,41 @@ def conversion_pair(rel: str, doc: dict[str, Any]) -> str | None:
     return None
 
 
-def check_graph(root: Path, documents: dict[str, dict[str, Any]], errors: list[str]) -> list[dict[str, Any]]:
+def features_of(doc: dict[str, Any]) -> list[str]:
+    dtypes = set(doc.get("derived_dtypes", []))
+    operations = set(doc["tags"].get("operations", []))
+    features = []
+    low = dtypes & LOW_PRECISION
+    if low:
+        features.append("low_precision")
+        if "matrix_multiply_accumulate" in operations:
+            features.append("low_precision_matrix")
+        if "conversion" in operations:
+            features.append("low_precision_conversion")
+    if "int4" in dtypes:
+        features.append("int4")
+    return sorted(features)
+
+
+def check_graph(documents: dict[str, dict[str, Any]], errors: list[str]) -> list[dict[str, Any]]:
     edges: dict[tuple[str, str], dict[str, Any]] = {}
     for rel, doc in documents.items():
-        for dep in doc["deps_out"]:
-            out_of_scope = dep["path"] not in documents
-            if out_of_scope and not (root / dep["path"]).is_file():
-                errors.append(f"{rel}: dependency target not found: {dep['path']}")
-                continue
+        for dep in doc["dependencies"]:
             edges[(rel, dep["path"])] = {
-                "from": rel, "to": dep["path"], "kind": dep["kind"],
-                "condition": dep["condition"], "out_of_scope": out_of_scope,
+                "from": rel, "to": dep["path"], "kind": dep["kind"], "condition": dep["condition"],
             }
     adjacency: dict[str, list[str]] = {}
     for (src, dst), edge in edges.items():
-        if edge["kind"] == "requires" and not edge["out_of_scope"]:
+        if edge["kind"] == "requires":
             adjacency.setdefault(src, []).append(dst)
     state: dict[str, str] = {}
+    cycles: list[str] = []
 
     def visit(node: str, stack: list[str]) -> None:
         state[node] = "active"
         for nxt in sorted(adjacency.get(node, [])):
             if state.get(nxt) == "active":
-                errors.append(f"requires cycle: {' -> '.join(stack + [node, nxt])}")
+                cycles.append(" -> ".join(stack + [node, nxt]))
             elif state.get(nxt) != "done":
                 visit(nxt, stack + [node])
         state[node] = "done"
@@ -390,24 +362,26 @@ def check_graph(root: Path, documents: dict[str, dict[str, Any]], errors: list[s
     for node in sorted(adjacency):
         if state.get(node) != "done":
             visit(node, [])
+    for cycle in cycles:
+        errors.append(f"requires cycle: {cycle}")
+    for rel, doc in documents.items():
+        for dep in doc["dependencies"]:
+            target = dep["path"]
+            if target not in documents and not (REPO_ROOT / target).is_file():
+                errors.append(f"{rel}: dependency target not found: {target}")
     return [edges[key] for key in sorted(edges)]
-
-
-def primary_documents(documents: dict[str, dict[str, Any]]) -> list[str]:
-    return sorted(
-        rel for rel, doc in documents.items()
-        if doc["standalone_primary"] or doc["family"] != "__nav__"
-    )
 
 
 def build_views(documents: dict[str, dict[str, Any]]) -> dict[str, Any]:
     views: dict[str, dict[str, list[str]]] = {
         "by_stage": {stage: [] for stage in STAGES},
-        "by_role": {}, "by_operation": {}, "by_category": {},
-        "by_dtype": {}, "by_dtype_pair": {}, "by_prototype_id": {}, "by_header": {}, "by_api": {},
+        "by_role": {}, "by_operation": {}, "by_category": {}, "by_api_class": {},
+        "by_dtype": {}, "by_dtype_pair": {}, "by_override_id": {}, "by_header": {}, "by_api": {},
+        "by_param": {}, "by_enum": {}, "by_feature": {}, "by_version": {}, "by_product": {},
     }
-    for rel in primary_documents(documents):
-        doc = documents[rel]
+    for rel, doc in documents.items():
+        if doc["family"] == "__nav__":
+            continue
         for stage in stage_of(doc):
             views["by_stage"][stage].append(rel)
         for role in doc["tags"].get("roles", []):
@@ -415,25 +389,221 @@ def build_views(documents: dict[str, dict[str, Any]]) -> dict[str, Any]:
         for op in doc["tags"].get("operations", []):
             views["by_operation"].setdefault(op, []).append(rel)
         views["by_category"].setdefault(doc["category"], []).append(rel)
-        for sig in doc["signatures"]:
-            for dtype in sig["dtypes"]:
-                views["by_dtype"].setdefault(dtype, []).append(rel)
-            views["by_prototype_id"].setdefault(sig["prototype_id"], []).append(rel)
-            for header in sig["headers"]:
-                views["by_header"].setdefault(header, []).append(rel)
+        if doc.get("derived_api_class"):
+            views["by_api_class"].setdefault(doc["derived_api_class"], []).append(rel)
+        for dtype in doc.get("derived_dtypes", []):
+            views["by_dtype"].setdefault(dtype, []).append(rel)
+        for signature in doc.get("derived_signatures", []):
+            if signature["override_id"]:
+                views["by_override_id"].setdefault(signature["override_id"], []).append(rel)
+        for header in doc.get("derived_headers", []):
+            views["by_header"].setdefault(header, []).append(rel)
+        for param in doc.get("derived_params", []):
+            views["by_param"].setdefault(param["name"], []).append(rel)
+            if param["type"].startswith("asc_"):
+                views["by_param"].setdefault(param["type"], []).append(rel)
+        for enum_type in doc.get("derived_enum_types", []):
+            views["by_enum"].setdefault(enum_type, []).append(rel)
+        for feature in features_of(doc):
+            views["by_feature"].setdefault(feature, []).append(rel)
+        if doc.get("version"):
+            views["by_version"].setdefault(doc["version"], []).append(rel)
+        for marker, info in doc.get("product_support", {}).items():
+            if info["support"] == "支持":
+                views["by_product"].setdefault(marker, []).append(rel)
         pair = conversion_pair(rel, doc)
         if pair:
             views["by_dtype_pair"].setdefault(pair, []).append(rel)
         views["by_api"].setdefault(doc["family"], []).append(rel)
     return {
-        name: {key: sorted(set(paths)) for key, paths in view.items()} if name != "by_stage"
-        else {stage: sorted(set(paths)) for stage, paths in view.items()}
+        name: {key: sorted(set(paths)) for key, paths in view.items()}
         for name, view in views.items()
     }
 
 
-def validate_gaps(root: Path, scope: Scope, errors: list[str]) -> dict[str, Any]:
-    gaps = json.loads((scope_index_dir(scope.name) / "gaps.json").read_text(encoding="utf-8"))
+# ---------------------------------------------------------------- 构建主流程
+
+
+def git_output(args: list[str]) -> str:
+    return subprocess.run(["git", *args], cwd=REPO_ROOT, capture_output=True, text=True, check=True).stdout.strip()
+
+
+def overview(index: dict[str, Any], enums: dict[str, Any]) -> str:
+    meta = index["meta"]
+    lines = [
+        "# OKF 索引概览（构建副产物，勿手改）", "",
+        f"- 门控：CANN {meta['cann_version']} × 架构 {meta['arch_label']}（{meta['arch']}）× 层级 {meta['surface']}",
+        f"- 索引文档：{meta['doc_count']}（主文档 {meta['primary_count']}、导航页 {meta['nav_page_count']}）",
+        f"- 版本过滤：{meta['filtered_by_version']} 篇；架构过滤：{meta['filtered_by_arch']} 篇",
+        f"- 范围内无 slim 头的文档：{meta['pending_no_okf']} 篇",
+        f"- 推导残留（unresolved）：{meta['unresolved_count']} 条（derive-overrides 裁决）",
+        f"- defs 目录：枚举 {len(enums)} 个；参数反查视图 {len(index['views']['by_param'])} 项", "",
+        "## 分阶段候选规模", "", "| 阶段 | 主文档数 |", "| --- | ---: |",
+    ]
+    for stage, paths in index["views"]["by_stage"].items():
+        lines.append(f"| {stage} | {len(paths)} |")
+    lines += ["", "## 分类视图", "", "| 分类 | 主文档数 |", "| --- | ---: |"]
+    for category, paths in index["views"]["by_category"].items():
+        lines.append(f"| {category} | {len(paths)} |")
+    lines += ["", "## 特性视图", "", "| 特性 | 主文档数 |", "| --- | ---: |"]
+    for feature, paths in index["views"]["by_feature"].items():
+        lines.append(f"| {feature} | {len(paths)} |")
+    lines.append("")
+    return "\n".join(lines)
+
+
+def build(root: Path, scope: Scope, out_dir: Path, cann_version: str, arch_label: str) -> list[Path]:
+    errors: list[str] = []
+    unresolved: list[dict[str, Any]] = []
+    product_map = gate.load_product_map(PRODUCT_MAP_PATH)
+    arch = gate.arch_label_to_number(arch_label, product_map)
+
+    documents, pending = load_documents(root, scope, errors)
+    classify_documents(documents, scope)
+    include_db = build_include_db(root / "include" / "c_api")
+    examples_db = build_examples_db(root / "examples" / "02_simd_c_api" / "03_c_api")
+    override_map = overrides_mod.load_overrides(SKILL_ROOT / "derive-overrides" / f"{scope.name}.json")
+
+    gated: dict[str, dict[str, Any]] = {}
+    filtered_by_version = filtered_by_arch = 0
+    for rel, doc in sorted(documents.items()):
+        area = doc["category"] if doc["category"] in EXECUTION_MODEL_AREAS else None
+        page_arch = doc.get("page_arch", "")
+        derived = derive_signatures(
+            rel, doc, include_db, area, examples_db, unresolved, page_arch=page_arch,
+        ) if doc["okftype"] == "reference.api" else {
+            "api": "", "api_class": "", "signatures": [], "archs": [], "headers": [],
+            "examples": [], "params": [], "enum_types": [], "deprecated": None,
+        }
+        applied = overrides_mod.apply_overrides(rel, derived, override_map)
+        doc["derived"] = derived
+        doc["derived_applied_overrides"] = applied
+        doc["derived_api_class"] = derived["api_class"] or (
+            area if area else ("defs" if "/defs/" in rel else "")
+        )
+        doc["derived_execution_model"] = API_CLASS_TO_MODEL.get(doc["derived_api_class"], "")
+        doc["derived_signatures"] = derived["signatures"]
+        doc["derived_dtypes"] = sorted({d for s in derived["signatures"] for d in s["dtypes"]})
+        doc["derived_locations"] = sorted({loc for s in derived["signatures"] for loc in s["locations"]})
+        doc["derived_masked"] = any(s["masked"] for s in derived["signatures"])
+        doc["derived_deprecated"] = bool(derived["deprecated"]) or "deprecated" in doc["tags"].get("traits", [])
+        doc["derived_examples"] = derived["examples"]
+        doc["derived_headers"] = derived["headers"]
+        doc["derived_params"] = derived["params"]
+        doc["derived_enum_types"] = derived["enum_types"]
+
+        is_entity = doc["okftype"] != "reference.index"
+        if is_entity:
+            if doc["version"] and not gate.version_covers(doc["version"], cann_version):
+                filtered_by_version += 1
+                continue
+            if derived["archs"] and arch not in derived["archs"]:
+                filtered_by_arch += 1
+                continue
+            if derived["signatures"]:
+                derived["signatures"] = [
+                    s for s in derived["signatures"] if not s["archs"] or arch in s["archs"]
+                ]
+        gated[rel] = doc
+
+    edges = check_graph(gated, errors)
+    gaps = validate_gaps(scope, errors)
+    if errors:
+        raise BuildError(f"{len(errors)} validation error(s):\n" + "\n".join(f"  - {e}" for e in errors[:30]))
+
+    nav_pages = sorted(rel for rel, doc in gated.items() if doc["family"] == "__nav__")
+    primary = sorted(
+        rel for rel, doc in gated.items()
+        if doc["family"] != "__nav__" or doc["standalone_primary"]
+    )
+    views = build_views(gated)
+    reverse: dict[str, dict[str, list[str]]] = {kind: {} for kind in sorted(DEPENDENCY_KINDS)}
+    for edge in edges:
+        if edge["to"] in gated:
+            reverse[edge["kind"]].setdefault(edge["to"], []).append(edge["from"])
+
+    index = {
+        "schema": "okf-index/3",
+        "meta": {
+            "surface": scope.name,
+            "source_commit": git_output(["rev-parse", "HEAD"]),
+            "commit_date": git_output(["log", "-1", "--format=%cI"]),
+            "cann_version": cann_version,
+            "arch_label": arch_label,
+            "arch": arch,
+            "doc_count": len(gated),
+            "primary_count": len(primary),
+            "nav_page_count": len(nav_pages),
+            "filtered_by_version": filtered_by_version,
+            "filtered_by_arch": filtered_by_arch,
+            "pending_no_okf": len(pending),
+            "unresolved_count": len(unresolved),
+            "gap_ids": [gap["id"] for gap in gaps.get("scope_out_gaps", [])],
+        },
+        "documents": {
+            rel: {
+                "okftype": doc["okftype"], "title": doc["title"], "description": doc["description"],
+                "tags": doc["tags"], "dependencies": doc["dependencies"], "version": doc["version"],
+                "navigation": doc["navigation"], "product_support": {
+                    m: i["support"] for m, i in doc["product_support"].items()
+                },
+                "api_class": doc["derived_api_class"], "execution_model": doc["derived_execution_model"],
+                "signatures": [
+                    {k: v for k, v in s.items() if k != "unresolved"}
+                    for s in doc["derived_signatures"]
+                ],
+                "dtypes": doc["derived_dtypes"], "locations": doc["derived_locations"],
+                "masked": doc["derived_masked"], "deprecated": doc["derived_deprecated"],
+                "headers": doc["derived_headers"], "examples": doc["derived_examples"],
+                "params": doc["derived_params"], "enum_types": doc["derived_enum_types"],
+                "family": doc["family"], "category": doc["category"], "nav_page": doc["nav_page"],
+                "applied_overrides": doc["derived_applied_overrides"],
+            }
+            for rel, doc in sorted(gated.items())
+        },
+        "views": views,
+        "graph": {"edges": edges, "reverse": reverse},
+        "defs": {
+            "enums": include_db["enums"],
+            "constants": include_db["constants"],
+            "macros": [m for m in include_db["macros"] if m["name"].startswith("ASC_")],
+            "aliases": include_db["aliases"],
+            "records": include_db["records"],
+        },
+        "scope": {"primary_docs": primary, "navigation_pages": nav_pages},
+    }
+    build_meta = {
+        "schema": "okf-index-meta/2",
+        "source_commit": index["meta"]["source_commit"],
+        "taxonomy_sha256": hashlib.sha256(TAXONOMY_PATH.read_bytes()).hexdigest(),
+        "product_map_sha256": hashlib.sha256(PRODUCT_MAP_PATH.read_bytes()).hexdigest(),
+        "gaps_sha256": hashlib.sha256(
+            (INDEX_DIR / scope.name / "gaps.json").read_bytes()
+        ).hexdigest(),
+        "document_sha256": {
+            rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in sorted(gated)
+        },
+    }
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written: list[Path] = []
+    for name, payload in (
+        ("index.json", json.dumps(index, ensure_ascii=False, indent=1) + "\n"),
+        ("build-meta.json", json.dumps(build_meta, ensure_ascii=False, indent=1) + "\n"),
+        ("概览.md", overview(index, include_db["enums"])),
+    ):
+        target = out_dir / name
+        target.write_text(payload, encoding="utf-8")
+        written.append(target)
+    overrides_mod.write_unresolved(out_dir, overrides_mod.collect_unresolved(unresolved))
+    return written
+
+
+def validate_gaps(scope: Scope, errors: list[str]) -> dict[str, Any]:
+    path = INDEX_DIR / scope.name / "gaps.json"
+    if not path.is_file():
+        errors.append(f"gaps.json is missing: {path}")
+        return {"scope_out_gaps": [], "relation_gaps": []}
+    gaps = json.loads(path.read_text(encoding="utf-8"))
     for section in ("scope_out_gaps", "relation_gaps"):
         if section not in gaps:
             errors.append(f"gaps.json: missing section {section}")
@@ -442,120 +612,15 @@ def validate_gaps(root: Path, scope: Scope, errors: list[str]) -> dict[str, Any]
             if not gap.get(key):
                 errors.append(f"gaps.json: gap {gap.get('id')} missing {key}")
         for hint in gap.get("hints", []):
-            if not (root / hint["path"]).exists():
+            if not (REPO_ROOT / hint["path"]).exists():
                 errors.append(f"gaps.json: hint path not found: {hint['path']}")
         for ev in gap.get("evidence", []):
-            if not (root / ev["path"]).exists():
+            if not (REPO_ROOT / ev["path"]).exists():
                 errors.append(f"gaps.json: evidence path not found: {ev['path']}")
     for gap in gaps.get("relation_gaps", []):
-        if not (root / gap["from"]).is_file():
+        if not (REPO_ROOT / gap["from"]).is_file():
             errors.append(f"gaps.json: relation gap source not found: {gap['from']}")
     return gaps
-
-
-def git_output(root: Path, args: list[str]) -> str:
-    return subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, check=True).stdout.strip()
-
-
-def overview(index: dict[str, Any], gaps: dict[str, Any]) -> str:
-    meta = index["meta"]
-    lines = [
-        "# OKF 索引概览（构建副产物，勿手改）", "",
-        f"- 文档总数：{meta['doc_count']}（主文档 {meta['primary_count']}、导航页 {meta['nav_page_count']}、架构页 {meta['arch_page_count']}）",
-        f"- 范围内尚未生成 OKF 头的文档：{meta['pending_no_okf']} 篇（跳过索引，待补齐后重建）",
-        f"- signature 降级页（api/arch 页无 signature，仅按 tag/description/依赖检索）：{meta['degraded_no_signature']} 篇",
-        f"- 范围外缺口登记：{len(meta['gap_ids'])} 条；关系缺口：{meta['relation_gap_count']} 条", "",
-        "## 分阶段候选规模", "", "| 阶段 | 主文档数 |", "| --- | ---: |",
-    ]
-    for stage, paths in index["views"]["by_stage"].items():
-        lines.append(f"| {stage} | {len(paths)} |")
-    lines += ["", "## 分类视图", "", "| 分类 | 主文档数 |", "| --- | ---: |"]
-    for category, paths in index["views"]["by_category"].items():
-        lines.append(f"| {category} | {len(paths)} |")
-    lines += ["", "## 范围外缺口（详见 gaps.json）", ""]
-    for gap in gaps.get("scope_out_gaps", []):
-        lines.append(f"- **{gap['id']}**：{gap['conclusion']}")
-    lines.append("")
-    return "\n".join(lines)
-
-
-def build(root: Path, scope: Scope, out_dir: Path) -> list[Path]:
-    errors: list[str] = []
-    warnings: list[str] = []
-    documents, pending = load_raw_documents(root, scope, errors)
-    if documents:
-        classify(documents, scope, errors, warnings)
-        rollup_families(documents)
-        edges = check_graph(root, documents, errors)
-    else:
-        edges = []
-    gaps = validate_gaps(root, scope, errors) if not errors else {"scope_out_gaps": [], "relation_gaps": []}
-    if errors:
-        raise BuildError(f"{len(errors)} validation error(s):\n" + "\n".join(f"  - {e}" for e in errors[:30]))
-
-    nav_pages = sorted(rel for rel, doc in documents.items() if doc["family"] == "__nav__")
-    arch_pages = sorted(rel for rel, doc in documents.items() if doc["arch_of"])
-    primary = primary_documents(documents)
-    views = build_views(documents)
-    reverse: dict[str, dict[str, list[str]]] = {kind: {} for kind in sorted(DEPENDENCY_KINDS)}
-    for edge in edges:
-        if not edge["out_of_scope"]:
-            reverse[edge["kind"]].setdefault(edge["to"], []).append(edge["from"])
-
-    index = {
-        "schema": "okf-index/2",
-        "meta": {
-            "surface": scope.name,
-            "source_commit": git_output(root, ["rev-parse", "HEAD"]),
-            "commit_date": git_output(root, ["log", "-1", "--format=%cI"]),
-            "doc_count": len(documents),
-            "primary_count": len(primary),
-            "nav_page_count": len(nav_pages),
-            "arch_page_count": len(arch_pages),
-            "gap_ids": [gap["id"] for gap in gaps["scope_out_gaps"]],
-            "relation_gap_count": len(gaps["relation_gaps"]),
-            "pending_no_okf": len(pending),
-            "degraded_no_signature": len(warnings),
-            "degraded_no_signature_docs": sorted(warnings),
-        },
-        "documents": {
-            rel: {
-                "okftype": doc["okftype"], "title": doc["title"], "description": doc["description"],
-                "tags": doc["tags"], "signatures": doc["signatures"], "deps_out": doc["deps_out"],
-                "examples": doc["examples"], "family": doc["family"], "category": doc["category"],
-                "nav_page": doc["nav_page"], "arch_variants": doc["arch_variants"],
-            }
-            for rel, doc in sorted(documents.items())
-        },
-        "views": views,
-        "graph": {"edges": edges, "reverse": reverse},
-        "scope": {
-            "all_docs": sorted(documents), "primary_docs": primary,
-            "navigation_pages": nav_pages, "arch_pages": arch_pages,
-        },
-    }
-    build_meta = {
-        "schema": "okf-index-meta/1",
-        "source_commit": index["meta"]["source_commit"],
-        "taxonomy_sha256": hashlib.sha256(TAXONOMY_PATH.read_bytes()).hexdigest(),
-        "gaps_sha256": hashlib.sha256(
-            (scope_index_dir(scope.name) / "gaps.json").read_bytes()
-        ).hexdigest(),
-        "document_sha256": {
-            rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in sorted(documents)
-        },
-    }
-    out_dir.mkdir(parents=True, exist_ok=True)
-    written: list[Path] = []
-    for name, payload in (
-        ("index.json", json.dumps(index, ensure_ascii=False, indent=1) + "\n"),
-        ("build-meta.json", json.dumps(build_meta, ensure_ascii=False, indent=1) + "\n"),
-        ("概览.md", overview(index, gaps)),
-    ):
-        target = out_dir / name
-        target.write_text(payload, encoding="utf-8")
-        written.append(target)
-    return written
 
 
 INFORMATIONAL_META = ("source_commit", "commit_date")
@@ -571,19 +636,20 @@ def strip_informational(payload: dict) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, default=SKILL_ROOT.parents[1])
-    parser.add_argument("--scope", default="c_api", choices=sorted(SCOPES),
-                        help="API surface to build or check (surface registry in this script)")
-    parser.add_argument("--out", type=Path, default=None,
-                        help="output dir (default: index/<scope>)")
-    parser.add_argument("--check", action="store_true", help="verify committed index matches a rebuild")
+    parser.add_argument("--root", type=Path, default=REPO_ROOT)
+    parser.add_argument("--scope", default="c_api", choices=sorted(SCOPES))
+    parser.add_argument("--out", type=Path, default=None)
+    parser.add_argument("--cann-version", default=None, help="默认自动检测（$ASCEND_HOME_PATH > version.cmake）")
+    parser.add_argument("--arch", default="A5", help="检索代际标签（默认 A5，经 product-map 映射架构号）")
+    parser.add_argument("--check", action="store_true", help="校验已提交索引与重建结果一致")
     args = parser.parse_args()
     scope = SCOPES[args.scope]
-    out_dir = args.out if args.out is not None else scope_index_dir(scope.name)
+    out_dir = args.out if args.out is not None else INDEX_DIR / scope.name
     try:
+        cann_version = gate.detect_cann_version(args.cann_version, args.root)
         if args.check:
             with tempfile.TemporaryDirectory() as tmp:
-                fresh = build(args.root, scope, Path(tmp))
+                fresh = build(args.root, scope, Path(tmp), cann_version, args.arch)
                 for target in fresh:
                     if target.name.endswith(".json"):
                         committed = strip_informational(json.loads((out_dir / target.name).read_text(encoding="utf-8")))
@@ -596,10 +662,10 @@ def main() -> int:
                         return 1
             print("index is up to date")
             return 0
-        for target in build(args.root, scope, out_dir):
+        for target in build(args.root, scope, out_dir, cann_version, args.arch):
             print(f"written: {target}")
         return 0
-    except (BuildError, ValidationError, subprocess.CalledProcessError, OSError, KeyError) as exc:
+    except (BuildError, ValidationError, ValueError, subprocess.CalledProcessError, OSError, KeyError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 

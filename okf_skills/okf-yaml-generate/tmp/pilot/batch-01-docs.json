@@ -1,0 +1,70 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md",
+  "sha256": "3ddb4abec698c624ef738ba947e8939b5261ab982f1fff75decbcd3930390c2a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+  "sha256": "6706e617a2e9ec68f2bdbf8178cc94ad4d47d6c86fd01cd60ad2801bd26c8f5e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+  "sha256": "4ee4dd47b3bbf7fbacd20e8d30b6dea79dd0f141512113b76a259644b7957646"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md",
+  "sha256": "77cd2bca7794785d93ba67ae684ec0697957e18f0bcc6fdc85db648736c83149"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md",
+  "sha256": "11664bb5f5e0b9e63d723eb4c579eb06c2b2e0ef9172fad7d27a612147876aea"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md",
+  "sha256": "5bc0e3beda23a1d220dbaa609c7a9d41877af2b94a60f8f5fc88fa3cee3c8a59"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+  "sha256": "e394c855dfa91b6f52699449056949bc2f0e26921d2f5e865f9e35e194196e73"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+  "sha256": "70d333b5941f16a40baa65be58fc2d3a26fabe82167dc006b68e744f11bdea67"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+  "sha256": "d8bca5f8cedab0dbea747cba3f1d250e9c0004d629b08d63663df748026f8f2f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+  "sha256": "1c449751e8659dde598dd4b7ea502c13c6f6ccd4ce1743be1315e047c38d24d7"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+  "sha256": "2de7b5328fc4204ad40443c5fccf2af873d499cc7a6e86cea9646b12323cacf4"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md",
+  "sha256": "67c0582c1ff9eaf27e79272b2d7951d05b5d52a502899bfe1738bfb3601e4c53"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+  "sha256": "97f482ef7e4699e31ef64ce852ade744805d29ce0ae6f358931c864b398bb41b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+  "sha256": "f5528608d229b562c51d7775b3b64d11c2687df6ef7d253f77fc381d23c86044"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+  "sha256": "a1332a510602c62cdf956c46c2a9897173528e13bc94e8005f475e0f2420970c"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+  "sha256": "fe6c3bcf74df8e410862dd7cd49fbdbdd39492b64a877fd6c247b5dcb7590806"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+  "sha256": "600020aa839e15cde36bde7cdcdd1ec4809465533316e724dcd1f202641a5eb8"
+ }
+]

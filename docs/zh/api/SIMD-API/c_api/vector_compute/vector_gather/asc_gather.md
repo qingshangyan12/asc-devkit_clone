@@ -1,38 +1,14 @@
 ---
 okftype: reference.api
-title: asc_gather
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md
-description: 将src按照src_offset给定的偏移按元素收集到dst中，偏移量相对于源操作数起始基地址且单位为Bytes，偏移后地址不能超出Unified
-  Buffer（UB）范围。
+description: "按src_offset给定的偏移将源矢量元素按元素收集到目的矢量中，偏移量相对源操作数起始基地址、单位为Bytes，支持前n个数据计算与高维切分计算两类原型。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [gather]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [elementwise, high_dimensional]
-signature:
-  - override_id: asc_gather__PUi16_PUi16_PUu32_u32
-  - override_id: asc_gather__PUu16_PUu16_PUu32_u32
-  - override_id: asc_gather__PUf16_PUf16_PUu32_u32
-  - override_id: asc_gather__PUbf16_PUbf16_PUu32_u32
-  - override_id: asc_gather__PUi32_PUi32_PUu32_u32
-  - override_id: asc_gather__PUu32_PUu32_PUu32_u32
-  - override_id: asc_gather__PUf32_PUf32_PUu32_u32
-  - override_id: asc_gather__PUi16_PUi16_PUu32_u16_u8
-  - override_id: asc_gather__PUu16_PUu16_PUu32_u16_u8
-  - override_id: asc_gather__PUf16_PUf16_PUu32_u16_u8
-  - override_id: asc_gather__PUbf16_PUbf16_PUu32_u16_u8
-  - override_id: asc_gather__PUi32_PUi32_PUu32_u16_u8
-  - override_id: asc_gather__PUu32_PUu32_PUu32_u16_u8
-  - override_id: asc_gather__PUf32_PUf32_PUu32_u16_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - traits: [aligned_transfer, elementwise, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 
 # asc_gather

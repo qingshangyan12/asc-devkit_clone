@@ -1,0 +1,516 @@
+{
+  "schema_version": 1,
+  "purpose": "independent_open_discovery",
+  "run_id": "core-v10",
+  "worker": "discovery-b",
+  "reviewed_documents": [
+    "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md"
+  ],
+  "documents": [
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+      "title": "asc_loadalign_brc_datablock_postupdate",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md"
+      ],
+      "proposed_tags": [
+        "traits:aligned_transfer"
+      ],
+      "evidence": {
+        "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节）"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+      "title": "asc_loadalign_unpack_postupdate",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md"
+      ],
+      "proposed_tags": [
+        "operations:unpack",
+        "traits:aligned_transfer"
+      ],
+      "evidence": {
+        "operations:unpack": "读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素",
+        "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+      "title": "asc_extract_mask",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md"
+      ],
+      "proposed_tags": [
+        "operations:mask_extraction"
+      ],
+      "evidence": {
+        "operations:mask_extraction": "从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+      "title": "asc_mask",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+      "title": "asc_intlv",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+      "title": "asc_squeeze",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+      "title": "asc_storealign",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md"
+      ],
+      "proposed_tags": [
+        "traits:aligned_transfer"
+      ],
+      "evidence": {
+        "traits:aligned_transfer": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+      "title": "asc_storealign_pack",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md"
+      ],
+      "proposed_tags": [
+        "traits:aligned_transfer"
+      ],
+      "evidence": {
+        "traits:aligned_transfer": "**连续对齐搬出模式**：将压缩后的数据搬出到UB起始地址"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+      "title": "asc_mul",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md",
+      "title": "asc_rcp",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+      "title": "asc_brcb",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+      "title": "asc_duplicate",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+      "title": "asc_lt",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+      "title": "asc_ne_scalar",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+      "title": "asc_half2int16",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+      "title": "asc_int322int16",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md",
+      "title": "asc_add_relu",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md",
+      "title": "asc_deq_int322half",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+      "title": "asc_gather",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+      "title": "asc_gather_datablock",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md"
+      ],
+      "proposed_tags": [
+        "traits:datablock_granularity"
+      ],
+      "evidence": {
+        "traits:datablock_granularity": "根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+      "title": "asc_or",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+      "title": "asc_shiftright",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+      "title": "asc_set_mask_count",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+      "title": "asc_set_vector_mask",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+      "title": "asc_set_va_reg",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+      "title": "asc_transto5hd",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+      "title": "asc_get_reduce_max_cnt",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md"
+      ],
+      "proposed_tags": [
+        "traits:extremum_index"
+      ],
+      "evidence": {
+        "traits:extremum_index": "操作后的最大值，以及第一个最大值时的索引"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+      "title": "asc_repeat_reduce_min",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md"
+      ],
+      "proposed_tags": [
+        "traits:extremum_index"
+      ],
+      "evidence": {
+        "traits:extremum_index": "对每个Repeat内所有元素求最小值，以及Repeat内的首个最小值元素在当前Repeat中的索引"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+      "title": "asc_get_vms4_sr",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+      "title": "asc_mrgsort4",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md"
+      ],
+      "proposed_tags": [
+        "operations:merge"
+      ],
+      "evidence": {
+        "operations:merge": "将2、3或4条已经按score从大到小排列的队列合并为一条有序队列"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+      "title": "asc_copy_gm2ub",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md"
+      ],
+      "proposed_tags": [
+        "traits:aligned_transfer"
+      ],
+      "evidence": {
+        "traits:aligned_transfer": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+      "title": "asc_copy_gm2ub",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+      "title": "asc_copy_gm2ub_align",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md"
+      ],
+      "proposed_tags": [
+        "traits:loop_transfer"
+      ],
+      "evidence": {
+        "traits:loop_transfer": "循环搬运模式相关配置接口请参考[asc_set_gm2ub_loop_size]"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+      "title": "asc_copy_gm2ub_align",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"
+      ],
+      "proposed_tags": [
+        "traits:loop_transfer"
+      ],
+      "evidence": {
+        "traits:loop_transfer": "使用循环搬运模式时，可通过[asc_set_gm2ub_loop_size]"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+      "title": "asc_copy_ub2gm",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md"
+      ],
+      "proposed_tags": [
+        "traits:aligned_transfer"
+      ],
+      "evidence": {
+        "traits:aligned_transfer": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+      "title": "asc_copy_ub2gm",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md"
+      ],
+      "proposed_tags": [
+        "traits:loop_transfer"
+      ],
+      "evidence": {
+        "traits:loop_transfer": "可通过loop功能实现Broadcast，将`burst_count`设置为1"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+      "title": "asc_copy_ub2gm_align",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+      "title": "asc_copy_ub2gm_align",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md"
+      ],
+      "proposed_tags": [
+        "traits:loop_transfer"
+      ],
+      "evidence": {
+        "traits:loop_transfer": "可通过loop功能实现Broadcast，将`burst_count`设置为1"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+      "title": "asc_ndim_copy_gm2ub",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"
+      ],
+      "proposed_tags": [
+        "traits:nearest_value_padding"
+      ],
+      "evidence": {
+        "traits:nearest_value_padding": "使用最近值填充，左右Padding值选取当前维度最左侧或最右侧的值"
+      }
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+      "title": "asc_set_ub2gm_loop1_stride",
+      "peer_paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md"
+      ],
+      "proposed_tags": [],
+      "evidence": {}
+    }
+  ]
+}

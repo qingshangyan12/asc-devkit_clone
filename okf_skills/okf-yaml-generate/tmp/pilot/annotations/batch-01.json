@@ -1,0 +1,798 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md",
+      "document_sha256": "3ddb4abec698c624ef738ba947e8939b5261ab982f1fff75decbcd3930390c2a",
+      "description": {
+        "value": "在Unified Buffer（UB）内搬运矢量数据，支持前n个数据与高维切分两种形式，目的与源操作数起始地址需32字节对齐，地址重叠须满足通用地址重叠约束。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md", "excerpt": "将数据从Unified Buffer（UB）搬运到UB。支持高维切分。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy"],
+        "traits": ["high_dimensional", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将数据从Unified Buffer（UB）搬运到UB。支持高维切分。",
+        "operations:copy": "将数据从Unified Buffer（UB）搬运到UB。支持高维切分。",
+        "traits:high_dimensional": "支持高维切分。",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+      "document_sha256": "6706e617a2e9ec68f2bdbf8178cc94ad4d47d6c86fd01cd60ad2801bd26c8f5e",
+      "description": {
+        "value": "将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持前n个数据搬运与高维切分搬运两种形式；前n个数据搬运要求数据大小32字节对齐，与其他指令存在UB地址重叠时须插入同步指令保证串行化。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md", "excerpt": "将数据从Global Memory (GM)搬运到Unified Buffer（UB）。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md", "excerpt": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md", "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy"],
+        "traits": ["high_dimensional", "aligned_transfer", "datablock_granularity"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将数据从Global Memory (GM)搬运到Unified Buffer（UB）。",
+        "operations:copy": "将数据从Global Memory (GM)搬运到Unified Buffer（UB）。",
+        "traits:high_dimensional": "高维切分搬运",
+        "traits:aligned_transfer": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐。",
+        "traits:datablock_granularity": "待搬运的每个连续传输数据块的长度，单位为DataBlock（32字节）"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在UB地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+            "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在UB地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+            "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+      "document_sha256": "4ee4dd47b3bbf7fbacd20e8d30b6dea79dd0f141512113b76a259644b7957646",
+      "description": {
+        "value": "将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持连续数据搬运与高维切分数据搬运，目的UB起始地址需32字节对齐，仅在AIV上生效，UB地址重叠时须插入同步指令。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md", "excerpt": "将数据从Global Memory（GM）搬运到Unified Buffer（UB）。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md", "excerpt": "本接口支持连续数据搬运和高维切分数据搬运。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md", "excerpt": "本接口仅在AIV上生效。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy"],
+        "traits": ["high_dimensional", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将数据从Global Memory（GM）搬运到Unified Buffer（UB）。",
+        "operations:copy": "将数据从Global Memory（GM）搬运到Unified Buffer（UB）。",
+        "traits:high_dimensional": "本接口支持连续数据搬运和高维切分数据搬运。",
+        "traits:aligned_transfer": "目的UB的起始地址。需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在UB地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+            "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在UB地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+            "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md",
+      "document_sha256": "77cd2bca7794785d93ba67ae684ec0697957e18f0bcc6fdc85db648736c83149",
+      "description": {
+        "value": "将数据从Unified Buffer（UB）搬运到L1 Buffer，支持连续数据搬运与高维切分数据搬运，源与目的起始地址需32字节对齐，连续搬运大小需为32的整数倍，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md", "excerpt": "提供数据搬运功能，将数据从Unified Buffer（UB）搬运到L1 Buffer。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md", "excerpt": "目的L1 Buffer的起始地址。需要32字节对齐。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md", "excerpt": "`size`需为32的整数倍，否则`size/32`截断后实际搬运字节数不足，多出非整32字节部分被丢弃。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy"],
+        "traits": ["high_dimensional", "aligned_transfer", "datablock_granularity"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "提供数据搬运功能，将数据从Unified Buffer（UB）搬运到L1 Buffer。",
+        "operations:copy": "提供数据搬运功能，将数据从Unified Buffer（UB）搬运到L1 Buffer。",
+        "traits:high_dimensional": "高维切分数据搬运",
+        "traits:aligned_transfer": "目的L1 Buffer的起始地址。需要32字节对齐。",
+        "traits:datablock_granularity": "每个数据块的长度以及相邻数据块之间的间隔均以DataBlock（32字节）为单位指定"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在UB地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md",
+            "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在UB地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md",
+            "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md",
+      "document_sha256": "11664bb5f5e0b9e63d723eb4c579eb06c2b2e0ef9172fad7d27a612147876aea",
+      "description": {
+        "value": "在Unified Buffer（UB）内搬运数据，支持连续数据搬运与高维切分数据搬运，源与目的起始地址需32字节对齐，搬运大小需为32的整数倍，仅在AIV上生效，多条指令目的地址重叠时须插入同步指令。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md", "excerpt": "将数据从Unified Buffer（UB）搬运到UB。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md", "excerpt": "本接口支持连续数据搬运和高维切分数据搬运。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md", "excerpt": "如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy"],
+        "traits": ["high_dimensional", "aligned_transfer", "datablock_granularity"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将数据从Unified Buffer（UB）搬运到UB。",
+        "operations:copy": "将数据从Unified Buffer（UB）搬运到UB。",
+        "traits:high_dimensional": "本接口支持连续数据搬运和高维切分数据搬运。",
+        "traits:aligned_transfer": "目的UB的起始地址。需要32字节对齐。",
+        "traits:datablock_granularity": "每个连续数据块的长度，单位为DataBlock（32字节）"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果需要执行多条本接口指令，且目的地址存在重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md",
+            "excerpt": "如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果需要执行多条本接口指令，且目的地址存在重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md",
+            "excerpt": "如果需要执行多条本接口指令，且目的地址存在重叠，需要插入同步指令（`asc_sync_notify`和`asc_sync_wait`），保证多个指令串行化，防止出现异常数据。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md",
+      "document_sha256": "5bc0e3beda23a1d220dbaa609c7a9d41877af2b94a60f8f5fc88fa3cee3c8a59",
+      "description": {
+        "value": "刷新NDDMA DataCache，多核场景下多个AI Core读取同一块GM地址时缓存可能为旧数据，须在使用asc_ndim_copy_gm2ub前调用本接口，保证多核间数据一致性，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md", "excerpt": "刷新NDDMA DataCache。在多核场景下，当多个AI Core读取同一块GM（Global Memory）地址时，NDDMA DataCache中可能缓存旧数据，导致部分核读取到错误的数据。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md", "excerpt": "本接口仅在使用[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)前调用，用于刷新NDDMA DataCache。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"]
+      },
+      "tag_evidence": {
+        "roles:control": "因此，在使用[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)前，需要调用本接口刷新NDDMA DataCache，确保缓存中的数据为最新状态。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+          "kind": "related",
+          "condition": "仅在使用asc_ndim_copy_gm2ub前调用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md",
+            "excerpt": "本接口仅在使用[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)前调用，用于刷新NDDMA DataCache。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+      "document_sha256": "e394c855dfa91b6f52699449056949bc2f0e26921d2f5e865f9e35e194196e73",
+      "description": {
+        "value": "将多维数据从Global Memory（GM）搬运到Unified Buffer（UB），最多支持5个维度且每个维度可单独配置Stride，支持随路Padding，各维步长与填充元素数须通过配套接口预先配置，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md", "excerpt": "该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。相比基础数据搬运接口，本接口可以灵活配置搬入数据的维度信息。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md", "excerpt": "本接口最多支持5个维度，每个维度均可单独配置Stride，并支持随路Padding功能。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md", "excerpt": "目的UB的起始地址，指向padding后数据的起始位置。需要1字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy"],
+        "traits": ["high_dimensional", "padding", "unaligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。",
+        "operations:copy": "该接口用于将多维数据从Global Memory（GM）搬运到Unified Buffer（UB）。",
+        "traits:high_dimensional": "本接口最多支持5个维度，每个维度均可单独配置Stride，并支持随路Padding功能。",
+        "traits:padding": "并支持随路Padding功能。",
+        "traits:unaligned_transfer": "目的UB的起始地址，指向padding后数据的起始位置。需要1字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在UB地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+            "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在UB地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+            "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md",
+          "kind": "requires",
+          "condition": "多核场景下，如果多个AI Core可能读取同一块GM地址，且该GM地址中的数据可能被其他核更新",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+            "excerpt": "多核场景下，如果多个AI Core可能读取同一块GM地址，且该GM地址中的数据可能被其他核更新，应在调用本接口前调用[asc_ndim_copy_dci](asc_ndim_copy_dci.md)刷新NDDMA DataCache，保证多核间数据一致性。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+            "excerpt": "各维源/目步长须通过配套接口（[asc_set_ndim_loop_stride](asc_set_ndim_loop_stride.md)）预先配置，单位为元素个数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+            "excerpt": "loop1~loop4维度的左右填充元素数须通过配套接口（[asc_set_ndim_pad_count](asc_set_ndim_pad_count.md)）预先配置，本接口不设置这四个维度的填充。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+          "kind": "related",
+          "condition": "padding_mode为true使用常数填充时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+            "excerpt": "当`padding_mode`为`true`时，该值作为Padding的固定填充值；当`padding_mode`为`false`时，该值不生效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+      "document_sha256": "70d333b5941f16a40baa65be58fc2d3a26fabe82167dc006b68e744f11bdea67",
+      "description": {
+        "value": "与asc_copy_gm2ub_align配合使用，设置连续搬运数据块左右两侧的填充值；须在调用搬运接口前写入配置，填充值仅在enable_constant_pad参数为true时被取用，配置持续生效直至再次调用覆盖，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md", "excerpt": "该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md", "excerpt": "本接口仅设置填充值，须先调用本接口写入配置，再调用对应搬运接口。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md", "excerpt": "本接口设置的填充值仅在`asc_copy_gm2ub_align`接口的参数`enable_constant_pad`设置为`true`时被取用；若`enable_constant_pad`设置为`false`，填充值配置寄存器不被取用，本接口设置不生效。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。",
+        "traits:padding": "本接口仅设置填充值，须先调用本接口写入配置，再调用对应搬运接口。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md",
+          "kind": "configures",
+          "condition": "填充值仅在enable_constant_pad设置为true时被取用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+            "excerpt": "本接口设置的填充值仅在`asc_copy_gm2ub_align`接口的参数`enable_constant_pad`设置为`true`时被取用；若`enable_constant_pad`设置为`false`，填充值配置寄存器不被取用，本接口设置不生效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+      "document_sha256": "d8bca5f8cedab0dbea747cba3f1d250e9c0004d629b08d63663df748026f8f2f",
+      "description": {
+        "value": "设置asc_copy_gm2ub_align循环搬运模式内层循环中相邻两次迭代源与目的操作数数据块起始地址之间的偏移量，配置持续生效直至重新配置，需配合设置循环次数与外层循环步长，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md", "excerpt": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md", "excerpt": "使用循环搬运模式时，还需通过[asc_set_gm2ub_loop_size](./asc_set_gm2ub_loop_size.md)设置循环次数，并通过[asc_set_gm2ub_loop2_stride](./asc_set_gm2ub_loop2_stride.md)设置外层循环`loop2`的步长。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md",
+          "kind": "configures",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+            "excerpt": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_gm2ub_loop_size](./asc_set_gm2ub_loop_size.md)设置循环次数，并通过[asc_set_gm2ub_loop2_stride](./asc_set_gm2ub_loop2_stride.md)设置外层循环`loop2`的步长。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_gm2ub_loop_size](./asc_set_gm2ub_loop_size.md)设置循环次数，并通过[asc_set_gm2ub_loop2_stride](./asc_set_gm2ub_loop2_stride.md)设置外层循环`loop2`的步长。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+      "document_sha256": "1c449751e8659dde598dd4b7ea502c13c6f6ccd4ce1743be1315e047c38d24d7",
+      "description": {
+        "value": "设置asc_copy_gm2ub_align循环搬运模式外层循环中相邻两次迭代源与目的操作数数据块起始地址之间的偏移量，配置持续生效直至重新配置，需配合设置循环次数与内层循环步长，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md", "excerpt": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md", "excerpt": "使用循环搬运模式时，还需通过[asc_set_gm2ub_loop_size](./asc_set_gm2ub_loop_size.md)设置循环次数，并通过[asc_set_gm2ub_loop1_stride](./asc_set_gm2ub_loop1_stride.md)设置内层循环`loop1`的步长。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md",
+          "kind": "configures",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+            "excerpt": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_gm2ub_loop_size](./asc_set_gm2ub_loop_size.md)设置循环次数，并通过[asc_set_gm2ub_loop1_stride](./asc_set_gm2ub_loop1_stride.md)设置内层循环`loop1`的步长。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_gm2ub_loop_size](./asc_set_gm2ub_loop_size.md)设置循环次数，并通过[asc_set_gm2ub_loop1_stride](./asc_set_gm2ub_loop1_stride.md)设置内层循环`loop1`的步长。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+      "document_sha256": "2de7b5328fc4204ad40443c5fccf2af873d499cc7a6e86cea9646b12323cacf4",
+      "description": {
+        "value": "设置asc_copy_gm2ub_align循环搬运模式两层循环的迭代次数，内层loop1与外层loop2分别配置，循环次数为0时对应循环不执行，任务完成后需复位为1，配置持续生效直至重新配置，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md", "excerpt": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时的两层循环迭代次数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md", "excerpt": "`loop1_size`或`loop2_size`设置为0时，对应循环不执行，后续的`asc_copy_gm2ub_align`调用不搬运数据。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时的两层循环迭代次数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md",
+          "kind": "configures",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+            "excerpt": "本接口用于设置[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)使用循环搬运模式时的两层循环迭代次数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_gm2ub_loop1_stride](./asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](./asc_set_gm2ub_loop2_stride.md)分别设置内层循环和外层循环中，相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_gm2ub_loop1_stride](./asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](./asc_set_gm2ub_loop2_stride.md)分别设置内层循环和外层循环中，相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md",
+      "document_sha256": "67c0582c1ff9eaf27e79272b2d7951d05b5d52a502899bfe1738bfb3601e4c53",
+      "description": {
+        "value": "设置asc_ndim_copy_gm2ub进行NDDMA多维数据搬运时loop0至loop4各循环维度的源操作数步长和目的操作数步长，调用搬运接口前必须先完成配置，配置持续生效直至重新配置，仅在AIV上执行有效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md", "excerpt": "本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)进行NDDMA多维数据搬运时，`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md", "excerpt": "调用`asc_ndim_copy_gm2ub`前，必须先调用本接口完成`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长配置。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["high_dimensional"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)进行NDDMA多维数据搬运时，`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长。",
+        "traits:high_dimensional": "本接口包含5个函数，分别用于配置`loop0`至`loop4`的步长，其中`loop0`为最内层循环，`loop4`为最外层循环。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md",
+            "excerpt": "调用`asc_ndim_copy_gm2ub`前，必须先调用本接口完成`loop0`至`loop4`各循环维度的源操作数步长和目的操作数步长配置。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md",
+            "excerpt": "`loop1`至`loop4`各维的填充元素数通过[asc_set_ndim_pad_count](asc_set_ndim_pad_count.md)配置；使用常数填充模式时，还需通过[asc_set_ndim_pad_value](asc_set_ndim_pad_value.md)设置填充值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+          "kind": "related",
+          "condition": "使用常数填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md",
+            "excerpt": "`loop1`至`loop4`各维的填充元素数通过[asc_set_ndim_pad_count](asc_set_ndim_pad_count.md)配置；使用常数填充模式时，还需通过[asc_set_ndim_pad_value](asc_set_ndim_pad_value.md)设置填充值。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+      "document_sha256": "97f482ef7e4699e31ef64ce852ade744805d29ce0ae6f358931c864b398bb41b",
+      "description": {
+        "value": "配置NDDMA高维切分搬运中loop1至loop4各维左右两侧的填充元素数，配置结果供后续调用asc_ndim_copy_gm2ub时使用，loop0的填充由搬运接口参数配置，配置持续生效直至重新配置，仅在AIV上执行有效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md", "excerpt": "本接口用于配置NDDMA高维切分搬运中`loop1`至`loop4`各维左右两侧的填充元素数。配置结果供后续调用[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)时使用。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md", "excerpt": "`loop0`的左右填充元素数由`asc_ndim_copy_gm2ub`的`loop0_lp_count`和`loop0_rp_count`参数配置，不通过本接口配置。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["high_dimensional", "padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于配置NDDMA高维切分搬运中`loop1`至`loop4`各维左右两侧的填充元素数。配置结果供后续调用[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)时使用。",
+        "traits:high_dimensional": "NDDMA高维切分搬运的填充元素数配置，类型为`asc_ndim_pad_count_config&`。",
+        "traits:padding": "本接口用于配置NDDMA高维切分搬运中`loop1`至`loop4`各维左右两侧的填充元素数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+            "excerpt": "调用`asc_ndim_copy_gm2ub`前，必须先调用本接口完成`loop1`至`loop4`各维的填充元素数配置。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+          "kind": "related",
+          "condition": "使用常数填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+            "excerpt": "使用常数填充模式时，还需通过[asc_set_ndim_pad_value](asc_set_ndim_pad_value.md)设置与搬运数据类型一致的填充值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+            "excerpt": "详细字段说明请参见[asc_ndim_pad_count_config](../defs/union/asc_ndim_pad_count_config.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+      "document_sha256": "f5528608d229b562c51d7775b3b64d11c2687df6ef7d253f77fc381d23c86044",
+      "description": {
+        "value": "设置asc_ndim_copy_gm2ub在常数填充模式下使用的填充值，padding_mode为true时用于填充搬运数据的边界区域，填充值数据类型须与搬运数据类型一致，配置持续生效直至重新配置，仅在AIV上执行有效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md", "excerpt": "本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)在常数填充模式下使用的填充值。当`padding_mode`设置为`true`时，后续调用`asc_ndim_copy_gm2ub`将使用该值填充搬运数据的边界区域。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md", "excerpt": "填充值的数据类型应为本接口支持的数据类型，并与`asc_ndim_copy_gm2ub`搬运的数据类型一致。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)在常数填充模式下使用的填充值。",
+        "traits:padding": "当`padding_mode`设置为`true`时，后续调用`asc_ndim_copy_gm2ub`将使用该值填充搬运数据的边界区域。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+          "kind": "configures",
+          "condition": "填充值仅在搬运接口选择常数填充模式时被取用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+            "excerpt": "本接口用于设置[asc_ndim_copy_gm2ub](asc_ndim_copy_gm2ub.md)在常数填充模式下使用的填充值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+          "kind": "related",
+          "condition": "常数填充模式下",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+            "excerpt": "常数填充模式下，还需配置各维左右两侧的填充元素数。`loop0`的左右填充元素数通过`asc_ndim_copy_gm2ub`的`loop0_lp_count`和`loop0_rp_count`参数配置，`loop1`至`loop4`的左右填充元素数通过[asc_set_ndim_pad_count](asc_set_ndim_pad_count.md)配置。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+      "document_sha256": "a1332a510602c62cdf956c46c2a9897173528e13bc94e8005f475e0f2420970c",
+      "description": {
+        "value": "设置asc_copy_ub2gm_align循环搬运模式内层循环中相邻两次迭代源与目的操作数数据块起始地址之间的偏移量，源步长必须32字节对齐，配置持续生效直至重新配置，仅在AIV上执行有效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md", "excerpt": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md", "excerpt": "`loop1_src_stride`必须32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md",
+          "kind": "configures",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+            "excerpt": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，内层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_ub2gm_loop_size](./asc_set_ub2gm_loop_size.md)设置循环次数，并通过[asc_set_ub2gm_loop2_stride](./asc_set_ub2gm_loop2_stride.md)设置外层循环`loop2`的步长。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_ub2gm_loop_size](./asc_set_ub2gm_loop_size.md)设置循环次数，并通过[asc_set_ub2gm_loop2_stride](./asc_set_ub2gm_loop2_stride.md)设置外层循环`loop2`的步长。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+      "document_sha256": "fe6c3bcf74df8e410862dd7cd49fbdbdd39492b64a877fd6c247b5dcb7590806",
+      "description": {
+        "value": "设置asc_copy_ub2gm_align循环搬运模式外层循环中相邻两次迭代源与目的操作数数据块起始地址之间的偏移量，源步长必须32字节对齐，配置持续生效直至重新配置，仅在AIV上执行有效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md", "excerpt": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md", "excerpt": "`loop2_src_stride`必须32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md",
+          "kind": "configures",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+            "excerpt": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时，外层循环中相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_ub2gm_loop_size](./asc_set_ub2gm_loop_size.md)设置循环次数，并通过[asc_set_ub2gm_loop1_stride](./asc_set_ub2gm_loop1_stride.md)设置内层循环`loop1`的步长。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_ub2gm_loop_size](./asc_set_ub2gm_loop_size.md)设置循环次数，并通过[asc_set_ub2gm_loop1_stride](./asc_set_ub2gm_loop1_stride.md)设置内层循环`loop1`的步长。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+      "document_sha256": "600020aa839e15cde36bde7cdcdd1ec4809465533316e724dcd1f202641a5eb8",
+      "description": {
+        "value": "设置asc_copy_ub2gm_align循环搬运模式内层loop1与外层loop2的迭代次数，循环次数为0时对应循环不执行、不搬运数据，任务完成后需复位为1，配置持续生效直至重新配置，仅在AIV上执行有效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md", "excerpt": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时的两层循环迭代次数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md", "excerpt": "`loop1_size`或`loop2_size`设置为0时，对应循环不执行，后续的`asc_copy_ub2gm_align`调用不搬运数据。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时的两层循环迭代次数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md",
+          "kind": "configures",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+            "excerpt": "本接口用于设置[asc_copy_ub2gm_align](./asc_copy_ub2gm_align/asc_copy_ub2gm_align.md)使用循环搬运模式时的两层循环迭代次数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_ub2gm_loop1_stride](./asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](./asc_set_ub2gm_loop2_stride.md)分别设置内层循环和外层循环中，相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+          "kind": "related",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+            "excerpt": "使用循环搬运模式时，还需通过[asc_set_ub2gm_loop1_stride](./asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](./asc_set_ub2gm_loop2_stride.md)分别设置内层循环和外层循环中，相邻两次迭代源操作数数据块起始地址之间的偏移量，以及目的操作数数据块起始地址之间的偏移量。"
+          }
+        }
+      ]
+    }
+  ]
+}

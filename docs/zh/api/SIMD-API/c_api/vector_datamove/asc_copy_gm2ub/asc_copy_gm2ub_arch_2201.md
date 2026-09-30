@@ -1,29 +1,20 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2ub
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md
-description: 将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持前n个数据搬运和高维切分搬运，前n个数据搬运时搬运数据大小要求32字节对齐。
+description: "将数据从Global Memory（GM）搬运到Unified Buffer（UB），支持前n个数据搬运与高维切分搬运两种形式；前n个数据搬运要求数据大小32字节对齐，与其他指令存在UB地址重叠时须插入同步指令保证串行化。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [unified_buffer]
-  - traits: [high_dimensional]
-signature:
-  - override_id: asc_copy_gm2ub__PUv_PGv_u32@2201
-  - override_id: asc_copy_gm2ub__PUv_PGv_u16_u16_u16_u16@2201
-archs: ['2201']
-header: [/include/c_api/vector_datamove/vector_datamove.h]
+  - traits: [aligned_transfer, datablock_granularity, high_dimensional]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-24'
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_gm2ub
 

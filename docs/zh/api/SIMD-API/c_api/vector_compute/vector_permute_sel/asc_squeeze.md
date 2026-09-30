@@ -1,25 +1,14 @@
 ---
 okftype: reference.api
-title: asc_squeeze
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md
-description: 通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中，操作数起始地址需要32字节对齐。
+description: "通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中；目的与源操作数起始地址需32字节对齐，地址重叠需满足通用约束。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [compression]
-  - objects: [mask, tensor]
-  - execution_models: [memory_vector]
-  - traits: [masked]
-signature:
-  - override_id: asc_squeeze__PUu16_PUu16_PUu16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_squeeze__PUu32_PUu32_PUu32_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_squeeze
 

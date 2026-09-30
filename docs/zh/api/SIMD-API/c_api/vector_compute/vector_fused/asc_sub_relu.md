@@ -1,34 +1,14 @@
 ---
 okftype: reference.api
-title: asc_sub_relu
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md
-description: 对两个矢量操作数按元素求差后再做Relu计算（结果和0对比取较大值），并提供s162s8、f322f16、f162s8的结果类型转换功能，结果存入目的矢量。
+description: "对两个源矢量按元素求差后再做Relu计算，结果与0对比取较大值，并支持s162s8、f322f16、f162s8的最终结果类型转换，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [activation, arithmetic]
   - operations: [conversion, relu, subtract]
-  - objects: [vector]
-  - execution_models: [memory_vector]
   - traits: [elementwise, high_dimensional]
-signature:
-  - override_id: asc_sub_relu__PUi16_PUi16_PUi16_u32
-  - override_id: asc_sub_relu__PUf16_PUf16_PUf16_u32
-  - override_id: asc_sub_relu__PUf32_PUf32_PUf32_u32
-  - override_id: asc_sub_relu__PUi8_PUf16_PUf16_u32
-  - override_id: asc_sub_relu__PUf16_PUf32_PUf32_u32
-  - override_id: asc_sub_relu__PUi8_PUi16_PUi16_u32
-  - override_id: asc_sub_relu__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_sub_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_sub_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_sub_relu__PUi8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_sub_relu__PUf16_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_sub_relu__PUi8_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_fused.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_sub_relu
 

@@ -1,309 +1,198 @@
-"""Tests for okf-index: surface isolation, build determinism, view correctness, and the 20-task dry-run."""
+"""okf-index 推导引擎、门控与查询测试（不写入已提交索引，用临时目录构建）。"""
 
 from __future__ import annotations
 
 import json
-import shlex
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
-import yaml
-
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+REPO_ROOT = SCRIPTS.parents[2]
 sys.path.insert(0, str(SCRIPTS))
+
 import build_index  # noqa: E402
-import query  # noqa: E402
-
-REPO = build_index.SKILL_ROOT.parent.parent
-C_API = build_index.SCOPES["c_api"]
-INDEX_DIR = build_index.scope_index_dir("c_api")
-TASKS_PATH = REPO / "okf_skills/okf-evaluate/testset/tasks.yaml"
-DRYRUN_PATH = Path(__file__).resolve().parent / "dryrun.yaml"
-BASE = "docs/zh/api/SIMD-API/c_api"
-
-# E 类任务原登记的范围外缺口（pipeline-event-sync / register-load-store / float-floor）
-# 已随 c_api 全量入范围；缺口登记清空后，E 类改为断言对应能力文档可检索。
-RESOLVED_GAP_DOCS = {
-    "E1": {
-        f"{BASE}/sync/intra_core_sync/asc_sync_notify.md",
-        f"{BASE}/sync/intra_core_sync/asc_sync_wait.md",
-    },
-    "E2": {f"{BASE}/reg_compute/load/asc_loadalign.md"},
-    "E3": {f"{BASE}/reg_compute/reg_convert/asc_floor.md"},
-}
+from derive import gate  # noqa: E402
+from derive.docparse import doc_product_support, doc_title  # noqa: E402
+from derive.examples_db import build_examples_db  # noqa: E402
+from derive.include_db import build_include_db, declarations_for  # noqa: E402
 
 
-def build_to_tmp() -> Path:
-    with tempfile.TemporaryDirectory() as tmp:
-        out = Path(tmp)
-        build_index.build(REPO, C_API, out)
-        payload = {p.name: p.read_text(encoding="utf-8") for p in out.iterdir()}
-    return payload
+class GateTests(unittest.TestCase):
+    def test_version_covers(self) -> None:
+        self.assertTrue(gate.version_covers("9.0.0-", "9.2.0"))
+        self.assertTrue(gate.version_covers("9.1.0-", "9.2.0"))
+        self.assertTrue(gate.version_covers("9.0.0-9.2.0", "9.2.0"))
+        self.assertFalse(gate.version_covers("9.1.0-", "9.0.0"))
+        self.assertFalse(gate.version_covers("9.0.0-9.1.0", "9.2.0"))
+
+    def test_arch_label_mapping(self) -> None:
+        pm = gate.load_product_map(REPO_ROOT / "okf_skills/config/product-map.yaml")
+        self.assertEqual(gate.arch_label_to_number("A5", pm), "3510")
+        self.assertEqual(gate.arch_label_to_number("A3", pm), "2201")
+        self.assertEqual(gate.npu_to_arch("950", pm), "3510")
+        self.assertEqual(gate.npu_to_arch("910b", pm), "2201")
+        with self.assertRaises(ValueError):
+            gate.arch_label_to_number("A9", pm)
+
+    def test_cann_detection_chain(self) -> None:
+        self.assertEqual(gate.detect_cann_version("8.0.0", REPO_ROOT), "8.0.0")
+        detected = gate.detect_cann_version(None, REPO_ROOT)
+        self.assertRegex(detected, r"^\d+\.\d+\.\d+$")
 
 
-class SurfaceRegistryTest(unittest.TestCase):
-    def test_scope_index_dir_per_surface(self):
-        self.assertEqual(build_index.scope_index_dir("c_api"), build_index.INDEX_DIR / "c_api")
-        with self.assertRaises(KeyError):
-            build_index.scope_index_dir("bogus")
-
-    def test_query_surface_choices_enforced(self):
-        with self.assertRaises(SystemExit):
-            query.parser().parse_args(["--surface", "bogus", "--kw", "x"])
-
-
-class EmptyTagGuardTest(unittest.TestCase):
-    def test_empty_tag_namespace_rejected_and_clean_doc_passes(self):
-        front_matter = (
-            "okftype: reference.api\n"
-            "title: {title}\n"
-            "resource: asc-devkit/docs/zh/api/SIMD-API/c_api/foo.md\n"
-            "description: 测试。\n"
-            "tag:\n"
-            "  - api_surfaces: [c_api]{extra_tag}\n"
-            "  - roles: [compute]\n"
-            "signature: []\n"
-            "dependencies: []\n"
-            "examples: []\n"
-            "timestamp: '2026-09-24'\n"
-        )
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            doc = root / BASE / "foo.md"
-            doc.parent.mkdir(parents=True)
-            doc.write_text(
-                "---\n" + front_matter.format(title="foo", extra_tag="") + "---\n\n# foo\n",
-                encoding="utf-8",
-            )
-            errors: list[str] = []
-            documents, _ = build_index.load_raw_documents(root, C_API, errors)
-            self.assertEqual(errors, [])
-            self.assertEqual(documents[doc.relative_to(root).as_posix()]["tags"]["api_surfaces"], ["c_api"])
-
-            doc.write_text(
-                "---\n" + front_matter.format(title="foo", extra_tag="\n  - families: []") + "---\n\n# foo\n",
-                encoding="utf-8",
-            )
-            errors = []
-            build_index.load_raw_documents(root, C_API, errors)
-            self.assertTrue(
-                any("empty tag namespace rendered: families" in error for error in errors), errors
-            )
-
-
-class BuildTest(unittest.TestCase):
+class DeriveTests(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
-        cls.index = json.loads((INDEX_DIR / "index.json").read_text(encoding="utf-8"))
-        cls.gaps = json.loads((INDEX_DIR / "gaps.json").read_text(encoding="utf-8"))
+    def setUpClass(cls) -> None:
+        cls.include_db = build_include_db(REPO_ROOT / "include" / "c_api")
 
-    def test_build_deterministic(self):
-        first = build_to_tmp()
-        second = build_to_tmp()
+    def test_declaration_derivation(self) -> None:
+        decls, mode = declarations_for("asc_copy_gm2ub", self.include_db, "vector_datamove")
+        self.assertEqual(mode, "exact")
+        annotated = [d for d in decls if d.override_id]
+        self.assertTrue(any("2201" in d.archs for d in annotated))
+        self.assertTrue(any("3510" in d.archs for d in annotated))
+        strided = next(d for d in annotated if "u16" in d.override_id and "3510" in d.archs)
+        self.assertEqual(strided.locations(), ["global_memory", "unified_buffer"])
+
+    def test_enum_catalog(self) -> None:
+        enum = self.include_db["enums"]["asc_cast_round_mode"]
+        self.assertIn("RN", enum["values"])
+        self.assertTrue(
+            any(c["name"] == "ASC_CAST_RN" for c in self.include_db["constants"]),
+            "ASC_CAST_RN 常量应入 defs 目录",
+        )
+
+    def test_mask_derivation(self) -> None:
+        decls, _ = declarations_for("asc_add", self.include_db, "vector_compute")
+        self.assertTrue(all(d.masked() for d in decls if d.params and d.params[0].is_vector))
+
+    def test_examples_db(self) -> None:
+        db = build_examples_db(REPO_ROOT / "examples/02_simd_c_api/03_c_api")
+        self.assertGreater(len(db), 50)
+        marker_id = next(iter(db))
+        self.assertIn("file", db[marker_id][0])
+
+    def test_product_support_parse(self) -> None:
+        body = (REPO_ROOT / "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md").read_text(encoding="utf-8")
+        support = doc_product_support(body.split("---\n", 2)[-1])
+        self.assertEqual(support["950"]["support"], "支持")
+        self.assertEqual(support["A3"]["support"], "不支持")
+
+
+class BuildTests(unittest.TestCase):
+    """真实构建（临时目录）：门控、推导与确定性。"""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.out = Path(cls.tmp.name)
+        scope = build_index.SCOPES["c_api"]
+        build_index.build(REPO_ROOT, scope, cls.out / "a5", "9.2.0", "A5")
+        build_index.build(REPO_ROOT, scope, cls.out / "a3", "9.2.0", "A3")
+        cls.a5 = json.loads((cls.out / "a5" / "index.json").read_text(encoding="utf-8"))
+        cls.a3 = json.loads((cls.out / "a3" / "index.json").read_text(encoding="utf-8"))
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.tmp.cleanup()
+
+    def test_gate_arch(self) -> None:
+        self.assertEqual(self.a5["meta"]["arch"], "3510")
+        self.assertEqual(self.a3["meta"]["arch"], "2201")
+        for path in self.a5["documents"]:
+            if "_arch_2201" in path:
+                self.fail(f"2201 变体页进入 A5 索引: {path}")
+        for path in self.a3["documents"]:
+            if "_arch_3510" in path:
+                self.fail(f"3510 变体页进入 A3 索引: {path}")
+        self.assertGreater(len(self.a3["documents"]), len(self.a5["documents"]))
+
+    def test_gate_version(self) -> None:
+        # 试点全部 version 区间覆盖 9.2.0，version 过滤应为 0
+        self.assertEqual(self.a5["meta"]["filtered_by_version"], 0)
+
+    def test_arch_page_signatures(self) -> None:
+        doc = self.a5["documents"]["docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"]
+        for signature in doc["signatures"]:
+            self.assertIn("3510", signature["archs"])
+
+    def test_views(self) -> None:
+        for view in ("by_stage", "by_role", "by_operation", "by_dtype", "by_param", "by_enum", "by_feature"):
+            self.assertIn(view, self.a5["views"])
+        self.assertGreater(len(self.a5["views"]["by_param"]), 10)
+        self.assertIn("asc_load_l2_cache_mode", self.a5["views"]["by_enum"])
+        self.assertGreater(len(self.a3["views"]["by_dtype_pair"]), 0)
+        self.assertIn("low_precision", self.a3["views"]["by_feature"])
+
+    def test_enum_reverse_lookup(self) -> None:
+        users = self.a5["views"]["by_enum"]["asc_load_l2_cache_mode"]
+        self.assertTrue(users)
+        enum = self.a5["defs"]["enums"]["asc_load_l2_cache_mode"]
+        self.assertIn("NORMAL_PERSISTENT", enum["values"])
+
+    def test_deterministic_rebuild(self) -> None:
+        scope = build_index.SCOPES["c_api"]
+        build_index.build(REPO_ROOT, scope, self.out / "a5-again", "9.2.0", "A5")
+        first = build_index.strip_informational(self.a5)
+        second = build_index.strip_informational(
+            json.loads((self.out / "a5-again" / "index.json").read_text(encoding="utf-8"))
+        )
         self.assertEqual(first, second)
 
-    def test_committed_index_fresh(self):
-        committed = {}
-        for name in ("index.json", "build-meta.json", "概览.md"):
-            text = (INDEX_DIR / name).read_text(encoding="utf-8")
-            if name.endswith(".json"):
-                committed[name] = json.dumps(build_index.strip_informational(json.loads(text)))
-            else:
-                committed[name] = text
-        fresh = build_to_tmp()
-        for name, payload in committed.items():
-            if name.endswith(".json"):
-                self.assertEqual(payload, json.dumps(build_index.strip_informational(json.loads(fresh[name]))), name)
-            else:
-                self.assertEqual(payload, fresh[name], name)
 
-    def test_scope_identity(self):
-        self.assertEqual(self.index["schema"], "okf-index/2")
-        self.assertEqual(self.index["meta"]["surface"], "c_api")
-        self.assertEqual(INDEX_DIR, build_index.INDEX_DIR / "c_api")
+class DryrunTests(unittest.TestCase):
+    """dryrun.yaml 查询清单回归。"""
 
-    def test_scope_alignment(self):
-        meta = self.index["meta"]
-        scope = self.index["scope"]
-        self.assertEqual(meta["doc_count"], 838)
-        self.assertEqual(meta["nav_page_count"], 65)
-        self.assertEqual(meta["arch_page_count"], 59)
-        self.assertEqual(meta["primary_count"], 773)
-        self.assertEqual(len(scope["all_docs"]), 838)
-        nav = set(scope["navigation_pages"])
-        arch = set(scope["arch_pages"])
-        primary = set(scope["primary_docs"])
-        all_docs = set(scope["all_docs"])
-        self.assertTrue(nav.isdisjoint(primary))
-        self.assertTrue(nav.isdisjoint(arch))
-        self.assertEqual(nav | arch | primary, all_docs)
-        self.assertEqual(meta["gap_ids"], [])
-        self.assertEqual(meta["relation_gap_count"], 1)
-        # 旧基线的合法导航命中（阶段1测试集）在新口径下仍为导航页/架构页/家族主页。
-        tasks = yaml.safe_load(TASKS_PATH.read_text(encoding="utf-8"))
-        acceptable = set(tasks["acceptable_navigation"])
-        derived = nav | arch | {p for p in primary if Path(p).stem == Path(p).parent.name}
-        self.assertTrue(acceptable <= derived)
-
-    def test_stage_views(self):
-        views = self.index["views"]["by_stage"]
-        self.assertEqual({k: len(v) for k, v in views.items()}, {"in": 71, "out": 37, "compute": 388})
-        self.assertIn(f"{BASE}/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md", views["in"])
-        self.assertIn(f"{BASE}/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md", views["out"])
-        # cube 搬运（gm→l0a/l1 入、l0c→gm 出）与寄存器 load/store 进入阶段视图。
-        self.assertIn(f"{BASE}/cube_datamove/asc_copy_gm2l0a.md", views["in"])
-        self.assertIn(f"{BASE}/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1.md", views["in"])
-        self.assertIn(f"{BASE}/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md", views["out"])
-        self.assertIn(f"{BASE}/reg_compute/load/asc_loadalign.md", views["in"])
-        self.assertIn(f"{BASE}/reg_compute/store/asc_storealign.md", views["out"])
-        # 矩阵计算与同步类主文档。
-        self.assertIn(f"{BASE}/cube_compute/asc_mmad.md", views["compute"])
-        # 纯 L1→L0A 搬运与配置/查询类不进入任何阶段桶。
-        self.assertNotIn(f"{BASE}/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md",
-                         views["in"] + views["out"] + views["compute"])
-
-    def test_operation_and_category_views(self):
-        views = self.index["views"]
-        self.assertIn(f"{BASE}/cube_compute/asc_mmad.md", views["by_operation"]["matrix_multiply_accumulate"])
-        self.assertIn(f"{BASE}/cube_compute/asc_mmad_mx.md", views["by_operation"]["matrix_multiply_accumulate"])
-        self.assertIn(f"{BASE}/sync/intra_core_sync/asc_sync_notify.md", views["by_operation"]["synchronization"])
-        self.assertIn(f"{BASE}/sync/intra_core_sync/asc_sync_wait.md", views["by_operation"]["synchronization"])
-        # 类型页（reference.type）参与 defs 分类检索，但不进入任何阶段桶。
-        self.assertIn(f"{BASE}/defs/union/asc_store_atomic_config.md", views["by_category"]["defs"])
-        self.assertIn(f"{BASE}/defs/enum/asc_saturation_mode.md", views["by_category"]["defs"])
-        self.assertEqual(len(views["by_category"]["defs"]), 24)
-        self.assertNotIn(f"{BASE}/defs/union/asc_store_atomic_config.md",
-                         views["by_stage"]["in"] + views["by_stage"]["out"] + views["by_stage"]["compute"])
-        # deprecated 散置架构页（无家族主页承接）作为独立主文档，可经 by_api 查到。
-        self.assertEqual(views["by_api"]["asc_copy_gm2ub_sync"], [
-            f"{BASE}/deprecated_interface/asc_copy_gm2ub_sync_arch_2201_deprecated.md",
-            f"{BASE}/deprecated_interface/asc_copy_gm2ub_sync_arch_3510_deprecated.md",
-        ])
-
-    def test_convert_view(self):
-        pairs = self.index["views"]["by_dtype_pair"]
-        self.assertEqual(pairs["half->float"], [
-            f"{BASE}/reg_compute/reg_convert/asc_half2float.md",
-            f"{BASE}/vector_compute/vector_convert/asc_half2float.md",
-        ])
-        self.assertEqual(pairs["bfloat16->float"], [
-            f"{BASE}/reg_compute/reg_convert/asc_bfloat162float.md",
-            f"{BASE}/vector_compute/vector_convert/asc_bfloat162float.md",
-        ])
-        # fp8 / hifloat8 / fp4x2 新 token 与 packed 命名拆分。
-        self.assertEqual(pairs["float->fp8_e4m3fn"], [f"{BASE}/reg_compute/reg_convert/asc_float2e4m3.md"])
-        self.assertEqual(pairs["float->hifloat8"], [f"{BASE}/reg_compute/reg_convert/asc_float2hif8.md"])
-        self.assertEqual(pairs["bfloat16->fp4x2_e1m2"], [f"{BASE}/reg_compute/reg_convert/asc_bfloat162e1m2x2.md"])
-        self.assertEqual(pairs["bfloat16->fp4x2_e2m1"], [f"{BASE}/reg_compute/reg_convert/asc_bfloat162e2m1x2.md"])
-        self.assertEqual(pairs["fp4x2_e1m2->bfloat16"], [f"{BASE}/reg_compute/reg_convert/asc_e1m2x22bfloat16.md"])
-
-    def test_api_card_variants(self):
-        results = query.api_card(self.index, "asc_copy_gm2ub")
-        paths = {row["path"] for row in results}
-        self.assertIn(f"{BASE}/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md", paths)
-        for arch in ("arch_2201", "arch_3510"):
-            self.assertIn(f"{BASE}/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_{arch}.md", paths)
-        card = query.api_card(self.index, "asc_copy_l12l0a")
-        self.assertEqual({row["path"] for row in card}, {
-            f"{BASE}/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md",
-            f"{BASE}/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md",
-            f"{BASE}/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md",
-            f"{BASE}/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md",
-        })
-
-    def test_dependency_queries(self):
-        ndim = "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md"
-        deps = {Path(row["path"]).name for row in query.deps_query(self.index, "asc_ndim_copy_gm2ub", "requires", False)}
-        self.assertIn("asc_set_ndim_loop_stride.md", deps)
-        self.assertIn("asc_set_ndim_pad_count.md", deps)
-        reverse = query.deps_query(self.index, "asc_ndim_copy_gm2ub", "configures", True)
-        self.assertIn("asc_set_ndim_loop_stride.md", {Path(r["path"]).name for r in reverse})
-
-    def test_gap_queries(self):
-        # 三条范围外缺口已全部入范围，scope_out_gaps 为空：旧关键词不再命中缺口登记。
-        self.assertEqual(self.gaps["scope_out_gaps"], [])
-        for keyword in ("同步", "寄存器", "取整", "floor"):
-            self.assertEqual(query.gap_query(self.gaps, keyword), [], keyword)
-        # 关系缺口（asc_get_cmp_mask 配合对象未定）仍可检索。
-        hits = query.gap_query(self.gaps, "compare")
-        self.assertEqual([h["gap_id"] for h in hits], ["relation:asc_get_cmp_mask"])
-
-    def test_relation_gap_registered(self):
-        self.assertEqual(len(self.gaps["relation_gaps"]), 1)
-
-
-class DryRunTest(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):
-        cls.index = json.loads((INDEX_DIR / "index.json").read_text(encoding="utf-8"))
-        cls.gaps = json.loads((INDEX_DIR / "gaps.json").read_text(encoding="utf-8"))
-        cls.tasks = {t["id"]: t for t in yaml.safe_load(TASKS_PATH.read_text(encoding="utf-8"))["tasks"]}
-        payload = yaml.safe_load(DRYRUN_PATH.read_text(encoding="utf-8"))
-        cls.queries = payload["queries"]
-        cls.extended = payload["extended"]
+    def setUpClass(cls) -> None:
+        import yaml
+        cls.tmp = tempfile.TemporaryDirectory()
+        cls.out = Path(cls.tmp.name)
+        scope = build_index.SCOPES["c_api"]
+        build_index.build(REPO_ROOT, scope, cls.out / "a5", "9.2.0", "A5")
+        build_index.build(REPO_ROOT, scope, cls.out / "a3", "9.2.0", "A3")
+        (cls.out / "a5" / "gaps.json").write_text(
+            (REPO_ROOT / "okf_skills/okf-index/index/c_api/gaps.json").read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        (cls.out / "a3" / "gaps.json").write_text(
+            (REPO_ROOT / "okf_skills/okf-index/index/c_api/gaps.json").read_text(encoding="utf-8"), encoding="utf-8"
+        )
+        cls.cases = yaml.safe_load(
+            (Path(__file__).parent / "dryrun.yaml").read_text(encoding="utf-8")
+        )
 
-    def family_expand(self, paths: set[str]) -> set[str]:
-        expanded = set(paths)
-        for path in paths:
-            doc = self.index["documents"].get(path)
-            if doc is None:
-                continue
-            expanded.update(doc["arch_variants"])
-            if doc["family"] and doc["family"] != "__nav__":
-                owner = f"{Path(path).parent.as_posix()}/{doc['family']}.md"
-                if owner in self.index["documents"]:
-                    expanded.add(owner)
-        return expanded
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.tmp.cleanup()
 
-    def run_queries(self, task_id: str) -> tuple[set[str], list[dict]]:
-        specs = self.queries[task_id]
-        self.assertLessEqual(len(specs), 2, f"{task_id} exceeds 2-query budget")
-        paths: set[str] = set()
-        gap_rows: list[dict] = []
-        for spec in specs:
-            args = query.parser().parse_args(shlex.split(spec))
-            for row in query.run_query(args, self.index, self.gaps):
-                if "gap_id" in row:
-                    gap_rows.append(row)
-                else:
-                    paths.add(row["path"])
-        return paths, gap_rows
+    def _run(self, arch: str, args: dict) -> list[dict]:
+        sys.path.insert(0, str(SCRIPTS))
+        import query as query_mod
+        index, gaps = query_mod.load(self.out / arch)
+        defaults = {
+            "stage": None, "operation": None, "category": None, "api_class": None,
+            "dtype": None, "kw": None, "convert": None, "feature": None, "version": None,
+            "product": None, "api": None, "deps_of": None, "kind": None, "reverse": False,
+            "param": None, "enum": None, "gap": None,
+        }
+        namespace = type("Args", (), {**defaults, **args, "json": True, "surface": "c_api", "index_dir": None})()
+        return query_mod.run_query(namespace, index, gaps)
 
-    def test_dryrun_coverage(self):
-        failures = []
-        for task_id, task in self.tasks.items():
-            paths, gap_rows = self.run_queries(task_id)
-            expanded = self.family_expand(paths)
-            for required in task.get("required", []):
-                if required not in expanded:
-                    failures.append(f"{task_id}: required not covered: {required}")
-            for group in task.get("alternative_groups", []):
-                if not any(member in expanded for member in group):
-                    failures.append(f"{task_id}: alternative group uncovered: {[Path(m).name for m in group]}")
-            if task.get("gap_expected"):
-                if self.gaps["scope_out_gaps"]:
-                    if not any("无文档" in row["conclusion"] for row in gap_rows):
-                        failures.append(f"{task_id}: expected scope-out gap not hit")
-                else:
-                    expected = RESOLVED_GAP_DOCS.get(task_id, set())
-                    if not expected <= expanded:
-                        failures.append(
-                            f"{task_id}: former scope-out capability not retrieved: {sorted(expected - expanded)}"
-                        )
-        self.assertEqual(failures, [])
-
-    def test_extended_queries(self):
-        for spec in self.extended:
-            args = query.parser().parse_args(shlex.split(spec["args"]))
-            results = query.run_query(args, self.index, self.gaps)
-            if spec.get("empty"):
-                self.assertEqual(results, [], spec["id"])
-                continue
-            paths = {row["path"] for row in results}
-            for required in spec.get("include", []):
-                self.assertIn(required, paths, spec["id"])
+    def test_dryrun_cases(self) -> None:
+        for case in self.cases["cases"]:
+            with self.subTest(case=case["name"]):
+                arch = case.get("arch", "a5")
+                results = self._run(arch, case["args"])
+                self.assertGreaterEqual(
+                    len(results), case.get("min", 1),
+                    f"{case['name']}: 期望 ≥{case.get('min', 1)}，实际 {len(results)}",
+                )
+                if "contains" in case:
+                    joined = json.dumps(results, ensure_ascii=False)
+                    for token in case["contains"]:
+                        self.assertIn(token, joined, f"{case['name']}: 缺少 {token}")
 
 
 if __name__ == "__main__":

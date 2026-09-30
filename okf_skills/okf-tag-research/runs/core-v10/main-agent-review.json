@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "purpose": "main_agent_taxonomy_review",
+  "run_id": "core-v10",
+  "reviewer": "main_agent_rule_based_adjudication",
+  "reviewed_documents": [
+    "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+    "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md"
+  ],
+  "normalizations": [],
+  "decisions": [
+    {
+      "tag": "traits:aligned_transfer",
+      "decision": "approve",
+      "reason": "两个发现子代理独立支持，6 篇文档、跨 load/store/copy 目录，证据逐字匹配且概念一致（地址/搬运大小按 32 字节粒度对齐）。",
+      "definition": "搬运或访存要求地址或数据块按固定粒度（通常 32 字节）对齐的稳定特征；与既有 unaligned_transfer 构成对齐维度的两端，用于区分对齐搬运接口与支持非对齐的搬运接口。",
+      "selection_rule": "正文明确要求源或目的地址、或搬运数据大小按字节粒度对齐（如「32字节对齐」「以对齐的方式搬出」）时选择；非对齐能力由 unaligned_transfer 表达，两者可并存。",
+      "evidence": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+          "excerpt": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+          "excerpt": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+          "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节）"
+        }
+      ]
+    },
+    {
+      "tag": "traits:datablock_granularity",
+      "decision": "approve",
+      "reason": "两个发现子代理独立支持，3 篇文档、跨 load/broadcast/gather 目录，证据逐字匹配且概念一致（按 DataBlock 32 字节粒度操作）。",
+      "definition": "以 DataBlock（32 字节）为搬运、广播或重排粒度的稳定特征，用于区分按元素粒度操作与按 DataBlock 粒度操作的接口。",
+      "selection_rule": "正文说明按 DataBlock（32 字节）粒度读取、搬运、广播或收集数据时选择。",
+      "evidence": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+          "excerpt": "根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+          "excerpt": "读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+          "excerpt": "每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去"
+        }
+      ]
+    }
+  ],
+  "notes": {
+    "deferred_candidates": [
+      {
+        "tag": "traits:strided_transfer",
+        "worker": "discovery-a only",
+        "reason": "单子代理支持，不符合双盲收敛规则；证据为跨步/Stride 搬运描述（10 篇）。",
+        "next_round": "下一轮扩大样本验证双工支持后优先复议。"
+      },
+      {
+        "tag": "traits:loop_transfer",
+        "worker": "discovery-b only",
+        "reason": "单子代理支持；概念为「循环搬运模式」，与 strided_transfer（跨步搬运）非同一概念的拼写差异，不可归一。"
+      },
+      {
+        "tag": "operations:unpack",
+        "worker": "both, 1 doc",
+        "reason": "双工支持但仅 1 篇文档，低于最低文档门槛（2 篇）。"
+      },
+      {
+        "tag": "operations:mask_extraction",
+        "worker": "both, 1 doc",
+        "reason": "双工支持但仅 1 篇文档，低于最低文档门槛。"
+      },
+      {
+        "tag": "operations:merge_sort / operations:merge",
+        "worker": "single",
+        "reason": "单子代理、单文档支持。"
+      },
+      {
+        "tag": "traits:bit_packed_result / traits:extremum_index / traits:mask_counter_mode / traits:nearest_value_padding",
+        "reason": "目录数或文档数不足门槛。"
+      }
+    ]
+  }
+}

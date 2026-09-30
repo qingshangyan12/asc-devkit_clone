@@ -1,28 +1,14 @@
 ---
 okftype: reference.api
-title: asc_pair_reduce_sum
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md
-description: 对输入数据做归约操作，将相邻两个奇偶元素两两求和得到数据总和，支持前n个数据连续计算和高维切分计算两种模式。
+description: "对输入数据做归约操作，将相邻两个奇偶元素两两求和，得到数据总和；支持前n个数据连续计算和高维切分计算两种模式，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [arithmetic]
   - operations: [add, reduction]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [high_dimensional]
-signature:
-  - override_id: asc_pair_reduce_sum__PUf16_PUf16_u32
-  - override_id: asc_pair_reduce_sum__PUf32_PUf32_u32
-  - override_id: asc_pair_reduce_sum__PUf16_PUf16_u8_u16_u16_u16
-  - override_id: asc_pair_reduce_sum__PUf32_PUf32_u8_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_reduce.h]
+  - traits: [aligned_transfer, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_pair_reduce_sum
 

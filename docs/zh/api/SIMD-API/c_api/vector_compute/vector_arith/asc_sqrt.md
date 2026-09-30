@@ -1,27 +1,14 @@
 ---
 okftype: reference.api
-title: asc_sqrt
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sqrt.md
-description: 按元素计算源矢量的平方根并写入目的矢量，源操作数只支持设置为正数，提供前n个数据计算与高维切分计算两种原型，操作数起始地址需32字节对齐。
+description: "按元素计算源矢量的平方根并写入目的矢量，源操作数只支持设置为正数，支持前n个数据计算与高维切分计算两种原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [sqrt]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [elementwise]
-signature:
-  - override_id: asc_sqrt__PUf16_PUf16_u32
-  - override_id: asc_sqrt__PUf32_PUf32_u32
-  - override_id: asc_sqrt__PUf16_PUf16_u8_u16_u16_u16_u16
-  - override_id: asc_sqrt__PUf32_PUf32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - traits: [elementwise, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_sqrt
 

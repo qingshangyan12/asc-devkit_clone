@@ -1,40 +1,30 @@
 ---
 okftype: reference.api
-title: asc_ndim_copy_gm2ub
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
-description: 将多维数据从Global Memory（GM）搬运到Unified Buffer（UB），最多支持5个维度，每个维度均可单独配置Stride，并支持随路Padding功能，仅在AIV上生效。
+description: "将多维数据从Global Memory（GM）搬运到Unified Buffer（UB），最多支持5个维度且每个维度可单独配置Stride，支持随路Padding，各维步长与填充元素数须通过配套接口预先配置，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [unified_buffer]
-  - traits: [high_dimensional, padding]
-signature:
-  - prototype_id: asc_ndim_copy_gm2ub__PU<dtype>_PG<dtype>_u32_u32_u32_u32_u32_u8_u8_b_loadl2
-    dtype: [int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t,
-      int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/vector_datamove/vector_datamove.h]
+  - traits: [high_dimensional, padding, unaligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md
     kind: requires
-    condition: 多核场景下，如果多个AI Core可能读取同一块GM地址，且该GM地址中的数据可能被其他核更新
+    condition: "多核场景下，如果多个AI Core可能读取同一块GM地址，且该GM地址中的数据可能被其他核更新"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
     kind: related
-    condition: 当`padding_mode`为`true`时
-examples: []
-timestamp: '2026-09-24'
+    condition: "padding_mode为true使用常数填充时"
+version: 9.0.0-
 ---
 # asc_ndim_copy_gm2ub
 

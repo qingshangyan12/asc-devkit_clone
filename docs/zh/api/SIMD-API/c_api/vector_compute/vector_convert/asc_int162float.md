@@ -1,25 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int162float
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md
-description: 将int16_t类型矢量数据转换为float类型，提供前n个数据计算与高维切分计算两类原型，源和目的操作数起始地址需32字节对齐。
+description: "将int16_t类型矢量数据转换为float类型，提供前n个数据计算与高维切分计算两类原型，源和目的操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [high_dimensional]
-signature:
-  - override_id: asc_int162float__PUf32_PUi16_u32
-  - override_id: asc_int162float__PUf32_PUi16_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+    condition: "通用地址重叠约束"
+version: 9.0.0-
 ---
 # asc_int162float
 

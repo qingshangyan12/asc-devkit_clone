@@ -1,32 +1,14 @@
 ---
 okftype: reference.api
-title: asc_shiftleft
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
-description: 将源矢量的所有元素左移distance位并存入目的矢量，distance不支持负数且取值不能超过源数据类型的位宽，操作数起始地址需32字节对齐。
+description: "将源矢量的所有元素左移distance位并存入目的矢量，distance不支持负数且取值不能超过源数据类型位宽，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [bitwise]
   - operations: [bitwise_shift]
-  - objects: [scalar, tensor]
-  - execution_models: [memory_vector]
   - traits: [elementwise, high_dimensional, scalar_operand]
-signature:
-  - override_id: asc_shiftleft__PUi16_PUi16_u32_u32
-  - override_id: asc_shiftleft__PUu16_PUu16_u32_u32
-  - override_id: asc_shiftleft__PUi32_PUi32_u32_u32
-  - override_id: asc_shiftleft__PUu32_PUu32_u32_u32
-  - override_id: asc_shiftleft__PUi16_PUi16_u32_u8_u16_u16_u16_u16
-  - override_id: asc_shiftleft__PUu16_PUu16_u32_u8_u16_u16_u16_u16
-  - override_id: asc_shiftleft__PUi32_PUi32_u32_u8_u16_u16_u16_u16
-  - override_id: asc_shiftleft__PUu32_PUu32_u32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_logic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 
 # asc_shiftleft

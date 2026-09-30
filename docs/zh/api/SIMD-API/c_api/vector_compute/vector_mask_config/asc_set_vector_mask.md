@@ -1,27 +1,19 @@
 ---
 okftype: reference.api
-title: asc_set_vector_mask
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
-description: 设置矢量计算接口的Mask值以指示哪些数据参与计算，使用前需先调用asc_set_mask_count或asc_set_mask_norm设置Mask模式。
+description: "设置矢量计算接口的Mask值以指示哪些数据参与计算，支持Normal和Counter两种模式，使用前需先调用asc_set_mask_count或asc_set_mask_norm设置Mask模式，在950产品上用于VF场景外设置掩码寄存器。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - objects: [mask]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_set_vector_mask__u64_u64
-archs: ['2201', '3510']
-header: [/include/c_api/vector_compute/compute/vector_mask_config.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md
     kind: related
-    condition: 在Reg矢量计算配置时
+    condition: "Ascend 950PR&950DT系列产品，在Reg矢量计算配置时"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md
     kind: requires
+    condition: "Atlas A3系列产品和Atlas A2系列产品"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md
     kind: requires
-examples: []
-timestamp: '2026-09-28'
+    condition: "Atlas A3系列产品和Atlas A2系列产品"
+version: 9.0.0-
 ---
 # asc_set_vector_mask
 

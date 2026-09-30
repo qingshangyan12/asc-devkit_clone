@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-"""Query the persistent OKF index.
+"""OKF 索引查询 CLI。
 
-Each API surface has its own isolated index instance under index/<surface>/,
-selected via --surface (default c_api) or an explicit --index-dir override.
-Filter queries (--stage/--operation/--category/--dtype/--kw/--convert) combine
-with AND across dimensions and OR within comma-separated values. Standalone
-queries (--api/--deps-of/--gap) return structured cards and ignore filters.
+索引实例按 surface 隔离（默认 c_api），构建时已按 CANN 版本 × 架构门控。
+过滤查询各维度 AND、逗号值内 OR；独立查询（--api/--deps-of/--enum/--gap）返回结构化卡片。
 """
 
 from __future__ import annotations
@@ -20,7 +17,7 @@ SCRIPTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS))
 from build_index import INDEX_DIR, SCOPES, STAGES, normalize_dtype  # noqa: E402
 
-FILTER_KEYS = ("stage", "operation", "category", "dtype", "kw", "convert")
+FILTER_KEYS = ("stage", "operation", "category", "api_class", "dtype", "kw", "convert", "feature", "version", "product")
 
 
 def load(index_dir: Path) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -37,16 +34,13 @@ def resolve_api(index: dict[str, Any], name: str) -> str:
     view = index["views"]["by_api"]
     if name in view:
         return view[name][0]
-    if f"{name}.md" in {Path(p).name for p in index["documents"]}:
-        return next(p for p in index["documents"] if Path(p).name == f"{name}.md")
     for path in index["documents"]:
-        if Path(path).stem == name:
+        if Path(path).stem == name or Path(path).name == f"{name}.md":
             return path
     raise ValueError(f"unknown API or document: {name}")
 
 
 def why_tags(index: dict[str, Any], path: str, dims: dict[str, list[str]]) -> list[str]:
-    doc = index["documents"][path]
     reasons = []
     for stage in dims.get("stage", []):
         if path in index["views"]["by_stage"].get(stage, []):
@@ -57,13 +51,26 @@ def why_tags(index: dict[str, Any], path: str, dims: dict[str, list[str]]) -> li
     for cat in dims.get("category", []):
         if path in index["views"]["by_category"].get(cat, []):
             reasons.append(f"category:{cat}")
+    for cls in dims.get("api_class", []):
+        if path in index["views"]["by_api_class"].get(cls, []):
+            reasons.append(f"api_class:{cls}")
     for dtype in dims.get("dtype", []):
         if path in index["views"]["by_dtype"].get(dtype, []):
             reasons.append(f"dtype:{dtype}")
     for pair in dims.get("pair", []):
         if path in index["views"]["by_dtype_pair"].get(pair, []):
             reasons.append(f"convert:{pair}")
+    for feature in dims.get("feature", []):
+        if path in index["views"]["by_feature"].get(feature, []):
+            reasons.append(f"feature:{feature}")
+    for version in dims.get("version", []):
+        if path in index["views"]["by_version"].get(version, []):
+            reasons.append(f"version:{version}")
+    for product in dims.get("product", []):
+        if path in index["views"]["by_product"].get(product, []):
+            reasons.append(f"product:{product}")
     for kw in dims.get("kw", []):
+        doc = index["documents"][path]
         haystack = f"{doc['title']} {doc['description']}".lower()
         if kw.lower() in haystack:
             reasons.append(f"kw:{kw}")
@@ -75,21 +82,30 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
         "stage": [s for s in csv(args.stage) if s] if args.stage else [],
         "operation": csv(args.operation),
         "category": csv(args.category),
+        "api_class": csv(args.api_class),
         "dtype": [normalize_dtype(d) for d in csv(args.dtype)],
         "kw": csv(args.kw),
         "pair": [],
+        "feature": csv(args.feature),
+        "version": csv(args.version),
+        "product": csv(args.product),
     }
     if args.convert:
         src = normalize_dtype(args.convert[0])
         dims["pair"] = [f"{src}->{normalize_dtype(dst)}" for dst in csv(args.convert[1])]
     if not any(dims[key] for key in dims):
-        raise ValueError("no filter given; use --stage/--operation/--category/--dtype/--kw/--convert")
+        raise ValueError(
+            "no filter given; use --stage/--operation/--category/--api-class/--dtype/--kw/--convert/--feature/--version/--product"
+        )
     unknown_stage = [s for s in dims["stage"] if s not in STAGES]
     if unknown_stage:
         raise ValueError(f"unknown stage(s): {unknown_stage}; valid: {list(STAGES)}")
     for cat in dims["category"]:
         if cat not in index["views"]["by_category"]:
             raise ValueError(f"unknown category: {cat}; valid: {sorted(index['views']['by_category'])}")
+    for cls in dims["api_class"]:
+        if cls not in index["views"]["by_api_class"]:
+            raise ValueError(f"unknown api_class: {cls}; valid: {sorted(index['views']['by_api_class'])}")
     for op in dims["operation"]:
         if op not in index["views"]["by_operation"]:
             raise ValueError(f"unknown operation: {op}")
@@ -100,7 +116,8 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
     candidates: set[str] | None = None
     for key, view_name in (
         ("stage", "by_stage"), ("operation", "by_operation"), ("category", "by_category"),
-        ("dtype", "by_dtype"), ("pair", "by_dtype_pair"),
+        ("api_class", "by_api_class"), ("dtype", "by_dtype"), ("pair", "by_dtype_pair"),
+        ("feature", "by_feature"), ("version", "by_version"), ("product", "by_product"),
     ):
         values = dims[key]
         if not values:
@@ -126,12 +143,10 @@ def api_card(index: dict[str, Any], name: str) -> list[dict[str, Any]]:
     owner = resolve_api(index, name)
     doc = index["documents"][owner]
     results = [{"path": owner, "why": ["api:owner"]}]
-    for variant in doc["arch_variants"]:
-        results.append({"path": variant, "why": [f"arch-variant:{Path(variant).stem.split('_arch_')[-1]}"]})
     for member in index["views"]["by_api"].get(doc["family"], []):
         if member != owner:
             results.append({"path": member, "why": ["family-member"]})
-    if doc["nav_page"] != owner:
+    if doc["nav_page"] != owner and doc["nav_page"] in index["documents"]:
         results.append({"path": doc["nav_page"], "why": ["category-page"]})
     return results
 
@@ -144,16 +159,76 @@ def deps_query(index: dict[str, Any], target: str, kind: str | None, reverse: bo
         for edge in index["graph"]["edges"]:
             if edge["to"] == path and (not kind or edge["kind"] == kind):
                 results.append({"path": edge["from"], "why": [f"reverse:{edge['kind']}"],
-                                "condition": edge["condition"], "out_of_scope": False})
+                                "condition": edge["condition"], "out_of_scope": edge["from"] not in index["documents"]})
     else:
-        for dep in doc["deps_out"]:
+        for dep in doc["dependencies"]:
             if kind and dep["kind"] != kind:
                 continue
-            out_of_scope = dep["path"] not in index["documents"]
             results.append({
                 "path": dep["path"], "why": [f"dep:{dep['kind']}"],
-                "condition": dep["condition"], "out_of_scope": out_of_scope,
+                "condition": dep["condition"], "out_of_scope": dep["path"] not in index["documents"],
             })
+    return results
+
+
+def param_query(index: dict[str, Any], token: str) -> list[dict[str, Any]]:
+    """参数名或枚举类型反查：--param round_mode / --param asc_cast_round_mode。"""
+    results = []
+    for path, doc in sorted(index["documents"].items()):
+        hits = [p for p in doc.get("params", []) if p["name"] == token or p["type"] == token]
+        if hits:
+            param = hits[0]
+            reasons = [f"param:{param['name']}"]
+            if param["type"].startswith("asc_"):
+                reasons.append(f"type:{param['type']}")
+            results.append({"path": path, "why": reasons})
+    if not results and token in index.get("defs", {}).get("enums", {}):
+        enum = index["defs"]["enums"][token]
+        results.append({
+            "path": enum["header"], "why": [f"enum:{token}"],
+            "enum": {"values": enum["values"][:20], "header": enum["header"], "total_values": len(enum["values"])},
+        })
+    return results
+
+
+def enum_query(index: dict[str, Any], token: str) -> list[dict[str, Any]]:
+    """枚举名或枚举值反查：--enum asc_cast_round_mode / --enum ASC_CAST_RN。"""
+    enums = index.get("defs", {}).get("enums", {})
+    constants = {c["name"]: c for c in index.get("defs", {}).get("constants", [])}
+    results = []
+    if token in enums:
+        users = index["views"].get("by_enum", {}).get(token, [])
+        enum = enums[token]
+        results.append({
+            "path": f"include/{enum['header']}", "why": [f"enum:{token}"],
+            "enum": {"values": enum["values"], "used_by": users},
+        })
+    value_owner = None
+    for name, enum in enums.items():
+        if token in enum["values"]:
+            value_owner = name
+            break
+    if value_owner is None and token in constants:
+        value_owner = next(
+            (e for e, info in enums.items()
+             if any(c["name"] == token for c in constants.values() if True) and False),
+            None,
+        )
+        # 常量名 ASC_CAST_RN → 归属枚举（defs 常量与枚举同名族）
+        stem = token[4:] if token.startswith("ASC_") else token
+        for name in enums:
+            if name.lower().endswith(stem.split("_")[0].lower()):
+                value_owner = name
+                break
+    if value_owner:
+        users = index["views"].get("by_enum", {}).get(value_owner, [])
+        results.append({
+            "path": f"include/{enums[value_owner]['header']}",
+            "why": [f"enum-value:{token}", f"enum:{value_owner}"],
+            "enum": {"value": token, "used_by": users},
+        })
+    if not results:
+        raise ValueError(f"unknown enum or value: {token}")
     return results
 
 
@@ -185,6 +260,10 @@ def run_query(args: argparse.Namespace, index: dict[str, Any], gaps: dict[str, A
         return api_card(index, args.api)
     if args.deps_of:
         return deps_query(index, args.deps_of, args.kind, args.reverse)
+    if args.param:
+        return param_query(index, args.param)
+    if args.enum:
+        return enum_query(index, args.enum)
     return filter_query(index, args)
 
 
@@ -197,10 +276,16 @@ def render(index: dict[str, Any], results: list[dict[str, Any]]) -> str:
             hints = "; ".join(h["path"] for h in row["hints"])
             lines.append(f"{row['gap_id']}\n  {row['conclusion']}\n  hints: {hints}")
             continue
+        if "enum" in row:
+            enum = row["enum"]
+            detail = f"值: {', '.join(enum['values'][:12])}" if "value" not in enum else f"枚举值 {enum['value']}"
+            users = f"；使用方 {len(enum['used_by'])} 篇" if enum.get("used_by") else ""
+            lines.append(f"{row['path']} | {','.join(row['why'])}\n  {detail}{users}")
+            continue
         doc = index["documents"].get(row["path"])
         name = doc["title"] if doc else Path(row["path"]).stem
         desc = (doc["description"] if doc else "")[:60]
-        flags = "".join(" [范围外]" if row.get("out_of_scope") else "")
+        flags = " [范围外]" if row.get("out_of_scope") else ""
         condition = f"（{row['condition']}）" if row.get("condition") else ""
         lines.append(f"{row['path']}{flags} | {name} | {','.join(row['why'])}{condition}\n  {desc}")
     return "\n".join(lines)
@@ -209,21 +294,26 @@ def render(index: dict[str, Any], results: list[dict[str, Any]]) -> str:
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--surface", default="c_api", choices=sorted(SCOPES),
-                   help="API surface index to query (default: c_api); ignored with --index-dir")
-    p.add_argument("--index-dir", type=Path, default=None,
-                   help="explicit index dir (default: index/<surface>)")
-    p.add_argument("--json", action="store_true", help="emit machine-readable JSON")
-    p.add_argument("--stage", help="comma list: in,out,compute")
-    p.add_argument("--operation", help="comma list of operations (e.g. divide,gather)")
-    p.add_argument("--category", help="comma list of categories (e.g. vector_compare)")
-    p.add_argument("--dtype", help="comma list of dtypes (e.g. half,float)")
-    p.add_argument("--kw", help="comma list of keywords over title+description")
-    p.add_argument("--convert", nargs=2, metavar=("SRC", "DST"), help="dtype conversion pair, DST may be comma list")
-    p.add_argument("--api", help="family card: owner + arch variants + category page")
-    p.add_argument("--deps-of", dest="deps_of", help="outgoing dependencies of an API name or path")
-    p.add_argument("--kind", choices=["requires", "configures", "related", "constrained_by"])
-    p.add_argument("--reverse", action="store_true", help="with --deps-of: incoming edges instead")
-    p.add_argument("--gap", help="search scope-out gap registry by keyword")
+                   help="API surface 索引实例（默认 c_api）；索引构建时已按 CANN×架构门控")
+    p.add_argument("--index-dir", type=Path, default=None, help="显式索引目录（默认 index/<surface>）")
+    p.add_argument("--json", action="store_true", help="机器可读输出")
+    p.add_argument("--stage", help="逗号列表: in,out,compute")
+    p.add_argument("--operation", help="逗号列表（如 copy,divide,gather）")
+    p.add_argument("--category", help="逗号列表（如 vector_compute,vector_datamove）")
+    p.add_argument("--api-class", dest="api_class", help="API 分类=include 子目录（如 vector_datamove,reg_compute）")
+    p.add_argument("--dtype", help="逗号列表（如 half,fp8_e4m3fn）")
+    p.add_argument("--kw", help="title+description 子串")
+    p.add_argument("--convert", nargs=2, metavar=("SRC", "DST"), help="类型转换对，DST 可为逗号列表")
+    p.add_argument("--feature", help="特性（如 low_precision,low_precision_matrix,int4）")
+    p.add_argument("--version", help="CANN 版本区间（如 9.0.0-,9.1.0-）")
+    p.add_argument("--product", help="产品 npu 标记（如 950,A3,910b）")
+    p.add_argument("--api", help="家族卡：主页+同族成员+分类页")
+    p.add_argument("--deps-of", dest="deps_of", help="依赖图遍历（API 名或路径）")
+    p.add_argument("--kind", choices=["requires", "configures", "constrained_by", "related", "replaced_by"])
+    p.add_argument("--reverse", action="store_true", help="配合 --deps-of：反向边")
+    p.add_argument("--param", help="参数名或枚举类型反查（如 round_mode,asc_cast_round_mode）")
+    p.add_argument("--enum", help="枚举名或枚举值反查（如 asc_cast_round_mode,ASC_CAST_RN）")
+    p.add_argument("--gap", help="缺口登记检索")
     return p
 
 

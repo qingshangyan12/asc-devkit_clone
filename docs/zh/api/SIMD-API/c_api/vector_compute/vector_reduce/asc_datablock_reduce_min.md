@@ -1,27 +1,14 @@
 ---
 okftype: reference.api
-title: asc_datablock_reduce_min
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md
-description: 执行数据块内的求最小值规约操作，支持前n个数据连续计算和高维切分计算两种模式，目的和源操作数均为矢量，起始地址需32字节对齐。
+description: "执行数据块内的求最小值规约（Reduce Min）操作，支持前n个数据连续计算和高维切分计算两种模式，目的和源操作数均为矢量，起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [reduction]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
-  - traits: [high_dimensional]
-signature:
-  - override_id: asc_datablock_reduce_min__PUf16_PUf16_u32
-  - override_id: asc_datablock_reduce_min__PUf32_PUf32_u32
-  - override_id: asc_datablock_reduce_min__PUf16_PUf16_u8_u16_u16_u16
-  - override_id: asc_datablock_reduce_min__PUf32_PUf32_u8_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_reduce.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [aligned_transfer, datablock_granularity, high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_datablock_reduce_min
 

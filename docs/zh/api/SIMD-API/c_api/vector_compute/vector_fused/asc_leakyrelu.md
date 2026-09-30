@@ -1,30 +1,14 @@
 ---
 okftype: reference.api
-title: asc_leakyrelu
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md
-description: 执行矢量Leaky Relu运算，源元素大于0时保持原值，小于等于0时乘以alpha系数，alpha值由标量参数value指定，结果写入dst。
+description: "执行矢量Leaky Relu运算，源元素大于0时保持原值，小于等于0时乘以alpha系数，alpha由标量参数value指定，结果写入目的矢量，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [activation]
   - operations: [leaky_relu]
-  - objects: [scalar, tensor]
-  - execution_models: [memory_vector]
-  - traits: [high_dimensional, scalar_operand]
-signature:
-  - override_id: asc_leakyrelu__PUf16_PUf16_f16_u32
-  - override_id: asc_leakyrelu__PUf32_PUf32_f32_u32
-  - override_id: asc_leakyrelu__PUf16_PUf16_f16_u8_u16_u16_u16_u16
-  - override_id: asc_leakyrelu__PUf32_PUf32_f32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_fused.h]
-dependencies: []
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/01_memory_vector_compute/fused_compute
-    file: fused_compute.asc
-    archs: ['2201']
-    override_id: asc_leakyrelu__PUf16_PUf16_f16_u32
-timestamp: '2026-09-28'
+  - traits: [elementwise, high_dimensional, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_leakyrelu
 

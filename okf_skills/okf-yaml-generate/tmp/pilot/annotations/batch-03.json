@@ -1,0 +1,919 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+      "document_sha256": "ef274cb2cf53e0ce71adc48992ff3bb20a718b6a86a6d5ffa8c30fb942623180",
+      "description": {
+        "value": "给定输入矢量，每次取其中8个数，逐个填充到结果矢量对应的8个datablock（32Bytes）中，实现矢量元素到数据块的广播复制；约束为不支持src与dst为同一块内存地址。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+            "excerpt": "每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+            "excerpt": "不支持src与dst为同一块内存地址。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "broadcast"
+        ],
+        "traits": [
+          "datablock_granularity",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "给定一个输入矢量，每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。",
+        "operations:broadcast": "每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去，每个数对应一个datablock。",
+        "traits:datablock_granularity": "每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+      "document_sha256": "110df05c66f0ba05232dbb884bf48d5536e1ffd2732b068f02412a502b12eaf5",
+      "description": {
+        "value": "执行矢量复制操作，将标量值复制填充到目的矢量的各元素中，提供前n个数据计算与高维切分计算两类原型；约束为目的矢量起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+            "excerpt": "执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+            "excerpt": "dst的起始地址需要32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "broadcast"
+        ],
+        "traits": [
+          "scalar_operand",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。",
+        "operations:broadcast": "执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。",
+        "traits:scalar_operand": "将标量值复制填充到矢量中",
+        "traits:aligned_transfer": "dst的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+      "document_sha256": "7c9bd642f6a7eb9c32fb04d0fd986fb160e43a34c9c1a31b27577dce24881350",
+      "description": {
+        "value": "逐元素比较src0与src1对应位置的元素是否相等，结果按比特位输出，为真时对应比特位为1，否则为0；比较结果可存入寄存器或写入目的矢量。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+            "excerpt": "比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+            "excerpt": "当结果输出到寄存器中时，固定处理256B的数据，repeat字段不生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。",
+        "operations:comparison": "比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。",
+        "traits:elementwise": "比较src0与src1在对应索引位置的元素大小",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+          "kind": "requires",
+          "condition": "使用寄存器形式的接口时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+            "excerpt": "使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+          "kind": "related",
+          "condition": "如果要初始化寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+            "excerpt": "如果要初始化寄存器，可以调用[asc_set_cmp_mask](asc_set_cmp_mask.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md",
+      "document_sha256": "c817235fee0dabd4bef70abdf4adb91fca1e2c0a27b458b2d04ff8e05c24cb3a",
+      "description": {
+        "value": "按元素判断源矢量元素与标量value是否相等，成立时输出结果对应比特位为1，否则为0；结果按小端顺序排布为二进制比特，目的与源起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md",
+            "excerpt": "按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md",
+            "excerpt": "dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。",
+        "operations:comparison": "按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。",
+        "traits:elementwise": "按元素判断src = value是否成立",
+        "traits:scalar_operand": "| value | 输入 | 源操作数（标量）。 |",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md",
+      "document_sha256": "be4a1282e70b9c9048674d47b0c1274d33f4d135f643d98db8fb2729b4086c73",
+      "description": {
+        "value": "逐元素比较src0是否大于等于src1，成立时输出结果为1，否则为0，每个元素的比较结果占一个比特位；比较结果可存入寄存器或写入目的矢量。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md",
+            "excerpt": "Ge（greater than or equal to），逐元素比较src0 >= src1是否成立，成立则输出结果为1，否则输出结果为0，每个元素的比较结果占一个bit。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md",
+            "excerpt": "当结果输出到寄存器中时，固定处理256B的数据，repeat字段不生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "逐元素比较src0 >= src1是否成立，成立则输出结果为1，否则输出结果为0，每个元素的比较结果占一个bit。",
+        "operations:comparison": "逐元素比较src0 >= src1是否成立",
+        "traits:elementwise": "逐元素比较src0 >= src1是否成立",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+          "kind": "requires",
+          "condition": "使用寄存器形式的接口时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md",
+            "excerpt": "使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+          "kind": "related",
+          "condition": "如果要初始化寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md",
+            "excerpt": "如果要初始化寄存器，可以调用[asc_set_cmp_mask](asc_set_cmp_mask.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md",
+      "document_sha256": "38870185278642c12d392bb9ca7e8bda7efd28f9fcfebbb11714a6a62a4dac19",
+      "description": {
+        "value": "按元素判断源矢量元素是否大于等于标量value，成立时输出结果为1，否则为0，每个元素比较结果占1个比特位，结果按小端顺序排布。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md",
+            "excerpt": "按元素判断src >= value是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md",
+            "excerpt": "dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素判断src >= value是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。",
+        "operations:comparison": "按元素判断src >= value是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。",
+        "traits:elementwise": "按元素判断src >= value是否成立",
+        "traits:scalar_operand": "|value|输入|源操作数（标量）。|",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+      "document_sha256": "9175ceebe5d6b20b7196366ce2c8c5879f4dc74b44824e1a3731ce7aa7e43003",
+      "description": {
+        "value": "获取Compare操作产生的比较结果并存放到指定目的地址，需与Compare操作配合使用。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+            "excerpt": "此接口用于获取Compare操作的比较结果。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+            "excerpt": "需和Compare操作配合使用。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "query"
+        ]
+      },
+      "tag_evidence": {
+        "roles:query": "此接口用于获取Compare操作的比较结果。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md",
+      "document_sha256": "a4385192decd4516e3c662470370deda44f535fbacdebc2f0f89549b81b3d4ba",
+      "description": {
+        "value": "按元素比较两个矢量的大小关系，判断src0是否大于src1，结果为真时输出结果的对应比特位为1，否则为0；比较结果可存入寄存器或输出到目的地址。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md",
+            "excerpt": "按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md",
+            "excerpt": "当结果输出到寄存器中时，固定处理256B的数据，repeat字段不生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。",
+        "operations:comparison": "按元素比较两个矢量的大小关系，若比较后的结果为真，则输出结果的对应比特位为1，否则为0。",
+        "traits:elementwise": "按元素比较两个矢量的大小关系",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+          "kind": "requires",
+          "condition": "使用寄存器形式的接口时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md",
+            "excerpt": "使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+          "kind": "related",
+          "condition": "如果要初始化寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md",
+            "excerpt": "如果要初始化寄存器，可以调用[asc_set_cmp_mask](asc_set_cmp_mask.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md",
+      "document_sha256": "bfef9947af9e062b56e01629c319f6a60c84910e6aaa484b9f39a6cd5b409a59",
+      "description": {
+        "value": "将源矢量每个元素逐个与标量value比较大小，元素大于value时输出结果对应比特位为1，否则为0，比较结果按小端顺序排布。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md",
+            "excerpt": "src中的每个元素逐个与标量value比较大小，如果某个位置上的元素大于value，则输出结果dst上的对应比特位为1，否则为0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md",
+            "excerpt": "dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "src中的每个元素逐个与标量value比较大小，如果某个位置上的元素大于value，则输出结果dst上的对应比特位为1，否则为0。",
+        "operations:comparison": "src中的每个元素逐个与标量value比较大小，如果某个位置上的元素大于value，则输出结果dst上的对应比特位为1，否则为0。",
+        "traits:elementwise": "src中的每个元素逐个与标量value比较大小",
+        "traits:scalar_operand": "逐个与标量value比较大小",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md",
+      "document_sha256": "e7e2a7737ed5dbeec69e44080714e4f7eb6b167d344659e156e5289aa906c628",
+      "description": {
+        "value": "按元素判断src0是否小于等于src1，成立时输出结果为1，否则为0，每个元素比较结果占1个比特位；比较结果可存入寄存器或输出到目标地址。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md",
+            "excerpt": "按元素判断src0 <= src1是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md",
+            "excerpt": "当结果输出到寄存器中时，固定处理256B的数据，repeat字段不生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素判断src0 <= src1是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。",
+        "operations:comparison": "按元素判断src0 <= src1是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。",
+        "traits:elementwise": "按元素判断src0 <= src1是否成立",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+          "kind": "requires",
+          "condition": "使用寄存器形式的接口时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md",
+            "excerpt": "使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+          "kind": "related",
+          "condition": "如果要初始化寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md",
+            "excerpt": "如果要初始化寄存器，可以调用[asc_set_cmp_mask](asc_set_cmp_mask.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md",
+      "document_sha256": "7d984a930d0af38d5be6080acee81e8091825bb05b244c0a791ff1b387b16f2b",
+      "description": {
+        "value": "按元素判断源矢量元素是否小于等于标量value，成立时输出结果为1，否则为0，每个元素比较结果占1个比特位，结果按小端顺序排布。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md",
+            "excerpt": "按元素判断src <= value是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md",
+            "excerpt": "dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素判断src <= value是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。",
+        "operations:comparison": "按元素判断src <= value是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。",
+        "traits:elementwise": "按元素判断src <= value是否成立",
+        "traits:scalar_operand": "|value|输入|源操作数（标量）。|",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+      "document_sha256": "bcf2a81b81a8928875db4da9f3d74561987275a8f490a31415ee48e8be8a2578",
+      "description": {
+        "value": "按元素判断src0是否小于src1，成立时输出结果dst上的对应比特位为1，否则为0；比较结果可存入寄存器或输出到目标地址。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+            "excerpt": "按元素判断src0 < src1是否成立，若成立则输出结果dst上的对应比特位为1，否则为0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+            "excerpt": "当结果输出到寄存器中时，固定处理256B的数据，repeat字段不生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素判断src0 < src1是否成立，若成立则输出结果dst上的对应比特位为1，否则为0。",
+        "operations:comparison": "按元素判断src0 < src1是否成立，若成立则输出结果dst上的对应比特位为1，否则为0。",
+        "traits:elementwise": "按元素判断src0 < src1是否成立",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+          "kind": "requires",
+          "condition": "使用寄存器形式的接口时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+            "excerpt": "使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+          "kind": "related",
+          "condition": "如果要初始化寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+            "excerpt": "如果要初始化寄存器，可以调用[asc_set_cmp_mask](asc_set_cmp_mask.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md",
+      "document_sha256": "153f8d40caf6141794236ef6984fa2a254d3bb637deaffb7568930a316a50841",
+      "description": {
+        "value": "将矢量中每个位置的元素与标量值比较，值小于标量值时结果为1，否则为0，比较结果按比特位以小端序排布。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md",
+            "excerpt": "执行矢量中每个位置和标量比较，如果值小于标量值则为1，否则为0，结果为每个bit位按小端序排布。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md",
+            "excerpt": "dst、src的起始地址需要32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "执行矢量中每个位置和标量比较，如果值小于标量值则为1，否则为0，结果为每个bit位按小端序排布。",
+        "operations:comparison": "执行矢量中每个位置和标量比较，如果值小于标量值则为1，否则为0，结果为每个bit位按小端序排布。",
+        "traits:elementwise": "执行矢量中每个位置和标量比较",
+        "traits:scalar_operand": "执行矢量中每个位置和标量比较",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md",
+      "document_sha256": "a0eb759b9a75cead1d5bd06539518af1f0d2de564eae66ac44e57631a6798772",
+      "description": {
+        "value": "按元素判断src0是否不等于src1，成立时输出结果为1，否则为0，每个元素比较结果占1个比特位；比较结果可存入寄存器或输出到目标地址。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md",
+            "excerpt": "按元素判断src0 != src1是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md",
+            "excerpt": "当结果输出到寄存器中时，固定处理256B的数据，repeat字段不生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素判断src0 != src1是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。",
+        "operations:comparison": "按元素判断src0 != src1是否成立，若成立则输出结果为1，否则为0。每个元素的比较结果占1个bit。",
+        "traits:elementwise": "按元素判断src0 != src1是否成立",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+          "kind": "requires",
+          "condition": "使用寄存器形式的接口时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md",
+            "excerpt": "使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](asc_get_cmp_mask.md)获取比较结果。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+          "kind": "related",
+          "condition": "如果要初始化寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md",
+            "excerpt": "如果要初始化寄存器，可以调用[asc_set_cmp_mask](asc_set_cmp_mask.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+      "document_sha256": "b81b76e0923f83e88becfa77e3a890fbc97ff3eb0a67fc180b30c25589a958e5",
+      "description": {
+        "value": "将src中每个元素逐个与标量value比较，元素不等于value时输出结果dst对应比特位为1，否则为0，比较结果按小端顺序排布。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+            "excerpt": "src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst对应比特位为1，否则为0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+            "excerpt": "dst按照小端顺序排序成二进制结果，对应src中相应位置的数据比较结果。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "comparison"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst对应比特位为1，否则为0。",
+        "operations:comparison": "src中的每个元素逐个与标量value比较大小，如果某个位置上的元素不等于value，则输出结果dst对应比特位为1，否则为0。",
+        "traits:elementwise": "src中的每个元素逐个与标量value比较大小",
+        "traits:scalar_operand": "逐个与标量value比较大小",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+      "document_sha256": "667f146d3b37d117d2630e3d885e2889e1b283ce0c89330d671475acae45cf5c",
+      "description": {
+        "value": "为asc_select操作设置作用于选择的Mask掩码，需与asc_select操作配合使用。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+            "excerpt": "为[asc_select](../vector_permute_sel/asc_select.md)操作设置作用于选择的Mask掩码。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+            "excerpt": "需和[asc_select](../vector_permute_sel/asc_select.md)操作配合使用。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "为[asc_select](../vector_permute_sel/asc_select.md)操作设置作用于选择的Mask掩码。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+            "excerpt": "为[asc_select](../vector_permute_sel/asc_select.md)操作设置作用于选择的Mask掩码。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+      "document_sha256": "83b3d22b6ae5a5159de21ce59f486c8d0dcd8537e18acf043f3d71bf6b8845fa",
+      "description": {
+        "value": "按src_offset给定的偏移将源矢量元素按元素收集到目的矢量中，偏移量相对源操作数起始基地址、单位为Bytes，支持前n个数据计算与高维切分计算两类原型。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+            "excerpt": "将src按照src_offset给定的偏移按元素收集到dst中。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+            "excerpt": "src加上src_offset偏移后的地址不能超出Unified Buffer（UB）大小数据的范围。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "gather"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "将src按照src_offset给定的偏移按元素收集到dst中。",
+        "operations:gather": "将src按照src_offset给定的偏移按元素收集到dst中。",
+        "traits:elementwise": "将src按照src_offset给定的偏移按元素收集到dst中。",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+      "document_sha256": "e46a36f96dbbbda4b7067800fa2a87dc2ba16da3dcf3f0f637fb77fd72d48803",
+      "description": {
+        "value": "给定输入矢量与地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中，偏移后地址不能超出Unified Buffer（UB）范围。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+            "excerpt": "给定一个输入的矢量和一个地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+            "excerpt": "src加上src_offset偏移后的地址不能超出Unified Buffer（UB）大小数据的范围。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "gather"
+        ],
+        "traits": [
+          "datablock_granularity",
+          "aligned_transfer",
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "给定一个输入的矢量和一个地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中。",
+        "operations:gather": "给定一个输入的矢量和一个地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中。",
+        "traits:datablock_granularity": "根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+        "traits:high_dimensional": "- 高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    }
+  ]
+}

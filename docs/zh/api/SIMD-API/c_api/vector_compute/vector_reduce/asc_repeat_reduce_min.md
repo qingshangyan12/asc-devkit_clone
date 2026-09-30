@@ -1,42 +1,17 @@
 ---
 okftype: reference.api
-title: asc_repeat_reduce_min
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md
-description: 对每个Repeat内所有元素求最小值以及Repeat内首个最小值元素的索引，一次Repeat计算256字节，之后可继续调用asc_get_reduce_min_cnt获取全部repeat内的最小值和首个最小值索引。
+description: "对每个Repeat内所有元素求最小值以及Repeat内首个最小值元素的索引，一次Repeat计算256字节；提供index_value、value_index、only_value、only_index四种返回形态，执行后可继续调用asc_get_reduce_min_cnt获取全部repeat内的最小值与首个最小值索引。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [reduction]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [high_dimensional]
-signature:
-  - override_id: asc_repeat_reduce_min_index_value__PUf16_PUf16_u32
-  - override_id: asc_repeat_reduce_min_index_value__PUf32_PUf32_u32
-  - override_id: asc_repeat_reduce_min_value_index__PUf16_PUf16_u32
-  - override_id: asc_repeat_reduce_min_value_index__PUf32_PUf32_u32
-  - override_id: asc_repeat_reduce_min_only_value__PUf16_PUf16_u32
-  - override_id: asc_repeat_reduce_min_only_value__PUf32_PUf32_u32
-  - override_id: asc_repeat_reduce_min_only_index__PUf16_PUf16_u32
-  - override_id: asc_repeat_reduce_min_only_index__PUf32_PUf32_u32
-  - override_id: asc_repeat_reduce_min_index_value__PUf16_PUf16_u8_u16_u16_u16
-  - override_id: asc_repeat_reduce_min_index_value__PUf32_PUf32_u8_u16_u16_u16
-  - override_id: asc_repeat_reduce_min_value_index__PUf16_PUf16_u8_u16_u16_u16
-  - override_id: asc_repeat_reduce_min_value_index__PUf32_PUf32_u8_u16_u16_u16
-  - override_id: asc_repeat_reduce_min_only_value__PUf16_PUf16_u8_u16_u16_u16
-  - override_id: asc_repeat_reduce_min_only_value__PUf32_PUf32_u8_u16_u16_u16
-  - override_id: asc_repeat_reduce_min_only_index__PUf16_PUf16_u8_u16_u16_u16
-  - override_id: asc_repeat_reduce_min_only_index__PUf32_PUf32_u8_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_reduce.h]
+  - traits: [aligned_transfer, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md
     kind: related
-    condition: 执行此接口后
-examples: []
-timestamp: '2026-09-28'
+    condition: "执行此接口后，可继续调用asc_get_reduce_min_cnt获取全部repeat内的最小值及首个最小值索引"
+version: 9.0.0-
 ---
 # asc_repeat_reduce_min
 

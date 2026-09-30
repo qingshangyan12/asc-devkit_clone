@@ -1,7 +1,8 @@
 # 源文档上下文配置。
 #
-# 本文件只描述本次源集合的范围和文档族；不为每个目录或文件
-# 编写 okftype 映射。页面种类由通用结构分类器从文档事实判断。
+# 本文件只描述源集合范围和文档族；不为每个目录或文件编写 okftype 映射。
+# 页面种类由通用结构分类器从文档事实判断。api 层级（api_surfaces）由文档路径
+# 在索引期推导，不再配置 default_tags。
 
 schema_version: 1
 registry_id: okf-source-context-v1
@@ -9,10 +10,3 @@ document_roots: [docs/zh/api]
 
 context:
   family: reference
-
-# 这些是来源范围标签，不参与页面分类。
-default_tags:
-  docs/zh/api/SIMD-API/c_api/: {api_surfaces: [c_api]}
-  docs/zh/api/SIMD-API/basic_api/: {api_surfaces: [basic_api]}
-  docs/zh/api/SIMD-API/adv_api/: {api_surfaces: [adv_api]}
-  docs/zh/api/SIMD-API/tensor_api/: {api_surfaces: [tensor_api]}

@@ -1,26 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mul_add_relu
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md
-description: 按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中，操作数起始地址需32字节对齐。
+description: "按元素将src0和dst相乘并加上src1，再进行Relu计算，结果与0对比取较大值后存入dst，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [activation, arithmetic]
   - operations: [fused_multiply_add, relu]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
   - traits: [elementwise, high_dimensional]
-signature:
-  - override_id: asc_mul_add_relu__PUf16_PUf16_PUf16_u32
-  - override_id: asc_mul_add_relu__PUf32_PUf32_PUf32_u32
-  - override_id: asc_mul_add_relu__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_mul_add_relu__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_fused.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_mul_add_relu
 

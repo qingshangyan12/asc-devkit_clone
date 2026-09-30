@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mul_scalar
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul_scalar.md
-description: 将源矢量各元素与给定标量逐元素相乘并把结果写入目的矢量，支持前n个数据计算与高维切分计算两种原型，操作数起始地址需32字节对齐。
+description: "将源矢量各元素与给定标量逐元素相乘并写入目的矢量，支持前n个数据计算与高维切分计算两种原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [multiply]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [elementwise, scalar_operand]
-signature:
-  - override_id: asc_mul_scalar__PUi16_PUi16_i16_u32
-  - override_id: asc_mul_scalar__PUf16_PUf16_f16_u32
-  - override_id: asc_mul_scalar__PUi32_PUi32_i32_u32
-  - override_id: asc_mul_scalar__PUf32_PUf32_f32_u32
-  - override_id: asc_mul_scalar__PUi16_PUi16_i16_u8_u16_u16_u16_u16
-  - override_id: asc_mul_scalar__PUf16_PUf16_f16_u8_u16_u16_u16_u16
-  - override_id: asc_mul_scalar__PUi32_PUi32_i32_u8_u16_u16_u16_u16
-  - override_id: asc_mul_scalar__PUf32_PUf32_f32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - traits: [elementwise, high_dimensional, scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 
 # asc_mul_scalar

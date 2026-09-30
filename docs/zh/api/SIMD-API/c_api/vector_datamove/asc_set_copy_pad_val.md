@@ -1,24 +1,14 @@
 ---
 okftype: reference.api
-title: asc_set_copy_pad_val
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
-description: 与asc_copy_gm2ub_align配合使用，设置连续搬运数据块左右两侧的填充值；须在调用搬运接口前写入配置，配置持续生效直至再次调用覆盖，填充值仅在enable_constant_pad参数为true时被取用，仅在AIV上生效。
+description: "与asc_copy_gm2ub_align配合使用，设置连续搬运数据块左右两侧的填充值；须在调用搬运接口前写入配置，填充值仅在enable_constant_pad参数为true时被取用，配置持续生效直至再次调用覆盖，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
   - traits: [padding]
-signature:
-  - prototype_id: asc_set_copy_pad_val__<dtype>
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['2201', '3510']
-header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
     kind: configures
-    condition: '`enable_constant_pad`设置为`true`时'
-examples: []
-timestamp: '2026-09-24'
+    condition: "填充值仅在enable_constant_pad设置为true时被取用"
+version: 9.1.0-
 ---
 # asc_set_copy_pad_val
 

@@ -1,36 +1,14 @@
 ---
 okftype: reference.api
-title: asc_shiftright
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
-description: 对src中的每个元素右移value位，有符号类型做算术右移并复制符号位，无符号类型做逻辑右移最高位补0，value不支持负数且不能超过位宽。
+description: "对src中的每个元素执行右移，有符号类型做算术右移并复制符号位，无符号类型做逻辑右移最高位补0，value不支持负数且不能超过位宽，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [bitwise]
   - operations: [bitwise_shift]
-  - objects: [scalar, tensor]
-  - execution_models: [memory_vector]
   - traits: [elementwise, high_dimensional, scalar_operand]
-signature:
-  - override_id: asc_shiftright__PUi16_PUi16_i32_u32
-  - override_id: asc_shiftright__PUu16_PUu16_u32_u32
-  - override_id: asc_shiftright__PUi32_PUi32_i32_u32
-  - override_id: asc_shiftright__PUu32_PUu32_u32_u32
-  - override_id: asc_shiftright_round__PUi16_PUi16_i32_u32
-  - override_id: asc_shiftright_round__PUi32_PUi32_i32_u32
-  - override_id: asc_shiftright__PUi16_PUi16_i32_u8_u16_u16_u16_u16
-  - override_id: asc_shiftright__PUu16_PUu16_u32_u8_u16_u16_u16_u16
-  - override_id: asc_shiftright__PUi32_PUi32_i32_u8_u16_u16_u16_u16
-  - override_id: asc_shiftright__PUu32_PUu32_u32_u8_u16_u16_u16_u16
-  - override_id: asc_shiftright_round__PUi16_PUi16_i32_u8_u16_u16_u16_u16
-  - override_id: asc_shiftright_round__PUi32_PUi32_i32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_logic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 
 # asc_shiftright

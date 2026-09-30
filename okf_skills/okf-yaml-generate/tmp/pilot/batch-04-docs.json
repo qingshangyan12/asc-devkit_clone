@@ -1,0 +1,98 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md",
+  "sha256": "aad1472072300b7762ea66239eb17ca6ec3edda8360cd42d3c97f9372f486728"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md",
+  "sha256": "e1e4c6539213c1e6e42e9b151ec46482622969dc4d8a31103f2d251cc22dd7bd"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md",
+  "sha256": "22fafed0a4ef64e54df8628861f60546295522b059b937b75449e69caecaba60"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md",
+  "sha256": "9a959da2e1fc012e9504253efe400e3472de63f705e925eb950a98551ba2cbf7"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md",
+  "sha256": "17bd81c7337cde44bb28563de3de110c11eaba95f925ac0994d69695dda5988f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md",
+  "sha256": "8006a14275209ea7be34d8cef4ad74ecabcf3e044b813bf74e71df1835dba5b1"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md",
+  "sha256": "cd1b8017297f8f2d9166f27dd00d75ac3e3776a2832c34399a89c830b9490d02"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md",
+  "sha256": "d2da204c32a5492dbbedc524bc7a41e814a4c2101f26d4d5aec01a98d425e845"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md",
+  "sha256": "09df08cefe8a066d31af94edff648f3becf383d2d97446cf90cae0669cd972ae"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+  "sha256": "ee3b212b62fce94fdd1cefd07bf6cbfb763933b255e914f1ca174394db0da1bb"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md",
+  "sha256": "e4526d7c9f63235bca173e9bbb2bdb846a5f95a8455707f039f29f832775cb25"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md",
+  "sha256": "f7072d3f3f79c81346a6fea602be797e195e8d725dd1039ed9199c9003cda07f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md",
+  "sha256": "6ffc63c4b6ede066e11291f2ac0d692f84033e5fd7f634b069d343dbe01a8c1e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md",
+  "sha256": "268445c9f4cac5271c3e14d458c321af810d93ffce8207a46ef3446f0db4a666"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md",
+  "sha256": "287899660fda467f948bd65a53a99ec5ca079da6b02d3c47acea2009eb93efe2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md",
+  "sha256": "3e99894cd2a0e86144a014c8a102262566f0042dc5a3353394dffcdd28099eac"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md",
+  "sha256": "5d5f7986d2fa4cbd116a32b48cb8a0fc08059e78d6548d9d8b037017065a17ea"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+  "sha256": "cf16c4af1cb417d73c54769c5193d65a4cf0d7224c85bdde8b340ec03ac3cab6"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int64.md",
+  "sha256": "29cd7a752cef8fa98c9e171a91523533eed876afe81e3d54742ac70b071b6b37"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md",
+  "sha256": "46049877024c91151574385bbbe156d743427a2468813d911735954245843c43"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md",
+  "sha256": "cc8cac801eafb4def574c8aa0e90c8241539874ea62c7dc1f752789cdfd18808"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642int32.md",
+  "sha256": "f6624df4d54352242ed55c2a3cbf21bcb0c5da876891f73d5fda8c40c936ac87"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int82half.md",
+  "sha256": "f534f147c57bad16182135b8013612baa7c729200b3cbdb595a2778e2b8c0276"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md",
+  "sha256": "de6bc0efc020bbc374742bf6deb71eded8ec9827916e534ee848f8399b60ac00"
+ }
+]

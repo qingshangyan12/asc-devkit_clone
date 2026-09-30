@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mul
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md
-description: 对两个源矢量执行逐元素乘法运算并将结果写入目的矢量，提供前n个数据计算与高维切分计算两种原型，目的与源操作数起始地址需32字节对齐。
+description: "对两个源矢量执行逐元素乘法并将结果写入目的矢量，支持前n个数据计算与高维切分计算两种原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [multiply]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [elementwise]
-signature:
-  - override_id: asc_mul__PUi16_PUi16_PUi16_u32
-  - override_id: asc_mul__PUf16_PUf16_PUf16_u32
-  - override_id: asc_mul__PUi32_PUi32_PUi32_u32
-  - override_id: asc_mul__PUf32_PUf32_PUf32_u32
-  - override_id: asc_mul__PUi16_PUi16_PUi16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_mul__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_mul__PUi32_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_mul__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_arith.h]
+  - traits: [elementwise, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_mul
 

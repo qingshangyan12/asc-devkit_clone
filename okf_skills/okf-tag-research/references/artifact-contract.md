@@ -79,17 +79,9 @@
 
 只有 `decision: "approve"` 才能生成冻结 taxonomy。拒绝或延后必须保留运行工件，不得修改既有 release。
 
-## 最终 API 标注的必填概念
+## 标注阶段的规则归属
 
-词表中的 namespace 定义是强制覆盖策略的事实来源。对每一篇最终要写入的 API Markdown，标注
-工件必须：
-
-- `tag` 恰好包含 taxonomy 中的所有 namespace；
-- 对每个 `required: true` 的 namespace，值列表至少包含一个冻结值；
-- 每个 `namespace:value` 都有一条非空 `evidence`；除 `api_surfaces` 这类允许由稳定路径证明的导航
-  值外，其他证据必须逐字出现在目标 Markdown 正文中；
-- 不允许用空数组、`unknown`、`other` 或临时值绕过必填概念；无法从正文确定概念时，该 API 必须
-  阻断写入并进入人工补证/词表修订队列。
-
-开放发现工件可以暂时没有候选值，因为它的任务是发现词表；但在 taxonomy 批准后的逐篇标注阶段，
-必须运行覆盖校验，覆盖不完整时不得调用 tag 写入器。
+逐篇标注的必填 namespace、条件必填与证据规则由 `okf-yaml-generate` 的 tags 模式执行和校验，
+统一读取 `taxonomy/tag-rules.yaml` 与 [`../../字段与推导规范.md`](../../字段与推导规范.md)；
+本契约只约定调研工件的形状。开放发现工件可以暂时没有候选值；taxonomy 批准后的逐篇标注
+必须通过 `validate-annotation` 覆盖校验，覆盖不完整时不得调用 tag 写入器。

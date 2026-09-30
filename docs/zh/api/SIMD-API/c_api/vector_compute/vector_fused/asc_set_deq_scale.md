@@ -1,27 +1,11 @@
 ---
 okftype: reference.api
-title: asc_set_deq_scale
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
-description: 设置DEQSCALE（量化参数）寄存器的值，可用数组一次设置一组大小为16的量化参数，或设置单个scale、offset及符号模式，half类型scale适用于cast_deq等接口的int32_t转化为half场景。
+description: "设置DEQSCALE量化参数寄存器的值，可用数组一次设置一组大小为16的量化参数，也可设置单个scale、offset及符号模式，half类型scale适用于int32_t转化为half的场景。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
   - traits: [quantization]
-signature:
-  - override_id: asc_set_deq_scale__PUu64_Avdeqf32_Avdeqi16_Avdeqb
-  - override_id: asc_set_deq_scale__f32_i16_b
-  - override_id: asc_set_deq_scale__f16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_fused.h]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md
-    kind: configures
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md
-    kind: configures
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md
-    kind: configures
-examples: []
-timestamp: '2026-09-28'
+dependencies: []
+version: 9.0.0-
 ---
 # asc_set_deq_scale
 

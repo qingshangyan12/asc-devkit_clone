@@ -119,10 +119,8 @@ def resolve_inside(root: Path, candidate: Path) -> Path:
     return resolved
 
 
-def load_reference_classifier(guard_repo: Path):
-    scripts_dir = (guard_repo / "scripts").resolve()
-    if not scripts_dir.is_dir():
-        raise FileNotFoundError(f"metadata guard scripts directory is missing: {scripts_dir}")
+def load_reference_classifier():
+    scripts_dir = (Path(__file__).resolve().parents[2] / "okf-yaml-generate" / "scripts").resolve()
     if str(scripts_dir) not in sys.path:
         sys.path.insert(0, str(scripts_dir))
     module = importlib.import_module("extract_api_descriptions")
@@ -130,11 +128,6 @@ def load_reference_classifier(guard_repo: Path):
     if not callable(classifier):
         raise ValueError("extract_api_descriptions.is_api_reference_document is unavailable")
     return classifier
-
-
-def document_group(path: str, source_prefix: str) -> str:
-    relative = Path(path).relative_to(source_prefix)
-    return relative.parts[0] if len(relative.parts) > 1 else "__root__"
 
 
 def stratified_sample(records: list[dict[str, str]], count: int, salt: str) -> list[dict[str, str]]:
@@ -161,29 +154,36 @@ def stratified_sample(records: list[dict[str, str]], count: int, salt: str) -> l
     return sorted(selected, key=lambda item: item["path"])
 
 
-def scan_documents(devkit_root: Path, source_dir: Path, guard_repo: Path) -> list[dict[str, str]]:
-    is_reference = load_reference_classifier(guard_repo)
+def scan_documents(devkit_root: Path, source_dirs: list[Path]) -> list[dict[str, str]]:
+    is_reference = load_reference_classifier()
     root = devkit_root.resolve()
-    source = resolve_inside(root, source_dir)
-    if not source.is_dir():
-        raise FileNotFoundError(f"source directory is missing: {source}")
-    prefix = source.relative_to(root).as_posix()
     records: list[dict[str, str]] = []
-    for document in sorted(source.rglob("*.md")):
-        raw = document.read_text(encoding="utf-8", errors="replace")
-        if not is_reference(raw):
-            continue
-        relative = document.relative_to(root).as_posix()
-        records.append(
-            {
-                "path": relative,
-                "title": markdown_title(raw, document.stem),
-                "sha256": digest_file(document),
-                "group": document_group(relative, prefix),
-            }
-        )
+    seen: set[str] = set()
+    for source_dir in source_dirs:
+        source = resolve_inside(root, source_dir)
+        if not source.is_dir():
+            raise FileNotFoundError(f"source directory is missing: {source}")
+        prefix = source.relative_to(root).as_posix()
+        for document in sorted(source.rglob("*.md")):
+            raw = document.read_text(encoding="utf-8", errors="replace")
+            if not is_reference(raw):
+                continue
+            relative = document.relative_to(root).as_posix()
+            if relative in seen:
+                continue
+            seen.add(relative)
+            rel_parts = document.relative_to(source).parts
+            group = f"{source.name}/{rel_parts[0]}" if len(rel_parts) > 1 else source.name
+            records.append(
+                {
+                    "path": relative,
+                    "title": markdown_title(raw, document.stem),
+                    "sha256": digest_file(document),
+                    "group": group,
+                }
+            )
     if not records:
-        raise ValueError(f"scope contains no API reference Markdown: {prefix}")
+        raise ValueError(f"scope contains no API reference Markdown: {[str(s) for s in source_dirs]}")
     return records
 
 
@@ -723,8 +723,10 @@ def command_prepare(args: argparse.Namespace) -> dict[str, Any]:
     if not RUN_ID_RE.fullmatch(args.run_id):
         raise ValueError("run_id may contain only letters, digits, dot, underscore, and hyphen")
     devkit_root = args.devkit_root.resolve()
-    source_dir = args.source_dir if args.source_dir.is_absolute() else devkit_root / args.source_dir
-    source_dir = resolve_inside(devkit_root, source_dir)
+    source_dirs: list[Path] = []
+    for item in args.source_dir:
+        source = item if item.is_absolute() else devkit_root / item
+        source_dirs.append(resolve_inside(devkit_root, source))
     taxonomy_path = args.taxonomy.resolve()
     taxonomy = read_json(taxonomy_path)
     if taxonomy.get("status") not in {"frozen", "released"}:
@@ -735,14 +737,20 @@ def command_prepare(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("discovery_count is invalid")
     if not 0 < args.maximum_coverage <= 1 or args.minimum_independent_directories < 1:
         raise ValueError("coverage or independent directory threshold is invalid")
-    documents = scan_documents(devkit_root, source_dir, args.guard_repo.resolve())
+    documents = scan_documents(devkit_root, source_dirs)
+    source_rel = [source.relative_to(devkit_root).as_posix() for source in source_dirs]
     discovery = stratified_sample(documents, min(args.discovery_count, len(documents)), "discovery:")
     run_dir.mkdir(parents=True, exist_ok=True)
     base_assignment = {
         "schema_version": SCHEMA_VERSION,
         "run_id": args.run_id,
         "devkit_root": str(devkit_root),
-        "source_dir": source_dir.relative_to(devkit_root).as_posix(),
+        "source_dir": source_rel[0] if len(source_rel) == 1 else source_rel,
+        "sources": {
+            "docs": source_rel,
+            "include": "include/c_api",
+            "examples": "examples/02_simd_c_api/03_c_api",
+        },
         "taxonomy": {"path": str(taxonomy_path), "sha256": digest_file(taxonomy_path)},
         "output_contract": "references/artifact-contract.md",
     }
@@ -762,7 +770,7 @@ def command_prepare(args: argparse.Namespace) -> dict[str, Any]:
         "isolation_level": args.isolation_level,
         "scope": {
             "devkit_root": str(devkit_root),
-            "source_dir": source_dir.relative_to(devkit_root).as_posix(),
+            "source_dirs": source_rel,
             "documents": documents,
         },
         "taxonomy": {"path": str(taxonomy_path), "sha256": digest_file(taxonomy_path)},
@@ -899,8 +907,8 @@ def build_parser() -> argparse.ArgumentParser:
     commands = parser.add_subparsers(dest="command", required=True)
     prepare = commands.add_parser("prepare", help="固化范围并写入子代理任务包。")
     prepare.add_argument("--devkit-root", type=Path, required=True)
-    prepare.add_argument("--source-dir", type=Path, required=True)
-    prepare.add_argument("--guard-repo", type=Path, required=True, help="api-yaml-metadata-guard 仓库根目录")
+    prepare.add_argument("--source-dir", type=Path, required=True, action="append",
+                         help="调研源目录（可重复传入多个目录）")
     prepare.add_argument("--taxonomy", type=Path, default=DEFAULT_TAXONOMY)
     prepare.add_argument("--run-id", required=True)
     prepare.add_argument("--output-dir", type=Path, required=True)

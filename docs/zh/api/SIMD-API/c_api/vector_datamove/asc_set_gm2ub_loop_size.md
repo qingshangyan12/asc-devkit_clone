@@ -1,27 +1,19 @@
 ---
 okftype: reference.api
-title: asc_set_gm2ub_loop_size
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
-description: 设置asc_copy_gm2ub_align使用循环搬运模式时的两层循环迭代次数，loop1_size设置内层循环次数，loop2_size设置外层循环次数，配置持续生效直至重新配置，任务完成后需将两层循环次数复位为1，仅在AIV上生效。
+description: "设置asc_copy_gm2ub_align循环搬运模式两层循环的迭代次数，内层loop1与外层loop2分别配置，循环次数为0时对应循环不执行，任务完成后需复位为1，配置持续生效直至重新配置，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-signature:
-  - override_id: asc_set_gm2ub_loop_size__u64_u64
-archs: ['3510']
-header: [/include/c_api/vector_datamove/vector_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md
     kind: configures
-    condition: 使用循环搬运模式时
+    condition: "使用循环搬运模式时"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
     kind: related
-    condition: 使用循环搬运模式时
+    condition: "使用循环搬运模式时"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
     kind: related
-    condition: 使用循环搬运模式时
-examples: []
-timestamp: '2026-09-24'
+    condition: "使用循环搬运模式时"
+version: 9.0.0-
 ---
 # asc_set_gm2ub_loop_size
 

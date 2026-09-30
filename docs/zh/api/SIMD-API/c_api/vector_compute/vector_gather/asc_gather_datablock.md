@@ -1,26 +1,14 @@
 ---
 okftype: reference.api
-title: asc_gather_datablock
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md
-description: 给定输入矢量和地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中，仅提供高维切分计算原型，偏移后地址不能超出Unified
-  Buffer（UB）范围。
+description: "给定输入矢量与地址偏移矢量，根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中，偏移后地址不能超出Unified Buffer（UB）范围。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [gather]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [high_dimensional]
-signature:
-  - override_id: asc_gather_datablock__PUu16_PUu16_PUu32_u16_u8_u8
-  - override_id: asc_gather_datablock__PUu32_PUu32_PUu32_u16_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_gather.h]
+  - traits: [aligned_transfer, datablock_granularity, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_gather_datablock
 

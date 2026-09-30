@@ -1,19 +1,5 @@
 ---
 okftype: reference.index
-title: 逻辑计算
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/vector_logic.md
-navigation:
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md
-    title: asc_and
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
-    title: asc_not
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
-    title: asc_or
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md
-    title: asc_shiftleft
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
-    title: asc_shiftright
-timestamp: '2026-09-28'
 ---
 # 逻辑计算
 

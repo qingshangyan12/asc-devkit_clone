@@ -1,29 +1,14 @@
 ---
 okftype: reference.api
-title: asc_axpy
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md
-description: 将源操作数src中每个元素与标量value求积，再与目的操作数dst中的对应元素相加后写回dst，支持连续数据计算和高维切分计算两种接口形式。
+description: "将源矢量每个元素与标量value求积后加上目的矢量对应元素并写回dst，实现标量乘加融合计算，提供连续数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [fused_multiply_add]
-  - objects: [scalar, tensor]
-  - execution_models: [memory_vector]
   - traits: [elementwise, high_dimensional, scalar_operand]
-signature:
-  - override_id: asc_axpy__PUf16_PUf16_f16_u32
-  - override_id: asc_axpy__PUf32_PUf16_f16_u32
-  - override_id: asc_axpy__PUf32_PUf32_f32_u32
-  - override_id: asc_axpy__PUf16_PUf16_f16_u8_u16_u16_u16_u16
-  - override_id: asc_axpy__PUf32_PUf16_f16_u8_u16_u16_u16_u16
-  - override_id: asc_axpy__PUf32_PUf32_f32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_fused.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_axpy
 

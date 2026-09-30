@@ -1,22 +1,19 @@
-# OKF 文档 Profile 注册表。
+# OKF 文档 Profile 注册表（v5，slim 头）。
 #
-# Profile 直接使用“文档族.页面种类”的完整 okftype 作为唯一键。
-# 分类器从文档结构或 defs 实体目录得到页面种类；文档族由源上下文确定。
-# 不在这里维护路径规则、字段能力依赖或 okftype 组合表。
+# 字段与推导契约的唯一事实源是 ../../字段与推导规范.md（5 字段）。
+# Profile 使用完整 okftype 作为唯一键；required 表示该 Profile 写入时必须出现的字段
+#（dependencies 允许空数组）。
 
-schema_version: 4
+schema_version: 5
 status: active
-registry_id: okf-document-profile-v3
+registry_id: okf-document-profile-v5
 taxonomy: ../okf-tag-research/taxonomy/tag-taxonomy.json
 
-common_required_fields: [okftype, title, resource, version]
-common_fields: [okftype, title, resource, description, tag, signature, declaration, type_catalog, archs, header,
-                dependencies, examples, navigation, version]
+common_required_fields: [okftype]
+common_fields: [okftype, description, tag, dependencies, version]
 
-# YAML 字段顺序是输出契约，不能由 common/profile 字段拼接顺序间接决定。
-field_order:
-  [okftype, title, resource, description, tag, signature, declaration,
-   type_catalog, archs, header, dependencies, examples, navigation, version]
+# YAML 字段顺序是输出契约。
+field_order: [okftype, description, tag, dependencies, version]
 
 unknown_policy:
   unclassified_document: report_only
@@ -30,107 +27,82 @@ field_catalog:
   okftype:
     含义: 文档族、页面种类组成的受控页面类型。
     事实来源: 文档结构分类结果和本次运行上下文。
-  title:
-    含义: 页面标题。
-    事实来源: Markdown 一级标题。
-  resource:
-    含义: 仓内资源路径。
-    事实来源: Markdown 相对路径。
   description:
-    含义: 页面主体的简要说明。
-    事实来源: 已验证的 description artifact。
+    含义: 页面语义的单段中文摘要（8–180 字）。
+    事实来源: 已验证的语义标注 artifact。
   tag:
-    含义: 用于检索的语义标签。
+    含义: 语义标签，仅 roles/operations/traits 三个 namespace。
     事实来源: 每个 namespace:value 的逐字证据。
-  version:
-    含义: 当前接口原型的 CANN 生命周期区间，例如 9.0.0- 或 9.0.0-9.2.0。
-    事实来源: CANN 包原型扫描和 Release Notes。
-  signature:
-    含义: 函数、函数宏或类成员的原型标识。
-    事实来源: Markdown 原型与真实声明的兼容匹配结果。
   dependencies:
-    含义: 当前页面引用的关联 API 或文档；replaced_by 表示当前废弃实体指向替代目标。
-    事实来源: Markdown 链接和关联语句。
-  examples:
-    含义: 已确认的样例工程或调用位置。
-    事实来源: 样例索引和实际调用。
-  navigation:
-    含义: 导航页直接链接的子页面路径。
-    事实来源: Markdown 中的相对链接；页面标题可从目标路径对应的文档提取。
-  header:
-    含义: 定义或声明所在的头文件。
-    事实来源: 唯一的头文件匹配结果。
-  archs:
-    含义: 所有函数原型共同适用的架构列表。
-    事实来源: 函数原型的架构证据。
-  declaration:
-    含义: 非函数实体的声明信息。
-    事实来源: 头文件定义匹配结果。
-  type_catalog:
-    含义: 数据类型分类页的类型目录。
-    事实来源: 文档目录和类型解析结果。
+    含义: 关联 API 或文档及关系类型；replaced_by 表示当前废弃实体指向替代目标。
+    事实来源: Markdown 正文明确表达的关联语句。
+  version:
+    含义: 接口原型的 CANN 生命周期区间，如 9.0.0- 或 9.0.0-9.2.0。
+    事实来源: Release Notes 逐版本清单（derive_version 脚本推导）。
 
 output_contracts:
   front_matter:
     写入位置: front_matter
-    说明: 只写公共必填字段和 Profile 允许且有证据的字段。
-  doxygen:
-    写入位置: include_doxygen
-    固定身份: ['@ingroup', '@override_id 或 @macro_id']
-    有证据时生成: ['@archs', '@level', '@brief', '@param']
-  example_markers:
-    写入位置: example_markers
-    固定格式: 成对 //! [override_id] marker
+    说明: 只写 Profile 允许且必填的字段；可推导字段一律不写（见字段与推导规范第 3 节）。
 
-# fields 表示该 Profile 允许解析器生成的字段，不表示每个字段都必须出现。
-# 公共字段由 common_required_fields 提供；Profile 字段不会继承 common_fields 中的全部可选字段。
+# fields: 该 Profile 允许写入的字段；required: 写入时必须出现的字段。
 profiles:
   reference.api:
-    说明: C++ 或 AscendC 的单个可调用接口、类或成员接口。
-    fields: [description, tag, signature, archs, header, dependencies, examples]
-    outputs: [front_matter, doxygen, example_markers]
+    说明: 可调用接口页（含架构变体页）。
+    fields: [description, tag, dependencies, version]
+    required: [description, tag, version, dependencies]
+    outputs: [front_matter]
 
   reference.constant:
     说明: C API 常量定义页。
-    fields: [description, tag, header, declaration, type_catalog]
-    outputs: [front_matter, doxygen]
+    fields: [description, tag, dependencies, version]
+    required: [description, tag, version, dependencies]
+    outputs: [front_matter]
 
   reference.enum:
     说明: C API 枚举和枚举别名定义页。
-    fields: [description, tag, header, declaration, type_catalog]
-    outputs: [front_matter, doxygen]
+    fields: [description, tag, dependencies, version]
+    required: [description, tag, version, dependencies]
+    outputs: [front_matter]
 
   reference.macro:
-    说明: C/C++ 预处理器宏定义页，包括带参数的函数式宏和不带参数的对象式宏。
-    fields: [description, tag, signature, header, declaration, type_catalog]
-    outputs: [front_matter, doxygen]
+    说明: 预处理器宏定义页。
+    fields: [description, tag, dependencies, version]
+    required: [description, tag, version, dependencies]
+    outputs: [front_matter]
 
   reference.union:
     说明: C API 结构体和联合体定义页。
-    fields: [description, tag, header, declaration, type_catalog]
-    outputs: [front_matter, doxygen]
+    fields: [description, tag, dependencies, version]
+    required: [description, tag, version, dependencies]
+    outputs: [front_matter]
 
   reference.type:
     说明: C API 数据类型目录页。
-    fields: [description, tag, header, declaration, type_catalog]
-    outputs: [front_matter, doxygen]
+    fields: [description, tag, dependencies, version]
+    required: [description, tag, version, dependencies]
+    outputs: [front_matter]
 
   reference.index:
-    说明: C++ 或 AscendC API 的导航目录页。
-    fields: [navigation]
+    说明: 导航目录页；navigation 由索引期从正文链接推导，不写入头。
+    fields: []
+    required: []
     outputs: [front_matter]
 
   reference.concept:
-    说明: C++ 或 AscendC API 的概述、约束、特性或机制说明。
-    fields: [description, tag, dependencies]
+    说明: 概述、约束、特性或机制说明页。
+    fields: [description]
+    required: [description]
     outputs: [front_matter]
 
   reference.catalog:
-    说明: C++ 或 AscendC API 的汇总、能力矩阵和对照表。
-    fields: [description, tag, dependencies]
+    说明: 汇总、能力矩阵和对照表页。
+    fields: [description]
+    required: [description]
     outputs: [front_matter]
 
   reference.release:
-    说明: C++ 或 AscendC API 的版本发布和变更说明。
-    fields: [description, tag, dependencies]
+    说明: 版本发布和变更说明页。
+    fields: [description]
+    required: [description]
     outputs: [front_matter]

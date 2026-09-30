@@ -1,24 +1,14 @@
 ---
 okftype: reference.api
-title: asc_bitsort
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
-description: 一次迭代内对32个数做降序排列，src0和src1分别为待排序的score及对应索引，排序后以score和index结构存入dst，不同迭代之间不进行排序。
+description: "一次迭代内对32个数做降序排列，src0和src1分别为待排序的score及对应索引，排序完成后以score和index结构存入dst；不同迭代之间不进行排序，可通过repeat参数处理多个迭代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [sort]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-signature:
-  - prototype_id: asc_bitsort__PU<dtype>_PU<dtype>_PUu32_i32
-    dtype: [half, float]
-archs: ['2201', '3510']
-header: [/include/c_api/vector_compute/compute/vector_sort.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.1.0-
 ---
 # asc_bitsort
 

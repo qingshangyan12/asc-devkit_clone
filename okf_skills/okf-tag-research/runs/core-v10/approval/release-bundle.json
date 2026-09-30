@@ -1,0 +1,1154 @@
+{
+  "schema_version": 1,
+  "purpose": "human_approval_release_bundle",
+  "run_id": "core-v10",
+  "created_at": "2026-09-30T04:35:13+00:00",
+  "state": "awaiting_human_approval",
+  "scope": {
+    "devkit_root": "/mnt/workspace/asc-devkit",
+    "source_dirs": [
+      "docs/zh/api/SIMD-API/c_api/vector_datamove",
+      "docs/zh/api/SIMD-API/c_api/vector_compute",
+      "docs/zh/api/SIMD-API/c_api/reg_compute/load",
+      "docs/zh/api/SIMD-API/c_api/reg_compute/store",
+      "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy",
+      "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel"
+    ],
+    "documents": [
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md",
+        "title": "asc_copy",
+        "sha256": "3ddb4abec698c624ef738ba947e8939b5261ab982f1fff75decbcd3930390c2a",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+        "title": "asc_copy_gm2ub",
+        "sha256": "6706e617a2e9ec68f2bdbf8178cc94ad4d47d6c86fd01cd60ad2801bd26c8f5e",
+        "group": "vector_datamove/asc_copy_gm2ub"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+        "title": "asc_copy_gm2ub",
+        "sha256": "4ee4dd47b3bbf7fbacd20e8d30b6dea79dd0f141512113b76a259644b7957646",
+        "group": "vector_datamove/asc_copy_gm2ub"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+        "title": "asc_copy_gm2ub_align",
+        "sha256": "3c12ac80f059567fb68f40117ce105b8a53bbb3b550fdd743f3a5b427a956758",
+        "group": "vector_datamove/asc_copy_gm2ub_align"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+        "title": "asc_copy_gm2ub_align",
+        "sha256": "43e1f02fc8894bec432bf5472932c8e13b2d3ad4a0cd2646ffbe492ecc80c0e5",
+        "group": "vector_datamove/asc_copy_gm2ub_align"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+        "title": "asc_copy_ub2gm",
+        "sha256": "294d8bc4efa54737b0f9e1d17902eeace8aa4747128957e7e029de0451872fa6",
+        "group": "vector_datamove/asc_copy_ub2gm"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+        "title": "asc_copy_ub2gm",
+        "sha256": "0679c2e7c4f359161e7257a12b60f76b151739ec293c38f16a8d8df1c379026b",
+        "group": "vector_datamove/asc_copy_ub2gm"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+        "title": "asc_copy_ub2gm_align",
+        "sha256": "2c636d3e81a0415ef7051b029b2b5bca2ebfc6bf5038ef37a89b2dab946b5929",
+        "group": "vector_datamove/asc_copy_ub2gm_align"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+        "title": "asc_copy_ub2gm_align",
+        "sha256": "e19ea0387f54bdc8df1af2e17b0a61156975d442db019cb13ae1032e0d0f6175",
+        "group": "vector_datamove/asc_copy_ub2gm_align"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md",
+        "title": "asc_copy_ub2l1",
+        "sha256": "77cd2bca7794785d93ba67ae684ec0697957e18f0bcc6fdc85db648736c83149",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md",
+        "title": "asc_copy_ub2ub",
+        "sha256": "11664bb5f5e0b9e63d723eb4c579eb06c2b2e0ef9172fad7d27a612147876aea",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md",
+        "title": "asc_ndim_copy_dci",
+        "sha256": "5bc0e3beda23a1d220dbaa609c7a9d41877af2b94a60f8f5fc88fa3cee3c8a59",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+        "title": "asc_ndim_copy_gm2ub",
+        "sha256": "e394c855dfa91b6f52699449056949bc2f0e26921d2f5e865f9e35e194196e73",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+        "title": "asc_set_copy_pad_val",
+        "sha256": "70d333b5941f16a40baa65be58fc2d3a26fabe82167dc006b68e744f11bdea67",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+        "title": "asc_set_gm2ub_loop1_stride",
+        "sha256": "d8bca5f8cedab0dbea747cba3f1d250e9c0004d629b08d63663df748026f8f2f",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+        "title": "asc_set_gm2ub_loop2_stride",
+        "sha256": "1c449751e8659dde598dd4b7ea502c13c6f6ccd4ce1743be1315e047c38d24d7",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+        "title": "asc_set_gm2ub_loop_size",
+        "sha256": "2de7b5328fc4204ad40443c5fccf2af873d499cc7a6e86cea9646b12323cacf4",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md",
+        "title": "asc_set_ndim_loop_stride",
+        "sha256": "67c0582c1ff9eaf27e79272b2d7951d05b5d52a502899bfe1738bfb3601e4c53",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+        "title": "asc_set_ndim_pad_count",
+        "sha256": "97f482ef7e4699e31ef64ce852ade744805d29ce0ae6f358931c864b398bb41b",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+        "title": "asc_set_ndim_pad_value",
+        "sha256": "f5528608d229b562c51d7775b3b64d11c2687df6ef7d253f77fc381d23c86044",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+        "title": "asc_set_ub2gm_loop1_stride",
+        "sha256": "a1332a510602c62cdf956c46c2a9897173528e13bc94e8005f475e0f2420970c",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+        "title": "asc_set_ub2gm_loop2_stride",
+        "sha256": "fe6c3bcf74df8e410862dd7cd49fbdbdd39492b64a877fd6c247b5dcb7590806",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+        "title": "asc_set_ub2gm_loop_size",
+        "sha256": "600020aa839e15cde36bde7cdcdd1ec4809465533316e724dcd1f202641a5eb8",
+        "group": "vector_datamove"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md",
+        "title": "asc_abs",
+        "sha256": "f88267738d1a2b3600e7497d6c8d555384070693885071fef18e3f1c247afe07",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md",
+        "title": "asc_add",
+        "sha256": "6744d7b2de9ab83f166a35c78da898298c607e45b6fff7675f7c9175d8363a96",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add_scalar.md",
+        "title": "asc_add_scalar",
+        "sha256": "aded46bcef00b126ab20a2ca19b9afc74c9c8213bc726bb50fc053e627024f2b",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md",
+        "title": "asc_div",
+        "sha256": "69322b3a2cbea65081c37e90f9d44ea87c3728bb58b8272a8cc0e19d266de1d3",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_exp.md",
+        "title": "asc_exp",
+        "sha256": "b7629869d0e6d8d23d2d6205e8107f092e51b0dfc72f9d337a9a5fc23a707525",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_log.md",
+        "title": "asc_log",
+        "sha256": "2291c4dc8eaf9d608654e8780b8c383664736e967cfb3b3449fa5e05de5b9a66",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max.md",
+        "title": "asc_max",
+        "sha256": "f0e8dff5cc2bd4c81ad2a1d20428fd700a6f9daef16da31618d5b0cc5752d419",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max_scalar.md",
+        "title": "asc_max_scalar",
+        "sha256": "b7178cd3a9a7f27b26b3bc38346be0315f310bf3f5e357fe1bd0af67c510bade",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min.md",
+        "title": "asc_min",
+        "sha256": "bf7077a19bb249bd413e57c5f50a46f29b9de17a3ceeff6cab2a3a452e353518",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md",
+        "title": "asc_min_scalar",
+        "sha256": "33fb4f569f682c73fc1f675c7826c23512f7029c21f31c71c4e119725d048fbf",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+        "title": "asc_mul",
+        "sha256": "119f644ae0181a8e24f4bb3a09db46bff3fdb852879da1641f8a3525e8903f0b",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul_scalar.md",
+        "title": "asc_mul_scalar",
+        "sha256": "4155222110a8b6704d79c12c8e6ac61e6074b1b510e03c6eb44f929f53293731",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md",
+        "title": "asc_rcp",
+        "sha256": "30fdee91605045ea74a4b29a4a27dbc7b9867768d0e76351c624bfeac9fb8603",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rsqrt.md",
+        "title": "asc_rsqrt",
+        "sha256": "bf13d21be736d289130e5ef34435b405a32f35b7ed6df2caff7e74377390894d",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sqrt.md",
+        "title": "asc_sqrt",
+        "sha256": "8716e772478e9201f14dc1ad2740244b787210734814859058177cfbc36c03fb",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub.md",
+        "title": "asc_sub",
+        "sha256": "0f66b99a26e150613ccd7c967851f580bbb9a7429191fe74329714d24bd4120f",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub_scalar.md",
+        "title": "asc_sub_scalar",
+        "sha256": "f5ee690040dc430a4de8b95a82f7d7b7ded0fceea72d98d548aa3dc3aad029b4",
+        "group": "vector_compute/vector_arith"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+        "title": "asc_brcb",
+        "sha256": "ef274cb2cf53e0ce71adc48992ff3bb20a718b6a86a6d5ffa8c30fb942623180",
+        "group": "vector_compute/vector_broadcast"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+        "title": "asc_duplicate",
+        "sha256": "110df05c66f0ba05232dbb884bf48d5536e1ffd2732b068f02412a502b12eaf5",
+        "group": "vector_compute/vector_broadcast"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+        "title": "asc_eq",
+        "sha256": "7c9bd642f6a7eb9c32fb04d0fd986fb160e43a34c9c1a31b27577dce24881350",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md",
+        "title": "asc_eq_scalar",
+        "sha256": "c817235fee0dabd4bef70abdf4adb91fca1e2c0a27b458b2d04ff8e05c24cb3a",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md",
+        "title": "asc_ge",
+        "sha256": "be4a1282e70b9c9048674d47b0c1274d33f4d135f643d98db8fb2729b4086c73",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md",
+        "title": "asc_ge_scalar",
+        "sha256": "38870185278642c12d392bb9ca7e8bda7efd28f9fcfebbb11714a6a62a4dac19",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+        "title": "asc_get_cmp_mask",
+        "sha256": "9175ceebe5d6b20b7196366ce2c8c5879f4dc74b44824e1a3731ce7aa7e43003",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md",
+        "title": "asc_gt",
+        "sha256": "a4385192decd4516e3c662470370deda44f535fbacdebc2f0f89549b81b3d4ba",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md",
+        "title": "asc_gt_scalar",
+        "sha256": "bfef9947af9e062b56e01629c319f6a60c84910e6aaa484b9f39a6cd5b409a59",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md",
+        "title": "asc_le",
+        "sha256": "e7e2a7737ed5dbeec69e44080714e4f7eb6b167d344659e156e5289aa906c628",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md",
+        "title": "asc_le_scalar",
+        "sha256": "7d984a930d0af38d5be6080acee81e8091825bb05b244c0a791ff1b387b16f2b",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+        "title": "asc_lt",
+        "sha256": "bcf2a81b81a8928875db4da9f3d74561987275a8f490a31415ee48e8be8a2578",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md",
+        "title": "asc_lt_scalar",
+        "sha256": "153f8d40caf6141794236ef6984fa2a254d3bb637deaffb7568930a316a50841",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md",
+        "title": "asc_ne",
+        "sha256": "a0eb759b9a75cead1d5bd06539518af1f0d2de564eae66ac44e57631a6798772",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+        "title": "asc_ne_scalar",
+        "sha256": "b81b76e0923f83e88becfa77e3a890fbc97ff3eb0a67fc180b30c25589a958e5",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+        "title": "asc_set_cmp_mask",
+        "sha256": "667f146d3b37d117d2630e3d885e2889e1b283ce0c89330d671475acae45cf5c",
+        "group": "vector_compute/vector_compare"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md",
+        "title": "asc_bfloat162float",
+        "sha256": "aad1472072300b7762ea66239eb17ca6ec3edda8360cd42d3c97f9372f486728",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md",
+        "title": "asc_bfloat162int32",
+        "sha256": "e1e4c6539213c1e6e42e9b151ec46482622969dc4d8a31103f2d251cc22dd7bd",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md",
+        "title": "asc_float2bfloat16",
+        "sha256": "22fafed0a4ef64e54df8628861f60546295522b059b937b75449e69caecaba60",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md",
+        "title": "asc_float2float",
+        "sha256": "9a959da2e1fc012e9504253efe400e3472de63f705e925eb950a98551ba2cbf7",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md",
+        "title": "asc_float2half",
+        "sha256": "17bd81c7337cde44bb28563de3de110c11eaba95f925ac0994d69695dda5988f",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md",
+        "title": "asc_float2int16",
+        "sha256": "8006a14275209ea7be34d8cef4ad74ecabcf3e044b813bf74e71df1835dba5b1",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md",
+        "title": "asc_float2int32",
+        "sha256": "cd1b8017297f8f2d9166f27dd00d75ac3e3776a2832c34399a89c830b9490d02",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md",
+        "title": "asc_float2int64",
+        "sha256": "d2da204c32a5492dbbedc524bc7a41e814a4c2101f26d4d5aec01a98d425e845",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md",
+        "title": "asc_half2float",
+        "sha256": "09df08cefe8a066d31af94edff648f3becf383d2d97446cf90cae0669cd972ae",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+        "title": "asc_half2int16",
+        "sha256": "ee3b212b62fce94fdd1cefd07bf6cbfb763933b255e914f1ca174394db0da1bb",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md",
+        "title": "asc_half2int32",
+        "sha256": "e4526d7c9f63235bca173e9bbb2bdb846a5f95a8455707f039f29f832775cb25",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md",
+        "title": "asc_half2int4",
+        "sha256": "f7072d3f3f79c81346a6fea602be797e195e8d725dd1039ed9199c9003cda07f",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md",
+        "title": "asc_half2int8",
+        "sha256": "6ffc63c4b6ede066e11291f2ac0d692f84033e5fd7f634b069d343dbe01a8c1e",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md",
+        "title": "asc_half2uint8",
+        "sha256": "268445c9f4cac5271c3e14d458c321af810d93ffce8207a46ef3446f0db4a666",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md",
+        "title": "asc_int162float",
+        "sha256": "287899660fda467f948bd65a53a99ec5ca079da6b02d3c47acea2009eb93efe2",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md",
+        "title": "asc_int162half",
+        "sha256": "3e99894cd2a0e86144a014c8a102262566f0042dc5a3353394dffcdd28099eac",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md",
+        "title": "asc_int322float",
+        "sha256": "5d5f7986d2fa4cbd116a32b48cb8a0fc08059e78d6548d9d8b037017065a17ea",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+        "title": "asc_int322int16",
+        "sha256": "cf16c4af1cb417d73c54769c5193d65a4cf0d7224c85bdde8b340ec03ac3cab6",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int64.md",
+        "title": "asc_int322int64",
+        "sha256": "29cd7a752cef8fa98c9e171a91523533eed876afe81e3d54742ac70b071b6b37",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md",
+        "title": "asc_int42half",
+        "sha256": "46049877024c91151574385bbbe156d743427a2468813d911735954245843c43",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md",
+        "title": "asc_int642float",
+        "sha256": "cc8cac801eafb4def574c8aa0e90c8241539874ea62c7dc1f752789cdfd18808",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642int32.md",
+        "title": "asc_int642int32",
+        "sha256": "f6624df4d54352242ed55c2a3cbf21bcb0c5da876891f73d5fda8c40c936ac87",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int82half.md",
+        "title": "asc_int82half",
+        "sha256": "f534f147c57bad16182135b8013612baa7c729200b3cbdb595a2778e2b8c0276",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md",
+        "title": "asc_uint82half",
+        "sha256": "de6bc0efc020bbc374742bf6deb71eded8ec9827916e534ee848f8399b60ac00",
+        "group": "vector_compute/vector_convert"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md",
+        "title": "asc_add_relu",
+        "sha256": "4d5c8f8597eb5c544088deee9b96918ddda71153870fbd2392dfd19b73becc46",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md",
+        "title": "asc_axpy",
+        "sha256": "35c30d6d7d5274b819fdc4d527310cc390c1b3c09090419cab71b537d420c573",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md",
+        "title": "asc_deq_int162b8",
+        "sha256": "33b376d36de17964f7c51fb5795715d19b3f82cb0794170d8a3ba9da832d0c2e",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md",
+        "title": "asc_deq_int322half",
+        "sha256": "4f36368479487221d71dbdc92081963624cab71994f745421039b60e447d3405",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md",
+        "title": "asc_fma",
+        "sha256": "018a44158f93a39b0cc63e3b9669d03f4e202cd0b4133c2f1c9f0e00dae60862",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md",
+        "title": "asc_leakyrelu",
+        "sha256": "2e56b23b33c6cd7f198ec6ab05425a40ded0bedbc2c3ba7653ba56386f632b52",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md",
+        "title": "asc_mul_add",
+        "sha256": "f33784e97ddff1f11d69e34d2280e75086d5ff1a6d40cfc65da0dc8cdb665b2e",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md",
+        "title": "asc_mul_add_relu",
+        "sha256": "e85d4eb5a1ae34ead3efcd3ab09360326e6ccdaa3a4b74015341a66fed704394",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md",
+        "title": "asc_mul_cast_half2int8",
+        "sha256": "cd5a5b4dcd66663ea798d8b022f1b0bc976f04a2103b0259787ff166bbd14663",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md",
+        "title": "asc_mul_cast_half2uint8",
+        "sha256": "7cee02d793152b4234d94a7ce91bcbeced9dcc31287482e44a236945a7336c19",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md",
+        "title": "asc_relu",
+        "sha256": "845c8ae5e3e66f59e301586d957c8690498fdb8834f0c7ec105c33be877a89b8",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+        "title": "asc_set_deq_scale",
+        "sha256": "d56023e012fff82fb4822f9990e7f41f6ebef6aeee0ac21bfed8c4f00c6e4b82",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md",
+        "title": "asc_sub_relu",
+        "sha256": "bf91df9ec1fdf05316262abd89b60b6475d8efa0c44578d7eea93559fff70060",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md",
+        "title": "asc_vdeq_int162b8",
+        "sha256": "6592f77b0c1c2d38fdfe64fa751e746b1bf37545a047823b27c743223dae9fd0",
+        "group": "vector_compute/vector_fused"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+        "title": "asc_gather",
+        "sha256": "83b3d22b6ae5a5159de21ce59f486c8d0dcd8537e18acf043f3d71bf6b8845fa",
+        "group": "vector_compute/vector_gather"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+        "title": "asc_gather_datablock",
+        "sha256": "e46a36f96dbbbda4b7067800fa2a87dc2ba16da3dcf3f0f637fb77fd72d48803",
+        "group": "vector_compute/vector_gather"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md",
+        "title": "asc_and",
+        "sha256": "8e55d5069f14a6b9489a580554e981191bf2f3ea44382b6843a0ab61708114a5",
+        "group": "vector_compute/vector_logic"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md",
+        "title": "asc_not",
+        "sha256": "412954aa0684c2b76ba4247ad2224221b0b53f3b5432d54be74f54750e1f6112",
+        "group": "vector_compute/vector_logic"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+        "title": "asc_or",
+        "sha256": "6ae810683c88fe5c2607a50c682d56350b2efba4bdcfb40d381cb5ae8b3cc7cb",
+        "group": "vector_compute/vector_logic"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md",
+        "title": "asc_shiftleft",
+        "sha256": "9aad4ff790ea75b546ed3fc24222eff41d3ad0eba6511cc878e74a3f2fce0d1b",
+        "group": "vector_compute/vector_logic"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+        "title": "asc_shiftright",
+        "sha256": "7b83e1a1e54e2acf71a9dd797f3b5f0dc887136a003a03e494b871ae3e6bde66",
+        "group": "vector_compute/vector_logic"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+        "title": "asc_set_mask_count",
+        "sha256": "e634b33d0a2d3130e9d065ccabb975747b12d668a72019ea0e279cb4e155e25f",
+        "group": "vector_compute/vector_mask_config"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md",
+        "title": "asc_set_mask_norm",
+        "sha256": "d96a856e69af4e406ea52de3104a44e70f8e3b30e5d38bf15b08b33466928a66",
+        "group": "vector_compute/vector_mask_config"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+        "title": "asc_set_vector_mask",
+        "sha256": "39b0ca5a5e23d826bcc38a8873b1191ec8c755070858519b8b492ed3739a3283",
+        "group": "vector_compute/vector_mask_config"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+        "title": "asc_select",
+        "sha256": "e67ddf2423b8f15a1e1635b27f7fcbb6d242e3e10e475128afbac9df6be2e068",
+        "group": "vector_compute/vector_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+        "title": "asc_set_va_reg",
+        "sha256": "4f8c46a158270c8e424475aba340e363cf9b1573f30c2a0e4ed24a8e74fe1ba5",
+        "group": "vector_compute/vector_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md",
+        "title": "asc_squeeze",
+        "sha256": "396c58dcb7a3d0b32d02183c52b6fa907b8e25863ad2acda36786eb516b8e158",
+        "group": "vector_compute/vector_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+        "title": "asc_transpose",
+        "sha256": "2f17889bcd5a1b0c31839bfb63bc480a87cd9a3781edf6c8b5fceac832b889e0",
+        "group": "vector_compute/vector_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+        "title": "asc_transto5hd",
+        "sha256": "d2d8546b99931feb76f7091e7f6d17d53f44436345427307e033d818bcd7469f",
+        "group": "vector_compute/vector_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_max.md",
+        "title": "asc_datablock_reduce_max",
+        "sha256": "5847675c4082d2e5f2c3031212792a0d79578b8b5022a7df7f0781ce714f678e",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md",
+        "title": "asc_datablock_reduce_min",
+        "sha256": "103222785564fd22681b52d6c507ad86b391790254bf4075fa4e0cac1f8f1f09",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md",
+        "title": "asc_datablock_reduce_sum",
+        "sha256": "1b553c8b9fae7dbe56322c32f15c7bf5c18c2fdf519695491bafe1fa10e2b324",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+        "title": "asc_get_reduce_max_cnt",
+        "sha256": "56c3d181e2fa066df337a281de47fb966f838b745536ed7306e2a53fcb47c4fb",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md",
+        "title": "asc_get_reduce_min_cnt",
+        "sha256": "7366be88b16456bb4fb9e1d1e9367970d68830e711e8d259e12225fb4d1e1168",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md",
+        "title": "asc_get_rsvd_count",
+        "sha256": "6c717f66dc32e8026ebd9586c28a30afb2fcffc51dd7d2f282bd777e75aab33c",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md",
+        "title": "asc_pair_reduce_sum",
+        "sha256": "3063671400ba4258b8467e03a321b7e2ac2987f835ab3080e10324b9c84bf83d",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md",
+        "title": "asc_reduce",
+        "sha256": "70e740630c4917080e7c9d3a5b4a45e1d5da0542d25f07d58c1f9135ea663428",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md",
+        "title": "asc_repeat_reduce_max",
+        "sha256": "4e1274d9f3845b82a3f83ad861ba7783a0092fe505ea14ce7854d9fda61af425",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+        "title": "asc_repeat_reduce_min",
+        "sha256": "63fa50a17844266f570f4f782ddccf4e5539001193a3ad5834e035a7a4907a0c",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md",
+        "title": "asc_repeat_reduce_sum",
+        "sha256": "0efa76220c01a08209abeb1b63599e5c83145253957670e7cf915f784629b1e9",
+        "group": "vector_compute/vector_reduce"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md",
+        "title": "asc_bitsort",
+        "sha256": "bf00acec7506176e1540ef16e154b1dea698e2d390eb5c24dec6e474ada487be",
+        "group": "vector_compute/vector_sort"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+        "title": "asc_get_vms4_sr",
+        "sha256": "a144b99fe4198cc46cc95b3e64106606186b9a1d60a57ae5c848e5ea6c0c76bb",
+        "group": "vector_compute/vector_sort"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+        "title": "asc_mrgsort4",
+        "sha256": "5ef42b45a71f91f91ae3c199afddb5926e3ab61dcf8851353822d675d99c6564",
+        "group": "vector_compute/vector_sort"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+        "title": "asc_load",
+        "sha256": "5c30476de3340be2b8263b2cdf617c0a1b7921f84c637d157598fe98634c14b2",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+        "title": "asc_loadalign",
+        "sha256": "712681680e679a22918892a9f8851425b2196c16c4839b33331def582da55c7e",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md",
+        "title": "asc_loadalign_brc_datablock",
+        "sha256": "6065757c81e27f6f450fbbf54934963321c51eac07ef73b5e5c1251d6b6396c6",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+        "title": "asc_loadalign_brc_datablock_postupdate",
+        "sha256": "82c80693fc0b94de266c42fcbace1376e717907220f0ef3824f7cb35c7473237",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md",
+        "title": "asc_loadalign_brc_elem",
+        "sha256": "1e6d47eedac233c566f9150c18ae8af550155704d9c256787f9d78722b98c544",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md",
+        "title": "asc_loadalign_brc_elem2datablock",
+        "sha256": "463bf09263872bad7bb0d94599973b92cdaf07357266e099ec4f06979c349875",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md",
+        "title": "asc_loadalign_brc_elem2datablock_postupdate",
+        "sha256": "81a72abaf71c531b83292f0ce0a43f660d4e53e171fc41d4e931548aa772ed48",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md",
+        "title": "asc_loadalign_brc_elem_postupdate",
+        "sha256": "58040ffcae50759aed05f8c27d21e721736ef8ea038f9457c6dcf3098362b458",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+        "title": "asc_loadalign_datablock_strided",
+        "sha256": "f98c40fc3092e9d659469d5606acbcf382caba40ed664bd0d32339b6971c5f9b",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md",
+        "title": "asc_loadalign_deintlv",
+        "sha256": "9b14b6f6709cf51cbcc27c1e4136018e63f3aa56d987a3c9f7cac04efef41af1",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv_postupdate.md",
+        "title": "asc_loadalign_deintlv_postupdate",
+        "sha256": "e747a14fe387c7343a3469d9630e9a306b5edf8826ef53231ff118a1a30923eb",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+        "title": "asc_loadalign_downsample",
+        "sha256": "223560a34d2d0d8969ccd45c6023c2456d2da8da3a65f9c85af107e8f0b9446b",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md",
+        "title": "asc_loadalign_downsample_postupdate",
+        "sha256": "ea36049c3cce6f0a27b5a5fafbe73d1495990d693c26716f4b85a14cbec1348c",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md",
+        "title": "asc_loadalign_mask",
+        "sha256": "9a4dee966d2014b9728a20f89fd06d2d91e9354f57585fe6f719bb2577b43e18",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md",
+        "title": "asc_loadalign_mask_downsample",
+        "sha256": "e8dee9234d4c4fc9e224a0e63caa1152b448a71ce62cab78a5ca891b1427ae37",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md",
+        "title": "asc_loadalign_mask_upsample",
+        "sha256": "7707d0b73f46dd73e3432e5141c397949e828ec939506493ef1eae2c95db9268",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+        "title": "asc_loadalign_postupdate",
+        "sha256": "69b45843899b565bca80f54bd1872d2ad371702db86771b4320a01ba6e23c20a",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md",
+        "title": "asc_loadalign_unpack",
+        "sha256": "5fa95daeba6b31ec705eaa4643453e8279cae0bc5c1538145074184f28cf9ee6",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md",
+        "title": "asc_loadalign_unpack4",
+        "sha256": "690e1c8d60a02af61ca705a64f6f0693960c688be88cee5faeb47bfeb0d7061a",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md",
+        "title": "asc_loadalign_unpack4_postupdate",
+        "sha256": "5aee0b9e07f1c317d702c91d5da0cb1947d14e3457e320ef55470e0186fbc577",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+        "title": "asc_loadalign_unpack_postupdate",
+        "sha256": "87e61cea682a6d31607ad0d6acbdc80454c7374d50c0c8df264500e968aeb0d5",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+        "title": "asc_loadalign_upsample",
+        "sha256": "92f51553a67d4452e1c2320014c9d2955c05bf3f49281eb41f4950a1198a844a",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md",
+        "title": "asc_loadalign_upsample_postupdate",
+        "sha256": "72f5907cd2e0279fb97a3e3bb32be96e7fa5e16a6a482281f8adfc87876b7d0b",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+        "title": "asc_loadunalign",
+        "sha256": "c65c165c6087aad55ded52a6121c407758c0e09a23ba474b71a0a71097c369ba",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md",
+        "title": "asc_loadunalign_postupdate",
+        "sha256": "c9f637003693727a4eddb05f2bd8325f0dd7276ef79af45f40571b74d116d472",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md",
+        "title": "asc_loadunalign_pre",
+        "sha256": "24f73772a30a0b8a7665540fbf1d46d88341c0c2c0b64f2ecbdf13740f252372",
+        "group": "load"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md",
+        "title": "asc_store",
+        "sha256": "dd7f63aea9c3bdecc058346599ceb599284d4476874da177e21bb593e1dc858b",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+        "title": "asc_storealign",
+        "sha256": "8f1f9f75bddca780f80cd7a7fa30ec5c065e05e95c3f14df82d6c690d8cbaa1b",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st.md",
+        "title": "asc_storealign_1st",
+        "sha256": "451f201a2491268db0c21588e0b0b2debb03f8f76edb49eca1fae0b886fa355e",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st_postupdate.md",
+        "title": "asc_storealign_1st_postupdate",
+        "sha256": "b71064422a2f9b220c0f06a7d8433cbbc80e6ec91ea467c55cce140b81d0ff2c",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_intlv.md",
+        "title": "asc_storealign_intlv",
+        "sha256": "f76bb54a8224475b3c0584a8d7161d308b8a0f2abebaaaffaa73c7522c94ccec",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+        "title": "asc_storealign_pack",
+        "sha256": "2fa54dff485f323066568bb4c21717be5b241c0ca0ae614e55a96c878138d0d2",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_postupdate.md",
+        "title": "asc_storealign_pack_postupdate",
+        "sha256": "c652383c6ff8fdc283e50098327842685045ace650e54ce808384255fefcdc75",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md",
+        "title": "asc_storealign_pack_quarter",
+        "sha256": "b2e3af5547207c4de08630b1053121c78a8c6aa7f29de5374963dae215d95283",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md",
+        "title": "asc_storealign_pack_quarter_postupdate",
+        "sha256": "1360ef03020b6b33cd3c17f3caef5c96544dee00c78293a24b36baeec9620a87",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_postupdate.md",
+        "title": "asc_storealign_postupdate",
+        "sha256": "a8a35908d5617551c7e341bffb3cc5722f5b6fa9587bbc70cd99b52442dac9fa",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status.md",
+        "title": "asc_storealign_squeeze_status",
+        "sha256": "33757b2468820849a0046abdb7a28554c9b48d37ea725de309d9730a5c4c7a9e",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status_postupdate.md",
+        "title": "asc_storealign_squeeze_status_postupdate",
+        "sha256": "6815b5aca0ac1e5ebe7268eb8746b4033365a3491570ad6c4ab94d935fef72be",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md",
+        "title": "asc_storeunalign",
+        "sha256": "778dfa120d8e6bb4af792013e2ced8ee6451ae77f7f4063ef9b2f4c4f18c5622",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md",
+        "title": "asc_storeunalign_post",
+        "sha256": "5bf4007d4a3eb6a7544829ed0bf9e62b7bbe91bb1d48e1ff1552061e601a28db",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md",
+        "title": "asc_storeunalign_post_postupdate",
+        "sha256": "7aaaa772ce3d16faf6a39aac3b7ddf8e64c9e20801e02456908783d1c45e4dcf",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md",
+        "title": "asc_storeunalign_postupdate",
+        "sha256": "3fb039679d9c2417871c0d592b51e27c237c4660e7eb31532fbf59dbe6afc896",
+        "group": "store"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md",
+        "title": "asc_copy",
+        "sha256": "d85ba9be0a0819c28fb2dfdc0f98a27f77ab48a143fe093c3d234d2bbbaaff94",
+        "group": "reg_copy"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+        "title": "asc_extract_mask",
+        "sha256": "7638225039e5bb9c43a04b3be176c992d329ccdab1eb32292034cbc25e27a108",
+        "group": "reg_copy"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+        "title": "asc_mask",
+        "sha256": "747e401c3fab2d1372ca32c9d42279228413444fbe9c3b8ca447fe89a1fd0794",
+        "group": "reg_copy"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md",
+        "title": "asc_deintlv",
+        "sha256": "fa87b9eeb0c984391bcfb8934140268716f80e1dc776af70f32ace50b6b6b53d",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+        "title": "asc_intlv",
+        "sha256": "a43de612c36aa7acfb2b905e2753b1ca127717a36c81848a9f1640b50f4efd0c",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md",
+        "title": "asc_pack_to_high",
+        "sha256": "7d0a91cd8639a910b3254a4556cff9e8a06fc8813d62d6717303861bc4bfaad1",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md",
+        "title": "asc_pack_to_low",
+        "sha256": "6b4e2fc32d55040a8be35ebbb3c9bad1baa7f7dc8c02eb018c40eea8180fe042",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md",
+        "title": "asc_select",
+        "sha256": "32a3956204c32b723686c839af3c3a9b70b33667af839e20047c34f25df4d1aa",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+        "title": "asc_squeeze",
+        "sha256": "b6fd41bd076e1ee47333a8edefb09afff2e85ca08261aef2f83ccf2f8017e4d2",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+        "title": "asc_squeeze_and_storeunalign",
+        "sha256": "3a3729b88ceffafe7b37b8d00e5b13e97d766ef154f0303da858307764639add",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+        "title": "asc_squeeze_and_storeunalign_finalize",
+        "sha256": "4adf4ac809c148ada160914dcfed369c236a9fd706624278645e937562d65b61",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+        "title": "asc_squeeze_and_storeunalign_init",
+        "sha256": "2aefcac45af157fa1f8c617b2b84899c7459096c4fb042177f04304d2c579d79",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
+        "title": "asc_unpack",
+        "sha256": "7bbba0c4ca32db8cf1a0ae4b8c60647633d1cfcf9ebd4353d0e003e69435ca4b",
+        "group": "reg_permute_sel"
+      },
+      {
+        "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md",
+        "title": "asc_unsqueeze",
+        "sha256": "b3c3ccce01fce9e278a46ef2e5785c4e55c77f0e5748612d95e46e75db0678a9",
+        "group": "reg_permute_sel"
+      }
+    ]
+  },
+  "base_taxonomy": {
+    "path": "/mnt/workspace/asc-devkit/okf_skills/okf-tag-research/runs/core-v10-base-taxonomy.json",
+    "sha256": "75c517ece5dd6bd9ebd52ea39d662f357db8e671fd6db66b2dfafefc7fd9cff3"
+  },
+  "gates": {
+    "discovery_a_valid": true,
+    "discovery_b_valid": true,
+    "main_agent_review_valid": true,
+    "provisional_taxonomy_sha256": "5eb16b7ab5a1bf430243078ddff4b060c296714b01c33e7baa5924700fc64b2c"
+  },
+  "approved_additions": [
+    {
+      "tag": "traits:aligned_transfer",
+      "decision": "approve",
+      "reason": "两个发现子代理独立支持，6 篇文档、跨 load/store/copy 目录，证据逐字匹配且概念一致（地址/搬运大小按 32 字节粒度对齐）。",
+      "definition": "搬运或访存要求地址或数据块按固定粒度（通常 32 字节）对齐的稳定特征；与既有 unaligned_transfer 构成对齐维度的两端，用于区分对齐搬运接口与支持非对齐的搬运接口。",
+      "selection_rule": "正文明确要求源或目的地址、或搬运数据大小按字节粒度对齐（如「32字节对齐」「以对齐的方式搬出」）时选择；非对齐能力由 unaligned_transfer 表达，两者可并存。",
+      "evidence": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+          "excerpt": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+          "excerpt": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+          "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节）"
+        }
+      ]
+    },
+    {
+      "tag": "traits:datablock_granularity",
+      "decision": "approve",
+      "reason": "两个发现子代理独立支持，3 篇文档、跨 load/broadcast/gather 目录，证据逐字匹配且概念一致（按 DataBlock 32 字节粒度操作）。",
+      "definition": "以 DataBlock（32 字节）为搬运、广播或重排粒度的稳定特征，用于区分按元素粒度操作与按 DataBlock 粒度操作的接口。",
+      "selection_rule": "正文说明按 DataBlock（32 字节）粒度读取、搬运、广播或收集数据时选择。",
+      "evidence": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+          "excerpt": "根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+          "excerpt": "读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+          "excerpt": "每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去"
+        }
+      ]
+    }
+  ],
+  "artifacts": {
+    "manifest": "run-manifest.json",
+    "discovery_summary": "reports/discovery-summary.json",
+    "review": "main-agent-review.json",
+    "provisional_taxonomy": "provisional-taxonomy.json"
+  }
+}

@@ -1,23 +1,13 @@
 ---
 okftype: reference.api
-title: asc_get_reduce_max_cnt
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md
-description: 获取执行asc_repeat_reduce_max操作后的最大值以及第一个最大值时的索引，需通过同步操作确保asc_repeat_reduce_max执行完成后再调用本接口获取结果。
+description: "获取执行asc_repeat_reduce_max操作后的最大值以及第一个最大值时的索引，需与该操作配合使用，并通过同步操作确保其执行完成后再调用本接口获取结果。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_get_reduce_max_cnt__Rf16_Ru32
-  - override_id: asc_get_reduce_max_cnt__Rf32_Ru32
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_reduce.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md
     kind: requires
-    condition: 需通过同步操作确保asc_repeat_reduce_max执行完成后再调用本接口获取结果。
-examples: []
-timestamp: '2026-09-28'
+    condition: "需通过同步操作确保asc_repeat_reduce_max执行完成后再调用本接口获取结果"
+version: 9.0.0-
 ---
 # asc_get_reduce_max_cnt
 

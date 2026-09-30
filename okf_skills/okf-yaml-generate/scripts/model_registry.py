@@ -25,7 +25,6 @@ class ModelValidationError(ValueError):
 class Classification:
     okftype: str
     rule: str
-    default_tags: dict[str, list[str]]
 
 
 @dataclass(frozen=True)
@@ -33,8 +32,8 @@ class ExecutionPlan:
     okftype: str
     rule: str
     fields: tuple[str, ...]
+    required: tuple[str, ...]
     outputs: tuple[str, ...]
-    default_tags: dict[str, list[str]]
 
 
 def _load_yaml(path: Path) -> dict[str, Any]:
@@ -61,8 +60,8 @@ def _string_list(value: Any, location: str, *, allow_empty: bool = False) -> lis
 def load_model() -> dict[str, Any]:
     document = _load_yaml(PROFILE_PATH)
     source = _load_yaml(SOURCE_CONTEXT_PATH)
-    if document.get("schema_version") != 4 or document.get("status") != "active":
-        raise ModelValidationError("document profile registry must be active schema version 4")
+    if document.get("schema_version") != 5 or document.get("status") != "active":
+        raise ModelValidationError("document profile registry must be active schema version 5")
     if source.get("schema_version") != 1:
         raise ModelValidationError("source context registry must use schema version 1")
 
@@ -96,6 +95,11 @@ def load_model() -> dict[str, Any]:
         unknown_outputs = sorted(set(outputs) - set(output_contracts))
         if unknown_outputs:
             raise ModelValidationError(f"profile {name} has unknown outputs: {', '.join(unknown_outputs)}")
+        required = _string_list(profile.get("required", []), f"profile {name}.required", allow_empty=True)
+        available = set(common) | set(profile_fields)
+        unknown_required = sorted(set(required) - available)
+        if unknown_required:
+            raise ModelValidationError(f"profile {name} requires unregistered fields: {', '.join(unknown_required)}")
 
     roots = _string_list(source.get("document_roots"), "source_context.document_roots")
     context = source.get("context")
@@ -106,6 +110,8 @@ def load_model() -> dict[str, Any]:
         raise ModelValidationError("source_context.context requires family")
     if set(context) != {"family"}:
         raise ModelValidationError("source_context.context only supports family")
+    if source.get("default_tags"):
+        raise ModelValidationError("source_context no longer supports default_tags (derivable dimensions)")
 
     return {
         "document": document,
@@ -168,11 +174,7 @@ def classify_document(path: str, body: str, model: dict[str, Any] | None = None)
     okftype = f"{context['family']}.{kind}"
     if okftype not in model["profiles"]:
         return None
-    return Classification(
-        okftype=okftype,
-        rule=rule,
-        default_tags=_default_tags(path, model),
-    )
+    return Classification(okftype=okftype, rule=rule)
 
 
 def _classify_kind(path: str, body: str) -> tuple[str | None, str]:
@@ -203,23 +205,6 @@ def _classify_kind(path: str, body: str) -> tuple[str | None, str]:
     return None, "insufficient_structure"
 
 
-def _default_tags(path: str, model: dict[str, Any]) -> dict[str, list[str]]:
-    candidates = model["source"].get("default_tags", {})
-    if not isinstance(candidates, dict):
-        return {}
-    matched = [prefix for prefix in candidates if isinstance(prefix, str) and path.startswith(prefix)]
-    if not matched:
-        return {}
-    raw = candidates[max(matched, key=len)]
-    if not isinstance(raw, dict):
-        return {}
-    return {
-        namespace: list(values)
-        for namespace, values in raw.items()
-        if isinstance(namespace, str) and isinstance(values, list) and all(isinstance(value, str) for value in values)
-    }
-
-
 def compile_execution_plan(
     classification: Classification,
     *,
@@ -233,12 +218,14 @@ def compile_execution_plan(
     selected = set(model["common_required_fields"])
     selected.update(profile.get("fields", []))
     fields = [field for field in model["field_order"] if field in selected]
+    required = set(model["common_required_fields"])
+    required.update(profile.get("required", []))
     return ExecutionPlan(
         okftype=classification.okftype,
         rule=classification.rule,
         fields=tuple(_ordered_unique(fields)),
+        required=tuple(f for f in model["field_order"] if f in required),
         outputs=tuple(profile["outputs"]),
-        default_tags=classification.default_tags,
     )
 
 
@@ -247,8 +234,8 @@ def plan_to_dict(plan: ExecutionPlan) -> dict[str, Any]:
         "okftype": plan.okftype,
         "rule": plan.rule,
         "fields": list(plan.fields),
+        "required": list(plan.required),
         "outputs": list(plan.outputs),
-        "default_tags": plan.default_tags,
     }
 
 

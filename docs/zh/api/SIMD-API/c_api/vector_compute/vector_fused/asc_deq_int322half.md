@@ -1,26 +1,17 @@
 ---
 okftype: reference.api
-title: asc_deq_int322half
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md
-description: 对输入的int32_t类型数据按元素做量化并转换为half类型，量化参数scale需通过asc_set_deq_scale接口的非向量模式设置，dst与src起始地址需32字节对齐。
+description: "对输入的int32_t类型数据按元素做量化并转换为half类型，scale需通过asc_set_deq_scale设置并配合其非向量模式使用，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
   - traits: [elementwise, high_dimensional, quantization]
-signature:
-  - override_id: asc_deq_int322half__PUf16_PUi32_u32
-  - override_id: asc_deq_int322half__PUf16_PUi32_u8_u16_u16_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_fused.h]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: 非向量模式
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+    kind: related
+    condition: "非向量模式"
+version: 9.0.0-
 ---
 
 # asc_deq_int322half

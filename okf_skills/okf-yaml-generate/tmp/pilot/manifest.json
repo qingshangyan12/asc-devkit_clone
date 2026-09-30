@@ -1,0 +1,2940 @@
+{
+  "devkit_root": "/mnt/workspace/asc-devkit",
+  "documents": [
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "f88267738d1a2b3600e7497d6c8d555384070693885071fef18e3f1c247afe07",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "6744d7b2de9ab83f166a35c78da898298c607e45b6fff7675f7c9175d8363a96",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "aded46bcef00b126ab20a2ca19b9afc74c9c8213bc726bb50fc053e627024f2b",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_div.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "69322b3a2cbea65081c37e90f9d44ea87c3728bb58b8272a8cc0e19d266de1d3",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_exp.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "b7629869d0e6d8d23d2d6205e8107f092e51b0dfc72f9d337a9a5fc23a707525",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_log.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "2291c4dc8eaf9d608654e8780b8c383664736e967cfb3b3449fa5e05de5b9a66",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "f0e8dff5cc2bd4c81ad2a1d20428fd700a6f9daef16da31618d5b0cc5752d419",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_max_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "b7178cd3a9a7f27b26b3bc38346be0315f310bf3f5e357fe1bd0af67c510bade",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "bf7077a19bb249bd413e57c5f50a46f29b9de17a3ceeff6cab2a3a452e353518",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "33fb4f569f682c73fc1f675c7826c23512f7029c21f31c71c4e119725d048fbf",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "119f644ae0181a8e24f4bb3a09db46bff3fdb852879da1641f8a3525e8903f0b",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "4155222110a8b6704d79c12c8e6ac61e6074b1b510e03c6eb44f929f53293731",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "30fdee91605045ea74a4b29a4a27dbc7b9867768d0e76351c624bfeac9fb8603",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rsqrt.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "bf13d21be736d289130e5ef34435b405a32f35b7ed6df2caff7e74377390894d",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sqrt.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "8716e772478e9201f14dc1ad2740244b787210734814859058177cfbc36c03fb",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "0f66b99a26e150613ccd7c967851f580bbb9a7429191fe74329714d24bd4120f",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "f5ee690040dc430a4de8b95a82f7d7b7ded0fceea72d98d548aa3dc3aad029b4",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/vector_arith.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "0aa20ca559263ae336df8d7719928ce1584aa27921bf5c1aad62691f8d3a0a54"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "ef274cb2cf53e0ce71adc48992ff3bb20a718b6a86a6d5ffa8c30fb942623180",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "110df05c66f0ba05232dbb884bf48d5536e1ffd2732b068f02412a502b12eaf5",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/vector_broadcast.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "95e8e28e58cdc67949a39706a4501d139f328219f87995c92092487c5da7f2cc"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "7c9bd642f6a7eb9c32fb04d0fd986fb160e43a34c9c1a31b27577dce24881350",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "c817235fee0dabd4bef70abdf4adb91fca1e2c0a27b458b2d04ff8e05c24cb3a",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "be4a1282e70b9c9048674d47b0c1274d33f4d135f643d98db8fb2729b4086c73",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ge_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "38870185278642c12d392bb9ca7e8bda7efd28f9fcfebbb11714a6a62a4dac19",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "9175ceebe5d6b20b7196366ce2c8c5879f4dc74b44824e1a3731ce7aa7e43003",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "a4385192decd4516e3c662470370deda44f535fbacdebc2f0f89549b81b3d4ba",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "bfef9947af9e062b56e01629c319f6a60c84910e6aaa484b9f39a6cd5b409a59",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e7e2a7737ed5dbeec69e44080714e4f7eb6b167d344659e156e5289aa906c628",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_le_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "7d984a930d0af38d5be6080acee81e8091825bb05b244c0a791ff1b387b16f2b",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "bcf2a81b81a8928875db4da9f3d74561987275a8f490a31415ee48e8be8a2578",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "153f8d40caf6141794236ef6984fa2a254d3bb637deaffb7568930a316a50841",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "a0eb759b9a75cead1d5bd06539518af1f0d2de564eae66ac44e57631a6798772",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "b81b76e0923f83e88becfa77e3a890fbc97ff3eb0a67fc180b30c25589a958e5",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "667f146d3b37d117d2630e3d885e2889e1b283ce0c89330d671475acae45cf5c",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/vector_compare.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "dd7171da89e505e1370594620c0f96ad600f705d6c71f81af7e937bc8d969d33"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compute.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "10fef3086bfda2a33c42a0da25295bc46f89c112d1e3a33737fce26c3c852c0b"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162float.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "aad1472072300b7762ea66239eb17ca6ec3edda8360cd42d3c97f9372f486728",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_bfloat162int32.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e1e4c6539213c1e6e42e9b151ec46482622969dc4d8a31103f2d251cc22dd7bd",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "22fafed0a4ef64e54df8628861f60546295522b059b937b75449e69caecaba60",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "9a959da2e1fc012e9504253efe400e3472de63f705e925eb950a98551ba2cbf7",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "17bd81c7337cde44bb28563de3de110c11eaba95f925ac0994d69695dda5988f",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "8006a14275209ea7be34d8cef4ad74ecabcf3e044b813bf74e71df1835dba5b1",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "cd1b8017297f8f2d9166f27dd00d75ac3e3776a2832c34399a89c830b9490d02",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int64.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "d2da204c32a5492dbbedc524bc7a41e814a4c2101f26d4d5aec01a98d425e845",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2float.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "09df08cefe8a066d31af94edff648f3becf383d2d97446cf90cae0669cd972ae",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "ee3b212b62fce94fdd1cefd07bf6cbfb763933b255e914f1ca174394db0da1bb",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int32.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e4526d7c9f63235bca173e9bbb2bdb846a5f95a8455707f039f29f832775cb25",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int4.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "f7072d3f3f79c81346a6fea602be797e195e8d725dd1039ed9199c9003cda07f",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int8.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "6ffc63c4b6ede066e11291f2ac0d692f84033e5fd7f634b069d343dbe01a8c1e",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2uint8.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "268445c9f4cac5271c3e14d458c321af810d93ffce8207a46ef3446f0db4a666",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162float.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "287899660fda467f948bd65a53a99ec5ca079da6b02d3c47acea2009eb93efe2",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "3e99894cd2a0e86144a014c8a102262566f0042dc5a3353394dffcdd28099eac",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322float.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "5d5f7986d2fa4cbd116a32b48cb8a0fc08059e78d6548d9d8b037017065a17ea",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "cf16c4af1cb417d73c54769c5193d65a4cf0d7224c85bdde8b340ec03ac3cab6",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int64.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "29cd7a752cef8fa98c9e171a91523533eed876afe81e3d54742ac70b071b6b37",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int42half.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "46049877024c91151574385bbbe156d743427a2468813d911735954245843c43",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "cc8cac801eafb4def574c8aa0e90c8241539874ea62c7dc1f752789cdfd18808",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642int32.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "f6624df4d54352242ed55c2a3cbf21bcb0c5da876891f73d5fda8c40c936ac87",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int82half.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "f534f147c57bad16182135b8013612baa7c729200b3cbdb595a2778e2b8c0276",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "de6bc0efc020bbc374742bf6deb71eded8ec9827916e534ee848f8399b60ac00",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/vector_convert.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "509680555e7ae0adaf3480dce9df1daed360f425df05cd12a353872c529eddaf"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "4d5c8f8597eb5c544088deee9b96918ddda71153870fbd2392dfd19b73becc46",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "35c30d6d7d5274b819fdc4d527310cc390c1b3c09090419cab71b537d420c573",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "33b376d36de17964f7c51fb5795715d19b3f82cb0794170d8a3ba9da832d0c2e",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "4f36368479487221d71dbdc92081963624cab71994f745421039b60e447d3405",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "018a44158f93a39b0cc63e3b9669d03f4e202cd0b4133c2f1c9f0e00dae60862",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "2e56b23b33c6cd7f198ec6ab05425a40ded0bedbc2c3ba7653ba56386f632b52",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "f33784e97ddff1f11d69e34d2280e75086d5ff1a6d40cfc65da0dc8cdb665b2e",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e85d4eb5a1ae34ead3efcd3ab09360326e6ccdaa3a4b74015341a66fed704394",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "cd5a5b4dcd66663ea798d8b022f1b0bc976f04a2103b0259787ff166bbd14663",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "7cee02d793152b4234d94a7ce91bcbeced9dcc31287482e44a236945a7336c19",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "845c8ae5e3e66f59e301586d957c8690498fdb8834f0c7ec105c33be877a89b8",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "d56023e012fff82fb4822f9990e7f41f6ebef6aeee0ac21bfed8c4f00c6e4b82",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "bf91df9ec1fdf05316262abd89b60b6475d8efa0c44578d7eea93559fff70060",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "6592f77b0c1c2d38fdfe64fa751e746b1bf37545a047823b27c743223dae9fd0",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/vector_fused.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "51464440733528ddfc32eba67f66859a8cf62df0fe01b56a3a67374905c23118"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "83b3d22b6ae5a5159de21ce59f486c8d0dcd8537e18acf043f3d71bf6b8845fa",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e46a36f96dbbbda4b7067800fa2a87dc2ba16da3dcf3f0f637fb77fd72d48803",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/vector_gather.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "b7dfb62e97434fbc1670fd42af23a9d74d2cd0c15f3851c27936bed65734b561"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "8e55d5069f14a6b9489a580554e981191bf2f3ea44382b6843a0ab61708114a5",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "412954aa0684c2b76ba4247ad2224221b0b53f3b5432d54be74f54750e1f6112",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "6ae810683c88fe5c2607a50c682d56350b2efba4bdcfb40d381cb5ae8b3cc7cb",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "9aad4ff790ea75b546ed3fc24222eff41d3ad0eba6511cc878e74a3f2fce0d1b",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "7b83e1a1e54e2acf71a9dd797f3b5f0dc887136a003a03e494b871ae3e6bde66",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/vector_logic.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "84fb1d45c12a542e02ce6f59a44583dcd28bb42724638f65e1c774a9ae438287"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e634b33d0a2d3130e9d065ccabb975747b12d668a72019ea0e279cb4e155e25f",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "d96a856e69af4e406ea52de3104a44e70f8e3b30e5d38bf15b08b33466928a66",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "39b0ca5a5e23d826bcc38a8873b1191ec8c755070858519b8b492ed3739a3283",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/vector_mask_config.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "34ac1f1585074f6a6676d6257d8666c3d931664847cd77d77bce63b8219eedb2"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e67ddf2423b8f15a1e1635b27f7fcbb6d242e3e10e475128afbac9df6be2e068",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "4f8c46a158270c8e424475aba340e363cf9b1573f30c2a0e4ed24a8e74fe1ba5",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "396c58dcb7a3d0b32d02183c52b6fa907b8e25863ad2acda36786eb516b8e158",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "2f17889bcd5a1b0c31839bfb63bc480a87cd9a3781edf6c8b5fceac832b889e0",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "d2d8546b99931feb76f7091e7f6d17d53f44436345427307e033d818bcd7469f",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/vector_permute_sel.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "790c1d7f6a55a99c12339d04de21c894abcc3fffdf023ef45b051d0685207abb"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_max.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "5847675c4082d2e5f2c3031212792a0d79578b8b5022a7df7f0781ce714f678e",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "103222785564fd22681b52d6c507ad86b391790254bf4075fa4e0cac1f8f1f09",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "1b553c8b9fae7dbe56322c32f15c7bf5c18c2fdf519695491bafe1fa10e2b324",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "56c3d181e2fa066df337a281de47fb966f838b745536ed7306e2a53fcb47c4fb",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "7366be88b16456bb4fb9e1d1e9367970d68830e711e8d259e12225fb4d1e1168",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "6c717f66dc32e8026ebd9586c28a30afb2fcffc51dd7d2f282bd777e75aab33c",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "3063671400ba4258b8467e03a321b7e2ac2987f835ab3080e10324b9c84bf83d",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "70e740630c4917080e7c9d3a5b4a45e1d5da0542d25f07d58c1f9135ea663428",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "4e1274d9f3845b82a3f83ad861ba7783a0092fe505ea14ce7854d9fda61af425",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "63fa50a17844266f570f4f782ddccf4e5539001193a3ad5834e035a7a4907a0c",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "0efa76220c01a08209abeb1b63599e5c83145253957670e7cf915f784629b1e9",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/vector_reduce.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "d99f9e8981974312806ba9520c105bfb491378666f464fa78cfe06f989615d43"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "bf00acec7506176e1540ef16e154b1dea698e2d390eb5c24dec6e474ada487be",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "a144b99fe4198cc46cc95b3e64106606186b9a1d60a57ae5c848e5ea6c0c76bb",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "5ef42b45a71f91f91ae3c199afddb5926e3ab61dcf8851353822d675d99c6564",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/vector_sort.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "799f2f7eb1adf1b39954ceac8b5de3d84ad6493a9508743f2acd6779215c413e"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "3ddb4abec698c624ef738ba947e8939b5261ab982f1fff75decbcd3930390c2a",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "543256cf505197e4d810cb082c3153dbdcd593a549146c9fba2958c0197c66be"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "6706e617a2e9ec68f2bdbf8178cc94ad4d47d6c86fd01cd60ad2801bd26c8f5e",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "4ee4dd47b3bbf7fbacd20e8d30b6dea79dd0f141512113b76a259644b7957646",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "5fd13b6639d4107887035592968d7a1cfb7998b5d62ca49deae0939026c43023"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "3c12ac80f059567fb68f40117ce105b8a53bbb3b550fdd743f3a5b427a956758",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "43e1f02fc8894bec432bf5472932c8e13b2d3ad4a0cd2646ffbe492ecc80c0e5",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "a086a38f8a82b92af34c616f40c753e1b97d45d52345d5b2a109ec94a592a6e5"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "294d8bc4efa54737b0f9e1d17902eeace8aa4747128957e7e029de0451872fa6",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "0679c2e7c4f359161e7257a12b60f76b151739ec293c38f16a8d8df1c379026b",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "04f7146832ca6c4a0885961065e8cce791c5be3c399dd52a72a26c01986c2190"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "2c636d3e81a0415ef7051b029b2b5bca2ebfc6bf5038ef37a89b2dab946b5929",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e19ea0387f54bdc8df1af2e17b0a61156975d442db019cb13ae1032e0d0f6175",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "77cd2bca7794785d93ba67ae684ec0697957e18f0bcc6fdc85db648736c83149",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "11664bb5f5e0b9e63d723eb4c579eb06c2b2e0ef9172fad7d27a612147876aea",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "5bc0e3beda23a1d220dbaa609c7a9d41877af2b94a60f8f5fc88fa3cee3c8a59",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "e394c855dfa91b6f52699449056949bc2f0e26921d2f5e865f9e35e194196e73",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "70d333b5941f16a40baa65be58fc2d3a26fabe82167dc006b68e744f11bdea67",
+      "version": "9.1.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "d8bca5f8cedab0dbea747cba3f1d250e9c0004d629b08d63663df748026f8f2f",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "1c449751e8659dde598dd4b7ea502c13c6f6ccd4ce1743be1315e047c38d24d7",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "2de7b5328fc4204ad40443c5fccf2af873d499cc7a6e86cea9646b12323cacf4",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "67c0582c1ff9eaf27e79272b2d7951d05b5d52a502899bfe1738bfb3601e4c53",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "97f482ef7e4699e31ef64ce852ade744805d29ce0ae6f358931c864b398bb41b",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "f5528608d229b562c51d7775b3b64d11c2687df6ef7d253f77fc381d23c86044",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "a1332a510602c62cdf956c46c2a9897173528e13bc94e8005f475e0f2420970c",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "fe6c3bcf74df8e410862dd7cd49fbdbdd39492b64a877fd6c247b5dcb7590806",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "needs_annotation": true,
+      "okftype": "reference.api",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+      "required": [
+        "okftype",
+        "description",
+        "tag",
+        "dependencies",
+        "version"
+      ],
+      "rule": "callable_structure",
+      "sha256": "600020aa839e15cde36bde7cdcdd1ec4809465533316e724dcd1f202641a5eb8",
+      "version": "9.0.0-"
+    },
+    {
+      "fields": [
+        "okftype"
+      ],
+      "needs_annotation": false,
+      "okftype": "reference.index",
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/vector_datamove.md",
+      "required": [
+        "okftype"
+      ],
+      "rule": "navigation_structure",
+      "sha256": "9726c892fa2a5b197f3e72e9562d546d277985fb15b02f111b6d71ce6dfaa5d6"
+    }
+  ],
+  "purpose": "okf_yaml_run",
+  "run_dir": "/mnt/workspace/asc-devkit/okf_skills/okf-yaml-generate/tmp/pilot",
+  "schema_version": 2,
+  "taxonomy": {
+    "path": "/mnt/workspace/asc-devkit/okf_skills/okf-tag-research/taxonomy/tag-taxonomy.json",
+    "sha256": "79fd49bb303aa3f4402c0763fbb63a58e92a176ca626e0db64bbd4c82ef571b5"
+  },
+  "version_overrides": "/mnt/workspace/asc-devkit/okf_skills/okf-yaml-generate/config/version-overrides.yaml"
+}

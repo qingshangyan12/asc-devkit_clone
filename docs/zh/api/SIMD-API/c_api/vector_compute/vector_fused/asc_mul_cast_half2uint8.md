@@ -1,24 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mul_cast_half2uint8
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md
-description: 按元素对两个half类型矢量求积并将结果转换为uint8_t类型，乘积按RINT舍入模式（四舍六入五成双）舍入，溢出做饱和处理。
+description: "按元素对两个half类型源矢量求积并将结果转换为uint8_t类型，乘积按RINT舍入模式即四舍六入五成双舍入，溢出做饱和处理，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [arithmetic]
   - operations: [conversion, multiply]
-  - objects: [vector]
-  - execution_models: [memory_vector]
   - traits: [elementwise, high_dimensional, rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_mul_cast_half2uint8__PUu8_PUf16_PUf16_u32
-  - override_id: asc_mul_cast_half2uint8__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_fused.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 
 # asc_mul_cast_half2uint8

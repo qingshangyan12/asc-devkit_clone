@@ -1,0 +1,878 @@
+{
+ "schema_version": 1,
+ "purpose": "okf_semantic_annotations",
+ "annotations": [
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+   "document_sha256": "e67ddf2423b8f15a1e1635b27f7fcbb6d242e3e10e475128afbac9df6be2e068",
+   "description": {
+    "value": "依据比较掩码对两个源操作数执行矢量选择，掩码比特位为1时从src0选取元素、为0时从src1选取元素，结果写入目的操作数dst；需配合asc_set_cmp_mask设置掩码，操作数起始地址要求32字节对齐。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+      "excerpt": "执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素，得到目的操作数dst。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+      "excerpt": "当sel_mask的比特位是1时，从src0选取；当比特位是0时，从src1选择。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+      "excerpt": "需要配合[asc_set_cmp_mask](../vector_compare/asc_set_cmp_mask.md)接口使用。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "selection"
+    ],
+    "traits": [
+     "elementwise",
+     "aligned_transfer",
+     "high_dimensional"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素，得到目的操作数dst。",
+    "operations:selection": "当sel_mask的比特位是1时，从src0选取；当比特位是0时，从src1选择。",
+    "traits:elementwise": "当sel_mask的比特位是1时，从src0选取；当比特位是0时，从src1选择。",
+    "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐",
+    "traits:high_dimensional": "- 高维切分计算"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+      "excerpt": "需要配合[asc_set_cmp_mask](../vector_compare/asc_set_cmp_mask.md)接口使用。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+   "document_sha256": "4f8c46a158270c8e424475aba340e363cf9b1573f30c2a0e4ed24a8e74fe1ba5",
+   "description": {
+    "value": "设置transpose所需的16个DataBlock地址，将操作数地址序列与VA地址寄存器关联；前8个与后8个地址序列需分别关联，每个地址寄存器只能关联8个地址。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+      "excerpt": "用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+      "excerpt": "每个地址寄存器只能关联8个地址，使用方法请参考调用示例"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "用于设置transpose的16个DataBlock地址，将操作数地址序列与地址寄存器关联，接口要求前8个和后8个地址序列与地址寄存器分别关联。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+      "excerpt": "操作数地址对齐约束请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md",
+   "document_sha256": "396c58dcb7a3d0b32d02183c52b6fa907b8e25863ad2acda36786eb516b8e158",
+   "description": {
+    "value": "通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中；目的与源操作数起始地址需32字节对齐，地址重叠需满足通用约束。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md",
+      "excerpt": "通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md",
+      "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "compression"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中。",
+    "operations:compression": "通过比较掩码src1，将src0中的向量压缩成更短的向量，存储到dst中。",
+    "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_squeeze.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+   "document_sha256": "2f17889bcd5a1b0c31839bfb63bc480a87cd9a3781edf6c8b5fceac832b889e0",
+   "description": {
+    "value": "实现16*16的二维矩阵数据块转置，源和目的操作数均为矢量；操作数起始地址要求32字节对齐，地址重叠需满足通用约束。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+      "excerpt": "用于实现16*16的二维矩阵数据块转置。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+      "excerpt": "dst、src的起始地址需要32字节对齐。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "transpose"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "用于实现16*16的二维矩阵数据块转置。",
+    "operations:transpose": "用于实现16*16的二维矩阵数据块转置。",
+    "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+   "document_sha256": "d2d8546b99931feb76f7091e7f6d17d53f44436345427307e033d818bcd7469f",
+   "description": {
+    "value": "数据格式转换接口，一般用于将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置；单次Repeat内可处理512字节即16个DataBlock的数据，支持多次Repeat操作，源和目的地址由VA地址寄存器指定。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+      "excerpt": "数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。本接口单次Repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置（比如数据类型为half时，单次Repeat可完成16*16大小的矩阵转置），同时还可以支持多次Repeat操作。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+      "excerpt": "每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成一个新的DataBlock单元放入目的地址中。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "layout_transform",
+     "transpose"
+    ],
+    "traits": [
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。",
+    "operations:layout_transform": "数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。",
+    "operations:transpose": "特别的，也可以用于二维矩阵数据块的转置。",
+    "traits:datablock_granularity": "每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成一个新的DataBlock单元放入目的地址中。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+     "kind": "requires",
+     "condition": "传入的dst/src地址寄存器需先经asc_set_va_reg配置16个DataBlock地址",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+      "excerpt": "`dst`和`src`仅支持VA0、VA2、VA4、VA6，且不能相同，配置方式请参考[asc_set_va_reg](./asc_set_va_reg.md)；每个地址寄存器存储8个地址，接口会将传入的起始寄存器与相邻寄存器组成一组，处理16个地址。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+      "excerpt": "操作数地址对齐约束请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_max.md",
+   "document_sha256": "5847675c4082d2e5f2c3031212792a0d79578b8b5022a7df7f0781ce714f678e",
+   "description": {
+    "value": "执行数据块内的求最大值规约（Reduce Max）操作，支持前n个数据连续计算和高维切分计算两种模式，目的和源操作数均为矢量，起始地址需32字节对齐。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_max.md",
+      "excerpt": "执行数据块内的求最大值规约（Reduce Max）操作。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_max.md",
+      "excerpt": "dst、src的起始地址需要32字节对齐。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "reduction"
+    ],
+    "traits": [
+     "high_dimensional",
+     "aligned_transfer",
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "执行数据块内的求最大值规约（Reduce Max）操作。",
+    "operations:reduction": "执行数据块内的求最大值规约（Reduce Max）操作。",
+    "traits:high_dimensional": "- 高维切分计算",
+    "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+    "traits:datablock_granularity": "执行数据块内的求最大值规约（Reduce Max）操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_max.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md",
+   "document_sha256": "103222785564fd22681b52d6c507ad86b391790254bf4075fa4e0cac1f8f1f09",
+   "description": {
+    "value": "执行数据块内的求最小值规约（Reduce Min）操作，支持前n个数据连续计算和高维切分计算两种模式，目的和源操作数均为矢量，起始地址需32字节对齐。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md",
+      "excerpt": "执行数据块内的求最小值规约（Reduce Min）操作。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md",
+      "excerpt": "dst、src的起始地址需要32字节对齐。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "reduction"
+    ],
+    "traits": [
+     "high_dimensional",
+     "aligned_transfer",
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "执行数据块内的求最小值规约（Reduce Min）操作。",
+    "operations:reduction": "执行数据块内的求最小值规约（Reduce Min）操作。",
+    "traits:high_dimensional": "- 高维切分计算",
+    "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+    "traits:datablock_granularity": "执行数据块内的求最小值规约（Reduce Min）操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_min.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md",
+   "document_sha256": "1b553c8b9fae7dbe56322c32f15c7bf5c18c2fdf519695491bafe1fa10e2b324",
+   "description": {
+    "value": "对每个DataBlock内所有元素求和完成规约，源操作数以二叉树方式两两相加，计算结果大于65504时保存为65504；支持前n个数据计算和高维切分计算两种模式，操作数起始地址需32字节对齐。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md",
+      "excerpt": "对每个DataBlock内所有元素求和。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md",
+      "excerpt": "需要注意的是，两两相加计算过程中，计算结果大于65504时结果保存为65504。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md",
+      "excerpt": "dst、src的起始地址需要32字节对齐。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "add",
+     "reduction"
+    ],
+    "traits": [
+     "high_dimensional",
+     "aligned_transfer",
+     "datablock_granularity",
+     "saturation_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对每个DataBlock内所有元素求和。",
+    "operations:add": "源操作数相加采用二叉树的方式，两两相加。",
+    "operations:reduction": "对每个DataBlock内所有元素求和。",
+    "traits:high_dimensional": "- 高维切分计算",
+    "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。",
+    "traits:datablock_granularity": "对每个DataBlock内所有元素求和。",
+    "traits:saturation_mode": "两两相加计算过程中，计算结果大于65504时结果保存为65504。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+   "document_sha256": "56c3d181e2fa066df337a281de47fb966f838b745536ed7306e2a53fcb47c4fb",
+   "description": {
+    "value": "获取执行asc_repeat_reduce_max操作后的最大值以及第一个最大值时的索引，需与该操作配合使用，并通过同步操作确保其执行完成后再调用本接口获取结果。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+      "excerpt": "此接口用于获取执行[asc_repeat_reduce_max](asc_repeat_reduce_max.md)操作后的最大值，以及第一个最大值时的索引。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+      "excerpt": "需通过同步操作确保[asc_repeat_reduce_max](asc_repeat_reduce_max.md)执行完成后再调用本接口获取结果。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "query"
+    ]
+   },
+   "tag_evidence": {
+    "roles:query": "此接口用于获取执行[asc_repeat_reduce_max](asc_repeat_reduce_max.md)操作后的最大值，以及第一个最大值时的索引。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md",
+     "kind": "requires",
+     "condition": "需通过同步操作确保asc_repeat_reduce_max执行完成后再调用本接口获取结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+      "excerpt": "需和[asc_repeat_reduce_max](asc_repeat_reduce_max.md)操作配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md",
+   "document_sha256": "7366be88b16456bb4fb9e1d1e9367970d68830e711e8d259e12225fb4d1e1168",
+   "description": {
+    "value": "获取执行asc_repeat_reduce_min操作后的最小值以及第一个最小值时的索引，需与该操作配合使用，并通过同步操作确保其执行完成后再调用本接口获取结果。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md",
+      "excerpt": "此接口用于获取执行[asc_repeat_reduce_min](asc_repeat_reduce_min.md)操作后的最小值，以及第一个最小值时的索引。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md",
+      "excerpt": "需通过同步操作确保[asc_repeat_reduce_min](asc_repeat_reduce_min.md)执行完成后再调用本接口获取结果。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "query"
+    ]
+   },
+   "tag_evidence": {
+    "roles:query": "此接口用于获取执行[asc_repeat_reduce_min](asc_repeat_reduce_min.md)操作后的最小值，以及第一个最小值时的索引。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+     "kind": "requires",
+     "condition": "需通过同步操作确保asc_repeat_reduce_min执行完成后再调用本接口获取结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md",
+      "excerpt": "需和[asc_repeat_reduce_min](asc_repeat_reduce_min.md)操作配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md",
+   "document_sha256": "6c717f66dc32e8026ebd9586c28a30afb2fcffc51dd7d2f282bd777e75aab33c",
+   "description": {
+    "value": "获取执行asc_reduce操作后剩余的元素数量，需与asc_reduce操作配合使用，并通过同步操作确保其执行完成后再调用本接口获取结果。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md",
+      "excerpt": "此接口用于获取执行[asc_reduce](asc_reduce.md)操作后剩余的元素数量。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md",
+      "excerpt": "需通过同步操作确保[asc_reduce](asc_reduce.md)执行完成后再调用本接口获取结果。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "query"
+    ]
+   },
+   "tag_evidence": {
+    "roles:query": "此接口用于获取执行[asc_reduce](asc_reduce.md)操作后剩余的元素数量。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md",
+     "kind": "requires",
+     "condition": "需通过同步操作确保asc_reduce执行完成后再调用本接口获取结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_rsvd_count.md",
+      "excerpt": "需和[asc_reduce](asc_reduce.md)操作配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md",
+   "document_sha256": "3063671400ba4258b8467e03a321b7e2ac2987f835ab3080e10324b9c84bf83d",
+   "description": {
+    "value": "对输入数据做归约操作，将相邻两个奇偶元素两两求和，得到数据总和；支持前n个数据连续计算和高维切分计算两种模式，操作数起始地址需32字节对齐。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md",
+      "excerpt": "对输入数据做归约操作，得到数据总和。相邻两个（奇偶）元素求和，例如（a1，a2，a3，a4，a5，a6…），相邻两个数据求和为（a1+a2，a3+a4，a5+a6…）。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md",
+      "excerpt": "dst、src的起始地址需要32字节对齐。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "add",
+     "reduction"
+    ],
+    "traits": [
+     "high_dimensional",
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对输入数据做归约操作，得到数据总和。",
+    "operations:add": "相邻两个数据求和为（a1+a2，a3+a4，a5+a6…）",
+    "operations:reduction": "对输入数据做归约操作，得到数据总和。",
+    "traits:high_dimensional": "- 高维切分计算",
+    "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_pair_reduce_sum.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md",
+   "document_sha256": "70e740630c4917080e7c9d3a5b4a45e1d5da0542d25f07d58c1f9135ea663428",
+   "description": {
+    "value": "依据内置固定模式对应的二进制或用户自定义数值对应的gather掩码，从源操作数中选取元素写入目的操作数，内置固定模式取值1至7，自定义模式的掩码由src1传入；不支持通过asc_set_vector_mask配置掩码。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md",
+      "excerpt": "以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md",
+      "excerpt": "接口不支持通过[asc_set_vector_mask](../vector_mask_config/asc_set_vector_mask.md)配置掩码。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "gather"
+    ],
+    "traits": [
+     "high_dimensional",
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。",
+    "operations:gather": "以内置固定模式对应的二进制或者用户自定义输入的数值对应的gather mask（数据收集的掩码），从源操作数中选取元素写入目的操作数中。",
+    "traits:high_dimensional": "- 高维切分计算",
+    "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+     "kind": "constrained_by",
+     "condition": "接口不支持通过asc_set_vector_mask配置掩码",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md",
+      "excerpt": "接口不支持通过[asc_set_vector_mask](../vector_mask_config/asc_set_vector_mask.md)配置掩码。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_reduce.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md",
+   "document_sha256": "4e1274d9f3845b82a3f83ad861ba7783a0092fe505ea14ce7854d9fda61af425",
+   "description": {
+    "value": "对每个Repeat内所有元素求最大值以及Repeat内首个最大值元素的索引，一次Repeat计算256字节；提供index_value、value_index、only_value、only_index四种返回形态，执行后可继续调用asc_get_reduce_max_cnt获取全部repeat内的最大值与首个最大值索引。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md",
+      "excerpt": "对每个Repeat内所有元素求最大值，以及Repeat内的首个最大值元素在当前Repeat中的索引index。一次Repeat计算256字节。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md",
+      "excerpt": "执行此接口后，可以继续执行[asc_get_reduce_max_cnt](asc_get_reduce_max_cnt.md)获取全部repeat内的最大值，以及第一个最大值时的索引。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "reduction"
+    ],
+    "traits": [
+     "high_dimensional",
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对每个Repeat内所有元素求最大值，以及Repeat内的首个最大值元素在当前Repeat中的索引index。一次Repeat计算256字节。",
+    "operations:reduction": "对每个Repeat内所有元素求最大值，以及Repeat内的首个最大值元素在当前Repeat中的索引index。一次Repeat计算256字节。",
+    "traits:high_dimensional": "- 高维切分计算",
+    "traits:aligned_transfer": "src的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+     "kind": "related",
+     "condition": "执行此接口后，可继续调用asc_get_reduce_max_cnt获取全部repeat内的最大值及首个最大值索引",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md",
+      "excerpt": "执行此接口后，可以继续执行[asc_get_reduce_max_cnt](asc_get_reduce_max_cnt.md)获取全部repeat内的最大值，以及第一个最大值时的索引。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_max.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+   "document_sha256": "63fa50a17844266f570f4f782ddccf4e5539001193a3ad5834e035a7a4907a0c",
+   "description": {
+    "value": "对每个Repeat内所有元素求最小值以及Repeat内首个最小值元素的索引，一次Repeat计算256字节；提供index_value、value_index、only_value、only_index四种返回形态，执行后可继续调用asc_get_reduce_min_cnt获取全部repeat内的最小值与首个最小值索引。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+      "excerpt": "对每个Repeat内所有元素求最小值，以及Repeat内的首个最小值元素在当前Repeat中的索引index。一次Repeat计算256字节。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+      "excerpt": "执行此接口后，可以继续执行[asc_get_reduce_min_cnt](asc_get_reduce_min_cnt.md)获取全部repeat内的最小值，以及第一个最小值时的索引。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "reduction"
+    ],
+    "traits": [
+     "high_dimensional",
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对每个Repeat内所有元素求最小值，以及Repeat内的首个最小值元素在当前Repeat中的索引index。一次Repeat计算256字节。",
+    "operations:reduction": "对每个Repeat内所有元素求最小值，以及Repeat内的首个最小值元素在当前Repeat中的索引index。一次Repeat计算256字节。",
+    "traits:high_dimensional": "- 高维切分计算",
+    "traits:aligned_transfer": "src的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_min_cnt.md",
+     "kind": "related",
+     "condition": "执行此接口后，可继续调用asc_get_reduce_min_cnt获取全部repeat内的最小值及首个最小值索引",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+      "excerpt": "执行此接口后，可以继续执行[asc_get_reduce_min_cnt](asc_get_reduce_min_cnt.md)获取全部repeat内的最小值，以及第一个最小值时的索引。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md",
+   "document_sha256": "0efa76220c01a08209abeb1b63599e5c83145253957670e7cf915f784629b1e9",
+   "description": {
+    "value": "对每个Repeat内所有元素求和完成归约，源操作数以二叉树方式两两相加，计算结果大于65504时保存为65504；支持前n个数据计算和高维切分计算两种模式。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md",
+      "excerpt": "对每个Repeat内所有元素求和。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md",
+      "excerpt": "需要注意的是，两两相加计算过程中，计算结果大于65504时结果保存为65504。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "add",
+     "reduction"
+    ],
+    "traits": [
+     "high_dimensional",
+     "aligned_transfer",
+     "saturation_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对每个Repeat内所有元素求和。",
+    "operations:add": "源操作数相加采用二叉树的方式，两两相加。",
+    "operations:reduction": "对每个Repeat内所有元素求和。",
+    "traits:high_dimensional": "- 高维切分计算",
+    "traits:aligned_transfer": "src的起始地址需要32字节对齐。",
+    "traits:saturation_mode": "两两相加计算过程中，计算结果大于65504时结果保存为65504。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md",
+   "document_sha256": "bf00acec7506176e1540ef16e154b1dea698e2d390eb5c24dec6e474ada487be",
+   "description": {
+    "value": "一次迭代内对32个数做降序排列，src0和src1分别为待排序的score及对应索引，排序完成后以score和index结构存入dst；不同迭代之间不进行排序，可通过repeat参数处理多个迭代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md",
+      "excerpt": "本接口实现一次迭代内对32个数的降序排列操作。支持通过`repeat`参数分别对多个迭代进行排列。每次迭代处理32个元素；下次迭代时，`src0`和`src1`各跳过32个元素，`dst`跳过256字节。不同迭代之间不进行排序。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md",
+      "excerpt": "src0和src1分别表示待排序的数据score和对应RP的索引index，排序完成后以（score, index）的结构存储在dst中。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "sort"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "本接口实现一次迭代内对32个数的降序排列操作。",
+    "operations:sort": "本接口实现一次迭代内对32个数的降序排列操作。",
+    "traits:aligned_transfer": "`dst`、`src0`、`src1`的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+   "document_sha256": "a144b99fe4198cc46cc95b3e64106606186b9a1d60a57ae5c848e5ea6c0c76bb",
+   "description": {
+    "value": "获取执行asc_mrgsort4操作后4个队列中每个队列已处理过的Region Proposal个数；需将asc_mrgsort4的if_exhausted_suspension参数配置为true，并通过同步操作确保其执行完成后再调用本接口。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+      "excerpt": "此接口用于获取执行[asc_mrgsort4](asc_mrgsort4.md)操作后的4个队列中，每个队列已经理过的Region Proposal个数。使用时，需要将asc_mrgsort4中的if_exhausted_suspension参数配置为true，该配置模式下某条队列耗尽后，MrgSort4指令停止。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+      "excerpt": "需通过同步操作确保[asc_mrgsort4](asc_mrgsort4.md)执行完成后再调用本接口获取结果。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "query"
+    ]
+   },
+   "tag_evidence": {
+    "roles:query": "此接口用于获取执行[asc_mrgsort4](asc_mrgsort4.md)操作后的4个队列中，每个队列已经理过的Region Proposal个数。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+     "kind": "requires",
+     "condition": "需asc_mrgsort4中的if_exhausted_suspension参数配置为true，并通过同步操作确保其执行完成后再调用",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+      "excerpt": "需和[asc_mrgsort4](asc_mrgsort4.md)操作配合使用，且需asc_mrgsort4中的if_exhausted_suspension参数配置为true。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+   "document_sha256": "5ef42b45a71f91f91ae3c199afddb5926e3ab61dcf8851353822d675d99c6564",
+   "description": {
+    "value": "将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按score从大到小排序；接口不负责排序无序输入，输入一般是经过asc_bitsort处理后的输出数据，队列有效性由valid_bit参数指定。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+      "excerpt": "本接口实现将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按照score从大到小排序。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+      "excerpt": "该接口不负责将无序的输入队列排序，输入一般是经过[asc_bitsort](asc_bitsort.md)指令处理后的输出数据，队列详细结构请参考[asc_bitsort功能说明](asc_bitsort.md#功能说明)中的介绍。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "sort"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "本接口实现将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按照score从大到小排序。",
+    "operations:sort": "本接口实现将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按照score从大到小排序。",
+    "traits:aligned_transfer": "dst的起始地址要求32字节对齐，src数组中的起始地址要求8字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md",
+     "kind": "related",
+     "condition": "输入一般为经过asc_bitsort处理后的输出数据",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+      "excerpt": "该接口不负责将无序的输入队列排序，输入一般是经过[asc_bitsort](asc_bitsort.md)指令处理后的输出数据，队列详细结构请参考[asc_bitsort功能说明](asc_bitsort.md#功能说明)中的介绍。"
+     }
+    }
+   ]
+  }
+ ]
+}

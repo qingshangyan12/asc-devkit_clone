@@ -1,33 +1,16 @@
 ---
 okftype: reference.api
-title: asc_deq_int162b8
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md
-description: 将int16_t类型数据转换为int8_t或uint8_t类型并将结果存放在每个DataBlock的高半块或低半块，使用前需调用asc_set_deq_scale接口设置量化参数。
+description: "将int16_t类型数据反量化转换为int8_t或uint8_t类型，按变体把结果存放到每个DataBlock的高半块或低半块，使用前需调用asc_set_deq_scale设置量化参数，支持前n个数据计算和高维切分计算。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [high_dimensional, quantization]
-signature:
-  - override_id: asc_deq_int162b8_h__PUi8_PUi16_u32
-  - override_id: asc_deq_int162b8_h__PUu8_PUi16_u32
-  - override_id: asc_deq_int162b8_l__PUi8_PUi16_u32
-  - override_id: asc_deq_int162b8_l__PUu8_PUi16_u32
-  - override_id: asc_deq_int162b8_h__PUi8_PUi16_u8_u16_u16_u8_u8
-  - override_id: asc_deq_int162b8_h__PUu8_PUi16_u8_u16_u16_u8_u8
-  - override_id: asc_deq_int162b8_l__PUi8_PUi16_u8_u16_u16_u8_u8
-  - override_id: asc_deq_int162b8_l__PUu8_PUi16_u8_u16_u16_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_fused.h]
+  - traits: [elementwise, high_dimensional, quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
     kind: requires
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 
 # asc_deq_int162b8

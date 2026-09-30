@@ -1,37 +1,15 @@
 ---
 okftype: reference.api
-title: asc_float2half
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md
-description: 将float类型数据转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC、ODD多种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。
+description: "将float类型矢量数据转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC、ODD多种舍入模式，其中ODD为Von Neumann最近邻奇数舍入，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
   - traits: [rounding_mode]
-signature:
-  - override_id: asc_float2half__PUf16_PUf32_u32
-  - override_id: asc_float2half_rn__PUf16_PUf32_u32
-  - override_id: asc_float2half_rna__PUf16_PUf32_u32
-  - override_id: asc_float2half_rd__PUf16_PUf32_u32
-  - override_id: asc_float2half_ru__PUf16_PUf32_u32
-  - override_id: asc_float2half_rz__PUf16_PUf32_u32
-  - override_id: asc_float2half_ro__PUf16_PUf32_u32
-  - override_id: asc_float2half__PUf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2half_rn__PUf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2half_rna__PUf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2half_rd__PUf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2half_ru__PUf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2half_rz__PUf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2half_ro__PUf16_PUf32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+    condition: "通用地址重叠约束"
+version: 9.0.0-
 ---
 # asc_float2half
 

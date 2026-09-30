@@ -1,0 +1,90 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md",
+  "sha256": "4d5c8f8597eb5c544088deee9b96918ddda71153870fbd2392dfd19b73becc46"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md",
+  "sha256": "35c30d6d7d5274b819fdc4d527310cc390c1b3c09090419cab71b537d420c573"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md",
+  "sha256": "33b376d36de17964f7c51fb5795715d19b3f82cb0794170d8a3ba9da832d0c2e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md",
+  "sha256": "4f36368479487221d71dbdc92081963624cab71994f745421039b60e447d3405"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md",
+  "sha256": "018a44158f93a39b0cc63e3b9669d03f4e202cd0b4133c2f1c9f0e00dae60862"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md",
+  "sha256": "2e56b23b33c6cd7f198ec6ab05425a40ded0bedbc2c3ba7653ba56386f632b52"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md",
+  "sha256": "f33784e97ddff1f11d69e34d2280e75086d5ff1a6d40cfc65da0dc8cdb665b2e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md",
+  "sha256": "e85d4eb5a1ae34ead3efcd3ab09360326e6ccdaa3a4b74015341a66fed704394"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md",
+  "sha256": "cd5a5b4dcd66663ea798d8b022f1b0bc976f04a2103b0259787ff166bbd14663"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md",
+  "sha256": "7cee02d793152b4234d94a7ce91bcbeced9dcc31287482e44a236945a7336c19"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md",
+  "sha256": "845c8ae5e3e66f59e301586d957c8690498fdb8834f0c7ec105c33be877a89b8"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+  "sha256": "d56023e012fff82fb4822f9990e7f41f6ebef6aeee0ac21bfed8c4f00c6e4b82"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md",
+  "sha256": "bf91df9ec1fdf05316262abd89b60b6475d8efa0c44578d7eea93559fff70060"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md",
+  "sha256": "6592f77b0c1c2d38fdfe64fa751e746b1bf37545a047823b27c743223dae9fd0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md",
+  "sha256": "8e55d5069f14a6b9489a580554e981191bf2f3ea44382b6843a0ab61708114a5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md",
+  "sha256": "412954aa0684c2b76ba4247ad2224221b0b53f3b5432d54be74f54750e1f6112"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+  "sha256": "6ae810683c88fe5c2607a50c682d56350b2efba4bdcfb40d381cb5ae8b3cc7cb"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md",
+  "sha256": "9aad4ff790ea75b546ed3fc24222eff41d3ad0eba6511cc878e74a3f2fce0d1b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+  "sha256": "7b83e1a1e54e2acf71a9dd797f3b5f0dc887136a003a03e494b871ae3e6bde66"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+  "sha256": "e634b33d0a2d3130e9d065ccabb975747b12d668a72019ea0e279cb4e155e25f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md",
+  "sha256": "d96a856e69af4e406ea52de3104a44e70f8e3b30e5d38bf15b08b33466928a66"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+  "sha256": "39b0ca5a5e23d826bcc38a8873b1191ec8c755070858519b8b492ed3739a3283"
+ }
+]

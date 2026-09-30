@@ -1,32 +1,20 @@
 ---
 okftype: reference.api
-title: asc_eq
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md
-description: 逐元素比较两个源矢量对应元素是否相等，比较结果为真时对应比特位设为1，否则设为0，结果可存入寄存器或目的矢量。
+description: "逐元素比较src0与src1对应位置的元素是否相等，结果按比特位输出，为真时对应比特位为1，否则为0；比较结果可存入寄存器或写入目的矢量。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
-  - objects: [tensor]
-  - execution_models: [memory_vector]
-  - traits: [elementwise]
-signature:
-  - override_id: asc_eq__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_eq__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_eq__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_eq__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_eq__PUu8_PUi32_PUi32_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - traits: [aligned_transfer, elementwise, high_dimensional]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
     kind: requires
-    condition: 使用寄存器形式的接口时
+    condition: "使用寄存器形式的接口时"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
     kind: related
-    condition: 如果要初始化寄存器
-examples: []
-timestamp: '2026-09-28'
+    condition: "如果要初始化寄存器"
+version: 9.0.0-
 ---
 # asc_eq
 

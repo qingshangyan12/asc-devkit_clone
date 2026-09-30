@@ -1,29 +1,16 @@
 ---
 okftype: reference.api
-title: asc_select
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md
-description: 执行矢量选择操作，给定两个源操作数src0和src1，根据条件选择元素得到目的操作数dst，sel_mask比特位为1时从src0选取，为0时从src1选择，需配合asc_set_cmp_mask接口使用。
+description: "依据比较掩码对两个源操作数执行矢量选择，掩码比特位为1时从src0选取元素、为0时从src1选取元素，结果写入目的操作数dst；需配合asc_set_cmp_mask设置掩码，操作数起始地址要求32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [selection]
-  - objects: [mask, tensor]
-  - execution_models: [memory_vector]
-  - traits: [elementwise, high_dimensional, masked]
-signature:
-  - override_id: asc_select__PUf16_PUf16_PUf16_u32
-  - override_id: asc_select__PUf32_PUf32_PUf32_u32
-  - override_id: asc_select__PUf16_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_select__PUf32_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - traits: [aligned_transfer, elementwise, high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
     kind: requires
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_select
 

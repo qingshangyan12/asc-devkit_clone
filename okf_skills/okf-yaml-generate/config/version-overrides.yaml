@@ -1,0 +1,11 @@
+# version 推导人工裁决覆盖（derive_version.py 消费）。
+#
+# 仅登记脚本规则无法裁决、经人工核对 Release Notes 原文确认的版本修正；
+# 每条必须给出依据摘录。新增条目须附核对说明。
+
+schema_version: 1
+floors:
+  asc_fma:
+    floor: 9.1.0
+    reason: CANN_9_2_0.md「新增特性」自述 asc_fma 在 CANN 9.1.0 仅有 Memory 矢量计算接口、9.2.0 新增的是 Reg 接口；Memory 版文档 floor 应为 9.1.0。9.1.0 Release Notes 未逐名列出该接口，规则正则无法识别。
+    evidence: "`asc_fma`在CANN 9.1.0中仅有Memory矢量计算接口，本版本新增的是Reg接口"

@@ -1,25 +1,14 @@
 ---
 okftype: reference.api
-title: asc_gt_scalar
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt_scalar.md
-description: src中每个元素逐个与标量value比较大小，元素大于value时输出结果对应比特位为1，否则为0。
+description: "将源矢量每个元素逐个与标量value比较大小，元素大于value时输出结果对应比特位为1，否则为0，比较结果按小端顺序排布。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
-  - objects: [scalar, tensor]
-  - execution_models: [memory_vector]
-  - traits: [elementwise, scalar_operand]
-signature:
-  - override_id: asc_gt_scalar__PUu8_PUf16_f16_u8_u16_u16_u16_u16
-  - override_id: asc_gt_scalar__PUu8_PUf32_f32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_compare.h]
+  - traits: [aligned_transfer, elementwise, high_dimensional, scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_gt_scalar
 

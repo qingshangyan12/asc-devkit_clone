@@ -1,33 +1,15 @@
 ---
 okftype: reference.api
-title: asc_float2bfloat16
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md
-description: 将float类型矢量数据转换为bfloat16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式，操作数起始地址需32字节对齐。
+description: "将float类型矢量数据转换为bfloat16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC五种舍入模式，提供前n个数据计算与高维切分计算两类原型，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [memory_vector]
   - traits: [rounding_mode]
-signature:
-  - override_id: asc_float2bfloat16_rn__PUbf16_PUf32_u32
-  - override_id: asc_float2bfloat16_rna__PUbf16_PUf32_u32
-  - override_id: asc_float2bfloat16_rd__PUbf16_PUf32_u32
-  - override_id: asc_float2bfloat16_ru__PUbf16_PUf32_u32
-  - override_id: asc_float2bfloat16_rz__PUbf16_PUf32_u32
-  - override_id: asc_float2bfloat16_rn__PUbf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2bfloat16_rna__PUbf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2bfloat16_rd__PUbf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2bfloat16_ru__PUbf16_PUf32_u8_u16_u16_u16_u16
-  - override_id: asc_float2bfloat16_rz__PUbf16_PUf32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+    condition: "通用地址重叠约束"
+version: 9.0.0-
 ---
 # asc_float2bfloat16
 

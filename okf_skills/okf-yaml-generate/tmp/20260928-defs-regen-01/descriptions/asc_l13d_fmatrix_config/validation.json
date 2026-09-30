@@ -1,8 +1,0 @@
-{
-  "schema_version": 1,
-  "purpose": "okf_api_description_validation",
-  "validated_at": "2026-09-28T06:50:35+00:00",
-  "result": "/home/hugh/code/asc-devkit_okf_knowledge-fork/okf_skills/okf-yaml-generate/tmp/20260928-defs-regen-01/descriptions/asc_l13d_fmatrix_config/description-result.json",
-  "valid": true,
-  "errors": []
-}

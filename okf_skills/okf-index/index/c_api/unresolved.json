@@ -1,0 +1,66 @@
+{
+  "purpose": "okf_derive_unresolved",
+  "records": [
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['2201', '3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+      "field": "signatures",
+      "issue": "2 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['2201']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+      "field": "signatures",
+      "issue": "21 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+      "field": "signatures",
+      "issue": "21 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+      "field": "signatures",
+      "issue": "21 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+      "field": "signatures",
+      "issue": "21 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    }
+  ],
+  "schema_version": 1
+}

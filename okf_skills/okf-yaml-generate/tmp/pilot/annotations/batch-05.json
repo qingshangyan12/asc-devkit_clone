@@ -1,0 +1,590 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md",
+      "document_sha256": "4d5c8f8597eb5c544088deee9b96918ddda71153870fbd2392dfd19b73becc46",
+      "description": {
+        "value": "对两个源矢量按元素求和后再做Relu计算，结果与0对比取较大值，并支持s162s8、f322f16、f162s8的最终结果类型转换，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md", "excerpt": "按元素求和，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md", "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["add", "conversion", "relu"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "按元素求和，再进行Relu计算（结果和0对比取较大值）",
+        "operations:add": "按元素求和，再进行Relu计算",
+        "operations:conversion": "并提供转换最终结果的数据类型的功能",
+        "operations:relu": "再进行Relu计算（结果和0对比取较大值）",
+        "traits:elementwise": "按元素求和，再进行Relu计算（结果和0对比取较大值）",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md",
+      "document_sha256": "35c30d6d7d5274b819fdc4d527310cc390c1b3c09090419cab71b537d420c573",
+      "description": {
+        "value": "将源矢量每个元素与标量value求积后加上目的矢量对应元素并写回dst，实现标量乘加融合计算，提供连续数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md", "excerpt": "源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["fused_multiply_add"], "traits": ["elementwise", "high_dimensional", "scalar_operand"]},
+      "tag_evidence": {
+        "roles:compute": "源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加计算公式如下：",
+        "operations:fused_multiply_add": "源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加",
+        "traits:elementwise": "源操作数src中每个元素与标量value求积后和目的操作数dst中的对应元素相加",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:scalar_operand": "源操作数（标量）。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_axpy.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md",
+      "document_sha256": "33b376d36de17964f7c51fb5795715d19b3f82cb0794170d8a3ba9da832d0c2e",
+      "description": {
+        "value": "将int16_t类型数据反量化转换为int8_t或uint8_t类型，按变体把结果存放到每个DataBlock的高半块或低半块，使用前需调用asc_set_deq_scale设置量化参数，支持前n个数据计算和高维切分计算。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md", "excerpt": "将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md", "excerpt": "使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["elementwise", "high_dimensional", "quantization"]},
+      "tag_evidence": {
+        "roles:compute": "将int16_t类型转换为int8_t或uint8_t类型，并将数据存放在每个DataBlock的高半块或低半块。",
+        "operations:conversion": "将int16_t类型转换为int8_t或uint8_t类型",
+        "traits:elementwise": "dst_i = (src_i * scale) + offset",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:quantization": "使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+          "kind": "requires",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md", "excerpt": "使用该接口前需要调用[asc_set_deq_scale](asc_set_deq_scale.md)接口设置量化参数。"}
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int162b8.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md",
+      "document_sha256": "4f36368479487221d71dbdc92081963624cab71994f745421039b60e447d3405",
+      "description": {
+        "value": "对输入的int32_t类型数据按元素做量化并转换为half类型，scale需通过asc_set_deq_scale设置并配合其非向量模式使用，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md", "excerpt": "对输入的int32_t类型的数据按元素做量化并转换为half类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md", "excerpt": "需配合[asc_set_deq_scale](asc_set_deq_scale.md)接口的非向量模式使用，该接口用于设置量化参数。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["elementwise", "high_dimensional", "quantization"]},
+      "tag_evidence": {
+        "roles:compute": "对输入的int32_t类型的数据按元素做量化并转换为half类型。",
+        "operations:conversion": "对输入的int32_t类型的数据按元素做量化并转换为half类型",
+        "traits:elementwise": "对输入的int32_t类型的数据按元素做量化并转换为half类型",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:quantization": "需配合[asc_set_deq_scale](asc_set_deq_scale.md)接口的非向量模式使用，该接口用于设置量化参数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+          "kind": "related",
+          "condition": "非向量模式",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md", "excerpt": "需配合[asc_set_deq_scale](asc_set_deq_scale.md)接口的非向量模式使用，该接口用于设置量化参数。"}
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md",
+      "document_sha256": "018a44158f93a39b0cc63e3b9669d03f4e202cd0b4133c2f1c9f0e00dae60862",
+      "description": {
+        "value": "按元素将src0和src1相乘并和dst相加，把融合乘加结果存回dst，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md", "excerpt": "按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中，计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md", "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["fused_multiply_add"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "按元素将src0和src1相乘并和dst相加，将最终结果存放进dst中",
+        "operations:fused_multiply_add": "按元素将src0和src1相乘并和dst相加",
+        "traits:elementwise": "按元素将src0和src1相乘并和dst相加",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_fma.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md",
+      "document_sha256": "2e56b23b33c6cd7f198ec6ab05425a40ded0bedbc2c3ba7653ba56386f632b52",
+      "description": {
+        "value": "执行矢量Leaky Relu运算，源元素大于0时保持原值，小于等于0时乘以alpha系数，alpha由标量参数value指定，结果写入目的矢量，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md", "excerpt": "执行矢量Leaky Relu运算。计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md", "excerpt": "源操作数（标量），leaky_relu中alpha的值。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["leaky_relu"], "traits": ["elementwise", "high_dimensional", "scalar_operand"]},
+      "tag_evidence": {
+        "roles:compute": "执行矢量Leaky Relu运算。计算公式如下：",
+        "operations:leaky_relu": "执行矢量Leaky Relu运算",
+        "traits:elementwise": "src_i ,\\quad src_i>0",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:scalar_operand": "源操作数（标量），leaky_relu中alpha的值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md",
+      "document_sha256": "f33784e97ddff1f11d69e34d2280e75086d5ff1a6d40cfc65da0dc8cdb665b2e",
+      "description": {
+        "value": "执行矢量的乘加融合运算，将src0与dst相乘后加上src1并把结果存回dst，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md", "excerpt": "执行矢量的乘加运算。计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md", "excerpt": "dst_i = (src0_i * dst_i) + src1_i"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md", "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["fused_multiply_add"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "执行矢量的乘加运算。计算公式如下：",
+        "operations:fused_multiply_add": "执行矢量的乘加运算",
+        "traits:elementwise": "dst_i = (src0_i * dst_i) + src1_i",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md",
+      "document_sha256": "e85d4eb5a1ae34ead3efcd3ab09360326e6ccdaa3a4b74015341a66fed704394",
+      "description": {
+        "value": "按元素将src0和dst相乘并加上src1，再进行Relu计算，结果与0对比取较大值后存入dst，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md", "excerpt": "按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值），最终结果存放进dst中。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["fused_multiply_add", "relu"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "按元素将src0和dst相乘并加上src1，再进行Relu计算（结果和0对比取较大值）",
+        "operations:fused_multiply_add": "按元素将src0和dst相乘并加上src1",
+        "operations:relu": "再进行Relu计算（结果和0对比取较大值）",
+        "traits:elementwise": "按元素将src0和dst相乘并加上src1",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_add_relu.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md",
+      "document_sha256": "cd5a5b4dcd66663ea798d8b022f1b0bc976f04a2103b0259787ff166bbd14663",
+      "description": {
+        "value": "按元素对两个half类型源矢量求积并将结果转换为int8_t类型，乘积按RINT舍入模式即四舍六入五成双舍入，溢出做饱和处理，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md", "excerpt": "按元素求积，并将结果转换为int8_t类型。计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md", "excerpt": "精度转换规则：将源操作数的乘积按照RINT舍入模式（四舍六入五成双舍入），溢出做饱和处理。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion", "multiply"], "traits": ["elementwise", "high_dimensional", "rounding_mode", "saturation_mode"]},
+      "tag_evidence": {
+        "roles:compute": "按元素求积，并将结果转换为int8_t类型。",
+        "operations:multiply": "按元素求积，并将结果转换为int8_t类型。",
+        "operations:conversion": "并将结果转换为int8_t类型",
+        "traits:elementwise": "按元素求积，并将结果转换为int8_t类型。",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:rounding_mode": "将源操作数的乘积按照RINT舍入模式（四舍六入五成双舍入）",
+        "traits:saturation_mode": "溢出做饱和处理。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2int8.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md",
+      "document_sha256": "7cee02d793152b4234d94a7ce91bcbeced9dcc31287482e44a236945a7336c19",
+      "description": {
+        "value": "按元素对两个half类型源矢量求积并将结果转换为uint8_t类型，乘积按RINT舍入模式即四舍六入五成双舍入，溢出做饱和处理，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md", "excerpt": "按元素求积，并将结果转换为uint8_t类型。计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md", "excerpt": "精度转换规则：将源操作数的乘积按照RINT舍入模式（四舍六入五成双舍入），溢出做饱和处理。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion", "multiply"], "traits": ["elementwise", "high_dimensional", "rounding_mode", "saturation_mode"]},
+      "tag_evidence": {
+        "roles:compute": "按元素求积，并将结果转换为uint8_t类型。",
+        "operations:multiply": "按元素求积，并将结果转换为uint8_t类型。",
+        "operations:conversion": "并将结果转换为uint8_t类型",
+        "traits:elementwise": "按元素求积，并将结果转换为uint8_t类型。",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:rounding_mode": "将源操作数的乘积按照RINT舍入模式（四舍六入五成双舍入）",
+        "traits:saturation_mode": "溢出做饱和处理。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_mul_cast_half2uint8.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md",
+      "document_sha256": "845c8ae5e3e66f59e301586d957c8690498fdb8834f0c7ec105c33be877a89b8",
+      "description": {
+        "value": "对源矢量按元素做线性整流Relu运算并将结果写入目的矢量，支持half、int32_t、float类型，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md", "excerpt": "按元素做线性整流Relu，计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["relu"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "按元素做线性整流Relu",
+        "operations:relu": "按元素做线性整流Relu",
+        "traits:elementwise": "按元素做线性整流Relu",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+      "document_sha256": "d56023e012fff82fb4822f9990e7f41f6ebef6aeee0ac21bfed8c4f00c6e4b82",
+      "description": {
+        "value": "设置DEQSCALE量化参数寄存器的值，可用数组一次设置一组大小为16的量化参数，也可设置单个scale、offset及符号模式，half类型scale适用于int32_t转化为half的场景。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md", "excerpt": "设置DEQSCALE（量化参数）寄存器的值。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md", "excerpt": "一块临时内存区域，用于存储一组大小为16的量化参数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md", "excerpt": "适用于cast_deq等接口的int32_t转化为half的场景。"}
+        ]
+      },
+      "tag": {"roles": ["configuration"], "traits": ["quantization"]},
+      "tag_evidence": {
+        "roles:configuration": "设置DEQSCALE（量化参数）寄存器的值。",
+        "traits:quantization": "用于存储一组大小为16的量化参数。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md",
+      "document_sha256": "bf91df9ec1fdf05316262abd89b60b6475d8efa0c44578d7eea93559fff70060",
+      "description": {
+        "value": "对两个源矢量按元素求差后再做Relu计算，结果与0对比取较大值，并支持s162s8、f322f16、f162s8的最终结果类型转换，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md", "excerpt": "按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md", "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion", "relu", "subtract"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "按元素求差，再进行Relu计算（结果和0对比取较大值）",
+        "operations:subtract": "按元素求差，再进行Relu计算",
+        "operations:relu": "再进行Relu计算（结果和0对比取较大值）",
+        "operations:conversion": "并提供转换最终结果的数据类型的功能",
+        "traits:elementwise": "按元素求差，再进行Relu计算（结果和0对比取较大值）",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md",
+      "document_sha256": "6592f77b0c1c2d38fdfe64fa751e746b1bf37545a047823b27c743223dae9fd0",
+      "description": {
+        "value": "将int16_t类型数据反量化转化为int8_t或uint8_t类型，按变体把结果存放到每个DataBlock的上半块或下半块，使用前需调用asc_set_deq_scale设置量化参数，支持前n个数据计算和高维切分计算。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md", "excerpt": "将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md", "excerpt": "使用该接口前需要调用asc_set_deq_scale设置量化参数。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["conversion"], "traits": ["elementwise", "high_dimensional", "quantization"]},
+      "tag_evidence": {
+        "roles:compute": "将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。",
+        "operations:conversion": "将int16_t类型转化为int8_t或uint8_t类型",
+        "traits:elementwise": "dst_i = (src_i * scale_j) + offset_j",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:quantization": "使用该接口前需要调用asc_set_deq_scale设置量化参数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+          "kind": "requires",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md", "excerpt": "使用该接口前需要调用asc_set_deq_scale设置量化参数。"}
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md",
+      "document_sha256": "8e55d5069f14a6b9489a580554e981191bf2f3ea44382b6843a0ab61708114a5",
+      "description": {
+        "value": "对两个源矢量的对应元素执行按位与运算并将结果写入目的矢量，支持int16_t与uint16_t类型，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md", "excerpt": "执行矢量与运算。计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md", "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["bitwise_and"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "执行矢量与运算。计算公式如下：",
+        "operations:bitwise_and": "执行矢量与运算",
+        "traits:elementwise": "dst_i = src0_i \\quad \\&  \\quad src1_i",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_and.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md",
+      "document_sha256": "412954aa0684c2b76ba4247ad2224221b0b53f3b5432d54be74f54750e1f6112",
+      "description": {
+        "value": "对源矢量的每个元素做按位取反并将结果写入目的矢量，支持int16_t与uint16_t类型，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md", "excerpt": "按元素做按位取反，计算公式如下。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["bitwise_not"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "按元素做按位取反，计算公式如下。",
+        "operations:bitwise_not": "按元素做按位取反",
+        "traits:elementwise": "按元素做按位取反",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+      "document_sha256": "6ae810683c88fe5c2607a50c682d56350b2efba4bdcfb40d381cb5ae8b3cc7cb",
+      "description": {
+        "value": "对两个源矢量的每对元素执行按位或运算并将结果写入目的矢量，支持int16_t与uint16_t类型，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md", "excerpt": "每对元素按位或运算，计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["bitwise_or"], "traits": ["elementwise", "high_dimensional"]},
+      "tag_evidence": {
+        "roles:compute": "每对元素按位或运算，计算公式如下：",
+        "operations:bitwise_or": "每对元素按位或运算",
+        "traits:elementwise": "每对元素按位或运算",
+        "traits:high_dimensional": "高维切分计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md",
+      "document_sha256": "9aad4ff790ea75b546ed3fc24222eff41d3ad0eba6511cc878e74a3f2fce0d1b",
+      "description": {
+        "value": "将源矢量的所有元素左移distance位并存入目的矢量，distance不支持负数且取值不能超过源数据类型位宽，提供前n个数据计算和高维切分计算两种原型，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md", "excerpt": "将所有元素左移distance位。计算公式如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md", "excerpt": "distance不支持设置为负数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md", "excerpt": "distance取值不能超过src数据类型的位宽。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["bitwise_shift"], "traits": ["elementwise", "high_dimensional", "scalar_operand"]},
+      "tag_evidence": {
+        "roles:compute": "将所有元素左移distance位。计算公式如下：",
+        "operations:bitwise_shift": "将所有元素左移distance位",
+        "traits:elementwise": "将所有元素左移distance位",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:scalar_operand": "源操作数（标量），表示左移的位数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+      "document_sha256": "7b83e1a1e54e2acf71a9dd797f3b5f0dc887136a003a03e494b871ae3e6bde66",
+      "description": {
+        "value": "对src中的每个元素执行右移，有符号类型做算术右移并复制符号位，无符号类型做逻辑右移最高位补0，value不支持负数且不能超过位宽，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md", "excerpt": "对src中的每个元素执行右移，右移大小为value。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md", "excerpt": "对于int16_t/int32_t，做算术右移（去掉最低位，最高位复制符号位）。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md", "excerpt": "对于uint16_t/uint32_t，做逻辑右移（去掉最低位，最高位填充为0）。"}
+        ]
+      },
+      "tag": {"roles": ["compute"], "operations": ["bitwise_shift"], "traits": ["elementwise", "high_dimensional", "scalar_operand"]},
+      "tag_evidence": {
+        "roles:compute": "对src中的每个元素执行右移，右移大小为value。",
+        "operations:bitwise_shift": "对src中的每个元素执行右移",
+        "traits:elementwise": "对src中的每个元素执行右移",
+        "traits:high_dimensional": "高维切分计算",
+        "traits:scalar_operand": "源操作数（标量），表示右移的位数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md", "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+      "document_sha256": "e634b33d0a2d3130e9d065ccabb975747b12d668a72019ea0e279cb4e155e25f",
+      "description": {
+        "value": "设置Mask模式为Counter模式，可直接传入数据计算数量，实际迭代次数由Vector计算单元自动推断，无需感知迭代次数和处理非对齐尾块，需和asc_set_vector_mask配合使用。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md", "excerpt": "设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入数据计算数量，实际迭代次数由Vector计算单元自动推断。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md", "excerpt": "该API需和[asc_set_vector_mask](asc_set_vector_mask.md)配合使用。"}
+        ]
+      },
+      "tag": {"roles": ["configuration"]},
+      "tag_evidence": {
+        "roles:configuration": "设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作，可直接传入数据计算数量，实际迭代次数由Vector计算单元自动推断。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+          "kind": "related",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md", "excerpt": "该API需和[asc_set_vector_mask](asc_set_vector_mask.md)配合使用。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md",
+      "document_sha256": "d96a856e69af4e406ea52de3104a44e70f8e3b30e5d38bf15b08b33466928a66",
+      "description": {
+        "value": "设置Mask模式为系统默认的Normal模式，该模式下Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素，需和asc_set_vector_mask配合使用。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md", "excerpt": "设置Mask模式为Normal模式，该模式为系统默认模式。该模式下，Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md", "excerpt": "该API需和[asc_set_vector_mask](asc_set_vector_mask.md)配合使用。"}
+        ]
+      },
+      "tag": {"roles": ["configuration"]},
+      "tag_evidence": {
+        "roles:configuration": "设置Mask模式为Normal模式，该模式为系统默认模式。该模式下，Mask参数可控制高维切分计算过程中单次迭代内参与计算的元素。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+          "kind": "related",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md", "excerpt": "该API需和[asc_set_vector_mask](asc_set_vector_mask.md)配合使用。"}
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+      "document_sha256": "39b0ca5a5e23d826bcc38a8873b1191ec8c755070858519b8b492ed3739a3283",
+      "description": {
+        "value": "设置矢量计算接口的Mask值以指示哪些数据参与计算，支持Normal和Counter两种模式，使用前需先调用asc_set_mask_count或asc_set_mask_norm设置Mask模式，在950产品上用于VF场景外设置掩码寄存器。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md", "excerpt": "本接口用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md", "excerpt": "使用前需要先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md", "excerpt": "针对Ascend 950PR&950DT系列产品：该接口通常用于VF场景外设置掩码寄存器，配合Reg矢量计算接口使用。"}
+        ]
+      },
+      "tag": {"roles": ["configuration"]},
+      "tag_evidence": {
+        "roles:configuration": "本接口用于设置Mask值。某些矢量计算接口需要提前设置Mask，用于指示哪些数据参与计算。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+          "kind": "requires",
+          "condition": "Atlas A3系列产品和Atlas A2系列产品",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md", "excerpt": "使用前需要先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。"}
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_norm.md",
+          "kind": "requires",
+          "condition": "Atlas A3系列产品和Atlas A2系列产品",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md", "excerpt": "需先调用[asc_set_mask_count](asc_set_mask_count.md)或[asc_set_mask_norm](asc_set_mask_norm.md)设置Mask模式。"}
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md",
+          "kind": "related",
+          "condition": "Ascend 950PR&950DT系列产品，在Reg矢量计算配置时",
+          "evidence": {"source_path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md", "excerpt": "在Reg矢量计算配置时，通过[asc_get_mask_spr](../../reg_compute/reg_mask/asc_get_mask_spr.md)接口中的`asc_get_mask_spr_b16`或`asc_get_mask_spr_b32`配合获取掩码寄存器的值。"}
+        }
+      ]
+    }
+  ]
+}

@@ -1,21 +1,12 @@
 ---
 okftype: reference.api
-title: asc_set_cmp_mask
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
-description: 为asc_select操作设置作用于选择的Mask掩码，该接口需与asc_select操作配合使用。
+description: "为asc_select操作设置作用于选择的Mask掩码，需与asc_select操作配合使用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - objects: [mask]
-signature:
-  - override_id: asc_set_cmp_mask__PUv
-archs: ['2201']
-header: [/include/c_api/vector_compute/compute/vector_compare.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_select.md
     kind: configures
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_set_cmp_mask
 

@@ -1,0 +1,482 @@
+{
+  "schema_version": 1,
+  "purpose": "discovery_summary",
+  "run_id": "core-v10",
+  "candidate_count": 12,
+  "candidates": [
+    {
+      "tag": "operations:mask_extraction",
+      "workers": [
+        "discovery-a",
+        "discovery-b"
+      ],
+      "supporting_documents": 1,
+      "supporting_directories": 1,
+      "coverage": 0.005587,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md"
+      ],
+      "directories": [
+        "reg_copy"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+          "excerpt": "从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+          "excerpt": "从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果"
+        }
+      ],
+      "status": "insufficient_document_support"
+    },
+    {
+      "tag": "operations:merge",
+      "workers": [
+        "discovery-b"
+      ],
+      "supporting_documents": 1,
+      "supporting_directories": 1,
+      "coverage": 0.005587,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md"
+      ],
+      "directories": [
+        "vector_compute/vector_sort"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+          "excerpt": "将2、3或4条已经按score从大到小排列的队列合并为一条有序队列"
+        }
+      ],
+      "status": "insufficient_document_support"
+    },
+    {
+      "tag": "operations:merge_sort",
+      "workers": [
+        "discovery-a"
+      ],
+      "supporting_documents": 1,
+      "supporting_directories": 1,
+      "coverage": 0.005587,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md"
+      ],
+      "directories": [
+        "vector_compute/vector_sort"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+          "excerpt": "将2、3或4条已经按score从大到小排列的队列合并为一条有序队列，保持按照score从大到小排序"
+        }
+      ],
+      "status": "insufficient_document_support"
+    },
+    {
+      "tag": "operations:unpack",
+      "workers": [
+        "discovery-a",
+        "discovery-b"
+      ],
+      "supporting_documents": 1,
+      "supporting_directories": 1,
+      "coverage": 0.005587,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md"
+      ],
+      "directories": [
+        "load"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+          "excerpt": "读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+          "excerpt": "读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素"
+        }
+      ],
+      "status": "insufficient_document_support"
+    },
+    {
+      "tag": "traits:aligned_transfer",
+      "workers": [
+        "discovery-a",
+        "discovery-b"
+      ],
+      "supporting_documents": 6,
+      "supporting_directories": 4,
+      "coverage": 0.03352,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+        "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md"
+      ],
+      "directories": [
+        "load",
+        "store",
+        "vector_datamove/asc_copy_gm2ub",
+        "vector_datamove/asc_copy_ub2gm"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+          "excerpt": "当前实际读取地址及Post Update更新后的下一次实际读取地址必须按32字节对齐"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+          "excerpt": "当前实际读取地址及Post Update更新后的下一次实际读取地址必须按32字节对齐"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+          "excerpt": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+          "excerpt": "目的操作数的起始地址。类型为`__ubuf__ <dtype>*`，起始地址需32字节对齐。"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+          "excerpt": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+          "excerpt": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+          "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节）"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+          "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+          "excerpt": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+          "excerpt": "**连续对齐搬出模式**：将压缩后的数据搬出到UB起始地址"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+          "excerpt": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+          "excerpt": "当采用前n个数据搬运接口时，搬运数据大小要求32字节对齐"
+        }
+      ],
+      "status": "requires_main_agent_review"
+    },
+    {
+      "tag": "traits:bit_packed_result",
+      "workers": [
+        "discovery-a"
+      ],
+      "supporting_documents": 2,
+      "supporting_directories": 1,
+      "coverage": 0.011173,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md"
+      ],
+      "directories": [
+        "vector_compute/vector_compare"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+          "excerpt": "若成立则输出结果dst上的对应比特位为1，否则为0"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+          "excerpt": "如果某个位置上的元素不等于value，则输出结果dst对应比特位为1，否则为0"
+        }
+      ],
+      "status": "insufficient_directory_support"
+    },
+    {
+      "tag": "traits:datablock_granularity",
+      "workers": [
+        "discovery-a",
+        "discovery-b"
+      ],
+      "supporting_documents": 3,
+      "supporting_directories": 3,
+      "coverage": 0.01676,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md"
+      ],
+      "directories": [
+        "load",
+        "vector_compute/vector_broadcast",
+        "vector_compute/vector_gather"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+          "excerpt": "读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+          "excerpt": "每一次取输入矢量中的8个数填充到结果矢量的8个datablock（32Bytes）中去"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+          "excerpt": "根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+          "excerpt": "根据偏移地址按照DataBlock的粒度将输入矢量收集到目的矢量中"
+        }
+      ],
+      "status": "requires_main_agent_review"
+    },
+    {
+      "tag": "traits:extremum_index",
+      "workers": [
+        "discovery-a",
+        "discovery-b"
+      ],
+      "supporting_documents": 2,
+      "supporting_directories": 1,
+      "coverage": 0.011173,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md"
+      ],
+      "directories": [
+        "vector_compute/vector_reduce"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+          "excerpt": "操作后的最大值，以及第一个最大值时的索引"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+          "excerpt": "对每个Repeat内所有元素求最小值，以及Repeat内的首个最小值元素在当前Repeat中的索引index"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+          "excerpt": "操作后的最大值，以及第一个最大值时的索引"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+          "excerpt": "对每个Repeat内所有元素求最小值，以及Repeat内的首个最小值元素在当前Repeat中的索引"
+        }
+      ],
+      "status": "insufficient_directory_support"
+    },
+    {
+      "tag": "traits:loop_transfer",
+      "workers": [
+        "discovery-b"
+      ],
+      "supporting_documents": 4,
+      "supporting_directories": 3,
+      "coverage": 0.022346,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md"
+      ],
+      "directories": [
+        "vector_datamove/asc_copy_gm2ub_align",
+        "vector_datamove/asc_copy_ub2gm",
+        "vector_datamove/asc_copy_ub2gm_align"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+          "excerpt": "循环搬运模式相关配置接口请参考[asc_set_gm2ub_loop_size]"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+          "excerpt": "使用循环搬运模式时，可通过[asc_set_gm2ub_loop_size]"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+          "excerpt": "可通过loop功能实现Broadcast，将`burst_count`设置为1"
+        },
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+          "excerpt": "可通过loop功能实现Broadcast，将`burst_count`设置为1"
+        }
+      ],
+      "status": "single_worker_only"
+    },
+    {
+      "tag": "traits:mask_counter_mode",
+      "workers": [
+        "discovery-a"
+      ],
+      "supporting_documents": 1,
+      "supporting_directories": 1,
+      "coverage": 0.005587,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md"
+      ],
+      "directories": [
+        "vector_compute/vector_mask_config"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+          "excerpt": "设置Mask模式为Counter模式。该模式下，不需要开发者去感知迭代次数、处理非对齐的尾块等操作"
+        }
+      ],
+      "status": "insufficient_document_support"
+    },
+    {
+      "tag": "traits:nearest_value_padding",
+      "workers": [
+        "discovery-b"
+      ],
+      "supporting_documents": 1,
+      "supporting_directories": 1,
+      "coverage": 0.005587,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md"
+      ],
+      "directories": [
+        "vector_datamove"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-b",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+          "excerpt": "使用最近值填充，左右Padding值选取当前维度最左侧或最右侧的值"
+        }
+      ],
+      "status": "insufficient_document_support"
+    },
+    {
+      "tag": "traits:strided_transfer",
+      "workers": [
+        "discovery-a"
+      ],
+      "supporting_documents": 10,
+      "supporting_directories": 6,
+      "coverage": 0.055866,
+      "paths": [
+        "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+        "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md"
+      ],
+      "directories": [
+        "store",
+        "vector_datamove",
+        "vector_datamove/asc_copy_gm2ub",
+        "vector_datamove/asc_copy_gm2ub_align",
+        "vector_datamove/asc_copy_ub2gm",
+        "vector_datamove/asc_copy_ub2gm_align"
+      ],
+      "evidence": [
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+          "excerpt": "通过参数配置相邻DataBlock的步长和相对目的起始地址的偏移"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+          "excerpt": "源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+          "excerpt": "并通过`src_stride`和`dst_stride`指定源操作数和目的操作数相邻数据块首地址间隔"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+          "excerpt": "源操作数相邻连续数据块的距离（前面一个数据块的尾与后面一个数据块的头的间隔），单位为字节"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+          "excerpt": "源操作数相邻连续数据块的距离（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+          "excerpt": "源操作数相邻连续数据块的间隔（前面一个数据块的尾与后面一个数据块的头的间隔）"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+          "excerpt": "并通过`src_stride`和`dst_stride`指定源操作数和目的操作数相邻数据块首地址间隔"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+          "excerpt": "源操作数相邻连续数据块的距离（前面一个数据块的尾与后面一个数据块的头的间隔），单位为DataBlock（32字节）"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+          "excerpt": "目的操作数相邻连续数据块的距离（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节"
+        },
+        {
+          "worker": "discovery-a",
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+          "excerpt": "本接口最多支持5个维度，每个维度均可单独配置Stride，并支持随路Padding功能"
+        }
+      ],
+      "status": "single_worker_only"
+    }
+  ]
+}
