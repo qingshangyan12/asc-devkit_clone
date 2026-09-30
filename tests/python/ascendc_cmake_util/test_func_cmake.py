@@ -92,3 +92,88 @@ def test_without_kernel_json_option_keeps_existing_path(tmp_path):
 
     assert result.returncode == 0, result.stdout
     assert (build_dir / "autogen/custom_opc_options.ini").read_text() == ""
+
+
+def _configure_kernel_spec_mode(source_dir, build_dir, mode):
+    result = subprocess.run(
+        ["cmake", "-S", str(source_dir), "-B", str(build_dir), f"-DKERNEL_SPEC_MODE={mode}"],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout
+
+
+def _write_codegen_option_project(source_dir, initialize_twice=False):
+    fake_opbuild = source_dir / "cann/tools/opbuild/op_build"
+    fake_opbuild.parent.mkdir(parents=True)
+    fake_opbuild.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+    fake_opbuild.chmod(0o755)
+    second_codegen = (
+        """set(ASCEND_PYTHON_EXECUTABLE "/bin/true")
+npu_op_code_gen(SRC "${CMAKE_CURRENT_SOURCE_DIR}/kernel.cpp" PACKAGE demo OUT_DIR "${custom_out}")"""
+        if initialize_twice
+        else ""
+    )
+    source_dir.mkdir(exist_ok=True)
+    (source_dir / "kernel.cpp").write_text("", encoding="utf-8")
+    (source_dir / "CMakeLists.txt").write_text(
+        f'''cmake_minimum_required(VERSION 3.16)
+project(codegen_options_test NONE)
+set(ASCENDC_CMAKE_SCRIPTS_PATH "{FWK_MODULES_DIR.as_posix()}")
+set(ASCEND_CANN_PACKAGE_PATH "{(source_dir / "cann").as_posix()}")
+set(CUSTOM_COMPILE_OPTIONS "custom_compile_options.ini")
+set(CUSTOM_OPC_OPTIONS "custom_opc_options.ini")
+include("{(FWK_MODULES_DIR / "func.cmake").as_posix()}")
+set(custom_out "${{CMAKE_BINARY_DIR}}/custom_autogen")
+set(ASCEND_PYTHON_EXECUTABLE "/bin/true")
+npu_op_code_gen(SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/kernel.cpp" PACKAGE demo OUT_DIR "${{custom_out}}")
+set(ASCEND_PYTHON_EXECUTABLE "python3")
+if(KERNEL_SPEC_MODE STREQUAL "Normal" OR KERNEL_SPEC_MODE STREQUAL "SK")
+  npu_op_kernel_options(kernel ALL OPTIONS
+    "--kernel-spec=${{KERNEL_SPEC_MODE}}"
+    "--kernel-spec-dir=${{CMAKE_BINARY_DIR}}/kernel_spec")
+endif()
+{second_codegen}
+''',
+        encoding="utf-8",
+    )
+
+
+def test_custom_codegen_options_are_reset_when_kernel_spec_is_disabled(tmp_path):
+    source_dir = tmp_path / "source"
+    build_dir = tmp_path / "build"
+    _write_codegen_option_project(source_dir)
+
+    _configure_kernel_spec_mode(source_dir, build_dir, "Normal")
+    _configure_kernel_spec_mode(source_dir, build_dir, "None")
+
+    assert (build_dir / "custom_autogen/custom_opc_options.ini").read_text(encoding="utf-8") == ""
+
+
+def test_custom_codegen_options_replace_previous_kernel_spec_mode(tmp_path):
+    source_dir = tmp_path / "source"
+    build_dir = tmp_path / "build"
+    _write_codegen_option_project(source_dir)
+
+    _configure_kernel_spec_mode(source_dir, build_dir, "Normal")
+    _configure_kernel_spec_mode(source_dir, build_dir, "SK")
+
+    config_file = build_dir / "custom_autogen/custom_opc_options.ini"
+    assert config_file.read_text(encoding="utf-8") == (
+        f"ALL@@--kernel-spec=SK@--kernel-spec-dir={build_dir}/kernel_spec\n"
+    )
+
+
+def test_codegen_options_are_initialized_once_per_configure(tmp_path):
+    source_dir = tmp_path / "source"
+    build_dir = tmp_path / "build"
+    _write_codegen_option_project(source_dir, initialize_twice=True)
+
+    _configure_kernel_spec_mode(source_dir, build_dir, "Normal")
+
+    config_file = build_dir / "custom_autogen/custom_opc_options.ini"
+    assert config_file.read_text(encoding="utf-8") == (
+        f"ALL@@--kernel-spec=Normal@--kernel-spec-dir={build_dir}/kernel_spec\n"
+    )
