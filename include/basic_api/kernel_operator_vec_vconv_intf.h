@@ -69,6 +69,19 @@ __aicore__ inline void Cast(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const RoundMode& roundMode, const uint64_t mask,
     const uint8_t repeatTime, const UnaryRepeatParams& repeatParams);
 
+/* **************************************************************************************************
+ * ReciprocalCast                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup ReciprocalCast Level 2
+ * @brief dst[i] = Precision conversion
+ * @param [out] dst output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] count number Number of data involved in calculation
+ */
+template <typename T, typename U>
+__aicore__ inline void ReciprocalCast(const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint32_t count);
+
 /*
  * @ingroup Cast Level 2
  * @brief dst[i] = Precision conversion

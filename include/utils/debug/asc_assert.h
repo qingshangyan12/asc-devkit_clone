@@ -33,7 +33,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
-    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #include "impl/utils/debug/asc_aicore_assert_impl.h"
 #endif
 #endif
@@ -59,7 +59,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __trap();
 #define assert(...)
 #define ascendc_assert(...)
 #endif
-
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_COMPILER_INTERNAL_HEADERS_ASC_ASSERT_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__
