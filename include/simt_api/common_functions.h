@@ -24,8 +24,8 @@
 #include "utils/debug/asc_time.h"
 
 #ifndef SPLIT_CORE_VEC
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || \
-    __NPU_ARCH__ == 9202))
+#if defined(__DAV_VEC__) && \
+    (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #define SPLIT_CORE_VEC
 #endif
 #endif
