@@ -25,6 +25,11 @@
 #include "../../include/basic_api/kernel_struct_binary.h"
 #include "../../include/basic_api/kernel_struct_brcb.h"
 #include "../../include/basic_api/kernel_struct_gather.h"
+#include "kernel_tensor.h"
+#include "kernel_struct_unary.h"
+#include "kernel_struct_binary.h"
+#include "kernel_struct_brcb.h"
+#include "kernel_struct_gather.h"
 
 #ifdef __MSTX_DFX_REPORT__
 
