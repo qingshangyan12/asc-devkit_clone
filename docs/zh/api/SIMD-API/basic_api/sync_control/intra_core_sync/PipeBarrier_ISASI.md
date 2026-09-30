@@ -71,7 +71,7 @@ __aicore__ inline void PipeBarrier()
 - 开启[cce-auto-sync编译选项](key_features.md#cce-compiler-auto-sync)时，毕昇编译器自动插入PIPE\_V之间的同步。
 <!-- end id10 -->
 <!-- npu="950" id11 -->
-- 针对Ascend 950PR&950DT系列产品，PIPE\_V之间的同步由硬件保证。
+- 针对Ascend 950PR/Ascend 950DT，PIPE\_V之间的同步由硬件保证。
 <!-- end id11 -->
 
 **图2**  Mul指令和Add指令是串行关系，必须等待Add指令执行完成后，才能执行Mul指令。<a name="fig1359216580459"></a>  
