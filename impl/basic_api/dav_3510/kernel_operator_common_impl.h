@@ -63,24 +63,16 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 #endif
 }
 
-__aicore__ inline int64_t GetStoreAtomicConfigImpl()
-{
-#if ((__NPU_ARCH__ != 9201) && (__NPU_ARCH__ != 9202))
-    return get_st_atomic_cfg();
-#endif
-    return 0;
-}
+__aicore__ inline int64_t GetStoreAtomicConfigImpl() { return get_st_atomic_cfg(); }
 
 __aicore__ inline void GetStoreAtomicConfigImpl(uint16_t& atomicType, uint16_t& atomicOp)
 {
-#if ((__NPU_ARCH__ != 9201) && (__NPU_ARCH__ != 9202))
     int64_t stAtomic = get_st_atomic_cfg();
     constexpr uint64_t typeMask = 0x7;
     constexpr uint64_t opBit = 4;
     constexpr uint64_t opMask = 0x3;
     atomicType = (static_cast<uint64_t>(stAtomic) & typeMask);
     atomicOp = ((static_cast<uint64_t>(stAtomic) >> opBit) & opMask);
-#endif
 }
 
 __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam& checkParams)
@@ -92,9 +84,7 @@ __aicore__ inline void CheckLocalMemoryIAImpl(const CheckLocalMemoryIAParam& che
 template <atomic_type_t type, atomic_op_t op>
 __aicore__ inline void SetStoreAtomicConfigImpl()
 {
-#if ((__NPU_ARCH__ != 9201) && (__NPU_ARCH__ != 9202))
     set_st_atomic_cfg(type, op);
-#endif
 }
 
 template <int8_t startBit, int8_t endBit>
