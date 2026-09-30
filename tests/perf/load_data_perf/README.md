@@ -9,9 +9,9 @@
 
 | 产品 | 架构代号 | CANN软件版本 |
 |------|----------|-------------|
-| Ascend 950PR/Ascend 950DT | dav-3510 | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | dav-2201 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | dav-2201 | >= CANN 9.0.0 |
+| Ascend 950PR&950DT系列产品 | dav-3510 | >= CANN 9.1.0 |
+| Atlas A3系列产品 | dav-2201 | >= CANN 9.0.0 |
+| Atlas A2系列产品 | dav-2201 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 

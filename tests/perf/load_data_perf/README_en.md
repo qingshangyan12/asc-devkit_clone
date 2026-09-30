@@ -9,9 +9,9 @@ This is a non-business test sample and does not include matrix computation instr
 
 | Product | Architecture Code | CANN Version |
 |------|----------|-------------|
-| Ascend 950PR/Ascend 950DT | dav-3510 | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | dav-2201 | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | dav-2201 | >= CANN 9.0.0 |
+| Ascend 950PR&950DT products | dav-3510 | >= CANN 9.1.0 |
+| Atlas A3 products/Atlas A3 products | dav-2201 | >= CANN 9.0.0 |
+| Atlas A2 products/Atlas A2 products | dav-2201 | >= CANN 9.0.0 |
 
 ## Directory Structure
 

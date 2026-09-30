@@ -8,7 +8,7 @@ This example tests the performance of matrix multiply-add operations using Mmad 
 
 | Product | Architecture Code | CANN Version |
 |---------|-------------------|--------------|
-| Ascend 950PR/Ascend 950DT | dav-3510 | >= CANN 9.1.0 |
+| Ascend 950PR&950DT products | dav-3510 | >= CANN 9.1.0 |
 | Atlas A3 Training/Inference Series | dav-2201 | >= CANN 9.0.0 |
 | Atlas A2 Training/Inference Series | dav-2201 | >= CANN 9.0.0 |
 
