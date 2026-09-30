@@ -252,6 +252,49 @@ class TestCompileOp(unittest.TestCase):
         self.assertEqual(safe_parse_value("C_DT_UNKNOWN"), -1)
         self.assertEqual(extract_expr("{C_DT_FLOAT16, (13 * 2 + 1), C_DT_UNKNOWN, C_FORMAT_ND}"), [1, 27, 2])
 
+    def test_template_tiling_integer_division_and_remainder(self):
+        cases = (
+            ("7 / 3", 2),
+            ("-7 / 3", -2),
+            ("7 / -3", -2),
+            ("-7 / -3", 2),
+            ("7 % 3", 1),
+            ("-7 % 3", -1),
+            ("7 % -3", 1),
+            ("-7 % -3", -1),
+            ("-7 // 3", -3),
+            ("9223372036854775807 / 3", 3074457345618258602),
+            ("-9223372036854775807 / 3", -3074457345618258602),
+            ("9223372036854775807 % 3", 1),
+        )
+        for expression, expected in cases:
+            with self.subTest(expression=expression):
+                self.assertEqual(template_tiling.safe_eval_int_expr(expression), expected)
+        for expression in ("7 / 0", "7 % 0"):
+            with self.subTest(expression=expression):
+                with self.assertRaises(ZeroDivisionError):
+                    template_tiling.safe_eval_int_expr(expression)
+
+    def test_template_tiling_datatype_signed_intermediate_values(self):
+        declare_param_str = (
+            "@@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {"
+            "@@ASCENDC_TPL_DATATYPE_DECL_D_T_X@@ = {C_DT_FLOAT16, C_DT_BF16},};"
+        )
+        for expression in ("29 + (-7 / 3)", "28 + (-7 % 3)"):
+            select_param_str = (
+                "@@ASCENDC_TPL_LISTS@@ = {@@{"
+                f"@@ASCENDC_TPL_DATATYPE_SEL_D_T_X@@ = {{{expression}}},}},}};"
+            )
+            with self.subTest(expression=expression):
+                with tbe.common.context.op_context.OpContext():
+                    with mock.patch.object(
+                        tbe.common.context.get_context(), "get_addition", return_value=""
+                    ):
+                        template_tiling.extract_template_tiling_info(declare_param_str, select_param_str)
+                        result = template_tiling.decode_tiling()
+                self.assertEqual(list(result), [27])
+                self.assertEqual(result[27]["dtypeParams"], ["bfloat16"])
+
     def test_template_tiling_datatype_invalid_select_value(self):
         declare_param_str = (
             "@@ASCENDC_TPL_ARGS_DECL_AddTemplateCustom@@ = {@@ASCENDC_TPL_DATATYPE_DECL_D_T_X@@ = {C_DT_FLOAT16, C_DT_BF16},"

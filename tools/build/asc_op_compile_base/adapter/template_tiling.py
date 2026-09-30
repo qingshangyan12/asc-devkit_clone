@@ -156,13 +156,25 @@ ASCENDC_COMPILE_DATAFORMAT_MAP = {
     "FORMAT_MAX": ["unknown", ASCENDC_TPL_DATAFORMAT_MAX],  # 0xff = 255
 }
 ASCENDC_COMPILE_DATAFORMAT_REVERT_MAP = {v[-1]: v[0] for v in ASCENDC_COMPILE_DATAFORMAT_MAP.values()}
+
+
+def _divide_int(left, right):
+    """Match C++ integer division, which truncates toward zero."""
+    quotient = abs(left) // abs(right)
+    return -quotient if (left < 0) != (right < 0) else quotient
+
+
+def _remainder_int(left, right):
+    return left - _divide_int(left, right) * right
+
+
 SAFE_EXPR_BIN_OPS = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
     ast.Mult: operator.mul,
     ast.FloorDiv: operator.floordiv,
-    ast.Div: operator.floordiv,
-    ast.Mod: operator.mod,
+    ast.Div: _divide_int,
+    ast.Mod: _remainder_int,
     ast.LShift: operator.lshift,
     ast.RShift: operator.rshift,
     ast.BitOr: operator.or_,
