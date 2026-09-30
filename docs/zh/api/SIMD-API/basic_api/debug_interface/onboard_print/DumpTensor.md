@@ -129,7 +129,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 - SIMD场景下，每核打印FIFO缓冲区大小默认为30KB，可通过[aclInit接口](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/02_initialization_and_deinitialization.md#aclinit)中的`simd_printf_fifo_size_per_core`字段配置，配置范围最小为1KB，最大为64MB。
 <!-- npu="950,A3,910b,310p" id114 -->
-针对如下型号:
+- 针对如下型号:
 <!-- npu="950" id115 -->
 - Ascend 950PR&950DT系列产品
 <!-- end id115 -->
