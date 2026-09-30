@@ -73,7 +73,23 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams,
+    const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    CheckLoadData2dDatatype<T>();
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParams");
+    CheckLoadData2dParams<T>(loadDataParams, false);
+#endif
+    LoadDataImpl(dst, src, loadDataParams, enablePreReadIgnoreSync);
+#endif
+}
+
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load2DBitModeParam& loadDataParams)
@@ -110,8 +126,9 @@ __aicore__ inline void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, typename U, typename V>
 __aicore__ inline void LoadData(
     const LocalTensor<U>& dst, const LocalTensor<T>& src0, const LocalTensor<V>& srcMx,
@@ -147,6 +164,20 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     LoadDataImpl(dst, src, loadDataParams, nd2nzParams);
 }
 #endif
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams,
+    const bool enablePreReadIgnoreSync)
+{
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    CheckLoadData2dDatatype<T>();
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData2dGlobal2Local(dst, "LoadData with LoadData2DParamsV2");
+#endif
+    LoadDataImpl(dst, src, loadDataParams, enablePreReadIgnoreSync);
+#endif
+}
 
 /* **************************************************************************************************
  * LoadData 3dv1                                             *
@@ -248,7 +279,8 @@ __aicore__ inline void LoadData(
     LoadDataImpl<T, defaultConfig>(dst, src, loadDataParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <
     typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
@@ -265,7 +297,8 @@ __aicore__ inline void LoadDataWithStride(
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load3DBitModeParam& loadDataParams)
@@ -372,23 +405,6 @@ __aicore__ inline void LoadDataWithTranspose(
 }
 
 /* **************************************************************************************************
- * LoadDataWithDecomp                                             *
- * ************************************************************************************************* */
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
-__aicore__ inline void EnableS4ToS8() { EnableS4ToS8Impl(); }
-
-__aicore__ inline void EnableS3ToS8() { EnableS3ToS8Impl(); }
-
-template <typename T>
-__aicore__ inline __inout_pipe__(MTE2) void LoadData(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DDecompParamsV2& loadDataDecompParams)
-{
-    LoadDataImpl<T>(dst, src, loadDataDecompParams);
-}
-#endif
-
-/* **************************************************************************************************
  * Mmad                                             *
  * ************************************************************************************************* */
 /*
@@ -423,7 +439,7 @@ __aicore__ inline void Mmad(
     MmadImpl(dst, fm, filter, bias, mmadParams);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
@@ -455,7 +471,7 @@ __aicore__ inline void MmadMx(
     MmadMxImpl(dst, fm, filter, bias, mmadParams);
 }
 
-template <typename T, typename U, typename S>
+template <typename T, typename U, typename S, typename R>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,
     const MmadBitModeParams& mmadParams)
@@ -463,7 +479,7 @@ __aicore__ inline void MmadMx(
     MmadMxImpl(dst, fm, filter, mmadParams);
 }
 
-template <typename T, typename U, typename S, typename V>
+template <typename T, typename U, typename S, typename V, typename R>
 __aicore__ inline void MmadMx(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadBitModeParams& mmadParams)
@@ -594,7 +610,8 @@ __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padL
     SetFmatrixImpl(l1H, l1W, padList, fmatrixMode);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
     SetFmatrixImpl(param, fmatrixMode);
@@ -620,7 +637,8 @@ __aicore__ inline void SetLoadDataRepeat(const LoadDataRepeatParam& repeatParams
     SetLoadDataRepeatImpl(repeatParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline void SetLoadDataRepeatWithStride(const LoadDataRepeatParamWithStride& repeatParams)
 {
     ASCENDC_CHECK_VALUE_RANGE(repeatParams.repeatMode, 0, 1, "repeatMode", "SetLoadDataRepeat");
@@ -715,14 +733,14 @@ __aicore__ inline void SetHF32Mode(bool hf32Mode) { SetHF32ModeImpl(hf32Mode); }
  */
 __aicore__ inline void SetHF32TransMode(HF32TransMode mode)
 {
-    SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_AWAY);
+    SetHF32TransModeImpl(mode == AscendC::HF32TransMode::NEAREST_ZERO);
 }
 
 /*
  * @brief Sets the rounding method for HF32 rounding mode
  * @param [in] hf32TransMode Control parameter for Mmad HF32 mode
  * @note Must Call SetHF32Mode to enable HF32 rounding mode first.When hf32TransMode is true, FP32 is rounded to HF32
- * with rounding to nearest, with ties away from zero; when false, rounded to nearest, with ties to even
+ * with rounding towards zero; when false, rounded to nearest even
  */
 // SetHF32TransMode(bool hf32TransMode) has been updated, please use SetHF32TransMode(HF32TransMode mode) instead.
 __aicore__ inline void SetHF32TransMode(bool hf32TransMode) { SetHF32TransModeImpl(hf32TransMode); }
