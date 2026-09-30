@@ -35,12 +35,19 @@ __simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& sr
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1);
+
+template <typename T = DefaultType, HighLowPart part, typename U>
+__simd_callee__ inline void Interleave(U& dstReg, U& srcReg0, U& srcReg1);
+
+template <typename T = DefaultType, HighLowPart part, typename U>
+__simd_callee__ inline void DeInterleave(U& dstReg, U& srcReg0, U& srcReg1);
 } // namespace Reg
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) ||  \
-         (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165)) || \
+#if defined(__NPU_ARCH__) &&                                                                                     \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+         (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165) || \
+         (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                                                    \
     defined(__ASC_NPU_HOST__)
 #include "../../../impl/basic_api/reg_compute/kernel_reg_compute_vec_data_reorder_intf_impl.h"
 #endif
