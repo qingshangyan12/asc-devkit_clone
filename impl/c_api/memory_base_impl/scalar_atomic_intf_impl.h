@@ -32,6 +32,67 @@ __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op
     set_st_atomic_cfg(config);
 }
 
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int8_t value, __gm__ int8_t* addr)
+{
+    constexpr uint64_t type_mask = 0x7;
+    constexpr uint64_t op_mask = 0x3;
+    constexpr uint64_t op_bit = 3;
+    uint64_t config = (type & type_mask) | ((op & op_mask) << op_bit);
+    set_st_atomic_cfg(config);
+    st_atomic(value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int16_t value, __gm__ int16_t* addr)
+{
+    constexpr uint64_t type_mask = 0x7;
+    constexpr uint64_t op_mask = 0x3;
+    constexpr uint64_t op_bit = 3;
+    uint64_t config = (type & type_mask) | ((op & op_mask) << op_bit);
+    set_st_atomic_cfg(config);
+    st_atomic(value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int32_t value, __gm__ int32_t* addr)
+{
+    constexpr uint64_t type_mask = 0x7;
+    constexpr uint64_t op_mask = 0x3;
+    constexpr uint64_t op_bit = 3;
+    uint64_t config = (type & type_mask) | ((op & op_mask) << op_bit);
+    set_st_atomic_cfg(config);
+    st_atomic(value, addr);
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, half value, __gm__ half* addr)
+{
+    constexpr uint64_t type_mask = 0x7;
+    constexpr uint64_t op_mask = 0x3;
+    constexpr uint64_t op_bit = 3;
+    uint64_t config = (type & type_mask) | ((op & op_mask) << op_bit);
+    set_st_atomic_cfg(config);
+    st_atomic(*(reinterpret_cast<int16_t*>(&value)), reinterpret_cast<__gm__ int16_t*>(addr));
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, float value, __gm__ float* addr)
+{
+    constexpr uint64_t type_mask = 0x7;
+    constexpr uint64_t op_mask = 0x3;
+    constexpr uint64_t op_bit = 3;
+    uint64_t config = (type & type_mask) | ((op & op_mask) << op_bit);
+    set_st_atomic_cfg(config);
+    st_atomic(*(reinterpret_cast<int32_t*>(&value)), reinterpret_cast<__gm__ int32_t*>(addr));
+}
+
+__aicore__ inline void asc_set_store_atomic_config_v1(
+    uint16_t type, uint16_t op, bfloat16_t value, __gm__ bfloat16_t* addr)
+{
+    constexpr uint64_t type_mask = 0x7;
+    constexpr uint64_t op_mask = 0x3;
+    constexpr uint64_t op_bit = 3;
+    uint64_t config = (type & type_mask) | ((op & op_mask) << op_bit);
+    set_st_atomic_cfg(config);
+    st_atomic(*(reinterpret_cast<int16_t*>(&value)), reinterpret_cast<__gm__ int16_t*>(addr));
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)

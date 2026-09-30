@@ -79,6 +79,16 @@ __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val
 
 __aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op);
 
+#if !defined(__NPU_ARCH__) || (__NPU_ARCH__ == 2201)
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int8_t value, __gm__ int8_t* addr);
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int16_t value, __gm__ int16_t* addr);
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, int32_t value, __gm__ int32_t* addr);
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, half value, __gm__ half* addr);
+__aicore__ inline void asc_set_store_atomic_config_v1(uint16_t type, uint16_t op, float value, __gm__ float* addr);
+__aicore__ inline void asc_set_store_atomic_config_v1(
+    uint16_t type, uint16_t op, bfloat16_t value, __gm__ bfloat16_t* addr);
+#endif
+
 __aicore__ inline void asc_get_store_atomic_config(asc_store_atomic_config& config);
 
 ASC_DEPRECATED(9.1.0, "2027/09/07", asc_atomic_add)
