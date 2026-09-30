@@ -70,6 +70,22 @@ TEST_F(TestAscCApiSimdDcci, dcci_gm_entire_all)
 }
 
 namespace {
+void dcci_entire_ub_stub(__ubuf__ void* dstPtr, uint64_t entire, uint64_t type)
+{
+    EXPECT_EQ((__ubuf__ void*)0, dstPtr);
+    EXPECT_EQ(cache_line_t::ENTIRE_DATA_CACHE, entire);
+    EXPECT_EQ(dcci_dst_t::CACHELINE_UB, type);
+}
+} // namespace
+
+TEST_F(TestAscCApiSimdDcci, dcci_ub_entire)
+{
+    MOCKER(dcci, void(__ubuf__ void*, uint64_t, uint64_t)).times(1).will(invoke(dcci_entire_ub_stub));
+    asc_dcci_entire_ub();
+    GlobalMockObject ::verify();
+}
+
+namespace {
 void dcci_entire_out_stub(__gm__ void* dstPtr, uint64_t entire, uint64_t type)
 {
     EXPECT_EQ((__gm__ void*)0, dstPtr);
