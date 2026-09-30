@@ -41,7 +41,7 @@
 <!-- npu="310p" id11 -->
 - Atlas推理系列产品
 <!-- end id11 --> 
-- NPU上板调试的非SIMD VF场景支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dump_size`指定需要打印的元素个数，无需手动拆分数据或多次调用接口。
+- NPU上板调试时支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dump_size`指定需要打印的元素个数，无需手动拆分数据或多次调用接口。
 <!-- end id7 --> 
 
 使用该接口需要包含`"utils/debug/asc_dump.h"`头文件。
