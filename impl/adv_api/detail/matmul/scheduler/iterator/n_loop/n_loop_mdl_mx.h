@@ -31,12 +31,12 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     NLoop is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, class A_TYPE, const auto& MM_CFG>
+template <typename IMPL, class A_TYPE, class B_TYPE, const auto& MM_CFG>
 class NLoop<
-    IMPL, A_TYPE, MM_CFG,
+    IMPL, A_TYPE, B_TYPE, MM_CFG,
     enable_if_t<
-        DoMatmulMDL(MM_CFG) && HasScalePosition<A_TYPE>::value && !MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB()>>
-    : public NLoopMDLBase<IMPL, A_TYPE, MM_CFG> {
+        DoMatmulMDL(MM_CFG) && (HasScalePosition<A_TYPE>::value || HasScalePosition<B_TYPE>::value) &&
+        !MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB()>> : public NLoopMDLBase<IMPL, A_TYPE, MM_CFG> {
     MATMUL_USE_MODULE(MatmulShapeTiling);
 
 public:
