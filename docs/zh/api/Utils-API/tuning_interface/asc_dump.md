@@ -27,6 +27,8 @@
 
 将对应内存上的数据打印出来，同时支持打印自定义的附加信息（仅支持uint32\_t类型的信息），比如打印当前行号等。
 
+针对Ascend 950PR&950DT系列产品、Atlas A3系列产品和Atlas A2系列产品，NPU上板调试的非SIMD VF场景支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dump_size`指定需要打印的元素个数，无需手动拆分数据或多次调用接口。
+
 使用该接口需要包含`"utils/debug/asc_dump.h"`头文件。
 
 > [!CAUTION]注意
@@ -141,10 +143,9 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 -   针对Ascend 950PR&950DT系列产品，打印Fixpipe Buffer中的Tensor信息场景：
     -   Fixpipe Buffer保存的是硬件参数位域，打印结果不一定与L1 Buffer中的原始数据按位相同。前级Quant参数每8字节保留bit[7:0]、bit[31:13]和bit[46:37]，期望值为`input & 0x00007fe0ffffe0ffULL`；前级ReLU参数每4字节保留bit[31:13]，期望值为`word & 0xffffe000U`。
 <!-- end id15 -->
--   使用该接口时，在每个核上dump的数据总量不能大于30KB，请开发者自行控制打印的内容数据量，超出则不会打印。
 -   当`dump_size`的大小超过了`input`的实际元素个数时，会出现未定义问题。
 -   在计算数据量时，若dump的总长度未对齐，需要考虑padding数据的影响。当进行非对齐dump时，如果实际dump的元素长度不满足32字节对齐，系统会自动在其末尾补充一定数量的padding数据（这部分数据并不会打印），以满足对齐要求。
--   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过acl.json中的`"simd_printf_fifo_size_per_core"`字段进行配置，配置范围最小为1KB，最大为64MB（可通过[aclInit](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_0022.html)接口调整）。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
+-   SIMD场景下，每核打印FIFO缓冲区大小默认为30KB，可通过acl.json中的`simd_printf_fifo_size_per_core`字段配置，配置范围最小为1KB，最大为64MB（可通过[aclInit](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_0022.html)接口调整）。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
 
 <!-- npu="950" id16 -->
 -   SIMD VF场景下，使用`asc_dump_reg`或寄存器入参的`asc_dump`时，若`dump_size`超过一个矢量寄存器可容纳的元素数量，系统会将其自动截断为该寄存器可容纳的元素数量。
