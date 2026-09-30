@@ -32,6 +32,7 @@ build_device/
 .claude/
 .cursor/
 .opencode/
+.arts/
 docs/zh/vitepress/docs/.vitepress/theme/outline-index.json
 
 oat_reports/
