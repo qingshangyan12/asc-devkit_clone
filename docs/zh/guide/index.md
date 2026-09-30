@@ -206,6 +206,7 @@
         -   [概述](operator_practice/simd_operator_impl/overview.md)
         -   [矢量编程](operator_practice/simd_operator_impl/vector_programming/vector_programming.md)
             -   [概述](operator_practice/simd_operator_impl/vector_programming/overview.md)
+            -   [hifloat8数据类型](operator_practice/simd_operator_impl/vector_programming/hifloat8_operator.md)
             -   [基础矢量算子](operator_practice/simd_operator_impl/vector_programming/basic_vector_operator.md)
             -   [TBuf的使用](operator_practice/simd_operator_impl/vector_programming/tbuf_usage.md)
             -   [多核Tiling切分](operator_practice/simd_operator_impl/vector_programming/multi_core_tiling/overview.md)
