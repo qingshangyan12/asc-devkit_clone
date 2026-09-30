@@ -238,31 +238,6 @@ __aicore__ inline void Gather(
 #endif
 #endif
 }
-/*
- * @ingroup gather Level 0
- * @brief gather element from global src according to offsetSrc
- * @param [out] dst output LocalTensor
- * @param [in] src input GlobalTensor
- * @param [in] offsetSrc input LocalTensor, offset type is int32_t or int64_t
- * @param [in] gatherParam gather parameters, including offsetNum, burstLen and dstStride
- * @param [in] gatherPadParam gather pad parameters, including padSel and paddingValue
- */
-template <typename T, typename U>
-__aicore__ inline void GatherFromGlobal(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offsetSrc, GatherParams& gatherParam,
-    GatherPadParams<T>& gatherPadParam)
-{
-    using PrimType = PrimT<T>;
-    using OffsetPrimType = PrimT<U>;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
-    const uint8_t cacheMode = ExtractCacheMode(src);
-    GatherFromGlobalImpl(
-        (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(),
-        (__ubuf__ OffsetPrimType*)offsetSrc.GetPhyAddr(), gatherParam, gatherPadParam, cacheMode);
-#else
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "GatherFromGlobal is not supported on current device"); });
-#endif
-}
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_GATHER_INTERFACE_IMPL_H
