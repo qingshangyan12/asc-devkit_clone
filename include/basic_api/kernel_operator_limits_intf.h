@@ -43,7 +43,8 @@ struct NumericLimits {
 public:
     constexpr __aicore__ static inline T Max()
     {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         static_assert(
             SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
             "current data type is not supported on current device!");
@@ -68,7 +69,8 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0x7BFFu);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0x7F7FFFFFu);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x7F7Fu);
 #endif
@@ -78,7 +80,8 @@ public:
 
     constexpr __aicore__ static inline T Lowest()
     {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         static_assert(
             SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
             "current data type is not supported on current device!");
@@ -103,7 +106,8 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0xFBFFu);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0xFF7FFFFFu);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0xFF7Fu);
 #endif
@@ -113,7 +117,8 @@ public:
 
     constexpr __aicore__ static inline T Min()
     {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         static_assert(
             SupportType<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
             "current data type is not supported on current device!");
@@ -138,7 +143,8 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0x0400u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0x00800000u);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x0080u);
 #endif
@@ -148,7 +154,8 @@ public:
 
     constexpr __aicore__ static inline T Infinity()
     {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         static_assert(
             SupportType<T, half, float, bfloat16_t>(), "current data type is not supported on current device!");
 #else
@@ -158,7 +165,8 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0x7C00u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0x7F800000u);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x7F80u);
 #endif
@@ -168,7 +176,8 @@ public:
 
     constexpr __aicore__ static inline T NegativeInfinity()
     {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         static_assert(
             SupportType<T, half, float, bfloat16_t>(), "current data type is not supported on current device!");
 #else
@@ -178,7 +187,8 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0xFC00u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0xFF800000u);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0xFF80u);
 #endif
@@ -188,7 +198,8 @@ public:
 
     constexpr __aicore__ static inline T QuietNaN()
     {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         static_assert(
             SupportType<T, half, float, bfloat16_t>(), "current data type is not supported on current device!");
 #else
@@ -198,7 +209,8 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0x7E00u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0x7FC00000u);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x7FC0u);
 #endif
@@ -208,7 +220,8 @@ public:
 
     constexpr __aicore__ static inline T SignalingNaN()
     {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         static_assert(
             SupportType<T, half, float, bfloat16_t>(), "current data type is not supported on current device!");
 #else
@@ -218,7 +231,8 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0x7D00u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0x7FA00000u);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x7FA0u);
 #endif
@@ -228,7 +242,8 @@ public:
 
     constexpr __aicore__ static inline T DeNormMin()
     {
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         static_assert(
             SupportType<T, half, float, bfloat16_t>(), "current data type is not supported on current device!");
 #else
@@ -238,7 +253,8 @@ public:
             return GetScalarBitcodeValue<uint16_t, T>(0x0001u);
         } else if constexpr (AscendC::Std::is_same<T, float>::value) {
             return GetScalarBitcodeValue<uint32_t, T>(0x00000001u);
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
         } else if constexpr (AscendC::Std::is_same<T, bfloat16_t>::value) {
             return GetScalarBitcodeValue<uint16_t, T>(0x0001u);
 #endif
