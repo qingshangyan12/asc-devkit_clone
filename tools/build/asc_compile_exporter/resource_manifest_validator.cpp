@@ -41,8 +41,7 @@ const std::map<std::string, MarkerRequirement> GENERIC_MARKER_REQUIREMENTS = {
 };
 
 using FieldSet = std::set<std::string>;
-const FieldSet MANIFEST_FIELDS = {
-    "resource_id", "soc_version", "source_file", "resource_path", "options", "kernels"};
+const FieldSet MANIFEST_FIELDS = {"resource_id", "soc_version", "source_file", "resource_path", "options", "kernels"};
 const FieldSet KERNEL_FIELDS = {"kernel_name", "constant_infos", "link_options", "objects"};
 const FieldSet CONSTANT_FIELDS = {"name", "parameter_index", "arg_type", "byte_size", "file", "template"};
 const FieldSet OBJECT_FIELDS = {"object_name", "object_type", "commands", "outputs"};
