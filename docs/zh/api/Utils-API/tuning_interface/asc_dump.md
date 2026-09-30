@@ -27,7 +27,22 @@
 
 将对应内存上的数据打印出来，同时支持打印自定义的附加信息（仅支持uint32\_t类型的信息），比如打印当前行号等。
 
-针对Ascend 950PR&950DT系列产品、Atlas A3系列产品和Atlas A2系列产品，NPU上板调试的非SIMD VF场景支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dump_size`指定需要打印的元素个数，无需手动拆分数据或多次调用接口。
+<!-- npu="950,A3,910b,310p" id7 -->
+针对如下型号:
+<!-- npu="950" id8 -->
+- Ascend 950PR&950DT系列产品
+<!-- end id8 -->
+<!-- npu="A3" id9 -->
+- Atlas A3系列产品
+<!-- end id9 --> 
+<!-- npu="910b" id10 -->
+- Atlas A2系列产品
+<!-- end id10 --> 
+<!-- npu="310p" id11 -->
+- Atlas推理系列产品
+<!-- end id11 --> 
+- NPU上板调试的非SIMD VF场景支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dump_size`指定需要打印的元素个数，无需手动拆分数据或多次调用接口。
+<!-- end id7 --> 
 
 使用该接口需要包含`"utils/debug/asc_dump.h"`头文件。
 

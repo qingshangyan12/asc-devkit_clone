@@ -131,17 +131,18 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 <!-- npu="950,A3,910b,310p" id114 -->
 针对如下型号:
 <!-- npu="950" id115 -->
-- Ascend 950PR&950DT系列产品，NPU上板调试时支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dumpSize`指定需要打印的元素个数，无需手动拆分Tensor或多次调用接口。
+- Ascend 950PR&950DT系列产品
 <!-- end id115 -->
 <!-- npu="A3" id116 -->
-- Atlas A3系列产品，NPU上板调试时支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dumpSize`指定需要打印的元素个数，无需手动拆分Tensor或多次调用接口。
+- Atlas A3系列产品
 <!-- end id116 --> 
 <!-- npu="910b" id117 -->
-- Atlas A2系列产品，NPU上板调试时支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dumpSize`指定需要打印的元素个数，无需手动拆分Tensor或多次调用接口。
+- Atlas A2系列产品
 <!-- end id117 --> 
 <!-- npu="310p" id118 -->
-- Atlas推理系列产品，NPU上板调试时支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dumpSize`指定需要打印的元素个数，无需手动拆分Tensor或多次调用接口。
+- Atlas推理系列产品
 <!-- end id118 --> 
+- NPU上板调试时支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dumpSize`指定需要打印的元素个数，无需手动拆分Tensor或多次调用接口。
 <!-- end id114 --> 
 
 ## 调用示例<a name="section82241477610"></a>
