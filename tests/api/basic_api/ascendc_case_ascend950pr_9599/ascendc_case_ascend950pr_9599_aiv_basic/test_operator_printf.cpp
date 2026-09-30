@@ -99,6 +99,29 @@ TEST_F(TestPrintfSuite, SimdVfPrintfMatchesAicoreCpuFallback)
     EXPECT_EQ(simdVfOutput, aicoreOutput);
     EXPECT_EQ(simdVfOutput, "SIMD_VF_PRINTF value -3 6 1.25 0x2a");
 }
+
+TEST_F(TestPrintfSuite, SimdVfGmCStringPrintfUnwrapsAddressOnlyStrings)
+{
+    auto fmt = __asc_simd_vf::make_gm_cstring_ref("CSTRING %s %d %.2f");
+    auto text = __asc_simd_vf::make_gm_cstring_ref("hello");
+    testing::internal::CaptureStdout();
+    __asc_simd_vf::printf_gm(fmt, text, -3, 1.25);
+    EXPECT_EQ(testing::internal::GetCapturedStdout(), "CSTRING hello -3 1.25");
+}
+
+TEST_F(TestPrintfSuite, SimdVfGmPrintfUnwrapsCpuStrings)
+{
+    const char fmt[] = "GM_STRING %s %s %d %.2f";
+    const char text[] = "hello";
+    auto fmtRef = __asc_simd_vf::make_gm_debug_string(fmt, sizeof(fmt));
+    auto textRef = __asc_simd_vf::make_gm_debug_string(text, sizeof(text));
+    char dynamic[] = "snapshot";
+    testing::internal::CaptureStdout();
+    __asc_simd_vf::printf(fmtRef, textRef, dynamic, -3, 1.25);
+    const auto output = testing::internal::GetCapturedStdout();
+    EXPECT_EQ(output, "GM_STRING hello snapshot -3 1.25");
+}
+
 #endif
 
 TEST_F(TestPrintfSuite, DumpBlockIdxAndSysVarCase)

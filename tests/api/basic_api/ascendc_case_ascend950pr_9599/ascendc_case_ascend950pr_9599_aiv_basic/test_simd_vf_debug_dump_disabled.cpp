@@ -18,6 +18,8 @@ TEST(SimdVfDebugDumpDisabledTest, PrintfIsSilentAndDumpFallbacksRemainAvailable)
 {
     testing::internal::CaptureStdout();
     __asc_simd_vf::printf("disabled %llu", 1ULL);
+    __asc_simd_vf::printf_gm(__asc_simd_vf::make_gm_cstring_ref("disabled %s"),
+        __asc_simd_vf::make_gm_cstring_ref("cstring"));
     EXPECT_TRUE(testing::internal::GetCapturedStdout().empty());
 
     int16_t ubInput[1] = {0};

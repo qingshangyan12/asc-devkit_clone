@@ -17,6 +17,7 @@
 
 #include "impl/utils/sys_macros_impl.h"
 #include "impl/utils/debug/asc_simd_vf_utils.h"
+#include "impl/utils/debug/npu_arch_3510/asc_simd_gm_publish_impl.h"
 
 namespace __asc_simd_vf {
 template <typename T, typename U, typename... Args>
@@ -279,72 +280,71 @@ __aicore__ inline void update_write_info(
     asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(writeInfo));
 }
 
-__aicore__ static bool count_vf_tlv_packages(__ubuf__ uint8_t* tlv, uint32_t tlvLen, uint32_t& packageNum)
-{
-    constexpr uint32_t tlvHeadLen = 2 * sizeof(uint32_t);
-
-    uint32_t offset = 0;
-
-    while (offset + tlvHeadLen <= tlvLen) {
-        __ubuf__ uint32_t* head = reinterpret_cast<__ubuf__ uint32_t*>(tlv + offset);
-        uint32_t payloadLen = head[1];
-
-        if (payloadLen > tlvLen - offset - tlvHeadLen) {
-            return false;
-        }
-
-        offset += tlvHeadLen + payloadLen;
-        packageNum += 1;
-    }
-
-    return packageNum != 0 && offset == tlvLen;
-}
-
 __aicore__ inline void asc_vf_debug_publish(
     __ubuf__ BlockVFBufInfo* blockInfo, uint32_t curWriteLen, uint32_t curReadLen)
 {
-    const uint32_t tlvLen = curWriteLen - curReadLen;
-    __ubuf__ uint8_t* tlv = reinterpret_cast<__ubuf__ uint8_t*>(blockInfo->buffer) + curReadLen;
-
-    uint32_t packageNum = 0;
-    if (!count_vf_tlv_packages(tlv, tlvLen, packageNum)) {
+    if (curWriteLen > ASCENDC_SIMD_VF_PRINTF_UBUF_MAX_SIZE || curReadLen > curWriteLen ||
+        (curReadLen % 8) != 0 || (curWriteLen % 8) != 0) {
         blockInfo->flag = 1;
         return;
     }
-
-    __gm__ DebugBlockHeadInfo* debugBlockInfo = get_block_info();
-    if (debugBlockInfo == nullptr) {
-        blockInfo->flag = 1;
-        return;
+    __gm__ DebugBlockHeadInfo* debugBlockInfo = nullptr;
+    // Local cursor: acknowledging the last record lets the VF reset the shared read/write offsets.
+    uint32_t cursor = curReadLen;
+    while (cursor < curWriteLen) {
+        if (curWriteLen - cursor < 8) {
+            blockInfo->flag = 1;
+            return;
+        }
+        auto* src = blockInfo->buffer + cursor;
+        auto* head = reinterpret_cast<__ubuf__ uint32_t*>(src);
+        if (head[1] > curWriteLen - cursor - 8) {
+            blockInfo->flag = 1;
+            return;
+        }
+        const uint32_t inputBytes = head[1] + 8;
+        if (head[0] == __asc_simd_vf::GM_CSTRING_REFERENCE) {
+            if (debugBlockInfo == nullptr) { debugBlockInfo = get_block_info(); }
+            if ((inputBytes % 8) != 0 || debugBlockInfo == nullptr ||
+                !resolve_gm_cstring_record(src, inputBytes, debugBlockInfo->ringBufLen)) {
+                blockInfo->flag = 1;
+                return;
+            }
+        }
+        const bool gmReference = head[0] == __asc_simd_vf::GM_PRINT_REFERENCE;
+        uint32_t outputBytes = inputBytes;
+        if ((inputBytes % 8) != 0 ||
+            (gmReference ? !size_gm_print_record(src, inputBytes, outputBytes) :
+                head[0] > static_cast<uint32_t>(DumpType::DUMP_SUPER_TENSOR_BODY))) {
+            blockInfo->flag = 1;
+            return;
+        }
+        if (debugBlockInfo == nullptr) {
+            debugBlockInfo = get_block_info();
+            if (debugBlockInfo == nullptr) {
+                blockInfo->flag = 1;
+                return;
+            }
+        }
+        if (outputBytes > debugBlockInfo->ringBufLen || sizeof(SkipTlv) >= debugBlockInfo->ringBufLen) {
+            blockInfo->flag = 1;
+            return;
+        }
+        // May publish a SkipTlv even if it subsequently returns false. Never roll back GM offsets.
+        if (!check_ringbuf_space(debugBlockInfo, outputBytes)) { return; }
+        auto* dst = call_get_ring_buf_tlv(debugBlockInfo);
+        if (gmReference) {
+            write_gm_print_record(dst, src, outputBytes);
+        } else {
+            for (uint32_t i = 0; i < inputBytes / sizeof(uint32_t); ++i) {
+                reinterpret_cast<__gm__ uint32_t*>(dst)[i] = reinterpret_cast<__ubuf__ uint32_t*>(src)[i];
+            }
+        }
+        asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(dst));
+        update_write_info(get_ring_buf_write_info(debugBlockInfo), outputBytes);
+        cursor += inputBytes;
+        blockInfo->readLen = cursor;
     }
-    // A batch larger than the ring buffer can never be published; retrying would spin forever and hang the kernel.
-    // Drop it: advance readLen to release the producer, raise flag to stop the transfer loop.
-    if (tlvLen > debugBlockInfo->ringBufLen || sizeof(SkipTlv) >= debugBlockInfo->ringBufLen) {
-        blockInfo->readLen = curWriteLen;
-        blockInfo->flag = 1;
-        return;
-    }
-    // Remaining failures are transient (RTS lagging); keep retrying.
-    if (!check_ringbuf_space(debugBlockInfo, tlvLen)) {
-        return;
-    }
-    __gm__ uint8_t* dstTlv = reinterpret_cast<__gm__ uint8_t*>(call_get_ring_buf_tlv(debugBlockInfo));
-
-    constexpr uint32_t sizeU32 = sizeof(uint32_t);
-    const uint32_t totalWords = tlvLen / sizeU32;
-    auto* dstWords = reinterpret_cast<__gm__ uint32_t*>(dstTlv);
-    auto* srcWords = reinterpret_cast<__ubuf__ uint32_t*>(tlv);
-    for (uint32_t i = 0; i < totalWords; ++i) {
-        dstWords[i] = srcWords[i];
-    }
-    for (uint32_t i = totalWords * sizeU32; i < tlvLen; ++i) {
-        dstTlv[i] = tlv[i];
-    }
-    asc_entire_dcci_impl(reinterpret_cast<__gm__ uint64_t*>(dstTlv));
-
-    __gm__ RingBufWriteInfo* writeInfo = get_ring_buf_write_info(debugBlockInfo);
-    update_write_info(writeInfo, tlvLen, packageNum);
-    blockInfo->readLen = curWriteLen;
 }
 
 __aicore__ inline bool asc_vf_debug_ub2gm()
