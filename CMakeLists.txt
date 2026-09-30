@@ -51,6 +51,7 @@ endif()
 add_cann_version_info_targets()
 
 if(ENABLE_TEST)
+  include(cmake/version_info.cmake)
   add_subdirectory(tests)
 endif()
 
