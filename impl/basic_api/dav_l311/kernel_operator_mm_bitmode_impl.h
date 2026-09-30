@@ -24,6 +24,70 @@
 #include "../../../include/basic_api/kernel_struct_mm.h"
 
 namespace AscendC {
+constexpr uint8_t PADLIST2 = 2;
+constexpr uint8_t PADLIST3 = 3;
+
+struct Load2DBitModeConfig0 {
+    uint64_t mStartPosition : 16;
+    uint64_t kStartPosition : 16;
+    uint64_t mStep : 8;
+    uint64_t kStep : 8;
+
+    __aicore__ inline void Init(const LoadData2DParamsV2& loadData2DParams_)
+    {
+        mStartPosition = loadData2DParams_.mStartPosition;
+        kStartPosition = loadData2DParams_.kStartPosition;
+        mStep = loadData2DParams_.mStep;
+        kStep = loadData2DParams_.kStep;
+    }
+    __aicore__ inline void SetMStartPosition(uint32_t mStartPosition_) { mStartPosition = mStartPosition_; };
+    __aicore__ inline void SetKStartPosition(uint32_t kStartPosition_) { kStartPosition = kStartPosition_; };
+    __aicore__ inline void SetMStep(uint16_t mStep_) { mStep = mStep_; };
+    __aicore__ inline void SetKStep(uint16_t kStep_) { kStep = kStep_; };
+    __aicore__ inline uint32_t GetMStartPosition() const { return mStartPosition; };
+    __aicore__ inline uint32_t GetKStartPosition() const { return kStartPosition; };
+    __aicore__ inline uint16_t GetMStep() const { return mStep; };
+    __aicore__ inline uint16_t GetKStep() const { return kStep; };
+};
+
+struct Load2DBitModeConfig1 {
+    uint64_t srcStride : 16;
+    uint64_t dstStride : 16;
+    __aicore__ inline void Init(const LoadData2DParamsV2& loadData2DParams_)
+    {
+        srcStride = loadData2DParams_.srcStride;
+        dstStride = loadData2DParams_.dstStride;
+    }
+    __aicore__ inline void SetSrcStride(int32_t srcStride_) { srcStride = srcStride_; };
+    __aicore__ inline void SetDstStride(uint16_t dstStride_) { dstStride = dstStride_; };
+    __aicore__ inline int32_t GetSrcStride() const { return srcStride; };
+    __aicore__ inline uint16_t GetDstStride() const { return dstStride; };
+};
+
+struct SetFMatrixBitModeConfig0 {
+    uint64_t l1H : 16;
+    uint64_t l1W : 16;
+    uint64_t padList0 : 8;
+    uint64_t padList1 : 8;
+    uint64_t padList2 : 8;
+    uint64_t padList3 : 8;
+
+    template <typename T>
+    __aicore__ inline void Init(const LoadData3DParamsV2<T>& loadData3DParams_)
+    {
+        l1H = loadData3DParams_.l1H;
+        l1W = loadData3DParams_.l1W;
+    }
+    __aicore__ inline void SetL1H(uint16_t l1H_) { l1H = l1H_; };
+    __aicore__ inline void SetL1W(uint16_t l1W_) { l1W = l1W_; };
+    __aicore__ inline void SetPadList(const uint8_t padList_[4])
+    {
+        padList0 = padList_[0];
+        padList1 = padList_[1];
+        padList2 = padList_[PADLIST2];
+        padList3 = padList_[PADLIST3];
+    };
+};
 
 struct MmadBitModeConfig0 {
     uint64_t m : 12;
