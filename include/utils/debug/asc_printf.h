@@ -23,7 +23,7 @@
 
 #include "../../../impl/utils/sys_macros_impl.h"
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #include "simt_api/device_types.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
@@ -47,8 +47,7 @@ __aicore__ static __attribute__((noinline)) void printf(__gm__ const char* fmt, 
 
 namespace __asc_simd_vf {
 template <class... Args>
-__ASC_USE_RESERVED_UBUF__(3510,
-    "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__ASC_USE_RESERVED_UBUF__(3510, "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args);
 } // namespace __asc_simd_vf
 #endif
@@ -57,14 +56,14 @@ __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args);
 #include "impl/utils/debug/asc_simd_debug_enable.h"
 
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #include "impl/utils/debug/asc_printf_simt_impl.h"
 #endif
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #include "impl/utils/debug/asc_simd_printf_impl.h"
 #endif
 #endif

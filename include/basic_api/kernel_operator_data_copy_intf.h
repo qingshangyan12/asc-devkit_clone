@@ -52,9 +52,15 @@ namespace AscendC {
  * @param [in] repeatParams.srcGap src block gap
  * @param [in] repeatParams.dstGap dst block gap
  */
+
 template <typename T>
-__aicore__ inline void __inout_pipe__(MTE2)
-    DataCopy(const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams);
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams,
+    const bool enablePreReadIgnoreSync);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& repeatParams);
 
 /*
  * @ingroup DataCopy Level 0
@@ -71,7 +77,13 @@ __aicore__ inline void __inout_pipe__(MTE2)
  * @param [in] intriParams.dstNzMatrixStride DST_nz_matrix_stride in L1 in unit of element
  */
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3113) || \
-    (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+    (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams,
+    const bool enablePreReadIgnoreSync);
+
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams);
@@ -112,12 +124,14 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
  * @param [in] intriParams.dstNzNStride stride of n between 2 C0 in L1
  * @param [in] intriParams.dstNzMatrixStride DST_nz_matrix_stride in L1 in unit of element
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
-    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams,
+    const bool enablePreReadIgnoreSync);
+
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams);
-#endif
 
 /*
  * @ingroup DataCopy Level 0
@@ -149,6 +163,22 @@ __aicore__ inline void DataCopy(
 
 /*
  * @ingroup DataCopy Level 0
+ * @brief datacopy from src to dst0 and dst1, applicable to vector data
+ * @param [out] dst0 and dst1 output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] repeatParams.blockCount number of blocks
+ * @param [in] repeatParams.blockLen Length of blocks
+ * @param [in] repeatParams.srcGap src block gap
+ * @param [in] repeatParams.dstGap dst block gap
+ */
+
+template <typename T>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src,
+    const DataCopyParams& repeatParams);
+
+/*
+ * @ingroup DataCopy Level 0
  * @brief datacopy from L1 to bt, applicable to vector data
  * @param [out] dst output LocalTensor
  * @param [in] src input LocalTensor
@@ -160,6 +190,25 @@ __aicore__ inline void DataCopy(
 template <typename T, typename U>
 __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& repeatParams);
+
+// 9201 ONLY
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void RemoteDataCopy(
+    const GlobalTensor<T>& dstGlobal, const LocalTensor<T>& srcLocal, const DataCopyExtParams& dataCopyParams,
+    const RemoteDataCopyParams& remoteParams);
+
+/*
+ * @ingroup DataCopy Level 2
+ * @brief datacopy from src to dst, applicable to vector data
+ * @param [out] dstGlobal output GlobalTensor
+ * @param [in] srcLocal input LocalTensor
+ * @param [in] calCount Number of operands
+ */
+// 9201 ONLY
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE3) void RemoteDataCopy(
+    const GlobalTensor<T>& dstGlobal, const LocalTensor<T>& srcLocal, const uint32_t calCount,
+    const RemoteDataCopyParams& remoteParams);
 
 /*
  * @ingroup Copy Level 0
@@ -187,12 +236,10 @@ __aicore__ inline __inout_pipe__(V) void Copy(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint64_t mask, const uint8_t repeatTime,
     const CopyRepeatParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 // Copy::Level 2 - count mode
 template <typename T, bool isSetMask = true>
 __aicore__ inline __inout_pipe__(V) void Copy(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const uint32_t count);
-#endif
 
 /*
  * @ingroup DataCopy Level 1
@@ -203,6 +250,11 @@ __aicore__ inline __inout_pipe__(V) void Copy(
  * @param [in] SliceInfo srcSliceInfo[] gm
  * @param [in] dimValue dim value also for length for dstSliceInfo[] and srcSliceInfo[]
  */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[],
+    const SliceInfo srcSliceInfo[], const uint32_t dimValue, const bool enablePreReadIgnoreSync);
+
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const SliceInfo dstSliceInfo[],
@@ -231,6 +283,10 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
  */
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count, const bool enablePreReadIgnoreSync);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const uint32_t count);
 
 /*
@@ -256,6 +312,17 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 
 /*
  * @ingroup DataCopy Level 2
+ * @brief datacopy from src to dst0 and dst1, applicable to vector data
+ * @param [out] dst0 and dst1 output LocalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] count Number of operands
+ */
+template <typename T>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dst0, const LocalTensor<T>& dst1, const LocalTensor<T>& src, const uint32_t count);
+
+/*
+ * @ingroup DataCopy Level 2
  * @brief datacopy from src to dst, nz2nd, applicable to simulated cube data(such as data from l0c, 16*16)
  * @param [out] dst output GlobalTensor
  * @param [in] src input LocalTensor
@@ -263,19 +330,6 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2NdParamsFull& intriParams);
-
-/*
- * @ingroup DataCopy Level 2
- * @brief datacopy from src to dst, nz2dn, applicable to simulated cube data(such as data from l0c, 16*16)
- * @param [out] dst output GlobalTensor
- * @param [in] src input LocalTensor
- */
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
-template <typename T>
-__aicore__ inline __inout_pipe__(MTE3) void DataCopy(
-    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const Nz2DnParamsFull& intriParams);
-#endif
 
 /* **************************************************************************************************
  * DataCopy Enhanced                                             *
@@ -295,6 +349,11 @@ __aicore__ inline __inout_pipe__(MTE3) void DataCopy(
  * @param [in] enhancedParams.sidStoreMode Multiplex input
  * @param [in] enhancedParams.isRelu Configure whether Relu can be performed along the circuit
  */
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopy(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& intriParams,
+    const DataCopyEnhancedParams& enhancedParams, const bool enablePreReadIgnoreSync);
+
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& intriParams,
@@ -383,7 +442,13 @@ __aicore__ inline __inout_pipe__(V) void DataCopy(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const DataCopyParams& intriParams,
     const DataCopyEnhancedParams& enhancedParams);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
+    const DataCopyPadParams& padParams, const bool enablePreReadIgnoreSync);
+
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyParams& dataCopyParams,
@@ -410,7 +475,13 @@ __aicore__ inline void DataCopyPad(
 
 // override DataCopyPad, use new param DataCopyExtParams
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
-    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
+template <typename T, PaddingMode mode = PaddingMode::Normal>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<T>& padParams, const bool enablePreReadIgnoreSync);
+
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
@@ -429,10 +500,18 @@ template <
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value && (!Std::is_same<T, U>::value), bool>::type = true>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
+    const DataCopyPadExtParams<U>& padParams, const bool enablePreReadIgnoreSync);
+
+template <
+    typename T, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value && (!Std::is_same<T, U>::value), bool>::type = true>
+__aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
     const DataCopyPadExtParams<U>& padParams);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
-    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams);
@@ -457,11 +536,14 @@ template <typename T, uint8_t subBlockId = 0>
 __aicore__ inline void DataCopyL1ToUB(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyParams& repeatParams);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+template <typename T, uint8_t dim, const MultiCopyConfig& config = kDefaultMultiCopyConfig>
+__aicore__ inline void DataCopy(
+    const LocalTensor<T>& dstTensor, const GlobalTensor<T>& srcTensor, const MultiCopyParams<T, dim>& params,
+    const bool enablePreReadIgnoreSync);
+
 template <typename T, uint8_t dim, const NdDmaConfig& config = kDefaultNdDmaConfig>
 __aicore__ inline void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const MultiCopyParams<T, dim>& params);
-#endif
 
 __aicore__ inline void NdDmaDci();
 
