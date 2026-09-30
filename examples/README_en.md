@@ -21,5 +21,5 @@ Developers need to modify the `--npu-arch` build option in the `CMakeLists.txt` 
 | Product Model | npu-arch Parameter |
 | ---- | ---- |
 | Ascend 950PR&950DT products | --npu-arch=dav-3510 |
-| Atlas A3 products/Atlas A3 products<br>Atlas A2 products/Atlas A2 products | --npu-arch=dav-2201 |
+| Atlas A3 products<br>Atlas A2 products | --npu-arch=dav-2201 |
 | Atlas Inference Series Products AI Core | --npu-arch=dav-2002 |

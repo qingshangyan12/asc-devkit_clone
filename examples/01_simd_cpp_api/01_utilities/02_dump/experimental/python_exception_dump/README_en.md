@@ -13,8 +13,8 @@ This example demonstrates an NPU operator exception info auto-dump solution base
 | Products | CANN Versions |
 |---|---|
 | Ascend 950PR&950DT products | \>= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | \>= CANN 9.1.0 |
-| Atlas A2 products/Atlas A2 products | \>= CANN 9.1.0 |
+| Atlas A3 products | \>= CANN 9.1.0 |
+| Atlas A2 products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 

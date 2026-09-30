@@ -13,8 +13,8 @@ This example uses the Add operator to show how to capture Ascend C `<<<>>>` kern
 | Product | CANN Version |
 |---------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.1.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.1.0 |
+| Atlas A3 products | >= CANN 9.1.0 |
+| Atlas A2 products | >= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -137,7 +137,7 @@ The example also calls `aclmdlRIDebugJsonPrint` to output the captured task info
 
   | Option | Values | Description |
   |--------|--------|-------------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products; dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products; dav-3510 corresponds to Ascend 950PR&950DT products |
   | `SCENARIO_NUM` | `1` (default), `2` | Capture scenario number: 1 indicates single-stream capture, and 2 indicates double-stream capture |
 
 - Execution result

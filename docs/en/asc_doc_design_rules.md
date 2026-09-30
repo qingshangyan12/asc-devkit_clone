@@ -264,10 +264,10 @@ For details, see [C Programming Overview](../../../guide/programming_guide/progr
 - Ascend 950PR&950DT products: Not supported
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 products/Atlas A3 products: Supported
+- Atlas A3 products: Supported
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 products/Atlas A2 products: Supported
+- Atlas A2 products: Supported
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 inference products: Supported
@@ -294,10 +294,10 @@ For details, see [C Programming Overview](../../../guide/programming_guide/progr
 - Ascend 950PR&950DT products: Supported
 <!-- end id10 -->
 <!-- npu="A3" id11 -->
-- Atlas A3 products/Atlas A3 products: Not supported
+- Atlas A3 products: Not supported
 <!-- end id11 -->
 <!-- npu="910b" id12 -->
-- Atlas A2 products/Atlas A2 products: Not supported
+- Atlas A2 products: Not supported
 <!-- end id12 -->
 <!-- npu="310b" id13 -->
 - Atlas 200I/500 A2 inference products: Not supported
@@ -495,8 +495,8 @@ inQueueY.FreeTensor(yLocal);
 
 <!-- npu="910b,A3" id19 -->
 - For the following product models:
-    - Atlas A2 products/Atlas A2 products
-    - Atlas A3 products/Atlas A3 products
+    - Atlas A2 products
+    - Atlas A3 products
 
     In cross-device communication operator development scenarios, DataCopy interfaces support cross-device data transfers over HCCS physical links only; other paths are not supported. During development, developers must pay attention to the physical paths involved in inter-device communication. Run the `npu-smi info -t topo` command to query HCCS physical links.
 <!-- end id19 -->
@@ -690,11 +690,11 @@ The source and destination operands must use the same data type. The Global Memo
 <!-- end id20 -->
 
 <!-- npu="A3" id21 -->
-- Atlas A3 products/Atlas A3 products support the following data types: int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t, uint64_t, and double.
+- Atlas A3 products support the following data types: int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t, uint64_t, and double.
 <!-- end id21 -->
 
 <!-- npu="910b" id22 -->
-- Atlas A2 products/Atlas A2 products support the following data types: int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t, uint64_t, and double.
+- Atlas A2 products support the following data types: int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t, uint64_t, and double.
 <!-- end id22 -->
 
 <!-- npu="310b" id23 -->
@@ -735,8 +735,8 @@ None
 
 <!-- npu="910b,A3" id29 -->
 - For the following product models:
-    - Atlas A2 products/Atlas A2 products
-    - Atlas A3 products/Atlas A3 products
+    - Atlas A2 products
+    - Atlas A3 products
 
     In cross-device communication operator development scenarios, DataCopy interfaces support cross-device data transfers over HCCS physical links only; other paths are not supported. During development, developers must pay attention to the physical paths involved in inter-device communication. Run the `npu-smi info -t topo` command to query HCCS physical links.
 <!-- end id29 -->
@@ -946,10 +946,10 @@ Matrix fractal formats define the layout rules for multidimensional tensors in m
 >[!NOTE] Note
 >This performance optimization recommendation applies to the following product models:
 ><!-- npu="A3" id30 -->
->- Atlas A3 products/Atlas A3 products
+>- Atlas A3 products
 ><!-- end id30 -->
 ><!-- npu="910b" id31 -->
->- Atlas A2 products/Atlas A2 products
+>- Atlas A2 products
 ><!-- end id31 -->
 ```
 

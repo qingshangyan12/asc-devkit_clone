@@ -9,8 +9,8 @@ This example uses the Fmod high-level API to implement element-wise floating-poi
 | Product | CANN Software Version |
 |------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.0.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.0.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -106,7 +106,7 @@ Run the following steps in the root directory of this example to build and run t
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products; dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products; dav-3510 corresponds to Ascend 950PR&950DT products |
 
 - Execution result
 

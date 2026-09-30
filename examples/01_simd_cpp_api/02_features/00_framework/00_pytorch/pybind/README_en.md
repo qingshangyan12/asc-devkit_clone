@@ -9,8 +9,8 @@ This example demonstrates how to register a custom operator using pybind11, base
 | Product | CANN Version |
 |---------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.1.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.1.0 |
+| Atlas A3 products | >= CANN 9.1.0 |
+| Atlas A2 products | >= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -99,7 +99,7 @@ This example demonstrates how to register a custom operator using pybind11, base
 
   | Option | Values | Description |
   | -------| -------| ------------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products; dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products; dav-3510 corresponds to Ascend 950PR&950DT products |
 
 - Execution result
 

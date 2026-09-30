@@ -18,8 +18,8 @@ This example uses addition to introduce performance tuning methods based on stat
 | Product | CANN Version |
 |------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.2.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.2.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.2.0 |
+| Atlas A3 products | >= CANN 9.2.0 |
+| Atlas A2 products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -641,7 +641,7 @@ The reasons why the Ascend 950 Series does not reach the theoretical vector dura
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
   | `SCENARIO_NUM` | `0` (default), `1`, `2`, `3`, `4`, `5`, `6` | Performance optimization case number |
   
   The following execution result indicates that the accuracy comparison succeeded.

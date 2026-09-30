@@ -7,8 +7,8 @@ This sample demonstrates the basic process of verifying operator kernel function
 ## Supported Products
 
 - Ascend 950PR&950DT products
-- Atlas A3 products/Atlas A3 products
-- Atlas A2 products/Atlas A2 products
+- Atlas A3 products
+- Atlas A2 products
 
 ## Directory Structure
 

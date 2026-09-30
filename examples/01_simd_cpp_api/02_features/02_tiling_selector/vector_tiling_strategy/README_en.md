@@ -11,8 +11,8 @@ The sample uses 8 Cores. The main tile data volume in each core is 3200 `half` e
 | Product | CANN software version |
 |------|--------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.0.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.0.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 

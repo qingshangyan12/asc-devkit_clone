@@ -9,8 +9,8 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
 | Product | CANN Software Version |
 |---------|----------------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.0.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.0.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -341,7 +341,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
   ```
   For example, when transferring matrix A with `{1, baseM, baseK, 0, K, baseM, 1, 0}`, it converts baseM×baseK ND data to Nz format.
 
-  **[AscendC::LoadData2DParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md)** — Used by the `LoadData` interface to describe data transfer parameters for matrix A from L1 to L0A and matrix B from L1 to L0B in Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products:
+  **[AscendC::LoadData2DParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md)** — Used by the `LoadData` interface to describe data transfer parameters for matrix A from L1 to L0A and matrix B from L1 to L0B in Atlas A2 products and Atlas A3 products:
   ```cpp
   struct LoadData2DParams {
       int32_t startIndex;   // Fractal matrix ID (0 is the first), unit: 512B, [0, 65535]
@@ -353,7 +353,7 @@ This example implements Matmul and LeakyRelu fusion computation based on the sta
       bool    addrMode;     // Address update mode, false=increment, true=decrement, default false
   };
   ```
-  For example: In Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products, the layout format on L0A is Zz. When transferring matrix A, use `{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`;<br>
+  For example: In Atlas A2 products and Atlas A3 products, the layout format on L0A is Zz. When transferring matrix A, use `{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`;<br>
   When transferring matrix B, set `ifTranspose=true` to complete Nz to Zn transpose transfer.
 
   **[AscendC::LoadData2DParamsV2](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D_V2.md)** — Used by the `LoadData` interface to describe data transfer parameters for matrix A from L1 to L0A and matrix B from L1 to L0B in Ascend 950PR&950DT products:
@@ -465,7 +465,7 @@ Execute the following steps in the root directory of this example to compile and
   | Option | Possible Values | Description |
   | -------| ----------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
 
 - Execution Result
 

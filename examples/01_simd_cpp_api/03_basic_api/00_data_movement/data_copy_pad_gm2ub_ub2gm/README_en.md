@@ -11,8 +11,8 @@ The data transfer process includes: Global Memory (GM) -> Unified Buffer (UB) (u
 | Product | CANN Version |
 |---------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.0.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.0.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -148,7 +148,7 @@ Run the following steps in the root directory of this example to build and run i
   | Option | Values | Description |
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
   | `SCENARIO_NUM` | `1` (default), `2`, `3`, `4`, `5`, `6` | Scenario number: 1 (SetPadValue padding), 2 (rightPadding), 3 (Compact mode), 4 (SetLoopModePara loop mode Compact), 5 (SetLoopModePara loop mode Normal), 6 (five-dimensional LoopMode Normal) |
 
 - Execution result

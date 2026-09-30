@@ -108,7 +108,7 @@ The following lists some common architecture directories; for the complete list,
 
 | Directory | `__NPU_ARCH__` value | Corresponding Products |
 |------|-------------------|---------|
-| `dav_c220` | `2201` | Atlas A2 products / Atlas A2 products, Atlas A3 products / Atlas A3 products |
+| `dav_c220` | `2201` | Atlas A2 products, Atlas A3 products |
 | `dav_3510` | `3510` | Ascend 950PR&950DT products |
 
 > For the complete mapping between product models and `__NPU_ARCH__`, see the [**NPU_ARCH** documentation](../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch).

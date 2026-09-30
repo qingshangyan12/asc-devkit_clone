@@ -5,4 +5,4 @@ Optimization samples based on Vector Compute API usage, introducing performance 
 ## Sample List
 | Directory Name | Description | Supported Products |
 | ------------------------------------------------------------ | ---------------------------------------------------- | --- |
-| [add_high_performance](./add_high_performance) |  This sample uses addition as an example to introduce performance tuning methods for static Tensor-based programming. | Ascend 950PR&950DT products<br>Atlas A3 products/Atlas A3 products<br>Atlas A2 products/Atlas A2 products |
+| [add_high_performance](./add_high_performance) |  This sample uses addition as an example to introduce performance tuning methods for static Tensor-based programming. | Ascend 950PR&950DT products<br>Atlas A3 products<br>Atlas A2 products |

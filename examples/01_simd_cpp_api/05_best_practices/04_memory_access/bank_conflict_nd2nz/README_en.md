@@ -9,8 +9,8 @@ This example uses an `8192 × 8192` half ND matrix to globally compact NZ layout
 | Product | CANN Version |
 |------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.0.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.0.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -549,7 +549,7 @@ The measured `aiv_vec_time` is `9.14μs`. The gap from the 4.965μs theoretical 
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
   | `SCENARIO_NUM` | `1` (default), `2` | Bank conflict scenario number |
 
   The following execution result indicates that the accuracy comparison succeeded:

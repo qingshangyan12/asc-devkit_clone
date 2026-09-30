@@ -11,8 +11,8 @@ The example supports switching between different scenarios through compilation p
 | Product | CANN Version |
 |---------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.0.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.0.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -124,7 +124,7 @@ Run the following steps in the root directory of this example to build and run t
   | Option | Values | Description |
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
   | `SCENARIO_NUM` | `1` (default), `2`, `3`, `4` | Scenario number: 1 for Select, 2 for Select (Scalar), 3 for Select (no valid bit limit), 4 for Select (flexible scalar) |
 
 - Execution result

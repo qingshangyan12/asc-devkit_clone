@@ -297,10 +297,10 @@ Some interfaces are Host interfaces that do not differentiate by product. In thi
 - Ascend 950PR&950DT products: Supported
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 products/Atlas A3 products: Not supported
+- Atlas A3 products: Not supported
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 products/Atlas A2 products: Not supported
+- Atlas A2 products: Not supported
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2 Inference Products: Not supported
@@ -331,10 +331,10 @@ Some interfaces are Host interfaces that do not differentiate by product. In thi
 - Ascend 950PR&950DT products: Supported
 <!-- end id8 -->
 <!-- npu="A3" id9 -->
-- Atlas A3 products/Atlas A3 products: Not supported
+- Atlas A3 products: Not supported
 <!-- end id9 -->
 <!-- npu="910b" id10 -->
-- Atlas A2 products/Atlas A2 products: Not supported
+- Atlas A2 products: Not supported
 <!-- end id10 -->
 <!-- npu="310b" id11 -->
 - Atlas 200I/500 A2 Inference Products: Not supported
@@ -601,11 +601,11 @@ For scenarios with too many function prototypes, using only unordered lists woul
     <!-- end id16 -->
 
     <!-- npu="A3" id17 -->
-    Atlas A3 products/Atlas A3 products 
+    Atlas A3 products 
     <!-- end id17 -->
 
     <!-- npu="910b" id18 -->
-    Atlas A2 products/Atlas A2 products 
+    Atlas A2 products 
     <!-- end id18 -->
 
     <!-- npu="310b" id19 -->

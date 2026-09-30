@@ -67,7 +67,7 @@
 
   > AI处理器的型号<soc_version>请通过如下方式获取：
   > - 针对如下产品型号：在安装昇腾AI处理器的服务器执行`npu-smi info`命令进行查询，获取**Name**信息。实际配置值为AscendName，例如**Name**取值为xxxyy，实际配置值为Ascendxxxyy。
-  >   - Atlas A2系列产品 / Atlas A2系列产品
+  >   - Atlas A2系列产品
   >   - Atlas 200I/500 A2推理产品
   >   - Atlas推理系列产品
   >   - Atlas训练系列产品
@@ -78,7 +78,7 @@
   >
   >   chip_id：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id
   >   - Ascend 950PR&950DT系列产品
-  >   - Atlas A3系列产品 / Atlas A3系列产品
+  >   - Atlas A3系列产品
   >
   >   基于同系列的AI处理器型号创建的样例工程，其基础功能（基于该工程进行样例开发、编译和部署）通用。
 

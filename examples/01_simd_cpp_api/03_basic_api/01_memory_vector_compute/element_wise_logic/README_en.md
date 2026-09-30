@@ -9,8 +9,8 @@ This example implements bitwise logic operation functionality based on And, Ors,
 | Product | CANN Version |
 |---------|-------------|
 | Ascend 950PR&950DT products | >= CANN 9.1.0 |
-| Atlas A3 products/Atlas A3 products | >= CANN 9.0.0 |
-| Atlas A2 products/Atlas A2 products | >= CANN 9.0.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -145,7 +145,7 @@ Run the following steps in the root directory of this example to build and run t
   | Option | Values | Description |
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products/Atlas A2 products and Atlas A3 products/Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products. Note: Scenarios 2 and 3 only support dav-3510, automatically switched during compilation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products. Note: Scenarios 2 and 3 only support dav-3510, automatically switched during compilation |
   | `SCENARIO_NUM` | `1` (default), `2`, `3`, `4` | Scenario number: 1 (And bitwise AND), 2 (Ors vector-scalar OR), 3 (ShiftLeft tensor form), 4 (ShiftRight scalar form) |
 
 - Execution result
