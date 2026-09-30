@@ -31,10 +31,11 @@
 
 namespace AscendC {
 namespace Reg {
-#if !defined(__NPU_ARCH__) ||                                                                                 \
-    (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) ||  \
-                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) ||  \
-                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165)) || \
+#if !defined(__NPU_ARCH__) ||                                                                                     \
+    (defined(__NPU_ARCH__) &&                                                                                     \
+         ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+          (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || \
+          (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
      defined(__ASC_NPU_HOST__))
 template <typename T, const RegTrait& regTrait = RegTraitNumOne>
 __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue);
@@ -63,6 +64,12 @@ __simd_callee__ inline void Interleave(MaskReg& dst0, MaskReg& dst1, MaskReg& sr
 template <typename T>
 __simd_callee__ inline void DeInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1);
 
+template <typename T, HighLowPart part>
+__simd_callee__ inline void Interleave(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1);
+
+template <typename T, HighLowPart part>
+__simd_callee__ inline void DeInterleave(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1);
+
 __simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask);
 
 template <HighLowPart part = HighLowPart::LOWEST>
@@ -77,9 +84,10 @@ __simd_callee__ inline MaskReg MoveMask();
 } // namespace Reg
 } // namespace AscendC
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) ||  \
-                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) ||  \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5165)) || \
+#if defined(__NPU_ARCH__) &&                                                                                     \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+         (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || \
+         (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) ||                          \
     defined(__ASC_NPU_HOST__)
 #include "../../../impl/basic_api/reg_compute/kernel_reg_compute_maskreg_intf_impl.h"
 #endif
