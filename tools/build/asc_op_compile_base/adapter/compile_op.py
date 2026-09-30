@@ -266,7 +266,7 @@ def _gen_kernel_func_declare_head(
             called_func_params = "param, sargs"
             called_func_params_type = "__gm__ uint64_t *param, sk::SkSystemArgs *sargs"
             source += "__gm__ uint64_t *param, sk::SkSystemArgs *sargs) {\n"
-            source += "    g_super_kernel_early_start_config = sargs->SkGetTaskSyncCfg();\n"
+            source += "    sargs->SkInit();\n"
             source += "    uint32_t __asc_index = 0;\n"
             for param in func_params:
                 source += f"    {param} = (GM_ADDR)param[__asc_index++];\n"
@@ -480,7 +480,7 @@ def gen_kernel_fun(
     else:
         source += _gen_set_mc2_ctx_param(opinfo)
         if _omit_super_kernel_workspace(tiling_info):
-            source += "    GM_ADDR usrWorkspace = nullptr;\n"
+            source += "    GM_ADDR usrWorkspace = reinterpret_cast<GM_ADDR>(0xFFFFFFFFFFFFFFFFULL);\n"
         else:
             source += "    AscendC::SetSysWorkspaceForce(workspace);\n"
             source += "    GM_ADDR usrWorkspace = AscendC::GetUserWorkspace(workspace);\n"

@@ -182,7 +182,39 @@ enum KfcReduceScatterSoleNhr2DieParamIndex : uint32_t {
     KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_1 = 18,
     KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_2 = 19,
     KFC_RS_SOLE_NHR_2DIE_GO_SIZE_LAST_3 = 20,
-    KFC_RS_SOLE_NHR_2DIE_PARAM_NUM = 21,
+    // die1 专属 goSize 组（双 die 切分后各 die 收尾 GroupCopy 长度不同，按 axisId 选组）
+    KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_0 = 21,
+    KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_1 = 22,
+    KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_2 = 23,
+    KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_NORMAL_3 = 24,
+    KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_0 = 25,
+    KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_1 = 26,
+    KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_2 = 27,
+    KFC_RS_SOLE_NHR_2DIE_DIE1_GO_SIZE_LAST_3 = 28,
+    KFC_RS_SOLE_NHR_2DIE_PARAM_NUM = 29,
+};
+
+// SoleNHR（CcuSchedAllGatherSoleNHR）单帧 xnData 布局：
+// [0]=opId 哨兵，参数从 1 顺排。AIV prepare（CcuPrepareForAllGatherSoleNhrM2M）写入、
+// KFC dispatch 逐槽转发、kernel 形参三处索引必须一致。
+// 单 die 语义：die0Size/die0LastSize 即全量分片与末分片（hccl dieNum=1 口径），die1 参数省略。
+enum KfcAllGatherSoleNhrParamIndex : uint32_t {
+    KFC_AG_SOLE_NHR_OP_ID = 0,
+    KFC_AG_SOLE_NHR_INPUT = 1,
+    KFC_AG_SOLE_NHR_OUTPUT = 2,
+    KFC_AG_SOLE_NHR_DIE0_SIZE = 3,
+    KFC_AG_SOLE_NHR_DIE0_LAST_SIZE = 4,
+    KFC_AG_SOLE_NHR_REPEAT_NUM_INV = 5,
+    KFC_AG_SOLE_NHR_INPUT_SLICE_STRIDE = 6,
+    KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE = 7,
+    KFC_AG_SOLE_NHR_INPUT_REPEAT_STRIDE = 8,
+    KFC_AG_SOLE_NHR_OUTPUT_REPEAT_STRIDE = 9,
+    KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL = 10,
+    KFC_AG_SOLE_NHR_GO_SIZE_0 = 11,
+    KFC_AG_SOLE_NHR_GO_SIZE_1 = 12,
+    KFC_AG_SOLE_NHR_GO_SIZE_2 = 13,
+    KFC_AG_SOLE_NHR_GO_SIZE_3 = 14,
+    KFC_AG_SOLE_NHR_PARAM_NUM = 15,
 };
 
 // ReduceScatter 并发(Mesh+NHR)单帧 xnData 布局：mission0 读 Mesh 区间，mission1 读 NHR 区间。
