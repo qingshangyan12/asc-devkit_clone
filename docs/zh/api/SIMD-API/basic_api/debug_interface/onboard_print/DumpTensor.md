@@ -24,10 +24,10 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor_res.md#id1 -->
 
@@ -114,9 +114,9 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 <!-- npu="310p" id105 -->
 - Atlas推理系列产品AI Core，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id105 -->
 <!-- npu="x90" id107 -->
-- Kirin X90，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id107 -->
+- Kirin X90处理器系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id107 -->
 <!-- npu="9030" id108 -->
-- Kirin 9030，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id108 -->
+- Kirin 9030处理器系列产品，T支持的数据类型为：bool、int8_t、uint8_t、int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float、int64_t、uint64_t。<!-- end id108 -->
 
 ## 约束说明<a name="section794123819592"></a>
 
@@ -132,7 +132,7 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
   - Fixpipe Buffer保存的是硬件参数位域，打印结果不一定与L1 Buffer中的原始数据按位相同。前级Quant参数每8字节保留bit[7:0]、bit[31:13]和bit[46:37]，期望值为`input & 0x00007fe0ffffe0ffULL`；前级ReLU参数每4字节保留bit[31:13]，期望值为`word & 0xffffe000U`。
 <!-- end id113 --> 
 - 操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
-- SIMD场景下，每核打印FIFO缓冲区大小默认为30KB，可通过[aclInit接口](https://hiascend.com/document/redirect/CannCommunityruntimeapiaclinit)中的`simd_printf_fifo_size_per_core`字段配置，配置范围最小为1KB，最大为64MB。
+- SIMD场景下，每核打印FIFO缓冲区大小默认为30KB，可通过[aclInit接口](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/02_initialization_and_deinitialization.md#aclinit)中的`simd_printf_fifo_size_per_core`字段配置，配置范围最小为1KB，最大为64MB。
 <!-- npu="310b,x90,9030" id115 -->
 - 针对Atlas 200I/500 A2推理产品、Kirin X90和Kirin 9030，单次调用本接口打印的数据总量仍受打印大小限制，超过限制时数据不会被打印。
 <!-- end id115 -->
