@@ -1,7 +1,7 @@
 # 基础算术
 
 - **[abs](abs.md)**
-- **[addc](addc.md)**
+- **[add_carry](add_carry.md)**
 - **[exp](exp.md)**
 - **[leaky_relu](leaky_relu.md)**
 - **[log](log.md)**
@@ -19,4 +19,4 @@
 - **[prelu](prelu.md)**
 - **[relu](relu.md)**
 - **[sqrt](sqrt.md)**
-- **[subc](subc.md)**
+- **[sub_carry](sub_carry.md)**

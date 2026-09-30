@@ -1,4 +1,4 @@
-# subc
+# add_carry
 
 ## 产品支持情况
 
@@ -16,31 +16,31 @@
 
 命名空间：`asc::te::experimental`。
 
-对输入元素执行逐元素减法，并返回结果和借位。两个重载分别为不带输入借位、带输入借位：
+对输入元素执行逐元素加法，并返回低位结果和进位。两个重载分别为不带输入进位、带输入进位：
 
 $$
-\{borrow_i, dst_i\} = \{0, src0_i\} - \{0, src1_i\}
+\{carry_i, dst_i\} = \{0, src0_i\} + \{0, src1_i\}
 $$
 
 $$
-\{borrow_i, dst_i\} = \{0, src0_i\} - \{0, src1_i\} - borrow\_src_i
+\{carry_i, dst_i\} = \{0, src0_i\} + \{0, src1_i\} + carry\_src_i
 $$
 
-当前接口仅支持`int32_t`和`uint32_t`。返回值`second`表示每个元素的借位输出。
+当前接口仅支持`int32_t`和`uint32_t`。
 
 ## 函数原型
 
 ```cpp
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> subc(
+__simd_callee__ inline reg_pair<T, bool> add_carry(
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1)
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> subc(
+__simd_callee__ inline reg_pair<T, bool> add_carry(
     const reg_tensor<T>& src0,
     const reg_tensor<T>& src1,
-    const reg_tensor<bool>& borrow_src)
+    const reg_tensor<bool>& carry_src)
 ```
 
 ## 参数说明
@@ -48,19 +48,19 @@ __simd_callee__ inline reg_pair<T, bool> subc(
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
 | T | 模板参数 | 操作数数据类型，支持`int32_t`、`uint32_t`。 |
-| src0 | 输入 | 被减数，类型为`reg_tensor<T>`；`src0.mask`控制参与计算的元素。 |
-| src1 | 输入 | 减数，类型为`reg_tensor<T>`。 |
-| borrow_src | 输入 | 借位输入，类型为`reg_tensor<bool>`；对应元素为1时再减1。仅第二个重载使用，且其`reg`成员必须已初始化。 |
+| src0 | 输入 | 源操作数，类型为`reg_tensor<T>`；`src0.mask`控制参与计算的元素。 |
+| src1 | 输入 | 源操作数，类型为`reg_tensor<T>`。 |
+| carry_src | 输入 | 进位输入，类型为`reg_tensor<bool>`；对应元素为1时加1。仅第二个重载使用，且其`reg`成员必须已初始化。 |
 
 ## 返回值说明
 
-返回类型为`reg_pair<T, bool>`：`first`保存减法结果，`second`保存借位。两个成员的`mask`均设置为`src0.mask`。
+返回类型为`reg_pair<T, bool>`：`first`保存加法结果的低32位，`second`保存进位。两个成员的`mask`均设置为`src0.mask`。
 
 ## 约束说明
 
-`src0.mask`需通过`with_mask`接口预先设置。`src1.mask`和`borrow_src.mask`不参与本次计算；`borrow_src.reg`必须已初始化。
+`src0.mask`需通过`with_mask`接口预先设置。`src1.mask`和`carry_src.mask`不参与本次计算；`carry_src.reg`必须已初始化。
 
-## 不带输入借位的调用示例
+## 不带输入进位的调用示例
 
 ```cpp
 #include "tensor_api/tensor.h"
@@ -68,17 +68,17 @@ __simd_callee__ inline reg_pair<T, bool> subc(
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void sub_c_example(InputTensor input0, InputTensor input1, OutputTensor output)
+__simd_vf__ inline void add_carry_example(InputTensor input0, InputTensor input1, OutputTensor output)
 {
     auto mask = asc::te::experimental::all_mask<uint32_t>();
     auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
     auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0));
-    auto result = asc::te::experimental::subc(src0, src1);
+    auto result = asc::te::experimental::add_carry(src0, src1);
     asc::te::experimental::store(output, asc::te::make_coord(0), result.first);
 }
 ```
 
-## 带输入借位的调用示例
+## 带输入进位的调用示例
 
 ```cpp
 #include "tensor_api/tensor.h"
@@ -86,13 +86,13 @@ __simd_vf__ inline void sub_c_example(InputTensor input0, InputTensor input1, Ou
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void subc_with_borrow_example(InputTensor input0, InputTensor input1, OutputTensor output)
+__simd_vf__ inline void add_carry_with_carry_example(InputTensor input0, InputTensor input1, OutputTensor output)
 {
     auto mask = asc::te::experimental::all_mask<uint32_t>();
     auto src0 = asc::te::experimental::load(input0, asc::te::make_coord(0)).with_mask(mask);
     auto src1 = asc::te::experimental::load(input1, asc::te::make_coord(0));
-    auto borrow_src = asc::te::experimental::none_mask<uint32_t>();
-    auto result = asc::te::experimental::subc(src0, src1, borrow_src);
+    auto carry_src = asc::te::experimental::none_mask<uint32_t>();
+    auto result = asc::te::experimental::add_carry(src0, src1, carry_src);
     asc::te::experimental::store(output, asc::te::make_coord(0), result.first);
 }
 ```

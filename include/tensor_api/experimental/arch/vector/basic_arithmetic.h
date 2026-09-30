@@ -93,17 +93,17 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const T& slope);
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> addc(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> addc(
+__simd_callee__ inline reg_pair<T, bool> add_carry(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src);
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> subc(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> subc(
+__simd_callee__ inline reg_pair<T, bool> sub_carry(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src);
 
 template <typename T>

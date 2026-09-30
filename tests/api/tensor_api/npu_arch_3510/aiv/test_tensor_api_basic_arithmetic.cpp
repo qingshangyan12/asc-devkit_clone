@@ -134,38 +134,38 @@ __aicore__ inline void TestLeakyRelu()
 }
 
 template <typename T>
-__aicore__ inline void TestAddC()
+__aicore__ inline void TestAddCarry()
 {
     reg_type<T> src0{};
     reg_type<T> src1{};
     reg_type<bool> carry_src{};
     src0.mask = all_mask<T>().reg;
 
-    auto result_without_carry = asc::te::experimental::addc(src0, src1);
+    auto result_without_carry = asc::te::experimental::add_carry(src0, src1);
     static_assert(AscendC::Std::is_same_v<decltype(result_without_carry), reg_pair<T, bool>>);
     EXPECT_EQ(result_without_carry.first.mask, src0.mask);
     EXPECT_EQ(result_without_carry.second.mask, src0.mask);
 
-    auto result = asc::te::experimental::addc(src0, src1, carry_src);
+    auto result = asc::te::experimental::add_carry(src0, src1, carry_src);
     static_assert(AscendC::Std::is_same_v<decltype(result), reg_pair<T, bool>>);
     EXPECT_EQ(result.first.mask, src0.mask);
     EXPECT_EQ(result.second.mask, src0.mask);
 }
 
 template <typename T>
-__aicore__ inline void TestSubC()
+__aicore__ inline void TestSubCarry()
 {
     reg_type<T> src0{};
     reg_type<T> src1{};
     reg_type<bool> borrow_src{};
     src0.mask = all_mask<T>().reg;
 
-    auto result_without_borrow = asc::te::experimental::subc(src0, src1);
+    auto result_without_borrow = asc::te::experimental::sub_carry(src0, src1);
     static_assert(AscendC::Std::is_same_v<decltype(result_without_borrow), reg_pair<T, bool>>);
     EXPECT_EQ(result_without_borrow.first.mask, src0.mask);
     EXPECT_EQ(result_without_borrow.second.mask, src0.mask);
 
-    auto result = asc::te::experimental::subc(src0, src1, borrow_src);
+    auto result = asc::te::experimental::sub_carry(src0, src1, borrow_src);
     static_assert(AscendC::Std::is_same_v<decltype(result), reg_pair<T, bool>>);
     EXPECT_EQ(result.first.mask, src0.mask);
     EXPECT_EQ(result.second.mask, src0.mask);
@@ -251,10 +251,10 @@ BASIC_ARITHMETIC_TEST(Prelu, half)
 BASIC_ARITHMETIC_TEST(Prelu, float)
 BASIC_ARITHMETIC_TEST(LeakyRelu, half)
 BASIC_ARITHMETIC_TEST(LeakyRelu, float)
-BASIC_ARITHMETIC_TEST(AddC, int32_t)
-BASIC_ARITHMETIC_TEST(AddC, uint32_t)
-BASIC_ARITHMETIC_TEST(SubC, int32_t)
-BASIC_ARITHMETIC_TEST(SubC, uint32_t)
+BASIC_ARITHMETIC_TEST(AddCarry, int32_t)
+BASIC_ARITHMETIC_TEST(AddCarry, uint32_t)
+BASIC_ARITHMETIC_TEST(SubCarry, int32_t)
+BASIC_ARITHMETIC_TEST(SubCarry, uint32_t)
 BASIC_ARITHMETIC_TEST(Mull, int32_t)
 BASIC_ARITHMETIC_TEST(Mull, uint32_t)
 BASIC_ARITHMETIC_TEST(Div, int16_t)
