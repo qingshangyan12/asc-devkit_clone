@@ -144,8 +144,6 @@ DumpTensor: desc=5, addr=0, data_type=float16, position=UB, dump_size=32
 <!-- end id118 --> 
 <!-- end id114 --> 
 
-
-
 ## 调用示例<a name="section82241477610"></a>
 
 - 无Tensor shape的打印
