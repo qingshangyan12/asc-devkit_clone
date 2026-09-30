@@ -38,6 +38,10 @@ static __attribute__((noinline)) __SIMT_DEVICE_FUNCTIONS_DECL__ void printf(cons
 #endif
 #endif
 
+#if !defined(__NPU_COMPILER_INTERNAL_PURE_SIMT__) && ((__NPU_ARCH__ == 3510) || defined(ASCENDC_CPU_DEBUG))
+#include "asc_gm_debug_string.h"
+#endif
+
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
 #ifndef __CHECK_FEATURE_AT_PRECOMPILE
 namespace __asc_aicore {
@@ -49,6 +53,16 @@ namespace __asc_simd_vf {
 template <class... Args>
 __ASC_USE_RESERVED_UBUF__(3510, "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __simd_callee__ inline void printf(__ubuf__ const char* fmt, Args&&... args);
+#if (__NPU_ARCH__ == 3510) || defined(ASCENDC_CPU_DEBUG)
+template <class... Args>
+__ASC_USE_RESERVED_UBUF__(3510,
+    "printf is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
+__simd_callee__ inline void printf(__asc_simd_vf::GmDebugString fmt, Args&&... args);
+// Explicit SDK entry until compiler literal lowering is available.
+template <class... Args>
+__ASC_USE_RESERVED_UBUF__(3510, "printf_gm requires reserved UB")
+__simd_callee__ inline void printf_gm(__asc_simd_vf::GmCStringRef fmt, Args&&... args);
+#endif
 } // namespace __asc_simd_vf
 #endif
 #endif
