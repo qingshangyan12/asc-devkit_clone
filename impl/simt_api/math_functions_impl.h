@@ -608,23 +608,31 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nearbyintf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float nextafterf(float x, float y)
 {
-    uint32_t ux = __float_as_uint(x);
-    uint32_t uy = __float_as_uint(y);
-    uint32_t ax = ux & 0x7FFFFFFFu;
-    uint32_t ay = uy & 0x7FFFFFFFu;
+    if (isnan(x) || isnan(y)) {
+        return ASCRT_NAN_F;
+    }
 
-    bool nan = (ax > 0x7F800000u) || (ay > 0x7F800000u);     // NaN
-    bool x_is_zero = (ax == 0u);                             // x == +/-0
-    bool step_down = (ax > ay) || ((ux ^ uy) & 0x80000000u); // 方向
-
-    uint32_t stepped = step_down ? (ux - 1u) : (ux + 1u);
-    uint32_t zero_res = (ay == 0u) ? ux : ((uy & 0x80000000u) | 1u);
-
-    uint32_t res = x_is_zero ? zero_res : stepped;
-    res = (ux == uy) ? ux : res;              // x==y → x
-    res = nan ? __float_as_uint(x + y) : res; // NaN 传播
-
-    return __uint_as_float(res);
+    uint32_t* f = reinterpret_cast<uint32_t*>(&x);
+    if (x > 0) {
+        if (x < y) { // when x < src, x bit +1
+            (*f)++;
+        } else if (x > y) { // when x > src, x bit -1
+            (*f)--;
+        }
+    } else if (x < 0) {
+        if (x > y) {
+            (*f)++;
+        } else if (x < y) {
+            (*f)--;
+        }
+    } else if (x == 0) {
+        if (y > 0) {
+            *f = 1;
+        } else if (y < 0) {
+            *f = 0x80000001;
+        }
+    }
+    return x;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmaxf(float x, float y)
