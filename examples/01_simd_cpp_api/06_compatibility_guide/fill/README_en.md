@@ -45,7 +45,7 @@ This example demonstrates how to use the Fill interface to initialize the L0A Bu
 
    1. First, initialize the L0A Buffer and L0B Buffer. Different hardware architectures use different methods:
       - Atlas A2/A3 Training/Inference Series Products: Call the `Fill` interface to directly initialize the L0A Buffer and L0B Buffer to a specified value (initialized to 1 in this example).
-      - Ascend 950PR/950DT: Use the `Fill` interface to initialize the L1 Buffer to a specified value (initialized to 1 in this example), then transfer the data to the L0A Buffer and L0B Buffer through the `LoadData` interface.
+      - Ascend 950PR&950DT products: Use the `Fill` interface to initialize the L1 Buffer to a specified value (initialized to 1 in this example), then transfer the data to the L0A Buffer and L0B Buffer through the `LoadData` interface.
    2. Call the `Mmad` interface to perform matrix multiplication.
    3. Transfer the result to Global Memory through the `Fixpipe` interface.
 
@@ -82,10 +82,10 @@ Run the following steps in the root directory of this example to build and run t
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU simulation mode
   ```
 
-  To build for Ascend 950PR/950DT:
+  To build for Ascend 950PR&950DT products:
 
   ```bash
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # Build the project (Ascend 950PR/950DT)
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # Build the project (Ascend 950PR&950DT products)
   ```
 
   > **Notice:** Clear the cmake cache before switching build modes. Run `rm CMakeCache.txt` in the build directory and then re-run cmake.

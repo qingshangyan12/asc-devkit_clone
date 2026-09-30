@@ -4,7 +4,7 @@
 
 This example demonstrates the end-to-end implementation of int4 matrix multiplication, isolating different hardware implementations through compile-time macros.
 - Atlas A2/A3 Training/Inference Series Products support the int4 data type and can perform Matmul computation directly.
-- The Cube computation unit in Ascend 950PR/950DT does not support the int4 data type. int4x2 must be unzipped to int8 before performing Matmul computation.
+- The Cube computation unit in Ascend 950PR&950DT products does not support the int4 data type. int4x2 must be unzipped to int8 before performing Matmul computation.
 
 ## Supported Products and CANN Versions
 
@@ -43,7 +43,7 @@ This example demonstrates the end-to-end implementation of int4 matrix multiplic
 ## Example Implementation:
 
   - **Atlas A2/A3 Training/Inference Series Products**: The Cube computation unit supports the int4 data type and can execute Matmul computation directly.
-  - **Ascend 950PR/950DT**: The Cube computation unit does not support the int4 data type. The Unzip operation must be performed on the Vector Core through mix mode to unzip int4x2 to int8 before performing Matmul computation.
+  - **Ascend 950PR&950DT products**: The Cube computation unit does not support the int4 data type. The Unzip operation must be performed on the Vector Core through mix mode to unzip int4x2 to int8 before performing Matmul computation.
 
 ## Build and Run
 

@@ -108,7 +108,7 @@ bash run.sh -r npu --size 1023 --is_perf 0 --api_mode 2
 bash run.sh -r npu --size 1023 --is_perf 0 --api_mode 3
 ```
 
-Run the full Ascend 950PR/950DT regression:
+Run the full Ascend 950PR&950DT products regression:
 
 ```bash
 bash run_all.sh npu 1

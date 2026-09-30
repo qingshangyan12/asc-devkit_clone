@@ -5,7 +5,7 @@
 This example demonstrates the end-to-end flow of L1 data transfer to GM, isolating different hardware implementations through compile-time macros.
 
 - Atlas A2/A3 Training/Inference Series Products use the DataCopy interface directly for the transfer.
-- The new Ascend 950PR/950DT architecture does not support direct transfer. Data is output to the L0C Buffer through Mmad matrix multiplication, and then transferred from the L0C Buffer to GM through Fixpipe.
+- The new Ascend 950PR&950DT products architecture does not support direct transfer. Data is output to the L0C Buffer through Mmad matrix multiplication, and then transferred from the L0C Buffer to GM through Fixpipe.
 
 ## Supported Products and CANN Versions
 
@@ -45,11 +45,11 @@ This example has different implementation logic depending on the architecture:
   </table>
 - Example implementation: Call the DataCopy instruction to implement data transfer from GM to L1 and then to GM.
 
-### Ascend 950PR/950DT
+### Ascend 950PR&950DT products
 
 - Example specifications:
   <table>
-  <caption>Ascend 950PR/950DT Product Example Specification Table</caption>
+  <caption>Ascend 950PR&950DT products Product Example Specification Table</caption>
   <tr><td rowspan="1" align="center">Category</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
   <tr><td rowspan="3" align="center">Example Input</td></tr>
   <tr><td align="center">x</td><td align="center">[64, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
@@ -57,7 +57,7 @@ This example has different implementation logic depending on the architecture:
   <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[64, 128]</td><td align="center">float</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">data_copy_l1togm</td></tr>
   </table>
-- Example implementation: The new Ascend 950PR/950DT architecture does not support direct L1 to GM transfer. In the cube-only scenario, matrix multiplication can be used to achieve the transfer effect. An identity matrix is allocated in GM (original matrix × identity matrix = original matrix). The data is output to the L0C Buffer through Mmad matrix multiplication, and then transferred from the L0C Buffer to GM through Fixpipe. The data flow is: GM -> A1/B1 -> L0A/L0B -> L0C -> GM.
+- Example implementation: The new Ascend 950PR&950DT products architecture does not support direct L1 to GM transfer. In the cube-only scenario, matrix multiplication can be used to achieve the transfer effect. An identity matrix is allocated in GM (original matrix × identity matrix = original matrix). The data is output to the L0C Buffer through Mmad matrix multiplication, and then transferred from the L0C Buffer to GM through Fixpipe. The data flow is: GM -> A1/B1 -> L0A/L0B -> L0C -> GM.
 
 ## Build and Run
 

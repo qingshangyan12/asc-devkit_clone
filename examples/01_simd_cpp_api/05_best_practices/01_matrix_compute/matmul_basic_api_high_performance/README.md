@@ -153,7 +153,7 @@ if ((kOffsetInChunkA + 1) == stepKa) {
 
 #### 3. 多核并行切分
 
-按 M/N 方向均匀切分矩阵到多核并行计算。以 Atlas A2/A3（dav-2201）为例，采用 4×6 切分策略（M 方向 4 块、N 方向 6 块，共 24 核）满足地址 512B 对齐，并减少同地址访问冲突；Ascend 950PR/950DT（dav-3510）下为 32 核切分（参见后文性能数据小节）：
+按 M/N 方向均匀切分矩阵到多核并行计算。以 Atlas A2/A3（dav-2201）为例，采用 4×6 切分策略（M 方向 4 块、N 方向 6 块，共 24 核）满足地址 512B 对齐，并减少同地址访问冲突；Ascend 950PR&950DT系列产品（dav-3510）下为 32 核切分（参见后文性能数据小节）：
 
 ```cpp
 constexpr uint32_t mIter = AscendC::Std::ceil_div(M, singleCoreM);
