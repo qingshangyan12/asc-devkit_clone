@@ -78,7 +78,7 @@ def collect_object_from_files(object_files_dir, tmp_obj_dir):
     dst_object_list = []
     for target, obj_list in ori_object_list.items():
         for obj in obj_list:
-            file_name = target + "_" + os.path.basename(obj)
+            file_name = f"{len(dst_object_list)}_{target}_{os.path.basename(obj)}"
             dst_file = os.path.join(tmp_obj_dir, file_name)
             shutil.copyfile(obj, dst_file)
             dst_object_list.append(file_name)
