@@ -42,7 +42,7 @@ YAML front matter 位于 Markdown 开头，以 `---` 包围。
 | `navigation[]` | 子文档的 `path`。 |
 
 字段适用范围和输出顺序见 [Profile 注册表](okf-yaml-generate/config/document-profile-registry.yaml)；
-标签词表及证据约束见 [tag 规则](okf-yaml-generate/config/tag-rules.yaml)。
+标签词表及证据约束见 [tag 规则](okf-tag-research/taxonomy/tag-rules.yaml)。
 
 
 ## 示例

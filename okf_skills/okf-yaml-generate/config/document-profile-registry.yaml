@@ -7,7 +7,7 @@
 schema_version: 4
 status: active
 registry_id: okf-document-profile-v3
-taxonomy: ../okf-tag-generate/taxonomy/tag-taxonomy.json
+taxonomy: ../okf-tag-research/taxonomy/tag-taxonomy.json
 
 common_required_fields: [okftype, title, resource, version]
 common_fields: [okftype, title, resource, description, tag, signature, declaration, type_catalog, archs, header,

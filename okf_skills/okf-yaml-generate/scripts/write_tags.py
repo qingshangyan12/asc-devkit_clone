@@ -16,8 +16,9 @@ from tag_deprecation_evidence import explicitly_deprecates_subject
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_TAXONOMY = SKILL_ROOT / "taxonomy" / "tag-taxonomy.json"
-TAG_RULES = SKILL_ROOT / "taxonomy" / "tag-rules.yaml"
+TAXONOMY_DIR = SKILL_ROOT.parent / "okf-tag-research" / "taxonomy"
+DEFAULT_TAXONOMY = TAXONOMY_DIR / "tag-taxonomy.json"
+TAG_RULES = TAXONOMY_DIR / "tag-rules.yaml"
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
 TOP_LEVEL_KEY_RE = re.compile(r"^[^\s#][^:]*:\s*(?:.*)?(?:\n|$)")
@@ -288,13 +289,13 @@ def prepare_writes(
     return prepared
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--devkit-root", type=Path, required=True)
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--taxonomy", type=Path, default=DEFAULT_TAXONOMY)
     parser.add_argument("--write", action="store_true", help="Write only after validation succeeds")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     try:
         devkit_root = args.devkit_root.expanduser().resolve()

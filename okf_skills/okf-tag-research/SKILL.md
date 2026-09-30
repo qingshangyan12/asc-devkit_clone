@@ -5,15 +5,17 @@ description: 自动完成 Ascend DevKit API tag 词表调研，包括两个独�
 
 # OKF Tag 调研
 
-本 Skill 用于确定或扩展受控 tag 词表，不向 DevKit Markdown 写入 tag。词表获得批准后，使用同仓库的
-`okf-tag-generate` 从冻结词表读取值、基于正文证据逐篇标注并写入 YAML；`annotate-api-tags` 仅在需要
-独立产出或审核 annotation artifact 时使用，不替代最终 YAML 写入阶段。
+本 Skill 用于确定或扩展受控 tag 词表，不向 DevKit Markdown 写入 tag。词表获得批准后，使用同仓库
+`okf-yaml-generate` 的 tags 模式（`scripts/write_tags.py`）从冻结词表读取值、基于正文证据逐篇标注并
+写入 YAML；`annotate-api-tags` 仅在需要独立产出或审核 annotation artifact 时使用，不替代最终 YAML
+写入阶段。
 
 ## 词表来源
 
-冻结 tag 词表由 `../okf-tag-generate/taxonomy/tag-taxonomy.json` 唯一维护；本 Skill 不再维护第二份
-taxonomy。所有运行默认读取这个文件；不得在项目仓库或其他目录另建一份并行词表。批准后的新 taxonomy
-规则和词表均直接维护在 `../okf-tag-generate/taxonomy/` 的唯一事实源文件中。
+冻结 tag 词表由本 Skill 的 `taxonomy/tag-taxonomy.json` 唯一维护；本 Skill 是词表唯一事实源，不再
+从其他 skill 目录读取第二份 taxonomy。所有运行默认读取这个文件；不得在项目仓库或其他目录另建一份
+并行词表。批准后的新 taxonomy 规则和词表均直接维护在 `taxonomy/` 的唯一事实源文件中；生产写入方
+（`okf-yaml-generate` tags 模式）同样读取本目录。
 
 taxonomy 中标记为 `required: true` 的 namespace 是强制概念维度。每一个最终 API 标注必须为每个
 强制 namespace 至少选择一个值，并为每个值提供目标 Markdown 正文中的逐字证据；缺少任一强制
@@ -37,7 +39,7 @@ taxonomy 中标记为 `required: true` 的 namespace 是强制概念维度。每
 3. 执行两次 `validate-discovery`。任何校验失败即停止本轮；源文档缺失或哈希变化同样使本轮无效。
 4. 执行 `summarize-discovery`。此时主代理才可读取两份已校验发现结果、汇总和原文，并按 `references/artifact-contract.md` 写入 `main-agent-review.json`。主代理只能批准两个发现子代理均支持的候选；定义、选择规则或原文证据不明确时必须 `defer`。
 5. 执行 `validate-review`、`freeze-provisional` 和 `build-release-bundle`。产出的 provisional taxonomy 不能被 tag 写入器使用。
-6. 仅向人工审批者展示发布包和 proposed taxonomy diff。收到 approval record 后，按批准结果更新唯一的 `okf-tag-generate/taxonomy/tag-taxonomy.json`。
+6. 仅向人工审批者展示发布包和 proposed taxonomy diff。收到 approval record 后，按批准结果更新本 Skill 唯一的 `taxonomy/tag-taxonomy.json`（冻结发布产物写入 `taxonomy/releases/`）。
 
 ## 子代理隔离
 
@@ -83,7 +85,7 @@ python3 scripts/tag_research.py approve \
 ```
 
 如需审计或迁移，可显式传入 `--taxonomy`；正常运行不要替换 Skill 内置基线。
-`approve` 省略输出路径时，目标为唯一的 `../okf-tag-generate/taxonomy/tag-taxonomy.json`。
+`approve` 省略输出路径时，冻结产物写入本 Skill 的 `taxonomy/releases/`；生产词表的切换是单独的人工批准动作。
 
 主代理创建 review 或 approval 文件前，必须阅读 `references/artifact-contract.md`；启动子代理前，必须阅读 `references/worker-protocol.md`。
 

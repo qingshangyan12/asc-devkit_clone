@@ -723,7 +723,7 @@ constexpr uint8_t ASC_SIZE = 16;
                 "batch_id": "batch-01",
                 "annotations": [],
             }), encoding="utf-8")
-            namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
+            namespaces, values = module.taxonomy(ROOT / "../okf-tag-research/taxonomy/tag-taxonomy.json")
             self.assertEqual(module.load_semantic_annotations(
                 semantic_input, task, root, namespaces, values,
             ), {})
@@ -736,7 +736,7 @@ constexpr uint8_t ASC_SIZE = 16;
             document = root / path
             document.parent.mkdir(parents=True)
             document.write_text("# asc_mode\n", encoding="utf-8")
-            namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
+            namespaces, values = module.taxonomy(ROOT / "../okf-tag-research/taxonomy/tag-taxonomy.json")
             fields = {
                 "okftype": "reference.enum",
                 "title": "asc_mode",
@@ -790,7 +790,7 @@ constexpr uint8_t ASC_SIZE = 16;
             root = Path(temp)
             path = "docs/zh/api/SIMD-API/c_api/vector_compute/asc_add.md"
             namespaces, values = module.taxonomy(
-                ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
+                ROOT / "../okf-tag-research/taxonomy/tag-taxonomy.json"
             )
             fields = {
                 "okftype": "reference.api",
@@ -959,7 +959,7 @@ constexpr uint8_t ASC_SIZE = 16;
         from importlib.util import module_from_spec, spec_from_file_location
         import sys
 
-        scripts = ROOT.parent / "okf-tag-generate" / "scripts"
+        scripts = ROOT / "scripts"
         sys.path.insert(0, str(scripts))
         try:
             spec = spec_from_file_location("okf_tag_writer_test", scripts / "write_tags.py")
@@ -1096,7 +1096,7 @@ example: true
             self.assertNotIn("api_signature:", module.strip_inline_api_signature_blocks(body))
             self.assertIn("example: true", module.strip_inline_api_signature_blocks(body))
 
-            namespaces, values = module.taxonomy(ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json")
+            namespaces, values = module.taxonomy(ROOT / "../okf-tag-research/taxonomy/tag-taxonomy.json")
             fields = {
                 "okftype": "reference.api",
                 "title": "asc_foo",
@@ -1216,7 +1216,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
     def test_render_yaml_follows_registry_order_and_never_emits_applicability(self):
         module = self._controller_module()
         namespaces, values = module.taxonomy(
-            ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
+            ROOT / "../okf-tag-research/taxonomy/tag-taxonomy.json"
         )
         document_path = "docs/zh/api/SIMD-API/c_api/foo/foo.md"
         fields = {
@@ -1339,7 +1339,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
             run = Path(temp) / "run"
             batch = run / "batches" / "batch-01"
             batch.mkdir(parents=True)
-            taxonomy = ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
+            taxonomy = ROOT / "../okf-tag-research/taxonomy/tag-taxonomy.json"
             (run / "manifest.json").write_text(
                 json.dumps({
                     "schema_version": 1,
@@ -1470,7 +1470,7 @@ __simd_callee__ inline void asc_mode(vector_<dtype>& dst, vector_<dtype> src)
         run = Path(temp) / "run"
         batch = run / "batches/batch-01"
         batch.mkdir(parents=True)
-        taxonomy = ROOT / "../okf-tag-generate/taxonomy/tag-taxonomy.json"
+        taxonomy = ROOT / "../okf-tag-research/taxonomy/tag-taxonomy.json"
         (run / "manifest.json").write_text(
             json.dumps({
                 "schema_version": 1,

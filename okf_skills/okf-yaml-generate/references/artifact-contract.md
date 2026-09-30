@@ -71,7 +71,8 @@ Index 结果不得包含 `description`、`tag`、`dependencies`、`examples`、`
 
 非 Index 页的 `fields.description`、`fields.tag` 和 `fields.dependencies` 不由 worker 或总控脚本猜测。它们必须来自同一
 批次 `semantic-input.json`，并且每项 annotation 的 document hash 与当前输入一致。description 必须来自同一
-文档、同一哈希且已通过 `okf-description-generate validate` 的 `description-result.json`；tag 的每个非空值
+文档、同一哈希且已通过 `controller.py description validate`（或 `scripts/description.py validate`）的
+`description-result.json`；tag 的每个非空值
 必须有 namespace:value 级 evidence。没有有效语义结果时，非 Index 页 worker 只能标记 `semantic_verified: false`，
 `validate` 必须阻断；Index 不需要语义结果。
 

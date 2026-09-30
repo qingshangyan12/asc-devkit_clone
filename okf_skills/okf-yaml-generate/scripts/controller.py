@@ -19,9 +19,14 @@ import yaml
 
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
-TAG_RULES_PATH = SCRIPTS_DIR.parents[1] / "okf-tag-generate" / "taxonomy" / "tag-rules.yaml"
+TAG_RULES_PATH = SCRIPTS_DIR.parents[1] / "okf-tag-research" / "taxonomy" / "tag-rules.yaml"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
+
+import description
+import field_manager
+import generate_dependencies
+import write_tags
 
 from example_snippet_markers import apply_insertions_to_text, candidate_insertions_for_documents
 from yaml_deprecation_evidence import explicitly_deprecates_subject
@@ -1531,7 +1536,14 @@ def split_conflicting_doxygen_records(
     return retained, conflicts
 
 
+def field_closure_check() -> None:
+    result = field_manager.check()
+    if not result["ok"]:
+        raise ValidationError("field closure check failed; " + "; ".join(result["errors"]))
+
+
 def prepare(args: argparse.Namespace) -> int:
+    field_closure_check()
     model = load_model()
     registered = set(model["common_fields"])
     for profile_name, profile in model["profiles"].items():
@@ -1598,7 +1610,7 @@ def prepare(args: argparse.Namespace) -> int:
         "devkit_root": str(root),
         "documents": selected,
         "batches": [],
-        "taxonomy": str((Path(__file__).resolve().parents[2] / "okf-tag-generate" / "taxonomy" / "tag-taxonomy.json").resolve()),
+        "taxonomy": str((Path(__file__).resolve().parents[2] / "okf-tag-research" / "taxonomy" / "tag-taxonomy.json").resolve()),
         "write_contracts": list(DEFAULT_WRITE_CONTRACTS),
     }
     for index, batch in enumerate(batches, 1):
@@ -2264,6 +2276,7 @@ def report_markdown(report: dict[str, Any]) -> str:
 
 
 def validate(args: argparse.Namespace) -> int:
+    field_closure_check()
     run_dir = args.run_dir.expanduser().resolve()
     manifest = read_json(run_dir / "manifest.json")
     root = Path(manifest["devkit_root"]).resolve()
@@ -2587,6 +2600,39 @@ def write_validation_failure_report(run_dir: Path, error: Exception) -> None:
     )
 
 
+def run_tags(args: argparse.Namespace) -> int:
+    argv = ["--devkit-root", str(args.devkit_root), "--input", str(args.input)]
+    if args.taxonomy is not None:
+        argv += ["--taxonomy", str(args.taxonomy)]
+    if args.write:
+        argv.append("--write")
+    return write_tags.main(argv)
+
+
+def run_deps(args: argparse.Namespace) -> int:
+    argv = ["--devkit-root", str(args.devkit_root), "--input", str(args.input)]
+    if args.write:
+        argv.append("--write")
+    return generate_dependencies.main(argv)
+
+
+def run_description(args: argparse.Namespace) -> int:
+    argv = [args.description_command]
+    for name in ("devkit_root", "document", "run_id", "run_dir", "result"):
+        value = getattr(args, name, None)
+        if value is not None:
+            argv += [f"--{name.replace('_', '-')}", str(value)]
+    if getattr(args, "allow_unresolved", False):
+        argv.append("--allow-unresolved")
+    if getattr(args, "write", False):
+        argv.append("--write")
+    return description.main(argv)
+
+
+def run_check(args: argparse.Namespace) -> int:
+    return field_manager.main(["check"])
+
+
 def parser() -> argparse.ArgumentParser:
     root = argparse.ArgumentParser(description=__doc__)
     sub = root.add_subparsers(dest="command", required=True)
@@ -2610,6 +2656,35 @@ def parser() -> argparse.ArgumentParser:
         command = sub.add_parser(name)
         command.add_argument("--run-dir", type=Path, required=True)
         command.set_defaults(handler=function)
+    tags_parser = sub.add_parser("tags")
+    tags_parser.add_argument("--devkit-root", type=Path, required=True)
+    tags_parser.add_argument("--input", type=Path, required=True)
+    tags_parser.add_argument("--taxonomy", type=Path)
+    tags_parser.add_argument("--write", action="store_true")
+    tags_parser.set_defaults(handler=run_tags)
+    deps_parser = sub.add_parser("deps")
+    deps_parser.add_argument("--devkit-root", type=Path, required=True)
+    deps_parser.add_argument("--input", type=Path, required=True)
+    deps_parser.add_argument("--write", action="store_true")
+    deps_parser.set_defaults(handler=run_deps)
+    description_parser = sub.add_parser("description")
+    description_sub = description_parser.add_subparsers(dest="description_command", required=True)
+    description_prepare = description_sub.add_parser("prepare")
+    description_prepare.add_argument("--devkit-root", required=True)
+    description_prepare.add_argument("--document", required=True)
+    description_prepare.add_argument("--run-id", required=True)
+    description_prepare.add_argument("--run-dir", required=True)
+    description_validate = description_sub.add_parser("validate")
+    description_validate.add_argument("--run-dir", required=True)
+    description_validate.add_argument("--result", required=True)
+    description_write = description_sub.add_parser("write")
+    description_write.add_argument("--run-dir", required=True)
+    description_write.add_argument("--result", required=True)
+    description_write.add_argument("--allow-unresolved", action="store_true")
+    description_write.add_argument("--write", action="store_true")
+    description_parser.set_defaults(handler=run_description)
+    check_parser = sub.add_parser("check")
+    check_parser.set_defaults(handler=run_check)
     return root
 
 

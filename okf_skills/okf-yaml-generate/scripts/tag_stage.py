@@ -16,7 +16,7 @@ from yaml_deprecation_evidence import explicitly_deprecates_subject
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_TAXONOMY = SKILL_ROOT.parents[1] / "okf-tag-generate" / "taxonomy" / "tag-taxonomy.json"
+DEFAULT_TAXONOMY = SKILL_ROOT.parents[1] / "okf-tag-research" / "taxonomy" / "tag-taxonomy.json"
 API_ROOT = Path("docs/zh/api/SIMD-API")
 API_SURFACES = {"c_api", "basic_api", "adv_api", "tensor_api"}
 TOP_LEVEL_KEY_RE = re.compile(r"^[^\s#][^:]*:\s*(?:.*)?(?:\n|$)")

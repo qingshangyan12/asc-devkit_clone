@@ -336,12 +336,12 @@ def prepare_writes(
     return prepared
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--devkit-root", type=Path, required=True)
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--write", action="store_true", help="Write only after validation succeeds")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     try:
         root = args.devkit_root.expanduser().resolve()

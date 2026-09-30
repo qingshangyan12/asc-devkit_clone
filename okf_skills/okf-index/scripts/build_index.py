@@ -35,7 +35,7 @@ from controller import (  # noqa: E402
 )
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-TAXONOMY_PATH = SKILL_ROOT.parent / "okf-tag-generate" / "taxonomy" / "tag-taxonomy.json"
+TAXONOMY_PATH = SKILL_ROOT.parent / "okf-tag-research" / "taxonomy" / "tag-taxonomy.json"
 INDEX_DIR = SKILL_ROOT / "index"
 STAGES = ("in", "out", "compute")
 

@@ -293,7 +293,7 @@ def cmd_write(args: argparse.Namespace) -> None:
     print(json.dumps({"write_plan": str(run_dir / "write-plan.json"), "written": bool(args.write)}, ensure_ascii=False))
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
     prepare = subparsers.add_parser("prepare", help="固定单个 API 的 description 任务")
@@ -312,11 +312,11 @@ def parse_args() -> argparse.Namespace:
     write.add_argument("--allow-unresolved", action="store_true")
     write.add_argument("--write", action="store_true")
     write.set_defaults(handler=cmd_write)
-    return parser.parse_args()
+    return parser.parse_args(argv)
 
 
-def main() -> int:
-    args = parse_args()
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
     try:
         args.handler(args)
     except (FileNotFoundError, ValueError, json.JSONDecodeError) as error:

@@ -1,4 +1,4 @@
 interface:
   display_name: "OKF YAML Generate"
-  short_description: "集中生成并校验 Ascend API OKF YAML"
-  default_prompt: "使用 $okf-yaml-generate 处理指定 API 文件或目录，按 SKILL.md 的流程生成、校验并写入 OKF YAML。"
+  short_description: "集中生成并校验 Ascend API OKF YAML（含 tags、description、dependencies 与字段检查）"
+  default_prompt: "使用 $okf-yaml-generate 处理指定 API 文件或目录，按 SKILL.md 的流程生成、校验并写入 OKF YAML、tag、description 或 dependencies。"

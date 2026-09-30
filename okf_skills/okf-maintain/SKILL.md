@@ -16,7 +16,7 @@ description: OKF 知识建设流水线的复用入口：为新 API 文档范围�
   （受影响文档的头按 `okf-yaml-generate` 单文档重跑，索引经 `build_index.py` 重建，
   词表问题开 `okf-tag-research` 新轮次，均直接复用对应 skill）。
 - 不新建标签、字段、Profile 或索引规则；词表唯一事实源仍是
-  `../okf-tag-generate/taxonomy/tag-taxonomy.json`。
+  `../okf-tag-research/taxonomy/tag-taxonomy.json`。
 - 范围外知识只登记扩展需求，不自动扩大建设范围。
 - 审计痕迹复用各 skill 自带的 run 目录（`okf-tag-research/runs/`、
   `okf-yaml-generate/tmp/<run-id>/`），不另建记录目录。
@@ -26,7 +26,7 @@ description: OKF 知识建设流水线的复用入口：为新 API 文档范围�
 | 段 | 复用 skill | 交付物 | 关键门槛 |
 | --- | --- | --- | --- |
 | 1 调研 | `okf-tag-research` | 冻结词表（当前 core-v9） | 双盲发现、确定性校验、人工批准后冻结 |
-| 2 添加头 | `okf-yaml-generate`（description 语义工件来自 `okf-description-generate`，依赖关系内联生成） | 范围内全部文档的 OKF YAML 头、include Doxygen、example marker | prepare→worker→resolve-issues→validate→write；validate 阻断不得写入 |
+| 2 添加头 | `okf-yaml-generate`（建设侧唯一打标记入口；description、tag、dependencies 由 full 管线内联生成，也可经 tags/description/deps 子命令单独重跑） | 范围内全部文档的 OKF YAML 头、include Doxygen、example marker | prepare→worker→resolve-issues→validate→write；validate 阻断不得写入 |
 | 3 建立索引 | `okf-index` | `index/<surface>/{index.json,gaps.json,build-meta.json}` 与查询 CLI（`--surface`） | 校验不过不出索引；单测 + dryrun 全过 |
 
 ## 新范围接入清单
@@ -43,8 +43,7 @@ description: OKF 知识建设流水线的复用入口：为新 API 文档范围�
    校准分类/导航规则与该 surface 的 dryrun 查询清单后执行
    `build_index.py --scope <surface>`。索引实例按 surface 隔离（`index/<surface>/`，
    含独立的缺口登记与漂移检测），不影响既有实例。
-6. **复核**：`okf-index` 单测与 dryrun 全过；必要时按 `okf-evaluate` 口径回归
-   检索质量。
+6. **复核**：`okf-index` 单测与 dryrun 全过；`okf-yaml-generate check` 字段闭包通过。
 
 ## 当前应用实例
 

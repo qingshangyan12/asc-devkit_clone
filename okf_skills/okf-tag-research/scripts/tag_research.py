@@ -25,9 +25,9 @@ SCHEMA_VERSION = 1
 TAG_RE = re.compile(r"^(?P<namespace>[a-z][a-z0-9_]*):(?P<value>[a-z][a-z0-9_]*)$")
 RUN_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]*$")
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-GENERATOR_SKILL_ROOT = SKILL_ROOT.parent / "okf-tag-generate"
-DEFAULT_TAXONOMY = GENERATOR_SKILL_ROOT / "taxonomy" / "tag-taxonomy.json"
-RELEASE_DIR = GENERATOR_SKILL_ROOT / "taxonomy" / "releases"
+TAXONOMY_DIR = SKILL_ROOT / "taxonomy"
+DEFAULT_TAXONOMY = TAXONOMY_DIR / "tag-taxonomy.json"
+RELEASE_DIR = TAXONOMY_DIR / "releases"
 
 
 def read_json(path: Path) -> dict[str, Any]:
@@ -881,7 +881,7 @@ def command_approve(args: argparse.Namespace) -> dict[str, Any]:
             candidate.relative_to(RELEASE_DIR.resolve())
         except ValueError as error:
             raise ValueError(
-                "approved taxonomy must be written to okf-tag-generate/taxonomy/tag-taxonomy.json"
+                "approved taxonomy must be written to okf-tag-research/taxonomy/releases/"
             ) from error
     if output.exists():
         raise FileExistsError("refusing to overwrite taxonomy")

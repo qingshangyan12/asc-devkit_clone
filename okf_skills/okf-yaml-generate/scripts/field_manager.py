@@ -12,9 +12,9 @@ import importlib.util
 import yaml
 
 
-ROOT = Path(__file__).resolve().parents[1]
-REGISTRY = ROOT / ".." / "okf-yaml-generate" / "config" / "document-profile-registry.yaml"
-CONTROLLER = ROOT / ".." / "okf-yaml-generate" / "scripts"
+SKILL_ROOT = Path(__file__).resolve().parents[1]
+REGISTRY = SKILL_ROOT / "config" / "document-profile-registry.yaml"
+CONTROLLER = Path(__file__).resolve().parent
 sys.path.insert(0, str(CONTROLLER.resolve()))
 
 
@@ -56,10 +56,10 @@ def check() -> dict:
     return {"ok": not errors, "registry": str(REGISTRY.resolve()), "errors": errors}
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["check"])
-    args = parser.parse_args()
+    parser.parse_args(argv)
     result = check()
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0 if result["ok"] else 1
