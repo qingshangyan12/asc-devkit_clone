@@ -21,7 +21,7 @@
 
 #ifndef ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
 #define ASCENDC_MODULE_TPIPE_INTERFACE_IMPL_H
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #include "dav_3510/kernel_tpipe_impl_c310.h"
 #include "dav_3510/kernel_tpipe_impl_c310_vec.h"
 #include "kernel_tquesync_impl.h"
@@ -75,6 +75,9 @@ __aicore__ inline TPipe::TPipe()
 {
     InitSocState();
     Init();
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_TPIPE));
+#endif
 }
 
 __aicore__ inline TPipe::~TPipe()
@@ -243,6 +246,9 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, const Std::tuple<U, V>& addr0, 
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n",
             this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
+#endif
     return true;
 }
 
@@ -344,6 +350,9 @@ __aicore__ inline bool TPipe::InitBuffer(T& que, uint8_t num, uint32_t len)
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "tscm addr is %d, limits is %d",
             this->g_tpipeImpl.bufPool_[static_cast<uint8_t>(Hardware::L1)].maxAddr, this->g_tpipeImpl.tscmBufferPtr_));
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
+#endif
     return true;
 }
 
@@ -408,6 +417,9 @@ __aicore__ inline bool TPipe::InitBuffer(TBuf<pos>& buf, uint32_t len)
         KERNEL_LOG_INTERNAL(
             KERNEL_ERROR, "Total buffer num managed by TPipe is %d, should be in range (0, %d]\n",
             this->g_tpipeImpl.curBufSize_, QBUF_MAX_LEN));
+#ifdef ASCENDC_TIME_STAMP_ON
+    PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_BUFFER));
+#endif
     return true;
 }
 
@@ -690,7 +702,8 @@ __aicore__ inline void TPipe::InitSpmBuffer(const GlobalTensor<T>& workspace, co
 
 __aicore__ inline void TPipe::InitSpmBuffer(const int32_t bufferSize)
 {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     (void)(bufferSize);
     ASCENDC_DEBUG_ASSERT((false), KERNEL_LOG_INTERNAL(KERNEL_ERROR, "not supported on current device"));
 #else
