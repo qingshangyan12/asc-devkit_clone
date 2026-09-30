@@ -722,10 +722,6 @@ __aicore__ constexpr HardEvent GetQueEvt(TPosition src, TPosition dst, bool fwdD
     } else if (src == TPosition::C1) {
         if (dst == TPosition::C2) {
             return fwdDirect ? HardEvent::MTE1_M : HardEvent::M_MTE1;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
-        } else if (dst == TPosition::GM || dst == TPosition::C2) {
-            return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;
-#endif
         }
     } else if (src == TPosition::CO1) {
         if (dst == TPosition::CO2 || dst == TPosition::GM) {
