@@ -146,20 +146,20 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 -   SIMD场景下，每核打印FIFO缓冲区大小默认为30KB，可通过acl.json中的`simd_printf_fifo_size_per_core`字段配置，配置范围最小为1KB，最大为64MB（可通过[aclInit](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/02_initialization_and_deinitialization.md#aclinit)接口调整）。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
 <!-- npu="950,A3,910b,310p" id16 -->
 - 针对如下型号:
-<!-- npu="950" id17 -->
-- Ascend 950PR&950DT系列产品
-<!-- end id17 -->
-<!-- npu="A3" id18 -->
-- Atlas A3系列产品
-<!-- end id18 --> 
-<!-- npu="910b" id19 -->
-- Atlas A2系列产品
-<!-- end id19 --> 
-<!-- npu="310p" id20 -->
-- Atlas推理系列产品
-<!-- end id20 --> 
-- NPU上板调试时支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dump_size`指定需要打印的元素个数，无需手动拆分数据或多次调用接口。
-<!-- end id16 -->  
+  <!-- npu="950" id17 -->
+  - Ascend 950PR&950DT系列产品
+  <!-- end id17 -->
+  <!-- npu="A3" id18 -->
+  - Atlas A3系列产品
+  <!-- end id18 --> 
+  <!-- npu="910b" id19 -->
+  - Atlas A2系列产品
+  <!-- end id19 --> 
+  <!-- npu="310p" id20 -->
+  - Atlas推理系列产品
+  <!-- end id20 -->
+  NPU上板调试时支持打印超大Tensor，即单次调用可打印数据量超过每核打印缓冲区大小的Tensor。使用方式与普通Tensor相同，通过`dumpSize`指定需要打印的元素个数，无需手动拆分Tensor或多次调用接口。
+<!-- end id16 -->
 
 <!-- npu="950" id21 -->
 -   SIMD VF场景下，使用`asc_dump_reg`或寄存器入参的`asc_dump`时，若`dump_size`超过一个矢量寄存器可容纳的元素数量，系统会将其自动截断为该寄存器可容纳的元素数量。
