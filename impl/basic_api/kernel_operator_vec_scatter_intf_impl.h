@@ -204,29 +204,6 @@ __aicore__ inline void Scatter(
 #endif
 #endif
 }
-/*
- * @ingroup scatter Level 0
- * @brief scatter element from src to global dst according to offsetSrc
- * @param [out] dst output GlobalTensor
- * @param [in] src input LocalTensor
- * @param [in] offsetSrc input LocalTensor, offset type is int32_t or int64_t
- * @param [in] scatterParam scatter parameters, including offsetNum, burstLen and dstStride
- */
-template <typename T, typename U>
-__aicore__ inline void ScatterToGlobal(
-    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offsetSrc, ScatterParams& scatterParam)
-{
-    using PrimType = PrimT<T>;
-    using OffsetPrimType = PrimT<U>;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
-    const uint8_t cacheMode = ExtractCacheMode(dst);
-    ScatterToGlobalImpl(
-        (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
-        (__ubuf__ OffsetPrimType*)offsetSrc.GetPhyAddr(), scatterParam, cacheMode);
-#else
-    ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "ScatterToGlobal is not supported on current device"); });
-#endif
-}
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_SCATTER_INTERFACE_IMPL_H
