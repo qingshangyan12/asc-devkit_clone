@@ -66,11 +66,9 @@ PIPE_FIX
 ## 调用示例
 
 ```cpp
-constexpr uint16_t n_burst = 1;
-constexpr uint16_t len_burst = 1;
-constexpr uint16_t src_gap = 0;
-constexpr uint16_t dst_gap = 1;
+// 同步接口按字节数连续搬运，此处搬运一个32字节数据块。
+constexpr uint32_t copy_size = 32;
 __cbuf__ half src[256];
 __fbuf__ half dst[256];
-asc_copy_l12fb_sync(dst, src, n_burst, len_burst, src_gap, dst_gap);
+asc_copy_l12fb_sync(dst, src, copy_size);
 ```
