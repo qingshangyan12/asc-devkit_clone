@@ -6,14 +6,14 @@ Choose the appropriate environment preparation method based on **whether you hav
 
 | Environment Preparation | Community Experience / Operator Development (CANN Commercial/Community Edition) | Ecosystem Developer Contribution (CANN master) |
 | :---: | :---: | :---: |
-| **No NPU device** | [Cloud Development Environment](#1️⃣-cloud-development-environment) | [Manually Download and Install CANN master](#📥-download-and-install-cann-package) + [Cloud Development Environment](#1️⃣-cloud-development-environment) |
-| **Have NPU device** | [CANN Official Docker Image](#2️⃣-cann-official-docker-image) | [Manually Download and Install CANN master](#📥-download-and-install-cann-package) + [Dev Container](#3️⃣-devcontainer) |
+| **No NPU device** | [Cloud Development Environment](#1-cloud-development-environment) | [Manually Download and Install CANN master](#download-and-install-cann-package) + [Cloud Development Environment](#1-cloud-development-environment) |
+| **Have NPU device** | [CANN Official Docker Image](#2-cann-official-docker-image) | [Manually Download and Install CANN master](#download-and-install-cann-package) + [Dev Container](#3-devcontainer) |
 
 > [!TIP] Recommendations
 >
 > - To ensure development environment quality, we recommend users complete **environment preparation** based on **containerization technology**.
 > - If you prefer not to use containers, you can also complete **environment preparation** on a host with NPU device. Refer to [CANN Software Installation Guide - Install on Physical Machine](https://www.hiascend.com/cann/download).
-> - For users who only want to experience "compile and install this open source repository + run operators in simulation environment", the host does not require an NPU device. You can skip NPU driver and firmware installation and directly install the CANN package. Refer to [Download and Install CANN Package](#📥-download-and-install-cann-package).
+> - For users who only want to experience "compile and install this open source repository + run operators in simulation environment", the host does not require an NPU device. You can skip NPU driver and firmware installation and directly install the CANN package. Refer to [Download and Install CANN Package](#download-and-install-cann-package).
 
 <!-- AI Agent enablement logic to be added -->
 
@@ -35,7 +35,7 @@ For users without NPU devices, you can use the NPU computing resources provided 
 > [!NOTE] Usage Instructions
 >
 > - The environment has the latest commercial NPU driver and firmware, CANN package pre-installed. Pay attention to software compatibility when downloading source code.
-> - To download a specific version of CANN package, refer to [Download and Install CANN Package](#📥-download-and-install-cann-package).
+> - To download a specific version of CANN package, refer to [Download and Install CANN Package](#download-and-install-cann-package).
 > - For more information about **WebIDE Development Platform**, refer to [Cloud Development Platform Introduction](https://gitcode.com/org/cann/discussions/54).
 > - [Huawei Developer Space plugin](https://marketplace.visualstudio.com/items?itemName=HuaweiCloud.developerspace) provides technical support for VSCode IDE to access **cloud development environment**.
 
@@ -109,7 +109,7 @@ For users with NPU devices, we recommend using DevContainer for ecosystem develo
 DevContainer is based on VS Code Dev Containers. It automatically builds a consistent containerized development environment through `.devcontainer` configuration in the repository. It has built-in `conda`, `Python` and other development toolchains. It shares device access with the host's NPU driver, suitable for scenarios that require compiling source code, running UT, and contributing code to this repository. For detailed instructions, refer to [`.devcontainer/README_en.md`](../../.devcontainer/README_en.md).
 
 > [!NOTE] Usage Instructions
-> DevContainer only mounts the host's NPU driver (read-only). **CANN toolkit and ops packages need to be manually installed after container starts**. Refer to [Download and Install CANN Package](#📥-download-and-install-cann-package).
+> DevContainer only mounts the host's NPU driver (read-only). **CANN toolkit and ops packages need to be manually installed after container starts**. Refer to [Download and Install CANN Package](#download-and-install-cann-package).
 
 ### 📥 Download and Install CANN Package<a name="cann-install"></a>
 <!-- AI Agent download & install CANN package skill to be added -->
