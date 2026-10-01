@@ -29,12 +29,11 @@ CcuResult CcuKfcReduceScatterMesh1DA5Mem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
     ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride, ccu::Variable normalSliceSize,
-    ccu::Variable lastSliceSize, ccu::Variable scratchRepeatStride, ccu::Variable repeatNum,
-    ccu::Variable goAddrOffset, ccu::Variable goLoopParam, ccu::Variable goParallelParam, ccu::Variable goResidual,
-    ccu::Variable goBAddrOffset, ccu::Variable goBLoopParam, ccu::Variable goBParallelParam,
-    ccu::Variable goBResidual, ccu::Variable scratchSlotStride, const ChannelHandle channels[], uint32_t channelCount,
-    uint32_t rankSize, uint32_t rankId, const HcclDataType& dataType, const HcclDataType& outputType,
-    const HcclReduceOp& reduceType);
+    ccu::Variable lastSliceSize, ccu::Variable scratchRepeatStride, ccu::Variable repeatNum, ccu::Variable goAddrOffset,
+    ccu::Variable goLoopParam, ccu::Variable goParallelParam, ccu::Variable goResidual, ccu::Variable goBAddrOffset,
+    ccu::Variable goBLoopParam, ccu::Variable goBParallelParam, ccu::Variable goBResidual,
+    ccu::Variable scratchSlotStride, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
+    uint32_t rankId, const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType);
 
 } // namespace mc2_ops_hccl
 #endif // HCCL_CCU_KERNEL_KFC_REDUCE_SCATTER_MESH_1D_A5_MEM2MEM_H

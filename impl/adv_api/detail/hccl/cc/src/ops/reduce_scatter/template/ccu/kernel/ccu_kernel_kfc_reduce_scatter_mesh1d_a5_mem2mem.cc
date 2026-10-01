@@ -4,7 +4,7 @@
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE.
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
@@ -239,8 +239,7 @@ static void SwitchToLastChunkGoSize(KfcReduceScatterMesh1DA5Mem2MemContext& ctx)
 
 // 规约当前 chunk：复用 asc-devkit GroupLocalReduce；本rank槽位直读 input 通过 scratch[rankId]=myInput 注入。
 // 传入 scratchSet 的副本（GroupLocalReduce 内部会推进地址），保持 scratchMemA/B 基址恒定。
-static CcuResult DoReduceScatter(
-    KfcReduceScatterMesh1DA5Mem2MemContext& ctx, std::vector<ccu::LocalAddr>& scratchSet)
+static CcuResult DoReduceScatter(KfcReduceScatterMesh1DA5Mem2MemContext& ctx, std::vector<ccu::LocalAddr>& scratchSet)
 {
     ccu::LocalAddr myOutput;
     myOutput.addr = ctx.output;
@@ -323,12 +322,11 @@ CcuResult CcuKfcReduceScatterMesh1DA5Mem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable scratch,
     ccu::Variable currentRankSliceInputOffset, ccu::Variable currentRankSliceOutputOffset,
     ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride, ccu::Variable normalSliceSize,
-    ccu::Variable lastSliceSize, ccu::Variable scratchRepeatStride, ccu::Variable repeatNum,
-    ccu::Variable goAddrOffset, ccu::Variable goLoopParam, ccu::Variable goParallelParam, ccu::Variable goResidual,
-    ccu::Variable goBAddrOffset, ccu::Variable goBLoopParam, ccu::Variable goBParallelParam,
-    ccu::Variable goBResidual, ccu::Variable scratchSlotStride, const ChannelHandle channels[], uint32_t channelCount,
-    uint32_t rankSize, uint32_t rankId, const HcclDataType& dataType, const HcclDataType& outputType,
-    const HcclReduceOp& reduceType)
+    ccu::Variable lastSliceSize, ccu::Variable scratchRepeatStride, ccu::Variable repeatNum, ccu::Variable goAddrOffset,
+    ccu::Variable goLoopParam, ccu::Variable goParallelParam, ccu::Variable goResidual, ccu::Variable goBAddrOffset,
+    ccu::Variable goBLoopParam, ccu::Variable goBParallelParam, ccu::Variable goBResidual,
+    ccu::Variable scratchSlotStride, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize,
+    uint32_t rankId, const HcclDataType& dataType, const HcclDataType& outputType, const HcclReduceOp& reduceType)
 {
     KfcReduceScatterMesh1DA5Mem2MemContext ctx;
     ctx.channels = channels;

@@ -18,9 +18,10 @@ namespace mc2_ops_hccl {
 // AlgMeta::variantCondId 取值；-1 = 无条件
 enum VariantCondId {
     COND_NONE = -1,
-    COND_Z_AXIS = 0, // 两层网且(2P 大数据或总量超阈值) -> ZAxisDetour 候选
-    COND_PEER_ONLY,  // rankSize==2 且对端仅 1 条链路 -> PeerOnly 候选
-    COND_SPECIAL_DT, // 64bit dtype 或 PROD 归约 -> soft_reduce(AicpuReduce) 候选
+    COND_Z_AXIS = 0,       // 两层网且(2P 大数据或总量超阈值) -> ZAxisDetour 候选
+    COND_PEER_ONLY,        // rankSize==2 且对端仅 1 条链路 -> PeerOnly 候选
+    COND_SPECIAL_DT,       // 64bit dtype 或 PROD 归约 -> soft_reduce(AicpuReduce) 候选
+    COND_SINGLE_SERVER_A5, // A5(Ascend950) 单server -> SoleMeshA5 候选
     VARIANT_COND_COUNT
 };
 
@@ -40,6 +41,7 @@ using MachineFlag = bool (*)(const TopoInfoWithNetLayerDetails* topo);
 bool CondZAxis(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam);
 bool CondPeerOnly(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam);
 bool CondSpecialDt(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam);
+bool CondSingleServerA5(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam);
 bool FlagPcieMix(const TopoInfoWithNetLayerDetails* topo);
 bool FlagUbx(const TopoInfoWithNetLayerDetails* topo);
 bool FlagMultiLevel(const TopoInfoWithNetLayerDetails* topo);

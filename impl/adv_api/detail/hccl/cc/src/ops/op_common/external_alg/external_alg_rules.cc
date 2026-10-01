@@ -69,6 +69,23 @@ bool CondSpecialDt(const TopoInfoWithNetLayerDetails* topo, const OpParam& opPar
     return Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
 }
 
+// A5(Ascend950) 单server 机型；950 与 910_95 是同一机型在不同 SDK 头文件下的枚举名（见 topo_match_1d.cc）
+bool CondSingleServerA5(const TopoInfoWithNetLayerDetails* topo, const OpParam& opParam)
+{
+    (void)opParam;
+    if (topo == nullptr) {
+        return false;
+    }
+#ifdef MACRO_DEV_TYPE_NEW
+    if (topo->deviceType != DevType::DEV_TYPE_950) {
+#else
+    if (topo->deviceType != DevType::DEV_TYPE_910_95) {
+#endif
+        return false;
+    }
+    return (topo->level0Topo == Level0Shape::MESH_1D && topo->serverNum == 1);
+}
+
 bool FlagPcieMix(const TopoInfoWithNetLayerDetails* topo)
 {
     if (topo == nullptr) {
@@ -124,9 +141,10 @@ bool EngineMatch(AlgEngine candEngine, const OpParam& opParam)
 // 漏项（NoHole）全部编译期暴露。
 namespace {
 constexpr VariantCond VARIANT_COND_BINDING[VARIANT_COND_COUNT] = {
-    CondZAxis,     // COND_Z_AXIS
-    CondPeerOnly,  // COND_PEER_ONLY
-    CondSpecialDt, // COND_SPECIAL_DT
+    CondZAxis,          // COND_Z_AXIS
+    CondPeerOnly,       // COND_PEER_ONLY
+    CondSpecialDt,      // COND_SPECIAL_DT
+    CondSingleServerA5, // COND_SINGLE_SERVER_A5
 };
 constexpr MachineFlag MACHINE_FLAG_BINDING[MACHINE_FLAG_COUNT] = {
     FlagPcieMix,    // FLAG_PCIE_MIX
@@ -160,6 +178,7 @@ constexpr bool NoHole(const MachineFlag* table, int count)
 static_assert(VARIANT_COND_BINDING[COND_Z_AXIS] == CondZAxis, "table binding drifted");
 static_assert(VARIANT_COND_BINDING[COND_PEER_ONLY] == CondPeerOnly, "table binding drifted");
 static_assert(VARIANT_COND_BINDING[COND_SPECIAL_DT] == CondSpecialDt, "table binding drifted");
+static_assert(VARIANT_COND_BINDING[COND_SINGLE_SERVER_A5] == CondSingleServerA5, "table binding drifted");
 static_assert(MACHINE_FLAG_BINDING[FLAG_PCIE_MIX] == FlagPcieMix, "table binding drifted");
 static_assert(MACHINE_FLAG_BINDING[FLAG_UBX] == FlagUbx, "table binding drifted");
 static_assert(MACHINE_FLAG_BINDING[FLAG_MULTI_LEVEL] == FlagMultiLevel, "table binding drifted");
@@ -171,6 +190,7 @@ const VariantCond VARIANT_COND_TABLE[VARIANT_COND_COUNT] = {
     VARIANT_COND_BINDING[COND_Z_AXIS],
     VARIANT_COND_BINDING[COND_PEER_ONLY],
     VARIANT_COND_BINDING[COND_SPECIAL_DT],
+    VARIANT_COND_BINDING[COND_SINGLE_SERVER_A5],
 };
 
 const MachineFlag MACHINE_FLAG_TABLE[MACHINE_FLAG_COUNT] = {
@@ -182,7 +202,8 @@ const MachineFlag MACHINE_FLAG_TABLE[MACHINE_FLAG_COUNT] = {
 
 const char* VariantCondName(int id)
 {
-    static const char* NAMES[VARIANT_COND_COUNT] = {"COND_Z_AXIS", "COND_PEER_ONLY", "COND_SPECIAL_DT"};
+    static const char* NAMES[VARIANT_COND_COUNT] = {
+        "COND_Z_AXIS", "COND_PEER_ONLY", "COND_SPECIAL_DT", "COND_SINGLE_SERVER_A5"};
     return (id >= 0 && id < VARIANT_COND_COUNT) ? NAMES[id] : "n/a";
 }
 
