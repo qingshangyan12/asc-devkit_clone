@@ -23,6 +23,7 @@ def run_command(args, **others):
         subprocess.run(args, check=True, **others)
     except subprocess.CalledProcessError as e:
         LogUtil.print_compile_log("", f"Command failed: {e}!", AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC)
+        raise
 
 
 def args_parse():
@@ -131,17 +132,19 @@ def remove_temporary_files(tmp_obj_dir):
 
 
 def main():
+    args = args_parse()
     try:
-        args = args_parse()
-
         objects = collect_object_from_files(args.object_files_dir, args.tmp_obj_dir)
         unpack_kernel_library(args.kernel_libs_dir, objects, args.tmp_obj_dir)
         pack_static_library(args.output_file, objects, args.tmp_obj_dir, args.package_name)
-
-        if args.remove_tmp_files == "1":
+    finally:
+        if (
+            args.remove_tmp_files == "1"
+            and args.tmp_obj_dir
+            and os.path.isdir(args.tmp_obj_dir)
+            and not os.path.islink(args.tmp_obj_dir)
+        ):
             remove_temporary_files(args.tmp_obj_dir)
-    except Exception as e:
-        raise (e)
 
 
 if __name__ == "__main__":
