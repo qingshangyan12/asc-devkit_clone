@@ -575,12 +575,12 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, 48>();
     AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, 48>();
     AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, 48>();
-    
+
     AscendC::GlobalTensor<float> xGlobal, yGlobal, zGlobal;
     xGlobal.SetGlobalBuffer((__gm__ float*)x);
     yGlobal.SetGlobalBuffer((__gm__ float*)y);
     zGlobal.SetGlobalBuffer((__gm__ float*)z);
-    
+
     // ...
     // 1. Step 1: Data transfer in, execution pipeline is PIPE_MTE2
     AscendC::Mutex::Lock<PIPE_MTE2>(mutex_id);
@@ -592,7 +592,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     AscendC::Mutex::Lock<PIPE_V>(mutex_id);
     AscendC::Add(zLocal, xLocal, yLocal, 48);
     AscendC::Mutex::Unlock<PIPE_V>(mutex_id);
-    
+
     // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
     AscendC::Mutex::Lock<PIPE_MTE3>(mutex_id);
     AscendC::DataCopy(zGlobal, zLocal, 48);
@@ -900,7 +900,7 @@ int32_t main(int32_t argc, char* argv[])
 
     ```
     ...
-    
+
     target_compile_options(demo PRIVATE
         // 将dav-xxxx更换为对应NPU架构版本号
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-xxxx>
