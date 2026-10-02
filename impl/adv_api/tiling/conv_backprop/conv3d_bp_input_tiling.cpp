@@ -659,7 +659,7 @@ void Conv3DBpInputTiling::CalStepMNK()
     tilingParams.al1Pbuffer = DB_ON;
     tilingParams.bl1Pbuffer = DB_OFF;
 
-    // The right matrix is ​​the weight, and the total amount of data is small. The right matrix is ​​given
+    // The right matrix is the weight, and the total amount of data is small. The right matrix is given
     // priority to be fully loaded
     uint64_t kIter = ConvBackpropApi::CeilDiv(mmInfo_.kValue, static_cast<uint64_t>(tilingParams.baseK));
     if (IsStepL1Valid(1, kIter) && shapeInfo.orgkD == 1) {
