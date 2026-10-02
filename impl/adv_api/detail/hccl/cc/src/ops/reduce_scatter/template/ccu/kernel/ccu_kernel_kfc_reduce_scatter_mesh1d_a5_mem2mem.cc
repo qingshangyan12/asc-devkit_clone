@@ -248,7 +248,8 @@ static CcuResult DoReduceScatter(KfcReduceScatterMesh1DA5Mem2MemContext& ctx, st
 
     std::vector<ccu::LocalAddr> scratch = scratchSet;
     scratch[ctx.rankId] = ctx.myInput;
-    CCU_CHK_RET(GroupLocalReduce(ctx, myOutput, scratch, ctx.goSize, ctx.dataType, ctx.outputDataType, ctx.reduceOp));
+    CCU_CHK_RET(GroupLocalReduce(
+        ctx, myOutput, scratch, ctx.goSize, ctx.dataType, ctx.outputDataType, ctx.reduceOp, GetCcuVersion()));
     return CCU_SUCCESS;
 }
 
