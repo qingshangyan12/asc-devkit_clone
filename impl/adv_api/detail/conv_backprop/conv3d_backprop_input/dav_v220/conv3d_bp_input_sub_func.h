@@ -250,7 +250,7 @@ __aicore__ inline void LoadToB2Pro(
     SetFmatrix(1, wSize, PADLIST_B, AscendC::FmatrixMode::FMATRIX_RIGHT);
     uint16_t kStart = static_cast<uint16_t>(self->ctx.curNL0Idx_ % self->ctx.curStepN_ * self->ctx.baseUseN_);
     uint16_t channelSize = static_cast<uint16_t>(self->ctx.curStepN_ * self->ctx.baseUseN_);
-    // In the fp32 scenario, the B matrix is ​​a 16*8 small fractal, and two 16*8 small fractals become two 8*16
+    // In the fp32 scenario, the B matrix is a 16*8 small fractal, and two 16*8 small fractals become two 8*16
     // small fractals
     uint16_t numHkWk = kPos * self->ctx.mmad_.k / self->ctx.HkWkC0_;
     // Depending on whether it is the upper half fractal or the lower half fractal, determine whether the M direction is
