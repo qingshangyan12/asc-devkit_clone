@@ -663,8 +663,12 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_RS_SOLE_MESH_A5_LAST_SLICE_SIZE] = lastChunk;
     xnData_[KFC_RS_SOLE_MESH_A5_SCRATCH_REPEAT_STRIDE] = scratchRepeatStride;
     xnData_[KFC_RS_SOLE_MESH_A5_REPEAT_NUM] = repeatNum;
-    CalcGoSize(chunk, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, &xnData_[KFC_RS_SOLE_MESH_A5_GO_ADDR_OFFSET]);
-    CalcGoSize(lastChunk, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, &xnData_[KFC_RS_SOLE_MESH_A5_GO_B_ADDR_OFFSET]);
+    CalcGoSize(
+        chunk, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, &xnData_[KFC_RS_SOLE_MESH_A5_GO_ADDR_OFFSET],
+        ccuProtocolVersion_);
+    CalcGoSize(
+        lastChunk, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, &xnData_[KFC_RS_SOLE_MESH_A5_GO_B_ADDR_OFFSET],
+        ccuProtocolVersion_);
     xnData_[KFC_RS_SOLE_MESH_A5_SCRATCH_SLOT_STRIDE] = scratchSlotStride;
     KERNEL_LOG(
         KERNEL_INFO,
