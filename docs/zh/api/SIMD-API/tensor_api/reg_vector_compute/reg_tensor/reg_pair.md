@@ -28,15 +28,15 @@
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_tensor.h"`，命名空间为`asc::te::experimental`。
 
-保存两个相同元素类型的`reg_tensor`，用于`deinterleave`等双结果接口。
+保存两个元素类型可不同的`reg_tensor`；第二个元素类型默认与第一个相同，用于`deinterleave`等双结果接口。
 
 ## 定义原型
 
 ```cpp
-template <typename DataType>
+template <typename DataType, typename CarryType = DataType>
 struct reg_pair {
     reg_tensor<DataType> first;
-    reg_tensor<DataType> second;
+    reg_tensor<CarryType> second;
 };
 ```
 
@@ -44,7 +44,8 @@ struct reg_pair {
 
 | 参数名 | 描述 |
 | --- | --- |
-| `DataType` | `reg_tensor<DataType> first`和`reg_tensor<DataType> second`的元素类型。 |
+| `DataType` | 第一个`reg_tensor`的元素类型。 |
+| `CarryType` | 第二个`reg_tensor`的元素类型，默认值为`DataType`。 |
 
 ## 成员说明
 
