@@ -53,6 +53,18 @@ class ReadmeSpecTest(unittest.TestCase):
         self.assertEqual(commands[0].env["SCENARIO"], "0")
         self.assertEqual(commands[-1].env["SCENARIO"], "0")
 
+    def test_split_commands_keeps_escaped_separators_and_quotes(self) -> None:
+        cases = [
+            (r"echo one\;two; echo done", [r"echo one\;two", "echo done"]),
+            (r"echo one\&\&two && echo done", [r"echo one\&\&two", "echo done"]),
+            (r"echo one\\; echo done", [r"echo one\\", "echo done"]),
+            (r'echo "one\";two"; echo done', [r'echo "one\";two"', "echo done"]),
+            (r"echo 'one\;two'; echo done", [r"echo 'one\;two'", "echo done"]),
+        ]
+        for source, expected in cases:
+            with self.subTest(source=source):
+                self.assertEqual([command.raw for command in split_commands(source)], expected)
+
     def test_parse_readme_extracts_sample_block_arch_and_modes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "examples"
