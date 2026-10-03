@@ -114,20 +114,16 @@ __aicore__ inline bool CheckDataCopyPointerSliceInfo(
             ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "invalid DataCopy pointer slice stride"); });
             return false;
         }
-        if (srcShapeElements > UINT32_MAX / srcInfo.shapeValue ||
-            dstShapeElements > UINT32_MAX / dstInfo.shapeValue) {
+        if (srcShapeElements > UINT32_MAX / srcInfo.shapeValue || dstShapeElements > UINT32_MAX / dstInfo.shapeValue) {
             ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "DataCopy pointer slice shape exceeds index range"); });
             return false;
         }
         srcShapeElements *= srcInfo.shapeValue;
         dstShapeElements *= dstInfo.shapeValue;
         if (i != 0) {
-            const uint64_t srcSliceFactor =
-                (srcSpan + srcInfo.stride) / (static_cast<uint64_t>(srcInfo.stride) + 1);
-            const uint64_t dstSliceFactor =
-                (dstSpan + dstInfo.stride) / (static_cast<uint64_t>(dstInfo.stride) + 1);
-            if (srcSliceFactor == 0 || dstSliceFactor == 0 ||
-                srcSliceCount > MAX_SLICE_SIZE / srcSliceFactor ||
+            const uint64_t srcSliceFactor = (srcSpan + srcInfo.stride) / (static_cast<uint64_t>(srcInfo.stride) + 1);
+            const uint64_t dstSliceFactor = (dstSpan + dstInfo.stride) / (static_cast<uint64_t>(dstInfo.stride) + 1);
+            if (srcSliceFactor == 0 || dstSliceFactor == 0 || srcSliceCount > MAX_SLICE_SIZE / srcSliceFactor ||
                 dstSliceCount > MAX_SLICE_SIZE / dstSliceFactor) {
                 ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "DataCopy pointer slice list exceeds capacity"); });
                 return false;
@@ -136,8 +132,8 @@ __aicore__ inline bool CheckDataCopyPointerSliceInfo(
             dstSliceCount *= dstSliceFactor;
         }
     }
-    const uint64_t oneSliceLen = static_cast<uint64_t>(srcSliceInfo[0].burstLen) *
-        AscendCUtils::GetC0Count(sizeof(T)) + srcSliceInfo[0].stride;
+    const uint64_t oneSliceLen =
+        static_cast<uint64_t>(srcSliceInfo[0].burstLen) * AscendCUtils::GetC0Count(sizeof(T)) + srcSliceInfo[0].stride;
     if (srcSliceInfo[0].burstLen == 0 || oneSliceLen > UINT32_MAX ||
         static_cast<uint64_t>(srcSliceInfo[0].stride) * sizeof(T) > UINT32_MAX ||
         static_cast<uint64_t>(dstSliceInfo[0].stride) * sizeof(T) > UINT32_MAX) {

@@ -14,7 +14,7 @@
  */
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
-        "impl/basic_api/kernel_operator_data_copy_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_data_copy_intf.h\"\" and use public functions or variables defined in interface headers files.")
+    "impl/basic_api/kernel_operator_data_copy_intf_impl.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_data_copy_intf.h\"\" and use public functions or variables defined in interface headers files.")
 #define __ASCENDC_INCLUDE_INTERNAL_HEADERS__
 #define __UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_DATA_COPY_INTF_IMPL_H__
 #endif
@@ -404,7 +404,7 @@ __aicore__ inline void DataCopy(
         } else if (dstHWPos == Hardware::BIAS) {
             CheckTensorAlign<T>(dst, 64, "dst", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 64B align
             CheckTensorAlign<T>(
-                src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)");       // 32B align
+                src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 32B align
             DataCopyL12BTImpl(
                 (uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), static_cast<uint16_t>(0),
                 repeatParams);
@@ -475,7 +475,7 @@ __aicore__ inline void DataCopy(
             // l1 -> bt
             CheckTensorAlign<T>(dst, 64, "dst", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 64B align
             CheckTensorAlign<U>(
-                src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)");       // 32B align
+                src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 32B align
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
             if constexpr (
@@ -909,12 +909,12 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 #else
     if (srcHWPos != Hardware::L1) { // UB -> UB, UB -> L1
         repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
-    } else {                        // L1 -> UB, L1 -> BT, L1 -> FB
+    } else { // L1 -> UB, L1 -> BT, L1 -> FB
         if (dstHWPos == Hardware::UB) {
             repeatParams.blockLen = count / AscendCUtils::GetC0Count(sizeof(PrimType));
         } else if (dstHWPos == Hardware::BIAS) {
 #if (__NPU_ARCH__ == 3510)
-            repeatParams.blockLen = count / (32 / sizeof(PrimType));  // BT blockLen is in unit of 32B
+            repeatParams.blockLen = count / (32 / sizeof(PrimType)); // BT blockLen is in unit of 32B
 #else
             repeatParams.blockLen = count / (64 / sizeof(PrimType)); // BT blockLen is in unit of 64B
 #endif
