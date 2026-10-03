@@ -34,9 +34,9 @@ def detect_arch(explicit: Optional[str] = None) -> Optional[str]:
     except (OSError, subprocess.TimeoutExpired):
         return None
     text = proc.stdout.lower()
-    if "910b" in text or "910" in text or "a2" in text:
+    if "910b" in text or "910" in text or "a2" in text or "a3" in text:
         return "dav-2201"
-    if "950" in text or "a3" in text:
+    if "950" in text:
         return "dav-3510"
     found = re.search(r"dav-\d+", text)
     if found:
