@@ -491,7 +491,7 @@ inQueueY.FreeTensor(yLocal);
 - 调用连续搬运接口时，count \* sizeof\(T\)需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。
 - 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的Global Memory地址存在重叠，两条搬运指令之间需要通过调用`PipeBarrier<PIPE_MTE3>()`添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用`PipeBarrier<PIPE_MTE2>()`添加MTE2搬入流水的同步。
 
-    ![](../../../../figures/datacopy_address_overlap_sync_diagram.png)
+    ![](api/figures/datacopy_address_overlap_sync_diagram.png)
 
 <!-- npu="910b,A3" id19 -->
 - 针对如下产品型号：
@@ -542,7 +542,7 @@ inQueueY.FreeTensor(yLocal);
 连续计算，`dataBlockStride`设置为1，对同一迭代内的8个DataBlock数据连续进行处理。
 非连续计算，`dataBlockStride`值大于1（如取2），同一迭代内不同DataBlock之间在读取数据时出现一个DataBlock的间隔，如下图所示。
 
-![dataBlockStride示例](../../../../figures/db_stride.png)
+![dataBlockStride示例](guide/figures/db_stride.png)
 ```
 
 【反例】复杂参数使用纯文字解释，且超过三句。
@@ -575,12 +575,12 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, 48>();
     AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, 48>();
     AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, 48>();
-    
+
     AscendC::GlobalTensor<float> xGlobal, yGlobal, zGlobal;
     xGlobal.SetGlobalBuffer((__gm__ float*)x);
     yGlobal.SetGlobalBuffer((__gm__ float*)y);
     zGlobal.SetGlobalBuffer((__gm__ float*)z);
-    
+
     // ...
     // 1. Step 1: Data transfer in, execution pipeline is PIPE_MTE2
     AscendC::Mutex::Lock<PIPE_MTE2>(mutex_id);
@@ -592,7 +592,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     AscendC::Mutex::Lock<PIPE_V>(mutex_id);
     AscendC::Add(zLocal, xLocal, yLocal, 48);
     AscendC::Mutex::Unlock<PIPE_V>(mutex_id);
-    
+
     // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
     AscendC::Mutex::Lock<PIPE_MTE3>(mutex_id);
     AscendC::DataCopy(zGlobal, zLocal, 48);
@@ -731,7 +731,7 @@ AscendC::Mutex::Unlock<PIPE_MTE2>(mutex_id);
 - 调用连续搬运接口时，count \* sizeof\(T\)需要32字节对齐，若未对齐，则搬运量会向下取整到32字节对齐。
 - 如果需要执行多个DataCopy指令，且DataCopy的目的地址存在重叠，需要通过调用[PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md)来插入同步指令，保证多个DataCopy指令的串行化，防止出现异常数据。如下图左侧示意图，执行两个DataCopy指令，搬运的目的Global Memory地址存在重叠，两条搬运指令之间需要通过调用`PipeBarrier<PIPE_MTE3>()`添加MTE3搬出流水的同步；如下图右侧示意图所示，搬运的目的地址Unified Buffer存在重叠，两条搬运指令之间需要调用`PipeBarrier<PIPE_MTE2>()`添加MTE2搬入流水的同步。
 
-    ![](../../../../figures/datacopy_address_overlap_sync_diagram.png)
+    ![](api/figures/datacopy_address_overlap_sync_diagram.png)
 
 <!-- npu="910b,A3" id29 -->
 - 针对如下产品型号：
@@ -900,7 +900,7 @@ int32_t main(int32_t argc, char* argv[])
 
     ```
     ...
-    
+
     target_compile_options(demo PRIVATE
         // 将dav-xxxx更换为对应NPU架构版本号
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-xxxx>
