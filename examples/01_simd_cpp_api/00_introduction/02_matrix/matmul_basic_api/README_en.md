@@ -87,14 +87,14 @@ This sample implements multi-core matrix multiplication computation based on the
   **[`AscendC::Nd2NzParams`](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_ND2NZ.md)** — Used by [`DataCopy`](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_GMToUB_ND2NZ.md) interface, describes ND→Nz format conversion parameters:
   ```cpp
   struct Nd2NzParams {
-      int32_t  ndNum;              // Number of ND matrices to transfer, [0, 4095]
+      uint16_t  ndNum;              // Number of ND matrices to transfer, [0, 4095]
       uint16_t nValue;             // Number of rows in ND matrix, [0, 16384]
-      int32_t  dValue;             // Number of columns in ND matrix, [0, 65535]
-      int32_t  srcNdMatrixStride;  // Offset between starting addresses of adjacent ND matrices, unit: element, [0, 65535]
-      int32_t  srcDValue;          // Offset between adjacent rows of the same ND matrix, unit: element, [1, 65535]
+      uint16_t  dValue;             // Number of columns in ND matrix, [0, 65535]
+      uint16_t  srcNdMatrixStride;  // Offset between starting addresses of adjacent ND matrices, unit: element, [0, 65535]
+      uint16_t  srcDValue;          // Offset between adjacent rows of the same ND matrix, unit: element, [1, 65535]
       uint16_t dstNzC0Stride;      // Adjacent row offset after conversion of multiple rows from the same source row in destination Nz, unit: C0_SIZE(32B), [1, 16384]
       uint16_t dstNzNStride;       // Adjacent row offset of Z-shaped matrices in destination Nz, unit: C0_SIZE(32B), [1, 16384]
-      int32_t  dstNzMatrixStride;  // Starting address offset between adjacent Nz matrices in destination Nz, unit: element, [1, 65535]
+      uint16_t  dstNzMatrixStride;  // Starting address offset between adjacent Nz matrices in destination Nz, unit: element, [1, 65535]
   };
   ```
   For example, when transferring matrix A, `{1, baseM, baseK, 0, K, baseM, 1, 0}` converts baseM×baseK ND data to Nz format.
@@ -103,13 +103,13 @@ This sample implements multi-core matrix multiplication computation based on the
 
   ```cpp
   struct LoadData2DParams {
-      int32_t startIndex;   // Fractal matrix ID (0 is the first), unit: 512B, [0, 65535]
-      int32_t repeatTimes;  // Number of iterations, each iteration processes 512B, [1, 255]
-      int32_t srcStride;    // Source fractal starting address interval between adjacent iterations, unit: 512B, [0, 65535]
-      int32_t sid;          // Reserved, set to 0
-      int32_t dstGap;       // Destination fractal interval between adjacent iterations, unit: 512B, [0, 65535]
+      uint16_t startIndex;   // Fractal matrix ID (0 is the first), unit: 512B, [0, 65535]
+      uint8_t repeatTimes;  // Number of iterations, each iteration processes 512B, [1, 255]
+      uint16_t srcStride;    // Source fractal starting address interval between adjacent iterations, unit: 512B, [0, 65535]
+      uint8_t sid;          // Reserved, set to 0
+      uint16_t dstGap;       // Destination fractal interval between adjacent iterations, unit: 512B, [0, 65535]
       bool    ifTranspose;  // Whether to transpose each fractal, default false
-      bool    addrMode;     // Address update mode, false=increment, true=decrement, default false
+      uint8_t    addrMode;     // Address update mode, false=increment, true=decrement, default false
   };
   ```
   For example: In Atlas A2 Training Series Products/Atlas A2 Inference Series Products, Atlas A3 Training Series Products/Atlas A3 Inference Series Products, the layout format on L0A is Zz. When transferring matrix A, use `{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`; <br>
@@ -137,7 +137,7 @@ This sample implements multi-core matrix multiplication computation based on the
       uint16_t m;               // Left matrix Height (M dimension), [0, 4095]
       uint16_t n;               // Right matrix Width (N dimension), [0, 4095]
       uint16_t k;               // Left matrix Width/Right matrix Height (K dimension), [0, 4095]
-      uint16_t unitFlag;        // Mmad and Fixpipe fine-grained parallelism control, default 0
+      uint8_t unitFlag;        // Mmad and Fixpipe fine-grained parallelism control, default 0
       bool     cmatrixSource;   // C matrix initial value source, false=CO1, true=C2, default false
       bool     cmatrixInitVal;  // Whether C matrix initial value is 0, default true
   };
@@ -147,17 +147,17 @@ This sample implements multi-core matrix multiplication computation based on the
   **[`AscendC::FixpipeParamsV220`](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)** — Used by [`Fixpipe`](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md) interface, describes L0C to GM data transfer and precision conversion parameters:
   ```cpp
   struct FixpipeParamsV220 {
-      int32_t     nSize;        // Source Nz matrix N direction size, [1, 4095]
+      uint16_t     nSize;        // Source Nz matrix N direction size, [1, 4095]
       uint16_t    mSize;        // Source Nz matrix M direction size (for Nz2ND, [1, 8192])
       uint16_t    srcStride;    // Source Nz adjacent Z layout starting offset, unit: C0_SIZE, [0, 65535]
-      int32_t     dstStride;    // Number of elements per row in destination ND matrix for Nz2ND, unit: element
+      uint32_t     dstStride;    // Number of elements per row in destination ND matrix for Nz2ND, unit: element
       bool        reluEn;       // Whether to enable ReLU
       QuantMode_t quantPre;     // Quantization mode, F322F16 means float→half
       uint64_t    deqScalar;    // Scalar quantization parameter, single scale value
-      int32_t     ndNum;        // Number of source Nz matrices, [1, 65535]
-      int32_t     srcNdStride;  // Starting address interval between different Nz matrices, unit: 16×C0_SIZE, [1, 512]
-      int32_t     dstNdStride;  // Destination adjacent ND matrix offset, unit: element, [1, 65535]
-      int32_t     unitFlag;     // Mmad and Fixpipe parallelism control
+      uint16_t     ndNum;        // Number of source Nz matrices, [1, 65535]
+      uint16_t     srcNdStride;  // Starting address interval between different Nz matrices, unit: 16×C0_SIZE, [1, 512]
+      uint16_t     dstNdStride;  // Destination adjacent ND matrix offset, unit: element, [1, 65535]
+      uint8_t     unitFlag;     // Mmad and Fixpipe parallelism control
   };
   ```
   For example, `{baseN, baseM, baseM, N, false, F322F16, 0, 1, 0, 0, 0}` converts the baseM×baseN float32 result in L0C to half and writes it back to GM.

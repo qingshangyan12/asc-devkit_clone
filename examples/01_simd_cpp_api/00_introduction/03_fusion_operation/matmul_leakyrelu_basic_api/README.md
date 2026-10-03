@@ -329,14 +329,14 @@
   **[AscendC::Nd2NzParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)** — `DataCopy`接口使用，描述ND→Nz格式转换参数：
   ```cpp
   struct Nd2NzParams {
-      int32_t  ndNum;              // 传输ND矩阵的数目，[0, 4095]
+      uint16_t  ndNum;              // 传输ND矩阵的数目，[0, 4095]
       uint16_t nValue;             // ND矩阵的行数，[0, 16384]
-      int32_t  dValue;             // ND矩阵的列数，[0, 65535]
-      int32_t  srcNdMatrixStride;  // 相邻ND矩阵起始地址偏移，单位：元素，[0, 65535]
-      int32_t  srcDValue;          // 同一ND矩阵相邻行偏移，单位：元素，[1, 65535]
+      uint16_t  dValue;             // ND矩阵的列数，[0, 65535]
+      uint16_t  srcNdMatrixStride;  // 相邻ND矩阵起始地址偏移，单位：元素，[0, 65535]
+      uint16_t  srcDValue;          // 同一ND矩阵相邻行偏移，单位：元素，[1, 65535]
       uint16_t dstNzC0Stride;      // 目的Nz中同源行转换后多行相邻偏移，单位：C0_SIZE(32B)，[1, 16384]
       uint16_t dstNzNStride;       // 目的Nz中Z型矩阵相邻行偏移，单位：C0_SIZE(32B)，[1, 16384]
-      int32_t  dstNzMatrixStride;  // 目的Nz中相邻Nz矩阵起始地址偏移，单位：元素，[1, 65535]
+      uint16_t  dstNzMatrixStride;  // 目的Nz中相邻Nz矩阵起始地址偏移，单位：元素，[1, 65535]
   };
   ```
   例如搬运A矩阵时`{1, baseM, baseK, 0, K, baseM, 1, 0}`，将baseM×baseK的ND数据转为Nz格式。
@@ -344,13 +344,13 @@
   **[AscendC::LoadData2DParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md)** — `LoadData`接口使用，描述Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品中A矩阵L1到L0A和B矩阵L1到L0B的数据搬运参数：
   ```cpp
   struct LoadData2DParams {
-      int32_t startIndex;   // 分形矩阵ID（0为第1个），单位：512B，[0, 65535]
-      int32_t repeatTimes;  // 迭代次数，每个迭代处理512B，[1, 255]
-      int32_t srcStride;    // 相邻迭代源分形起始地址间隔，单位：512B，[0, 65535]
-      int32_t sid;          // 预留，配置为0
-      int32_t dstGap;       // 目的端相邻迭代分形间隔，单位：512B，[0, 65535]
+      uint16_t startIndex;   // 分形矩阵ID（0为第1个），单位：512B，[0, 65535]
+      uint8_t repeatTimes;  // 迭代次数，每个迭代处理512B，[1, 255]
+      uint16_t srcStride;    // 相邻迭代源分形起始地址间隔，单位：512B，[0, 65535]
+      uint8_t sid;          // 预留，配置为0
+      uint16_t dstGap;       // 目的端相邻迭代分形间隔，单位：512B，[0, 65535]
       bool    ifTranspose;  // 是否转置每个分形，默认false
-      bool    addrMode;     // 地址更新方式，false=递增，true=递减，默认false
+      uint8_t    addrMode;     // 地址更新方式，false=递增，true=递减，默认false
   };
   ```
   例如：Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品中，L0A上的排布格式为Zz，搬运A矩阵时`{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`；<br>
@@ -377,7 +377,7 @@
       uint16_t m;               // 左矩阵Height（M维），[0, 4095]
       uint16_t n;               // 右矩阵Width（N维），[0, 4095]
       uint16_t k;               // 左矩阵Width/右矩阵Height（K维），[0, 4095]
-      uint16_t unitFlag;        // Mmad与Fixpipe细粒度并行控制，默认0
+      uint8_t unitFlag;        // Mmad与Fixpipe细粒度并行控制，默认0
       bool     cmatrixSource;   // C矩阵初始值来源，false=CO1，true=C2，默认false
       bool     cmatrixInitVal;  // C矩阵初始值是否为0，默认true
   };
@@ -387,17 +387,17 @@
   **[AscendC::FixpipeParamsV220](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)** — `Fixpipe`接口使用，描述L0C到GM的数据搬运和精度转换参数：
   ```cpp
   struct FixpipeParamsV220 {
-      int32_t     nSize;        // 源Nz矩阵N方向大小，[1, 4095]
+      uint16_t     nSize;        // 源Nz矩阵N方向大小，[1, 4095]
       uint16_t    mSize;        // 源Nz矩阵M方向大小（Nz2ND时[1, 8192]）
       uint16_t    srcStride;    // 源Nz相邻Z排布起始偏移，单位：C0_SIZE，[0, 65535]
-      int32_t     dstStride;    // Nz2ND时目的ND矩阵每行元素数，单位：element
+      uint32_t     dstStride;    // Nz2ND时目的ND矩阵每行元素数，单位：element
       bool        reluEn;       // 是否使能ReLU
       QuantMode_t quantPre;     // 量化模式，F322F16表示float→half
       uint64_t    deqScalar;    // scalar量化参数，单个scale值
-      int32_t     ndNum;        // 源Nz矩阵数目，[1, 65535]
-      int32_t     srcNdStride;  // 不同Nz矩阵起始地址间隔，单位：16×C0_SIZE，[1, 512]
-      int32_t     dstNdStride;  // 目的相邻ND矩阵偏移，单位：element，[1, 65535]
-      int32_t     unitFlag;     // Mmad与Fixpipe并行控制
+      uint16_t     ndNum;        // 源Nz矩阵数目，[1, 65535]
+      uint16_t     srcNdStride;  // 不同Nz矩阵起始地址间隔，单位：16×C0_SIZE，[1, 512]
+      uint16_t     dstNdStride;  // 目的相邻ND矩阵偏移，单位：element，[1, 65535]
+      uint8_t     unitFlag;     // Mmad与Fixpipe并行控制
   };
   ```
   例如`{baseN, baseM, baseM, N, false, F322F16, 0, 1, 0, 0, 0}`，将L0C中的baseM×baseN float32结果转为half并写回GM。
