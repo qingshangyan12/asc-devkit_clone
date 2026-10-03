@@ -95,15 +95,17 @@ def apply_fixed_schedule(cells: List[Cell], schedule_file: Path) -> List[Cell]:
     if not schedule_file.exists():
         raise FileNotFoundError(f"schedule file not found: {schedule_file}")
     order = read_schedule_file(schedule_file)
-    by_name = {cell.example.rel_path: cell for cell in cells}
+    by_name: dict[str, List[Cell]] = {}
+    for cell in cells:
+        by_name.setdefault(cell.example.rel_path, []).append(cell)
     used: set[str] = set()
     scheduled: List[Cell] = []
     for name in order:
-        cell = by_name.get(name)
-        if cell is None or cell.key in used:
-            continue
-        scheduled.append(cell)
-        used.add(cell.key)
+        for cell in by_name.get(name, []):
+            if cell.key in used:
+                continue
+            scheduled.append(cell)
+            used.add(cell.key)
     scheduled.extend(cell for cell in cells if cell.key not in used)
     return scheduled
 
