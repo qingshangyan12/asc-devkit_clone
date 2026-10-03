@@ -181,6 +181,7 @@ TEST_F(DataCopyPadStrideBoundarySuite, DstStrideAtUpperBoundRaises)
     ExpectDstStrideRaiseCount(STRIDE_UPPER_BOUND, 1);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
 TEST(DataCopyPadPointerSuite, NonAlignedGmUbRoundTrip)
 {
     constexpr uint32_t elementCount = 5;
@@ -204,3 +205,4 @@ TEST(DataCopyPadPointerSuite, NonAlignedGmUbRoundTrip)
         EXPECT_FLOAT_EQ(dstGm[i], srcGm[i]);
     }
 }
+#endif

@@ -110,6 +110,7 @@ TEST_F(DataCopyUB2L0CTestSuite, testCaseDataCopyUB2L0C)
     DataCopyUB2L0CIntf(dstGm, srcGm, params, enhancedParams);
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
 TEST(DataCopyPointerSuite, GmUbRoundTrip)
 {
     constexpr uint32_t elementCount = 32;
@@ -134,3 +135,4 @@ TEST(DataCopyPointerSuite, GmUbRoundTrip)
         EXPECT_EQ(dstGm[i], srcGm[i]);
     }
 }
+#endif

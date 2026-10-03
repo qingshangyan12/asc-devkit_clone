@@ -64,7 +64,7 @@ extern "C" __global__ __aicore__ void KernelTestICachePreLoad1()
     AscendC::ICachePreLoad(preFetchLen);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
 extern "C" __global__ __aicore__ void KernelTestDataCachePointerOverloads()
 {
     __gm__ uint64_t* gm = nullptr;
