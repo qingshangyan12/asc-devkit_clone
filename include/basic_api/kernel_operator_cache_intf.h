@@ -52,7 +52,7 @@ __aicore__ inline void DataCacheCleanAndInvalid(const LocalTensor<T>& dst);
 template <typename T, CacheLine entireType>
 __aicore__ inline void DataCacheCleanAndInvalid(const GlobalTensor<T>& dst);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
 template <typename T>
 __aicore__ inline void DataCachePreload(__gm__ uint64_t* src, const T cacheOffset);
 
