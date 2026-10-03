@@ -13,7 +13,6 @@
 
 
 import os
-from math import ceil
 import numpy as np
 
 
@@ -44,25 +43,6 @@ def gen_golden_data_simple():
         mask.tofile("./input/input_mask.bin")
         mask = mask[:, : src_shape[1]]
         golden = src * mask
-    elif ceil(src_shape[1] / 8) * 8 == mask_shape[1]:
-        mask = np.random.randint(1, 255, mask_shape).astype(mask_dtype)
-        mask.tofile("./input/input_mask.bin")
-        result = []
-        for i in range(mask_shape[0]):
-            line = []
-            for j in range(mask_shape[1]):
-                value = bin(mask[i][j])[2:]
-                value = list("0" * (8 - len(value)) + value)[::-1]
-                line.extend(value)
-            result.extend(line[: src_shape[1]])
-
-        index = 0
-        temp = np.zeros(params[0]).astype(mask_dtype)
-        for i in range(src_shape[0]):
-            for j in range(src_shape[1]):
-                temp[i][j] = result[index]
-                index += 1
-        golden = src * temp
     else:
         mask = np.random.randint(1, 255, mask_shape).astype(mask_dtype)
         mask.tofile("./input/input_mask.bin")
