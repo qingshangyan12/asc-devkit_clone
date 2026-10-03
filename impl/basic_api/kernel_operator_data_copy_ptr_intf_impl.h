@@ -87,13 +87,74 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(__cbuf__ T* dst, __gm__ T* 
 }
 
 template <typename T>
+__aicore__ inline bool CheckDataCopyPointerSliceInfo(
+    const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[], const uint32_t dimValue)
+{
+    if (dimValue == 0 || dimValue > K_MAX_SHAPE_DIM) {
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "invalid DataCopy pointer slice dimension"); });
+        return false;
+    }
+    uint64_t srcSliceCount = 1;
+    uint64_t dstSliceCount = 1;
+    uint64_t srcShapeElements = 1;
+    uint64_t dstShapeElements = 1;
+    for (uint32_t i = 0; i < dimValue; ++i) {
+        const SliceInfo& srcInfo = srcSliceInfo[i];
+        const SliceInfo& dstInfo = dstSliceInfo[i];
+        if (srcInfo.shapeValue == 0 || dstInfo.shapeValue == 0 || srcInfo.startIndex > srcInfo.endIndex ||
+            dstInfo.startIndex > dstInfo.endIndex || srcInfo.endIndex >= srcInfo.shapeValue ||
+            dstInfo.endIndex >= dstInfo.shapeValue) {
+            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "invalid DataCopy pointer slice range or shape"); });
+            return false;
+        }
+        const uint64_t srcSpan = static_cast<uint64_t>(srcInfo.endIndex) - srcInfo.startIndex + 1;
+        const uint64_t dstSpan = static_cast<uint64_t>(dstInfo.endIndex) - dstInfo.startIndex + 1;
+        if (srcSpan + srcInfo.stride > UINT32_MAX || dstSpan + dstInfo.stride > UINT32_MAX ||
+            srcInfo.stride == UINT32_MAX || dstInfo.stride == UINT32_MAX) {
+            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "invalid DataCopy pointer slice stride"); });
+            return false;
+        }
+        if (srcShapeElements > UINT32_MAX / srcInfo.shapeValue ||
+            dstShapeElements > UINT32_MAX / dstInfo.shapeValue) {
+            ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "DataCopy pointer slice shape exceeds index range"); });
+            return false;
+        }
+        srcShapeElements *= srcInfo.shapeValue;
+        dstShapeElements *= dstInfo.shapeValue;
+        if (i != 0) {
+            const uint64_t srcSliceFactor =
+                (srcSpan + srcInfo.stride) / (static_cast<uint64_t>(srcInfo.stride) + 1);
+            const uint64_t dstSliceFactor =
+                (dstSpan + dstInfo.stride) / (static_cast<uint64_t>(dstInfo.stride) + 1);
+            if (srcSliceFactor == 0 || dstSliceFactor == 0 ||
+                srcSliceCount > MAX_SLICE_SIZE / srcSliceFactor ||
+                dstSliceCount > MAX_SLICE_SIZE / dstSliceFactor) {
+                ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "DataCopy pointer slice list exceeds capacity"); });
+                return false;
+            }
+            srcSliceCount *= srcSliceFactor;
+            dstSliceCount *= dstSliceFactor;
+        }
+    }
+    const uint64_t oneSliceLen = static_cast<uint64_t>(srcSliceInfo[0].burstLen) *
+        AscendCUtils::GetC0Count(sizeof(T)) + srcSliceInfo[0].stride;
+    if (srcSliceInfo[0].burstLen == 0 || oneSliceLen > UINT32_MAX ||
+        static_cast<uint64_t>(srcSliceInfo[0].stride) * sizeof(T) > UINT32_MAX ||
+        static_cast<uint64_t>(dstSliceInfo[0].stride) * sizeof(T) > UINT32_MAX) {
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "invalid DataCopy pointer slice length"); });
+        return false;
+    }
+    return true;
+}
+
+template <typename T>
 __aicore__ inline void DataCopyPtrSliceGm2Ub(
     __ubuf__ T* dst, __gm__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
     const uint32_t dimValue)
 {
-    ASCENDC_ASSERT((srcSliceInfo[0].shapeValue != 0), {
-        KERNEL_LOG(KERNEL_ERROR, "shapeValue must be specified when DataCopy SliceInfo is used with pointers");
-    });
+    if (!CheckDataCopyPointerSliceInfo<T>(dstSliceInfo, srcSliceInfo, dimValue)) {
+        return;
+    }
     uint32_t srcOffsetListSize = 0;
     uint32_t dstOffsetListSize = 0;
     uint32_t srcShapeInfo[K_MAX_SHAPE_DIM];
@@ -108,9 +169,10 @@ __aicore__ inline void DataCopyPtrSliceGm2Ub(
     uint32_t dstOffsetList[MAX_SLICE_SIZE];
     DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
     DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
-    ASCENDC_ASSERT((srcOffsetListSize == dstOffsetListSize), {
-        KERNEL_LOG(KERNEL_ERROR, "source and destination slice counts must be equal");
-    });
+    if (srcOffsetListSize != dstOffsetListSize) {
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "source and destination slice counts must be equal"); });
+        return;
+    }
 
     DataCopyParams repeatParams;
     repeatParams.blockLen = srcSliceInfo[0].burstLen;
@@ -147,9 +209,9 @@ __aicore__ inline void DataCopyPtrSliceUb2Gm(
     __gm__ T* dst, __ubuf__ T* src, const SliceInfo dstSliceInfo[], const SliceInfo srcSliceInfo[],
     const uint32_t dimValue)
 {
-    ASCENDC_ASSERT((srcSliceInfo[0].shapeValue != 0), {
-        KERNEL_LOG(KERNEL_ERROR, "shapeValue must be specified when DataCopy SliceInfo is used with pointers");
-    });
+    if (!CheckDataCopyPointerSliceInfo<T>(dstSliceInfo, srcSliceInfo, dimValue)) {
+        return;
+    }
     uint32_t srcOffsetListSize = 0;
     uint32_t dstOffsetListSize = 0;
     uint32_t srcShapeInfo[K_MAX_SHAPE_DIM];
@@ -164,9 +226,10 @@ __aicore__ inline void DataCopyPtrSliceUb2Gm(
     uint32_t dstOffsetList[MAX_SLICE_SIZE];
     DataCopyGetOffsetList(srcSliceInfo, srcShapeInfo, dimValue, &srcOffsetListSize, srcOffsetList);
     DataCopyGetOffsetList(dstSliceInfo, dstShapeInfo, dimValue, &dstOffsetListSize, dstOffsetList);
-    ASCENDC_ASSERT((srcOffsetListSize == dstOffsetListSize), {
-        KERNEL_LOG(KERNEL_ERROR, "source and destination slice counts must be equal");
-    });
+    if (srcOffsetListSize != dstOffsetListSize) {
+        ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "source and destination slice counts must be equal"); });
+        return;
+    }
 
     DataCopyParams repeatParams;
     repeatParams.blockLen = srcSliceInfo[0].burstLen;

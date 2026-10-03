@@ -423,7 +423,7 @@ extern "C" __global__ __aicore__ void KernelTestResetLoopModePara1()
     AscendC::ResetLoopModePara(type);
 }
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
 extern "C" __global__ __aicore__ void KernelTestDataCopyPointerBasic()
 {
     __gm__ half* gm = nullptr;
@@ -490,8 +490,8 @@ extern "C" __global__ __aicore__ void KernelTestDataCopyPointerEnhanced()
     AscendC::DataCopy(ub, l0cFloat, params, enhanced);
     AscendC::DataCopy(ubInt8, l0cInt32, params, enhanced);
     AscendC::DataCopy((__cc__ float*)l0cFloat, ub, params, enhanced);
-    AscendC::DataCopy(l1, l0c, c012Dst);
-    AscendC::DataCopy(gm, l0c, c012Dst);
+    AscendC::DataCopy(l1, l0cFloat, c012Dst);
+    AscendC::DataCopy(gm, l0cFloat, c012Dst);
 }
 
 extern "C" __global__ __aicore__ void KernelTestDataCopyPointerPad()

@@ -476,8 +476,8 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(dst, 64, "dst", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)"); // 64B align
             CheckTensorAlign<U>(
                 src, ONE_BLK_SIZE, "src", "DataCopy from L1 Buffer(C1) to BiasTable Buffer(C2)");       // 32B align
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
             if constexpr (
                 Std::is_same<PrimDstType, int32_t>::value &&
                     (Std::is_same<PrimSrcType, half>::value || Std::is_same<PrimSrcType, bfloat16_t>::value ||
@@ -1900,7 +1900,7 @@ __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
     }
 }
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
 #include "kernel_operator_data_copy_ptr_intf_impl.h"
 #endif
 } // namespace AscendC
