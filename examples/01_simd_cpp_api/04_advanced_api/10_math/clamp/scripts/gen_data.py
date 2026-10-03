@@ -59,7 +59,7 @@ def gen_golden_data_simple():
     src_max = np.random.uniform(0, 100, [128]).astype(dtype)
     tiling = np.array([count, data_size, scalar_type], dtype="uint32")
 
-    if dtype == np.half or dtype == np.float32 or dtype == ml_dtypes.bfloat16:
+    if dtype == np.half or dtype == np.float32:
         random_set_boundary([src])
     golden = np.zeros([128]).astype(dtype)
     if scalar_type == ScalarType.BOTH_TENSOR.value:
