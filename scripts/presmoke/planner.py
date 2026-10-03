@@ -97,14 +97,20 @@ def rewrite_cmake(command: str, arch: str, mode: str, werror: bool = False) -> s
     except ValueError:
         parts = command.split()
     out: List[str] = []
-    for part in parts:
-        if part.startswith("-DCMAKE_ASC_ARCHITECTURES="):
-            continue
-        if part.startswith("-DCMAKE_ASC_RUN_MODE="):
-            continue
-        if part.startswith("-DNPU_ARCH="):
+    index = 0
+    replaced_keys = {"CMAKE_ASC_ARCHITECTURES", "CMAKE_ASC_RUN_MODE", "NPU_ARCH"}
+    while index < len(parts):
+        part = parts[index]
+        definition = part[2:] if part.startswith("-D") else ""
+        separate = part == "-D" and index + 1 < len(parts)
+        if separate:
+            definition = parts[index + 1]
+        key = definition.split("=", 1)[0].split(":", 1)[0]
+        if key in replaced_keys and "=" in definition:
+            index += 2 if separate else 1
             continue
         out.append(part)
+        index += 1
     if not out:
         out = ["cmake"]
     if out[0] != "cmake":
