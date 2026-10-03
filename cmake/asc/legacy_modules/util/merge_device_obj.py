@@ -13,6 +13,7 @@
 import argparse
 import os
 import subprocess
+from itertools import zip_longest
 
 
 class CompareError(Exception):
@@ -97,10 +98,12 @@ def get_mix_obj_info(aic_dir, aiv_dir, file_name, output_dir):
 
     aic_contents = read_file(aic_cfg_file)
     aiv_contents = read_file(aiv_cfg_file)
-    for aic_content, aiv_content in zip(aic_contents, aiv_contents):
+    for aic_content, aiv_content in zip_longest(aic_contents, aiv_contents, fillvalue=""):
         aic_obj = aic_content.strip()
         aiv_obj = aiv_content.strip()
         if (not aic_obj) or (not aiv_obj):
+            if aic_obj or aiv_obj:
+                raise CompareError(f"aic: {aic_obj}, aiv: {aiv_obj}")
             continue
 
         aic_basename = os.path.basename(aic_obj)
