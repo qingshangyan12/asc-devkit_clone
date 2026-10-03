@@ -43,8 +43,8 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
 | 参数名称 | 输入/输出 | 含义 |
 | :--- | :--- | :--- |
-| gmWorkspace | 输入 | 临时空间，初始化核间同步的共享内存，类型为GlobalTensor。 |
-| ubWorkspace | 输入 | 临时空间，用于操作gmWorkspace，类型为LocalTensor。 |
+| gmWorkspace | 输入 | 临时空间，初始化核间同步的共享内存，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。 |
+| ubWorkspace | 输入 | 临时空间，用于操作gmWorkspace，类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -52,11 +52,23 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- gmWorkspace申请的空间最少要求为：GetBlockNum()*32Bytes，ubWorkspace申请的空间最少要求为：GetBlockNum()*32+32Bytes。
-- 与IBSet/SyncAll不同，该接口输入参数gmWorkspace缓存的值不需要初始化为0。
+`gmWorkspace`和`ubWorkspace`申请的空间须满足以下公式：
+
+$$
+\begin{aligned}
+\text{gmWorkspace空间大小} &\geq \mathrm{GetBlockNum}() \times 32\text{字节} \\
+\text{ubWorkspace空间大小} &\geq (\mathrm{GetBlockNum}() + 1) \times 32\text{字节}
+\end{aligned}
+$$
+
+公式中的`GetBlockNum()`表示当前任务配置的逻辑AI Core数量，接口说明请参考[GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md)。
+
+- 与[IBSet](IBSet.md)、[SyncAll](SyncAll.md)不同，该接口输入参数gmWorkspace缓存的值不需要初始化为0。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 
 ## 调用示例<a name="section177231425115410"></a>
+
+本示例还使用了[TQue](../../resource_management/TQue/TQue.md)的[AllocTensor](../../resource_management/TQue/AllocTensor.md)和[FreeTensor](../../resource_management/TQue/FreeTensor.md)接口、[DataCopy](../../memory_vector_compute/data_move/DataCopy_GMAndUB_continuous.md)接口，以及[SetAtomicAdd](../../atomic_operations/SetAtomicAdd.md)和[DisableDmaAtomic](../../atomic_operations/DisableDmaAtomic.md)接口。
 
 ```cpp
     // 初始化GM共享内存的同步状态，必须在核函数（Kernel）开始时首先调用。
