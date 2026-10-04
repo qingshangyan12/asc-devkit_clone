@@ -241,9 +241,20 @@ def _split_shell_line(line: str) -> List[str]:
     current: List[str] = []
     in_single = False
     in_double = False
+    escaped = False
     i = 0
     while i < len(line):
         ch = line[i]
+        if escaped:
+            current.append(ch)
+            escaped = False
+            i += 1
+            continue
+        if ch == "\\" and not in_single:
+            current.append(ch)
+            escaped = True
+            i += 1
+            continue
         if ch == "'" and not in_double:
             in_single = not in_single
         elif ch == '"' and not in_single:
