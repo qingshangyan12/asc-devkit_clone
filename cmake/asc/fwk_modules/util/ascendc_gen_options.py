@@ -55,7 +55,7 @@ def _handle_kernel_template_input(opts):
 
 
 def _parse_single_option(opts, opc_debug_config, opc_kernel_config):
-    if "oom" in opts:
+    if opts == "--oom":
         _handle_oom_option(opts, opc_debug_config)
         return "debug_config", None
     elif "--save-temp-files" in opts:
