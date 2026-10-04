@@ -14,7 +14,9 @@ $$
 \mathrm{eventStride} \times 32\text{字节} \times \mathrm{eventID\_max} + \mathrm{blockIdx\_max} \times 32\text{字节} + 32\text{字节}
 $$
 
-其中 `eventID_max` 和 `blockIdx_max` 分别是实际使用的 `eventID` 和 `blockIdx` 的最大值，两者都从 0 开始计数。该公式也可等价写成：
+其中，`eventStride` 表示相邻 `eventID` 对应的同步标志区域起始位置之间间隔的 32 字节标志位数量；换算成字节后，相邻 `eventID` 的起始地址间隔为 `eventStride × 32` 字节。AIVOnly 模式和耦合模式下，`eventStride = GetBlockNum()`；分离模式下，当 `isAIVOnly` 为 `false` 时，当前实现固定为 `eventStride = GetBlockNum() × 2`。该值对应实现中的 `blockNum` 变量，见 [`IBSet` 的 `blockNum` 计算](impl/basic_api/kernel_operator_block_sync_intf_impl.h#L146) 和 [`IBWait` 的 `blockNum` 计算](impl/basic_api/kernel_operator_block_sync_intf_impl.h#L188)。
+
+`eventID_max` 和 `blockIdx_max` 分别是实际使用的 `eventID` 和 `blockIdx` 的最大值，两者都从 0 开始计数。该公式也可等价写成：
 
 $$
 (\mathrm{eventStride} \times \mathrm{eventID\_max} + \mathrm{blockIdx\_max} + 1) \times 32\text{字节}
