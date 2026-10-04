@@ -17,9 +17,6 @@ import numpy as np
 
 
 def generate_random_data(min_range, max_range, shape, dtype):
-    if isinstance(min_range, str):
-        min_range = hex_str_to_fp32(min_range)
-        max_range = hex_str_to_fp32(max_range)
     full_value = None
     if min_range in [np.inf, -np.inf] or np.isnan(min_range):
         full_value = min_range
