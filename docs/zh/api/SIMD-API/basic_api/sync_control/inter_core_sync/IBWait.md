@@ -29,9 +29,9 @@
 
 头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
-当不同核之间操作同一块全局内存且可能存在读后写、写后读以及写后写等数据依赖问题时，通过调用该函数来插入同步语句来避免上述数据依赖时可能出现的数据读写错误问题。
+等待由`blockIdx`和`eventID`共同指定的同步标志。不同核操作同一块全局内存且存在读后写、写后读或写后写等数据依赖时，等待核在访问依赖数据前调用本接口。本接口持续读取同步标志，直到其值为1时将其清零并返回，以保证被等待核已经完成相关操作，避免因核间执行顺序不确定而产生数据读写错误。
 
-调用[IBSet](IBSet.md)设置某一个核的标志位，与IBWait成对使用，表示核之间的同步等待指令：被等待核中调用IBSet，通过将值1写入全局内存中某块地址来通知等待核；而等待核中调用IBWait，持续读取全局内存中相应地址块的值，直到其值变为1，从而实现核间同步。
+本接口须与[IBSet](IBSet.md)成对使用。被等待核在完成相关操作后调用IBSet，并为`gmWorkspace`、`blockIdx`和`eventID`传入与本接口相同的值。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -75,7 +75,7 @@ $$
 - ubWorkspace申请的空间最少要求为：32Bytes。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 - IBSet和IBWait配对使用时，除了ubWorkspace其余所有参数都必须相同，否则程序会在IBWait处卡死。
-- 分离模式下，使用该接口进行两个核间的同步时，仅对AIV核生效。
+- [分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，该接口仅对AIV核生效。在AIC核中调用时，接口直接返回，不等待同步标志，也不执行核间同步。
 - IBSet接口的gmWorkspace缓存的值需要初始化为0。
 
 ## 调用示例<a name="section177231425115410"></a>

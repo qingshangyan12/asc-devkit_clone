@@ -111,6 +111,20 @@ $$
 
 该空间约束同时适用于配套的 [NotifyNextBlock](docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/NotifyNextBlock.md#L55) 和 [WaitPreBlock](docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/WaitPreBlock.md#L55)，三份文档应保持相同的公式表达。
 
+## AIC调用行为核对
+
+在[AIC/AIV分离模式](docs/zh/guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，两对核间同步接口均仅在AIV核上执行同步逻辑。在AIC核中调用时，接口直接结束，不产生核间同步效果，但具体实现形式不同：
+
+| 接口 | 代码证据 | AIC调用行为 |
+| --- | --- | --- |
+| `IBSet` | [`ASCEND_IS_AIC`分支](impl/basic_api/kernel_operator_block_sync_intf_impl.h#L147) | 显式执行`return`，不设置同步标志。 |
+| `IBWait` | [`ASCEND_IS_AIC`分支](impl/basic_api/kernel_operator_block_sync_intf_impl.h#L189) | 显式执行`return`，不等待同步标志。 |
+| `WaitPreBlock` | [dav_c220实现](impl/basic_api/dav_c220/kernel_operator_determine_compute_sync_impl.h#L66)和[dav_3510实现](impl/basic_api/dav_3510/kernel_operator_determine_compute_sync_impl.h#L84) | 同步逻辑全部位于`ASCEND_IS_AIV`条件体内；AIC核跳过条件体后直接结束。 |
+| `NotifyNextBlock` | [dav_c220实现](impl/basic_api/dav_c220/kernel_operator_determine_compute_sync_impl.h#L88)和[dav_3510实现](impl/basic_api/dav_3510/kernel_operator_determine_compute_sync_impl.h#L106) | 同步逻辑全部位于`ASCEND_IS_AIV`条件体内；AIC核跳过条件体后直接结束。 |
+| `InitDetermineComputeWorkspace` | [dav_c220实现](impl/basic_api/dav_c220/kernel_operator_determine_compute_sync_impl.h#L27)和[dav_3510实现](impl/basic_api/dav_3510/kernel_operator_determine_compute_sync_impl.h#L46) | 初始化逻辑全部位于`ASCEND_IS_AIV`条件体内；AIC核不会初始化工作区。 |
+
+因此，约束说明应明确限定为“分离模式”：不能把上述AIC行为泛化到耦合架构或产品支持表中的“AI Core”概念。
+
 ## 影响范围
 
 这是文档渲染问题，不是 `IBSet` 接口实现或空间计算公式错误，因此不需要修改接口声明、实现或公式含义。

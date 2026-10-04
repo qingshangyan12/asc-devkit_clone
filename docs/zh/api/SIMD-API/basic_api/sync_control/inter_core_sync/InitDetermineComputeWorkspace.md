@@ -64,6 +64,7 @@ $$
 公式中的`GetBlockNum()`表示当前任务配置的逻辑AI Core数量，接口说明请参考[GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md)。
 
 - 与[IBSet](IBSet.md)、[SyncAll](SyncAll.md)不同，该接口输入参数gmWorkspace缓存的值不需要初始化为0。
+- [分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，该接口仅对AIV核生效。在AIC核中调用时，接口直接返回，不初始化`gmWorkspace`和`ubWorkspace`。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 
 ## 调用示例<a name="section177231425115410"></a>

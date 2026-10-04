@@ -29,9 +29,9 @@
 
 头文件路径为：`"basic_api/kernel_operator_determine_compute_sync_intf.h"`。
 
-WaitPreBlock和[NotifyNextBlock](NotifyNextBlock.md)是核间同步控制接口。NotifyNextBlock通过写全局内存来通知其他核当前核已执行完成，其他核可以继续往下执行；WaitPreBlock通过读取全局内存，判断当前核是否可以继续往下执行。
+等待当前AIV核的所有前序核完成本轮操作。接口持续读取全局内存中的同步状态；当`blockIdx`小于当前核的所有AIV核均已完成本轮操作时，当前核结束等待并继续执行，从而确保多个AIV核严格按照`blockIdx`升序执行。
 
-WaitPreBlock和NotifyNextBlock必须与[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md)接口配合使用，这三个接口组合使用能够确保多个AIV核严格按照blockIdx的升序执行，适用于要求确定性计算的场景，确定性计算的具体含义请参考[原子操作-确定性计算](../../atomic_operations/key_features.md)。
+本接口须与[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md)和[NotifyNextBlock](NotifyNextBlock.md)配合使用：在核函数（Kernel）开始时调用InitDetermineComputeWorkspace初始化同步状态，在需要顺序执行的操作前调用本接口，操作完成后调用NotifyNextBlock通知后序核。三个接口组合使用适用于要求[确定性计算](../../atomic_operations/key_features.md)的场景。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -68,7 +68,8 @@ $$
 
 公式中的`GetBlockNum()`表示当前任务配置的逻辑AI Core数量，接口说明请参考[GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md)。
 
-- 使用该接口进行多核同步时，仅对AIV核生效，WaitPreBlock和NotifyNextBlock之间仅支持插入矢量计算相关指令，对矩阵计算相关指令不生效。
+- [分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，WaitPreBlock和NotifyNextBlock仅对AIV核生效。在AIC核中调用任一接口时，接口直接返回，不执行等待、通知或核间同步。
+- WaitPreBlock和NotifyNextBlock之间仅支持插入矢量计算相关指令，对矩阵计算相关指令不生效。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 
 ## 调用示例<a name="section177231425115410"></a>
