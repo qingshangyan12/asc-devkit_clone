@@ -46,7 +46,7 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 
 | 参数名 | 描述 |
 | --- | --- |
-| isAIVOnly | 控制是否为AIVOnly模式，默认为true。 |
+| isAIVOnly | 控制同步标志的寻址模式。取值为true（默认值）时，按AIVOnly模式寻址；取值为false时，按MIX模式寻址。MIX模式下须显式配置为false。 |
 
 **表2**  接口参数说明
 
@@ -54,7 +54,7 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 | --- | --- | --- |
 | gmWorkspace | 输入 | 外部存储核状态的公共缓存，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。 |
 | ubWorkspace | 输入 | 存储当前核状态的公共缓存。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的[TPosition](../../aux_data_structures/TPosition.md)为VECIN/VECCALC/VECOUT。 |
-| blockIdx | 输入 | 同步标志对应的逻辑核索引。在典型场景下，该参数为被等待核（即调用IBSet的核）的逻辑核索引。取值范围为`[0, 核数 - 1]`。 |
+| blockIdx | 输入 | 同步标志对应的逻辑核索引。在典型场景下，该参数为被等待核（即调用IBSet的核）的逻辑核索引。取值范围为`[0, 实际参与同步的核数 - 1]`。AIVOnly模式和耦合模式下，实际参与同步的核数为[GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md)的返回值；分离模式的MIX场景下，实际参与同步的AIV核数为`GetBlockNum() × GetTaskRatio()`，[GetTaskRatio](../../tool_interface/system_resources_and_variables/GetTaskRatio.md)表示AIV数量与逻辑AI Core数量的比例。 |
 | eventID | 输入 | 同步事件的逻辑编号，与`blockIdx`共同确定`gmWorkspace`中的同步标志。取值为非负整数，建议从0开始连续编号。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
@@ -66,11 +66,12 @@ __aicore__ inline void IBWait(const GlobalTensor<int32_t>& gmWorkspace, const Lo
 `gmWorkspace`申请的空间须满足以下公式：
 
 $$
-\text{gmWorkspace空间大小} \geq (\text{核数} \times \mathrm{eventID\_max} + \mathrm{blockIdx\_max} + 1) \times 32\text{字节}
+\text{gmWorkspace空间大小} \geq (\mathrm{eventStride} \times \mathrm{eventID\_max} + \mathrm{blockIdx\_max} + 1) \times 32\text{字节}
 $$
 
 - `eventID_max`和`blockIdx_max`分别表示共享同一`gmWorkspace`的所有IBSet和IBWait调用中，`eventID`和`blockIdx`可能取到的最大值。如果参数在运行时确定，应按所有合法执行路径中的取值上界计算。
-- AIVOnly模式下，核数为`GetBlockNum()`；MIX模式下，核数为`GetBlockNum() × 2`。`GetBlockNum()`的接口说明请参考[GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md)。
+- `eventStride`表示相邻`eventID`对应的同步标志区域之间预留的32字节标志位数量。AIVOnly模式和耦合模式下，`eventStride = GetBlockNum()`；分离模式下，当`isAIVOnly`为false时，受当前接口实现限制，`eventStride`固定为`GetBlockNum() × 2`，暂不支持按实际MIX配比动态调整，使用时须按该固定值申请`gmWorkspace`。
+- [MIX核函数](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#函数执行空间限定符)支持1:1和1:2等配比。上述固定事件步长不表示MIX模式固定为1:2，也不表示实际AIV核数固定为`GetBlockNum() × 2`。例如，在`__mix__(1, 1)`场景中，实际AIV核数为`GetBlockNum()`，但`IBWait<false>`仍按`GetBlockNum() × 2`的事件步长寻址，事件区域之间会存在未使用的空间；只要按上述公式申请空间，配对的IBSet和IBWait可正常完成AIV核之间的同步。该接口不能用于同步AIC核。
 - 例如，共享同一`gmWorkspace`的所有调用均传入`blockIdx = 0`和`eventID = 0`时，`blockIdx_max = 0`、`eventID_max = 0`，`gmWorkspace`至少需要32字节。
 - ubWorkspace申请的空间最少要求为：32Bytes。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
