@@ -378,7 +378,7 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 }
 
 template <typename T>
-__aicore__ inline void DataCopyGM2UBND2NZImpl(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline void DataCopyGM2UBND2NZImpl(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
 {
     ASSERT(false && "unsupported data copy GM to UB ND2NZ on current device");
 }
