@@ -186,7 +186,7 @@ const HcclCMDType COLL_CMDS[] = {
 
 // 不变量：V2 注册表 ↔ AlgMetaRegistry 双向满射。本目标全量编译所有注册现场
 // （15 个 executor 文件，-DMC2_CLIENT_ENABLE_CCU=1 且无 AICPU_COMPILE 守卫裁剪），可见全部
-// 52 行 sidecar——按 cmd 分布：AG 15 / RS 18 / AR 9 / A2A 7 / A2AV 3。
+// 53 行 sidecar——按 cmd 分布：AG 15 / RS 19 / AR 9 / A2A 7 / A2AV 3。
 TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 {
     for (HcclCMDType cmd : COLL_CMDS) {
@@ -201,13 +201,13 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
         std::sort(metaNames.begin(), metaNames.end());
         EXPECT_EQ(v2Tags, metaNames) << "cmd=" << static_cast<u32>(cmd);
     }
-    // 各 cmd 精确分布锚（AG 15 / RS 18 / AR 9 / A2A 7 / A2AV 3 = 52），失败时定位更直接
+    // 各 cmd 精确分布锚（AG 15 / RS 19 / AR 9 / A2A 7 / A2AV 3 = 53），失败时定位更直接
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLGATHER).size(), 15U);
-    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_REDUCE_SCATTER).size(), 18U);
+    EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_REDUCE_SCATTER).size(), 19U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLREDUCE).size(), 9U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALL).size(), 7U);
     EXPECT_EQ(CollAlgExecRegistryV2::Instance().GetRegisteredTags(HcclCMDType::HCCL_CMD_ALLTOALLV).size(), 3U);
-    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：52 行精确锚
+    // 本目标全量编译（MC2_CLIENT_ENABLE_CCU=1，无 AICPU_COMPILE）：53 行精确锚
     size_t total = 0;
     for (HcclCMDType cmd : COLL_CMDS) {
         for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
@@ -216,7 +216,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
             }
         }
     }
-    EXPECT_EQ(total, 52U);
+    EXPECT_EQ(total, 53U);
 }
 
 // 不变量：注册行 externalName 字面量必须自身就是规范形（"与 parser 产出同构"的机器契约）。
@@ -225,7 +225,7 @@ TEST(ExtAlgSurjectivity, V2AndMetaRegistryAreBijective)
 TEST(ExtAlgSurjectivity, ExternalNameLiteralsAreCanonical)
 {
     const std::vector<AlgMetaRow> rows = AlgMetaRegistry::Instance().GetAll();
-    ASSERT_FALSE(rows.empty()); // 全量编译目标：51 行产品 sidecar + 测试夹具
+    ASSERT_FALSE(rows.empty()); // 全量编译目标：52 行产品 sidecar + 测试夹具
     for (const AlgMetaRow& row : rows) {
         ExternalAlgSpec spec;
         std::string errMsg;
@@ -653,19 +653,20 @@ TEST(ExtAlgResolver, SpecificityOrdering)
 {
     // 特异性排序：特化候选(带 cond/flag)在前，裸名(双-1)在后；同特异性内字典序
     const std::vector<AlgCandidate>& cands = GetExternalCandidates(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]");
-    // 本目标全量：4 候选 = ZAxisDetour(COND) / CcuSchedReduceScatterSoleMesh(裸) /
-    //              CcuSchedReduceScatterSoleMeshPeerOnly(COND) / InsReduceScatterMesh1D(裸)
-    ASSERT_EQ(cands.size(), 4U);
+    // 本目标全量：5 候选 = A5(COND) / PeerOnly(COND) / ZAxisDetour(COND) /
+    //              CcuSchedReduceScatterSoleMesh(裸) / InsReduceScatterMesh1D(裸)
+    ASSERT_EQ(cands.size(), 5U);
     int lastSpecificity = 2;
     for (const AlgCandidate& cand : cands) {
         const int specificity = (cand.variantCondId != COND_NONE ? 1 : 0) + (cand.machineFlagId != FLAG_NONE ? 1 : 0);
         EXPECT_LE(specificity, lastSpecificity); // 降序
         lastSpecificity = specificity;
     }
-    EXPECT_EQ(cands[0].registeredName, "CcuSchedReduceScatterSoleMeshPeerOnly"); // 特化字典序在前
-    EXPECT_EQ(cands[1].registeredName, "InsReduceScatterMesh1DZAxisDetour");
-    EXPECT_EQ(cands[2].registeredName, "CcuSchedReduceScatterSoleMesh"); // 裸名字典序
-    EXPECT_EQ(cands[3].registeredName, "InsReduceScatterMesh1D");
+    EXPECT_EQ(cands[0].registeredName, "CcuSchedReduceScatterSoleMeshA5");       // 特化字典序在前
+    EXPECT_EQ(cands[1].registeredName, "CcuSchedReduceScatterSoleMeshPeerOnly");
+    EXPECT_EQ(cands[2].registeredName, "InsReduceScatterMesh1DZAxisDetour");
+    EXPECT_EQ(cands[3].registeredName, "CcuSchedReduceScatterSoleMesh"); // 裸名字典序
+    EXPECT_EQ(cands[4].registeredName, "InsReduceScatterMesh1D");
 }
 
 // 显式 priority 注册可用性：REGISTER_ALG_META 第 7 参落库（KFC cmd 不触碰满射断言的 5 个 COLL_CMDS）。
