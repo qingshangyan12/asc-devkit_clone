@@ -662,7 +662,7 @@ TEST(ExtAlgResolver, SpecificityOrdering)
         EXPECT_LE(specificity, lastSpecificity); // 降序
         lastSpecificity = specificity;
     }
-    EXPECT_EQ(cands[0].registeredName, "CcuSchedReduceScatterSoleMeshA5");       // 特化字典序在前
+    EXPECT_EQ(cands[0].registeredName, "CcuSchedReduceScatterSoleMeshA5"); // 特化字典序在前
     EXPECT_EQ(cands[1].registeredName, "CcuSchedReduceScatterSoleMeshPeerOnly");
     EXPECT_EQ(cands[2].registeredName, "InsReduceScatterMesh1DZAxisDetour");
     EXPECT_EQ(cands[3].registeredName, "CcuSchedReduceScatterSoleMesh"); // 裸名字典序
