@@ -85,7 +85,7 @@ class PackKernel:
                         "aarch64",
                         in_file,
                         out_file,
-                    ]
+                    ], check=True
                 )
             except Exception:
                 LogUtil.print_compile_log(
@@ -112,7 +112,7 @@ class PackKernel:
                         "i386",
                         in_file,
                         out_file,
-                    ]
+                    ], check=True
                 )
             elif target_platform == "aarch64":
                 subprocess.run(
@@ -126,7 +126,7 @@ class PackKernel:
                         "aarch64",
                         in_file,
                         out_file,
-                    ]
+                    ], check=True
                 )
             else:
                 subprocess.run(["echo", "unsupported environment!"])
@@ -268,8 +268,8 @@ class PackKernel:
             sub_objs = objs[start : start + batch_size]
             start += batch_size
             try:
-                subprocess.run(["ar", "qc", out_lib] + sub_objs)
-                subprocess.run(["ranlib", out_lib])
+                subprocess.run(["ar", "qc", out_lib] + sub_objs, check=True)
+                subprocess.run(["ranlib", out_lib], check=True)
             except Exception as e:
                 LogUtil.print_compile_log(
                     "", f"execute ar/ranlib command error: {e}!", AscendCLogLevel.LOG_ERROR, LogUtil.Option.NON_SOC

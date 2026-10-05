@@ -233,9 +233,9 @@ def split_sub_kernel_objs(dst_file: str, tiling_info, compile_info):
             CommonUtility.dump_compile_log(
                 ["ar", "rcs", temp_target_o] + tmp_obj_files, CompileStage.PACK, compile_log_path
             )
-            subprocess.run(["ar", "rcs", temp_target_o] + tmp_obj_files)
+            subprocess.run(["ar", "rcs", temp_target_o] + tmp_obj_files, check=True)
             CommonUtility.dump_compile_log(["mv", temp_target_o, dst_file], CompileStage.PACK, compile_log_path)
-            subprocess.run(["mv", temp_target_o, dst_file])
+            subprocess.run(["mv", temp_target_o, dst_file], check=True)
         except Exception as err:
             raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("ar sub super kernel op files failed", err))
         return
