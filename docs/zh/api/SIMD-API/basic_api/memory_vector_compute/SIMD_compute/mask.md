@@ -44,8 +44,8 @@ Mask（掩码）是Ascend C中用于控制数据元素是否参与计算的标�
 
 |配置方式|说明|
 |:---|:---|
-|[接口内设置Mask](#接口内设置Mask)（默认）|&bull;通过矢量计算API的入参直接传递mask值。<br>&bull;矢量计算API的模板参数isSetMask（仅部分API支持）用于控制接口传参还是外部API配置，默认值为true，表示接口传参。Mask对应于高维切分计算API中的mask/mask[]参数或者tensor前n个数据计算API中的calCount参数。|
-|[接口外设置Mask](#接口外设置Mask)|&bull;通过[SetVectorMask](../mask_operations/SetVectorMask.md)接口设置Mask值，矢量计算API的模板参数isSetMask设置为false，接口入参中的mask参数（对应于高维切分计算API中的mask/mask[]参数或者tensor前n个数据计算API中的calCount参数）不生效。<br>&bull;适用于mask参数相同、多次重复使用的场景，无需在矢量计算API内部反复设置，会有一定的性能优势。|
+|[接口内设置Mask](#接口内设置mask)（默认）|&bull;通过矢量计算API的入参直接传递mask值。<br>&bull;矢量计算API的模板参数isSetMask（仅部分API支持）用于控制接口传参还是外部API配置，默认值为true，表示接口传参。Mask对应于高维切分计算API中的mask/mask[]参数或者tensor前n个数据计算API中的calCount参数。|
+|[接口外设置Mask](#接口外设置mask)|&bull;通过[SetVectorMask](../mask_operations/SetVectorMask.md)接口设置Mask值，矢量计算API的模板参数isSetMask设置为false，接口入参中的mask参数（对应于高维切分计算API中的mask/mask[]参数或者tensor前n个数据计算API中的calCount参数）不生效。<br>&bull;适用于mask参数相同、多次重复使用的场景，无需在矢量计算API内部反复设置，会有一定的性能优势。|
 
 Mask支持以下工作模式：
 
@@ -288,7 +288,7 @@ Mask操作的使用方式如下：
 
 |参数名|描述|
 |:---|:---|
-|isSetMask|是否在接口内部设置Mask。<br>&bull; true，表示在[接口内设置Mask](#接口内设置Mask)。<br>&bull; false，表示在[接口外设置Mask](#接口外设置Mask)，开发者需要使用[SetVectorMask](../mask_operations/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
+|isSetMask|是否在接口内部设置Mask。<br>&bull; true，表示在[接口内设置Mask](#接口内设置mask)。<br>&bull; false，表示在[接口外设置Mask](#接口外设置mask)，开发者需要使用[SetVectorMask](../mask_operations/SetVectorMask.md)接口设置mask值。这种模式下，接口入参中的mask值设置为占位符`MASK_PLACEHOLDER`，用于占位，无实际含义。 |
 
 **表5**  掩码相关参数<a id="sheet2"></a>
 
