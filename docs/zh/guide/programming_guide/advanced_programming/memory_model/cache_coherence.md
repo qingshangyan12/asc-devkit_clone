@@ -633,7 +633,7 @@ FixPipe常用于`L0C Buffer -> GM`或相关矩阵搬出路径。对一致性分�
 
 因此，FixPipe随路原子的缓存一致性行为与MTE3随路原子类似：它不会自动清理Scalar DCache旧副本，也不会自动把此前停留在DCache中的Dirty数据合入GM。
 
-- 如果GM目标地址的初值来自普通Scalar写GM，需要先按[DCache缓存一致性](#DCache与GM的缓存一致性)把DCache中的Dirty数据写回GM，再执行FixPipe随路原子。
+- 如果GM目标地址的初值来自普通Scalar写GM，需要先按[DCache缓存一致性](#dcache与gm的缓存一致性)把DCache中的Dirty数据写回GM，再执行FixPipe随路原子。
 - 如果FixPipe随路原子后，消费者通过Scalar普通路径读取GM，需要等待FixPipe写GM完成，并在读端处理DCache旧副本。
 - 如果多个流水或多个核都对同一GM地址做随路原子，原子操作只保证每次GM读-改-写不被打断；不同流水、不同核之间的启动顺序仍应由同步或算法协议保证。
 
@@ -646,7 +646,7 @@ FixPipe常用于`L0C Buffer -> GM`或相关矩阵搬出路径。对一致性分�
 分析缓存一致性时，需要先区分目标地址：
 
 - 目标是UB时，主要关注同一Thread Block内线程之间对共享UB数据的可见性和执行顺序；如果同一段UB数据还被Scalar以DCache模式读取，需要结合处理[DCache与UB的一致性](#ub与dcache的缓存一致性)。
-- 目标是GM时，需要把SIMT原子更新GM、SIMT普通读写GM、Scalar普通读写GM、MTE搬运GM放在同一张可见性图里分析。原子操作本身不能替代SIMT DCache或Scalar DCache的旧副本处理；若后续通过默认SIMT读或Scalar普通读读取同一GM地址，仍需要按[SIMT缓存一致性](#simt-dcache与gm的缓存一致性)或[DCache缓存一致性](#DCache与GM的缓存一致性)处理读端可能存在的旧Cache副本。
+- 目标是GM时，需要把SIMT原子更新GM、SIMT普通读写GM、Scalar普通读写GM、MTE搬运GM放在同一张可见性图里分析。原子操作本身不能替代SIMT DCache或Scalar DCache的旧副本处理；若后续通过默认SIMT读或Scalar普通读读取同一GM地址，仍需要按[SIMT缓存一致性](#simt-dcache与gm的缓存一致性)或[DCache缓存一致性](#dcache与gm的缓存一致性)处理读端可能存在的旧Cache副本。
 - 如果不同Thread Block或不同AI Core通过GM标志位配合SIMT原子操作通信，仍需要结合内存栅栏、原子操作、轮询协议以及必要的Cache处理建立完整同步关系，不能只依赖原子操作本身。
 <!-- end id9 -->
 
@@ -662,7 +662,7 @@ L2 Cache和GM之间没有一致性问题，因此L2 Cache的预取不会导致�
 
 [asc_datacache_preload](../../../../api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md)用于从指定GM地址预加载数据到DCache中，每次调用只能预加载一个Cache Line大小的数据。它的作用是让后续Scalar读取更可能命中DCache，而不是建立新的同步或一致性关系。
 
-DCache是每个核内独立的缓存，因此DCache预取会在当前核DCache中提前形成GM数据副本。如果预取之后，同一GM地址被其他核、MTE、原子操作或SIMT路径更新，当前核后续普通Scalar读可能继续命中预取形成的旧副本。需要读取最新GM数据时，仍要按[DCache缓存一致性](#DCache与GM的缓存一致性)执行DCCI失效旧副本，或使用绕过DCache的读接口。
+DCache是每个核内独立的缓存，因此DCache预取会在当前核DCache中提前形成GM数据副本。如果预取之后，同一GM地址被其他核、MTE、原子操作或SIMT路径更新，当前核后续普通Scalar读可能继续命中预取形成的旧副本。需要读取最新GM数据时，仍要按[DCache缓存一致性](#dcache与gm的缓存一致性)执行DCCI失效旧副本，或使用绕过DCache的读接口。
 
 #### ICache预取
 
