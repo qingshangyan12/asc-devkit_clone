@@ -1261,7 +1261,7 @@ CcuResult GroupLocalReduceV1(
 {
     const uint32_t size = scratchOrg.size();
 
-    GroupLocalReduceVar var;
+    GroupLocalReduceVar& var = ctx.localReduceVar;
     ccu::Variable tmp;
     ccu::Variable loopParam;
     ccu::Variable sliceSize;
