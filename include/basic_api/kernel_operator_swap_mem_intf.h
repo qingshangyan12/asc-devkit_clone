@@ -44,7 +44,7 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetSysWorkSpacePtr()
 {
     // kernel launch
 #if defined(__NPU_DEVICE__) && defined(__NPU_ARCH__)
-    if constexpr (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510) {
+    if constexpr (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) {
         return __get_kfc_workspace_addr();
     } else {
         return g_sysWorkspaceReserved;
