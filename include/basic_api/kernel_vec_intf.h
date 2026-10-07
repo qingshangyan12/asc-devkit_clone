@@ -36,6 +36,7 @@
 #include "kernel_prof_trace_intf.h"
 #include "kernel_operator_data_copy_intf.h"
 #include "kernel_operator_dump_tensor_intf.h"
+#include "kernel_operator_mem_intf.h"
 #include "kernel_operator_common_intf.h"
 #if !(                       \
     defined(__NPU_ARCH__) && \
