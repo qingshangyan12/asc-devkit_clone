@@ -146,11 +146,16 @@ __aicore__ inline void SetNextTaskStart()
 template <bool FORCE>
 __aicore__ inline void WaitPreTaskEnd()
 {
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    WaitPreTaskEndImpl<-1, PIPE_S>();
+#else
 #ifdef __ASCENDC_ENABLE_WAIT_PRE_TASK_END
     WaitPreTaskEndImpl();
+#else
+    if constexpr (FORCE) {
+        WaitPreTaskEndImpl<-1, true>();
+    }
 #endif
-#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
-    WaitPreTaskEndImpl<earlyStartConfig, pipe>();
 #endif
 }
 
