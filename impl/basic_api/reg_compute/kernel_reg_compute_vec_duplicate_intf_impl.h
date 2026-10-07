@@ -33,6 +33,10 @@
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 5162
 #include "../../basic_api/reg_compute/dav_v516/kernel_reg_compute_vec_duplicate_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "../../basic_api/reg_compute/dav_9201/kernel_reg_compute_vec_duplicate_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "../../basic_api/reg_compute/dav_9202/kernel_reg_compute_vec_duplicate_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_duplicate_impl.h"
 #endif
@@ -57,6 +61,49 @@ __simd_callee__ inline void Duplicate(U& dstReg, U& srcReg, MaskReg& mask)
     DuplicateImpl<T, pos, mode, U>(dstReg, srcReg, mask);
 }
 
+template <typename T, typename U>
+__simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1)
+{
+    InterleaveImpl<T, U>(dstReg0, dstReg1, srcReg0, srcReg1);
+}
+
+template <typename T, typename U>
+__simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1)
+{
+    DeInterleaveImpl<T, U>(dstReg0, dstReg1, srcReg0, srcReg1);
+}
+
+template <typename T, HighLowPart part, typename U>
+__simd_callee__ inline void InterleaveV2(U& dstReg, U& srcReg0, U& srcReg1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    InterleaveV2Impl<T, part, U>(dstReg, srcReg0, srcReg1);
+#endif
+}
+
+template <typename T, HighLowPart part, typename U>
+__simd_callee__ inline void DeInterleaveV2(U& dstReg, U& srcReg0, U& srcReg1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    DeInterleaveV2Impl<T, part, U>(dstReg, srcReg0, srcReg1);
+#endif
+}
+
+template <typename T, HighLowPart part, typename U>
+__simd_callee__ inline void Interleave(U& dstReg, U& srcReg0, U& srcReg1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    InterleaveV2Impl<T, part, U>(dstReg, srcReg0, srcReg1);
+#endif
+}
+
+template <typename T, HighLowPart part, typename U>
+__simd_callee__ inline void DeInterleave(U& dstReg, U& srcReg0, U& srcReg1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    DeInterleaveV2Impl<T, part, U>(dstReg, srcReg0, srcReg1);
+#endif
+}
 } // namespace Reg
 } // namespace AscendC
 
