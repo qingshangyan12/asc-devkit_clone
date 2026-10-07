@@ -893,7 +893,9 @@ def is_enable_build_log():
         return False
     short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
     if short_soc_version is None:
-        raise_tbe_python_err(TBE_DEFAULT_PYTHON_ERROR_CODE, ("get soc version failed, reason is:", err))
+        raise_tbe_python_err(
+            TBE_DEFAULT_PYTHON_ERROR_CODE, ("get soc version failed, reason is:", "short soc version is None")
+        )
     build_log_path = os.path.join(build_log_path, short_soc_version.lower())
     if not os.path.exists(build_log_path):
         try:
