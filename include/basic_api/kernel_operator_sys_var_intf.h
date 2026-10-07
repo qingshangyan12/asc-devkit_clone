@@ -66,7 +66,8 @@ __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     return TOTAL_UB_SIZE;
 #else
     return 0;
@@ -77,7 +78,8 @@ __aicore__ inline constexpr uint32_t GetVecLen()
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     return VECTOR_REG_WIDTH;
 #else
     return 0;
@@ -88,11 +90,12 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
                               (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return TOTAL_UB_SIZE;
 #else
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if defined(SPLIT_CORE_VEC)
 #if defined(__ASC_DISABLE_VF_STACK_RESERVED__)
     constexpr uint32_t RESERVED_UB_SIZE = 2 * 1024;
@@ -117,7 +120,7 @@ __aicore__ inline uint32_t GetRuntimeUBSize()
 
 __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr()
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if ASCENDC_CPU_DEBUG
     return reinterpret_cast<__ssbuf__ void*>(ConstDefiner::Instance().cpuSSbuf);
 #else
