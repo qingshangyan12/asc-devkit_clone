@@ -1072,7 +1072,7 @@ __aicore__ inline TTagType LocalTensor<T>::GetUserTag() const
 
 template <typename T>
 template <typename U>
-__aicore__ inline void LocalTensor<T>::CreateTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
+__aicore__ inline constexpr void LocalTensor<T>::CreateTensor(AscendC::TPosition pos, uint32_t addr, uint32_t tileSize)
 {
 #if ASCENDC_CPU_DEBUG
     ASCENDC_DEBUG_ASSERT(
