@@ -31,8 +31,12 @@
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_vec_duplicate_impl.h"
 #elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5165)
 #include "../../basic_api/reg_compute/dav_5161/kernel_reg_compute_vec_duplicate_impl.h"
-#else
+#elif (__NPU_ARCH__ == 3510)
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_vec_duplicate_impl.h"
+#elif (__NPU_ARCH__ == 9201)
+#include "../../basic_api/reg_compute/dav_9201/kernel_reg_compute_vec_duplicate_impl.h"
+#elif (__NPU_ARCH__ == 9202)
+#include "../../basic_api/reg_compute/dav_9202/kernel_reg_compute_vec_duplicate_impl.h"
 #endif
 
 namespace AscendC {
@@ -47,6 +51,22 @@ template <typename T, typename U>
 __simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1)
 {
     DeInterleaveImpl<T, U>(dstReg0, dstReg1, srcReg0, srcReg1);
+}
+
+template <typename T, HighLowPart part, typename U>
+__simd_callee__ inline void Interleave(U& dstReg, U& srcReg0, U& srcReg1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    InterleaveV2Impl<T, part, U>(dstReg, srcReg0, srcReg1);
+#endif
+}
+
+template <typename T, HighLowPart part, typename U>
+__simd_callee__ inline void DeInterleave(U& dstReg, U& srcReg0, U& srcReg1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    DeInterleaveV2Impl<T, part, U>(dstReg, srcReg0, srcReg1);
+#endif
 }
 } // namespace Reg
 } // namespace AscendC
