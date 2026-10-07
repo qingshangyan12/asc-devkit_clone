@@ -217,7 +217,7 @@ enum class DataCopyMode {
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5163) || \
-    (__NPU_ARCH__ == 5165) || defined(__ASC_NPU_HOST__)
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || defined(__ASC_NPU_HOST__)
 struct ExpSpecificMode {
     MaskMergeMode mrgMode = MaskMergeMode::ZEROING;
     ExpAlgo algo = ExpAlgo::INTRINSIC;
@@ -306,6 +306,13 @@ using ReduceType = AscendC::ReduceType;
 
 enum class PairReduce {
     SUM = 0,
+};
+
+enum class DistributionPos { CONTINUOUS, DATABLOCK_DISCRETE };
+
+struct ReduceSpecificMode {
+    MaskMergeMode mrgMode = MaskMergeMode::ZEROING;
+    DistributionPos pos = DistributionPos::CONTINUOUS;
 };
 } // namespace Reg
 } // namespace AscendC
