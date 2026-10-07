@@ -16,7 +16,7 @@
 #define IMPL_UTILS_DEBUG_NPU_ARCH_9201_ASC_AICORE_DUMP_UTILS_H
 
 #include "impl/utils/debug/asc_debug_utils.h"
-#include "impl/utils/sys_macros.h"
+#include "impl/utils/sys_macros_impl.h"
 
 namespace __asc_aicore {
 constexpr uint32_t ASC_DEBUG_BUS_UNLOCK_OFFSET = 0x078;
@@ -95,10 +95,10 @@ __aicore__ inline void debug_bus_write_reg(uint64_t debugBusAddr, uint16_t offse
     dsb((mem_dsb_t)0U);
 }
 
-__aicore__ inline volatile uint32_t debug_bus_read_reg(uint64_t debugBusAddr, uint16_t offset)
+__aicore__ inline uint32_t debug_bus_read_reg(uint64_t debugBusAddr, uint16_t offset)
 {
     dsb((mem_dsb_t)0U);
-    volatile uint32_t value = ld_dev((__gm__ uint32_t*)(debugBusAddr + offset), 0);
+    uint32_t value = ld_dev((__gm__ uint32_t*)(debugBusAddr + offset), 0);
     dsb((mem_dsb_t)0U);
     return value;
 }
@@ -115,7 +115,7 @@ __aicore__ inline void debug_bus_read_chunk(
     debug_bus_write_reg(debugBusAddr, ASC_DEBUG_BUS_MODEL_BASE_OFFSET, modelBase);
     debug_bus_write_reg(debugBusAddr, ASC_DEBUG_BUS_CTRL_OFFSET, ASC_DEBUG_BUS_READ_MASK);
     volatile uint32_t debug_status = 0;
-    volatile uint32_t counter = 0;
+    uint32_t counter = 0;
     while ((debug_status & 0x80000000U) != 0x80000000U) {
         if (counter > max_wait_count) {
             // timeout protection, avoid infinite loop
