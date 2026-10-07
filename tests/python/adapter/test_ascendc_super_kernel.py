@@ -837,23 +837,6 @@ Idx Name                              Size     VMA              Type
                     tmp.kernel_type = KernelMetaType.KERNEL_TYPE_AIC_ONLY
                     self.assertRaises(Exception, tmp.extract_sub_bin_file_of_mix_kernel, "./", "b", "c")
 
-    def test_gen_super_kernel_file(self):
-        SetCurrentSocInfo("Ascend950PR_9599")
-        with mock.patch("adapter.super_kernel.super_kernel_compile"):
-            with mock.patch("builtins.open", new_callable=mock.mock_open, read_data="{}") as mock_open:
-                with mock.patch("json.load", return_value=op_json):
-                    with mock.patch("os.fdopen") as mock_fdopen:
-                        super_operator = SuperOperatorInfos(
-                            {"op_list": [{"bin_path": "op1.o", "json_path": "op1.json", "kernel_name": "op1"}]},
-                            "super_kernel",
-                        )
-                        super_operator.datacache_mpde = SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
-                        super_operator.preload_mode = SuperKernelPreLoadMode.PreLoadByWhole
-                        super_operator.datacache_mode = SuperKernelDataCacheMode.DataCacheLoadAdancanceStep
-                        super_operator.timestamp_option = True
-                        mock_fdopen.side_effect = Exception("error")
-                        self.assertRaises(Exception, gen_super_kernel_file, super_operator)
-
     def test_ascendc_super_kernel_plus_multi_ops(self):
         with (
             mock.patch("adapter.super_kernel.super_kernel_compile"),

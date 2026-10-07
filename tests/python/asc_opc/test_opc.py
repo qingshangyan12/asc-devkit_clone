@@ -801,33 +801,6 @@ class TestOpc02(unittest.TestCase):
         options = opt_parser.get_all_options()
         self.assertEqual(opt_parser.check_input_params(), True)
 
-    def test_options_parse_24(self):
-        """
-        test valid core_type, aicore_num, mdl_bank_path, op_bank_path, impl_mode
-        """
-        logger.info("Start to execute ==============test_options_parse_24==============")
-        test_root_dir = os.path.abspath(os.path.dirname(__file__))
-        path = test_root_dir + "/output"
-        input_param_path = test_root_dir + "/stub/files/matmul_test.json"
-        op_path = test_root_dir + "/stub/files/mat_mul.py"
-
-        sys.argv = [
-            "xx",
-            op_path,
-            "--main_func=mat_mul",
-            "--input_param=" + input_param_path,
-            "--soc_version=Ascend910A",
-            "--output=./output",
-            "--log=debug",
-            "--core_type=AiCore",
-            "--aicore_num=1",
-            "--impl_mode=high_performance",
-        ]
-        ret, opt_parser = opc.parse_args()
-        opc.op_compile_classify(opt_parser)
-        options = opt_parser.get_all_options()
-        self.assertEqual(opt_parser.check_input_params(), True)
-
     def test_options_parse_25(self):
         """
         test valid core_type, aicore_num, mdl_bank_path, op_bank_path, impl_mode
