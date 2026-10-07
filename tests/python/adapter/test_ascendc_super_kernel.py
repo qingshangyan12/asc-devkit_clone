@@ -80,7 +80,6 @@ op_json1 = {
     "kernelName": "te_dequantswigluquant_e22b2f2842ce6848f5485a744deaefe5c0c8aec04b6bf8e727854abd4c5be684__kernel0",
     "sha256": "82b640327d7f75745413c68646640a172565ceed2b3c88050c53ee3f50578e3e",
     "workspace": {"num": 1, "size": [32], "type": [0]},
-    "debugOptions": "timestamp",
     "sub_operator_params": [
         "x_in__",
         "weight_scale_in__",
