@@ -150,7 +150,7 @@ struct SkSystemArgs {
     inline __aicore__ uint16_t SkGetTaskSyncCfg() { return skTaskSyncCfg; }
     inline __aicore__ void SkInit() const
     {
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
         g_super_kernel_early_start_config = skTaskSyncCfg;
 #endif
     }
