@@ -31,66 +31,41 @@
 
 namespace AscendC {
 namespace Reg {
-namespace Internal {
-__simd_callee__ inline constexpr ReduceSpecificMode GetReduceSpecificMode(MaskMergeMode mrgMode)
-{
-    return {.mrgMode = mrgMode, .pos = DistributionPos::CONTINUOUS};
-}
-
-__simd_callee__ inline constexpr ReduceSpecificMode GetReduceSpecificMode(const ReduceSpecificMode* sprMode)
-{
-    return {.mrgMode = sprMode->mrgMode, .pos = sprMode->pos};
-}
-} // namespace Internal
-
 template <
-    typename T = DefaultType, typename U = DefaultType, auto mode = MaskMergeMode::ZEROING, typename S, typename V>
+    typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S,
+    typename V>
 __simd_callee__ inline void ReduceSumImpl(S& dstReg, V srcReg, MaskReg mask)
 {
     using ActualDstRegT = typename S::ActualT;
     using ActualSrcRegT = typename V::ActualT;
-    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualDstRegT>, "T type is not correct!");
-    static_assert(std::is_same_v<U, DefaultType> || std::is_same_v<U, ActualSrcRegT>, "U type is not correct!");
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualDstRegT>, "T type is not correct!");
+    static_assert(Std::is_same_v<U, DefaultType> || Std::is_same_v<U, ActualSrcRegT>, "U type is not correct!");
     static_assert(
-        IsSameType<decltype(mode), MaskMergeMode>::value ||
-            IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
-        "mode type must be either MaskMergeMode or const ReduceSpecificMode* ");
-    constexpr ReduceSpecificMode sprMode = Internal::GetReduceSpecificMode(mode);
+        (SupportType<
+            Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<uint32_t, uint16_t>,
+            Tuple<uint32_t, uint32_t>, Tuple<int32_t, int32_t>, Tuple<half, half>, Tuple<float, float>,
+            Tuple<uint64_t, uint64_t>, Tuple<int64_t, int64_t>>()),
+        "Reduce unsupport this datatype on current device");
     static_assert(
-        SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
-        "current ReduceSum api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
-        static_assert(
-            (SupportType<
-                Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<uint32_t, uint16_t>,
-                Tuple<uint32_t, uint32_t>, Tuple<int32_t, int32_t>, Tuple<half, half>, Tuple<float, float>,
-                Tuple<uint64_t, uint64_t>, Tuple<int64_t, int64_t>>()),
-            "ReduceSum unsupport this datatype on current device");
-        if constexpr (sizeof(ActualSrcRegT) != 8) {
-            vcadd(dstReg, srcReg, mask, modeValue);
-        } else if constexpr (sizeof(ActualSrcRegT) == 8) {
-            if constexpr (CheckRegTrait<V, RegTraitNumTwo>()) {
-                S dstTemp;
-                ReduceSumB64Impl(dstTemp, srcReg, mask);
-                dstReg = dstTemp;
-            } else if constexpr (CheckRegTrait<V, RegTraitNumOne>()) {
-                MaskReg maskTrait2;
-                MaskPack(maskTrait2, mask);
-                RegTensor<ActualSrcRegT, RegTraitNumTwo> traitTwoSrcReg0;
-                RegTensor<ActualDstRegT, RegTraitNumTwo> traitTwoDstReg;
-                B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg);
-                ReduceSumB64Impl(traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
-                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-            }
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current Reduce api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    if constexpr (sizeof(ActualSrcRegT) != 8) {
+        vcadd(dstReg, srcReg, mask, modeValue);
+    } else if constexpr (sizeof(ActualSrcRegT) == 8) {
+        if constexpr (CheckRegTrait<V, RegTraitNumTwo>()) {
+            S dstTemp;
+            ReduceSumB64Impl(dstTemp, srcReg, mask);
+            dstReg = dstTemp;
+        } else if constexpr (CheckRegTrait<V, RegTraitNumOne>()) {
+            MaskReg maskTrait2;
+            MaskPack(maskTrait2, mask);
+            RegTensor<ActualSrcRegT, RegTraitNumTwo> traitTwoSrcReg0;
+            RegTensor<ActualDstRegT, RegTraitNumTwo> traitTwoDstReg;
+            B64TraitOneToTraitTwo(traitTwoSrcReg0, srcReg);
+            ReduceSumB64Impl(traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
+            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
         }
-    } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
-        static_assert(
-            (SupportType<
-                Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int32_t>, Tuple<uint32_t, uint32_t>,
-                Tuple<half, half>, Tuple<float, float>>()),
-            "ReduceSum unsupport this datatype on current device");
-        vcaddv2(dstReg, srcReg);
     }
 }
 
@@ -127,48 +102,36 @@ __simd_callee__ inline void ReduceSumB64Impl(T& dstReg, T srcReg, MaskReg mask)
         (RegTensor<uint16_t>&)midReg);
 }
 
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceMaxImpl(U& dstReg, U srcReg, MaskReg mask)
 {
     using ActualT = typename U::ActualT;
-    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        IsSameType<decltype(mode), MaskMergeMode>::value ||
-            IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
-        "mode type must be either MaskMergeMode or const ReduceSpecificMode* ");
-    constexpr ReduceSpecificMode sprMode = Internal::GetReduceSpecificMode(mode);
+        (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
+        "Reduce unsupport this datatype on current device");
     static_assert(
-        SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
-        "current ReduceMax api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
-        static_assert(
-            (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
-            "ReduceMax unsupport this datatype on current device");
-        if constexpr (sizeof(ActualT) != 8) {
-            vcmax(dstReg, srcReg, mask, modeValue);
-        } else {
-            if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-                U dstTemp;
-                ReduceMaxB64Impl(dstTemp, srcReg, mask);
-                dstReg = dstTemp;
-            } else if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-                MaskReg maskTrait2;
-                MaskPack(maskTrait2, mask);
-                RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
-                RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-                DeInterleave(
-                    (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[0], (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[1],
-                    (RegTensor<uint32_t>&)srcReg, (RegTensor<uint32_t>&)srcReg);
-                ReduceMaxB64Impl(traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
-                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-            }
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current Reduce api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    if constexpr (sizeof(ActualT) != 8) {
+        vcmax(dstReg, srcReg, mask, modeValue);
+    } else {
+        if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
+            U dstTemp;
+            ReduceMaxB64Impl(dstTemp, srcReg, mask);
+            dstReg = dstTemp;
+        } else if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
+            MaskReg maskTrait2;
+            MaskPack(maskTrait2, mask);
+            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
+            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
+            DeInterleave(
+                (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[0], (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[1],
+                (RegTensor<uint32_t>&)srcReg, (RegTensor<uint32_t>&)srcReg);
+            ReduceMaxB64Impl(traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
+            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
         }
-    } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
-        static_assert(
-            (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-            "ReduceMax unsupport this datatype on current device");
-        vcmaxv2(dstReg, srcReg);
     }
 }
 
@@ -210,48 +173,36 @@ __simd_callee__ inline void ReduceMaxB64Impl(T& dstReg, T srcReg, MaskReg mask)
     }
 }
 
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceMinImpl(U& dstReg, U srcReg, MaskReg mask)
 {
     using ActualT = typename U::ActualT;
-    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        IsSameType<decltype(mode), MaskMergeMode>::value ||
-            IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
-        "mode type must be either MaskMergeMode or const ReduceSpecificMode* ");
-    constexpr ReduceSpecificMode sprMode = Internal::GetReduceSpecificMode(mode);
+        (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
+        "Reduce unsupport this datatype on current device");
     static_assert(
-        SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
-        "current ReduceMin api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
-        static_assert(
-            (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half, uint64_t, int64_t>()),
-            "ReduceMin unsupport this datatype on current device");
-        if constexpr (sizeof(ActualT) != 8) {
-            vcmin(dstReg, srcReg, mask, modeValue);
-        } else if constexpr (sizeof(ActualT) == 8) {
-            if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
-                U dstTemp;
-                ReduceMinB64Impl(dstTemp, srcReg, mask);
-                dstReg = dstTemp;
-            } else if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
-                MaskReg maskTrait2;
-                MaskPack(maskTrait2, mask);
-                RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
-                RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
-                DeInterleave(
-                    (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[0], (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[1],
-                    (RegTensor<uint32_t>&)srcReg, (RegTensor<uint32_t>&)srcReg);
-                ReduceMinB64Impl(traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
-                B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
-            }
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current Reduce api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    if constexpr (sizeof(ActualT) != 8) {
+        vcmin(dstReg, srcReg, mask, modeValue);
+    } else if constexpr (sizeof(ActualT) == 8) {
+        if constexpr (CheckRegTrait<U, RegTraitNumTwo>()) {
+            U dstTemp;
+            ReduceMinB64Impl(dstTemp, srcReg, mask);
+            dstReg = dstTemp;
+        } else if constexpr (CheckRegTrait<U, RegTraitNumOne>()) {
+            MaskReg maskTrait2;
+            MaskPack(maskTrait2, mask);
+            RegTensor<ActualT, RegTraitNumTwo> traitTwoSrcReg0;
+            RegTensor<ActualT, RegTraitNumTwo> traitTwoDstReg;
+            DeInterleave(
+                (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[0], (RegTensor<uint32_t>&)traitTwoSrcReg0.reg[1],
+                (RegTensor<uint32_t>&)srcReg, (RegTensor<uint32_t>&)srcReg);
+            ReduceMinB64Impl(traitTwoDstReg, traitTwoSrcReg0, maskTrait2);
+            B64TraitTwoToTraitOne(dstReg, traitTwoDstReg);
         }
-    } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
-        static_assert(
-            (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-            "ReduceMin unsupport this datatype on current device");
-        vcminv2(dstReg, srcReg);
     }
 }
 
@@ -293,137 +244,83 @@ __simd_callee__ inline void ReduceMinB64Impl(T& dstReg, T srcReg, MaskReg mask)
     }
 }
 
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void ReduceSumWithDataBlockImpl(U& dstReg, U srcReg, MaskReg mask)
+template <
+    typename T = DefaultType, typename U = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename S,
+    typename V>
+__simd_callee__ inline void ReduceSumWithDataBlockImpl(S& dstReg, V srcReg, MaskReg mask)
 {
-    using ActualT = typename U::ActualT;
-    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert(
-        IsSameType<decltype(mode), MaskMergeMode>::value ||
-            IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
-        "mode type must be either MaskMergeMode or const ReduceSpecificMode* ");
-    constexpr ReduceSpecificMode sprMode = Internal::GetReduceSpecificMode(mode);
-    static_assert(
-        SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
-        "current ReduceSumWithDataBlock api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
-        static_assert(
-            (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-            "ReduceSumWithDataBlock unsupport this datatype on current device");
-        if constexpr (Std::is_same_v<ActualT, uint16_t>) {
-            RegTensor<uint32_t> tmpReg;
-            vcgadd(tmpReg, srcReg, mask, modeValue);
-            vpack(dstReg, tmpReg, LOWER);
-        } else if constexpr (Std::is_same_v<ActualT, int16_t>) {
-            RegTensor<int32_t> tmpReg;
-            vcgadd(tmpReg, srcReg, mask, modeValue);
-            vpack((RegTensor<uint16_t>&)dstReg, tmpReg, LOWER);
-        } else {
-            vcgadd(dstReg, srcReg, mask, modeValue);
-        }
-    } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
-        static_assert(
-            (SupportType<ActualT, uint32_t, int32_t, float, half>()),
-            "ReduceSumWithDataBlock unsupport this datatype on current device");
-        vcgaddv2(dstReg, srcReg, mask);
-    }
-}
-
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void ReduceSumWithDataBlockImpl(T& dstReg, U srcReg, MaskReg mask)
-{
-    using ActualDstRegT = typename T::ActualT;
-    using ActualSrcRegT = typename U::ActualT;
+    using ActualDstRegT = typename S::ActualT;
+    using ActualSrcRegT = typename V::ActualT;
     static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualDstRegT>, "T type is not correct!");
     static_assert(std::is_same_v<U, DefaultType> || std::is_same_v<U, ActualSrcRegT>, "U type is not correct!");
     static_assert(
-        (SupportType<Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<uint32_t, uint16_t>>()),
-        "ReduceSumWithDataBlock unsupport this datatype on current device");
+        (SupportType<
+            Tuple<ActualDstRegT, ActualSrcRegT>, Tuple<int32_t, int16_t>, Tuple<uint32_t, uint16_t>,
+            Tuple<uint32_t, uint32_t>, Tuple<int32_t, int32_t>, Tuple<half, half>, Tuple<float, float>>()),
+        "ReduceDataBlock unsupport this datatype on current device");
     static_assert(
-        IsSameType<decltype(mode), MaskMergeMode>::value ||
-            IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
-        "mode type must be either MaskMergeMode or const ReduceSpecificMode* ");
-    constexpr ReduceSpecificMode sprMode = Internal::GetReduceSpecificMode(mode);
-    static_assert(
-        SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
-        "current ReduceSumWithDataBlock api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
-        vcgadd(dstReg, srcReg, mask, modeValue);
-    } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
-        vcgaddv2(dstReg, srcReg, mask);
-    }
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current ReduceDataBlock api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vcgadd(dstReg, srcReg, mask, modeValue);
 }
 
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
+__simd_callee__ inline void ReduceSumWithDataBlockImpl(U& dstReg, U srcReg, MaskReg mask)
+{
+    using ActualT = typename U::ActualT;
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(
+        (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
+        "ReduceDataBlock unsupport this datatype on current device");
+    static_assert(
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current ReduceDataBlock api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vcgadd(dstReg, srcReg, mask, modeValue);
+}
+
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceMaxWithDataBlockImpl(U& dstReg, U srcReg, MaskReg mask)
 {
     using ActualT = typename U::ActualT;
-    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMaxWithDataBlock unsupport this datatype on current device");
+        "ReduceDataBlock unsupport this datatype on current device");
     static_assert(
-        IsSameType<decltype(mode), MaskMergeMode>::value ||
-            IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
-        "mode type must be either MaskMergeMode or const ReduceSpecificMode* ");
-    constexpr ReduceSpecificMode sprMode = Internal::GetReduceSpecificMode(mode);
-    static_assert(
-        SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
-        "current ReduceMaxWithDataBlock api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
-        vcgmax(dstReg, srcReg, mask, modeValue);
-    } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
-        vcgmaxv2(dstReg, srcReg, mask);
-    }
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current ReduceDataBlock api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vcgmax(dstReg, srcReg, mask, modeValue);
 }
 
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void ReduceMinWithDataBlockImpl(U& dstReg, U srcReg, MaskReg mask)
 {
     using ActualT = typename U::ActualT;
-    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
         (SupportType<ActualT, uint16_t, int16_t, uint32_t, int32_t, float, half>()),
-        "ReduceMinWithDataBlock unsupport this datatype on current device");
+        "ReduceDataBlock unsupport this datatype on current device");
     static_assert(
-        IsSameType<decltype(mode), MaskMergeMode>::value ||
-            IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
-        "mode type must be either MaskMergeMode or const ReduceSpecificMode* ");
-    constexpr ReduceSpecificMode sprMode = Internal::GetReduceSpecificMode(mode);
-    static_assert(
-        SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
-        "current ReduceMinWithDataBlock api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
-        vcgmin(dstReg, srcReg, mask, modeValue);
-    } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
-        vcgminv2(dstReg, srcReg, mask);
-    }
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current ReduceDataBlock api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vcgmin(dstReg, srcReg, mask, modeValue);
 }
 
-template <typename T = DefaultType, auto mode = MaskMergeMode::ZEROING, typename U>
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void PairReduceSumImpl(U& dstReg, U srcReg, MaskReg mask)
 {
     using ActualT = typename U::ActualT;
-    static_assert(std::is_same_v<T, DefaultType> || std::is_same_v<T, ActualT>, "T type is not correct!");
-    static_assert((SupportType<ActualT, float, half>()), "PairReduceSum unsupport this datatype on current device");
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert((SupportType<ActualT, float, half>()), "PairReduceElem unsupport this datatype on current device");
     static_assert(
-        IsSameType<decltype(mode), MaskMergeMode>::value ||
-            IsSameType<decltype(mode), const ReduceSpecificMode*>::value,
-        "mode type must be either MaskMergeMode or const ReduceSpecificMode* ");
-    constexpr ReduceSpecificMode sprMode = Internal::GetReduceSpecificMode(mode);
-    static_assert(
-        SupportEnum<sprMode.mrgMode, MaskMergeMode::ZEROING>(),
-        "current PairReduceSum api only supported Mode ZEROING on current device!");
-    constexpr auto modeValue = GetMaskMergeMode<sprMode.mrgMode>();
-    if constexpr (sprMode.pos == DistributionPos::CONTINUOUS) {
-        vcpadd(dstReg, srcReg, mask, modeValue);
-    } else if constexpr (sprMode.pos == DistributionPos::DATABLOCK_DISCRETE) {
-        vcpaddv2(dstReg, srcReg, mask);
-    }
+        SupportEnum<mode, MaskMergeMode::ZEROING>(),
+        "current PairReduceElem api only supported Mode ZEROING on current device!");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vcpadd(dstReg, srcReg, mask, modeValue);
 }
 } // namespace Reg
 } // namespace AscendC
