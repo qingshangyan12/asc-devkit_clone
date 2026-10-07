@@ -78,7 +78,8 @@ template <bool isAIVOnly = true>
 __aicore__ inline void SyncAll(
     const GlobalTensor<int32_t>& gmWorkspace, const LocalTensor<int32_t>& ubWorkspace, const int32_t usedCores = 0);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <bool isAIVOnly = true, const SyncAllConfig& config = DEFAULT_SYNC_ALL_CONFIG>
 __aicore__ inline void SyncAll();
 #else
@@ -98,6 +99,15 @@ public:
     __aicore__ inline void SetFlag(TEventID id);
     __aicore__ inline void WaitFlag(TEventID id);
 };
+
+namespace BlockSync {
+enum SyncScope {
+    InterBlock,
+};
+
+template <SyncScope Scope = SyncScope::InterBlock>
+__aicore__ inline void MakeBarrier(uint8_t groupID, uint16_t arriveNum);
+} // namespace BlockSync
 
 } // namespace AscendC
 #if defined(__NPU_ARCH__)
