@@ -19,7 +19,13 @@
 
 #ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
+#if __NPU_ARCH__ == 9201
+#include "impl/utils/debug/npu_arch_9201/asc_type_conversion_utils.h"
+#elif __NPU_ARCH__ == 9202
+#include "impl/utils/debug/npu_arch_9202/asc_type_conversion_utils.h"
+#else
 #include "impl/utils/debug/npu_arch_3510/asc_type_conversion_utils.h"
+#endif
 
 namespace __asc_simd_vf {
 template <typename T>
