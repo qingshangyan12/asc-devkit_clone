@@ -33,6 +33,10 @@
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_maskreg_impl.h"
 #elif __NPU_ARCH__ == 5162
 #include "../../basic_api/reg_compute/dav_v516/kernel_reg_compute_maskreg_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "../../basic_api/reg_compute/dav_9201/kernel_reg_compute_maskreg_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "../../basic_api/reg_compute/dav_9202/kernel_reg_compute_maskreg_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_maskreg_impl.h"
 #endif
@@ -51,10 +55,7 @@ __simd_callee__ inline MaskReg CreateMask()
     return CreateMaskImpl<T, mode, regTrait>();
 }
 
-#if !(                       \
-    defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
-// Kirin v516 平台尚未支持
+__simd_callee__ inline void MaskNot(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskNotImpl(dst, src, mask); }
 __simd_callee__ inline void Not(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskNotImpl(dst, src, mask); }
 
 template <typename T, int16_t offset, typename U>
@@ -63,80 +64,38 @@ __simd_callee__ inline void MaskGenWithRegTensor(MaskReg& dst, U& srcReg)
     MaskGenWithRegTensorImpl<T, offset, U>(dst, srcReg);
 }
 
+__simd_callee__ inline void MaskAnd(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+{
+    MaskAndImpl(dst, src0, src1, mask);
+}
 __simd_callee__ inline void And(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
     MaskAndImpl(dst, src0, src1, mask);
 }
 
+__simd_callee__ inline void MaskOr(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+{
+    MaskOrImpl(dst, src0, src1, mask);
+}
 __simd_callee__ inline void Or(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
     MaskOrImpl(dst, src0, src1, mask);
 }
 
+__simd_callee__ inline void MaskXor(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+{
+    MaskXorImpl(dst, src0, src1, mask);
+}
 __simd_callee__ inline void Xor(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
     MaskXorImpl(dst, src0, src1, mask);
 }
 
+__simd_callee__ inline void MaskMov(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskMovImpl(dst, src, mask); }
 __simd_callee__ inline void Move(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskMovImpl(dst, src, mask); }
 
-__simd_callee__ inline void Move(MaskReg& dst, MaskReg& src) { MaskMovImpl(dst, src); }
-
-template <typename T>
-__simd_callee__ inline void Interleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
-{
-    MaskInterleaveImpl<T>(dst0, dst1, src0, src1);
-}
-
-template <typename T>
-__simd_callee__ inline void DeInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
-{
-    MaskDeInterleaveImpl<T>(dst0, dst1, src0, src1);
-}
-
-__simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    MaskSelImpl(dst, src0, src1, mask);
-}
-#endif
-
-template <HighLowPart part>
-__simd_callee__ inline void Pack(MaskReg& dst, MaskReg& src)
-{
-    MaskPackImpl<part>(dst, src);
-}
-
-template <HighLowPart part>
-__simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src)
-{
-    MaskUnPackImpl<part>(dst, src);
-}
-
-template <typename T>
-__simd_callee__ inline MaskReg MoveMask()
-{
-    return MoveMaskImpl<T>();
-}
-
-#if !(                       \
-    defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
-// Kirin v516 平台不支持如下历史接口
-__simd_callee__ inline void MaskNot(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskNotImpl(dst, src, mask); }
-__simd_callee__ inline void MaskAnd(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    MaskAndImpl(dst, src0, src1, mask);
-}
-__simd_callee__ inline void MaskOr(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    MaskOrImpl(dst, src0, src1, mask);
-}
-__simd_callee__ inline void MaskXor(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
-{
-    MaskXorImpl(dst, src0, src1, mask);
-}
-__simd_callee__ inline void MaskMov(MaskReg& dst, MaskReg& src, MaskReg& mask) { MaskMovImpl(dst, src, mask); }
 __simd_callee__ inline void MaskMov(MaskReg& dst, MaskReg& src) { MaskMovImpl(dst, src); }
+__simd_callee__ inline void Move(MaskReg& dst, MaskReg& src) { MaskMovImpl(dst, src); }
 
 template <typename T>
 __simd_callee__ inline void MaskInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
@@ -149,7 +108,44 @@ __simd_callee__ inline void MaskDeInterleave(MaskReg& dst0, MaskReg& dst1, MaskR
 {
     MaskDeInterleaveImpl<T>(dst0, dst1, src0, src1);
 }
+
+template <typename T, HighLowPart part>
+__simd_callee__ inline void MaskInterleaveV2(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    MaskInterleaveV2Impl<T, part>(dstMask, srcMask0, srcMask1);
+#endif
+}
+
+template <typename T, HighLowPart part>
+__simd_callee__ inline void MaskDeInterleaveV2(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    MaskDeInterleaveV2Impl<T, part>(dstMask, srcMask0, srcMask1);
+#endif
+}
+
+template <typename T, HighLowPart part>
+__simd_callee__ inline void MaskInterleave(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    MaskInterleaveV2Impl<T, part>(dstMask, srcMask0, srcMask1);
+#endif
+}
+
+template <typename T, HighLowPart part>
+__simd_callee__ inline void MaskDeInterleave(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    MaskDeInterleaveV2Impl<T, part>(dstMask, srcMask0, srcMask1);
+#endif
+}
+
 __simd_callee__ inline void MaskSel(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
+{
+    MaskSelImpl(dst, src0, src1, mask);
+}
+__simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
 {
     MaskSelImpl(dst, src0, src1, mask);
 }
@@ -159,13 +155,28 @@ __simd_callee__ inline void MaskPack(MaskReg& dst, MaskReg& src)
 {
     MaskPackImpl<part>(dst, src);
 }
+template <HighLowPart part>
+__simd_callee__ inline void Pack(MaskReg& dst, MaskReg& src)
+{
+    MaskPackImpl<part>(dst, src);
+}
 
 template <HighLowPart part = HighLowPart::LOWEST>
 __simd_callee__ inline void MaskUnPack(MaskReg& dst, MaskReg& src)
 {
     MaskUnPackImpl<part>(dst, src);
 }
-#endif
+template <HighLowPart part>
+__simd_callee__ inline void UnPack(MaskReg& dst, MaskReg& src)
+{
+    MaskUnPackImpl<part>(dst, src);
+}
+
+template <typename T>
+__simd_callee__ inline MaskReg MoveMask()
+{
+    return MoveMaskImpl<T>();
+}
 } // namespace Reg
 } // namespace AscendC
 
