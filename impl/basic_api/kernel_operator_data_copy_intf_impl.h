@@ -2204,24 +2204,33 @@ __aicore__ inline void DataCopy(
 
 __aicore__ inline void NdDmaDci()
 {
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102))
     NdDmaDciImpl();
+#endif
 }
 
 __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCopyMVType type)
 {
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102))
     if (type == DataCopyMVType::UB_TO_OUT) {
         SetLoopModeUBParaImpl(loopParams);
     } else {
         SetLoopModeOutParaImpl(loopParams);
     }
+#endif
 }
 __aicore__ inline void ResetLoopModePara(DataCopyMVType type)
 {
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102))
     if (type == DataCopyMVType::UB_TO_OUT) {
         ResetUBLoopModeParaImpl();
     } else {
         ResetOutLoopModeParaImpl();
     }
+#endif
 }
 
 /*
