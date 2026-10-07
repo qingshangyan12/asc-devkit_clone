@@ -670,6 +670,7 @@ __aicore__ inline void RepeatReduceSum(
 
 /* **************************************** Whole Reduce Interface ****************************************** */
 /*
+ * WholeReduceSum has been updated, please use ReduceRepeat instead.
  * @ingroup WholeReduceSum
  * @brief Sum of all effective elements in each repeatTime
  * @param [out] dst output LocalTensor
@@ -969,9 +970,26 @@ __aicore__ inline void ReducePairElem(
         dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
 }
 
-template <typename T, bool isSetMask>
-__aicore__ inline void WholeReduceMin(
-    const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t mask, const int32_t repeatTime,
+template <ReduceType reduceType, typename T, typename U, bool isSetMask>
+__aicore__ inline void ReducePairElem(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const uint64_t mask[], const int32_t repeatTime,
+    const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride)
+{
+#ifdef __MSTX_DFX_REPORT__
+    MstxTensor::GetMstxVecReducePairInfo(
+        dst, src, mask[0], mask[1], repeatTime, dstRepStride, srcBlkStride, srcRepStride, isSetMask, "ReducePairElem");
+#endif
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    Internal::CheckReducePairElemParams<T, U, isSetMask>(
+        dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride, "ReducePairElem<SUM>");
+#endif
+    Internal::ReducePairElemCommon<reduceType, T, U, isSetMask>(
+        dst, src, mask, repeatTime, dstRepStride, srcBlkStride, srcRepStride);
+}
+
+template <ReduceType reduceType, typename T, typename U, bool isSetMask>
+__aicore__ inline void ReduceRepeat(
+    const LocalTensor<T>& dst, const LocalTensor<U>& src, const int32_t mask, const int32_t repeatTime,
     const int32_t dstRepStride, const int32_t srcBlkStride, const int32_t srcRepStride, ReduceOrder order)
 {
 #ifdef __MSTX_DFX_REPORT__
@@ -1505,6 +1523,7 @@ __aicore__ inline void ReduceSum(
     }
 #endif
 }
+#endif
 #pragma end_pipe
 
 // GetReduceMaxMinCount has been updated, please use GetReduceRepeatMaxMinSpr instead.

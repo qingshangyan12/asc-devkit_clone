@@ -36,13 +36,13 @@
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 3510
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 #include "dav_3510/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 9201
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 #include "dav_9201/kernel_operator_vec_duplicate_impl.h"
 #elif __NPU_ARCH__ == 9202
-#include "reg_compute/kernel_reg_compute_intf.h"
+#include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"
 #include "dav_9202/kernel_operator_vec_duplicate_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "../../include/basic_api/reg_compute/kernel_reg_compute_intf.h"

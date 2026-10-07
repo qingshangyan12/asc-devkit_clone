@@ -35,6 +35,12 @@ __simd_callee__ inline void Interleave(U& dstReg0, U& dstReg1, U& srcReg0, U& sr
 
 template <typename T = DefaultType, typename U>
 __simd_callee__ inline void DeInterleave(U& dstReg0, U& dstReg1, U& srcReg0, U& srcReg1);
+
+template <typename T = DefaultType, HighLowPart part, typename U>
+__simd_callee__ inline void Interleave(U& dstReg, U& srcReg0, U& srcReg1);
+
+template <typename T = DefaultType, HighLowPart part, typename U>
+__simd_callee__ inline void DeInterleave(U& dstReg, U& srcReg0, U& srcReg1);
 } // namespace Reg
 } // namespace AscendC
 
