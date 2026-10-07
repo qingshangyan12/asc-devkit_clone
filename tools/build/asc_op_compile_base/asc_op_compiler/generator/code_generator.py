@@ -36,7 +36,7 @@ class CodeGeneratorConfig:
         self.need_clear_workspace = need_clear_workspace
         self.gen_code_for_l2_cache = gen_code_for_l2_cache
         self.write_back_overflow = write_back_overflow
-        self.needs_ffts = need_ffts
+        self.needs_ffts = needs_ffts
         self.support_dci = support_dci
         self.support_raw_aic_only_dump_tensor = support_raw_aic_only_dump_tensor
         self.support_mix = support_mix
