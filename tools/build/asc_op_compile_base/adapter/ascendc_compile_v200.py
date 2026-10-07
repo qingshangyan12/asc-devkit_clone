@@ -65,7 +65,7 @@ def gen_compile_cmd_v200(src_file: str, dst_file: str, compile_option_tuple, sub
     Generate the compile command for the V200 compiler.
     :param src_file: the source file
     :param dst_file: the destination file
-    :param extra_options: the extra options
+    :param compile_option_tuple: the compile option tuple
     :return: the compile command
     """
     if global_var_storage.get_variable("ascendc_enable_ccache") == True:
@@ -156,7 +156,7 @@ def call_bisheng_v200_static(
 
     Args:
         compile_info (CompileInfo): compile info for generate .o and .json
-        compile_options (list): compile options for bisheng
+        compile_option_tuple (CompileOptionTuple): compile options for bisheng
         tiling_info (TilingInfo): tiling info
         sub_arch (str): davinci-m200-cube or davinci-m200-vec
     """

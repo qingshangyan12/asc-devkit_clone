@@ -1924,7 +1924,7 @@ def _compile_ascendc_cce_v220_with_kernel_type(
 
     Args:
         compile_info (CompileInfo): compile info for generate .o and .json
-        compile_options (list): compile options for bisheng
+        compile_option_tuple (CompileOptionTuple): compile options for bisheng
         tiling_info (TilingInfo): tiling info
     """
     if tiling_info.static_shape_flag:
@@ -2265,7 +2265,7 @@ def _gen_compile_cmd_regbase(
     Generate the compile command for the V300 compiler.
     :param src_file: the source file
     :param dst_file: the destination file
-    :param extra_options: the extra options
+    :param compile_option_tuple: the compile option tuple
     :param with_tiling_file: whether with the tiling file
     :return: the compile command
     """
@@ -2379,7 +2379,7 @@ def _call_bisheng_regbase(
 
     Args:
         compile_info (CompileInfo): compile info for generate .o and .json
-        compile_options (list): compile options for bisheng
+        compile_option_tuple (CompileOptionTuple): compile options for bisheng
         tiling_info (TilingInfo): tiling info
         sub_arch (str): m300 arch info
     """

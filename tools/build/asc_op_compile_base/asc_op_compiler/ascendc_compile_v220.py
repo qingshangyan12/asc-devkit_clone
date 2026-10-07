@@ -180,7 +180,7 @@ def _gen_compile_cmd_c310(
     Generate the compile command for the c310 compiler.
     :param src_file: the source file
     :param dst_file: the destination file
-    :param extra_options: the extra options
+    :param compile_option_tuple: the compile option tuple
     :param with_tiling_file: whether with the tiling file
     :return: the compile command
     """
@@ -239,7 +239,7 @@ def _gen_compile_cmd_v220(
     Generate the compile command for the V220 compiler.
     :param src_file: the source file
     :param dst_file: the destination file
-    :param extra_options: the extra options
+    :param compile_option_tuple: the compile option tuple
     :param with_tiling_file: whether with the tiling file
     :return: the compile command
     """
@@ -359,7 +359,7 @@ def gen_compile_cmd_v220(
     Generate the compile command for the V220/C310 compiler.
     :param src_file: the source file
     :param dst_file: the destination file
-    :param extra_options: the extra options
+    :param compile_option_tuple: the compile option tuple
     :param with_tiling_file: whether with the tiling file
     :return: the compile command
     """
@@ -675,7 +675,7 @@ def call_bisheng_v220(
 
     Args:
         compile_info (CompileInfo): compile info for generate .o and .json
-        compile_options (list): compile options for bisheng
+        compile_option_tuple (CompileOptionTuple): compile options for bisheng
         tiling_info (TilingInfo): tiling info
         sub_arch (str): davinci-c220-cube or davinci-c220-vec
     """

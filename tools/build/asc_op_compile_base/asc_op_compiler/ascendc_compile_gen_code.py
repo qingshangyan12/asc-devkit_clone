@@ -427,7 +427,7 @@ def _gen_compile_cmd(
     Generate the compile command for the v100/v200 compiler.
     :param src_file: the source file
     :param dst_file: the destination file
-    :param extra_options: the extra options
+    :param compile_option_tuple: the compile option tuple
     :param with_tiling_file: whether with the tiling file
     :return: the compile command
     """
