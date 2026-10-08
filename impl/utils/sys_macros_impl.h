@@ -53,11 +53,11 @@
 #define K_MAX_SHAPE_DIM 8
 #endif
 
-#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
+#if (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)))
 #define SPLIT_CORE_CUBE
 #endif
 
-#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510))
+#if (defined(__DAV_VEC__) && (__NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)))
 #define SPLIT_CORE_VEC
 #endif
 
@@ -115,7 +115,7 @@ constexpr int32_t g_coreType = AscendC::MIX;
 #define __ASC_USE_RESERVED_UBUF_2201(msg)
 #endif
 
-#if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__ASC_DISABLE_RESERVED_UBUF__) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #define __ASC_USE_RESERVED_UBUF_3510(msg) __ASC_RESERVED_UBUF_UNAVAILABLE_ATTR__(msg)
 #else
 #define __ASC_USE_RESERVED_UBUF_3510(msg)

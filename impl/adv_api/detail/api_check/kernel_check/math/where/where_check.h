@@ -23,7 +23,7 @@
 #define IMPL_API_CHECK_KERNEL_CHECK_MATH_WHERE_WHERE_CHECK_H_
 
 #if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
 #include "where_check_aicore.h"
 #endif
 
@@ -35,7 +35,7 @@ __aicore__ inline void CheckFuncWhere(
     const uint32_t count)
 {
 #if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     CheckFuncClassWhere<T, U, S, V> checkFun(name);
     checkFun.VerifyingParameters(dst, src0, src1, condition, count);
 #endif

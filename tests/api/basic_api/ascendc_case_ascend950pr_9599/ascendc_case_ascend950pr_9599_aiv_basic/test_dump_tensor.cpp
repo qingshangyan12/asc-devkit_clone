@@ -14,7 +14,7 @@
 #include "kernel_operator.h"
 #include "utils/debug/asc_dump.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(ASCENDC_CPU_DEBUG)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) && !defined(ASCENDC_CPU_DEBUG)
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_dump_utils.h"
 #define ASCENDC_TEST_HAS_SIMD_VF_DUMP_POSITION 1
 #endif
