@@ -50,6 +50,8 @@ static const std::map<std::string, SocVersion> convertMap{
     {"Ascend910_93", SocVersion::ASCEND910B},
     {"Ascend310B", SocVersion::ASCEND310B},
     {"Ascend950", SocVersion::ASCEND950},
+    {"Ascend960DT", SocVersion::ASCEND960DT},
+    {"Ascend960PR", SocVersion::ASCEND960PR},
     {"Ascend350", SocVersion::ASCEND350},
     {"AS31XM1", SocVersion::AS31XM1},
     {"Ascend031", SocVersion::ASCEND031},
@@ -375,6 +377,19 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend950DT_9576", "Ascend950"},
     {"Ascend950DT_9577", "Ascend950"},
     {"Ascend950DT_9578", "Ascend950"}, // ascend950_list
+    {"Ascend960DT", "Ascend960DT"},
+    {"Ascend960DT_969B5", "Ascend960DT"},
+    {"Ascend960DT_968B7", "Ascend960DT"},
+    {"Ascend960DT_966B7", "Ascend960DT"},
+    {"Ascend960DT_969B6", "Ascend960DT"},
+    {"Ascend960DT_966B8", "Ascend960DT"},
+    {"Ascend960DT_966B8Z", "Ascend960DT"},
+    {"Ascend960DT_961BZ", "Ascend960DT"},
+    {"Ascend960DT_961BY", "Ascend960DT"}, // ascend960DT_list
+    {"Ascend960PR", "Ascend960PR"},
+    {"Ascend960PR_969A1", "Ascend960PR"},
+    {"Ascend960PR_963A1", "Ascend960PR"},
+    {"Ascend960PR_964A1", "Ascend960PR"}, // ascend960PR_list
     {"Ascend350_354f", "Ascend350"},
     {"Ascend350_355e", "Ascend350"}, // ascend350_list
     {"MC62CM12AA", "MC62"},
@@ -407,6 +422,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
 const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
     {"Ascend910B", "2201"}, // ascend910b_list
     {"Ascend910", "1001"},   {"Ascend310P", "2002"},   {"Ascend310B", "3002"},   {"Ascend950", "3510"},
+    {"Ascend960DT", "9201"}, {"Ascend960PR", "9202"},
     {"Ascend350", "3510"},   {"MC62", "5102"},         {"KirinX90", "3003"},     {"Kirin9030", "3113"},
     {"MC32DM11A", "5102"},   {"KirinDev0000", "5101"}, {"KirinDev0001", "5161"}, {"KirinDev0002", "5165"},
     {"KirinDev0003", "5163"}};

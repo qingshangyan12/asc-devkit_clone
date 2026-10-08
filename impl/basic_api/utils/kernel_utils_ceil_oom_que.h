@@ -30,7 +30,7 @@ __aicore__ constexpr inline uint32_t ConstCeil(uint32_t a, uint32_t b) { return 
 
 __aicore__ constexpr inline uint32_t Ceil(uint32_t a, uint32_t b) { return (a + b - 1) / b; }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) ||  \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) ||  \
                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) ||  \
                               (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)) || \
     defined(__ASC_NPU_HOST__)
@@ -400,7 +400,7 @@ __aicore__ constexpr TQueConfig GetTQueConfig(const TQueConfig* conf)
         .enableLoopQueue = conf->enableLoopQueue};
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)) || \
     defined(__ASC_NPU_HOST__)
 __aicore__ constexpr bool UseAltBufId(TPosition queDstPos, TPosition dstConsumerPos, uint32_t consumerSize)
 {
@@ -504,7 +504,7 @@ __aicore__ constexpr bool SupportBytes()
 using complex32 = AscendC::Complex<half>;
 using complex64 = AscendC::Complex<float>;
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) ||                          \
     defined(__ASC_NPU_HOST__)
 namespace AscendC {
