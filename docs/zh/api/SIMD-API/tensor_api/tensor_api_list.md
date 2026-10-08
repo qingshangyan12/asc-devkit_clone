@@ -110,7 +110,9 @@
 | [deinterleave（掩码寄存器解交织）](reg_vector_compute/mask_reg_compute/deinterleave.md) | 将两个Mask寄存器按指定元素宽度解交织，返回偶数组和奇数组结果。 |
 | [load](reg_vector_compute/reg_data_load/load.md) | 将UB中的数据搬入`reg_tensor`，支持多种数据排列方式。 |
 | [load_broadcast](reg_vector_compute/reg_data_load/load_broadcast.md) | 从UB搬入数据，并按指定模式广播到`reg_tensor`。 |
+| [load_gather](reg_vector_compute/reg_data_load/load_gather.md) | 根据索引从UB Tensor的离散位置收集数据到`reg_tensor`。 |
 | [store](reg_vector_compute/reg_data_store/store.md) | 将`reg_tensor`中的数据搬出到UB，支持多种数据排列方式。 |
+| [store_scatter](reg_vector_compute/reg_data_store/store_scatter.md) | 根据索引将`reg_tensor`中的有效元素分散写入UB Tensor。 |
 | [cast](reg_vector_compute/type_conversion/cast.md) | 转换寄存器数据类型，支持配置数据排布、舍入和饱和模式。 |
 | [trunc](reg_vector_compute/type_conversion/trunc.md) | 将Mask选中的浮点元素向零取整，并保留原数据类型。 |
 | [abs](reg_vector_compute/basic_arithmetic/abs.md) | 对源操作数逐元素计算绝对值。 |
