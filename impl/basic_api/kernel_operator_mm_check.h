@@ -150,8 +150,8 @@ __aicore__ inline void CheckFixpipeQuantPreCommon(const QuantMode_t quantPre, co
                                                     "Failed to check quantPre value in %s, when src is float and dst "
                                                     "is half, supported value is F322F16.\n",
                                                     apiName));
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || \
+                              (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     } else if constexpr (IsSameType<PrimT<U>, float>::value && IsSameType<PrimT<T>, bfloat16_t>::value) {
         ASCENDC_DEBUG_ASSERT(
             (quantPre == QuantMode_t::F322BF16),
@@ -575,7 +575,8 @@ __aicore__ static inline void CheckLoadData3dv2ChannelSize(const uint16_t channe
     }
 #elif defined(__NPU_ARCH__) &&                                                                               \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102 || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     if constexpr (IsSameType<PrimT<T>, half>::value) {
         uint16_t remainderList[] = {0, 4, 8};

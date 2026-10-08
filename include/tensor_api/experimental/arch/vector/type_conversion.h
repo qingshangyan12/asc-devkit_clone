@@ -54,7 +54,7 @@ __simd_callee__ inline reg_tensor<T> trunc(const reg_tensor<T>& src);
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/tensor_api/experimental/arch/vector/type_conversion_impl.h"
 #endif
 
