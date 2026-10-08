@@ -37,6 +37,8 @@
 #include "dav_3510/kernel_operator_vec_scatter_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_scatter_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_vec_scatter_impl.h"
 #elif (__NPU_ARCH__ == 3003)
 #include "dav_l300/kernel_operator_vec_scatter_impl.h"
 #elif (__NPU_ARCH__ == 3113)
@@ -49,7 +51,7 @@ template <typename T>
 __aicore__ inline void ScatterCheck()
 {
     using PrimType = PrimT<T>;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     ASCENDC_ASSERT(
         (SupportType<
             PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t, uint64_t,
@@ -158,7 +160,7 @@ __aicore__ inline void Scatter(
     using PrimType = PrimT<T>;
     ScatterCheck<T>();
     uint32_t vectorRegWidth = 256;
-#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
     ScatterImpl(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ uint32_t*)dstOffset.GetPhyAddr(), dstBaseAddr, count);
@@ -199,6 +201,32 @@ __aicore__ inline void Scatter(
             DEFAULT_REPEAT_STRIDE);
     }
 #endif
+#endif
+}
+/*
+ * @ingroup scatter Level 0
+ * @brief scatter element from src to global dst according to offsetSrc
+ * @param [out] dst output GlobalTensor
+ * @param [in] src input LocalTensor
+ * @param [in] offsetSrc input LocalTensor, offset type is int32_t or int64_t
+ * @param [in] scatterParam scatter parameters, including offsetNum, burstLen and dstStride
+ */
+template <typename T, typename U>
+__aicore__ inline void ScatterToGlobal(
+    const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offsetSrc,
+    ScatterParams& scatterParam)
+{
+    using PrimType = PrimT<T>;
+    using OffsetPrimType = PrimT<U>;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+    const uint8_t cacheMode = ExtractCacheMode(dst);
+    ScatterToGlobalImpl(
+        (__gm__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
+        (__ubuf__ OffsetPrimType*)offsetSrc.GetPhyAddr(), scatterParam, cacheMode);
+#else
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "ScatterToGlobal is not supported on current device");
+    });
 #endif
 }
 } // namespace AscendC
