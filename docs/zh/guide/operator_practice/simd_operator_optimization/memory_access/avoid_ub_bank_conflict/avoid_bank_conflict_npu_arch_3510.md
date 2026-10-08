@@ -11,6 +11,7 @@
 Unified Buffer（UB）缓存总大小为256KB，包含8个bank group，每个bank group包含2个bank。每个bank大小为16KB，由512行组成，每行长度为32B，采用低位地址交织。
 
 UB的地址编码格式：
+
 ```
 UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
 ```
@@ -42,6 +43,7 @@ UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
 **注：bank冲突的场景与UB的规格密切相关，规格的变化通常会导致bank冲突场景的变化。**
 
 ### 基于连续访存的bank冲突分析
+
 以下对连续访存的冲突类型进行解读：
 
 -   读写冲突
@@ -239,6 +241,7 @@ UB_ADDR[18:0] = {BANK_DEPTH[8:0], BANK[0], BG[2:0], BANK_WIDTH[4:0]}
     </table>
 
 ### 基于离散访存的bank冲突分析
+
 以下对离散访存下的冲突进行解读：
 
 -   当gather/scatter访存数据分布在不同的subbank中时，不发生冲突。

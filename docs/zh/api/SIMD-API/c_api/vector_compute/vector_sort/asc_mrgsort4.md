@@ -49,7 +49,7 @@ __aicore__ inline void asc_mrgsort4(__ubuf__ <dtype>* dst,
 
 ### dtype支持数据类型
 
-`dtype`支持的数据类型为`half`、`float`，源操作数与目的操作数的指针类型须一致。
+`dtype`取值为：`half`、`float`，源操作数与目的操作数的指针类型须一致。
 
 ### 函数原型典型示例
 
@@ -120,6 +120,7 @@ PIPE_V
 <!-- end id12 -->
 
 <!-- npu="950" id8 -->
+
 ## 调用示例
 
 以下示例将256个乱序float类型score及其index分别作为输入，通过[asc_bitsort](asc_bitsort.md)与`asc_mrgsort4`配合完成全局降序排序，每个输出数据单元包含一个score及其对应的index，占8字节，总体计算流程为：

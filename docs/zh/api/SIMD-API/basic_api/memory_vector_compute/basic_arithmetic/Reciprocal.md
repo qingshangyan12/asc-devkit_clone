@@ -26,10 +26,10 @@
 - Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Reciprocal_res.md#id1 -->
 
@@ -57,10 +57,10 @@
 - Atlas训练系列产品：不支持
 <!-- end id16 -->
 <!-- npu="x90" id17 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id17 -->
 <!-- npu="9030" id18 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id18 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Reciprocal_res.md#id2 -->
 
@@ -164,10 +164,10 @@ $dst_i = \frac{1}{src_i}$
 - 针对Atlas训练系列产品，T支持的数据类型为：half、float。
 <!-- end id25 -->
 <!-- npu="x90" id26 -->
-- 针对Kirin X90，T支持的数据类型为：half、float。
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id26 -->
 <!-- npu="9030" id27 -->
-- 针对Kirin 9030，T支持的数据类型为：half、float。
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：half、float。
 <!-- end id27 -->
 
 ## 返回值说明<a name="section15227195416231"></a>
@@ -204,6 +204,7 @@ $dst_i = \frac{1}{src_i}$
 - 使用Reciprocal时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md)替代实现。
 
 <!-- npu="950" id35 -->
+
 ## 关键特性<a id="reciprocal-key-features"></a>
 
 针对Ascend 950PR&950DT系列产品，有如下关键特性：
