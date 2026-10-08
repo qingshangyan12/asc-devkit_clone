@@ -156,8 +156,7 @@ __simd_callee__ inline void CastOperator(RegTensor<T>& dstReg, RegTensor<U>& src
 {
     constexpr bool partCondition = SupportType<
         Tuple<T, U>, Tuple<int16_t, float>, Tuple<uint8_t, half>, Tuple<int8_t, half>, Tuple<int32_t, bfloat16_t>,
-        Tuple<int64_t, float>, Tuple<half, float>, Tuple<bfloat16_t, float>, Tuple<hifloat8_t, half>,
-        Tuple<fp8_e8m0_t, bfloat16_t>>();
+        Tuple<half, float>, Tuple<bfloat16_t, float>, Tuple<hifloat8_t, half>, Tuple<fp8_e8m0_t, bfloat16_t>>();
     constexpr bool conditionNoneToRint =
         SupportType<Tuple<T, U>, Tuple<half, float>, Tuple<int8_t, half>, Tuple<uint8_t, half>>();
     constexpr bool conditionNoNone = SupportType<Tuple<T, U>, Tuple<bfloat16_t, float>>();
