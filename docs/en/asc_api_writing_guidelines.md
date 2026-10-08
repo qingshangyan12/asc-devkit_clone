@@ -478,7 +478,7 @@ The `ReduceSum` interface performs summation on all input data. The calculation 
 
 **Figure 1** `ReduceSum` Calculation Diagram<a id="fig1"></a>
 
-![ReduceSum Calculation Diagram](api/figures/ReduceSum_basic_api.png "ReduceSum Calculation Diagram")
+![ReduceSum Calculation Diagram](../zh/api/figures/ReduceSum_basic_api.png "ReduceSum Calculation Diagram")
 ```
 
 [Negative Example]
@@ -853,7 +853,7 @@ The usage description of DataCopy includes an illustration of the DataCopyParams
 ```text
 The following example demonstrates the usage of DataCopyParams structure parameters. The example completes the transfer of 2 continuous data blocks, each containing 8 datablocks, with no interval between adjacent data blocks of the source operand, and an interval of 1 datablock between the tail and head of adjacent data blocks of the destination operand.
 
-![DataCopyParams Structure Parameter Usage Diagram](api/figures/repeat-times.png)
+![DataCopyParams Structure Parameter Usage Diagram](../zh/api/figures/repeat-times.png)
 ```
 
 ## 7 Return Value Description
