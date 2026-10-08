@@ -11,6 +11,10 @@ project(ascendc_python_tests)
 cmake_minimum_required(VERSION 3.16.0)
 add_subdirectory(ascendc_hidden)
 
+if(NOT EXISTS ${CMAKE_BINARY_DIR}/scripts/package/asc-devkit/asc_devkit_version.h)
+    include(${ASCENDC_DIR}/cmake/version_info.cmake)
+endif()
+
 set(INSTALL_PATH ${CMAKE_BINARY_DIR})
 set(DST_PATH adapter_ut)
 
