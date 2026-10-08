@@ -95,27 +95,25 @@ __simd_callee__ inline void check_binary_reg_types()
 {
     if constexpr (is_reg_tensor_v<T> && is_reg_tensor_v<U>) {
         static_assert(Std::is_same_v<reg_elem_t<T>, reg_elem_t<U>>,
-            "the reg_tensor operands must have the same element type");
+                      "the reg_tensor operands must have the same element type");
     }
 }
 
 template <typename T>
-inline constexpr bool supports_abs_v =
-    ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
+inline constexpr bool supports_abs_v = ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_float_math_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
-inline constexpr bool supports_neg_v =
-    ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
+inline constexpr bool supports_neg_v = ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_relu_v = ::AscendC::Std::is_one_of_v<T, half, int32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_add_sub_v =
-        ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
+    ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_carry_v = ::AscendC::Std::is_one_of_v<T, int32_t, uint32_t>;
@@ -133,25 +131,24 @@ inline constexpr bool supports_mul_scalar_v =
 
 template <typename T>
 inline constexpr bool supports_min_max_v =
-        ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
+    ::AscendC::Std::is_one_of_v<T, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_div_v =
     ::AscendC::Std::is_one_of_v<T, int16_t, uint16_t, half, int32_t, uint32_t, float>;
 
 template <typename T>
-inline constexpr bool supports_not_v =
-    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t,
-        uint32_t, float>;
+inline constexpr bool supports_not_v = ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half,
+                                                                   bfloat16_t, int32_t, uint32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_and_v =
-    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
-        half, bfloat16_t, int32_t, uint32_t, float>;
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t,
+                                int32_t, uint32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_or_v =
-        ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>;
+    ::AscendC::Std::is_one_of_v<T, bool, int8_t, uint8_t, int16_t, uint16_t, half, int32_t, uint32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_xor_v =
@@ -163,9 +160,9 @@ inline constexpr bool supports_shift_v =
 
 template <typename T, typename shift_type>
 inline constexpr bool supports_shift_pair_v =
-    (::AscendC::Std::is_one_of_v<T, int8_t, uint8_t> && ::AscendC::Std::is_same_v<shift_type, int8_t>) ||
-    (::AscendC::Std::is_one_of_v<T, int16_t, uint16_t> && ::AscendC::Std::is_same_v<shift_type, int16_t>) ||
-    (::AscendC::Std::is_one_of_v<T, int32_t, uint32_t> && ::AscendC::Std::is_same_v<shift_type, int32_t>);
+    (::AscendC::Std::is_one_of_v<T, int8_t, uint8_t> && ::AscendC::Std::is_same_v<shift_type, int8_t>)
+    || (::AscendC::Std::is_one_of_v<T, int16_t, uint16_t> && ::AscendC::Std::is_same_v<shift_type, int16_t>)
+    || (::AscendC::Std::is_one_of_v<T, int32_t, uint32_t> && ::AscendC::Std::is_same_v<shift_type, int32_t>);
 
 template <typename T>
 inline constexpr bool supports_axpy_v = ::AscendC::Std::is_one_of_v<T, half, float>;

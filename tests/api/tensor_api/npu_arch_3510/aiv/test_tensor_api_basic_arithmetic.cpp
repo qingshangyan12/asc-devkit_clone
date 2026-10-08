@@ -24,116 +24,168 @@ using reg_type = asc::te::experimental::reg_tensor<T>;
 template <typename T>
 void check_unary_arithmetic()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::abs(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::neg(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::abs(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::neg(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
 }
 
 template <typename T>
 void check_float_math()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::exp(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::sqrt(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::log(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::ln(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::log2(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::log10(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::prelu(
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::leaky_relu(
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const T&>())), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::exp(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::sqrt(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::log(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::ln(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::log2(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::log10(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::prelu(AscendC::Std::declval<const reg_type<T>&>(),
+                                                                      AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::leaky_relu(AscendC::Std::declval<const reg_type<T>&>(),
+                                                                           AscendC::Std::declval<const T&>())),
+                                reg_type<T>>);
 }
 
 template <typename T>
 void check_relu()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(
-        asc::te::experimental::relu(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::relu(AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
 }
 
 template <typename T>
 void check_add_sub()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() + AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() + AscendC::Std::declval<const T&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const T&>() + AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() - AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() - AscendC::Std::declval<const T&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const T&>() - AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
+                                                   + AscendC::Std::declval<const reg_type<T>&>()),
+                                          reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(AscendC::Std::declval<const reg_type<T>&>() + AscendC::Std::declval<const T&>()), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(AscendC::Std::declval<const T&>() + AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
+                                                   - AscendC::Std::declval<const reg_type<T>&>()),
+                                          reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(AscendC::Std::declval<const reg_type<T>&>() - AscendC::Std::declval<const T&>()), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(AscendC::Std::declval<const T&>() - AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
 }
 
 template <typename T>
 void check_register_mul()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() * AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
+                                                   * AscendC::Std::declval<const reg_type<T>&>()),
+                                          reg_type<T>>);
 }
 
 template <typename T>
 void check_scalar_mul_and_div()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() * AscendC::Std::declval<const T&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const T&>() * AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() / AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const reg_type<T>&>() / AscendC::Std::declval<const T&>()), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(
-        AscendC::Std::declval<const T&>() / AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(AscendC::Std::declval<const reg_type<T>&>() * AscendC::Std::declval<const T&>()), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(AscendC::Std::declval<const T&>() * AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(AscendC::Std::declval<const reg_type<T>&>()
+                                                   / AscendC::Std::declval<const reg_type<T>&>()),
+                                          reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(AscendC::Std::declval<const reg_type<T>&>() / AscendC::Std::declval<const T&>()), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(AscendC::Std::declval<const T&>() / AscendC::Std::declval<const reg_type<T>&>()), reg_type<T>>);
 }
 
 template <typename T>
 void check_min_max()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::max(
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::max(
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const T&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::max(
-        AscendC::Std::declval<const T&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::min(
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::min(
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const T&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::min(
-        AscendC::Std::declval<const T&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::max(AscendC::Std::declval<const reg_type<T>&>(),
+                                                                    AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::max(AscendC::Std::declval<const reg_type<T>&>(),
+                                                                    AscendC::Std::declval<const T&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::max(AscendC::Std::declval<const T&>(),
+                                                                    AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::min(AscendC::Std::declval<const reg_type<T>&>(),
+                                                                    AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::min(AscendC::Std::declval<const reg_type<T>&>(),
+                                                                    AscendC::Std::declval<const T&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::min(AscendC::Std::declval<const T&>(),
+                                                                    AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
 }
 
 template <typename T>
 void check_carry()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::add(AscendC::Std::declval<reg_type<bool>&>(),
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::add_c(AscendC::Std::declval<reg_type<bool>&>(),
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-        AscendC::Std::declval<const reg_type<bool>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::sub(AscendC::Std::declval<reg_type<bool>&>(),
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::sub_c(AscendC::Std::declval<reg_type<bool>&>(),
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>(),
-        AscendC::Std::declval<const reg_type<bool>&>())), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::add(AscendC::Std::declval<reg_type<bool>&>(),
+                                                                    AscendC::Std::declval<const reg_type<T>&>(),
+                                                                    AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::add_c(AscendC::Std::declval<reg_type<bool>&>(),
+                                                                      AscendC::Std::declval<const reg_type<T>&>(),
+                                                                      AscendC::Std::declval<const reg_type<T>&>(),
+                                                                      AscendC::Std::declval<const reg_type<bool>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::sub(AscendC::Std::declval<reg_type<bool>&>(),
+                                                                    AscendC::Std::declval<const reg_type<T>&>(),
+                                                                    AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::sub_c(AscendC::Std::declval<reg_type<bool>&>(),
+                                                                      AscendC::Std::declval<const reg_type<T>&>(),
+                                                                      AscendC::Std::declval<const reg_type<T>&>(),
+                                                                      AscendC::Std::declval<const reg_type<bool>&>())),
+                                reg_type<T>>);
 }
 
 template <typename T>
 void check_mull()
 {
-    static_assert(AscendC::Std::is_same_v<decltype(asc::te::experimental::mull(AscendC::Std::declval<reg_type<T>&>(),
-        AscendC::Std::declval<const reg_type<T>&>(), AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::mull(AscendC::Std::declval<reg_type<T>&>(),
+                                                                     AscendC::Std::declval<const reg_type<T>&>(),
+                                                                     AscendC::Std::declval<const reg_type<T>&>())),
+                                reg_type<T>>);
 }
 
 template <typename T>

@@ -93,40 +93,35 @@ template <typename T, typename ScalarType>
 __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const ScalarType& slope);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> add(reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add_c(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
-    const reg_tensor<bool>& carry_src);
+__simd_callee__ inline reg_tensor<T> add_c(reg_tensor<bool>& carry, const reg_tensor<T>& src0,
+                                           const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> sub(reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub_c(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
-    const reg_tensor<bool>& carry_src);
+__simd_callee__ inline reg_tensor<T> sub_c(reg_tensor<bool>& carry, const reg_tensor<T>& src0,
+                                           const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src);
 
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> add_carry(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src);
+__simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1,
+                                                   const reg_tensor<bool>& carry_src);
 
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> sub_carry(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src);
+__simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1,
+                                                   const reg_tensor<bool>& borrow_src);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> mull(
-    reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> mull(reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_tensor<T>& src1);

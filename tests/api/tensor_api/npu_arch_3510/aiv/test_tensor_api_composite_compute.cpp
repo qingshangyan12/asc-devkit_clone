@@ -122,11 +122,11 @@ __aicore__ inline void test_muls_cast()
     EXPECT_EQ(odd_dst.mask, src.mask);
 }
 
-#define COMPOSITE_COMPUTE_TEST(Function, DataType)                          \
-    TEST_F(tensor_api_vector_composite_compute_3510, Function##_##DataType) \
-    {                                                                       \
-        test_##Function<DataType>();                                        \
-        SUCCEED();                                                          \
+#define COMPOSITE_COMPUTE_TEST(Function, DataType)                                                                     \
+    TEST_F(tensor_api_vector_composite_compute_3510, Function##_##DataType)                                            \
+    {                                                                                                                  \
+        test_##Function<DataType>();                                                                                   \
+        SUCCEED();                                                                                                     \
     }
 
 COMPOSITE_COMPUTE_TEST(axpy, half)

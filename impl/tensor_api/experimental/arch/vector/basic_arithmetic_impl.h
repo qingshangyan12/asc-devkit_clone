@@ -249,9 +249,8 @@ template <typename T, typename ScalarType>
 __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const ScalarType& slope)
 {
     static_assert(detail::supports_float_math_v<T>, "leaky_relu supports half and float");
-    static_assert(!is_reg_tensor_v<ScalarType> &&
-            Std::is_convertible_v<Std::remove_cvref_t<ScalarType>, T>,
-        "leaky_relu requires a scalar convertible to the reg_tensor element type");
+    static_assert(!is_reg_tensor_v<ScalarType> && Std::is_convertible_v<Std::remove_cvref_t<ScalarType>, T>,
+                  "leaky_relu requires a scalar convertible to the reg_tensor element type");
     reg_tensor<T> dst;
     asc_leakyrelu(dst.reg, src.reg, static_cast<T>(slope), src.mask);
     dst.mask = src.mask;
@@ -259,8 +258,7 @@ __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const 
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> add(reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_carry_v<T>, "add with carry supports int32_t and uint32_t");
     reg_tensor<T> dst;
@@ -271,9 +269,8 @@ __simd_callee__ inline reg_tensor<T> add(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add_c(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
-    const reg_tensor<bool>& carry_src)
+__simd_callee__ inline reg_tensor<T> add_c(reg_tensor<bool>& carry, const reg_tensor<T>& src0,
+                                           const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src)
 {
     static_assert(detail::supports_carry_v<T>, "add_c supports int32_t and uint32_t");
     reg_tensor<T> dst;
@@ -284,8 +281,7 @@ __simd_callee__ inline reg_tensor<T> add_c(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> sub(reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_carry_v<T>, "sub with carry supports int32_t and uint32_t");
     reg_tensor<T> dst;
@@ -296,9 +292,8 @@ __simd_callee__ inline reg_tensor<T> sub(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> sub_c(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
-    const reg_tensor<bool>& carry_src)
+__simd_callee__ inline reg_tensor<T> sub_c(reg_tensor<bool>& carry, const reg_tensor<T>& src0,
+                                           const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src)
 {
     static_assert(detail::supports_carry_v<T>, "sub_c supports int32_t and uint32_t");
     reg_tensor<T> dst;
@@ -320,8 +315,8 @@ __simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, co
 }
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> add_carry(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src)
+__simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1,
+                                                   const reg_tensor<bool>& carry_src)
 {
     static_assert(detail::supports_carry_v<T>, "add_carry supports int32_t and uint32_t");
     reg_pair<T, bool> result;
@@ -343,8 +338,8 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, co
 }
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> sub_carry(
-    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src)
+__simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1,
+                                                   const reg_tensor<bool>& borrow_src)
 {
     static_assert(detail::supports_carry_v<T>, "sub_carry supports int32_t and uint32_t");
     reg_pair<T, bool> result;
@@ -355,8 +350,7 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(
 }
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> mull(
-    reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+__simd_callee__ inline reg_tensor<T> mull(reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1)
 {
     static_assert(detail::supports_mull_v<T>, "mull supports int32_t and uint32_t");
     reg_tensor<T> low;
