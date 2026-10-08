@@ -19,7 +19,7 @@
 
 为避免分支切换产生的开销，编译器可通过predicate优化对简单分支进行改写，将分支体内的指令改写为带谓词的指令，Warp内32个线程**全部发射**，指令流保持一条直线，仅谓词为真的线程写回结果，谓词为假的线程丢弃结果（不写回寄存器、不产生访存副作用）。出现warp divergence时，各分支只能串行执行，执行某一分支时，未进入该分支的线程被活跃线程掩码屏蔽、空转等待；硬件将汇合点地址与各方向的活跃线程掩码压入分支栈，全部分支执行完毕后在汇合点重新汇合。predicate优化可以消除跳转和分支栈开销，提高算子性能。
 
-【样例介绍】样例以[hlog10](../../../../api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个half元素为输入。对比不同特殊值处理方式的性能差异，展示predicate优化的收益来源。
+【样例介绍】样例以[hlog10](../../../../api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个避开6个特殊值的正常half元素为输入。对比不同特殊值处理写法在正常值路径上的分支开销，展示predicate优化的收益来源。
 
 【反例】通过提前return的方式处理精度异常的特殊值。
 
@@ -86,7 +86,7 @@ __aicore__ inline half hlog10(half x)
 | :---------------: | :--------------: | :--------------: |
 |      224        |     2.233       |      2498.75      |
 
-为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程。Task Duration与aiv_total_cycles为msOpProf 3次采集中位数，aiv_total_cycles取8个block的平均值。
+为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程，并取32个线程中的最大值。Task Duration与aiv_total_cycles为msOpProf 3次采集中位数，aiv_total_cycles取8个block的平均值。
 
 【正例】先完整执行正常值路径得到临时变量temp，然后逐级覆盖临时变量处理精度异常的特殊值。
 
@@ -118,8 +118,6 @@ __aicore__ inline half hlog10(half x)
 | execute cycle | Task Duration(μs) | aiv_total_cycles |
 | :---------------: | :--------------: | :--------------: |
 |      190       |     2.259       |      2475.50      |
-
-提前return在实际场景中很难触发：SIMT代码实际以warp为单位执行，必须warp内所有线程的数据都是特殊值才能提前return，从概率上可以忽略不计，绝大部分场景下，特殊值线程需要等其他线程完成计算后再一起往下执行。通过临时变量存储中间值，逐级覆盖最后统一return这种写法，可以引导编译器进行predicate优化，消除跳转与分支栈开销，相比反例的224，execute cycle降至190，下降约15.2%；Task Duration基本持平，aiv_total_cycles从2498.75降至2475.50。
 
 predicate优化通过消除跳转与分支栈开销提高性能，但复杂逻辑编译器不会用predicate优化，因此异常值处理这类简单分支建议使用predicate优化。predicate优化会执行所有分支的所有指令，divergence机制只执行必要的路径。若某分支命中率较高，使用predicate优化时这部分线程会多执行大量无用指令，会造成性能损失，此时使用divergence可以节省计算开销。后续样例将对不同命中率的分支采用不同处理方式，展示predicate优化的适用范围。
 
