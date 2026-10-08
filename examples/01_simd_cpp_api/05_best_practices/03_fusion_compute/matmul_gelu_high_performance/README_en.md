@@ -8,9 +8,9 @@ This example demonstrates Cube-Vector (CV) fusion implementation based on the st
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.2.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.2.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
+| Atlas A3 products | >= CANN 9.2.0 |
+| Atlas A2 products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -285,7 +285,7 @@ AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 
 > The following data is based on msOpProf tool measurement, taking the median of 5 runs. Matrix specifications M=8192, K=8192, N=8192, input data type float16, output data type float32.
 
-##### Atlas A2 Training Series Chip
+##### Atlas A2 products Chip
 
 - singleCoreM=2048, singleCoreN=1536, 24 cores
 

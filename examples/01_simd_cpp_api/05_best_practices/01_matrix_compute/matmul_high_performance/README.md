@@ -9,9 +9,9 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
+| Atlas A3系列产品 | >= CANN 9.0.0 |
+| Atlas A2系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -445,7 +445,7 @@ Matmul理论性能评估的关键参数为：Cube计算性能和MTE2带宽。
 
 #### Cube计算性能分析
 
-样例参数：M=N=K=8192，baseM=128，baseN=256，baseK=64。本样例性能数据在Atlas A2训练系列产品上测试，该计算芯片主频为1.85GHz，每cycle处理16×16×16次乘加运算。
+样例参数：M=N=K=8192，baseM=128，baseN=256，baseK=64。本样例性能数据在Atlas A2系列产品上测试，该计算芯片主频为1.85GHz，每cycle处理16×16×16次乘加运算。
 
 Cube理论计算时间：
 $$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_num \times cube\_freq} = \frac{8192 \times 8192 \times 8192}{16 \times 16 \times 16 \times 24 \times 1850} = 3022.92\mu s$$
@@ -566,7 +566,7 @@ $$MTE2耗时误差 = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.7
   |------|--------|------|
   | `SCENARIO_NUM` | `0`-`8` | 样例类型（0-8），默认为0 |
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2系列产品和 Atlas A3系列产品，dav-3510 对应 Ascend 950PR&950DT系列产品 |
 
   执行结果如下，说明精度对比成功。
   ```bash

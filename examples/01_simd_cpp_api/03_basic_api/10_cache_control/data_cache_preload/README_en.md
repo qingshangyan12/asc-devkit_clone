@@ -7,9 +7,9 @@
 
 | Product | CANN Software Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -143,7 +143,7 @@ When profiling with `msprof`, compare the execution time of the two kernels:
 
 The following performance data is the average of 5 independent runs to eliminate random fluctuations.
 
-#### Atlas A2 Training Series Products (dav-2201 Architecture)
+#### Atlas A2 products (dav-2201 Architecture)
 
 | Metric | kernel_no_preload | kernel_with_preload | Improvement |
 |------|------------------|---------------------|---------|
@@ -161,7 +161,7 @@ Metric descriptions:
 **Task Duration**: End-to-end kernel execution time, the most direct performance indicator.
 **aiv_scalar_time**: Scalar unit execution time; in indirect index scenarios, Scalar memory access is the main bottleneck.
 
-#### Detailed Data from 5 Independent Runs (Atlas A2 Training Series)
+#### Detailed Data from 5 Independent Runs (Atlas A2 products)
 
 | Run | no_preload Duration(us) | with_preload Duration(us) | Speedup |
 |---------|------------------------|--------------------------|--------|
@@ -227,7 +227,7 @@ Execute the following steps in this sample's root directory.
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU, CPU debug, or NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | dav-2201 for Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 for Ascend 950 series |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | dav-2201 for Atlas A2 products and Atlas A3 products, dav-3510 for Ascend 950 series |
   | `SCENARIO_NUM` | `1` (default), `2` | Scenario: 1 (no preload), 2 (with preload) |
 
 - Result
