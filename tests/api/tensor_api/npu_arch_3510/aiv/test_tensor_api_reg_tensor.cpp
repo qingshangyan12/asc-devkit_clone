@@ -137,37 +137,37 @@ __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* d
     }
 }
 
-template <asc::te::experimental::gather_mode mode>
-__simd_vf__ inline void compile_reg_local_tensor_gather_scatter(
-    __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, vector_uint32_t value, vector_uint32_t index, vector_bool mask)
+template <typename T, typename Index, asc::te::experimental::gather_mode Mode>
+__simd_vf__ inline void CompileLoadGather(__ubuf__ T* src)
+{
+    auto layout = asc::te::make_layout(asc::te::make_shape(64));
+    auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
+    asc::te::experimental::reg_tensor<Index> index{};
+    asc::te::experimental::reg_tensor<bool> mask{};
+
+    auto gathered = asc::te::experimental::load_gather<Mode>(src_tensor, index, mask);
+    auto gathered_at = asc::te::experimental::load_gather<Mode>(src_tensor, asc::te::make_coord(0), index, mask);
+    static_assert(AscendC::Std::is_same_v<decltype(gathered), asc::te::experimental::reg_tensor<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(gathered_at), asc::te::experimental::reg_tensor<T>>);
+    (void)gathered;
+    (void)gathered_at;
+}
+
+template <typename T, typename Index>
+__simd_vf__ inline void CompileStoreScatter(__ubuf__ T* dst)
 {
     auto layout = asc::te::make_layout(asc::te::make_shape(64));
     auto dst_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst), layout);
-    auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
-
-    asc::te::experimental::reg_tensor<uint32_t> value_reg{mask};
-    value_reg.reg = value;
-    asc::te::experimental::reg_tensor<uint32_t> index_reg{};
-    index_reg.reg = index;
-    asc::te::experimental::reg_tensor<bool> gather_mask{};
-    gather_mask.reg = mask;
+    asc::te::experimental::reg_tensor<T> src{};
+    asc::te::experimental::reg_tensor<Index> index{};
 
     static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::store_scatter(dst_tensor, value_reg, index_reg)), void>);
+                  decltype(asc::te::experimental::store_scatter(dst_tensor, src, index)), void>);
     static_assert(
         AscendC::Std::is_same_v<
-            decltype(asc::te::experimental::store_scatter(dst_tensor, asc::te::make_coord(0), value_reg, index_reg)),
-            void>);
-    asc::te::experimental::store_scatter(dst_tensor, value_reg, index_reg);
-    asc::te::experimental::store_scatter(dst_tensor, asc::te::make_coord(0), value_reg, index_reg);
-
-    auto gathered = asc::te::experimental::load_gather<mode>(src_tensor, index_reg, gather_mask);
-    auto gathered_at =
-        asc::te::experimental::load_gather<mode>(src_tensor, asc::te::make_coord(0), index_reg, gather_mask);
-    static_assert(AscendC::Std::is_same_v<decltype(gathered), asc::te::experimental::reg_tensor<uint32_t>>);
-    static_assert(AscendC::Std::is_same_v<decltype(gathered_at), asc::te::experimental::reg_tensor<uint32_t>>);
-    (void)gathered;
-    (void)gathered_at;
+            decltype(asc::te::experimental::store_scatter(dst_tensor, asc::te::make_coord(0), src, index)), void>);
+    asc::te::experimental::store_scatter(dst_tensor, src, index);
+    asc::te::experimental::store_scatter(dst_tensor, asc::te::make_coord(0), src, index);
 }
 
 template <typename T>
@@ -199,6 +199,80 @@ __simd_vf__ inline void compile_reg_mask_data_reorder(vector_bool src0, vector_b
     static_assert(AscendC::Std::is_same_v<decltype(restored), asc::te::experimental::reg_pair<bool>>);
     (void)restored;
 }
+
+class TensorApiGatherScatter3510 : public testing::Test {};
+
+#define LOAD_GATHER_TEST(TestName, DataType, IndexType, Mode)                     \
+    TEST_F(TensorApiGatherScatter3510, LoadGather_##TestName##_##IndexType)        \
+    {                                                                              \
+        auto compile = &CompileLoadGather<DataType, IndexType,                     \
+            asc::te::experimental::gather_mode::Mode>;                             \
+        (void)compile;                                                              \
+        SUCCEED();                                                                  \
+    }
+
+#define LOAD_GATHER_ELEMENT_TEST(DataType, IndexType) \
+    LOAD_GATHER_TEST(Element_##DataType, DataType, IndexType, element)
+
+#define LOAD_GATHER_DATABLOCK_TEST(DataType) \
+    LOAD_GATHER_TEST(DataBlock_##DataType, DataType, uint32_t, data_block)
+
+#define STORE_SCATTER_TEST(DataType, IndexType)                               \
+    TEST_F(TensorApiGatherScatter3510, StoreScatter_##DataType##_##IndexType)  \
+    {                                                                          \
+        auto compile = &CompileStoreScatter<DataType, IndexType>;              \
+        (void)compile;                                                          \
+        SUCCEED();                                                              \
+    }
+
+LOAD_GATHER_ELEMENT_TEST(int8_t, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(uint8_t, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(int16_t, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(int16_t, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(uint16_t, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(uint16_t, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(half, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(half, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(bfloat16_t, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(bfloat16_t, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(int32_t, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(uint32_t, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(float, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(int64_t, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(uint64_t, uint32_t)
+LOAD_GATHER_ELEMENT_TEST(fp8_e4m3fn_t, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(fp8_e5m2_t, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(fp8_e8m0_t, uint16_t)
+LOAD_GATHER_ELEMENT_TEST(hifloat8_t, uint16_t)
+
+LOAD_GATHER_DATABLOCK_TEST(int8_t)
+LOAD_GATHER_DATABLOCK_TEST(uint8_t)
+LOAD_GATHER_DATABLOCK_TEST(int16_t)
+LOAD_GATHER_DATABLOCK_TEST(uint16_t)
+LOAD_GATHER_DATABLOCK_TEST(int32_t)
+LOAD_GATHER_DATABLOCK_TEST(uint32_t)
+LOAD_GATHER_DATABLOCK_TEST(int64_t)
+LOAD_GATHER_DATABLOCK_TEST(uint64_t)
+LOAD_GATHER_DATABLOCK_TEST(half)
+LOAD_GATHER_DATABLOCK_TEST(float)
+LOAD_GATHER_DATABLOCK_TEST(bfloat16_t)
+LOAD_GATHER_DATABLOCK_TEST(fp8_e4m3fn_t)
+LOAD_GATHER_DATABLOCK_TEST(fp8_e5m2_t)
+LOAD_GATHER_DATABLOCK_TEST(fp8_e8m0_t)
+LOAD_GATHER_DATABLOCK_TEST(hifloat8_t)
+LOAD_GATHER_DATABLOCK_TEST(int4x2_t)
+LOAD_GATHER_DATABLOCK_TEST(fp4x2_e2m1_t)
+LOAD_GATHER_DATABLOCK_TEST(fp4x2_e1m2_t)
+
+STORE_SCATTER_TEST(int8_t, uint16_t)
+STORE_SCATTER_TEST(uint8_t, uint16_t)
+STORE_SCATTER_TEST(int16_t, uint16_t)
+STORE_SCATTER_TEST(uint16_t, uint16_t)
+STORE_SCATTER_TEST(half, uint16_t)
+STORE_SCATTER_TEST(bfloat16_t, uint16_t)
+STORE_SCATTER_TEST(int32_t, uint32_t)
+STORE_SCATTER_TEST(uint32_t, uint32_t)
+STORE_SCATTER_TEST(float, uint32_t)
 
 TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
 {
