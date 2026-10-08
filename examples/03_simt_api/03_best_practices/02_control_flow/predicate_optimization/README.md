@@ -59,7 +59,7 @@
 
 - 样例功能
 
-  以[hlog10](../../../../../docs/zh/api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个half元素为输入。对比不同特殊值处理方式的性能差异，展示predicate优化的收益来源。
+  以[hlog10](../../../../../docs/zh/api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个避开6个特殊值的正常half元素为输入。对比不同特殊值处理写法在正常值路径上的分支开销，展示predicate优化的收益来源。
 
 - 样例规格：
   <table>
@@ -82,11 +82,11 @@
 
 |             字段名             | 字段含义                                             |
 |:---------------------------:|:-------------------------------------------------|
-|      execute cycle          | kernel内`clock()`采样到的单线程执行周期数，反映kernel指令流的长度与分支开销。          |
+|      execute cycle          | kernel内`clock()`采样到的执行周期数，采集时取32个线程中的最大值，反映kernel指令流的长度与分支开销。          |
 |      Task Duration(μs)      | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。          |
-|      aiv_total_cycles       | Task在Vector Core上执行所消耗的CPU周期（Cycle）数，性能数据表中取8个block的平均值。          |
+|      aiv_total_cycles       | 单个block在Vector Core上执行所消耗的CPU周期（Cycle）数，性能数据表中取8个block的平均值。          |
 
-为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程。Task Duration与aiv_total_cycles为msOpProf 3次采集中位数，aiv_total_cycles取8个block的平均值。
+为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程，并取32个线程中的最大值。Task Duration与aiv_total_cycles为msOpProf 3次采集中位数，aiv_total_cycles取8个block的平均值。
 
 ### Case 0: hlog10分支链divergence版本
 
