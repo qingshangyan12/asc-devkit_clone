@@ -1,4 +1,0 @@
-interface:
-  display_name: "OKF Tag 调研"
-  short_description: "自动化生成可审计的 API tag 词表候选。"
-  default_prompt: "使用 $okf-tag-research 为指定 API 范围执行自动化、独立复核的 tag taxonomy 调研。"

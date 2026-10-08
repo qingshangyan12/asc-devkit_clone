@@ -1,4 +1,0 @@
-interface:
-  display_name: "OKF YAML Generate"
-  short_description: "为 Ascend C API 文档生成并写入 slim OKF 头（5 字段，可推导字段不写）"
-  default_prompt: "使用 $okf-yaml-generate 对指定 C API 目录执行 prepare→标注→validate→write 管线，生成、校验并写入 slim OKF 头。"
