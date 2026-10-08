@@ -18,7 +18,7 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_CUBE_COMPUTE_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_CUBE_COMPUTE_INTF_IMPL_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/cube_compute_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/npu_arch_9201/cube_compute_intf_impl.h"
