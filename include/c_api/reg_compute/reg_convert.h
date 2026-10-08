@@ -20,6 +20,7 @@
 #ifndef INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #define INCLUDE_C_API_REG_COMPUTE_REG_CONVERT_H
 #include "c_api/defs/defs.h"
+#include "version/asc_devkit_version.h"
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
 #include "impl/c_api/reg_base_impl/reg_convert_intf_impl.h"
@@ -5887,7 +5888,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat(
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
         dst_quarter_pos);
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 // ==========9201 merging conversion interfaces (*_merge / *_sat_merge)==========
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask,
