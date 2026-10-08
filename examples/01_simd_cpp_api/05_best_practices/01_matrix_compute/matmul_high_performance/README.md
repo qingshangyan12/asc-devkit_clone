@@ -445,7 +445,7 @@ Matmul理论性能评估的关键参数为：Cube计算性能和MTE2带宽。
 
 #### Cube计算性能分析
 
-样例参数：M=N=K=8192，baseM=128，baseN=256，baseK=64。本样例性能数据在Atlas A2系列产品上测试，该计算芯片主频为1.85GHz，每cycle处理16×16×16次乘加运算。
+样例参数：M=N=K=8192，baseM=128，baseN=256，baseK=64。本样例性能数据在Atlas A2训练系列产品上测试，该计算芯片主频为1.85GHz，每cycle处理16×16×16次乘加运算。
 
 Cube理论计算时间：
 $$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_num \times cube\_freq} = \frac{8192 \times 8192 \times 8192}{16 \times 16 \times 16 \times 24 \times 1850} = 3022.92\mu s$$

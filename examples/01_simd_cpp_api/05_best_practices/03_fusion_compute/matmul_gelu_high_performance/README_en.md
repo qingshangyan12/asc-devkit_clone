@@ -285,7 +285,7 @@ AscendC::DataCopyPad<float>(cGM[gmOffset], geluOutUB, copyOutParams);
 
 > The following data is based on msOpProf tool measurement, taking the median of 5 runs. Matrix specifications M=8192, K=8192, N=8192, input data type float16, output data type float32.
 
-##### Atlas A2 products Chip
+##### Atlas A2 Training Series Chip
 
 - singleCoreM=2048, singleCoreN=1536, 24 cores
 
