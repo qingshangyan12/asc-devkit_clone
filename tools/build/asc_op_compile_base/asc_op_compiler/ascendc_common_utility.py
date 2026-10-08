@@ -563,18 +563,6 @@ class CommonUtility:
         return False
 
     @staticmethod
-    def is_920r1():
-        """return if current soc version is 920r1
-
-        Returns:
-            res: True means 920r1
-        """
-        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["Ascend960DT"]:
-            return True
-        return False
-
-    @staticmethod
     def is_has_ffts_mode():
         """return if current soc version is has ffts mode
 
@@ -585,6 +573,18 @@ class CommonUtility:
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
         if short_soc_version not in ["Ascend950", "Ascend350", "Ascend960DT"]:
+            return True
+        return False
+
+    @staticmethod
+    def is_920r1():
+        """return if current soc version is 920r1
+
+        Returns:
+            res: True means 920r1
+        """
+        short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
+        if short_soc_version in ["Ascend960DT"]:
             return True
         return False
 

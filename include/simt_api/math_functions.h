@@ -270,7 +270,7 @@ __aicore__ inline void asc_get_uintdiv_magic_and_shift(uint64_t* magic, uint64_t
 #endif
 
 #ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510)
 #ifndef ASCENDC_CPU_DEBUG
 static __callee__ long long max(long long x, long long y);
 

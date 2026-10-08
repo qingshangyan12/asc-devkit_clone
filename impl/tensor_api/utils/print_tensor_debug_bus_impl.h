@@ -28,7 +28,7 @@ namespace asc {
 namespace te {
 namespace detail {
 
-#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510)
 constexpr uint32_t DEBUG_BUS_MAX_WAIT_COUNT = 5U;
 constexpr uint32_t DEBUG_BUS_READY_MASK = 0x80000000U;
 constexpr uint64_t DEBUG_BUS_WAIT_CYCLES = 100U;
