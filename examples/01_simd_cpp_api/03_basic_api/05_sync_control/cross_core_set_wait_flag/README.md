@@ -191,14 +191,20 @@
 
 ```cpp
 if (blockIdx % 2 == 0) {
-    ...
+    AscendC::DataCopy(aLocal, aGM, A_BLOCKS_LENGTH);
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::Cast(castALocal, aLocal, AscendC::RoundMode::CAST_NONE, A_BLOCKS_LENGTH);
-    ...
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
     AscendC::DataCopy(AVectorGM, castALocal, A_BLOCKS_LENGTH);
 } else {
-    ...
+    AscendC::DataCopy(bLocal, bGM, B_BLOCKS_LENGTH);
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::Cast(castBLocal, bLocal, AscendC::RoundMode::CAST_NONE, B_BLOCKS_LENGTH);
-    ...
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
     AscendC::DataCopy(BVectorGM, castBLocal, B_BLOCKS_LENGTH);
 }
 // 模式2，每一个AI Core内部，一个AIC等2个AIV
@@ -220,18 +226,18 @@ $$
 
 ```cpp
 // 模式2，每一个AI Core内部，AIC等2个AIV
-AscendC::CrossCoreWaitFlag<2>(SYNC_AIV_AIC_FLAG);
+CrossCoreWaitFlagForArch<2, PIPE_MTE2>(SYNC_AIV_AIC_FLAG);
 
 CopyIn(a1Local, b1Local);
 SplitA(a1Local, a2Local);
 SplitBTranspose(b1Local, b2Local);
 Compute(a2Local, b2Local, c1Local);
 CopyOut(c1Local);
-// 模式0，8个AI Core包含的8个AIC同步
+// 模式0：8个AIC全核同步，确保原子累加结果正确。
 AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);
-AscendC::CrossCoreWaitFlag<0>(SYNC_AIC_FLAG);
+CrossCoreWaitFlagForArch<0, PIPE_FIX>(SYNC_AIC_FLAG);
 
-// 模式2，每一个AI Core内部，2个AIV等AIC
+// 模式2：AIC通知本AI Core内2个AIV可以执行LeakyRelu。
 AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);
 ```
 
@@ -248,13 +254,17 @@ AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);
 
 ```cpp
 // 模式2，每一个AI Core内部，2个AIV等AIC
-AscendC::CrossCoreWaitFlag<2>(SYNC_AIC_AIV_FLAG);
+CrossCoreWaitFlagForArch<2, PIPE_MTE2>(SYNC_AIC_AIV_FLAG);
+AscendC::DataCopy(cLocal, CVectorGM, C_AIV_BLOCKS_LENGTH);
+AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
 // 进行LeakyRelu运算
 float alpha = 0.001;
-...
 AscendC::LeakyRelu(reluCLocal, cLocal, alpha, C_AIV_BLOCKS_LENGTH);
-...
+AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+AscendC::DataCopy(CVectorGM, reluCLocal, C_AIV_BLOCKS_LENGTH);
 ```
 
 <p align="center">
@@ -269,8 +279,10 @@ AscendC::LeakyRelu(reluCLocal, cLocal, alpha, C_AIV_BLOCKS_LENGTH);
 场景3将`FUSED_NUM_BLOCKS`设置为1，AIC侧的`AIC_K`等于完整K维度，因此单个AIC完成的矩阵乘结果与场景2经过多AIC分块累加后的完整矩阵乘结果一致。AIC完成矩阵乘后，使用两个模式4通知分别唤醒AIV0和AIV1：AIV0直接消费L0C Buffer到UB的前半矩阵，AIV1从GM搬入后半矩阵，两个AIV获得的`LeakyRelu`输入共同覆盖完整C矩阵。这样既展示了模式4能够选择单个AIV同步，也体现了Ascend 950PR/Ascend 950DT支持的L0C Buffer到UB数据通路。
 
 ```cpp
-// AIV0/AIV1分别通知AIC输入已准备完成；AIC等待AIV1时使用flagId + 16。
+// AIV0/AIV1分别通知AIC输入已准备完成。
 AscendC::CrossCoreSetFlag<4, PIPE_MTE3>(SYNC_MODE4_INPUT_FLAG);
+
+// AIC分别等待AIV0和AIV1完成精度转换，等待AIV1时使用flagId + 16。
 AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG);
 AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG + SYNC_MODE4_AIV1_OFFSET);
 
@@ -300,14 +312,16 @@ AscendC::CrossCoreSetFlag<4, PIPE_FIX>(SYNC_MODE4_OUTPUT_FLAG + SYNC_MODE4_AIV1_
 (3)步骤3对应代码片段如下，`atomicResultGm`用于存储16个AIV全部搬运完成后的累加结果。通过调用`CrossCoreSetFlag`与`CrossCoreWaitFlag`接口，实现同步控制：确保16个AIV均完成`PIPE_MTE3`搬运指令后，方可执行`CrossCoreWaitFlag`后续指令。
 
 ```cpp
-// UB到GM搬运启用原子累加：搬运至atomicResult的数据与原值累加后覆盖原值
+// UB 到 GM 搬运启用原子累加：搬运至 atomicResult 的数据与原值累加后覆盖原值
 AscendC::SetAtomicAdd<float>();
 // DataCopy属于PIPE_MTE3流水操作
 AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
 // 当本AIV完成前置PIPE_MTE3(DataCopy)流水操作后，通知其他AIV核，本AIV已经完成
 AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
 // 阻塞本AIV继续往下执行指令，直到其他AIV全部都完成PIPE_MTE3流水操作，才解除阻塞往下执行。
-AscendC::CrossCoreWaitFlag<0>(0);
+CrossCoreWaitFlagForArch<0, PIPE_MTE2>(0);
+// 关闭原子累加
+AscendC::DisableDmaAtomic();
 ```
 
 上述同步完成之后，此时`atomicResultGm`已经是16个AIV中矢量计算结果的累加值。
@@ -316,6 +330,9 @@ AscendC::CrossCoreWaitFlag<0>(0);
 ```cpp
 if (AscendC::GetBlockIdx() == 0) {
     AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);   // PIPE_MTE2
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+    AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);
     return;
 }
 ```
@@ -330,7 +347,8 @@ if (AscendC::GetBlockIdx() == 0) {
 #### 3.1 Cube与Vector融合计算场景
 (1) Cube与Vector融合计算场景中，融合算子（配置`__mix__(1, 2)`）中需要通过`ASCEND_IS_AIV`/`ASCEND_IS_AIC`进行AIV和AIC核代码的隔离。
 
-```
+```cpp
+AscendC::InitSocState();
 KernelMmad op;
 if ASCEND_IS_AIC {
     op.InitAIC(A, B, c);
@@ -340,6 +358,7 @@ if ASCEND_IS_AIV {
     op.InitAIV(a, b, A, B, c);
     op.ProcessAIV();
 }
+AscendC::PipeBarrier<PIPE_ALL>();
 ```
 (2) `GetBlockIdx`的返回值（获取当前核的index）在AIC和AIV的取值范围不同，其取值与算子设置的逻辑核数和一个AI Core中的AIC与AIV的比例有关。本样例中设置`NUM_BLOCKS=8`、AIC与AIV的比例为1:2，因此`GetBlockIdx`的返回值在AIC和AIV的取值范围分别为0-7和0-15。
 
@@ -353,15 +372,32 @@ if ASCEND_IS_AIV {
 
 (3) `CrossCoreWaitFlag`的`pipe`模板参数在NPU架构`dav-2201`上不影响硬件指令，但在NPU架构`dav-3510`上会生效。由于NPU架构`dav-3510`的模式0、模式1和模式2不支持默认的`PIPE_S`，样例代码通过架构条件分别处理：NPU架构`dav-3510`显式传入`PIPE_MTE2`或`PIPE_FIX`，NPU架构`dav-2201`保留默认参数行为。具体约束请参见[CrossCoreWaitFlag模板参数默认值及生效情况](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md#template-parameter-defaults)。
 
+为兼容上述两种NPU架构，样例封装了`CrossCoreWaitFlagForArch`函数。该函数在NPU架构`dav-3510`上显式传入`pipe`模板参数，在其他NPU架构上省略该参数并使用默认值。具体实现如下：
+
+```cpp
+template <uint8_t modeId, pipe_t pipe>
+__aicore__ inline void CrossCoreWaitFlagForArch(uint16_t flagId)
+{
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    AscendC::CrossCoreWaitFlag<modeId, pipe>(flagId);
+#else
+    AscendC::CrossCoreWaitFlag<modeId>(flagId);
+#endif
+}
+```
+
 #### 3.3纯Vector计算场景
 (1)在使用`CrossCoreSetFlag`与`CrossCoreWaitFlag`核间同步接口时，即使是纯Vector计算场景，核函数也不能使用`__vector__`修饰符。
 本样例核函数采用`__mix__(1, 2)`修饰，但在纯Vector场景下，由于仅执行矢量计算，必须通过`ASCEND_IS_AIV`宏确保程序仅在AIV核上运行，否则会导致程序卡死。
 
 ```cpp
+AscendC::InitSocState();
+KernelCrossCoreSetFlag op;
 if ASCEND_IS_AIV {
-        op.Init(x, z, dataLength);
-        op.Process();
+    op.Init(x, z, dataLength);
+    op.Process();
 }
+AscendC::PipeBarrier<PIPE_ALL>();
 ```
  (2)模式1要求参与同步的2个AIV必须属于同一个AI Core，否则程序会卡死。本样例中，参与同步的两个AIV的`GetBlockIdx`的返回值为2、3，同属第2个AI Core（下标从1开始）；若将`GetBlockIdx`的返回值改为3和4（分别属于两个不同的AI Core），程序将卡死。
 

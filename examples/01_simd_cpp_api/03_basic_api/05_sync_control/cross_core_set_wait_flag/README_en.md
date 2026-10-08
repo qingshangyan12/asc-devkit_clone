@@ -190,14 +190,20 @@ The code segment corresponding to the above description is as follows:
 
 ```cpp
 if (blockIdx % 2 == 0) {
-    ...
+    AscendC::DataCopy(aLocal, aGM, A_BLOCKS_LENGTH);
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::Cast(castALocal, aLocal, AscendC::RoundMode::CAST_NONE, A_BLOCKS_LENGTH);
-    ...
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
     AscendC::DataCopy(AVectorGM, castALocal, A_BLOCKS_LENGTH);
 } else {
-    ...
+    AscendC::DataCopy(bLocal, bGM, B_BLOCKS_LENGTH);
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
     AscendC::Cast(castBLocal, bLocal, AscendC::RoundMode::CAST_NONE, B_BLOCKS_LENGTH);
-    ...
+    AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
     AscendC::DataCopy(BVectorGM, castBLocal, B_BLOCKS_LENGTH);
 }
 // Mode 2: within each AI Core, one AIC waits for 2 AIVs
@@ -219,18 +225,18 @@ $$
 
 ```cpp
 // Mode 2: within each AI Core, AIC waits for 2 AIVs
-AscendC::CrossCoreWaitFlag<2>(SYNC_AIV_AIC_FLAG);
+CrossCoreWaitFlagForArch<2, PIPE_MTE2>(SYNC_AIV_AIC_FLAG);
 
 CopyIn(a1Local, b1Local);
 SplitA(a1Local, a2Local);
 SplitBTranspose(b1Local, b2Local);
 Compute(a2Local, b2Local, c1Local);
 CopyOut(c1Local);
-// Mode 0: 8 AICs from 8 AI Cores synchronize
+// Mode 0: all 8 AICs synchronize to ensure correct atomic accumulation results.
 AscendC::CrossCoreSetFlag<0, PIPE_FIX>(SYNC_AIC_FLAG);
-AscendC::CrossCoreWaitFlag<0>(SYNC_AIC_FLAG);
+CrossCoreWaitFlagForArch<0, PIPE_FIX>(SYNC_AIC_FLAG);
 
-// Mode 2: within each AI Core, 2 AIVs wait for AIC
+// Mode 2: the AIC notifies 2 AIVs in the same AI Core to execute LeakyRelu.
 AscendC::CrossCoreSetFlag<2, PIPE_FIX>(SYNC_AIC_AIV_FLAG);
 ```
 
@@ -247,13 +253,17 @@ Specifically, the accumulated C matrix is split into 16 parts along the M axis, 
 
 ```cpp
 // Mode 2: within each AI Core, 2 AIVs wait for AIC
-AscendC::CrossCoreWaitFlag<2>(SYNC_AIC_AIV_FLAG);
+CrossCoreWaitFlagForArch<2, PIPE_MTE2>(SYNC_AIC_AIV_FLAG);
+AscendC::DataCopy(cLocal, CVectorGM, C_AIV_BLOCKS_LENGTH);
+AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(EVENT_ID0);
 
 // Perform LeakyRelu operation
 float alpha = 0.001;
-...
 AscendC::LeakyRelu(reluCLocal, cLocal, alpha, C_AIV_BLOCKS_LENGTH);
-...
+AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(EVENT_ID0);
+AscendC::DataCopy(CVectorGM, reluCLocal, C_AIV_BLOCKS_LENGTH);
 ```
 
 <p align="center">
@@ -268,8 +278,10 @@ Figure 5: LeakyRelu operation and result write-back phase, mode 2 diagram
 Scenario 3 sets `FUSED_NUM_BLOCKS` to 1, and `AIC_K` on the AIC side equals the complete K dimension. Therefore, the matrix multiplication result produced by the single AIC is consistent with the complete matrix multiplication result obtained by multi-AIC block accumulation in scenario 2. After matrix multiplication, the AIC sends two mode 4 notifications to wake up AIV0 and AIV1 separately. AIV0 directly consumes the first half of the matrix from L0C Buffer to UB, while AIV1 loads the second half from GM. The `LeakyRelu` inputs obtained by the two AIVs together cover the complete C matrix. This demonstrates both single-AIV synchronization and the L0C Buffer-to-UB data path available on Ascend 950PR/Ascend 950DT.
 
 ```cpp
-// AIV0/AIV1 notify the AIC that inputs are ready. The AIC uses flagId + 16 when waiting for AIV1.
+// AIV0/AIV1 notify the AIC that inputs are ready.
 AscendC::CrossCoreSetFlag<4, PIPE_MTE3>(SYNC_MODE4_INPUT_FLAG);
+
+// The AIC waits for AIV0 and AIV1 to complete precision conversion. It uses flagId + 16 when waiting for AIV1.
 AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG);
 AscendC::CrossCoreWaitFlag<4, PIPE_MTE2>(SYNC_MODE4_INPUT_FLAG + SYNC_MODE4_AIV1_OFFSET);
 
@@ -306,7 +318,9 @@ AscendC::DataCopy(atomicResultGm, xLocal, this->blockLength);
 // After this AIV completes the preceding PIPE_MTE3(DataCopy) pipeline operation, notify other AIV cores that this AIV has completed.
 AscendC::CrossCoreSetFlag<0, PIPE_MTE3>(0);
 // Block this AIV from continuing to execute instructions until all other AIVs complete the PIPE_MTE3 pipeline operation, then unblock and continue execution.
-AscendC::CrossCoreWaitFlag<0>(0);
+CrossCoreWaitFlagForArch<0, PIPE_MTE2>(0);
+// Disable atomic accumulation.
+AscendC::DisableDmaAtomic();
 ```
 
 After the above synchronization is complete, `atomicResultGm` already contains the accumulated value of vector computation results from 16 AIVs.
@@ -315,6 +329,9 @@ If the synchronization in the previous step is not inserted correctly, the data 
 ```cpp
 if (AscendC::GetBlockIdx() == 0) {
     AscendC::DataCopy(yLocal, atomicResultGm, this->blockLength);   // PIPE_MTE2
+    AscendC::SetFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+    AscendC::WaitFlag<AscendC::HardEvent::MTE2_MTE3>(EVENT_ID0);
+    AscendC::DataCopy(atomicResultGm, yLocal, this->blockLength);
     return;
 }
 ```
@@ -328,7 +345,8 @@ Figure 7: Pure AIV scenario, mode 0 computation logic diagram
 ### 3. Notes
 #### 3.1 Cube and Vector Fused Computation Scenario
 (1) In the Cube and Vector fused computation scenario, the fused operator (configured with `__mix__(1, 2)`) requires `ASCEND_IS_AIV`/`ASCEND_IS_AIC` for code isolation between AIV and AIC cores.
-```
+```cpp
+AscendC::InitSocState();
 KernelMmad op;
 if ASCEND_IS_AIC {
     op.InitAIC(A, B, c);
@@ -338,6 +356,7 @@ if ASCEND_IS_AIV {
     op.InitAIV(a, b, A, B, c);
     op.ProcessAIV();
 }
+AscendC::PipeBarrier<PIPE_ALL>();
 ```
 (2) The return value of `GetBlockIdx` (obtaining the index of the current core) has different value ranges in AIC and AIV, and its values are related to the logical core count set by the operator and the AIC to AIV ratio in one AI Core. In this example, `NUM_BLOCKS=8` and the AIC to AIV ratio is 1:2, so the return value of `GetBlockIdx` ranges from 0-7 in AIC and 0-15 in AIV.
 
@@ -351,14 +370,31 @@ if ASCEND_IS_AIV {
 
 (3) The `pipe` template parameter of `CrossCoreWaitFlag` does not affect the hardware instruction on NPU architecture `dav-2201`, but takes effect on NPU architecture `dav-3510`. Because NPU architecture `dav-3510` does not support the default `PIPE_S` for modes 0, 1, and 2, the example uses architecture-specific handling: it passes `PIPE_MTE2` or `PIPE_FIX` explicitly on NPU architecture `dav-3510` and keeps the default parameter behavior on NPU architecture `dav-2201`. See [CrossCoreWaitFlag template parameter defaults and effects](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md#template-parameter-defaults) for details.
 
+To support both NPU architectures described above, this example encapsulates the `CrossCoreWaitFlagForArch` function. The function explicitly passes the `pipe` template parameter on NPU architecture `dav-3510`, while omitting it and using the default value on other NPU architectures. The implementation is as follows:
+
+```cpp
+template <uint8_t modeId, pipe_t pipe>
+__aicore__ inline void CrossCoreWaitFlagForArch(uint16_t flagId)
+{
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+    AscendC::CrossCoreWaitFlag<modeId, pipe>(flagId);
+#else
+    AscendC::CrossCoreWaitFlag<modeId>(flagId);
+#endif
+}
+```
+
 #### 3.3 Pure Vector Computation Scenario
 (1) When using the `CrossCoreSetFlag` and `CrossCoreWaitFlag` inter-core synchronization interfaces, even in pure Vector computation scenarios, the kernel function cannot use the `__vector__` modifier.
 The kernel function in this example uses `__mix__(1, 2)` decoration, but in the pure Vector scenario, since only vector computation is performed, the `ASCEND_IS_AIV` macro must be used to ensure the program runs only on AIV cores, otherwise the program will hang.
-```
+```cpp
+AscendC::InitSocState();
+KernelCrossCoreSetFlag op;
 if ASCEND_IS_AIV {
-        op.Init(x, z, dataLength);
-        op.Process();
+    op.Init(x, z, dataLength);
+    op.Process();
 }
+AscendC::PipeBarrier<PIPE_ALL>();
 ```
  (2) Mode 1 requires that the 2 AIVs participating in synchronization must belong to the same AI Core, otherwise the program will hang. In this example, the return values of `GetBlockIdx` for the two AIVs participating in synchronization are 2 and 3, which belong to the 2nd AI Core (index starting from 1); if the return values of `GetBlockIdx` are changed to 3 and 4 (belonging to two different AI Cores), the program will hang.
 
