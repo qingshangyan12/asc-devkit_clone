@@ -31,7 +31,7 @@
 
 #include "basic_api/kernel_tensor.h"
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #include "impl/adv_api/detail/experimental/math/ndtri/ndtri_3510_impl.h"
 #endif
 
@@ -60,7 +60,7 @@ __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
     static_assert(sizeof(T) == 0, "Ndtri is only supported on NPU architecture 3510.");
 #endif
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
     NdtriImpl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 #endif
 }
@@ -84,7 +84,7 @@ __aicore__ inline void Ndtri(const LocalTensor<T>& dstTensor, const LocalTensor<
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ != 3510)
     static_assert(sizeof(T) == 0, "Ndtri is only supported on NPU architecture 3510.");
 #endif
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
     NdtriImpl<T, isReuseSource>(dstTensor, srcTensor, srcTensor.GetSize());
 #endif
 }

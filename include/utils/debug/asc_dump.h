@@ -23,11 +23,11 @@
 #include "impl/utils/debug/asc_simd_debug_enable.h"
 #include "impl/utils/sys_macros_impl.h"
 
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
 #endif
 
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #include "impl/utils/debug/asc_simd_dump_impl.h"
 #endif
 
