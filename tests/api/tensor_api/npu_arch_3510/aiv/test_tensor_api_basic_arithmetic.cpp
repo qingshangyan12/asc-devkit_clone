@@ -26,6 +26,8 @@ void check_unary_arithmetic()
 {
     static_assert(AscendC::Std::is_same_v<decltype(
         asc::te::experimental::abs(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(
+        asc::te::experimental::neg(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
 }
 
 template <typename T>
@@ -37,6 +39,8 @@ void check_float_math()
         asc::te::experimental::sqrt(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(
         asc::te::experimental::log(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(
+        asc::te::experimental::ln(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(
         asc::te::experimental::log2(AscendC::Std::declval<const reg_type<T>&>())), reg_type<T>>);
     static_assert(AscendC::Std::is_same_v<decltype(
@@ -140,10 +144,10 @@ void check_pair_results()
     reg_type<bool> carry_src{};
     src0.mask = all_mask<T>().reg;
 
-    auto add_result = asc::te::experimental::addc(src0, src1);
-    auto add_carry_result = asc::te::experimental::addc(src0, src1, carry_src);
-    auto sub_result = asc::te::experimental::subc(src0, src1);
-    auto sub_borrow_result = asc::te::experimental::subc(src0, src1, carry_src);
+    auto add_result = asc::te::experimental::add_carry(src0, src1);
+    auto add_carry_result = asc::te::experimental::add_carry(src0, src1, carry_src);
+    auto sub_result = asc::te::experimental::sub_carry(src0, src1);
+    auto sub_borrow_result = asc::te::experimental::sub_carry(src0, src1, carry_src);
     auto mull_result = asc::te::experimental::mull(src0, src1);
     static_assert(AscendC::Std::is_same_v<decltype(add_result), reg_pair<T, bool>>);
     static_assert(AscendC::Std::is_same_v<decltype(add_carry_result), reg_pair<T, bool>>);
