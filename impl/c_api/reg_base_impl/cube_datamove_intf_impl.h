@@ -24,7 +24,7 @@ constexpr uint8_t ASC_GM2L1_SID_DEFAULT = 0;
 
 constexpr uint8_t ASC_GM2L1_DECOMP_MODE_DEFAULT = 0;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/cube_datamove_intf_impl.h"
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/npu_arch_9201/cube_datamove_intf_impl.h"

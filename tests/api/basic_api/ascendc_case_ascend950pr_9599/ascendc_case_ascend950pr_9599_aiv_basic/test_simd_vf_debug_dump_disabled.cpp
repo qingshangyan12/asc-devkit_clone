@@ -13,7 +13,7 @@
 #include "utils/debug/asc_dump.h"
 #include "utils/debug/asc_printf.h"
 
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 && __NPU_ARCH__ == 3510
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1 && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 TEST(SimdVfDebugDumpDisabledTest, PrintfIsSilentAndDumpFallbacksRemainAvailable)
 {
     testing::internal::CaptureStdout();

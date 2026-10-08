@@ -36,8 +36,8 @@
 
 // The implementation header uses AscendC::Reg::RegTensor/MaskReg and other RegBase types that are
 // only declared in the device-side DAV_3510 compile pass, so it must only be included when
-// compiling for __NPU_ARCH__ == 3510 (same pattern as erf.h).
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+// compiling for __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202 (same pattern as erf.h).
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #include "../../../impl/adv_api/detail/experimental/math/bessel_i0/bessel_i0_3510_impl.h"
 #endif
 
@@ -66,7 +66,7 @@ __aicore__ inline void BesselI0(
     const uint32_t calCount)
 {
     (void)sharedTmpBuffer;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     BesselI0Impl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 #endif
 }
@@ -105,7 +105,7 @@ template <typename T, bool isReuseSource = false>
 __aicore__ inline void BesselI0(
     const LocalTensor<T>& dstTensor, const LocalTensor<T>& srcTensor, const uint32_t calCount)
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     BesselI0Impl<T, isReuseSource>(dstTensor, srcTensor, calCount);
 #endif
 }
