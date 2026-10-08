@@ -102,11 +102,7 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         cntIterator++;
         if constexpr ((ToMatmulConfig(MM_CFG).iterateMode & IterateMode::ITERATE_MODE_NORMAL) != 0) {
             if (cntIterator < INC_PROCESS_CHECK && funID == KFC_Enum::MMFUN_ITERATE) {
-                uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
-                NotifyEvent<PIPE_FIX>(eventID);
-#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
-                SuperKernelEventCount(eventID);
-#endif
+                NotifyAivEvent();
             }
         }
         offset += offsetSize;
@@ -201,8 +197,7 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         }
     }
     if (msg->body.sync == 1) { // Synchronize
-        uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
-        NotifyEvent<PIPE_FIX>(eventID);
+        NotifyAivEvent();
     }
     return false;
 }
@@ -245,8 +240,7 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         }
     }
     if (body->sync || body->waitIterateBatch) {
-        uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
-        NotifyEvent<PIPE_FIX>(eventID);
+        NotifyAivEvent();
     }
     return true;
 }
@@ -293,8 +287,7 @@ MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, MM_CB, MATMUL_POLICY>::
             body->matrixStrideB, body->matrixStrideC);
         cntIterator++;
         if (cntIterator < INC_PROCESS_CHECK && (!body->sync && !body->waitIterateBatch)) {
-            uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
-            NotifyEvent<PIPE_FIX>(eventID);
+            NotifyAivEvent();
         }
     }
 }
@@ -327,11 +320,10 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
             kfcCommSrv->FreeUB(msg->ubAddr);
         }
     }
-    uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
     if (msg->body.sync || msg->body.waitIterateBatch) {
-        NotifyEvent<PIPE_FIX>(eventID);
+        NotifyAivEvent();
     } else if (cntIterator >= INC_PROCESS_CHECK) {
-        NotifyEvent<PIPE_FIX>(eventID);
+        NotifyAivEvent();
     }
     return true;
 }
@@ -348,11 +340,7 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
     if constexpr ((A_TYPE::ibShare == true) || (B_TYPE::ibShare == true)) {
         if (msg->body.iterateFakeMsg) {
             if (funID == KFC_Enum::MMFUN_ITERATE_ALL) { // fake msg
-                uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + kfcCommSrv->subBlockID);
-                NotifyEvent<PIPE_FIX>(eventID);
-#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
-                SuperKernelEventCount(eventID);
-#endif
+                NotifyAivEvent();
                 return true;
             }
         }
@@ -375,18 +363,11 @@ __aicore__ inline bool MatmulService<A_TYPE, B_TYPE, C_TYPE, BIAS_TYPE, MM_CFG, 
         }
     }
 
-    uint16_t eventID = static_cast<uint16_t>(this->devEvtID * 2 + mul.GetSubBlockIdx());
     if (sync || msg->body.waitIterateAll) {
         ASSERT(funID == KFC_Enum::MMFUN_ITERATE_ALL);
-        NotifyEvent<PIPE_FIX>(eventID);
-#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
-        SuperKernelEventCount(eventID);
-#endif
+        NotifyAivEvent();
     } else if (cntIterator >= INC_PROCESS_CHECK && funID == KFC_Enum::MMFUN_ITERATE) {
-        NotifyEvent<PIPE_FIX>(eventID);
-#if defined(__ASCENDC_ENABLE_SUPER_KERNEL__)
-        SuperKernelEventCount(eventID);
-#endif
+        NotifyAivEvent();
     }
     mul.End();
     TRACE_STOP(TraceId::MatMul_CALC);
