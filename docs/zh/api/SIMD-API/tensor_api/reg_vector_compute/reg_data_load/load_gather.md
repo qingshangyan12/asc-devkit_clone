@@ -28,7 +28,7 @@
 
 头文件路径为：`"tensor_api/experimental/arch/vector/reg_data_load.h"`，命名空间为`asc::te::experimental`。
 
-`load_gather`根据索引寄存器，从Unified Buffer（UB）Tensor的离散位置收集数据到[reg_tensor](../reg_tensor/reg_tensor.md)。`gather_mode::element`按元素收集，`gather_mode::data_block`按DataBlock（32B）收集。
+`load_gather`根据索引寄存器，从Unified Buffer（UB）Tensor的离散位置收集数据到[reg_tensor](../reg_tensor/reg_tensor.md)。`gather_mode::element`表示按元素收集，`gather_mode::data_block`表示按DataBlock（32B）收集。
 
 传入`coord`时，以`tensor.engine() + tensor.layout()(coord)`为基地址；不传入`coord`时，以`tensor`起始地址为基地址。
 
@@ -36,9 +36,7 @@
 
 ```cpp
 template <gather_mode mode = gather_mode::element,
-          typename Tensor,
-          typename Coord,
-          typename Index>
+          typename Tensor, typename Coord, typename Index>
 __simd_callee__ inline decltype(auto) load_gather(
     const Tensor& tensor,
     const Coord& coord,
@@ -46,8 +44,7 @@ __simd_callee__ inline decltype(auto) load_gather(
     const reg_tensor<bool>& gather_mask)
 
 template <gather_mode mode = gather_mode::element,
-          typename Tensor,
-          typename Index>
+          typename Tensor, typename Index>
 __simd_callee__ inline decltype(auto) load_gather(
     const Tensor& tensor,
     const reg_tensor<Index> index,
@@ -56,18 +53,43 @@ __simd_callee__ inline decltype(auto) load_gather(
 
 ## 参数说明
 
+**表1** 模板参数说明
+
+| 参数名 | 描述 |
+| --- | --- |
+| `mode` | 收集模式，类型为`gather_mode`，默认值为`gather_mode::element`。具体取值请参考[表3](#表3-gather_mode参数说明)。 |
+| `Tensor` | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
+| `Coord` | 源Tensor的坐标类型，由函数实参自动推导。 |
+| `Index` | 索引的数据类型，由函数实参自动推导。 |
+
+**表2** 参数说明
+
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `mode` | 输入 | 收集模式。默认值为`gather_mode::element`。 |
 | `tensor` | 输入 | 位于UB的源Tensor。 |
 | `coord` | 输入 | 基地址在`tensor`逻辑布局中的坐标。 |
 | `index` | 输入 | 相对于基地址的索引。元素模式下单位为元素；DataBlock模式下单位为字节。 |
 | `gather_mask` | 输入 | 收集操作的有效位Mask。元素模式下逐元素生效；DataBlock模式下按b32格式解释，仅bit 0、4、8、12、16、20、24、28有效。 |
 
+<a id="表3-gather_mode参数说明"></a>
+
+**表3** `gather_mode`参数说明
+
+| 取值 | 含义 | 索引单位 |
+| --- | --- | --- |
+| `gather_mode::element` | 根据`index`逐元素从UB收集数据到目的寄存器。 | 元素 |
+| `gather_mode::data_block` | 根据`index`以DataBlock（32B）为单位从UB收集数据到目的寄存器。 | 字节 |
+
 ## 数据类型
 
-- `gather_mode::element`：Tensor元素类型支持`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`和`uint64_t`。16bit及以下元素使用`uint16_t`索引，32bit元素使用`uint32_t`索引，64bit元素使用`uint32_t`或`uint64_t`索引。
-- `gather_mode::data_block`：Tensor元素类型支持8bit、16bit、32bit和64bit类型，索引类型为`uint32_t`。
+| `mode` | Tensor元素类型 | `Index`类型 |
+| --- | --- | --- |
+| `element` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t` | `uint16_t` |
+| `element` | `int32_t`、`uint32_t`、`float` | `uint32_t` |
+| `element` | `int64_t`、`uint64_t` | `uint32_t`、`uint64_t` |
+| `data_block` | 8bit、16bit、32bit和64bit类型 | `uint32_t` |
+
+未列出的类型或模式组合会产生编译期错误。
 
 ## 返回值说明
 

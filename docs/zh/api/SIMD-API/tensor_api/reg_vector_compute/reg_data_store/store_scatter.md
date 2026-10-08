@@ -60,7 +60,15 @@ __simd_callee__ inline void store_scatter(
 
 ## 数据类型
 
-Tensor元素类型与`src`元素类型必须一致，支持`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`和`uint64_t`。16bit及以下元素使用`uint16_t`索引，32bit元素使用`uint32_t`索引，64bit元素使用`uint32_t`或`uint64_t`索引。
+Tensor元素类型与`src`元素类型必须一致，支持的数据类型组合如下：
+
+| Tensor元素类型/`src`元素类型 | `Index`类型 |
+| --- | --- |
+| `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t` | `uint16_t` |
+| `int32_t`、`uint32_t`、`float` | `uint32_t` |
+| `int64_t`、`uint64_t` | `uint32_t`、`uint64_t` |
+
+未列出的类型组合会产生编译期错误。
 
 ## 返回值说明
 
