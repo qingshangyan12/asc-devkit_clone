@@ -158,7 +158,8 @@ __aicore__ inline void Scatter(
     using PrimType = PrimT<T>;
     ScatterCheck<T>();
     uint32_t vectorRegWidth = 256;
-#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
     ScatterImpl(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ uint32_t*)dstOffset.GetPhyAddr(), dstBaseAddr, count);
