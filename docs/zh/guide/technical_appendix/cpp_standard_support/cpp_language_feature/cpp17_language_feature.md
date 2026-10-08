@@ -1,0 +1,25 @@
+# C++17语言特性<a name="ZH-CN_TOPIC_000000253823119012"></a>
+
+本文介绍C++17语言特性在Ascend C SIMT Device侧的支持情况。
+
+## C++17语言特性支持列表<a name="section_cpp17_features"></a>
+
+**表1**  C++17语言特性支持列表
+
+| C++17特性 | C++17 Proposal | 支持情况 | 说明 |
+| --- | --- | --- | --- |
+| 移除trigraphs | [N4086](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4086.html) | ✅ | 三字符组不再转译。 |
+| u8字符字面量 | [N4267](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4267.html) | ✅ | `u8'x'`形式可用。 |
+| 命名空间与枚举器属性 | [N4266](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4266.html) | ✅ | `namespace [[maybe_unused]] ns {...}`、枚举器携带属性可用。 |
+| 嵌套命名空间定义 | [N4230](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4230.html) | ✅ | `namespace a::b::c {...}`形式可用。 |
+| 非类型模板参数的常量求值 | [N4268](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4268.html) | ✅ | — |
+| 模板模板参数允许typename | [N4051](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2014/n4051.html) | ✅ | `template <template <typename> typename TT>`形式可用。 |
+| \[\[fallthrough\]\]属性 | [P0188R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0188r1.pdf) | ✅ | — |
+| \[\[nodiscard\]\]属性 | [P0189R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0189r1.pdf) | ✅ | 忽略返回值会产生告警。 |
+| \[\[maybe\_unused\]\]属性 | [P0212R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0212r1.pdf) | ✅ | — |
+| constexpr lambda | [P0170R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0170r1.pdf) | ✅ | `constexpr auto f = [...] constexpr {...}`编译期调用可用；混合编程VF函数内建议先落`constexpr`变量，见[Lambda表达式](./lambda_expressions.md)。 |
+| 一元折叠与空参数包 | [P0036R0](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/p0036r0.pdf) | ✅ | — |
+| lambda按值捕获\*this | [P0018R3](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0018r3.html) | ✅ | `[*this]`捕获当前对象副本。混合编程场景写法见[Lambda表达式](./lambda_expressions.md)。 |
+| enum class构造规则 | [P0138R2](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0138r2.pdf) | ✅ | 整型可直接列表初始化enum class。 |
+| 十六进制浮点字面量 | [P0245R1](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0245r1.html) | ✅ | `0x1.8p3`形式可用。 |
+| \_\_has\_include | [P0061R1](https://wg21.link/p0061) | ✅ | — |
