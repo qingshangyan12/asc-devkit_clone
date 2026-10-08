@@ -31,7 +31,7 @@
 #include "../utils/debug/asc_debug_utils.h"
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) &&             \
     ((defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1)) || \
-     (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) && !defined(__ASC_DISABLE_RESERVED_UBUF__)))
+     (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) && !defined(__ASC_DISABLE_RESERVED_UBUF__)))
 #define ASCENDC_INTERNAL_SIMD_VF_OVERFLOW_WARNING_ENABLED
 #include "../utils/debug/asc_aicore_printf_impl.h"
 #endif
@@ -49,19 +49,19 @@
 
 inline __gm__ void* g_sysFftsAddr = nullptr;
 namespace AscendC {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 namespace Internal {
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 namespace Internal {
 __BLOCK_LOCAL__ __inline__ uint64_t g_rptConfig;
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
                               __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
                               __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 namespace Internal {

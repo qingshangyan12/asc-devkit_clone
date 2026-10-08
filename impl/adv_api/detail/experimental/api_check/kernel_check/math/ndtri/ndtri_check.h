@@ -20,7 +20,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_MATH_NDTRI_NDTRI_CHECK_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_MATH_NDTRI_NDTRI_CHECK_H_
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202))
 #include "ndtri_check_common.h"
 #else
 #include "ndtri_check_aicore.h"

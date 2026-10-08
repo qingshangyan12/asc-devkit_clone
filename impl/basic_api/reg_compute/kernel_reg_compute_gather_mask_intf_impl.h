@@ -23,7 +23,7 @@
 #ifndef ASCENDC_KERNEL_REG_COMPUTE_GATHER_MASK_INTERFACE_IMPL_H
 #define ASCENDC_KERNEL_REG_COMPUTE_GATHER_MASK_INTERFACE_IMPL_H
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) ||                          \
     defined(__ASC_NPU_HOST__)
 #if __NPU_ARCH__ == 3003
@@ -48,7 +48,7 @@ namespace Reg {
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) ||                          \
     defined(__ASC_NPU_HOST__)
     return GetSprImpl<spr>();
@@ -58,7 +58,7 @@ __aicore__ inline int64_t GetSpr()
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) ||                          \
     defined(__ASC_NPU_HOST__)
 template <typename T, GatherMaskMode store, typename U>
@@ -87,7 +87,7 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 #endif
 
 #if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
+        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
     defined(__ASC_NPU_HOST__)
 template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
 __simd_callee__ inline void GatherMask(U& dstReg, U& srcReg, MaskReg& mask)

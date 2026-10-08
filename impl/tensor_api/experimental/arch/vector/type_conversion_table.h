@@ -374,7 +374,7 @@ ASC_REG_CAST_OP(int32_t, half, one, ceil, not_sat, asc_half2int32_ru);
 ASC_REG_CAST_OP(int32_t, half, zero, trunc, not_sat, asc_half2int32_rz);
 ASC_REG_CAST_OP(int32_t, half, one, trunc, not_sat, asc_half2int32_rz);
 #if !defined(ASCENDC_CPU_DEBUG)
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)) || defined(__ASC_NPU_HOST__)
+#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) || defined(__ASC_NPU_HOST__)
 
 // float -> hifloat8_t
 ASC_REG_CAST_OP(hifloat8_t, float, zero, round, not_sat, asc_float2hif8_rna);

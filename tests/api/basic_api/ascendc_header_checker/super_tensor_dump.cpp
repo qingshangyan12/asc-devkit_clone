@@ -8,7 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#if __NPU_ARCH__ == 3510 && !defined(ASCENDC_CPU_DEBUG)
+#if (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) && !defined(ASCENDC_CPU_DEBUG)
 #include "impl/utils/debug/asc_aicore_dump_impl.h"
 
 using AscendC::Hardware;

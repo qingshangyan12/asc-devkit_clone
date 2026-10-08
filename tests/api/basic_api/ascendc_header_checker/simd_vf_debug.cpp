@@ -12,7 +12,7 @@
 #include "kernel_operator.h"
 #endif
 
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #include "utils/debug/asc_dump.h"
 #include "utils/debug/asc_printf.h"
 
