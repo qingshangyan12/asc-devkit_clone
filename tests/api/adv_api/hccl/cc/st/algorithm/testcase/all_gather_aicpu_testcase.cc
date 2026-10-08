@@ -81,6 +81,22 @@ TopoInfoWithNetLayerDetails MakeMultiJettyTopo(u32 userRank = 0U)
     return topo;
 }
 
+TopoInfoWithNetLayerDetails MakeMultiLevelClosTopo(u32 rankSize = 16U, u32 serverNum = 2U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = rankSize;
+    topo.serverNum = serverNum;
+    topo.level0Topo = Level0Shape::CLOS;
+    topo.topoLevelNums = 2U;
+    topo.level0PcieMix = false;
+    const u32 rankSizePerServer = rankSize / serverNum;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {rankSizePerServer, rankSize};
+    topo.topoInstDetailsOfLayer.resize(1U);
+    topo.topoInstDetailsOfLayer[0].rankNumForTopoType[COMM_TOPO_CLOS] = {rankSizePerServer};
+    return topo;
+}
+
 AlgHierarchyInfoForAllLevel MakeMultiJettyHierarchy(u32 userRank)
 {
     const u32 meshBase = userRank / MULTI_JETTY_MESH_SIZE * MULTI_JETTY_MESH_SIZE;
@@ -95,6 +111,19 @@ AlgHierarchyInfoForAllLevel MakeMultiJettyHierarchy(u32 userRank)
     AlgHierarchyInfoForAllLevel hierarchy;
     hierarchy.infos = {{meshRanks, closRanks}, {}};
     return hierarchy;
+}
+
+TopoInfoWithNetLayerDetails MakeSequenceTopo(u32 level0Size = 4U, u32 level1Size = 2U)
+{
+    TopoInfoWithNetLayerDetails topo{};
+    topo.userRank = 0U;
+    topo.userRankSize = level0Size * level1Size;
+    topo.serverNum = level1Size;
+    topo.level0Topo = Level0Shape::MESH_1D;
+    topo.topoLevelNums = 2U;
+    topo.level0PcieMix = false;
+    topo.netLayerDetails.localNetInsSizeOfLayer = {level0Size, level1Size};
+    return topo;
 }
 
 } // namespace
@@ -117,7 +146,9 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, local_registry_contains_all_gather_algorithms)
     CollAlgExecRegistryV2& registry = CollAlgExecRegistryV2::Instance();
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherMesh1D"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleNHR"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSoleNHRMultiLink"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherConcurMeshNHR"), nullptr);
+    EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "AicpuAllGatherSequenceMeshConcurNHR"), nullptr);
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "InsAllGatherParallelMesh1DNHRMultiJetty"), nullptr);
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
     EXPECT_NE(registry.GetAlgExec(HCCL_CMD_ALLGATHER, "CcuSchedAllGatherParallelMeshNHRMultiLink"), nullptr);
@@ -202,6 +233,24 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_selector_uses_algorithm_for_uneven_m
     EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHRMultiJetty");
 }
 
+TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_uses_nhr_multilink_for_clos_topo)
+{
+    AllGatherAutoSelector selector;
+    OpParam param = MakeAicpuParam();
+    param.DataDes.count = 1U;
+    std::string algName;
+
+    TopoInfoWithNetLayerDetails topo = MakeMultiLevelClosTopo();
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllGatherSoleNHRMultiLink");
+
+    TopoInfoWithNetLayerDetails singleLevelTopo = MakeMultiLevelClosTopo(8U, 1U);
+    singleLevelTopo.topoLevelNums = 1U;
+    singleLevelTopo.netLayerDetails.localNetInsSizeOfLayer = {8U};
+    EXPECT_EQ(selector.Select(param, &singleLevelTopo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllGatherSoleNHRMultiLink");
+}
+
 TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_executor_calculates_multichannel_resources)
 {
     OpParam param = MakeAicpuParam();
@@ -222,6 +271,73 @@ TEST_F(ST_ALL_GATHER_AICPU_TEST, multijetty_executor_calculates_multichannel_res
     ASSERT_EQ(request.channels.size(), 2U);
     EXPECT_EQ(request.channels[0].size(), MULTI_JETTY_MESH_SIZE - 1U);
     EXPECT_EQ(request.channels[1].size(), MULTI_JETTY_CHANNEL_NUM);
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_selects_sequence_for_large_data_on_two_level_mesh)
+{
+    AllGatherAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    OpParam param = MakeAicpuParam();
+    std::string algName;
+
+    param.DataDes.count = 200U * 1024U * 1024U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "AicpuAllGatherSequenceMeshConcurNHR");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, aicpu_selector_keeps_parallel_for_medium_data_on_two_level_mesh)
+{
+    AllGatherAutoSelector selector;
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    OpParam param = MakeAicpuParam();
+    std::string algName;
+
+    param.DataDes.count = 300U * 1024U;
+    EXPECT_EQ(selector.Select(param, &topo, algName), SelectorStatus::MATCH);
+    EXPECT_EQ(algName, "InsAllGatherParallelMesh1DNHR");
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, sequence_executor_calculates_two_level_resources)
+{
+    OpParam param = MakeAicpuParam();
+    ASSERT_GT(std::snprintf(param.algName, sizeof(param.algName), "%s", "AicpuAllGatherSequenceMeshConcurNHR"), 0);
+
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    AlgHierarchyInfoForAllLevel hierarchy;
+    hierarchy.infos = {{{0U, 1U, 2U, 3U}}, {{0U, 4U}}};
+    std::unique_ptr<InsCollAlgBase> executor =
+        CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLGATHER, param.algName);
+    ASSERT_NE(executor, nullptr);
+
+    AlgResourceRequest request;
+    ASSERT_EQ(executor->CalcRes(nullptr, param, &topo, hierarchy, request), HCCL_SUCCESS);
+    ASSERT_EQ(request.channels.size(), 2U);
+    EXPECT_EQ(request.channels[0].size(), 6U);
+    EXPECT_EQ(request.channels[1].size(), 1U);
+    EXPECT_EQ(request.slaveThreadNum, 5U);
+    EXPECT_EQ(request.notifyNumOnMainThread, 5U);
+    EXPECT_EQ(request.notifyNumPerThread, std::vector<u32>({2U, 1U, 1U, 1U, 1U}));
+}
+
+TEST_F(ST_ALL_GATHER_AICPU_TEST, sequence_executor_rejects_invalid_hierarchy)
+{
+    OpParam param = MakeAicpuParam();
+    ASSERT_GT(std::snprintf(param.algName, sizeof(param.algName), "%s", "AicpuAllGatherSequenceMeshConcurNHR"), 0);
+
+    TopoInfoWithNetLayerDetails topo = MakeSequenceTopo(4U, 2U);
+    std::unique_ptr<InsCollAlgBase> executor =
+        CollAlgExecRegistryV2::Instance().GetAlgExec(HCCL_CMD_ALLGATHER, param.algName);
+    ASSERT_NE(executor, nullptr);
+
+    AlgHierarchyInfoForAllLevel singleLevel;
+    singleLevel.infos = {{{0U, 1U, 2U, 3U}}};
+    AlgResourceRequest request;
+    EXPECT_NE(executor->CalcRes(nullptr, param, &topo, singleLevel, request), HCCL_SUCCESS);
+
+    AlgHierarchyInfoForAllLevel emptyLevel1;
+    emptyLevel1.infos = {{{0U, 1U, 2U, 3U}}, {}};
+    AlgResourceRequest requestEmptyLevel;
+    EXPECT_NE(executor->CalcRes(nullptr, param, &topo, emptyLevel1, requestEmptyLevel), HCCL_SUCCESS);
 }
 
 } // namespace checker

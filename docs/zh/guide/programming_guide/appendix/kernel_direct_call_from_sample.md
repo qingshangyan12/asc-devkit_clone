@@ -170,7 +170,7 @@ AddKernelInvocationNeo
     >```
     >- kernel\_name：算子核函数（Kernel）的名称。
     >- numBlocks：规定了核函数（Kernel）将会在几个核上执行。每个执行该核函数（Kernel）的核会被分配一个逻辑ID，即block\_idx，可以在核函数（Kernel）的实现中调用[GetBlockIdx](../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)来获取block\_idx。
-    >- stream，类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+    >- stream，类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在Device上执行。stream创建等管理接口请参考[《Runtime运行时API》](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/README.md)。
     >- argument list：参数列表，与核函数（Kernel）的参数列表保持一致。
 
 ## CMake编译配置文件编写<a name="section185111259496"></a>
@@ -451,10 +451,10 @@ bash run.sh -r npu  -v <soc_version> -i <install_path> -b Debug -p <install-pref
 基于核函数（Kernel）直调样例工程，通过ACLRT\_LAUNCH\_KERNEL接口调用核函数（Kernel）时，可实现CPU与NPU域的代码的统一，且该方式仅支持以下型号：
 
 <!-- npu="A3" id1 -->
--   Atlas A3 训练系列产品/Atlas A3 推理系列产品
+-   Atlas A3系列产品
 <!-- end id1 -->
 <!-- npu="910b" id2 -->
--   Atlas A2 训练系列产品/Atlas A2 推理系列产品
+-   Atlas A2系列产品
 <!-- end id2 -->
 <!-- npu="310p" id3 -->
 -   Atlas 推理系列产品

@@ -3,16 +3,16 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="910" id4 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
 - Atlas 推理系列产品 AI Core：不支持
@@ -21,7 +21,7 @@
 - Atlas 推理系列产品 Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="310b" id7 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -29,6 +29,8 @@
 头文件路径为：`"c_api/reg_compute/compute/reg_broadcast.h"`。
 
 merge模式下，将src的最低位元素广播到dst中被mask筛选的位置，dst中未被mask筛选的元素保留原值。
+
+本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
 
@@ -65,7 +67,7 @@ __simd_callee__ inline void asc_duplicate_merge(vector_float& dst, vector_float 
 
 ## 约束说明
 
-无
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 
 ## 调用示例
 

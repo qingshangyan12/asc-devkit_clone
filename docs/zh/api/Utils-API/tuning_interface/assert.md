@@ -3,31 +3,31 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：支持
+- Atlas推理系列产品Vector Core：支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/Utils-API/tuning_interface/assert_res.md#id1 -->
 
@@ -44,7 +44,7 @@
     </tr>
     <!-- npu="950" id10 -->
     <tr>
-        <td>Ascend 950PR/Ascend 950DT</td>
+        <td>Ascend 950PR&950DT系列产品</td>
         <td>支持</td>
         <td>支持</td>
         <td>支持</td>
@@ -52,7 +52,7 @@
     <!-- end id10 -->
     <!-- npu="A3" id11 -->
     <tr>
-        <td>Atlas A3 训练系列产品/Atlas A3 推理系列产品</td>
+        <td>Atlas A3系列产品</td>
         <td>支持</td>
         <td>不支持</td>
         <td>不支持</td>
@@ -60,7 +60,7 @@
     <!-- end id11 -->
     <!-- npu="910b" id12 -->
     <tr>
-        <td>Atlas A2 训练系列产品/Atlas A2 推理系列产品</td>
+        <td>Atlas A2系列产品</td>
         <td>支持</td>
         <td>不支持</td>
         <td>不支持</td>
@@ -132,7 +132,7 @@ ascendc_assert(expr, fmt, args...)
 ### SIMD编程场景
 
 - CPU域调试时，多参数调用仅检查断言条件，不打印`fmt`和`args`指定的自定义错误信息，行为与单参数调用相同。
-- 单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。超出限制时，断言失败信息不会打印，但接口仍会触发异常。可以通过[aclInit接口](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_0022.html)中的`simd_printf_fifo_size_per_core`字段配置，配置范围为`[1KB,64MB]`。PyTorch调用和算子入图场景暂不支持该配置。
+- 单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。超出限制时，断言失败信息不会打印，但接口仍会触发异常。可以通过[aclInit接口](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/02_initialization_and_deinitialization.md#aclinit)中的`simd_printf_fifo_size_per_core`字段配置，配置范围为`[1KB,64MB]`。PyTorch调用和算子入图场景暂不支持该配置。
 
 ### SIMD VF编程场景
 

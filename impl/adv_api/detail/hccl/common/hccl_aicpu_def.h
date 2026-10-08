@@ -125,13 +125,13 @@ private:
 private:
     uint64_t ccOpTilingDataTable_[static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)] = {0UL};
     uint64_t ccOpParamTable_[static_cast<uint32_t>(HcclCMDType::HCCL_CMD_ALL)] = {0UL};
-#if (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
     __gm__ OpResCtx* hcclContext_;
 #else
     __gm__ HcclCombineOpParam* hcclContext_;
 #endif
     __gm__ HcclMsgArea* hcclMsgArea_;
-    uint64_t tilingBaseAddr_;
+    uint64_t tilingBaseAddr_ = 0UL;
     uint16_t queueNum_ = 0U;
     uint16_t handleId2CurrSliceId_[HCCL_MAX_HANDLE_ID] = {0U};
     uint16_t handleIdCommitTurnCnt_[HCCL_MAX_HANDLE_ID] = {0U};
@@ -148,7 +148,7 @@ private:
     HcclTilingVersion curVersion_ = HcclTilingVersion::INVALID_TILING_VERSION;
     uint8_t workingFlag_ = false;
     uint8_t debugMode_ = 0U;
-    uint8_t devType_;
+    uint8_t devType_ = 0U;
 };
 } // namespace AscendC
 
