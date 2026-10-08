@@ -106,3 +106,11 @@ inline bfloat16x2_t __float22bfloat162_rz(const float2 x)
         asc_vf_call<simt_float22bfloat162_rz>(dim3(1024), (__gm__ float2*)input, (__gm__ bfloat16x2_t*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x：128.25, 128.5, 128.75, -128.5, 0.0, -0.0, inf, nan
+y：nan, inf, -0.0, 0.0, -128.5, 128.75, 128.5, 128.25
+result: (128.0, nan) (128.0, inf) (128.0, -0.0) (-128.0, 0.0) (0.0, -128.0) (-0.0, 128.0) (inf, 128.0) (nan, 128.0)
+```
