@@ -48,7 +48,8 @@
 #include "dav_5161/kernel_operator_sys_var_impl.h"
 #endif
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || \
+    (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 #ifdef __SUPER_KERNEL_DYNAMIC_BLOCK_NUM__
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_dynamic_block_num;
 #endif
@@ -85,8 +86,8 @@ __aicore__ inline void Trap() { TrapImpl(); }
 
 __aicore__ inline int64_t GetSystemCycle() { return GetSystemCycleImpl(); }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || \
+    (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
 template <SpecialPurposeReg spr>
 __aicore__ inline int64_t GetSpr()
 {
