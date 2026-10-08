@@ -227,7 +227,7 @@ __simd_callee__ inline void asc_dump(__ubuf__ T* input, uint32_t desc, uint32_t 
 }
 } // namespace __asc_simd_vf
 
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 namespace __asc_aicore {
 // CPU debug exposes unqualified debug APIs through this namespace; bridge the SIMD-only register overloads.
 template <typename T, typename U>

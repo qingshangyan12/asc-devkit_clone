@@ -18,7 +18,7 @@
 #ifndef IMPL_C_API_REG_BASE_IMPL_DATAMOVE_ATOMIC_INTF_IMPL_H
 #define IMPL_C_API_REG_BASE_IMPL_DATAMOVE_ATOMIC_INTF_IMPL_H
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/datamove_atomic_intf_impl.h"
 #endif
 

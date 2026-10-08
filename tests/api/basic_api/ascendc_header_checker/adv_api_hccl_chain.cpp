@@ -18,7 +18,7 @@
 #include "kernel_operator.h"
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 1001 || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202 || __NPU_ARCH__ == 1001 || \
                               __NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "adv_api/hccl/hccl.h"
 #endif

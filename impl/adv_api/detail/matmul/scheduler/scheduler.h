@@ -36,7 +36,7 @@
 #include "base/scheduler_special_mdl.h"
 #include "base/scheduler_n_buffer.h"
 #include "base/scheduler_mdl_partial_output.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #include "base/scheduler_mdl_mx.h"
 #include "base/scheduler_norm_mx.h"
 #endif
