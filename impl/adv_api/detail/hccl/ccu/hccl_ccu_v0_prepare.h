@@ -319,11 +319,24 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
     const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
 
+    // hccl SplitDataFor2Dies 口径（对齐 CcuTempAllGatherNHR1DMem2Mem 与 RS 2die prepare）：
+    // permille ∈ (0,1000) 且非小数据（>rankNum*4 元素）才切分，否则全量归 die0；双 die 两 mission 共帧。
+    const uint64_t sliceCount = sliceSize / dataTypeSize;
+    uint64_t die0Size = sliceSize;
+    uint64_t die1Size = 0;
+    if (ccuParam_.dieSplitRatioPermille > 0U && ccuParam_.dieSplitRatioPermille < 1000U &&
+        sliceCount > ccuParam_.rankNum * 4U) {
+        die0Size = sliceCount * ccuParam_.dieSplitRatioPermille / 1000U * dataTypeSize;
+        die1Size = sliceSize - die0Size;
+    }
+
     xnData_[KFC_AG_SOLE_NHR_OP_ID] = GetOpId(commParam);
     xnData_[KFC_AG_SOLE_NHR_INPUT] = inputBase;
     xnData_[KFC_AG_SOLE_NHR_OUTPUT] = outputBase;
-    xnData_[KFC_AG_SOLE_NHR_DIE0_SIZE] = sliceSize;
-    xnData_[KFC_AG_SOLE_NHR_DIE0_LAST_SIZE] = sliceSize;
+    xnData_[KFC_AG_SOLE_NHR_DIE0_SIZE] = die0Size;
+    xnData_[KFC_AG_SOLE_NHR_DIE0_LAST_SIZE] = die0Size; // sole executor tailSize==sliceSize，末档=正常档
+    xnData_[KFC_AG_SOLE_NHR_DIE1_SIZE] = die1Size;
+    xnData_[KFC_AG_SOLE_NHR_DIE1_LAST_SIZE] = die1Size;
     xnData_[KFC_AG_SOLE_NHR_REPEAT_NUM_INV] = UINT64_MAX - 1U; // sole executor repeatNum=1
     xnData_[KFC_AG_SOLE_NHR_INPUT_SLICE_STRIDE] = 0U;
     xnData_[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE] = outputSliceStride;
@@ -332,11 +345,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL] =
         (inputBase == outputBase + outputSliceStride * ccuParam_.rankId) ? 1U : 0U;
     CalcGoSize(
-        sliceSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_SIZE_0],
+        die0Size, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_SIZE_0],
+        ccuProtocolVersion_);
+    CalcGoSize(
+        die1Size, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_SIZE_DIE1_0],
         ccuProtocolVersion_);
     KERNEL_LOG(
-        KERNEL_INFO, "AG sole-NHR prepare: slice=0x%llx, outStride=0x%llx, equal=%llu\n", sliceSize, outputSliceStride,
-        xnData_[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL]);
+        KERNEL_INFO, "AG sole-NHR prepare: slice=0x%llx, outStride=0x%llx, die0=0x%llx, die1=0x%llx, equal=%llu\n",
+        sliceSize, outputSliceStride, die0Size, die1Size, xnData_[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL]);
 }
 
 template <const auto& config>
