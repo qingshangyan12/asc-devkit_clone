@@ -15,7 +15,8 @@
 //     来自 CcuKernelArgKfcServer（InheritKfcServerKernelArg 透传）。
 //  3. 固定 axisId=0（单 die）语义：hccl 的 die1Size/die1LastSize/axisId==1 分支不迁移
 //     （KFC 单 mission 约束，见 docs/migration/ccu-sched-allgather-sole-nhr-migration.md 4.2 节）。
-//  4. GroupCopy 使用 devkit 4 参版本（无 GetCcuVersion）。
+//  4. 本地拷贝对齐 hccl LocalCopyNb 单跳直拷（ccu::LocalCopy），不使用 GroupCopy 双跳
+//     （帧内 goSize 槽位保留，AIV prepare 仍写入，便于按需回切）。
 #include "ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
@@ -213,8 +214,14 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
 }
 
 // 对应 hccl DoAllGatherGroupCopy：isInputOutputEqual==0 时本地拷贝自身分片。
+// 本地拷贝对齐 hccl 原版 LocalCopyNb 单跳直拷（mem→mem 单描述符），替换 GroupCopy 的
+// mem→CcuBuffer→mem 双跳（数据搬运量×2，且 CreateMultiOpCopyV1 额外占用 8 event + 64 CcuBuffer）；
+// 长度按本 rank 末分片口径取 die0 档（sole executor 下 die0Last==die0，即全量分片）。
+// 先例：mesh kernel DoAllGatherGroupCopy 的 useGroupCopy=false 分支（ccu::LocalCopy + EventWait）。
 CcuResult DoAllGatherGroupCopy(KfcAllGatherNhr1DContext& ctx)
 {
+    const bool localIsLast = (ctx.rankId + 1 == ctx.rankSize);
+    ccu::Variable& localSliceSize = localIsLast ? ctx.die0LastSize : ctx.die0Size;
     CCU_IF(ctx.isInputOutputEqual == 0)
     {
         CCU_IF(ctx.groupCopyRepeatNum != UINT64_MAX)
@@ -228,7 +235,11 @@ CcuResult DoAllGatherGroupCopy(KfcAllGatherNhr1DContext& ctx)
                     ctx.localDst.addr += ctx.outputRepeatStride;
                     ctx.srcMem.addr += ctx.inputRepeatStride;
                 }
-                CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcMem, ctx.goSize));
+                CCU_IF(localSliceSize != 0)
+                {
+                    CCU_CHK_RET(ccu::LocalCopy(ctx.localDst, ctx.srcMem, localSliceSize, ctx.localEvent, 1));
+                    CCU_CHK_RET(ccu::EventWait(ctx.localEvent, 1));
+                }
                 ctx.repeatTimeflag = 1;
             }
         }
