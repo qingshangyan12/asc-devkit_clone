@@ -31,7 +31,9 @@ DOCTYPE_BLOCK_RE = re.compile(r"/\*\*(?P<body>.*?)\*/", re.DOTALL)
 INGROUP_RE = re.compile(r"@ingroup\s+(\S+)")
 OVERRIDE_ID_RE = re.compile(r"@override_id\s+(\S+)")
 ARCHS_RE = re.compile(r"@archs\s+([\d ]+)")
-PARAM_DOC_RE = re.compile(r"@param\s+\[(?P<direction>in|out)\]\s+(?P<name>\S+)")
+PARAM_DOC_RE = re.compile(
+    r"@param\s+\[(?P<direction>(?:in|out)\s*(?:,\s*(?:in|out))?)\]\s+(?P<name>\S+)"
+)
 DECL_START_RE = re.compile(
     r"^(?:__aicore__|__simd_callee__)\s+inline\s+(?P<ret>.+?)\s+(?P<name>asc_\w+)\s*\("
 )
@@ -187,6 +189,12 @@ def _parse_param(text: str, directions: dict[str, str]) -> Param:
     return param
 
 
+def _normalize_direction(value: str) -> str:
+    """@param [in,out] 等写法归一：去空格，顺序统一为 in,out。"""
+    compact = re.sub(r"\s+", "", value)
+    return "in,out" if compact in {"in,out", "out,in"} else compact
+
+
 def _parse_doxygen(text: str) -> list[dict[str, Any]]:
     blocks: list[dict[str, Any]] = []
     for match in DOCTYPE_BLOCK_RE.finditer(text):
@@ -194,7 +202,10 @@ def _parse_doxygen(text: str) -> list[dict[str, Any]]:
         entry: dict[str, Any] = {
             "start": match.start(), "end": match.end(),
             "ingroup": "", "override_id": "", "archs": [], "deprecated": None,
-            "params": {m.group("name"): m.group("direction") for m in PARAM_DOC_RE.finditer(body)},
+            "params": {
+                m.group("name"): _normalize_direction(m.group("direction"))
+                for m in PARAM_DOC_RE.finditer(body)
+            },
         }
         if group := INGROUP_RE.search(body):
             entry["ingroup"] = group.group(1)

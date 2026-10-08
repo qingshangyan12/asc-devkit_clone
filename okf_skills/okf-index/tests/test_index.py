@@ -70,6 +70,15 @@ class DeriveTests(unittest.TestCase):
         decls, _ = declarations_for("asc_add", self.include_db, "vector_compute")
         self.assertTrue(all(d.masked() for d in decls if d.params and d.params[0].is_vector))
 
+    def test_param_direction(self) -> None:
+        from derive.include_db import _normalize_direction, _parse_doxygen
+
+        self.assertEqual(_normalize_direction("in,out"), "in,out")
+        self.assertEqual(_normalize_direction("out, in "), "in,out")
+        self.assertEqual(_normalize_direction("in"), "in")
+        parsed = _parse_doxygen("/**\n * @param [in,out] address 地址。\n * @param [in] val 值。\n */")
+        self.assertEqual(parsed[0]["params"], {"address": "in,out", "val": "in"})
+
     def test_examples_db(self) -> None:
         db = build_examples_db(REPO_ROOT / "examples/02_simd_c_api/03_c_api")
         self.assertGreater(len(db), 50)

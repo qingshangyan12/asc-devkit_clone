@@ -110,7 +110,6 @@ types:
 aliases:
   ascMutexExecuteMode: asc_mutex_execute_mode
   AscendC::Te::CacheMode: cache_mode
-  asc_mutex_execute_mode: ascMutexExecuteMode
   int4b_t: int4x2_t
   MaskReg: vector_bool
   UnalignRegForLoad: vector_align
