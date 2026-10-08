@@ -32,7 +32,7 @@ inline __gm__ uint8_t* __gm__ g_sysPrintFifoSpace = nullptr;
 #include "impl/utils/debug/npu_arch_3002/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 2201
 #include "impl/utils/debug/npu_arch_2201/asc_debug_utils_impl.h"
-#elif __NPU_ARCH__ == 3510
+#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #include "impl/utils/debug/npu_arch_3510/asc_debug_utils_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "impl/utils/debug/npu_arch_5102/asc_debug_utils_impl.h"
@@ -76,7 +76,7 @@ __aicore__ inline uint64_t asc_debug_get_block_num() { return get_block_num(); }
 
 __aicore__ inline uint64_t asc_debug_get_block_total_num()
 {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     return asc_debug_get_block_num() * get_task_ration();
 #else
     return asc_debug_get_block_num();
@@ -203,7 +203,7 @@ __aicore__ inline void do_overlow_skip(
     ringbuf_skip_with_info(writeInfo, ringBufAddr, ringBufLen);
 }
 
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 __aicore__ inline bool ringbuf_overflow_wait(__gm__ DebugBlockReadInfo* readInfo, __gm__ DebugBlockWriteInfo* writeInfo)
 {
     constexpr uint32_t maxCounter = 15;
@@ -317,7 +317,7 @@ __aicore__ inline void asc_debug_get_cann_vserion(__gm__ char*& versionStr, uint
 __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
-    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     init_printf_ubuf_addr_aicore(asc_debug_get_block_idx());
 #endif
 }
@@ -325,7 +325,7 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugInitUb()
 __aicore__ static __attribute__((noinline)) void AscVFDebugFinish()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
-    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     __asc_simd_vf::asc_finish_flag();
 #endif
 }
@@ -333,7 +333,7 @@ __aicore__ static __attribute__((noinline)) void AscVFDebugFinish()
 __aicore__ static __attribute__((noinline)) bool AscVFDebugTransferUb()
 {
 #if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) && !defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && \
-    __NPU_ARCH__ == 3510 && !defined(__ASC_DISABLE_RESERVED_UBUF__)
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) && !defined(__ASC_DISABLE_RESERVED_UBUF__)
     if (g_sysPrintFifoSpace != nullptr) {
         return asc_vf_debug_ub2gm();
     }

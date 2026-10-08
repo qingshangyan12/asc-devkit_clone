@@ -465,7 +465,7 @@ __aicore__ inline void LoadData2DL12L0ATransposeCal(
  * Mmad                                             *
  * ************************************************************************************************* */
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadParams& mmadParams)
 {
@@ -606,7 +606,7 @@ __aicore__ inline void MmadCal(
 /* **************************************************************************************************
  * MmadMx                                                                                           *
  * **************************************************************************************************/
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadMxCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadParams& mmadParams)
 {

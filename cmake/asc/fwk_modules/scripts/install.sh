@@ -141,7 +141,7 @@ build_dlopen_lib_path() {
     local dlopen_lib_path=""
 
     # Keep target so directory first to avoid resolving same-name so from other paths.
-    dlopen_lib_path="${so_dir}:${sourcedir}/${vendordir}/op_api/lib"
+    dlopen_lib_path="${so_dir}:${sourcedir}/${vendordir}/op_api/lib:${ASCEND_HOME_PATH}/lib64"
     echo "${dlopen_lib_path}"
 }
 
@@ -163,6 +163,11 @@ import sys
 
 path = sys.argv[1]
 try:
+    for preload_name in ("libregister.so", "libexe_graph.so"):
+        try:
+            ctypes.CDLL(preload_name, mode=os.RTLD_GLOBAL)
+        except OSError:
+            pass
     ctypes.CDLL(path, mode=os.RTLD_NOW)
 except Exception as exc:
     print(str(exc))
@@ -171,7 +176,7 @@ PY
     )
     if [ $? -ne 0 ]; then
         err_msg="${err_msg//${so_path}/${so_name}}"
-        log "[ERROR] Failed to load ${so_name} wish env ASCEND_HOME_PATH(${ASCEND_HOME_PATH}),error message is ${err_msg}."
+        log "[ERROR] Failed to load ${so_name} with env ASCEND_HOME_PATH(${ASCEND_HOME_PATH}), error message is ${err_msg}."
         return 1
     fi
     return 0

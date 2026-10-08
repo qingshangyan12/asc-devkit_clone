@@ -23,7 +23,7 @@
 #ifndef IMPL_API_CHECK_KERNEL_CHECK_TRANSPOSE_TRANSDATA_TRANSDATA_CHECK_H_
 #define IMPL_API_CHECK_KERNEL_CHECK_TRANSPOSE_TRANSDATA_TRANSDATA_CHECK_H_
 #include "../../../../../../../include/adv_api/transpose/transdata_common.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || \
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) || \
                               __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
 #include "transdata_check_common.h"
 #else

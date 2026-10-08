@@ -151,7 +151,7 @@ __aicore__ inline void CheckFixpipeQuantPreCommon(const QuantMode_t quantPre, co
                                                     "is half, supported value is F322F16.\n",
                                                     apiName));
 #if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     } else if constexpr (IsSameType<PrimT<U>, float>::value && IsSameType<PrimT<T>, bfloat16_t>::value) {
         ASCENDC_DEBUG_ASSERT(
             (quantPre == QuantMode_t::F322BF16),
@@ -355,7 +355,7 @@ __aicore__ static inline void CheckLoadData2dLocal2Local(
 template <typename T>
 __aicore__ static inline void CheckLoadData2dGlobal2Local(const LocalTensor<T>& dst, const __gm__ char* apiName)
 {
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
     // only support GM -> A1 / B1
     CheckTensorPhyPosition<Hardware::L1>(dst, "dst", "L1 Buffer(A1/B1)", apiName);
     CheckTensorAlignment(dst, ONE_BLK_SIZE, "dst", apiName);
@@ -575,7 +575,7 @@ __aicore__ static inline void CheckLoadData3dv2ChannelSize(const uint16_t channe
     }
 #elif defined(__NPU_ARCH__) &&                                                                               \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102 || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     if constexpr (IsSameType<PrimT<T>, half>::value) {
         uint16_t remainderList[] = {0, 4, 8};

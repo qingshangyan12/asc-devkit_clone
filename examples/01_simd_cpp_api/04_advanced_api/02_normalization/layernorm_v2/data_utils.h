@@ -27,10 +27,10 @@
 
 static inline void InitCpuDebugPlatform()
 {
-#if defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510))
+#if defined(ASCENDC_CPU_DEBUG) && defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if __NPU_ARCH__ == 2201
     const char* socVersion = "Ascend910B1";
-#elif __NPU_ARCH__ == 3510
+#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
     const char* socVersion = "Ascend950PR_9589";
 #endif
     if (platform_ascendc::PlatformAscendCManager::GetInstance(socVersion) == nullptr) {
