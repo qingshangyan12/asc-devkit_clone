@@ -32,7 +32,7 @@
 #include "cube_in_buffer_n_buffer.h"
 #include "cube_in_buffer_bmm_db.h"
 #endif
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "cube_in_buffer_n_buffer.h"
 #include "cube_in_buffer_bmm_db.h"
 #endif
