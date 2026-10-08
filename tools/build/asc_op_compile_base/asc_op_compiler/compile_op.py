@@ -903,6 +903,10 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
         compile_info.code_channel = CORE_TYPE_CUBE
         compile_info.hard_sync = False
         _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
+    elif CommonUtility.is_516r2():
+        compile_info.code_channel = CORE_TYPE_CUBE
+        compile_info.hard_sync = False
+        _compile_ascendc_cce_516r2(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_regbase():
         _compile_ascendc_cce_regbase(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_v200() and compile_info.no_set_kernel_type is False:
@@ -1344,7 +1348,13 @@ def compile_op(
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510())
+        (
+            CommonUtility.is_c310()
+            or CommonUtility.is_m510()
+            or CommonUtility.is_516r2()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+        )
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -1419,7 +1429,13 @@ def compile_op_with_customized_config(
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510())
+        (
+            CommonUtility.is_c310()
+            or CommonUtility.is_m510()
+            or CommonUtility.is_516r2()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+        )
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -2155,6 +2171,31 @@ def get_core_info(compile_info: CompileInfo):
 
 
 def _compile_ascendc_cce_m510(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):
+    """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
+
+    Args:
+        compile_info (CompileInfo): compile info for generate .o and .json
+        compile_options (list): compile options for bisheng
+        tiling_info (TilingInfo): tiling info
+    """
+    sub_core_type = "AIC"
+    optional_core = "AiCore"
+    arch = None
+    set_soc_spec(optional_core)
+    tiling_key_list = call_bisheng_v220(
+        compile_info, compile_option_tuple, tiling_info, arch, compile_info.code_channel
+    )
+    _gen_non_mix_sub_json(compile_info, tiling_info, sub_core_type)
+    if not tiling_info.static_shape_flag:
+        _dynamic_kernel_list_to_json(
+            compile_info.kernel_name,
+            tiling_key_list,
+            compile_info.enable_deterministic,
+            compile_info.tiling_key_deterministic,
+        )
+
+
+def _compile_ascendc_cce_516r2(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):
     """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
 
     Args:

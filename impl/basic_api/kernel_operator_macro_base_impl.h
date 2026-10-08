@@ -22,17 +22,18 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_MACRO_BASE_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_MACRO_BASE_IMPL_H
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5162 || \
+                              __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #include "../../include/basic_api/kernel_tensor.h"
 #include "kernel_npu_debug.h"
+#include "kernel_operator_macro_check.h"
+#include "../../include/basic_api/kernel_struct_macro.h"
 
 #if defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #include "dav_5161/kernel_operator_macro_impl.h"
-#endif
-#include "kernel_operator_macro_check.h"
-#include "../../include/basic_api/kernel_struct_macro.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_macro_impl.h"
 
 namespace AscendC {
 __aicore__ inline void SetConvKernelImpl(const ConvKernelBitModeParams& params) { SetConvKernelCal(params); }
@@ -146,7 +147,14 @@ __aicore__ inline void ConvFixImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const ConvFixBitModeParams& convFixParams)
 {
-    ConvFixCal<T, U, S, V>(
+    const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
+    if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check bias tensor position in ConvFix, supported positions are CO1 or C2");
+        });
+    }
+    ConvFixCal(
         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
         (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), convFixParams);
 }
@@ -156,7 +164,14 @@ __aicore__ inline void ConvFixImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const ConvFixParams& convFixParams)
 {
-    ConvFixCal<T, U, S, V>(
+    const Hardware biasScope = GetPhyType((TPosition)bias.GetPosition());
+    if (biasScope != Hardware::L0C && biasScope != Hardware::BIAS) {
+        ASCENDC_ASSERT((false), {
+            KERNEL_LOG(
+                KERNEL_ERROR, "Failed to check bias tensor position in ConvFix, supported positions are CO1 or C2");
+        });
+    }
+    ConvFixCal(
         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)fm.GetPhyAddr(),
         (__cb__ PrimT<S>*)filter.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), convFixParams);
 }
@@ -186,7 +201,7 @@ __aicore__ inline void MmadFixImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
     const MmadFixBitModeParams& mmadFixParams)
 {
-    MmadFixCal<T, U, S, V>(
+    MmadFixCal(
         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
 }
@@ -196,7 +211,7 @@ __aicore__ inline void MmadFixImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
     const MmadFixParams& mmadFixParams)
 {
-    MmadFixCal<T, U, S, V>(
+    MmadFixCal(
         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
 }
@@ -226,7 +241,7 @@ __aicore__ inline void MmadMxFixImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
     const MmadFixBitModeParams& mmadFixParams)
 {
-    MmadMxFixCal<T, U, S, V>(
+    MmadMxFixCal(
         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
 }
@@ -236,12 +251,13 @@ __aicore__ inline void MmadMxFixImpl(
     const LocalTensor<T>& dst, const LocalTensor<U>& left, const LocalTensor<S>& right, const LocalTensor<V>& bias,
     const MmadFixParams& mmadFixParams)
 {
-    MmadMxFixCal<T, U, S, V>(
+    MmadMxFixCal(
         (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__cbuf__ PrimT<U>*)left.GetPhyAddr(),
         (__cb__ PrimT<S>*)right.GetPhyAddr(), (uint64_t)bias.GetPhyAddr(), mmadFixParams);
 }
 } // namespace AscendC
 
+#endif
 #endif // __NPU_ARCH__
 #endif // ASCENDC_MODULE_OPERATOR_MACRO_BASE_IMPL_H
 
