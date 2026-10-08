@@ -1,30 +1,13 @@
 ---
 okftype: reference.api
-title: asc_unsqueeze
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md
-description: 根据mask对目的矢量数据寄存器进行解压缩，dst第0个元素置为0，第i个元素等于mask中前i个元素中1的数量，mask最高位被忽略，结果也可通过函数返回值返回。
+description: "根据mask对目的矢量数据寄存器执行解压缩，第0个元素置为0，第i个元素等于mask中前i个元素中1的数量，mask最高位被忽略不参与统计，结果也可通过函数返回值返回，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [compact]
-  - objects: [mask, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-signature:
-  - override_id: asc_unsqueeze_u8__vb
-  - override_id: asc_unsqueeze_s8__vb
-  - override_id: asc_unsqueeze_u16__vb
-  - override_id: asc_unsqueeze_s16__vb
-  - override_id: asc_unsqueeze_u32__vb
-  - override_id: asc_unsqueeze_s32__vb
-  - prototype_id: asc_unsqueeze__Rv<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - operations: [bit_manipulation]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_unsqueeze
 

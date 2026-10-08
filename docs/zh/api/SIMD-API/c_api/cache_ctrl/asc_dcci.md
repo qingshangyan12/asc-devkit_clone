@@ -1,30 +1,19 @@
 ---
 okftype: reference.api
-title: asc_dcci
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
-description: 用于维护DCache与GM间的缓存一致性：Clean将缓存中脏数据写回GM避免丢失，Invalid将指定地址范围的Cache Line标记无效并从缓存移除，下次访问时从GM重新加载数据，提供按单个地址或整个目标域刷新的多组接口。
+description: "维护DCache与GM间的缓存一致性，Clean将被修改的脏数据写回GM避免丢失，Invalid将指定地址范围的Cache Line标记无效并在下次访问时从GM重新加载，提供按单个地址或整个目标域刷新的多组接口。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
-  - families: [cache_management]
-signature:
-  - override_id: asc_dcci_single__PGv
-  - override_id: asc_ub_dcci_single__PUv
-  - override_id: asc_dcci_entire_all__z
-  - override_id: asc_dcci_entire_ub__z
-  - override_id: asc_dcci_entire_out__z
-  - override_id: asc_dcci_entire_atomic__z
-archs: ['2201', '3510']
-header: [/include/c_api/cache_ctrl/cache_ctrl.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md
     kind: related
+    condition: "若通过asc_load_dev与asc_store_dev读写GM则不经过DCache，无需调用本接口"
   - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
     kind: related
+    condition: "若通过asc_load_dev与asc_store_dev读写GM则不经过DCache，无需调用本接口"
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: constrained_by
+    condition: "Scalar单元读写UB时是否经过DCache由asc_set_ctrl配置的CTRL49位控制"
+version: 9.0.0-
 ---
 # asc_dcci
 

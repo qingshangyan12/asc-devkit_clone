@@ -1,22 +1,13 @@
 ---
 okftype: reference.api
-title: asc\_vf\_call
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/vf_call/asc_vf_call.md
-description: 在SIMD C API编程场景下于Kernel中启动Vector Function（VF）子任务，VF函数内可调用Reg矢量计算C API完成寄存器级搬运和计算；入口函数须用__simd_vf__修饰，入参仅支持内置数据类型及其指针、数组、结构体，传入的地址指针须指向Unified
-  Buffer（UB）内存。
+description: "在Kernel中启动Vector Function（VF）子任务，VF函数内可调用Reg矢量计算C API完成寄存器级搬运和计算；入口函数须用__simd_vf__修饰且不能是类的成员函数，入参仅支持内置数据类型及其指针、数组、结构体，传入地址指针须指向UB内存。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
-signature:
-  - override_id: asc_vf_call__QOpArgs
-    archs: ['3510']
-    headers: []
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: Vector Function内部如存在UB地址重叠或跨流水依赖
-examples: []
-timestamp: '2026-09-23'
+    kind: requires
+    condition: "Vector Function内部如存在UB地址重叠或跨流水依赖"
+version: 9.0.0-
 ---
 # asc\_vf\_call
 

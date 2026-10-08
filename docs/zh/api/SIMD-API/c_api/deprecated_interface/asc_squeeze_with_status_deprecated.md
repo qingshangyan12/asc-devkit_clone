@@ -1,41 +1,18 @@
 ---
 okftype: reference.api
-title: asc_squeeze_with_status（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md
-description: 已废弃的矢量计算接口，将src中被mask选择的有效元素依次复制到dst连续排列，剩余位置置0，并将有效数据大小保存至AR寄存器，请改用asc_squeeze_and_storeunalign实现筛选并连续搬出功能。
+description: "该接口已废弃，请使用asc_squeeze_and_storeunalign实现筛选并连续搬出有效元素的功能；将src中被mask选择的有效元素依次复制到dst连续排列、剩余位置置0，并将有效数据大小保存至AR寄存器，搬出时配合asc_storeunalign_postupdate用作存储偏移量，AR值可通过asc_get_squeeze_status获取。"
 tag:
-  - api_surfaces: [c_api]
-  - roles: [compute]
+  - roles: [data_movement]
   - operations: [compact]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked]
-signature:
-  - override_id: asc_squeeze_with_status__Rvi8_vi8_vb
-  - override_id: asc_squeeze_with_status__Rvu8_vu8_vb
-  - override_id: asc_squeeze_with_status__Rvhf8_vhf8_vb
-  - override_id: asc_squeeze_with_status__Rvf8e5m2_vf8e5m2_vb
-  - override_id: asc_squeeze_with_status__Rvf8e4m3_vf8e4m3_vb
-  - override_id: asc_squeeze_with_status__Rvf8e8m0_vf8e8m0_vb
-  - override_id: asc_squeeze_with_status__Rvi16_vi16_vb
-  - override_id: asc_squeeze_with_status__Rvu16_vu16_vb
-  - override_id: asc_squeeze_with_status__Rvf16_vf16_vb
-  - override_id: asc_squeeze_with_status__Rvbf16_vbf16_vb
-  - override_id: asc_squeeze_with_status__Rvi32_vi32_vb
-  - override_id: asc_squeeze_with_status__Rvu32_vu32_vb
-  - override_id: asc_squeeze_with_status__Rvf32_vf32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
-    kind: related
-    condition: 实现筛选并连续搬出有效元素的功能
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
     kind: related
-    condition: 将有效数据大小保存至AR寄存器
+    condition: "搬出时使用该值作为存储偏移量"
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-9.2.0
 ---
 # asc_squeeze_with_status（废弃）
 

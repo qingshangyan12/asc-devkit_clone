@@ -1,30 +1,18 @@
 ---
 okftype: reference.api
-title: asc_or_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_or_sync_deprecated.md
-description: 已废弃的同步计算接口，对每对元素执行按位或运算并将结果写入目的矢量，需改用非同步接口asc_or配合同步接口asc_sync替代。
+description: "已废弃的同步按位或接口，对每对元素执行按位或运算并将结果写入目的矢量，起始地址需32字节对齐；请改用非同步接口asc_or配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [bitwise]
-  - operations: [bitwise_or]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise]
-signature:
-  - override_id: asc_or_sync__PUi16_PUi16_PUi16_u32
-  - override_id: asc_or_sync__PUu16_PUu16_PUu16_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [bitwise_or, synchronization]
+  - traits: [aligned_transfer, elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 已废弃接口的替代方案
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md
-    kind: related
-    condition: 已废弃接口的替代方案
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_or_sync（废弃）
 

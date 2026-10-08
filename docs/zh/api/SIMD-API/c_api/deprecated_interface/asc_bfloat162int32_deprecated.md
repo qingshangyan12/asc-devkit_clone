@@ -1,45 +1,19 @@
 ---
 okftype: reference.api
-title: asc_bfloat162int32（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162int32_deprecated.md
-description: 根据掩码将bfloat16_t元素逐个转换为int32_t类型，支持多种舍入与饱和或非饱和模式，并通过接口后缀选择读取源操作数偶数或奇数索引位置；该类原型已废弃，请使用显式位置参数重载替代。
+description: "根据掩码将bfloat16_t元素逐个转换为int32_t类型，支持五种舍入模式与饱和、非饱和模式，因位宽比为1:2经接口后缀选择读取偶数或奇数索引；该类原型已废弃，请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_bfloat162int32_rd__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rd_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rd_sat_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rn__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rn_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rn_sat_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rna__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rna_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rna_sat_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_ru__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_ru_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_ru_sat_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rz__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rz_v2__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb
-  - override_id: asc_bfloat162int32_rz_sat_v2__Rvi32_vbf16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode, widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162int32.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_bfloat162int32（废弃）
 

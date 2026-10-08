@@ -1,30 +1,20 @@
 ---
 okftype: reference.api
-title: asc_vdeq_int162b8_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md
-description: 该接口已废弃，将int16_t类型转化为int8_t或uint8_t类型并存放在每个DataBlock的上半块或下半块，使用前需先调用asc_set_deq_scale设置量化参数，请使用非同步接口配合asc_sync替代。
+description: "已废弃的同步反量化转换接口，将int16_t类型转化为int8_t或uint8_t类型并存放在每个DataBlock的上半块或下半块，使用前需先设置量化参数，目的与源起始地址需32字节对齐；请改用非同步接口asc_vdeq_int162b8配合asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [conversion]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, quantization]
-signature:
-  - override_id: asc_vdeq_int162b8_h_sync__PUi8_PUi16_u32
-  - override_id: asc_vdeq_int162b8_h_sync__PUu8_PUi16_u32
-  - override_id: asc_vdeq_int162b8_l_sync__PUi8_PUi16_u32
-  - override_id: asc_vdeq_int162b8_l_sync__PUu8_PUi16_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [conversion, synchronization]
+  - traits: [aligned_transfer, quantization]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_vdeq_int162b8_sync（废弃）
 

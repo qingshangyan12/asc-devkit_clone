@@ -1,23 +1,14 @@
 ---
 okftype: reference.api
-title: asc_sync_pipe
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
-description: 完成同一流水内的同步控制，约束同一流水内部的执行顺序。传入PIPE_ALL时等待所有流水的前序指令全部完成后才解除阻塞，功能等价于asc_sync；传入其他合法流水值时仅阻塞该流水的后续指令，不影响其他流水。
+description: "完成同一流水内的同步控制，约束同一流水内部的执行顺序，保证指定流水前序指令的所有数据读写完成后后序指令才开始执行；传入PIPE_ALL时等待所有流水前序指令完成，功能等价于asc_sync，传入其他流水值时仅阻塞该流水，不支持PIPE_S单流水同步。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
   - operations: [synchronization]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_sync_pipe__pipe
-archs: ['2201', '3510']
-header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: 传入`PIPE_ALL`时
-examples: []
-timestamp: '2026-09-28'
+    condition: "传入PIPE_ALL时"
+version: 9.0.0-
 ---
 # asc_sync_pipe
 

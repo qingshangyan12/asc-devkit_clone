@@ -1,28 +1,19 @@
 ---
 okftype: reference.api
-title: asc_enable_hf32
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md
-description: 设置Mmad计算开启HF32模式，开启后L0A Buffer与L0B Buffer中的FP32数据在参与Mmad计算之前被舍入为HF32格式，可提升FP32数据计算性能但带来一定精度损失，最终结果仍以FP32格式输出。
+description: "设置Mmad计算开启HF32模式以提升FP32数据计算性能但带来一定精度损失，L0A与L0B Buffer中的FP32数据在参与Mmad计算前被舍入为HF32格式，舍入模式由配套接口配置，最终结果仍以FP32格式输出，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [matrix_compute]
   - traits: [rounding_mode]
-signature:
-  - override_id: asc_enable_hf32__z
-archs: ['2201', '3510']
-header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md
     kind: related
-    condition: 如需关闭HF32模式
+    condition: "如需关闭HF32模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md
     kind: related
-    condition: HF32模式启用后
-examples: []
-timestamp: '2026-09-28'
+    condition: "HF32模式启用后"
+version: 9.1.0-
 ---
 # asc_enable_hf32
 

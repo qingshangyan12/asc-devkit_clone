@@ -1,46 +1,36 @@
 ---
 okftype: reference.api
-title: asc_copy_l0c2l1
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
-description: 将矩阵计算结果从L0C Buffer搬运到L1 Buffer，搬运过程中可组合随路量化、ReLU、Nz2ND格式转换和通道拆分能力，需通过配套接口预先配置相关参数，仅在AIC上执行有效。
+description: "将矩阵计算结果从L0C Buffer搬运到L1 Buffer，搬运过程中可组合随路量化、ReLU、Nz2ND格式转换与通道拆分能力，相关参数需通过配套接口预先配置，仅在AIC上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, layout_transform]
-  - source_locations: [l0c_buffer]
-  - destination_locations: [l1_buffer]
-  - traits: [quantization]
-signature:
-  - prototype_id: asc_copy_l0c2l1__PL1<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_unitflag_quantmode_relupre_b_b_b_b
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer, quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
     kind: requires
-    condition: Nz2DN格式转换场景下
+    condition: "Nz2DN格式转换场景下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
     kind: requires
-    condition: 随路tensor量化模式下
+    condition: "随路tensor量化模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md
     kind: requires
-    condition: 随路激活模式下
+    condition: "随路激活模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
     kind: requires
-    condition: Nz2ND格式转换场景下
+    condition: "Nz2ND/Nz2DN格式转换场景下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md
     kind: requires
-    condition: 随路scalar量化模式下
+    condition: "随路scalar量化模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
     kind: requires
-    condition: 随路激活模式下
+    condition: "随路激活模式下"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_l0c2l1
 

@@ -1,28 +1,18 @@
 ---
 okftype: reference.api
-title: asc_not_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_not_sync_deprecated.md
-description: 已废弃的同步接口，按元素对矢量做按位取反运算，结果写入dst，请使用非同步接口asc_not配合同步接口asc_sync替代。
+description: "已废弃的同步按位取反接口，按元素对矢量源操作数做按位取反并将结果写入目的操作数，起始地址需32字节对齐；请改用非同步接口asc_not配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [bitwise]
-  - operations: [bitwise_not]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise]
-signature:
-  - override_id: asc_not_sync__PUi16_PUi16_u32
-  - override_id: asc_not_sync__PUu16_PUu16_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [bitwise_not, synchronization]
+  - traits: [aligned_transfer, elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_not.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_not_sync（废弃）
 

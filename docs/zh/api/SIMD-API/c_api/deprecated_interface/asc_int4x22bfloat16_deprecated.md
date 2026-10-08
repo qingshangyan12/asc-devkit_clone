@@ -1,28 +1,13 @@
 ---
 okftype: reference.api
-title: asc_int4x22bfloat16（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22bfloat16_deprecated.md
-description: 已废弃的类型转换接口，根据mask将int4x2_t存储单元中打包的两个4bit有符号整数转换为bfloat16_t类型，掩码位为1时两个4bit整数同时转换、为0时对应结果置0，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，根据mask将int4x2_t存储单元中打包的两个4bit有符号整数转换为bfloat16_t类型，掩码位为1时两个4bit整数同时转换、为0时对应结果置0；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked]
-signature:
-  - override_id: asc_int4x22bfloat16__Rvbf16_vi4x2_vb
-  - override_id: asc_int4x22bfloat16_v2__Rvbf16_vi4x2_vb
-  - override_id: asc_int4x22bfloat16_v3__Rvbf16_vi4x2_vb
-  - override_id: asc_int4x22bfloat16_v4__Rvbf16_vi4x2_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md
-    kind: related
-    condition: 无显式位置参数原型已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_int4x22bfloat16（废弃）
 

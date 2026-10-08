@@ -1,28 +1,14 @@
 ---
 okftype: reference.api
-title: asc_hif82float（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_hif82float_deprecated.md
-description: 已废弃的寄存器矢量转换接口，将hifloat8_t类型数据转换为float类型，源与目的位宽比为1:4，按接口后缀选取索引0至3的读取位置，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将hifloat8_t类型数据转换为float类型，因位宽比为1:4分四部分按接口后缀选取索引0至3的读取位置；请改用asc_hif82float的显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, widening_result]
-signature:
-  - override_id: asc_hif82float__Rvf32_vhf8_vb
-  - override_id: asc_hif82float_v2__Rvf32_vhf8_vb
-  - override_id: asc_hif82float_v3__Rvf32_vhf8_vb
-  - override_id: asc_hif82float_v4__Rvf32_vhf8_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md
-    kind: related
-    condition: 原型已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_hif82float（废弃）
 

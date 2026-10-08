@@ -1,33 +1,6 @@
 ---
-okftype: reference.index
-title: Reg数据搬入概述
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/reg_load_overview.md
-description: 介绍Reg数据搬入接口的分类与选择：将Unified Buffer（UB）中的数据搬入矢量数据寄存器、掩码寄存器或非对齐寄存器，涵盖对齐与非对齐搬入接口、非对齐搬入搬出原理及b64数据类型的搬运方法。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement]
-  - operations: [load]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍Reg数据搬入接口的分类与选择，将Unified Buffer中的数据搬入矢量数据寄存器、掩码寄存器或非对齐寄存器，覆盖对齐与非对齐搬入接口、非对齐搬入搬出配合关系及b64数据类型的搬运方法，接口仅在AIV上生效且需在Vector Function内调用。"
 ---
 # Reg数据搬入概述
 

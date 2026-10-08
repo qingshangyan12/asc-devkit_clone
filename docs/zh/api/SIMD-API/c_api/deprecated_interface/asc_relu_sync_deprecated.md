@@ -1,31 +1,18 @@
 ---
 okftype: reference.api
-title: asc_relu_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_relu_sync_deprecated.md
-description: 已废弃的同步计算接口，对矢量数据按元素做线性整流Relu运算，请使用非同步接口asc_relu配合同步接口asc_sync替代。
+description: "已废弃的同步线性整流接口，对矢量按元素做Relu运算并将结果写入目的操作数，起始地址需32字节对齐；请改用非同步接口asc_relu配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [activation]
-  - operations: [relu]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise]
-signature:
-  - override_id: asc_relu_sync__PUf16_PUf16_u32
-  - override_id: asc_relu_sync__PUi32_PUi32_u32
-  - override_id: asc_relu_sync__PUf32_PUf32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [relu, synchronization]
+  - traits: [aligned_transfer, elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 已废弃接口的替代方案
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_relu.md
-    kind: related
-    condition: 已废弃接口的替代方案
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_relu_sync（废弃）
 

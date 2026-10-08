@@ -1,34 +1,16 @@
 ---
 okftype: reference.api
-title: asc_int642float（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642float_deprecated.md
-description: 已废弃的类型转换接口，将int64_t类型数据转换为float并支持多种舍入模式，源与目的类型位宽比为2:1，按接口后缀选择数据写入奇数或偶数索引位置，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将int64_t类型数据转换为float并支持多种舍入模式，因位宽比为2:1写入时需将一个VL大小的数据分为两部分并按接口后缀选取奇偶索引；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode]
-signature:
-  - override_id: asc_int642float_rn__Rvf32_vi64_vb
-  - override_id: asc_int642float_rn_v2__Rvf32_vi64_vb
-  - override_id: asc_int642float_rna__Rvf32_vi64_vb
-  - override_id: asc_int642float_rna_v2__Rvf32_vi64_vb
-  - override_id: asc_int642float_rd__Rvf32_vi64_vb
-  - override_id: asc_int642float_rd_v2__Rvf32_vi64_vb
-  - override_id: asc_int642float_ru__Rvf32_vi64_vb
-  - override_id: asc_int642float_ru_v2__Rvf32_vi64_vb
-  - override_id: asc_int642float_rz__Rvf32_vi64_vb
-  - override_id: asc_int642float_rz_v2__Rvf32_vi64_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md
-    kind: related
-    condition: 接口后缀控制写入位置的原型已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_int642float（废弃）
 

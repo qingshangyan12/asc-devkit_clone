@@ -1,36 +1,17 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l0b_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l0b_sync_deprecated.md
-description: 将矩阵数据从Global Memory搬运到L0B Buffer，按起始分块ID、迭代次数及相邻迭代间的源步长和目的间隔控制搬运；接口已废弃，请使用非同步接口asc_copy_gm2l0b和asc_sync替代。
+description: "将矩阵数据从Global Memory搬运到L0B Buffer，以16×16个数对矩阵分块，按起始分块ID、迭代次数及源步长和目的间隔控制搬运；接口已废弃，请改用非同步接口asc_copy_gm2l0b配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
-  - operations: [copy]
-  - objects: [matrix]
-  - source_locations: [global_memory]
-  - destination_locations: [l0b_buffer]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_copy_gm2l0b_sync__PCBi4x2_PGi4x2_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b_sync__PCBi8_PGi8_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b_sync__PCBu8_PGu8_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b_sync__PCBf16_PGf16_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b_sync__PCBbf16_PGbf16_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b_sync__PCBi32_PGi32_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b_sync__PCBu32_PGu32_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b_sync__PCBf32_PGf32_u16_u8_u16_u16
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - operations: [copy, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l0b.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_copy_gm2l0b_sync（废弃）
 

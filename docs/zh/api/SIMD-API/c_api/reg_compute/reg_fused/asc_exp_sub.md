@@ -1,17 +1,14 @@
 ---
 okftype: reference.api
-title: asc_exp_sub
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md
-description: 根据mask将src0与src1按元素相减，并计算以差值为指数的自然指数函数：float输入直接计算，half输入由asc_exp_sub_half2float按偶数或奇数索引读取并转为float后计算，结果写入dst或通过返回值返回，仅在AIV上生效。
+description: "根据掩码将两个源操作数按元素相减并以差值为指数计算自然指数函数，float输入直接计算，half输入由half2float变体按偶数或奇数索引读取元素并转为float后计算，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [exponential, subtract]
-  - execution_models: [register_vector]
-  - traits: [elementwise, masked]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_exp_sub
 

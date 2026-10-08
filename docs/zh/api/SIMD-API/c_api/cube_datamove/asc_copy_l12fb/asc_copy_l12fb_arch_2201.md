@@ -1,23 +1,14 @@
 ---
 okftype: reference.api
-title: asc_copy_l12fb
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_2201.md
-description: 将数据从L1 Buffer搬运到Fixpipe Buffer中，Fixpipe Buffer用于存放量化参数，提供前n个数据搬运和高维切分搬运两种重载，前n个数据搬运时搬运数据大小要求32字节对齐。
+description: "将数据从L1 Buffer搬运到Fixpipe Buffer，该Buffer用于存放量化参数，提供前n个数据搬运与高维切分搬运两种重载，前n个数据搬运时搬运数据大小要求32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [l1_buffer]
-  - destination_locations: [fixpipe_buffer]
-  - traits: [high_dimensional, quantization]
-signature:
-  - override_id: asc_copy_l12fb__PFBv_PL1v_u32@2201
-  - override_id: asc_copy_l12fb__PFBv_PL1v_u16_u16_u16_u16@2201
-archs: ['2201']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [aligned_transfer, datablock_granularity, high_dimensional, quantization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.1.0-
 ---
 # asc_copy_l12fb
 

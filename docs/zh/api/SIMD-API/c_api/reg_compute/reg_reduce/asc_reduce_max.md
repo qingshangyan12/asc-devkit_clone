@@ -1,27 +1,13 @@
 ---
 okftype: reference.api
-title: asc_reduce_max
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max.md
-description: 根据mask对源矢量数据寄存器执行归约最大值操作，最大值保存于dst第0个元素，其索引的原始位模式保存于第1个元素，其余元素置0，存在多个最大值时保留最小索引。
+description: "根据mask对源矢量数据寄存器执行归约最大值操作，最大值保存于dst第0个元素、其索引的原始位模式保存于第1个元素，其余元素置0，存在多个最大值时保留最小索引，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [reduction]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked]
-signature:
-  - prototype_id: asc_reduce_max__v<dtype>_vb
-    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
-  - prototype_id: asc_reduce_max__Rv<dtype>_v<dtype>_vb
-    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_reduce.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_reduce_max
 

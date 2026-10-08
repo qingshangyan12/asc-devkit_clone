@@ -1,29 +1,18 @@
 ---
 okftype: reference.api
-title: asc_enable_fp8（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md
-description: 已废弃的矩阵计算模式配置接口：设置Mmad计算开启FP8模式，该接口会关闭HiF8模式，与asc_enable_hif8不同时生效，需在asc_mmad执行前调用，请使用asc_disable_hif8接口替代。
+description: "已废弃的模式配置接口，设置Mmad计算开启FP8模式并关闭HiF8模式，使FP8数据参与Mmad计算前不被转换为hifloat8_t类型，需在asc_mmad执行前调用；请改用asc_disable_hif8接口替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [matrix_compute]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_enable_fp8__z
-archs: ['3510']
-header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md
     kind: related
-    condition: 与asc_enable_hif8相反，二者不同时生效
+    condition: "与asc_enable_hif8相反，二者不同时生效"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
-    condition: 需在asc_mmad执行前调用
-examples: []
-timestamp: '2026-09-28'
+    condition: "需在asc_mmad执行前调用"
+version: 9.1.0-9.2.0
 ---
 # asc_enable_fp8（废弃）
 

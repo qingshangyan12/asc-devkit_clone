@@ -1,25 +1,19 @@
 ---
 okftype: reference.api
-title: asc_set_gm2l1_loop_size
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md
-description: 将数据从GM搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式的内层和外层循环次数，需与循环步长配置接口配合使用，仅在AIC上生效。
+description: "设置asc_copy_gm2l1_align循环填充模式内层与外层循环的迭代次数，需与内外层循环步长配置接口配合使用，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-signature:
-  - override_id: asc_set_gm2l1_loop_size__u64_u64
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md
     kind: configures
-    condition: 循环填充模式
+    condition: "使用循环填充模式时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md
     kind: related
+    condition: "使用循环填充模式时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "使用循环填充模式时"
+version: 9.0.0-
 ---
 # asc_set_gm2l1_loop_size
 

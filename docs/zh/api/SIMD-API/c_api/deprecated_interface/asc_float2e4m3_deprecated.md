@@ -1,34 +1,19 @@
 ---
 okftype: reference.api
-title: asc_float2e4m3（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md
-description: 已废弃接口，将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式与饱和、非饱和模式，位宽比为4:1需分四部分按索引写入，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式与饱和、非饱和模式，因位宽比为4:1分四部分按索引写入目的寄存器；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_float2e4m3_rn__Rvf8e4m3_vf32_vb
-  - override_id: asc_float2e4m3_rn_sat__Rvf8e4m3_vf32_vb
-  - override_id: asc_float2e4m3_rn_v2__Rvf8e4m3_vf32_vb
-  - override_id: asc_float2e4m3_rn_sat_v2__Rvf8e4m3_vf32_vb
-  - override_id: asc_float2e4m3_rn_v3__Rvf8e4m3_vf32_vb
-  - override_id: asc_float2e4m3_rn_sat_v3__Rvf8e4m3_vf32_vb
-  - override_id: asc_float2e4m3_rn_v4__Rvf8e4m3_vf32_vb
-  - override_id: asc_float2e4m3_rn_sat_v4__Rvf8e4m3_vf32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "开启饱和模式和非饱和模式时"
+version: 9.0.0-
 ---
 # asc_float2e4m3（废弃）
 

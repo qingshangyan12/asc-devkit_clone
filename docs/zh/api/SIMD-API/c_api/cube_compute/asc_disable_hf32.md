@@ -1,29 +1,14 @@
 ---
 okftype: reference.api
-title: asc_disable_hf32
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md
-description: 设置Mmad计算关闭HF32模式，作用与asc_enable_hf32相反且二者不同时生效；关闭后L0A Buffer与L0B Buffer中的float数据在参与Mmad计算之前不做舍入处理。
+description: "设置Mmad计算关闭HF32模式，作用与asc_enable_hf32相反且二者不同时生效，需在asc_mmad执行前调用；关闭后L0A与L0B Buffer中的float数据在参与Mmad计算之前不做舍入处理，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [matrix_compute]
-signature:
-  - override_id: asc_disable_hf32__z
-archs: ['2201', '3510']
-header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md
     kind: related
-    condition: 其作用与[asc_enable_hf32](./asc_enable_hf32.md)相反，两个接口不同时生效。
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
-    condition: 本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
-    file: matmul.asc
-    archs: ['3510']
-    override_id: asc_disable_hf32__z
-timestamp: '2026-09-28'
+version: 9.2.0-
 ---
 # asc_disable_hf32
 

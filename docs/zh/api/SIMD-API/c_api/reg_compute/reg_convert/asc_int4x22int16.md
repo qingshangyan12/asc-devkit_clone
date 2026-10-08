@@ -1,24 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int4x22int16
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22int16.md
-description: 根据掩码将源操作数中参与计算的4bit有符号整数转换为int16_t类型，单个源数据与目的数据位宽比为1:4，按四分之一位置标签离散选取源读取位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+description: "根据掩码将源操作数中打包存储的4bit有符号整数转换为int16_t类型写入目的矢量数据寄存器，同一存储单元的两个整数共享一个掩码位并同时参与转换；因位宽比为1:4，按四分之一位置标签离散选取源读取位置，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [elementwise, masked, widening_result]
-signature:
-  - archs: ['3510']
-    headers: []
-    override_id: asc_int4x22int16__Rvi16_vi4x2_vb_icposquarter
-  - archs: ['3510']
-    headers: []
-    override_id: asc_int4x22int16__vi4x2_vb_icposquarter
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_int4x22int16
 

@@ -1,17 +1,16 @@
 ---
-okftype: reference.type
-title: asc_store_l2_cache_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md
-description: 该枚举表示Unified Buffer（UB）到GM搬运时的L2 Cache策略，也用于标量访存路径的store策略配置与查询。
+okftype: reference.enum
+description: "表示数据从Unified Buffer搬运到GM时的L2 Cache策略，提供启用并标记替换优先级、驻留及不分配等模式，供向量搬运接口与标量store策略配置查询使用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - families: [cache_management]
-declaration:
-  symbol: asc_store_l2_cache_mode
-  underlying_type: uint8_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_store_l2_cache_mode
 

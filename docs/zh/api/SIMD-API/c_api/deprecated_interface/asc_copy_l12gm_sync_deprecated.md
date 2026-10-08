@@ -1,26 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_l12gm_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12gm_sync_deprecated.md
-description: 已废弃的同步搬运接口，将数据从L1 Buffer搬运到Global Memory，请改用对应的非同步接口和asc_sync替代。
+description: "已废弃的同步搬运接口，将数据从L1 Buffer搬运到GM，按连续数据块个数、块长度与源目间隔组织搬运，块长度以32字节为单位；请改用非同步接口asc_copy_l12gm和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [l1_buffer]
-  - destination_locations: [global_memory]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_copy_l12gm_sync__PGv_PL1v_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - traits: [datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12gm.md
-    kind: related
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_copy_l12gm_sync（废弃）
 

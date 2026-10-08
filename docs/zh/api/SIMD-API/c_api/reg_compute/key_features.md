@@ -1,44 +1,6 @@
 ---
-okftype: reference.index
-title: 关键特性说明
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md
-description: 介绍Reg矢量计算关键特性：VF循环满足Hardware Loop编码规范时可被编译器优化提升编码性能，指令双发提升单位时间指令处理效率，VF融合为编译器优化特性，并汇总各场景下数据搬运C
-  API接口的选择与示例。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [compute, data_movement]
-  - operations: [load, store]
-  - execution_models: [register_vector]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md
-    kind: related
-  - path: docs/zh/api/appendix/reg_vector_compute_interface_instruction_single_dual_issue_summary.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍Reg矢量计算的关键特性：VF循环满足Hardware Loop编码规范时可被编译器优化以提升编码性能，指令双发在同一时钟周期发射两条指令提升处理效率，VF融合将多个VF函数融合为一个VF函数，并按连续对齐、非对齐、离散等场景汇总数据搬运C API接口的选择与示例。"
 ---
 # 关键特性说明
 

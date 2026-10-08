@@ -1,17 +1,12 @@
 ---
-okftype: reference.type
-title: ASC_VDEQ_SIZE
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md
-description: 定义反量化缩放接口数组的元素个数常量，规定scale、offset和sign模式数组长度为16。
+okftype: reference.constant
+description: "定义反量化缩放配置中scale、offset与sign模式三个数组的元素个数常量，值为16，用于asc_set_deq_scale接口的数组长度定义。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-declaration:
-  symbol: ASC_VDEQ_SIZE
-  value: '16'
-  type: uint8_t
-header: [/include/c_api/defs/constant.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+    kind: related
+version: 9.0.0-
 ---
 # ASC_VDEQ_SIZE
 

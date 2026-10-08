@@ -1,19 +1,10 @@
 ---
 okftype: reference.api
-title: asc_datacache_preload
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md
-description: 从Global Memory指定地址预加载一个64字节的Cache Line数据到DCache，为后续Scalar单元读取提前填充缓存、降低首次访问延迟；预取地址由address与offset相加得到，建议连续调用不超过4次。
+description: "从Global Memory指定地址预加载一个64字节的Cache Line数据到DCache，为后续Scalar单元读取提前填充缓存以降低首次访问延迟，预取地址由address与offset相加得到，频繁调用可能阻塞Scalar流水线，建议连续调用不超过4次。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
-  - families: [cache_management]
-signature:
-  - override_id: asc_datacache_preload__PGu64_i64
-archs: ['2201', '3510']
-header: [/include/c_api/cache_ctrl/cache_ctrl.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_datacache_preload
 

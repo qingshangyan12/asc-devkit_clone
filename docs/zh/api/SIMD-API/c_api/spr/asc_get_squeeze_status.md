@@ -1,25 +1,19 @@
 ---
 okftype: reference.api
-title: asc_get_squeeze_status
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
-description: 读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，需先清空AR寄存器并完成数据筛选后再调用，用于获取已连续搬出的有效数据量。
+description: "读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于获取已连续搬出的有效数据量，调用前需先经asc_squeeze_and_storeunalign_init清空AR寄存器并完成数据筛选，完成后还需调用finalize接口搬出尾块。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_get_squeeze_status__z
-archs: ['3510']
-header: [/include/c_api/spr/spr.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
     kind: requires
+    condition: "调用本接口前需先完成数据筛选"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
     kind: related
+    condition: "筛选流程完成后需要搬出尾块"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
     kind: requires
-examples: []
-timestamp: '2026-09-28'
+    condition: "调用本接口前需先清空AR特殊寄存器"
+version: 9.2.0-
 ---
 # asc_get_squeeze_status
 

@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mul_scalar_float2half_rn
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md
-description: 根据mask将float类型的源操作数src按元素与标量value相乘后按照ROUND舍入模式转换为half类型，并通过dst_pos参数指定结果写入dst中偶数或奇数索引位置，未写入的位置置0，仅在AIV上生效。
+description: "根据掩码将float源矢量按元素与标量value相乘后按ROUND舍入模式转换为half类型，并由dst_pos指定结果写入偶数或奇数索引位置，未写入位置置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion, multiply]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, rounding_mode, scalar_operand]
-signature:
-  - override_id: asc_mul_scalar_float2half_rn__vf32_f32_vb_icposeven
-  - override_id: asc_mul_scalar_float2half_rn__vf32_f32_vb_icposodd
-  - override_id: asc_mul_scalar_float2half_rn__Rvf16_vf32_f32_vb_icposeven
-  - override_id: asc_mul_scalar_float2half_rn__Rvf16_vf32_f32_vb_icposodd
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_fused.h]
+  - traits: [elementwise, rounding_mode, scalar_operand]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.2.0-
 ---
 # asc_mul_scalar_float2half_rn
 

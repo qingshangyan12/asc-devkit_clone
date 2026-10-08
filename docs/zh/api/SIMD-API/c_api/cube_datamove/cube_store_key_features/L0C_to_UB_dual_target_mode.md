@@ -1,21 +1,6 @@
 ---
-okftype: reference.index
-title: L0C Buffer到UB双目标模式
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/L0C_to_UB_dual_target_mode.md
-description: 介绍仅适用于3510的L0C Buffer到UB双目标模式：启用后L0C Buffer中的M×N矩阵被分成两半，同时写入两个Vector
-  Core各自的Unified Buffer，支持按M维度或N维度拆分，仅限L0C到UB通路的普通搬运或Nz2ND场景且不支持随路功能。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement]
-  - operations: [copy]
-  - source_locations: [l0c_buffer]
-  - destination_locations: [unified_buffer]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍仅适用于3510的L0C Buffer到UB双目标模式：启用后L0C Buffer中的M×N矩阵被分成两半，同时写入同一AI Core内两个Vector Core各自的Unified Buffer，支持按M维度或N维度拆分，仅限普通搬运或Nz2ND场景且不支持随路功能。"
 ---
 # L0C Buffer到UB双目标模式
 

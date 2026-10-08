@@ -1,24 +1,14 @@
 ---
 okftype: reference.api
-title: asc_bfloat162float（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162float_deprecated.md
-description: 根据掩码将bfloat16_t元素逐个转换为float类型写入目的矢量数据寄存器，并通过接口后缀选择读取源操作数偶数或奇数索引位置；该类原型已废弃，请使用显式位置参数重载替代。
+description: "根据掩码将bfloat16_t元素逐个转换为float类型写入目的矢量数据寄存器，因位宽比为1:2经接口后缀选择读取源操作数偶数或奇数索引位置；该类原型已废弃，请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked]
-signature:
-  - override_id: asc_bfloat162float__Rvf32_vbf16_vb
-  - override_id: asc_bfloat162float_v2__Rvf32_vbf16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162float.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_bfloat162float（废弃）
 

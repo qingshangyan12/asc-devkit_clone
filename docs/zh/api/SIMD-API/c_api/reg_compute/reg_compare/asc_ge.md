@@ -1,28 +1,14 @@
 ---
 okftype: reference.api
-title: asc_ge
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_ge.md
-description: 逐元素比较两个源操作数大小（大于等于），比较结果为真时对应比特位为1否则为0，结果以掩码寄存器返回或写入dst对应比特位，仅在AIV上生效。
+description: "在掩码控制下逐元素比较两个源矢量数据寄存器的大小（大于等于），比较结果为真时对应比特位为1否则为0，结果作为返回值返回或写入目的操作数对应比特位；浮点输入含nan时结果位写0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
-  - objects: [mask, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_ge__v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_ge__Rvb_v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_compare.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_ge
 

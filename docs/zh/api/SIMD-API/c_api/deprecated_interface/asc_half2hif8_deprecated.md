@@ -1,35 +1,19 @@
 ---
 okftype: reference.api
-title: asc_half2hif8（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2hif8_deprecated.md
-description: 已废弃的寄存器矢量转换接口，根据mask将half类型元素转换为hifloat8_t类型写入dst，支持ROUND与HYBRID舍入及饱和/非饱和模式，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，根据掩码将half类型元素转换为hifloat8_t类型，支持ROUND与HYBRID舍入模式及饱和、非饱和模式，因位宽比为2:1按接口后缀写入奇偶索引位置；请改用asc_half2hif8的显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_half2hif8_rna__Rvhf8_vf16_vb
-  - override_id: asc_half2hif8_rna_v2__Rvhf8_vf16_vb
-  - override_id: asc_half2hif8_rna_sat__Rvhf8_vf16_vb
-  - override_id: asc_half2hif8_rna_sat_v2__Rvhf8_vf16_vb
-  - override_id: asc_half2hif8_rh__Rvhf8_vf16_vb
-  - override_id: asc_half2hif8_rh_v2__Rvhf8_vf16_vb
-  - override_id: asc_half2hif8_rh_sat__Rvhf8_vf16_vb
-  - override_id: asc_half2hif8_rh_sat_v2__Rvhf8_vf16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md
-    kind: related
-    condition: 原型已废弃，作为替代方案使用
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_half2hif8（废弃）
 

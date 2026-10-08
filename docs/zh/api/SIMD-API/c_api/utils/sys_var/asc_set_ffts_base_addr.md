@@ -1,24 +1,17 @@
 ---
 okftype: reference.api
-title: asc_set_ffts_base_addr
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md
-description: 设置核间同步寄存器的基地址，地址需在Host侧通过aclrtGetHardwareSyncAddr获取后作为config参数传入，取值范围0至2^48-1，且必须在使用asc_sync_block_wait和asc_sync_block_arrive之前完成设置。
+description: "设置核间同步寄存器的基地址，取值范围0至2^48-1，地址需在Host侧调用aclrtGetHardwareSyncAddr获取后作为config参数传入，且必须在asc_sync_block_wait与asc_sync_block_arrive之前完成设置。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: [system]
   - traits: [inter_core_synchronization]
-signature:
-  - override_id: asc_set_ffts_base_addr__u64
-archs: ['2201']
-header: [/include/c_api/utils/sys_var.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
     kind: configures
+    condition: "在使用asc_sync_block_arrive之前必须先设置基地址"
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
     kind: configures
-examples: []
-timestamp: '2026-09-28'
+    condition: "在使用asc_sync_block_wait之前必须先设置基地址"
+version: 9.0.0-
 ---
 # asc_set_ffts_base_addr
 

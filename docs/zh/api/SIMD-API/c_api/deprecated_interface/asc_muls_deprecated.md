@@ -1,25 +1,14 @@
 ---
 okftype: reference.api
-title: asc_muls (废弃)
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_muls_deprecated.md
-description: 已废弃的矢量乘标量接口，将源操作数src与标量value相乘后按ROUND舍入模式转换为half类型，依mask将结果写入目的矢量数据寄存器dst，请使用asc_mul_scalar_float2half_rn替代。
+description: "已废弃的矢量乘标量接口，将源矢量与标量value相乘后按ROUND舍入模式转换为half类型并依掩码写入目的矢量数据寄存器；请改用asc_mul_scalar_float2half_rn替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion, multiply]
-  - execution_models: [register_vector]
-  - traits: [deprecated, elementwise, masked, rounding_mode, scalar_operand]
-signature:
-  - override_id: asc_muls__Rvf16_vf32_f32_vb
-  - override_id: asc_muls_v2__Rvf16_vf32_f32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_fused.h]
+  - traits: [elementwise, rounding_mode, scalar_operand]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_muls (废弃)
 

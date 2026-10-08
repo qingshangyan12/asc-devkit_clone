@@ -1,28 +1,19 @@
 ---
 okftype: reference.api
-title: asc_loadalign_mask_upsample
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md
-description: 从Unified Buffer中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次得到VL/8长度数据，通过函数返回值返回掩码寄存器，与asc_loadalign_upsample掩码原型功能相同。
+description: "从Unified Buffer中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次得到VL/8长度数据，通过函数返回值返回掩码寄存器，与asc_loadalign_upsample掩码寄存器原型功能相同，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [load]
-  - objects: [mask]
-  - execution_models: [register_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [vector_register]
-signature:
-  - override_id: asc_loadalign_mask_upsample__PUu32
-archs: ['3510']
-header: [/include/c_api/reg_compute/load/loadalign.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md
     kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_loadalign_mask_upsample
 

@@ -1,36 +1,15 @@
 ---
 okftype: reference.api
-title: asc_fill_l0b
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md
-description: 将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化，初始化相关参数通过asc_fill_value_config配置，若dst与value数据类型不同需按dst类型对value的值进行转换。
+description: "将value的二进制值赋值给目的操作数dst，完成L0B Buffer本地存储的初始化，初始化参数通过asc_fill_value_config配置，dst与value数据类型不同时需按dst类型转换value的值。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_initialization]
   - operations: [fill]
-  - destination_locations: [l0b_buffer]
-signature:
-  - override_id: asc_fill_l0b__PCBi16_f16_RCfillcfg
-  - override_id: asc_fill_l0b__PCBi16_u32_RCfillcfg
-  - override_id: asc_fill_l0b__PCBu16_f16_RCfillcfg
-  - override_id: asc_fill_l0b__PCBu16_u32_RCfillcfg
-  - override_id: asc_fill_l0b__PCBf16_f16_RCfillcfg
-  - override_id: asc_fill_l0b__PCBf16_u32_RCfillcfg
-  - override_id: asc_fill_l0b__PCBbf16_bf16_RCfillcfg
-  - override_id: asc_fill_l0b__PCBbf16_f16_RCfillcfg
-  - override_id: asc_fill_l0b__PCBbf16_u32_RCfillcfg
-  - override_id: asc_fill_l0b__PCBi32_f16_RCfillcfg
-  - override_id: asc_fill_l0b__PCBi32_u32_RCfillcfg
-  - override_id: asc_fill_l0b__PCBu32_f16_RCfillcfg
-  - override_id: asc_fill_l0b__PCBu32_u32_RCfillcfg
-  - override_id: asc_fill_l0b__PCBf32_f16_RCfillcfg
-  - override_id: asc_fill_l0b__PCBf32_u32_RCfillcfg
-archs: ['2201']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_fill_l0b
 

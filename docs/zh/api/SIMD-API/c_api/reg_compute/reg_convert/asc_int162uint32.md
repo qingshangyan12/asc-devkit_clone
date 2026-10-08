@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int162uint32
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md
-description: 将源操作数中int16_t元素转换为uint32_t类型写入目的操作数，位宽比为1:2，按位置标签选取源操作数偶数或奇数索引读取，掩码未筛选的元素置零，仅在AIV上生效的Reg矢量计算接口。
+description: "将矢量数据寄存器中int16_t类型的元素转换为uint32_t类型并写入目的操作数，16位有符号整数转换为32位无符号整数，通过src_pos选择读取源数据索引为偶数或奇数的位置，掩码位为0时目的对应元素置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, widening_result]
-signature:
-  - override_id: asc_int162uint32__Rvu32_vi16_vb_icposeven
-  - override_id: asc_int162uint32__Rvu32_vi16_vb_icposodd
-  - override_id: asc_int162uint32__vi16_vb_icposeven
-  - override_id: asc_int162uint32__vi16_vb_icposodd
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_int162uint32
 

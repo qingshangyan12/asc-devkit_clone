@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+  "sha256": "00620dbbce114090155b9faba75ee3e66a176c64af5151fbdb168be4912e4970"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md",
+  "sha256": "3e09ba0e1f67613bd1ba8ac242ec2a0ed5354769d5bce1beddd4656b1df3c625"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md",
+  "sha256": "fc1a187b1091cf61ba9e59bfe587069796e76536934a8a1426c5020ab7773a65"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md",
+  "sha256": "754c138a10d6dc4d67bd3de8fdd41d7ba57d9c97ca81133a84f98faf7848f51d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md",
+  "sha256": "018476430fc2c948cc5f77dfda665b7bd41cce517260243e0a6a1abbb278febb"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md",
+  "sha256": "3b48b690d93b387fb254d7b43ff3b9346fe76cd6ec18c312441333d7df0a3bc4"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/background_and_core_concepts.md",
+  "sha256": "fd8456bd72986e23adf397d47b2723c605641f4254b4598610af5394363867d0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md",
+  "sha256": "8819f50a71131803b6f9a949b1c809f1fe03ee2c93d163a629df20979d4c2fe2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/GEMV.md",
+  "sha256": "137528fc363be900f5b742783825bf92aeebc89c4a6e56d479e0a8889078e1a5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md",
+  "sha256": "28f8476a645bde446450d8239f118d1363a93f03757472a9c7801c5765a257e1"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md",
+  "sha256": "9d505100d0bc1f885fc8a207c6f39ce0e9ae29a450577b49b302e583edd2f554"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/k_direction_alignment_constraint.md",
+  "sha256": "c829c95cb0c8571a555cd515d5cd4cdb5a959649f27e2a39b56beedcc57ee91d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md",
+  "sha256": "5028324d12449f3a1e15e303f4acb6f10025e9a9fbbb558633ecf8519097c543"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_unit.md",
+  "sha256": "d8fb1538effc400e6c5889d80825bb082cd7cebbf82a4b5cf2265ad156f69c97"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+  "sha256": "60326c231bc42cf5e901e3c9b889f9ef43a7f163d7bc3c238d3d19a5da09395f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+  "sha256": "642e4ec787383e1670ecf9fbce83d7d841d999b88539c63f2951370ce467e114"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+  "sha256": "8c5647dccbb5641a05501fe6609dddebccd267ab98a0d01085cb89b0c5a7f20a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+  "sha256": "e001640c87bdac416c0809e850777c31a7dad88211ad8df968b46fbf5022a471"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+  "sha256": "d654e5bf7aea118dbccc33a58bce7ba8a657cc0cde950260ed9070118a1574ce"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+  "sha256": "c36a87dee4e3e2214c906e10302c74592961d695671facdc11654039d24acdec"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+  "sha256": "c73ab03f5485ababe0c2eb401abc085b87faef8693b019bc5b2bea4bb00208c4"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+  "sha256": "8e46e064d2ad0c19dc3a7ed1173a797b50914294b4027856b0c9e326f8325683"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+  "sha256": "befb754e321549673c1829c7d23ed521a1cdb9da433f3b268950d27629c61ebb"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+  "sha256": "4e0aeaa03f1ac3a59c51be6b35ebd97585cf9536f3aba30b863a9e656dadb9a5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+  "sha256": "b844d1ecb8eebbd7ada86edcdfb7e5dd65d3077a83a98dba23221303b52ab357"
+ }
+]

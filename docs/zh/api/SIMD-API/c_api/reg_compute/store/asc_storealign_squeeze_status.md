@@ -1,27 +1,19 @@
 ---
 okftype: reference.api
-title: asc_storealign_squeeze_status
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_squeeze_status.md
-description: 将asc_squeeze_and_storeunalign操作后保存在AR特殊寄存器中的有效数据长度写入Unified Buffer（UB），无offset重载写入dst基地址，带offset重载写入dst加字节偏移的位置，调用前需先完成squeeze操作，仅在AIV上生效。
+description: "将asc_squeeze_and_storeunalign操作后保存在AR特殊寄存器中的有效数据长度写入Unified Buffer（UB），无offset重载写入dst基地址，带offset重载写入加字节偏移的位置，调用前需先完成squeeze操作，实际目的地址需4字节对齐，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [store]
-  - execution_models: [register_vector]
-  - destination_locations: [unified_buffer]
-signature:
-  - override_id: asc_storealign_squeeze_status__PUu32
-  - override_id: asc_storealign_squeeze_status__PUu32_i32
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storealign.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
     kind: requires
+    condition: "调用本接口前需先完成squeeze操作"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果本接口与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本接口与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_storealign_squeeze_status
 

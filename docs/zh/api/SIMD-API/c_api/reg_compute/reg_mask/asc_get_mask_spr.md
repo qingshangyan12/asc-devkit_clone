@@ -1,23 +1,12 @@
 ---
 okftype: reference.api
-title: asc_get_mask_spr
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md
-description: 从SPR特殊寄存器中读取mask值并按数据类型格式化后返回，b16模式将128bit数据每个bit扩展为2bit、b32模式将64bit数据每个bit扩展为4bit，拼成256bit掩码寄存器，需在Vector
-  Function内调用，仅在AIV上生效。
+description: "从SPR特殊寄存器中读取mask值并按数据类型格式化后返回，b16模式将128bit数据逐bit扩展为2bit、b32模式将64bit数据逐bit扩展为4bit，拼成256bit掩码寄存器，需在Vector Function内调用，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - objects: [mask]
-signature:
-  - override_id: asc_get_mask_spr_b16__z
-  - override_id: asc_get_mask_spr_b32__z
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_mask.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_get_mask_spr
 

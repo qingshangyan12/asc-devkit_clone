@@ -1,46 +1,19 @@
 ---
 okftype: reference.api
-title: asc_bfloat162half
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162half.md
-description: 根据mask将矢量数据寄存器中参与计算的bfloat16_t元素转换为half类型并写入dst，支持多种舍入模式和饱和/非饱和模式。
+description: "在掩码控制下将源矢量数据寄存器中的bfloat16_t元素转换为half类型，支持五种舍入模式与饱和、非饱和模式选择；使用饱和或非饱和模式时需先通过asc_set_ctrl配置ctrl寄存器，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked, rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_bfloat162half_rd__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_rd_sat__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_rn__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_rn_sat__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_rna__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_rna_sat__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_ru__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_ru_sat__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_rz__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_rz_sat__Rvf16_vbf16_vb
-  - override_id: asc_bfloat162half_rd__vbf16_vb
-  - override_id: asc_bfloat162half_rd_sat__vbf16_vb
-  - override_id: asc_bfloat162half_rn__vbf16_vb
-  - override_id: asc_bfloat162half_rn_sat__vbf16_vb
-  - override_id: asc_bfloat162half_rna__vbf16_vb
-  - override_id: asc_bfloat162half_rna_sat__vbf16_vb
-  - override_id: asc_bfloat162half_ru__vbf16_vb
-  - override_id: asc_bfloat162half_ru_sat__vbf16_vb
-  - override_id: asc_bfloat162half_rz__vbf16_vb
-  - override_id: asc_bfloat162half_rz_sat__vbf16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_bfloat162half
 

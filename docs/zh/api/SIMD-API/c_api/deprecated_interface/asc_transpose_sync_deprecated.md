@@ -1,28 +1,18 @@
 ---
 okftype: reference.api
-title: asc_transpose_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md
-description: 该接口已废弃，用于实现16*16的二维矩阵数据块转置，请使用非同步接口asc_transpose和同步接口asc_sync替代。
+description: "该接口已废弃，请使用非同步接口asc_transpose和同步接口asc_sync替代；实现16*16的二维矩阵数据块转置，将源矩阵数据块转置后写入目的操作数，操作数起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [transpose]
-  - execution_models: [memory_vector]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_transpose_sync__PUi16_PUi16
-  - override_id: asc_transpose_sync__PUu16_PUu16
-archs: ['2201', '3510']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [synchronization, transpose]
+  - traits: [aligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: '`asc_transpose_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_permute_sel/asc_transpose.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md
-    kind: related
-    condition: '`asc_transpose_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_permute_sel/asc_transpose.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。'
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-
 ---
 # asc_transpose_sync（废弃）
 

@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_smmu_tag_version.md",
+  "sha256": "45f96a3ce16d7f08b749f8ebfe0a2bff13188227230162b2938af6b16364f580"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_status.md",
+  "sha256": "8faf2848b3a8f57bce00beaedc8b64d1ffeefd527b2039a4a46c852cb9d6ce50"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md",
+  "sha256": "9a9410d6461e1be0becf6ab88b79d68e75d70b2c70dc56e35856b177bc7b3e45"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md",
+  "sha256": "437d73652a09eadbb31387e2fc6f3ff465f0a37f6b3d80986b4fee3c6100404f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sys_virtual_base.md",
+  "sha256": "3c25853fbd3630ab3e9ed172e0449ee6ab615bda161a7e90179ff511eecdcc21"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md",
+  "sha256": "c5b006a7431601c33eee5b2d26c3615786b672445ac6afe09016d539c0452a9d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md",
+  "sha256": "0fae79022929eb39f6496944536cae042c040e73cf24924dc1bc6032e1e1aca0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_vf_len.md",
+  "sha256": "e34ae322f1a56f532eda8546bbdb73b4b96129585bfc6c9b477ea09ad0569511"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md",
+  "sha256": "24e4ab0bb728797a6b3e08fc657ddbf05d876042d9039af9f0d3ff61a212cdbe"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md",
+  "sha256": "c6888bfe6805c75cf106258d8f08f034559d5d38af05f03971a9e5a5a5a42d72"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+  "sha256": "dfd0399254fa0a6709a6c9897dedd0df7c32657b6e83ffc173c3c711f61a6990"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dci.md",
+  "sha256": "641ce08fc64d237b18abcac00e177f3f640791af453590c9484f1b03e798d906"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md",
+  "sha256": "cb325006e80bd3ad0762591ea5d91ef9791e1032ceb8f0e2ec755c729fda7721"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md",
+  "sha256": "74e9d5e3fb7d81b5e42a6245a904e26bcc90cfe8e4073b51f3894e1093065bf3"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md",
+  "sha256": "5124cb971344d157b7e87dea0deb8b8caf3de4129e14850cc46e34a8ed76c6f2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md",
+  "sha256": "1c11b666ebbbf1230c47f38843e33e9b8187ab0bc89111d661da5e5278d1c949"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+  "sha256": "42253a8523c606f6d2e986ab683d9b03581acc138954d99fb0223d6df6b687e4"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/system_cache_overview.md",
+  "sha256": "d6a2ea3896b107ea140f208361a4476d34f2c9d7b39582400782f40453821498"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+  "sha256": "eb22d90ce87550474dcdc967f2d1de76c38bab0f5a17b4c417a5323bff422fc5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+  "sha256": "587881c051c3a665c5db459af3f664893407f609742196ca83621ab67a2a60ad"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+  "sha256": "b3a91099296994f76714c6cfedafe0584c3b6e56b28917767697c6f0bab87c08"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+  "sha256": "73133a2c27a8632107b9ddf886561e049061a4695818ecd2fe26c4e74c13f39d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+  "sha256": "1799f47f094da4d9c193d5369d41f387e4e73402572b3806d4b84271179404be"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+  "sha256": "b113b12ae601113a21d18ce578657e9735c71f8eca33bd56a826a72894700ca9"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+  "sha256": "624361e0d2e2daaa2c20c152f71e95ff9fa6c325f76f2496b48cf5c31561de2a"
+ }
+]

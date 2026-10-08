@@ -1,19 +1,10 @@
 ---
 okftype: reference.api
-title: asc_get_l0c2gm_unitflag
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_unitflag.md
-description: 用于数据搬运随路量化场景下读取unit_flag设置，该设置实现矩阵计算指令与搬运指令的细粒度并行，不适用于L0C Buffer累加场景。
+description: "在数据搬运随路量化场景下查询unit_flag设置，unit_flag实现矩阵计算指令与搬运指令的细粒度并行，开启后每计算完一个分形结果即被搬出，不适用于L0C Buffer累加场景。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_get_l0c2gm_unitflag__z
-archs: ['2201']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_get_l0c2gm_unitflag
 

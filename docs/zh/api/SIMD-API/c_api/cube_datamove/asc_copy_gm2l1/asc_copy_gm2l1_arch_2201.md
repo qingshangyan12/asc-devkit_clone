@@ -1,46 +1,14 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_arch_2201.md
-description: 将矩阵数据从Global Memory搬运到L1 Buffer中，并支持不同类型的pad模式，提供普通搬运、高维切分搬运和2D搬运等多种函数原型。
+description: "将矩阵数据从Global Memory搬运到L1 Buffer，支持不同类型的pad模式，提供普通搬运、高维切分搬运与2D搬运多种函数原型，搬运块长度以DataBlock（32字节）为单位。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-  - traits: [high_dimensional, padding]
-signature:
-  - override_id: asc_copy_gm2l1__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1_pad1__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1_pad2__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1_pad3__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1_pad4__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1_pad5__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1_pad6__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1_pad7__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1_pad8__PL1v_PGv_u32
-  - override_id: asc_copy_gm2l1__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_pad1__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_pad2__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_pad3__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_pad4__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_pad5__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_pad6__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_pad7__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_pad8__PL1v_PGv_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1__PL1bf16_PGbf16_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l1__PL1f16_PGf16_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l1__PL1f32_PGf32_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l1__PL1i32_PGi32_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l1__PL1i8_PGi8_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l1__PL1u32_PGu32_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l1__PL1u8_PGu8_u16_u8_u16_u16
-archs: ['2201']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [datablock_granularity, high_dimensional, padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.1.0-
 ---
 # asc_copy_gm2l1
 

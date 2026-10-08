@@ -1,29 +1,16 @@
 ---
 okftype: reference.api
-title: asc_addc
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md
-description: 根据mask对源操作数src0、src1及输入进位carry_src按元素求和，结果写入目的矢量数据寄存器，每个元素的进位写入目的掩码寄存器，硬件按32位无符号数处理。
+description: "根据掩码对源操作数src0、src1及输入进位carry_src按元素求和，结果写入目的矢量数据寄存器，每个元素的进位写入目的掩码寄存器，硬件按32位无符号数处理，输出不受饱和截断控制影响，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [add]
-  - objects: [carry_flag, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [carry_input, elementwise, masked, supports_carry_output]
-signature:
-  - prototype_id: asc_addc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb
-    dtype: [int32_t, uint32_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
+  - traits: [carry_input, elementwise, supports_carry_output]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md
-    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_addc
 

@@ -1,20 +1,10 @@
 ---
 okftype: reference.api
-title: asc_get_status
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_status.md
-description: 读取当前核上下文中STATUS状态寄存器的64bit整体值并按int64_t返回，该寄存器记录核运行过程中各类告警事件的发生情况，各状态位一旦置位即保持，直到复位或被读取清除，本接口为只读查询接口。
+description: "读取当前核上下文中STATUS状态寄存器的64bit整体值并按int64_t返回，各状态位记录核运行中浮点溢出、数据搬运溢出、NaN输入等告警事件，一旦置位即保持直到复位或被读取清除，为只读查询接口，不支持纯SIMT编译模式。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - families: [system]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_get_status__z
-archs: ['2201', '3510']
-header: [/include/c_api/utils/sys_var.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.1.0-
 ---
 # asc_get_status
 

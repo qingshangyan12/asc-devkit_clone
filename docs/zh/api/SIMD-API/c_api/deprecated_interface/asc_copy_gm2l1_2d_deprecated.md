@@ -1,38 +1,20 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_2d_deprecated.md
-description: 将数据从Global Memory搬运到L1 Buffer，以512字节的分形为单位按行列方向切分提取多个分形矩阵，用于矩阵计算所需的2D格式数据加载；旧常规重载及其同步接口已废弃，需改用带l2_cache_mode参数的新接口。
+description: "将数据从Global Memory搬运到L1 Buffer，以512字节分形为单位按行列起始位置与步长切分提取多个分形矩阵，不支持分形格式转换，目的地址需32字节对齐；旧常规重载及其同步接口已废弃，请改用带l2_cache_mode参数的新接口。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - objects: [matrix]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-  - traits: [deprecated]
-signature:
-  - prototype_id: asc_copy_gm2l1__PL1<dtype>_PG<dtype>_u32_u32_u16_u16_u16_u8_u8
-    header: [/include/c_api/cube_datamove/cube_datamove.h]
-    dtype: [int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
-      int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, void]
-  - prototype_id: asc_copy_gm2l1_sync__PL1<dtype>_PG<dtype>_u32_u32_u16_u16_u16_u8_u8
-    header: [/include/c_api/composite/cube_datamove_composite.h]
-    dtype: [int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
-      int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, void]
-archs: ['3510']
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_2d_arch_3510.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）（废弃）
 

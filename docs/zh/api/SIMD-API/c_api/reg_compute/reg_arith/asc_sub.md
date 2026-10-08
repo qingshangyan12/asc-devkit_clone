@@ -1,35 +1,19 @@
 ---
 okftype: reference.api
-title: asc_sub
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md
-description: 根据mask对两个源矢量数据寄存器按元素求差并写入目的操作数，另提供带借位输出减法形式，硬件按32位无符号补码加法处理，差值低32位写入矢量数据寄存器、无借位标志写入目的掩码寄存器。
+description: "根据掩码对两个源矢量数据寄存器按元素求差写入目的操作数，另提供带借位输出减法形式，减法在硬件底层通过补码加法实现，差值低32位写入矢量数据寄存器、借位标志写入目的掩码寄存器。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [subtract]
-  - objects: [carry_flag, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, supports_carry_output]
-signature:
-  - prototype_id: asc_sub__Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_sub__v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_sub__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [int32_t, uint32_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
+  - traits: [elementwise, supports_carry_output]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "带借位输出减法"
+version: 9.0.0-
 ---
 # asc_sub
 

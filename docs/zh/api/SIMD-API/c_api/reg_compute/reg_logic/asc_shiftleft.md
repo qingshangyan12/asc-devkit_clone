@@ -1,29 +1,14 @@
 ---
 okftype: reference.api
-title: asc_shiftleft
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md
-description: 根据掩码对矢量数据寄存器中的元素执行左移，左移位数由shift矢量数据寄存器中对应元素指定，无符号整数执行逻辑左移、有符号整数执行算术左移，掩码为0的元素置零，仅在AIV上生效。
+description: "根据掩码对矢量数据寄存器元素执行左移，移位量由shift矢量寄存器中对应元素逐元素指定，无符号整数执行逻辑左移、有符号整数执行算术左移，位移量不支持负数，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [bitwise_shift]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_shiftleft__v<dtype0>_v<dtype1>_vb
-  - prototype_id: asc_shiftleft__Rv<dtype0>_v<dtype0>_v<dtype1>_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_logic.h]
+  - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_shiftleft
 

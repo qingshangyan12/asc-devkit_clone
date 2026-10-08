@@ -1,31 +1,18 @@
 ---
 okftype: reference.api
-title: asc_min_scalar_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_min_scalar_sync_deprecated.md
-description: 已废弃的同步矢量运算接口：将矢量src逐元素与标量value比较并将较小值存入dst，请使用非同步接口asc_min_scalar并配合同步接口asc_sync替代。
+description: "已废弃的同步矢量运算接口，将矢量src逐元素与标量value比较并将较小值存入dst，目的与源起始地址需32字节对齐；请改用非同步接口asc_min_scalar配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [minimum]
-  - objects: [scalar, vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise, scalar_operand]
-signature:
-  - override_id: asc_min_scalar_sync__PUf16_PUf16_f16_u32
-  - override_id: asc_min_scalar_sync__PUf32_PUf32_f32_u32
-  - override_id: asc_min_scalar_sync__PUi16_PUi16_i16_u32
-  - override_id: asc_min_scalar_sync__PUi32_PUi32_i32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [minimum, synchronization]
+  - traits: [aligned_transfer, elementwise, scalar_operand]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_min_scalar.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_min_scalar_sync（废弃）
 

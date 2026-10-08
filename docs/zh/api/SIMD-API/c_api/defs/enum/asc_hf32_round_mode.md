@@ -1,17 +1,13 @@
 ---
-okftype: reference.type
-title: asc_hf32_round_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md
-description: 描述Mmad开启HF32模式时将FP32舍入为HF32的舍入策略，供相关配置接口选择舍入方式。
+okftype: reference.enum
+description: "表示Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，定义向最接近值远离零与向偶数等舍入方式，在调用asc_set_hf32_round_mode时使用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
   - traits: [rounding_mode]
-declaration:
-  symbol: asc_hf32_round_mode
-  underlying_type: uint8_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_hf32_round_mode
 

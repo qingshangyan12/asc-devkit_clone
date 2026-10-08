@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint8.md",
+  "sha256": "26abce3f433687a70c0e3ae2502ab0ec5e1565085cff6034a80b32bd5a3c7e12"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322float.md",
+  "sha256": "17ca4c882fefcbe6daa9ab4ae55e3bcfc0a2462319b1abff7b9920585e80ee19"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int16.md",
+  "sha256": "e6192a172eefb079d3fdaab7b75b8ec4821f04d36ba819cb3c30411dca576f37"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int64.md",
+  "sha256": "123dd55facf9930f4b8dd0cf9e2f8fc93fec4f37b30f88029de00c89653e19e9"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint16.md",
+  "sha256": "e861a50e3511705a2b619f9b2d5db93b6710c8467a7e425add0d050e6426891b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint8.md",
+  "sha256": "d487a39d81fd460837d3a66b8b1e01d597a246faa45737284cdd5fd85b749273"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md",
+  "sha256": "a42fba2c5007787bc391e9afdac248b8f6c8c5b22a95c843fd2f0c9734e8ac4f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22half.md",
+  "sha256": "f15611874c2b6c66aeb3bd95fd1465ad156875561c58b594485f04bac0aec224"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22int16.md",
+  "sha256": "b039e2f17616d60e669bf70eff1c7f7931e8cf49f2f5b7efb88d3f3a52eff726"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642float.md",
+  "sha256": "1e1308eb63315d00f8bc78e9f8b633e93d1841838dffe9b12eb761f3bf2be438"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md",
+  "sha256": "b8ef3988fc060b24ee66b540cadde072a99972a5931b21d2268bc7fcae181f1e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82half.md",
+  "sha256": "97ca2f59dbf29c5677a6f11052b89297c2864072bff19e8a6ef187b938fa74e0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int16.md",
+  "sha256": "c5196b694147226e461c0cb256698fba9836e48ee22d5d51e8ce4be6497ef5da"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md",
+  "sha256": "37540f3fd93ef6c642916a705f19d756010eff58465d719ff63a748eb57a8060"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_rint.md",
+  "sha256": "4ff81c626e31ccb3c8292520c4f254c3cde27d6d776ce0505ce1c68a5f484b1e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_round.md",
+  "sha256": "f050643f6691900d6596db1f08169e12c0a443ebfaa6603a2575b97674369118"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_trunc.md",
+  "sha256": "a43f82f53155d8ee1fde640fc5a7403d21bc4ef660d70706254f87959f17e740"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md",
+  "sha256": "2a7b1068622aa3aaed3518437e1837d76c652d130f9467f762f8a376d04a334f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md",
+  "sha256": "187eefc8466eb3a1367f30ced02d82c84bddbd6726e70b2ec11a939e8d818a77"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322int16.md",
+  "sha256": "81b4ed2a4630e6ea9c89d812d0de7e7079b994f82347e7c8d41bfcea22af98ae"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint16.md",
+  "sha256": "c12833678f77c9d68330a2eead3fe0f634fd5805b6e09dfbae0f7a151c6148bc"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md",
+  "sha256": "6480d5800c29198b314506ee5cee88fde4749abf9647d5e8309af3f7a9ab8276"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md",
+  "sha256": "86cad82f48f0858dce146a539786610b47384e3e63b6f3ff454f242a74df2c16"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md",
+  "sha256": "9eb4f0887ea0eb0efd0d446368eacc51811cf6d6aecf2f3754b4144e4f22cc42"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md",
+  "sha256": "04cc4ad52da2c57ae82e36ad72e45e7c0be2dcad03e41c8632559c37eedac947"
+ }
+]

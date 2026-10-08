@@ -1,33 +1,24 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0a_mx_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_mx_sync_deprecated.md
-description: 已废弃的同步搬运接口，负责完成MX矩阵计算所需左矩阵量化系数从L1 Buffer到L0A_MX Buffer的搬运，需与asc_copy_l12l0a配合使用，请改用对应的非同步接口和asc_sync替代。
+description: "已废弃的同步搬运接口，完成MX矩阵计算左矩阵量化系数从L1 Buffer到L0A_MX Buffer的搬运，以32字节分形为最小粒度，需与asc_copy_l12l0a配合使用；请改用非同步接口asc_copy_l12l0a_mx和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [l1_buffer]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_copy_l12l0a_mx_sync__u64_PL1f8e8m0_u16_u16_u8_u8_u16_u16
-archs: ['3510']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - traits: [aligned_transfer, datablock_granularity, quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md
-    kind: related
+    kind: requires
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_l12l0a_mx_sync（废弃）
 

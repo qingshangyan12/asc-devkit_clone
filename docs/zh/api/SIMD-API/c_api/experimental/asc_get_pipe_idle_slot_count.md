@@ -1,25 +1,10 @@
 ---
 okftype: reference.api
-title: 指令发射队列空闲槽位查询
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md
-description: 试验接口，提供六个函数分别查询PIPE_MTE2、PIPE_MTE3、PIPE_V、PIPE_M、PIPE_MTE1、PIPE_FIX发射队列当前的空闲槽位数量，用于观察队列占用情况；不支持的AI
-  Core类型上调用返回0。
+description: "试验接口，提供六个函数分别查询PIPE_MTE2、PIPE_MTE3、PIPE_V、PIPE_M、PIPE_MTE1、PIPE_FIX流水线发射队列当前的空闲槽位数量，用于观察队列占用情况；各函数仅支持所列AI Core类型，不支持的类型上调用返回0，使用前需开启试验编译选项。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - families: [system]
-signature:
-  - override_id: asc_get_pipe_mte2_idle_slot_count__z
-  - override_id: asc_get_pipe_mte3_idle_slot_count__z
-  - override_id: asc_get_pipe_v_idle_slot_count__z
-  - override_id: asc_get_pipe_m_idle_slot_count__z
-  - override_id: asc_get_pipe_mte1_idle_slot_count__z
-  - override_id: asc_get_pipe_fix_idle_slot_count__z
-archs: ['3510']
-header: [/include/c_api/experimental/asc_get_pipe_idle_slot_count.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.2.0-
 ---
 # 指令发射队列空闲槽位查询
 

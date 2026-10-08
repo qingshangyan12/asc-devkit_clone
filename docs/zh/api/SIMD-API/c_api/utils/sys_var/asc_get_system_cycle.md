@@ -1,22 +1,13 @@
 ---
 okftype: reference.api
-title: asc_get_system_cycle
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md
-description: 读取当前系统cycle计数器并返回int64_t类型的当前计数值，该计数器为只读系统计数器，宽度64bit、复位值为0，随系统时钟持续递增，反映硬件运行以来的累计cycle数，常用于性能统计、耗时测量与执行序的时序判断。
+description: "读取当前系统cycle计数器并返回int64_t类型的当前计数值，该计数器为宽度64bit、复位值为0的只读系统计数器，随系统时钟持续递增，常用于性能统计、耗时测量与执行序时序判断，如需微秒级时间值可改用内部完成换算的asc_get_system_clock。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - families: [system]
-signature:
-  - override_id: asc_get_system_cycle__z
-archs: ['2201', '3510']
-header: [/include/c_api/utils/sys_var.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md
     kind: related
-    condition: 如需直接获取微秒级时间值
-examples: []
-timestamp: '2026-09-28'
+    condition: "如需直接获取微秒级时间值（接口内部完成频率换算）时推荐使用"
+version: 9.0.0-
 ---
 # asc_get_system_cycle
 

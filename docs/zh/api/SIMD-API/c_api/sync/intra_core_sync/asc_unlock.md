@@ -1,26 +1,16 @@
 ---
 okftype: reference.api
-title: asc_unlock
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
-description: 与asc_lock配对使用，实现核内异步流水指令之间的同步处理。指定流水的前序指令执行完成后，根据mutex_id释放对应Mutex；mode参数可指定仅等待前置指令完成，或再等待相同mutex_id的所有asc_unlock执行完成。
+description: "与asc_lock配对使用实现核内异步流水指令之间的同步处理，指定流水的前序指令执行完成后根据mutex_id释放对应Mutex；mode参数可选择仅等待前置指令完成或再等待相同mutex_id的所有unlock执行完成，unlock必须写在对应的lock之后且两者须严格成对使用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
   - operations: [synchronization]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_unlock__pipe_u8
-  - override_id: asc_unlock__pipe_u8_mutexmode
-archs: ['3510']
-header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
-    kind: related
+    kind: requires
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
     kind: related
-    condition: 单流水内多个指令之间的同步
-examples: []
-timestamp: '2026-09-28'
+    condition: "单流水内多个指令之间的同步"
+version: 9.1.0-
 ---
 # asc_unlock
 

@@ -1,18 +1,6 @@
 ---
-okftype: reference.index
-title: 背景与核心概念
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/background_and_core_concepts.md
-description: 说明矩阵分形存储格式的背景与核心概念：矩阵计算单元分块处理16×16矩阵分片，分形格式通过软件重排使计算块在物理内存中连续存放，避免非连续访问并提升数据吞吐率，并介绍大Y小x命名法。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [compute]
-  - operations: [matrix_multiply_accumulate]
-  - objects: [matrix]
-  - execution_models: [matrix_compute]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "说明矩阵分形存储格式的背景与核心概念：矩阵计算单元以16×16矩阵分片分块处理，分形格式通过软件重排使计算块在物理内存中连续存放，避免非连续访问并提升数据吞吐率，并以大Y小x命名法区分分形间与分形内的排列顺序。"
 ---
 # 背景与核心概念
 

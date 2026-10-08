@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_unpack
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
-description: 将矢量数据寄存器或掩码寄存器中低半部分或高半部分的元素以扩充位宽的方式解压缩写入目的寄存器或通过函数返回值返回，无符号整型高位填0，有符号整型保持符号位扩充。
+description: "将矢量数据寄存器或掩码寄存器中低半部分或高半部分的元素扩充位宽后写入目的寄存器或通过函数返回值返回，无符号整型高位填0、有符号整型按符号位扩充、bool每bit展开为2bit，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [mask, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, widening_result]
-signature:
-  - prototype_id: asc_unpack_lower__v<dtype_src>
-  - prototype_id: asc_unpack_upper__v<dtype_src>
-  - prototype_id: asc_unpack_lower__Rv<dtype_dst>_v<dtype_src>
-  - prototype_id: asc_unpack_upper__Rv<dtype_dst>_v<dtype_src>
-  - override_id: asc_unpack_lower__vb
-  - override_id: asc_unpack_upper__vb
-  - override_id: asc_unpack_lower__Rvb_vb
-  - override_id: asc_unpack_upper__Rvb_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_unpack
 

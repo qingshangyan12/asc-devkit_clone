@@ -1,47 +1,19 @@
 ---
 okftype: reference.api
-title: asc_half2int8（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int8_deprecated.md
-description: 已废弃的寄存器矢量转换接口：根据mask将half类型元素转换为int8_t类型写入dst，支持多种舍入与饱和/非饱和模式，位宽比为2:1，按后缀写入偶数或奇数位置，请使用asc_half2int8的显式位置参数重载替代。
+description: "已废弃的矢量转换接口，根据掩码将half类型元素转换为int8_t类型，支持多种舍入模式与饱和、非饱和模式，因位宽比为2:1按接口后缀写入奇偶索引位置；请改用asc_half2int8的显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_half2int8_rd__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rd_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rd_sat__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rd_sat_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rn__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rn_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rn_sat__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rn_sat_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rna__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rna_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rna_sat__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rna_sat_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_ru__Rvi8_vf16_vb
-  - override_id: asc_half2int8_ru_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_ru_sat__Rvi8_vf16_vb
-  - override_id: asc_half2int8_ru_sat_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rz__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rz_v2__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rz_sat__Rvi8_vf16_vb
-  - override_id: asc_half2int8_rz_sat_v2__Rvi8_vf16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md
-    kind: related
-    condition: 该接口原型已废弃，需替代时
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_half2int8（废弃）
 

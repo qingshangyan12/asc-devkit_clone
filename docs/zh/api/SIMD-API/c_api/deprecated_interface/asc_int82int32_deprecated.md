@@ -1,28 +1,15 @@
 ---
 okftype: reference.api
-title: asc_int82int32（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82int32_deprecated.md
-description: 已废弃的类型转换接口，将int8_t类型数据转化为int32_t类型，源与目的类型位宽比为1:4，读取数据时需将一个VL大小的数据分为四部分并根据接口选取索引位置，请使用显式位置参数重载替代。
+description: "已废弃的矢量类型转换接口，将int8_t类型数据转换为int32_t类型写入目的矢量数据寄存器，因源与目的类型位宽比为1:4，读取时需将一个VL大小的数据分为四部分并按接口选取索引位置；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, widening_result]
-signature:
-  - override_id: asc_int82int32__Rvi32_vi8_vb
-  - override_id: asc_int82int32_v2__Rvi32_vi8_vb
-  - override_id: asc_int82int32_v3__Rvi32_vi8_vb
-  - override_id: asc_int82int32_v4__Rvi32_vi8_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md
-    kind: related
-    condition: 无显式位置参数原型已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+    condition: "无显式位置参数原型已废弃，使用显式位置参数重载替代"
+version: 9.0.0-
 ---
 # asc_int82int32（废弃）
 

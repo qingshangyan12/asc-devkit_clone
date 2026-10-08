@@ -1,36 +1,24 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1_sync_highdim_split_arch_3510（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_sync_highdim_split_arch_3510_deprecated.md
-description: 将数据从Global Memory搬运到L1 Buffer且格式内容保持不变，通过配置数据块个数、单个数据块长度和地址偏移实现高维切分非连续搬运，支持按通道padding插入或移除；接口已废弃，请使用非同步接口和asc_sync替代。
+description: "已废弃的同步搬运接口，将GM数据高维切分搬入L1 Buffer，格式内容保持不变，支持按通道padding模式对32字节粒度数据插入或移除padding，填充值需经asc_set_gm2l1_padding设置；请改用非同步接口和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-  - traits: [deprecated, high_dimensional, padding]
-signature:
-  - override_id: asc_copy_gm2l1_sync__PL1v_PGv_u32_u32_u8_u64_u32
-archs: ['3510']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - traits: [aligned_transfer, datablock_granularity, high_dimensional, padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_gm2l1_sync_highdim_split_arch_3510（废弃）
 

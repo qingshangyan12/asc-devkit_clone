@@ -1,41 +1,20 @@
 ---
 okftype: reference.api
-title: asc_set_l0c_copy_prequant
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md
-description: 在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号，由后续L0C搬出接口与quant_pre_mode搭配使用，仅在AIC上生效。
+description: "在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号，供后续搬出接口与quant_pre_mode搭配使用，量化参数不能为inf、nan或非规格化数，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
   - traits: [quantization]
-signature:
-  - override_id: asc_set_l0c_copy_prequant__f32_u16_b
-  - override_id: asc_set_l0c_copy_prequant__u64
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
     kind: configures
-    condition: 需要与搬出接口的`quant_pre_mode`搭配使用
+    condition: "需要与搬出接口的quant_pre_mode搭配使用"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
     kind: configures
-    condition: 需要与搬出接口的`quant_pre_mode`搭配使用
+    condition: "需要与搬出接口的quant_pre_mode搭配使用"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
     kind: configures
-    condition: 需要与搬出接口的`quant_pre_mode`搭配使用
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm
-    file: data_copy_l0c2gm.asc
-    archs: ['3510']
-    override_id: asc_set_l0c_copy_prequant__f32_u16_b
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1
-    file: data_copy_l0c2l1.asc
-    archs: ['3510']
-    override_id: asc_set_l0c_copy_prequant__f32_u16_b
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub
-    file: data_copy_l0c2ub.asc
-    archs: ['3510']
-    override_id: asc_set_l0c_copy_prequant__f32_u16_b
-timestamp: '2026-09-28'
+    condition: "需要与搬出接口的quant_pre_mode搭配使用"
+version: 9.0.0-
 ---
 # asc_set_l0c_copy_prequant
 

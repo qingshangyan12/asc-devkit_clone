@@ -1,32 +1,22 @@
 ---
 okftype: reference.api
-title: asc_set_atomic_none（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_none_deprecated.md
-description: 已废弃的配置接口，与原子累加及原子比较接口配合使用，在完成原子操作后关闭原子操作以避免影响后续搬运，请使用asc_disable_dma_atomic替代。
+description: "已废弃的配置接口，与原子累加及原子比较接口配合使用，在完成原子操作后关闭原子操作以避免影响后续搬运；请改用asc_disable_dma_atomic替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - execution_models: [scalar]
-  - traits: [atomic, deprecated]
-signature:
-  - override_id: asc_set_atomic_none__z
-archs: ['2201', '3510']
-header: [/include/c_api/atomic/datamove_atomic.h]
+  - traits: [atomic]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
     kind: related
-    condition: 与原子操作接口配合使用
+    condition: "与原子操作接口配合使用"
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md
     kind: related
-    condition: 与原子操作接口配合使用
+    condition: "与原子操作接口配合使用"
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
     kind: related
-    condition: 与原子操作接口配合使用
-examples: []
-timestamp: '2026-09-28'
+    condition: "与原子操作接口配合使用"
+version: 9.0.0-9.2.0
 ---
 # asc_set_atomic_none（废弃）
 

@@ -1,0 +1,1418 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md",
+      "document_sha256": "85287b335937f2a8ec81b933b3e9ad7c219da2ea16254b6c17a7c56cf0e48d7b",
+      "description": {
+        "value": "该接口已废弃，请使用asc_set_l0c_copy_channel_para接口替代；用于在L0C Buffer搬出并执行Nz2DN格式转换时配置源Nz矩阵中相邻行的地址偏移，配置由后续开启Nz2DN功能的L0C搬出接口使用，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_channel_para`接口已废弃。请使用[asc_set_l0c_copy_channel_para](../cube_datamove/asc_set_l0c_copy_channel_para.md)接口替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md",
+            "excerpt": "本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_channel_para`接口已废弃。请使用[asc_set_l0c_copy_channel_para](../cube_datamove/asc_set_l0c_copy_channel_para.md)接口替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+          "kind": "configures",
+          "condition": "开启Nz2DN功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md",
+            "excerpt": "本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "configures",
+          "condition": "开启Nz2DN功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md",
+            "excerpt": "本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+          "kind": "configures",
+          "condition": "开启Nz2DN功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_channel_para_deprecated.md",
+            "excerpt": "本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md",
+      "document_sha256": "b759ea7218a41b858dc4a9011de7e0df2b4a1e7a14c804bc1e9c8a2c4cf81949",
+      "description": {
+        "value": "该接口已废弃，请使用asc_set_l0c_copy_config接口替代；在数据搬运过程中进行随路量化时设置量化流程中的矢量量化参数，支持relu_pre与quant_pre多种传参组合，量化参数不能为inf/nan和非规格化数。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_config`接口已废弃。请使用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)接口替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md",
+            "excerpt": "数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md",
+            "excerpt": "量化参数不能为inf/nan和非规格化数。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "traits": [
+          "quantization"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。",
+        "traits:quantization": "数据搬运过程中进行随路量化时，通过调用该接口设置量化流程中的矢量量化参数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_config`接口已废弃。请使用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)接口替代。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md",
+      "document_sha256": "557c068a8cfe92aebe5af20c72a92698297b9d8d6d6913557d3b2af75b9b9e67",
+      "description": {
+        "value": "该接口已废弃，请使用asc_set_l0c_copy_lrelu_alpha接口替代；用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值，该值只支持half和float两种数据类型。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_lrelu_alpha`接口已废弃。请使用[asc_set_l0c_copy_lrelu_alpha](../cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)接口替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md",
+            "excerpt": "用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "用于设置asc_copy_l0c2l1或asc_copy_l0c2gm接口计算过程中使用的Leaky ReLU alpha值。该值只支持half和float两种数据类型。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_lrelu_alpha_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_lrelu_alpha`接口已废弃。请使用[asc_set_l0c_copy_lrelu_alpha](../cube_datamove/asc_set_l0c_copy_lrelu_alpha.md)接口替代。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md",
+      "document_sha256": "7efa2f353c3775b6a18b9777fe9d158b5d23f5dd41a911a792094b3cbd9036e9",
+      "description": {
+        "value": "该接口已废弃，请使用asc_set_l0c_copy_nz_para接口替代；用于在L0C Buffer搬出接口启用随路Nz转ND格式功能时配置格式转换所需的相关参数，调用搬出接口前必须先完成配置，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_nz2nd`接口已废弃。请使用[asc_set_l0c_copy_nz_para](../cube_datamove/asc_set_l0c_copy_nz_para.md)接口替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md",
+            "excerpt": "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md",
+            "excerpt": "调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND格式之前，必须先调用本接口配置格式转换参数。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_nz2nd`接口已废弃。请使用[asc_set_l0c_copy_nz_para](../cube_datamove/asc_set_l0c_copy_nz_para.md)接口替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+          "kind": "configures",
+          "condition": "启用随路Nz转ND格式功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md",
+            "excerpt": "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "configures",
+          "condition": "启用随路Nz转ND格式功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md",
+            "excerpt": "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+          "kind": "configures",
+          "condition": "启用随路Nz转ND格式功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md",
+            "excerpt": "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND格式功能时，配置格式转换所需的相关参数。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md",
+      "document_sha256": "8bef4806548012c91da76d3a8f427256246c8c2bb5e04ced24387a1f608a3a4d",
+      "description": {
+        "value": "该接口已废弃且暂无替代接口；对QUANT_POST寄存器中的值进行设置，该64bit寄存器存储Fixpipe后处理阶段量化信息，不同bit位表示各量化模式下的偏移量、符号位、M3与位移值等字段，量化参数不能为inf/nan和非规格化数。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_quant_post`接口已废弃，暂无替代接口。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md",
+            "excerpt": "对QUANT_POST寄存器中的值进行设置, QUANT_POST是一个64bit的寄存器，存储Fixpipe后处理阶段量化信息。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md",
+            "excerpt": "量化参数不能为inf/nan和非规格化数。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "traits": [
+          "quantization"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "对QUANT_POST寄存器中的值进行设置, QUANT_POST是一个64bit的寄存器，存储Fixpipe后处理阶段量化信息。",
+        "traits:quantization": "对QUANT_POST寄存器中的值进行设置, QUANT_POST是一个64bit的寄存器，存储Fixpipe后处理阶段量化信息。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_quant_post_deprecated.md",
+            "excerpt": "其中各种量化模式的说明可见[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)中对各种量化模式的说明："
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md",
+      "document_sha256": "8518a74162d9fe2908fad6dc807c2343221dd29ac65701c034a22e6a2dafaab8",
+      "description": {
+        "value": "该接口已废弃，请使用asc_set_l0c_copy_relu_alpha接口替代；对RELU_ALPHA寄存器中的值进行设置，该64bit寄存器存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值，M2值不能是INF/NAN。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_relu_alpha`接口已废弃。请使用[asc_set_l0c_copy_relu_alpha](../cube_datamove/asc_set_l0c_copy_relu_alpha.md)接口替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md",
+            "excerpt": "对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "对RELU_ALPHA寄存器中的值进行设置。这是一个64bit的寄存器，存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md",
+            "excerpt": "`asc_set_l0c2gm_relu_alpha`接口已废弃。请使用[asc_set_l0c_copy_relu_alpha](../cube_datamove/asc_set_l0c_copy_relu_alpha.md)接口替代。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l12l0_padding_val_deprecated.md",
+      "document_sha256": "3d6be58476117f03933399f42a4a83c815ba5cdff42ae5486ebc41a8cea2338e",
+      "description": {
+        "value": "该接口已废弃，请使用asc_set_l12l0b_3d_padding接口替代；对PADDING_B寄存器中的值进行设置，该64bit寄存器用于存储搬运过程中padding的值，支持固定padding与按通道padding两种模式。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l12l0_padding_val_deprecated.md",
+            "excerpt": "`asc_set_l12l0_padding_val`接口已废弃。请使用[asc_set_l12l0b_3d_padding](../cube_datamove/asc_set_l12l0b_3d_padding.md)接口替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l12l0_padding_val_deprecated.md",
+            "excerpt": "对PADDING_B寄存器中的值进行设置，这是一个64bit的寄存器，用于存储搬运过程中padding的值。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l12l0_padding_val_deprecated.md",
+            "excerpt": "表示所使用的padding模式，当前支持三种模式。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "对PADDING_B寄存器中的值进行设置，这是一个64bit的寄存器，用于存储搬运过程中padding的值。",
+        "traits:padding": "对PADDING_B寄存器中的值进行设置，这是一个64bit的寄存器，用于存储搬运过程中padding的值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l12l0_padding_val_deprecated.md",
+            "excerpt": "`asc_set_l12l0_padding_val`接口已废弃。请使用[asc_set_l12l0b_3d_padding](../cube_datamove/asc_set_l12l0b_3d_padding.md)接口替代。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md",
+      "document_sha256": "cb3a8ec9101f5662d9692e5e182fee1f43b50779b81337374885b6a411508888",
+      "description": {
+        "value": "该接口已废弃，请使用asc_set_l12l0a_3d_padding接口替代；设置Pad属性描述，用于在调用asc_copy_l12l0a接口搬运时配置填充数值。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md",
+            "excerpt": "`asc_set_l13d_padding`接口已废弃。请使用[asc_set_l12l0a_3d_padding](../cube_datamove/asc_set_l12l0a_3d_padding.md)接口替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md",
+            "excerpt": "设置Pad属性描述，用于在调用[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "设置Pad属性描述，用于在调用[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。",
+        "traits:padding": "设置Pad属性描述，用于在调用[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md",
+            "excerpt": "`asc_set_l13d_padding`接口已废弃。请使用[asc_set_l12l0a_3d_padding](../cube_datamove/asc_set_l12l0a_3d_padding.md)接口替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md",
+          "kind": "configures",
+          "condition": "在调用asc_copy_l12l0a接口时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l13d_padding_deprecated.md",
+            "excerpt": "设置Pad属性描述，用于在调用[asc_copy_l12l0a](../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)接口时配置填充数值。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md",
+      "document_sha256": "e8adf7f3fc4ab59b5e8704fd1418366de01d8a5e5ec10049eee64ec791dfb0d3",
+      "description": {
+        "value": "该接口已废弃，原子加操作请使用asc_atomic_add接口实现；用于设置原子操作启用位与原子操作类型的值，开启后可对int32_t、half、float、bfloat16_t、int16_t、int8_t等数据类型执行原子求和操作。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md",
+            "excerpt": "该接口已废弃。原子加操作请使用[asc_atomic_add](../atomic/scalar_atomic/asc_atomic_add.md)实现。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md",
+            "excerpt": "设置原子操作启用位与原子操作类型的值。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md",
+            "excerpt": "1：开启原子操作，进行原子操作的数据类型为int32_t。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ],
+        "traits": [
+          "atomic"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "设置原子操作启用位与原子操作类型的值。",
+        "traits:atomic": "设置原子操作启用位与原子操作类型的值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md",
+            "excerpt": "该接口已废弃。原子加操作请使用[asc_atomic_add](../atomic/scalar_atomic/asc_atomic_add.md)实现。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftleft_sync_deprecated.md",
+      "document_sha256": "3bc86c6e8186000b13dadc1049b70370ecec014aa8362af3ad51343dbffb404c",
+      "description": {
+        "value": "该接口已废弃，请使用非同步接口asc_shiftleft和同步接口asc_sync替代；将源矢量的所有元素左移distance位并写入目的矢量，distance不支持负数且不能超过源数据类型位宽，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftleft_sync_deprecated.md",
+            "excerpt": "`asc_shiftleft_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_logic/asc_shiftleft.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftleft_sync_deprecated.md",
+            "excerpt": "将所有元素左移distance位。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftleft_sync_deprecated.md",
+            "excerpt": "dst、src的起始地址需要32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_shift",
+          "synchronization"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "将所有元素左移distance位。计算公式如下：",
+        "operations:bitwise_shift": "将所有元素左移distance位。计算公式如下：",
+        "operations:synchronization": "同步计算",
+        "traits:elementwise": "将所有元素左移distance位。计算公式如下：",
+        "traits:scalar_operand": "源操作数（标量），表示左移的位数。",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftleft.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftleft_sync_deprecated.md",
+            "excerpt": "`asc_shiftleft_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_logic/asc_shiftleft.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftleft_sync_deprecated.md",
+            "excerpt": "`asc_shiftleft_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_logic/asc_shiftleft.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftleft_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md",
+      "document_sha256": "933fc743ac1c9f680d5c910276602d280fa92c07b8553a138c9679dff8b08ca0",
+      "description": {
+        "value": "该接口已废弃，请使用非同步接口asc_shiftright和同步接口asc_sync替代；对src中的每个元素执行右移，右移大小为value，有符号类型做算术右移、无符号类型做逻辑右移，value不支持负数且不能超过源数据类型位宽。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md",
+            "excerpt": "`asc_shiftright_sync`和`asc_shiftright_round_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_logic/asc_shiftright.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md",
+            "excerpt": "对src中的每个元素执行右移，右移大小为value。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md",
+            "excerpt": "对于int16_t/int32_t，做算术右移（去掉最低位，最高位复制符号位）。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_shift",
+          "synchronization"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "对src中的每个元素执行右移，右移大小为value。",
+        "operations:bitwise_shift": "对src中的每个元素执行右移，右移大小为value。",
+        "operations:synchronization": "同步计算",
+        "traits:elementwise": "对src中的每个元素执行右移，右移大小为value。",
+        "traits:scalar_operand": "源操作数（标量），表示右移的位数。",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md",
+            "excerpt": "`asc_shiftright_sync`和`asc_shiftright_round_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_logic/asc_shiftright.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md",
+            "excerpt": "`asc_shiftright_sync`和`asc_shiftright_round_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_logic/asc_shiftright.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md",
+      "document_sha256": "88e51c59a92877bdbfe724b0d8de413a13938ba8d2b9980a166d910fc64b430a",
+      "description": {
+        "value": "该接口已废弃，请使用非同步接口asc_sqrt和同步接口asc_sync替代；按元素对源矢量做开方运算并将结果写入目的矢量，src只支持设置为正数，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md",
+            "excerpt": "`asc_sqrt_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sqrt.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md",
+            "excerpt": "按元素做开方，计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md",
+            "excerpt": "src只支持设置为正数。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "sqrt",
+          "synchronization"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素做开方，计算公式如下：",
+        "operations:sqrt": "按元素做开方，计算公式如下：",
+        "operations:synchronization": "同步计算",
+        "traits:elementwise": "按元素做开方，计算公式如下：",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sqrt.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md",
+            "excerpt": "`asc_sqrt_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sqrt.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md",
+            "excerpt": "`asc_sqrt_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sqrt.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sqrt_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md",
+      "document_sha256": "fb3b4dfa954974b43a10fa75e2fce73e695f9a6aba1fe7c1ab9525cede63cc25",
+      "description": {
+        "value": "该接口已废弃，请使用asc_squeeze_and_storeunalign实现筛选并连续搬出有效元素的功能；将src中被mask选择的有效元素依次复制到dst并连续排列，剩余位置元素置0，搭配asc_storeunalign_postupdate搬出时将有效数据大小保存至AR寄存器作为存储偏移量。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md",
+            "excerpt": "该接口已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现筛选并连续搬出有效元素的功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md",
+            "excerpt": "将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md",
+            "excerpt": "asc_squeeze_v2接口搭配[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md)接口使用时，会将有效数据大小保存至AR寄存器，搬出时使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../spr/asc_get_squeeze_status.md)接口获取。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "compact"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。",
+        "operations:compact": "将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md",
+            "excerpt": "该接口已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现筛选并连续搬出有效元素的功能。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md",
+          "kind": "related",
+          "condition": "搭配asc_storeunalign_postupdate接口搬出时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md",
+            "excerpt": "asc_squeeze_v2接口搭配[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md)接口使用时，会将有效数据大小保存至AR寄存器，搬出时使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../spr/asc_get_squeeze_status.md)接口获取。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_deprecated.md",
+            "excerpt": "asc_squeeze_v2接口搭配[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md)接口使用时，会将有效数据大小保存至AR寄存器，搬出时使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../spr/asc_get_squeeze_status.md)接口获取。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md",
+      "document_sha256": "0f930f8fd920bceab32f0670936641de91f2decc75c47791dd3f5bae4fff3ab3",
+      "description": {
+        "value": "该接口已废弃，请使用asc_squeeze_and_storeunalign实现筛选并连续搬出有效元素的功能；将src中被mask选择的有效元素依次复制到dst连续排列、剩余位置置0，并将有效数据大小保存至AR寄存器，搬出时配合asc_storeunalign_postupdate用作存储偏移量，AR值可通过asc_get_squeeze_status获取。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md",
+            "excerpt": "该接口已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现筛选并连续搬出有效元素的功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md",
+            "excerpt": "将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md",
+            "excerpt": "本接口会将有效数据大小保存至AR寄存器，搬出时配合[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md)接口使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../spr/asc_get_squeeze_status.md)接口获取。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "compact"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。",
+        "operations:compact": "将src中被mask选择的有效元素依次复制到dst，有效元素在dst上连续排列。dst中剩余位置元素置为0。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md",
+            "excerpt": "该接口已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现筛选并连续搬出有效元素的功能。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md",
+          "kind": "related",
+          "condition": "搬出时使用该值作为存储偏移量",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md",
+            "excerpt": "本接口会将有效数据大小保存至AR寄存器，搬出时配合[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md)接口使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../spr/asc_get_squeeze_status.md)接口获取。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_squeeze_with_status_deprecated.md",
+            "excerpt": "本接口会将有效数据大小保存至AR寄存器，搬出时配合[asc_storeunalign_postupdate](../reg_compute/store/asc_storeunalign_postupdate.md)接口使用该值作为存储偏移量。AR寄存器中的数值可以通过[asc_get_squeeze_status](../spr/asc_get_squeeze_status.md)接口获取。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md",
+      "document_sha256": "58560646316bb067860702384a5594bd697939837ef599241fe3731ab90fa634",
+      "description": {
+        "value": "该接口已废弃，请使用asc_storealign_pack_quarter实现此功能；将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），不传入偏移量，需用户自行更新目的操作数地址，目的起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md)实现此功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md",
+            "excerpt": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。本接口不传入偏移量，用户需要自行更新目的操作数地址。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md",
+            "excerpt": "`dst_align32b`起始地址需32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "compression",
+          "store"
+        ],
+        "traits": [
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "operations:compression": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "operations:store": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "traits:aligned_transfer": "`dst_align32b`起始地址需32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v1_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md)实现此功能。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md",
+      "document_sha256": "de724a22b3f3d0f3b22630d0d9ca14bd6a28605591ab60c61a84794b88a47fb8",
+      "description": {
+        "value": "该接口已废弃，请使用asc_storealign_pack_quarter实现此功能；将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），通过地址寄存器offset传入偏移量，offset必须通过asc_update_addr_reg预先构造，目的起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md)实现此功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md",
+            "excerpt": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。本接口通过地址寄存器`offset`传入偏移量，用户可以选择更新偏移量或目的操作数地址。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md",
+            "excerpt": "`offset`必须通过[asc_update_addr_reg](../reg_compute/reg_addr_reg/asc_update_addr_reg.md)预先构造。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "compression",
+          "store"
+        ],
+        "traits": [
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "operations:compression": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "operations:store": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "traits:aligned_transfer": "`dst_align32b`起始地址需32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md)实现此功能。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md",
+            "excerpt": "`offset`必须通过[asc_update_addr_reg](../reg_compute/reg_addr_reg/asc_update_addr_reg.md)预先构造。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md",
+      "document_sha256": "be98e76d32660be963c83c2e82f1b1ebeb24a7107dffc7340f835df24166186b",
+      "description": {
+        "value": "该接口已废弃，请使用asc_storealign_pack_quarter实现此功能；将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），通过int32_t类型的offset传入偏移量，偏移后实际访问地址仍需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md)实现此功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md",
+            "excerpt": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。本接口通过`int32_t`类型的`offset`传入偏移量，用户可以选择更新偏移量或目的操作数地址。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md",
+            "excerpt": "通过`offset`偏移后的实际访问地址需落在UB地址范围内，且仍需32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "compression",
+          "store"
+        ],
+        "traits": [
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "operations:compression": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "operations:store": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "traits:aligned_transfer": "`dst_align32b`起始地址需32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v3_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_storealign_pack_quarter](../reg_compute/store/asc_storealign_pack_quarter.md)实现此功能。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md",
+      "document_sha256": "4de86636c5dd01cdbe0953f07bb5c13658f6e72863990ea4a941d5ee42632441",
+      "description": {
+        "value": "该接口已废弃，请使用asc_storealign_pack_quarter_postupdate实现此功能；将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），通过int32_t类型offset传入偏移量并启用Post Update模式自动更新目的操作数地址，新地址仍需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_storealign_pack_quarter_postupdate](../reg_compute/store/asc_storealign_pack_quarter_postupdate.md)实现此功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md",
+            "excerpt": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。本接口通过`int32_t`类型的`offset`传入偏移量，并启用Post Update模式自动更新目的操作数地址。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md",
+            "excerpt": "`dst_align32b`起始地址需32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "compression",
+          "store"
+        ],
+        "traits": [
+          "post_update",
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。本接口通过`int32_t`类型的`offset`传入偏移量，并启用Post Update模式自动更新目的操作数地址。",
+        "operations:compression": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "operations:store": "将矢量数据寄存器中由`mask`指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB）。",
+        "traits:post_update": "并启用Post Update模式自动更新目的操作数地址。",
+        "traits:aligned_transfer": "`dst_align32b`起始地址需32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v4_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_storealign_pack_quarter_postupdate](../reg_compute/store/asc_storealign_pack_quarter_postupdate.md)实现此功能。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md",
+      "document_sha256": "44955a5c448f7114c435f5f37830adf3b92f944a126cadd14fb3488e03316013",
+      "description": {
+        "value": "该接口已废弃，请使用asc_squeeze_and_storeunalign_finalize实现此功能；将非对齐寄存器中暂存的尾块数据搬出到Unified Buffer（UB），适用于连续非32B对齐搬出的收尾场景，调用前须先调用asc_storeunalign_postupdate并保持非对齐寄存器一致。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)实现此功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md",
+            "excerpt": "reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到Unified Buffer（UB）的尾块场景。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md",
+            "excerpt": "本接口执行时，会将尾块从非对齐寄存器搬出至UB。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "store"
+        ],
+        "traits": [
+          "unaligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "reg计算数据搬运接口，适用于从矢量数据寄存器连续非32B对齐的起始地址连续搬出到Unified Buffer（UB）的尾块场景。",
+        "operations:store": "本接口执行时，会将尾块从非对齐寄存器搬出至UB。",
+        "traits:unaligned_transfer": "该接口中的dst不需要32B对齐，但数据类型为T的dst需要sizeof(T) Byte对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md",
+            "excerpt": "该接口已废弃。请使用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)实现此功能。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md",
+          "kind": "requires",
+          "condition": "调用本接口之前，且非对齐寄存器与前序接口保持一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md",
+            "excerpt": "调用本接口之前，需要调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate_deprecated.md)接口，且本接口与前序接口的非对齐寄存器要保持一致。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md",
+      "document_sha256": "584ae2885ad52b985439879db9be57dbc34887b554d8c14d223b37933695f0a5",
+      "description": {
+        "value": "该接口不指定存储偏移量的原型已废弃，请使用asc_squeeze_and_storeunalign实现此功能；将矢量数据寄存器或掩码寄存器中的数据连续搬出到非32B对齐的Unified Buffer（UB）地址，每次调用后自动更新目的地址，应配合asc_storeunalign_post完成尾块搬出。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md",
+            "excerpt": "该接口不指定存储偏移量的原型已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现此功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md",
+            "excerpt": "reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址连续搬出到Unified Buffer（UB）的场景。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md",
+            "excerpt": "该接口每调用一次接口会更新目的操作数在UB上的地址。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "store"
+        ],
+        "traits": [
+          "post_update",
+          "unaligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址连续搬出到Unified Buffer（UB）的场景。",
+        "operations:store": "reg计算数据搬运接口，适用于从矢量数据寄存器或掩码寄存器连续非32B对齐的起始地址连续搬出到Unified Buffer（UB）的场景。",
+        "traits:post_update": "该接口每调用一次接口会更新目的操作数在UB上的地址。",
+        "traits:unaligned_transfer": "该接口中的dst不需要32B对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md",
+            "excerpt": "该接口不指定存储偏移量的原型已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现此功能。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md",
+          "kind": "related",
+          "condition": "配合asc_storeunalign_post接口一起使用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md",
+            "excerpt": "本接口应该配合[asc_storeunalign_post](asc_storeunalign_post_deprecated.md)接口一起使用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md",
+      "document_sha256": "e4ea8ee8d45e5c9616678b7151fc5bb1b6ede739f9bbd75735bc1d6cba1ec52b",
+      "description": {
+        "value": "该接口已废弃，请使用非同步接口asc_sub_relu和同步接口asc_sync替代；按元素求差后再进行Relu计算（结果和0对比取较大值），并提供转换最终结果数据类型的功能，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md",
+            "excerpt": "`asc_sub_relu_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_fused/asc_sub_relu.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md",
+            "excerpt": "按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md",
+            "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "subtract",
+          "relu",
+          "conversion",
+          "synchronization"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。",
+        "operations:subtract": "按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。",
+        "operations:relu": "按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。",
+        "operations:conversion": "按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。",
+        "operations:synchronization": "同步计算",
+        "traits:elementwise": "按元素求差，再进行Relu计算（结果和0对比取较大值），并提供转换最终结果的数据类型的功能(s162s8、f322f16、f162s8)。",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_sub_relu.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md",
+            "excerpt": "`asc_sub_relu_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_fused/asc_sub_relu.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md",
+            "excerpt": "`asc_sub_relu_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_fused/asc_sub_relu.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_relu_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_scalar_sync_deprecated.md",
+      "document_sha256": "4eda3fa4fd9f425294f85fe712c79c95c1f52ea2ae06eeb01ddfe5db34460717",
+      "description": {
+        "value": "该接口已废弃，请使用非同步接口asc_sub_scalar和同步接口asc_sync替代；执行矢量和标量的减法运算，将源矢量每个元素减去标量value后写入目的操作数，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_scalar_sync_deprecated.md",
+            "excerpt": "`asc_sub_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sub_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_scalar_sync_deprecated.md",
+            "excerpt": "执行矢量和标量的减法运算。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_scalar_sync_deprecated.md",
+            "excerpt": "源操作数（标量）。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "subtract",
+          "synchronization"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand",
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "执行矢量和标量的减法运算。",
+        "operations:subtract": "执行矢量和标量的减法运算。",
+        "operations:synchronization": "数据同步计算",
+        "traits:elementwise": "dst_i = src_i - value",
+        "traits:scalar_operand": "源操作数（标量）。",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub_scalar.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_scalar_sync_deprecated.md",
+            "excerpt": "`asc_sub_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sub_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_scalar_sync_deprecated.md",
+            "excerpt": "`asc_sub_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sub_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_scalar_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_sync_deprecated.md",
+      "document_sha256": "97b9d0a9e96c1f4b6782fa922f92cb4e1a116bc744e91340f4529b33089595a4",
+      "description": {
+        "value": "该接口已废弃，请使用非同步接口asc_sub和同步接口asc_sync替代；执行矢量减法运算，按元素将两个源矢量操作数相减并将结果写入目的操作数，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_sync_deprecated.md",
+            "excerpt": "`asc_sub_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sub.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_sync_deprecated.md",
+            "excerpt": "执行矢量减法运算。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_sync_deprecated.md",
+            "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "subtract",
+          "synchronization"
+        ],
+        "traits": [
+          "elementwise",
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "执行矢量减法运算。计算公式如下：",
+        "operations:subtract": "执行矢量减法运算。计算公式如下：",
+        "operations:synchronization": "同步计算",
+        "traits:elementwise": "dst_i  = src0_i -src1_i",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_sub.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_sync_deprecated.md",
+            "excerpt": "`asc_sub_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sub.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_sync_deprecated.md",
+            "excerpt": "`asc_sub_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_sub.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_sub_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md",
+      "document_sha256": "3572c27a628123eb3bb1a6dea144f12b8827e808c91c917ebe61b68ffac8e696",
+      "description": {
+        "value": "该接口已废弃，请使用非同步接口asc_transpose和同步接口asc_sync替代；实现16*16的二维矩阵数据块转置，将源矩阵数据块转置后写入目的操作数，操作数起始地址需32字节对齐。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md",
+            "excerpt": "`asc_transpose_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_permute_sel/asc_transpose.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md",
+            "excerpt": "用于实现16*16的二维矩阵数据块转置。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md",
+            "excerpt": "dst、src的起始地址需要32字节对齐。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "transpose",
+          "synchronization"
+        ],
+        "traits": [
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "用于实现16*16的二维矩阵数据块转置。",
+        "operations:transpose": "用于实现16*16的二维矩阵数据块转置。",
+        "operations:synchronization": "同步计算",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md",
+            "excerpt": "`asc_transpose_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_permute_sel/asc_transpose.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md",
+            "excerpt": "`asc_transpose_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_permute_sel/asc_transpose.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transpose_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md",
+      "document_sha256": "d68e8a94448058f14b29ce49938ff9590279e44fee9be9ac0b881f61f04e9edd",
+      "description": {
+        "value": "三个transto5hd_b8/b16/b32_sync接口已废弃，请使用asc_transto5hd和asc_sync接口替代；进行数据格式转换，一般将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，单次Repeat内可处理512Byte数据，支持多次Repeat操作。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md",
+            "excerpt": "`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/intra_core_sync/asc_sync.md)接口替代。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md",
+            "excerpt": "数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md",
+            "excerpt": "每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成一个新的DataBlock单元放入目的地址中"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "conversion",
+          "layout_transform",
+          "transpose",
+          "synchronization"
+        ],
+        "traits": [
+          "datablock_granularity"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。",
+        "operations:conversion": "数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。",
+        "operations:layout_transform": "一般用于将NCHW格式转换成NC1HWC0格式",
+        "operations:transpose": "也可以用于二维矩阵数据块的转置。",
+        "operations:synchronization": "同步计算",
+        "traits:datablock_granularity": "每次循环都会分别从指定的16个DataBlock中的对应位置取值，组成一个新的DataBlock单元放入目的地址中"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md",
+            "excerpt": "`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/intra_core_sync/asc_sync.md)接口替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md",
+            "excerpt": "`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/intra_core_sync/asc_sync.md)接口替代。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md",
+            "excerpt": "操作数地址对齐约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    }
+  ]
+}

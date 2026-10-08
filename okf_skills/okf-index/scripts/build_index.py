@@ -77,8 +77,8 @@ class Scope:
 
 
 SCOPES: dict[str, Scope] = {
-    # 试点范围：vector_compute + vector_datamove；全量轮次改为 categories=None
-    "c_api": Scope("c_api", "docs/zh/api/SIMD-API/c_api", "c_api.md", ("vector_compute", "vector_datamove")),
+    # c_api 全量（vector_* 试点轮已完成，categories=None 放开全部子目录）
+    "c_api": Scope("c_api", "docs/zh/api/SIMD-API/c_api", "c_api.md", None),
 }
 
 
@@ -95,6 +95,17 @@ def normalize_dtype(value: str) -> str:
 
 def is_arch_page(path: str) -> bool:
     return re.fullmatch(r".+_arch_\d+(?:_deprecated)?", PurePosixPath(path).stem) is not None
+
+
+def family_of(stem: str) -> str:
+    """家族名：剥离 _arch_NNNN(_deprecated) 变体后缀与纯 _deprecated 后缀。
+
+    纯后缀页（如 asc_set_gm2ub_pad_deprecated.md）按真实 API 名回查 include 声明。
+    """
+    stripped = re.sub(r"_arch_\d+(?:_deprecated)?$", "", stem)
+    if stripped == stem:
+        stripped = re.sub(r"_deprecated$", "", stem)
+    return stripped
 
 
 # ---------------------------------------------------------------- 文档加载
@@ -180,7 +191,7 @@ def derive_signatures(
     unresolved: list[dict[str, Any]], page_arch: str = "",
 ) -> dict[str, Any]:
     stem = PurePosixPath(rel).stem
-    family = re.sub(r"_arch_(\d+)(?:_deprecated)?$", "", stem)
+    family = family_of(stem)
     declarations, mode = declarations_for(family, include_db, area)
     if mode == "none":
         # 回退：家族页名不带序号（如 asc_set_ndim_loop_stride 覆盖 loop0-3_stride），
@@ -197,7 +208,7 @@ def derive_signatures(
     }
     if mode == "none":
         unresolved.append({"document": rel, "field": "signatures", "issue": "no declaration found in include/c_api"})
-        return derived
+        # 无声明也继续：archs 交给正文 npu 标记兜底（保守保留改为按证据门控）。
     silent = 0
     for declaration in declarations:
         raw_archs = list(declaration.archs)
@@ -224,7 +235,8 @@ def derive_signatures(
         for param in entry["params"]:
             derived["params"].append({
                 "name": param["name"], "type": param["type"],
-                "address_space": param["address_space"], "direction": param["direction"],
+                "address_space": param.get("address_space", ""),
+                "direction": param.get("direction", ""),
                 "override_id": entry["override_id"],
             })
             if param["type"] in include_db["enums"]:
@@ -238,6 +250,10 @@ def derive_signatures(
             "issue": f"{silent} declaration(s) without @override_id (no example link; dtypes/params still derived)",
         })
     derived["archs"] = sorted(set(derived["archs"]))
+    if page_arch and derived["signatures"]:
+        # 架构变体页只呈现本架构视图：声明 @archs 含多架构（如废弃接口 2201+3510）
+        # 时也按页面架构门控，防止变体页漏入其他架构索引。
+        derived["archs"] = [page_arch]
     derived["headers"] = sorted(set(derived["headers"]))
     derived["params"] = list({
         (p["name"], p["type"], p["override_id"]): p for p in derived["params"]
@@ -290,7 +306,7 @@ def classify_documents(documents: dict[str, dict[str, Any]], scope: Scope) -> No
         elif doc["okftype"] == "reference.index":
             doc["family"] = stem if len(parts) > base + 2 else "__nav__"
         else:
-            doc["family"] = stem
+            doc["family"] = family_of(stem)
         doc["standalone_primary"] = False
 
 
@@ -315,7 +331,7 @@ def stage_of(doc: dict[str, Any]) -> list[str]:
 def conversion_pair(rel: str, doc: dict[str, Any]) -> str | None:
     if "conversion" not in doc["tags"].get("operations", []):
         return None
-    stem = PurePosixPath(rel).stem
+    stem = family_of(PurePosixPath(rel).stem)
     body = stem[len("asc_"):] if stem.startswith("asc_") else ""
     for cut in (i for i, ch in enumerate(body) if ch == "2"):
         src, dst = normalize_dtype(body[:cut]), normalize_dtype(body[cut + 1:])
@@ -527,7 +543,7 @@ def build(root: Path, scope: Scope, out_dir: Path, cann_version: str, arch_label
             reverse[edge["kind"]].setdefault(edge["to"], []).append(edge["from"])
 
     index = {
-        "schema": "okf-index/3",
+        "schema": "okf-index/4",
         "meta": {
             "surface": scope.name,
             "source_commit": git_output(["rev-parse", "HEAD"]),
@@ -559,10 +575,12 @@ def build(root: Path, scope: Scope, out_dir: Path, cann_version: str, arch_label
                 "dtypes": doc["derived_dtypes"], "locations": doc["derived_locations"],
                 "masked": doc["derived_masked"], "deprecated": doc["derived_deprecated"],
                 "headers": doc["derived_headers"], "examples": doc["derived_examples"],
-                "params": doc["derived_params"], "enum_types": doc["derived_enum_types"],
+                "enum_types": doc["derived_enum_types"],
                 "family": doc["family"], "category": doc["category"], "nav_page": doc["nav_page"],
                 "applied_overrides": doc["derived_applied_overrides"],
             }
+            # 注意：不落盘 per-doc params（与 signatures[].params 冗余）；
+            # 参数反查经 by_param 视图 / signatures 推导。
             for rel, doc in sorted(gated.items())
         },
         "views": views,
@@ -594,7 +612,8 @@ def build(root: Path, scope: Scope, out_dir: Path, cann_version: str, arch_label
     (out_dir / "gaps.json").write_bytes((INDEX_DIR / scope.name / "gaps.json").read_bytes())
     written: list[Path] = [out_dir / "gaps.json"]
     for name, payload in (
-        ("index.json", json.dumps(index, ensure_ascii=False, indent=1) + "\n"),
+        # index.json 紧凑序列化（全量 592 篇 + 6550 声明，indent 会突破远端 10 MiB 单文件限制）
+        ("index.json", json.dumps(index, ensure_ascii=False, separators=(",", ":")) + "\n"),
         ("build-meta.json", json.dumps(build_meta, ensure_ascii=False, indent=1) + "\n"),
         ("概览.md", overview(index, include_db["enums"])),
     ):

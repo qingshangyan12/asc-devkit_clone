@@ -1,24 +1,19 @@
 ---
 okftype: reference.api
-title: asc_float2hif8
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md
-description: 根据mask将矢量数据寄存器中参与计算的float元素转换为hifloat8_t类型并写入dst，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取位置写入结果、其他位置置零，支持舍入和饱和/非饱和模式。
+description: "根据掩码将矢量数据寄存器中参与计算的float元素转换为hifloat8_t类型，支持rna与rh舍入模式及饱和/非饱和模式，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取目的写入位置，其他位置置零，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked, rounding_mode, saturation_mode]
-signature: []
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_float2hif8
 

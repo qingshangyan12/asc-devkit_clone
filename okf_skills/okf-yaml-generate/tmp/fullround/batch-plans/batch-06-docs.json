@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+  "sha256": "cf588873af143ff004005b35fb2568ab9ac2ced1f56a193cd5c5ceb18bb666db"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md",
+  "sha256": "d85ba9be0a0819c28fb2dfdc0f98a27f77ab48a143fe093c3d234d2bbbaaff94"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+  "sha256": "7638225039e5bb9c43a04b3be176c992d329ccdab1eb32292034cbc25e27a108"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+  "sha256": "747e401c3fab2d1372ca32c9d42279228413444fbe9c3b8ca447fe89a1fd0794"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md",
+  "sha256": "dbd36836b9d710466d601cce2a6b5cf0e341b9bd4edc06026ecc9352d1f4c40d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_axpy.md",
+  "sha256": "2c89e69bfdc9edaf3e509d98f91f11bc149cdecfbd1e39b986327f3a927d51ed"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md",
+  "sha256": "75ea80bca12baeca721cd639b8db268ccfc16a208b2463872d4f963ad4100052"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md",
+  "sha256": "ff0bdcf7a09dcf09cfde496831b1d99857612ad672b042c61f60da3e57850f8b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md",
+  "sha256": "645250d088b49bb877787f084d6cd5ced62633c2c9c9b10fbae657523c8dac14"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md",
+  "sha256": "8ffac60b2249a24df9996530c16d88d66e629680589120384c1f245b5a785658"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md",
+  "sha256": "dc2ded22c7a700da9af7289b662237450c27244ce38a3984a4d7f4efa3e9bef5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md",
+  "sha256": "e6259193a67b87e9a637ba132ac3ffe781cfc34fd6d5ee0750c9c917135ccdfb"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md",
+  "sha256": "92c062078aa1711b3a7af076d3b1ff15b10f883146a4cdfba31a87c1a2cd6a64"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md",
+  "sha256": "a4a4adcc902aeb84abe9e36014d50ed65d4398e1d3af0dd82599f7fb5f87d07b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md",
+  "sha256": "28b66722729ee855283d1fc15eddca42865f3f523bf6b23cd9f3373f1fd41770"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md",
+  "sha256": "b15bd262543fdad22e778b9a2fe1ac11c1cdf55007ae593e6908ab0ca43c9e5d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md",
+  "sha256": "3f00b945a4795bb870bef0062bf86aa870b8c0ebc6a6cdebcdd3b86e0729630e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md",
+  "sha256": "9a4382becb9ec06de760850bacb17e3e594ac9461055fb4f35ac5385d0a2d056"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md",
+  "sha256": "63571d3a35dcd1f7eae84ccf0370c43906457b7779d79fab27ebb53bb7bc2c1b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md",
+  "sha256": "63f6f14ff0fdbb89bbcb53054aff34fa70d9896b52945d9e9ae9b90a04624804"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md",
+  "sha256": "a33736e06cbbe529c6331f1235d09131845328e1a3c6169a0838114977cf5ffe"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md",
+  "sha256": "97806ea40c496e6cb2c621d1e345409e6c327709ca341a64bf66efadcd0e6c97"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft_scalar.md",
+  "sha256": "b6795a48e318d12dc72bb090fed37f639b7f8d2f1b87ad673501f33be5e3d82d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright.md",
+  "sha256": "f26cf15dd1857432655b592e31a82fc0e020a5a1d601c042c18e64b9a1abcc20"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md",
+  "sha256": "6d75a1513091f868758e8f3a423e8130eed5edbb3bc273f9eacc3161f902c067"
+ }
+]

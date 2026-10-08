@@ -1,0 +1,1141 @@
+{
+ "schema_version": 1,
+ "purpose": "okf_semantic_annotations",
+ "annotations": [
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+   "document_sha256": "baed552702b02fc0f2f29ffad1ffb96a2ad9d1ba4993b85951db30ce2d90d10a",
+   "description": {
+    "value": "核内全部流水同步接口，功能等价于单流水同步接口传入PIPE_ALL时的行为，阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成；会等待所有流水中先前提交的接口完成而对性能产生影响，仅需阻塞单条流水时应改用指定流水的同步接口。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+      "excerpt": "用于同一核内所有流水之间的全部流水同步，功能等价于[asc_sync_pipe(PIPE_ALL)](asc_sync_pipe.md)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+      "excerpt": "`asc_sync`会等待所有流水中所有先前提交的接口完成，这会对性能产生影响。若仅需阻塞单条流水，应避免随意调用`asc_sync`，可使用[asc_sync_pipe](asc_sync_pipe.md)接口指定某个流水的阻塞。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "用于同一核内所有流水之间的全部流水同步，功能等价于[asc_sync_pipe(PIPE_ALL)](asc_sync_pipe.md)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。",
+    "operations:synchronization": "用于同一核内所有流水之间的全部流水同步，功能等价于[asc_sync_pipe(PIPE_ALL)](asc_sync_pipe.md)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+      "excerpt": "用于同一核内所有流水之间的全部流水同步，功能等价于[asc_sync_pipe(PIPE_ALL)](asc_sync_pipe.md)。阻塞调用点后所有硬件流水的后序指令，直到调用点之前所有硬件流水的前序指令全部完成。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+   "document_sha256": "f6a0e655414e79fdd09d4f933dce7e0f2938b6765b1ca02b266d2c7c152da4df",
+   "description": {
+    "value": "阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成，可通过参数指定阻塞作用的内存范围，支持等待全部、GM或UB的访问指令；DSB_ALL仅覆盖GM与Unified Buffer访问，不包括L0C Buffer、L1 Buffer等其他内存位置。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+      "excerpt": "阻塞后续的指令执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。可以通过`arg`参数指定阻塞作用的内存范围，取值的范围以及各个取值的含义见[参数说明](#参数说明)。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+      "excerpt": "- 等待的内存位置取值为DSB_ALL时，只能等待GM和Unified Buffer（UB）的访问指令，不包括其他内存位置，例如L0C Buffer、L1 Buffer。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "阻塞后续的指令执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。可以通过`arg`参数指定阻塞作用的内存范围，取值的范围以及各个取值的含义见[参数说明](#参数说明)。",
+    "operations:synchronization": "阻塞后续的指令执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。可以通过`arg`参数指定阻塞作用的内存范围，取值的范围以及各个取值的含义见[参数说明](#参数说明)。"
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+   "document_sha256": "c241b524d7d712bb3240b4e285dc70e0165a053f746323efeba91064e4230c27",
+   "description": {
+    "value": "针对PIPE_MTE2执行同步操作的易用性接口，保证PIPE_MTE2中前序指令如GM到UB的数据搬运全部完成后，PIPE_MTE3与PIPE_V的后续指令才能开始执行，一次调用同时完成对两条目的流水的同步以简化手工同步编码，只能在AIV中调用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+      "excerpt": "针对`PIPE_MTE2`执行同步操作。其作用是保证`PIPE_MTE2`中前序指令（如GM到UB的数据搬运）全部完成后，`PIPE_MTE3`与`PIPE_V`的后续指令才能开始执行。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+      "excerpt": "本接口为易用性接口，用于简化手工同步的编码。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "针对`PIPE_MTE2`执行同步操作。其作用是保证`PIPE_MTE2`中前序指令（如GM到UB的数据搬运）全部完成后，`PIPE_MTE3`与`PIPE_V`的后续指令才能开始执行。",
+    "operations:synchronization": "针对`PIPE_MTE2`执行同步操作。其作用是保证`PIPE_MTE2`中前序指令（如GM到UB的数据搬运）全部完成后，`PIPE_MTE3`与`PIPE_V`的后续指令才能开始执行。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+     "kind": "related",
+     "condition": "若手工同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+      "excerpt": "本示例展示`asc_sync_mte2`作为易用性接口的价值：GM->UB一次搬入`src0`、`src1`、`src2`三份数据后，`PIPE_V`上的矢量计算（依赖`src0`与`src1`）与`PIPE_MTE3`上的数据搬出（依赖`src2`）两条独立路径都需要依赖该次搬入。若手工同步，需分别对`PIPE_V`与`PIPE_MTE3`各执行一组`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_mte2`一次调用即可同时完成对`PIPE_MTE3`与`PIPE_V`的同步，减少手写代码量。示例中`PIPE_V`到`PIPE_MTE3`的依赖则使用`asc_sync_notify`与`asc_sync_wait`进行精准同步，以便与`asc_sync_mte2`的易用性写法形成对比。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+     "kind": "related",
+     "condition": "若手工同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+      "excerpt": "本示例展示`asc_sync_mte2`作为易用性接口的价值：GM->UB一次搬入`src0`、`src1`、`src2`三份数据后，`PIPE_V`上的矢量计算（依赖`src0`与`src1`）与`PIPE_MTE3`上的数据搬出（依赖`src2`）两条独立路径都需要依赖该次搬入。若手工同步，需分别对`PIPE_V`与`PIPE_MTE3`各执行一组`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_mte2`一次调用即可同时完成对`PIPE_MTE3`与`PIPE_V`的同步，减少手写代码量。示例中`PIPE_V`到`PIPE_MTE3`的依赖则使用`asc_sync_notify`与`asc_sync_wait`进行精准同步，以便与`asc_sync_mte2`的易用性写法形成对比。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+   "document_sha256": "a90077ea34b8eebf7aad2f27785e766b24160fa29630c79703f7b5f81e81247a",
+   "description": {
+    "value": "针对PIPE_MTE3执行同步操作的易用性接口，保证PIPE_MTE3中前序指令如UB到GM的数据搬运全部完成后，PIPE_MTE2与PIPE_V的后续指令才能开始执行，一次调用同时完成对两条目的流水的同步以简化手工同步编码，只能在AIV中调用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+      "excerpt": "针对`PIPE_MTE3`执行同步操作。其作用是保证`PIPE_MTE3`中前序指令（如UB到GM的数据搬运）全部完成后，`PIPE_MTE2`与`PIPE_V`的后续指令才能开始执行。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+      "excerpt": "本接口为易用性接口，用于简化手工同步的编码。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "针对`PIPE_MTE3`执行同步操作。其作用是保证`PIPE_MTE3`中前序指令（如UB到GM的数据搬运）全部完成后，`PIPE_MTE2`与`PIPE_V`的后续指令才能开始执行。",
+    "operations:synchronization": "针对`PIPE_MTE3`执行同步操作。其作用是保证`PIPE_MTE3`中前序指令（如UB到GM的数据搬运）全部完成后，`PIPE_MTE2`与`PIPE_V`的后续指令才能开始执行。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+     "kind": "related",
+     "condition": "若手工同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+      "excerpt": "本示例展示`asc_sync_mte3`作为易用性接口的价值：每次迭代中，UB->GM搬出计算结果`dst0`与直接搬入的数据`dst1`后，下一轮迭代的`PIPE_MTE2`搬入（重新占用缓冲区）与`PIPE_V`计算都需要依赖该次搬出。对比代码中`PIPE_MTE2`到`PIPE_V`的同步：若手工同步，需对每条流水分别编写`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_mte3`一次调用即可同时完成对`PIPE_MTE2`与`PIPE_V`的同步，减少手写代码量。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+     "kind": "related",
+     "condition": "若手工同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+      "excerpt": "本示例展示`asc_sync_mte3`作为易用性接口的价值：每次迭代中，UB->GM搬出计算结果`dst0`与直接搬入的数据`dst1`后，下一轮迭代的`PIPE_MTE2`搬入（重新占用缓冲区）与`PIPE_V`计算都需要依赖该次搬出。对比代码中`PIPE_MTE2`到`PIPE_V`的同步：若手工同步，需对每条流水分别编写`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_mte3`一次调用即可同时完成对`PIPE_MTE2`与`PIPE_V`的同步，减少手写代码量。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+   "document_sha256": "034f8c33f556a1075cf3be212cbfeea6079df8720e17baa23b9c063a0175d4aa",
+   "description": {
+    "value": "与asc_sync_wait配对使用实现AI Core内部不同流水之间的同步控制，当源流水的前序指令所有读写操作都完成后将硬件中对应标志位设置为1，仅设置标志位并不阻塞源流水中的下一个指令；配对调用的pipe、tpipe、id三个参数必须完全一致。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+      "excerpt": "如图1所示，与[asc_sync_wait](asc_sync_wait.md)配对使用，用于实现AI Core内部不同流水之间的同步控制，`asc_sync_notify`和`asc_sync_wait`各自的功能如下："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+      "excerpt": "- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "如图1所示，与[asc_sync_wait](asc_sync_wait.md)配对使用，用于实现AI Core内部不同流水之间的同步控制，`asc_sync_notify`和`asc_sync_wait`各自的功能如下：",
+    "operations:synchronization": "- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+      "excerpt": "- 本接口需与`asc_sync_wait`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+      "excerpt": "- **`pipe`与`tpipe`并非任意组合，两者组合的取值存在限制**：针对不同产品，AIC与AIV中支持的组合不同，具体请参考[核内同步分类](intra_core_sync_overview.md#核内同步分类)中的[表2](intra_core_sync_overview.md#aic_intra_core_sync_combinations)和[表3](intra_core_sync_overview.md#aiv_intra_core_sync_combinations)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+   "document_sha256": "2e6d0850d8b9d8306cf4191224c2a98b87838c10e6d6a413aaeff13468bef295",
+   "description": {
+    "value": "完成同一流水内的同步控制，约束同一流水内部的执行顺序，保证指定流水前序指令的所有数据读写完成后后序指令才开始执行；传入PIPE_ALL时等待所有流水前序指令完成，功能等价于asc_sync，传入其他流水值时仅阻塞该流水，不支持PIPE_S单流水同步。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+      "excerpt": "完成同一流水内的同步控制，用于在同一流水内部约束执行顺序："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+      "excerpt": "- 传入`PIPE_ALL`时等待所有流水的前序指令全部完成后才会对后序指令解除阻塞，此时功能等价于[asc_sync](asc_sync.md)。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+      "excerpt": "- 传入其他合法流水值时仅阻塞该流水的后续指令，直至该流水前序指令全部完成，不影响其他流水线的指令执行。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "完成同一流水内的同步控制，用于在同一流水内部约束执行顺序：",
+    "operations:synchronization": "如图1所示，其作用是保证指定流水线中前序指令的所有数据读写全部完成后，该流水的后序指令才能开始执行。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+     "kind": "related",
+     "condition": "传入PIPE_ALL时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+      "excerpt": "- 传入`PIPE_ALL`时等待所有流水的前序指令全部完成后才会对后序指令解除阻塞，此时功能等价于[asc_sync](asc_sync.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+   "document_sha256": "5d8181db511f0c5df1e7128d69434414dab9fb17a0eb0f57e4de4a200e04686f",
+   "description": {
+    "value": "针对PIPE_V执行同步操作的易用性接口，保证PIPE_V中前序指令如矢量计算全部完成后，PIPE_MTE2、PIPE_MTE3与PIPE_S的后续指令才能开始执行；无入参函数原型已废弃，应改用asc_sync执行针对所有流水的同步操作，本接口只能在AIV中调用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+      "excerpt": "**无入参函数原型`asc_sync_vec()`接口已废弃，请使用[asc_sync](asc_sync.md)执行针对所有流水的同步操作。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+      "excerpt": "针对`PIPE_V`执行同步操作。其作用是保证`PIPE_V`中前序指令（如矢量计算）全部完成后，`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`的后续指令才能开始执行。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "针对`PIPE_V`执行同步操作。其作用是保证`PIPE_V`中前序指令（如矢量计算）全部完成后，`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`的后续指令才能开始执行。",
+    "operations:synchronization": "针对`PIPE_V`执行同步操作。其作用是保证`PIPE_V`中前序指令（如矢量计算）全部完成后，`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`的后续指令才能开始执行。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+     "kind": "replaced_by",
+     "condition": "无入参函数原型已废弃",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+      "excerpt": "**无入参函数原型`asc_sync_vec()`接口已废弃，请使用[asc_sync](asc_sync.md)执行针对所有流水的同步操作。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+     "kind": "related",
+     "condition": "若手工同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+      "excerpt": "本示例展示`asc_sync_vec`作为易用性接口的价值：`PIPE_V`上的矢量计算完成后，`PIPE_MTE2`上的搬入、`PIPE_MTE3`上的数据搬出以及`PIPE_S`上的标量处理都需要依赖该次计算。若手工同步，需分别对`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`各执行一组`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_vec`一次调用即可同时完成对`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`的同步，减少手写代码量。示例中`PIPE_MTE2`到`PIPE_V`的依赖则使用`asc_sync_notify`与`asc_sync_wait`进行精准同步，以便与`asc_sync_vec`的易用性写法形成对比。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+     "kind": "related",
+     "condition": "若手工同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+      "excerpt": "本示例展示`asc_sync_vec`作为易用性接口的价值：`PIPE_V`上的矢量计算完成后，`PIPE_MTE2`上的搬入、`PIPE_MTE3`上的数据搬出以及`PIPE_S`上的标量处理都需要依赖该次计算。若手工同步，需分别对`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`各执行一组`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_vec`一次调用即可同时完成对`PIPE_MTE2`、`PIPE_MTE3`与`PIPE_S`的同步，减少手写代码量。示例中`PIPE_MTE2`到`PIPE_V`的依赖则使用`asc_sync_notify`与`asc_sync_wait`进行精准同步，以便与`asc_sync_vec`的易用性写法形成对比。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+   "document_sha256": "5d94d1b38f7e63030e09fb7c8de40997fe1b767073bb124b2350c0c9bbab67b7",
+   "description": {
+    "value": "与asc_sync_notify配对使用实现AI Core内部不同流水之间的同步控制，目的流水执行到该指令时若对应标志位为0则后续指令一直被阻塞，为1则将标志位清0并放行后续指令；配对调用的pipe、tpipe、id三个参数必须完全一致。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+      "excerpt": "如图1所示，与[asc_sync_notify](asc_sync_notify.md)配对使用，用于实现AI Core内部不同流水之间的同步控制，`asc_sync_notify`和`asc_sync_wait`各自的功能如下："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+      "excerpt": "- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "如图1所示，与[asc_sync_notify](asc_sync_notify.md)配对使用，用于实现AI Core内部不同流水之间的同步控制，`asc_sync_notify`和`asc_sync_wait`各自的功能如下：",
+    "operations:synchronization": "- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+      "excerpt": "- 本接口需与`asc_sync_notify`配对使用，配对的两条调用其`pipe`、`tpipe`、`id`三个参数必须完全一致。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+      "excerpt": "- **`pipe`与`tpipe`并非任意组合，两者组合的取值存在限制**：针对不同产品，AIC与AIV中支持的组合不同，具体请参考[核内同步分类](intra_core_sync_overview.md#核内同步分类)中的[表2](intra_core_sync_overview.md#aic_intra_core_sync_combinations)和[表3](intra_core_sync_overview.md#aiv_intra_core_sync_combinations)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+   "document_sha256": "348df3b248de8762dd27a385c7e5480e84e28ae3d39244e2592e7eeecd08c81d",
+   "description": {
+    "value": "与asc_lock配对使用实现核内异步流水指令之间的同步处理，指定流水的前序指令执行完成后根据mutex_id释放对应Mutex；mode参数可选择仅等待前置指令完成或再等待相同mutex_id的所有unlock执行完成，unlock必须写在对应的lock之后且两者须严格成对使用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+      "excerpt": "与[asc_lock](asc_lock.md)配对使用，用于实现核内异步流水指令之间的同步处理，`asc_lock`和`asc_unlock`各自的功能如下："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+      "excerpt": "- `asc_unlock`：指定流水的前序指令执行完成后，根据`mutex_id`释放对应Mutex。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+      "excerpt": "- `asc_lock`与`asc_unlock`必须严格成对使用，并使用相同的`pipe`、`mutex_id`和`mode`。此外，对应的`asc_unlock`必须始终写在`asc_lock`之后，否则属于未定义行为。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "与[asc_lock](asc_lock.md)配对使用，用于实现核内异步流水指令之间的同步处理，`asc_lock`和`asc_unlock`各自的功能如下：",
+    "operations:synchronization": "- `asc_unlock`：指定流水的前序指令执行完成后，根据`mutex_id`释放对应Mutex。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+      "excerpt": "- `asc_lock`与`asc_unlock`必须严格成对使用，并使用相同的`pipe`、`mutex_id`和`mode`。此外，对应的`asc_unlock`必须始终写在`asc_lock`之后，否则属于未定义行为。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+     "kind": "related",
+     "condition": "单流水内多个指令之间的同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+      "excerpt": "- 当具有相同`mutex_id`与`pipe`的两对`asc_lock`与`asc_unlock`连续调用时，第一次调用的`asc_lock`将由参数`pipe`指定的流水阻塞后，第二次调用的`asc_lock`不能再次阻塞该流水。换言之，连续调用的、具有相同`mutex_id`与`pipe`的两对`asc_lock`与`asc_unlock`不能实现单流水（参数`pipe`指定）内不同指令之间的同步，单流水内多个指令之间的同步请使用[asc_sync_pipe](asc_sync_pipe.md)接口。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+   "document_sha256": "c94b95ade68ed9ebc2d7b432021f33f91dbd5015d930fea462bdd11a34e5b8b7",
+   "description": {
+    "value": "核内同步能力概述页，说明AI Core内部执行单元异步并行运行、读写同一存储资源存在数据依赖时需通过同步控制协调操作时序，介绍各硬件流水类型及PIPE_ALL的含义，并按多流水同步、单流水同步与内存屏障分类说明核内同步接口及AIC与AIV中合法的同步组合。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+      "excerpt": "AI Core内部的执行单元（如MTE2搬运单元、Vector计算单元等）以异步并行的方式运行，在读写同一存储资源时可能存在数据依赖关系。为确保数据一致性及计算正确性，需通过同步控制协调操作时序。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+      "excerpt": "四个执行单元Scalar、Vector、DMA（MTE2）、DMA（MTE3）并行执行，若访问同一片Local Memory，需要同步机制来控制它们的访问时序：保证先搬入Local Memory后再计算，计算完成后再搬出。"
+     }
+    ]
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+   "document_sha256": "86b8c3f44bae530292a321126f1bdc50ca0174b2eea1f02fc7647feb85fb7776",
+   "description": {
+    "value": "系统同步能力概述页，说明同步通过协调多个执行单元对共享资源的访问顺序与时机来确保程序正确性，将AI Core同步分为核内同步与核间同步两类，以表格汇总核内同步接口的功能简述，并按四种同步控制模式介绍AIC与AIV之间及组间的核间同步接口。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+      "excerpt": "在编程中，同步是指协调多个执行单元（如线程、进程等）对共享资源的访问顺序和时机来确保程序的正确性。如果没有同步来严格控制执行顺序，则会出现结果不一致、行为不可预测等多种问题。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+      "excerpt": "AI Core的同步，总共分成2类：[核内同步](intra_core_sync/intra_core_sync_overview.md)、[核间同步](inter_core_sync/inter_core_sync_overview.md)。各类同步对应的接口如下。"
+     }
+    ]
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+   "document_sha256": "22e4fb3702b2879c8e933d53a2eb573fa6d50eb188aca8e1dc5514890bb13061",
+   "description": {
+    "value": "原子操作概述页，介绍数据搬运随路原子操作与Scalar原子操作两类接口：前者对后续目的地址为GM的数据搬运指令开启原子累加、原子比较等随路操作，使GM最终数据由原始数据与新搬运数据共同决定；后者在指定GM地址上进行单点原子计算操作，不影响后续向GM搬运数据的指令。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+      "excerpt": "数据搬运随路原子操作接口用于对后续目的地址为GM的数据搬运指令开启原子操作，涉及的接口请参见[表1](#table1)。如下图1的左侧子图所示，未开启原子操作时，写入GM的数据搬运完成后，GM中原始数据将被新搬运数据完全覆盖。如图1右侧子图所示，当数据搬运随路原子操作接口被调用后，系统将为后续写入GM的数据搬运开启原子操作。此时，数据搬运完成后，GM中的最终数据由原始GM数据与新搬运数据共同决定。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+      "excerpt": "针对Ascend 950PR&950DT系列产品，新增Scalar原子操作接口，能够在指定GM地址上进行单点原子计算操作，涉及的接口请参见[表2](#table2)。对比数据搬运随路原子操作接口，Scalar原子操作接口不会影响后续向GM搬运数据的指令。"
+     }
+    ]
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+   "document_sha256": "2d3b1282744ace1c4e09dd5a796ac52cdf125f02784f3dc0039236b3a2db9961",
+   "description": {
+    "value": "关闭数据搬运随路原子操作功能的接口，与asc_set_atomic_add、asc_set_atomic_max、asc_set_atomic_min配合使用，在完成原子操作后关闭原子操作，避免影响后续数据搬运。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+      "excerpt": "与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。",
+    "traits:atomic": "与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+      "excerpt": "与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+      "excerpt": "与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+      "excerpt": "与[asc_set_atomic_add](asc_set_atomic_add.md)、[asc_set_atomic_max](asc_set_atomic_max.md)、[asc_set_atomic_min](asc_set_atomic_min.md)接口配合使用，用于在完成原子操作后关闭原子操作，避免影响后续搬运。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+   "document_sha256": "cc5965a33caad932f61413ebfe6132b91529012d938573671c6537aa6f27b9c9",
+   "description": {
+    "value": "对后续目的地址为GM的数据搬运指令开启原子累加，搬运时将待搬运数据与GM上已有数据求和后将结果写入GM，可通过选择不同函数原型设定累加数据类型；调用asc_disable_dma_atomic可关闭该原子操作，仅对MTE搬运单元的搬运指令生效，对标量写GM的指令不生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+      "excerpt": "原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+      "excerpt": "- 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)接口关闭原子操作。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。",
+    "traits:atomic": "原子累加过程：将待搬运到GM的数据和GM上已有数据进行求和，然后将求和结果写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子累加，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+      "excerpt": "- 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)接口关闭原子操作。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+     "kind": "constrained_by",
+     "condition": "若需保证确定性的执行顺序",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+      "excerpt": "- 本接口不能保证后续搬运指令的执行顺序，若需保证确定性的执行顺序请参考[关键特性说明](../key_features.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+     "kind": "related",
+     "condition": "对于标量写GM的指令不生效",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+      "excerpt": "- 本接口仅对后续目的地址为GM的搬运指令（通过MTE1/MTE2/MTE3单元搬运）生效，对于标量写GM的指令（例如[asc_store_dev](../../scalar_compute/scalar_store/asc_store_dev.md)）不生效。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+   "document_sha256": "90746f8dd629e07afed7628496d75ef6db73764a597a3fe87ff3b2ae7db9aca5",
+   "description": {
+    "value": "对后续目的地址为GM的数据搬运指令开启原子比较取大，搬运时将待搬运数据与GM上已有数据进行比较并将两者中的最大值写入GM，可通过选择不同函数原型设定比较取大数据类型；调用asc_disable_dma_atomic可关闭该原子操作，仅对MTE搬运单元的搬运指令生效，对标量写GM的指令不生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+      "excerpt": "原子取大过程：将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最大值写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子比较取大，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+      "excerpt": "- 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)接口关闭原子操作。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "原子取大过程：将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最大值写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子比较取大，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。",
+    "traits:atomic": "原子取大过程：将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最大值写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子比较取大，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+      "excerpt": "- 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)接口关闭原子操作。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+     "kind": "constrained_by",
+     "condition": "若需保证确定性的执行顺序",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+      "excerpt": "- 本接口不能保证后续搬运指令的执行顺序，若需保证确定性的执行顺序请参考[关键特性说明](../key_features.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+     "kind": "related",
+     "condition": "对于标量写GM的指令不生效",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+      "excerpt": "- 本接口仅对后续目的地址为GM的搬运指令（通过MTE1/MTE2/MTE3单元搬运）生效，对于标量写GM的指令（例如[asc_store_dev](../../scalar_compute/scalar_store/asc_store_dev.md)）不生效。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+   "document_sha256": "2c566a377abeabc64ea8c33e55dfa5131999699b31e2194fc9afe2ebab918d91",
+   "description": {
+    "value": "对后续目的地址为GM的数据搬运指令开启原子比较取小，搬运时将待搬运数据与GM上已有数据进行比较并将两者中的最小值写入GM，可通过选择不同函数原型设定比较取小数据类型；调用asc_disable_dma_atomic可关闭该原子操作，仅对MTE搬运单元的搬运指令生效，对标量写GM的指令不生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+      "excerpt": "将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最小值写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子比较取小，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+      "excerpt": "- 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)接口关闭原子操作。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最小值写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子比较取小，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。",
+    "traits:atomic": "将待搬运到GM的数据和GM上已有数据进行比较，然后将两者中的最小值写入GM。本接口对后续目的地址为GM的数据搬运指令开启原子比较取小，不同产品支持的数据搬运通路请参考[约束说明](#约束说明)。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+      "excerpt": "- 本接口调用后会对后续所有目的地址为GM的搬运指令开启原子操作，可以调用[asc_disable_dma_atomic](asc_disable_dma_atomic.md)接口关闭原子操作。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+     "kind": "constrained_by",
+     "condition": "若需保证确定性的执行顺序",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+      "excerpt": "- 本接口不能保证后续搬运指令的执行顺序，若需保证确定性的执行顺序请参考[关键特性说明](../key_features.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+     "kind": "related",
+     "condition": "对于标量写GM的指令不生效",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+      "excerpt": "- 本接口仅对后续目的地址为GM的搬运指令（通过MTE1/MTE2/MTE3单元搬运）生效，对于标量写GM的指令（例如[asc_store_dev](../../scalar_compute/scalar_store/asc_store_dev.md)）不生效。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+   "document_sha256": "01940feec2d795547d146a49ffe729735b0734878d904bfcfa72bb2add88778a",
+   "description": {
+    "value": "阐述原子操作场景下的确定性计算，分析带随路原子操作的搬运指令乱序、开启原子操作前后指令乱序两类非确定性结果的产生原因与前提条件，并给出通过核内同步指令与基于GM信号量的软件核间同步方案，在指令之间插入适当同步以保证每次执行输出的结果都相同。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+      "excerpt": "确定性计算是指在相同输入条件下，无论执行次数或执行环境如何变化，总能产生完全一致输出结果的计算过程。确定性计算为系统稳定性和实验可验证性提供保障。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+      "excerpt": "根据导致非确定性计算的两个根因，下面也从解决这两个方面描述确定性计算实现的方案。核心思想是在指令之间插入适当的同步，使每次程序运行时相关指令都按照预期确定的顺序执行，最终保证每次执行程序输出的结果都相同。具体来说包含以下两个方面："
+     }
+    ]
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+   "document_sha256": "536e0b1b39cd434a5609db1e57c3c9e558d1543cc38a8a3a39939f00abfc34f1",
+   "description": {
+    "value": "对Global Memory中address指向的单个元素执行原子加操作，读取该元素的旧值，将旧值与输入标量值之和写回该地址并返回修改前的旧值，整个读取、计算和写回过程为原子操作；接口访问GM时绕过DCache，需调用缓存维护接口确保GM与DCache的一致性。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子加操作。读取该元素的旧值`old_value`，将`old_value + val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+      "excerpt": "- Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "add"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对Global Memory中`address`指向的单个元素执行原子加操作。读取该元素的旧值`old_value`，将`old_value + val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+    "operations:add": "对Global Memory中`address`指向的单个元素执行原子加操作。读取该元素的旧值`old_value`，将`old_value + val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+    "traits:atomic": "对Global Memory中`address`指向的单个元素执行原子加操作。读取该元素的旧值`old_value`，将`old_value + val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+      "excerpt": "- Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+   "document_sha256": "f570d1f24e9dbc06219928b7032538bbcda29c81154a965e70235385f11f9606",
+   "description": {
+    "value": "对Global Memory中address指向的单个元素执行原子按位与操作，读取该元素的旧值，将旧值与输入标量值按位与的结果写回该地址并返回修改前的旧值，整个读取、计算和写回过程为原子操作。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子按位与操作。读取该元素的旧值`old_value`，将`old_value & val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "bitwise_and"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对Global Memory中`address`指向的单个元素执行原子按位与操作。读取该元素的旧值`old_value`，将`old_value & val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+    "operations:bitwise_and": "对Global Memory中`address`指向的单个元素执行原子按位与操作。读取该元素的旧值`old_value`，将`old_value & val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+    "traits:atomic": "对Global Memory中`address`指向的单个元素执行原子按位与操作。读取该元素的旧值`old_value`，将`old_value & val`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+      "excerpt": "- Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+   "document_sha256": "92e307875ae5d841799416bd53ceb379fe05d8e8a4d1fd754cfb279244161877",
+   "description": {
+    "value": "对Global Memory中address指向的单个元素执行原子比较交换操作，读取该元素的旧值，若旧值等于比较值则将输入标量值写回该地址，否则保持不变，接口返回修改前的旧值，整个读取、比较和条件写回过程为原子操作。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子比较交换操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+      "excerpt": "接口返回`old_value`。整个读取、比较和条件写回过程为原子操作。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "comparison"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对Global Memory中`address`指向的单个元素执行原子比较交换操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`：",
+    "operations:comparison": "接口返回`old_value`。整个读取、比较和条件写回过程为原子操作。",
+    "traits:atomic": "接口返回`old_value`。整个读取、比较和条件写回过程为原子操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+      "excerpt": "- Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+   "document_sha256": "a91f59c65e5d3ddc731a8c6ebb039536fa46666c73e3f336a8d1573d1c0a3e65",
+   "description": {
+    "value": "对Global Memory中address指向的uint32_t或uint64_t元素执行原子递减操作，读取旧值，旧值为0或大于指定值时写回该指定值，否则写回旧值减1，接口返回修改前的旧值，整个读取、判断和写回过程为原子操作。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+      "excerpt": "对Global Memory中`address`指向的一个`uint32_t`或`uint64_t`元素执行原子递减操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+      "excerpt": "接口返回`old_value`。整个读取、判断和写回过程为原子操作。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "subtract"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对Global Memory中`address`指向的一个`uint32_t`或`uint64_t`元素执行原子递减操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`：",
+    "operations:subtract": "new\\_value = (old\\_value == 0 || old\\_value > val) ? val : (old\\_value - 1)",
+    "traits:atomic": "接口返回`old_value`。整个读取、判断和写回过程为原子操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+      "excerpt": "- Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+   "document_sha256": "934da2a2480fe830877e5313646a5f659ab3b276c14eab7b326f10067122bd6e",
+   "description": {
+    "value": "对Global Memory中address指向的单个元素执行原子交换操作，读取该元素的旧值，将输入标量值写回该地址以替换旧值并返回修改前的旧值，整个读取和写回过程为原子操作。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子交换操作。读取该元素的旧值`old_value`，将`val`写回该地址以替换旧值，并返回`old_value`。整个读取和写回过程为原子操作。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "store"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "对Global Memory中`address`指向的单个元素执行原子交换操作。读取该元素的旧值`old_value`，将`val`写回该地址以替换旧值，并返回`old_value`。整个读取和写回过程为原子操作。",
+    "operations:store": "对Global Memory中`address`指向的单个元素执行原子交换操作。读取该元素的旧值`old_value`，将`val`写回该地址以替换旧值，并返回`old_value`。整个读取和写回过程为原子操作。",
+    "traits:atomic": "对Global Memory中`address`指向的单个元素执行原子交换操作。读取该元素的旧值`old_value`，将`val`写回该地址以替换旧值，并返回`old_value`。整个读取和写回过程为原子操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+      "excerpt": "- Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+   "document_sha256": "e2b4ae01a0e06ae8fc78faf2827a94942bc3041a75eaac5a8b73f1335ecb9b66",
+   "description": {
+    "value": "对Global Memory中address指向的uint32_t或uint64_t元素执行原子递增操作，读取旧值，旧值大于等于指定值时写回0，否则写回旧值加1，接口返回修改前的旧值，整个读取、判断和写回过程为原子操作。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+      "excerpt": "对Global Memory中`address`指向的一个`uint32_t`或`uint64_t`元素执行原子递增操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+      "excerpt": "接口返回`old_value`。整个读取、判断和写回过程为原子操作。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "add"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对Global Memory中`address`指向的一个`uint32_t`或`uint64_t`元素执行原子递增操作。读取该元素的旧值`old_value`，按照以下公式计算并写回新值`new_value`：",
+    "operations:add": "new\\_value = (old\\_value >= val) ? 0 : (old\\_value + 1)",
+    "traits:atomic": "接口返回`old_value`。整个读取、判断和写回过程为原子操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+      "excerpt": "- Scalar原子操作会绕过DCache，需要调用[asc_dcci](../../cache_ctrl/asc_dcci.md)接口确保GM与DCache的一致性。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+   "document_sha256": "38ed5d168441dc6f8e77c4a55eedc679d6475bb7445663d3a4073b380321e5e8",
+   "description": {
+    "value": "对Global Memory中address指向的单个元素执行原子取大操作，读取该地址中的旧值并与输入标量值比较，将较大值写回该地址并返回修改前的旧值，整个读取、比较和写回过程为原子操作；接口运行在标量流水PIPE_S上，访问GM时绕过DCache。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子取大操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较大值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "maximum"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对Global Memory中`address`指向的单个元素执行原子取大操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较大值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。",
+    "operations:maximum": "对Global Memory中`address`指向的单个元素执行原子取大操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较大值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。",
+    "traits:atomic": "对Global Memory中`address`指向的单个元素执行原子取大操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较大值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+     "kind": "requires",
+     "condition": "若其他核或其他通路通过缓存访问同一GM地址",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+     "kind": "requires",
+     "condition": "若其他核或其他通路通过缓存访问同一GM地址",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+     "kind": "requires",
+     "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+     "kind": "requires",
+     "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+     "kind": "requires",
+     "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+      "excerpt": "- 本接口不受[asc_set_atomic_max](../datamove_atomic/asc_set_atomic_max.md)等数据搬运随路原子设置影响，也不会影响后续搬运指令。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+   "document_sha256": "371ea7c3aa8a1f017ccae8d85992a7cae8d1780a9585a0ef0432cab59f4f25be",
+   "description": {
+    "value": "对Global Memory中address指向的单个元素执行原子取小操作，读取该地址中的旧值并与输入标量值比较，将较小值写回该地址并返回修改前的旧值，整个读取、比较和写回过程为原子操作；接口运行在标量流水PIPE_S上，访问GM时绕过DCache。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "excerpt": "对Global Memory中`address`指向的单个元素执行原子取小操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较小值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "minimum"
+    ],
+    "traits": [
+     "atomic"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "对Global Memory中`address`指向的单个元素执行原子取小操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较小值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。",
+    "operations:minimum": "对Global Memory中`address`指向的单个元素执行原子取小操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较小值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。",
+    "traits:atomic": "对Global Memory中`address`指向的单个元素执行原子取小操作：读取该地址中的旧值`old_value`，比较`old_value`与输入标量值`val`，将较小值`new_value`写回该地址，并返回`old_value`。整个读取、比较和写回过程为原子操作。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+     "kind": "requires",
+     "condition": "若其他核或其他通路通过缓存访问同一GM地址",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+     "kind": "requires",
+     "condition": "若其他核或其他通路通过缓存访问同一GM地址",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+     "kind": "requires",
+     "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+     "kind": "requires",
+     "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+     "kind": "requires",
+     "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+      "excerpt": "- 本接口不受[asc_set_atomic_min](../datamove_atomic/asc_set_atomic_min.md)等数据搬运随路原子设置影响，也不会影响后续搬运指令。"
+     }
+    }
+   ]
+  }
+ ]
+}

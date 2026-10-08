@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_shiftright_scalar
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md
-description: 根据掩码对矢量数据寄存器中的元素执行右移，右移位数由标量立即数指定，无符号整数执行逻辑右移、有符号整数执行算术右移并复制符号位，掩码为0的元素置零，仅在AIV上生效。
+description: "根据掩码将矢量数据寄存器元素统一右移由标量立即数指定的位数，无符号整数执行逻辑右移、有符号整数执行算术右移并复制符号位，位移量不支持负数，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [bitwise_shift]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, scalar_operand]
-signature:
-  - prototype_id: asc_shiftright_scalar__v<dtype>_i16_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
-  - prototype_id: asc_shiftright_scalar__Rv<dtype>_v<dtype>_i16_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_logic.h]
+  - traits: [elementwise, scalar_operand]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_shiftright_scalar
 

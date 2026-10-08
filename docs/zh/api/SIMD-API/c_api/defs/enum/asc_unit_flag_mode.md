@@ -1,16 +1,10 @@
 ---
-okftype: reference.type
-title: asc_unit_flag_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md
-description: 该枚举用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口unit_flag_mode参数的类型。
+okftype: reference.enum
+description: "配置矩阵计算或矩阵搬出接口执行后UnitFlag行为的枚举类型，作为相关接口unit_flag_mode参数的类型，提供不使能、使能后保持与使能后更新单元标志位三个取值。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-declaration:
-  symbol: asc_unit_flag_mode
-  underlying_type: uint8_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies: []
+version: 9.0.0-
 ---
 # asc_unit_flag_mode
 

@@ -1,29 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_2d_arch_3510.md
-description: 将数据从Global Memory搬运到L1 Buffer，以512字节的分形为单位按行列方向切分提取多个分形矩阵，用于矩阵计算所需的2D格式数据加载，搬运过程中不支持分形格式转换，仅在AIC上执行有效。
+description: "将数据从Global Memory搬运到L1 Buffer，以512字节分形为单位按行列起始位置与步长切分提取多个分形矩阵，搬运过程中不支持分形格式转换，用于矩阵计算所需的2D格式数据加载，目的地址需32字节对齐，仅在AIC上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-signature:
-  - prototype_id: asc_copy_gm2l1__PL1<dtype>_PG<dtype>_u32_u32_u16_u16_u16_loadl2
-    dtype: [int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t,
-      int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, void]
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）
 

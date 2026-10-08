@@ -1,33 +1,16 @@
 ---
 okftype: reference.api
-title: asc_int162half
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md
-description: 将源操作数中int16_t类型的元素转换为half类型，源与目的操作数位宽相同、转换后元素数量不变，支持5种舍入模式，可通过引用参数或函数返回值输出结果。本接口为Reg矢量计算接口，仅在AIV上生效。
+description: "将矢量数据寄存器中int16_t类型的元素转换为half类型，源与目的位宽相同、转换后元素数量不变，支持5种舍入模式，可通过引用参数或函数返回值输出结果，掩码位为0时目的对应元素置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, rounding_mode]
-signature:
-  - override_id: asc_int162half_rd__Rvf16_vi16_vb
-  - override_id: asc_int162half_rn__Rvf16_vi16_vb
-  - override_id: asc_int162half_rna__Rvf16_vi16_vb
-  - override_id: asc_int162half_ru__Rvf16_vi16_vb
-  - override_id: asc_int162half_rz__Rvf16_vi16_vb
-  - override_id: asc_int162half_rd__vi16_vb
-  - override_id: asc_int162half_rn__vi16_vb
-  - override_id: asc_int162half_rna__vi16_vb
-  - override_id: asc_int162half_ru__vi16_vb
-  - override_id: asc_int162half_rz__vi16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_int162half
 

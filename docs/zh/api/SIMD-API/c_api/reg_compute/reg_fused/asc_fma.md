@@ -1,27 +1,12 @@
 ---
 okftype: reference.api
-title: asc_fma
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md
-description: 根据mask对源操作数src0、src1按元素相乘后与src2中的对应元素相加，将计算结果作为返回值返回，掩码为0的元素在返回值中置0，支持half、bfloat16_t与float类型，仅在AIV上生效。
+description: "根据掩码将src0与src1按元素相乘后与src2对应元素相加，结果通过函数返回值返回，掩码为0的元素在返回值中置0，支持half、bfloat16_t与float类型，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [fused_multiply_add]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_fma__v<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_fused.h]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+  - traits: [elementwise]
+dependencies: []
+version: 9.1.0-
 ---
 # asc_fma
 

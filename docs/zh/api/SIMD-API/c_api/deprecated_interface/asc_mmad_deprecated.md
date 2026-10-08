@@ -1,72 +1,33 @@
 ---
 okftype: reference.api
-title: asc_mmad（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_deprecated.md
-description: 已废弃的矩阵乘加接口：完成结果矩阵C等于A乘B加C的Mmad计算，C可初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，仅在AIC上生效；请使用asc_unit_flag_mode类型入参的新asc_mmad接口替代，同步功能通过asc_sync实现。
+description: "已废弃的矩阵乘加接口，完成结果矩阵C等于A乘B加C的Mmad计算，C矩阵可初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，仅在AIC上生效；请改用asc_unit_flag_mode类型入参的新asc_mmad接口替代，同步功能通过asc_sync实现。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [matrix_multiply_accumulate]
-  - objects: [matrix]
-  - execution_models: [matrix_compute]
-  - source_locations: [l0a_buffer, l0b_buffer]
-  - destination_locations: [l0c_buffer]
-  - traits: [deprecated]
-signature:
-  - prototype_id: asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b
-    archs: ['3510']
-    header: [/include/c_api/cube_compute/cube_compute.h]
-  - prototype_id: asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b
-    archs: ['3510']
-    header: [/include/c_api/composite/cube_compute_composite.h]
-  - prototype_id: asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b
-    archs: ['2201']
-    header: [/include/c_api/cube_compute/cube_compute.h]
-  - prototype_id: asc_mmad__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b
-    archs: ['2201']
-    header: [/include/c_api/cube_compute/cube_compute.h]
-  - prototype_id: asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b
-    archs: ['2201']
-    header: [/include/c_api/composite/cube_compute_composite.h]
-  - prototype_id: asc_mmad_sync__PCC<c_dtype>_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_u8_u8_b_b_b_b
-    archs: ['2201']
-    header: [/include/c_api/composite/cube_compute_composite.h]
-  - override_id: asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b
-    archs: ['2201']
-    header: [/include/c_api/cube_compute/cube_compute.h]
-  - override_id: asc_mmad_s4__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b
-    archs: ['2201']
-    header: [/include/c_api/cube_compute/cube_compute.h]
-  - override_id: asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_b_b_b
-    archs: ['2201']
-    header: [/include/c_api/composite/cube_compute_composite.h]
-  - override_id: asc_mmad_s4_sync__PCCi32_PCAi4x2_PCBi4x2_u16_u16_u16_u8_u8_u8_b_b_b_b
-    archs: ['2201']
-    header: [/include/c_api/composite/cube_compute_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md
-    kind: constrained_by
-    condition: 开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致
+    kind: requires
+    condition: "开启UnitFlag的其他场景"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
-    kind: constrained_by
-    condition: 开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致
+    kind: requires
+    condition: "开启UnitFlag且矩阵搬出指令开启Nz2ND随路格式转换，或未随路格式转换但开启B8/B4量化触发Channel Merge时"
   - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md
-    kind: constrained_by
-    condition: 需要清除UnitFlag产生的残留状态时
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
-    kind: constrained_by
-    condition: 浮点类型的输入或输出包含inf/nan时
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: 接口已废弃，作为替代方案使用
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    condition: "需要清除UnitFlag产生的残留状态时"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: 针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: "浮点类型的输入或输出包含inf/nan时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "原同步功能请通过新接口和asc_sync()实现"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: requires
+    condition: "输入矩阵沿K轴分块计算并累加到同一块L0C Buffer且(left_height/16)*(right_width/16)小于10时"
+version: 9.1.0-9.2.0
 ---
 # asc_mmad（废弃）
 

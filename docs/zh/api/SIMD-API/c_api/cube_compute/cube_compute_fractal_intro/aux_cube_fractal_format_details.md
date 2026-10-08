@@ -1,13 +1,6 @@
 ---
-okftype: reference.index
-title: 辅助矩阵分形格式详解
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md
-navigation:
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md
-    title: asc_copy_l12l0a_mx
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md
-    title: asc_copy_l12l0b_mx
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍矩阵计算的两类辅助矩阵分形格式：MX量化系数矩阵scaleA与scaleB在L1 Buffer上分别按Zz与Nn排布以满足行列读取需求，以及4选2稀疏索引矩阵的生成编码规则与Zn排布约束，并给出与系数搬运接口的配合关系。"
 ---
 # 辅助矩阵分形格式详解
 

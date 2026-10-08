@@ -1,39 +1,16 @@
 ---
 okftype: reference.api
-title: asc_int322float
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322float.md
-description: 根据掩码将源操作数中每个int32_t类型数据转换成float类型并写入目的操作数，支持rd、rn、rna、ru、rz多种舍入模式，可通过引用参数或函数返回值输出结果，仅在AIV上生效的Reg矢量计算接口。
+description: "根据掩码将源操作数中每个int32_t数据转换为float类型写入目的矢量数据寄存器，支持rd、rn、rna、ru、rz多种舍入模式，绝对值大于2的24次方时按函数后缀指定的舍入模式处理，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, rounding_mode]
-signature:
-  - override_id: asc_int322float_rd__Rvf32_vi32_vb
-  - override_id: asc_int322float_rn__Rvf32_vi32_vb
-  - override_id: asc_int322float_rna__Rvf32_vi32_vb
-  - override_id: asc_int322float_ru__Rvf32_vi32_vb
-  - override_id: asc_int322float_rz__Rvf32_vi32_vb
-  - override_id: asc_int322float_rd__vi32_vb
-  - override_id: asc_int322float_rn__vi32_vb
-  - override_id: asc_int322float_rna__vi32_vb
-  - override_id: asc_int322float_ru__vi32_vb
-  - override_id: asc_int322float_rz__vi32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_int322float
 

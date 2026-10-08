@@ -1,37 +1,15 @@
 ---
 okftype: reference.api
-title: asc_pack (废弃)
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_pack_deprecated.md
-description: 已废弃接口，将源操作数中的元素选取低8位、低16位或低32位写入目的操作数的低半部分或高半部分，请使用asc_pack_to_low和asc_pack_to_high替代。
+description: "已废弃的数据打包接口，将源操作数元素的低8位、低16位或低32位写入目的操作数的低半部分或高半部分，asc_pack写入低半部分、asc_pack_v2写入高半部分；请改用asc_pack_to_low和asc_pack_to_high替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [compression]
-  - objects: [mask, vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_pack__Rvu8_vu16
-  - override_id: asc_pack__Rvu8_vi16
-  - override_id: asc_pack__Rvu16_vu32
-  - override_id: asc_pack__Rvu16_vi32
-  - override_id: asc_pack__Rvb_vb
-  - override_id: asc_pack_v2__Rvu8_vu16
-  - override_id: asc_pack_v2__Rvu8_vi16
-  - override_id: asc_pack_v2__Rvu16_vu32
-  - override_id: asc_pack_v2__Rvu16_vi32
-  - override_id: asc_pack_v2__Rvb_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md
-    kind: related
-    condition: 已废弃接口的替代方案
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md
-    kind: related
-    condition: 已废弃接口的替代方案
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_pack (废弃)
 

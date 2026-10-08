@@ -1,17 +1,17 @@
 ---
-okftype: reference.type
-title: asc_override_strategy
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
-description: 该枚举表示饱和控制策略，用于设置或查询单指令/API路径与全局CAST饱和配置的生效方式。
+okftype: reference.enum
+description: "表示饱和控制策略，决定按单指令或API路径配置饱和与使用全局CAST饱和配置两种生效方式，在调用饱和策略设置与查询接口时使用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
   - traits: [saturation_mode]
-declaration:
-  symbol: asc_override_strategy
-  underlying_type: uint8_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_override_strategy
 

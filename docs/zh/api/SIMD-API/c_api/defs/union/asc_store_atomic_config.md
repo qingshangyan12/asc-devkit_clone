@@ -1,17 +1,13 @@
 ---
-okftype: reference.type
-title: asc_store_atomic_config
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md
-description: 保存原子操作的启用类型和操作类型配置，供 asc_get_store_atomic_config 接口使用。
+okftype: reference.union
+description: "包含原子操作启用位与原子操作类型的联合体，供asc_get_store_atomic_config接口使用，启用位按float、half、int16_t、int32_t、int8_t、bfloat16_t等数据类型开启原子操作，操作类型当前支持求和操作，默认值均为0。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
   - traits: [atomic]
-declaration:
-  symbol: asc_store_atomic_config
-  record_kind: union
-header: [/include/c_api/defs/union.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_store_atomic_config
 

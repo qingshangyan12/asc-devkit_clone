@@ -1,33 +1,14 @@
 ---
 okftype: reference.api
-title: asc_reduce_sum
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md
-description: 根据mask对源矢量数据寄存器中所有参与计算的元素进行归约求和，指令内累加顺序采用二叉树累加方式，结果保存于dst第0个元素，其余元素置0，16位输入会提升精度到32位计算。
+description: "根据mask对源矢量数据寄存器中所有参与计算的元素归约求和，指令内采用二叉树累加方式，结果保存于dst第0个元素、其余元素置0，16位输入会提升精度到32位计算，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [reduction]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked, widening_result]
-signature:
-  - prototype_id: asc_reduce_sum__v<src_dtype>_vb
-  - prototype_id: asc_reduce_sum__Rv<dst_dtype>_v<src_dtype>_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_reduce.h]
+  - operations: [add, reduction]
+  - traits: [widening_result]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce
-    file: reduce.asc
-    archs: ['3510']
-    override_id: asc_reduce_sum__Rvf32_vf32_vb
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_reduce_sum
 

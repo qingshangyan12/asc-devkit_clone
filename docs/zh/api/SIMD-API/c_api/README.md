@@ -1,14 +1,6 @@
 ---
-okftype: reference.index
-title: C API
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/README.md
-description: 介绍Ascend C语言扩展层SIMD C API的定位与特性：基于指针编程、直接映射NPU硬件指令、开放全部底层硬件能力，并说明头文件包含方式、关键字、流水类型、API目录列表与参考样例入口。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement]
-  - operations: [load]
-dependencies: []
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍C API的定位与特性：作为Ascend C语言扩展层SIMD API，基于指针编程、直接映射NPU硬件指令，开发者自主管理内存搬运与同步，开放全部底层硬件能力；并说明头文件包含方式、API类型、关键字、流水类型与API目录列表入口。"
 ---
 # C API
 

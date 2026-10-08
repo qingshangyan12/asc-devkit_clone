@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md",
+  "sha256": "4851e610527aac84b021a23e54c0c5c3d467608af14d23f6021864942f678c50"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+  "sha256": "5c30476de3340be2b8263b2cdf617c0a1b7921f84c637d157598fe98634c14b2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+  "sha256": "712681680e679a22918892a9f8851425b2196c16c4839b33331def582da55c7e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md",
+  "sha256": "6065757c81e27f6f450fbbf54934963321c51eac07ef73b5e5c1251d6b6396c6"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+  "sha256": "82c80693fc0b94de266c42fcbace1376e717907220f0ef3824f7cb35c7473237"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md",
+  "sha256": "1e6d47eedac233c566f9150c18ae8af550155704d9c256787f9d78722b98c544"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md",
+  "sha256": "463bf09263872bad7bb0d94599973b92cdaf07357266e099ec4f06979c349875"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md",
+  "sha256": "81a72abaf71c531b83292f0ce0a43f660d4e53e171fc41d4e931548aa772ed48"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md",
+  "sha256": "58040ffcae50759aed05f8c27d21e721736ef8ea038f9457c6dcf3098362b458"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+  "sha256": "f98c40fc3092e9d659469d5606acbcf382caba40ed664bd0d32339b6971c5f9b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md",
+  "sha256": "9b14b6f6709cf51cbcc27c1e4136018e63f3aa56d987a3c9f7cac04efef41af1"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv_postupdate.md",
+  "sha256": "e747a14fe387c7343a3469d9630e9a306b5edf8826ef53231ff118a1a30923eb"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+  "sha256": "223560a34d2d0d8969ccd45c6023c2456d2da8da3a65f9c85af107e8f0b9446b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md",
+  "sha256": "ea36049c3cce6f0a27b5a5fafbe73d1495990d693c26716f4b85a14cbec1348c"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md",
+  "sha256": "9a4dee966d2014b9728a20f89fd06d2d91e9354f57585fe6f719bb2577b43e18"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md",
+  "sha256": "e8dee9234d4c4fc9e224a0e63caa1152b448a71ce62cab78a5ca891b1427ae37"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md",
+  "sha256": "7707d0b73f46dd73e3432e5141c397949e828ec939506493ef1eae2c95db9268"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+  "sha256": "69b45843899b565bca80f54bd1872d2ad371702db86771b4320a01ba6e23c20a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md",
+  "sha256": "5fa95daeba6b31ec705eaa4643453e8279cae0bc5c1538145074184f28cf9ee6"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md",
+  "sha256": "690e1c8d60a02af61ca705a64f6f0693960c688be88cee5faeb47bfeb0d7061a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md",
+  "sha256": "5aee0b9e07f1c317d702c91d5da0cb1947d14e3457e320ef55470e0186fbc577"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+  "sha256": "87e61cea682a6d31607ad0d6acbdc80454c7374d50c0c8df264500e968aeb0d5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+  "sha256": "92f51553a67d4452e1c2320014c9d2955c05bf3f49281eb41f4950a1198a844a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md",
+  "sha256": "72f5907cd2e0279fb97a3e3bb32be96e7fa5e16a6a482281f8adfc87876b7d0b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+  "sha256": "c65c165c6087aad55ded52a6121c407758c0e09a23ba474b71a0a71097c369ba"
+ }
+]

@@ -1,31 +1,5 @@
 ---
 okftype: reference.index
-title: 排布变换
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/reg_permute_sel.md
-navigation:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md
-    title: asc_deintlv
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md
-    title: asc_intlv
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md
-    title: asc_pack_to_high
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md
-    title: asc_pack_to_low
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md
-    title: asc_select
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md
-    title: asc_squeeze
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
-    title: asc_squeeze_and_storeunalign
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
-    title: asc_squeeze_and_storeunalign_finalize
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
-    title: asc_squeeze_and_storeunalign_init
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
-    title: asc_unpack
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md
-    title: asc_unsqueeze
-timestamp: '2026-09-28'
 ---
 # 排布变换
 

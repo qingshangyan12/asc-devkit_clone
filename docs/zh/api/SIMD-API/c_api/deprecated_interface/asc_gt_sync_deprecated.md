@@ -1,37 +1,24 @@
 ---
 okftype: reference.api
-title: asc_gt_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_gt_sync_deprecated.md
-description: 已废弃的同步矢量比较接口，按元素比较两个矢量的大小关系，结果为真时输出对应比特位为1否则为0，请使用非同步接口asc_gt并配合同步接口asc_sync替代。
+description: "已废弃的同步矢量比较接口，按元素比较两个矢量的大小关系，比较结果按比特位写入目的地址或比较寄存器，目的与源起始地址需32字节对齐；请改用非同步接口asc_gt配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [comparison]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise]
-signature:
-  - override_id: asc_gt_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_gt_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_gt_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_gt_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [comparison, synchronization]
+  - traits: [aligned_transfer, elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
-    kind: related
-    condition: 使用寄存器形式的接口时
+    kind: requires
+    condition: "使用寄存器形式的接口时"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_gt.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
     kind: related
-    condition: 如果要初始化寄存器
-examples: []
-timestamp: '2026-09-28'
+    condition: "如果要初始化寄存器"
+version: 9.0.0-
 ---
 # asc_gt_sync（废弃）
 

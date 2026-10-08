@@ -1,0 +1,1046 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md",
+      "document_sha256": "814430ed4c1861d469236121622d9f45c904c86a5c83522097860b5bd0ce163f",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的fp8_e4m3fn_t元素转换为float类型并写入目的操作数，源与目的位宽比为1:4，通过src_quarter_pos每隔4个索引离散选取一组源位置读取数据，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md", "excerpt": "根据`mask`将`src`中参与计算的`fp8_e4m3fn_t`类型元素转换为`float`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md", "excerpt": "由于源操作数与目的操作数的类型位宽比为1:4，`src`中的元素按索引分为四组"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中参与计算的`fp8_e4m3fn_t`类型元素转换为`float`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中参与计算的`fp8_e4m3fn_t`类型元素转换为`float`类型，结果写入`dst`。",
+        "traits:widening_result": "由于源操作数与目的操作数的类型位宽比为1:4，`src`中的元素按索引分为四组"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md",
+      "document_sha256": "de287cd3c1488ab3b50c4c58239238aa17485199b8bb13540e62537cbfe2307e",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的fp8_e5m2_t元素转换为float类型并写入目的操作数，源与目的位宽比为1:4，通过src_quarter_pos每隔4个索引离散选取一组源位置读取数据，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md", "excerpt": "根据`mask`将`src`中参与计算的`fp8_e5m2_t`类型元素转换为`float`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md", "excerpt": "由于源操作数与目的操作数的类型位宽比为1:4，`src`中的元素按索引分为四组"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中参与计算的`fp8_e5m2_t`类型元素转换为`float`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中参与计算的`fp8_e5m2_t`类型元素转换为`float`类型，结果写入`dst`。",
+        "traits:widening_result": "由于源操作数与目的操作数的类型位宽比为1:4，`src`中的元素按索引分为四组"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md",
+      "document_sha256": "b7fccbc1f910046ceae5f8572f9ef90112961b825e3bb4ca4d9b007a639cd11a",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中的float元素转换为bfloat16_t类型，支持多种舍入模式与饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的索引为偶数或奇数的位置，其他位置清零，使用饱和或非饱和模式前须配置ctrl寄存器。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md", "excerpt": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md", "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md", "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。",
+        "traits:rounding_mode": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。",
+        "traits:saturation_mode": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md",
+            "excerpt": "关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+      "document_sha256": "0aa53063bf9164d97617d8ebd5207fdc12af3f19d8d9a161e3a46ae22b0facfc",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的float元素转换为fp8_e4m3fn_t类型，涉及舍入与饱和/非饱和模式，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取目的写入位置，其他位置置零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md", "excerpt": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e4m3fn_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md", "excerpt": "由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e4m3fn_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e4m3fn_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。",
+        "traits:saturation_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md",
+      "document_sha256": "f07c506b1f696a1fa47c42a1d6baf0ca7b805ac50dc4bb329f489bf3cd03cd18",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的float元素转换为fp8_e5m2_t类型，涉及舍入与饱和/非饱和模式，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取目的写入位置，其他位置置零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md", "excerpt": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e5m2_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md", "excerpt": "由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e5m2_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e5m2_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。",
+        "traits:saturation_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md",
+      "document_sha256": "fc961838f1d7120fad6e095da916a548a74c668267fbdf210ac0584281fa5773",
+      "description": {
+        "value": "将矢量数据寄存器中的float元素转换为half类型，支持rd、rn、rna、ro、ru、rz多种舍入模式与饱和/非饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的索引为偶数或奇数的位置，其他位置清零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md", "excerpt": "将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md", "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md", "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。",
+        "operations:conversion": "将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。",
+        "traits:rounding_mode": "将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。",
+        "traits:saturation_mode": "将`float`类型数据转换成`half`类型，并支持多种舍入模式与饱和模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md",
+      "document_sha256": "19070d5ace5a3979ec3328cf6d729bbfd97604790c2c973cc15aea4604111955",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的float元素转换为hifloat8_t类型，支持rna与rh舍入模式及饱和/非饱和模式，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取目的写入位置，其他位置置零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md", "excerpt": "根据`mask`将`src`中参与计算的`float`类型元素转换为`hifloat8_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md", "excerpt": "由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中参与计算的`float`类型元素转换为`hifloat8_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中参与计算的`float`类型元素转换为`hifloat8_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。",
+        "traits:saturation_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md",
+      "document_sha256": "87758142aa697f375f8eece037b9ece67fca3036235c359d0dde74c8ad007a87",
+      "description": {
+        "value": "将矢量数据寄存器中的float元素转换为int16_t类型，支持多种舍入模式与饱和/非饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的索引为偶数或奇数的位置，其他位置清零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md", "excerpt": "将`float`类型数据转换为`int16_t`类型，并支持多种舍入模式与饱和/非饱和模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md", "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md", "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将`float`类型数据转换为`int16_t`类型，并支持多种舍入模式与饱和/非饱和模式。",
+        "operations:conversion": "将`float`类型数据转换为`int16_t`类型，并支持多种舍入模式与饱和/非饱和模式。",
+        "traits:rounding_mode": "将`float`类型数据转换为`int16_t`类型，并支持多种舍入模式与饱和/非饱和模式。",
+        "traits:saturation_mode": "将`float`类型数据转换为`int16_t`类型，并支持多种舍入模式与饱和/非饱和模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md",
+      "document_sha256": "bacbeb646d791bcb9ffff83e53597c0aa9e30966600b78cfcdbb28b332a23e02",
+      "description": {
+        "value": "在矢量数据寄存器中将float元素转换为int32_t类型，支持多种舍入模式与饱和/非饱和模式，可通过引用参数或函数返回值输出结果，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md", "excerpt": "将`float`类型数据转换为`int32_t`类型，并支持多种舍入模式与饱和/非饱和模式，可通过引用参数或函数返回值输出结果。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md", "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将`float`类型数据转换为`int32_t`类型，并支持多种舍入模式与饱和/非饱和模式，可通过引用参数或函数返回值输出结果。",
+        "operations:conversion": "将`float`类型数据转换为`int32_t`类型，并支持多种舍入模式与饱和/非饱和模式，可通过引用参数或函数返回值输出结果。",
+        "traits:rounding_mode": "将`float`类型数据转换为`int32_t`类型，并支持多种舍入模式与饱和/非饱和模式，可通过引用参数或函数返回值输出结果。",
+        "traits:saturation_mode": "将`float`类型数据转换为`int32_t`类型，并支持多种舍入模式与饱和/非饱和模式，可通过引用参数或函数返回值输出结果。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int32.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md",
+      "document_sha256": "e8b180bb5c477f63c90f2667375eb9078a1674f01d7ce71c7ca007df449d6914",
+      "description": {
+        "value": "将矢量数据寄存器中的float元素转换为int64_t类型，支持多种舍入模式与饱和/非饱和模式，源与目的位宽比为1:2，通过src_pos选择读取源数据索引为偶数或奇数的位置，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md", "excerpt": "将`float`类型数据转换为`int64_t`类型，并支持多种舍入模式与饱和/非饱和模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md", "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode", "widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将`float`类型数据转换为`int64_t`类型，并支持多种舍入模式与饱和/非饱和模式。",
+        "operations:conversion": "将`float`类型数据转换为`int64_t`类型，并支持多种舍入模式与饱和/非饱和模式。",
+        "traits:rounding_mode": "将`float`类型数据转换为`int64_t`类型，并支持多种舍入模式与饱和/非饱和模式。",
+        "traits:saturation_mode": "将`float`类型数据转换为`int64_t`类型，并支持多种舍入模式与饱和/非饱和模式。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md",
+      "document_sha256": "e0695d2d198eadc64e08e8e149623176417711bf7c57c9ed484dd78c5b95c0bd",
+      "description": {
+        "value": "将矢量数据寄存器中的浮点数元素按FLOOR模式向负无穷方向舍入到整数值，结果保持原浮点数据类型，等价于C标准库floor语义，支持half、bfloat16_t与float数据类型，未被掩码筛选的元素置零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md", "excerpt": "将`src`中的浮点数元素按照FLOOR（向负无穷方向舍入）舍入模式舍入到整数值，结果仍保持原浮点数据类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md", "excerpt": "舍入规则等价于C标准库`floor`语义：向负无穷方向舍入，即取小于或等于输入值的最大整数"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将`src`中的浮点数元素按照FLOOR（向负无穷方向舍入）舍入模式舍入到整数值，结果仍保持原浮点数据类型。",
+        "operations:conversion": "将`src`中的浮点数元素按照FLOOR（向负无穷方向舍入）舍入模式舍入到整数值，结果仍保持原浮点数据类型。",
+        "traits:rounding_mode": "将`src`中的浮点数元素按照FLOOR（向负无穷方向舍入）舍入模式舍入到整数值，结果仍保持原浮点数据类型。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md",
+            "excerpt": "关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md",
+      "document_sha256": "6dde671120d5aeec3943512abf57bcb196ebd6835276ba7b2965ae2478062bd3",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的half元素转换为bfloat16_t类型并写入目的操作数，支持rd、rn、rna、ru、rz五种舍入模式，源与目的位宽相同，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md", "excerpt": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`bfloat16_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md", "excerpt": "`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`bfloat16_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`bfloat16_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md",
+      "document_sha256": "c377508c9a2f793068bc4f3b119a88deab65a79ee8bc6f90301dcd233725926b",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的half元素转换为float类型，源与目的位宽比为1:2，通过src_pos选择读取源数据索引为偶数或奇数的位置，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md", "excerpt": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`float`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`float`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`float`类型，结果写入`dst`。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md",
+      "document_sha256": "774de3b1f6a74a4f551a4ba86879044bd85cbb0aac1e058ac2fa673d87e39451",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的half元素转换为hifloat8_t类型，支持rna与rh舍入模式及饱和/非饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的索引为偶数或奇数的位置，其他位置清零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md", "excerpt": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`hifloat8_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md", "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md", "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`hifloat8_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`hifloat8_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。",
+        "traits:saturation_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2hif8.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md",
+      "document_sha256": "2ee67674a2a246cbdc5f3a194056d598a34dfe3bccd10daee9f80097ab1346e5",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的half元素转换为int16_t类型，支持多种舍入模式与饱和/非饱和模式，源与目的位宽相同，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md", "excerpt": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int16_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int16_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int16_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。",
+        "traits:saturation_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int16.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md",
+      "document_sha256": "fbb8996fb1144bbd71ee4f704b7fc6ca8ff4b1060237c79873b01d13d01796a8",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的half元素转换为int32_t类型，支持rd、rn、rna、ru、rz五种舍入模式，源与目的位宽比为1:2，通过src_pos选择读取源数据索引为偶数或奇数的位置，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md", "excerpt": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int32_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md", "excerpt": "`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int32_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int32_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int32.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md",
+      "document_sha256": "e5bf67b326baee86fabc0e4a214eabcd3fce457187e8fcbb1761aa2ddcbe9d86",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的half元素转换为int4x2_t类型，两个连续half元素打包为一对4bit有符号整数，支持舍入与饱和/非饱和模式，通过dst_quarter_pos每隔4个存储单元离散选取目的写入位置，其他位置置零。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md", "excerpt": "根据`mask`将`src`中参与计算的`half`类型元素转换为`int4x2_t`类型，可通过引用参数或函数返回值输出结果。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md", "excerpt": "两个连续的`half`类型元素转换为两个连续的4bit有符号整数，转换结果按输入顺序打包到同一个`int4x2_t`存储单元中，共占用1Byte。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md", "excerpt": "由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的`int4x2_t`存储单元按索引分为四组"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中参与计算的`half`类型元素转换为`int4x2_t`类型，可通过引用参数或函数返回值输出结果。",
+        "operations:conversion": "根据`mask`将`src`中参与计算的`half`类型元素转换为`int4x2_t`类型，可通过引用参数或函数返回值输出结果。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。",
+        "traits:saturation_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "开启饱和模式或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md",
+            "excerpt": "开启饱和模式或非饱和模式时，需配置ctrl寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md",
+      "document_sha256": "492cfd1766d71bd869dc4e69d2f8becd9d820b786ad5aa166a6d4581fa312d68",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的half元素转换为int8_t类型，支持多种舍入模式与饱和/非饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的索引为偶数或奇数的位置，其他位置清零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md", "excerpt": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int8_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md", "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md", "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int8_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`int8_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。",
+        "traits:saturation_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int8.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md",
+      "document_sha256": "4e2d5e3bbe1e3be0fe1ee0ef6ca5d6d3d984e144c9e6820682ba3c02378a4447",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的half元素转换为uint8_t类型，支持多种舍入模式与饱和/非饱和模式，源与目的位宽比为2:1，通过dst_pos选择写入目的索引为偶数或奇数的位置，其他位置清零，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md", "excerpt": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`uint8_t`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md", "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md", "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`uint8_t`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`uint8_t`类型，结果写入`dst`。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。",
+        "traits:saturation_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2uint8.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md",
+      "document_sha256": "09db0280c5c7a32f37aa92ab05b381900b3e3c5f64f3fe8c1234d06559a5cca1",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器中参与计算的hifloat8_t元素转换为float类型，源与目的位宽比为1:4，通过src_quarter_pos每隔4个索引离散选取一组源位置读取数据，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md", "excerpt": "根据`mask`将`src`中参与计算的`hifloat8_t`类型元素转换为`float`类型，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md", "excerpt": "由于源操作数与目的操作数的类型位宽比为1:4，`src`中的元素按索引分为四组"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中参与计算的`hifloat8_t`类型元素转换为`float`类型，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中参与计算的`hifloat8_t`类型元素转换为`float`类型，结果写入`dst`。",
+        "traits:widening_result": "由于源操作数与目的操作数的类型位宽比为1:4，`src`中的元素按索引分为四组"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md",
+      "document_sha256": "029176415b059a1c36b4259613944b0c1a3ee29268944f710a043f1644fed06b",
+      "description": {
+        "value": "将矢量数据寄存器中hifloat8_t类型的元素转换为half类型并写入目的操作数，源与目的位宽比为1:2，通过src_pos选择读取源数据索引为偶数或奇数的位置，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md", "excerpt": "`src`中hifloat8_t数据类型的元素转换为half数据类型，并将结果写入dst。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "`src`中hifloat8_t数据类型的元素转换为half数据类型，并将结果写入dst。",
+        "operations:conversion": "`src`中hifloat8_t数据类型的元素转换为half数据类型，并将结果写入dst。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82half.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162float.md",
+      "document_sha256": "67593b5228b1672ea24ff05b8504d27fe2a07af60db844391d6e326b494de30e",
+      "description": {
+        "value": "将矢量数据寄存器中int16_t类型的元素转换为float类型并写入目的操作数，源与目的位宽比为1:2，通过src_pos选择读取源数据索引为偶数或奇数的位置，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162float.md", "excerpt": "`src`中int16_t类型的元素转换为float类型，并将结果写入dst。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162float.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "`src`中int16_t类型的元素转换为float类型，并将结果写入dst。",
+        "operations:conversion": "`src`中int16_t类型的元素转换为float类型，并将结果写入dst。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162float.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md",
+      "document_sha256": "3d784f92a5db8dc6d41bd8091320440378a1ac3d69d2b3891740c368aa5cc7bd",
+      "description": {
+        "value": "将矢量数据寄存器中int16_t类型的元素转换为half类型，源与目的位宽相同、转换后元素数量不变，支持5种舍入模式，可通过引用参数或函数返回值输出结果，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md", "excerpt": "`src`中`int16_t`类型的元素转换为`half`类型（16位浮点数），可通过引用参数或函数返回值输出结果。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md", "excerpt": "源操作数和目的操作数位宽相同，转换后元素数量不变。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md", "excerpt": "支持5种舍入模式，关于舍入模式的详细说明请参见[舍入模式与饱和模式](rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "`src`中`int16_t`类型的元素转换为`half`类型（16位浮点数），可通过引用参数或函数返回值输出结果。",
+        "operations:conversion": "`src`中`int16_t`类型的元素转换为`half`类型（16位浮点数），可通过引用参数或函数返回值输出结果。",
+        "traits:rounding_mode": "支持5种舍入模式，关于舍入模式的详细说明请参见[舍入模式与饱和模式](rounding_mode.md)。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162half.md",
+            "excerpt": "支持5种舍入模式，关于舍入模式的详细说明请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162int32.md",
+      "document_sha256": "5e9649dd3dcb6ae60055cb55f6d233582579521da77e4e6f71d91bc1156eaea4",
+      "description": {
+        "value": "将矢量数据寄存器中int16_t类型的元素转换为int32_t类型并写入目的操作数，源与目的位宽比为1:2，通过src_pos选择读取源数据索引为偶数或奇数的位置，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162int32.md", "excerpt": "`src`中int16_t类型的元素转换为int32_t类型，并将结果写入dst。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162int32.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "`src`中int16_t类型的元素转换为int32_t类型，并将结果写入dst。",
+        "operations:conversion": "`src`中int16_t类型的元素转换为int32_t类型，并将结果写入dst。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162int32.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md",
+      "document_sha256": "0d0652e680134aa066ea3e392fde3ec5c3732d1c24a54cbbfbe82dc411dd5ef8",
+      "description": {
+        "value": "将矢量数据寄存器中int16_t类型的元素转换为uint32_t类型并写入目的操作数，16位有符号整数转换为32位无符号整数，通过src_pos选择读取源数据索引为偶数或奇数的位置，掩码位为0时目的对应元素置0，仅在AIV上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md", "excerpt": "`src`中int16_t类型的元素转换为uint32_t类型，并将结果写入dst。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "`src`中int16_t类型的元素转换为uint32_t类型，并将结果写入dst。",
+        "operations:conversion": "`src`中int16_t类型的元素转换为uint32_t类型，并将结果写入dst。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint32.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    }
+  ]
+}

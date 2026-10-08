@@ -1,62 +1,15 @@
 ---
 okftype: reference.api
-title: asc_fill_l0a
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md
-description: 将value的二进制值赋值给目的操作数dst，完成L0A Buffer本地存储（Local Memory）的初始化。
+description: "将value的二进制值赋值给目的操作数dst，完成L0A Buffer本地存储的初始化，初始化参数通过asc_fill_value_config配置，dst与value数据类型不同时需按dst类型转换value的值。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_initialization]
   - operations: [fill]
-  - destination_locations: [l0a_buffer]
-signature:
-  - override_id: asc_fill_l0a__PCAi16_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAi16_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAu16_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAu16_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAf16_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAf16_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAbf16_bf16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAbf16_f16_RCfillcfg
-    archs: ['2201']
-    headers: []
-  - override_id: asc_fill_l0a__PCAbf16_u32_RCfillcfg
-    archs: ['2201']
-    headers: []
-  - override_id: asc_fill_l0a__PCAi32_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAi32_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAu32_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAu32_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAf32_f16_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-  - override_id: asc_fill_l0a__PCAf32_u32_RCfillcfg
-    archs: ['2201']
-    headers: [/include/c_api/cube_datamove/cube_datamove.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_fill_l0a
 

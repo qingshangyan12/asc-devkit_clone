@@ -1,35 +1,20 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1_dn2nz
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md
-description: 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式的转换，使其满足后续矩阵计算对分形列连续性的要求，调用前需先配置Nz矩阵步长与DN矩阵搬运个数，仅在AIC上执行有效。
+description: "将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式的转换，使其满足后续矩阵计算对分形列连续性的要求，调用前需先通过asc_set_gm2l1_nz_para配置目的Nz矩阵步长与DN矩阵搬运个数，仅在AIC上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, layout_transform]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-signature:
-  - prototype_id: asc_copy_gm2l1_dn2nz__PL1<dtype>_PG<dtype>_u64_loadl2_u16_u32_u64_b
-    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
-      half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
-    file: matmul.asc
-    archs: ['3510']
-    override_id: asc_copy_gm2l1_dn2nz__PL1f32_PGf32_u64_loadl2_u16_u32_u64_b
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-
 ---
 # asc_copy_gm2l1_dn2nz
 

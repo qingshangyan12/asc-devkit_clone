@@ -1,33 +1,14 @@
 ---
 okftype: reference.api
-title: asc_intlv
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md
-description: 将两个源矢量数据寄存器中的数据交织后分别写入两个目的矢量数据寄存器，前半部分元素依次交替写入dst0、后半部分依次交替写入dst1，掩码寄存器按接口后缀指定的粒度分组交织，仅在AIV上生效。
+description: "将两个源矢量数据寄存器或掩码寄存器中的数据交织后分别写入两个目的寄存器，矢量模式以元素为单位前半部分交替写入dst0、后半部分写入dst1，掩码模式按接口后缀1、2、4bit粒度分组交织，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [interleave]
-  - objects: [mask, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
   - traits: [split_high_low]
-signature:
-  - prototype_id: asc_intlv__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>
-    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t,
-      uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
-  - override_id: asc_intlv_b8__Rvb_Rvb_vb_vb
-  - override_id: asc_intlv_b16__Rvb_Rvb_vb_vb
-  - override_id: asc_intlv_b32__Rvb_Rvb_vb_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
-dependencies: []
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout
-    file: data_relayout.asc
-    archs: ['3510']
-    override_id: asc_intlv__Rvu16_Rvu16_vu16_vu16
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_intlv
 

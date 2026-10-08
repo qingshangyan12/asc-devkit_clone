@@ -1,27 +1,14 @@
 ---
 okftype: reference.api
-title: asc_neg
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_neg.md
-description: 根据mask对源矢量数据寄存器按元素取相反数，结果写入目的操作数或通过函数返回值返回，整数最小负值取反后保留原值，浮点数通过翻转符号位实现取反。
+description: "根据掩码对源矢量数据寄存器按元素取相反数，结果经函数返回值返回或写入目的操作数，有符号整数最小负值取反后保留原值，浮点输入通过翻转符号位实现取反，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [negate]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_neg__v<dtype>_vb
-    dtype: [int8_t, int16_t, half, int32_t, float]
-  - prototype_id: asc_neg__Rv<dtype>_v<dtype>_vb
-    dtype: [int8_t, int16_t, half, int32_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_neg
 

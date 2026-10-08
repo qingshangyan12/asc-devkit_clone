@@ -1,37 +1,22 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0b_sync_2d_arch_3510（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sync_2d_arch_3510_deprecated.md
-description: 已废弃的同步搬运接口，以512字节分形为粒度完成矩阵计算所需2D格式数据从L1 Buffer到L0B Buffer的搬运，支持非转置与转置矩阵，请改用对应的非同步接口和asc_sync替代。
+description: "已废弃的同步搬运接口，以512字节分形为粒度完成矩阵计算所需2D格式数据从L1 Buffer到L0B Buffer的搬运，支持非转置与转置矩阵，仅在AIC上执行有效；请改用非同步接口asc_copy_l12l0b和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, transpose]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0b_buffer]
-  - traits: [deprecated]
-signature:
-  - prototype_id: asc_copy_l12l0b_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
-      fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
-  - prototype_id: asc_copy_l12l0b_transpose_sync__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
-      fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_l12l0b_sync_2d_arch_3510（废弃）
 

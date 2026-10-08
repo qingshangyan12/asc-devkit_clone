@@ -1,29 +1,13 @@
 ---
 okftype: reference.api
-title: asc_cumulative_histogram
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md
-description: 对输入矢量数据寄存器中的元素进行累计频率统计生成累计直方图，统计结果在目的矢量数据寄存器原有数据基础上累加，支持低位BIN0与高位BIN1两种模式，掩码为1的元素参与统计，仅在AIV上生效。
+description: "对输入矢量数据寄存器中的元素进行累计频率统计生成累计直方图，统计结果在dst原有数据基础上累加，支持低位BIN0与高位BIN1两种累计阈值模式，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [histogram]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked]
-signature:
-  - override_id: asc_cumulative_histogram_bin0__Rvu16_vu8_vb
-  - override_id: asc_cumulative_histogram_bin1__Rvu16_vu8_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_histogram.h]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_cumulative_histogram
 

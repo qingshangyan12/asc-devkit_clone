@@ -1,24 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int82int32
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md
-description: 根据掩码将源操作数中参与计算的int8_t类型元素转换为int32_t类型并写入目的操作数，位宽比为1:4，按四分之一位置标签离散选取源读取位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+description: "根据掩码将源操作数中参与计算的int8_t元素转换为int32_t类型写入目的矢量数据寄存器，结果位宽为源元素的四倍；因位宽比为1:4，按四分之一位置标签每隔4个索引离散选取源读取位置，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [elementwise, masked, widening_result]
-signature:
-  - archs: ['3510']
-    headers: []
-    override_id: asc_int82int32__Rvi32_vi8_vb_icposquarter
-  - archs: ['3510']
-    headers: []
-    override_id: asc_int82int32__vi8_vb_icposquarter
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_int82int32
 

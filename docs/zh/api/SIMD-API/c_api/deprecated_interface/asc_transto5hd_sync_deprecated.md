@@ -1,28 +1,20 @@
 ---
 okftype: reference.api
-title: asc_transto5hd_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_transto5hd_sync_deprecated.md
-description: 已废弃的同步数据格式转换接口，一般将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块的转置，单次Repeat内可处理512Byte数据，请使用asc_transto5hd和asc_sync接口替代。
+description: "三个transto5hd_b8/b16/b32_sync接口已废弃，请使用asc_transto5hd和asc_sync接口替代；进行数据格式转换，一般将NCHW格式转换成NC1HWC0格式，也可用于二维矩阵数据块转置，单次Repeat内可处理512Byte数据，支持多次Repeat操作。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [conversion, layout_transform, transpose]
-  - objects: [matrix, tensor]
-  - execution_models: [memory_vector]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_transto5hd_b32_sync__uba8_uba8_u8_u16_u16
-  - override_id: asc_transto5hd_b16_sync__uba8_uba8_u8_u16_u16
-  - override_id: asc_transto5hd_b8_sync__uba8_uba8_u8_u16_u16_b_b
-archs: ['2201', '3510']
-header: [/include/c_api/vector_compute/compute/vector_permute_sel.h]
+  - operations: [conversion, layout_transform, synchronization, transpose]
+  - traits: [datablock_granularity]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_transto5hd_sync（废弃）
 

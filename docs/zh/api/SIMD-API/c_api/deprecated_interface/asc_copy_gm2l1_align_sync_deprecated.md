@@ -1,42 +1,34 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1_align_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_align_sync_deprecated.md
-description: 已废弃的同步搬运接口，将数据从Global Memory搬运到L1 Buffer，提供非32字节对齐搬运能力，支持Normal与Compact搬运模式以及手动或自动填充，请使用非同步接口asc_copy_gm2l1_align配合同步接口asc_sync替代。
+description: "将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力，搬运过程中支持padding及Normal与Compact两种搬运模式；接口已废弃，请改用非同步接口asc_copy_gm2l1_align配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-  - traits: [deprecated, padding, unaligned_transfer]
-signature:
-  - prototype_id: asc_copy_gm2l1_align_sync__PL1<dtype>_PG<dtype>_u32_u32_u8_u8_b_u8_u64_u32
-    dtype: [int8_t, uint8_t, hifloat8_t, int16_t, uint16_t, half, bfloat16_t, int32_t,
-      uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - traits: [aligned_transfer, padding, unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md
-    kind: related
-    condition: 接口已废弃时的替代方案
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md
-    kind: related
-    condition: 循环填充模式
+    kind: requires
+    condition: "循环填充模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md
-    kind: related
-    condition: 循环填充模式
+    kind: requires
+    condition: "循环填充模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md
-    kind: related
-    condition: 循环填充模式
+    kind: requires
+    condition: "循环填充模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md
     kind: requires
-    condition: '`data_select_bit`设置为true时，或者左右填充模式（`left_padding_count`和`right_padding_count`任意不为0）时'
+    condition: "data_select_bit设置为true时，或者左右填充模式时"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃时的替代方案
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-
 ---
 # asc_copy_gm2l1_align_sync（废弃）
 

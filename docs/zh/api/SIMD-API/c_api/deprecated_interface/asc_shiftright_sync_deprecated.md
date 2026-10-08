@@ -1,36 +1,18 @@
 ---
 okftype: reference.api
-title: asc_shiftright_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_shiftright_sync_deprecated.md
-description: 对src中的每个元素执行右移，有符号类型做算术右移、无符号类型做逻辑右移，value不支持负数且不能超过源数据类型位宽，接口已废弃，请使用非同步接口asc_shiftright和同步接口asc_sync替代。
+description: "该接口已废弃，请使用非同步接口asc_shiftright和同步接口asc_sync替代；对src中的每个元素执行右移，右移大小为value，有符号类型做算术右移、无符号类型做逻辑右移，value不支持负数且不能超过源数据类型位宽。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [bitwise]
-  - operations: [bitwise_shift]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, elementwise, scalar_operand]
-signature:
-  - override_id: asc_shiftright_sync__PUi16_PUi16_i32_u32
-  - override_id: asc_shiftright_sync__PUu16_PUu16_u32_u32
-  - override_id: asc_shiftright_sync__PUi32_PUi32_i32_u32
-  - override_id: asc_shiftright_sync__PUu32_PUu32_u32_u32
-  - override_id: asc_shiftright_round_sync__PUi16_PUi16_i32_u32
-  - override_id: asc_shiftright_round_sync__PUi32_PUi32_i32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [bitwise_shift, synchronization]
+  - traits: [aligned_transfer, elementwise, scalar_operand]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_shiftright_sync（废弃）
 

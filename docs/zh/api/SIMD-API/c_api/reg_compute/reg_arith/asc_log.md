@@ -1,25 +1,14 @@
 ---
 okftype: reference.api
-title: asc_log
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_log.md
-description: 根据mask对源矢量数据寄存器按元素取自然对数，结果写入目的矢量数据寄存器，支持half与float数据类型，掩码位为0时dst对应元素置0。
+description: "根据掩码将源矢量数据寄存器按元素取自然对数并写入目的矢量数据寄存器，计算公式为dst取src的自然对数，掩码位为0的元素不参与计算且结果置0，支持half与float数据类型，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [natural_log]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_log__Rv<dtype>_v<dtype>_vb
-    dtype: [half, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_log
 

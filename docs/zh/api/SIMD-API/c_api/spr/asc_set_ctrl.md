@@ -1,21 +1,13 @@
 ---
 okftype: reference.api
-title: asc_set_ctrl
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
-description: 对CTRL寄存器（控制寄存器）的特定比特位进行设置，可配置饱和模式、标量单元访问UB是否经过DCache、MASK模式等控制位，使用前需先获取当前值。
+description: "对CTRL控制寄存器的特定比特位进行设置，可配置浮点计算与精度转换饱和模式、标量单元访问UB是否经过DCache、MASK模式等控制位，使用前需先用asc_get_ctrl获取当前值，仅对需要变更的bit位进行修改。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_set_ctrl__u64
-archs: ['2201', '3510']
-header: [/include/c_api/spr/spr.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md
     kind: requires
-examples: []
-timestamp: '2026-09-28'
+    condition: "使用前需先获取当前值，仅对需要变更的bit位进行修改"
+version: 9.0.0-
 ---
 # asc_set_ctrl
 

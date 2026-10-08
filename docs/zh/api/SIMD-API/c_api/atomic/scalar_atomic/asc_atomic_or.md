@@ -1,39 +1,27 @@
 ---
 okftype: reference.api
-title: asc_atomic_or
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md
-description: 对Global Memory中address指向的单个元素执行原子按位或操作，读取旧值并与输入标量值进行按位或运算，将结果写回该地址并返回旧值，整个读取、计算和写回过程为原子操作，接口运行在标量流水PIPE_S上，访问GM时绕过DCache。
+description: "对Global Memory中address指向的单个元素执行原子按位或操作，读取旧值与输入标量值按位或后写回该地址并返回旧值，整个读取、计算和写回过程为原子操作，地址须落在GM地址空间并按数据类型字节数对齐，访问GM时绕过DCache。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [bitwise]
   - operations: [bitwise_or]
-  - objects: [scalar]
-  - execution_models: [scalar]
   - traits: [atomic]
-signature:
-  - prototype_id: asc_atomic_or__PG<dtype>_<dtype>
-    dtype: [int32_t, uint32_t, int64_t, uint64_t]
-archs: ['3510']
-header: [/include/c_api/atomic/scalar_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
     kind: requires
-    condition: 若其他核或其他通路通过缓存访问同一GM地址
+    condition: "若其他核或其他通路通过缓存访问同一GM地址"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
     kind: requires
-    condition: 若其他核或其他通路通过缓存访问同一GM地址
+    condition: "若其他核或其他通路通过缓存访问同一GM地址"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
-    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
+    condition: "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
     kind: requires
-    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
+    condition: "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: requires
-    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
-examples: []
-timestamp: '2026-09-28'
+    condition: "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+version: 9.1.0-
 ---
 # asc_atomic_or
 

@@ -1,52 +1,40 @@
 ---
 okftype: reference.api
-title: asc_copy_l0c2ub（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2ub_deprecated.md
-description: 已废弃的旧参数形式及同步搬运接口，将矩阵计算结果从L0C Buffer搬运至Unified Buffer，支持随路量化、随路激活与Nz2ND/Nz2DN格式转换组合，需配套接口预先配置后调用，请改用asc_copy_l0c2ub和asc_sync替代。
+description: "已废弃的旧参数形式及同步接口，将矩阵计算结果从L0C Buffer搬至UB，随路支持量化、激活与Nz2ND或Nz2DN格式转换组合，支持双目标模式写入两个Vector Core的UB；请改用asc_copy_l0c2ub新接口和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, layout_transform]
-  - source_locations: [l0c_buffer]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, quantization]
-signature:
-  - prototype_id: asc_copy_l0c2ub__PU<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_b_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
-    header: [/include/c_api/cube_datamove/cube_datamove.h]
-  - prototype_id: asc_copy_l0c2ub_sync__PU<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_u8_b_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
-    header: [/include/c_api/composite/cube_datamove_composite.h]
-archs: ['3510']
+  - traits: [aligned_transfer, quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
     kind: requires
-    condition: Nz2DN格式转换场景下
+    condition: "Nz2DN格式转换场景下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
     kind: requires
-    condition: 随路tensor量化模式下
+    condition: "随路tensor量化模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md
     kind: requires
-    condition: 随路激活模式下
+    condition: "随路激活模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
     kind: requires
-    condition: Nz2ND格式转换场景下
+    condition: "Nz2ND/Nz2DN格式转换场景下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md
     kind: requires
-    condition: 随路scalar量化模式下
+    condition: "随路scalar量化模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
     kind: requires
-    condition: 随路激活模式下
+    condition: "随路激活模式下"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-9.2.0
 ---
 # asc_copy_l0c2ub（废弃）
 

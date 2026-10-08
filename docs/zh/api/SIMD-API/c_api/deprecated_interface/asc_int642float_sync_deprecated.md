@@ -1,34 +1,18 @@
 ---
 okftype: reference.api
-title: asc_int642float_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642float_sync_deprecated.md
-description: 已废弃的同步类型转换接口，将int64_t类型数据转换为float类型，目的和源操作数为矢量起始地址且需32字节对齐，请使用对应的非同步接口和同步接口asc_sync替代。
+description: "已废弃的同步矢量转换接口，将int64_t类型数据转换为float类型，目的与源矢量起始地址需32字节对齐；请改用对应的非同步接口asc_int642float并配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_int642float_rd_sync__PUf32_PUi64_u32
-  - override_id: asc_int642float_rn_sync__PUf32_PUi64_u32
-  - override_id: asc_int642float_rna_sync__PUf32_PUi64_u32
-  - override_id: asc_int642float_ru_sync__PUf32_PUi64_u32
-  - override_id: asc_int642float_rz_sync__PUf32_PUi64_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [conversion, synchronization]
+  - traits: [aligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 已废弃接口的替代实现
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int642float.md
-    kind: related
-    condition: 已废弃接口的替代实现
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_int642float_sync（废弃）
 

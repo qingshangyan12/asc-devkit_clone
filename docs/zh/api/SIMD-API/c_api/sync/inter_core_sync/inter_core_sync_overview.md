@@ -1,30 +1,6 @@
 ---
-okftype: reference.index
-title: 核间同步能力概述
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md
-description: 核间同步能力概述页，说明一个核的计算需等待其他相关核计算完成的典型场景，介绍group内block与subblock的结构及算子类型对应的函数执行空间限定符配置，并按四种同步模式汇总各对核间同步接口的同步范围与功能。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [control]
-  - traits: [inter_core_synchronization]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "概述核间同步能力：说明一个核的计算须等待其他相关核计算完成的典型场景，介绍group内block与subblock的结构及算子类型对应的函数执行空间限定符配置，并按四种同步模式汇总各对核间同步接口的同步范围与生产者消费者角色。"
 ---
 # 核间同步能力概述
 

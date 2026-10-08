@@ -1,11 +1,6 @@
 ---
-okftype: reference.index
-title: L0C Buffer内存结构介绍
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/L0C_memory_structure_intro.md
-navigation:
-  - path: docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
-    title: UnitFlag
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍L0C Buffer的Bank与Bank Group内存组织结构、不同产品的总容量与地址编码格式，并说明C API寻址时16×16结果分形的对齐要求及UnitFlag以512B块管理读写状态的机制。"
 ---
 # L0C Buffer内存结构介绍
 

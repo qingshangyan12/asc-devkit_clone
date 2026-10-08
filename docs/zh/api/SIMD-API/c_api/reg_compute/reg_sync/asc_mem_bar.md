@@ -1,34 +1,31 @@
 ---
 okftype: reference.api
-title: asc_mem_bar
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-description: Reg矢量计算内不同流水线之间的同步指令，通过mem_type指定源流水线和目的流水线，目的流水线将等待源流水线上所有指令完成后再执行，UB数据存在依赖时才需要插入同步。
+description: "Reg矢量计算内不同流水线之间的同步指令，通过mem_type指定源流水线与目的流水线，目的流水线等待源流水线上所有指令完成后才执行，仅UB数据存在依赖时需要插入，冗余同步会导致性能下降，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
   - operations: [synchronization]
-  - execution_models: [register_vector]
-signature:
-  - override_id: asc_mem_bar__mem
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
     kind: related
+    condition: "VEC_LOAD流水线对应的UB到寄存器搬运指令"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md
     kind: related
+    condition: "UB数据存在依赖时判断是否需要插入同步"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
     kind: related
+    condition: "UB数据存在依赖时判断是否需要插入同步"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
     kind: related
+    condition: "VEC_STORE流水线对应的寄存器到UB搬运指令"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md
     kind: related
+    condition: "UB数据存在依赖时判断是否需要插入同步"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "UB数据存在依赖时判断是否需要插入同步"
+version: 9.0.0-
 ---
 # asc_mem_bar
 

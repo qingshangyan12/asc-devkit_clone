@@ -1,14 +1,6 @@
 ---
-okftype: reference.index
-title: L1 Buffer、L0A Buffer/L0B Buffer内存结构介绍
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/L1_L0A_B_memory_structure_intro.md
-description: 介绍L1 Buffer以及L0A Buffer、L0B Buffer的容量、Bank与Bank Group组织方式、地址编码格式，并说明各Buffer在同一Bank上读写并发的约束。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement]
-  - operations: [copy]
-dependencies: []
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍L1 Buffer以及L0A Buffer、L0B Buffer的容量、Bank与Bank Group组织方式及地址编码格式，并说明各Buffer在同一Bank上读写并发的约束。"
 ---
 # L1 Buffer、L0A Buffer/L0B Buffer内存结构介绍
 

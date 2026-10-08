@@ -1,16 +1,10 @@
 ---
-okftype: reference.type
-title: asc_load3d_v2_config
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md
-description: 配置 Load3Dv2 repeat 参数，控制 height 或 width 方向的迭代步长、迭代次数和迭代方向。
+okftype: reference.union
+description: "设置Load3Dv2接口repeat参数的联合体，包含height或width方向上前一个迭代与后一个迭代起始地址的距离、迭代次数与迭代方向三个字段，迭代方向可选沿height或沿width，迭代次数默认值为1。"
 tag:
-  - api_surfaces: [c_api]
-  - roles: [configuration]
-declaration:
-  symbol: asc_load3d_v2_config
-  record_kind: union
-header: [/include/c_api/defs/union.h]
-timestamp: '2026-09-28'
+  - roles: [data_movement_configuration]
+dependencies: []
+version: 9.0.0-
 ---
 # asc_load3d_v2_config
 

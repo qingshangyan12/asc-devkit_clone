@@ -1,28 +1,17 @@
 ---
 okftype: reference.api
-title: asc_storealign_1st_postupdate
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st_postupdate.md
-description: 将源矢量数据寄存器中的第一个元素写入Unified Buffer（UB）中目的地址，采用Post Update模式在搬运完成后自动更新目的地址，便于硬件循环内连续多次调用，不支持配置掩码。
+description: "将源矢量数据寄存器中的第一个元素写入Unified Buffer（UB）中目的地址，采用Post Update模式在搬运完成后自动更新目的地址，便于硬件循环内连续调用，不支持配置掩码，目的地址需按数据类型对齐，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [store]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
   - traits: [post_update]
-signature:
-  - prototype_id: asc_storealign_1st_postupdate__RPU<dtype>_v<dtype>_i32
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storealign.h]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_storealign_1st_postupdate
 

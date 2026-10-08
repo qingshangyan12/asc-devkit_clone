@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_abs_sub
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md
-description: 根据mask对源操作数src0、src1按元素相减后取绝对值得到计算结果，支持half与float类型，结果可写入dst或通过函数返回值返回，掩码为0的元素在结果中置0，仅在AIV上生效。
+description: "根据掩码对两个源矢量数据寄存器按元素相减后取绝对值，结果写入dst或通过函数返回值返回，掩码为0的元素在结果中置0，支持half与float类型，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [absolute, subtract]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_abs_sub__v<dtype>_v<dtype>_vb
-    dtype: [half, float]
-  - prototype_id: asc_abs_sub__Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [half, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_fused.h]
+  - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_abs_sub
 

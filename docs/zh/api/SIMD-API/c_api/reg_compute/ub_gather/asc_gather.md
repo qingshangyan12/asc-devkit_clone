@@ -1,32 +1,14 @@
 ---
 okftype: reference.api
-title: asc_gather
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md
-description: 根据索引矢量中保存的逐元素索引，将Unified Buffer中的源操作数按元素收集到目的矢量数据寄存器，受mask掩码控制且掩码为0的位置写0，提供引用参数输出与函数返回值两种形式，仅在AIV上生效。
+description: "根据索引矢量中保存的逐元素索引，将Unified Buffer中的源操作数按元素收集到目的矢量数据寄存器，受掩码控制且掩码为0的位置写0，提供引用参数输出与函数返回值两种形式，源起始地址需32字节对齐，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [gather, load]
-  - execution_models: [register_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [vector_register]
-  - traits: [masked]
-signature:
-  - prototype_id: asc_gather__Rv<dst_dtype>_PU<src_dtype>_v<index_dtype>_vb
-  - prototype_id: asc_gather__PU<src_dtype>_v<index_dtype>_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/gather/ub_gather.h]
+  - traits: [aligned_transfer]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather
-    file: reg_load_gather.asc
-    archs: ['3510']
-    override_id: asc_gather__Rvf16_PUf16_vu16_vb
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_gather
 

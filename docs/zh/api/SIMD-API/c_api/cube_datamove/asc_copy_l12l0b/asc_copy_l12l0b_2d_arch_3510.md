@@ -1,40 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0b_arch_3510（2D矩阵搬运）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md
-description: 以512字节的数据分形为搬运粒度，完成矩阵计算所需的2D格式数据从L1 Buffer到L0B Buffer的搬运，支持非转置与转置矩阵，不同数据类型对应不同大小的分形矩阵，仅在AIC上执行有效。
+description: "以512字节的数据分形为搬运粒度，完成矩阵计算所需2D格式数据从L1 Buffer到L0B Buffer的搬运，支持非转置与转置矩阵，不同数据类型对应不同大小的分形矩阵，仅在AIC上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, transpose]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0b_buffer]
-signature:
-  - prototype_id: asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
-      fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
-  - prototype_id: asc_copy_l12l0b_transpose__PCB<dtype>_PL1<dtype>_u16_u16_u8_u8_i16_u16
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
-      fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
-    file: matmul.asc
-    archs: ['3510']
-    override_id: asc_copy_l12l0b__PCBf32_PL1f32_u16_u16_u8_u8_i16_u16
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
-    file: mmad_s2.h
-    archs: ['3510']
-    override_id: asc_copy_l12l0b__PCBbf16_PL1bf16_u16_u16_u8_u8_i16_u16
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_l12l0b_arch_3510（2D矩阵搬运）
 

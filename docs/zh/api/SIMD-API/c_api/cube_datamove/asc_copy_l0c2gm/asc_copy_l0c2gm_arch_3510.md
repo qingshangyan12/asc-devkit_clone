@@ -1,56 +1,33 @@
 ---
 okftype: reference.api
-title: asc_copy_l0c2gm_arch_3510
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
-description: 将矩阵计算结果从L0C Buffer搬运至Global Memory，搬运过程中可同步支持随路量化、随路激活、随路格式转换Nz2ND/Nz2DN等能力组合，需通过配套接口预先配置相关参数，仅在AIC上执行有效。
+description: "将矩阵计算结果从L0C Buffer搬运至Global Memory，搬运过程中可同步支持随路量化、随路激活与随路格式转换Nz2ND或Nz2DN等能力组合，相关参数需通过配套接口预先配置，仅在AIC上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, layout_transform]
-  - source_locations: [l0c_buffer]
-  - destination_locations: [global_memory]
-  - traits: [quantization]
-signature:
-  - prototype_id: asc_copy_l0c2gm__PG<dst_dtype>_PCC<src_dtype>_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer, quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md
     kind: requires
-    condition: Nz2DN格式转换场景下
+    condition: "Nz2DN格式转换场景下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
     kind: requires
-    condition: 随路tensor量化模式下
+    condition: "随路tensor量化模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md
     kind: requires
-    condition: 随路激活模式下
+    condition: "随路激活模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
     kind: requires
-    condition: Nz2ND格式转换场景下
+    condition: "Nz2ND/Nz2DN格式转换场景下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md
     kind: requires
-    condition: 随路scalar量化模式下
+    condition: "随路scalar量化模式下"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
     kind: requires
-    condition: 随路激活模式下
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
-    file: matmul.asc
-    archs: ['3510']
-    override_id: asc_copy_l0c2gm__PGf32_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
-    file: mmad_s1.h
-    archs: ['3510']
-    override_id: asc_copy_l0c2gm__PGi32_PCCi32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
-    file: mmad_s2.h
-    archs: ['3510']
-    override_id: asc_copy_l0c2gm__PGf32_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx
-    file: mmad_mx.asc
-    archs: ['3510']
-    override_id: asc_copy_l0c2gm__PGf32_PCCf32_u16_u16_u32_u16_storel2_unitflag_quantmode_relupre_b_b_b_b
-timestamp: '2026-09-28'
+    condition: "随路激活模式下"
+  - path: docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md
+    kind: constrained_by
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-
 ---
 # asc_copy_l0c2gm_arch_3510
 

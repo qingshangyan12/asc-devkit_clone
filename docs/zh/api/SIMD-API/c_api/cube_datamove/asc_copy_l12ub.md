@@ -1,27 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_l12ub
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md
-description: 将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、单个数据块长度以及源目间隔实现连续与非连续搬运，搬运过程中格式和内容保持不变，仅在AIC上执行有效。
+description: "将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、长度与源目间隔实现连续和非连续搬运，格式和内容保持不变，源与目的地址需32字节对齐，仅在AIC上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [l1_buffer]
-  - destination_locations: [unified_buffer]
-signature:
-  - override_id: asc_copy_l12ub__PUv_PL1v_i8_u16_u16_u16_u16
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer, datablock_granularity]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-
 ---
 # asc_copy_l12ub
 

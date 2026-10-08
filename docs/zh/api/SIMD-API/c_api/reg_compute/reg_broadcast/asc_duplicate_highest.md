@@ -1,31 +1,18 @@
 ---
 okftype: reference.api
-title: asc_duplicate_highest
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_highest.md
-description: 将源操作数src的最高位元素（下标最大的元素）广播到目的操作数dst中被mask筛选的位置，未被筛选的元素置0，与asc_duplicate的区别在于使用src的最高位元素作为待广播数据，仅在AIV上生效。
+description: "将源矢量数据寄存器中下标最大的元素广播到目的矢量数据寄存器中被掩码筛选的位置，未被筛选的元素置零，掩码仅作用于目的侧而不影响源读取；与使用最低位元素的asc_duplicate相区别，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [broadcast]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked]
-signature:
-  - prototype_id: asc_duplicate_highest__Rv<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
-      half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_broadcast.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果不同寄存器访问同一Unified Buffer（UB）地址且存在写后读或写后写依赖"
+version: 9.2.0-
 ---
 # asc_duplicate_highest
 

@@ -1,55 +1,19 @@
 ---
 okftype: reference.api
-title: asc_add
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md
-description: 根据mask对两个源矢量数据寄存器按元素求和并写入目的操作数，另提供带进位输出加法形式，硬件按32位无符号数处理，加法和的低32位写入矢量数据寄存器、进位写入目的掩码寄存器。
+description: "根据掩码对两个源矢量数据寄存器按元素求和写入目的操作数，另提供带进位输出加法形式，硬件按32位无符号数处理，和的低32位写入矢量数据寄存器、进位写入目的掩码寄存器，整型溢出按环绕策略处理。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [add]
-  - objects: [carry_flag, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, supports_carry_output]
-signature:
-  - prototype_id: asc_add__Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_add__v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_add__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [int32_t, uint32_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
+  - traits: [elementwise, supports_carry_output]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
-examples:
-  - path: /examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
-    file: c_api_add.asc
-    archs: ['3510']
-    override_id: asc_add__Rvf32_vf32_vf32_vb
-  - path: /examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode
-    file: set_l2_cache_mode.h
-    archs: ['3510', '2201']
-    override_id: asc_add__Rvf16_vf16_vf16_vb
-  - path: /examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer
-    file: add_double_buffer.asc
-    archs: ['3510']
-    override_id: asc_add__Rvf16_vf16_vf16_vb
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
-    file: reg_load_store_align.asc
-    archs: ['3510']
-    override_id: asc_add__Rvf16_vf16_vf16_vb
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce
-    file: reduce.asc
-    archs: ['3510']
-    override_id: asc_add__Rvf32_vf32_vf32_vb
-timestamp: '2026-09-28'
+    condition: "带进位输出加法"
+version: 9.0.0-
 ---
 # asc_add
 

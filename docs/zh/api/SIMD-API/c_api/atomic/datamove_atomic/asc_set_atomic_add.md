@@ -1,33 +1,19 @@
 ---
 okftype: reference.api
-title: asc_set_atomic_add
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
-description: 对后续目的地址为GM的数据搬运指令开启原子累加，搬运时将待搬运数据与GM上已有数据求和后写入GM，可通过选择不同函数原型设定累加数据类型，调用asc_disable_dma_atomic接口可关闭该原子操作。
+description: "对后续目的地址为GM的数据搬运指令开启原子累加，搬运时将待搬运数据与GM上已有数据求和后将结果写入GM，可通过选择不同函数原型设定累加数据类型；调用asc_disable_dma_atomic可关闭该原子操作，仅对MTE搬运单元的搬运指令生效，对标量写GM的指令不生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - operations: [add]
-  - execution_models: [scalar]
   - traits: [atomic]
-signature:
-  - override_id: asc_set_atomic_add_int8__z
-  - override_id: asc_set_atomic_add_int16__z
-  - override_id: asc_set_atomic_add_int32__z
-  - override_id: asc_set_atomic_add_float16__z
-  - override_id: asc_set_atomic_add_bfloat__z
-  - override_id: asc_set_atomic_add_float__z
-archs: ['2201', '3510']
-header: [/include/c_api/atomic/datamove_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/atomic/key_features.md
     kind: constrained_by
-    condition: 若需保证确定性的执行顺序
+    condition: "若需保证确定性的执行顺序"
   - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "对于标量写GM的指令不生效"
+version: 9.2.0-
 ---
 # asc_set_atomic_add
 

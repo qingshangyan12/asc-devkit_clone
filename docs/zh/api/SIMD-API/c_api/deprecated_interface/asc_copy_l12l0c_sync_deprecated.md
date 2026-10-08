@@ -1,32 +1,17 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0c_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0c_sync_deprecated.md
-description: 已废弃的同步搬运接口，将矩阵由L1 Buffer搬运到L0C Buffer中，支持float到half、bfloat16_t等源与目的数据类型组合，请使用非同步接口配合asc_sync替代。
+description: "已废弃的同步搬运接口，将矩阵由L1 Buffer搬运到L0C Buffer，支持float到half、bfloat16_t等源与目的数据类型组合，多条指令目的地址重叠时须插入同步指令保证串行化；请改用非同步接口asc_copy_l12l0c配合asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [conversion, copy]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0c_buffer]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_copy_l12l0c_sync__PCCbf16_PL1bf16_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c_sync__PCCf16_PL1f16_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c_sync__PCCf16_PL1f32_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c_sync__PCCbf16_PL1f32_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c_sync__PCCf32_PL1f32_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c_sync__PCCi32_PL1i32_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c_sync__PCCu32_PL1u32_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md
-    kind: related
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_copy_l12l0c_sync（废弃）
 

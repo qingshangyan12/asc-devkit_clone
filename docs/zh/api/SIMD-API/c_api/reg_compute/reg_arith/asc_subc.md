@@ -1,29 +1,16 @@
 ---
 okftype: reference.api
-title: asc_subc
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md
-description: 根据mask对源操作数src0、src1及输入借位carry_src进行按元素求差，减法在硬件底层通过补码加法实现，结果写入dst，每个元素的进位标志写入carry掩码寄存器，仅在AIV上生效。
+description: "根据掩码对源操作数src0、src1及输入进位carry_src按元素求差，减法在硬件底层通过补码加法实现，差值低32位写入矢量数据寄存器，进位标志写入目的掩码寄存器，输出不受饱和截断控制影响，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [subtract]
-  - objects: [carry_flag, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [carry_input, elementwise, masked, supports_carry_output]
-signature:
-  - prototype_id: asc_subc__Rvb_Rv<dtype>_v<dtype>_v<dtype>_vb_vb
-    dtype: [int32_t, uint32_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
+  - traits: [carry_input, elementwise, supports_carry_output]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md
-    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_subc
 

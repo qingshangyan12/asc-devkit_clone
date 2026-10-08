@@ -1,30 +1,6 @@
 ---
-okftype: reference.index
-title: 关键特性说明<a id="inter_core_sync_key_features"></a>
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md
-description: 关键特性说明页，配合时序图介绍四对核间同步接口支持的四种同步控制模式的实现原理：多AI Core间AIC或AIV全核同步、单AI Core内AIV全核同步、AIC与AIV全核同步及AIC与单个AIV同步，并说明不同NPU架构下阻塞流水范围的差异。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [control]
-  - traits: [inter_core_synchronization]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "配合时序图介绍四对核间同步接口支持的四种同步控制模式的实现原理：多AI Core间AIC或AIV全核同步、单AI Core内AIV全核同步、AIC与AIV全核同步及AIC与单个AIV同步，并说明不同NPU架构下wait接口阻塞流水范围的差异。"
 ---
 # 关键特性说明<a id="inter_core_sync_key_features"></a>
 

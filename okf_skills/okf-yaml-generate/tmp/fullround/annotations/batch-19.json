@@ -1,0 +1,1198 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_duplicate_sync_deprecated.md",
+      "document_sha256": "749874d98e8efb2917faf4e73d27aed7e21a95280b88a3200a59eff2f57885e6",
+      "description": {
+        "value": "已废弃的同步矢量复制接口，将标量值复制填充到目的矢量的各元素中，目的起始地址需32字节对齐；请改用非同步接口asc_duplicate配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_duplicate_sync_deprecated.md", "excerpt": "**`asc_duplicate_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_broadcast/asc_duplicate.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_duplicate_sync_deprecated.md", "excerpt": "执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_duplicate_sync_deprecated.md", "excerpt": "dst的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["broadcast", "synchronization"],
+        "traits": ["scalar_operand", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。",
+        "operations:broadcast": "执行矢量复制（Duplicate）操作，将标量值复制填充到矢量中。",
+        "operations:synchronization": "同步计算",
+        "traits:scalar_operand": "| src | 输入 | 源操作数（标量）。 |",
+        "traits:aligned_transfer": "dst的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_duplicate_sync_deprecated.md",
+            "excerpt": "**`asc_duplicate_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_broadcast/asc_duplicate.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_duplicate_sync_deprecated.md",
+            "excerpt": "**`asc_duplicate_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_broadcast/asc_duplicate.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e1m2x22bfloat16_deprecated.md",
+      "document_sha256": "945d84f283d1dbb9b43d204a4069fa8f4baf8ed8ce3fc317f6a87bbcd1f4dcd2",
+      "description": {
+        "value": "已废弃的矢量转换接口，将fp4x2_e1m2_t类型转化为bfloat16_t类型，因位宽比为1:4读取时需将一个VL大小的数据分为四部分并按接口选取索引；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e1m2x22bfloat16_deprecated.md", "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_e1m2x22bfloat16](../reg_compute/reg_convert/asc_e1m2x22bfloat16.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e1m2x22bfloat16_deprecated.md", "excerpt": "将fp4x2_e1m2_t类型转化为bfloat16_t类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e1m2x22bfloat16_deprecated.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将fp4x2_e1m2_t类型转化为bfloat16_t类型。",
+        "operations:conversion": "将fp4x2_e1m2_t类型转化为bfloat16_t类型。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e1m2x22bfloat16.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e1m2x22bfloat16_deprecated.md",
+            "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_e1m2x22bfloat16](../reg_compute/reg_convert/asc_e1m2x22bfloat16.md)的显式位置参数重载替代。**"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e2m1x22bfloat16_deprecated.md",
+      "document_sha256": "1b4e0604a4f695a6d72948207c3190e2d3cdaeb0d647357a40b1a0348437a09f",
+      "description": {
+        "value": "已废弃的矢量转换接口，将fp4x2_e2m1_t类型转化为bfloat16_t类型，因位宽比为1:4读取时需将一个VL大小的数据分为四部分并按接口选取索引；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e2m1x22bfloat16_deprecated.md", "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_e2m1x22bfloat16](../reg_compute/reg_convert/asc_e2m1x22bfloat16.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e2m1x22bfloat16_deprecated.md", "excerpt": "将fp4x2_e2m1_t类型转化为bfloat16_t类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e2m1x22bfloat16_deprecated.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将fp4x2_e2m1_t类型转化为bfloat16_t类型。",
+        "operations:conversion": "将fp4x2_e2m1_t类型转化为bfloat16_t类型。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e2m1x22bfloat16_deprecated.md",
+            "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_e2m1x22bfloat16](../reg_compute/reg_convert/asc_e2m1x22bfloat16.md)的显式位置参数重载替代。**"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e4m32float_deprecated.md",
+      "document_sha256": "9d480c854ca86d4e028dcca31f92c831ce0f5c268b8c3cf6c5b61057824ac2ae",
+      "description": {
+        "value": "已废弃的矢量转换接口，将fp8_e4m3fn_t类型转化为float类型，因位宽比为1:4读取时需将一个VL大小的数据分为四部分并按接口选取索引；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e4m32float_deprecated.md", "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_e4m32float](../reg_compute/reg_convert/asc_e4m32float.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e4m32float_deprecated.md", "excerpt": "将fp8_e4m3fn_t类型转化为float类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e4m32float_deprecated.md", "excerpt": "由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将fp8_e4m3fn_t类型转化为float类型。",
+        "operations:conversion": "将fp8_e4m3fn_t类型转化为float类型。",
+        "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e4m32float_deprecated.md",
+            "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_e4m32float](../reg_compute/reg_convert/asc_e4m32float.md)的显式位置参数重载替代。**"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e5m22float_deprecated.md",
+      "document_sha256": "6244ec9cbaa78549273d87a46987f3d439836b6e1f1873eee6a497d7635d8684",
+      "description": {
+        "value": "已废弃的矢量转换接口，将vector_fp8_e5m2_t源操作数以256B为单位分为四部分，读取其中一部分元素转换成vector_float类型写入目的操作数；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e5m22float_deprecated.md", "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_e5m22float](../reg_compute/reg_convert/asc_e5m22float.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e5m22float_deprecated.md", "excerpt": "将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["widening_result"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。",
+        "operations:conversion": "将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。",
+        "traits:widening_result": "将vector_fp8_e5m2_t类型的源操作数以256B为单位分为四部分，读取其中一部分元素，将其转换成vector_float类型并写入目的操作数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e5m22float_deprecated.md",
+            "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_e5m22float](../reg_compute/reg_convert/asc_e5m22float.md)的显式位置参数重载替代。**"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md",
+      "document_sha256": "678f02a54b1cb58c76a33b612b662ee99f36233fd2e066a1c4cb2088e08d8234",
+      "description": {
+        "value": "已废弃的模式配置接口，设置Mmad计算开启FP8模式并关闭HiF8模式，使FP8数据参与Mmad计算前不被转换为hifloat8_t类型，需在asc_mmad执行前调用；请改用asc_disable_hif8接口替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md", "excerpt": "**`asc_enable_fp8`接口已废弃。请使用[asc_disable_hif8](../cube_compute/asc_disable_hif8.md)接口替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md", "excerpt": "用于设置Mmad计算开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](../cube_compute/asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md", "excerpt": "需在[asc_mmad](../cube_compute/asc_mmad.md)执行前调用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "用于设置Mmad计算开启FP8模式。该接口会关闭HiF8模式（与[asc_enable_hif8](../cube_compute/asc_enable_hif8.md)相反），开启该模式后L0A Buffer/L0B Buffer中的FP8数据在参与Mmad计算之前不会被转化为hifloat8_t类型数据。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md",
+            "excerpt": "**`asc_enable_fp8`接口已废弃。请使用[asc_disable_hif8](../cube_compute/asc_disable_hif8.md)接口替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md",
+          "kind": "related",
+          "condition": "与asc_enable_hif8相反，二者不同时生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md",
+            "excerpt": "与[asc_enable_hif8](../cube_compute/asc_enable_hif8.md)相反，二者不同时生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "condition": "需在asc_mmad执行前调用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_fp8_deprecated.md",
+            "excerpt": "需在[asc_mmad](../cube_compute/asc_mmad.md)执行前调用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md",
+      "document_sha256": "d8537dd0ca60303af879bb37ef03176575d6bd021aa81c4bd1b8d60b2b0b4f99",
+      "description": {
+        "value": "已废弃的模式配置接口，设置HF32模式的舍入方式，需先开启HF32模式并在矩阵乘加指令执行前调用，配置持续生效直至重新设置；请改用asc_set_hf32_round_mode接口替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md", "excerpt": "**`asc_enable_hf32_trans`接口已废弃。请使用[asc_set_hf32_round_mode](../cube_compute/asc_set_hf32_round_mode.md)接口替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md", "excerpt": "本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](../cube_compute/asc_enable_hf32.md)开启HF32模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md", "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](../cube_compute/asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"],
+        "traits": ["rounding_mode"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](../cube_compute/asc_enable_hf32.md)开启HF32模式。",
+        "traits:rounding_mode": "本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](../cube_compute/asc_enable_hf32.md)开启HF32模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md",
+            "excerpt": "**`asc_enable_hf32_trans`接口已废弃。请使用[asc_set_hf32_round_mode](../cube_compute/asc_set_hf32_round_mode.md)接口替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+          "kind": "requires",
+          "condition": "使用该接口前需要先开启HF32模式",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md",
+            "excerpt": "本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](../cube_compute/asc_enable_hf32.md)开启HF32模式。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "condition": "需在矩阵乘加指令执行前调用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_enable_hf32_trans_deprecated.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](../cube_compute/asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md",
+      "document_sha256": "cfbf5779bd816faaa8bdd2babe5a71d48e4fc04a0ff8041e323f663170f34fbb",
+      "description": {
+        "value": "已废弃的同步矢量比较接口，按元素判断源矢量与标量value是否相等，比较结果按比特位写入目的操作数，目的与源起始地址需32字节对齐；请改用非同步接口asc_eq_scalar配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md", "excerpt": "**`asc_eq_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_eq_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md", "excerpt": "按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["comparison", "synchronization"],
+        "traits": ["elementwise", "scalar_operand", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。",
+        "operations:comparison": "按元素判断src = value是否成立，若成立则输出结果的对应比特位为1，否则为0。",
+        "operations:synchronization": "同步计算",
+        "traits:elementwise": "按元素判断src = value是否成立",
+        "traits:scalar_operand": "| value | 输入 | 源操作数（标量）。 |",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md",
+            "excerpt": "**`asc_eq_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_eq_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md",
+            "excerpt": "**`asc_eq_scalar_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_eq_scalar.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md",
+      "document_sha256": "fab651c105d2a6452c26b90fee6c9daa08d502e7ea79c3e8b4941ae0bbc82470",
+      "description": {
+        "value": "已废弃的同步矢量比较接口，比较src0与src1对应索引位置的元素是否相等，结果按比特位写入目的地址或比较寄存器，目的与源起始地址需32字节对齐；请改用非同步接口asc_eq配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md", "excerpt": "**`asc_eq_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_eq.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md", "excerpt": "比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md", "excerpt": "dst、src0、src1的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["comparison", "synchronization"],
+        "traits": ["elementwise", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。",
+        "operations:comparison": "比较src0与src1在对应索引位置的元素大小。若比较结果为真，则输出结果的对应比特位设为1，否则设为0。",
+        "operations:synchronization": "同步计算",
+        "traits:elementwise": "比较src0与src1在对应索引位置的元素大小",
+        "traits:aligned_transfer": "dst、src0、src1的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md",
+            "excerpt": "**`asc_eq_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_eq.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md",
+            "excerpt": "**`asc_eq_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_compare/asc_eq.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md",
+          "kind": "requires",
+          "condition": "使用寄存器形式的接口时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md",
+            "excerpt": "使用寄存器形式的接口时，需要配合[asc_get_cmp_mask](../vector_compute/vector_compare/asc_get_cmp_mask.md)获取比较结果。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md",
+          "kind": "related",
+          "condition": "如果要初始化寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_sync_deprecated.md",
+            "excerpt": "如果要初始化寄存器，可以调用[asc_set_cmp_mask](../vector_compute/vector_compare/asc_set_cmp_mask.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md",
+      "document_sha256": "6492dac1d2c1c0627aeaa48603aa5b5908f4e8e73319f731083b2cbe8ee8e1ea",
+      "description": {
+        "value": "已废弃的寄存器矢量计算接口，将src0与src1按元素相减并计算以差值为指数的自然指数函数写入目的寄存器；输入为half且不带src_pos参数的原型及asc_exp_sub_v2原型已废弃，请改用新原型替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md", "excerpt": "**输入数据类型为`half`且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃。新接口请参见[asc_exp_sub](../reg_compute/reg_fused/asc_exp_sub.md)。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md", "excerpt": "这些接口将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，将计算结果写入`dst`。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["subtract", "exponential"],
+        "traits": ["elementwise"]
+      },
+      "tag_evidence": {
+        "roles:compute": "这些接口将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，将计算结果写入`dst`。",
+        "operations:subtract": "这些接口将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，将计算结果写入`dst`。",
+        "operations:exponential": "这些接口将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，将计算结果写入`dst`。",
+        "traits:elementwise": "这些接口将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，将计算结果写入`dst`。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md",
+            "excerpt": "**输入数据类型为`half`且不带`src_pos`参数的`asc_exp_sub`原型以及`asc_exp_sub_v2`原型已废弃。新接口请参见[asc_exp_sub](../reg_compute/reg_fused/asc_exp_sub.md)。**"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sync_deprecated.md",
+      "document_sha256": "ee539052fb770922eba15452187d75c4c3f0ecda00a326665672e8d63991ae5a",
+      "description": {
+        "value": "已废弃的同步矢量计算接口，按元素取自然指数并将结果写入目的矢量，目的与源起始地址需32字节对齐；请改用非同步接口asc_exp配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sync_deprecated.md", "excerpt": "**`asc_exp_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_exp.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sync_deprecated.md", "excerpt": "按元素取自然指数，计算公式如下。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sync_deprecated.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["exponential", "synchronization"],
+        "traits": ["elementwise", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "按元素取自然指数，计算公式如下。",
+        "operations:exponential": "按元素取自然指数，计算公式如下。",
+        "operations:synchronization": "同步计算",
+        "traits:elementwise": "按元素取自然指数",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_exp.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sync_deprecated.md",
+            "excerpt": "**`asc_exp_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_exp.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sync_deprecated.md",
+            "excerpt": "**`asc_exp_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_arith/asc_exp.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md",
+      "document_sha256": "2048232aeb20bb5969b09d7d49eb511cf97756ca01151d5d860f45a430853dc1",
+      "description": {
+        "value": "已废弃的同步初始化接口，将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化，value与dst类型不同时需按dst类型转换；请改用非同步接口asc_fill_l0a配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md", "excerpt": "**`asc_fill_l0a_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0a.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md", "excerpt": "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md", "excerpt": "若dst和value的数据类型不相同，则需要根据dst的数据类型对value的值进行转换，具体请参考调用示例。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_initialization"],
+        "operations": ["fill", "synchronization"]
+      },
+      "tag_evidence": {
+        "roles:data_initialization": "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。",
+        "operations:fill": "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。",
+        "operations:synchronization": "同步计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md",
+            "excerpt": "**`asc_fill_l0a_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0a.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md",
+            "excerpt": "**`asc_fill_l0a_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0a.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0a_sync_deprecated.md",
+            "excerpt": "| config | 输入 | 使用的初始化相关参数，详细说明请参考[asc_fill_value_config](../defs/union/asc_fill_value_config.md)。 |"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md",
+      "document_sha256": "ed53bd59fdbee467722267f1640fdbd78d7a8827008573495995ec805e6890c1",
+      "description": {
+        "value": "已废弃的同步初始化接口，将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化，value与dst类型不同时需按dst类型转换；请改用非同步接口asc_fill_l0b配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md", "excerpt": "**`asc_fill_l0b_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0b.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md", "excerpt": "将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md", "excerpt": "若dst和value的数据类型不相同，则需要根据dst的数据类型对value的值进行转换，具体请参考调用示例。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_initialization"],
+        "operations": ["fill", "synchronization"]
+      },
+      "tag_evidence": {
+        "roles:data_initialization": "将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化。",
+        "operations:fill": "将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化。",
+        "operations:synchronization": "同步计算"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md",
+            "excerpt": "**`asc_fill_l0b_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0b.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md",
+            "excerpt": "**`asc_fill_l0b_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l0b.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md",
+            "excerpt": "| config | 输入 | 使用的初始化相关参数，详细说明请参考[asc_fill_value_config](../defs/union/asc_fill_value_config.md)。 |"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md",
+      "document_sha256": "de508b2ecaf626f10dfb0fd647284c62da66d6e1c0893ae88fff58422ebee6c6",
+      "description": {
+        "value": "已废弃的同步初始化接口，将标量填充值写入L1 Buffer并广播到多个32字节分形块用于内存初始化，起始地址需32字节对齐，仅在AIC上执行有效；请改用非同步接口asc_fill_l1配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md", "excerpt": "**`asc_fill_l1_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l1.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md", "excerpt": "将一个标量填充值写入L1 Buffer的目的地址，并将填充值广播到多个32字节分形块中，可用于L1 Buffer的内存初始化。需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md", "excerpt": "`dst`起始地址需要按照32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_initialization"],
+        "operations": ["fill", "synchronization"],
+        "traits": ["aligned_transfer", "datablock_granularity"]
+      },
+      "tag_evidence": {
+        "roles:data_initialization": "将一个标量填充值写入L1 Buffer的目的地址，并将填充值广播到多个32字节分形块中，可用于L1 Buffer的内存初始化。需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。",
+        "operations:fill": "将一个标量填充值写入L1 Buffer的目的地址，并将填充值广播到多个32字节分形块中，可用于L1 Buffer的内存初始化。需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。",
+        "operations:synchronization": "调用`asc_fill_l1_sync`时，接口内部完成同步。",
+        "traits:aligned_transfer": "`dst`起始地址需要按照32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。",
+        "traits:datablock_granularity": "并将填充值广播到多个32字节分形块中"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md",
+            "excerpt": "**`asc_fill_l1_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l1.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md",
+            "excerpt": "**`asc_fill_l1_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_fill_l1.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md",
+            "excerpt": "需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在目的地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md",
+            "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。调用`asc_fill_l1_sync`时，接口内部完成同步。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在目的地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md",
+            "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。调用`asc_fill_l1_sync`时，接口内部完成同步。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md",
+      "document_sha256": "ce587424b33c06e0f774b19e09b7b2c10d05dc8266b1024f43a3435a01f8ab5f",
+      "description": {
+        "value": "已废弃的矢量转换接口，根据掩码将float类型数据转换成bfloat16_t类型并支持多种舍入与饱和模式，因位宽比为2:1按接口后缀写入奇偶索引位置；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md", "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2bfloat16](../reg_compute/reg_convert/asc_float2bfloat16.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md", "excerpt": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md", "excerpt": "关于舍入模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。",
+        "operations:conversion": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。",
+        "traits:rounding_mode": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。",
+        "traits:saturation_mode": "根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2bfloat16.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md",
+            "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2bfloat16](../reg_compute/reg_convert/asc_float2bfloat16.md)的显式位置参数重载替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md",
+            "excerpt": "关于舍入模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "使用饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_deprecated.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md",
+      "document_sha256": "5af1fd1918f0ca42d4980810fa39b0f19d5c61a619f8f3eaf8e414d41935cc1b",
+      "description": {
+        "value": "已废弃的同步转换接口，将float类型数据转换为bfloat16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，目的与源起始地址需32字节对齐；请改用非同步接口asc_float2bfloat16配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md", "excerpt": "**`asc_float2bfloat16_rn_sync`、`asc_float2bfloat16_rna_sync`、`asc_float2bfloat16_rd_sync`、`asc_float2bfloat16_ru_sync`和`asc_float2bfloat16_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2bfloat16.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md", "excerpt": "将float类型数据转换为bfloat16_t类型，并支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion", "synchronization"],
+        "traits": ["rounding_mode", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转换为bfloat16_t类型，并支持多种舍入模式：",
+        "operations:conversion": "将float类型数据转换为bfloat16_t类型，并支持多种舍入模式：",
+        "operations:synchronization": "同步计算",
+        "traits:rounding_mode": "将float类型数据转换为bfloat16_t类型，并支持多种舍入模式：",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2bfloat16.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md",
+            "excerpt": "**`asc_float2bfloat16_rn_sync`、`asc_float2bfloat16_rna_sync`、`asc_float2bfloat16_rd_sync`、`asc_float2bfloat16_ru_sync`和`asc_float2bfloat16_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2bfloat16.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md",
+            "excerpt": "**`asc_float2bfloat16_rn_sync`、`asc_float2bfloat16_rna_sync`、`asc_float2bfloat16_rd_sync`、`asc_float2bfloat16_ru_sync`和`asc_float2bfloat16_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2bfloat16.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2bfloat16_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md",
+      "document_sha256": "40be6de6cb80beb57d22fb20710f16f057f642825728fc38ecad20931e6b42ac",
+      "description": {
+        "value": "已废弃的矢量转换接口，将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式与饱和、非饱和模式，因位宽比为4:1分四部分按索引写入目的寄存器；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md", "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_float2e4m3](../reg_compute/reg_convert/asc_float2e4m3.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md", "excerpt": "将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式，饱和/非饱和模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式，饱和/非饱和模式。",
+        "operations:conversion": "将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式，饱和/非饱和模式。",
+        "traits:rounding_mode": "将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式，饱和/非饱和模式。",
+        "traits:saturation_mode": "将float类型转化为fp8_e4m3fn_t类型，支持RINT舍入模式，饱和/非饱和模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md",
+            "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_float2e4m3](../reg_compute/reg_convert/asc_float2e4m3.md)的显式位置参数重载替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "开启饱和模式和非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md",
+            "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md",
+      "document_sha256": "48037292a31603b85504a08376120edc38b8779d02245c14624cb13fdcb8904e",
+      "description": {
+        "value": "已废弃的矢量转换接口，将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式与饱和、非饱和模式，因位宽比为4:1分四部分按索引写入目的寄存器；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md", "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_float2e5m2](../reg_compute/reg_convert/asc_float2e5m2.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md", "excerpt": "将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式，饱和/非饱和模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式，饱和/非饱和模式。",
+        "operations:conversion": "将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式，饱和/非饱和模式。",
+        "traits:rounding_mode": "将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式，饱和/非饱和模式。",
+        "traits:saturation_mode": "将float类型数据转换为fp8_e5m2类型，支持RINT舍入模式，饱和/非饱和模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md",
+            "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_float2e5m2](../reg_compute/reg_convert/asc_float2e5m2.md)的显式位置参数重载替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "开启饱和模式和非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md",
+            "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md",
+      "document_sha256": "00b6a91404a9f86a4cec196c2e160955ce3cb18550a412032279c2c45d5a1fe2",
+      "description": {
+        "value": "已废弃的同步精度转换接口，对float类型数据进行精度转换处理，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，目的与源起始地址需32字节对齐；请改用非同步接口asc_float2float配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md", "excerpt": "**`asc_float2float_rn_sync`、`asc_float2float_rd_sync`、`asc_float2float_ru_sync`、`asc_float2float_rna_sync`和`asc_float2float_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2float.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md", "excerpt": "对float类型数据进行精度转换处理,支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion", "synchronization"],
+        "traits": ["rounding_mode", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "对float类型数据进行精度转换处理,支持多种舍入模式：",
+        "operations:conversion": "对float类型数据进行精度转换处理,支持多种舍入模式：",
+        "operations:synchronization": "同步模式",
+        "traits:rounding_mode": "对float类型数据进行精度转换处理,支持多种舍入模式：",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md",
+            "excerpt": "**`asc_float2float_rn_sync`、`asc_float2float_rd_sync`、`asc_float2float_ru_sync`、`asc_float2float_rna_sync`和`asc_float2float_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2float.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md",
+            "excerpt": "**`asc_float2float_rn_sync`、`asc_float2float_rd_sync`、`asc_float2float_ru_sync`、`asc_float2float_rna_sync`和`asc_float2float_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2float.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md",
+      "document_sha256": "b16b75ef7ced7c5e5c612a5b16cbbcadcd86cc87168a61a543e62e9c99a94b85",
+      "description": {
+        "value": "已废弃的矢量转换接口，将float类型数据转换成half类型并支持多种舍入模式与饱和模式，因位宽比为2:1按接口后缀写入奇偶索引位置；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md", "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2half](../reg_compute/reg_convert/asc_float2half.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md", "excerpt": "将float类型数据转换成half类型，并支持多种舍入模式与饱和模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../reg_compute/reg_convert/rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转换成half类型，并支持多种舍入模式与饱和模式。",
+        "operations:conversion": "将float类型数据转换成half类型，并支持多种舍入模式与饱和模式。",
+        "traits:rounding_mode": "将float类型数据转换成half类型，并支持多种舍入模式与饱和模式。",
+        "traits:saturation_mode": "将float类型数据转换成half类型，并支持多种舍入模式与饱和模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md",
+            "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2half](../reg_compute/reg_convert/asc_float2half.md)的显式位置参数重载替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../reg_compute/reg_convert/rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "开启饱和模式和非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md",
+            "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_sync_deprecated.md",
+      "document_sha256": "0140856368c2c08df8df61b5f0ce862ef4c6dbc189efac1f7137d0761ba5b630",
+      "description": {
+        "value": "已废弃的同步转换接口，将float类型数据转换为half类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC、ODD多种舍入模式，目的与源起始地址需32字节对齐；请改用非同步接口asc_float2half配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_sync_deprecated.md", "excerpt": "**`asc_float2half_sync`、`asc_float2half_rn_sync`、`asc_float2half_rna_sync`、`asc_float2half_rd_sync`、`asc_float2half_ru_sync`、`asc_float2half_rz_sync`和`asc_float2half_ro_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2half.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_sync_deprecated.md", "excerpt": "将float类型数据转换为half类型，支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_sync_deprecated.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion", "synchronization"],
+        "traits": ["rounding_mode", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转换为half类型，支持多种舍入模式：",
+        "operations:conversion": "将float类型数据转换为half类型，支持多种舍入模式：",
+        "operations:synchronization": "同步计算",
+        "traits:rounding_mode": "将float类型数据转换为half类型，支持多种舍入模式：",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2half.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_sync_deprecated.md",
+            "excerpt": "**`asc_float2half_sync`、`asc_float2half_rn_sync`、`asc_float2half_rna_sync`、`asc_float2half_rd_sync`、`asc_float2half_ru_sync`、`asc_float2half_rz_sync`和`asc_float2half_ro_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2half.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_sync_deprecated.md",
+            "excerpt": "**`asc_float2half_sync`、`asc_float2half_rn_sync`、`asc_float2half_rna_sync`、`asc_float2half_rd_sync`、`asc_float2half_ru_sync`、`asc_float2half_rz_sync`和`asc_float2half_ro_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2half.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md",
+      "document_sha256": "fad48a217c09a37ac9725ba2024d730ebc988b87176ad84180ba2851706e1402",
+      "description": {
+        "value": "已废弃的矢量转换接口，将float类型转化为hifloat8_t类型并支持多种舍入模式与饱和、非饱和模式，因位宽比为4:1分四部分按索引写入目的寄存器；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md", "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_float2hif8](../reg_compute/reg_convert/asc_float2hif8.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md", "excerpt": "将float类型转化为hifloat8_t类型，并支持多种舍入模式，饱和/非饱和模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型转化为hifloat8_t类型，并支持多种舍入模式，饱和/非饱和模式。",
+        "operations:conversion": "将float类型转化为hifloat8_t类型，并支持多种舍入模式，饱和/非饱和模式。",
+        "traits:rounding_mode": "将float类型转化为hifloat8_t类型，并支持多种舍入模式，饱和/非饱和模式。",
+        "traits:saturation_mode": "将float类型转化为hifloat8_t类型，并支持多种舍入模式，饱和/非饱和模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md",
+            "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_float2hif8](../reg_compute/reg_convert/asc_float2hif8.md)的显式位置参数重载替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "开启饱和模式和非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md",
+            "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_deprecated.md",
+      "document_sha256": "5d8d7898f236ecde74d6373441bee0327d697aff0cc9e05e8e868b3293660085",
+      "description": {
+        "value": "已废弃的矢量转换接口，将float类型数据转化为int16_t类型并支持多种舍入模式与饱和、非饱和模式，因位宽比为2:1按接口后缀写入奇偶索引位置；请改用显式位置参数重载替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_deprecated.md", "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2int16](../reg_compute/reg_convert/asc_float2int16.md)的显式位置参数重载替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_deprecated.md", "excerpt": "将float类型数据转化为int16_t类型，并支持多种舍入模式，饱和/非饱和模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_deprecated.md", "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../reg_compute/reg_convert/rounding_mode.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion"],
+        "traits": ["rounding_mode", "saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转化为int16_t类型，并支持多种舍入模式，饱和/非饱和模式。",
+        "operations:conversion": "将float类型数据转化为int16_t类型，并支持多种舍入模式，饱和/非饱和模式。",
+        "traits:rounding_mode": "将float类型数据转化为int16_t类型，并支持多种舍入模式，饱和/非饱和模式。",
+        "traits:saturation_mode": "将float类型数据转化为int16_t类型，并支持多种舍入模式，饱和/非饱和模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int16.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_deprecated.md",
+            "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_float2int16](../reg_compute/reg_convert/asc_float2int16.md)的显式位置参数重载替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_deprecated.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../reg_compute/reg_convert/rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "开启饱和模式和非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_deprecated.md",
+            "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_sync_deprecated.md",
+      "document_sha256": "59cabba38ec6061f1a19168175ac2f4cc0a4cfe64eb2d4800325c6f352eb74a6",
+      "description": {
+        "value": "已废弃的同步转换接口，将float类型数据转换为int16_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，目的与源起始地址需32字节对齐；请改用非同步接口asc_float2int16配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_sync_deprecated.md", "excerpt": "**`asc_float2int16_rn_sync`、`asc_float2int16_rna_sync`、`asc_float2int16_rd_sync`、`asc_float2int16_ru_sync`和`asc_float2int16_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2int16.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_sync_deprecated.md", "excerpt": "将float类型数据转换为int16_t类型，支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_sync_deprecated.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion", "synchronization"],
+        "traits": ["rounding_mode", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型数据转换为int16_t类型，支持多种舍入模式：",
+        "operations:conversion": "将float类型数据转换为int16_t类型，支持多种舍入模式：",
+        "operations:synchronization": "同步计算",
+        "traits:rounding_mode": "将float类型数据转换为int16_t类型，支持多种舍入模式：",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int16.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_sync_deprecated.md",
+            "excerpt": "**`asc_float2int16_rn_sync`、`asc_float2int16_rna_sync`、`asc_float2int16_rd_sync`、`asc_float2int16_ru_sync`和`asc_float2int16_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2int16.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_sync_deprecated.md",
+            "excerpt": "**`asc_float2int16_rn_sync`、`asc_float2int16_rna_sync`、`asc_float2int16_rd_sync`、`asc_float2int16_ru_sync`和`asc_float2int16_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2int16.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int16_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int32_sync_deprecated.md",
+      "document_sha256": "0336e985231e0376fe119f38a2b100c9ce7b8d09523b35d6af2c3562e95637f1",
+      "description": {
+        "value": "已废弃的同步转换接口，将float类型转化为int32_t类型，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，目的与源起始地址需32字节对齐；请改用非同步接口asc_float2int32配合同步接口asc_sync替代。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int32_sync_deprecated.md", "excerpt": "**`asc_float2int32_rn_sync`、`asc_float2int32_rna_sync`、`asc_float2int32_rd_sync`、`asc_float2int32_ru_sync`和`asc_float2int32_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2int32.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int32_sync_deprecated.md", "excerpt": "将float类型转化为int32_t类型，并支持多种舍入模式："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int32_sync_deprecated.md", "excerpt": "dst、src的起始地址需要32字节对齐。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["conversion", "synchronization"],
+        "traits": ["rounding_mode", "aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:compute": "将float类型转化为int32_t类型，并支持多种舍入模式：",
+        "operations:conversion": "将float类型转化为int32_t类型，并支持多种舍入模式：",
+        "operations:synchronization": "同步计算",
+        "traits:rounding_mode": "将float类型转化为int32_t类型，并支持多种舍入模式：",
+        "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2int32.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int32_sync_deprecated.md",
+            "excerpt": "**`asc_float2int32_rn_sync`、`asc_float2int32_rna_sync`、`asc_float2int32_rd_sync`、`asc_float2int32_ru_sync`和`asc_float2int32_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2int32.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int32_sync_deprecated.md",
+            "excerpt": "**`asc_float2int32_rn_sync`、`asc_float2int32_rna_sync`、`asc_float2int32_rd_sync`、`asc_float2int32_ru_sync`和`asc_float2int32_rz_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_float2int32.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int32_sync_deprecated.md",
+            "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+          }
+        }
+      ]
+    }
+  ]
+}

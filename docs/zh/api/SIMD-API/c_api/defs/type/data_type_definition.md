@@ -1,25 +1,10 @@
 ---
 okftype: reference.type
-title: Reg数据类型定义
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-description: 总览 Reg 数据类型，说明矢量数据、掩码、非对齐和地址寄存器的类别、容量限制及使用方式。
+description: "定义C API的Reg数据类型，说明矢量数据寄存器、掩码寄存器、非对齐寄存器与地址寄存器四类的容量、位宽类别与使用方式，包括各寄存器数量上限、生命周期限定于单个Vector Function内，以及非对齐数据搬入搬出与地址偏移计算的调用流程。"
 tag:
-  - api_surfaces: [c_api]
-  - roles: [query]
-  - objects: [mask, vector]
-type_catalog:
-  groups:
-    - name: b8
-      types: [vector_int8_t, vector_uint8_t, vector_int4x2_t, vector_fp4x2_e2m1_t,
-        vector_fp4x2_e1m2_t, vector_hifloat8_t, vector_fp8_e4m3fn_t, vector_fp8_e5m2_t,
-        vector_fp8_e8m0_t]
-    - name: b16
-      types: [vector_int16_t, vector_uint16_t, vector_half, vector_bfloat16_t]
-    - name: b32
-      types: [vector_int32_t, vector_uint32_t, vector_float]
-    - name: b64
-      types: [vector_int64_t, vector_uint64_t]
-timestamp: '2026-09-28'
+  - roles: [configuration]
+dependencies: []
+version: 9.0.0-
 ---
 # Reg数据类型定义
 

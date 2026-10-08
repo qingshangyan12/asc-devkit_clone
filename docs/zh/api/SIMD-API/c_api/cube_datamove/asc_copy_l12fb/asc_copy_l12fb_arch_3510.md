@@ -1,29 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_l12fb
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md
-description: 将L1 Buffer中的随路Vector量化与随路ReLU参数搬运到Fixpipe Buffer，供后续Fixpipe流水使用，通过dst地址高4位区分量化参数和ReLU参数的独立地址空间，仅在AIC上执行有效。
+description: "将L1 Buffer中的随路Vector量化与随路ReLU参数搬运到Fixpipe Buffer供后续Fixpipe流水使用，两类参数拥有独立地址空间并通过dst地址高4位区分，支持高维切分与前n个数据两种搬运形式，仅在AIC上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [l1_buffer]
-  - destination_locations: [fixpipe_buffer]
-  - traits: [high_dimensional, quantization]
-signature:
-  - override_id: asc_copy_l12fb__PFBv_PL1v_u16_u16_u16_u16@3510
-  - override_id: asc_copy_l12fb__PFBv_PL1v_u32@3510
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer, high_dimensional, quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-
 ---
 # asc_copy_l12fb
 

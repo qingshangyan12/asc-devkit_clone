@@ -1,35 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mul_scalar
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md
-description: 根据mask对源矢量数据寄存器按元素与标量value相乘，结果写入目的矢量数据寄存器或通过函数返回值返回，掩码位为0的元素在结果中置0。
+description: "根据掩码将源矢量数据寄存器按元素与标量value相乘，结果写入目的矢量数据寄存器或经函数返回值返回，掩码位为0的元素不参与计算且结果置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [multiply]
-  - objects: [scalar, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, scalar_operand]
-signature:
-  - prototype_id: asc_mul_scalar__v<dtype>_<dtype>_vb
-    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
-  - prototype_id: asc_mul_scalar__Rv<dtype>_v<dtype>_<dtype>_vb
-    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
-dependencies: []
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls
-    file: muls.asc
-    archs: ['3510']
-    override_id: asc_mul_scalar__Rvf32_vf32_f32_vb
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
-    file: elu.asc
-    archs: ['3510']
-    override_id: asc_mul_scalar__Rvf32_vf32_f32_vb
-timestamp: '2026-09-28'
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_mul_scalar
 

@@ -1,21 +1,16 @@
 ---
 okftype: reference.api
-title: asc_bfloat162e1m2x2
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e1m2x2.md
-description: 根据mask将src中参与计算的bfloat16_t元素转换为fp4x2_e1m2_t类型并写入dst，因源与目的类型位宽比为4:1，由dst_quarter_pos参数每隔4个元素离散选取写入位置，其余位置置零。
+description: "在掩码控制下将源矢量数据寄存器中的bfloat16_t元素转换为fp4x2_e1m2_t类型，因源与目的位宽比为4:1，由位置选择标签每隔4个元素离散选取目的写入位置，其余位置置零；转换涉及舍入与饱和模式，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [elementwise, masked, rounding_mode, saturation_mode]
-signature:
-  - archs: ['3510']
-    headers: []
-    override_id: asc_bfloat162e1m2x2___Rvf4e1m2x2_vbf16_vb_icposquarter
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_bfloat162e1m2x2
 

@@ -1,30 +1,13 @@
 ---
 okftype: reference.api
-title: asc_pack_to_low
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md
-description: 将源操作数中元素的低8位或低16位压缩写入目的操作数的低半部分，源为掩码寄存器时每2bit取低位bit压缩存储，结果写入dst或通过函数返回值返回，仅在AIV上生效。
+description: "将源操作数元素的低位数据压缩写入目的操作数的低半部分，b16源取低8位、b32源取低16位，源为掩码寄存器时每2bit取低位bit压缩存储，结果写入dst或通过函数返回值返回，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [compression]
-  - objects: [mask, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-signature:
-  - prototype_id: asc_pack_to_low__Rv<dtype_dst>_v<dtype_src>
-  - prototype_id: asc_pack_to_low__v<dtype_src>
-  - override_id: asc_pack_to_low__Rvb_vb
-  - override_id: asc_pack_to_low__vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
-dependencies: []
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout
-    file: data_relayout.asc
-    archs: ['3510']
-    override_id: asc_pack_to_low__Rvu16_vu32
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.2.0-
 ---
 # asc_pack_to_low
 

@@ -1,26 +1,14 @@
 ---
 okftype: reference.api
-title: asc_atomic_exch
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md
-description: 对Global Memory中address指向的单个元素执行原子交换操作，读取旧值并将val写回该地址以替换旧值，接口返回旧值，整个读取和写回过程为原子操作。
+description: "对Global Memory中address指向的单个元素执行原子交换操作，读取该元素的旧值，将输入标量值写回该地址以替换旧值并返回修改前的旧值，整个读取和写回过程为原子操作。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [store]
-  - execution_models: [scalar]
-  - destination_locations: [global_memory]
   - traits: [atomic]
-signature:
-  - prototype_id: asc_atomic_exch__PG<dtype>_<dtype>
-    dtype: [int32_t, uint32_t, float, int64_t, uint64_t]
-archs: ['3510']
-header: [/include/c_api/atomic/scalar_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
     kind: requires
-    condition: Scalar原子操作会绕过DCache
-examples: []
-timestamp: '2026-09-28'
+version: 9.1.0-
 ---
 # asc_atomic_exch
 

@@ -1,34 +1,14 @@
 ---
 okftype: reference.api
-title: asc_scatter（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_scatter_deprecated.md
-description: 已废弃的数据分散接口，根据索引值index将源操作数src中的元素分散到目的操作数dst中，index中的值必须唯一，请使用asc_scatter接口实现此功能。
+description: "已废弃的数据分散接口，根据索引值index将矢量数据寄存器中的源元素分散写入目的操作数，index值必须唯一且dst首地址必须32B对齐；请改用asc_scatter接口实现此功能。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [scatter]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, masked]
-signature:
-  - override_id: asc_scatter__Rvi8_PUi8_vu16_vb
-  - override_id: asc_scatter__Rvu8_PUu8_vu16_vb
-  - override_id: asc_scatter__Rvi16_PUi16_vu16_vb
-  - override_id: asc_scatter__Rvu16_PUu16_vu16_vb
-  - override_id: asc_scatter__Rvi32_PUi32_vu32_vb
-  - override_id: asc_scatter__Rvu32_PUu32_vu32_vb
-  - override_id: asc_scatter__Rvbf16_PUbf16_vu16_vb
-  - override_id: asc_scatter__Rvf16_PUf16_vu16_vb
-  - override_id: asc_scatter__Rvf32_PUf32_vu32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.1.0
 ---
 # asc_scatter（废弃）
 

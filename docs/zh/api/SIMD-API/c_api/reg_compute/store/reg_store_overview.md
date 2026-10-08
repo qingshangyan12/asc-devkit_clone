@@ -1,25 +1,6 @@
 ---
-okftype: reference.index
-title: Reg数据搬出概述
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/reg_store_overview.md
-description: 介绍Reg数据搬出接口的分类与选择：将矢量数据寄存器、掩码寄存器或非对齐寄存器中的数据写入Unified Buffer（UB），按对齐与非对齐汇总各接口模式与目的地址对齐要求，并对比手动偏移、立即数偏移、地址寄存器偏移与Post
-  Update四种目的地址维护方式。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement]
-  - operations: [store]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍Reg数据搬出接口的分类与选择：将矢量数据寄存器、掩码寄存器或非对齐寄存器中的数据写入Unified Buffer（UB），按对齐与非对齐汇总各接口模式与目的地址对齐要求，并对比手动偏移、立即数偏移、地址寄存器偏移与Post Update四种目的地址维护方式。"
 ---
 # Reg数据搬出概述
 

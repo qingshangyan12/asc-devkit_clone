@@ -1,0 +1,15 @@
+{
+  "classified": 698,
+  "documents": 698,
+  "okftype_counts": {
+    "reference.api": 575,
+    "reference.concept": 39,
+    "reference.constant": 2,
+    "reference.enum": 14,
+    "reference.index": 60,
+    "reference.macro": 2,
+    "reference.type": 1,
+    "reference.union": 5
+  },
+  "unclassified": []
+}

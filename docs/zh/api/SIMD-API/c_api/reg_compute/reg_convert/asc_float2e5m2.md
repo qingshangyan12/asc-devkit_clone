@@ -1,25 +1,19 @@
 ---
 okftype: reference.api
-title: asc_float2e5m2
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md
-description: 根据mask将矢量数据寄存器中参与计算的float元素转换为fp8_e5m2_t类型并写入dst，涉及舍入模式和饱和/非饱和模式，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引写入一组，其他位置置零。
+description: "根据掩码将矢量数据寄存器中参与计算的float元素转换为fp8_e5m2_t类型，涉及舍入与饱和/非饱和模式，源与目的位宽比为4:1，通过dst_quarter_pos每隔4个索引离散选取目的写入位置，其他位置置零，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [masked, rounding_mode, saturation_mode]
-signature:
-  - archs: ['3510']
-    headers: []
-    override_id: asc_float2e5m2_rn__Rvf8e5m2_vf32_vb_icposquarter
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
-examples: []
-timestamp: '2026-09-23'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_float2e5m2
 

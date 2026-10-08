@@ -1,9 +1,6 @@
 ---
-okftype: reference.index
-title: 随路量化与随路ReLU场景组合
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md
-navigation: []
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍矩阵搬出中随路量化与随路ReLU的组合方式，按产品给出不激活与Normal ReLU组合下Scalar及Vector量化的参数取值规则，M1为原始数据非负时使用的随路系数，M2为原始数据为负数时使用的随路系数。"
 ---
 # 随路量化与随路ReLU场景组合
 

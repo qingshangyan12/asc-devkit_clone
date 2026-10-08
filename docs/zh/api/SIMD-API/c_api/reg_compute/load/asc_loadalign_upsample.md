@@ -1,49 +1,23 @@
 ---
 okftype: reference.api
-title: asc_loadalign_upsample
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md
-description: 从Unified Buffer（UB）满足对齐要求的起始地址读取连续数据并进行2倍上采样，写入矢量数据寄存器时每个源元素重复两次，写入掩码寄存器时每个bit重复两次，提供对齐、立即数偏移、地址寄存器偏移三种搬入模式。
+description: "从Unified Buffer中满足对齐要求的起始地址读取连续数据并进行2倍上采样，写入矢量数据寄存器时每个源元素重复两次，写入掩码寄存器时每个bit重复两次，提供对齐、立即数偏移和地址寄存器偏移三种模式，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [load]
-  - execution_models: [register_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [vector_register]
-signature:
-  - prototype_id: asc_loadalign_upsample__PU<dtype>
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t]
-  - prototype_id: asc_loadalign_upsample__Rv<dtype>_PU<dtype>
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t]
-  - override_id: asc_loadalign_upsample__Rvb_PUu32
-  - prototype_id: asc_loadalign_upsample__Rv<dtype>_PU<dtype>_i32
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t]
-  - override_id: asc_loadalign_upsample__Rvb_PUu32_i32
-  - prototype_id: asc_loadalign_upsample__Rv<dtype>_PU<dtype>_ar
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t]
-  - override_id: asc_loadalign_upsample__Rvb_PUu32_ar
-archs: ['3510']
-header: [/include/c_api/reg_compute/load/loadalign.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md
     kind: related
-    condition: 对齐搬入模式中，通过函数返回值返回掩码寄存器时
+    condition: "对齐搬入模式中，通过函数返回值返回掩码寄存器时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
-    condition: 地址寄存器偏移搬入模式
+    condition: "地址寄存器偏移搬入模式"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
-    file: reg_load_store_align.asc
-    archs: ['3510']
-    override_id: asc_loadalign_upsample__Rvf16_PUf16
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_loadalign_upsample
 

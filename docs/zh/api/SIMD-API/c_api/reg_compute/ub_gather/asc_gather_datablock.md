@@ -1,34 +1,14 @@
 ---
 okftype: reference.api
-title: asc_gather_datablock
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md
-description: 给定源操作数在Unified Buffer（UB）中的基地址和索引，按DataBlock（32字节）粒度将数据收集到目的矢量数据寄存器，index仅前8个元素有效且每个元素对应一个DataBlock，支持掩码控制与非掩码两种形式，仅在AIV上生效。
+description: "给定源操作数在Unified Buffer（UB）中的基地址和索引，按DataBlock（32字节）粒度将数据收集到目的矢量数据寄存器，index仅前8个元素有效且每个元素对应一个DataBlock，支持掩码控制与非掩码两种形式，源起始地址需32字节对齐，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [gather, load]
-  - execution_models: [register_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [vector_register]
-  - traits: [masked]
-signature:
-  - prototype_id: asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32_vb
-  - prototype_id: asc_gather_datablock__PU<src_dtype>_vu32_vb
-  - prototype_id: asc_gather_datablock__Rv<dst_dtype>_PU<src_dtype>_vu32
-  - prototype_id: asc_gather_datablock__PU<src_dtype>_vu32
-archs: ['3510']
-header: [/include/c_api/reg_compute/gather/ub_gather.h]
+  - traits: [aligned_transfer, datablock_granularity]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather
-    file: reg_load_gather.asc
-    archs: ['3510']
-    override_id: asc_gather_datablock__Rvf16_PUf16_vu32_vb
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_gather_datablock
 

@@ -1,32 +1,18 @@
 ---
 okftype: reference.api
-title: asc_add_relu_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_add_relu_sync_deprecated.md
-description: 按元素对两个源矢量求和后再进行Relu计算，取结果与0的较大值，并支持转换最终结果的数据类型；接口已废弃，请使用非同步接口asc_add_relu和同步接口asc_sync替代。
+description: "按元素对两个源矢量求和后取结果与0的较大值完成Relu计算，并支持转换最终结果的数据类型；接口已废弃，请改用非同步接口asc_add_relu配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [add, conversion, relu]
-  - execution_models: [memory_vector]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_add_relu_sync__PUf16_PUf16_PUf16_u32
-  - override_id: asc_add_relu_sync__PUf32_PUf32_PUf32_u32
-  - override_id: asc_add_relu_sync__PUi16_PUi16_PUi16_u32
-  - override_id: asc_add_relu_sync__PUi8_PUi16_PUi16_u32
-  - override_id: asc_add_relu_sync__PUf16_PUf32_PUf32_u32
-  - override_id: asc_add_relu_sync__PUi8_PUf16_PUf16_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [add, conversion, relu, synchronization]
+  - traits: [aligned_transfer, elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_add_relu_sync（废弃）
 

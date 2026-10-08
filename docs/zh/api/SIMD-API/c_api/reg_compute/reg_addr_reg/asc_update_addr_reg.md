@@ -1,37 +1,15 @@
 ---
 okftype: reference.api
-title: asc_update_addr_reg
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-description: 更新地址寄存器addr_reg用于迭代寻址，支持1~4维偏移量设置和b8、b16、b32三种位宽模式，按各维循环迭代变量与步长计算地址偏移，配合Reg搬运接口在循环中按设定偏移自动递增UB地址。
+description: "更新地址寄存器用于迭代寻址，支持1~4维偏移量设置与b8、b16、b32三种位宽模式，按各维循环迭代变量与步长计算地址偏移，配合Reg搬运接口在循环中按设定偏移自动递增UB地址，地址寄存器须在最内层循环体内赋值使用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-signature:
-  - override_id: asc_update_addr_reg_b8__u32
-  - override_id: asc_update_addr_reg_b16__u32
-  - override_id: asc_update_addr_reg_b32__u32
-  - override_id: asc_update_addr_reg_b8__u32_u32
-  - override_id: asc_update_addr_reg_b16__u32_u32
-  - override_id: asc_update_addr_reg_b32__u32_u32
-  - override_id: asc_update_addr_reg_b8__u32_u32_u32
-  - override_id: asc_update_addr_reg_b16__u32_u32_u32
-  - override_id: asc_update_addr_reg_b32__u32_u32_u32
-  - override_id: asc_update_addr_reg_b8__u32_u32_u32_u32
-  - override_id: asc_update_addr_reg_b16__u32_u32_u32_u32
-  - override_id: asc_update_addr_reg_b32__u32_u32_u32_u32
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
+  - traits: [high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md
     kind: configures
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md
     kind: configures
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
-    file: reg_load_store_align.asc
-    archs: ['3510']
-    override_id: asc_update_addr_reg_b16__u32
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_update_addr_reg
 

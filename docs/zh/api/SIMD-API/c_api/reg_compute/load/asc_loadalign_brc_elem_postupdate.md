@@ -1,29 +1,17 @@
 ---
 okftype: reference.api
-title: asc_loadalign_brc_elem_postupdate
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md
-description: 从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素并广播到整个矢量数据寄存器，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。
+description: "从Unified Buffer中按dtype对齐的起始地址读取一个元素并广播到整个矢量数据寄存器，Post Update模式下搬运完成后按指定步长自动更新源地址指针，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [broadcast, load]
-  - execution_models: [register_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [vector_register]
   - traits: [post_update]
-signature:
-  - prototype_id: asc_loadalign_brc_elem_postupdate__Rv<dtype>_RPU<dtype>_i32
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/load/loadalign.h]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_loadalign_brc_elem_postupdate
 

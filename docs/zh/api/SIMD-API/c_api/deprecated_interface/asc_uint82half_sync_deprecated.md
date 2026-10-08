@@ -1,25 +1,18 @@
 ---
 okftype: reference.api
-title: asc_uint82half_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md
-description: 该接口已废弃，将uint8_t类型数据转换为half类型的同步计算接口，按指定元素个数对矢量数据进行转换，请使用对应的非同步接口和同步接口asc_sync替代。
+description: "已废弃的同步转换接口，按指定元素个数将uint8_t类型数据转换为half类型，目的与源起始地址需32字节对齐；请改用非同步接口asc_uint82half配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [conversion]
-  - execution_models: [memory_vector]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_uint82half_sync__PUf16_PUu8_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [conversion, synchronization]
+  - traits: [aligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_uint82half_sync（废弃）
 

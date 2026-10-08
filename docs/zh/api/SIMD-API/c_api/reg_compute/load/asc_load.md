@@ -1,44 +1,22 @@
 ---
 okftype: reference.api
-title: asc_load
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md
-description: 从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据并写入矢量数据寄存器，搬运过程中数据格式和内容保持不变；连续搬入需在每次调用前手动更新源地址，对性能有要求时可改用asc_loadunalign，仅在AIV上生效。
+description: "从Unified Buffer按dtype对齐的起始地址读取VL长度数据写入矢量数据寄存器，搬运中数据格式和内容保持不变；连续搬入需每次调用前手动更新源地址，对性能有要求时可改用asc_loadunalign，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [load]
-  - execution_models: [register_vector]
-  - source_locations: [unified_buffer]
-  - destination_locations: [vector_register]
-signature:
-  - prototype_id: asc_load__PU<dtype>
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_load__Rv<dtype>_PU<dtype>
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float, int64_t]
-archs: ['3510']
-header: [/include/c_api/composite/loadunalign_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
     kind: related
+    condition: "对性能有要求时"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md
     kind: related
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    condition: "对性能有要求时"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples:
-  - path: /examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
-    file: c_api_add.asc
-    archs: ['3510']
-    override_id: asc_load__Rvf32_PUf32
-  - path: /examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode
-    file: set_l2_cache_mode.h
-    archs: ['3510', '2201']
-    override_id: asc_load__Rvf16_PUf16
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_load
 

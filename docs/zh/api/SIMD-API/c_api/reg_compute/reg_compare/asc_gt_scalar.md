@@ -1,33 +1,14 @@
 ---
 okftype: reference.api
-title: asc_gt_scalar
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_gt_scalar.md
-description: 根据mask将源矢量数据寄存器按元素与标量value进行大于比较，若src大于value则对应结果位为1，否则为0，每个元素的比较结果占一个比特，仅在AIV上生效。
+description: "在掩码控制下将源矢量数据寄存器按元素与标量value进行大于比较，结果为真时对应结果位为1否则为0，每个元素的比较结果占一个比特；浮点比较涉及nan时结果为0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
-  - objects: [scalar, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, scalar_operand]
-signature:
-  - prototype_id: asc_gt_scalar__v<dtype>_<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_gt_scalar__Rvb_v<dtype>_<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_compare.h]
-dependencies: []
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare
-    file: compare.asc
-    archs: ['3510']
-    override_id: asc_gt_scalar__Rvb_vf32_f32_vb
-timestamp: '2026-09-28'
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_gt_scalar
 

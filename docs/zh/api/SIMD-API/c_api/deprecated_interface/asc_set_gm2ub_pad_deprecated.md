@@ -1,22 +1,13 @@
 ---
 okftype: reference.api
-title: asc_set_gm2ub_pad（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_gm2ub_pad_deprecated.md
-description: 已废弃的搬运配置接口，在数据从GM非对齐搬运到Unified Buffer（UB）时设置连续搬运数据块左右两侧需要填补的数据值，请使用asc_set_copy_pad_val进行设置。
+description: "已废弃的搬运配置接口，在数据从GM非对齐搬运到UB时设置连续搬运数据块左右两侧需要填补的数据值；请改用asc_set_copy_pad_val进行设置。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - traits: [deprecated, padding]
-signature:
-  - override_id: asc_set_gm2ub_pad__u32
-archs: ['3510']
-header: [/include/c_api/vector_datamove/vector_datamove.h]
+  - traits: [padding, unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.1.0
 ---
 # asc_set_gm2ub_pad（废弃）
 

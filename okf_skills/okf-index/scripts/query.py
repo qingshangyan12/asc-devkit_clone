@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 SCRIPTS = Path(__file__).resolve().parent
@@ -33,7 +33,12 @@ def csv(value: str | None) -> list[str]:
 def resolve_api(index: dict[str, Any], name: str) -> str:
     view = index["views"]["by_api"]
     if name in view:
-        return view[name][0]
+        candidates = view[name]
+        # 家族 canonical 页（<family>/<family>.md）优先于废弃/变体成员作 owner
+        for path in candidates:
+            if PurePosixPath(path).stem == name and PurePosixPath(path).parent.name == name:
+                return path
+        return candidates[0]
     for path in index["documents"]:
         if Path(path).stem == name or Path(path).name == f"{name}.md":
             return path
@@ -175,11 +180,16 @@ def param_query(index: dict[str, Any], token: str) -> list[dict[str, Any]]:
     """参数名或枚举类型反查：--param round_mode / --param asc_cast_round_mode。"""
     results = []
     for path, doc in sorted(index["documents"].items()):
-        hits = [p for p in doc.get("params", []) if p["name"] == token or p["type"] == token]
+        hits = [
+            p
+            for sig in doc.get("signatures", [])
+            for p in sig.get("params", [])
+            if p.get("name") == token or p.get("type") == token
+        ]
         if hits:
             param = hits[0]
-            reasons = [f"param:{param['name']}"]
-            if param["type"].startswith("asc_"):
+            reasons = [f"param:{param.get('name', '')}"]
+            if str(param.get("type", "")).startswith("asc_"):
                 reasons.append(f"type:{param['type']}")
             results.append({"path": path, "why": reasons})
     if not results and token in index.get("defs", {}).get("enums", {}):

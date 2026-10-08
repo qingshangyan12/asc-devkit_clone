@@ -8,8 +8,7 @@ description: 把 slim OKF 头（5字段）+ include Doxygen + examples marker �
 本 Skill 把已打标文档构建为持久索引，支撑 `okf-retrieve` 的算子需求检索。索引是三类头的
 **纯派生数据**：文档 slim 头（语义）+ include Doxygen/声明（结构）+ examples marker（关联），
 推导规则以 [`../字段与推导规范.md`](../字段与推导规范.md) 第 3 节为唯一契约。
-当前实例为 c_api 试点范围（vector_compute + vector_datamove，140 篇；全量轮次在
-`SCOPES` 注册表放开 categories）。
+当前实例为 c_api 全量（838 篇 slim 头，SCOPES categories=None；592 篇过 A5 门控）。
 
 ## 资产结构
 
@@ -101,4 +100,4 @@ scope 文档数 + 词表/映射/gaps 哈希，毫秒级），`--strict` 走全�
 - gaps.json 人工按证据增补（hint/evidence 必须是真实仓库路径），构建只做存在性校验；
   `--out` 构建的实例目录会落盘 gaps.json 快照供 query 直接加载。
 - 词表合法性以 `config/tag-taxonomy.json`（共享配置，okf-tag-research 冻结产出）校验；
-  全量轮次接入新范围时在 `SCOPES` 登记、放开 categories 并扩充 dryrun 清单。
+  接入新范围时在 `SCOPES` 登记并扩充 dryrun 清单（c_api 全量已放开 categories=None）。

@@ -1,28 +1,18 @@
 ---
 okftype: reference.api
-title: asc_leakyrelu_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_leakyrelu_sync_deprecated.md
-description: 已废弃的同步矢量Leaky ReLU运算接口：源矢量元素大于0时保持原值、小于等于0时乘以系数alpha，结果写入目的矢量，请使用非同步接口asc_leakyrelu并配合同步接口asc_sync替代。
+description: "已废弃的同步Leaky ReLU运算接口，源矢量元素大于0时保持原值、小于等于0时乘以系数alpha，结果写入目的矢量，目的与源起始地址需32字节对齐；请改用非同步接口asc_leakyrelu配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [leaky_relu]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, scalar_operand]
-signature:
-  - override_id: asc_leakyrelu_sync__PUf16_PUf16_f16_u32
-  - override_id: asc_leakyrelu_sync__PUf32_PUf32_f32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [leaky_relu, synchronization]
+  - traits: [aligned_transfer, scalar_operand]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_leakyrelu_sync（废弃）
 

@@ -1,28 +1,11 @@
 ---
 okftype: reference.api
-title: asc_load_dev
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md
-description: 不经过DCache直接从GM地址读取整型数据并返回，可在多核操作GM且数据无法对齐到Cache Line时避免Cache Line粒度的数据覆盖。
+description: "不经过DCache直接从GM地址读取整型数据并返回，仅支持整型、不支持浮点类型，多核操作GM且数据无法对齐到Cache Line时可绕过DCache读取，避免Cache Line粒度的数据覆盖。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [load]
-  - execution_models: [scalar]
-  - source_locations: [global_memory]
-signature:
-  - override_id: asc_load_dev__PGi8
-  - override_id: asc_load_dev__PGu8
-  - override_id: asc_load_dev__PGi16
-  - override_id: asc_load_dev__PGu16
-  - override_id: asc_load_dev__PGi32
-  - override_id: asc_load_dev__PGu32
-  - override_id: asc_load_dev__PGi64
-  - override_id: asc_load_dev__PGu64
-archs: ['3510']
-header: [/include/c_api/scalar_compute/scalar_load.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.2.0-
 ---
 # asc_load_dev
 

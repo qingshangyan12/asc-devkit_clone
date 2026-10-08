@@ -1,57 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0b_trans
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md
-description: 将数据从L1 Buffer搬运到L0B Buffer，以512字节的数据分形为单位在搬运过程中完成二维分形矩阵转置，按分形索引、重复次数和源、目的间隔等参数组织搬运。
+description: "将数据从L1 Buffer搬运到L0B Buffer，以512字节数据分形为单位在搬运过程中完成二维分形矩阵转置，源地址需32字节对齐、目的地址需512字节对齐，仅在AIC上执行有效，目的地址重叠时须插入同步指令。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, transpose]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0b_buffer]
-signature:
-  - prototype_id: asc_copy_l12l0b_trans__PCB<dtype>_PL1<dtype>_u16_u8_u16_u16_u16_u16
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e5m2_t,
-      fp8_e4m3fn_t, half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠，需要插入同步指令
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠，需要插入同步指令
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm
-    file: data_copy_l0c2gm.asc
-    archs: ['3510']
-    override_id: asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm
-    file: data_copy_l0c2gm.asc
-    archs: ['3510']
-    override_id: asc_copy_l12l0b_trans__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1
-    file: data_copy_l0c2l1.asc
-    archs: ['3510']
-    override_id: asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1
-    file: data_copy_l0c2l1.asc
-    archs: ['3510']
-    override_id: asc_copy_l12l0b_trans__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub
-    file: data_copy_l0c2ub.asc
-    archs: ['3510']
-    override_id: asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub
-    file: data_copy_l0c2ub.asc
-    archs: ['3510']
-    override_id: asc_copy_l12l0b_trans__PCBf16_PL1f16_u16_u8_u16_u16_u16_u16
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
-    file: mmad_s1.h
-    archs: ['3510']
-    override_id: asc_copy_l12l0b_trans__PCBi8_PL1i8_u16_u8_u16_u16_u16_u16
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-
 ---
 # asc_copy_l12l0b_trans
 

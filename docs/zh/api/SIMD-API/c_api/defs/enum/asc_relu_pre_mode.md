@@ -1,16 +1,10 @@
 ---
-okftype: reference.type
-title: asc_relu_pre_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md
-description: 该枚举表示L0C Buffer数据搬出时的随路ReLU模式，并作为矩阵搬出接口relu_pre_mode参数的类型。
+okftype: reference.enum
+description: "表示L0C Buffer数据搬出时的随路ReLU模式，作为矩阵搬出接口relu_pre_mode参数的类型，支持不执行、普通ReLU及使用Scalar或Vector参数执行随路ReLU。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-declaration:
-  symbol: asc_relu_pre_mode
-  underlying_type: uint8_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies: []
+version: 9.0.0-
 ---
 # asc_relu_pre_mode
 

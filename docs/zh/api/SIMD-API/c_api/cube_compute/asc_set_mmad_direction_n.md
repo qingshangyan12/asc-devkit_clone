@@ -1,33 +1,17 @@
 ---
 okftype: reference.api
-title: asc_set_mmad_direction_n
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
-description: 设置矩阵乘加计算时逐行生成矩阵计算结果分形，该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，需在矩阵乘加指令执行前调用。
+description: "设置矩阵乘加计算时逐行生成结果分形的方向配置，仅改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，须在矩阵乘加指令执行前调用，配置写入后持续生效直至重新配置。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [matrix_compute]
-  - destination_locations: [l0c_buffer]
-signature:
-  - override_id: asc_set_mmad_direction_n__z
-archs: ['2201', '3510']
-header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
-    condition: 本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)、[asc_mmad_mx](asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md
     kind: configures
-    condition: 本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)、[asc_mmad_mx](asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md
     kind: related
-    condition: 如需切换为逐列生成矩阵计算结果分形，请重新调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)接口。
-examples:
-  - path: /examples/02_simd_c_api/02_features/02_matrix_compute/01_mmad_direction
-    file: mmad_direction.asc
-    archs: ['3510']
-    override_id: asc_set_mmad_direction_n__z
-timestamp: '2026-09-28'
+    condition: "如需切换为逐列生成矩阵计算结果分形时"
+version: 9.1.0-
 ---
 # asc_set_mmad_direction_n
 

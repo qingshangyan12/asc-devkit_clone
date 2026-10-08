@@ -1,0 +1,758 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+      "document_sha256": "00620dbbce114090155b9faba75ee3e66a176c64af5151fbdb168be4912e4970",
+      "description": {
+        "value": "完成带量化系数的矩阵乘加计算，左矩阵A与右矩阵B分别带有量化系数矩阵，K维度每连续32个元素共享一个量化系数，经广播乘法后做矩阵乘法并累加到结果矩阵C；Scale矩阵须预先搬入L0A_MX与L0B_MX Buffer，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md", "excerpt": "本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md", "excerpt": "矩阵A、B沿K维度每连续32个元素共享对应量化系数矩阵ScaleA、ScaleB中的一个量化系数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md", "excerpt": "调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["matrix_multiply_accumulate"]
+      },
+      "tag_evidence": {
+        "roles:compute": "本接口用于完成带有量化系数的矩阵乘加计算（MmadMx），即左矩阵A和右矩阵B均有对应的量化系数矩阵，左量化系数矩阵ScaleA和右量化系数矩阵ScaleB。",
+        "operations:matrix_multiply_accumulate": "本接口用于完成带有量化系数的矩阵乘加计算（MmadMx）"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "调用本接口前，需通过[asc_copy_l12l0a_mx](../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../cube_datamove/asc_copy_l12l0b_mx.md)等接口，将ScaleA和ScaleB矩阵分别搬入L0A_MX Buffer和L0B_MX Buffer。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md",
+          "kind": "requires",
+          "condition": "显式传入Bias起始地址时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "Bias支持的数据类型为`float`，调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址，Bias占用长度为`n * sizeof(float)`向上补齐到64字节。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md",
+          "kind": "requires",
+          "condition": "开启UnitFlag且矩阵搬出开启Nz2ND随路格式转换，或开启B8/B4量化触发Channel Merge时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致。矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md",
+          "kind": "requires",
+          "condition": "开启UnitFlag时除Nz2ND随路格式转换与Channel Merge场景外的其他场景",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致。矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "kind": "requires",
+          "condition": "沿K轴分块计算并累加到同一块L0C Buffer且(m / 16) * (n / 16) < 10时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(m / 16) * (n / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/intra_core_sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md",
+          "kind": "related",
+          "condition": "需要清除UnitFlag产生的残留状态时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "需要清除UnitFlag产生的残留状态时，可调用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)，并将`enable_unit_flag`设置为true，将L0C Buffer中所有内存块的单元标志位设置为0并关闭UnitFlag。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "related",
+          "condition": "浮点类型的输入或输出包含inf/nan时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\\[48\\]比特位控制计算时的模式："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+            "excerpt": "操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md",
+      "document_sha256": "3e09ba0e1f67613bd1ba8ac242ec2a0ed5354769d5bce1beddd4656b1df3c625",
+      "description": {
+        "value": "完成4选2稀疏矩阵乘加操作，左矩阵A为稀疏矩阵并在计算时完成稠密化，右矩阵B为稠密矩阵且须在输入数据准备阶段预先稠密化，并通过asc_copy_l12l0b_sparse载入，同时加载的索引矩阵用于矩阵A的稠密化。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md", "excerpt": "完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md", "excerpt": "稠密矩阵B需要通过[asc_copy_l12l0b_sparse](../cube_datamove/asc_copy_l12l0b_sparse.md)载入，同时加载索引矩阵，索引矩阵在矩阵B稠密化的过程中生成，再用于矩阵A的稠密化。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md", "excerpt": "原始稀疏矩阵B每4个元素中应保证最多2个非零元素，如果存在3个或更多非零元素，则仅使用前2个非零元素。"}
+        ]
+      },
+      "tag": {
+        "roles": ["compute"],
+        "operations": ["matrix_multiply_accumulate"],
+        "traits": ["sparse_input"]
+      },
+      "tag_evidence": {
+        "roles:compute": "完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。",
+        "operations:matrix_multiply_accumulate": "完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。",
+        "traits:sparse_input": "完成矩阵乘加操作，传入的左矩阵A为稀疏矩阵，右矩阵B为稠密矩阵。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md",
+            "excerpt": "稠密矩阵B需要通过[asc_copy_l12l0b_sparse](../cube_datamove/asc_copy_l12l0b_sparse.md)载入，同时加载索引矩阵，索引矩阵在矩阵B稠密化的过程中生成，再用于矩阵A的稠密化。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md",
+      "document_sha256": "fc1a187b1091cf61ba9e59bfe587069796e76536934a8a1426c5020ab7773a65",
+      "description": {
+        "value": "设置HF32模式的舍入方式，支持NEAREST_AWAY与NEAREST_EVEN两种取值，使用前须先通过asc_enable_hf32开启HF32模式，且须在矩阵乘加指令执行前调用以确保配置在计算过程中生效，配置持续生效直至重新调用。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md", "excerpt": "本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md", "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md", "excerpt": "NEAREST_AWAY：FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"],
+        "traits": ["rounding_mode"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。",
+        "traits:rounding_mode": "NEAREST_AWAY：FP32将以向最接近的值舍入，平局时远离零的方式舍入为HF32。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md",
+            "excerpt": "本接口用于设置HF32模式舍入方式，使用该接口前需要先使用[asc_enable_hf32](asc_enable_hf32.md)开启HF32模式。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md",
+      "document_sha256": "754c138a10d6dc4d67bd3de8fdd41d7ba57d9c97ca81133a84f98faf7848f51d",
+      "description": {
+        "value": "设置矩阵乘加计算时逐列生成结果分形的方向配置，仅改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，须在矩阵乘加指令执行前调用，配置写入后持续生效直至重新配置。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md", "excerpt": "本接口用于设置矩阵乘加计算（Mmad）时逐列生成矩阵计算结果分形。该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md", "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)、[asc_mmad_mx](asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md", "excerpt": "如需切换为逐行生成矩阵计算结果分形，请重新调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)接口。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口用于设置矩阵乘加计算（Mmad）时逐列生成矩阵计算结果分形。该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)、[asc_mmad_mx](asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)、[asc_mmad_mx](asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md",
+          "kind": "related",
+          "condition": "如需切换为逐行生成矩阵计算结果分形时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md",
+            "excerpt": "如需切换为逐行生成矩阵计算结果分形，请重新调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md",
+      "document_sha256": "018476430fc2c948cc5f77dfda665b7bd41cce517260243e0a6a1abbb278febb",
+      "description": {
+        "value": "设置矩阵乘加计算时逐行生成结果分形的方向配置，仅改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式，须在矩阵乘加指令执行前调用，配置写入后持续生效直至重新配置。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md", "excerpt": "本接口用于设置矩阵乘加计算（Mmad）时逐行生成矩阵计算结果分形。该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md", "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)、[asc_mmad_mx](asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md", "excerpt": "如需切换为逐列生成矩阵计算结果分形，请重新调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)接口。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口用于设置矩阵乘加计算（Mmad）时逐行生成矩阵计算结果分形。该配置只改变L0C Buffer上结果分形的生成顺序，不改变计算结果、乘加次数或输出格式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)、[asc_mmad_mx](asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)、[asc_mmad_mx](asc_mmad_mx.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md",
+          "kind": "related",
+          "condition": "如需切换为逐列生成矩阵计算结果分形时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md",
+            "excerpt": "如需切换为逐列生成矩阵计算结果分形，请重新调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md",
+      "document_sha256": "3b48b690d93b387fb254d7b43ff3b9346fe76cd6ec18c312441333d7df0a3bc4",
+      "description": {
+        "value": "介绍矩阵计算的两类辅助矩阵分形格式：MX量化系数矩阵scaleA与scaleB在L1 Buffer上分别按Zz与Nn排布以满足行列读取需求，以及4选2稀疏索引矩阵的生成编码规则与Zn排布约束，并给出与系数搬运接口的配合关系。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md", "excerpt": "MX矩阵乘法为带有量化系数X的矩阵乘法，即左矩阵和右矩阵均有对应的量化系数矩阵，左量化系数矩阵scaleA和右量化系数矩阵scaleB。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md", "excerpt": "定义：原始B矩阵稠密化过程中生成的索引矩阵。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md", "excerpt": "系数搬运接口见[asc_copy_l12l0a_mx](../../cube_datamove/asc_copy_l12l0a_mx.md)和[asc_copy_l12l0b_mx](../../cube_datamove/asc_copy_l12l0b_mx.md)。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/background_and_core_concepts.md",
+      "document_sha256": "fd8456bd72986e23adf397d47b2723c605641f4254b4598610af5394363867d0",
+      "description": {
+        "value": "说明矩阵分形存储格式的背景与核心概念：矩阵计算单元以16×16矩阵分片分块处理，分形格式通过软件重排使计算块在物理内存中连续存放，避免非连续访问并提升数据吞吐率，并以大Y小x命名法区分分形间与分形内的排列顺序。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/background_and_core_concepts.md", "excerpt": "矩阵计算单元采用分块计算逻辑，例如可并行处理16×16的矩阵分片。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/background_and_core_concepts.md", "excerpt": "该格式通过软件层对数据进行重排，使每个16×16计算块在物理内存中连续存放。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md",
+      "document_sha256": "8819f50a71131803b6f9a949b1c809f1fe03ee2c93d163a629df20979d4c2fe2",
+      "description": {
+        "value": "详解矩阵分形存储格式：说明各产品形态下矩阵乘法对左右矩阵与结果矩阵的Zz、Zn、Nz格式组合要求，逐一定义ND、DN、Zz、Zn、Nz与NC1HWC0格式的物理位置、设计原理、转换过程与分形大小约束，并给出ND转Nz的转换示例。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md", "excerpt": "矩阵分形存储格式是对多维Tensor在内存中数据排布格式的描述。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md", "excerpt": "矩阵乘法A × B = C要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如图1所示。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/GEMV.md",
+      "document_sha256": "137528fc363be900f5b742783825bf92aeebc89c4a6e56d479e0a8889078e1a5",
+      "description": {
+        "value": "说明GEMV特性：当矩阵A的维度M为1时asc_mmad自动启用GEMV，矩阵乘退化为1×K行向量与K×N矩阵的乘法运算，将向量按16×16分块搬运以减少搬运开销，Ascend 950系列可通过disable_gemv参数关闭该功能。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/GEMV.md", "excerpt": "Gemv的核心功能体现为：当矩阵A的维度M取值为1时，接口会自动启用Gemv功能，该操作退化为1×K维度的行向量与K×N维度矩阵之间的乘法运算。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/GEMV.md", "excerpt": "开启GEMV模式，则矩阵乘法将M方向作为非对齐场景进行处理。GEMV模式相较于非对齐处理方式，搬运数据量更少，可减少搬运开销。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md",
+      "document_sha256": "28f8476a645bde446450d8239f118d1363a93f03757472a9c7801c5765a257e1",
+      "description": {
+        "value": "说明HF32特性：输入矩阵A、B均为fp32时开启HF32开关后，数据在矩阵乘法运算前被转换并舍入为HF32格式以提升Mmad类接口的计算性能，最终结果仍以fp32格式输出，舍入模式由asc_set_hf32_round_mode接口配置。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md", "excerpt": "HF32的核心功能体现为：用户在输入矩阵A、B矩阵都为fp32数据类型的场景下，当配置开启HF32开关后，fp32数据在执行矩阵乘法运算前会被转换并舍入为HF32（half-fp32）格式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/HF32.md", "excerpt": "舍入模式说明：fp32至HF32转换过程中的舍入模式由[asc_set_hf32_round_mode](../asc_set_hf32_round_mode.md)接口配置。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md",
+      "document_sha256": "9d505100d0bc1f885fc8a207c6f39ce0e9ae29a450577b49b302e583edd2f554",
+      "description": {
+        "value": "说明UnitFlag特性：asc_mmad与L0C Buffer搬出接口通过单元标志位以内存块粒度实现精细化读写同步，降低同步延迟；多指令复用同一块L0C Buffer时前n-1条以ENABLE_KEEP维持占用、最后一条以ENABLE_UPDATE解除，并要求计算与搬出数据量保持一致。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md", "excerpt": "unitFlag的核心功能体现为：asc_mmad和L0C Buffer搬出接口引入了单元标志（unit-flag）机制，通过以内存块为粒度实现精细化的数据同步，从而有效降低同步延迟，提升系统整体性能。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md", "excerpt": "asc_mmad和L0C Buffer搬出接口均提供了UnitFlag控制参数来控制该功能的启用，需确保两者同步开启，才能正常生效。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/k_direction_alignment_constraint.md",
+      "document_sha256": "c829c95cb0c8571a555cd515d5cd4cdb5a959649f27e2a39b56beedcc57ee91d",
+      "description": {
+        "value": "说明K方向对齐约束：float数据类型场景下asc_mmad通过k_direction_align参数控制L0A与L0B Buffer矩阵在K方向的对齐粒度，开启时对齐到ceil(K/16)*16、关闭时对齐到ceil(K/8)*8，A矩阵转置场景需开启以避免读入无效分形数据。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/k_direction_alignment_constraint.md", "excerpt": "K方向对齐的核心功能是通过k_direction_align参数控制在使用float数据类型（其他数据类型无需关注此特性）时，L0A Buffer和L0B Buffer矩阵在K方向上的对齐方式。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/k_direction_alignment_constraint.md", "excerpt": "当设置k_direction_align = true时，L0A Buffer/L0B Buffer中的矩阵会将K方向对齐到 `ceil\\(K/16\\)\\*16`。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md",
+      "document_sha256": "5028324d12449f3a1e15e303f4acb6f10025e9a9fbbb558633ecf8519097c543",
+      "description": {
+        "value": "概述普通矩阵计算的四步流程：数据搬入L1 Buffer、搬入L0A/L0B与Bias、asc_mmad计算输出到L0C Buffer、结果搬出；并分别说明Mx矩阵计算与4选2稀疏矩阵计算的专用流程，以及Conv2D通过img2col将卷积转为矩阵乘的前向计算流程。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md", "excerpt": "C API针对矩阵计算编程模型提供了数据搬入、矩阵计算和结果搬出接口，分别承载Cube核中各个通路的搬运能力和计算能力，如下图所示："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_flow.md", "excerpt": "Conv2D前向计算的本质是将卷积运算转换为矩阵乘：先通过img2col（Image to Column）将FeatureMap按卷积核滑动窗口展开为左矩阵A，将Weight作为右矩阵B，再做矩阵乘累加得到输出。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_unit.md",
+      "document_sha256": "d8fb1538effc400e6c5889d80825bb082cd7cebbf82a4b5cf2265ad156f69c97",
+      "description": {
+        "value": "介绍矩阵计算单元的硬件结构与存储配置：Cube计算单元专用于矩阵运算，直接访问L0A、L0B、L0C三类专用缓存，分别存储左矩阵、右矩阵与初始化累加值及计算结果，并说明L1、Fixpipe、BiasTable等关联存储单元的用途。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_unit.md", "excerpt": "Cube计算单元专用于执行矩阵运算，直接访问的专用缓存如下：L0A Buffer用于存储左矩阵，L0B Buffer用于存储右矩阵，L0C Buffer则用于存储初始化累加值和矩阵计算结果。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+      "document_sha256": "60326c231bc42cf5e901e3c9b889f9ef43a7f163d7bc3c238d3d19a5da09395f",
+      "description": {
+        "value": "与asc_sync_block_wait配对使用，实现单AI Core内AIC与全部AIV之间的核间同步：指定流水的前序指令执行完成后向调度模块发送通知，调度模块将对应flag_id的计数器增加1，本接口不阻塞流水中的后续指令。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md", "excerpt": "本接口与[asc_sync_block_wait](asc_sync_block_wait.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md", "excerpt": "本接口不阻塞`pipe`流水中的后续指令。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "本接口与[asc_sync_block_wait](asc_sync_block_wait.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下：",
+        "operations:synchronization": "实现单AI Core内AIC与全部AIV之间的同步",
+        "traits:inter_core_synchronization": "实现单AI Core内AIC与全部AIV之间的同步"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+          "kind": "related",
+          "condition": "配对使用，flag_id必须完全一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+            "excerpt": "本接口与[asc_sync_block_wait](asc_sync_block_wait.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+            "excerpt": "该同步模式的具体执行原理，请参考[单个AI Core中AIC与AIV全核同步（模式2）](key_features.md#single_ai_core_aic_aiv_full_sync)中的代码片段及配套时序图。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+      "document_sha256": "642e4ec787383e1670ecf9fbce83d7d841d999b88539c63f2951370ce467e114",
+      "description": {
+        "value": "与asc_sync_block_arrive配对使用，实现单AI Core内AIC与全部AIV之间的核间同步：检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水的后续指令与NPU架构有关。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md", "excerpt": "本接口与[asc_sync_block_arrive](asc_sync_block_arrive.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md", "excerpt": "各AIV上配对的`asc_sync_block_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "本接口与[asc_sync_block_arrive](asc_sync_block_arrive.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下：",
+        "operations:synchronization": "实现单AI Core内AIC与全部AIV之间的同步",
+        "traits:inter_core_synchronization": "实现单AI Core内AIC与全部AIV之间的同步"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+          "kind": "related",
+          "condition": "配对使用，flag_id必须完全一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+            "excerpt": "本接口与[asc_sync_block_arrive](asc_sync_block_arrive.md)配对使用，实现单AI Core内AIC与全部AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式2），核间同步实现的原理如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+            "excerpt": "该同步模式的具体执行原理，请参考[单个AI Core中AIC与AIV全核同步（模式2）](key_features.md#single_ai_core_aic_aiv_full_sync)中的代码片段及配套时序图。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+      "document_sha256": "8c5647dccbb5641a05501fe6609dddebccd267ab98a0d01085cb89b0c5a7f20a",
+      "description": {
+        "value": "与asc_sync_inter_wait配对使用，实现不同AI Core之间全部AIC或全部AIV的核间同步：所有参与同步的核执行本接口后向调度模块发送通知，调度模块将各核对应flag_id的计数器增加1，本接口不阻塞流水中的后续指令。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md", "excerpt": "本接口与[asc_sync_inter_wait](asc_sync_inter_wait.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md", "excerpt": "本接口不阻塞`pipe`流水中的后续指令。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "本接口与[asc_sync_inter_wait](asc_sync_inter_wait.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下：",
+        "operations:synchronization": "实现不同AI Core之间全部AIC或全部AIV的同步",
+        "traits:inter_core_synchronization": "实现不同AI Core之间全部AIC或全部AIV的同步"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+          "kind": "related",
+          "condition": "配对使用，flag_id必须完全一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+            "excerpt": "本接口与[asc_sync_inter_wait](asc_sync_inter_wait.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+            "excerpt": "该同步模式的具体执行原理，请参考[多AI Core中AIC或者AIV全核同步（模式0）](key_features.md#multi_ai_core_aic_aiv_full_sync)中的代码片段及配套时序图。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+      "document_sha256": "e001640c87bdac416c0809e850777c31a7dad88211ad8df968b46fbf5022a471",
+      "description": {
+        "value": "与asc_sync_inter_arrive配对使用，实现不同AI Core之间全部AIC或全部AIV的核间同步：检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水的后续指令与NPU架构有关。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md", "excerpt": "本接口与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md", "excerpt": "各AIC上配对的`asc_sync_inter_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "本接口与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下：",
+        "operations:synchronization": "实现不同AI Core之间全部AIC或全部AIV的同步",
+        "traits:inter_core_synchronization": "实现不同AI Core之间全部AIC或全部AIV的同步"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_arrive.md",
+          "kind": "related",
+          "condition": "配对使用，flag_id必须完全一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+            "excerpt": "本接口与[asc_sync_inter_arrive](asc_sync_inter_arrive.md)配对使用，实现不同AI Core之间全部AIC或全部AIV的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式0），核间同步实现的原理如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_inter_wait.md",
+            "excerpt": "该同步模式的具体执行原理，请参考[多AI Core中AIC或者AIV全核同步（模式0）](key_features.md#multi_ai_core_aic_aiv_full_sync)中的代码片段及配套时序图。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+      "document_sha256": "d654e5bf7aea118dbccc33a58bce7ba8a657cc0cde950260ed9070118a1574ce",
+      "description": {
+        "value": "与asc_sync_intra_wait配对使用，实现单AI Core内AIC与单个AIV之间的核间同步：指定流水的前序指令执行完成后向调度模块发送通知，并将对应sync_id的计数器增加1；arrive与wait的sync_id须符合跨核ID映射关系，本接口不阻塞后续指令。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md", "excerpt": "本接口与[asc_sync_intra_wait](asc_sync_intra_wait.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md", "excerpt": "本接口与`asc_sync_intra_wait`配对使用时，**不要求**`arrive`与`wait`传入的`sync_id`相同，而是要求二者符合如下跨核ID映射关系，否则会出现未定义行为。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md", "excerpt": "本接口不阻塞`pipe`流水中的后续指令。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "本接口与[asc_sync_intra_wait](asc_sync_intra_wait.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下：",
+        "operations:synchronization": "实现单AI Core内AIC与单个AIV之间的同步",
+        "traits:inter_core_synchronization": "实现单AI Core内AIC与单个AIV之间的同步"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+          "kind": "related",
+          "condition": "配对使用，sync_id须符合跨核ID映射关系",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+            "excerpt": "本接口与[asc_sync_intra_wait](asc_sync_intra_wait.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+            "excerpt": "该同步模式的具体执行原理，请参考[单个AI Core中AIC与单个AIV同步（模式4）](key_features.md#single_ai_core_aic_single_aiv_sync)中的代码片段及配套时序图。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+      "document_sha256": "c36a87dee4e3e2214c906e10302c74592961d695671facdc11654039d24acdec",
+      "description": {
+        "value": "与asc_sync_intra_arrive配对使用，实现单AI Core内AIC与单个AIV之间的核间同步：本接口阻塞pipe流水中的后续指令，检测到对应sync_id的计数器非0后解除阻塞并将计数器减1，arrive与wait的sync_id须符合跨核ID映射关系。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md", "excerpt": "本接口与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md", "excerpt": "本接口会阻塞`pipe`流水中的后续指令；对应`sync_id`的计数器非0时解除阻塞，并将计数器减1。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "本接口与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下：",
+        "operations:synchronization": "实现单AI Core内AIC与单个AIV之间的同步",
+        "traits:inter_core_synchronization": "实现单AI Core内AIC与单个AIV之间的同步"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_arrive.md",
+          "kind": "related",
+          "condition": "配对使用，sync_id须符合跨核ID映射关系",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+            "excerpt": "本接口与[asc_sync_intra_arrive](asc_sync_intra_arrive.md)配对使用，实现单AI Core内AIC与单个AIV之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式4），核间同步实现的原理如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_intra_wait.md",
+            "excerpt": "该同步模式的具体执行原理，请参考[单个AI Core中AIC与单个AIV同步（模式4）](key_features.md#single_ai_core_aic_single_aiv_sync)中的代码片段及配套时序图。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+      "document_sha256": "c73ab03f5485ababe0c2eb401abc085b87faef8693b019bc5b2bea4bb00208c4",
+      "description": {
+        "value": "与asc_sync_subblock_wait配对使用，实现同一AI Core内全部AIV之间的核间同步：各AIV指定流水的前序指令执行完成后向调度模块发送通知，调度模块将各AIV对应flag_id的计数器增加1，本接口仅支持AIV调用且不阻塞后续指令。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md", "excerpt": "本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md", "excerpt": "本接口仅支持AIV调用，AIV支持的`pipe`取值如下：`PIPE_MTE2`、`PIPE_MTE3`、`PIPE_V`。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：",
+        "operations:synchronization": "实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步",
+        "traits:inter_core_synchronization": "实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+          "kind": "related",
+          "condition": "配对使用，flag_id必须完全一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+            "excerpt": "本接口与[asc_sync_subblock_wait](asc_sync_subblock_wait.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+            "excerpt": "该同步模式的具体执行原理，请参考[单个AI Core中AIV全核同步（模式1）](key_features.md#single_ai_core_aiv_full_sync)中的代码片段及配套时序图。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+      "document_sha256": "8e46e064d2ad0c19dc3a7ed1173a797b50914294b4027856b0c9e326f8325683",
+      "description": {
+        "value": "与asc_sync_subblock_arrive配对使用，实现同一AI Core内全部AIV之间的核间同步：检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水的后续指令与NPU架构有关，本接口仅支持AIV调用。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md", "excerpt": "本接口与[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md", "excerpt": "各AIV（subblock）上配对的`asc_sync_subblock_wait`检测到对应`flag_id`的计数器非0后解除阻塞并将计数器减1。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "本接口与[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下：",
+        "operations:synchronization": "实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步",
+        "traits:inter_core_synchronization": "实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md",
+          "kind": "related",
+          "condition": "配对使用，flag_id必须完全一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+            "excerpt": "本接口与[asc_sync_subblock_arrive](asc_sync_subblock_arrive.md)配对使用，实现同一AI Core内全部AIV（[subblock](inter_core_sync_overview.md#fig_block_subblock_relationship)）之间的同步（[四种核间同步模式](../system_sync_overview.md#fig_sync_control_mode)中的模式1），核间同步实现的原理如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md",
+            "excerpt": "该同步模式的具体执行原理，请参考[单个AI Core中AIV全核同步（模式1）](key_features.md#single_ai_core_aiv_full_sync)中的代码片段及配套时序图。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md",
+      "document_sha256": "befb754e321549673c1829c7d23ed521a1cdb9da433f3b268950d27629c61ebb",
+      "description": {
+        "value": "概述核间同步能力：说明一个核的计算须等待其他相关核计算完成的典型场景，介绍group内block与subblock的结构及算子类型对应的函数执行空间限定符配置，并按四种同步模式汇总各对核间同步接口的同步范围与生产者消费者角色。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md", "excerpt": "核间同步的使用场景通常是：一个核计算所依赖的数据，需要等待其他相关核的计算全部完成后才能获取。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/inter_core_sync_overview.md", "excerpt": "AIC/AIV多核结构如下图2所示，AIC/AIV按group划分。一个group内包含1个block和N个subblock（N≥1），其中block表示“主核”，每个subblock表示一个“从核”。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md",
+      "document_sha256": "4e0aeaa03f1ac3a59c51be6b35ebd97585cf9536f3aba30b863a9e656dadb9a5",
+      "description": {
+        "value": "配合时序图介绍四对核间同步接口支持的四种同步控制模式的实现原理：多AI Core间AIC或AIV全核同步、单AI Core内AIV全核同步、AIC与AIV全核同步及AIC与单个AIV同步，并说明不同NPU架构下wait接口阻塞流水范围的差异。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md", "excerpt": "如图1所示，本章节将配合时序图介绍四对核间同步接口支持的四种同步控制模式各自实现的原理。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md", "excerpt": "模式4：AI Core内部，AIC与单个AIV之间的同步控制。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+      "document_sha256": "b844d1ecb8eebbd7ada86edcdfb7e5dd65d3077a83a98dba23221303b52ab357",
+      "description": {
+        "value": "与asc_unlock配对使用实现核内异步流水指令之间的同步：根据mutex_id获取Mutex，若已被锁定则阻塞指定流水上的后续指令，直到所有流水中相同mutex_id的Mutex均被释放，可选mode参数指定是否阻塞流水，相同mutex_id的lock与unlock不得嵌套使用。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md", "excerpt": "与[asc_unlock](asc_unlock.md)配对使用，用于实现核内异步流水指令之间的同步处理，`asc_lock`和`asc_unlock`各自的功能如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md", "excerpt": "`asc_lock`：根据`mutex_id`获取Mutex，若Mutex已被锁定，将阻塞指定流水上后续指令的执行，直到所有流水中具有相同`mutex_id`的Mutex都已经被[asc_unlock](asc_unlock.md)释放。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"],
+        "operations": ["synchronization"]
+      },
+      "tag_evidence": {
+        "roles:control": "与[asc_unlock](asc_unlock.md)配对使用，用于实现核内异步流水指令之间的同步处理，`asc_lock`和`asc_unlock`各自的功能如下：",
+        "operations:synchronization": "与[asc_unlock](asc_unlock.md)配对使用，用于实现核内异步流水指令之间的同步处理，`asc_lock`和`asc_unlock`各自的功能如下："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+          "kind": "related",
+          "condition": "同一组pipe、mutex_id和mode须严格成对使用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+            "excerpt": "与[asc_unlock](asc_unlock.md)配对使用，用于实现核内异步流水指令之间的同步处理，`asc_lock`和`asc_unlock`各自的功能如下："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "kind": "related",
+          "condition": "单流水内多个指令之间的同步",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+            "excerpt": "单流水内多个指令之间的同步请使用[asc_sync_pipe](asc_sync_pipe.md)接口。"
+          }
+        }
+      ]
+    }
+  ]
+}

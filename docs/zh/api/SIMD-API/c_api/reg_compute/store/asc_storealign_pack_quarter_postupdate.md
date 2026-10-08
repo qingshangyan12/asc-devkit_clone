@@ -1,29 +1,17 @@
 ---
 okftype: reference.api
-title: asc_storealign_pack_quarter_postupdate
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter_postupdate.md
-description: 将矢量数据寄存器中有效的32位元素按低8bit压缩后搬出到Unified Buffer（UB），mask为0的元素不搬出且目的位置保持原值，写入完成后启用Post
-  Update模式自动累加目的地址指针，便于硬件循环内连续调用。
+description: "将矢量数据寄存器中有效的32位元素按低8bit压缩后搬出到Unified Buffer（UB），掩码为0的元素不搬出且目的位置保持原值，写入完成后启用Post Update模式自动累加目的地址指针，便于硬件循环内连续调用，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [compression, store]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-  - traits: [masked, post_update]
-signature:
-  - prototype_id: asc_storealign_pack_quarter_postupdate__RPU<dtype>_v<dtype>_i32_vb
-    dtype: [int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storealign.h]
+  - traits: [aligned_transfer, post_update]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.2.0-
 ---
 # asc_storealign_pack_quarter_postupdate
 

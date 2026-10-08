@@ -42,6 +42,7 @@ ENUM_RE = re.compile(r"enum class (?P<name>\w+)\s*(?::\s*(?P<underlying>\w+))?\s
 ENUM_VALUE_RE = re.compile(r"(?P<name>\w+)\s*(?:=\s*(?P<value>[^,}]+))?")
 CONSTEXPR_RE = re.compile(r"^constexpr[^;]*?\b(?P<name>ASC_\w+)\s*;", re.MULTILINE)
 DEFINE_RE = re.compile(r"^#\s*define\s+(?P<name>\w+)(?P<args>\([^)]*\)|)\s+(?P<body>.+)$", re.MULTILINE)
+ALIAS_DEFINE_RE = re.compile(r"^#\s*define\s+(asc_[a-z0-9_]+)\s+([a-z_][a-z0-9_]*)\s*$")
 ALIAS_RE = re.compile(r"^using\s+(?P<name>\w+)\s*=\s*(?P<target>[^;]+);", re.MULTILINE)
 RECORD_RE = re.compile(r"^(?:struct|union)\s+(?P<name>\w+)\s*\{", re.MULTILINE)
 DEPRECATED_RE = re.compile(
@@ -62,12 +63,21 @@ class Param:
     direction: str = ""
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "name": self.name, "type": self.base_type or self.type_text,
-            "address_space": self.address_space, "dtype": self.dtype,
-            "is_pointer": self.is_pointer, "is_vector": self.is_vector,
-            "is_mask": self.is_mask, "direction": self.direction,
-        }
+        # 只序列化非默认键：参数条目数量大，空值键会显著膨胀 index.json
+        out: dict[str, Any] = {"name": self.name, "type": self.base_type or self.type_text}
+        if self.address_space:
+            out["address_space"] = self.address_space
+        if self.dtype:
+            out["dtype"] = self.dtype
+        if self.is_pointer:
+            out["is_pointer"] = True
+        if self.is_vector:
+            out["is_vector"] = True
+        if self.is_mask:
+            out["is_mask"] = True
+        if self.direction:
+            out["direction"] = self.direction
+        return out
 
 
 @dataclass
@@ -241,6 +251,15 @@ def parse_header(path: Path, rel_root: Path) -> dict[str, Any]:
             elif stripped.startswith("#endif"):
                 if guard_stack:
                     guard_stack.pop()
+            elif alias_match := ALIAS_DEFINE_RE.match(stripped):
+                # 对象式宏别名（#define asc_mem_bar mem_bar）：C API 名 → 内部函数。
+                # 产出无参 Declaration，archs 依赖守卫/Doxygen，否则交正文 npu 兜底。
+                declaration = _build_alias_declaration(
+                    alias_match.group(1), alias_match.group(2),
+                    header_rel, offset, doxygen, guard_stack, prev_decl_end,
+                )
+                functions.setdefault(declaration.name, []).append(declaration)
+                prev_decl_end = offset + len(stripped)
             elif DECL_START_RE.match(stripped) or (
                 stripped.startswith(("__aicore__", "__simd_callee__"))
                 and index + 1 < len(lines)
@@ -329,6 +348,33 @@ def _build_declaration(
         declaration.unresolved.append("declaration without @override_id")
         if not declaration.archs:
             declaration.unresolved.append("archs unknown (no @archs and no __NPU_ARCH__ guard)")
+    return declaration
+
+
+def _build_alias_declaration(
+    name: str, target: str, header_rel: str, offset: int,
+    doxygen: list[dict[str, Any]], guard_stack: list[str], prev_decl_end: int,
+) -> Declaration:
+    declaration = Declaration(
+        name=name, header=header_rel, signature=f"#define {name} {target}", return_type="",
+    )
+    nearest = max(
+        (block for block in doxygen if block["end"] <= offset),
+        key=lambda block: block["end"], default=None,
+    )
+    owned = (
+        nearest is not None
+        and nearest["override_id"]
+        and nearest["end"] > prev_decl_end
+        and (nearest["override_id"] == name or nearest["override_id"].startswith(name + "__"))
+    )
+    if owned:
+        declaration.override_id = nearest["override_id"]
+        declaration.archs = list(nearest["archs"])
+        declaration.ingroup = nearest["ingroup"]
+        declaration.deprecated = nearest["deprecated"]
+    else:
+        declaration.archs = list(guard_stack)
     return declaration
 
 

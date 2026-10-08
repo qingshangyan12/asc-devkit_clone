@@ -1,29 +1,14 @@
 ---
 okftype: reference.api
-title: asc_max
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max.md
-description: 根据mask对两个源矢量数据寄存器按元素求最大值并写入目的操作数，结果可通过引用参数或函数返回值输出，支持整型与浮点等多种数据类型。
+description: "根据掩码对两个源矢量数据寄存器按元素求最大值并写入目的操作数，结果可经引用参数或函数返回值输出，负零与正零比较结果为正零，支持整型与浮点数据类型，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [maximum]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_max__Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_max__v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_max
 

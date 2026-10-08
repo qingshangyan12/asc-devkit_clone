@@ -82,9 +82,9 @@ python3 okf_skills/okf-index/scripts/ensure_index.py --json [--arch A3] [--cann-
 
 ## 检索策略要点
 
-- **同步需求**：`--operation synchronization` 覆盖核间/流水线同步；语义细节读 sync 概念页
-  （全量轮次接入；试点范围内 UB 地址重叠约束经 `--deps-of <搬运接口> --kind requires` 展开）。
+- **同步需求**：`--operation synchronization` 覆盖核间/流水线同步（含废弃同步接口）；
+  语义细节读 sync 概念页；UB 地址重叠约束经 `--deps-of <搬运接口> --kind requires` 展开。
 - **枚举/宏适配**：外部枚举与宏经 `--enum`/`--param` 反查（含 defs 头文件目录与使用方）。
-- **缺口判断**：首选 `--gap`；未命中时如实说明「范围内未覆盖」并给出范围外目录线索
-  （reg_compute/cube_*/basic_api/SIMT/AI-CPU）。
+- **缺口判断**：首选 `--gap`；未命中时如实说明「范围内未覆盖」并给出范围外线索
+  （c_api 之外：adv_api/tensor_api/basic_api/SIMT/AI-CPU 等其他 API 层级）。
 - 索引缺失或失效时说明限制并回流 okf-index，不能把范围内未检索到写成仓库不支持。

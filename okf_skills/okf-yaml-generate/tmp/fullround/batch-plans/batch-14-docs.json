@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+  "sha256": "1698c3cc6bb9ce222af9f6ffae64b8b6cd43027209acf679c86eede8cd016502"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+  "sha256": "9e2b31eda1f6a62bbcfad5311493dbd925168c1162ecedbd564a8b6237ca8e33"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+  "sha256": "9cf74899fec030c5523c0f1481439c8c59f73d783d3bc605af3609bef2d93b7b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+  "sha256": "7eec750900947638ebe95d175fd71404baf046da1e4c1640d8a38146236d1b95"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+  "sha256": "d2983fb5d72a885bc8b7b2ad1884e67fdba783ecc4abd64c21a7f861ab1f0d28"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clear_nthbit.md",
+  "sha256": "845007746a06cbe6fd424d83b26d9e19b25e4e63314191dc4a1985bd00f34c6f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clz.md",
+  "sha256": "6548ea5e5bbe1144716050305f1f2931f5b8390bf7c91fa13a967ff3ee489518"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffs.md",
+  "sha256": "719370033faf1a89903de38d94c791484c5fee134600a60f082c6ce5933496f5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffz.md",
+  "sha256": "8c1e871826c42f213ded51fe5d83195f0091ea4087f1d7925a21023617387be0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_popc.md",
+  "sha256": "f7d27b92612bc51decf5438a51ae28a5d61c20da4b0d89fc3475381b3f70352e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_set_nthbit.md",
+  "sha256": "9253515e7a9e52e41c6a9be71e75d25dbe5662d9f193e4ddae6f58eda4d1af91"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_sflbits.md",
+  "sha256": "23cf69e7f92262840777ae149c08fe3d1896b20b2290b3063a313341f2e44942"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_zero_bits_cnt.md",
+  "sha256": "8a61a8e5222259c2160ac8e8387e62dc6fbe71feeddae3e57a2584c47e73ff3b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md",
+  "sha256": "309e5df497adcde1d03241ce3617ed9b2d77e139aa2b3eded0ecd7d660225d54"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md",
+  "sha256": "6aaba52aea5299761951762456315d81e0e008fe5bcb886a5ca0ac821e3f837e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md",
+  "sha256": "54ce1b30e4e15f238e6b18e6438679339233ea45fe54dbfb5fced944c8e165ef"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+  "sha256": "04d1b8a4330f8a1257f8080dded3d49230223eb3ceba32d2c898ef875a7fab71"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_init/asc_init.md",
+  "sha256": "f0dae9adc361264cdcd92b67c5d53005d4623341e12ef86af1d8d4a654e20665"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_misc/asc_nop.md",
+  "sha256": "6bdfa92310bdefa7ec8efdbff6d1e273526c1c2af8726a94dd9237385f5c6d9d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_arch_ver.md",
+  "sha256": "dc9ebfd8b458b2ec2e3d441c1e3c622179b4b1ab49b8094b70bfa83d91534ec6"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_core_id.md",
+  "sha256": "2286312f048c0504d4e8918b54c5c3042427abd3f3e1e02e45ca81ff785a4dc4"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md",
+  "sha256": "a54e01c6ed3ae19f26b34635e61de88cb8e461e16637e65be871a64af6a0516b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_buf_addr.md",
+  "sha256": "188dcdf76d3db98fc95deaf4133504cc046326ec8717248c8c3ecf92230768f3"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_stack_base.md",
+  "sha256": "b04f8c76fc895ce3ae8f93fdd456623b1af9218a1027851e9d624922147034f7"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md",
+  "sha256": "27399f7921e3689383553f47370943330b10f7d1b18e883c8efd8924df034a8d"
+ }
+]

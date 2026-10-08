@@ -1,33 +1,14 @@
 ---
 okftype: reference.api
-title: asc_xor
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md
-description: 根据mask对两个矢量数据寄存器或掩码寄存器执行按位异或操作，结果通过函数返回值返回或写入目的操作数，未被mask筛选的位置置0，仅在AIV上生效的Reg矢量计算接口。
+description: "根据mask对矢量数据寄存器或掩码寄存器执行按位异或操作，结果写入目的操作数或通过函数返回值返回，未被mask筛选的位置被置0，源与目的数据类型须一致，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [bitwise_xor]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_xor__v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
-  - prototype_id: asc_xor__Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t]
-  - override_id: asc_xor__vb_vb_vb
-  - override_id: asc_xor__Rvb_vb_vb_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_logic.h]
+  - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_xor
 

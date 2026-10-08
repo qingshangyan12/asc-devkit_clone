@@ -1,24 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mmad_sparse
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_sparse.md
-description: 完成4选2稀疏矩阵乘加操作，左矩阵A为稀疏矩阵并在计算时完成稠密化，右矩阵B为稠密矩阵且需预先稠密化并通过asc_copy_l12l0b_sparse载入，同时加载的索引矩阵用于矩阵A的稠密化。
+description: "完成4选2稀疏矩阵乘加操作，左矩阵A为稀疏矩阵并在计算时完成稠密化，右矩阵B为稠密矩阵且须在输入数据准备阶段预先稠密化，并通过asc_copy_l12l0b_sparse载入，同时加载的索引矩阵用于矩阵A的稠密化。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [matrix_multiply_accumulate]
-  - objects: [matrix]
-  - execution_models: [matrix_compute]
   - traits: [sparse_input]
-signature:
-  - override_id: asc_mmad_sparse__PCCi32_PCAi8_PCBi8_u16_u16_u16_unitflag_b_b
-archs: ['2201']
-header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md
     kind: requires
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_mmad_sparse
 

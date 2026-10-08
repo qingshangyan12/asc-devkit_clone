@@ -1,17 +1,6 @@
 ---
-okftype: reference.index
-title: 舍入模式与饱和模式
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-description: 说明数据类型转换时Ascend C API支持的舍入模式与饱和/非饱和模式：舍入模式包括RINT、ROUND、FLOOR、CEIL、TRUNC、ODD、HYBRID，确定高精度数值到低精度表示的舍入方式；饱和与非饱和模式决定数值超出目标类型表示范围时的溢出行为，开启饱和模式和非饱和模式时需配置ctrl寄存器。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [configuration]
-  - traits: [rounding_mode, saturation_mode]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
-    kind: related
-    condition: 开启饱和模式和非饱和模式时，需配置ctrl寄存器
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "说明数据类型转换时Ascend C API支持的舍入模式与饱和、非饱和模式：舍入模式包括RINT、ROUND、FLOOR、CEIL、TRUNC、ODD、HYBRID七种，确定高精度数值到低精度表示的舍入方式；饱和与非饱和模式决定数值超出目标类型表示范围时的溢出行为，开启时需配置ctrl寄存器。"
 ---
 # 舍入模式与饱和模式
 

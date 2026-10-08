@@ -1,32 +1,18 @@
 ---
 okftype: reference.api
-title: asc_float2float_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2float_sync_deprecated.md
-description: 已废弃的同步精度转换接口，对float类型数据进行精度转换处理，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，请使用对应的非同步接口和同步接口asc_sync替代。
+description: "已废弃的同步精度转换接口，对float类型数据进行精度转换处理，支持RINT、ROUND、FLOOR、CEIL、TRUNC多种舍入模式，目的与源起始地址需32字节对齐；请改用非同步接口asc_float2float配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, rounding_mode]
-signature:
-  - override_id: asc_float2float_rn_sync__PUf32_PUf32_u32
-  - override_id: asc_float2float_rd_sync__PUf32_PUf32_u32
-  - override_id: asc_float2float_ru_sync__PUf32_PUf32_u32
-  - override_id: asc_float2float_rna_sync__PUf32_PUf32_u32
-  - override_id: asc_float2float_rz_sync__PUf32_PUf32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [conversion, synchronization]
+  - traits: [aligned_transfer, rounding_mode]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_float2float.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_float2float_sync（废弃）
 

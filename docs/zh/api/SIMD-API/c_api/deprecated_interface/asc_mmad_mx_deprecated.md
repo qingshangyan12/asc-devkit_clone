@@ -1,51 +1,37 @@
 ---
 okftype: reference.api
-title: asc_mmad_mx（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mmad_mx_deprecated.md
-description: 已废弃的带量化系数矩阵乘加接口：左矩阵A与右矩阵B分别配有量化系数矩阵ScaleA和ScaleB，按广播乘法完成MmadMx计算，仅在AIC上生效；请使用asc_unit_flag_mode类型入参的新asc_mmad_mx接口替代，同步功能通过asc_sync实现。
+description: "已废弃的带量化系数矩阵乘加接口，左矩阵A与右矩阵B分别配有量化系数矩阵ScaleA与ScaleB，按广播乘法完成MmadMx计算，Scale矩阵须先经搬运接口写入MX Buffer，仅在AIC上生效；请改用asc_unit_flag_mode类型入参的新asc_mmad_mx接口替代，同步功能通过asc_sync实现。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [matrix_multiply_accumulate]
-  - objects: [matrix]
-  - execution_models: [matrix_compute]
-  - source_locations: [l0a_buffer, l0b_buffer]
-  - destination_locations: [l0c_buffer]
-  - traits: [deprecated]
-signature:
-  - prototype_id: asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b
-    header: [/include/c_api/cube_compute/cube_compute.h]
-  - prototype_id: asc_mmad_mx_sync__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_u8_b_b_b
-    header: [/include/c_api/composite/cube_compute_composite.h]
-archs: ['3510']
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md
-    kind: constrained_by
-    condition: 开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致
+    kind: requires
+    condition: "开启UnitFlag的其他场景"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
-    kind: constrained_by
-    condition: 开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致
+    kind: requires
+    condition: "开启UnitFlag且矩阵搬出指令开启Nz2ND随路格式转换，或未随路格式转换但开启B8/B4量化触发Channel Merge时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_config_deprecated.md
-    kind: constrained_by
-    condition: 需要清除UnitFlag产生的残留状态时
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
-    kind: constrained_by
-    condition: 浮点类型的输入或输出包含inf/nan时
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: related
-    condition: 接口已废弃，作为替代方案使用
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    condition: "需要清除UnitFlag产生的残留状态时"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: 针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: related
+    condition: "浮点类型的输入或输出包含inf/nan时"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+    condition: "原asc_mmad_mx_sync接口的同步功能请通过新asc_mmad_mx接口和asc_sync()实现"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
+    kind: requires
+    condition: "输入矩阵沿K轴分块计算并累加到同一块L0C Buffer且(left_height/16)*(right_width/16)小于10时"
+version: 9.0.0-9.2.0
 ---
 # asc_mmad_mx（废弃）
 

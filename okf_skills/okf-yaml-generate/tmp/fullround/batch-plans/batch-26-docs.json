@@ -1,0 +1,54 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+  "sha256": "96503641385ba4baaaf49440946038c21d6e59a36240e255d1916105dde9b484"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+  "sha256": "ad95718b83ca1d6650ec5fd61dd63ac7469bac5a9200229812b7a379086c2a99"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+  "sha256": "24418f86167f01288f0bf90754060c4b30f73c5c1ae31f254c4d61260430051e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+  "sha256": "564e984f3709fe4e7a7f7920dd7b74b12a7415138e12ac03701994049ea10c1b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+  "sha256": "e621b724a3c8b38bca54bb2d66f2331ee0cc13022df012ef85929e6ab3b6c662"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+  "sha256": "c03a53804423ac9f8862e3c843ed369d9295ccb97410e8c70c16c25ce1e1ffa1"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+  "sha256": "6309351bf67bb5da8c7a554458d0b85fc95a7810b2ff44a09fa725ba5bb5da5e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+  "sha256": "ef4abcdce81af74ab3d363d970c2d80f21fe294a81ec0e57e72d6defe339b9ef"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+  "sha256": "17be14a35faf76c71cdb6b0f31183417707f3f4d71b5811a3af92d9934c67b2a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md",
+  "sha256": "55104117f4c084a8f9203b6ce8b0673387f97395ef93379cf0ef0a1b4bd3eb45"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/README.md",
+  "sha256": "8de98ade709923a94f88f61298ce2e8d726e29a80a1f89c99b410c3dac50c54f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/c_api.md",
+  "sha256": "a4a1389c06b626eba8691e3d92c3baabf59c6e177c50fccf50507cf8e5831be1"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+  "sha256": "fe683ba1ba6ae2d7193ebfce6930704570c10825263458a97d31e7aa7129ac0d"
+ }
+]

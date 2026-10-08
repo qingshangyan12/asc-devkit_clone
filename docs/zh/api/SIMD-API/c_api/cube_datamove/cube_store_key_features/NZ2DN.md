@@ -1,18 +1,6 @@
 ---
-okftype: reference.index
-title: NZ2DN
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md
-description: 介绍矩阵搬出过程中的Nz2DN特性：将Nz格式矩阵转化为DN格式矩阵，文档给出转化伪代码、可配置参数说明及特性约束；该功能与Channel
-  Split/Channel Merge（Nz2Nz）及L0C到UB双目标模式互斥，目标操作数地址之间不能重叠。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement]
-  - operations: [copy, layout_transform]
-  - source_locations: [l0c_buffer]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍矩阵搬出的Nz2DN特性：将Nz格式矩阵转化为DN格式矩阵，支持多个矩阵的批量转化，文档给出转化伪代码与可配置参数说明；该功能与通道拆分合并及L0C到UB双目标模式互斥，目标操作数地址之间不能重叠。"
 ---
 # NZ2DN
 

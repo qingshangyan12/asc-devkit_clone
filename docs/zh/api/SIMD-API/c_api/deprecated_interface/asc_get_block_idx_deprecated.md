@@ -1,27 +1,14 @@
 ---
 okftype: reference.api
-title: asc_get_block_idx（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_block_idx_deprecated.md
-description: 已废弃的核索引查询接口：获取当前运行核（逻辑核）的索引并返回int64_t结果，运行于标量流水，请使用内置变量block_idx结合asc_get_sub_block_num和asc_get_sub_block_id接口替代。
+description: "已废弃的核索引查询接口，获取当前运行核（逻辑核）的索引；请改用内置变量block_idx结合asc_get_sub_block_num与asc_get_sub_block_id接口替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - families: [system]
-  - execution_models: [scalar]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_get_block_idx__z
-archs: ['2201', '3510']
-header: [/include/c_api/utils/sys_var.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-9.2.0
 ---
 # asc_get_block_idx（废弃）
 

@@ -1,28 +1,17 @@
 ---
 okftype: reference.api
-title: asc_scatter
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md
-description: 根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB），掩码为1的元素写入对应索引位置，掩码为0的元素保留目的地址原数据，搬运过程中数据格式与内容保持不变。
+description: "根据索引寄存器中的索引值将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB），掩码为1的元素写入对应索引位置、为0时保留目的地址原数据，有效索引值必须唯一，目的起始地址需32字节对齐，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [scatter]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-  - traits: [masked]
-signature:
-  - prototype_id: asc_scatter__PU<dtype>_v<dtype>_v<index_dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/scatter/ub_scatter.h]
+  - traits: [aligned_transfer]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_scatter
 

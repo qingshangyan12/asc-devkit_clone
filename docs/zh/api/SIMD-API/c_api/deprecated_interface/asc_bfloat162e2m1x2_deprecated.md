@@ -1,42 +1,16 @@
 ---
 okftype: reference.api
-title: asc_bfloat162e2m1x2（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162e2m1x2_deprecated.md
-description: 将bfloat16_t类型转化为fp4x2_e2m1_t类型，支持多种舍入模式并按索引位置写入；无显式位置参数的原型已废弃，需使用显式位置参数重载替代。
+description: "将bfloat16_t类型转化为fp4x2_e2m1_t类型并支持多种舍入模式，因位宽比为4:1按索引位置分四部分写入目的寄存器；无显式位置参数的原型已废弃，请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode]
-signature:
-  - override_id: asc_bfloat162e2m1x2_rn__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rn_v2__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rn_v3__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rn_v4__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rna__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rna_v2__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rna_v3__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rna_v4__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rd__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rd_v2__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rd_v3__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rd_v4__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_ru__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_ru_v2__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_ru_v3__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_ru_v4__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rz__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rz_v2__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rz_v3__Rvf4e2m1x2_vbf16_vb
-  - override_id: asc_bfloat162e2m1x2_rz_v4__Rvf4e2m1x2_vbf16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e2m1x2.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_bfloat162e2m1x2（废弃）
 

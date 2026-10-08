@@ -1,17 +1,17 @@
 ---
-okftype: reference.type
-title: asc_saturation_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
-description: 该枚举表示饱和控制所作用的模式类型，用于asc_set_saturation_flag和asc_get_saturation_flag接口。
+okftype: reference.enum
+description: "表示饱和控制所作用的模式类型，覆盖浮点计算、fp8、整数溢出及精度转换场景，在调用饱和标志设置与查询接口时使用，CAST模式仅在全局饱和策略下生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
   - traits: [saturation_mode]
-declaration:
-  symbol: asc_saturation_mode
-  underlying_type: uint8_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_saturation_mode
 

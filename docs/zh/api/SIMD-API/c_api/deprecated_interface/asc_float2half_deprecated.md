@@ -1,51 +1,19 @@
 ---
 okftype: reference.api
-title: asc_float2half（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2half_deprecated.md
-description: 已废弃的矢量转换接口，将float类型数据转换成half类型，支持多种舍入模式与饱和模式，位宽比为2:1并按接口后缀写入奇偶位置，需使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将float类型数据转换成half类型并支持多种舍入模式与饱和模式，因位宽比为2:1按接口后缀写入奇偶索引位置；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_float2half_rn__Rvf16_vf32_vb
-  - override_id: asc_float2half_rn_sat__Rvf16_vf32_vb
-  - override_id: asc_float2half_rn_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_rn_sat_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_rna__Rvf16_vf32_vb
-  - override_id: asc_float2half_rna_sat__Rvf16_vf32_vb
-  - override_id: asc_float2half_rna_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_rna_sat_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_rd__Rvf16_vf32_vb
-  - override_id: asc_float2half_rd_sat__Rvf16_vf32_vb
-  - override_id: asc_float2half_rd_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_rd_sat_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_ru__Rvf16_vf32_vb
-  - override_id: asc_float2half_ru_sat__Rvf16_vf32_vb
-  - override_id: asc_float2half_ru_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_ru_sat_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_rz__Rvf16_vf32_vb
-  - override_id: asc_float2half_rz_sat__Rvf16_vf32_vb
-  - override_id: asc_float2half_rz_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_rz_sat_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_ro__Rvf16_vf32_vb
-  - override_id: asc_float2half_ro_sat__Rvf16_vf32_vb
-  - override_id: asc_float2half_ro_v2__Rvf16_vf32_vb
-  - override_id: asc_float2half_ro_sat_v2__Rvf16_vf32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2half.md
-    kind: related
-    condition: 接口后缀控制写入位置的原型已废弃，作为替代方案使用
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "开启饱和模式和非饱和模式时"
+version: 9.0.0-
 ---
 # asc_float2half（废弃）
 

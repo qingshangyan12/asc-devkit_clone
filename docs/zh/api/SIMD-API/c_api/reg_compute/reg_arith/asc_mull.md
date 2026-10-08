@@ -1,25 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mull
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mull.md
-description: 根据掩码将两个源矢量数据寄存器中的有效元素相乘，32位元素相乘得到64位乘积，并拆分为低32位与高32位分别写入两个目的矢量数据寄存器。
+description: "根据掩码将两个32位源矢量数据寄存器的元素相乘得到64位乘积，拆分为低32位与高32位分别写入两个目的矢量数据寄存器，掩码为0的元素在目的寄存器置零，仅支持int32_t与uint32_t，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [multiply]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, split_high_low, widening_result]
-signature:
-  - prototype_id: asc_mull__Rv<dtype>_Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [int32_t, uint32_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [elementwise, split_high_low, widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_mull
 

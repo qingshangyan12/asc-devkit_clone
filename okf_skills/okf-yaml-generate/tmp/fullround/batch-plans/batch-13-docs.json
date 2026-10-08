@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+  "sha256": "baed552702b02fc0f2f29ffad1ffb96a2ad9d1ba4993b85951db30ce2d90d10a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+  "sha256": "f6a0e655414e79fdd09d4f933dce7e0f2938b6765b1ca02b266d2c7c152da4df"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md",
+  "sha256": "c241b524d7d712bb3240b4e285dc70e0165a053f746323efeba91064e4230c27"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md",
+  "sha256": "a90077ea34b8eebf7aad2f27785e766b24160fa29630c79703f7b5f81e81247a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+  "sha256": "034f8c33f556a1075cf3be212cbfeea6079df8720e17baa23b9c063a0175d4aa"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+  "sha256": "2e6d0850d8b9d8306cf4191224c2a98b87838c10e6d6a413aaeff13468bef295"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md",
+  "sha256": "5d8181db511f0c5df1e7128d69434414dab9fb17a0eb0f57e4de4a200e04686f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+  "sha256": "5d94d1b38f7e63030e09fb7c8de40997fe1b767073bb124b2350c0c9bbab67b7"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+  "sha256": "348df3b248de8762dd27a385c7e5480e84e28ae3d39244e2592e7eeecd08c81d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md",
+  "sha256": "c94b95ade68ed9ebc2d7b432021f33f91dbd5015d930fea462bdd11a34e5b8b7"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md",
+  "sha256": "86b8c3f44bae530292a321126f1bdc50ca0174b2eea1f02fc7647feb85fb7776"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/atomic_operations_overview.md",
+  "sha256": "22e4fb3702b2879c8e933d53a2eb573fa6d50eb188aca8e1dc5514890bb13061"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+  "sha256": "2d3b1282744ace1c4e09dd5a796ac52cdf125f02784f3dc0039236b3a2db9961"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md",
+  "sha256": "cc5965a33caad932f61413ebfe6132b91529012d938573671c6537aa6f27b9c9"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md",
+  "sha256": "90746f8dd629e07afed7628496d75ef6db73764a597a3fe87ff3b2ae7db9aca5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md",
+  "sha256": "2c566a377abeabc64ea8c33e55dfa5131999699b31e2194fc9afe2ebab918d91"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/key_features.md",
+  "sha256": "01940feec2d795547d146a49ffe729735b0734878d904bfcfa72bb2add88778a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+  "sha256": "536e0b1b39cd434a5609db1e57c3c9e558d1543cc38a8a3a39939f00abfc34f1"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_and.md",
+  "sha256": "f570d1f24e9dbc06219928b7032538bbcda29c81154a965e70235385f11f9606"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_cas.md",
+  "sha256": "92e307875ae5d841799416bd53ceb379fe05d8e8a4d1fd754cfb279244161877"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_dec.md",
+  "sha256": "a91f59c65e5d3ddc731a8c6ebb039536fa46666c73e3f336a8d1573d1c0a3e65"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_exch.md",
+  "sha256": "934da2a2480fe830877e5313646a5f659ab3b276c14eab7b326f10067122bd6e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_inc.md",
+  "sha256": "e2b4ae01a0e06ae8fc78faf2827a94942bc3041a75eaac5a8b73f1335ecb9b66"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_max.md",
+  "sha256": "38ed5d168441dc6f8e77c4a55eedc679d6475bb7445663d3a4073b380321e5e8"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_min.md",
+  "sha256": "371ea7c3aa8a1f017ccae8d85992a7cae8d1780a9585a0ef0432cab59f4f25be"
+ }
+]

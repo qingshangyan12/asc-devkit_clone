@@ -1,24 +1,14 @@
 ---
 okftype: reference.api
-title: asc_uint162uint32（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint32_deprecated.md
-description: 已废弃的矢量寄存器数据类型转换接口，将uint16_t类型数据转为uint32_t类型，读取数据时按索引奇数或偶数位置分两部分读取，请改用显式位置参数重载替代。
+description: "已废弃的矢量数据类型转换接口，将uint16_t类型数据转为uint32_t类型，因位宽比为1:2读取时将一个VL大小的数据分为两部分并按接口后缀选择奇偶索引位置；请改用asc_uint162uint32的显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked]
-signature:
-  - override_id: asc_uint162uint32__Rvu32_vu16_vb
-  - override_id: asc_uint162uint32_v2__Rvu32_vu16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_uint162uint32（废弃）
 

@@ -1,22 +1,13 @@
 ---
 okftype: reference.api
-title: asc_set_store_atomic_config_v2（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md
-description: 该接口已废弃，用于设置原子操作启用位与原子操作类型的值，原子加操作请使用asc_atomic_add接口实现。
+description: "该接口已废弃，原子加操作请使用asc_atomic_add接口实现；用于设置原子操作启用位与原子操作类型的值，开启后可对int32_t、half、float、bfloat16_t、int16_t、int8_t等数据类型执行原子求和操作。"
 tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement_configuration]
-  - traits: [atomic, deprecated]
-signature:
-  - override_id: asc_set_store_atomic_config_v2__u16_u16
-archs: ['3510']
-header: [/include/c_api/atomic/scalar_atomic.h]
+  - roles: [configuration]
+  - traits: [atomic]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md
-    kind: related
-    condition: 接口已废弃，原子加操作的替代实现
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.1.0
 ---
 # asc_set_store_atomic_config_v2（废弃）
 

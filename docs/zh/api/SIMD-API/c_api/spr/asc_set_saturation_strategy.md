@@ -1,23 +1,15 @@
 ---
 okftype: reference.api
-title: asc_set_saturation_strategy
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
-description: 设置饱和控制策略为USE_API或USE_GLOBAL，该策略影响CAST类饱和是否生效，切换策略不会自动修改各模式的饱和开关。
+description: "设置饱和控制策略为USE_API或USE_GLOBAL，分别表示按单指令或API路径配置饱和与使用全局饱和配置，该策略尤其影响CAST类饱和，仅在USE_GLOBAL时通过asc_set_saturation_flag配置的CAST才会生效，切换策略不会自动修改各模式饱和开关。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_set_saturation_strategy__strategy
-archs: ['3510']
-header: [/include/c_api/spr/spr.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "仅在USE_GLOBAL策略时通过其配置的CAST饱和才会生效"
+version: 9.0.0-
 ---
 # asc_set_saturation_strategy
 

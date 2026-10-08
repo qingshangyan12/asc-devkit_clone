@@ -1,23 +1,10 @@
 ---
-okftype: reference.type
-title: ASC_IS_AIC/ASC_IS_AIV
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md
-description: 在分离模式中提供 AIC 与 AIV 代码路径的条件判断宏，用于隔离 Cube Core 和 Vector Core 的专属代码。
+okftype: reference.macro
+description: "在AIC与AIV分离模式下作为if语句条件对两类核心代码路径进行条件编译和运行的宏对，分别是ASCEND_IS_AIC与ASCEND_IS_AIV的C API别名，用于隔离仅AIC执行的矩阵计算搬运代码与仅AIV执行的矢量计算搬运代码，仅适用于分离模式。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
-declaration:
-  macros:
-    - symbol: ASC_IS_AIC
-      cpp: '#define ASC_IS_AIC ASCEND_IS_AIC'
-      macro_kind: object
-      value: ASCEND_IS_AIC
-    - symbol: ASC_IS_AIV
-      cpp: '#define ASC_IS_AIV ASCEND_IS_AIV'
-      macro_kind: object
-      value: ASCEND_IS_AIV
-header: [/include/c_api/defs/macro.h]
-timestamp: '2026-09-28'
+dependencies: []
+version: 9.0.0-
 ---
 # ASC_IS_AIC/ASC_IS_AIV
 

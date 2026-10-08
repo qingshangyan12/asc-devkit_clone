@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_half2float
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md
-description: 根据mask将矢量数据寄存器中参与计算的half元素转换为float类型并写入dst，源与目的位宽比为1:2，通过src_pos选择读取源数据的偶数或奇数位置。
+description: "根据掩码将矢量数据寄存器中参与计算的half元素转换为float类型，源与目的位宽比为1:2，通过src_pos选择读取源数据索引为偶数或奇数的位置，掩码位为0时目的对应元素置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked, widening_result]
-signature:
-  - override_id: asc_half2float__Rvf32_vf16_vb_icposeven
-  - override_id: asc_half2float__Rvf32_vf16_vb_icposodd
-  - override_id: asc_half2float__vf16_vb_icposeven
-  - override_id: asc_half2float__vf16_vb_icposodd
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
-    file: elu.asc
-    archs: ['3510']
-    override_id: asc_half2float__Rvf32_vf16_vb_icposeven
-timestamp: '2026-09-28'
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_half2float
 

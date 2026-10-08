@@ -1,41 +1,21 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0b_sync_arch_2201（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sync_arch_2201_deprecated.md
-description: 已废弃的同步搬运接口，将存放在L1 Buffer里的512B大小矩阵搬运到L0B Buffer，包含2D与3D格式的高维切分搬运，请改用对应的非同步接口和asc_sync替代。
+description: "已废弃的同步搬运接口，将L1 Buffer里512B大小的矩阵搬运到L0B Buffer，包含2D与3D格式搬运，3D格式支持img2col展开与转置，2D格式不支持转置场景；请改用非同步接口asc_copy_l12l0b和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, img2col, transpose]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0b_buffer]
-  - traits: [deprecated, high_dimensional]
-signature:
-  - override_id: asc_copy_l12l0b_sync__PCBi4x2_PL1i4x2_u16_u8_u16_u16
-  - override_id: asc_copy_l12l0b_sync__PCBu8_PL1u8_u16_u8_u16_u16
-  - override_id: asc_copy_l12l0b_sync__PCBi8_PL1i8_u16_u8_u16_u16
-  - override_id: asc_copy_l12l0b_sync__PCBf16_PL1f16_u16_u8_u16_u16
-  - override_id: asc_copy_l12l0b_sync__PCBbf16_PL1bf16_u16_u8_u16_u16
-  - override_id: asc_copy_l12l0b_sync__PCBu32_PL1u32_u16_u8_u16_u16
-  - override_id: asc_copy_l12l0b_sync__PCBi32_PL1i32_u16_u8_u16_u16
-  - override_id: asc_copy_l12l0b_sync__PCBf32_PL1f32_u16_u8_u16_u16
-  - override_id: asc_copy_l12l0b_sync__PCBf16_PL1f16_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-  - override_id: asc_copy_l12l0b_sync__PCBbf16_PL1bf16_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-  - override_id: asc_copy_l12l0b_sync__PCBu32_PL1u32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-  - override_id: asc_copy_l12l0b_sync__PCBi32_PL1i32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-  - override_id: asc_copy_l12l0b_sync__PCBf32_PL1f32_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - traits: [high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md
     kind: related
-    condition: 2D格式搬运的转置场景
+    condition: "实现2D格式搬运的转置场景时"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-
 ---
 # asc_copy_l12l0b_sync_arch_2201（废弃）
 

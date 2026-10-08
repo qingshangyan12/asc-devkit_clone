@@ -1,31 +1,20 @@
 ---
 okftype: reference.api
-title: asc_storeunalign
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md
-description: 将矢量数据寄存器中的前count个元素连续搬出到非32字节对齐的Unified Buffer（UB）地址，主块直接写入UB、尾块暂存至非对齐寄存器供连续调用拼接，尾块需调用后处理接口收尾，每次调用后由用户手动更新目的地址。
+description: "将矢量数据寄存器中的前count个元素连续搬出到非32字节对齐的Unified Buffer（UB）地址，主块直接写入UB、尾块暂存至非对齐寄存器供连续调用拼接，尾块需调用后处理接口收尾，每次调用后由用户手动更新目的地址，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [store]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
   - traits: [unaligned_transfer]
-signature:
-  - prototype_id: asc_storeunalign__PU<dtype>_Rvstoreunalign_v<dtype>_u32
-    header: []
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float, int64_t]
-archs: ['3510']
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "非对齐搬出的尾块处理"
+version: 9.0.0-
 ---
 # asc_storeunalign
 

@@ -1,31 +1,21 @@
 ---
 okftype: reference.api
-title: asc_deq_int322half_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_deq_int322half_sync_deprecated.md
-description: 已废弃接口，对输入的int32_t类型数据按元素做量化并转换为half类型，scale需通过asc_set_deq_scale的非向量模式设置，请使用asc_deq_int322half配合同步接口asc_sync替代。
+description: "已废弃的同步计算接口，对输入的int32_t类型数据按元素做量化并转换为half类型，scale需通过asc_set_deq_scale的非向量模式设置，起始地址需32字节对齐；请改用非同步接口asc_deq_int322half配合asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise, quantization]
-signature:
-  - override_id: asc_deq_int322half_sync__PUf16_PUi32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - traits: [aligned_transfer, quantization]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 已废弃接口的替代实现
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md
-    kind: related
-    condition: 已废弃接口的替代实现
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-    condition: 非向量模式使用时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md
+    kind: requires
+    condition: "非向量模式使用时"
+version: 9.0.0-
 ---
 # asc_deq_int322half_sync（废弃）
 

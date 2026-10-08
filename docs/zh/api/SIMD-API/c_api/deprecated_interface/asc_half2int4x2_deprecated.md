@@ -1,67 +1,19 @@
 ---
 okftype: reference.api
-title: asc_half2int4x2（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int4x2_deprecated.md
-description: 已废弃的寄存器矢量转换接口：将half类型数据转为int4x2类型，支持多种舍入模式与饱和/非饱和模式，请使用asc_half2int4x2的显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将half类型数据转为int4x2类型，支持多种舍入模式与饱和、非饱和模式；请改用asc_half2int4x2的显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_half2int4x2_rd__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rd_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rd_sat__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rd_sat_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rd_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rd_sat_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rd_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rd_sat_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rn__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rn_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rn_sat__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rn_sat_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rn_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rn_sat_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rn_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rn_sat_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rna__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rna_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rna_sat__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rna_sat_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rna_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rna_sat_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rna_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rna_sat_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_ru__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_ru_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_ru_sat__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_ru_sat_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_ru_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_ru_sat_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_ru_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_ru_sat_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rz__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rz_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rz_sat__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rz_sat_v2__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rz_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rz_sat_v3__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rz_v4__Rvi4x2_vf16_vb
-  - override_id: asc_half2int4x2_rz_sat_v4__Rvi4x2_vf16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md
-    kind: related
-    condition: 该接口的无显式位置参数原型已废弃，需替代时
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "开启饱和模式和非饱和模式时"
+version: 9.0.0-
 ---
 # asc_half2int4x2（废弃）
 

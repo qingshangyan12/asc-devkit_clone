@@ -1,42 +1,17 @@
 ---
 okftype: reference.api
-title: asc_storeunalign_post（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md
-description: 该接口已废弃，将非对齐寄存器中暂存的尾块数据搬出到Unified Buffer（UB），需先调用asc_storeunalign_postupdate接口，请使用asc_squeeze_and_storeunalign_finalize接口实现此功能。
+description: "该接口已废弃，请使用asc_squeeze_and_storeunalign_finalize实现此功能；将非对齐寄存器中暂存的尾块数据搬出到Unified Buffer（UB），适用于连续非32B对齐搬出的收尾场景，调用前须先调用asc_storeunalign_postupdate并保持非对齐寄存器一致。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [store]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, unaligned_transfer]
-signature:
-  - override_id: asc_storeunalign_post__PUi8_vstoreunalign
-  - override_id: asc_storeunalign_post__PUu8_vstoreunalign
-  - override_id: asc_storeunalign_post__PUf4e2m1x2_vstoreunalign
-  - override_id: asc_storeunalign_post__PUf4e1m2x2_vstoreunalign
-  - override_id: asc_storeunalign_post__PUi4x2_vstoreunalign
-  - override_id: asc_storeunalign_post__PUf8e8m0_vstoreunalign
-  - override_id: asc_storeunalign_post__PUf8e5m2_vstoreunalign
-  - override_id: asc_storeunalign_post__PUf8e4m3_vstoreunalign
-  - override_id: asc_storeunalign_post__PUi16_vstoreunalign
-  - override_id: asc_storeunalign_post__PUu16_vstoreunalign
-  - override_id: asc_storeunalign_post__PUf16_vstoreunalign
-  - override_id: asc_storeunalign_post__PUbf16_vstoreunalign
-  - override_id: asc_storeunalign_post__PUi32_vstoreunalign
-  - override_id: asc_storeunalign_post__PUu32_vstoreunalign
-  - override_id: asc_storeunalign_post__PUf32_vstoreunalign
-  - override_id: asc_storeunalign_post__PUi64_vstoreunalign
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storeunalign.h]
+  - traits: [unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md
     kind: requires
-    condition: 调用本接口之前，需要调用[asc_storeunalign_postupdate](asc_storeunalign_postupdate_deprecated.md)接口，且本接口与前序接口的非对齐寄存器要保持一致。
+    condition: "调用本接口之前，且非对齐寄存器与前序接口保持一致"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
-    kind: related
-    condition: 该接口已废弃。请使用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)实现此功能。
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_storeunalign_post（废弃）
 

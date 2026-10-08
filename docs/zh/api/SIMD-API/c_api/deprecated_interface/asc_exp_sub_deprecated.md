@@ -1,27 +1,14 @@
 ---
 okftype: reference.api
-title: asc_exp_sub（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md
-description: 已废弃的寄存器矢量计算接口：将src0与src1按元素相减，并计算以差值为指数的自然指数函数写入dst，输入为half且不带src_pos参数的原型及asc_exp_sub_v2原型已废弃，请使用asc_exp_sub新原型替代。
+description: "已废弃的寄存器矢量计算接口，将src0与src1按元素相减并计算以差值为指数的自然指数函数写入目的寄存器；输入为half且不带src_pos参数的原型及asc_exp_sub_v2原型已废弃，请改用新原型替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [exponential, subtract]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, elementwise, masked]
-signature:
-  - override_id: asc_exp_sub__Rvf32_vf16_vf16_vb
-  - override_id: asc_exp_sub_v2__Rvf32_vf16_vf16_vb
-  - override_id: asc_exp_sub_v2__Rvf32_vf32_vf32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_fused.h]
+  - traits: [elementwise]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md
-    kind: related
-    condition: 原型已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_exp_sub（废弃）
 

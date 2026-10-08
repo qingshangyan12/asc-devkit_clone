@@ -1,13 +1,6 @@
 ---
-okftype: reference.index
-title: UnitFlag
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute_key_features/UnitFlag.md
-navigation:
-  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md
-    title: asc_set_mmad_direction_m
-  - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
-    title: asc_set_mmad_direction_n
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "说明UnitFlag特性：asc_mmad与L0C Buffer搬出接口通过单元标志位以内存块粒度实现精细化读写同步，降低同步延迟；多指令复用同一块L0C Buffer时前n-1条以ENABLE_KEEP维持占用、最后一条以ENABLE_UPDATE解除，并要求计算与搬出数据量保持一致。"
 ---
 # UnitFlag
 

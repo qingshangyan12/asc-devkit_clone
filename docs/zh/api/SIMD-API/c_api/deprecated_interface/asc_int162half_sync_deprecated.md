@@ -1,33 +1,18 @@
 ---
 okftype: reference.api
-title: asc_int162half_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162half_sync_deprecated.md
-description: 已废弃的同步类型转换接口，将int16_t类型数据转换为half类型，支持多种舍入模式，请使用对应的非同步接口并配合同步接口asc_sync替代。
+description: "已废弃的同步矢量转换接口，将int16_t类型数据转换为half类型并支持多种舍入模式，目的与源矢量起始地址需32字节对齐；请改用对应的非同步接口asc_int162half并配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, rounding_mode]
-signature:
-  - override_id: asc_int162half_sync__PUf16_PUi16_u32
-  - override_id: asc_int162half_rn_sync__PUf16_PUi16_u32
-  - override_id: asc_int162half_rna_sync__PUf16_PUi16_u32
-  - override_id: asc_int162half_rd_sync__PUf16_PUi16_u32
-  - override_id: asc_int162half_ru_sync__PUf16_PUi16_u32
-  - override_id: asc_int162half_rz_sync__PUf16_PUi16_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [conversion, synchronization]
+  - traits: [aligned_transfer, rounding_mode]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int162half.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_int162half_sync（废弃）
 

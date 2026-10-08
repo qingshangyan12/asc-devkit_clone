@@ -1,26 +1,17 @@
 ---
 okftype: reference.api
-title: asc_enable_hif8
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md
-description: 启用矩阵乘加计算的HiF8模式，当左矩阵A和右矩阵B均以fp8_e4m3fn_t作为输入数据类型时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法运算前将转换为hifloat8_t类型参与计算，需在矩阵乘加指令执行前调用。
+description: "启用矩阵乘加计算的HiF8模式，当左右矩阵均以fp8_e4m3fn_t作为输入数据类型时，L0A与L0B Buffer中的数据在参与矩阵乘法运算前转换为hifloat8_t类型参与计算，需在矩阵乘加指令执行前调用，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [matrix_compute]
-signature:
-  - override_id: asc_enable_hif8__z
-archs: ['3510']
-header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md
     kind: related
-    condition: 如需切换为FP8模式
+    condition: "如需切换为FP8模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md
     kind: configures
-examples: []
-timestamp: '2026-09-28'
+version: 9.1.0-
 ---
 # asc_enable_hif8
 

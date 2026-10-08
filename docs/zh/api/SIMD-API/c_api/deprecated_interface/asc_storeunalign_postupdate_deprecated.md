@@ -1,44 +1,17 @@
 ---
 okftype: reference.api
-title: asc_storeunalign_postupdate（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md
-description: 该接口不指定存储偏移量的原型及掩码寄存器b8搬出原型已废弃，用于从矢量数据寄存器或掩码寄存器向Unified Buffer（UB）非32B对齐起始地址连续搬出并更新目的地址，请使用asc_squeeze_and_storeunalign接口实现此功能。
+description: "该接口不指定存储偏移量的原型已废弃，请使用asc_squeeze_and_storeunalign实现此功能；将矢量数据寄存器或掩码寄存器中的数据连续搬出到非32B对齐的Unified Buffer（UB）地址，每次调用后自动更新目的地址，应配合asc_storeunalign_post完成尾块搬出。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [store]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, post_update, unaligned_transfer]
-signature:
-  - override_id: asc_storeunalign_postupdate__PUi8_Rvstoreunalign_vi8
-  - override_id: asc_storeunalign_postupdate__PUu8_Rvstoreunalign_vu8
-  - override_id: asc_storeunalign_postupdate__PUi16_Rvstoreunalign_vi16
-  - override_id: asc_storeunalign_postupdate__PUu16_Rvstoreunalign_vu16
-  - override_id: asc_storeunalign_postupdate__PUi32_Rvstoreunalign_vi32
-  - override_id: asc_storeunalign_postupdate__PUu32_Rvstoreunalign_vu32
-  - override_id: asc_storeunalign_postupdate__PUi64_Rvstoreunalign_vi64
-  - override_id: asc_storeunalign_postupdate__PUf16_Rvstoreunalign_vf16
-  - override_id: asc_storeunalign_postupdate__PUf32_Rvstoreunalign_vf32
-  - override_id: asc_storeunalign_postupdate__PUbf16_Rvstoreunalign_vbf16
-  - override_id: asc_storeunalign_postupdate__PUf8e4m3_Rvstoreunalign_vf8e4m3
-  - override_id: asc_storeunalign_postupdate__PUf8e5m2_Rvstoreunalign_vf8e5m2
-  - override_id: asc_storeunalign_postupdate__PUf8e8m0_Rvstoreunalign_vf8e8m0
-  - override_id: asc_storeunalign_postupdate__PUf4e2m1x2_Rvstoreunalign_vf4e2m1x2
-  - override_id: asc_storeunalign_postupdate__PUf4e1m2x2_Rvstoreunalign_vf4e1m2x2
-  - override_id: asc_storeunalign_postupdate__PUi4x2_Rvstoreunalign_vi4x2
-  - override_id: asc_storeunalign_postupdate__RPUu8_Rvstoreunalign_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storeunalign.h]
+  - traits: [post_update, unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md
     kind: related
-    condition: 本接口应该配合[asc_storeunalign_post](asc_storeunalign_post_deprecated.md)接口一起使用。
+    condition: "配合asc_storeunalign_post接口一起使用"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
-    kind: related
-    condition: 该接口不指定存储偏移量的原型已废弃，请使用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)实现此功能。掩码寄存器搬出模式的b8数据类型原型已废弃，请使用b16或b32数据类型原型。
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_storeunalign_postupdate（废弃）
 

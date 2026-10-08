@@ -1,29 +1,19 @@
 ---
 okftype: reference.api
-title: asc_uint322int16（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md
-description: 已废弃的矢量寄存器数据类型转换接口，将uint32_t类型数据转为int16_t类型，支持饱和与非饱和模式，写入时按索引奇偶位置分两部分，请改用显式位置参数重载替代。
+description: "已废弃的矢量数据类型转换接口，将uint32_t类型数据转为int16_t类型，支持饱和与非饱和模式，因位宽比为2:1写入时按接口后缀选择奇偶索引位置；请改用asc_uint322int16的显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, saturation_mode]
-signature:
-  - override_id: asc_uint322int16__Rvi16_vu32_vb
-  - override_id: asc_uint322int16_sat__Rvi16_vu32_vb
-  - override_id: asc_uint322int16_v2__Rvi16_vu32_vb
-  - override_id: asc_uint322int16_sat_v2__Rvi16_vu32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322int16.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "开启饱和模式和非饱和模式时"
+version: 9.0.0-
 ---
 # asc_uint322int16（废弃）
 

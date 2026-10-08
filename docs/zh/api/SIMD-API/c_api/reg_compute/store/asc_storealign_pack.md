@@ -1,52 +1,20 @@
 ---
 okftype: reference.api
-title: asc_storealign_pack
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md
-description: 将矢量数据寄存器或掩码寄存器中的数据压缩搬出到Unified Buffer（UB）：矢量场景按mask将有效元素低半部分bit数据写入压缩后目的位置，掩码场景每间隔1bit丢弃1bit后连续压缩存储，提供六种功能模式，仅在AIV上生效。
+description: "将矢量数据寄存器或掩码寄存器中的数据压缩搬出到Unified Buffer（UB），矢量场景按掩码将有效元素低半部分bit写入压缩后目的位置，掩码场景每间隔1bit丢弃1bit后连续压缩存储，目的地址需32字节或16字节对齐，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [compression, store]
-  - objects: [mask, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-  - traits: [masked]
-signature:
-  - prototype_id: asc_storealign_pack__PU<dtype>_v<dtype>_vb
-    dtype: [int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t,
-      uint64_t]
-  - prototype_id: asc_storealign_pack__PU<dtype>_v<dtype>_i32_vb
-    dtype: [int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t,
-      uint64_t]
-  - prototype_id: asc_storealign_pack__PU<dtype>_v<dtype>_ar_vb
-    dtype: [int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float, int64_t,
-      uint64_t]
-  - prototype_id: asc_storealign_pack__PU<dtype>_vb
-    dtype: [uint8_t, uint16_t, uint32_t]
-  - prototype_id: asc_storealign_pack__PU<dtype>_vb_i32
-    dtype: [uint8_t, uint16_t, uint32_t]
-  - prototype_id: asc_storealign_pack__PU<dtype>_vb_ar
-    dtype: [uint8_t, uint16_t, uint32_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storealign.h]
+  - traits: [aligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
-    condition: 地址寄存器偏移搬出模式
+    condition: "地址寄存器偏移压缩搬出模式"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast
-    file: cast.asc
-    archs: ['3510']
-    override_id: asc_storealign_pack__PUi32_vi32_vb
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
-    file: elu.asc
-    archs: ['3510']
-    override_id: asc_storealign_pack__PUi32_vi32_vb
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_storealign_pack
 

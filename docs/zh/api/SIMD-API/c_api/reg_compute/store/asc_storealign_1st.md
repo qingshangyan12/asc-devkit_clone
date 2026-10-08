@@ -1,39 +1,19 @@
 ---
 okftype: reference.api
-title: asc_storealign_1st
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_1st.md
-description: 将矢量数据寄存器中的首个元素搬出到Unified Buffer（UB），单次搬出量为一个元素，不支持设置掩码，目的地址需按数据类型对齐，提供对齐、立即数偏移和地址寄存器偏移三种搬出模式。
+description: "将矢量数据寄存器中的首个元素搬出到Unified Buffer（UB），单次搬出量为一个元素，不支持设置掩码，目的地址需按数据类型对齐，提供对齐、立即数偏移与地址寄存器偏移三种搬出模式，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [store]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-signature:
-  - prototype_id: asc_storealign_1st__PU<dtype>_v<dtype>
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_storealign_1st__PU<dtype>_v<dtype>_i32
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_storealign_1st__PU<dtype>_v<dtype>_ar
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storealign.h]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
-    condition: 地址寄存器偏移搬出模式
+    condition: "地址寄存器偏移搬出模式"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_storealign_1st
 

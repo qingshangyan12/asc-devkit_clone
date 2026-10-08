@@ -1,15 +1,10 @@
 ---
-okftype: reference.type
-title: asc_position_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md
-description: 该枚举表示寄存器中源或目的操作数的奇偶位置，供Reg类型转换和融合计算接口选择数据位置。
+okftype: reference.enum
+description: "表示源或目的操作数在寄存器中的奇偶位置，供Reg类型转换和融合计算接口选择数据位置，对应常量可直接作为接口的位置参数。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-declaration:
-  symbol: asc_position_mode
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies: []
+version: 9.0.0-
 ---
 # asc_position_mode
 

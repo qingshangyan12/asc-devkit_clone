@@ -1,46 +1,27 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2ub_align_sync_arch_3510（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_sync_arch_3510_deprecated.md
-description: 已废弃的同步搬运接口，提供GM到UB的非对齐数据搬运，数据长度非32字节对齐时补齐并支持手动或自动填充，请改用asc_copy_gm2ub_align连续数据搬运接口和asc_sync替代。
+description: "已废弃的同步搬运接口，提供GM到UB的非对齐数据搬运，数据长度非32字节对齐时补齐至32字节并支持手动或自动填充；请改用asc_copy_gm2ub_align连续数据搬运接口和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, padding, unaligned_transfer]
-signature:
-  - override_id: asc_copy_gm2ub_align_sync__PUi8_PGi8_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUu8_PGu8_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUhf8_PGhf8_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUf8e5m2_PGf8e5m2_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUf8e4m3_PGf8e4m3_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUi16_PGi16_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUu16_PGu16_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUf16_PGf16_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUbf16_PGbf16_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUi32_PGi32_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUu32_PGu32_u32
-  - override_id: asc_copy_gm2ub_align_sync__PUf32_PGf32_u32
-archs: ['3510']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - traits: [aligned_transfer, padding, unaligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
     kind: requires
-    condition: 手动填充时
-examples: []
-timestamp: '2026-09-28'
+    condition: "手动填充时"
+version: 9.0.0-
 ---
 # asc_copy_gm2ub_align_sync_arch_3510（废弃）
 

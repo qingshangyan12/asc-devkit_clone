@@ -1,23 +1,14 @@
 ---
 okftype: reference.api
-title: asc_set_store_atomic_config_v1
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md
-description: 设置原子操作启用位与原子操作类型的值：type为原子操作启用位，其取值指定开启原子操作的数据类型（如float、half、int32_t），op为原子操作类型（0表示求和操作），接口运行在标量流水PIPE_S上，使用完成后建议通过asc_disable_dma_atomic清空原子操作状态。
+description: "设置原子操作启用位与原子操作类型的值，type取值指定开启原子操作的数据类型，op为0表示求和操作，使用完成后建议通过asc_disable_dma_atomic清空原子操作状态，该指令执行前不会对GM数据清零，需开发者按需手动清零。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [scalar]
   - traits: [atomic]
-signature:
-  - override_id: asc_set_store_atomic_config_v1__u16_u16
-archs: ['2201']
-header: [/include/c_api/atomic/scalar_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
     kind: related
-    condition: 使用完成后
-examples: []
-timestamp: '2026-09-28'
+    condition: "使用完成后"
+version: 9.0.0-
 ---
 # asc_set_store_atomic_config_v1
 

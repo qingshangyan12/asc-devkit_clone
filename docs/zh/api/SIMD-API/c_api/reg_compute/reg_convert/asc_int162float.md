@@ -1,27 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int162float
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162float.md
-description: 将源操作数中int16_t类型的元素转换为float类型并写入目的操作数，位宽比为1:2，根据位置标签选择读取源操作数偶数或奇数索引位置。本接口为Reg矢量计算接口，仅在AIV上生效。
+description: "将矢量数据寄存器中int16_t类型的元素转换为float类型并写入目的操作数，源与目的位宽比为1:2，通过src_pos选择读取源数据索引为偶数或奇数的位置，掩码位为0时目的对应元素置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, widening_result]
-signature:
-  - override_id: asc_int162float__Rvf32_vi16_vb_icposeven
-  - override_id: asc_int162float__Rvf32_vi16_vb_icposodd
-  - override_id: asc_int162float__vi16_vb_icposeven
-  - override_id: asc_int162float__vi16_vb_icposodd
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_int162float
 

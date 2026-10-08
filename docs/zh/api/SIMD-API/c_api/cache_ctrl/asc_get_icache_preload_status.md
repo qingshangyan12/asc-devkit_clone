@@ -1,21 +1,13 @@
 ---
 okftype: reference.api
-title: asc_get_icache_preload_status
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md
-description: 调试接口，在asc_icache_preload之后调用以获取ICache预取状态，返回0表示上一次预取已完成，返回1表示预取正在进行中；仅用于调试与性能分析，不影响预取本身的执行流程。
+description: "调试用查询接口，在asc_icache_preload之后调用以获取ICache预取状态，返回0表示上一次预取已完成，返回1表示预取正在进行中，仅用于调试与性能分析，不影响预取本身的执行流程。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - families: [cache_management]
-signature:
-  - override_id: asc_get_icache_preload_status__z
-archs: ['2201', '3510']
-header: [/include/c_api/cache_ctrl/cache_ctrl.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
     kind: requires
-examples: []
-timestamp: '2026-09-28'
+    condition: "在asc_icache_preload后调用以获取其预取状态"
+version: 9.0.0-
 ---
 # asc_get_icache_preload_status
 

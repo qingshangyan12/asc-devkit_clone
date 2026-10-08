@@ -1,35 +1,24 @@
 ---
 okftype: reference.api
-title: asc_ne_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ne_sync_deprecated.md
-description: 已废弃的同步比较接口，按元素判断src0与src1是否不相等，成立时输出1否则为0，每个元素比较结果占1个bit，请使用非同步接口asc_ne配合asc_sync替代。
+description: "已废弃的同步比较接口，按元素判断src0与src1是否不相等，成立时输出1否则为0，每个比较结果占1个bit，结果输出到寄存器时需配合asc_get_cmp_mask获取；请改用非同步接口asc_ne配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [comparison]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise]
-signature:
-  - override_id: asc_ne_sync__PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_ne_sync__PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_ne_sync__PUu8_PUf16_PUf16_u8_u8_u8_u8_u8_u8_u8
-  - override_id: asc_ne_sync__PUu8_PUf32_PUf32_u8_u8_u8_u8_u8_u8_u8
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [comparison, synchronization]
+  - traits: [aligned_transfer, elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_get_cmp_mask.md
-    kind: related
-    condition: 使用寄存器形式的接口时
+    kind: requires
+    condition: "使用寄存器形式的接口时"
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_set_cmp_mask.md
     kind: related
-    condition: 如果要初始化寄存器
-examples: []
-timestamp: '2026-09-28'
+    condition: "如果要初始化寄存器"
+version: 9.0.0-
 ---
 # asc_ne_sync（废弃）
 

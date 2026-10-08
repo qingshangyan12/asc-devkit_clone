@@ -1,22 +1,12 @@
 ---
 okftype: reference.api
-title: asc_set_l0c2gm_relu_alpha（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_relu_alpha_deprecated.md
-description: 该接口已废弃，用于对RELU_ALPHA寄存器中的值进行设置，该64bit寄存器存储fixpipe或cube指令中进行Scalar ReLU时使用的alpha值，请使用asc_set_l0c_copy_relu_alpha接口替代。
+description: "该接口已废弃，请使用asc_set_l0c_copy_relu_alpha接口替代；对RELU_ALPHA寄存器中的值进行设置，该64bit寄存器存储在fixpipe或cube指令中进行Scalar ReLU时使用的alpha值，M2值不能是INF/NAN。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_set_l0c2gm_relu_alpha__u64
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md
-    kind: related
-    condition: 该接口已废弃，作为替代接口使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-9.2.0
 ---
 # asc_set_l0c2gm_relu_alpha（废弃）
 

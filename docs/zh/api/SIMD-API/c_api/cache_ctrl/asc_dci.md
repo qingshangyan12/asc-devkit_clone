@@ -1,21 +1,13 @@
 ---
 okftype: reference.api
-title: asc_dci
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dci.md
-description: 数据缓存无效化接口，无参数调用即触发整个DCache全量失效，不检查脏数据、脏数据将被直接丢弃不回写；调用前必须先以DSB_ALL参数调用asc_sync_data_barrier等待此前内存访问指令执行结束。
+description: "数据缓存无效化接口，无参数调用即触发整个DCache全量失效，不检查脏数据，脏数据将被直接丢弃不回写，下次访问时从GM重新加载，调用前必须先以DSB_ALL参数调用asc_sync_data_barrier等待此前内存访问指令执行结束。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
-  - families: [cache_management]
-signature:
-  - override_id: asc_dci__z
-archs: ['3510']
-header: [/include/c_api/cache_ctrl/cache_ctrl.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
     kind: requires
-examples: []
-timestamp: '2026-09-28'
+    condition: "调用前须以DSB_ALL参数调用，等待此前内存访问指令执行结束"
+version: 9.1.0-
 ---
 # asc_dci
 

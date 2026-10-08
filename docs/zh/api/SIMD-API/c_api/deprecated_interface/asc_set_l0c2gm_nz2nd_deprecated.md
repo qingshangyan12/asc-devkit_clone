@@ -1,31 +1,21 @@
 ---
 okftype: reference.api
-title: asc_set_l0c2gm_nz2nd（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l0c2gm_nz2nd_deprecated.md
-description: 该接口已废弃，用于在L0C Buffer搬出接口启用随路Nz转ND格式功能时配置格式转换所需的相关参数，仅在AIC上生效，请使用asc_set_l0c_copy_nz_para接口替代。
+description: "该接口已废弃，请使用asc_set_l0c_copy_nz_para接口替代；用于在L0C Buffer搬出接口启用随路Nz转ND格式功能时配置格式转换所需的相关参数，调用搬出接口前必须先完成配置，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_set_l0c2gm_nz2nd__u64_u64_u64
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
     kind: configures
-    condition: 需要进行随路Nz转ND格式时
+    condition: "启用随路Nz转ND格式功能时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
     kind: configures
-    condition: 需要进行随路Nz转ND格式时
+    condition: "启用随路Nz转ND格式功能时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
     kind: configures
-    condition: 需要进行随路Nz转ND格式时
+    condition: "启用随路Nz转ND格式功能时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
-    kind: related
-    condition: 该接口已废弃，作为替代接口使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_set_l0c2gm_nz2nd（废弃）
 

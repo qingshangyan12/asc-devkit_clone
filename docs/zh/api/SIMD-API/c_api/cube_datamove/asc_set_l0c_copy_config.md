@@ -1,28 +1,20 @@
 ---
 okftype: reference.api
-title: asc_set_l0c_copy_config
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
-description: 设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活参数在Fixpipe Buffer中的起始地址索引以及UnitFlag全局状态，配置由后续L0C搬出接口使用，仅在AIC上生效。
+description: "设置L0C Buffer搬出场景下随路tensor量化与随路tensor激活参数在Fixpipe Buffer中的起始地址索引以及UnitFlag全局状态，配置由后续搬出接口使用并持续生效，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
   - traits: [quantization]
-signature:
-  - override_id: asc_set_l0c_copy_config__u64_u64_b
-archs: ['2201', '3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
     kind: configures
-    condition: 需要开启随路量化或随路激活功能
+    condition: "需要开启随路量化或随路激活功能"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
     kind: configures
-    condition: 需要开启随路量化或随路激活功能
+    condition: "需要开启随路量化或随路激活功能"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
     kind: configures
-    condition: 需要开启随路量化或随路激活功能
-examples: []
-timestamp: '2026-09-28'
+    condition: "需要开启随路量化或随路激活功能"
+version: 9.2.0-
 ---
 # asc_set_l0c_copy_config
 

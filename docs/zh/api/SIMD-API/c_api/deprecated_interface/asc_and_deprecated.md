@@ -1,28 +1,14 @@
 ---
 okftype: reference.api
-title: asc_and（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_and_deprecated.md
-description: 根据掩码对两个矢量数据寄存器源操作数执行按位与操作并将结果写入目的寄存器，仅在AIV上生效；其浮点类型重载已废弃，请使用等位宽的asc_and整数重载替代。
+description: "根据掩码对两个矢量数据寄存器源操作数执行按位与并将结果写入目的寄存器，仅在AIV上生效；其浮点类型重载已废弃，请改用等位宽的asc_and整数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [bitwise]
   - operations: [bitwise_and]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked]
-signature:
-  - prototype_id: asc_and__Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [fp8_e5m2_t, fp8_e4m3fn_t, half, bfloat16_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_logic.h]
+  - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: requires
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md
-    kind: related
-    condition: 浮点类型重载已废弃，使用等位宽整数重载替代
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_and（废弃）
 

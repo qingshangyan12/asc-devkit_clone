@@ -1,17 +1,10 @@
 ---
-okftype: reference.type
-title: asc_dual_dst_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md
-description: 描述L0C Buffer数据搬出时的双目标拆分模式，供矩阵搬出接口通过dual_dst_ctrl参数选择拆分方向。
+okftype: reference.enum
+description: "表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口dual_dst_ctrl参数的类型，支持关闭双目标以及沿M方向或N方向拆分数据。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - source_locations: [l0c_buffer]
-declaration:
-  symbol: asc_dual_dst_mode
-  underlying_type: uint8_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies: []
+version: 9.0.0-
 ---
 # asc_dual_dst_mode
 

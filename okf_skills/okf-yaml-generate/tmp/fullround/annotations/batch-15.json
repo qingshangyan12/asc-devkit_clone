@@ -1,0 +1,799 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_smmu_tag_version.md",
+      "document_sha256": "45f96a3ce16d7f08b749f8ebfe0a2bff13188227230162b2938af6b16364f580",
+      "description": {
+        "value": "获取系统内存管理单元SMMU的版本信息并按int64_t返回，返回值按比特位编码年、月、日及同日子版本等标签字段，常用于运行时判断当前SMMU的版本或发布日期，以便进行版本相关的处理。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_smmu_tag_version.md", "excerpt": "获取系统内存管理单元（System Memory Management Unit，SMMU）版本信息。常用于在运行时判断当前SMMU的版本或发布日期，以便进行版本相关的处理。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_smmu_tag_version.md", "excerpt": "SMMU版本信息。各bit含义如下："}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "获取系统内存管理单元（System Memory Management Unit，SMMU）版本信息。常用于在运行时判断当前SMMU的版本或发布日期，以便进行版本相关的处理。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_status.md",
+      "document_sha256": "8faf2848b3a8f57bce00beaedc8b64d1ffeefd527b2039a4a46c852cb9d6ce50",
+      "description": {
+        "value": "读取当前核上下文中STATUS状态寄存器的64bit整体值并按int64_t返回，各状态位记录核运行中浮点溢出、数据搬运溢出、NaN输入等告警事件，一旦置位即保持直到复位或被读取清除，为只读查询接口，不支持纯SIMT编译模式。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_status.md", "excerpt": "读取当前核上下文中STATUS特殊寄存器的64bit整体值并按`int64_t`返回。STATUS是64bit状态寄存器，记录核运行过程中各类告警事件的发生情况，各状态位一旦因告警行为置位即保持，直到复位或被读取清除。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_status.md", "excerpt": "本接口为只读查询接口，仅读取状态寄存器当前值，可在AIC与AIV中调用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取当前核上下文中STATUS特殊寄存器的64bit整体值并按`int64_t`返回。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md",
+      "document_sha256": "9a9410d6461e1be0becf6ab88b79d68e75d70b2c70dc56e35856b177bc7b3e45",
+      "description": {
+        "value": "在分离模式下获取逻辑AI Core上Cube Core或Vector Core的逻辑索引并按int64_t返回，SubBlockIdx取值范围为0至SubBlockNum，上界可通过GetSubBlockNum接口获取，本接口只读且不修改任何寄存器或存储状态。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md", "excerpt": "在[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md", "excerpt": "SubBlockIdx的取值范围为[0, SubBlockNum)，SubBlockNum可以通过[GetSubBlockNum](asc_get_sub_block_num.md)获取。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md", "excerpt": "本接口为只读查询接口，不修改任何寄存器或存储状态。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "在[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下获取逻辑AI Core上Cube Core（AIC）或者Vector Core（AIV）的逻辑索引。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md",
+          "kind": "related",
+          "condition": "SubBlockNum用于确定SubBlockIdx取值范围上界",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md",
+            "excerpt": "SubBlockIdx的取值范围为[0, SubBlockNum)，SubBlockNum可以通过[GetSubBlockNum](asc_get_sub_block_num.md)获取。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md",
+      "document_sha256": "437d73652a09eadbb31387e2fc6f3ff465f0a37f6b3d80986b4fee3c6100404f",
+      "description": {
+        "value": "在分离模式下读取当前AI Core上Cube Core或Vector Core的数量并按int64_t返回，该值保存在只读特殊寄存器中，由系统控制器在核函数启动前配置，运行期间不可修改，连续两次调用返回值相同，非分离模式下语义以系统控制器配置为准。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md", "excerpt": "在[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下读取当前AI Core上Cube Core（AIC）或Vector Core（AIV）的数量。该值在核函数（Kernel）启动前配置，运行中不可修改。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md", "excerpt": "本接口读取的subblock维度保存在只读特殊寄存器中，由系统控制器（System Controller，SC）在核函数（Kernel）启动前配置，核函数（Kernel）运行期间不可修改，连续两次调用返回值相同。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "在[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下读取当前AI Core上Cube Core（AIC）或Vector Core（AIV）的数量。该值在核函数（Kernel）启动前配置，运行中不可修改。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sys_virtual_base.md",
+      "document_sha256": "3c25853fbd3630ab3e9ed172e0449ee6ab615bda161a7e90179ff511eecdcc21",
+      "description": {
+        "value": "读取系统虚拟基地址特殊寄存器的值并按int64_t返回，该基地址由系统在核函数启动前按核配置完成，用于在核函数内将相对偏移量转换为系统虚拟地址，常用于地址推导、跨核地址对齐等场景，为只读查询接口。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sys_virtual_base.md", "excerpt": "读取系统虚拟基地址特殊寄存器的值并按`int64_t`返回，该寄存器为只读特殊寄存器，存储当前核上下文的系统虚拟基地址，由系统在核函数（Kernel）启动前按核配置完成。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sys_virtual_base.md", "excerpt": "本接口为只读查询接口，仅读取系统虚拟基地址寄存器当前值，不修改任何寄存器或存储状态，可在AIC与AIV上下文中调用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取系统虚拟基地址特殊寄存器的值并按`int64_t`返回，该寄存器为只读特殊寄存器，存储当前核上下文的系统虚拟基地址，由系统在核函数（Kernel）启动前按核配置完成。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md",
+      "document_sha256": "c5b006a7431601c33eee5b2d26c3615786b672445ac6afe09016d539c0452a9d",
+      "description": {
+        "value": "读取当前系统时钟计数器并返回微秒级的int64_t时间值，接口内部按当前芯片时钟频率完成换算，无需调用方自行换算，返回值随系统时钟持续递增，同一核函数内多次调用单调不减，与asc_get_system_cycle读取同一底层计数器。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md", "excerpt": "读取当前系统时钟计数器，返回`int64_t`类型的当前时间值（单位：微秒）。该接口在底层读取系统cycle计数器后，按当前芯片的时钟频率进行换算，直接返回微秒级时间值，无需调用方自行换算。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md", "excerpt": "返回值随系统时钟持续递增，同一核函数（Kernel）内多次调用返回值单调不减。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取当前系统时钟计数器，返回`int64_t`类型的当前时间值（单位：微秒）。该接口在底层读取系统cycle计数器后，按当前芯片的时钟频率进行换算，直接返回微秒级时间值，无需调用方自行换算。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md",
+          "kind": "related",
+          "condition": "两者读取同一底层计数器，区别在于本接口在内部完成频率换算",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md",
+            "excerpt": "本接口与[asc_get_system_cycle](asc_get_system_cycle.md)的区别在于：`asc_get_system_cycle`返回原始cycle计数值，需要调用方根据芯片频率自行换算为时间；`asc_get_system_clock`在接口内部完成换算，直接返回微秒级时间值。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md",
+      "document_sha256": "0fae79022929eb39f6496944536cae042c040e73cf24924dc1bc6032e1e1aca0",
+      "description": {
+        "value": "读取当前系统cycle计数器并返回int64_t类型的当前计数值，该计数器为宽度64bit、复位值为0的只读系统计数器，随系统时钟持续递增，常用于性能统计、耗时测量与执行序时序判断，如需微秒级时间值可改用内部完成换算的asc_get_system_clock。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md", "excerpt": "读取当前系统cycle计数器，返回int64_t类型的当前计数值。该计数器为只读系统计数器，宽度64bit，复位值为0，随系统时钟持续递增，反映硬件运行以来的累计cycle数，常用于性能统计、耗时测量与执行序的时序判断。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md", "excerpt": "如需直接获取微秒级时间值（接口内部完成频率换算），推荐使用[asc_get_system_clock](asc_get_system_clock.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取当前系统cycle计数器，返回int64_t类型的当前计数值。该计数器为只读系统计数器，宽度64bit，复位值为0，随系统时钟持续递增，反映硬件运行以来的累计cycle数，常用于性能统计、耗时测量与执行序的时序判断。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_clock.md",
+          "kind": "related",
+          "condition": "如需直接获取微秒级时间值（接口内部完成频率换算）时推荐使用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_system_cycle.md",
+            "excerpt": "如需直接获取微秒级时间值（接口内部完成频率换算），推荐使用[asc_get_system_clock](asc_get_system_clock.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_vf_len.md",
+      "document_sha256": "e34ae322f1a56f532eda8546bbdb73b4b96129585bfc6c9b477ea09ad0569511",
+      "description": {
+        "value": "获取当前芯片的矢量寄存器位宽VL，即矢量计算单元单次Repeat可处理的元素个数，常用于推导mask长度、循环次数、单次搬运元素数等参数，接口不触发硬件指令且不依赖特殊寄存器或前置setter配置，同一核函数内多次调用返回值相同。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_vf_len.md", "excerpt": "获取当前芯片的矢量寄存器位宽VL（[Vector Length](../../defs/type/data_type_definition.md)），即矢量计算单元单次Repeat可处理的元素个数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_vf_len.md", "excerpt": "本接口不触发硬件指令，不依赖任何特殊寄存器或前置setter接口配置，可在AIC与AIV上下文中调用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "获取当前芯片的矢量寄存器位宽VL（[Vector Length](../../defs/type/data_type_definition.md)），即矢量计算单元单次Repeat可处理的元素个数。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md",
+      "document_sha256": "24e4ab0bb728797a6b3e08fc657ddbf05d876042d9039af9f0d3ff61a212cdbe",
+      "description": {
+        "value": "设置核间同步寄存器的基地址，取值范围0至2^48-1，地址需在Host侧调用aclrtGetHardwareSyncAddr获取后作为config参数传入，且必须在asc_sync_block_wait与asc_sync_block_arrive之前完成设置。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md", "excerpt": "在[asc_sync_block_wait](../../sync/inter_core_sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../../sync/inter_core_sync/asc_sync_block_arrive.md)之前使用，设置核间同步寄存器的基地址。需要在Host侧调用接口aclrtGetHardwareSyncAddr获取，并作为参数传入。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md", "excerpt": "在使用[asc_sync_block_wait](../../sync/inter_core_sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../../sync/inter_core_sync/asc_sync_block_arrive.md)之前必须使用本接口设置基地址。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"],
+        "traits": ["inter_core_synchronization"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "在[asc_sync_block_wait](../../sync/inter_core_sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../../sync/inter_core_sync/asc_sync_block_arrive.md)之前使用，设置核间同步寄存器的基地址。需要在Host侧调用接口aclrtGetHardwareSyncAddr获取，并作为参数传入。",
+        "traits:inter_core_synchronization": "设置核间同步寄存器的基地址。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+          "kind": "configures",
+          "condition": "在使用asc_sync_block_wait之前必须先设置基地址",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md",
+            "excerpt": "在使用[asc_sync_block_wait](../../sync/inter_core_sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../../sync/inter_core_sync/asc_sync_block_arrive.md)之前必须使用本接口设置基地址。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+          "kind": "configures",
+          "condition": "在使用asc_sync_block_arrive之前必须先设置基地址",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md",
+            "excerpt": "在使用[asc_sync_block_wait](../../sync/inter_core_sync/asc_sync_block_wait.md)和[asc_sync_block_arrive](../../sync/inter_core_sync/asc_sync_block_arrive.md)之前必须使用本接口设置基地址。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md",
+      "document_sha256": "c6888bfe6805c75cf106258d8f08f034559d5d38af05f03971a9e5a5a5a42d72",
+      "description": {
+        "value": "从Global Memory指定地址预加载一个64字节的Cache Line数据到DCache，为后续Scalar单元读取提前填充缓存以降低首次访问延迟，预取地址由address与offset相加得到，频繁调用可能阻塞Scalar流水线，建议连续调用不超过4次。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md", "excerpt": "从Global Memory的指定地址预加载一个Cache Line（64字节）的数据到DCache中，为后续Scalar单元对该地址的读取操作提前填充缓存，降低首次访问延迟。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md", "excerpt": "预取地址由`address`与`offset`相加得到，单位为字节。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md", "excerpt": "因此，建议连续调用此接口的次数不要超过4次。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"]
+      },
+      "tag_evidence": {
+        "roles:control": "从Global Memory的指定地址预加载一个Cache Line（64字节）的数据到DCache中，为后续Scalar单元对该地址的读取操作提前填充缓存，降低首次访问延迟。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+      "document_sha256": "dfd0399254fa0a6709a6c9897dedd0df7c32657b6e83ffc173c3c711f61a6990",
+      "description": {
+        "value": "维护DCache与GM间的缓存一致性，Clean将被修改的脏数据写回GM避免丢失，Invalid将指定地址范围的Cache Line标记无效并在下次访问时从GM重新加载，提供按单个地址或整个目标域刷新的多组接口。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md", "excerpt": "asc_dcci接口用于解决上述一致性问题，其功能可以拆解为两部分："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md", "excerpt": "Clean：将缓存中被修改过的数据（脏数据，Dirty Data）写回到GM中，避免数据丢失。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md", "excerpt": "将指定地址范围的Cache Line标记为“无效”，使其从缓存中移除。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"]
+      },
+      "tag_evidence": {
+        "roles:control": "将指定地址范围的Cache Line标记为“无效”，使其从缓存中移除。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md",
+          "kind": "related",
+          "condition": "若通过asc_load_dev与asc_store_dev读写GM则不经过DCache，无需调用本接口",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+            "excerpt": "若调用的是[asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md)和[asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md)这一对接口，则读写数据不经过DCache，无需调用asc_dcci接口。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+          "kind": "related",
+          "condition": "若通过asc_load_dev与asc_store_dev读写GM则不经过DCache，无需调用本接口",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+            "excerpt": "若调用的是[asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md)和[asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md)这一对接口，则读写数据不经过DCache，无需调用asc_dcci接口。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "constrained_by",
+          "condition": "Scalar单元读写UB时是否经过DCache由asc_set_ctrl配置的CTRL49位控制",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+            "excerpt": "Scalar单元读写UB时是否经过DCache，由[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置的CTRL[49]位控制，该bit位默认值为1'b0，即默认不经过DCache。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dci.md",
+      "document_sha256": "641ce08fc64d237b18abcac00e177f3f640791af453590c9484f1b03e798d906",
+      "description": {
+        "value": "数据缓存无效化接口，无参数调用即触发整个DCache全量失效，不检查脏数据，脏数据将被直接丢弃不回写，下次访问时从GM重新加载，调用前必须先以DSB_ALL参数调用asc_sync_data_barrier等待此前内存访问指令执行结束。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dci.md", "excerpt": "数据缓存无效化接口，将整个DCache的所有Cache Line标记为无效，使其从缓存中移除。本接口不检查缓存行是否为脏（dirty，表示数据已被修改但尚未写回到GM），若存在脏数据将被直接丢弃，不执行回写。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dci.md", "excerpt": "本接口无参数，调用即触发整个DCache的全量失效操作。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dci.md", "excerpt": "在调用`asc_dci`之前，必须调用[asc_sync_data_barrier](../sync/intra_core_sync/asc_sync_data_barrier.md)，并将参数设置为`mem_dsb_t::DSB_ALL`，等待此前的内存访问指令执行结束，再使整个数据缓存失效。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"]
+      },
+      "tag_evidence": {
+        "roles:control": "数据缓存无效化接口，将整个DCache的所有Cache Line标记为无效，使其从缓存中移除。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "kind": "requires",
+          "condition": "调用前须以DSB_ALL参数调用，等待此前内存访问指令执行结束",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dci.md",
+            "excerpt": "在调用`asc_dci`之前，必须调用[asc_sync_data_barrier](../sync/intra_core_sync/asc_sync_data_barrier.md)，并将参数设置为`mem_dsb_t::DSB_ALL`，等待此前的内存访问指令执行结束，再使整个数据缓存失效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md",
+      "document_sha256": "cb325006e80bd3ad0762591ea5d91ef9791e1032ceb8f0e2ec755c729fda7721",
+      "description": {
+        "value": "调试用查询接口，在asc_icache_preload之后调用以获取ICache预取状态，返回0表示上一次预取已完成，返回1表示预取正在进行中，仅用于调试与性能分析，不影响预取本身的执行流程。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md", "excerpt": "该接口为调试接口，在[asc_icache_preload](./asc_icache_preload.md)后调用，用于获取ICache的PreLoad的状态："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md", "excerpt": "本接口仅用于调试与性能分析场景下的状态查询，不影响预取本身的执行流程。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "该接口为调试接口，在[asc_icache_preload](./asc_icache_preload.md)后调用，用于获取ICache的PreLoad的状态："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md",
+          "kind": "requires",
+          "condition": "在asc_icache_preload后调用以获取其预取状态",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_icache_preload_status.md",
+            "excerpt": "该接口为调试接口，在[asc_icache_preload](./asc_icache_preload.md)后调用，用于获取ICache的PreLoad的状态："
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md",
+      "document_sha256": "74e9d5e3fb7d81b5e42a6245a904e26bcc90cfe8e4073b51f3894e1093065bf3",
+      "description": {
+        "value": "读取当前标量读路径的L2 Cache管理策略并返回asc_load_l2_cache_mode枚举值，该值由asc_set_scalar_cache_mode接口设置，常用于临时切换策略前保存原配置或设置后回读校验，仅反映标量load侧策略。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md", "excerpt": "读取当前标量读（load）路径的L2 Cache管理策略，并返回[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。该值可通过[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)接口设置，关于策略的详细说明请参考该接口。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md", "excerpt": "本接口仅反映标量load侧策略，与标量store侧以及向量搬运接口参数中的`l2_cache_mode`无关。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取当前标量读（load）路径的L2 Cache管理策略，并返回[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+          "kind": "related",
+          "condition": "该策略值通过asc_set_scalar_cache_mode设置，常用于设置后回读校验",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md",
+            "excerpt": "读取当前标量读（load）路径的L2 Cache管理策略，并返回[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)枚举值。该值可通过[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)接口设置，关于策略的详细说明请参考该接口。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md",
+            "excerpt": "当前标量load路径的L2 Cache管理策略，类型为[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md",
+      "document_sha256": "5124cb971344d157b7e87dea0deb8b8caf3de4129e14850cc46e34a8ed76c6f2",
+      "description": {
+        "value": "读取当前标量写路径的L2 Cache管理策略并返回asc_store_l2_cache_mode枚举值，该值由asc_set_scalar_cache_mode接口设置，常用于临时切换策略前保存原配置或设置后回读校验，仅反映标量store侧策略。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md", "excerpt": "读取当前标量写（store）路径的L2 Cache管理策略，并返回[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)枚举值。该值可通过[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)接口设置，关于策略的详细说明请参考该接口。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md", "excerpt": "本接口仅反映标量store侧策略，与标量load侧以及向量搬运接口参数中的`l2_cache_mode`无关。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取当前标量写（store）路径的L2 Cache管理策略，并返回[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)枚举值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+          "kind": "related",
+          "condition": "该策略值通过asc_set_scalar_cache_mode设置，常用于设置后回读校验",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md",
+            "excerpt": "读取当前标量写（store）路径的L2 Cache管理策略，并返回[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)枚举值。该值可通过[asc_set_scalar_cache_mode](asc_set_scalar_cache_mode.md)接口设置，关于策略的详细说明请参考该接口。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md",
+            "excerpt": "当前标量store路径的L2 Cache管理策略，类型为[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md",
+      "document_sha256": "1c11b666ebbbf1230c47f38843e33e9b8187ab0bc89111d661da5e5278d1c949",
+      "description": {
+        "value": "从当前程序所在的Global Memory地址预加载指令到ICache指令缓存，避免后续取指时出现ICache未命中，预加载地址需通过asc_get_program_counter获取PC值并用低48位掩码清零高位得到，预加载长度单位为2K字节。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md", "excerpt": "开发者手动调用本接口，从调用本接口所在的Global Memory地址预加载指令到ICache（指令缓存）中，避免后续取指时出现ICache未命中。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md", "excerpt": "调用本接口时的预加载地址需通过[asc_get_program_counter](../utils/sys_var/asc_get_program_counter.md)接口获取当前程序计数器（PC）值"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md", "excerpt": "预加载地址通常通过[asc_get_program_counter](../utils/sys_var/asc_get_program_counter.md)接口获取。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"]
+      },
+      "tag_evidence": {
+        "roles:control": "开发者手动调用本接口，从调用本接口所在的Global Memory地址预加载指令到ICache（指令缓存）中，避免后续取指时出现ICache未命中。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md",
+          "kind": "requires",
+          "condition": "预加载地址需通过获取PC值并用低48位掩码清零高位得到",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md",
+            "excerpt": "调用本接口时的预加载地址需通过[asc_get_program_counter](../utils/sys_var/asc_get_program_counter.md)接口获取当前程序计数器（PC）值"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+      "document_sha256": "42253a8523c606f6d2e986ab683d9b03581acc138954d99fb0223d6df6b687e4",
+      "description": {
+        "value": "配置标量单元访问Global Memory时的L2 Cache管理策略，传入asc_load_l2_cache_mode枚举设置标量读策略，传入asc_store_l2_cache_mode枚举设置标量写策略，设置后持续生效直至再次调用修改，仅作用于标量访存路径，不改变向量搬运接口入参中的策略。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md", "excerpt": "配置标量单元访问Global Memory时的L2 Cache管理策略："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md", "excerpt": "设置后，后续标量路径上的GM读写将按该策略访问L2 Cache，直至再次调用本接口修改。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md", "excerpt": "本接口仅作用于**标量访存路径**的L2 Cache默认策略，不会改变向量搬运类接口（如[asc_copy_gm2ub_align](../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)、[asc_copy_ub2gm_align](../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)、[asc_ndim_copy_gm2ub](../vector_datamove/asc_ndim_copy_gm2ub.md)等）入参中的`l2_cache_mode`，二者相互独立。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "设置后，后续标量路径上的GM读写将按该策略访问L2 Cache，直至再次调用本接口修改。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md",
+          "kind": "configures",
+          "condition": "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+            "excerpt": "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口有：\n        - [asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md)"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md",
+          "kind": "configures",
+          "condition": "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+            "excerpt": "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口有：\n        - [asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md)\n        - [asc_datacache_preload](asc_datacache_preload.md)"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md",
+          "kind": "configures",
+          "condition": "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+            "excerpt": "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口有：\n        - [asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md)\n        - [asc_datacache_preload](asc_datacache_preload.md)\n        - [asc_icache_preload](asc_icache_preload.md)"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+          "kind": "configures",
+          "condition": "对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+            "excerpt": "对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口有：\n        - [asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md)"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/scalar_atomic.md",
+          "kind": "configures",
+          "condition": "对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+            "excerpt": "对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口有：\n        - [asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md)\n        - [标量原子操作](../atomic/scalar_atomic/scalar_atomic.md)"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+            "excerpt": "传入[asc_load_l2_cache_mode](../defs/enum/asc_load_l2_cache_mode.md)时，设置标量读（load）策略。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+            "excerpt": "传入[asc_store_l2_cache_mode](../defs/enum/asc_store_l2_cache_mode.md)时，设置标量写（store）策略。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/system_cache_overview.md",
+      "document_sha256": "d6a2ea3896b107ea140f208361a4476d34f2c9d7b39582400782f40453821498",
+      "description": {
+        "value": "系统缓存概述页，介绍L2 Cache、DCache、ICache、SIMT DCache、NDDMA Cache五类缓存的位置与功能，Prefetch、Preload、Invalid、Clean四种缓存操作，Cache写策略与多核一致性问题，并按Cache类型汇总缓存控制接口。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/system_cache_overview.md", "excerpt": "Cache（缓存）的主要作用是在搬运单元或Scalar单元与外部存储之间提供一层高速缓冲，以降低数据访问延迟并提高带宽利用率。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/system_cache_overview.md", "excerpt": "表3按照Cache类型（L2 Cache、DCache、ICache、NDDMA Cache）汇总了与缓存控制相关的接口及其功能说明。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+      "document_sha256": "eb22d90ce87550474dcdc967f2d1de76c38bab0f5a17b4c417a5323bff422fc5",
+      "description": {
+        "value": "读取CTRL控制寄存器特定比特位上的值并按int64_t返回，返回值各比特位的具体含义与配置方式参考asc_set_ctrl接口中的描述。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md", "excerpt": "读取CTRL寄存器（控制寄存器）特定比特位上的值。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md", "excerpt": "CTRL寄存器的值。具体含义请参考[asc_set_ctrl](asc_set_ctrl.md)中的描述。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取CTRL寄存器（控制寄存器）特定比特位上的值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "related",
+          "condition": "返回值各比特位含义以asc_set_ctrl中的说明为准",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+            "excerpt": "CTRL寄存器的值。具体含义请参考[asc_set_ctrl](asc_set_ctrl.md)中的描述。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+      "document_sha256": "587881c051c3a665c5db459af3f664893407f609742196ca83621ab67a2a60ad",
+      "description": {
+        "value": "按饱和模式类型读取当前是否开启饱和并返回布尔结果，true表示该模式下饱和已开启，false表示未开启，各模式语义不同，INT为截断，FLOAT、FLOAT8与CAST为非饱和或截断，CAST模式还须饱和策略为USE_GLOBAL才会在精度转换中真正生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md", "excerpt": "按饱和模式类型读取当前是否开启饱和，并返回布尔类型的结果。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md", "excerpt": "`true`表示当前该模式下饱和已开启；`false`表示未开启（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断）。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md", "excerpt": "对`CAST`模式，即使本接口返回`true`，也需同时满足饱和策略为`USE_GLOBAL`，CAST饱和配置才会在精度转换中真正生效。详见[asc_set_saturation_strategy](asc_set_saturation_strategy.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"],
+        "traits": ["saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:query": "按饱和模式类型读取当前是否开启饱和，并返回布尔类型的结果。",
+        "traits:saturation_mode": "`true`表示当前该模式下饱和已开启；`false`表示未开启（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断）。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+          "kind": "related",
+          "condition": "各模式饱和语义差异见该接口表1",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "各模式语义差异见[asc_set_saturation_flag](asc_set_saturation_flag.md)表1。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+          "kind": "related",
+          "condition": "对CAST模式，饱和配置需同时满足策略为USE_GLOBAL才会在精度转换中真正生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "对`CAST`模式，即使本接口返回`true`，也需同时满足饱和策略为`USE_GLOBAL`，CAST饱和配置才会在精度转换中真正生效。详见[asc_set_saturation_strategy](asc_set_saturation_strategy.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+            "excerpt": "饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+      "document_sha256": "b3a91099296994f76714c6cfedafe0584c3b6e56b28917767697c6f0bab87c08",
+      "description": {
+        "value": "读取当前饱和控制策略并返回asc_override_strategy枚举值，按单指令或API路径配置时返回USE_API，全局饱和配置时返回USE_GLOBAL，常用于临时切换策略前保存原配置，或与asc_set_saturation_strategy配合做回读校验。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md", "excerpt": "读取当前饱和控制策略，默认为开启全局饱和配置："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md", "excerpt": "常用于临时切换策略前保存原配置，或与[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配合做回读校验。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取当前饱和控制策略，默认为开启全局饱和配置："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+          "kind": "related",
+          "condition": "与设置接口配合做回读校验",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "常用于临时切换策略前保存原配置，或与[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配合做回读校验。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+            "excerpt": "当前饱和控制策略，类型为[asc_override_strategy](../defs/enum/asc_override_strategy.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+      "document_sha256": "73133a2c27a8632107b9ddf886561e049061a4695818ecd2fe26c4e74c13f39d",
+      "description": {
+        "value": "读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于获取已连续搬出的有效数据量，调用前需先经asc_squeeze_and_storeunalign_init清空AR寄存器并完成数据筛选，完成后还需调用finalize接口搬出尾块。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md", "excerpt": "读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于配合[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口获取已连续搬出的有效数据量。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md", "excerpt": "调用本接口前，需要先调用[asc_squeeze_and_storeunalign_init](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md)清空AR特殊寄存器，并调用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)完成数据筛选。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md", "excerpt": "筛选流程完成后，需要调用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)搬出尾块。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "读取squeeze操作后保存至AR特殊寄存器的有效数据长度值，用于配合[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)接口获取已连续搬出的有效数据量。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+          "kind": "requires",
+          "condition": "调用本接口前需先清空AR特殊寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "调用本接口前，需要先调用[asc_squeeze_and_storeunalign_init](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md)清空AR特殊寄存器，并调用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)完成数据筛选。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+          "kind": "requires",
+          "condition": "调用本接口前需先完成数据筛选",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "调用本接口前，需要先调用[asc_squeeze_and_storeunalign_init](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md)清空AR特殊寄存器，并调用[asc_squeeze_and_storeunalign](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md)完成数据筛选。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+          "kind": "related",
+          "condition": "筛选流程完成后需要搬出尾块",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+            "excerpt": "筛选流程完成后，需要调用[asc_squeeze_and_storeunalign_finalize](../reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md)搬出尾块。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+      "document_sha256": "1799f47f094da4d9c193d5369d41f387e4e73402572b3806d4b84271179404be",
+      "description": {
+        "value": "对CTRL控制寄存器的特定比特位进行设置，可配置浮点计算与精度转换饱和模式、标量单元访问UB是否经过DCache、MASK模式等控制位，使用前需先用asc_get_ctrl获取当前值，仅对需要变更的bit位进行修改。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md", "excerpt": "对CTRL寄存器（控制寄存器）的特定比特位进行设置。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md", "excerpt": "使用前需要先用[asc_get_ctrl()](asc_get_ctrl.md)获取当前值，仅对需要变更的bit位进行修改。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "对CTRL寄存器（控制寄存器）的特定比特位进行设置。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_ctrl.md",
+          "kind": "requires",
+          "condition": "使用前需先获取当前值，仅对需要变更的bit位进行修改",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+            "excerpt": "使用前需要先用[asc_get_ctrl()](asc_get_ctrl.md)获取当前值，仅对需要变更的bit位进行修改。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+      "document_sha256": "b113b12ae601113a21d18ce578657e9735c71f8eca33bd56a826a72894700ca9",
+      "description": {
+        "value": "按饱和模式类型设置对应饱和开关，enable_sat表示是否开启饱和，FLOAT、FLOAT8、INT与CAST各模式下开关语义不同，INT关闭为截断，CAST仅在饱和策略为USE_GLOBAL时生效，对FLOAT开启饱和前需先开启全局饱和配置。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md", "excerpt": "按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md", "excerpt": "浮点转整数或整数转整数时的精度转换饱和控制，默认为饱和状态。仅在饱和策略为`USE_GLOBAL`时生效。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md", "excerpt": "当对`FLOAT`开启饱和模式前，需要通过[asc_set_saturation_strategy](asc_set_saturation_strategy.md)开启全局饱和配置方可生效；当`saturation_mode`为`FLOAT8`时，还需要先对`FLOAT`开启饱和模式才能生效。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"],
+        "traits": ["saturation_mode"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。",
+        "traits:saturation_mode": "浮点转整数或整数转整数时的精度转换饱和控制，默认为饱和状态。仅在饱和策略为`USE_GLOBAL`时生效。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+          "kind": "requires",
+          "condition": "对FLOAT开启饱和前需先开启全局饱和配置方可生效；CAST模式须策略为USE_GLOBAL才生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "当对`FLOAT`开启饱和模式前，需要通过[asc_set_saturation_strategy](asc_set_saturation_strategy.md)开启全局饱和配置方可生效；当`saturation_mode`为`FLOAT8`时，还需要先对`FLOAT`开启饱和模式才能生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+      "document_sha256": "624361e0d2e2daaa2c20c152f71e95ff9fa6c325f76f2496b48cf5c31561de2a",
+      "description": {
+        "value": "设置饱和控制策略为USE_API或USE_GLOBAL，分别表示按单指令或API路径配置饱和与使用全局饱和配置，该策略尤其影响CAST类饱和，仅在USE_GLOBAL时通过asc_set_saturation_flag配置的CAST才会生效，切换策略不会自动修改各模式饱和开关。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md", "excerpt": "设置饱和控制策略，默认为开启全局饱和配置："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md", "excerpt": "该策略尤其影响CAST类饱和：只有在`USE_GLOBAL`时，通过[asc_set_saturation_flag](asc_set_saturation_flag.md)配置的`asc_saturation_mode::CAST`才会生效。枚举含义详见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "设置饱和控制策略，默认为开启全局饱和配置："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+          "kind": "related",
+          "condition": "仅在USE_GLOBAL策略时通过其配置的CAST饱和才会生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "该策略尤其影响CAST类饱和：只有在`USE_GLOBAL`时，通过[asc_set_saturation_flag](asc_set_saturation_flag.md)配置的`asc_saturation_mode::CAST`才会生效。枚举含义详见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "饱和控制策略，取值见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。"
+          }
+        }
+      ]
+    }
+  ]
+}

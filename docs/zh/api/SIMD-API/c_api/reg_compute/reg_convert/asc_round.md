@@ -1,33 +1,16 @@
 ---
 okftype: reference.api
-title: asc_round
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_round.md
-description: 将源操作数中的浮点数元素按照ROUND舍入模式（四舍五入，中间值向远离0方向）舍入到整数值，结果保持原浮点数据类型，未被掩码筛选的元素置零，仅在AIV上生效。
+description: "将源操作数中的浮点数元素按ROUND模式舍入到整数值，中间值向远离0方向舍入，结果保持原浮点数据类型，未被掩码筛选的元素置零，half与bfloat16_t支持饱和模式而float仅支持不饱和模式，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, rounding_mode, saturation_mode]
-signature:
-  - prototype_id: asc_round__v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-  - prototype_id: asc_round__Rv<dtype>_v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_round
 

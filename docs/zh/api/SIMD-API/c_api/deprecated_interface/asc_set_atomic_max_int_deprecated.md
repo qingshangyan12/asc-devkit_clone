@@ -1,27 +1,16 @@
 ---
 okftype: reference.api
-title: asc_set_atomic_max_int（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_atomic_max_int_deprecated.md
-description: 已废弃的原子搬运配置接口，设置计算结果以原子比较方式传输到GM，拷贝前将int32_t数据与GM中已有数据逐元素比较并将最大值写入GM，请使用asc_set_atomic_max_int32替代。
+description: "已废弃的搬运配置接口，设置计算结果以原子比较方式传输到GM，拷贝前将int32_t数据与GM已有数据逐元素比较并将最大值写入GM，使用后建议关闭原子操作；请改用asc_set_atomic_max_int32替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - operations: [maximum]
-  - execution_models: [scalar]
-  - traits: [atomic, deprecated]
-signature:
-  - override_id: asc_set_atomic_max_int__z
-archs: ['2201', '3510']
-header: [/include/c_api/atomic/datamove_atomic.h]
+  - traits: [atomic]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md
     kind: related
-    condition: 使用结束后，建议关闭原子最大操作
+    condition: "使用结束后建议关闭原子最大操作"
   - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_set_atomic_max_int（废弃）
 

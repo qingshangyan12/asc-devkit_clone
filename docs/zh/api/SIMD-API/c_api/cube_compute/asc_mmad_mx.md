@@ -1,58 +1,35 @@
 ---
 okftype: reference.api
-title: asc_mmad_mx
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md
-description: 完成带有量化系数的矩阵乘加计算MmadMx，左矩阵A与右矩阵B分别带有量化系数矩阵ScaleA和ScaleB，K维度每连续32个元素共享一个量化系数，经广播乘法后做矩阵乘法并累加到结果矩阵C，仅在AIC上生效。
+description: "完成带量化系数的矩阵乘加计算，左矩阵A与右矩阵B分别带有量化系数矩阵，K维度每连续32个元素共享一个量化系数，经广播乘法后做矩阵乘法并累加到结果矩阵C；Scale矩阵须预先搬入L0A_MX与L0B_MX Buffer，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [matrix_multiply_accumulate]
-  - objects: [matrix]
-  - execution_models: [matrix_compute]
-  - source_locations: [l0a_buffer, l0b_buffer]
-  - destination_locations: [l0c_buffer]
-signature:
-  - prototype_id: asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u16_u16_u16_unitflag_b_b_b
-  - prototype_id: asc_mmad_mx__PCCf32_PCA<a_dtype>_PCB<b_dtype>_u64_u16_u16_u16_unitflag_b
-archs: ['3510']
-header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md
-    kind: constrained_by
-    condition: 开启UnitFlag时
+    kind: requires
+    condition: "开启UnitFlag时除Nz2ND随路格式转换与Channel Merge场景外的其他场景"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md
-    kind: constrained_by
-    condition: 矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时
+    kind: requires
+    condition: "开启UnitFlag且矩阵搬出开启Nz2ND随路格式转换，或开启B8/B4量化触发Channel Merge时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md
     kind: requires
-    condition: 仅显式传入Bias起始地址的接口包含该参数
+    condition: "显式传入Bias起始地址时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md
     kind: related
-    condition: 需要清除UnitFlag产生的残留状态时
+    condition: "需要清除UnitFlag产生的残留状态时"
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: related
-    condition: 浮点类型的输入或输出包含inf/nan时
+    condition: "浮点类型的输入或输出包含inf/nan时"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
-    kind: constrained_by
-    condition: 当`(m / 16) * (n / 16) < 10`时
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx
-    file: mmad_mx.asc
-    archs: ['3510']
-    override_id: asc_mmad_mx__PCCf32_PCAf4e1m2x2_PCBf4e2m1x2_u16_u16_u16_unitflag_b_b_b
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx
-    file: mmad_mx.asc
-    archs: ['3510']
-    override_id: asc_mmad_mx__PCCf32_PCAf4e2m1x2_PCBf4e1m2x2_u16_u16_u16_unitflag_b_b_b
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx
-    file: mmad_mx.asc
-    archs: ['3510']
-    override_id: asc_mmad_mx__PCCf32_PCAf8e4m3_PCBf8e5m2_u16_u16_u16_unitflag_b_b_b
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "沿K轴分块计算并累加到同一块L0C Buffer且(m / 16) * (n / 16) < 10时"
+version: 9.0.0-
 ---
 # asc_mmad_mx
 

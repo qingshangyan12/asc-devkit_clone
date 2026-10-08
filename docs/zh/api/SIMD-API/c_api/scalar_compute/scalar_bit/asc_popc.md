@@ -1,21 +1,11 @@
 ---
 okftype: reference.api
-title: asc_popc
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_popc.md
-description: 获取输入uint64_t数据的二进制表示中值为1的位数并返回int64_t结果，取值范围为0到64，接口运行在标量流水上，流水内数据依赖由指令执行顺序保证，无需额外同步。
+description: "获取输入uint64_t数据二进制表示中值为1的位数并返回int64_t结果，取值范围为0到64，运行在标量流水上，流水内数据依赖由指令执行顺序保证。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [bit_manipulation]
-  - objects: [scalar]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_popc__u64
-archs: ['2201', '3510']
-header: [/include/c_api/scalar_compute/compute/scalar_bit.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_popc
 

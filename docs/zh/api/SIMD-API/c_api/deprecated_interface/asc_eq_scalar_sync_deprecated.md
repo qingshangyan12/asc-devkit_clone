@@ -1,30 +1,18 @@
 ---
 okftype: reference.api
-title: asc_eq_scalar_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_eq_scalar_sync_deprecated.md
-description: 已废弃的同步矢量比较接口：按元素判断src与标量value是否相等，成立则输出结果的对应比特位为1，否则为0，请使用非同步接口asc_eq_scalar配合asc_sync替代。
+description: "已废弃的同步矢量比较接口，按元素判断源矢量与标量value是否相等，比较结果按比特位写入目的操作数，目的与源起始地址需32字节对齐；请改用非同步接口asc_eq_scalar配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [comparison]
-  - objects: [scalar, vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise, scalar_operand]
-signature:
-  - override_id: asc_eq_scalar_sync__PUu8_PUf16_f16_u8_u16_u16_u16_u16
-  - override_id: asc_eq_scalar_sync__PUu8_PUi32_i32_u8_u16_u16_u16_u16
-  - override_id: asc_eq_scalar_sync__PUu8_PUf32_f32_u8_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [comparison, synchronization]
+  - traits: [aligned_transfer, elementwise, scalar_operand]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_eq_scalar.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_eq_scalar_sync（废弃）
 

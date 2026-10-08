@@ -1,28 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int162uint8（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162uint8_deprecated.md
-description: 已废弃的寄存器矢量转换接口，将src中int16_t元素转换为uint8_t类型写入dst，支持非饱和与饱和两种模式，源与目的位宽比为2:1并按接口后缀选择写入位置，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将src中int16_t元素转换为uint8_t类型写入dst，支持非饱和与饱和两种模式，因位宽比为2:1写入时需将一个VL大小的数据分为两部分并按接口后缀选取奇偶索引；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, saturation_mode]
-signature:
-  - override_id: asc_int162uint8__Rvu8_vi16_vb
-  - override_id: asc_int162uint8_v2__Rvu8_vi16_vb
-  - override_id: asc_int162uint8_sat__Rvu8_vi16_vb
-  - override_id: asc_int162uint8_sat_v2__Rvu8_vi16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int162uint8.md
-    kind: related
-    condition: 原型已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_int162uint8（废弃）
 

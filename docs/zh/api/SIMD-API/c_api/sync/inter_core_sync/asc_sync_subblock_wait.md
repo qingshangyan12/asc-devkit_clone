@@ -1,26 +1,17 @@
 ---
 okftype: reference.api
-title: asc_sync_subblock_wait
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_wait.md
-description: 与asc_sync_subblock_arrive配对使用，实现同一AI Core内全部AIV（subblock）之间的核间同步（模式1）。检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水的后续指令与NPU架构有关。
+description: "与asc_sync_subblock_arrive配对使用，实现同一AI Core内全部AIV之间的核间同步：检测到对应flag_id的计数器非0后解除阻塞并将计数器减1，是否阻塞指定流水的后续指令与NPU架构有关，本接口仅支持AIV调用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
   - operations: [synchronization]
-  - execution_models: [scalar]
   - traits: [inter_core_synchronization]
-signature:
-  - override_id: asc_sync_subblock_wait__pipe_i64
-archs: ['2201', '3510']
-header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_subblock_arrive.md
     kind: related
-    condition: 用户需要确保配套使用（`flag_id`必须完全一致）
+    condition: "配对使用，flag_id必须完全一致"
   - path: docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/key_features.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+version: 9.1.0-
 ---
 # asc_sync_subblock_wait
 

@@ -1,37 +1,25 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1_dn2nz（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_dn2nz_deprecated.md
-description: 将数据从Global Memory搬运到L1 Buffer并在搬运过程中进行DN到Nz格式转换，满足后续矩阵计算对分形列连续性的要求；旧常规重载与asc_copy_gm2l1_dn2nz_sync接口已废弃，请使用带l2_cache_mode参数的新接口，同步场景请额外调用asc_sync。
+description: "将数据从Global Memory搬运到L1 Buffer并在搬运过程中进行DN到Nz格式转换，满足后续矩阵计算对分形列连续性的要求，搬运前需先配置目的Nz矩阵步长与搬运个数；旧常规重载与同步接口已废弃，请改用带l2_cache_mode参数的新接口，同步场景额外调用asc_sync。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, layout_transform]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-  - traits: [deprecated]
-signature:
-  - prototype_id: asc_copy_gm2l1_dn2nz__PL1<dtype>_PG<dtype>_u64_u8_u16_u32_u64_b
-    header: [/include/c_api/cube_datamove/cube_datamove.h]
-    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
-      half, bfloat16_t, int32_t, uint32_t, float]
-  - prototype_id: asc_copy_gm2l1_dn2nz_sync__PL1<dtype>_PG<dtype>_u64_u8_u16_u32_u64_b
-    header: [/include/c_api/composite/cube_datamove_composite.h]
-    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
-      half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md
-    kind: related
-    condition: 接口已废弃时的替代方案
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md
     kind: requires
-    condition: 进行DN2Nz格式搬运前
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 同步场景
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+    condition: "同步场景"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-9.2.0
 ---
 # asc_copy_gm2l1_dn2nz（废弃）
 

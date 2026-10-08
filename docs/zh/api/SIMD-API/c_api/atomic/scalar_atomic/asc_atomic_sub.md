@@ -1,38 +1,27 @@
 ---
 okftype: reference.api
-title: asc_atomic_sub
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md
-description: 对Global Memory中address指向的单个元素执行原子减操作，读取旧值并计算其与输入标量值的差，将结果写回该地址并返回旧值，整个读取、计算和写回过程为原子操作，接口运行在标量流水PIPE_S上，访问GM时绕过DCache。
+description: "对Global Memory中address指向的单个元素执行原子减操作，读取旧值计算其与输入标量值的差并写回该地址且返回旧值，整个过程为原子操作，float类型时最终结果可能因执行顺序不同而存在差异，访问GM时绕过DCache。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [subtract]
-  - objects: [scalar]
-  - execution_models: [scalar]
   - traits: [atomic]
-signature:
-  - prototype_id: asc_atomic_sub__PG<dtype>_<dtype>
-    dtype: [int32_t, uint32_t, float, int64_t, uint64_t]
-archs: ['3510']
-header: [/include/c_api/atomic/scalar_atomic.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
     kind: requires
-    condition: 若其他核或其他通路通过缓存访问同一GM地址
+    condition: "若其他核或其他通路通过缓存访问同一GM地址"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
     kind: requires
-    condition: 若其他核或其他通路通过缓存访问同一GM地址
+    condition: "若其他核或其他通路通过缓存访问同一GM地址"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
-    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
+    condition: "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
     kind: requires
-    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
+    condition: "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: requires
-    condition: 若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果
-examples: []
-timestamp: '2026-09-28'
+    condition: "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+version: 9.1.0-
 ---
 # asc_atomic_sub
 

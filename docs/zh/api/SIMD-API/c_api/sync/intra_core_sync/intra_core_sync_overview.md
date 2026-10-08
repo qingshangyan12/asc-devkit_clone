@@ -1,33 +1,6 @@
 ---
-okftype: reference.index
-title: 核内同步能力概述
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md
-description: 核内同步能力概述页，说明AI Core内部并行执行单元异步运行时协调访问时序的必要性，介绍PIPE_S、PIPE_V、PIPE_M、PIPE_MTE1、PIPE_MTE2、PIPE_MTE3、PIPE_FIX等硬件流水类型，并按多流水同步、单流水同步和内存屏障分类说明各核内同步接口。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [control]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte2.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "核内同步能力概述页，说明AI Core内部执行单元异步并行运行、读写同一存储资源存在数据依赖时需通过同步控制协调操作时序，介绍各硬件流水类型及PIPE_ALL的含义，并按多流水同步、单流水同步与内存屏障分类说明核内同步接口及AIC与AIV中合法的同步组合。"
 ---
 # 核内同步能力概述
 

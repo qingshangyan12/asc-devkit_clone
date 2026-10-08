@@ -1,39 +1,25 @@
 ---
 okftype: reference.api
-title: asc_squeeze_and_storeunalign
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md
-description: 将被squeeze_mask选中的源矢量数据寄存器元素压缩到目的矢量数据寄存器并连续搬出到Unified Buffer，主块直接写入、未满32B的尾块暂存非对齐寄存器，AR寄存器记录累计搬出字节数，仅在AIV上生效。
+description: "将源矢量数据寄存器中被掩码选中的元素压缩到目的矢量数据寄存器并连续搬出到Unified Buffer（UB），AR寄存器记录累计搬出字节数实现自动地址偏移，可完整组成32B的主块直接写入、未满32B尾块暂存非对齐寄存器，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [compact, store]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-  - traits: [masked, unaligned_transfer]
-signature:
-  - prototype_id: asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb
-    archs: ['3510']
-    headers: []
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, fp8_e8m0_t, fp8_e5m2_t,
-      fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
-  - prototype_id: asc_squeeze_and_storeunalign__PU<dtype>_Rv<dtype>_Rvstoreunalign_v<dtype>_vb
-    archs: ['3510']
-    headers: [/include/c_api/reg_compute/compute/reg_permute_sel.h]
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, fp8_e8m0_t, fp8_e5m2_t,
-      fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
+  - traits: [unaligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md
     kind: related
+    condition: "完成一次或多次连续搬出后"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md
     kind: requires
+    condition: "首次调用本接口前"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果本接口与其他指令存在UB地址重叠
+    kind: requires
+    condition: "如果本接口与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
     kind: related
-examples: []
-timestamp: '2026-09-23'
+version: 9.0.0-
 ---
 # asc_squeeze_and_storeunalign
 

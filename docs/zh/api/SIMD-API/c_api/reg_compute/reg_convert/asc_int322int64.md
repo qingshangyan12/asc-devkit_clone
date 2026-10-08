@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int322int64
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int64.md
-description: 根据掩码将源操作数中每个int32_t类型元素转换为int64_t类型写入目的操作数，位宽比为1:2，按位置标签选择读取源操作数偶数或奇数索引位置，掩码位为0时对应元素置0，仅在AIV上生效的Reg矢量计算接口。
+description: "根据掩码将源操作数中每个int32_t元素转换为int64_t类型写入目的矢量数据寄存器，结果位宽为源元素的两倍；因位宽比为1:2，按位置标签选择读取源偶数或奇数索引位置，掩码未选中的元素置零，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, widening_result]
-signature:
-  - override_id: asc_int322int64__Rvi64_vi32_vb_icposeven
-  - override_id: asc_int322int64__Rvi64_vi32_vb_icposodd
-  - override_id: asc_int322int64__vi32_vb_icposeven
-  - override_id: asc_int322int64__vi32_vb_icposodd
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_int322int64
 

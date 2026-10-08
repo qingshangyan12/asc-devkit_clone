@@ -1,16 +1,16 @@
 ---
-okftype: reference.type
-title: asc_fill_value_config
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
-description: 表示 fill_value 初始化参数，配置 L1、L0A 或 L0B 目标的迭代次数、数据块数量和目标间隔。
+okftype: reference.union
+description: "fill_value的初始化参数结构体，供asc_fill_l0a、asc_fill_l0b、asc_fill_l1接口配置初始化参数，包含迭代次数、每次迭代初始化的数据块个数与目的操作数迭代间隔字段，数据块大小依目的Buffer位于L1或L0A、L0B分别为32B或512B。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-declaration:
-  symbol: asc_fill_value_config
-  record_kind: union
-header: [/include/c_api/defs/union.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_fill_value_config
 

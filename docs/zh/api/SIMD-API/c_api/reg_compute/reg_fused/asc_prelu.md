@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_prelu
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md
-description: 根据掩码对源操作数矢量数据寄存器src0中的元素执行PReLU运算，负半轴斜率由矢量数据寄存器alpha中的对应元素指定，src0大于0时直接写入输出结果，否则与alpha相乘后写入，掩码为0的元素置零，仅在AIV上生效。
+description: "根据掩码对源矢量元素执行PReLU运算，负半轴斜率由矢量寄存器alpha中对应元素逐元素指定，src0大于0时保持原值、否则与alpha相乘后写入，掩码为0的元素置零，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [prelu]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_prelu__v<dtype>_v<dtype>_vb
-    dtype: [half, float]
-  - prototype_id: asc_prelu__Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [half, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_fused.h]
+  - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_prelu
 

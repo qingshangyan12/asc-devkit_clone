@@ -1,25 +1,14 @@
 ---
 okftype: reference.api
-title: asc_e4m32float
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md
-description: 根据mask将矢量数据寄存器中参与计算的fp8_e4m3fn_t元素转换为float类型并写入dst，源与目的元素位宽比为1:4，通过src_quarter_pos每隔4个索引离散选取一组位置读取数据。
+description: "根据掩码将矢量数据寄存器中参与计算的fp8_e4m3fn_t元素转换为float类型并写入目的操作数，源与目的位宽比为1:4，通过src_quarter_pos每隔4个索引离散选取一组源位置读取数据，掩码位为0时目的对应元素置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [masked, widening_result]
-signature:
-  - archs: ['3510']
-    headers: []
-    override_id: asc_e4m32float__Rvf32_vf8e4m3_vb_icposquarter
-  - archs: ['3510']
-    headers: []
-    override_id: asc_e4m32float__vf8e4m3_vb_icposquarter
-dependencies: []
-examples: []
-timestamp: '2026-09-23'
+  - traits: [widening_result]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_e4m32float
 

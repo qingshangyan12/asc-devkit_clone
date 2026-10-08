@@ -1,32 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0b_trans_sync_arch_2201（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_trans_sync_arch_2201_deprecated.md
-description: 已废弃的同步搬运接口，实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，支持uint8_t、half、float等多种数据类型，请使用非同步接口配合asc_sync替代。
+description: "已废弃的同步搬运接口，实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，按数据类型以不同大小的方块矩阵迭代完成转置排布；请改用非同步接口asc_copy_l12l0b_trans配合asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, transpose]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0b_buffer]
-  - traits: [deprecated, high_dimensional]
-signature:
-  - override_id: asc_copy_l12l0b_trans_sync__PCBu8_PL1u8_u16_u8_u16_u16_b_u16
-  - override_id: asc_copy_l12l0b_trans_sync__PCBi8_PL1i8_u16_u8_u16_u16_b_u16
-  - override_id: asc_copy_l12l0b_trans_sync__PCBf16_PL1f16_u16_u8_u16_u16_b_u16
-  - override_id: asc_copy_l12l0b_trans_sync__PCBbf16_PL1bf16_u16_u8_u16_u16_b_u16
-  - override_id: asc_copy_l12l0b_trans_sync__PCBu32_PL1u32_u16_u8_u16_u16_b_u16
-  - override_id: asc_copy_l12l0b_trans_sync__PCBi32_PL1i32_u16_u8_u16_u16_b_u16
-  - override_id: asc_copy_l12l0b_trans_sync__PCBf32_PL1f32_u16_u8_u16_u16_b_u16
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - traits: [high_dimensional]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md
-    kind: related
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-
 ---
 # asc_copy_l12l0b_trans_sync_arch_2201（废弃）
 

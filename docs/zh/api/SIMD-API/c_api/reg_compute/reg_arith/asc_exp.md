@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_exp
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md
-description: 根据mask对源矢量数据寄存器按元素求自然指数，结果写入目的矢量数据寄存器或通过函数返回值返回，支持half与float数据类型。
+description: "根据掩码对源矢量数据寄存器按元素求自然指数，结果写入目的矢量数据寄存器或经函数返回值返回，支持half与float数据类型，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [exponential]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_exp__Rv<dtype>_v<dtype>_vb
-    dtype: [half, float]
-  - prototype_id: asc_exp__v<dtype>_vb
-    dtype: [half, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
-dependencies: []
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
-    file: elu.asc
-    archs: ['3510']
-    override_id: asc_exp__Rvf32_vf32_vb
-timestamp: '2026-09-28'
+  - traits: [elementwise]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_exp
 

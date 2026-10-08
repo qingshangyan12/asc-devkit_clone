@@ -1,26 +1,21 @@
 ---
 okftype: reference.api
-title: asc_copy_l0c2l1_sync_arch_3510（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2l1_sync_arch_3510_deprecated.md
-description: 已废弃的同步搬运接口，将矩阵计算结果从L0C Buffer搬运至L1 Buffer，搬运中可组合随路量化、ReLU与格式转换等能力，请改用非同步接口和asc_sync替代。
+description: "已废弃的同步搬运接口，将矩阵计算结果从L0C Buffer搬至L1 Buffer，随路支持量化、ReLU、格式转换与通道拆分等能力组合，量化模式支持尚不完全；请改用非同步接口asc_copy_l0c2l1和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, layout_transform]
-  - source_locations: [l0c_buffer]
-  - destination_locations: [l1_buffer]
-  - traits: [deprecated, quantization]
-signature:
-  - prototype_id: asc_copy_l0c2l1_sync__PL1i4x2_PCC<src_dtype>_u16_u16_u32_u16_u8_u8_u8_u64_u8_b_b_u64_u8_b_u8_b_b_b_b
-    archs: ['3510']
-    headers: []
+  - traits: [quantization]
 dependencies:
+  - path: docs/zh/api/SIMD-API/adv_api/quantization/AscendDequant.md
+    kind: related
+    condition: "如果有双万分之一的精度要求"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
-    kind: related
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-examples: []
-timestamp: '2026-09-24'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_copy_l0c2l1_sync_arch_3510（废弃）
 

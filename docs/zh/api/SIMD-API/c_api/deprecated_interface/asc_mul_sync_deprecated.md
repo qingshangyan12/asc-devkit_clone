@@ -1,30 +1,18 @@
 ---
 okftype: reference.api
-title: asc_mul_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_mul_sync_deprecated.md
-description: 已废弃的同步矢量乘法运算接口，执行矢量乘法运算，将src0与src1的乘积写入目的矢量dst，请使用非同步接口asc_mul并配合同步接口asc_sync替代。
+description: "已废弃的同步矢量乘法接口，按元素将src0与src1相乘并将结果写入目的操作数dst，起始地址需32字节对齐；请改用非同步接口asc_mul配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [multiply]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, elementwise]
-signature:
-  - override_id: asc_mul_sync__PUi16_PUi16_PUi16_u32
-  - override_id: asc_mul_sync__PUf16_PUf16_PUf16_u32
-  - override_id: asc_mul_sync__PUi32_PUi32_PUi32_u32
-  - override_id: asc_mul_sync__PUf32_PUf32_PUf32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [multiply, synchronization]
+  - traits: [aligned_transfer, elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_mul_sync（废弃）
 

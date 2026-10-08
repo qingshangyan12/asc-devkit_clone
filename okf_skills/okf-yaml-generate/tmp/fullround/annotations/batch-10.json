@@ -1,0 +1,963 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md",
+      "document_sha256": "55d773934c8c35df284164d61bc3a9d8c5cc6b095f80cec27a8b365f95f675e5",
+      "description": {
+        "value": "实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载，按数据类型将源分形合并为方块矩阵转置后拆分，并通过目的分形间隔参数控制排布，repeat为零时不执行搬运。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md", "excerpt": "该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md", "excerpt": "源操作数中2个连续的16 × 32分形将被合并为1个32 × 32的方块矩阵，基于方块矩阵做转置，转置后分裂为2个16 × 32分形"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md", "excerpt": "repeat=0表示不执行搬运操作。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy", "transpose"],
+        "traits": ["high_dimensional"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。",
+        "operations:copy": "该接口实现带转置的2D格式数据从L1 Buffer到L0B Buffer的加载。",
+        "operations:transpose": "源操作数中2个连续的16 × 32分形将被合并为1个32 × 32的方块矩阵，基于方块矩阵做转置，转置后分裂为2个16 × 32分形",
+        "traits:high_dimensional": "高维切分搬运"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_2201.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md",
+      "document_sha256": "79ceb1db171fb021c7e2eba22764e0f1993b47959807b6b5f85ee0bacde67986",
+      "description": {
+        "value": "将数据从L1 Buffer搬运到L0B Buffer，以512字节数据分形为单位在搬运过程中完成二维分形矩阵转置，源地址需32字节对齐、目的地址需512字节对齐，仅在AIC上执行有效，目的地址重叠时须插入同步指令。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md", "excerpt": "将数据从L1 Buffer搬运到L0B Buffer，搬运过程中以大小为512字节的数据分形为单位进行二维分形矩阵转置。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md", "excerpt": "src起始地址需32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md", "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy", "transpose"],
+        "traits": ["aligned_transfer"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将数据从L1 Buffer搬运到L0B Buffer，搬运过程中以大小为512字节的数据分形为单位进行二维分形矩阵转置。",
+        "operations:copy": "将数据从L1 Buffer搬运到L0B Buffer，搬运过程中以大小为512字节的数据分形为单位进行二维分形矩阵转置。",
+        "operations:transpose": "将数据从L1 Buffer搬运到L0B Buffer，搬运过程中以大小为512字节的数据分形为单位进行二维分形矩阵转置。",
+        "traits:aligned_transfer": "src起始地址需32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在目的地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md",
+            "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在目的地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md",
+            "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md",
+      "document_sha256": "8fb69ca88018dd33a06228b191615766a91b7b17e01fc1c8513c5a0d4d38e676",
+      "description": {
+        "value": "将矩阵由L1 Buffer搬运到L0C Buffer，支持多种源与目的数据类型组合，搬运中可将float数据转为half或bfloat16_t，数据块长度以32字节为单位，多条指令目的地址重叠时须插入同步指令保证串行化。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md", "excerpt": "将矩阵由L1 Buffer搬运到L0C Buffer中。该搬运支持的数据类型如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md", "excerpt": "- float->half"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md", "excerpt": "待搬运的每个连续传输数据块的长度，单位为32个字节。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy", "conversion"],
+        "traits": ["datablock_granularity"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将矩阵由L1 Buffer搬运到L0C Buffer中。该搬运支持的数据类型如下：",
+        "operations:copy": "将矩阵由L1 Buffer搬运到L0C Buffer中。该搬运支持的数据类型如下：",
+        "operations:conversion": "- float->half",
+        "traits:datablock_granularity": "待搬运的每个连续传输数据块的长度，单位为32个字节。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md",
+      "document_sha256": "7a3465428ec3505631d8b01f172b4cc505acf3da0ce728793b0173dff80b1abe",
+      "description": {
+        "value": "将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、长度与源目间隔实现连续和非连续搬运，格式和内容保持不变，源与目的地址需32字节对齐，仅在AIC上执行有效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md", "excerpt": "将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、单个数据块长度以及源/目间隔实现连续与非连续搬运。数据搬运时格式和内容保持不变。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md", "excerpt": "dst_addr起始地址需32字节对齐（UB对齐要求），否则会导致搬运异常。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md", "excerpt": "每个连续数据块的长度，单位32字节。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy"],
+        "traits": ["aligned_transfer", "datablock_granularity"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、单个数据块长度以及源/目间隔实现连续与非连续搬运。数据搬运时格式和内容保持不变。",
+        "operations:copy": "将数据从L1 Buffer搬运到Unified Buffer（UB），按数据块个数、单个数据块长度以及源/目间隔实现连续与非连续搬运。数据搬运时格式和内容保持不变。",
+        "traits:aligned_transfer": "dst_addr起始地址需32字节对齐（UB对齐要求），否则会导致搬运异常。",
+        "traits:datablock_granularity": "每个连续数据块的长度，单位32字节。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在目的地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md",
+            "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在目的地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md",
+            "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md",
+      "document_sha256": "d9f652d95178fbb465577a4848218c9de3eecad546b927704f49a552851d660f",
+      "description": {
+        "value": "将value的二进制值赋值给目的操作数dst，完成L0A Buffer本地存储的初始化，初始化参数通过asc_fill_value_config配置，dst与value数据类型不同时需按dst类型转换value的值。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md", "excerpt": "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md", "excerpt": "使用的初始化相关参数，详细说明请参考[asc_fill_value_config](../defs/union/asc_fill_value_config.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_initialization"],
+        "operations": ["fill"]
+      },
+      "tag_evidence": {
+        "roles:data_initialization": "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。",
+        "operations:fill": "将value的二进制值赋值给dst，对L0A Buffer的Local Memory进行初始化。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md",
+            "excerpt": "使用的初始化相关参数，详细说明请参考[asc_fill_value_config](../defs/union/asc_fill_value_config.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md",
+      "document_sha256": "8e64daa9786f68d869ae6a9ce0f6dc8c97474bb71223e1fd789300477c63c8c2",
+      "description": {
+        "value": "将value的二进制值赋值给目的操作数dst，完成L0B Buffer本地存储的初始化，初始化参数通过asc_fill_value_config配置，dst与value数据类型不同时需按dst类型转换value的值。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md", "excerpt": "将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md", "excerpt": "使用的初始化相关参数，详细说明请参考[asc_fill_value_config](../defs/union/asc_fill_value_config.md)。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_initialization"],
+        "operations": ["fill"]
+      },
+      "tag_evidence": {
+        "roles:data_initialization": "将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化。",
+        "operations:fill": "将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md",
+            "excerpt": "使用的初始化相关参数，详细说明请参考[asc_fill_value_config](../defs/union/asc_fill_value_config.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md",
+      "document_sha256": "63236f6acb3149189b39a996896f14902734f69175a01c3329a5ce393c6006ad",
+      "description": {
+        "value": "将标量填充值写入L1 Buffer目的地址并广播到多个32字节分形块，用于L1 Buffer内存初始化，重复次数、单次分形块数与间隔由asc_fill_value_config配置，目的起始地址需32字节对齐，仅在AIC上执行有效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md", "excerpt": "将一个标量填充值写入L1 Buffer的目的地址，并将填充值广播到多个32字节分形块中，可用于L1 Buffer的内存初始化。需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md", "excerpt": "`dst`起始地址需要按照32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md", "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_initialization"],
+        "operations": ["fill"],
+        "traits": ["aligned_transfer", "datablock_granularity"]
+      },
+      "tag_evidence": {
+        "roles:data_initialization": "将一个标量填充值写入L1 Buffer的目的地址，并将填充值广播到多个32字节分形块中，可用于L1 Buffer的内存初始化。需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。",
+        "operations:fill": "将一个标量填充值写入L1 Buffer的目的地址，并将填充值广播到多个32字节分形块中，可用于L1 Buffer的内存初始化。需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。",
+        "traits:aligned_transfer": "`dst`起始地址需要按照32字节对齐（L1 Buffer对齐要求），否则触发地址对齐异常。",
+        "traits:datablock_granularity": "并将填充值广播到多个32字节分形块中"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md",
+            "excerpt": "需要通过[asc_fill_value_config](../defs/union/asc_fill_value_config.md)配置的重复次数、单次分形块数、相邻重复之间的间隔。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在目的地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md",
+            "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "condition": "如果本指令与其他指令存在目的地址重叠",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md",
+            "excerpt": "如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_prequant.md",
+      "document_sha256": "cf6aa3136d88ff640d197f2c5926c8d986b4344d5487bb8a47a0896e57bfd2ec",
+      "description": {
+        "value": "在数据搬运随路量化场景下查询量化操作前矢量的起始地址，无输入参数，返回值即该起始地址，供随路量化流程使用。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_prequant.md", "excerpt": "数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"],
+        "traits": ["quantization"]
+      },
+      "tag_evidence": {
+        "roles:query": "数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址。",
+        "traits:quantization": "数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_relu.md",
+      "document_sha256": "e2bd80e73e8515facd3aa26c14e2e7fd5e847f6eb23813722a37e44e702a5e59",
+      "description": {
+        "value": "在数据搬运随路量化场景下查询ReLU操作前矢量的起始地址，无输入参数，返回值即该起始地址，供搬出过程使用。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_relu.md", "excerpt": "数据搬运过程中进行随路量化时，通过调用该接口获取ReLU操作前矢量的起始地址。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "数据搬运过程中进行随路量化时，通过调用该接口获取ReLU操作前矢量的起始地址。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_unitflag.md",
+      "document_sha256": "b8e30751e5bd9da0d5bbdc9aee568e8d440bd4c0be665b5de16cebb879e6977e",
+      "description": {
+        "value": "在数据搬运随路量化场景下查询unit_flag设置，unit_flag实现矩阵计算指令与搬运指令的细粒度并行，开启后每计算完一个分形结果即被搬出，不适用于L0C Buffer累加场景。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_unitflag.md", "excerpt": "数据搬运过程中进行随路量化时，通过调用该接口获取unit_flag设置。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_unitflag.md", "excerpt": "unit_flag是一种矩阵计算指令和矩阵搬运指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于L0C Buffer累加的场景。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "数据搬运过程中进行随路量化时，通过调用该接口获取unit_flag设置。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md",
+      "document_sha256": "3e4afeb12fa92387d701fabc6c8d4a4d6c1d88f9982243d6898e88dfb2160a30",
+      "description": {
+        "value": "将图像数据从Global Memory搬运到L1 Buffer，可指定加载图片的宽高与源图起始位置，并支持在目的图片四周填充像素，填充像素数上限为32。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md", "excerpt": "将图像数据从Global Memory搬运到L1 Buffer。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md", "excerpt": "从源图中加载图片的水平宽度，单位为像素。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md", "excerpt": "目的图片顶部填充的像素数。取值范围：[0, 32]。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement"],
+        "operations": ["copy"],
+        "traits": ["padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将图像数据从Global Memory搬运到L1 Buffer。",
+        "operations:copy": "将图像数据从Global Memory搬运到L1 Buffer。",
+        "traits:padding": "目的图片顶部填充的像素数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_load_image_to_cbuf.md",
+            "excerpt": "各存储单元的空间大小和对齐要求请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md",
+      "document_sha256": "92dc7bd04c2f8ddc2181651d2dc727d978bd31db72876106bfa5b67a23c00bd8",
+      "description": {
+        "value": "设置asc_copy_gm2l1_align循环填充模式内层循环中相邻迭代数据块的源和目的L1间隔，目的间隔必须32字节对齐，需配合循环次数与外层循环步长配置，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md", "excerpt": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式内层循环中相邻迭代数据块的源和目的L1间隔。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md", "excerpt": "外层循环步长和两层循环次数需分别通过[asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md)和[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)配置。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式内层循环中相邻迭代数据块的源和目的L1间隔。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md",
+          "kind": "configures",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md",
+            "excerpt": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式内层循环中相邻迭代数据块的源和目的L1间隔。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md",
+          "kind": "related",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md",
+            "excerpt": "外层循环步长和两层循环次数需分别通过[asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md)和[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)配置。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md",
+          "kind": "related",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md",
+            "excerpt": "外层循环步长和两层循环次数需分别通过[asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md)和[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)配置。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md",
+      "document_sha256": "5671db013dd3441ea2a4bd0863a5ed3e456bcf9482b7769a9dd874f4e3bc9479",
+      "description": {
+        "value": "设置asc_copy_gm2l1_align循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔，目的间隔必须32字节对齐，需配合循环次数与内层循环步长配置，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md", "excerpt": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md", "excerpt": "内层循环步长和两层循环次数需分别通过[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)和[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)配置。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md",
+          "kind": "configures",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md",
+            "excerpt": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md",
+          "kind": "related",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md",
+            "excerpt": "内层循环步长和两层循环次数需分别通过[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)和[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)配置。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md",
+          "kind": "related",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md",
+            "excerpt": "内层循环步长和两层循环次数需分别通过[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)和[asc_set_gm2l1_loop_size](asc_set_gm2l1_loop_size.md)配置。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md",
+      "document_sha256": "53d5f59577f39cbd30440b33649c5ff43c92d4ba61c5b8feec68dc79a436e2b9",
+      "description": {
+        "value": "设置asc_copy_gm2l1_align循环填充模式内层与外层循环的迭代次数，需与内外层循环步长配置接口配合使用，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md", "excerpt": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式的内层和外层循环次数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md", "excerpt": "需与[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)和[asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md)配合使用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式的内层和外层循环次数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md",
+          "kind": "configures",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md",
+            "excerpt": "将数据从Global Memory（GM）搬运到L1 Buffer时，设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)循环填充模式的内层和外层循环次数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md",
+          "kind": "related",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md",
+            "excerpt": "需与[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)和[asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md)配合使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md",
+          "kind": "related",
+          "condition": "使用循环填充模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md",
+            "excerpt": "需与[asc_set_gm2l1_loop1_stride](asc_set_gm2l1_loop1_stride.md)和[asc_set_gm2l1_loop2_stride](asc_set_gm2l1_loop2_stride.md)配合使用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md",
+      "document_sha256": "7062a2fa9b96c3430f8b40f6337487a87833a5bb0bd40882e98b8f63bcc467f3",
+      "description": {
+        "value": "配置GM到L1 Buffer搬运中ND2Nz或DN2Nz格式转换所需的目的地址布局，含矩阵数量与相邻行、相邻Z矩阵、相邻Nz矩阵的步长，配置由后续搬运接口使用，接口本身不执行搬运，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md", "excerpt": "本接口用于配置从Global Memory搬运至L1 Buffer过程中，ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量、目的Nz矩阵中相邻行的步长、相邻Z矩阵的步长以及相邻Nz矩阵的步长。配置完成后，由后续调用的[asc_copy_gm2l1_nd2nz](./asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](./asc_copy_gm2l1_dn2nz.md)接口使用。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md", "excerpt": "本接口只完成参数配置，不执行数据搬运。源地址步长、矩阵行数和矩阵列数等搬运参数由后续搬运接口配置。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于配置从Global Memory搬运至L1 Buffer过程中，ND2Nz或DN2Nz格式转换所需的目的地址布局，包括矩阵数量、目的Nz矩阵中相邻行的步长、相邻Z矩阵的步长以及相邻Nz矩阵的步长。配置完成后，由后续调用的[asc_copy_gm2l1_nd2nz](./asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](./asc_copy_gm2l1_dn2nz.md)接口使用。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_gm2l1_nd2nz](./asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](./asc_copy_gm2l1_dn2nz.md)接口使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_nz_para.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_gm2l1_nd2nz](./asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md)或[asc_copy_gm2l1_dn2nz](./asc_copy_gm2l1_dn2nz.md)接口使用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md",
+      "document_sha256": "8873390ddacc46d28edd0ce3ce5a1369f04e1fbfb61fd694b4d22f010e8faed0",
+      "description": {
+        "value": "设置asc_copy_gm2l1_align接口的常量填充值，在Normal或Compact填充模式及左右填充模式下作为填充数据使用，须在调用搬运接口前配置，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md", "excerpt": "用于设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)接口的常量填充值。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md", "excerpt": "Normal填充模式或Compact填充模式的填充数据使用本接口设置的值。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md", "excerpt": "调用[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)前调用本接口配置填充值。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "用于设置[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)接口的常量填充值。",
+        "traits:padding": "Normal填充模式或Compact填充模式的填充数据使用本接口设置的值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md",
+          "kind": "configures",
+          "condition": "Normal或Compact填充模式及左右填充模式下取用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md",
+            "excerpt": "调用[asc_copy_gm2l1_align](asc_copy_gm2l1_align.md)前调用本接口配置填充值。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md",
+      "document_sha256": "0eb17fe331dc346e93f9250186fd3ee1efc2ac908d22d14f6bbadddf0dbd642d",
+      "description": {
+        "value": "设置asc_copy_gm2l1高维切分搬运接口padding模式使用的填充值，因底层寄存器与asc_set_l12l0a_3d_padding共用，该值同时作为3D矩阵搬运asc_copy_l12l0a的填充值，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md", "excerpt": "用于设置[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)接口搬运过程的padding模式使用的padding值。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md", "excerpt": "当前接口底层使用的寄存器与[asc_set_l12l0a_3d_padding](asc_set_l12l0a_3d_padding.md)为相同的寄存器，因此本设置的值也是[asc_copy_l12l0a_arch_3510（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)搬运时使用的填充值。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "用于设置[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)接口搬运过程的padding模式使用的padding值。",
+        "traits:padding": "用于设置[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)接口搬运过程的padding模式使用的padding值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md",
+            "excerpt": "用于设置[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)接口搬运过程的padding模式使用的padding值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md",
+          "kind": "configures",
+          "condition": "底层寄存器与asc_set_l12l0a_3d_padding共用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md",
+            "excerpt": "当前接口底层使用的寄存器与[asc_set_l12l0a_3d_padding](asc_set_l12l0a_3d_padding.md)为相同的寄存器，因此本设置的值也是[asc_copy_l12l0a_arch_3510（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)搬运时使用的填充值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md",
+          "kind": "related",
+          "condition": "底层使用相同寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md",
+            "excerpt": "当前接口底层使用的寄存器与[asc_set_l12l0a_3d_padding](asc_set_l12l0a_3d_padding.md)为相同的寄存器，因此本设置的值也是[asc_copy_l12l0a_arch_3510（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)搬运时使用的填充值。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md",
+      "document_sha256": "b6b9ad042ee404df269fd1998253a0eab4fac6407ab8777e0ca31ee4bb12502c",
+      "description": {
+        "value": "在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移，配置由开启Nz2DN功能的搬出接口使用，未开启时配置不生效，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md", "excerpt": "本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于在L0C Buffer搬出并执行Nz2DN格式转换时，配置源Nz矩阵中相邻行的地址偏移。配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+          "kind": "configures",
+          "condition": "开启Nz2DN功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md",
+            "excerpt": "配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "configures",
+          "condition": "开启Nz2DN功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md",
+            "excerpt": "配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+          "kind": "configures",
+          "condition": "开启Nz2DN功能时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_channel_para.md",
+            "excerpt": "配置写入后，由后续开启Nz2DN功能的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用；未开启Nz2DN功能时，本配置不生效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md",
+      "document_sha256": "1c5924ad38da81daba5313dd097ed654e49bd014b32b77fdac6a2bcb614cd1b2",
+      "description": {
+        "value": "设置L0C Buffer搬出场景下随路tensor量化与随路tensor激活参数在Fixpipe Buffer中的起始地址索引以及UnitFlag全局状态，配置由后续搬出接口使用并持续生效，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md", "excerpt": "本接口用于设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活、UnitFlag功能的相关配置，具体功能说明如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md", "excerpt": "功能一：设置随路tensor量化参数的起始地址索引。当L0C Buffer搬出接口启用tensor量化模式时，硬件将从Fixpipe Buffer中按本接口设置的起始地址索引读取N维量化参数，N代表搬出矩阵的列数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md", "excerpt": "若L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)需要开启随路量化或随路激活功能，则本接口需在搬出接口前调用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["quantization"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于设置L0C Buffer搬出场景下随路tensor量化、随路tensor激活、UnitFlag功能的相关配置，具体功能说明如下：",
+        "traits:quantization": "功能一：设置随路tensor量化参数的起始地址索引。当L0C Buffer搬出接口启用tensor量化模式时，硬件将从Fixpipe Buffer中按本接口设置的起始地址索引读取N维量化参数，N代表搬出矩阵的列数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+          "kind": "configures",
+          "condition": "需要开启随路量化或随路激活功能",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md",
+            "excerpt": "若L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)需要开启随路量化或随路激活功能，则本接口需在搬出接口前调用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "configures",
+          "condition": "需要开启随路量化或随路激活功能",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md",
+            "excerpt": "若L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)需要开启随路量化或随路激活功能，则本接口需在搬出接口前调用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+          "kind": "configures",
+          "condition": "需要开启随路量化或随路激活功能",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md",
+            "excerpt": "若L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)需要开启随路量化或随路激活功能，则本接口需在搬出接口前调用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md",
+      "document_sha256": "bb5de9f52d5b1301047f2c533884c945b970467d3d3a5a8bc17d875dfccaa226",
+      "description": {
+        "value": "在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数，供后续搬出接口与relu_pre_mode参数搭配使用，缩放系数不能为inf、nan或非规格化数，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md", "excerpt": "本接口用于在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+          "kind": "configures",
+          "condition": "进行随路Scalar激活时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "configures",
+          "condition": "进行随路Scalar激活时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+          "kind": "configures",
+          "condition": "进行随路Scalar激活时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_lrelu_alpha.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md",
+      "document_sha256": "f5e280f06771eb527c2bedaa9b5ff225bf31913810c28d6a9c9386791ec31044",
+      "description": {
+        "value": "在L0C Buffer搬出接口启用随路Nz转ND或Nz转DN格式功能时，配置矩阵数量、源相邻Nz矩阵偏移和目的相邻ND或DN矩阵偏移等格式转换参数，必须在搬出接口执行前调用，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md", "excerpt": "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND/DN格式功能时，配置格式转换所需的相关参数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md", "excerpt": "调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND/DN格式之前，即搬出接口内参数`enable_nz2nd`与`enable_nz2dn`其一设置为`true`时，必须先调用本接口配置格式转换参数。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于在L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)启用随路Nz转ND/DN格式功能时，配置格式转换所需的相关参数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+          "kind": "configures",
+          "condition": "需要进行随路Nz转ND/DN格式，即enable_nz2nd或enable_nz2dn其一设置为true时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md",
+            "excerpt": "调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND/DN格式之前，即搬出接口内参数`enable_nz2nd`与`enable_nz2dn`其一设置为`true`时，必须先调用本接口配置格式转换参数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "configures",
+          "condition": "需要进行随路Nz转ND/DN格式，即enable_nz2nd或enable_nz2dn其一设置为true时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md",
+            "excerpt": "调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND/DN格式之前，即搬出接口内参数`enable_nz2nd`与`enable_nz2dn`其一设置为`true`时，必须先调用本接口配置格式转换参数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+          "kind": "configures",
+          "condition": "需要进行随路Nz转ND/DN格式，即enable_nz2nd或enable_nz2dn其一设置为true时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md",
+            "excerpt": "调用L0C Buffer搬出接口[asc_copy_l0c2gm](../cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)、[asc_copy_l0c2ub](../cube_datamove/asc_copy_l0c2ub.md)并且需要进行随路Nz转ND/DN格式之前，即搬出接口内参数`enable_nz2nd`与`enable_nz2dn`其一设置为`true`时，必须先调用本接口配置格式转换参数。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_params.md",
+      "document_sha256": "85599c9d5ce997b85bdae2d1a595c92069a4a031aea62cc06dc9e1367e0224a9",
+      "description": {
+        "value": "在数据从L0C Buffer搬运到Global Memory或L1 Buffer并进行随路NZ转ND格式转换时，设置ND矩阵数量、源步长和目的步长等格式转换相关配置。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_params.md", "excerpt": "DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "DataCopy从L0C Buffer搬运到Global Memory或L1 Buffer过程中进行随路格式转换（NZ格式转换为ND格式）时，通过调用该接口设置格式转换的相关配置。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md",
+      "document_sha256": "ccefef5c28dd1d005d591f0f793f70f96179f73fe03208d2da9652bd05a4a31e",
+      "description": {
+        "value": "在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号，供后续搬出接口与quant_pre_mode搭配使用，量化参数不能为inf、nan或非规格化数，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md", "excerpt": "本接口用于在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号。配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`quant_pre_mode`搭配使用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["quantization"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号。配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`quant_pre_mode`搭配使用。",
+        "traits:quantization": "本接口用于在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号。配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`quant_pre_mode`搭配使用。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+          "kind": "configures",
+          "condition": "需要与搬出接口的quant_pre_mode搭配使用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`quant_pre_mode`搭配使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "configures",
+          "condition": "需要与搬出接口的quant_pre_mode搭配使用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`quant_pre_mode`搭配使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+          "kind": "configures",
+          "condition": "需要与搬出接口的quant_pre_mode搭配使用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_prequant.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`quant_pre_mode`搭配使用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md",
+      "document_sha256": "be8f3835bdb7c578141e7d2622f7e77aa3175a22a628aefa6724042744211169",
+      "description": {
+        "value": "在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数，供后续搬出接口与relu_pre_mode参数搭配使用，系数不能为inf、nan或非规格化数，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md", "excerpt": "本接口用于在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于在L0C Buffer搬出过程中进行随路Scalar激活时，配置激活计算所需的缩放系数。配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+          "kind": "configures",
+          "condition": "进行随路Scalar激活时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+          "kind": "configures",
+          "condition": "进行随路Scalar激活时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+          "kind": "configures",
+          "condition": "进行随路Scalar激活时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_relu_alpha.md",
+            "excerpt": "配置完成后，由后续调用的[asc_copy_l0c2gm](./asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](./asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](./asc_copy_l0c2ub.md)接口使用，并且需要与搬出接口的`relu_pre_mode`搭配使用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md",
+      "document_sha256": "85acb631d24bade4bd5125ccade345ff6bca6ba37658bbc219ffc00bed6c3345",
+      "description": {
+        "value": "设置3D格式分形矩阵搬运（im2col展开）指令使用的填充值，供f_matrix_ctrl为false时的asc_copy_l12l0a三维矩阵搬运使用，因底层寄存器与asc_set_gm2l1_padding共用，该值同时作为高维切分搬运的填充值，仅在AIC上生效。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md", "excerpt": "用于调用[asc_copy_l12l0a_arch_3510（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md", "excerpt": "3D格式分形矩阵搬运（im2col展开）场景会使用本接口设置的值做为填充值。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md", "excerpt": "当前接口底层使用的寄存器与[asc_set_gm2l1_padding](asc_set_gm2l1_padding.md)为相同的寄存器，因此本设置的值也是[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)搬运时使用的填充值。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "用于调用[asc_copy_l12l0a_arch_3510（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。",
+        "traits:padding": "3D格式分形矩阵搬运（im2col展开）场景会使用本接口设置的值做为填充值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md",
+          "kind": "configures",
+          "condition": "f_matrix_ctrl参数设置为false时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md",
+            "excerpt": "用于调用[asc_copy_l12l0a_arch_3510（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md",
+          "kind": "configures",
+          "condition": "底层寄存器与asc_set_gm2l1_padding共用",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md",
+            "excerpt": "当前接口底层使用的寄存器与[asc_set_gm2l1_padding](asc_set_gm2l1_padding.md)为相同的寄存器，因此本设置的值也是[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)搬运时使用的填充值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md",
+          "kind": "related",
+          "condition": "底层使用相同寄存器",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md",
+            "excerpt": "当前接口底层使用的寄存器与[asc_set_gm2l1_padding](asc_set_gm2l1_padding.md)为相同的寄存器，因此本设置的值也是[asc_copy_gm2l1_arch_3510（高维切分数据搬运）](asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)搬运时使用的填充值。"
+          }
+        }
+      ]
+    }
+  ]
+}

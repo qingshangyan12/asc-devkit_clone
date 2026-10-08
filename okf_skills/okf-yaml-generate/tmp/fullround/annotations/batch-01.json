@@ -1,0 +1,1493 @@
+{
+ "schema_version": 1,
+ "purpose": "okf_semantic_annotations",
+ "annotations": [
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md",
+   "document_sha256": "4851e610527aac84b021a23e54c0c5c3d467608af14d23f6021864942f678c50",
+   "description": {
+    "value": "介绍Reg矢量计算的关键特性：VF循环满足Hardware Loop编码规范时可被编译器优化以提升编码性能，指令双发在同一时钟周期发射两条指令提升处理效率，VF融合将多个VF函数融合为一个VF函数，并按连续对齐、非对齐、离散等场景汇总数据搬运C API接口的选择与示例。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md",
+      "excerpt": "当VF函数中的循环满足Hardware Loop编码规范会被编译器优化为Hardware Loop，提升整体的编码性能，否则它的循环逻辑会由迭代变量和条件判断语句构成Software Loop，无法开启VF循环优化。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md",
+      "excerpt": "指令双发指的是处理器在同一个时钟周期内，能够同时发射两条指令到执行单元进行处理。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/key_features.md",
+      "excerpt": "VF融合是将代码中多个VF函数融合成一个VF函数，有效提升性能。"
+     }
+    ]
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+   "document_sha256": "5c30476de3340be2b8263b2cdf617c0a1b7921f84c637d157598fe98634c14b2",
+   "description": {
+    "value": "从Unified Buffer按dtype对齐的起始地址读取VL长度数据写入矢量数据寄存器，搬运中数据格式和内容保持不变；连续搬入需每次调用前手动更新源地址，对性能有要求时可改用asc_loadunalign，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+      "excerpt": "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据，并通过函数返回值返回或写入目的矢量数据寄存器，搬运过程中数据格式和内容保持不变。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+      "excerpt": "该接口为易用性接口，对性能有要求时可使用[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据，并通过函数返回值返回或写入目的矢量数据寄存器，搬运过程中数据格式和内容保持不变。",
+    "operations:load": "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度数据，并通过函数返回值返回或写入目的矢量数据寄存器，搬运过程中数据格式和内容保持不变。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+     "kind": "related",
+     "condition": "对性能有要求时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+      "excerpt": "该接口为易用性接口，对性能有要求时可使用[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md",
+     "kind": "related",
+     "condition": "对性能有要求时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_load.md",
+      "excerpt": "该接口为易用性接口，对性能有要求时可使用[asc_loadunalign](asc_loadunalign.md)或[asc_loadunalign_postupdate](asc_loadunalign_postupdate.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+   "document_sha256": "712681680e679a22918892a9f8851425b2196c16c4839b33331def582da55c7e",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，提供连续对齐、立即数偏移、地址寄存器偏移和非连续对齐四种搬入模式，非连续模式单条指令搬入8个DataBlock，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "单条指令非连续搬入8个`DataBlock`，每个`DataBlock`的数据量为32字节。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。",
+    "traits:datablock_granularity": "单条指令非连续搬入8个`DataBlock`，每个`DataBlock`的数据量为32字节。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+     "kind": "requires",
+     "condition": "非连续对齐搬入模式中，当dtype为int64_t时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_mask/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
+     "kind": "requires",
+     "condition": "非连续对齐搬入模式中，当dtype为int64_t时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_mask/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md",
+     "kind": "related",
+     "condition": "连续对齐搬入模式中，通过函数返回值返回掩码寄存器时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "连续对齐搬入模式中，通过函数返回值返回掩码寄存器时，请使用[asc_loadalign_mask](asc_loadalign_mask.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+     "kind": "related",
+     "condition": "非连续对齐搬入模式中，通过函数返回值返回矢量数据寄存器时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "excerpt": "非连续对齐搬入模式中，通过函数返回值返回矢量数据寄存器时，请使用[asc_loadalign_datablock_strided](asc_loadalign_datablock_strided.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md",
+   "document_sha256": "6065757c81e27f6f450fbbf54934963321c51eac07ef73b5e5c1251d6b6396c6",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取一个DataBlock（32字节）并广播到整个矢量数据寄存器，提供对齐搬入、立即数偏移和地址寄存器偏移三种模式，搬运中数据格式和内容保持不变，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "broadcast",
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "operations:broadcast": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "traits:datablock_granularity": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+   "document_sha256": "82c80693fc0b94de266c42fcbace1376e717907220f0ef3824f7cb35c7473237",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取一个DataBlock（32字节）并广播到整个矢量数据寄存器，采用Post Update模式在搬运完成后按指定步长自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+      "excerpt": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "broadcast",
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "datablock_granularity",
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "operations:broadcast": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "traits:datablock_granularity": "从Unified Buffer（UB）中32字节对齐的起始地址读取一个`DataBlock`（32字节），并将该`DataBlock`广播到整个矢量数据寄存器。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md",
+   "document_sha256": "1e6d47eedac233c566f9150c18ae8af550155704d9c256787f9d78722b98c544",
+   "description": {
+    "value": "从Unified Buffer中按dtype对齐的起始地址读取一个元素并广播到整个矢量数据寄存器，提供对齐搬入、立即数偏移和地址寄存器偏移三种模式，搬运中数据格式和内容保持不变，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md",
+      "excerpt": "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "broadcast",
+     "load"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。",
+    "operations:broadcast": "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md",
+   "document_sha256": "463bf09263872bad7bb0d94599973b92cdaf07357266e099ec4f06979c349875",
+   "description": {
+    "value": "从Unified Buffer中16字节或32字节对齐的起始地址连续读取8个元素，将每个元素广播到输出结果对应的一个DataBlock（32字节）中，提供对齐搬入、立即数偏移和地址寄存器偏移三种模式，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md",
+      "excerpt": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个`DataBlock`（32字节）中。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "broadcast",
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个`DataBlock`（32字节）中。",
+    "operations:broadcast": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个`DataBlock`（32字节）中。",
+    "operations:load": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个`DataBlock`（32字节）中。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个`DataBlock`（32字节）中。",
+    "traits:datablock_granularity": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到输出结果对应的一个`DataBlock`（32字节）中。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md",
+   "document_sha256": "81a72abaf71c531b83292f0ce0a43f660d4e53e171fc41d4e931548aa772ed48",
+   "description": {
+    "value": "从Unified Buffer中16字节或32字节对齐的起始地址连续读取8个元素，将每个元素广播到目的矢量数据寄存器对应的一个DataBlock中，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md",
+      "excerpt": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "broadcast",
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "datablock_granularity",
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。",
+    "operations:broadcast": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。",
+    "operations:load": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。",
+    "traits:datablock_granularity": "从Unified Buffer（UB）中16字节对齐（b16类型）或32字节对齐（b32类型）的起始地址连续读取8个元素，并将每个元素广播到目的矢量数据寄存器对应的一个`DataBlock`（32字节）中。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md",
+   "document_sha256": "58040ffcae50759aed05f8c27d21e721736ef8ea038f9457c6dcf3098362b458",
+   "description": {
+    "value": "从Unified Buffer中按dtype对齐的起始地址读取一个元素并广播到整个矢量数据寄存器，Post Update模式下搬运完成后按指定步长自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md",
+      "excerpt": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "broadcast",
+     "load"
+    ],
+    "traits": [
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。",
+    "operations:broadcast": "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中按dtype对齐的起始地址读取一个元素，并将该元素广播到整个矢量数据寄存器。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+   "document_sha256": "f98c40fc3092e9d659469d5606acbcf382caba40ed664bd0d32339b6971c5f9b",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址非连续搬入8个DataBlock，每个DataBlock数据量为32字节，支持配置相邻数据块地址步长与本次搬入的起始读取位置，结果通过函数返回值返回，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址非连续搬入8个`DataBlock`，并通过函数返回值返回保存搬入结果的矢量数据寄存器。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+      "excerpt": "每个`DataBlock`的数据量为32字节，支持配置相邻数据块之间的地址步长和本次搬入的起始读取位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址非连续搬入8个`DataBlock`，并通过函数返回值返回保存搬入结果的矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址非连续搬入8个`DataBlock`，并通过函数返回值返回保存搬入结果的矢量数据寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址非连续搬入8个`DataBlock`，并通过函数返回值返回保存搬入结果的矢量数据寄存器。",
+    "traits:datablock_granularity": "每个`DataBlock`的数据量为32字节，支持配置相邻数据块之间的地址步长和本次搬入的起始读取位置。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_datablock_strided.md",
+      "excerpt": "本接口与[asc_loadalign](asc_loadalign.md)的非连续对齐搬入模式功能相同，区别在于本接口通过函数返回值返回结果。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md",
+   "document_sha256": "9b14b6f6709cf51cbcc27c1e4136018e63f3aa56d987a3c9f7cac04efef41af1",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取2×VL长度数据并解交织，偶数下标元素写入矢量数据寄存器dst0，奇数下标元素写入dst1，提供对齐、立即数偏移和地址寄存器偏移三种搬入模式，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md",
+      "excerpt": "将UB源地址的数据解交织后搬入到两个矢量数据寄存器，由用户自行更新源地址。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "deinterleave",
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。",
+    "operations:deinterleave": "将UB源地址的数据解交织后搬入到两个矢量数据寄存器，由用户自行更新源地址。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv_postupdate.md",
+   "document_sha256": "e747a14fe387c7343a3469d9630e9a306b5edf8826ef53231ff118a1a30923eb",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取2×VL长度数据，偶数下标元素写入矢量数据寄存器dst0、奇数下标元素写入dst1，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv_postupdate.md",
+      "excerpt": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "deinterleave",
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。",
+    "operations:deinterleave": "将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_deintlv_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+   "document_sha256": "223560a34d2d0d8969ccd45c6023c2456d2da8da3a65f9c85af107e8f0b9446b",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取连续数据并进行2倍下采样，写入矢量数据寄存器时保留偶数下标元素，写入掩码寄存器时保留偶数下标bit，提供对齐、立即数偏移和地址寄存器偏移三种模式，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，结果通过函数返回值返回或写入目的寄存器。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+      "excerpt": "当`dst`为矢量数据寄存器时，读取2×VL（512字节）长度数据，保留偶数下标元素后写入VL长度数据。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，结果通过函数返回值返回或写入目的寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，结果通过函数返回值返回或写入目的寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样，结果通过函数返回值返回或写入目的寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md",
+     "kind": "related",
+     "condition": "对齐搬入模式中，通过函数返回值返回掩码寄存器时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+      "excerpt": "对齐搬入模式中，通过函数返回值返回掩码寄存器时，请使用[asc_loadalign_mask_downsample](asc_loadalign_mask_downsample.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md",
+   "document_sha256": "ea36049c3cce6f0a27b5a5fafbe73d1495990d693c26716f4b85a14cbec1348c",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取连续数据并进行2倍下采样，结果写入矢量数据寄存器或掩码寄存器，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样。接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md",
+      "excerpt": "当`dst`为矢量数据寄存器时，读取2×VL（512字节）长度数据，保留偶数下标元素后写入VL长度数据。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取连续数据并进行2倍下采样。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md",
+   "document_sha256": "9a4dee966d2014b9728a20f89fd06d2d91e9354f57585fe6f719bb2577b43e18",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取VL/8长度数据，通过函数返回值返回掩码寄存器，与asc_loadalign连续对齐搬入模式中掩码寄存器原型功能相同，连续搬入需手动更新源地址，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/8长度数据，并通过函数返回值返回掩码寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/8长度数据，并通过函数返回值返回掩码寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/8长度数据，并通过函数返回值返回掩码寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/8长度数据，并通过函数返回值返回掩码寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask.md",
+      "excerpt": "本接口与[asc_loadalign](asc_loadalign.md)连续对齐搬入模式中目的操作数为掩码寄存器的原型功能相同，区别在于本接口通过函数返回值返回结果。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md",
+   "document_sha256": "e8dee9234d4c4fc9e224a0e63caa1152b448a71ce62cab78a5ca891b1427ae37",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取VL/4长度数据，保留偶数下标bit得到VL/8长度数据，通过函数返回值返回掩码寄存器，与asc_loadalign_downsample掩码寄存器原型功能相同，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度数据，保留偶数下标bit，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度数据，保留偶数下标bit，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度数据，保留偶数下标bit，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度数据，保留偶数下标bit，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_downsample.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_downsample.md",
+      "excerpt": "本接口与[asc_loadalign_downsample](asc_loadalign_downsample.md)对齐搬入模式中目的操作数为掩码寄存器的原型功能相同，区别在于本接口通过函数返回值返回结果。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md",
+   "document_sha256": "7707d0b73f46dd73e3432e5141c397949e828ec939506493ef1eae2c95db9268",
+   "description": {
+    "value": "从Unified Buffer中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次得到VL/8长度数据，通过函数返回值返回掩码寄存器，与asc_loadalign_upsample掩码寄存器原型功能相同，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md",
+      "excerpt": "从Unified Buffer（UB）中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。",
+    "operations:load": "从Unified Buffer（UB）中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次，得到VL/8长度数据，并通过函数返回值返回掩码寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md",
+      "excerpt": "本接口与[asc_loadalign_upsample](asc_loadalign_upsample.md)对齐搬入模式中目的操作数为掩码寄存器的原型功能相同，区别在于本接口通过函数返回值返回结果。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+   "document_sha256": "69b45843899b565bca80f54bd1872d2ad371702db86771b4320a01ba6e23c20a",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取数据搬入矢量数据寄存器或掩码寄存器，提供立即数偏移与非连续对齐两种搬入模式，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并搬入矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+      "excerpt": "按照指定的数据块间隔，从当前源地址非连续搬入8个`DataBlock`，每个`DataBlock`的数据量为32字节。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "datablock_granularity",
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并搬入矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并搬入矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并搬入矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。",
+    "traits:datablock_granularity": "按照指定的数据块间隔，从当前源地址非连续搬入8个`DataBlock`，每个`DataBlock`的数据量为32字节。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+     "kind": "requires",
+     "condition": "非连续对齐搬入模式中，当dtype为int64_t时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+      "excerpt": "当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_mask/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
+     "kind": "requires",
+     "condition": "非连续对齐搬入模式中，当dtype为int64_t时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md",
+      "excerpt": "当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_mask/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md",
+   "document_sha256": "5fa95daeba6b31ec705eaa4643453e8279cae0bc5c1538145074184f28cf9ee6",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取VL/2长度连续数据，在每个源元素后补1个值为0的元素得到VL长度数据搬入矢量数据寄存器，提供对齐、立即数偏移和地址寄存器偏移三种模式，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md",
+   "document_sha256": "690e1c8d60a02af61ca705a64f6f0693960c688be88cee5faeb47bfeb0d7061a",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取VL/4长度连续数据，在每个源元素后补3个值为0的元素得到VL长度数据搬入矢量数据寄存器，提供对齐、立即数偏移和地址寄存器偏移三种模式，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据通过函数返回值返回或写入目的矢量数据寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md",
+   "document_sha256": "5aee0b9e07f1c317d702c91d5da0cb1947d14e3457e320ef55470e0186fbc577",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取VL/4长度连续数据，在每个源元素后补3个值为0的元素得到VL长度数据写入矢量数据寄存器，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据写入目的矢量数据寄存器。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md",
+      "excerpt": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据写入目的矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据写入目的矢量数据寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/4长度的连续数据，在每个源元素后补3个值为0的元素，并将得到的VL长度数据写入目的矢量数据寄存器。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack4_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+   "document_sha256": "87e61cea682a6d31607ad0d6acbdc80454c7374d50c0c8df264500e968aeb0d5",
+   "description": {
+    "value": "从Unified Buffer中32字节对齐的起始地址读取VL/2长度连续数据，在每个源元素后补1个值为0的元素得到VL长度数据写入矢量数据寄存器，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素，并将得到的VL长度数据写入目的矢量数据寄存器。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+      "excerpt": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素，并将得到的VL长度数据写入目的矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素，并将得到的VL长度数据写入目的矢量数据寄存器。",
+    "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，在每个源元素后补1个值为0的元素，并将得到的VL长度数据写入目的矢量数据寄存器。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+   "document_sha256": "92f51553a67d4452e1c2320014c9d2955c05bf3f49281eb41f4950a1198a844a",
+   "description": {
+    "value": "从Unified Buffer中满足对齐要求的起始地址读取连续数据并进行2倍上采样，写入矢量数据寄存器时每个源元素重复两次，写入掩码寄存器时每个bit重复两次，提供对齐、立即数偏移和地址寄存器偏移三种模式，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+      "excerpt": "从Unified Buffer（UB）中满足对应对齐要求的起始地址读取连续数据并进行2倍上采样，结果通过函数返回值返回或写入目的寄存器。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+      "excerpt": "当`dst`为矢量数据寄存器时，从UB中32字节对齐的起始地址读取VL/2长度数据，将每个源元素重复两次后写入VL长度数据。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中满足对应对齐要求的起始地址读取连续数据并进行2倍上采样，结果通过函数返回值返回或写入目的寄存器。",
+    "operations:load": "从Unified Buffer（UB）中满足对应对齐要求的起始地址读取连续数据并进行2倍上采样，结果通过函数返回值返回或写入目的寄存器。",
+    "traits:aligned_transfer": "当`dst`为矢量数据寄存器时，从UB中32字节对齐的起始地址读取VL/2长度数据，将每个源元素重复两次后写入VL长度数据。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+     "kind": "requires",
+     "condition": "地址寄存器偏移搬入模式",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+      "excerpt": "需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_mask_upsample.md",
+     "kind": "related",
+     "condition": "对齐搬入模式中，通过函数返回值返回掩码寄存器时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample.md",
+      "excerpt": "对齐搬入模式中，通过函数返回值返回掩码寄存器时，请使用[asc_loadalign_mask_upsample](asc_loadalign_mask_upsample.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md",
+   "document_sha256": "72f5907cd2e0279fb97a3e3bb32be96e7fa5e16a6a482281f8adfc87876b7d0b",
+   "description": {
+    "value": "从Unified Buffer中满足对齐要求的起始地址读取连续数据并进行2倍上采样，目的为矢量数据寄存器时每个源元素重复两次、为掩码寄存器时每个bit重复两次，Post Update模式下搬运完成后自动更新源地址指针，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md",
+      "excerpt": "从Unified Buffer（UB）中满足对应对齐要求的起始地址读取连续数据并进行2倍上采样。接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md",
+      "excerpt": "当目的操作数为矢量数据寄存器时，从UB中32字节对齐的起始地址读取VL/2长度数据，将每个源元素重复两次后写入VL长度数据。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "aligned_transfer",
+     "post_update"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中满足对应对齐要求的起始地址读取连续数据并进行2倍上采样。",
+    "operations:load": "从Unified Buffer（UB）中满足对应对齐要求的起始地址读取连续数据并进行2倍上采样。",
+    "traits:aligned_transfer": "当目的操作数为矢量数据寄存器时，从UB中32字节对齐的起始地址读取VL/2长度数据，将每个源元素重复两次后写入VL长度数据。",
+    "traits:post_update": "接口采用Post Update模式，搬运完成后自动更新源地址指针。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_upsample_postupdate.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+   "document_sha256": "c65c165c6087aad55ded52a6121c407758c0e09a23ba474b71a0a71097c369ba",
+   "description": {
+    "value": "从Unified Buffer按dtype对齐的起始地址读取VL长度连续数据，将asc_loadunalign_pre非对齐寄存器缓存的前置数据与从UB读取的后续数据拼接后搬入矢量数据寄存器，每次搬入前必须先调用预处理接口初始化，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+      "excerpt": "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度连续数据，并搬入矢量数据寄存器。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+      "excerpt": "本接口将[asc_loadunalign_pre](asc_loadunalign_pre.md)中的非对齐寄存器（32字节）中缓存的前置数据与从UB读取的后续数据拼接，得到VL长度数据并搬入矢量数据寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "load"
+    ],
+    "traits": [
+     "unaligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度连续数据，并搬入矢量数据寄存器。",
+    "operations:load": "从Unified Buffer（UB）中按dtype对齐的起始地址读取VL长度连续数据，并搬入矢量数据寄存器。",
+    "traits:unaligned_transfer": "本接口将[asc_loadunalign_pre](asc_loadunalign_pre.md)中的非对齐寄存器（32字节）中缓存的前置数据与从UB读取的后续数据拼接，得到VL长度数据并搬入矢量数据寄存器。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md",
+      "excerpt": "每次搬入前必须调用[asc_loadunalign_pre](asc_loadunalign_pre.md)中的源地址预处理模式进行初始化，且初始化接口和本接口必须使用相同的`src1`。"
+     }
+    }
+   ]
+  }
+ ]
+}

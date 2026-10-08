@@ -1,17 +1,15 @@
 ---
-okftype: reference.type
-title: asc_l13d_fmatrix_config
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md
-description: 配置 L12 到 L0A 或 L0B 的 3D Feature map 搬运属性，包括尺寸和四个方向的 padding 大小。
+okftype: reference.union
+description: "设置asc_copy_l12l0a与asc_copy_l12l0b三维格式搬运接口Feature map属性参数的联合体，包含宽、高尺寸与上、下、左、右四个方向的填充大小字段，联合体变量定义后必须对l1_height和l1_width赋值以符合实际场景及取值范围要求。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
   - traits: [padding]
-declaration:
-  symbol: asc_l13d_fmatrix_config
-  record_kind: union
-header: [/include/c_api/defs/union.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_l13d_fmatrix_config
 

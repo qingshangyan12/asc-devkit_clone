@@ -1,28 +1,19 @@
 ---
 okftype: reference.api
-title: asc_half2int4x2
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md
-description: 根据mask将矢量数据寄存器中参与计算的half元素转换为int4x2_t类型，两个连续half元素打包为一对4bit有符号整数，支持舍入和饱和/非饱和模式，按dst_quarter_pos每隔4个存储单元写入，其他位置置零。
+description: "根据掩码将矢量数据寄存器中参与计算的half元素转换为int4x2_t类型，两个连续half元素打包为一对4bit有符号整数，支持舍入与饱和/非饱和模式，通过dst_quarter_pos每隔4个存储单元离散选取目的写入位置，其他位置置零。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [masked, rounding_mode, saturation_mode]
-signature:
-  - archs: ['3510']
-    headers: []
-    override_id: _sat__Rvi4x2_vf16_vb_icposquarter
-  - archs: ['3510']
-    headers: []
-    override_id: _sat__vf16_vb_icposquarter
+  - traits: [rounding_mode, saturation_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 开启饱和模式或非饱和模式时，需配置ctrl寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
-examples: []
-timestamp: '2026-09-23'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "开启饱和模式或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_half2int4x2
 

@@ -1,27 +1,16 @@
 ---
 okftype: reference.api
-title: asc_ceil
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_ceil.md
-description: 将矢量数据寄存器中的浮点数元素按CEIL模式（向正无穷方向舍入）舍入到整数值，结果保持原浮点数据类型，支持函数返回值或引用参数输出，未被mask筛选的元素置零。
+description: "将矢量数据寄存器中的浮点数元素按CEIL模式向正无穷方向舍入到整数值，结果保持原浮点类型，语义等价于C标准库ceil；未被掩码筛选的元素置零，half与bfloat16_t支持饱和模式而float仅支持不饱和，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked, rounding_mode]
-signature:
-  - prototype_id: asc_ceil__v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-  - prototype_id: asc_ceil__Rv<dtype>_v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_ceil
 

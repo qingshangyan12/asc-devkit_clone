@@ -1,15 +1,14 @@
 ---
-okftype: reference.type
-title: asc_mutex_execute_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md
-description: 描述互斥锁的阻塞和非阻塞执行模式，作为asc_lock与asc_unlock接口mode参数的类型并提供兼容别名。
+okftype: reference.enum
+description: "表示互斥锁的阻塞或非阻塞执行模式，作为asc_lock与asc_unlock接口mode参数的类型，阻塞模式暂停指定流水执行，非阻塞模式不阻塞流水，并提供兼容类型别名。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-declaration:
-  symbol: asc_mutex_execute_mode
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_mutex_execute_mode
 

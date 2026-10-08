@@ -1,31 +1,14 @@
 ---
 okftype: reference.api
-title: asc_reduce_min_datablock
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md
-description: 根据mask对每个DataBlock（32B）内的元素求最小值，得到各DataBlock的归约结果并依次保存在dst低位，仅输出最小值不输出索引，其余元素置0。
+description: "根据mask对每个DataBlock（32B）内的元素求最小值，得到各DataBlock的归约结果并依次保存在dst低位前8个元素，其余元素置0，仅输出最小值不输出索引，未被选中元素视为类型最大值，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [reduction]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked]
-signature:
-  - prototype_id: asc_reduce_min_datablock__v<dtype>_vb
-    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
-  - prototype_id: asc_reduce_min_datablock__Rv<dtype>_v<dtype>_vb
-    dtype: [int16_t, uint16_t, half, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_reduce.h]
+  - traits: [datablock_granularity]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_reduce_min_datablock
 

@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_hif82half_deprecated.md",
+  "sha256": "5ea44a1465a5b9d1a12526af85c4eaa6c764fb7f54929e2cc2299d50161c8c2e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162float_deprecated.md",
+  "sha256": "83036c0ef914fa1db7d18f1d26bfab616faa04a7b7e8132c960a96e341e2a4fc"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162float_sync_deprecated.md",
+  "sha256": "fdf3a731fa5b2bef2a2237413774230a602a7f082e02b7b29fcef21fe620b6f6"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162half_sync_deprecated.md",
+  "sha256": "9adbaadf0171043d7687967e6ee610cc27aa8085de0627124f60a0a45a69559f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162int32_deprecated.md",
+  "sha256": "48685d71eab838e5b4f39f3344a724334e6c9f3cc782dc50a1174657e1797d6a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162uint32_deprecated.md",
+  "sha256": "fbafca341e0dc173eb2b35804f202c6b0b7d4b9a7d3b7b5d9c6c278ee8664444"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int162uint8_deprecated.md",
+  "sha256": "f1c7ce33b23771067226392dd0caed8692ebe8c0ee372e324945e06a63aef715"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322float_sync_deprecated.md",
+  "sha256": "c8b16a501c8766bf3d0e3646412275136733ee3310807ae6017002554dc5a563"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322int16_deprecated.md",
+  "sha256": "face93d1ca1891e6913e7326f57203a7227090f9dfe399d11d06477be916f25f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322int16_sync_deprecated.md",
+  "sha256": "fe97c2ef8c8f69f93e6cd9987c0c1c34fb562e8e46fffc9fbd3a8cb1ba7dc4cf"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322int64_deprecated.md",
+  "sha256": "8309f61f6b9463bd53ced7218676a35785ec41f8668c39f14476418c344eee80"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322int64_sync_deprecated.md",
+  "sha256": "795cc42c9c3e2846dde5b8a5e3bba22b40972d88cbf128ba48a3b93237f5d27c"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322uint16_deprecated.md",
+  "sha256": "f78fb4e9de5e87905ab2066ee520a81b63a55d5323b351cbe676c61cf39ee4b1"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322uint8_deprecated.md",
+  "sha256": "b9a4ab7a9703f69a74360cb9d80aa5c7498436a09156bacec04db51a8bd1157e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int42half_sync_deprecated.md",
+  "sha256": "4858d23860adebf9ff22a4f3a707b39ef99da05918d2965743e2e4af305120c6"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22bfloat16_deprecated.md",
+  "sha256": "df4dd2293c683e906491514e407fe2fbbbfde057031b71ff7029be9ba1b53d0a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22half_deprecated.md",
+  "sha256": "3eabc8beff4a40f1357e49af07b7866ba96c5f94d811227c4fd20f38bf21f90d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22int16_deprecated.md",
+  "sha256": "23643ba5e3b41a442f23d364b8a58e4505929016189c108fd25becaea3f239f5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642float_deprecated.md",
+  "sha256": "dd45369d95d759939f6811ad3b663f155530dec3b49340f3bd6e85709a7b7d21"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642float_sync_deprecated.md",
+  "sha256": "0715dad267d1bfef6d44a5e1a09f6e59c2032dc54cd259a53b47e6607ada9c99"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642int32_deprecated.md",
+  "sha256": "00002f89ece99caea045c3fe805152a99e07901ef770b7bf6d110dbefd93de35"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642int32_sync_deprecated.md",
+  "sha256": "073e7787223372b0df9a9558cb141b35dde7cbc21b40d7bdbff58b44a0104ce0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82half_deprecated.md",
+  "sha256": "aaf8e1d7541edfffed13a7d27e5d48f178c85b01c06cfde8f21ee299f86b9a2b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82half_sync_deprecated.md",
+  "sha256": "2d47c2b95995aa8df909dcf277baf3d28403ac4ba26df2e1def873a117f4abed"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82int16_deprecated.md",
+  "sha256": "79bddf985e3c3d53662e9983846cc5e02c983a515f5c1e996d09d1acb3dab799"
+ }
+]

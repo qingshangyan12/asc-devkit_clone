@@ -1,24 +1,16 @@
 ---
 okftype: reference.api
-title: asc_set_l13d_fmatrix
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md
-description: 配置3D img2col搬运模式下左矩阵的Feature Map宽高与四侧padding属性参数，供f_matrix_ctrl为false的asc_copy_l12l0a
-  3D搬运接口使用，仅在AIC上生效。
+description: "配置3D img2col搬运模式下左矩阵的Feature Map宽高与四侧padding属性参数，供f_matrix_ctrl为false的asc_copy_l12l0a 3D搬运接口使用，配置持续生效直至再次调用覆盖，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - operations: [img2col]
-signature:
-  - override_id: asc_set_l13d_fmatrix__u16_u16_u8_u8_u8_u8
-  - override_id: asc_set_l13d_fmatrix__Rl13dcfg
-archs: ['2201', '3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md
     kind: configures
-    condition: 3D搬运接口的参数`f_matrix_ctrl`取值为`false`时配置才会生效。
-examples: []
-timestamp: '2026-09-28'
+    condition: "3D搬运接口的参数f_matrix_ctrl取值为false时配置才会生效"
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_set_l13d_fmatrix
 

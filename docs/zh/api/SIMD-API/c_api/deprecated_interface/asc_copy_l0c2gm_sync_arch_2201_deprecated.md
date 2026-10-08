@@ -1,33 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_l0c2gm_sync_arch_2201（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2gm_sync_arch_2201_deprecated.md
-description: 已废弃的同步搬运接口，矩阵计算完成后对结果进行量化处理，再将处理结果搬运到GM，请改用非同步asc_copy_l0c2gm接口和asc_sync替代。
+description: "已废弃的同步搬运接口，矩阵计算完成后对结果进行量化处理再搬运到GM，支持九种量化模式，可开启ReLU、通道拆分与NZ2ND功能；请改用非同步接口asc_copy_l0c2gm和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
-  - operations: [copy]
-  - destination_locations: [global_memory]
-  - traits: [deprecated, quantization]
-signature:
-  - override_id: asc_copy_l0c2gm_sync__PGf16_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-  - override_id: asc_copy_l0c2gm_sync__PGbf16_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-  - override_id: asc_copy_l0c2gm_sync__PGi8_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-  - override_id: asc_copy_l0c2gm_sync__PGu8_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-  - override_id: asc_copy_l0c2gm_sync__PGf32_PCCf32_u16_u16_u32_u16_u8_u64_u8_b_b
-  - override_id: asc_copy_l0c2gm_sync__PGf16_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
-  - override_id: asc_copy_l0c2gm_sync__PGi16_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
-  - override_id: asc_copy_l0c2gm_sync__PGi8_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
-  - override_id: asc_copy_l0c2gm_sync__PGi32_PCCi32_u16_u16_u32_u16_u8_u64_u8_b_b
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - operations: [copy, layout_transform]
+  - traits: [quantization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_2201.md
-    kind: related
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-
 ---
 # asc_copy_l0c2gm_sync_arch_2201（废弃）
 

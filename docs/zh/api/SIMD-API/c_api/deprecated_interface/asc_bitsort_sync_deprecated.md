@@ -1,26 +1,18 @@
 ---
 okftype: reference.api
-title: asc_bitsort_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bitsort_sync_deprecated.md
-description: 位图排序函数，一次迭代完成32个元素的排序，按Score从大到小将Score与对应Index一起存入目的操作数；接口已废弃，请使用对应的非同步接口和同步接口asc_sync替代。
+description: "位图排序函数，一次迭代完成32个元素的排序，按Score从大到小将Score与对应Index一起存入目的操作数；接口已废弃，请改用非同步接口asc_bitsort配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [sort]
-  - execution_models: [memory_vector]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_bitsort_sync__PUf16_PUf16_PUu32_i32
-  - override_id: asc_bitsort_sync__PUf32_PUf32_PUu32_i32
-archs: ['2201', '3510']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [sort, synchronization]
+  - traits: [aligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_bitsort.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-
 ---
 # asc_bitsort_sync（废弃）
 

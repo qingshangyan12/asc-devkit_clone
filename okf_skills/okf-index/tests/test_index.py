@@ -109,11 +109,12 @@ class BuildTests(unittest.TestCase):
         for path in self.a3["documents"]:
             if "_arch_3510" in path:
                 self.fail(f"3510 变体页进入 A3 索引: {path}")
-        self.assertGreater(len(self.a3["documents"]), len(self.a5["documents"]))
+        # 全量轮：A5 文档多于 A3（新架构 API 更多 + 废弃双架构文档保留）
+        self.assertGreater(len(self.a5["documents"]), len(self.a3["documents"]))
 
     def test_gate_version(self) -> None:
-        # 试点全部 version 区间覆盖 9.2.0，version 过滤应为 0
-        self.assertEqual(self.a5["meta"]["filtered_by_version"], 0)
+        # 全量轮：3 篇废弃接口 version 闭区间止于 9.1.0，不覆盖本地 9.2.0
+        self.assertEqual(self.a5["meta"]["filtered_by_version"], 3)
 
     def test_arch_page_signatures(self) -> None:
         doc = self.a5["documents"]["docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"]
@@ -256,7 +257,10 @@ class EnsureTests(unittest.TestCase):
             result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A5")
         self.assertEqual(result["status"], "ready")
         self.assertEqual(result["actions"], [])
-        self.assertEqual(result["categories"], ["vector_compute", "vector_datamove"])
+        # 全量轮：14 个分类全部入索引（含 defs/deprecated_interface/experimental）
+        self.assertEqual(len(result["categories"]), 14)
+        for marker in ("vector_compute", "deprecated_interface", "defs", "sync"):
+            self.assertIn(marker, result["categories"])
 
     def test_skip_drift_avoids_rebuild(self) -> None:
         inst = self._copy_instance("skip")

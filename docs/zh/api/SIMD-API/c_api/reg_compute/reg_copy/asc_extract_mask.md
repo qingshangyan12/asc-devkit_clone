@@ -1,29 +1,15 @@
 ---
 okftype: reference.api
-title: asc_extract_mask
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md
-description: 从矢量数据寄存器中提取掩码寄存器并通过函数返回值返回结果：按part选取源矢量数据寄存器中的数据块，将所选数据块的每个bit广播成掩码位，功能与asc_copy的矢量到掩码模式相同，仅在AIV上生效。
+description: "从矢量数据寄存器中按part选取数据块提取掩码寄存器并通过函数返回值返回，所选数据块的每个bit广播为2bit或4bit后构成32B掩码，功能与asc_copy的矢量到掩码模式相同，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - objects: [mask, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-signature:
-  - override_id: asc_extract_mask__vu16_i16
-  - override_id: asc_extract_mask__vu32_i16
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_copy.h]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_extract_mask
 

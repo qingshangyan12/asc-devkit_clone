@@ -1,66 +1,19 @@
 ---
 okftype: reference.api
-title: asc_bfloat162int32
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162int32.md
-description: 根据mask将矢量数据寄存器中参与计算的bfloat16_t元素转换为int32_t类型并写入dst，源与目的位宽比为1:2，通过src_pos选择读取源数据的偶数或奇数位置，支持多种舍入模式和饱和/非饱和模式。
+description: "在掩码控制下将源矢量数据寄存器中的bfloat16_t元素转换为int32_t类型，因源与目的位宽比为1:2，通过位置选择标签读取源数据偶数或奇数索引位置；支持五种舍入模式与饱和、非饱和模式，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked, rounding_mode, saturation_mode, widening_result]
-signature:
-  - override_id: asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rna__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_ru__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rz__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rd__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rd_sat__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rn__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rn_sat__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rna__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rna_sat__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_ru__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_ru_sat__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rz__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rz_sat__Rvi32_vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rd__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rd_sat__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rn__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rn_sat__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rna__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rna_sat__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_ru__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_ru_sat__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rz__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rz_sat__vbf16_vb_icposeven
-  - override_id: asc_bfloat162int32_rd__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rd_sat__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rn__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rn_sat__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rna__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rna_sat__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_ru__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_ru_sat__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rz__vbf16_vb_icposodd
-  - override_id: asc_bfloat162int32_rz_sat__vbf16_vb_icposodd
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode, widening_result]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_bfloat162int32
 

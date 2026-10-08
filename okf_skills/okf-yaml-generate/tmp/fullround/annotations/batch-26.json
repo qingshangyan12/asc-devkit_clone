@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md",
+      "document_sha256": "96503641385ba4baaaf49440946038c21d6e59a36240e255d1916105dde9b484",
+      "description": {
+        "value": "配置矩阵计算或矩阵搬出接口执行后UnitFlag行为的枚举类型，作为相关接口unit_flag_mode参数的类型，提供不使能、使能后保持与使能后更新单元标志位三个取值。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md", "excerpt": "`asc_unit_flag_mode`用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口中`unit_flag_mode`参数的类型。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md", "excerpt": "| ENABLE_UPDATE | 3 | 使能UnitFlag，硬件执行完指令后改变单元标志位。 |"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "`asc_unit_flag_mode`用于配置矩阵计算或矩阵搬出接口执行后的UnitFlag行为，作为相关接口中`unit_flag_mode`参数的类型。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md",
+      "document_sha256": "ad95718b83ca1d6650ec5fd61dd63ac7469bac5a9200229812b7a379086c2a99",
+      "description": {
+        "value": "为C API声明添加C++弃用属性的宏，编译调用被标记接口的代码时生成包含废弃版本、计划移除日期与替代接口的告警；宏仅添加属性与告警信息，不阻止接口参与编译，也不会在移除日期后自动删除接口。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md", "excerpt": "`ASC_DEPRECATED`用于为C API声明添加C++ `[[deprecated]]`属性。开发者编译调用被标记接口的代码时，编译器会生成告警，告警信息包含接口开始废弃的版本、计划移除日期和推荐使用的替代接口。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_deprecation.md", "excerpt": "该宏只添加废弃属性和告警信息，不会阻止被标记接口参与编译，也不会在计划移除日期后自动删除接口。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "`ASC_DEPRECATED`用于为C API声明添加C++ `[[deprecated]]`属性。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md",
+      "document_sha256": "24418f86167f01288f0bf90754060c4b30f73c5c1ae31f254c4d61260430051e",
+      "description": {
+        "value": "在AIC与AIV分离模式下作为if语句条件对两类核心代码路径进行条件编译和运行的宏对，分别是ASCEND_IS_AIC与ASCEND_IS_AIV的C API别名，用于隔离仅AIC执行的矩阵计算搬运代码与仅AIV执行的矢量计算搬运代码，仅适用于分离模式。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md", "excerpt": "`ASC_IS_AIC`和`ASC_IS_AIV`用于[分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)中对Cube Core（AIC）和Vector Core（AIV）的代码路径进行条件编译和运行，可作为`if`语句的条件。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md", "excerpt": "这两个宏分别是`ASCEND_IS_AIC`和`ASCEND_IS_AIV`的C API别名，对应宏的功能相同。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/macro/asc_is_aic-asc_is_aiv.md", "excerpt": "仅支持在AIC上执行的代码必须置于`ASC_IS_AIC`条件分支内；仅支持在AIV上执行的代码必须置于`ASC_IS_AIV`条件分支内。"}
+        ]
+      },
+      "tag": {
+        "roles": ["control"]
+      },
+      "tag_evidence": {
+        "roles:control": "对Cube Core（AIC）和Vector Core（AIV）的代码路径进行条件编译和运行，可作为`if`语句的条件。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md",
+      "document_sha256": "564e984f3709fe4e7a7f7920dd7b74b12a7415138e12ac03701994049ea10c1b",
+      "description": {
+        "value": "定义C API的Reg数据类型，说明矢量数据寄存器、掩码寄存器、非对齐寄存器与地址寄存器四类的容量、位宽类别与使用方式，包括各寄存器数量上限、生命周期限定于单个Vector Function内，以及非对齐数据搬入搬出与地址偏移计算的调用流程。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md", "excerpt": "矢量数据寄存器用于存储矢量数据，其长度为`VL`（Vector Length）。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md", "excerpt": "掩码寄存器的类型为`vector_bool`，用于在矢量计算中筛选参与计算的元素，其长度为`VL / 8`，即32字节（256 bit）。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md", "excerpt": "这两类寄存器作为缓冲区，用于在UB和矢量数据寄存器之间连续搬运非对齐数据。"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "地址寄存器的类型为`addr_reg`，用于存储地址偏移量。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+      "document_sha256": "e621b724a3c8b38bca54bb2d66f2331ee0cc13022df012ef85929e6ab3b6c662",
+      "description": {
+        "value": "fill_value的初始化参数结构体，供asc_fill_l0a、asc_fill_l0b、asc_fill_l1接口配置初始化参数，包含迭代次数、每次迭代初始化的数据块个数与目的操作数迭代间隔字段，数据块大小依目的Buffer位于L1或L0A、L0B分别为32B或512B。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md", "excerpt": "asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a](../../cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](../../cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](../../cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md", "excerpt": "| blk_num | 每次迭代初始化的数据块个数，默认值：0。取值范围：[0, 32767]。<br>目的操作数位于L1 Buffer时，数据块大小是32B；目的操作数位于L0A Buffer/L0B Buffer时，数据块大小是512B。 |"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a](../../cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](../../cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](../../cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0a.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+            "excerpt": "asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a](../../cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](../../cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](../../cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+            "excerpt": "asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a](../../cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](../../cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](../../cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md",
+            "excerpt": "asc_fill_value_config为fill_value的初始化参数结构体，包含[asc_fill_l0a](../../cube_datamove/asc_fill_l0a.md)/[asc_fill_l0b](../../cube_datamove/asc_fill_l0b.md)/[asc_fill_l1](../../cube_datamove/asc_fill_l1.md)接口需要配置的各种初始化参数。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+      "document_sha256": "c03a53804423ac9f8862e3c843ed369d9295ccb97410e8c70c16c25ce1e1ffa1",
+      "description": {
+        "value": "设置asc_copy_l12l0a与asc_copy_l12l0b三维格式搬运接口Feature map属性参数的联合体，包含宽、高尺寸与上、下、左、右四个方向的填充大小字段，联合体变量定义后必须对l1_height和l1_width赋值以符合实际场景及取值范围要求。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md", "excerpt": "asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md", "excerpt": "`asc_l13d_fmatrix_config`类型的联合体变量被定义后必须对`l1_height`和`l1_width`进行赋值以符合实际场景及取值范围要求。"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。",
+        "traits:padding": "| padding_left_size | 左侧填充的大小，取值范围：[0, 255]。 |"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+            "excerpt": "asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+            "excerpt": "asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+      "document_sha256": "6309351bf67bb5da8c7a554458d0b85fc95a7810b2ff44a09fa725ba5bb5da5e",
+      "description": {
+        "value": "设置Load3Dv2接口repeat参数的联合体，包含height或width方向上前一个迭代与后一个迭代起始地址的距离、迭代次数与迭代方向三个字段，迭代方向可选沿height或沿width，迭代次数默认值为1。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md", "excerpt": "asc_load3d_v2_config用于设置Load3Dv2接口的repeat参数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md", "excerpt": "| rpt_stride | height/width方向上的前一个迭代与后一个迭代起始地址的距离，取值范围：[0, 65535]，默认值为0。 |"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "asc_load3d_v2_config用于设置Load3Dv2接口的repeat参数。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+      "document_sha256": "ef4abcdce81af74ab3d363d970c2d80f21fe294a81ec0e57e72d6defe339b9ef",
+      "description": {
+        "value": "asc_set_ndim_pad_count接口使用的联合体，用于设置asc_ndim_copy_gm2ub接口loop1至loop4各维度左右侧的padding元素个数，每个字段以元素个数为单位，取值范围为0至255，默认值为0。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md", "excerpt": "asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../../vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md", "excerpt": "| loop1_lp_count | 表示1维左侧需要补齐的元素个数。<br> 单位为元素个数，取值范围为[0, 255]，默认值为0。 |"}
+        ]
+      },
+      "tag": {
+        "roles": ["data_movement_configuration"],
+        "traits": ["padding"]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../../vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。",
+        "traits:padding": "asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../../vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+            "excerpt": "asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../../vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md",
+            "excerpt": "asc_ndim_pad_count_config用于[asc_set_ndim_pad_count](../../vector_datamove/asc_set_ndim_pad_count.md)接口中，设置[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)接口的各个维度左右侧的padding元素个数。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+      "document_sha256": "17be14a35faf76c71cdb6b0f31183417707f3f4d71b5811a3af92d9934c67b2a",
+      "description": {
+        "value": "包含原子操作启用位与原子操作类型的联合体，供asc_get_store_atomic_config接口使用，启用位按float、half、int16_t、int32_t、int8_t、bfloat16_t等数据类型开启原子操作，操作类型当前支持求和操作，默认值均为0。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md", "excerpt": "asc_store_atomic_config参数包含原子操作启用位与原子操作类型，用于[asc_get_store_atomic_config](../../atomic/scalar_atomic/asc_get_store_atomic_config.md)接口使用。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md", "excerpt": "| atomic_op | 原子操作类型，默认值：0。<br>0：求和操作。<br>其余值无具体含义。 |"}
+        ]
+      },
+      "tag": {
+        "roles": ["configuration"],
+        "traits": ["atomic"]
+      },
+      "tag_evidence": {
+        "roles:configuration": "asc_store_atomic_config参数包含原子操作启用位与原子操作类型，用于[asc_get_store_atomic_config](../../atomic/scalar_atomic/asc_get_store_atomic_config.md)接口使用。",
+        "traits:atomic": "asc_store_atomic_config参数包含原子操作启用位与原子操作类型，用于[asc_get_store_atomic_config](../../atomic/scalar_atomic/asc_get_store_atomic_config.md)接口使用。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_store_atomic_config.md",
+            "excerpt": "asc_store_atomic_config参数包含原子操作启用位与原子操作类型，用于[asc_get_store_atomic_config](../../atomic/scalar_atomic/asc_get_store_atomic_config.md)接口使用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md",
+      "document_sha256": "55104117f4c084a8f9203b6ce8b0673387f97395ef93379cf0ef0a1b4bd3eb45",
+      "description": {
+        "value": "试验接口，提供六个函数分别查询PIPE_MTE2、PIPE_MTE3、PIPE_V、PIPE_M、PIPE_MTE1、PIPE_FIX流水线发射队列当前的空闲槽位数量，用于观察队列占用情况；各函数仅支持所列AI Core类型，不支持的类型上调用返回0，使用前需开启试验编译选项。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md", "excerpt": "本接口用于获取指定流水线对应发射队列（Issue Queue）当前的空闲槽位数量。空闲槽位表示发射队列还能接收的待发射指令数量，可用于观察队列占用情况。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/experimental/asc_get_pipe_idle_slot_count.md", "excerpt": "在不支持的AI Core类型上调用时，接口返回0。"}
+        ]
+      },
+      "tag": {
+        "roles": ["query"]
+      },
+      "tag_evidence": {
+        "roles:query": "本接口用于获取指定流水线对应发射队列（Issue Queue）当前的空闲槽位数量。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/README.md",
+      "document_sha256": "8de98ade709923a94f88f61298ce2e8d726e29a80a1f89c99b410c3dac50c54f",
+      "description": {
+        "value": "介绍C API的定位与特性：作为Ascend C语言扩展层SIMD API，基于指针编程、直接映射NPU硬件指令，开发者自主管理内存搬运与同步，开放全部底层硬件能力；并说明头文件包含方式、API类型、关键字、流水类型与API目录列表入口。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/README.md", "excerpt": "C API是Ascend C三层梯度化编程接口中的**语言扩展层SIMD API**，定位为最底层的C语言接口，基于指针编程，提供完备的C语言编程能力。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/README.md", "excerpt": "C API可直接映射NPU硬件指令，开发者自主管理内存搬运与同步（与TPipe/TQue自动管理内存、同步不同），开放全部底层硬件能力。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/c_api.md",
+      "document_sha256": "a4a1389c06b626eba8691e3d92c3baabf59c6e177c50fccf50507cf8e5831be1",
+      "description": {
+        "value": "C API接口总列表页，按最细粒度公共头文件归类组织全部接口，说明除试验接口外整体使用时可包含asc_simd.h头文件，列表涵盖基础定义、工具接口、矩阵计算、矩阵计算搬运、矢量数据搬运、Reg矢量计算、标量计算、原子操作、缓存控制、同步控制等分类目录。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/c_api.md", "excerpt": "C API文档按最细粒度公共头文件归类。除试验接口外，整体使用时可以包含`c_api/asc_simd.h`。"}
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+      "document_sha256": "fe683ba1ba6ae2d7193ebfce6930704570c10825263458a97d31e7aa7129ac0d",
+      "description": {
+        "value": "C API通用说明与约束页，介绍GM、UB、L1、L0A、L0B、L0C等存储单元的用途与容量注意事项，说明高维切分计算的通用地址重叠约束、dataBlockStride与repeatStride配置方法、掩码操作取值规则，以及以数组方式申请内存的使用约束。",
+        "evidence": [
+          {"source_path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md", "excerpt": "AI Core内外包含多级存储单元，各存储单元的主要用途如下："},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md", "excerpt": "使用高维切分计算接口时，为了节省地址空间，开发者可以申请一块内存，供源操作数与目的操作数同时使用（即地址重叠）。"},
+          {"source_path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md", "excerpt": "mask用于控制每次迭代内参与计算的元素。"}
+        ]
+      },
+      "dependencies": []
+    }
+  ]
+}

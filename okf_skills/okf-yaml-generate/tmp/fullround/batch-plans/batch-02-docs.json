@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md",
+  "sha256": "c9f637003693727a4eddb05f2bd8325f0dd7276ef79af45f40571b74d116d472"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md",
+  "sha256": "24f73772a30a0b8a7665540fbf1d46d88341c0c2c0b64f2ecbdf13740f252372"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/reg_load_overview.md",
+  "sha256": "2cc82de698553d1012473e86ecaad101cd8eb4161ce84ee398cd081265aae207"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+  "sha256": "bd382e8e44608757e376507b6eafa5a9333facfeaaf696399f5d26c44e05611f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+  "sha256": "cd3cf02200746df492e67ea7a1561100fcf9301aa5cdc34b47f53ffc7f19def2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md",
+  "sha256": "03906755304f85306b1ae589991a47ec5c205ab42c241669b5ec74e196778ddf"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add.md",
+  "sha256": "9785ee24e8de3c76e39de60e3316c67c9cd804173ac5ff26fb9e402576b03ce2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add_scalar.md",
+  "sha256": "515b42240c23bde2ba5c476a52d3be570a0249240e2fc83abe64171d4a599d4c"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md",
+  "sha256": "3dc0015dae1e679e5b6251eabfce94a0b42e72d80fe7f521b997b9f66385f999"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md",
+  "sha256": "3c65667640ebf02d394b38476e644d69765affe24860312dc45f52f5d1d8a906"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_exp.md",
+  "sha256": "42092e3c03c3e5f73b0e3f9d04deaac2d5772d2e4d453975ab851dc829f42de7"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_ln.md",
+  "sha256": "f2263d7edcf99985a23ae31cacd9995a68d478ee96018ccb637b582802ac0d56"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_log.md",
+  "sha256": "5f67b87c72f7f63833b0e3ddfd37f8ea28a1cf5b2fd6e0529fc96a3611451455"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max.md",
+  "sha256": "83d82566e1193158b27712875a8e8ea41e39d1128a712caff4bcc06ed4b38aa8"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_max_scalar.md",
+  "sha256": "6e2cca33cd81327bd4269ddc23564787f1be8fc00b05fbb2788a4a77c6481674"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min.md",
+  "sha256": "7cf704c399c302019cd5976132c0d45cbeff94b1470c6b8fe04686d1fecdb3f2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_min_scalar.md",
+  "sha256": "738c1925208fefc5bb9310a5d072b5e95d398f4b71e4125bac01ac3e0bba8b8d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul.md",
+  "sha256": "7fcb6fa06d790b1d5841d4a1841e26466df3a7f152edf46122407fdb46f80926"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mul_scalar.md",
+  "sha256": "aed85597849d1fb6f9d64faa0de8f4a74e6ee0ca070f4db80b85355e13fc56fd"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_mull.md",
+  "sha256": "8c06bb6e9340bc24feb813eb60e0832c7dade7523cad32451c0a8fa1bc8f555a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_neg.md",
+  "sha256": "d3af1592e8c835e683c50a225985b02072f2e27830810d54abd03631b3cfecdc"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sqrt.md",
+  "sha256": "1308ea4e17077b9cc1ff97e27b34b3b1c3895aa3e03ada2e54805786c0521c9d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_sub.md",
+  "sha256": "18f8b95dc5a4ce5287a513c5f064f3f39dd82a7add7884ac46697433690e9d27"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_subc.md",
+  "sha256": "297c2bd16b0c420a3fd0c51e878d44b505eef4d65c8a38d0b779ba5eb2fdcc49"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate.md",
+  "sha256": "bb1bcc897cccb48e0afb67fa5e58d4b3fcc06a00e0c23bb9bf762821f2eb1cca"
+ }
+]

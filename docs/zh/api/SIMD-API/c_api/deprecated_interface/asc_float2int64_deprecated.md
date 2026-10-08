@@ -1,47 +1,19 @@
 ---
 okftype: reference.api
-title: asc_float2int64（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2int64_deprecated.md
-description: 已废弃的寄存器矢量转换接口，将float类型数据转化为int64_t类型，支持多种舍入模式与饱和、非饱和模式，源与目的位宽比为1:2，需分两部分按奇偶索引读取，请使用asc_float2int64的显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将float类型数据转化为int64_t类型，支持多种舍入模式与饱和、非饱和模式，因位宽比为1:2按接口后缀读取奇偶索引位置；请改用asc_float2int64的显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, rounding_mode, saturation_mode, widening_result]
-signature:
-  - override_id: asc_float2int64_rn__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rn_sat__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rn_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rn_sat_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rna__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rna_sat__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rna_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rna_sat_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rd__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rd_sat__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rd_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rd_sat_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_ru__Rvi64_vf32_vb
-  - override_id: asc_float2int64_ru_sat__Rvi64_vf32_vb
-  - override_id: asc_float2int64_ru_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_ru_sat_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rz__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rz_sat__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rz_v2__Rvi64_vf32_vb
-  - override_id: asc_float2int64_rz_sat_v2__Rvi64_vf32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode, saturation_mode, widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2int64.md
-    kind: related
-    condition: 原型已废弃，作为显式位置参数重载的替代方案使用
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "开启饱和模式和非饱和模式时"
+version: 9.0.0-
 ---
 # asc_float2int64（废弃）
 

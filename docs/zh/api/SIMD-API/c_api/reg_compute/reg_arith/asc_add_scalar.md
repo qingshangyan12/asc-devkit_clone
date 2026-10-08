@@ -1,29 +1,14 @@
 ---
 okftype: reference.api
-title: asc_add_scalar
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_add_scalar.md
-description: 根据mask将源矢量数据寄存器按元素与标量value相加，结果写入目的矢量数据寄存器或通过函数返回值返回，掩码位为0的元素不参与计算并在结果中置0。
+description: "根据掩码将源矢量数据寄存器按元素与标量value相加，结果写入目的矢量数据寄存器或经函数返回值返回，掩码位为0的元素不参与计算且结果置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [add]
-  - objects: [scalar, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, scalar_operand]
-signature:
-  - prototype_id: asc_add_scalar__v<dtype>_<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_add_scalar__Rv<dtype>_v<dtype>_<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_arith.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_add_scalar
 

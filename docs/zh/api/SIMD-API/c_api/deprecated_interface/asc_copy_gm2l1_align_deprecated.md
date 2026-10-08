@@ -1,52 +1,35 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1_align（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_align_deprecated.md
-description: 将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力并支持Normal、Compact及左右填充等padding模式，循环填充模式须配合loop配置接口使用；旧常规重载和同步接口已废弃，需改用带l2_cache_mode参数的新接口。
+description: "将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力，支持Normal、Compact与左右填充等padding模式，循环填充模式须配合loop配置接口使用；旧常规重载和同步接口已废弃，请改用带l2_cache_mode参数的新接口，同步场景额外调用asc_sync。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-  - traits: [deprecated, padding, unaligned_transfer]
-signature:
-  - prototype_id: asc_copy_gm2l1_align__PL1<dtype>_PG<dtype>_u32_u32_u8_u8_b_u8_u64_u32
-    header: [/include/c_api/cube_datamove/cube_datamove.h]
-    dtype: [int8_t, uint8_t, hifloat8_t, int16_t, uint16_t, half, bfloat16_t, int32_t,
-      uint32_t, float]
-  - prototype_id: asc_copy_gm2l1_align_sync__PL1<dtype>_PG<dtype>_u32_u32_u8_u8_b_u8_u64_u32
-    header: [/include/c_api/composite/cube_datamove_composite.h]
-    dtype: [int8_t, uint8_t, hifloat8_t, int16_t, uint16_t, half, bfloat16_t, int32_t,
-      uint32_t, float]
-archs: ['3510']
+  - traits: [aligned_transfer, padding, unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md
     kind: requires
-    condition: 循环填充模式
+    condition: "循环填充模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md
     kind: requires
-    condition: 循环填充模式
+    condition: "循环填充模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md
     kind: requires
-    condition: 循环填充模式
+    condition: "循环填充模式"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md
     kind: requires
-    condition: '`data_select_bit`设置为true时，或者左右填充模式（`left_padding_count`和`right_padding_count`任意不为0）时'
+    condition: "data_select_bit设置为true时，或者左右填充模式时"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 同步场景
+    kind: replaced_by
+    condition: "同步场景"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.1.0-9.2.0
 ---
 # asc_copy_gm2l1_align（废弃）
 

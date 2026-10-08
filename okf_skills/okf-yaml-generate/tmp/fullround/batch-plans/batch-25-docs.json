@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint32_deprecated.md",
+  "sha256": "47cccf0c065ef3e97f9579889805df7b28f42dbb7e346c101064d95d73ffed5a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md",
+  "sha256": "0a0f0e928b23f2ac0f3c7e5cd96f97554faa9b596eccbf65220a7491a1dd9e4a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md",
+  "sha256": "f0d8bd5c509bb59741e2423e0234a22e355e3a1244f819dae6d8db2530b42e9e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md",
+  "sha256": "864b794dbfcd9ad5bb558510ad4ba7a29443995870fae05fc24e138e4e83e3d0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+  "sha256": "1f2ce3b9bb08084a489a5689989d66315bc611d841836d1ed57061aa2cade1be"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md",
+  "sha256": "3a033c3f2857bd92bde989350694c41092ac0c90ef56ce5b6efb4936f7cebca5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md",
+  "sha256": "0f5792652bc74e0f5eb0f6cf1ba80cb6a530d78adc0bb5e36d1265cb4be7ec7f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md",
+  "sha256": "52da93834561146668f640aa4e14ef3460690ebf8eff203f3e0558dbf7f44391"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint32_deprecated.md",
+  "sha256": "4697f0dd76cbe3a36145de21adfd738d6a41b313243e251ff5419e40aef001a2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+  "sha256": "50dc6234f0913025cb6afd98eced64837add7d18cb0119bc6a3cc3486fff807a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+  "sha256": "558016c73a624cae74e885e35e3cb13734fcc669c84081731ce9f932e12115c5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+  "sha256": "506bf9da200930edd0d967d17856c4d828d4af9bdccdb3f106866f2574716d44"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+  "sha256": "18465f077c408e4f7188372910f38e63ec84cb9e7ce7096fae876a5af3961d0d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+  "sha256": "349fb5014e1c89f9771c7fd7347fe34a3a43f6f5b9e6b4de324c345796587b6e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+  "sha256": "2f65d3a40f8e5efc2e901a5c1fdf11f45661f993b18f4b00a0a48dcbed36c626"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+  "sha256": "1780e20becd88c255b60651f5cb89749ce3762d538ca63bdb7842a03253865c4"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+  "sha256": "5baac55654d1cb90752f2fe1b642f291276e89d1c687f58d4266c0b5461e7ba8"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+  "sha256": "520017b47fa0cc55f63dd8a69bc4c752af194ad544a9407c65ce0e39ae14035c"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+  "sha256": "e7700130eef17a5495709022a5579196df5a12b08c4e48e55e349aa5c72fc4ce"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+  "sha256": "d7e6f16875eb28235ec195327923010a3704fece075d5afbc2378816b1e90f3c"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+  "sha256": "58d9b71c6276c684aaabeab1cc06a220179fbf74bf76eb335138e19410e1046c"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+  "sha256": "fa9a072e70a7dbd935c2793567c476d129da1ff377d62a6bb8e80105dd97a3a5"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+  "sha256": "1ec72c2c2ff25beffd5464b166ad5c30ab25335eec6e412a3188fb4c5951eab0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+  "sha256": "3a51e3b07e28add8aaeed51f4e81f9cbd2ffd621c1247cd23b2f71ecc0488210"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+  "sha256": "96d8357b4a6d962d6136f2b7ef0eebe7bd97849c01f8e9b89b9df93e403424d9"
+ }
+]

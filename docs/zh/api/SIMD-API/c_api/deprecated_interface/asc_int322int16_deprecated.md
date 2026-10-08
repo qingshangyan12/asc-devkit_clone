@@ -1,28 +1,16 @@
 ---
 okftype: reference.api
-title: asc_int322int16（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322int16_deprecated.md
-description: 已废弃的寄存器矢量转换接口，根据mask将src中每个int32_t元素转化为int16_t类型写入dst，支持饱和与非饱和模式，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，根据mask将src中每个int32_t元素转化为int16_t类型写入dst，支持饱和与非饱和模式，因位宽比为2:1写入时按接口后缀选取奇偶索引；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, saturation_mode]
-signature:
-  - override_id: asc_int322int16__Rvi16_vi32_vb
-  - override_id: asc_int322int16_v2__Rvi16_vi32_vb
-  - override_id: asc_int322int16_sat__Rvi16_vi32_vb
-  - override_id: asc_int322int16_sat_v2__Rvi16_vi32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int16.md
-    kind: related
-    condition: 原型已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_int322int16（废弃）
 

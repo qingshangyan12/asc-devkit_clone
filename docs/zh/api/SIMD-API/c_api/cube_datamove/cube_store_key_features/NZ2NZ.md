@@ -1,19 +1,6 @@
 ---
-okftype: reference.index
-title: NZ2NZ
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md
-description: 介绍矩阵计算搬出过程中的Nz2Nz特性：矩阵计算结果搬出前后保持Nz大分形排布，输出类型转换及Channel Split/Channel
-  Merge可能改变小分形宽度；文档给出不同产品型号下的转化伪代码、可配置参数说明及与F32 Channel Split等特性组合使用的约束。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [data_movement]
-  - operations: [copy]
-  - source_locations: [l0c_buffer]
-  - destination_locations: [global_memory, l1_buffer]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md
-    kind: related
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍矩阵计算搬出的Nz2Nz特性：矩阵计算结果搬出前后保持Nz大分形排布，输出类型转换及通道拆分合并可能改变小分形宽度；文档按产品给出转化伪代码、可配置参数说明及与F32通道拆分等特性组合使用的约束。"
 ---
 # NZ2NZ
 

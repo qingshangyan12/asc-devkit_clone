@@ -1,30 +1,18 @@
 ---
 okftype: reference.api
-title: asc_repeat_reduce_sum_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_repeat_reduce_sum_sync_deprecated.md
-description: 已废弃的同步接口，对每个Repeat内所有元素求和，源操作数以二叉树方式两两相加，计算结果大于65504时保存为65504，请使用非同步接口asc_repeat_reduce_sum配合同步接口asc_sync替代。
+description: "已废弃的同步归约接口，对每个Repeat内所有元素按二叉树方式两两相加求和，计算结果大于65504时保存为65504，src起始地址需32字节对齐；请改用非同步接口asc_repeat_reduce_sum配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - families: [arithmetic]
-  - operations: [add, reduction]
-  - objects: [vector]
-  - execution_models: [memory_vector]
-  - traits: [deprecated, saturation_mode]
-signature:
-  - override_id: asc_repeat_reduce_sum_sync__PUf16_PUf16_u32
-  - override_id: asc_repeat_reduce_sum_sync__PUf32_PUf32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [add, reduction, synchronization]
+  - traits: [aligned_transfer, saturation_mode]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_repeat_reduce_sum_sync（废弃）
 

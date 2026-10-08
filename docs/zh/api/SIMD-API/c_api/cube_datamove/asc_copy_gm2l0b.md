@@ -1,28 +1,13 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l0b
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l0b.md
-description: 将矩阵数据从Global Memory搬运到L0B Buffer，通过起始分块ID、迭代次数及相邻迭代间的源步长和目的间隔控制搬运过程。
+description: "将矩阵数据从Global Memory搬运到L0B Buffer，以16×16个数对矩阵进行分块，通过起始分块ID、迭代次数以及相邻迭代间的源步长和目的间隔控制搬运过程。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [l0b_buffer]
-signature:
-  - override_id: asc_copy_gm2l0b__PCBi4x2_PGi4x2_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b__PCBi8_PGi8_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b__PCBu8_PGu8_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b__PCBf16_PGf16_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b__PCBbf16_PGbf16_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b__PCBi32_PGi32_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b__PCBu32_PGu32_u16_u8_u16_u16
-  - override_id: asc_copy_gm2l0b__PCBf32_PGf32_u16_u8_u16_u16
-archs: ['2201']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_copy_gm2l0b
 

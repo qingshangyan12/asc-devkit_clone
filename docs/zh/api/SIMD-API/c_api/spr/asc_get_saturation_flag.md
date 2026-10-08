@@ -1,25 +1,19 @@
 ---
 okftype: reference.api
-title: asc_get_saturation_flag
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md
-description: 按饱和模式类型读取当前是否开启饱和并返回布尔结果，CAST模式的饱和配置需同时满足饱和策略为USE_GLOBAL才会在精度转换中真正生效。
+description: "按饱和模式类型读取当前是否开启饱和并返回布尔结果，true表示该模式下饱和已开启，false表示未开启，各模式语义不同，INT为截断，FLOAT、FLOAT8与CAST为非饱和或截断，CAST模式还须饱和策略为USE_GLOBAL才会在精度转换中真正生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_get_saturation_flag__saturation
-archs: ['3510']
-header: [/include/c_api/spr/spr.h]
+  - traits: [saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
     kind: related
+    condition: "各模式饱和语义差异见该接口表1"
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "对CAST模式，饱和配置需同时满足策略为USE_GLOBAL才会在精度转换中真正生效"
+version: 9.2.0-
 ---
 # asc_get_saturation_flag
 

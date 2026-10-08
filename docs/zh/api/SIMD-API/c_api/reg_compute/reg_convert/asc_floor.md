@@ -1,31 +1,16 @@
 ---
 okftype: reference.api
-title: asc_floor
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_floor.md
-description: 将矢量数据寄存器中的浮点数元素按FLOOR模式（向负无穷方向舍入）舍入到整数值，结果保持原浮点数据类型，支持函数返回值或引用参数输出，未被mask筛选的元素置零。
+description: "将矢量数据寄存器中的浮点数元素按FLOOR模式向负无穷方向舍入到整数值，结果保持原浮点数据类型，等价于C标准库floor语义，支持half、bfloat16_t与float数据类型，未被掩码筛选的元素置零，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked, rounding_mode]
-signature:
-  - prototype_id: asc_floor__v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-  - prototype_id: asc_floor__Rv<dtype>_v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate
-    file: truncate.asc
-    archs: ['3510']
-    override_id: asc_floor__Rvf32_vf32_vb
-timestamp: '2026-09-28'
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_floor
 

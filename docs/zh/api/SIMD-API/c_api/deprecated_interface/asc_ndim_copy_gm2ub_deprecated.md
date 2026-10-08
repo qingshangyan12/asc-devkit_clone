@@ -1,53 +1,31 @@
 ---
 okftype: reference.api
-title: asc_ndim_copy_gm2ub（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_ndim_copy_gm2ub_deprecated.md
-description: 已废弃的多维数据搬运接口，将数据从Global Memory搬运到Unified Buffer，最多支持5个维度，每个维度可单独配置Stride并支持随路Padding，新接口形式请参见asc_ndim_copy_gm2ub。
+description: "已废弃的多维数据搬运接口，将数据从GM搬运到UB，最多处理5个维度，每维可单独配置Stride并支持随路Padding，步长与填充参数须通过配套接口传入；新接口形式请参见asc_ndim_copy_gm2ub，L2 Cache管理策略请改用asc_load_l2_cache_mode枚举配置。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, high_dimensional, padding]
-signature:
-  - override_id: asc_ndim_copy_gm2ub__PUi8_PGi8_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUu8_PGu8_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUf4e2m1x2_PGf4e2m1x2_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUf4e1m2x2_PGf4e1m2x2_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUf8e8m0_PGf8e8m0_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUf8e5m2_PGf8e5m2_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUf8e4m3_PGf8e4m3_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUi16_PGi16_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUu16_PGu16_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUf16_PGf16_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUbf16_PGbf16_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUi32_PGi32_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUu32_PGu32_u32_u32_u32_u32_u32_u8_u8_b_u8
-  - override_id: asc_ndim_copy_gm2ub__PUf32_PGf32_u32_u32_u32_u32_u32_u8_u8_b_u8
-archs: ['3510']
-header: [/include/c_api/vector_datamove/vector_datamove.h]
+  - traits: [high_dimensional, padding]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md
     kind: requires
-    condition: 相关配置参数有很多，需要通过不同的接口传入
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
     kind: requires
-    condition: 相关配置参数有很多，需要通过不同的接口传入
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md
     kind: related
-    condition: 当padding_mode为true时
-examples: []
-timestamp: '2026-09-28'
+    condition: "当padding_mode为true时"
+version: 9.0.0-9.2.0
 ---
 # asc_ndim_copy_gm2ub（废弃）
 

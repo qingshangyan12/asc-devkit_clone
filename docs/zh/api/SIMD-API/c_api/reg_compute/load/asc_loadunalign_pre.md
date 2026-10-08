@@ -1,39 +1,24 @@
 ---
 okftype: reference.api
-title: asc_loadunalign_pre
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_pre.md
-description: 根据Unified Buffer中按dtype对齐的起始地址初始化非对齐寄存器，作为后续非对齐搬入的前置数据缓存，该阶段仅完成非对齐寄存器初始化，不会将数据搬入矢量数据寄存器，仅在AIV上生效。
+description: "根据Unified Buffer中按dtype对齐的起始地址，将起始地址向低地址方向对齐到32字节边界后读取32字节数据，初始化非对齐寄存器作为后续非对齐搬入的前置缓存，该阶段不将数据搬入矢量数据寄存器，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [load]
-  - execution_models: [register_vector]
-  - source_locations: [unified_buffer]
   - traits: [unaligned_transfer]
-signature:
-  - prototype_id: asc_loadunalign_pre__Rvloadunalign_PU<dtype>
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float, int64_t]
-  - prototype_id: asc_loadunalign_pre__Rvloadunalign_PU<dtype>_ar
-    dtype: [int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0_t,
-      fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float, int64_t]
-archs: ['3510']
-header: [/include/c_api/reg_compute/load/loadunalign.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadunalign_postupdate.md
     kind: related
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
-    condition: 地址寄存器偏移预处理模式
+    condition: "地址寄存器偏移预处理模式"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.0.0-
 ---
 # asc_loadunalign_pre
 

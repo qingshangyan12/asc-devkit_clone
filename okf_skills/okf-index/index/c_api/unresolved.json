@@ -2,6 +2,481 @@
   "purpose": "okf_derive_unresolved",
   "records": [
     {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md",
+      "field": "signatures",
+      "issue": "no declaration found in include/c_api"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md",
+      "field": "signatures",
+      "issue": "12 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md",
+      "field": "signatures",
+      "issue": "12 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_2201.md",
+      "field": "signatures",
+      "issue": "2 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+      "field": "signatures",
+      "issue": "2 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_2201.md",
+      "field": "signatures",
+      "issue": "2 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md",
+      "field": "signatures",
+      "issue": "2 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md",
+      "field": "signatures",
+      "issue": "7 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md",
+      "field": "signatures",
+      "issue": "7 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md",
+      "field": "signatures",
+      "issue": "7 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md",
+      "field": "signatures",
+      "issue": "5 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md",
+      "field": "signatures",
+      "issue": "5 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md",
+      "field": "signatures",
+      "issue": "5 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l1.md",
+      "field": "signatures",
+      "issue": "12 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162e1m2x2_deprecated.md",
+      "field": "signatures",
+      "issue": "40 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_bfloat162e2m1x2_deprecated.md",
+      "field": "signatures",
+      "issue": "40 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md",
+      "field": "signatures",
+      "issue": "no declaration found in include/c_api"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_deprecated.md",
+      "field": "signatures",
+      "issue": "12 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_sync_arch_2201_deprecated.md",
+      "field": "signatures",
+      "issue": "12 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_sync_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "12 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_sync_2d_arch_3510_deprecated.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_sync_2d_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "no declaration found in include/c_api"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_sync_highdim_split_arch_3510_deprecated.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_sync_highdim_split_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "no declaration found in include/c_api"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_align_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "21 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l0c2l1_deprecated.md",
+      "field": "signatures",
+      "issue": "2 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_2d_arch_3510_deprecated.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_2d_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "no declaration found in include/c_api"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_3d_arch_3510_deprecated.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_3d_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "no declaration found in include/c_api"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0a_sync_arch_2201_deprecated.md",
+      "field": "signatures",
+      "issue": "7 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sync_2d_arch_3510_deprecated.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sync_2d_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "no declaration found in include/c_api"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sync_3d_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "5 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sync_arch_2201_deprecated.md",
+      "field": "signatures",
+      "issue": "5 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12ub_sync_deprecated.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12ub_sync_deprecated.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_align_arch_3510_deprecated.md",
+      "field": "signatures",
+      "issue": "21 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e1m2x22bfloat16_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e2m1x22bfloat16_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e4m32float_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e5m22float_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_exp_sub_deprecated.md",
+      "field": "signatures",
+      "issue": "2 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l1_sync_deprecated.md",
+      "field": "signatures",
+      "issue": "12 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e4m3_deprecated.md",
+      "field": "signatures",
+      "issue": "16 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2e5m2_deprecated.md",
+      "field": "signatures",
+      "issue": "16 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_float2hif8_deprecated.md",
+      "field": "signatures",
+      "issue": "32 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_half2int4x2_deprecated.md",
+      "field": "signatures",
+      "issue": "80 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_hif82float_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322uint8_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22bfloat16_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22half_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int4x22int16_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82int32_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_post_deprecated.md",
+      "field": "signatures",
+      "issue": "34 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storeunalign_postupdate_deprecated.md",
+      "field": "signatures",
+      "issue": "36 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint32_deprecated.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e1m2x2.md",
+      "field": "signatures",
+      "issue": "40 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_bfloat162e2m1x2.md",
+      "field": "signatures",
+      "issue": "40 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e1m2x22bfloat16.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e2m1x22bfloat16.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e5m22float.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+      "field": "signatures",
+      "issue": "16 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md",
+      "field": "signatures",
+      "issue": "16 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2hif8.md",
+      "field": "signatures",
+      "issue": "32 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2int4x2.md",
+      "field": "signatures",
+      "issue": "80 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_hif82float.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322uint8.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22bfloat16.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22half.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int4x22int16.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int32.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md",
+      "field": "signatures",
+      "issue": "8 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md",
+      "field": "signatures",
+      "issue": "2 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+      "field": "signatures",
+      "issue": "3 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign.md",
+      "field": "signatures",
+      "issue": "17 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post.md",
+      "field": "signatures",
+      "issue": "34 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_post_postupdate.md",
+      "field": "signatures",
+      "issue": "17 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storeunalign_postupdate.md",
+      "field": "signatures",
+      "issue": "36 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/vf_call/asc_vf_call.md",
+      "field": "archs",
+      "issue": "archs derived from body npu markers (include has no @archs): ['3510']"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/vf_call/asc_vf_call.md",
+      "field": "signatures",
+      "issue": "no declaration found in include/c_api"
+    },
+    {
       "document": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transpose.md",
       "field": "archs",
       "issue": "archs derived from body npu markers (include has no @archs): ['2201', '3510']"

@@ -1,35 +1,20 @@
 ---
 okftype: reference.api
-title: asc_storealign_pack_quarter
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md
-description: 将矢量数据寄存器中的数据压缩搬出到Unified Buffer（UB），按mask将每个32bit有效元素的低8bit数据写入压缩后对应目的位置，mask为0的元素不搬出且目的位置保持原值，提供对齐、立即数偏移和地址寄存器偏移三种模式。
+description: "将矢量数据寄存器中的数据压缩搬出到Unified Buffer（UB），按掩码将每个32bit有效元素的低8bit数据写入压缩后对应目的位置，掩码为0的位置保持原值，目的地址需32字节对齐，提供对齐、立即数偏移与地址寄存器偏移三种模式，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [compression, store]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-  - traits: [masked]
-signature:
-  - prototype_id: asc_storealign_pack_quarter__PU<dtype>_v<dtype>_vb
-    dtype: [int32_t, uint32_t, float]
-  - prototype_id: asc_storealign_pack_quarter__PU<dtype>_v<dtype>_i32_vb
-    dtype: [int32_t, uint32_t, float]
-  - prototype_id: asc_storealign_pack_quarter__PU<dtype>_v<dtype>_ar_vb
-    dtype: [int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storealign.h]
+  - traits: [aligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
-    condition: 地址寄存器偏移搬出模式
+    condition: "地址寄存器偏移搬出模式"
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在UB地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在UB地址重叠"
+version: 9.2.0-
 ---
 # asc_storealign_pack_quarter
 

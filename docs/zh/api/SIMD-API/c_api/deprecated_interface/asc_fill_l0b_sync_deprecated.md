@@ -1,39 +1,19 @@
 ---
 okftype: reference.api
-title: asc_fill_l0b_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_fill_l0b_sync_deprecated.md
-description: 已废弃接口，将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化，请使用asc_fill_l0b与asc_sync组合替代。
+description: "已废弃的同步初始化接口，将value的二进制值赋值给dst，对L0B Buffer的Local Memory进行初始化，value与dst类型不同时需按dst类型转换；请改用非同步接口asc_fill_l0b配合同步接口asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_initialization]
-  - operations: [fill]
-  - destination_locations: [l0b_buffer]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_fill_l0b_sync__PCBi16_f16_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBi16_u32_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBu16_f16_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBu16_u32_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBf16_f16_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBf16_u32_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBbf16_bf16_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBbf16_f16_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBbf16_u32_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBi32_f16_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBi32_u32_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBu32_f16_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBu32_u32_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBf32_f16_RCfillcfg
-  - override_id: asc_fill_l0b_sync__PCBf32_u32_RCfillcfg
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - operations: [fill, synchronization]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_fill_l0b.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/defs/union/asc_fill_value_config.md
     kind: related
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_fill_l0b_sync（废弃）
 

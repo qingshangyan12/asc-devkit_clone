@@ -1,65 +1,24 @@
 ---
 okftype: reference.api
-title: asc_copy_ub2gm_align_arch_3510（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_ub2gm_align_arch_3510_deprecated.md
-description: 已废弃的高维切分搬运接口，提供数据非对齐搬运功能，将数据从UB搬运到GM并支持8位/16位/32位数据类型，请使用asc_copy_ub2gm_align高维切分搬运替代。
+description: "已废弃的高维切分搬运接口，提供数据非对齐搬运功能，将数据从UB搬运到GM并支持8位、16位、32位数据类型，非32字节对齐时硬件补齐dummy假数据且写入GM时丢弃；请改用asc_copy_ub2gm_align高维切分搬运并配合asc_store_l2_cache_mode枚举配置替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [unified_buffer]
-  - destination_locations: [global_memory]
-  - traits: [deprecated, high_dimensional, unaligned_transfer]
-signature:
-  - override_id: asc_copy_ub2gm_align__PGi8_PUi8_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGu8_PUu8_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGhf8_PUhf8_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGf8e5m2_PUf8e5m2_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGf8e4m3_PUf8e4m3_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGi16_PUi16_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGu16_PUu16_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGf16_PUf16_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGbf16_PUbf16_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGi32_PUi32_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGu32_PUu32_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
-  - override_id: asc_copy_ub2gm_align__PGf32_PUf32_u16_u32_u8_u64_u32
-    archs: ['3510']
-    headers: []
+  - traits: [aligned_transfer, high_dimensional, unaligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md
-    kind: related
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果需要执行多条`asc_copy_ub2gm_align`指令，且`asc_copy_ub2gm_align`指令的目的地址存在重叠
+    kind: requires
+    condition: "如果需要执行多条asc_copy_ub2gm_align指令，且目的地址存在重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果需要执行多条`asc_copy_ub2gm_align`指令，且`asc_copy_ub2gm_align`指令的目的地址存在重叠
+    kind: requires
+    condition: "如果需要执行多条asc_copy_ub2gm_align指令，且目的地址存在重叠"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md
-    kind: related
-examples: []
-timestamp: '2026-09-24'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_copy_ub2gm_align_arch_3510（废弃）
 

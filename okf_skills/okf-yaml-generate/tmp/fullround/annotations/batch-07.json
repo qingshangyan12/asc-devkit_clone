@@ -1,0 +1,1183 @@
+{
+ "schema_version": 1,
+ "purpose": "okf_semantic_annotations",
+ "annotations": [
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md",
+   "document_sha256": "7b63849ab5243848df1fedd5334d68af9ec3acf9e6ab4e652742956d3bd326d8",
+   "description": {
+    "value": "根据mask对矢量数据寄存器或掩码寄存器执行按位异或操作，结果写入目的操作数或通过函数返回值返回，未被mask筛选的位置被置0，源与目的数据类型须一致，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md",
+      "excerpt": "根据`mask`对源矢量数据寄存器`src0`和`src1`进行按位异或（^）操作，将结果写入目的矢量数据寄存器`dst`或通过函数返回值返回。未被`mask`筛选的位置被置为0。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md",
+      "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "bitwise_xor"
+    ],
+    "traits": [
+     "elementwise"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`对源矢量数据寄存器`src0`和`src1`进行按位异或（^）操作，将结果写入目的矢量数据寄存器`dst`或通过函数返回值返回。未被`mask`筛选的位置被置为0。",
+    "operations:bitwise_xor": "根据`mask`对源矢量数据寄存器`src0`和`src1`进行按位异或（^）操作，将结果写入目的矢量数据寄存器`dst`或通过函数返回值返回。未被`mask`筛选的位置被置为0。",
+    "traits:elementwise": "dst[i] = src0[i] ^ src1[i] if mask[i] else 0"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_xor.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+   "document_sha256": "dd66bf499b4b093121298e7279430553c12fcdc25793e9dd5d4e2ec5d606ab34",
+   "description": {
+    "value": "根据传入的pat_mode生成对应的掩码寄存器，支持b8、b16、b32三种位宽模式，pat_mode指定哪些位置的元素参与计算，掩码寄存器数量上限为8，超出上限会写入预留UB内存可能引起性能劣化，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+      "excerpt": "根据传入的pat_mode生成对应的掩码寄存器，支持b8、b16、b32三种位宽模式。pat_mode参数指定mask的模式，即指定哪些位置的元素参与计算。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+      "excerpt": "掩码寄存器的数量上限为8，超过上限的掩码寄存器会写入预留的8K Unified Buffer（UB）内存中，可能引起性能劣化。编译器会自动复用生命周期结束的寄存器和预留内存，若两者均可用，优先复用寄存器。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "根据传入的pat_mode生成对应的掩码寄存器，支持b8、b16、b32三种位宽模式。pat_mode参数指定mask的模式，即指定哪些位置的元素参与计算。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md",
+   "document_sha256": "c0523e0a3c355b76f32400102a5fbb98243d69be954ff5b7f4412bd9dd4c85d9",
+   "description": {
+    "value": "从SPR特殊寄存器中读取mask值并按数据类型格式化后返回，b16模式将128bit数据逐bit扩展为2bit、b32模式将64bit数据逐bit扩展为4bit，拼成256bit掩码寄存器，需在Vector Function内调用，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md",
+      "excerpt": "从SPR（Special Purpose Register）中读取mask值，并按数据类型格式化后返回。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md",
+      "excerpt": "对于b16数据类型：从SPR读取mask共128bit数据，将每个bit扩展为2bit，拼成256bit掩码寄存器返回。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md",
+      "excerpt": "本接口需在Vector Function（`__simd_vf__`标记的函数）内调用。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "query"
+    ]
+   },
+   "tag_evidence": {
+    "roles:query": "从SPR（Special Purpose Register）中读取mask值，并按数据类型格式化后返回。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_get_mask_spr.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md",
+   "document_sha256": "30401fe5cc3cb9eeb098eb3adf58b6210ca652fa7041692aba02a1ba5535a33b",
+   "description": {
+    "value": "根据元素个数value生成掩码寄存器并自动将value减去当前向量处理单元的元素个数，支持b8、b16、b32三种位宽模式，重复调用可按剩余元素个数逐次生成掩码，需在Vector Function内调用，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md",
+      "excerpt": "根据元素个数value生成mask，并自动将value减去当前向量处理单元的元素个数。支持b8、b16、b32三种位宽模式，由于VL=256B，各模式的向量处理单元元素个数为："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md",
+      "excerpt": "本接口需在Vector Function（`__simd_vf__`标记的函数）内调用。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "根据元素个数value生成mask，并自动将value减去当前向量处理单元的元素个数。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md",
+   "document_sha256": "fa87b9eeb0c984391bcfb8934140268716f80e1dc776af70f32ace50b6b6b53d",
+   "description": {
+    "value": "将两个源矢量数据寄存器或掩码寄存器中的元素解交织后分别存入两个目的寄存器，偶数索引元素写入dst0、奇数索引元素写入dst1，掩码模式按位宽分组解交织，两个目的寄存器不能相同，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md",
+      "excerpt": "将src0和src1中的元素解交织存入dst0和dst1中，本接口提供矢量数据解交织和掩码解交织两种功能模式："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md",
+      "excerpt": "dst0与dst1必须为不同的矢量数据寄存器或掩码寄存器，若两者引用同一寄存器将导致两个输出互相覆盖，结果未定义。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "deinterleave"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将src0和src1中的元素解交织存入dst0和dst1中，本接口提供矢量数据解交织和掩码解交织两种功能模式：",
+    "operations:deinterleave": "将src0和src1中的元素解交织存入dst0和dst1中，本接口提供矢量数据解交织和掩码解交织两种功能模式："
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_deintlv.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+   "document_sha256": "a43de612c36aa7acfb2b905e2753b1ca127717a36c81848a9f1640b50f4efd0c",
+   "description": {
+    "value": "将两个源矢量数据寄存器或掩码寄存器中的数据交织后分别写入两个目的寄存器，矢量模式以元素为单位前半部分交替写入dst0、后半部分写入dst1，掩码模式按接口后缀1、2、4bit粒度分组交织，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+      "excerpt": "将两个源操作数矢量数据寄存器中的数据交织后分别写入两个目的矢量数据寄存器。根据操作数类型，本接口提供两种功能模式："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+      "excerpt": "操作数为掩码寄存器：** 根据接口后缀指定的粒度进行交织。`asc_intlv_b8`以1bit为一组，`asc_intlv_b16`以2bit为一组，`asc_intlv_b32`以4bit为一组。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "interleave"
+    ],
+    "traits": [
+     "split_high_low"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将两个源操作数矢量数据寄存器中的数据交织后分别写入两个目的矢量数据寄存器。根据操作数类型，本接口提供两种功能模式：",
+    "operations:interleave": "将两个源操作数矢量数据寄存器中的数据交织后分别写入两个目的矢量数据寄存器。根据操作数类型，本接口提供两种功能模式：",
+    "traits:split_high_low": "目的操作数（矢量数据寄存器），用于保存交织后的低半部分数据。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md",
+   "document_sha256": "7d0a91cd8639a910b3254a4556cff9e8a06fc8813d62d6717303861bc4bfaad1",
+   "description": {
+    "value": "将源操作数元素的低位数据压缩写入目的操作数的高半部分，b16源取低8位、b32源取低16位，源为掩码寄存器时每2bit取低位bit压缩存储，结果写入dst或通过函数返回值返回，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md",
+      "excerpt": "将源操作数中的元素选取低8位（b16）、低16位（b32）写入目的操作数的高半部分。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md",
+      "excerpt": "当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的高半部分。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "compression"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将源操作数中的元素选取低8位（b16）、低16位（b32）写入目的操作数的高半部分。",
+    "operations:compression": "当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的高半部分。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_high.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md",
+   "document_sha256": "6b4e2fc32d55040a8be35ebbb3c9bad1baa7f7dc8c02eb018c40eea8180fe042",
+   "description": {
+    "value": "将源操作数元素的低位数据压缩写入目的操作数的低半部分，b16源取低8位、b32源取低16位，源为掩码寄存器时每2bit取低位bit压缩存储，结果写入dst或通过函数返回值返回，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md",
+      "excerpt": "将源操作数中的元素选取偶数位bit(bool)、低8位（b16）、低16位（b32）写入目的操作数的低半部分。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md",
+      "excerpt": "当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的低半部分。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "compression"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将源操作数中的元素选取偶数位bit(bool)、低8位（b16）、低16位（b32）写入目的操作数的低半部分。",
+    "operations:compression": "当源操作数为vector_bool时，其按bit位进行压缩，每2bit将其中的低位bit存储至目的操作数的低半部分。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_pack_to_low.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md",
+   "document_sha256": "32a3956204c32b723686c839af3c3a9b70b33667af839e20047c34f25df4d1aa",
+   "description": {
+    "value": "根据mask逐位置从两个源操作数中选择元素，mask比特位为1时选取src0对应位置的数、为0时选取src1的数，结果写入dst或通过函数返回值返回，源与目的数据类型须一致，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md",
+      "excerpt": "根据`mask`从源操作数`src0`、`src1`中选择元素，得到计算结果。选择的规则为：当`mask`的比特位为1时，从`src0`中选取对应位置的数；当`mask`的比特位为0时，从`src1`中选取对应位置的数。计算公式如下："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md",
+      "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "selection"
+    ],
+    "traits": [
+     "elementwise"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`从源操作数`src0`、`src1`中选择元素，得到计算结果。",
+    "operations:selection": "当`mask`的比特位为1时，从`src0`中选取对应位置的数；当`mask`的比特位为0时，从`src1`中选取对应位置的数。",
+    "traits:elementwise": "当`mask`的比特位为1时，从`src0`中选取对应位置的数；当`mask`的比特位为0时，从`src1`中选取对应位置的数。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_select.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+   "document_sha256": "b6fd41bd076e1ee47333a8edefb09afff2e85ca08261aef2f83ccf2f8017e4d2",
+   "description": {
+    "value": "将源矢量数据寄存器中被mask选中的有效元素压缩后依次复制到目的矢量数据寄存器或作为返回值返回，有效元素从低到高连续排列、剩余位置置0，本接口不保存有效数据大小至AR寄存器，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+      "excerpt": "将`src`中被`mask`选择的有效元素作为返回值返回或依次复制到`dst`中。有效元素在计算结果中从低到高连续排列，剩余位置元素置为0。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+      "excerpt": "本接口不会将有效数据大小保存至AR寄存器。如果需要筛选有效元素并将其连续搬出至Unified Buffer（UB），请参考[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "compact"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "将`src`中被`mask`选择的有效元素作为返回值返回或依次复制到`dst`中。有效元素在计算结果中从低到高连续排列，剩余位置元素置为0。",
+    "operations:compact": "将`src`中被`mask`选择的有效元素作为返回值返回或依次复制到`dst`中。有效元素在计算结果中从低到高连续排列，剩余位置元素置为0。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+     "kind": "related",
+     "condition": "如果需要筛选有效元素并将其连续搬出至Unified Buffer（UB）",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+      "excerpt": "如果需要筛选有效元素并将其连续搬出至Unified Buffer（UB），请参考[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+   "document_sha256": "3a3729b88ceffafe7b37b8d00e5b13e97d766ef154f0303da858307764639add",
+   "description": {
+    "value": "将源矢量数据寄存器中被掩码选中的元素压缩到目的矢量数据寄存器并连续搬出到Unified Buffer（UB），AR寄存器记录累计搬出字节数实现自动地址偏移，可完整组成32B的主块直接写入、未满32B尾块暂存非对齐寄存器，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "excerpt": "将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。压缩后的元素按其在`src1`中的顺序从`dst`的低位开始连续排列，`dst`中的剩余元素置0。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "excerpt": "接口将可完整组成32B的主块写入UB，未满32B的尾块暂存在非对齐寄存器`src0`中。完成一次或多次连续搬出后，需调用[asc_squeeze_and_storeunalign_finalize](asc_squeeze_and_storeunalign_finalize.md)将尾块写入UB。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "excerpt": "连续调用本接口并保持`dst_addr`和`src0`不变，可将多组筛选结果连续写入UB，无需手动更新地址。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "compact",
+     "store"
+    ],
+    "traits": [
+     "unaligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。",
+    "operations:compact": "将源矢量数据寄存器`src1`中被掩码`squeeze_mask`选中的元素压缩到目的矢量数据寄存器`dst`，并将这些元素连续搬出到Unified Buffer（UB）。",
+    "operations:store": "并将这些元素连续搬出到Unified Buffer（UB）。",
+    "traits:unaligned_transfer": "接口将可完整组成32B的主块写入UB，未满32B的尾块暂存在非对齐寄存器`src0`中。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+     "kind": "requires",
+     "condition": "首次调用本接口前",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "excerpt": "首次调用本接口前，需调用[asc_squeeze_and_storeunalign_init](asc_squeeze_and_storeunalign_init.md)清零AR寄存器。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+     "kind": "related",
+     "condition": "完成一次或多次连续搬出后",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "excerpt": "完成一次或多次连续搬出后，需调用[asc_squeeze_and_storeunalign_finalize](asc_squeeze_and_storeunalign_finalize.md)将尾块写入UB。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本接口与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "excerpt": "如果本接口与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "excerpt": "AR寄存器中的值可通过[asc_get_squeeze_status](../../spr/asc_get_squeeze_status.md)接口获取。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+   "document_sha256": "4adf4ac809c148ada160914dcfed369c236a9fd706624278645e937562d65b61",
+   "description": {
+    "value": "结束一组asc_squeeze_and_storeunalign连续搬出操作，将暂存在非对齐寄存器中未满32B的尾块写入Unified Buffer（UB），目的地址不要求32B对齐但需按dtype对齐并与主接口保持一致，每组连续搬出仅执行一次，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+      "excerpt": "Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB）。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+      "excerpt": "地址不要求32B对齐，但需按`sizeof(dtype)`字节对齐；需与同组`asc_squeeze_and_storeunalign`调用中的`dst_addr`保持一致。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "store"
+    ],
+    "traits": [
+     "unaligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "Reg计算数据搬运接口，用于结束一组[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)连续搬出操作，将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB）。",
+    "operations:store": "将暂存在非对齐寄存器中的尾块写入Unified Buffer（UB）。",
+    "traits:unaligned_transfer": "地址不要求32B对齐，但需按`sizeof(dtype)`字节对齐；需与同组`asc_squeeze_and_storeunalign`调用中的`dst_addr`保持一致。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+      "excerpt": "调用本接口前，需先调用一次或多次[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)；每组连续搬出操作仅在最后一次主接口调用后执行一次本接口。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本接口与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+      "excerpt": "如果本接口与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+   "document_sha256": "2aefcac45af157fa1f8c617b2b84899c7459096c4fb042177f04304d2c579d79",
+   "description": {
+    "value": "对AR特殊寄存器清零，需在首次调用asc_squeeze_and_storeunalign前执行，AR寄存器记录有效元素总字节数供该接口自动地址偏移使用，每组连续搬出开始前调用一次，组内重复调用会重置偏移导致数据覆盖，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+      "excerpt": "在首次调用asc_squeeze_and_storeunalign之前，需调用本接口将AR寄存器清零。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+      "excerpt": "每组连续搬出操作开始前，需调用一次本接口，再调用[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)。如果在一组连续搬出过程中再次调用本接口，AR寄存器记录的字节偏移会被重置，后续数据可能覆盖已经写入的结果。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "在首次调用asc_squeeze_and_storeunalign之前，需调用本接口将AR寄存器清零。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign.md",
+     "kind": "configures",
+     "condition": "每组连续搬出操作开始前",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+      "excerpt": "每组连续搬出操作开始前，需调用一次本接口，再调用[asc_squeeze_and_storeunalign](asc_squeeze_and_storeunalign.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_finalize.md",
+     "kind": "related",
+     "condition": "开始新一组操作前",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+      "excerpt": "开始新一组操作前，需先调用[asc_squeeze_and_storeunalign_finalize](asc_squeeze_and_storeunalign_finalize.md)完成上一组操作，避免上一组暂存在非对齐寄存器中的尾块数据丢失。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze_and_storeunalign_init.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
+   "document_sha256": "7bbba0c4ca32db8cf1a0ae4b8c60647633d1cfcf9ebd4353d0e003e69435ca4b",
+   "description": {
+    "value": "将矢量数据寄存器或掩码寄存器中低半部分或高半部分的元素扩充位宽后写入目的寄存器或通过函数返回值返回，无符号整型高位填0、有符号整型按符号位扩充、bool每bit展开为2bit，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
+      "excerpt": "将src中低半部分或高半部分的元素以扩充位宽的方式写入dst或通过函数返回值返回，支持："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
+      "excerpt": "无符号整型：高位填0扩充。例如vector_uint8_t到vector_uint16_t，src中每个uint8_t元素高位补0扩展为uint16_t。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "widening_result"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将src中低半部分或高半部分的元素以扩充位宽的方式写入dst或通过函数返回值返回，支持：",
+    "operations:conversion": "无符号整型：高位填0扩充。例如vector_uint8_t到vector_uint16_t，src中每个uint8_t元素高位补0扩展为uint16_t。",
+    "traits:widening_result": "例如vector_uint8_t到vector_uint16_t，src中每个uint8_t元素高位补0扩展为uint16_t。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md",
+   "document_sha256": "b3c3ccce01fce9e278a46ef2e5785c4e55c77f0e5748612d95e46e75db0678a9",
+   "description": {
+    "value": "根据mask对目的矢量数据寄存器执行解压缩，第0个元素置为0，第i个元素等于mask中前i个元素中1的数量，mask最高位被忽略不参与统计，结果也可通过函数返回值返回，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md",
+      "excerpt": "将dst中数据根据mask进行解压缩，或将解压缩结果通过函数返回值返回。解压缩方式：dst中第0个元素置为0，dst中的第i个元素等于mask中从第0个到第(i-1)个元素中1的数量。mask最高位被忽略，不参与统计。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "bit_manipulation"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将dst中数据根据mask进行解压缩，或将解压缩结果通过函数返回值返回。",
+    "operations:bit_manipulation": "dst中的第i个元素等于mask中从第0个到第(i-1)个元素中1的数量。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unsqueeze.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md",
+   "document_sha256": "b9e83a7202d4ceb008272d2173cb9c0b4b9b99a4b8ce294a794a96fe015792c3",
+   "description": {
+    "value": "根据mask将源矢量数据寄存器中每两个相邻元素相加，结果连续保存在目的操作数低半部分、高半部分置0，不参与计算的元素被当作0累加，支持half与float类型，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md",
+      "excerpt": "根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。结果连续保存在目的操作数`dst`的低半部分，`dst`的高半部分置0。以half数据类型为例，相加示意图如下："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md",
+      "excerpt": "`mask`指定源操作数是否参与计算，不参与计算的元素被当作0进行累加。例如："
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "add",
+     "reduction"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。",
+    "operations:add": "根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。",
+    "operations:reduction": "根据`mask`将源操作数`src`中每两个相邻元素相加，得到计算结果。结果连续保存在目的操作数`dst`的低半部分，`dst`的高半部分置0。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_pair_reduce_sum.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max.md",
+   "document_sha256": "9e85e62b324f2ba5be68431cb22cdd08de5f79510080669ba896cb7582b08693",
+   "description": {
+    "value": "根据mask对源矢量数据寄存器执行归约最大值操作，最大值保存于dst第0个元素、其索引的原始位模式保存于第1个元素，其余元素置0，存在多个最大值时保留最小索引，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max.md",
+      "excerpt": "根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。结果保存在`dst`的第0个元素，最大值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最大值，则保留最小的索引。计算公式如下："
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "reduction"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。",
+    "operations:reduction": "根据`mask`对源操作数`src`进行归约最大值操作，得到归约结果。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md",
+   "document_sha256": "cf565b4ff0551918c815458302433bd6374f8f023db7069b02c7b2b3d2e323ec",
+   "description": {
+    "value": "根据mask对每个DataBlock（32B）内的元素求最大值，得到各DataBlock的归约结果并依次保存在dst低位前8个元素，其余元素置0，仅输出最大值不输出索引，未被选中元素视为类型最小值，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md",
+      "excerpt": "根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。计算公式如下："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md",
+      "excerpt": "每个`DataBlock`内的最大值连续写入`dst`的前8个元素，这8个元素为有效输出，`dst`中的其他元素置0。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "reduction"
+    ],
+    "traits": [
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。",
+    "operations:reduction": "根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。",
+    "traits:datablock_granularity": "根据`mask`对每个`DataBlock`（32B）内的元素求最大值，得到各`DataBlock`的归约结果。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_max_datablock.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min.md",
+   "document_sha256": "18c6a6d3f55271d11b6eb32afff320623f85658fa69c84c6fded4b11e5c0e0eb",
+   "description": {
+    "value": "根据mask对源矢量数据寄存器执行归约最小值操作，最小值保存于dst第0个元素、其索引的原始位模式保存于第1个元素，其余元素置0，存在多个最小值时保留最小索引，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min.md",
+      "excerpt": "根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。结果保存在`dst`的第0个元素，最小值在`src`中的索引原始位模式保存在`dst`的第1个元素，`dst`中的其他元素置0。如果存在多个最小值，则保留最小的索引。计算公式如下："
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "reduction"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。",
+    "operations:reduction": "根据`mask`对源操作数`src`进行归约最小值操作，得到归约结果。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md",
+   "document_sha256": "8f0a292ce44e80583a9f8e57a545ad7d0fa06c60c64b5460b1e5e8d2d6efb13c",
+   "description": {
+    "value": "根据mask对每个DataBlock（32B）内的元素求最小值，得到各DataBlock的归约结果并依次保存在dst低位前8个元素，其余元素置0，仅输出最小值不输出索引，未被选中元素视为类型最大值，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md",
+      "excerpt": "根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。结果依次保存在`dst`的低位。计算公式如下："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md",
+      "excerpt": "每个`DataBlock`内的最小值连续写入`dst`的前8个元素，这8个元素为有效输出，`dst`中的其他元素置0。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "reduction"
+    ],
+    "traits": [
+     "datablock_granularity"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。",
+    "operations:reduction": "根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。",
+    "traits:datablock_granularity": "根据`mask`对每个`DataBlock`（32B）内的元素求最小值，得到各`DataBlock`的归约结果。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_min_datablock.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md",
+   "document_sha256": "5d7850953e0e63e9d8c23a6c50d28c37993ad1b0fb4162a38c6714bd4260827a",
+   "description": {
+    "value": "根据mask对源矢量数据寄存器中所有参与计算的元素归约求和，指令内采用二叉树累加方式，结果保存于dst第0个元素、其余元素置0，16位输入会提升精度到32位计算，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md",
+      "excerpt": "根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。结果保存在`dst`中的0位置。参考伪代码："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md",
+      "excerpt": "对于输入为`uint16_t`/`int16_t`类型的情况，会提升精度到`uint32_t`/`int32_t`进行计算。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "add",
+     "reduction"
+    ],
+    "traits": [
+     "widening_result"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。",
+    "operations:add": "根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。",
+    "operations:reduction": "根据`mask`对源操作数`src`进行归约求和操作，用于将`src`中的所有参与计算的元素求和，得到归约结果。",
+    "traits:widening_result": "对于输入为`uint16_t`/`int16_t`类型的情况，会提升精度到`uint32_t`/`int32_t`进行计算。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md",
+   "document_sha256": "84c3d0602c12f200879fd45a35cc38a4a2268456a40e2c542a56221fa575fe08",
+   "description": {
+    "value": "根据mask将每个DataBlock（32B）中参与计算的元素相加，得到各DataBlock的归约结果并依次保存在dst最低位，块内采用二叉树累加，其余位置置0，16位输入会提升精度到32位计算，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md",
+      "excerpt": "根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。结果依次保存在`dst`的最低位。参考伪代码："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md",
+      "excerpt": "指令内累加顺序采用二叉树累加方式，在每个`DataBlock`（32B）内两两相加逐层归约求和，结果连续写入到目的操作数，目的操作数中的其它元素置0。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md",
+      "excerpt": "对于输入为`uint16_t`/`int16_t`类型的情况，会提升精度到`uint32_t`/`int32_t`进行计算。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "add",
+     "reduction"
+    ],
+    "traits": [
+     "datablock_granularity",
+     "widening_result"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。",
+    "operations:add": "根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。",
+    "operations:reduction": "根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。",
+    "traits:datablock_granularity": "根据`mask`将每个`DataBlock`（32B）中参与计算的元素相加，得到各`DataBlock`的归约结果。",
+    "traits:widening_result": "对于输入为`uint16_t`/`int16_t`类型的情况，会提升精度到`uint32_t`/`int32_t`进行计算。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_reduce/asc_reduce_sum_datablock.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+   "document_sha256": "5f8b13ae8b67abc0b6ab66f4557a6610a2687a3c2e81cc34da4c33dc8c634f00",
+   "description": {
+    "value": "Reg矢量计算内不同流水线之间的同步指令，通过mem_type指定源流水线与目的流水线，目的流水线等待源流水线上所有指令完成后才执行，仅UB数据存在依赖时需要插入，冗余同步会导致性能下降，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "Reg矢量计算内不同流水线之间的同步指令。该同步指令指定源流水线和目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "当Unified Buffer（UB）数据存在依赖时，才需要插入同步，判断是否有依赖取决于指令读写的内存是否有重叠。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "control"
+    ],
+    "operations": [
+     "synchronization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:control": "Reg矢量计算内不同流水线之间的同步指令。该同步指令指定源流水线和目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。",
+    "operations:synchronization": "Reg矢量计算内不同流水线之间的同步指令。该同步指令指定源流水线和目的流水线，如下图所示，目的流水线将等待源流水线上所有指令完成才进行执行。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather.md",
+     "kind": "related",
+     "condition": "UB数据存在依赖时判断是否需要插入同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "[asc_gather](../ub_gather/asc_gather.md)/[asc_scatter](../scatter/asc_scatter.md)/[asc_gather_datablock](../ub_gather/asc_gather_datablock.md)等指令取决于`index`地址偏移。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md",
+     "kind": "related",
+     "condition": "UB数据存在依赖时判断是否需要插入同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "[asc_gather](../ub_gather/asc_gather.md)/[asc_scatter](../scatter/asc_scatter.md)/[asc_gather_datablock](../ub_gather/asc_gather_datablock.md)等指令取决于`index`地址偏移。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/ub_gather/asc_gather_datablock.md",
+     "kind": "related",
+     "condition": "UB数据存在依赖时判断是否需要插入同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "[asc_gather](../ub_gather/asc_gather.md)/[asc_scatter](../scatter/asc_scatter.md)/[asc_gather_datablock](../ub_gather/asc_gather_datablock.md)等指令取决于`index`地址偏移。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_elem.md",
+     "kind": "related",
+     "condition": "UB数据存在依赖时判断是否需要插入同步",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "[asc_loadalign_brc_elem](../load/asc_loadalign_brc_elem.md)单条指令读32B数据后将第一个元素进行广播。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+     "kind": "related",
+     "condition": "VEC_STORE流水线对应的寄存器到UB搬运指令",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "对应寄存器到UB的搬运指令，例如[asc_storealign](../store/asc_storealign.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+     "kind": "related",
+     "condition": "VEC_LOAD流水线对应的UB到寄存器搬运指令",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+      "excerpt": "对应UB到寄存器的搬运指令，例如[asc_loadalign](../load/asc_loadalign.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md",
+   "document_sha256": "bd4f5f3e494be256855170ef857be4901ab3090334b792f9121b7c9dbac055cd",
+   "description": {
+    "value": "根据索引寄存器中的索引值将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB），掩码为1的元素写入对应索引位置、为0时保留目的地址原数据，有效索引值必须唯一，目的起始地址需32字节对齐，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md",
+      "excerpt": "根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB）。`mask`用于指示参与搬出的元素，掩码为1的源元素写入`dst`中对应索引位置，掩码为0的源元素不写入目的地址，保留目的地址原数据。搬运过程中数据格式与内容保持不变。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md",
+      "excerpt": "`index`中的有效索引值必须唯一。若存在重复的有效索引值，系统仅保留其中一个索引值对应的数据，其余数据将被忽略，且无法确定具体保留的数据。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "scatter"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB）。",
+    "operations:scatter": "根据索引寄存器中的索引值，将源矢量数据寄存器中的元素分散搬出到Unified Buffer（UB）。",
+    "traits:aligned_transfer": "`dst`起始地址需32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/scatter/asc_scatter.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md",
+   "document_sha256": "dd7f63aea9c3bdecc058346599ceb599284d4476874da177e21bb593e1dc858b",
+   "description": {
+    "value": "将矢量数据寄存器中的数据搬出到Unified Buffer（UB），支持整矢量连续搬出与按count仅搬出前count个元素两种模式，底层经非对齐搬出指令完成单次连续写入，目的地址需按dtype对齐，数据格式与内容保持不变，仅在AIV上生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md",
+      "excerpt": "将矢量数据寄存器中的数据搬出到Unified Buffer（UB），目的地址需按照`dtype`对齐。底层经非对齐搬出指令完成单次连续写入，搬运过程中数据格式和内容保持不变。在追求极致性能时，对齐场景推荐使用[asc_storealign](asc_storealign.md)接口。本接口提供两种参数列表不同的功能模式："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md",
+      "excerpt": "**带搬出数量模式**：仅将矢量数据寄存器前`count`个元素写入`dst`起始地址，用于部分搬出场景。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement"
+    ],
+    "operations": [
+     "store"
+    ],
+    "traits": [
+     "unaligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement": "将矢量数据寄存器中的数据搬出到Unified Buffer（UB），目的地址需按照`dtype`对齐。",
+    "operations:store": "将矢量数据寄存器中的数据搬出到Unified Buffer（UB），目的地址需按照`dtype`对齐。",
+    "traits:unaligned_transfer": "底层经非对齐搬出指令完成单次连续写入，搬运过程中数据格式和内容保持不变。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+     "kind": "related",
+     "condition": "对齐场景",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md",
+      "excerpt": "在追求极致性能时，对齐场景推荐使用[asc_storealign](asc_storealign.md)接口。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+     "kind": "requires",
+     "condition": "如果本指令与其他指令存在UB地址重叠",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md",
+      "excerpt": "如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_store.md",
+      "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+     }
+    }
+   ]
+  }
+ ]
+}

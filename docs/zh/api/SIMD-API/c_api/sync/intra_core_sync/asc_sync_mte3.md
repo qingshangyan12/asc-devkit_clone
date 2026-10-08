@@ -1,25 +1,17 @@
 ---
 okftype: reference.api
-title: asc_sync_mte3
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_mte3.md
-description: 针对PIPE_MTE3执行同步操作的易用性接口，保证PIPE_MTE3中前序指令（如UB到GM的数据搬运）全部完成后，PIPE_MTE2与PIPE_V的后续指令才能开始执行，用于简化手工同步的编码，只能在AIV中调用。
+description: "针对PIPE_MTE3执行同步操作的易用性接口，保证PIPE_MTE3中前序指令如UB到GM的数据搬运全部完成后，PIPE_MTE2与PIPE_V的后续指令才能开始执行，一次调用同时完成对两条目的流水的同步以简化手工同步编码，只能在AIV中调用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
   - operations: [synchronization]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_sync_mte3__i
-archs: ['2201', '3510']
-header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: related
+    condition: "若手工同步"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: related
-    condition: 若手工同步
-examples: []
-timestamp: '2026-09-28'
+    condition: "若手工同步"
+version: 9.0.0-
 ---
 # asc_sync_mte3
 

@@ -1,31 +1,19 @@
 ---
 okftype: reference.api
-title: asc_int642int32（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int642int32_deprecated.md
-description: 已废弃的类型转换接口，将int64_t类型的源操作数转换成int32_t类型并支持饱和与非饱和模式，源与目的类型位宽比为2:1，按接口后缀选择数据写入奇数或偶数索引位置，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将int64_t类型的源操作数转换成int32_t类型并支持不同的饱和模式，因位宽比为2:1写入时需将一个VL大小的数据分为两部分并按接口后缀选取奇偶索引；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, saturation_mode]
-signature:
-  - override_id: asc_int642int32__Rvi32_vi64_vb
-  - override_id: asc_int642int32_sat__Rvi32_vi64_vb
-  - override_id: asc_int642int32_v2__Rvi32_vi64_vb
-  - override_id: asc_int642int32_sat_v2__Rvi32_vi64_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int642int32.md
-    kind: related
-    condition: 接口后缀控制写入位置的原型已废弃，作为替代方案使用
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
     kind: constrained_by
-    condition: 开启饱和模式和非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "开启饱和模式和非饱和模式时"
+version: 9.0.0-
 ---
 # asc_int642int32（废弃）
 

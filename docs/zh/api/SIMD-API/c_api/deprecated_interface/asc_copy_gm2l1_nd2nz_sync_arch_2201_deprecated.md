@@ -1,35 +1,17 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2l1_nd2nz_sync_arch_2201（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_sync_arch_2201_deprecated.md
-description: 已废弃的同步搬运接口，将数据从Global Memory搬运到L1，并在数据搬运时进行ND格式到NZ格式的转换；请使用对应的非同步接口asc_copy_gm2l1_nd2nz和同步接口asc_sync替代。
+description: "已废弃的同步搬运接口，将数据从GM搬运到L1并随路完成ND到NZ格式转换，通过NZ矩阵步长参数控制转换排布；请改用非同步接口asc_copy_gm2l1_nd2nz配合asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, layout_transform]
-  - source_locations: [global_memory]
-  - destination_locations: [l1_buffer]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1i8_PGi8_u16_u16_u16_u16_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1u8_PGu8_u16_u16_u16_u16_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1bf16_PGbf16_u16_u16_u16_u16_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1f16_PGf16_u16_u16_u16_u16_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1i16_PGi16_u16_u16_u16_u16_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1f32_PGf32_u16_u16_u16_u16_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1i32_PGi32_u16_u16_u16_u16_u16_u16_u16_u16
-  - override_id: asc_copy_gm2l1_nd2nz_sync__PL1u32_PGu32_u16_u16_u16_u16_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md
-    kind: related
-    condition: 接口已废弃时的替代方案
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 接口已废弃时的替代方案
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-
 ---
 # asc_copy_gm2l1_nd2nz_sync_arch_2201（废弃）
 

@@ -1,32 +1,24 @@
 ---
 okftype: reference.api
-title: asc_copy_gm2ub_sync_arch_2201（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_gm2ub_sync_arch_2201_deprecated.md
-description: 已废弃的同步搬运接口，将数据从Global Memory搬运到Unified Buffer，请改用非同步asc_copy_gm2ub接口和asc_sync替代。
+description: "已废弃的同步搬运接口，将数据从GM搬运到UB，前n个数据搬运要求数据大小32字节对齐，UB地址重叠时须插入同步指令；请改用非同步接口asc_copy_gm2ub和asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [global_memory]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_copy_gm2ub_sync__PUv_PGv_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - traits: [aligned_transfer]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: requires
-    condition: 如果本指令与其他指令存在UB地址重叠
+    condition: "如果本指令与其他指令存在UB地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-
 ---
 # asc_copy_gm2ub_sync_arch_2201（废弃）
 

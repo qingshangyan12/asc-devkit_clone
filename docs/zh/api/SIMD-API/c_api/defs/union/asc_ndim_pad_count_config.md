@@ -1,17 +1,15 @@
 ---
-okftype: reference.type
-title: asc_ndim_pad_count_config
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/union/asc_ndim_pad_count_config.md
-description: 为 asc_ndim_copy_gm2ub 搬运配置各维度左侧和右侧的 padding 元素数量。
+okftype: reference.union
+description: "asc_set_ndim_pad_count接口使用的联合体，用于设置asc_ndim_copy_gm2ub接口loop1至loop4各维度左右侧的padding元素个数，每个字段以元素个数为单位，取值范围为0至255，默认值为0。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
   - traits: [padding]
-declaration:
-  symbol: asc_ndim_pad_count_config
-  record_kind: union
-header: [/include/c_api/defs/union.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_ndim_pad_count_config
 

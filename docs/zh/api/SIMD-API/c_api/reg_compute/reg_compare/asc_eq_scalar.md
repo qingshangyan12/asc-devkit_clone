@@ -1,28 +1,14 @@
 ---
 okftype: reference.api
-title: asc_eq_scalar
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_compare/asc_eq_scalar.md
-description: 根据mask将源操作数src按元素与标量value进行二进制比较，相等时结果对应位为1否则为0，每个元素的比较结果占一个bit，仅在AIV上生效。
+description: "在掩码控制下将源矢量数据寄存器按元素与标量value进行相等比较，相等时结果对应位为1否则为0，每个元素的比较结果占一个比特，计算结果作为返回值返回或写入目的操作数；浮点输入含nan时结果位写0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [comparison]
-  - objects: [mask, scalar, vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - traits: [elementwise, masked, scalar_operand]
-signature:
-  - prototype_id: asc_eq_scalar__v<dtype>_<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - prototype_id: asc_eq_scalar__Rvb_v<dtype>_<dtype>_vb
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_compare.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [elementwise, scalar_operand]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_eq_scalar
 

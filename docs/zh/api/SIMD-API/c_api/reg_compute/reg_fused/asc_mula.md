@@ -1,29 +1,14 @@
 ---
 okftype: reference.api
-title: asc_mula
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md
-description: 根据mask对源操作数src0、src1按元素相乘后与目的操作数dst中的对应元素相加并将结果写回dst，dst既作为输入累加器参与计算又用于存储最终结果，支持多种整型与浮点类型，仅在AIV上生效。
+description: "根据掩码将src0与src1按元素相乘后与dst对应元素相加并写回dst，dst既作为输入累加器参与计算又存储最终结果，掩码为0的位置置0，支持多种整型与浮点类型，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [fused_multiply_add]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked]
-signature:
-  - prototype_id: asc_mula__Rv<dtype>_v<dtype>_v<dtype>_vb
-    dtype: [int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_fused.h]
+  - traits: [elementwise]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples: []
-timestamp: '2026-09-28'
+version: 9.2.0-
 ---
 # asc_mula
 

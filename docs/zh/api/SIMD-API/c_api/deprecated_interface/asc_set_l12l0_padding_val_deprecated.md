@@ -1,22 +1,13 @@
 ---
 okftype: reference.api
-title: asc_set_l12l0_padding_val（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_l12l0_padding_val_deprecated.md
-description: 该接口已废弃，用于对PADDING_B寄存器中的值进行设置，该64bit寄存器存储搬运过程中使用的padding值，请使用asc_set_l12l0b_3d_padding接口替代。
+description: "该接口已废弃，请使用asc_set_l12l0b_3d_padding接口替代；对PADDING_B寄存器中的值进行设置，该64bit寄存器用于存储搬运过程中padding的值，支持固定padding与按通道padding两种模式。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - traits: [deprecated, padding]
-signature:
-  - override_id: asc_set_l12l0_padding_val__u64
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.1.0-9.2.0
 ---
 # asc_set_l12l0_padding_val（废弃）
 

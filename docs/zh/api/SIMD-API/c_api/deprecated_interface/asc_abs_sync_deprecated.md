@@ -1,28 +1,18 @@
 ---
 okftype: reference.api
-title: asc_abs_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_abs_sync_deprecated.md
-description: 按元素计算源矢量操作数的绝对值并写入目的操作数，该接口已废弃，请通过asc_abs和同步接口asc_sync实现精细化调优以达成最优性能。
+description: "按元素计算源矢量操作数的绝对值并写入目的操作数，起始地址需32字节对齐；该接口已废弃，请改用asc_abs配合同步接口asc_sync实现精细化调优以达成最优性能。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
-  - operations: [absolute]
-  - execution_models: [memory_vector]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_abs_sync__PUf16_PUf16_u32
-  - override_id: asc_abs_sync__PUf32_PUf32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - operations: [absolute, synchronization]
+  - traits: [aligned_transfer, elementwise]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 实现精细化调优，达成最优性能
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_abs.md
-    kind: related
-    condition: 实现精细化调优，达成最优性能
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_abs_sync（废弃）
 

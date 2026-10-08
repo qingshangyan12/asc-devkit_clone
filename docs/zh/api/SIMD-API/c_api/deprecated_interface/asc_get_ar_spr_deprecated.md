@@ -1,23 +1,12 @@
 ---
 okftype: reference.api
-title: asc_get_ar_spr (废弃)
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_get_ar_spr_deprecated.md
-description: 已废弃的特殊寄存器读取接口：读取指定特殊寄存器的值并返回int64_t类型的数值，运行于标量流水，请使用asc_get_squeeze_status实现此功能。
+description: "已废弃的特殊寄存器读取接口，读取指定特殊寄存器的值并返回int64_t类型的数值；请改用asc_get_squeeze_status实现此功能。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - execution_models: [scalar]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_get_ar_spr__z
-archs: ['3510']
-header: [/include/c_api/spr/spr.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_get_squeeze_status.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-9.2.0
 ---
 # asc_get_ar_spr (废弃)
 

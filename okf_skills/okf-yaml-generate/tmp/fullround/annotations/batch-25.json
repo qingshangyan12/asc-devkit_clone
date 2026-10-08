@@ -1,0 +1,1178 @@
+{
+ "schema_version": 1,
+ "purpose": "okf_semantic_annotations",
+ "annotations": [
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint32_deprecated.md",
+   "document_sha256": "47cccf0c065ef3e97f9579889805df7b28f42dbb7e346c101064d95d73ffed5a",
+   "description": {
+    "value": "已废弃的矢量数据类型转换接口，将uint16_t类型数据转为uint32_t类型，因位宽比为1:2读取时将一个VL大小的数据分为两部分并按接口后缀选择奇偶索引位置；请改用asc_uint162uint32的显式位置参数重载替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint32_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint162uint32](../reg_compute/reg_convert/asc_uint162uint32.md)的显式位置参数重载替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint32_deprecated.md",
+      "excerpt": "将uint16_t类型数据转为uint32_t类型。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint32_deprecated.md",
+      "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "widening_result"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将uint16_t类型数据转为uint32_t类型。",
+    "operations:conversion": "将uint16_t类型数据转为uint32_t类型。",
+    "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint32.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint32_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint162uint32](../reg_compute/reg_convert/asc_uint162uint32.md)的显式位置参数重载替代。**"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md",
+   "document_sha256": "0a0f0e928b23f2ac0f3c7e5cd96f97554faa9b596eccbf65220a7491a1dd9e4a",
+   "description": {
+    "value": "已废弃的矢量数据类型转换接口，将uint16_t类型数据转化为uint8_t类型，无舍入模式，支持饱和与非饱和模式，因位宽比为2:1写入时按接口后缀选择奇偶索引位置；请改用asc_uint162uint8的显式位置参数重载替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint162uint8](../reg_compute/reg_convert/asc_uint162uint8.md)的显式位置参数重载替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md",
+      "excerpt": "将uint16_t类型数据转化为uint8_t类型，无舍入模式，支持饱和/非饱和模式。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md",
+      "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "saturation_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将uint16_t类型数据转化为uint8_t类型，无舍入模式，支持饱和/非饱和模式。",
+    "operations:conversion": "将uint16_t类型数据转化为uint8_t类型，无舍入模式，支持饱和/非饱和模式。",
+    "traits:saturation_mode": "将uint16_t类型数据转化为uint8_t类型，无舍入模式，支持饱和/非饱和模式。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint162uint8.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint162uint8](../reg_compute/reg_convert/asc_uint162uint8.md)的显式位置参数重载替代。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+     "kind": "requires",
+     "condition": "开启饱和模式和非饱和模式时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md",
+      "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint162uint8_deprecated.md",
+      "excerpt": "关于饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../reg_compute/reg_convert/rounding_mode.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md",
+   "document_sha256": "f0d8bd5c509bb59741e2423e0234a22e355e3a1244f819dae6d8db2530b42e9e",
+   "description": {
+    "value": "已废弃的矢量数据类型转换接口，将uint32_t类型数据转为int16_t类型，支持饱和与非饱和模式，因位宽比为2:1写入时按接口后缀选择奇偶索引位置；请改用asc_uint322int16的显式位置参数重载替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint322int16](../reg_compute/reg_convert/asc_uint322int16.md)的显式位置参数重载替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md",
+      "excerpt": "将uint32_t类型数据转为int16_t类型，支持饱和/非饱和模式。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md",
+      "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "saturation_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将uint32_t类型数据转为int16_t类型，支持饱和/非饱和模式。",
+    "operations:conversion": "将uint32_t类型数据转为int16_t类型，支持饱和/非饱和模式。",
+    "traits:saturation_mode": "将uint32_t类型数据转为int16_t类型，支持饱和/非饱和模式。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322int16.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint322int16](../reg_compute/reg_convert/asc_uint322int16.md)的显式位置参数重载替代。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+     "kind": "requires",
+     "condition": "开启饱和模式和非饱和模式时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md",
+      "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322int16_deprecated.md",
+      "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md",
+   "document_sha256": "864b794dbfcd9ad5bb558510ad4ba7a29443995870fae05fc24e138e4e83e3d0",
+   "description": {
+    "value": "已废弃的矢量数据类型转换接口，将uint32_t类型转化为uint16_t类型，支持饱和与非饱和模式，因位宽比为2:1写入时按接口后缀选择奇偶索引位置；请改用asc_uint322uint16的显式位置参数重载替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint322uint16](../reg_compute/reg_convert/asc_uint322uint16.md)的显式位置参数重载替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md",
+      "excerpt": "将uint32_t类型转化为uint16_t类型，支持饱和/非饱和模式。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md",
+      "excerpt": "由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个VL大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "saturation_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将uint32_t类型转化为uint16_t类型，支持饱和/非饱和模式。",
+    "operations:conversion": "将uint32_t类型转化为uint16_t类型，支持饱和/非饱和模式。",
+    "traits:saturation_mode": "将uint32_t类型转化为uint16_t类型，支持饱和/非饱和模式。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint16.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint322uint16](../reg_compute/reg_convert/asc_uint322uint16.md)的显式位置参数重载替代。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+     "kind": "requires",
+     "condition": "开启饱和模式和非饱和模式时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md",
+      "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint16_deprecated.md",
+      "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../reg_compute/reg_convert/rounding_mode.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+   "document_sha256": "1f2ce3b9bb08084a489a5689989d66315bc611d841836d1ed57061aa2cade1be",
+   "description": {
+    "value": "已废弃的矢量数据类型转换接口，将uint32_t类型数据转换为uint8_t类型，支持饱和与非饱和模式，因位宽比为4:1写入时将一个VL大小的数据分为四部分并按接口后缀选取索引；请改用asc_uint322uint8的显式位置参数重载替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+      "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_uint322uint8](../reg_compute/reg_convert/asc_uint322uint8.md)的显式位置参数重载替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+      "excerpt": "将uint32_t类型数据转换为uint8_t类型，支持饱和/非饱和模式。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+      "excerpt": "由于源操作数与目的操作数类型位宽比为4:1，写入数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "saturation_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将uint32_t类型数据转换为uint8_t类型，支持饱和/非饱和模式。",
+    "operations:conversion": "将uint32_t类型数据转换为uint8_t类型，支持饱和/非饱和模式。",
+    "traits:saturation_mode": "将uint32_t类型数据转换为uint8_t类型，支持饱和/非饱和模式。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint322uint8.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+      "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_uint322uint8](../reg_compute/reg_convert/asc_uint322uint8.md)的显式位置参数重载替代。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+     "kind": "requires",
+     "condition": "开启饱和模式和非饱和模式时",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+      "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器，ctrl寄存器的详细说明请参见[asc_set_ctrl.md](../spr/asc_set_ctrl.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint322uint8_deprecated.md",
+      "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../reg_compute/reg_convert/rounding_mode.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md",
+   "document_sha256": "3a033c3f2857bd92bde989350694c41092ac0c90ef56ce5b6efb4936f7cebca5",
+   "description": {
+    "value": "已废弃的矢量数据类型转换接口，将uint8_t类型数据转为half类型，因位宽比为1:2读取时将一个VL大小的数据分为两部分并按接口后缀选择奇偶索引位置；请改用asc_uint82half的显式位置参数重载替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint82half](../reg_compute/reg_convert/asc_uint82half.md)的显式位置参数重载替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md",
+      "excerpt": "将uint8_t类型数据转为half类型。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md",
+      "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "widening_result"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将uint8_t类型数据转为half类型。",
+    "operations:conversion": "将uint8_t类型数据转为half类型。",
+    "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个VL大小的数据分为两部分，根据不同接口选择输入数据索引为奇数的位置或偶数的位置。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82half.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制目的操作数写入位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint82half](../reg_compute/reg_convert/asc_uint82half.md)的显式位置参数重载替代。**"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md",
+   "document_sha256": "0f5792652bc74e0f5eb0f6cf1ba80cb6a530d78adc0bb5e36d1265cb4be7ec7f",
+   "description": {
+    "value": "已废弃的同步转换接口，按指定元素个数将uint8_t类型数据转换为half类型，目的与源起始地址需32字节对齐；请改用非同步接口asc_uint82half配合同步接口asc_sync替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md",
+      "excerpt": "**`asc_uint82half_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_uint82half.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md",
+      "excerpt": "将uint8_t类型数据转换为half类型。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md",
+      "excerpt": "dst、src的起始地址需要32字节对齐。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion",
+     "synchronization"
+    ],
+    "traits": [
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将uint8_t类型数据转换为half类型。",
+    "operations:conversion": "将uint8_t类型数据转换为half类型。",
+    "operations:synchronization": "同步计算",
+    "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_uint82half.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md",
+      "excerpt": "**`asc_uint82half_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_uint82half.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md",
+      "excerpt": "**`asc_uint82half_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_convert/asc_uint82half.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82half_sync_deprecated.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md",
+   "document_sha256": "52da93834561146668f640aa4e14ef3460690ebf8eff203f3e0558dbf7f44391",
+   "description": {
+    "value": "已废弃的矢量数据类型转换接口，根据掩码将源操作数中每个uint8_t类型元素转为uint16_t类型写入目的矢量数据寄存器，因位宽比为1:2按位置参数选择奇偶读取位置；请改用显式位置参数重载替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint82uint16](../reg_compute/reg_convert/asc_uint82uint16.md)的显式位置参数重载替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md",
+      "excerpt": "根据`mask`将源操作数`src`中的每个`uint8_t`类型元素转为`uint16_t`类型，结果写入`dst`。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md",
+      "excerpt": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据位置参数选择输入数据索引为奇数的位置或偶数的位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "widening_result"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "根据`mask`将源操作数`src`中的每个`uint8_t`类型元素转为`uint16_t`类型，结果写入`dst`。",
+    "operations:conversion": "根据`mask`将源操作数`src`中的每个`uint8_t`类型元素转为`uint16_t`类型，结果写入`dst`。",
+    "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据位置参数选择输入数据索引为奇数的位置或偶数的位置。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint16.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint16_deprecated.md",
+      "excerpt": "**该接口通过接口后缀来控制源操作数读取位置（仅包括源操作数、目的操作数、掩码寄存器三个参数）的原型已废弃，请使用[asc_uint82uint16](../reg_compute/reg_convert/asc_uint82uint16.md)的显式位置参数重载替代。**"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint32_deprecated.md",
+   "document_sha256": "4697f0dd76cbe3a36145de21adfd738d6a41b313243e251ff5419e40aef001a2",
+   "description": {
+    "value": "已废弃的矢量数据类型转换接口，将uint8_t类型数据转化为uint32_t类型，因位宽比为1:4读取时将一个VL大小的数据分为四部分并按接口后缀选取索引位置；请改用asc_uint82uint32的显式位置参数重载替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint32_deprecated.md",
+      "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_uint82uint32](../reg_compute/reg_convert/asc_uint82uint32.md)的显式位置参数重载替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint32_deprecated.md",
+      "excerpt": "将uint8_t类型转化为uint32_t类型。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint32_deprecated.md",
+      "excerpt": "由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion"
+    ],
+    "traits": [
+     "widening_result"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将uint8_t类型转化为uint32_t类型。",
+    "operations:conversion": "将uint8_t类型转化为uint32_t类型。",
+    "traits:widening_result": "由于源操作数与目的操作数类型位宽比为1:4，读取数据时需要将一个VL大小的数据分为四部分，根据不同接口选取索引0、索引1、索引2或者索引3。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_uint82uint32.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_uint82uint32_deprecated.md",
+      "excerpt": "**该接口的无显式位置参数原型已废弃，请使用[asc_uint82uint32](../reg_compute/reg_convert/asc_uint82uint32.md)的显式位置参数重载替代。**"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+   "document_sha256": "50dc6234f0913025cb6afd98eced64837add7d18cb0119bc6a3cc3486fff807a",
+   "description": {
+    "value": "已废弃的同步反量化转换接口，将int16_t类型转化为int8_t或uint8_t类型并存放在每个DataBlock的上半块或下半块，使用前需先设置量化参数，目的与源起始地址需32字节对齐；请改用非同步接口asc_vdeq_int162b8配合asc_sync替代。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+      "excerpt": "**`asc_vdeq_int162b8_h_sync`和`asc_vdeq_int162b8_l_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_fused/asc_vdeq_int162b8.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+      "excerpt": "将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+      "excerpt": "使用该接口前需要调用asc_set_deq_scale设置量化参数。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "compute"
+    ],
+    "operations": [
+     "conversion",
+     "synchronization"
+    ],
+    "traits": [
+     "quantization",
+     "aligned_transfer"
+    ]
+   },
+   "tag_evidence": {
+    "roles:compute": "将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。",
+    "operations:conversion": "将int16_t类型转化为int8_t或uint8_t类型，并将数据存放在每个DataBlock的上半块或下半块。",
+    "operations:synchronization": "同步计算",
+    "traits:quantization": "使用该接口前需要调用asc_set_deq_scale设置量化参数。",
+    "traits:aligned_transfer": "dst、src的起始地址需要32字节对齐。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_vdeq_int162b8.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+      "excerpt": "**`asc_vdeq_int162b8_h_sync`和`asc_vdeq_int162b8_l_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_fused/asc_vdeq_int162b8.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+     "kind": "replaced_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+      "excerpt": "**`asc_vdeq_int162b8_h_sync`和`asc_vdeq_int162b8_l_sync`接口已废弃，请使用[对应的非同步接口](../vector_compute/vector_fused/asc_vdeq_int162b8.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+     "kind": "requires",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+      "excerpt": "使用该接口前需要调用asc_set_deq_scale设置量化参数。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+     "kind": "constrained_by",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_vdeq_int162b8_sync_deprecated.md",
+      "excerpt": "操作数地址重叠约束请参考[通用地址重叠约束](../general_description_and_constraints.md#通用地址重叠约束)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+   "document_sha256": "558016c73a624cae74e885e35e3cb13734fcc669c84081731ce9f932e12115c5",
+   "description": {
+    "value": "定义MrgSort4操作支持的队列数量常量，值为4，作为asc_mrgsort4接口src数组与asc_get_vms4_sr接口sorted_num数组的长度。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+      "excerpt": "ASC_C_API_MRGSORT_ELEMENT_LEN表示MrgSort4操作支持的队列数量，值为4。该常量用于[asc_mrgsort4](../../vector_compute/vector_sort/asc_mrgsort4.md)接口的src数组长度，以及[asc_get_vms4_sr](../../vector_compute/vector_sort/asc_get_vms4_sr.md)接口的sorted_num数组长度。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "该常量用于[asc_mrgsort4](../../vector_compute/vector_sort/asc_mrgsort4.md)接口的src数组长度，以及[asc_get_vms4_sr](../../vector_compute/vector_sort/asc_get_vms4_sr.md)接口的sorted_num数组长度。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+      "excerpt": "ASC_C_API_MRGSORT_ELEMENT_LEN表示MrgSort4操作支持的队列数量，值为4。该常量用于[asc_mrgsort4](../../vector_compute/vector_sort/asc_mrgsort4.md)接口的src数组长度，以及[asc_get_vms4_sr](../../vector_compute/vector_sort/asc_get_vms4_sr.md)接口的sorted_num数组长度。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md",
+      "excerpt": "ASC_C_API_MRGSORT_ELEMENT_LEN表示MrgSort4操作支持的队列数量，值为4。该常量用于[asc_mrgsort4](../../vector_compute/vector_sort/asc_mrgsort4.md)接口的src数组长度，以及[asc_get_vms4_sr](../../vector_compute/vector_sort/asc_get_vms4_sr.md)接口的sorted_num数组长度。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+   "document_sha256": "506bf9da200930edd0d967d17856c4d828d4af9bdccdb3f106866f2574716d44",
+   "description": {
+    "value": "定义反量化缩放配置中scale、offset与sign模式三个数组的元素个数常量，值为16，用于asc_set_deq_scale接口的数组长度定义。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+      "excerpt": "ASC_VDEQ_SIZE表示[asc_set_deq_scale](../../vector_compute/vector_fused/asc_set_deq_scale.md)接口中scale_arr、offset_arr和sign_mode_arr数组的元素个数，值为16。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "ASC_VDEQ_SIZE表示[asc_set_deq_scale](../../vector_compute/vector_fused/asc_set_deq_scale.md)接口中scale_arr、offset_arr和sign_mode_arr数组的元素个数，值为16。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_set_deq_scale.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/constant/asc_vdeq_size.md",
+      "excerpt": "ASC_VDEQ_SIZE表示[asc_set_deq_scale](../../vector_compute/vector_fused/asc_set_deq_scale.md)接口中scale_arr、offset_arr和sign_mode_arr数组的元素个数，值为16。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+   "document_sha256": "18465f077c408e4f7188372910f38e63ec84cb9e7ce7096fae876a5af3961d0d",
+   "description": {
+    "value": "表示从GM搬运到L1 Buffer时每个32字节通道块的填充或压缩模式，EXPAND模式在目的数据中插入padding值，COMPACT模式移除高位数据仅保留低位有效区域，供高维切分搬运接口使用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+      "excerpt": "asc_channel_pad_mode用于表示从GM搬运到L1 Buffer时，每个32字节通道块的填充或压缩模式，可用于[asc_copy_gm2l1](../../cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)高维切分数据搬运接口。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+      "excerpt": "`EXPAND_*`为填充模式，在目的数据中插入padding值。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+      "excerpt": "`COMPACT_*`为删除模式，从每个32字节源数据块中移除高位部分数据，仅保留低位有效区域。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ],
+    "traits": [
+     "padding"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "asc_channel_pad_mode用于表示从GM搬运到L1 Buffer时，每个32字节通道块的填充或压缩模式，可用于[asc_copy_gm2l1](../../cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)高维切分数据搬运接口。",
+    "traits:padding": "`EXPAND_*`为填充模式，在目的数据中插入padding值。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+      "excerpt": "asc_channel_pad_mode用于表示从GM搬运到L1 Buffer时，每个32字节通道块的填充或压缩模式，可用于[asc_copy_gm2l1](../../cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md)高维切分数据搬运接口。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+      "excerpt": "通道填充值通过[asc_set_gm2l1_padding](../../cube_datamove/asc_set_gm2l1_padding.md)设置。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_pad.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md",
+      "excerpt": "该枚举控制的是通道块内部的填充或删除，区别于通过[asc_set_gm2l1_pad](../../cube_datamove/asc_set_gm2l1_pad.md)配置的左右填充。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+   "document_sha256": "349fb5014e1c89f9771c7fd7347fe34a3a43f6f5b9e6b4de324c345796587b6e",
+   "description": {
+    "value": "表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口dual_dst_ctrl参数的类型，支持关闭双目标以及沿M方向或N方向拆分数据。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md",
+      "excerpt": "`asc_dual_dst_mode`用于表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口中`dual_dst_ctrl`参数的类型。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "`asc_dual_dst_mode`用于表示L0C Buffer数据搬出时的双目标拆分模式，作为矩阵搬出接口中`dual_dst_ctrl`参数的类型。"
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+   "document_sha256": "2f65d3a40f8e5efc2e901a5c1fdf11f45661f993b18f4b00a0a48dcbed36c626",
+   "description": {
+    "value": "表示Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，定义向最接近值远离零与向偶数等舍入方式，在调用asc_set_hf32_round_mode时使用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+      "excerpt": "asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ],
+    "traits": [
+     "rounding_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。",
+    "traits:rounding_mode": "asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md",
+      "excerpt": "asc_hf32_round_mode用于Mmad计算开启HF32模式时由FP32舍入到HF32的舍入模式管理策略，在调用[asc_set_hf32_round_mode](../../cube_compute/asc_set_hf32_round_mode.md)时使用。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+   "document_sha256": "1780e20becd88c255b60651f5cb89749ce3762d538ca63bdb7842a03253865c4",
+   "description": {
+    "value": "表示3D img2col搬运的repeat迭代方向，支持沿height即M方向或width即K方向迭代，作为两个repeat配置接口repeat_direction参数的类型。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+      "excerpt": "`asc_l13d_repeat_direction`用于表示3D img2col搬运的repeat迭代方向，作为[asc_set_l13d_rpt](../../cube_datamove/asc_set_l13d_rpt.md)和[asc_set_l13d_rpt_b](../../cube_datamove/asc_set_l13d_rpt_b.md)接口的`repeat_direction`参数类型。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "`asc_l13d_repeat_direction`用于表示3D img2col搬运的repeat迭代方向，作为[asc_set_l13d_rpt](../../cube_datamove/asc_set_l13d_rpt.md)和[asc_set_l13d_rpt_b](../../cube_datamove/asc_set_l13d_rpt_b.md)接口的`repeat_direction`参数类型。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+      "excerpt": "`asc_l13d_repeat_direction`用于表示3D img2col搬运的repeat迭代方向，作为[asc_set_l13d_rpt](../../cube_datamove/asc_set_l13d_rpt.md)和[asc_set_l13d_rpt_b](../../cube_datamove/asc_set_l13d_rpt_b.md)接口的`repeat_direction`参数类型。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+      "excerpt": "`asc_l13d_repeat_direction`用于表示3D img2col搬运的repeat迭代方向，作为[asc_set_l13d_rpt](../../cube_datamove/asc_set_l13d_rpt.md)和[asc_set_l13d_rpt_b](../../cube_datamove/asc_set_l13d_rpt_b.md)接口的`repeat_direction`参数类型。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+   "document_sha256": "5baac55654d1cb90752f2fe1b642f291276e89d1c687f58d4266c0b5461e7ba8",
+   "description": {
+    "value": "表示数据从GM搬运到Unified Buffer时的L2 Cache管理策略，提供启用并标记替换优先级、驻留以及不分配等模式，供向量搬运接口与标量load策略配置查询使用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "excerpt": "asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 Cache管理策略，可用于："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "excerpt": "向量搬运接口，例如[asc_copy_gm2ub_align](../../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)和[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "excerpt": "标量访存路径的load策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_load_cache_mode](../../cache_ctrl/asc_get_scalar_load_cache_mode.md)。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时的L2 Cache管理策略，可用于："
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "excerpt": "向量搬运接口，例如[asc_copy_gm2ub_align](../../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)和[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "excerpt": "向量搬运接口，例如[asc_copy_gm2ub_align](../../vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md)和[asc_ndim_copy_gm2ub](../../vector_datamove/asc_ndim_copy_gm2ub.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "excerpt": "标量访存路径的load策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_load_cache_mode](../../cache_ctrl/asc_get_scalar_load_cache_mode.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_load_cache_mode.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md",
+      "excerpt": "标量访存路径的load策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_load_cache_mode](../../cache_ctrl/asc_get_scalar_load_cache_mode.md)。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+   "document_sha256": "520017b47fa0cc55f63dd8a69bc4c752af194ad544a9407c65ce0e39ae14035c",
+   "description": {
+    "value": "表示互斥锁的阻塞或非阻塞执行模式，作为asc_lock与asc_unlock接口mode参数的类型，阻塞模式暂停指定流水执行，非阻塞模式不阻塞流水，并提供兼容类型别名。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+      "excerpt": "`asc_mutex_execute_mode`用于选择互斥锁的阻塞或非阻塞执行模式，作为[asc_lock](../../sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../sync/intra_core_sync/asc_unlock.md)接口的`mode`参数类型。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "`asc_mutex_execute_mode`用于选择互斥锁的阻塞或非阻塞执行模式，作为[asc_lock](../../sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../sync/intra_core_sync/asc_unlock.md)接口的`mode`参数类型。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+      "excerpt": "`asc_mutex_execute_mode`用于选择互斥锁的阻塞或非阻塞执行模式，作为[asc_lock](../../sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../sync/intra_core_sync/asc_unlock.md)接口的`mode`参数类型。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md",
+      "excerpt": "`asc_mutex_execute_mode`用于选择互斥锁的阻塞或非阻塞执行模式，作为[asc_lock](../../sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../sync/intra_core_sync/asc_unlock.md)接口的`mode`参数类型。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+   "document_sha256": "e7700130eef17a5495709022a5579196df5a12b08c4e48e55e349aa5c72fc4ce",
+   "description": {
+    "value": "表示饱和控制策略，决定按单指令或API路径配置饱和与使用全局CAST饱和配置两种生效方式，在调用饱和策略设置与查询接口时使用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+      "excerpt": "asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+      "excerpt": "该策略影响CAST类全局饱和配置是否生效。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+      "excerpt": "按单指令/API路径配置饱和。此时通过[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)配置的全局`CAST`饱和不生效。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ],
+    "traits": [
+     "saturation_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。",
+    "traits:saturation_mode": "该策略影响CAST类全局饱和配置是否生效。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+      "excerpt": "asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_strategy.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+      "excerpt": "asc_override_strategy用于表示饱和控制策略，在调用[asc_set_saturation_strategy](../../spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../spr/asc_get_saturation_strategy.md)时使用。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+      "excerpt": "按单指令/API路径配置饱和。此时通过[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)配置的全局`CAST`饱和不生效。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+   "document_sha256": "d7e6f16875eb28235ec195327923010a3704fece075d5afbc2378816b1e90f3c",
+   "description": {
+    "value": "表示源或目的操作数在寄存器中的奇偶位置，供Reg类型转换和融合计算接口选择数据位置，对应常量可直接作为接口的位置参数。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md",
+      "excerpt": "`asc_position_mode`用于表示源或目的操作数在寄存器中的奇偶位置，供Reg类型转换和融合计算接口选择数据位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "`asc_position_mode`用于表示源或目的操作数在寄存器中的奇偶位置，供Reg类型转换和融合计算接口选择数据位置。"
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+   "document_sha256": "58d9b71c6276c684aaabeab1cc06a220179fbf74bf76eb335138e19410e1046c",
+   "description": {
+    "value": "表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置，对应常量可直接作为接口参数，支持第一至第四个四分之一位置。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md",
+      "excerpt": "`asc_position_quarter_mode`用于表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "`asc_position_quarter_mode`用于表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。"
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+   "document_sha256": "fa9a072e70a7dbd935c2793567c476d129da1ff377d62a6bb8e80105dd97a3a5",
+   "description": {
+    "value": "表示L0C Buffer数据搬出时的类型转换或量化模式，作为矩阵搬出接口quant_pre_mode参数的类型，支持float或int32_t按Scalar与Tensor量化参数量化为多种低精度类型。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md",
+      "excerpt": "`asc_quant_mode`用于表示L0C Buffer数据搬出时的类型转换或量化模式，作为矩阵搬出接口中`quant_pre_mode`参数的类型。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ],
+    "traits": [
+     "quantization"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "`asc_quant_mode`用于表示L0C Buffer数据搬出时的类型转换或量化模式，作为矩阵搬出接口中`quant_pre_mode`参数的类型。",
+    "traits:quantization": "`asc_quant_mode`用于表示L0C Buffer数据搬出时的类型转换或量化模式，作为矩阵搬出接口中`quant_pre_mode`参数的类型。"
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+   "document_sha256": "1ec72c2c2ff25beffd5464b166ad5c30ab25335eec6e412a3188fb4c5951eab0",
+   "description": {
+    "value": "表示L0C Buffer数据搬出时的随路ReLU模式，作为矩阵搬出接口relu_pre_mode参数的类型，支持不执行、普通ReLU及使用Scalar或Vector参数执行随路ReLU。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md",
+      "excerpt": "`asc_relu_pre_mode`用于表示L0C Buffer数据搬出时的随路ReLU模式，作为矩阵搬出接口中`relu_pre_mode`参数的类型。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "`asc_relu_pre_mode`用于表示L0C Buffer数据搬出时的随路ReLU模式，作为矩阵搬出接口中`relu_pre_mode`参数的类型。"
+   },
+   "dependencies": []
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+   "document_sha256": "3a51e3b07e28add8aaeed51f4e81f9cbd2ffd621c1247cd23b2f71ecc0488210",
+   "description": {
+    "value": "表示饱和控制所作用的模式类型，覆盖浮点计算、fp8、整数溢出及精度转换场景，在调用饱和标志设置与查询接口时使用，CAST模式仅在全局饱和策略下生效。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+      "excerpt": "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+      "excerpt": "仅在饱和策略为[asc_override_strategy::USE_GLOBAL](asc_override_strategy.md)时生效。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "configuration"
+    ],
+    "traits": [
+     "saturation_mode"
+    ]
+   },
+   "tag_evidence": {
+    "roles:configuration": "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。",
+    "traits:saturation_mode": "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。"
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+      "excerpt": "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/spr/asc_get_saturation_flag.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+      "excerpt": "asc_saturation_mode用于表示饱和控制所作用的模式类型，在调用[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)和[asc_get_saturation_flag](../../spr/asc_get_saturation_flag.md)时使用。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md",
+      "excerpt": "仅在饱和策略为[asc_override_strategy::USE_GLOBAL](asc_override_strategy.md)时生效。"
+     }
+    }
+   ]
+  },
+  {
+   "document_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+   "document_sha256": "96d8357b4a6d962d6136f2b7ef0eebe7bd97849c01f8e9b89b9df93e403424d9",
+   "description": {
+    "value": "表示数据从Unified Buffer搬运到GM时的L2 Cache策略，提供启用并标记替换优先级、驻留及不分配等模式，供向量搬运接口与标量store策略配置查询使用。",
+    "evidence": [
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+      "excerpt": "asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时的L2 Cache策略，可用于："
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+      "excerpt": "向量搬运接口，例如[asc_copy_ub2gm_align](../../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)。"
+     },
+     {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+      "excerpt": "标量访存路径的store策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_store_cache_mode](../../cache_ctrl/asc_get_scalar_store_cache_mode.md)。"
+     }
+    ]
+   },
+   "tag": {
+    "roles": [
+     "data_movement_configuration"
+    ]
+   },
+   "tag_evidence": {
+    "roles:data_movement_configuration": "asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时的L2 Cache策略，可用于："
+   },
+   "dependencies": [
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+      "excerpt": "向量搬运接口，例如[asc_copy_ub2gm_align](../../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+      "excerpt": "标量访存路径的store策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_store_cache_mode](../../cache_ctrl/asc_get_scalar_store_cache_mode.md)。"
+     }
+    },
+    {
+     "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_get_scalar_store_cache_mode.md",
+     "kind": "related",
+     "evidence": {
+      "source_path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md",
+      "excerpt": "标量访存路径的store策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_store_cache_mode](../../cache_ctrl/asc_get_scalar_store_cache_mode.md)。"
+     }
+    }
+   ]
+  }
+ ]
+}

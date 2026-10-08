@@ -1,22 +1,13 @@
 ---
 okftype: reference.api
-title: asc_nop
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_misc/asc_nop.md
-description: 生成一条空操作指令，不执行实际计算，每调用一次阻塞一拍流水；需要精确阻塞n拍流水时，须在n个接口调用前后插入asc_sync。
+description: "生成一条空操作指令，不执行实际计算，每调用一次阻塞一拍流水，需要精确阻塞n拍流水时须在n个接口调用前后插入asc_sync保证阻塞效果。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_nop__z
-archs: ['3510']
-header: [/include/c_api/utils/sys_misc.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
     kind: requires
-    condition: 如果需要精确阻塞n拍流水
-examples: []
-timestamp: '2026-09-28'
+    condition: "如果需要精确阻塞n拍流水"
+version: 9.2.0-
 ---
 # asc_nop
 

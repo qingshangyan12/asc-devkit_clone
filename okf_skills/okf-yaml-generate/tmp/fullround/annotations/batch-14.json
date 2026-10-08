@@ -1,0 +1,1041 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+      "document_sha256": "1698c3cc6bb9ce222af9f6ffae64b8b6cd43027209acf679c86eede8cd016502",
+      "description": {
+        "value": "对Global Memory中address指向的单个元素执行原子按位或操作，读取旧值与输入标量值按位或后写回该地址并返回旧值，整个读取、计算和写回过程为原子操作，地址须落在GM地址空间并按数据类型字节数对齐，访问GM时绕过DCache。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+            "excerpt": "对Global Memory中`address`指向的单个元素执行原子按位或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+            "excerpt": "本接口访问GM时绕过DCache，不维护缓存一致性。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_or"
+        ],
+        "traits": [
+          "atomic"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "对Global Memory中`address`指向的单个元素执行原子按位或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+        "operations:bitwise_or": "对Global Memory中`address`指向的单个元素执行原子按位或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+        "traits:atomic": "对Global Memory中`address`指向的单个元素执行原子按位或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+            "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+          },
+          "condition": "若其他核或其他通路通过缓存访问同一GM地址"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+            "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+          },
+          "condition": "若其他核或其他通路通过缓存访问同一GM地址"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_or.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+      "document_sha256": "9e2b31eda1f6a62bbcfad5311493dbd925168c1162ecedbd564a8b6237ca8e33",
+      "description": {
+        "value": "对Global Memory中address指向的单个元素执行原子减操作，读取旧值计算其与输入标量值的差并写回该地址且返回旧值，整个过程为原子操作，float类型时最终结果可能因执行顺序不同而存在差异，访问GM时绕过DCache。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+            "excerpt": "对Global Memory中`address`指向的单个元素执行原子减操作：读取该地址中的旧值`old_value`，计算`old_value`与输入标量值`val`的差，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+            "excerpt": "`dtype`为`float`时，最终结果可能因执行顺序不同而存在差异；如需确定性计算结果，需要通过同步指令控制执行顺序。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "subtract"
+        ],
+        "traits": [
+          "atomic"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "对Global Memory中`address`指向的单个元素执行原子减操作：读取该地址中的旧值`old_value`，计算`old_value`与输入标量值`val`的差，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+        "operations:subtract": "对Global Memory中`address`指向的单个元素执行原子减操作：读取该地址中的旧值`old_value`，计算`old_value`与输入标量值`val`的差，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+        "traits:atomic": "对Global Memory中`address`指向的单个元素执行原子减操作：读取该地址中的旧值`old_value`，计算`old_value`与输入标量值`val`的差，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+            "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+          },
+          "condition": "若其他核或其他通路通过缓存访问同一GM地址"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+            "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+          },
+          "condition": "若其他核或其他通路通过缓存访问同一GM地址"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_sub.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+      "document_sha256": "9cf74899fec030c5523c0f1481439c8c59f73d783d3bc605af3609bef2d93b7b",
+      "description": {
+        "value": "对Global Memory中address指向的单个元素执行原子按位异或操作，读取旧值与输入标量值按位异或后写回该地址并返回旧值，整个读取、计算和写回过程为原子操作，并发调用不会丢失更新，访问GM时绕过DCache。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+            "excerpt": "对Global Memory中`address`指向的单个元素执行原子按位异或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位异或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+            "excerpt": "本接口访问GM时绕过DCache，不维护缓存一致性。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_xor"
+        ],
+        "traits": [
+          "atomic"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "对Global Memory中`address`指向的单个元素执行原子按位异或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位异或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+        "operations:bitwise_xor": "对Global Memory中`address`指向的单个元素执行原子按位异或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位异或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。",
+        "traits:atomic": "对Global Memory中`address`指向的单个元素执行原子按位异或操作：读取该地址中的旧值`old_value`，将`old_value`与输入标量值`val`进行按位异或运算，将结果`new_value`写回该地址，并返回`old_value`。整个读取、计算和写回过程为原子操作。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+            "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+          },
+          "condition": "若其他核或其他通路通过缓存访问同一GM地址"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+            "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+          },
+          "condition": "若其他核或其他通路通过缓存访问同一GM地址"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_xor.md",
+            "excerpt": "- 本接口运行在标量流水（`PIPE_S`）上，同一标量流水内的数据依赖由指令执行顺序保证。若本接口与`PIPE_MTE2`或`PIPE_MTE3`上的数据搬运指令访问同一GM地址，且执行顺序影响结果，编译器无法自动完成跨流水同步，调用方需按实际依赖插入[asc_sync_pipe](../../sync/intra_core_sync/asc_sync_pipe.md)，或配合使用[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)与[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)保证执行顺序。"
+          },
+          "condition": "若本接口与PIPE_MTE2或PIPE_MTE3上的数据搬运指令访问同一GM地址，且执行顺序影响结果"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+      "document_sha256": "7eec750900947638ebe95d175fd71404baf046da1e4c1640d8a38146236d1b95",
+      "description": {
+        "value": "获取原子操作启用位与原子操作类型的值，可用于校验asc_set_store_atomic_config_v1等接口设置的配置是否符合预期；在Ascend 950PR&950DT系列产品上该接口已废弃，原子加操作可直接使用asc_atomic_add实现，无需再配置和校验。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+            "excerpt": "获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+            "excerpt": "**Ascend 950PR&950DT系列产品产品上该接口已废弃。原子加操作可以直接使用[asc_atomic_add](asc_atomic_add.md)实现。无需再对原子操作启用位和原子操作类型的值进行配置和校验。**"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "query"
+        ],
+        "traits": [
+          "atomic"
+        ]
+      },
+      "tag_evidence": {
+        "roles:query": "获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。",
+        "traits:atomic": "获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md",
+          "kind": "replaced_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+            "excerpt": "**Ascend 950PR&950DT系列产品产品上该接口已废弃。原子加操作可以直接使用[asc_atomic_add](asc_atomic_add.md)实现。无需再对原子操作启用位和原子操作类型的值进行配置和校验。**"
+          },
+          "condition": "Ascend 950PR&950DT系列产品产品上该接口已废弃"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+            "excerpt": "获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_get_store_atomic_config.md",
+            "excerpt": "获取原子操作启用位与原子操作类型的值，可用于校验[asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)和[asc_set_store_atomic_config_v2（废弃）](../../deprecated_interface/asc_set_store_atomic_config_v2_deprecated.md)设置的原子操作启用位和原子操作类型的值是否符合预期。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+      "document_sha256": "d2983fb5d72a885bc8b7b2ad1884e67fdba783ecc4abd64c21a7f861ab1f0d28",
+      "description": {
+        "value": "设置原子操作启用位与原子操作类型的值，type取值指定开启原子操作的数据类型，op为0表示求和操作，使用完成后建议通过asc_disable_dma_atomic清空原子操作状态，该指令执行前不会对GM数据清零，需开发者按需手动清零。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+            "excerpt": "设置原子操作启用位与原子操作类型的值。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+            "excerpt": "- 使用完成后，建议通过[asc_disable_dma_atomic](../datamove_atomic/asc_disable_dma_atomic.md)清空原子操作的状态，以免影响后续相关指令功能。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+            "excerpt": "- 该指令执行前不会对GM的数据做清零操作，开发者需在需要时手动添加清零操作。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ],
+        "traits": [
+          "atomic"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "设置原子操作启用位与原子操作类型的值。",
+        "traits:atomic": "原子操作启用位。<br>0：无原子操作。<br>1：开启原子操作，进行原子操作的数据类型为float。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_disable_dma_atomic.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/asc_set_store_atomic_config_v1.md",
+            "excerpt": "- 使用完成后，建议通过[asc_disable_dma_atomic](../datamove_atomic/asc_disable_dma_atomic.md)清空原子操作的状态，以免影响后续相关指令功能。"
+          },
+          "condition": "使用完成后"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clear_nthbit.md",
+      "document_sha256": "845007746a06cbe6fd424d83b26d9e19b25e4e63314191dc4a1985bd00f34c6f",
+      "description": {
+        "value": "对一个64位无符号整数执行位清除操作，将指定位索引的二进制位清零、其余位保持不变，返回修改后的64位无符号整数，实际位索引按取模规则计算、范围为0到63，标量位运算且AIC与AIV均可调用。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clear_nthbit.md",
+            "excerpt": "对一个64位无符号整数执行位清除操作，将`bits`中第`idx`位清零，其余位保持不变。返回修改后的64位无符号整数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clear_nthbit.md",
+            "excerpt": "当`idx`大于63或小于0时，实际清除的位索引按`(idx % 64 + 64) % 64`计算。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bit_manipulation"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "对一个64位无符号整数执行位清除操作，将`bits`中第`idx`位清零，其余位保持不变。返回修改后的64位无符号整数。",
+        "operations:bit_manipulation": "对一个64位无符号整数执行位清除操作，将`bits`中第`idx`位清零，其余位保持不变。返回修改后的64位无符号整数。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clz.md",
+      "document_sha256": "6548ea5e5bbe1144716050305f1f2931f5b8390bf7c91fa13a967ff3ee489518",
+      "description": {
+        "value": "计算uint64_t类型整数二进制表示下的前导零个数，即从二进制最高位开始到第一个出现1为止中间连续0的数量，输入为0时返回64，返回值范围为0到64。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clz.md",
+            "excerpt": "计算一个`uint64_t`类型整数在二进制表示下的前导零个数，即从二进制最高位开始，到第一个出现二进制1为止，中间连续的0的数量。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_clz.md",
+            "excerpt": "返回`value_in`的前导零个数，取值范围为[0, 64]。当`value_in`为0时，返回64。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bit_manipulation"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "计算一个`uint64_t`类型整数在二进制表示下的前导零个数，即从二进制最高位开始，到第一个出现二进制1为止，中间连续的0的数量。",
+        "operations:bit_manipulation": "计算一个`uint64_t`类型整数在二进制表示下的前导零个数，即从二进制最高位开始，到第一个出现二进制1为止，中间连续的0的数量。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffs.md",
+      "document_sha256": "719370033faf1a89903de38d94c791484c5fee134600a60f082c6ce5933496f5",
+      "description": {
+        "value": "在输入uint64_t数据的二进制表示中从最低位向最高位查找第一个值为1的比特并返回其位索引，未找到时返回-1，调用方须先判断返回值是否为-1再当作位索引使用以免越界。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffs.md",
+            "excerpt": "FindFirstSet接口，用于在输入`uint64_t`数据的二进制表示中，从最低位向最高位查找第一个值为1的比特，并返回其位索引；若未找到，则返回-1。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffs.md",
+            "excerpt": "返回值取值范围为[0, 63]或-1，调用方接收返回值后需先判断是否为-1，再当作位索引使用，否则将-1当作位索引使用会越界。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bit_manipulation"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "FindFirstSet接口，用于在输入`uint64_t`数据的二进制表示中，从最低位向最高位查找第一个值为1的比特，并返回其位索引；若未找到，则返回-1。",
+        "operations:bit_manipulation": "FindFirstSet接口，用于在输入`uint64_t`数据的二进制表示中，从最低位向最高位查找第一个值为1的比特，并返回其位索引；若未找到，则返回-1。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffz.md",
+      "document_sha256": "8c1e871826c42f213ded51fe5d83195f0091ea4087f1d7925a21023617387be0",
+      "description": {
+        "value": "在输入uint64_t数据的二进制表示中从最低位向最高位查找第一个值为0的比特并返回其位索引，未找到时返回-1，调用方须先判断返回值是否为-1再当作位索引使用以免越界。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffz.md",
+            "excerpt": "FindFirstZero接口，用于在输入`uint64_t`数据的二进制表示中，从最低位向最高位查找第一个值为0的比特，并返回其位索引；若未找到，则返回-1。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_ffz.md",
+            "excerpt": "返回值取值范围为[0, 63]或-1（未找到0时），调用方接收返回值后需先判断是否为-1，再当作位索引使用，否则将-1当作位索引使用会越界。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bit_manipulation"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "FindFirstZero接口，用于在输入`uint64_t`数据的二进制表示中，从最低位向最高位查找第一个值为0的比特，并返回其位索引；若未找到，则返回-1。",
+        "operations:bit_manipulation": "FindFirstZero接口，用于在输入`uint64_t`数据的二进制表示中，从最低位向最高位查找第一个值为0的比特，并返回其位索引；若未找到，则返回-1。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_popc.md",
+      "document_sha256": "f7d27b92612bc51decf5438a51ae28a5d61c20da4b0d89fc3475381b3f70352e",
+      "description": {
+        "value": "获取输入uint64_t数据二进制表示中值为1的位数并返回int64_t结果，取值范围为0到64，运行在标量流水上，流水内数据依赖由指令执行顺序保证。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_popc.md",
+            "excerpt": "获取输入`uint64_t`数据的二进制表示中值为1的位数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_popc.md",
+            "excerpt": "`int64_t`类型，表示`value`的二进制表示中值为1的位数。取值范围为[0, 64]。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bit_manipulation"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "获取输入`uint64_t`数据的二进制表示中值为1的位数。",
+        "operations:bit_manipulation": "获取输入`uint64_t`数据的二进制表示中值为1的位数。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_set_nthbit.md",
+      "document_sha256": "9253515e7a9e52e41c6a9be71e75d25dbe5662d9f193e4ddae6f58eda4d1af91",
+      "description": {
+        "value": "将uint64_t数据的指定二进制位置为1，其余位保持不变，返回修改后的uint64_t整数且执行计算后输入数据不变，实际位索引按取模规则计算，索引范围为0到63。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_set_nthbit.md",
+            "excerpt": "将`uint64_t`数据的指定二进制位置为1，其余位保持不变。返回修改后的`uint64_t`整数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_set_nthbit.md",
+            "excerpt": "当参数`idx > 63`或者`idx < 0`时，位索引的计算逻辑为`(idx % 64 + 64) % 64`。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bit_manipulation"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "将`uint64_t`数据的指定二进制位置为1，其余位保持不变。返回修改后的`uint64_t`整数。",
+        "operations:bit_manipulation": "将`uint64_t`数据的指定二进制位置为1，其余位保持不变。返回修改后的`uint64_t`整数。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_sflbits.md",
+      "document_sha256": "23cf69e7f92262840777ae149c08fe3d1896b20b2290b3063a313341f2e44942",
+      "description": {
+        "value": "对64位有符号整数取最高位符号位作为参考位，统计从次高位开始与符号位相同的连续比特位个数，输入为全0或全1时返回-1，其余输入返回值范围为0到62，仅支持int64_t，其他位宽按int64_t隐式转换后参与位运算。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_sflbits.md",
+            "excerpt": "对一个64位有符号整数，取其最高位（即符号位）作为参考位，统计从次高位（即最高数值位）开始与符号位相同的连续比特位的个数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_sflbits.md",
+            "excerpt": "接口仅支持`int64_t`，传入其他位宽的值会按`int64_t`隐式转换后参与位运算，结果以`int64_t`返回。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bit_manipulation"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "对一个64位有符号整数，取其最高位（即符号位）作为参考位，统计从次高位（即最高数值位）开始与符号位相同的连续比特位的个数。",
+        "operations:bit_manipulation": "对一个64位有符号整数，取其最高位（即符号位）作为参考位，统计从次高位（即最高数值位）开始与符号位相同的连续比特位的个数。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_zero_bits_cnt.md",
+      "document_sha256": "8a61a8e5222259c2160ac8e8387e62dc6fbe71feeddae3e57a2584c47e73ff3b",
+      "description": {
+        "value": "获取输入uint64_t数据二进制表示中值为0的位数并返回int64_t结果，取值范围为0到64，运行在标量流水上，流水内数据依赖由指令执行顺序保证。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_zero_bits_cnt.md",
+            "excerpt": "获取输入`uint64_t`数据的二进制表示中值为0的位数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_bit/asc_zero_bits_cnt.md",
+            "excerpt": "`int64_t`类型，表示`value`二进制表示中值为0的位数。取值范围为[0, 64]。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bit_manipulation"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "获取输入`uint64_t`数据的二进制表示中值为0的位数。",
+        "operations:bit_manipulation": "获取输入`uint64_t`数据的二进制表示中值为0的位数。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md",
+      "document_sha256": "309e5df497adcde1d03241ce3617ed9b2d77e139aa2b3eded0ecd7d660225d54",
+      "description": {
+        "value": "将float类型的标量转换为half类型并返回，舍入模式固定为ODD最近邻奇数舍入，饱和与非饱和模式可通过asc_set_saturation_flag接口配置，nan、inf及超出half表示范围输入的处理方式参见舍入模式与饱和模式说明。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md",
+            "excerpt": "将`float`类型的标量转换为`half`类型并返回，舍入模式固定为ODD（最近邻奇数舍入）。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md",
+            "excerpt": "饱和/非饱和模式可通过[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)接口配置。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "conversion"
+        ],
+        "traits": [
+          "rounding_mode"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "将`float`类型的标量转换为`half`类型并返回，舍入模式固定为ODD（最近邻奇数舍入）。",
+        "operations:conversion": "将`float`类型的标量转换为`half`类型并返回，舍入模式固定为ODD（最近邻奇数舍入）。",
+        "traits:rounding_mode": "将`float`类型的标量转换为`half`类型并返回，舍入模式固定为ODD（最近邻奇数舍入）。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](../../reg_compute/reg_convert/rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2half.md",
+            "excerpt": "饱和/非饱和模式可通过[asc_set_saturation_flag](../../spr/asc_set_saturation_flag.md)接口配置。"
+          },
+          "condition": "配置饱和/非饱和模式时"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md",
+      "document_sha256": "6aaba52aea5299761951762456315d81e0e008fe5bcb886a5ca0ac821e3f837e",
+      "description": {
+        "value": "将float类型的标量按指定舍入模式转换为int32_t并返回，支持rd、rn、rna、ru四种舍入模式，超范围输入在饱和模式下钳位到最大值或最小值、非饱和模式下截断为低32位，nan或inf输入返回0。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md",
+            "excerpt": "将`float`类型的标量转换为`int32_t`类型并返回。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md",
+            "excerpt": "- 输入值超出`int32_t`的表示范围[−2^31, 2^31-1]时，饱和模式下，结果钳位到`int32_t`的最大值或最小值；非饱和模式下，结果截断为低32位。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "conversion"
+        ],
+        "traits": [
+          "rounding_mode",
+          "saturation_mode"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "将`float`类型的标量转换为`int32_t`类型并返回。",
+        "operations:conversion": "将`float`类型的标量转换为`int32_t`类型并返回。",
+        "traits:rounding_mode": "`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）和`ru`（CEIL）。",
+        "traits:saturation_mode": "- 输入值超出`int32_t`的表示范围[−2^31, 2^31-1]时，饱和模式下，结果钳位到`int32_t`的最大值或最小值；非饱和模式下，结果截断为低32位。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](../../reg_compute/reg_convert/rounding_mode.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md",
+            "excerpt": "使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          },
+          "condition": "使用饱和或非饱和模式时"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md",
+      "document_sha256": "54ce1b30e4e15f238e6b18e6438679339233ea45fe54dbfb5fced944c8e165ef",
+      "description": {
+        "value": "不经过DCache直接从GM地址读取整型数据并返回，仅支持整型、不支持浮点类型，多核操作GM且数据无法对齐到Cache Line时可绕过DCache读取，避免Cache Line粒度的数据覆盖。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md",
+            "excerpt": "不经过DCache直接从GM地址读取整型数据。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md",
+            "excerpt": "当多核操作GM地址且数据无法对齐到Cache Line时，经过DCache读写可能引入Cache Line粒度的数据覆盖。此时，可使用本接口绕过DCache读取GM数据。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "load"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "不经过DCache直接从GM地址读取整型数据。",
+        "operations:load": "不经过DCache直接从GM地址读取整型数据。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+      "document_sha256": "04d1b8a4330f8a1257f8080dded3d49230223eb3ceba32d2c898ef875a7fab71",
+      "description": {
+        "value": "不经过DCache向GM地址写入数据，多核操作GM且数据无法对齐到Cache Line时可避免按Cache Line读写导致的多核数据随机覆盖，地址须按写入数据类型字节数对齐且落在GM可访问地址空间，绕过DCache不维护缓存一致性。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+            "excerpt": "不经过DCache向GM地址上写数据。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+            "excerpt": "当多核操作GM地址时，如果数据无法对齐到Cache Line，经过DCache的方式下，由于按照Cache Line大小进行读写，会导致多核数据随机覆盖的问题。此时，可以采用不经过DCache直接读写GM地址的方式，从而避免上述随机覆盖的问题。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "store"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "不经过DCache向GM地址上写数据。",
+        "operations:store": "不经过DCache向GM地址上写数据。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+            "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+          },
+          "condition": "若其他核或其他通路通过缓存访问同一GM地址"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md",
+            "excerpt": "- 本接口访问GM时绕过DCache，不维护缓存一致性。若其他核或其他通路通过缓存访问同一GM地址，调用方需使用[asc_dcci](../../cache_ctrl/asc_dcci.md)清理或失效对应Cache Line，并使用[asc_sync_data_barrier](../../sync/intra_core_sync/asc_sync_data_barrier.md)保证相关访存操作的执行顺序和数据可见性。详情可参考[Scalar原子操作与DCache一致性](../../../../../guide/programming_guide/advanced_programming/memory_model/cache_coherence.md#scalar原子操作与dcache一致性)。"
+          },
+          "condition": "若其他核或其他通路通过缓存访问同一GM地址"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_init/asc_init.md",
+      "document_sha256": "f0dae9adc361264cdcd92b67c5d53005d4623341e12ef86af1d8d4a654e20665",
+      "description": {
+        "value": "将当前AI Core上可能由前序算子遗留的全局状态恢复为接口约定的初始状态，覆盖原子累加状态、Mask工作模式、CTRL寄存器与原子操作开启位等，仅初始化控制状态，不会清零Global Memory、Local Memory或用户数据。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_init/asc_init.md",
+            "excerpt": "本接口将当前AI Core上可能由前序算子遗留的全局状态恢复为接口约定的初始状态，避免这些状态影响当前算子的计算结果。本接口仅初始化控制状态，不会清零Global Memory、Local Memory或用户数据。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口将当前AI Core上可能由前序算子遗留的全局状态恢复为接口约定的初始状态，避免这些状态影响当前算子的计算结果。本接口仅初始化控制状态，不会清零Global Memory、Local Memory或用户数据。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_init/asc_init.md",
+            "excerpt": "`asc_copy_l12l0a`进行3D格式搬运时的`Padding`填充值 | 设置为0。"
+          },
+          "condition": "初始化asc_copy_l12l0a进行3D格式搬运时的Padding填充值为0"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_misc/asc_nop.md",
+      "document_sha256": "6bdfa92310bdefa7ec8efdbff6d1e273526c1c2af8726a94dd9237385f5c6d9d",
+      "description": {
+        "value": "生成一条空操作指令，不执行实际计算，每调用一次阻塞一拍流水，需要精确阻塞n拍流水时须在n个接口调用前后插入asc_sync保证阻塞效果。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_misc/asc_nop.md",
+            "excerpt": "生成一条空操作指令，不执行实际计算。每调用一次阻塞一拍流水。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_misc/asc_nop.md",
+            "excerpt": "如果需要精确阻塞n拍流水，需要在n个`asc_nop`接口调用前后插入[`asc_sync`](../../sync/intra_core_sync/asc_sync.md)，例如："
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "control"
+        ]
+      },
+      "tag_evidence": {
+        "roles:control": "生成一条空操作指令，不执行实际计算。每调用一次阻塞一拍流水。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md",
+          "kind": "requires",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_misc/asc_nop.md",
+            "excerpt": "如果需要精确阻塞n拍流水，需要在n个`asc_nop`接口调用前后插入[`asc_sync`](../../sync/intra_core_sync/asc_sync.md)，例如："
+          },
+          "condition": "如果需要精确阻塞n拍流水"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_arch_ver.md",
+      "document_sha256": "dc9ebfd8b458b2ec2e3d441c1e3c622179b4b1ab49b8094b70bfa83d91534ec6",
+      "description": {
+        "value": "获取当前AI处理器架构版本号，通过输出参数core_version返回ARCH_VER寄存器中的核心版本字段值，不同型号服务器对应不同架构版本号取值，调用后core_version被覆写为对应值。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_arch_ver.md",
+            "excerpt": "获取当前AI处理器架构版本号。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_arch_ver.md",
+            "excerpt": "接收当前核的核心版本字段值，接口返回时该参数被覆写为ARCH_VER寄存器中的核心版本字段值，调用前无需初始化。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "query"
+        ]
+      },
+      "tag_evidence": {
+        "roles:query": "获取当前AI处理器架构版本号。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_core_id.md",
+      "document_sha256": "2286312f048c0504d4e8918b54c5c3042427abd3f3e1e02e45ca81ff785a4dc4",
+      "description": {
+        "value": "获取当前AI Core相对其余AI Core的编号，与内置变量获取的核内AIC或AIV索引层级不同，常用于按核编号划分任务使不同AI Core处理不同数据分片以实现多核并行。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_core_id.md",
+            "excerpt": "获取当前AI Core的编号。一个AI Core中包含1个AIC和若干个AIV，[内置变量](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#section199434523343)中的`block_idx`、`sub_block_idx`用于获取的是一个AI Core内部AIC或AIV的索引，而本接口获取的是一个AI Core相对其余AI Core的索引，二者层级不同。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_core_id.md",
+            "excerpt": "该接口常用于按核编号对任务进行划分，使不同的AI Core处理不同的数据分片，以实现多核并行。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "query"
+        ]
+      },
+      "tag_evidence": {
+        "roles:query": "获取当前AI Core的编号。一个AI Core中包含1个AIC和若干个AIV，[内置变量](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#section199434523343)中的`block_idx`、`sub_block_idx`用于获取的是一个AI Core内部AIC或AIV的索引，而本接口获取的是一个AI Core相对其余AI Core的索引，二者层级不同。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md",
+      "document_sha256": "a54e01c6ed3ae19f26b34635e61de88cb8e461e16637e65be871a64af6a0516b",
+      "description": {
+        "value": "获取核间同步寄存器的基地址，为只读查询接口，调用方不可直接设置或修改返回值，基地址需通过asc_set_ffts_base_addr预先配置后方可用于核间同步。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md",
+            "excerpt": "获取核间同步寄存器的基地址。需要在Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步寄存器的基地址，并作为参数传入[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)后使用。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md",
+            "excerpt": "本接口为只读查询接口，读取的是核间同步寄存器的基地址，调用方不可直接设置或修改返回的基地址值；基地址需通过[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)预先配置后方可用于核间同步。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "query"
+        ],
+        "traits": [
+          "inter_core_synchronization"
+        ]
+      },
+      "tag_evidence": {
+        "roles:query": "获取核间同步寄存器的基地址。需要在Host侧调用接口aclrtGetHardwareSyncAddr获取核间同步寄存器的基地址，并作为参数传入[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)后使用。",
+        "traits:inter_core_synchronization": "本接口为只读查询接口，读取的是核间同步寄存器的基地址，调用方不可直接设置或修改返回的基地址值；基地址需通过[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)预先配置后方可用于核间同步。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_set_ffts_base_addr.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md",
+            "excerpt": "本接口为只读查询接口，读取的是核间同步寄存器的基地址，调用方不可直接设置或修改返回的基地址值；基地址需通过[asc_set_ffts_base_addr](asc_set_ffts_base_addr.md)预先配置后方可用于核间同步。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_arrive.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md",
+            "excerpt": "完成该配置后，才能使用[asc_sync_block_arrive](../../sync/inter_core_sync/asc_sync_block_arrive.md)和[asc_sync_block_wait](../../sync/inter_core_sync/asc_sync_block_wait.md)进行核间同步。"
+          },
+          "condition": "完成基地址配置后进行核间同步"
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/inter_core_sync/asc_sync_block_wait.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_ffts_base_addr.md",
+            "excerpt": "完成该配置后，才能使用[asc_sync_block_arrive](../../sync/inter_core_sync/asc_sync_block_arrive.md)和[asc_sync_block_wait](../../sync/inter_core_sync/asc_sync_block_wait.md)进行核间同步。"
+          },
+          "condition": "完成基地址配置后进行核间同步"
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_buf_addr.md",
+      "document_sha256": "188dcdf76d3db98fc95deaf4133504cc046326ec8717248c8c3ecf92230768f3",
+      "description": {
+        "value": "基于偏移量offset获取片上实际物理地址，常用于调试、地址推导或tiling数据地址计算场景，把相对偏移量转换为硬件上可直接使用的物理地址形式，不能与以数组方式申请内存的方法混用。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_buf_addr.md",
+            "excerpt": "基于偏移量offset获取片上实际物理地址，常用于在调试、地址推导或tiling数据地址计算场景下，把一个相对偏移量转换为可在硬件上直接使用的物理地址形式。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_buf_addr.md",
+            "excerpt": "不能和[以数组方式申请内存的方法](../../general_description_and_constraints.md#以数组方式申请内存)混用。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "query"
+        ]
+      },
+      "tag_evidence": {
+        "roles:query": "基于偏移量offset获取片上实际物理地址，常用于在调试、地址推导或tiling数据地址计算场景下，把一个相对偏移量转换为可在硬件上直接使用的物理地址形式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_buf_addr.md",
+            "excerpt": "不能和[以数组方式申请内存的方法](../../general_description_and_constraints.md#以数组方式申请内存)混用。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_stack_base.md",
+      "document_sha256": "b04f8c76fc895ce3ae8f93fdd456623b1af9218a1027851e9d624922147034f7",
+      "description": {
+        "value": "获取物理堆栈基地址并返回，常用于调试时定位当前核的堆栈在物理内存中的位置。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_stack_base.md",
+            "excerpt": "获取物理堆栈基地址。常用于调试时定位当前核的堆栈在物理内存中的位置。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "query"
+        ]
+      },
+      "tag_evidence": {
+        "roles:query": "获取物理堆栈基地址。常用于调试时定位当前核的堆栈在物理内存中的位置。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md",
+      "document_sha256": "27399f7921e3689383553f47370943330b10f7d1b18e883c8efd8924df034a8d",
+      "description": {
+        "value": "获取程序计数器的指针，程序计数器记录当前程序执行位置，常用于调试定位，也可配合asc_icache_preload将当前指令地址作为指令预取起始地址，返回值有效地址位为0至47位，高16位为无效位需掩码清零。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md",
+            "excerpt": "获取程序计数器的指针，程序计数器用于记录当前程序执行的位置。常用于调试时定位当前执行位置，也可配合[asc_icache_preload](../../cache_ctrl/asc_icache_preload.md)等接口，将当前指令地址作为预取的起始地址。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md",
+            "excerpt": "本接口返回64位程序计数器值，其中有效地址位为0~47位，高16位为无效位。如下代码片段所示，使用时需通过掩码`0xFFFFFFFFFFFF`（低48位全1）将高位无效位清零，以得到当前指令在GM中的有效48位地址。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "query"
+        ]
+      },
+      "tag_evidence": {
+        "roles:query": "获取程序计数器的指针，程序计数器用于记录当前程序执行的位置。常用于调试时定位当前执行位置，也可配合[asc_icache_preload](../../cache_ctrl/asc_icache_preload.md)等接口，将当前指令地址作为预取的起始地址。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md",
+            "excerpt": "获取程序计数器的指针，程序计数器用于记录当前程序执行的位置。常用于调试时定位当前执行位置，也可配合[asc_icache_preload](../../cache_ctrl/asc_icache_preload.md)等接口，将当前指令地址作为预取的起始地址。"
+          },
+          "condition": "将当前指令地址作为预取起始地址"
+        }
+      ]
+    }
+  ]
+}

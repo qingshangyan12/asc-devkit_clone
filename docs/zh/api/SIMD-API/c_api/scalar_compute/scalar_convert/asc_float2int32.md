@@ -1,30 +1,17 @@
 ---
 okftype: reference.api
-title: asc_float2int32
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_convert/asc_float2int32.md
-description: 将float类型的标量按指定舍入模式转换为int32_t并返回，支持rd、rn、rna、ru四种舍入模式，超范围输入在饱和模式下钳位到最大值或最小值，非饱和模式下截断为低32位，nan或inf输入返回0。
+description: "将float类型的标量按指定舍入模式转换为int32_t并返回，支持rd、rn、rna、ru四种舍入模式，超范围输入在饱和模式下钳位到最大值或最小值、非饱和模式下截断为低32位，nan或inf输入返回0。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [scalar]
-  - execution_models: [scalar]
   - traits: [rounding_mode, saturation_mode]
-signature:
-  - override_id: asc_float2int32_rd__f32
-  - override_id: asc_float2int32_rn__f32
-  - override_id: asc_float2int32_rna__f32
-  - override_id: asc_float2int32_ru__f32
-archs: ['3510']
-header: [/include/c_api/scalar_compute/compute/scalar_convert.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
     kind: constrained_by
-    condition: 使用饱和或非饱和模式时
-examples: []
-timestamp: '2026-09-28'
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "使用饱和或非饱和模式时"
+version: 9.0.0-
 ---
 # asc_float2int32
 

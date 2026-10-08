@@ -1,29 +1,18 @@
 ---
 okftype: reference.api
-title: asc_set_fp32_mode（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_set_fp32_mode_deprecated.md
-description: 已废弃的配置接口，用于设置Mmad计算关闭HF32模式，关闭后L0A Buffer与L0B Buffer中的float数据参与Mmad计算前不做舍入处理，请使用asc_disable_hf32接口替代。
+description: "已废弃的配置接口，设置Mmad计算关闭HF32模式，关闭后L0A与L0B中的float数据参与Mmad计算前不做舍入处理，作用与asc_enable_hf32相反且不同时生效；请改用asc_disable_hf32接口替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [matrix_compute]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_set_fp32_mode__z
-archs: ['2201', '3510']
-header: [/include/c_api/cube_compute/cube_compute.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md
-    kind: related
-    condition: 接口已废弃，作为替代方案使用
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md
     kind: related
-    condition: 其作用与asc_enable_hf32相反，两个接口不同时生效
+    condition: "其作用与asc_enable_hf32相反，两个接口不同时生效"
   - path: docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md
     kind: configures
-    condition: 需在矩阵乘加指令执行前调用，确保模式配置在矩阵乘加计算过程中生效
-examples: []
-timestamp: '2026-09-28'
+    condition: "需在矩阵乘加指令执行前调用，确保模式配置在矩阵乘加计算过程中生效"
+version: 9.1.0-9.2.0
 ---
 # asc_set_fp32_mode（废弃）
 

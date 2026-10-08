@@ -1,15 +1,10 @@
 ---
-okftype: reference.type
-title: asc_position_quarter_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md
-description: 该枚举表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置。
+okftype: reference.enum
+description: "表示源或目的操作数的四分之一位置，供Reg类型转换接口选择数据位置，对应常量可直接作为接口参数，支持第一至第四个四分之一位置。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-declaration:
-  symbol: asc_position_quarter_mode
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies: []
+version: 9.0.0-
 ---
 # asc_position_quarter_mode
 

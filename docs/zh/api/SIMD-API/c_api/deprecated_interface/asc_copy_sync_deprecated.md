@@ -1,29 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_sync_deprecated.md
-description: 已废弃的同步接口，将数据从Unified Buffer（UB）搬运到UB，支持高维切分，源与目的操作数为矢量，请使用对应的非同步接口和同步接口asc_sync替代。
+description: "已废弃的同步搬运接口，在Unified Buffer（UB）内按元素个数搬运矢量数据，支持高维切分，源与目的起始地址需32字节对齐；请改用非同步接口asc_copy配合asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [unified_buffer]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, high_dimensional]
-signature:
-  - override_id: asc_copy_sync__PUi16_PUi16_u32
-  - override_id: asc_copy_sync__PUu16_PUu16_u32
-  - override_id: asc_copy_sync__PUi32_PUi32_u32
-  - override_id: asc_copy_sync__PUu32_PUu32_u32
-archs: ['2201']
-header: [/include/c_api/composite/vector_compute_composite.h]
+  - traits: [aligned_transfer, high_dimensional]
 dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
+    kind: replaced_by
   - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_copy_sync（废弃）
 

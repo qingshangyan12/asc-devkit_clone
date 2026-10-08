@@ -1,0 +1,1121 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+      "document_sha256": "cf588873af143ff004005b35fb2568ab9ac2ced1f56a193cd5c5ceb18bb666db",
+      "description": {
+        "value": "说明数据类型转换时Ascend C API支持的舍入模式与饱和、非饱和模式：舍入模式包括RINT、ROUND、FLOOR、CEIL、TRUNC、ODD、HYBRID七种，确定高精度数值到低精度表示的舍入方式；饱和与非饱和模式决定数值超出目标类型表示范围时的溢出行为，开启时需配置ctrl寄存器。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+            "excerpt": "在进行数据类型转换时，Ascend C API支持多种舍入模式和饱和模式。这些模式决定了当源数据类型转换为不同精度或范围的目标数据类型时，如何处理数值的舍入和溢出问题。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+            "excerpt": "开启饱和模式和非饱和模式时，需配置ctrl寄存器。ctrl寄存器的详细说明请参见[asc_set_ctrl接口](../../spr/asc_set_ctrl.md)。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md",
+      "document_sha256": "d85ba9be0a0819c28fb2dfdc0f98a27f77ab48a143fe093c3d234d2bbbaaff94",
+      "description": {
+        "value": "完成矢量数据寄存器与掩码寄存器间的数据搬运，支持矢量到矢量、掩码到掩码、矢量到掩码三种模式，可按掩码筛选元素或按part选取数据块，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md",
+            "excerpt": "完成数据在寄存器间的搬运，支持以下三种模式："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md",
+            "excerpt": "本接口为Reg矢量搬运接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "copy"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "完成数据在寄存器间的搬运，支持以下三种模式：",
+        "operations:copy": "完成数据在寄存器间的搬运，支持以下三种模式："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+      "document_sha256": "7638225039e5bb9c43a04b3be176c992d329ccdab1eb32292034cbc25e27a108",
+      "description": {
+        "value": "从矢量数据寄存器中按part选取数据块提取掩码寄存器并通过函数返回值返回，所选数据块的每个bit广播为2bit或4bit后构成32B掩码，功能与asc_copy的矢量到掩码模式相同，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+            "excerpt": "从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+            "excerpt": "本接口与[asc_copy](asc_copy.md)的矢量数据寄存器复制到掩码寄存器模式功能相同，区别在于本接口通过函数返回值返回结果。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+            "excerpt": "本接口为Reg矢量搬运接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "copy"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果。",
+        "operations:copy": "从矢量数据寄存器中提取掩码寄存器，并通过函数返回值返回结果。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+            "excerpt": "本接口与[asc_copy](asc_copy.md)的矢量数据寄存器复制到掩码寄存器模式功能相同，区别在于本接口通过函数返回值返回结果。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+      "document_sha256": "747e401c3fab2d1372ca32c9d42279228413444fbe9c3b8ca447fe89a1fd0794",
+      "description": {
+        "value": "将源操作数中被掩码筛选的有效元素或bit复制到函数返回值，支持矢量到矢量与掩码到掩码两种模式，矢量模式未被筛选位置值未定义、掩码模式未被筛选位置置0，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+            "excerpt": "将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置根据源/目的寄存器不同有不同的行为，最终通过函数返回值返回结果。支持以下两种模式："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+            "excerpt": "本接口与[asc_copy](asc_copy.md)的掩码寄存器复制到掩码寄存器模式功能相同，区别在于本接口通过函数返回值返回结果。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+            "excerpt": "本接口为Reg矢量搬运接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "copy"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置根据源/目的寄存器不同有不同的行为，最终通过函数返回值返回结果。支持以下两种模式：",
+        "operations:copy": "将src中被mask筛选的有效元素复制到返回值对应位置，未被mask筛选的位置根据源/目的寄存器不同有不同的行为，最终通过函数返回值返回结果。支持以下两种模式："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_copy.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+            "excerpt": "本接口与[asc_copy](asc_copy.md)的掩码寄存器复制到掩码寄存器模式功能相同，区别在于本接口通过函数返回值返回结果。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md",
+      "document_sha256": "dbd36836b9d710466d601cce2a6b5cf0e341b9bd4edc06026ecc9352d1f4c40d",
+      "description": {
+        "value": "根据掩码对两个源矢量数据寄存器按元素相减后取绝对值，结果写入dst或通过函数返回值返回，掩码为0的元素在结果中置0，支持half与float类型，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md",
+            "excerpt": "根据`mask`对源操作数`src0`、`src1`按元素相减后取绝对值，得到计算结果。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "absolute",
+          "subtract"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对源操作数`src0`、`src1`按元素相减后取绝对值，得到计算结果。计算公式如下：",
+        "operations:absolute": "根据`mask`对源操作数`src0`、`src1`按元素相减后取绝对值，得到计算结果。计算公式如下：",
+        "operations:subtract": "根据`mask`对源操作数`src0`、`src1`按元素相减后取绝对值，得到计算结果。计算公式如下：",
+        "traits:elementwise": "根据`mask`对源操作数`src0`、`src1`按元素相减后取绝对值，得到计算结果。计算公式如下："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_abs_sub.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_axpy.md",
+      "document_sha256": "2c89e69bfdc9edaf3e509d98f91f11bc149cdecfbd1e39b986327f3a927d51ed",
+      "description": {
+        "value": "根据掩码将源矢量每个元素与标量value相乘后与dst对应元素相加并写回dst，dst既作为输入累加器参与计算又存储最终结果，掩码为0的位置置0，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_axpy.md",
+            "excerpt": "根据`mask`将源操作数`src`中的每个元素与标量`value`求积后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_axpy.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "fused_multiply_add"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将源操作数`src`中的每个元素与标量`value`求积后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。计算公式如下：",
+        "operations:fused_multiply_add": "根据`mask`将源操作数`src`中的每个元素与标量`value`求积后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。计算公式如下：",
+        "traits:elementwise": "根据`mask`将源操作数`src`中的每个元素与标量`value`求积后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。计算公式如下：",
+        "traits:scalar_operand": "源操作数（标量）。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_axpy.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md",
+      "document_sha256": "75ea80bca12baeca721cd639b8db268ccfc16a208b2463872d4f963ad4100052",
+      "description": {
+        "value": "根据掩码将两个源操作数按元素相减并以差值为指数计算自然指数函数，float输入直接计算，half输入由half2float变体按偶数或奇数索引读取元素并转为float后计算，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md",
+            "excerpt": "根据`mask`将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，计算结果通过函数返回值返回或写入`dst`。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md",
+            "excerpt": "`asc_exp_sub_half2float`用于`half`类型输入。该接口支持读取源操作数中偶数索引或奇数索引的元素，将其转换为`float`类型后进行计算。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "exponential",
+          "subtract"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，计算结果通过函数返回值返回或写入`dst`。",
+        "operations:exponential": "根据`mask`将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，计算结果通过函数返回值返回或写入`dst`。",
+        "operations:subtract": "根据`mask`将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，计算结果通过函数返回值返回或写入`dst`。",
+        "traits:elementwise": "根据`mask`将`src0`与`src1`按元素相减，并计算以差值为指数的自然指数函数，计算结果通过函数返回值返回或写入`dst`。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_exp_sub.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md",
+      "document_sha256": "ff0bdcf7a09dcf09cfde496831b1d99857612ad672b042c61f60da3e57850f8b",
+      "description": {
+        "value": "根据掩码将src0与src1按元素相乘后与src2对应元素相加，结果通过函数返回值返回，掩码为0的元素在返回值中置0，支持half、bfloat16_t与float类型，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md",
+            "excerpt": "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与源操作数`src2`中的对应元素相加，将计算结果作为返回值返回。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_fma.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "fused_multiply_add"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与源操作数`src2`中的对应元素相加，将计算结果作为返回值返回。计算公式如下：",
+        "operations:fused_multiply_add": "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与源操作数`src2`中的对应元素相加，将计算结果作为返回值返回。计算公式如下：",
+        "traits:elementwise": "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与源操作数`src2`中的对应元素相加，将计算结果作为返回值返回。计算公式如下："
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md",
+      "document_sha256": "645250d088b49bb877787f084d6cd5ced62633c2c9c9b10fbae657523c8dac14",
+      "description": {
+        "value": "根据掩码对源矢量元素执行Leaky ReLU运算，大于0的元素保持原值，小于等于0的元素乘以标量alpha后写入，掩码为0的元素置零，结果经返回值或写入dst输出，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md",
+            "excerpt": "根据掩码对源矢量数据寄存器中的元素执行Leaky ReLU操作，并将结果通过函数返回值返回或写入目的矢量数据寄存器。源操作数中大于0的元素直接写入输出结果，小于或等于0的元素乘以标量立即数后写入输出结果。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "leaky_relu"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据掩码对源矢量数据寄存器中的元素执行Leaky ReLU操作，并将结果通过函数返回值返回或写入目的矢量数据寄存器。源操作数中大于0的元素直接写入输出结果，小于或等于0的元素乘以标量立即数后写入输出结果。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "operations:leaky_relu": "根据掩码对源矢量数据寄存器中的元素执行Leaky ReLU操作，并将结果通过函数返回值返回或写入目的矢量数据寄存器。源操作数中大于0的元素直接写入输出结果，小于或等于0的元素乘以标量立即数后写入输出结果。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "traits:elementwise": "源操作数中大于0的元素直接写入输出结果，小于或等于0的元素乘以标量立即数后写入输出结果。",
+        "traits:scalar_operand": "负半轴斜率（标量）。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_leakyrelu.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md",
+      "document_sha256": "8ffac60b2249a24df9996530c16d88d66e629680589120384c1f245b5a785658",
+      "description": {
+        "value": "根据掩码将dst与src0按元素相乘后与src1对应元素相加并写回dst，dst既作为输入参与计算又存储最终结果，掩码为0的位置置0，支持half、bfloat16_t与float类型，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md",
+            "excerpt": "根据`mask`对目的操作数`dst`与源操作数`src0`按元素相乘后，与源操作数`src1`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入参与计算，又用于存储最终结果。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "fused_multiply_add"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对目的操作数`dst`与源操作数`src0`按元素相乘后，与源操作数`src1`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入参与计算，又用于存储最终结果。计算公式如下：",
+        "operations:fused_multiply_add": "根据`mask`对目的操作数`dst`与源操作数`src0`按元素相乘后，与源操作数`src1`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入参与计算，又用于存储最终结果。计算公式如下：",
+        "traits:elementwise": "根据`mask`对目的操作数`dst`与源操作数`src0`按元素相乘后，与源操作数`src1`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入参与计算，又用于存储最终结果。计算公式如下："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_madd.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md",
+      "document_sha256": "dc2ded22c7a700da9af7289b662237450c27244ce38a3984a4d7f4efa3e9bef5",
+      "description": {
+        "value": "根据掩码将float源矢量按元素与标量value相乘后按ROUND舍入模式转换为half类型，并由dst_pos指定结果写入偶数或奇数索引位置，未写入位置置0，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md",
+            "excerpt": "根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照ROUND舍入模式转换为half类型，得到计算结果。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md",
+            "excerpt": "通过`dst_pos`参数指定结果写入`dst`中索引为偶数或奇数的位置，未写入的位置置0。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "conversion",
+          "multiply"
+        ],
+        "traits": [
+          "elementwise",
+          "rounding_mode",
+          "scalar_operand"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照ROUND舍入模式转换为half类型，得到计算结果。计算公式如下：",
+        "operations:conversion": "按照ROUND舍入模式转换为half类型",
+        "operations:multiply": "根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照ROUND舍入模式转换为half类型，得到计算结果。计算公式如下：",
+        "traits:elementwise": "根据`mask`将源操作数`src`（float类型）按元素与标量`value`相乘后，按照ROUND舍入模式转换为half类型，得到计算结果。计算公式如下：",
+        "traits:rounding_mode": "按照ROUND舍入模式转换为half类型",
+        "traits:scalar_operand": "源操作数（标量，float类型）。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mul_scalar_float2half_rn.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md",
+      "document_sha256": "e6259193a67b87e9a637ba132ac3ffe781cfc34fd6d5ee0750c9c917135ccdfb",
+      "description": {
+        "value": "根据掩码将src0与src1按元素相乘后与dst对应元素相加并写回dst，dst既作为输入累加器参与计算又存储最终结果，掩码为0的位置置0，支持多种整型与浮点类型，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md",
+            "excerpt": "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "fused_multiply_add"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。计算公式如下：",
+        "operations:fused_multiply_add": "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。计算公式如下：",
+        "traits:elementwise": "根据`mask`对源操作数`src0`、`src1`按元素相乘后，与目的操作数`dst`中的对应元素相加，将结果写入`dst`。其中，`dst`既作为输入累加器参与计算，又用于存储最终结果。计算公式如下："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_mula.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md",
+      "document_sha256": "92c062078aa1711b3a7af076d3b1ff15b10f883146a4cdfba31a87c1a2cd6a64",
+      "description": {
+        "value": "根据掩码对源矢量元素执行PReLU运算，负半轴斜率由矢量寄存器alpha中对应元素逐元素指定，src0大于0时保持原值、否则与alpha相乘后写入，掩码为0的元素置零，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md",
+            "excerpt": "根据掩码对源操作数矢量数据寄存器`src0`中的元素执行PReLU（Parametric ReLU）运算，负半轴斜率由矢量数据寄存器`alpha`中的对应元素指定，并将结果通过函数返回值返回或写入目的操作数矢量数据寄存器。`src0`大于0时直接写入输出结果，否则将`src0`与`alpha`相乘后写入输出结果。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "prelu"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据掩码对源操作数矢量数据寄存器`src0`中的元素执行PReLU（Parametric ReLU）运算",
+        "operations:prelu": "根据掩码对源操作数矢量数据寄存器`src0`中的元素执行PReLU（Parametric ReLU）运算",
+        "traits:elementwise": "负半轴斜率由矢量数据寄存器`alpha`中的对应元素指定"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_prelu.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md",
+      "document_sha256": "a4a4adcc902aeb84abe9e36014d50ed65d4398e1d3af0dd82599f7fb5f87d07b",
+      "description": {
+        "value": "根据掩码对源矢量按元素执行ReLU操作，大于等于0的元素保留原值、小于0的元素置0，结果写入dst或通过函数返回值返回，支持half、int32_t与float类型，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md",
+            "excerpt": "根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "relu"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。计算公式如下：",
+        "operations:relu": "根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。计算公式如下：",
+        "traits:elementwise": "根据`mask`对源操作数`src`按元素执行ReLU操作，得到计算结果。计算公式如下："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_fused/asc_relu.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md",
+      "document_sha256": "28b66722729ee855283d1fc15eddca42865f3f523bf6b23cd9f3373f1fd41770",
+      "description": {
+        "value": "按index矢量寄存器保存的逐元素索引从源矢量数据寄存器中选取元素写入目的矢量对应位置，不使用掩码，索引超出寄存器可存储元素个数时按模VL_T回绕，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md",
+            "excerpt": "根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md",
+            "excerpt": "按 `index` 矢量寄存器中保存的逐元素索引，从`src`矢量数据寄存器中选择对应位置的元素写入`dst`对应位置，不使用掩码。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md",
+            "excerpt": "如果`index`中索引值超出当前矢量数据寄存器中能存储的最大元素个数时，按照如下方式处理：设定当前矢量数据寄存器所能存储的最大数据元素个数为`VL_T`, `index`中索引值为`i`，索引值更新为`i % VL_T`。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "gather"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据索引位置`index`将源操作数`src`按元素收集到目的操作数`dst`中。",
+        "operations:gather": "按 `index` 矢量寄存器中保存的逐元素索引，从`src`矢量数据寄存器中选择对应位置的元素写入`dst`对应位置，不使用掩码。",
+        "traits:elementwise": "按 `index` 矢量寄存器中保存的逐元素索引，从`src`矢量数据寄存器中选择对应位置的元素写入`dst`对应位置，不使用掩码。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_gather/asc_gather.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md",
+      "document_sha256": "b15bd262543fdad22e778b9a2fe1ac11c1cdf55007ae593e6908ab0ca43c9e5d",
+      "description": {
+        "value": "对输入矢量数据寄存器中的元素进行累计频率统计生成累计直方图，统计结果在dst原有数据基础上累加，支持低位BIN0与高位BIN1两种累计阈值模式，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md",
+            "excerpt": "对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md",
+            "excerpt": "`dst[n]`累加`src`中取值不大于`n`的元素个数，累计阈值范围为[0, 127]。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "histogram"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。",
+        "operations:histogram": "对输入矢量数据寄存器中的元素进行累计频率统计，生成累计直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_cumulative_histogram.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md",
+      "document_sha256": "3f00b945a4795bb870bef0062bf86aa870b8c0ebc6a6cdebcdd3b86e0729630e",
+      "description": {
+        "value": "对输入矢量数据寄存器中的元素进行频率统计生成直方图，统计结果在dst原有数据基础上累加，支持低位BIN0与高位BIN1两种数值区间统计模式，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md",
+            "excerpt": "对输入矢量数据寄存器中的元素进行频率统计，生成直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md",
+            "excerpt": "统计`src`中数值在[0, 127]范围内的出现次数，并累加进`dst`。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "histogram"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "对输入矢量数据寄存器中的元素进行频率统计，生成直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。",
+        "operations:histogram": "对输入矢量数据寄存器中的元素进行频率统计，生成直方图。统计结果在目的矢量数据寄存器原有数据基础上累加。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_histogram/asc_frequency_histogram.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md",
+      "document_sha256": "9a4382becb9ec06de760850bacb17e3e594ac9461055fb4f35ac5385d0a2d056",
+      "description": {
+        "value": "以传入标量value为起始值在矢量数据寄存器中生成按1逐步递增或递减的索引序列，整型结果超出类型可表示范围时回绕且不触发异常，支持递增与递减两种模式，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md",
+            "excerpt": "以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md",
+            "excerpt": "整型dtype（int8_t、int16_t、int32_t）结果在超出该dtype可表示范围时回绕（wrap-around），不触发异常。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "fill"
+        ],
+        "traits": [
+          "scalar_operand"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中",
+        "operations:fill": "以传入的`value`为起始值，生成递增/递减的索引，并将生成的索引保存在`dst`中",
+        "traits:scalar_operand": "源操作数（标量），dtype须与dst一致。作为递增序列的起点，序列第0个元素等于value，后续元素按1递增。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_index/asc_arange.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md",
+      "document_sha256": "63571d3a35dcd1f7eae84ccf0370c43906457b7779d79fab27ebb53bb7bc2c1b",
+      "description": {
+        "value": "对两个矢量数据寄存器或掩码寄存器执行按位与操作，矢量模式按dtype位宽、掩码模式按bit粒度逐位计算，结果经函数返回值或目的操作数输出，掩码为0的位写0，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md",
+            "excerpt": "根据`mask`对源操作数`src0`、`src1`执行按位与（&）操作，将结果作为返回值返回或写入目的操作数`dst`。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md",
+            "excerpt": "矢量数据寄存器按位与：对两个矢量数据寄存器按`dtype`位宽执行按位与（&），结果为矢量数据寄存器。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_and"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对源操作数`src0`、`src1`执行按位与（&）操作，将结果作为返回值返回或写入目的操作数`dst`。",
+        "operations:bitwise_and": "根据`mask`对源操作数`src0`、`src1`执行按位与（&）操作，将结果作为返回值返回或写入目的操作数`dst`。",
+        "traits:elementwise": "dst_i = src0_i \\& src1_i"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_and.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md",
+      "document_sha256": "63f6f14ff0fdbb89bbcb53054aff34fa70d9896b52945d9e9ae9b90a04624804",
+      "description": {
+        "value": "对矢量数据寄存器或掩码寄存器执行按位取反操作，矢量模式按dtype位宽、掩码模式按bit粒度逐位取反，结果经函数返回值或目的操作数输出，掩码为0的位写0，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md",
+            "excerpt": "根据`mask`对源操作数`src`执行按位取反操作，将结果作为返回值返回或写入目的操作数`dst`。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md",
+            "excerpt": "矢量数据寄存器按位取反：对矢量数据寄存器执行按`dtype`位宽按位取反，结果为矢量数据寄存器。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_not"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对源操作数`src`执行按位取反操作，将结果作为返回值返回或写入目的操作数`dst`。",
+        "operations:bitwise_not": "根据`mask`对源操作数`src`执行按位取反操作，将结果作为返回值返回或写入目的操作数`dst`。",
+        "traits:elementwise": "dst_i = \\sim src_i"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_not.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md",
+      "document_sha256": "a33736e06cbbe529c6331f1235d09131845328e1a3c6169a0838114977cf5ffe",
+      "description": {
+        "value": "对两个矢量数据寄存器或掩码寄存器执行按位或操作，矢量模式按dtype位宽、掩码模式按bit粒度逐位计算，结果经函数返回值或目的操作数输出，掩码为0的位写0，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md",
+            "excerpt": "根据`mask`对源操作数`src0`、`src1`执行按位或（|）操作，将结果作为返回值返回或写入目的操作数`dst`。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md",
+            "excerpt": "矢量数据寄存器按位或：对两个矢量数据寄存器按`dtype`位宽执行按位或（|），结果为矢量数据寄存器。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_or"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对源操作数`src0`、`src1`执行按位或（|）操作，将结果作为返回值返回或写入目的操作数`dst`。",
+        "operations:bitwise_or": "根据`mask`对源操作数`src0`、`src1`执行按位或（|）操作，将结果作为返回值返回或写入目的操作数`dst`。",
+        "traits:elementwise": "dst_i = src0_i \\,|\\, src1_i"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_or.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md",
+      "document_sha256": "97806ea40c496e6cb2c621d1e345409e6c327709ca341a64bf66efadcd0e6c97",
+      "description": {
+        "value": "根据掩码对矢量数据寄存器元素执行左移，移位量由shift矢量寄存器中对应元素逐元素指定，无符号整数执行逻辑左移、有符号整数执行算术左移，位移量不支持负数，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md",
+            "excerpt": "根据掩码对源操作数矢量数据寄存器中的元素执行左移，左移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md",
+            "excerpt": "无符号整数：执行逻辑左移。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_shift"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据掩码对源操作数矢量数据寄存器中的元素执行左移，左移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "operations:bitwise_shift": "根据掩码对源操作数矢量数据寄存器中的元素执行左移，左移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "traits:elementwise": "根据掩码对源操作数矢量数据寄存器中的元素执行左移，左移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft_scalar.md",
+      "document_sha256": "b6795a48e318d12dc72bb090fed37f639b7f8d2f1b87ad673501f33be5e3d82d",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器元素统一左移由标量立即数指定的位数，无符号整数执行逻辑左移、有符号整数执行算术左移，位移量不支持负数，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft_scalar.md",
+            "excerpt": "根据掩码将源操作数矢量数据寄存器中的元素左移，左移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft_scalar.md",
+            "excerpt": "位移量（标量），类型为`int16_t`，不支持设置为负数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft_scalar.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_shift"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据掩码将源操作数矢量数据寄存器中的元素左移，左移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "operations:bitwise_shift": "根据掩码将源操作数矢量数据寄存器中的元素左移，左移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "traits:elementwise": "根据掩码将源操作数矢量数据寄存器中的元素左移，左移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "traits:scalar_operand": "位移量（标量），类型为`int16_t`，不支持设置为负数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftleft_scalar.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright.md",
+      "document_sha256": "f26cf15dd1857432655b592e31a82fc0e020a5a1d601c042c18e64b9a1abcc20",
+      "description": {
+        "value": "根据掩码对矢量数据寄存器元素执行右移，移位量由shift矢量寄存器中对应元素逐元素指定，无符号整数执行逻辑右移、有符号整数执行算术右移并复制符号位，位移量不支持负数，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright.md",
+            "excerpt": "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright.md",
+            "excerpt": "有符号整数：执行算术右移。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_shift"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "operations:bitwise_shift": "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "traits:elementwise": "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由矢量数据寄存器`shift`中对应元素指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md",
+      "document_sha256": "6d75a1513091f868758e8f3a423e8130eed5edbb3bc273f9eacc3161f902c067",
+      "description": {
+        "value": "根据掩码将矢量数据寄存器元素统一右移由标量立即数指定的位数，无符号整数执行逻辑右移、有符号整数执行算术右移并复制符号位，位移量不支持负数，仅在AIV上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md",
+            "excerpt": "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md",
+            "excerpt": "位移量（标量），类型为`int16_t`，不支持设置为负数。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md",
+            "excerpt": "本接口为Reg矢量计算接口，仅在AIV上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "bitwise_shift"
+        ],
+        "traits": [
+          "elementwise",
+          "scalar_operand"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "operations:bitwise_shift": "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "traits:elementwise": "根据掩码对源操作数矢量数据寄存器中的元素执行右移，右移位数由标量立即数指定，并将结果通过函数返回值返回或写入目的操作数。掩码对应位置为1的元素参与计算，为0的元素在输出结果中置零。计算公式如下：",
+        "traits:scalar_operand": "位移量（标量），类型为`int16_t`，不支持设置为负数。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_logic/asc_shiftright_scalar.md",
+            "excerpt": "Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。"
+          }
+        }
+      ]
+    }
+  ]
+}

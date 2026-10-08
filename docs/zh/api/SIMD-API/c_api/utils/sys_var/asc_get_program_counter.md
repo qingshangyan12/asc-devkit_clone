@@ -1,21 +1,13 @@
 ---
 okftype: reference.api
-title: asc_get_program_counter
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_program_counter.md
-description: 获取程序计数器的指针，程序计数器用于记录当前程序执行的位置，常用于调试时定位当前执行位置，也可配合asc_icache_preload将当前指令地址作为指令预取的起始地址。
+description: "获取程序计数器的指针，程序计数器记录当前程序执行位置，常用于调试定位，也可配合asc_icache_preload将当前指令地址作为指令预取起始地址，返回值有效地址位为0至47位，高16位为无效位需掩码清零。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - families: [system]
-signature:
-  - override_id: asc_get_program_counter__z
-archs: ['2201', '3510']
-header: [/include/c_api/utils/sys_var.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "将当前指令地址作为预取起始地址"
+version: 9.0.0-
 ---
 # asc_get_program_counter
 

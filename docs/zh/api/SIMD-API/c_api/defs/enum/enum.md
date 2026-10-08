@@ -1,23 +1,5 @@
 ---
 okftype: reference.index
-title: 枚举
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/enum.md
-navigation:
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_channel_pad_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_dual_dst_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_hf32_round_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_mutex_execute_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_override_strategy.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_position_quarter_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_relu_pre_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md
-  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_unit_flag_mode.md
-timestamp: '2026-09-28'
 ---
 # 枚举
 

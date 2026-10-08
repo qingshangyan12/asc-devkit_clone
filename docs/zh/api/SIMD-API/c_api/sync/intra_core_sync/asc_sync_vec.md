@@ -1,30 +1,20 @@
 ---
 okftype: reference.api
-title: asc_sync_vec
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_vec.md
-description: 针对PIPE_V执行同步操作的易用性接口，保证PIPE_V中前序指令（如矢量计算）全部完成后，PIPE_MTE2、PIPE_MTE3与PIPE_S的后续指令才能开始执行。无入参函数原型已废弃，请使用asc_sync执行针对所有流水的同步操作。
+description: "针对PIPE_V执行同步操作的易用性接口，保证PIPE_V中前序指令如矢量计算全部完成后，PIPE_MTE2、PIPE_MTE3与PIPE_S的后续指令才能开始执行；无入参函数原型已废弃，应改用asc_sync执行针对所有流水的同步操作，本接口只能在AIV中调用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
   - operations: [synchronization]
-  - execution_models: [scalar]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_sync_vec__i
-  - override_id: asc_sync_vec__z
-archs: ['2201', '3510']
-header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-    condition: 无入参函数原型`asc_sync_vec()`接口已废弃
+    kind: replaced_by
+    condition: "无入参函数原型已废弃"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
     kind: related
+    condition: "若手工同步"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
     kind: related
-    condition: 若手工同步
-examples: []
-timestamp: '2026-09-28'
+    condition: "若手工同步"
+version: 9.0.0-
 ---
 # asc_sync_vec
 

@@ -1,18 +1,6 @@
 ---
-okftype: reference.index
-title: 通用说明和约束
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-description: C API通用说明与约束页，介绍GM、UB、L1、L0A、L0B、L0C等存储单元的用途与容量注意事项，说明高维切分计算的地址重叠约束、dataBlockStride、repeatStride与掩码配置方法，以及以数组方式申请内存的约束。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [configuration]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_phy_buf_addr.md
-    kind: constrained_by
-  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md
-    kind: requires
-    condition: 调用此类接口后，如果后续需要调用高维切分计算接口
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "C API通用说明与约束页，介绍GM、UB、L1、L0A、L0B、L0C等存储单元的用途与容量注意事项，说明高维切分计算的通用地址重叠约束、dataBlockStride与repeatStride配置方法、掩码操作取值规则，以及以数组方式申请内存的使用约束。"
 ---
 # 通用说明和约束
 

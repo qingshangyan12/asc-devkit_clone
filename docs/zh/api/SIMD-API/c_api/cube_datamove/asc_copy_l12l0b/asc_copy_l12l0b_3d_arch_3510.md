@@ -1,46 +1,33 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0b_arch_3510（3D矩阵搬运）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md
-description: 将NC1HWC0格式的Feature Map按卷积步长、卷积核大小和膨胀系数完成Image to Column展开生成img2col二维矩阵，再从L1
-  Buffer选取指定数据块搬运到L0B Buffer，供3D卷积场景的矩阵计算加载数据，也可用于普通2D格式数据搬运。
+description: "将NC1HWC0格式的Feature Map按卷积步长、卷积核与膨胀系数完成Image to Column展开生成img2col二维矩阵，再从L1 Buffer选取指定数据块搬运到L0B Buffer，写入时自动转置，也可用于普通2D格式数据搬运，仅在AIC上执行有效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy, img2col, transpose]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0b_buffer]
-  - traits: [padding]
-signature:
-  - prototype_id: asc_copy_l12l0b__PCB<dtype>_PL1<dtype>_u16_u16_u16_u16_u8_u8_u8_u8_u8_u8_b_b_b_b_u16
-    dtype: [int8_t, uint8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, int16_t, uint16_t,
-      half, bfloat16_t, int32_t, uint32_t, float]
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
+  - traits: [aligned_transfer, padding]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md
-    kind: requires
-    condition: f_matrix_ctrl为false时
+    kind: related
+    condition: "f_matrix_ctrl设置为false时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md
-    kind: requires
-    condition: f_matrix_ctrl为false时
+    kind: related
+    condition: "f_matrix_ctrl设置为false时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md
-    kind: requires
-    condition: f_matrix_ctrl为false时
+    kind: related
+    condition: "f_matrix_ctrl设置为false时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: constrained_by
-    condition: 如果本指令与其他指令存在目的地址重叠
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+    condition: "如果本指令与其他指令存在目的地址重叠"
+version: 9.0.0-
 ---
 # asc_copy_l12l0b_arch_3510（3D矩阵搬运）
 

@@ -1,22 +1,15 @@
 ---
 okftype: reference.api
-title: asc_sync_wait
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-description: 与asc_sync_notify配对使用，实现AI Core内部不同流水之间的同步控制。目的流水执行到该指令时，若对应标志位为0则阻塞后续指令，为1则将标志位清0并放行后续指令，配对调用的参数必须完全一致。
+description: "与asc_sync_notify配对使用实现AI Core内部不同流水之间的同步控制，目的流水执行到该指令时若对应标志位为0则后续指令一直被阻塞，为1则将标志位清0并放行后续指令；配对调用的pipe、tpipe、id三个参数必须完全一致。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
   - operations: [synchronization]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_sync_wait__pipe_pipe_event
-archs: ['2201', '3510']
-header: [/include/c_api/sync/sync.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: requires
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/intra_core_sync_overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_sync_wait
 

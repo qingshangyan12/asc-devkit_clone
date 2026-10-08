@@ -1,30 +1,20 @@
 ---
 okftype: reference.api
-title: asc_set_l12l0a_3d_padding
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0a_3d_padding.md
-description: 设置3D格式分形矩阵搬运（im2col展开）指令使用的填充值，供f_matrix_ctrl为false的asc_copy_l12l0a 3D矩阵搬运接口使用，仅在AIC上生效。
+description: "设置3D格式分形矩阵搬运（im2col展开）指令使用的填充值，供f_matrix_ctrl为false时的asc_copy_l12l0a三维矩阵搬运使用，因底层寄存器与asc_set_gm2l1_padding共用，该值同时作为高维切分搬运的填充值，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - operations: [img2col]
   - traits: [padding]
-signature:
-  - prototype_id: asc_set_l12l0a_3d_padding__<dtype>
-    dtype: [int8_t, uint8_t, int16_t, uint16_t, half, bfloat16_t, int32_t, uint32_t,
-      float]
-  - override_id: asc_set_l12l0a_3d_padding__u64
-archs: ['2201', '3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md
     kind: configures
+    condition: "底层寄存器与asc_set_gm2l1_padding共用"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md
     kind: configures
-    condition: '`asc_copy_l12l0a`接口中的`f_matrix_ctrl`参数设置为`false`时'
+    condition: "f_matrix_ctrl参数设置为false时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_padding.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "底层使用相同寄存器"
+version: 9.0.0-
 ---
 # asc_set_l12l0a_3d_padding
 

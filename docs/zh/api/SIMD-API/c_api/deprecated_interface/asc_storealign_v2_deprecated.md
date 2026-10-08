@@ -1,29 +1,16 @@
 ---
 okftype: reference.api
-title: asc_storealign_pack_v2（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_storealign_v2_deprecated.md
-description: 已废弃的矢量搬运接口，将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），通过地址寄存器offset传入偏移量，请改用asc_storealign_pack_quarter实现此功能。
+description: "该接口已废弃，请使用asc_storealign_pack_quarter实现此功能；将矢量数据寄存器中由mask指示的有效32bit元素的低8bit数据压缩搬出到Unified Buffer（UB），通过地址寄存器offset传入偏移量，offset必须通过asc_update_addr_reg预先构造，目的起始地址需32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
-  - operations: [store]
-  - source_locations: [vector_register]
-  - destination_locations: [unified_buffer]
-  - traits: [deprecated, masked]
-signature:
-  - override_id: asc_storealign_pack_v2__PUi32_vi32_ar_vb
-  - override_id: asc_storealign_pack_v2__PUu32_vu32_ar_vb
-  - override_id: asc_storealign_pack_v2__PUf32_vf32_ar_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/store/storealign.h]
+  - operations: [compression, store]
+  - traits: [aligned_transfer]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
     kind: requires
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack_quarter.md
-    kind: related
-    condition: 实现此功能
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_storealign_pack_v2（废弃）
 

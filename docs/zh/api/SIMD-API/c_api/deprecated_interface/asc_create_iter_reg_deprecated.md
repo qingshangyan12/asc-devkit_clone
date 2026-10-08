@@ -1,33 +1,12 @@
 ---
 okftype: reference.api
-title: asc_create_iter_reg (废弃)
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_create_iter_reg_deprecated.md
-description: 已废弃接口，初始化地址寄存器并在循环中存储地址偏移量，支持1-4个offset参数和b8/b16/b32位宽寄存器以适配1-4维Tensor，请使用asc_update_addr_reg实现此功能。
+description: "已废弃接口，初始化地址寄存器并在循环中存储地址偏移量，支持1至4个offset参数与b8、b16、b32位宽寄存器以适配1至4维Tensor，底层在多维循环中自动计算地址偏移；请改用asc_update_addr_reg实现此功能。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - traits: [deprecated]
-signature:
-  - override_id: asc_create_iter_reg_b32__u32
-  - override_id: asc_create_iter_reg_b16__u32
-  - override_id: asc_create_iter_reg_b8__u32
-  - override_id: asc_create_iter_reg_b32__u32_u32
-  - override_id: asc_create_iter_reg_b16__u32_u32
-  - override_id: asc_create_iter_reg_b8__u32_u32
-  - override_id: asc_create_iter_reg_b32__u32_u32_u32
-  - override_id: asc_create_iter_reg_b16__u32_u32_u32
-  - override_id: asc_create_iter_reg_b8__u32_u32_u32
-  - override_id: asc_create_iter_reg_b32__u32_u32_u32_u32
-  - override_id: asc_create_iter_reg_b16__u32_u32_u32_u32
-  - override_id: asc_create_iter_reg_b8__u32_u32_u32_u32
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_addr_reg.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
-    kind: related
-    condition: 已废弃接口的替代实现
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_create_iter_reg (废弃)
 

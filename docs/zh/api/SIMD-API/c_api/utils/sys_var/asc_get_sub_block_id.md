@@ -1,22 +1,13 @@
 ---
 okftype: reference.api
-title: asc_get_sub_block_id
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_id.md
-description: 在分离模式下获取逻辑AI Core上Cube Core或Vector Core的逻辑索引并按int64_t返回，SubBlockIdx取值范围为0到SubBlockNum，SubBlockNum可通过GetSubBlockNum获取，本接口只读且不修改任何寄存器或存储状态。
+description: "在分离模式下获取逻辑AI Core上Cube Core或Vector Core的逻辑索引并按int64_t返回，SubBlockIdx取值范围为0至SubBlockNum，上界可通过GetSubBlockNum接口获取，本接口只读且不修改任何寄存器或存储状态。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - families: [system]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_get_sub_block_id__z
-archs: ['2201', '3510']
-header: [/include/c_api/utils/sys_var.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_sub_block_num.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "SubBlockNum用于确定SubBlockIdx取值范围上界"
+version: 9.1.0-
 ---
 # asc_get_sub_block_id
 

@@ -1,35 +1,13 @@
 ---
 okftype: reference.api
-title: asc_duplicate_merge
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_broadcast/asc_duplicate_merge.md
-description: merge模式下将源操作数src的最低位元素广播到目的操作数dst中被mask筛选的位置，未被mask筛选的元素保留原值，为仅在AIV上生效的Reg矢量计算接口。
+description: "在合并模式下将源矢量数据寄存器的最低位元素广播到目的矢量数据寄存器中被掩码筛选的位置，未被筛选的元素保留调用前的原值，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [broadcast]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked]
-signature:
-  - override_id: asc_duplicate_merge__Rvi8_vi8_vb
-  - override_id: asc_duplicate_merge__Rvu8_vu8_vb
-  - override_id: asc_duplicate_merge__Rvf8e8m0_vf8e8m0_vb
-  - override_id: asc_duplicate_merge__Rvf8e5m2_vf8e5m2_vb
-  - override_id: asc_duplicate_merge__Rvf8e4m3_vf8e4m3_vb
-  - override_id: asc_duplicate_merge__Rvi16_vi16_vb
-  - override_id: asc_duplicate_merge__Rvu16_vu16_vb
-  - override_id: asc_duplicate_merge__Rvf16_vf16_vb
-  - override_id: asc_duplicate_merge__Rvbf16_vbf16_vb
-  - override_id: asc_duplicate_merge__Rvi32_vi32_vb
-  - override_id: asc_duplicate_merge__Rvu32_vu32_vb
-  - override_id: asc_duplicate_merge__Rvf32_vf32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_broadcast.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_duplicate_merge
 

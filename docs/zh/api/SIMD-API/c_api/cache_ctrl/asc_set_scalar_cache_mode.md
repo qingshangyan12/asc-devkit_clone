@@ -1,35 +1,29 @@
 ---
 okftype: reference.api
-title: asc_set_scalar_cache_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_set_scalar_cache_mode.md
-description: 配置标量单元访问Global Memory时的L2 Cache管理策略：传入asc_load_l2_cache_mode枚举设置标量load策略，传入asc_store_l2_cache_mode枚举设置标量store策略，设置后持续生效直至再次调用本接口修改。
+description: "配置标量单元访问Global Memory时的L2 Cache管理策略，传入asc_load_l2_cache_mode枚举设置标量读策略，传入asc_store_l2_cache_mode枚举设置标量写策略，设置后持续生效直至再次调用修改，仅作用于标量访存路径，不改变向量搬运接口入参中的策略。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - families: [cache_management]
-signature:
-  - override_id: asc_set_scalar_cache_mode__loadl2
-  - override_id: asc_set_scalar_cache_mode__storel2
-archs: ['3510']
-header: [/include/c_api/cache_ctrl/cache_ctrl.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/atomic/scalar_atomic/scalar_atomic.md
     kind: configures
-    condition: 对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口有：
+    condition: "对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口"
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_datacache_preload.md
     kind: configures
-    condition: 对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口有：
+    condition: "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口"
   - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_icache_preload.md
     kind: configures
-    condition: 对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口有：
+    condition: "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口"
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_load_l2_cache_mode.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_store_l2_cache_mode.md
+    kind: related
   - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_load/asc_load_dev.md
     kind: configures
-    condition: 对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口有：
+    condition: "对于配置标量load接口的L2 Cache管理策略重载，作用范围内的接口"
   - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
     kind: configures
-    condition: 对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口有：
-examples: []
-timestamp: '2026-09-28'
+    condition: "对于配置标量store接口的L2 Cache管理策略重载，作用范围内的接口"
+version: 9.2.0-
 ---
 # asc_set_scalar_cache_mode
 

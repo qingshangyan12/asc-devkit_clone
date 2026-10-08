@@ -1,17 +1,11 @@
 ---
-okftype: reference.type
-title: asc_quant_mode
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_quant_mode.md
-description: 该类型别名表示L0C Buffer数据搬出时的类型转换或量化模式，并作为矩阵搬出接口quant_pre_mode参数的类型。
+okftype: reference.enum
+description: "表示L0C Buffer数据搬出时的类型转换或量化模式，作为矩阵搬出接口quant_pre_mode参数的类型，支持float或int32_t按Scalar与Tensor量化参数量化为多种低精度类型。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
   - traits: [quantization]
-declaration:
-  symbol: asc_quant_mode
-  target: QuantMode_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies: []
+version: 9.0.0-
 ---
 # asc_quant_mode
 

@@ -1,17 +1,14 @@
 ---
-okftype: reference.type
-title: asc_l13d_repeat_direction
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md
-description: 描述3D img2col搬运repeat迭代的方向选择，作为两个repeat配置接口的repeat_direction参数类型。
+okftype: reference.enum
+description: "表示3D img2col搬运的repeat迭代方向，支持沿height即M方向或width即K方向迭代，作为两个repeat配置接口repeat_direction参数的类型。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - operations: [img2col]
-declaration:
-  symbol: asc_l13d_repeat_direction
-  underlying_type: uint8_t
-header: [/include/c_api/defs/enum.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md
+    kind: related
+version: 9.0.0-
 ---
 # asc_l13d_repeat_direction
 

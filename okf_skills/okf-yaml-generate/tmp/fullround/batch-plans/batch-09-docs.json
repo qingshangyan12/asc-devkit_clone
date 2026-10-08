@@ -1,0 +1,102 @@
+[
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1/asc_copy_gm2l1_highdim_split_arch_3510.md",
+  "sha256": "056212dd8915b7959e9760e2665f7a1258c236991ecff2bcadedf9ed20cbcafd"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md",
+  "sha256": "e41542733212371d6363fc1f816e0faff2b99c10da2fc0785cffcab7fa30795f"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md",
+  "sha256": "a8d9f405a11648433901d4d97e1c91088f512e1e68a06b4a5070e27617fffdc0"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_2201.md",
+  "sha256": "50bbb899583bed3356f13489ba0801bb54878e4bd9b27464e4bc13e634f4e1e3"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md",
+  "sha256": "e6eba3b47a3cd1af360fe94228a860a93347d86b885015d4bdbea6d89ad4338d"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_2201.md",
+  "sha256": "f195b6908f3797985e5035dc40de23f7872d7e62299950e651f74baaa11ecd9e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md",
+  "sha256": "12f737071622e515a1a01c0d188d54713a89b2084184a4a9857f66c42c203c05"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_2201.md",
+  "sha256": "d3d4704a6f49873f300efc299a696ecdeaf8d089215250872068ac5e9e02f08b"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md",
+  "sha256": "b5a3b26d599997e7064fc7c3785769beb2f91f43d2d754b46b3030cfc1d7220e"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md",
+  "sha256": "a1d5dde40aa8b717838a47764697a45405a2325a3be4cc7be6ed516df28edc15"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_2201.md",
+  "sha256": "0ee547721599b6b96c6aa62d22c4cf8641f880b7b42e57122192317bd26e5300"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md",
+  "sha256": "241cd1f6c9d977e1bd44f029418b8c1e1a8e842e83ec2101351def92a97d8ffc"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_2201.md",
+  "sha256": "2f6e39ae82dc428efedfc7316773a8a5fb6c1c7fc9cfc804cf36713b235ef2d9"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md",
+  "sha256": "f28ddf1731333aa9a940fcb52eeae76be2ed62bc9fbe06344180e64c95e57a7a"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12gm.md",
+  "sha256": "001e250c5b9d0ca2d31b7ef69b5e005e96945855a390f22340fbc9c8f2938672"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_2d_arch_3510.md",
+  "sha256": "41d5e7b6ceb79a33d132cf90fda70e7d05b227b98660903c9b0e5a99259ad1a3"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md",
+  "sha256": "1bfb408cd52bd35ec0684a9c1a5559434837f755c07e9c2afae01108797a6df2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md",
+  "sha256": "a9d8268cadcd5e2523b49191a9ee96a55a5939b0797086818f80ec3883cdb8cf"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_mx.md",
+  "sha256": "36293e34289f806da258903ba628ffeaa485c5f41ab5b07a5541286579377192"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a_trans.md",
+  "sha256": "c8855efd4d37cd41adb3d1d0aaf3066dcac4445911947bc7c4a0ed98b2f794df"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_2d_arch_3510.md",
+  "sha256": "944e167ad5213dc27ef1187f1e575258d0b4b864acdb4e346ada07af144a46ba"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md",
+  "sha256": "3a4c280e52d963812c050f889aee6027fef2c11248817f3501bf992392514bca"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md",
+  "sha256": "bdeda2b1929c109c0f067d889bd616fa06e311ff718bcf93ee32692a54383bdb"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md",
+  "sha256": "07469574f667334da7ce03f6f78b655cb11182c99091f712359430141dfb62e2"
+ },
+ {
+  "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md",
+  "sha256": "4bc70c1c34d60533a283ee8a1ded9c3dd92ebb11de0a56fc7e719fc477bf1e52"
+ }
+]

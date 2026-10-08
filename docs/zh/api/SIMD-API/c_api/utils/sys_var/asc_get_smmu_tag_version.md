@@ -1,20 +1,10 @@
 ---
 okftype: reference.api
-title: asc_get_smmu_tag_version
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/utils/sys_var/asc_get_smmu_tag_version.md
-description: 获取系统内存管理单元SMMU的版本信息并按int64_t返回，返回值按比特位编码版本标签，其中包含年、月、日和同一日期的子版本字段，常用于运行时判断当前SMMU的版本或发布日期以进行版本相关的处理。
+description: "获取系统内存管理单元SMMU的版本信息并按int64_t返回，返回值按比特位编码年、月、日及同日子版本等标签字段，常用于运行时判断当前SMMU的版本或发布日期，以便进行版本相关的处理。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
-  - families: [system]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_get_smmu_tag_version__z
-archs: ['2201', '3510']
-header: [/include/c_api/utils/sys_var.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.1.0-
 ---
 # asc_get_smmu_tag_version
 

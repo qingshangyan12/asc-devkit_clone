@@ -1,9 +1,6 @@
 ---
-okftype: reference.index
-title: 矩阵计算单元
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_compute/overview/cube_compute_unit.md
-navigation: []
-timestamp: '2026-09-28'
+okftype: reference.concept
+description: "介绍矩阵计算单元的硬件结构与存储配置：Cube计算单元专用于矩阵运算，直接访问L0A、L0B、L0C三类专用缓存，分别存储左矩阵、右矩阵与初始化累加值及计算结果，并说明L1、Fixpipe、BiasTable等关联存储单元的用途。"
 ---
 # 矩阵计算单元
 

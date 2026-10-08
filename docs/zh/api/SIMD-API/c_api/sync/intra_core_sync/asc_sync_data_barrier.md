@@ -1,20 +1,11 @@
 ---
 okftype: reference.api
-title: asc_sync_data_barrier
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md
-description: 阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成。通过arg参数指定阻塞作用的内存范围，可等待全部内存访问指令，或仅等待GM、UB的访问指令。
+description: "阻塞后续指令的执行，直到此前已发出但尚未完成的内存访问指令全部执行完成，可通过参数指定阻塞作用的内存范围，支持等待全部、GM或UB的访问指令；DSB_ALL仅覆盖GM与Unified Buffer访问，不包括L0C Buffer、L1 Buffer等其他内存位置。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [control]
   - operations: [synchronization]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_sync_data_barrier__memdsb
-archs: ['2201', '3510']
-header: [/include/c_api/sync/sync.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.1.0-
 ---
 # asc_sync_data_barrier
 

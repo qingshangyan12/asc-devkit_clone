@@ -1,27 +1,14 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0c
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0c.md
-description: 将矩阵由L1 Buffer搬运到L0C Buffer中，支持bfloat16_t、half、float、int32_t、uint32_t等多种源与目的数据类型组合，多条指令目的地址重叠时需插入同步指令保证串行化。
+description: "将矩阵由L1 Buffer搬运到L0C Buffer，支持多种源与目的数据类型组合，搬运中可将float数据转为half或bfloat16_t，数据块长度以32字节为单位，多条指令目的地址重叠时须插入同步指令保证串行化。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [conversion, copy]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0c_buffer]
-signature:
-  - override_id: asc_copy_l12l0c__PCCbf16_PL1bf16_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c__PCCf16_PL1f16_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c__PCCf16_PL1f32_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c__PCCbf16_PL1f32_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c__PCCf32_PL1f32_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c__PCCi32_PL1i32_u16_u16_u16_u16
-  - override_id: asc_copy_l12l0c__PCCu32_PL1u32_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [datablock_granularity]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_copy_l12l0c
 

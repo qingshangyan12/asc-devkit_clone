@@ -1,24 +1,16 @@
 ---
 okftype: reference.api
-title: asc_set_saturation_flag
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
-description: 按饱和模式类型设置对应饱和开关，FLOAT、FLOAT8、INT、CAST各模式下开关的语义不同，CAST模式还需饱和策略为USE_GLOBAL才会生效。
+description: "按饱和模式类型设置对应饱和开关，enable_sat表示是否开启饱和，FLOAT、FLOAT8、INT与CAST各模式下开关语义不同，INT关闭为截断，CAST仅在饱和策略为USE_GLOBAL时生效，对FLOAT开启饱和前需先开启全局饱和配置。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - execution_models: [scalar]
-signature:
-  - override_id: asc_set_saturation_flag__saturation_b
-archs: ['3510']
-header: [/include/c_api/spr/spr.h]
+  - traits: [saturation_mode]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/defs/enum/asc_saturation_mode.md
     kind: related
   - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
     kind: requires
-    condition: 当对`FLOAT`开启饱和模式前
-examples: []
-timestamp: '2026-09-28'
+    condition: "对FLOAT开启饱和前需先开启全局饱和配置方可生效；CAST模式须策略为USE_GLOBAL才生效"
+version: 9.2.0-
 ---
 # asc_set_saturation_flag
 

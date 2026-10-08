@@ -1,48 +1,19 @@
 ---
 okftype: reference.api
-title: asc_set_l0c_copy_nz_para
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_nz_para.md
-description: 在L0C Buffer搬出接口启用随路Nz转ND/DN格式功能时，配置矩阵数量、源相邻Nz矩阵偏移和目的相邻ND/DN矩阵偏移等格式转换参数，仅在AIC上生效。
+description: "在L0C Buffer搬出接口启用随路Nz转ND或Nz转DN格式功能时，配置矩阵数量、源相邻Nz矩阵偏移和目的相邻ND或DN矩阵偏移等格式转换参数，必须在搬出接口执行前调用，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-  - operations: [layout_transform]
-signature:
-  - override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md
     kind: configures
-    condition: 需要进行随路Nz转ND/DN格式之前，即搬出接口内参数`enable_nz2nd`与`enable_nz2dn`其一设置为`true`时
+    condition: "需要进行随路Nz转ND/DN格式，即enable_nz2nd或enable_nz2dn其一设置为true时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2l1/asc_copy_l0c2l1_arch_3510.md
     kind: configures
-    condition: 需要进行随路Nz转ND/DN格式之前，即搬出接口内参数`enable_nz2nd`与`enable_nz2dn`其一设置为`true`时
+    condition: "需要进行随路Nz转ND/DN格式，即enable_nz2nd或enable_nz2dn其一设置为true时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md
     kind: configures
-    condition: 需要进行随路Nz转ND/DN格式之前，即搬出接口内参数`enable_nz2nd`与`enable_nz2dn`其一设置为`true`时
-examples:
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/load_data_l12l0_950
-    file: load_data_l12l0_950.asc
-    archs: ['3510']
-    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul
-    file: matmul.asc
-    archs: ['3510']
-    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
-    file: mmad_s1.h
-    archs: ['3510']
-    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad
-    file: mmad_s2.h
-    archs: ['3510']
-    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
-  - path: /examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx
-    file: mmad_mx.asc
-    archs: ['3510']
-    override_id: asc_set_l0c_copy_nz_para__u16_u16_u32
-timestamp: '2026-09-28'
+    condition: "需要进行随路Nz转ND/DN格式，即enable_nz2nd或enable_nz2dn其一设置为true时"
+version: 9.0.0-
 ---
 # asc_set_l0c_copy_nz_para
 

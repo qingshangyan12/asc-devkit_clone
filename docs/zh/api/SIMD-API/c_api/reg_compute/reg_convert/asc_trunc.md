@@ -1,33 +1,16 @@
 ---
 okftype: reference.api
-title: asc_trunc
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_trunc.md
-description: 将源操作数中的浮点数元素按照TRUNC模式向零方向截断到整数值，即丢弃小数部分取整，结果保持原浮点数据类型，未被掩码筛选的元素置零，仅在AIV上生效。
+description: "将源操作数中的浮点数元素按TRUNC模式向零方向截断到整数值，即丢弃小数部分取整，结果保持原浮点数据类型，未被掩码筛选的元素置零，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [elementwise, masked, rounding_mode]
-signature:
-  - prototype_id: asc_trunc__v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-  - prototype_id: asc_trunc__Rv<dtype>_v<dtype>_vb
-    dtype: [half, bfloat16_t, float]
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [rounding_mode]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_trunc
 

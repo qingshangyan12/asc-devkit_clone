@@ -1,19 +1,11 @@
 ---
 okftype: reference.api
-title: asc_get_l0c2gm_prequant
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_get_l0c2gm_prequant.md
-description: 在数据搬运过程中进行随路量化时，通过调用该接口获取量化操作前矢量的起始地址，无输入参数，返回值即为该起始地址。
+description: "在数据搬运随路量化场景下查询量化操作前矢量的起始地址，无输入参数，返回值即该起始地址，供随路量化流程使用。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [query]
   - traits: [quantization]
-signature:
-  - override_id: asc_get_l0c2gm_prequant__z
-archs: ['2201']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies: []
-examples: []
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_get_l0c2gm_prequant
 

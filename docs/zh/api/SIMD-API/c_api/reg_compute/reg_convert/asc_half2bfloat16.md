@@ -1,33 +1,14 @@
 ---
 okftype: reference.api
-title: asc_half2bfloat16
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2bfloat16.md
-description: 根据mask将矢量数据寄存器中参与计算的half元素转换为bfloat16_t类型并写入dst，支持rd、rn、rna、ru、rz多种舍入模式。
+description: "根据掩码将矢量数据寄存器中参与计算的half元素转换为bfloat16_t类型并写入目的操作数，支持rd、rn、rna、ru、rz五种舍入模式，源与目的位宽相同，掩码位为0时目的对应元素置0，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - source_locations: [vector_register]
-  - destination_locations: [vector_register]
-  - traits: [masked, rounding_mode]
-signature:
-  - override_id: asc_half2bfloat16_rd__Rvbf16_vf16_vb
-  - override_id: asc_half2bfloat16_rn__Rvbf16_vf16_vb
-  - override_id: asc_half2bfloat16_rna__Rvbf16_vf16_vb
-  - override_id: asc_half2bfloat16_ru__Rvbf16_vf16_vb
-  - override_id: asc_half2bfloat16_rz__Rvbf16_vf16_vb
-  - override_id: asc_half2bfloat16_rd__vf16_vb
-  - override_id: asc_half2bfloat16_rn__vf16_vb
-  - override_id: asc_half2bfloat16_rna__vf16_vb
-  - override_id: asc_half2bfloat16_ru__vf16_vb
-  - override_id: asc_half2bfloat16_rz__vf16_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [rounding_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: 9.0.0-
 ---
 # asc_half2bfloat16
 

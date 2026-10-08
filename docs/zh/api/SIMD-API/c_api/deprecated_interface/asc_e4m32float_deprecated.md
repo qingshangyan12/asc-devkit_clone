@@ -1,27 +1,14 @@
 ---
 okftype: reference.api
-title: asc_e4m32float（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_e4m32float_deprecated.md
-description: 将fp8_e4m3fn_t类型转化为float类型，源与目的操作数位宽比为1:4，读取时将一个VL大小的数据分为四部分并根据接口选取索引位置；无显式位置参数原型已废弃，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将fp8_e4m3fn_t类型转化为float类型，因位宽比为1:4读取时需将一个VL大小的数据分为四部分并按接口选取索引；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, widening_result]
-signature:
-  - override_id: asc_e4m32float__Rvf32_vf8e4m3_vb
-  - override_id: asc_e4m32float_v2__Rvf32_vf8e4m3_vb
-  - override_id: asc_e4m32float_v3__Rvf32_vf8e4m3_vb
-  - override_id: asc_e4m32float_v4__Rvf32_vf8e4m3_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_e4m32float.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_e4m32float（废弃）
 

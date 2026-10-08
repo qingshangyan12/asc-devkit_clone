@@ -1,25 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int322int64（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int322int64_deprecated.md
-description: 已废弃的类型转换接口，根据mask将src中每个int32_t元素转换为int64_t写入矢量数据寄存器，源与目的位宽比为1:2，请改用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，根据mask将src中每个int32_t元素转换为int64_t类型写入dst，因位宽比为1:2读取时需将一个VL大小的数据分为两部分并按接口后缀选取奇偶索引；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, widening_result]
-signature:
-  - override_id: asc_int322int64__Rvi64_vi32_vb
-  - override_id: asc_int322int64_v2__Rvi64_vi32_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int322int64.md
-    kind: related
-    condition: 该接口位置后缀原型已废弃，作为替代使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_int322int64（废弃）
 

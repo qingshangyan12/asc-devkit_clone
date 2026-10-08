@@ -1,26 +1,14 @@
 ---
 okftype: reference.api
-title: asc_int82int16（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_int82int16_deprecated.md
-description: 已废弃的类型转换接口，将int8_t类型数据转换为int16_t类型，源与目的类型位宽比为1:2，读取数据时需将一个VL大小的数据分为两部分并根据接口选择索引为奇数或偶数的位置，请使用显式位置参数重载替代。
+description: "已废弃的矢量转换接口，将int8_t类型数据转换为int16_t类型，因位宽比为1:2读取时需将一个VL大小的数据分为两部分并按接口后缀选取奇偶索引；请改用显式位置参数重载替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [compute]
   - operations: [conversion]
-  - objects: [vector]
-  - execution_models: [register_vector]
-  - traits: [deprecated, masked, widening_result]
-signature:
-  - override_id: asc_int82int16__Rvi16_vi8_vb
-  - override_id: asc_int82int16_v2__Rvi16_vi8_vb
-archs: ['3510']
-header: [/include/c_api/reg_compute/reg_convert.h]
+  - traits: [widening_result]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_int82int16.md
-    kind: related
-    condition: 接口后缀控制写入位置的原型已废弃，作为替代方案使用
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_int82int16（废弃）
 

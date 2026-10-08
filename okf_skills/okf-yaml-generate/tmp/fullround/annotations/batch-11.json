@@ -1,0 +1,879 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md",
+      "document_sha256": "d444c757ae5645b20a1d757f5fee5e59b1a452faa5a6b164cf7919867e73e710",
+      "description": {
+        "value": "设置3D格式分形矩阵搬运（im2col展开）指令使用的填充值，供f_matrix_ctrl参数为true的asc_copy_l12l0b 3D矩阵搬运接口使用，支持多种数据类型与64位配置寄存器两种传入形式，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md",
+            "excerpt": "用于调用[asc_copy_l12l0b_arch_3510（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md",
+            "excerpt": "当`asc_copy_l12l0b`接口中的`f_matrix_ctrl`参数设置为`true`时，3D格式分形矩阵搬运（im2col展开）场景会使用本接口设置的值作为填充值。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md",
+            "excerpt": "本接口为矩阵3D格式搬入相关配置接口，仅在AIC上生效。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "用于调用[asc_copy_l12l0b_arch_3510（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)时设置3D格式分形矩阵搬运（im2col展开）搬运指令使用的填充值。",
+        "traits:padding": "当`asc_copy_l12l0b`接口中的`f_matrix_ctrl`参数设置为`true`时，3D格式分形矩阵搬运（im2col展开）场景会使用本接口设置的值作为填充值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md",
+          "kind": "configures",
+          "condition": "当asc_copy_l12l0b接口的f_matrix_ctrl参数设置为true时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l12l0b_3d_padding.md",
+            "excerpt": "当`asc_copy_l12l0b`接口中的`f_matrix_ctrl`参数设置为`true`时，3D格式分形矩阵搬运（im2col展开）场景会使用本接口设置的值作为填充值。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md",
+      "document_sha256": "eccfa6c99ddfd37d6e1374840dc9d45f27bfcbdb0b4c6c98bbc884e999d2d428",
+      "description": {
+        "value": "配置3D img2col搬运模式下左矩阵的Feature Map宽高与四侧padding属性参数，供f_matrix_ctrl为false的asc_copy_l12l0a 3D搬运接口使用，配置持续生效直至再次调用覆盖，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下左矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`false`的[asc_copy_l12l0a（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)接口使用。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md",
+            "excerpt": "| pad_left | 输入 | 左侧padding大小，取值范围：[0, 255]。 |"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于配置3D img2col搬运模式下左矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`false`的[asc_copy_l12l0a（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)接口使用。",
+        "traits:padding": "| pad_left | 输入 | 左侧padding大小，取值范围：[0, 255]。 |"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md",
+          "kind": "configures",
+          "condition": "3D搬运接口的参数f_matrix_ctrl取值为false时配置才会生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下左矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`false`的[asc_copy_l12l0a（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)接口使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix.md",
+            "excerpt": "详细说明请参见[asc_l13d_fmatrix_config](../defs/union/asc_l13d_fmatrix_config.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md",
+      "document_sha256": "02c6993d5685ee4e7039906c3385a37370d97b49bc6390d199ad7e9953832b8a",
+      "description": {
+        "value": "配置3D img2col搬运模式下右矩阵的Feature Map宽高与四侧padding属性参数，供f_matrix_ctrl为true的asc_copy_l12l0b 3D搬运接口使用，配置持续生效直至再次调用覆盖，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下右矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md",
+            "excerpt": "| pad_left | 输入 | 左侧padding大小，取值范围：[0, 255]。 |"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于配置3D img2col搬运模式下右矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。",
+        "traits:padding": "| pad_left | 输入 | 左侧padding大小，取值范围：[0, 255]。 |"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md",
+          "kind": "configures",
+          "condition": "3D搬运接口的参数f_matrix_ctrl取值为true时配置才会生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下右矩阵的Feature Map属性描述参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_l13d_fmatrix_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_fmatrix_b.md",
+            "excerpt": "详细说明请参见[asc_l13d_fmatrix_config](../defs/union/asc_l13d_fmatrix_config.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md",
+      "document_sha256": "9f5954dfb52f812e0648daea8fc216e17746f8b5ac2d58cc59f8d155c314514a",
+      "description": {
+        "value": "配置3D img2col搬运模式下repeat模式搬运左矩阵所需的重复步长、迭代次数、迭代方向与目的步长参数，供f_matrix_ctrl为false的asc_copy_l12l0a 3D搬运接口使用，迭代次数为0时对应搬运为空操作，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运左矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`false`的[asc_copy_l12l0a（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)接口使用。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md",
+            "excerpt": "`0`表示不执行搬运，3D搬运接口被视为NOP（空操作）。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运左矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`false`的[asc_copy_l12l0a（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)接口使用。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md",
+          "kind": "configures",
+          "condition": "3D搬运接口的参数f_matrix_ctrl取值为false时配置才会生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运左矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`false`的[asc_copy_l12l0a（3D矩阵搬运）](asc_copy_l12l0a/asc_copy_l12l0a_3d_arch_3510.md)接口使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md",
+            "excerpt": "[asc_l13d_repeat_direction](../defs/enum/asc_l13d_repeat_direction.md)类型枚举值，表示repeat方向。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/union/asc_load3d_v2_config.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt.md",
+            "excerpt": "位域结构体配置说明请参考[asc_load3d_v2_config](../defs/union/asc_load3d_v2_config.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md",
+      "document_sha256": "2127fc19cb0fd64069cb41f24503d9f9c08dd1afc742572a24b4ac1b1e9c40e9",
+      "description": {
+        "value": "配置3D img2col搬运模式下repeat模式搬运右矩阵所需的重复步长、迭代次数、迭代方向与目的步长参数，供f_matrix_ctrl为true的asc_copy_l12l0b 3D搬运接口使用，迭代次数为0时对应搬运为空操作，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运右矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md",
+            "excerpt": "`0`表示不执行搬运，3D搬运接口被视为NOP（空操作）。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运右矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md",
+          "kind": "configures",
+          "condition": "3D搬运接口的参数f_matrix_ctrl取值为true时配置才会生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运右矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/defs/enum/asc_l13d_repeat_direction.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md",
+            "excerpt": "[asc_l13d_repeat_direction](../defs/enum/asc_l13d_repeat_direction.md)类型枚举值，表示repeat方向。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md",
+      "document_sha256": "e5d25663803a90e476bf44e21fe73ba1ad358ff49bf79cc217603cad78e84fcc",
+      "description": {
+        "value": "设置asc_copy_l12l0a和asc_copy_l12l0b的3D格式搬运接口在L1 Buffer的边界值，单位为字节，非0场景边界值不能小于1024，设置为0表示无边界，源操作数地址超出边界时将从L1 Buffer起始地址开始读取数据。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md",
+            "excerpt": "设置[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md",
+            "excerpt": "如果value设置为0，则表示无边界，asc_copy_l12l0a/asc_copy_l12l0b接口可使用整个L1 Buffer。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "设置[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md",
+            "excerpt": "设置[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md",
+            "excerpt": "设置[asc_copy_l12l0a](asc_copy_l12l0a/asc_copy_l12l0a_arch_2201.md)/[asc_copy_l12l0b](asc_copy_l12l0b/asc_copy_l12l0b_arch_2201.md)的3D格式搬运接口在L1 Buffer的边界值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_size.md",
+            "excerpt": "操作数地址对齐约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md",
+      "document_sha256": "2b29dfc1d27625e0d10002d1179a6a051d18e43c678985bbcea2381970a5b659",
+      "description": {
+        "value": "通过64位配置参数配置3D img2col搬运模式下repeat模式搬运右矩阵所需的参数，接口不检查或转换字段值、需调用者自行拼装比特位，供f_matrix_ctrl为true的asc_copy_l12l0b 3D搬运接口使用，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运右矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md",
+            "excerpt": "| config | 输入 | repeat模式相关配置。接口不检查或转换字段值，需按照表2完成拼装。 |"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运右矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md",
+          "kind": "configures",
+          "condition": "3D搬运接口的参数f_matrix_ctrl取值为true时配置才会生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md",
+            "excerpt": "本接口用于配置3D img2col搬运模式下使用repeat模式搬运右矩阵时所需的参数，该配置供参数`f_matrix_ctrl`取值为`true`的[asc_copy_l12l0b（3D矩阵搬运）](asc_copy_l12l0b/asc_copy_l12l0b_3d_arch_3510.md)接口使用。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l13d_rpt_b.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l3d_rpt_b.md",
+            "excerpt": "`asc_set_l3d_rpt_b`需要调用者自行拼装64位配置。相同功能推荐使用参数化接口[asc_set_l13d_rpt_b](asc_set_l13d_rpt_b.md)，以下示例使用该接口配置右矩阵的repeat参数。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_input_move_constraint.md",
+      "document_sha256": "d02711e45b12978723a30c9f7e5fb53bf543b2f678b9d1df5ddcbf9a1b00fb6d",
+      "description": {
+        "value": "汇总矩阵计算输入搬运的对齐约束、搬运粒度、分形排布与数据类型约束，覆盖GM到L1及L1到L0A、L0B通路，并按产品归纳常用与扩展分形转换支持情况以及常用搬运指令的选择建议。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_input_move_constraint.md",
+            "excerpt": "当源地址位于L1 Buffer时，该地址必须32Byte对齐；当源地址位于GM时，该地址必须1Byte对齐。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_input_move_constraint.md",
+            "excerpt": "2D矩阵搬运以大小为512Byte的分形为单位进行搬运。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_input_move_constraint.md",
+            "excerpt": "3D矩阵搬运主要用于对NC1HWC0格式的feature map完成image to column操作，并将展开后的二维矩阵搬入对应内存位置"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load_overall_description.md",
+      "document_sha256": "909ecbb3425de9b50f9edc9511032b7114d72f21a9ace91fb5e7e201ab3f012e",
+      "description": {
+        "value": "矩阵计算搬入接口的总体说明，主要实现Global Memory到L0A Buffer、L0B Buffer之间的高效数据传输，按数据通路分类介绍二维、三维、转置、稀疏等搬入接口及Feature Map描述、padding、repeat等辅助配置接口的使用场景。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load_overall_description.md",
+            "excerpt": "矩阵计算的搬入是Ascend C编程框架中用于数据搬运的一类核心接口，主要实现Global Memory到L0A Buffer/L0B Buffer之间的数据高效传输。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load_overall_description.md",
+            "excerpt": "矩阵计算的搬入接口支持多种数据通路，每种通路对应特定的存储层级和访问特性。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store_overall_description.md",
+      "document_sha256": "caca42dd7fe7478dc4fdda96cfccd15fb85908924f57cb9d18a82852c9e4cdc1",
+      "description": {
+        "value": "矩阵计算搬出接口的总体说明，主要实现从L0C Buffer到Global Memory和L1 Buffer的数据传输，支持随路量化、随路ReLU、随路格式转换、随路通道拆分与通道合并等搬运场景，通常在asc_mmad接口后配合使用。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store_overall_description.md",
+            "excerpt": "矩阵计算的搬出是Ascend C编程框架中用于数据搬运的一类核心接口，主要实现从L0C Buffer到Global Memory和L1 Buffer的数据传输。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store_overall_description.md",
+            "excerpt": "矩阵计算的搬出接口支持多种随路搬运场景，包括**随路量化、随路ReLU、随路格式转换（Nz2ND、Nz2DN）、随路通道拆分（Channel Split）、随路通道合并（Channel Merge）**。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/F32-Channel-Split.md",
+      "document_sha256": "0e9ba251ae3dbefd7cae73771a4cf60f5e5357ab7f66ccf2776b48e82b128ae8",
+      "description": {
+        "value": "介绍矩阵搬出的F32通道拆分特性：目标类型为f32且开启通道拆分时，硬件将每个16×16分形矩阵拆分为2个16×8小z分形矩阵；开启要求输入输出均为float、Nz输出到GM且未开启Nz2ND等特性，开启后源Nz矩阵的n_size须为8的倍数。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/F32-Channel-Split.md",
+            "excerpt": "矩阵计算的搬出过程中对于目标类型为f32，如果开启了Channel Split（通道拆分），硬件就能够将16×16的分形矩阵转换为16×8的小z分形矩阵，此时每个16×16的分形矩阵将被拆分为2个独立的16×8的小z分形矩阵。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/F32-Channel-Split.md",
+            "excerpt": "当开启Channel Split功能后，n_size（源Nz矩阵在N方向上的大小）必须为8的倍数。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/Int8-Channel-Merge.md",
+      "document_sha256": "cb2b048dfc42e3c5608297d33c294016373ec5a312f98585e7abae4ea250fce0",
+      "description": {
+        "value": "介绍矩阵搬出的Int8通道合并特性：目标数据类型被转换为int8_t、uint8_t时Nz输出自动启用，硬件将16×16分形矩阵按通道合并为16×32分形矩阵，N为16的奇数倍时最后16个通道保持不变，该特性由硬件自动开启、不能配置。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/Int8-Channel-Merge.md",
+            "excerpt": "矩阵计算的搬出过程中对于目标数据类型被转换为int8\\_t、uint8\\_t的情况，Nz输出时该特性自动启用。硬件会将分形矩阵从16×16扩展为16×32。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/Int8-Channel-Merge.md",
+            "excerpt": "硬件自动开启，不能配置。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/L0C_to_UB_dual_target_mode.md",
+      "document_sha256": "f2cd735f858b23cc9c462c1054abbaff4489533d1b6af4d936c254d98ec8f2fb",
+      "description": {
+        "value": "介绍仅适用于3510的L0C Buffer到UB双目标模式：启用后L0C Buffer中的M×N矩阵被分成两半，同时写入同一AI Core内两个Vector Core各自的Unified Buffer，支持按M维度或N维度拆分，仅限普通搬运或Nz2ND场景且不支持随路功能。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/L0C_to_UB_dual_target_mode.md",
+            "excerpt": "本特性仅适用于3510。同一AI Core内有一个Cube Core和两个Vector Core，当启用双目标模式控制时，L0C Buffer中的M×N矩阵将被分成两半，并同时分别写入两个Vector Core各自的Unified Buffer（UB）中，其中前半部分写入SUB BLOCK0，后半部分写入SUB BLOCK1。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/L0C_to_UB_dual_target_mode.md",
+            "excerpt": "双目标模式仅支持在L0C Buffer到UB通路，普通搬运模式（Nz2Nz）或Nz2ND搬运场景下使用，不支持随路功能场景。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md",
+      "document_sha256": "81e271113ad02bdc09f9e726ca89b0148aefc7237ccf5060c6e5038741d38f6b",
+      "description": {
+        "value": "介绍矩阵搬出的Nz2DN特性：将Nz格式矩阵转化为DN格式矩阵，支持多个矩阵的批量转化，文档给出转化伪代码与可配置参数说明；该功能与通道拆分合并及L0C到UB双目标模式互斥，目标操作数地址之间不能重叠。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md",
+            "excerpt": "矩阵计算的搬出过程中Nz2DN的核心功能体现为，将Nz格式矩阵转化为DN格式矩阵。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md",
+            "excerpt": "当开启Channel Split/Channel Merge功能（Nz2Nz）时，此功能不可用。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2DN.md",
+            "excerpt": "目标操作数地址之间不能重叠。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md",
+      "document_sha256": "e647e637b9c285b05cfead2c1136b6c47aee5564cdb402df84482e1090a388e7",
+      "description": {
+        "value": "介绍矩阵搬出的Nz2ND特性：实现Nz格式到ND格式的矩阵转换，支持多个矩阵的批量转化，文档给出转化伪代码、可配置参数含义与特性约束；开启通道拆分合并功能时此功能不可用，目标操作数地址之间不能重叠。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md",
+            "excerpt": "矩阵搬出时，Nz2ND功能即为实现Nz格式到ND格式的矩阵转换。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md",
+            "excerpt": "当开启Channel Split/Channel Merge功能（Nz2Nz）时，此功能不可用。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2ND.md",
+            "excerpt": "目标操作数地址之间不能重叠。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md",
+      "document_sha256": "388920799e1647ef82fc814555c976132acbd53588708fb7552b7745a23946b2",
+      "description": {
+        "value": "介绍矩阵计算搬出的Nz2Nz特性：矩阵计算结果搬出前后保持Nz大分形排布，输出类型转换及通道拆分合并可能改变小分形宽度；文档按产品给出转化伪代码、可配置参数说明及与F32通道拆分等特性组合使用的约束。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md",
+            "excerpt": "矩阵计算的搬出过程中Nz2Nz的核心功能体现为，矩阵计算结果搬出前后保持Nz大分形排布；输出类型转换及Channel Split/Channel Merge可能改变小分形宽度。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/NZ2NZ.md",
+            "excerpt": "目标操作数地址之间不能重叠。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md",
+      "document_sha256": "9499c63814fd6257c5c1c67b38aba3b4e2e285a777b6b34d36264c047f28811d",
+      "description": {
+        "value": "介绍矩阵搬出支持的随路量化能力：包括无需量化系数的Cast与带系数量化，带系数量化分整个C矩阵共享参数的Scalar与每列独立参数的Tensor、Vector两种粒度，并说明各产品支持的量化模式、系数配置接口及量化参数比特位含义。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md",
+            "excerpt": "矩阵搬出支持Cast和带系数的量化。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md",
+            "excerpt": "使用`asc_quant_mode::F322F16`或`asc_quant_mode::F322BF16`将float转换成half/bfloat16_t，无需量化系数，舍入模式采用CAST_RINT。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization.md",
+            "excerpt": "Scalar：整个C矩阵共享一个量化参数。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md",
+      "document_sha256": "6ca75be971fbd0fc33399819a7dbe50894d7a904313bccd235ed2edea963a1b6",
+      "description": {
+        "value": "介绍矩阵搬出中随路量化与随路ReLU的组合方式，按产品给出不激活与Normal ReLU组合下Scalar及Vector量化的参数取值规则，M1为原始数据非负时使用的随路系数，M2为原始数据为负数时使用的随路系数。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md",
+            "excerpt": "矩阵搬出支持多种随路量化与随路ReLU的组合，常用的不激活/Normal ReLU组合参考下表，Scalar/Vector扩展组合见后文。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md",
+            "excerpt": "注：M1为原始数据非负时使用的随路系数，M2为原始数据为负数时使用的随路系数。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md",
+      "document_sha256": "0e7ea0eb41f552c5d8ca58bf35a57f116f68e925de8470c607a8d8ae83592005",
+      "description": {
+        "value": "介绍矩阵计算搬出过程支持的随路ReLU能力，通过asc_relu_pre_mode枚举区分不启用激活、Normal ReLU、全矩阵共享激活系数的SCALAR与每个N通道独立激活系数的VECTOR四种模式，并说明各模式对应的配置接口。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md",
+            "excerpt": "矩阵计算的搬出过程中支持随路ReLU能力，当前支持如下随路ReLU能力。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/accompanying_relu.md",
+            "excerpt": "| `SCALAR` | 2 | 全矩阵共享激活系数，使用[asc_set_l0c_copy_relu_alpha](../asc_set_l0c_copy_relu_alpha.md)配置 |"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/convolution_format_conversion.md",
+      "document_sha256": "7f1ab18ce20633fef03ee4ebe014ca9a4407aa8a5d9b437665da56c2a6bfe196",
+      "description": {
+        "value": "介绍卷积格式转换：卷积运算中L0C Buffer上存放的NC1HWC0格式数据，通过Fixpipe指令的Nz2ND能力转为NHWC格式输出；Ascend 950PR与950DT系列产品还支持通过Nz2DN能力转为NCHW格式输出。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/convolution_format_conversion.md",
+            "excerpt": "在卷积运算中，L0C Buffer上存放的数据格式为NC1HWC0格式，Fixpipe指令通过[Nz2ND](NZ2ND.md)能力，支持将L0C Buffer上数据转为NHWC格式输出。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_datamove/cube_store_key_features/convolution_format_conversion.md",
+            "excerpt": "特别的，针对Ascend 950PR&950DT系列产品产品，还支持Fixpipe指令通过[Nz2DN](NZ2DN.md)能力，将L0C Buffer上数据转为NCHW格式输出。"
+          }
+        ]
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md",
+      "document_sha256": "f987fe5f43d80b66583efe5e40d8582b84abfacd12d68d12e672279c47d41ac8",
+      "description": {
+        "value": "设置Mmad计算关闭HF32模式，作用与asc_enable_hf32相反且二者不同时生效，需在asc_mmad执行前调用；关闭后L0A与L0B Buffer中的float数据在参与Mmad计算之前不做舍入处理，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md",
+            "excerpt": "本接口用于设置Mmad计算关闭HF32模式，其作用与[asc_enable_hf32](./asc_enable_hf32.md)相反，两个接口不同时生效。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md",
+            "excerpt": "关闭HF32模式后，L0A Buffer与L0B Buffer中的`float`数据在参与Mmad计算之前不做舍入处理。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口用于设置Mmad计算关闭HF32模式，其作用与[asc_enable_hf32](./asc_enable_hf32.md)相反，两个接口不同时生效。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md",
+            "excerpt": "本接口用于设置Mmad计算关闭HF32模式，其作用与[asc_enable_hf32](./asc_enable_hf32.md)相反，两个接口不同时生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md",
+      "document_sha256": "ed6fca35084e7f5839e49106251a71ba948490c736608763d49f6c7e1691da04",
+      "description": {
+        "value": "设置Mmad计算关闭HiF8模式，作用与asc_enable_hif8相反且二者不同时生效，需在asc_mmad等矩阵乘加指令执行前调用；关闭后左右矩阵均为fp8_e4m3fn_t输入时不转换为hifloat8_t、直接以原类型参与计算，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md",
+            "excerpt": "本接口用于设置Mmad计算关闭HiF8模式，其作用与[asc_enable_hif8](./asc_enable_hif8.md)相反，两个接口不同时生效。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md",
+            "excerpt": "关闭HiF8模式后，当矩阵乘加指令的左矩阵A和右矩阵B均以`fp8_e4m3fn_t`作为输入数据类型时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法运算前不会转换为`hifloat8_t`，而是直接以`fp8_e4m3fn_t`类型参与计算。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口用于设置Mmad计算关闭HiF8模式，其作用与[asc_enable_hif8](./asc_enable_hif8.md)相反，两个接口不同时生效。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md",
+          "kind": "related",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md",
+            "excerpt": "如需开启HiF8模式，请重新调用[asc_enable_hif8](./asc_enable_hif8.md)接口。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+      "document_sha256": "1ad9245e002cba25a5604bb1ce9e7b272437d4bb4391497313d790249ed29ae3",
+      "description": {
+        "value": "设置Mmad计算开启HF32模式以提升FP32数据计算性能但带来一定精度损失，L0A与L0B Buffer中的FP32数据在参与Mmad计算前被舍入为HF32格式，舍入模式由配套接口配置，最终结果仍以FP32格式输出，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+            "excerpt": "本接口用于设置Mmad计算开启HF32模式，开启该模式后，Mmad计算FP32数据的性能将得到提升，但会带来一定的精度损失。"
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+            "excerpt": "开启HF32模式后，L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32格式，舍入模式使用[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ],
+        "traits": [
+          "rounding_mode"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口用于设置Mmad计算开启HF32模式，开启该模式后，Mmad计算FP32数据的性能将得到提升，但会带来一定的精度损失。",
+        "traits:rounding_mode": "开启HF32模式后，L0A Buffer/L0B Buffer中的FP32数据将在参与Mmad计算之前被舍入为HF32格式，舍入模式使用[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](asc_mmad.md)）执行前调用，以此来确保模式配置在矩阵乘加计算过程中生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hf32.md",
+          "kind": "related",
+          "condition": "如需关闭HF32模式",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+            "excerpt": "如需关闭HF32模式，请重新调用[asc_disable_hf32](asc_disable_hf32.md)接口。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_hf32_round_mode.md",
+          "kind": "related",
+          "condition": "HF32模式启用后",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hf32.md",
+            "excerpt": "HF32模式启用后，FP32转换为HF32格式的舍入模式由配套的[asc_set_hf32_round_mode](asc_set_hf32_round_mode.md)接口配置，须在本接口之后调用该配套接口配置舍入模式，否则舍入模式沿用上次配置或默认值。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md",
+      "document_sha256": "4d363f99ed9968ff73764cb3df5340742bbe4000bbdea833fbcf5ed614368d8f",
+      "description": {
+        "value": "启用矩阵乘加计算的HiF8模式，当左右矩阵均以fp8_e4m3fn_t作为输入数据类型时，L0A与L0B Buffer中的数据在参与矩阵乘法运算前转换为hifloat8_t类型参与计算，需在矩阵乘加指令执行前调用，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md",
+            "excerpt": "本接口用于启用矩阵乘加（Mmad）计算的HiF8模式。启用HiF8模式后，当矩阵乘加指令的左矩阵A和右矩阵B均以`fp8_e4m3fn_t`作为输入数据类型时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法运算前将转换为`hifloat8_t`类型参与计算。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "本接口用于启用矩阵乘加（Mmad）计算的HiF8模式。启用HiF8模式后，当矩阵乘加指令的左矩阵A和右矩阵B均以`fp8_e4m3fn_t`作为输入数据类型时，L0A Buffer和L0B Buffer中的数据在参与矩阵乘法运算前将转换为`hifloat8_t`类型参与计算。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad_mx.md",
+          "kind": "configures",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md",
+            "excerpt": "本接口需在矩阵乘加指令（[asc_mmad](./asc_mmad.md)、[asc_mmad_mx](./asc_mmad_mx.md)）执行前调用，确保模式配置在矩阵乘加结果生成前生效。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_disable_hif8.md",
+          "kind": "related",
+          "condition": "如需切换为FP8模式",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_enable_hif8.md",
+            "excerpt": "如需切换为FP8模式，请重新调用[asc_disable_hif8](./asc_disable_hif8.md)接口。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+      "document_sha256": "4fce3e5ab8e03bda3cc76426d54763dad8a486394289b2fffc7ab356671c3b7b",
+      "description": {
+        "value": "矩阵乘加核心计算接口，完成左矩阵A与右矩阵B的乘法并累加到结果矩阵C，C矩阵可通过参数初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵，支持UnitFlag细粒度并行与GEMV模式，仅在AIC上生效。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其计算公式如下："
+          },
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "C矩阵可以通过配置本接口的参数，初始化为全0矩阵、L0C Buffer中的矩阵或Bias矩阵"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "matrix_multiply_accumulate"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其计算公式如下：",
+        "operations:matrix_multiply_accumulate": "本接口是Ascend C面向昇腾AI芯片的矩阵乘加（Mmad）核心计算接口，专为高性能算子开发设计，封装了昇腾NPU硬件的矩阵乘加计算能力，广泛用于神经网络层（如全连接层、卷积层）、数值计算类算子的开发，其计算公式如下："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md",
+          "kind": "constrained_by",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "各矩阵的起始地址需满足[参数说明](#asc_mmad_param_table)中的对齐要求。操作数的其他地址约束请参考[存储单元说明](../general_description_and_constraints.md#存储单元说明)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md",
+          "kind": "requires",
+          "condition": "使用Bias矩阵初始化C矩阵时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "调用本接口前，需将Bias数据通过[asc_copy_l12bt](../cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md)接口搬运到该地址"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md",
+          "kind": "requires",
+          "condition": "输入矩阵沿K轴分块计算并累加到同一块L0C Buffer且(m/16)*(n/16)小于10时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "针对输入矩阵沿K轴分块计算，并将结果累加到同一块L0C Buffer的场景，当`(m / 16) * (n / 16) < 10`时，需在相邻两次矩阵乘加指令之间调用[asc_sync_pipe](../sync/intra_core_sync/asc_sync_pipe.md)，并将入参`pipe`设置为`PIPE_M`。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_n.md",
+          "kind": "requires",
+          "condition": "开启UnitFlag且矩阵搬出指令开启Nz2ND随路格式转换，或未随路格式转换但开启B8/B4量化触发Channel Merge时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致。矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_set_mmad_direction_m.md",
+          "kind": "requires",
+          "condition": "开启UnitFlag的其他场景",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "开启UnitFlag时，矩阵计算方向需与矩阵搬出读取顺序保持一致。矩阵搬出指令开启Nz2ND随路格式转换，或未进行随路格式转换但开启B8/B4量化并触发Channel Merge功能时，调用[asc_set_mmad_direction_n](asc_set_mmad_direction_n.md)；其他场景调用[asc_set_mmad_direction_m](asc_set_mmad_direction_m.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_l0c_copy_config.md",
+          "kind": "related",
+          "condition": "需要清除UnitFlag产生的残留状态时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "需要清除UnitFlag产生的残留状态时，可调用[asc_set_l0c_copy_config](../cube_datamove/asc_set_l0c_copy_config.md)，并将`enable_unit_flag`设置为true，将L0C Buffer中所有内存块的单元标志位设置为0并关闭UnitFlag。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "related",
+          "condition": "浮点类型的输入或输出包含inf/nan时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/cube_compute/asc_mmad.md",
+            "excerpt": "浮点类型的输入或输出包含inf/nan时，可通过[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置CTRL寄存器的CTRL\\[48\\]比特位控制计算时的模式："
+          }
+        }
+      ]
+    }
+  ]
+}

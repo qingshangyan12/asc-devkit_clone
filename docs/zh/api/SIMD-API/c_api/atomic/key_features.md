@@ -1,37 +1,6 @@
 ---
 okftype: reference.concept
-title: 关键特性说明
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/atomic/key_features.md
-description: 关键特性说明页，阐述原子操作场景下的确定性计算：分析带随路原子操作的搬运指令乱序与开启原子操作前后指令乱序两类非确定性结果的产生原因，并给出通过核内同步及基于GM信号量的软件核间同步保证确定性执行顺序的实现方案。
-tag:
-  - api_surfaces: [c_api]
-  - roles: [compute]
-  - operations: [add]
-  - execution_models: [scalar]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_add.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_max.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/atomic/datamove_atomic/asc_set_atomic_min.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/cache_ctrl/asc_dcci.md
-    kind: requires
-    condition: 经过DCache访问
-  - path: docs/zh/api/SIMD-API/c_api/cube_datamove/cube_datamove.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/scalar_compute/scalar_store/asc_store_dev.md
-    kind: related
-    condition: 不通过DCache访问
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_pipe.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
-    kind: related
-  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/vector_datamove.md
-    kind: related
-timestamp: '2026-09-28'
+description: "阐述原子操作场景下的确定性计算，分析带随路原子操作的搬运指令乱序、开启原子操作前后指令乱序两类非确定性结果的产生原因与前提条件，并给出通过核内同步指令与基于GM信号量的软件核间同步方案，在指令之间插入适当同步以保证每次执行输出的结果都相同。"
 ---
 # 关键特性说明
 

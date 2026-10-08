@@ -1,26 +1,18 @@
 ---
 okftype: reference.api
-title: asc_copy_l12l0b_sparse_sync（废弃）
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/deprecated_interface/asc_copy_l12l0b_sparse_sync_deprecated.md
-description: 已废弃的同步搬运接口，将L1 Buffer里512B大小的稠密权重矩阵搬运到L0B Buffer，同时读取128B索引矩阵实现稀疏化，请改用非同步接口和asc_sync替代。
+description: "已废弃的同步搬运接口，将L1 Buffer里512B大小的稠密权重矩阵搬运到L0B Buffer，同时读取128B大小的索引矩阵实现稠密矩阵稀疏化，不支持转置功能；请改用非同步接口asc_copy_l12l0b_sparse配合asc_sync替代。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [l1_buffer]
-  - destination_locations: [l0b_buffer]
-  - traits: [deprecated, sparse_input]
-signature:
-  - override_id: asc_copy_l12l0b_sparse_sync__PCBi8_PL1i8_PL1i8_u16_u8
-archs: ['2201']
-header: [/include/c_api/composite/cube_datamove_composite.h]
+  - traits: [sparse_input]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_sparse.md
-    kind: related
+    kind: replaced_by
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
   - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync.md
-    kind: related
-examples: []
-timestamp: '2026-09-28'
+    kind: replaced_by
+version: 9.0.0-
 ---
 # asc_copy_l12l0b_sparse_sync（废弃）
 

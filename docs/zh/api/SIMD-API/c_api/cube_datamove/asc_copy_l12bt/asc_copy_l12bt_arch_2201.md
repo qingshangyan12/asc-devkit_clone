@@ -1,23 +1,14 @@
 ---
 okftype: reference.api
-title: asc_copy_l12bt
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_2201.md
-description: 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias，提供前n个数据搬运和高维切分搬运两种函数原型。
+description: "将数据从L1 Buffer搬运到BiasTable Buffer，该Buffer用于存放矩阵计算中的Bias，提供前n个数据搬运与高维切分搬运两种重载，前n个数据搬运时搬运数据大小要求32字节对齐。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement]
   - operations: [copy]
-  - source_locations: [l1_buffer]
-  - destination_locations: [bias_table_buffer]
-  - traits: [high_dimensional]
-signature:
-  - override_id: asc_copy_l12bt__u64_PL1v_u32
-  - override_id: asc_copy_l12bt__u64_PL1v_u16_u16_u16_u16_u16
-archs: ['2201']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
-dependencies: []
-examples: []
-timestamp: '2026-09-28'
+  - traits: [aligned_transfer, datablock_granularity, high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
+    kind: constrained_by
+version: 9.1.0-
 ---
 # asc_copy_l12bt
 

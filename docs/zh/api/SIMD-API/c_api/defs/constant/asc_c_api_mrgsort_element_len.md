@@ -1,17 +1,14 @@
 ---
-okftype: reference.type
-title: ASC_C_API_MRGSORT_ELEMENT_LEN
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/defs/constant/asc_c_api_mrgsort_element_len.md
-description: 定义MrgSort4操作支持的队列数量常量，值为4，并用于相关排序接口的数组长度约束。
+okftype: reference.constant
+description: "定义MrgSort4操作支持的队列数量常量，值为4，作为asc_mrgsort4接口src数组与asc_get_vms4_sr接口sorted_num数组的长度。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-declaration:
-  symbol: ASC_C_API_MRGSORT_ELEMENT_LEN
-  value: '4'
-  type: uint8_t
-header: [/include/c_api/defs/constant.h]
-timestamp: '2026-09-28'
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md
+    kind: related
+  - path: docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md
+    kind: related
+version: 9.0.0-
 ---
 # ASC_C_API_MRGSORT_ELEMENT_LEN
 

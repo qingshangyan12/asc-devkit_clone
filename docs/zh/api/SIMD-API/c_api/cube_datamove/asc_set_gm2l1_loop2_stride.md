@@ -1,25 +1,19 @@
 ---
 okftype: reference.api
-title: asc_set_gm2l1_loop2_stride
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop2_stride.md
-description: 将数据从GM搬运到L1 Buffer时，设置asc_copy_gm2l1_align循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔，仅在AIC上生效。
+description: "设置asc_copy_gm2l1_align循环填充模式外层循环中相邻迭代数据块的源和目的L1间隔，目的间隔必须32字节对齐，需配合循环次数与内层循环步长配置，仅在AIC上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [data_movement_configuration]
-signature:
-  - override_id: asc_set_gm2l1_loop2_stride__u64_u64
-archs: ['3510']
-header: [/include/c_api/cube_datamove/cube_datamove.h]
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md
     kind: configures
-    condition: 循环填充模式
+    condition: "使用循环填充模式时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop1_stride.md
     kind: related
+    condition: "使用循环填充模式时"
   - path: docs/zh/api/SIMD-API/c_api/cube_datamove/asc_set_gm2l1_loop_size.md
     kind: related
-examples: []
-timestamp: '2026-09-28'
+    condition: "使用循环填充模式时"
+version: 9.0.0-
 ---
 # asc_set_gm2l1_loop2_stride
 

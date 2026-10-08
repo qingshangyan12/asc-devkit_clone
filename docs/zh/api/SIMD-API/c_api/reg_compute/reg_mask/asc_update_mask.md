@@ -1,85 +1,12 @@
 ---
 okftype: reference.api
-title: asc_update_mask
-resource: asc-devkit/docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md
-description: 根据元素个数value生成掩码寄存器，调用后自动将value减去当前向量处理单元的元素个数，支持b8、b16、b32三种位宽模式，重复调用可按剩余元素个数逐次生成掩码，仅在AIV上生效。
+description: "根据元素个数value生成掩码寄存器并自动将value减去当前向量处理单元的元素个数，支持b8、b16、b32三种位宽模式，重复调用可按剩余元素个数逐次生成掩码，需在Vector Function内调用，仅在AIV上生效。"
 tag:
-  - api_surfaces: [c_api]
   - roles: [configuration]
-  - objects: [mask]
-signature:
-  - override_id: asc_update_mask_b8__Ru32
-  - override_id: asc_update_mask_b16__Ru32
-  - override_id: asc_update_mask_b32__Ru32
-archs: ['3510']
-header: [/include/c_api/reg_compute/compute/reg_mask.h]
 dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/defs/type/data_type_definition.md
-    kind: related
   - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
     kind: constrained_by
-examples:
-  - path: /examples/02_simd_c_api/00_introduction/04_reg_base_add_compute/c_api_simd_add
-    file: c_api_add.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode
-    file: set_l2_cache_mode.h
-    archs: ['3510', '2201']
-    override_id: asc_update_mask_b16__Ru32
-  - path: /examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer
-    file: add_double_buffer.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b16__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather
-    file: reg_load_gather.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b16__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align
-    file: reg_load_store_align.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b16__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs
-    file: abs.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare
-    file: compare.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div
-    file: div.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate
-    file: duplicate.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu
-    file: elu.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul
-    file: mul.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls
-    file: muls.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce
-    file: reduce.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair
-    file: reduce_pair.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-  - path: /examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate
-    file: truncate.asc
-    archs: ['3510']
-    override_id: asc_update_mask_b32__Ru32
-timestamp: '2026-09-28'
+version: 9.0.0-
 ---
 # asc_update_mask
 
