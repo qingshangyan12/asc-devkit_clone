@@ -321,7 +321,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     xnData_[KFC_AG_SOLE_NHR_OP_ID] = GetOpId(commParam);
     xnData_[KFC_AG_SOLE_NHR_INPUT] = inputBase;
-    xnData_[KFC_AG_SOLE_NHR_OUTPUT] = outputBase;
+    // 多轮开销治理：OUTPUT 写轮次不变基址（recvBuf，不含 repeatOffset），偏移走独立槽由
+    // kernel 本地叠加——PreSync 交换值全轮一致，kernel 仅首轮（repeatOffset==0）做同步。
+    xnData_[KFC_AG_SOLE_NHR_OUTPUT] = reinterpret_cast<uint64_t>(commParam->recvBuf);
+    xnData_[KFC_AG_SOLE_NHR_REPEAT_OFFSET] = repeatOffset;
     xnData_[KFC_AG_SOLE_NHR_DIE0_SIZE] = sliceSize;
     xnData_[KFC_AG_SOLE_NHR_DIE0_LAST_SIZE] = sliceSize;
     xnData_[KFC_AG_SOLE_NHR_REPEAT_NUM_INV] = UINT64_MAX - 1U; // sole executor repeatNum=1

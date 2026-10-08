@@ -226,7 +226,8 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
         } else if (ctx.arg->role == KfcServerRole::ALL_GATHER_SOLE_NHR) {
             // SoleNHR（CcuSchedAllGatherSoleNHR）单帧布局见 KfcAllGatherSoleNhrParamIndex
-            // （[0]=opId 哨兵，[1..14] 为 NHR 参数，token 由 server ctx 注入）。
+            // （[0]=opId 哨兵，[1..15] 为 NHR 参数，token 由 server ctx 注入）。
+            // [2]=OUTPUT 为轮次不变基址，[15]=REPEAT_OFFSET 由 kernel 叠加（多轮开销治理）。
             CcuKernelKfcAllGatherNHR1DMem2MemKernel(
                 param[KFC_AG_SOLE_NHR_INPUT], param[KFC_AG_SOLE_NHR_OUTPUT], ctx.token,
                 param[KFC_AG_SOLE_NHR_DIE0_SIZE], param[KFC_AG_SOLE_NHR_DIE0_LAST_SIZE],
@@ -234,9 +235,9 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 param[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE], param[KFC_AG_SOLE_NHR_INPUT_REPEAT_STRIDE],
                 param[KFC_AG_SOLE_NHR_OUTPUT_REPEAT_STRIDE], param[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL],
                 param[KFC_AG_SOLE_NHR_GO_SIZE_0], param[KFC_AG_SOLE_NHR_GO_SIZE_1], param[KFC_AG_SOLE_NHR_GO_SIZE_2],
-                param[KFC_AG_SOLE_NHR_GO_SIZE_3], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->nhrStepInfoVector,
-                ctx.arg->nhrRank2ChannelIdx);
+                param[KFC_AG_SOLE_NHR_GO_SIZE_3], param[KFC_AG_SOLE_NHR_REPEAT_OFFSET], ctx.arg->channels,
+                ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
+                ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
         } else {
             // The queue payload layout is
             // [0]=op, [1]=input, [2]=output, [3]=outputOffset, [4]=sliceSize,

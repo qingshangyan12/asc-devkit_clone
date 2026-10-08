@@ -47,6 +47,7 @@ struct KfcAllGatherNhr1DContext : CcuKernelCtxBase {
     ccu::Variable inputRepeatStride;
     ccu::Variable outputRepeatStride;
     ccu::Variable isInputOutputEqual;
+    ccu::Variable repeatOffset;
     ccu::Event localEvent;
     ccu::Variable repeatTimeflag;
     std::vector<ccu::Variable> outputSliceOffset;
@@ -87,12 +88,13 @@ CcuResult InitResource(KfcAllGatherNhr1DContext& ctx)
 }
 
 // 对应 hccl LoadArgs：本 rank 的 output/token 从队列参数取得，其余形参直赋。
+// 多轮开销治理：OUTPUT 槽为轮次不变基址，repeatOffset 由 kernel 叠加到所有输出侧地址。
 void LoadNhr1DArgs(
     KfcAllGatherNhr1DContext& ctx, ccu::Variable input, ccu::Variable output, ccu::Variable token,
     ccu::Variable die0Size, ccu::Variable die0LastSize, ccu::Variable repeatNumInv, ccu::Variable inputSliceStride,
     ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
     ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-    ccu::Variable goSize3)
+    ccu::Variable goSize3, ccu::Variable repeatOffset)
 {
     const uint32_t localIdx = ctx.channelCount;
     ctx.input = input;
@@ -106,6 +108,7 @@ void LoadNhr1DArgs(
     ctx.inputRepeatStride = inputRepeatStride;
     ctx.outputRepeatStride = outputRepeatStride;
     ctx.isInputOutputEqual = isInputOutputEqual;
+    ctx.repeatOffset = repeatOffset;
     ctx.goSize.addrOffset = goSize0;
     ctx.goSize.loopParam = goSize1;
     ctx.goSize.parallelParam = goSize2;
@@ -194,9 +197,11 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
             ctx.srcMem.addr += ctx.myrankInputSliceOffset;
         } else {
             ctx.srcMem.addr = ctx.output[localIdx];
+            ctx.srcMem.addr += ctx.repeatOffset;
             ctx.srcMem.addr += ctx.outputSliceOffset[sendSliceIdx];
         }
         ctx.dstMem.addr = ctx.output[toRankIdx];
+        ctx.dstMem.addr += ctx.repeatOffset;
         ctx.dstMem.addr += ctx.outputSliceOffset[sendSliceIdx];
         bool islastSlice = false;
         islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
@@ -256,9 +261,11 @@ CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
     ctx.srcMem.addr += ctx.myrankInputSliceOffset;
     ctx.srcMem.token = ctx.token[localIdx];
     ctx.dstMem.addr = ctx.output[localIdx];
+    ctx.dstMem.addr += ctx.repeatOffset;
     ctx.dstMem.addr += ctx.outputSliceOffset[ctx.rankId];
     ctx.dstMem.token = ctx.token[localIdx];
     ctx.localDst.addr = ctx.output[localIdx];
+    ctx.localDst.addr += ctx.repeatOffset;
     ctx.localDst.addr += ctx.outputSliceOffset[ctx.rankId];
     ctx.localDst.token = ctx.token[localIdx];
     ctx.groupCopyRepeatNum = ctx.repeatNum;
@@ -278,8 +285,9 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable die0LastSize, ccu::Variable repeatNumInv, ccu::Variable inputSliceStride,
     ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
     ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-    ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+    ccu::Variable goSize3, ccu::Variable repeatOffset, const ChannelHandle channels[], uint32_t channelCount,
+    uint32_t rankSize, uint32_t rankId, const std::vector<KfcNhrStepInfo>& stepInfoVector,
+    const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
 {
     KfcAllGatherNhr1DContext ctx;
     ctx.channels = channels;
@@ -294,13 +302,21 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     LoadNhr1DArgs(
         ctx, inputAddr, outputAddr, tokenInfo, die0Size, die0LastSize, repeatNumInv, inputSliceStride,
         outputSliceStride, inputRepeatStride, outputRepeatStride, isInputOutputEqual, goSize0, goSize1, goSize2,
-        goSize3);
+        goSize3, repeatOffset);
 
-    CCU_CHK_RET(PreSync(ctx));
+    // 多轮开销治理：仅首轮（repeatOffset==0）执行 PreSync/PostSync——交换值（output 基址/token）
+    // 已轮次不变，后续轮无需重同步；各轮数据区域由 repeatOffset 推进保证不相交，无跨轮依赖。
+    CCU_IF(ctx.repeatOffset == 0U)
+    {
+        CCU_CHK_RET(PreSync(ctx));
+    }
 
     CCU_CHK_RET(DoRepeatAllGatherNHR(ctx));
 
-    CCU_CHK_RET(PostSync(ctx));
+    CCU_IF(ctx.repeatOffset == 0U)
+    {
+        CCU_CHK_RET(PostSync(ctx));
+    }
 
     return CCU_SUCCESS;
 }

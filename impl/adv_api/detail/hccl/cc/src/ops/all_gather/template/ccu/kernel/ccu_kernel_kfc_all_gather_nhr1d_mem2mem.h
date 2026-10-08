@@ -19,14 +19,17 @@ namespace mc2_ops_hccl {
 
 // CcuSchedAllGatherSoleNHR 的 KFC kernel。与 hccl CcuAllGatherNHR1DMem2MemKernel 逐行对照移植；
 // KFC 单 mission 约束下固定 axisId=0（单 die）语义，die1 参数省略。
+// 多轮（repeat>1）开销治理：OUTPUT 槽为轮次不变基址，kernel 叠加 REPEAT_OFFSET；
+// 仅首轮（repeatOffset==0）执行 PreSync/PostSync，后续轮跳过（各轮区域不相交）。
 // xnData 槽位见 KfcAllGatherSoleNhrParamIndex（kfc_server_message.h），三处索引必须一致。
 CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
     ccu::Variable die0LastSize, ccu::Variable repeatNumInv, ccu::Variable inputSliceStride,
     ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
     ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-    ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+    ccu::Variable goSize3, ccu::Variable repeatOffset, const ChannelHandle channels[], uint32_t channelCount,
+    uint32_t rankSize, uint32_t rankId, const std::vector<KfcNhrStepInfo>& stepInfoVector,
+    const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
 
 } // namespace mc2_ops_hccl
 

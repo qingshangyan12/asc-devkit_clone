@@ -197,7 +197,10 @@ enum KfcReduceScatterSoleNhr2DieParamIndex : uint32_t {
 // SoleNHR（CcuSchedAllGatherSoleNHR）单帧 xnData 布局：
 // [0]=opId 哨兵，参数从 1 顺排。AIV prepare（CcuPrepareForAllGatherSoleNhrM2M）写入、
 // KFC dispatch 逐槽转发、kernel 形参三处索引必须一致。
-// 单 die 语义：die0Size/die0LastSize 即全量分片与末分片（hccl dieNum=1 口径），die1 参数省略。
+// 多轮（repeat>1）开销治理：OUTPUT 槽写轮次不变基址（recvBuf，不含 repeat 偏移），
+// 轮次偏移独立走 REPEAT_OFFSET 槽由 kernel 本地叠加——PreSync 交换值全轮一致，
+// kernel 按 repeatOffset==0 仅首轮执行 PreSync/PostSync，后续轮跳过（各轮数据区域
+// 由 repeatOffset 推进保证不相交，无跨轮依赖）。
 enum KfcAllGatherSoleNhrParamIndex : uint32_t {
     KFC_AG_SOLE_NHR_OP_ID = 0,
     KFC_AG_SOLE_NHR_INPUT = 1,
@@ -214,7 +217,8 @@ enum KfcAllGatherSoleNhrParamIndex : uint32_t {
     KFC_AG_SOLE_NHR_GO_SIZE_1 = 12,
     KFC_AG_SOLE_NHR_GO_SIZE_2 = 13,
     KFC_AG_SOLE_NHR_GO_SIZE_3 = 14,
-    KFC_AG_SOLE_NHR_PARAM_NUM = 15,
+    KFC_AG_SOLE_NHR_REPEAT_OFFSET = 15,
+    KFC_AG_SOLE_NHR_PARAM_NUM = 16,
 };
 
 // ReduceScatter 并发(Mesh+NHR)单帧 xnData 布局：mission0 读 Mesh 区间，mission1 读 NHR 区间。
