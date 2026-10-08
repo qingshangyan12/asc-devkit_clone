@@ -67,12 +67,11 @@ $$
 ## 函数原型
 
 <!-- npu="950" id12 -->
+
 ### 函数原型（[NPU架构版本3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
-**占位符形式：**
-
 ```c
-// 不显式传入Bias起始地址，通过参数控制C矩阵初始化方式
+// 不显式传入Bias起始地址，通过参数控制C矩阵初始化方式（占位符形式）
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 __ca__ <a_dtype>* a_matrix,
                                 __cb__ <b_dtype>* b_matrix,
@@ -84,7 +83,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 bool c_matrix_source,
                                 bool c_matrix_init_val)
 
-// 显式传入Bias起始地址，C矩阵使用Bias矩阵初始化
+// 显式传入Bias起始地址，C矩阵使用Bias矩阵初始化（占位符形式）
 __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 __ca__ <a_dtype>* a_matrix,
                                 __cb__ <b_dtype>* b_matrix,
@@ -143,13 +142,13 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 <!-- end id12 -->
 
 <!-- npu="A3,910b" id13 -->
-### 函数原型（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
-**占位符形式：**
+### 函数原型（[NPU架构版本2201](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
 
 - asc_mmad接口：
 
   ```c
+  // 占位符形式
   __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
   ```
 

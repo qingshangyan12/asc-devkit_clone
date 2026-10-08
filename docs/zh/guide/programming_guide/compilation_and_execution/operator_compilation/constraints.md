@@ -31,6 +31,7 @@
     | 复数 | complex32、complex64。| 仅支持声明 |
     
     使用示例如下：
+
       ```cpp
       // 全局
       bool flag = true;
@@ -53,6 +54,7 @@
     | 扩展向量数据类型  | vector_hifloat8_t、vector_fp8_e4m3fn_t、vector_fp8_e5m2_t、vector_fp8_e8m0_t、vector_bfloat16_t。|
 
     使用示例如下：
+
       ```cpp
       // 全局声明
       hifloat8_t *flag = nullptr;
@@ -66,7 +68,7 @@
       }
       ```
 
-- 暂不支持使用模板方式传递向量数据类型，如`vector_fp8_e5m2_t`。
+- 暂不支持在Host端使用模板方式传递`扩展向量数据类型`，如`vector_fp8_e4m3fn_t`。
 
 - 暂不支持在函数空间外定义和使用device侧的字符串字面量。例如：
 
