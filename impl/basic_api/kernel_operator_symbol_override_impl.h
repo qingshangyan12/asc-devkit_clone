@@ -37,7 +37,7 @@
 #include "dav_m300/kernel_operator_vec_binary_continuous_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_binary_continuous_impl.h"
-#elif __NPU_ARCH__ == 3510 
+#elif __NPU_ARCH__ == 3510
 #include "reg_compute/kernel_reg_compute_intf.h"
 #include "dav_3510/kernel_operator_vec_binary_continuous_impl.h"
 #include "dav_3510/kernel_operator_vec_compare_continuous_impl.h"

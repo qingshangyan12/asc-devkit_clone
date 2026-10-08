@@ -38,7 +38,7 @@
 #include "dav_m310/kernel_operator_vec_binary_scalar_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_binary_scalar_impl.h"
-#elif __NPU_ARCH__ == 9201 
+#elif __NPU_ARCH__ == 9201
 #include "dav_9201/kernel_operator_vec_binary_scalar_impl.h"
 #elif __NPU_ARCH__ == 9202
 #include "dav_9202/kernel_operator_vec_binary_scalar_impl.h"
@@ -1163,9 +1163,9 @@ __aicore__ inline void LeakyRelu(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(), scalarValue, count);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
-                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 /* **************************************************************************************************
  * Adds                                             *
  * ************************************************************************************************* */

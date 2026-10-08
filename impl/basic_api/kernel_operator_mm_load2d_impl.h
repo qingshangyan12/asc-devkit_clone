@@ -58,7 +58,8 @@ __aicore__ inline void LoadDataImpl(
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams, const bool enablePreReadIgnoreSync = false)
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams,
+    const bool enablePreReadIgnoreSync = false)
 {
 #if ASCENDC_CPU_DEBUG
     if (!CheckFuncLoadData2d(dst, src, loadDataParams, "LoadData with LoadData2DParams")) {
@@ -73,7 +74,8 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     } else if (dstScope == Hardware::L1) {
         const uint8_t cacheMode = ExtractCacheMode(src);
         LoadData2DGM2L1Cal(
-            (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams, enablePreReadIgnoreSync, cacheMode);
+            (__cbuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), loadDataParams,
+            enablePreReadIgnoreSync, cacheMode);
     }
 }
 #else
@@ -103,8 +105,8 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadDataImpl(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load2DBitModeParam& loadDataParams)
@@ -225,9 +227,9 @@ __aicore__ inline void LoadDataImpl(
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
-                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, typename U, typename V = fp8_e8m0_t>
 __aicore__ inline void LoadDataImpl(
     const LocalTensor<U>& dst, const LocalTensor<T>& src, const LocalTensor<V>& srcMx,
@@ -289,8 +291,8 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
     }
 #endif
     const Hardware dstScope = GetPhyType((TPosition)dst.GetPosition());
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     const uint8_t cacheMode = ExtractCacheMode(src);
     if (dstScope == Hardware::L0A) {
         LoadData2DGM2L0ACal(

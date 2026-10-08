@@ -70,15 +70,16 @@ __aicore__ inline int64_t GetICachePreloadStatus();
 __aicore__ inline void PrefetchStop();
 
 enum class PrefetchLayout : uint8_t {
-    ROW_MAJOR,     // ND
-    COLUMN_MAJOR   // DN
+    ROW_MAJOR,   // ND
+    COLUMN_MAJOR // DN
 };
 
 struct PrefetchParams {
     __aicore__ PrefetchParams() {}
 
     __aicore__ PrefetchParams(const uint32_t burstNumIn, const uint32_t burstLenIn, const int64_t srcStrideIn)
-        : burstNum(burstNumIn), burstLen(burstLenIn), srcStride(srcStrideIn) {}
+        : burstNum(burstNumIn), burstLen(burstLenIn), srcStride(srcStrideIn)
+    {}
 
     uint32_t burstNum = 0;
     uint32_t burstLen = 0;
@@ -89,10 +90,15 @@ template <PrefetchLayout layout>
 struct PrefetchToNZParams {
     __aicore__ PrefetchToNZParams() {}
 
-    __aicore__ PrefetchToNZParams(const uint16_t matrixNumIn, const uint16_t nValueIn, const uint32_t dValueIn,
-                                  const uint64_t srcMatrixStrideIn, const uint64_t srcDValueIn)
-        : matrixNum(matrixNumIn), nValue(nValueIn), dValue(dValueIn),
-          srcMatrixStride(srcMatrixStrideIn), srcDValue(srcDValueIn) {}
+    __aicore__ PrefetchToNZParams(
+        const uint16_t matrixNumIn, const uint16_t nValueIn, const uint32_t dValueIn, const uint64_t srcMatrixStrideIn,
+        const uint64_t srcDValueIn)
+        : matrixNum(matrixNumIn),
+          nValue(nValueIn),
+          dValue(dValueIn),
+          srcMatrixStride(srcMatrixStrideIn),
+          srcDValue(srcDValueIn)
+    {}
 
     uint16_t matrixNum = 0;
     uint16_t nValue = 0;
@@ -105,8 +111,7 @@ template <typename T>
 __aicore__ inline void Prefetch(const GlobalTensor<T>& src, const PrefetchParams& prefetchParams);
 
 template <typename T, PrefetchLayout layout>
-__aicore__ inline void Prefetch(const GlobalTensor<T>& src,
-                                const PrefetchToNZParams<layout>& prefetchToNZParams);
+__aicore__ inline void Prefetch(const GlobalTensor<T>& src, const PrefetchToNZParams<layout>& prefetchToNZParams);
 
 } // namespace AscendC
 

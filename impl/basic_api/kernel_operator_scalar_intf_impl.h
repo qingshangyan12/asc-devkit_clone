@@ -44,7 +44,7 @@ __aicore__ inline int64_t CountLeadingZero(uint64_t valueIn) { return CountLeadi
 __aicore__ inline int64_t ScalarCountLeadingZero(uint64_t valueIn) { return CountLeadingZero(valueIn); }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T>
 __aicore__ inline void GetUintDivMagicAndShift(T& magic, T& shift, T divisor)
 {

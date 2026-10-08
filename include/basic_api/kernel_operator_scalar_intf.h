@@ -68,18 +68,18 @@ __aicore__ inline U ScalarCast(T valueIn);
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
      (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101) || \
-     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
-     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || \
+     (__NPU_ARCH__ == 9202))
 // 所有架构共用的：float -> bfloat16_t
 __aicore__ inline bfloat16_t Cast(const float& fVal);
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
-                              (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 // 各架构特化的：类型 -> float
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, typename U, typename>
 __aicore__ constexpr inline U Cast(T bVal);
 #else
@@ -93,12 +93,14 @@ __aicore__ constexpr inline float Cast(const T& bVal);
 #endif
 
 template <typename T>
-[[deprecated("Deprecated since 9.2.0, will be removed after 2027/12/30, Use WriteGmBypassDCache instead.")]]
-__aicore__ inline void WriteGmByPassDCache(__gm__ T* addr, T value);
+[[deprecated("Deprecated since 9.2.0, will be removed after 2027/12/30, Use WriteGmBypassDCache "
+             "instead.")]] __aicore__ inline void
+WriteGmByPassDCache(__gm__ T* addr, T value);
 
 template <typename T>
-[[deprecated("Deprecated since 9.2.0, will be removed after 2027/12/30, Use ReadGmBypassDCache instead.")]]
-__aicore__ inline T ReadGmByPassDCache(__gm__ T* addr);
+[[deprecated(
+    "Deprecated since 9.2.0, will be removed after 2027/12/30, Use ReadGmBypassDCache instead.")]] __aicore__ inline T
+ReadGmByPassDCache(__gm__ T* addr);
 
 template <typename T>
 __aicore__ inline void WriteGmBypassDCache(__gm__ T* addr, T value);

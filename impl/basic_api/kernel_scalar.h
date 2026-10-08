@@ -37,8 +37,8 @@ __aicore__ inline int64_t GetBitCountImpl(uint64_t valueIn)
 
 __aicore__ inline int64_t CountLeadingZeroImpl(uint64_t valueIn) { return clz(valueIn); }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 __aicore__ inline uint64_t GetUintDivMagic(uint64_t dividend, uint64_t divisor)
 {
     uint64_t quotient = 0;
@@ -194,8 +194,8 @@ __aicore__ inline U CastImpl(T valueIn)
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
      (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || \
-     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
-     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || \
+     (__NPU_ARCH__ == 9202))
     if constexpr (std::is_same<U, half>::value) {
         return CastF322F16Impl<roundMode>(valueIn);
     } else if constexpr (std::is_same<U, int32_t>::value) {

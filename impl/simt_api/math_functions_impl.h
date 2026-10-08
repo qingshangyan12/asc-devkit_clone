@@ -361,7 +361,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normcdfinvf(float x)
         if (__isfinite(abs_x)) {                                \
             float integral_x = truncf(x);                       \
             *(n) = integral_x;                                  \
-            float decimal = (x) - integral_x;                   \
+            float decimal = (x)-integral_x;                     \
             union Data data {                                   \
                 .f = decimal                                    \
             };                                                  \

@@ -62,7 +62,7 @@ __aicore__ inline constexpr bool IsBf16NeedRound(uint64_t man)
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 namespace FPTranslation {
 // HiFloat8 -> Fp32
 #define HIF8_SIGN_INDEX (7)
@@ -397,7 +397,7 @@ __aicore__ __callee__ inline bfloat16_t Fp4e2m1ToBfloat(const uint8_t fpVal)
 
 // Fp4e1m2 -> Bf16
 constexpr uint16_t Fp4e1m2ToBf16[16] = {0x0,    0x3E80, 0x3F00, 0x3F40, 0x3F80, 0x3FA0, 0x3FC0, 0x3FE0,
-                                    0x8000, 0xBE80, 0xBF00, 0xBF40, 0xBF80, 0xBFA0, 0xBFC0, 0xBFE0};
+                                        0x8000, 0xBE80, 0xBF00, 0xBF40, 0xBF80, 0xBFA0, 0xBFC0, 0xBFE0};
 
 __aicore__ __callee__ inline bfloat16_t Fp4e1m2ToBfloat(const uint8_t fpVal)
 {

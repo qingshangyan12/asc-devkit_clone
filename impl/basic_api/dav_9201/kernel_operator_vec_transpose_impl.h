@@ -298,7 +298,7 @@ __aicore__ inline void TransposeImpl(__ubuf__ T* dst, __ubuf__ T* src)
 
 template <typename T>
 struct Transpose4dParams {
-    __aicore__ Transpose4dParams() {};
+    __aicore__ Transpose4dParams(){};
 
     uint8_t blockSize = 1;
     uint16_t tmp1RemainRowCount = 0;

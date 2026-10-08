@@ -59,43 +59,46 @@ __aicore__ inline void PreLoad(const int64_t preFetchLen)
     PreLoadImpl(reinterpret_cast<void*>(pc), preFetchLen);
 }
 
-__aicore__ inline void PrefetchStopImpl()
-{
-    __prefetch_stop();
-}
+__aicore__ inline void PrefetchStopImpl() { __prefetch_stop(); }
 
 template <typename T>
 __aicore__ inline void PrefetchAlignV2Impl(__gm__ T* src, const PrefetchParams& params)
 {
     constexpr uint8_t l2CacheCtl = PREFETCH_L2_CACHE_CTL;
-    const uint32_t burstNum  = params.burstNum;
-    const uint32_t burstLen  = params.burstLen;
+    const uint32_t burstNum = params.burstNum;
+    const uint32_t burstLen = params.burstLen;
     const uint64_t srcStride = params.srcStride;
 
     if ASCEND_IS_AIC {
         constexpr bool preAllocation = false;
         if constexpr (sizeof(T) == 4) {
-            copy_gm_to_cbuf_align_v2((__cbuf__ uint32_t*)0, (__gm__ uint32_t*)src,
-                0, burstNum, burstLen, 0, 0, true, preAllocation, l2CacheCtl, srcStride, 0);
+            copy_gm_to_cbuf_align_v2(
+                (__cbuf__ uint32_t*)0, (__gm__ uint32_t*)src, 0, burstNum, burstLen, 0, 0, true, preAllocation,
+                l2CacheCtl, srcStride, 0);
         } else if constexpr (sizeof(T) == 2) {
-            copy_gm_to_cbuf_align_v2((__cbuf__ uint16_t*)0, (__gm__ uint16_t*)src,
-                0, burstNum, burstLen, 0, 0, true, preAllocation, l2CacheCtl, srcStride, 0);
+            copy_gm_to_cbuf_align_v2(
+                (__cbuf__ uint16_t*)0, (__gm__ uint16_t*)src, 0, burstNum, burstLen, 0, 0, true, preAllocation,
+                l2CacheCtl, srcStride, 0);
         } else if constexpr (sizeof(T) == 1) {
-            copy_gm_to_cbuf_align_v2((__cbuf__ uint8_t*)0, (__gm__ uint8_t*)src,
-                0, burstNum, burstLen, 0, 0, true, preAllocation, l2CacheCtl, srcStride, 0);
+            copy_gm_to_cbuf_align_v2(
+                (__cbuf__ uint8_t*)0, (__gm__ uint8_t*)src, 0, burstNum, burstLen, 0, 0, true, preAllocation,
+                l2CacheCtl, srcStride, 0);
         }
     } else if ASCEND_IS_AIV {
         constexpr bool preAllocation = false;
         constexpr bool nonEodCtrl = false;
         if constexpr (sizeof(T) == 4) {
-            copy_gm_to_ubuf_align_v2((__ubuf__ uint32_t*)0, (__gm__ uint32_t*)src,
-                0, burstNum, burstLen, 0, 0, true, preAllocation, l2CacheCtl, srcStride, 0, nonEodCtrl);
+            copy_gm_to_ubuf_align_v2(
+                (__ubuf__ uint32_t*)0, (__gm__ uint32_t*)src, 0, burstNum, burstLen, 0, 0, true, preAllocation,
+                l2CacheCtl, srcStride, 0, nonEodCtrl);
         } else if constexpr (sizeof(T) == 2) {
-            copy_gm_to_ubuf_align_v2((__ubuf__ uint16_t*)0, (__gm__ uint16_t*)src,
-                0, burstNum, burstLen, 0, 0, true, preAllocation, l2CacheCtl, srcStride, 0, nonEodCtrl);
+            copy_gm_to_ubuf_align_v2(
+                (__ubuf__ uint16_t*)0, (__gm__ uint16_t*)src, 0, burstNum, burstLen, 0, 0, true, preAllocation,
+                l2CacheCtl, srcStride, 0, nonEodCtrl);
         } else if constexpr (sizeof(T) == 1) {
-            copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t*)0, (__gm__ uint8_t*)src,
-                0, burstNum, burstLen, 0, 0, true, preAllocation, l2CacheCtl, srcStride, 0, nonEodCtrl);
+            copy_gm_to_ubuf_align_v2(
+                (__ubuf__ uint8_t*)0, (__gm__ uint8_t*)src, 0, burstNum, burstLen, 0, 0, true, preAllocation,
+                l2CacheCtl, srcStride, 0, nonEodCtrl);
         }
     }
 }
@@ -106,10 +109,8 @@ __aicore__ inline void PrefetchND2NZImpl(__gm__ T* src, const PrefetchToNZParams
     if ASCEND_IS_AIC {
         constexpr uint8_t l2CacheCtl = PREFETCH_L2_CACHE_CTL;
 
-        uint64_t mte2NzPara = static_cast<uint64_t>(0) << 48
-                            | static_cast<uint64_t>(0) << 32
-                            | static_cast<uint64_t>(0) << 16
-                            | static_cast<uint64_t>(params.matrixNum);
+        uint64_t mte2NzPara = static_cast<uint64_t>(0) << 48 | static_cast<uint64_t>(0) << 32 |
+                              static_cast<uint64_t>(0) << 16 | static_cast<uint64_t>(params.matrixNum);
         set_mte2_nz_para(mte2NzPara);
 
         const uint64_t loop1SrcStride = static_cast<uint64_t>(params.srcDValue) * sizeof(T);
@@ -117,14 +118,17 @@ __aicore__ inline void PrefetchND2NZImpl(__gm__ T* src, const PrefetchToNZParams
 
         constexpr bool preAllocation = false;
         if constexpr (sizeof(T) == 1) {
-            copy_gm_to_cbuf_multi_nd2nz((__cbuf__ int8_t*)0, (__gm__ int8_t*)src,
-                0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue, loop4SrcStride, false, preAllocation);
+            copy_gm_to_cbuf_multi_nd2nz(
+                (__cbuf__ int8_t*)0, (__gm__ int8_t*)src, 0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue,
+                loop4SrcStride, false, preAllocation);
         } else if constexpr (sizeof(T) == 2) {
-            copy_gm_to_cbuf_multi_nd2nz((__cbuf__ half*)0, (__gm__ half*)src,
-                0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue, loop4SrcStride, false, preAllocation);
+            copy_gm_to_cbuf_multi_nd2nz(
+                (__cbuf__ half*)0, (__gm__ half*)src, 0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue,
+                loop4SrcStride, false, preAllocation);
         } else if constexpr (sizeof(T) == 4) {
-            copy_gm_to_cbuf_multi_nd2nz((__cbuf__ float*)0, (__gm__ float*)src,
-                0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue, loop4SrcStride, false, preAllocation);
+            copy_gm_to_cbuf_multi_nd2nz(
+                (__cbuf__ float*)0, (__gm__ float*)src, 0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue,
+                loop4SrcStride, false, preAllocation);
         }
     }
 }
@@ -135,10 +139,8 @@ __aicore__ inline void PrefetchDN2NZImpl(__gm__ T* src, const PrefetchToNZParams
     if ASCEND_IS_AIC {
         constexpr uint8_t l2CacheCtl = PREFETCH_L2_CACHE_CTL;
 
-        uint64_t mte2NzPara = static_cast<uint64_t>(0) << 48
-                            | static_cast<uint64_t>(0) << 32
-                            | static_cast<uint64_t>(0) << 16
-                            | static_cast<uint64_t>(params.matrixNum);
+        uint64_t mte2NzPara = static_cast<uint64_t>(0) << 48 | static_cast<uint64_t>(0) << 32 |
+                              static_cast<uint64_t>(0) << 16 | static_cast<uint64_t>(params.matrixNum);
         set_mte2_nz_para(mte2NzPara);
 
         const uint64_t loop1SrcStride = static_cast<uint64_t>(params.srcDValue) * sizeof(T);
@@ -146,14 +148,17 @@ __aicore__ inline void PrefetchDN2NZImpl(__gm__ T* src, const PrefetchToNZParams
 
         constexpr bool preAllocation = false;
         if constexpr (sizeof(T) == 1) {
-            copy_gm_to_cbuf_multi_dn2nz((__cbuf__ int8_t*)0, (__gm__ int8_t*)src,
-                0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue, loop4SrcStride, false, preAllocation);
+            copy_gm_to_cbuf_multi_dn2nz(
+                (__cbuf__ int8_t*)0, (__gm__ int8_t*)src, 0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue,
+                loop4SrcStride, false, preAllocation);
         } else if constexpr (sizeof(T) == 2) {
-            copy_gm_to_cbuf_multi_dn2nz((__cbuf__ half*)0, (__gm__ half*)src,
-                0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue, loop4SrcStride, false, preAllocation);
+            copy_gm_to_cbuf_multi_dn2nz(
+                (__cbuf__ half*)0, (__gm__ half*)src, 0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue,
+                loop4SrcStride, false, preAllocation);
         } else if constexpr (sizeof(T) == 4) {
-            copy_gm_to_cbuf_multi_dn2nz((__cbuf__ float*)0, (__gm__ float*)src,
-                0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue, loop4SrcStride, false, preAllocation);
+            copy_gm_to_cbuf_multi_dn2nz(
+                (__cbuf__ float*)0, (__gm__ float*)src, 0, loop1SrcStride, l2CacheCtl, params.nValue, params.dValue,
+                loop4SrcStride, false, preAllocation);
         }
     }
 }

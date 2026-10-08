@@ -68,8 +68,8 @@ bool CheckFuncVecBinaryScalarCmp(
     return CheckFuncVecBinaryScalarCmpImpl(chkParams, intriName);
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <const BinaryConfig& config, typename T, typename U, typename S>
 bool CheckFuncVecBinaryScalarCmp(
     const T& dstLocal, const U& src0, const S& src1, const int32_t& count, const char* intriName)

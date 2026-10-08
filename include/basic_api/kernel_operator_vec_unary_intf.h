@@ -30,7 +30,7 @@
 #include "kernel_struct_unary.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
-    __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #include "reg_compute/kernel_reg_compute_utils.h"
 #endif
 
@@ -92,8 +92,8 @@ __aicore__ inline void Relu(const LocalTensor<T>& dst, const LocalTensor<T>& src
  * @param [in] repeatParams.dstRepStride dst repeat stride
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, bool isSetMask = true, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __ASC_USE_RESERVED_UBUF__(3510, "Exp is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Exp(
@@ -122,8 +122,8 @@ __aicore__ inline void Exp(
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, const ExpConfig& config = DEFAULT_EXP_CONFIG>
 __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 #else
@@ -144,8 +144,8 @@ __aicore__ inline void Exp(const LocalTensor<T>& dst, const LocalTensor<T>& src,
  * @param [in] repeatParams.dstRepStride dst repeat stride
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, bool isSetMask = true, const LnConfig& config = DEFAULT_LN_CONFIG>
 __ASC_USE_RESERVED_UBUF__(3510, "Ln is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Ln(
@@ -174,8 +174,8 @@ __aicore__ inline void Ln(
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, const LnConfig& config = DEFAULT_LN_CONFIG>
 __aicore__ inline void Ln(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 #else
@@ -217,8 +217,8 @@ __aicore__ inline void Abs(
 template <typename T>
 __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 /*
  * @ingroup Abs Level 2 for complex32/complex64
  * @brief dst[i] = abs(src[i])
@@ -243,8 +243,8 @@ __aicore__ inline void Abs(const LocalTensor<T>& dst, const LocalTensor<U>& src,
  * @param [in] repeatParams.dstRepStride dst repeat stride
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, bool isSetMask = true, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
 __ASC_USE_RESERVED_UBUF__(
     3510, "Reciprocal is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
@@ -275,8 +275,8 @@ __aicore__ inline void Reciprocal(
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, const ReciprocalConfig& config = DEFAULT_RECIPROCAL_CONFIG>
 __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 #else
@@ -297,8 +297,8 @@ __aicore__ inline void Reciprocal(const LocalTensor<T>& dst, const LocalTensor<T
  * @param [in] repeatParams.dstRepStride dst repeat stride
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, bool isSetMask = true, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
 __ASC_USE_RESERVED_UBUF__(3510, "Rsqrt is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Rsqrt(
@@ -327,8 +327,8 @@ __aicore__ inline void Rsqrt(
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, const RsqrtConfig& config = DEFAULT_RSQRT_CONFIG>
 __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 #else
@@ -349,8 +349,8 @@ __aicore__ inline void Rsqrt(const LocalTensor<T>& dst, const LocalTensor<T>& sr
  * @param [in] repeatParams.dstRepStride dst repeat stride
  * @param [in] repeatParams.src0RepStride src repeat stride
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, bool isSetMask = true, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
 __ASC_USE_RESERVED_UBUF__(3510, "Sqrt is forbidden when compile option --cce-disable-asc-reserved-ubuf is enabled")
 __aicore__ inline void Sqrt(
@@ -379,8 +379,8 @@ __aicore__ inline void Sqrt(
  * @param [in] src input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, const SqrtConfig& config = DEFAULT_SQRT_CONFIG>
 __aicore__ inline void Sqrt(const LocalTensor<T>& dst, const LocalTensor<T>& src, const int32_t& count);
 #else

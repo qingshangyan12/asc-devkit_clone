@@ -88,9 +88,9 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
     SetFixPipeConfigImpl<T, setRelu>(preData, isUnitFlag);
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5101 || \
-                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || \
-                              __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
+     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
 {
     SetFixpipeNz2ndFlagImpl(ndNum, srcNdStride, dstNdStride);
@@ -200,8 +200,8 @@ __aicore__ inline void Fixpipe(
         (__cbuf__ uint64_t*)cbufWorkspace.GetPhyAddr(), intriParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 // L0C->L1/UB
 template <typename T, typename U, const FixpipeConfig& config>
 __aicore__ inline void Fixpipe(
@@ -266,8 +266,8 @@ __aicore__ inline void Fixpipe(
     }
 #endif // ASCENDC_CPU_DEBUG
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(), intriParams, cacheMode);
@@ -293,8 +293,8 @@ __aicore__ inline void Fixpipe(
     using SrcPrimType = PrimT<U>;
     CheckTensorPos(src, Hardware::L0C, "src", "CO1", "Fixpipe");
     CheckTensorPos(cbufWorkspace, Hardware::L1, "cbufWorkspace", "A1", "Fixpipe");
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
-    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && \
+    ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     const uint8_t cacheMode = ExtractCacheMode(dst);
     FixpipeL0C2GMImpl<DstPrimType, SrcPrimType, config>(
         (__gm__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(),
@@ -317,7 +317,8 @@ __aicore__ inline void Fixpipe(
     ASCENDC_CHECK_TPOSITION(
         (GetPhyType((TPosition)dst.GetPosition()) == Hardware::L1) ||
             (GetPhyType((TPosition)dst.GetPosition()) == Hardware::UB),
-        "dst", "L1 Buffer(A1)", "Fixpipe", ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+        "dst", "L1 Buffer(A1)", "Fixpipe",
+        ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
     if constexpr (config.isToUB) {
         FixpipeL0C2UBImpl<DstPrimType, SrcPrimType, config>(
             (__ubuf__ DstPrimType*)dst.GetPhyAddr(), (__cc__ SrcPrimType*)src.GetPhyAddr(), intriParams);
@@ -339,7 +340,8 @@ __aicore__ inline void Fixpipe(
     ASCENDC_CHECK_TPOSITION(
         (GetPhyType((TPosition)dst.GetPosition()) == Hardware::L1) ||
             (GetPhyType((TPosition)dst.GetPosition()) == Hardware::UB),
-        "dst", "L1 Buffer(A1)", "Fixpipe", ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
+        "dst", "L1 Buffer(A1)", "Fixpipe",
+        ConstDefiner::Instance().logicNameMap.at(static_cast<uint8_t>(dst.GetPosition())));
     CheckTensorPos(cbufWorkspace, Hardware::L1, "cbufWorkspace", "A1", "Fixpipe");
     if constexpr (config.isToUB) {
         FixpipeL0C2UBImpl<DstPrimType, SrcPrimType, config>(

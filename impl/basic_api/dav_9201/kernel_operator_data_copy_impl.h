@@ -136,7 +136,8 @@ __aicore__ inline void CopyUbufToGmAlignV2(
         uint32_t burstLength = blockLen * unitOfBytes;
         uint32_t srcStride310 = 0;
         if constexpr (mode == PaddingMode::Normal) {
-            srcStride310 = static_cast<uint32_t>(srcStride) * BYTE_32_ALIGN; // UB   DataCopy:32Bytes, DataCopyPad:32Bytes
+            srcStride310 =
+                static_cast<uint32_t>(srcStride) * BYTE_32_ALIGN; // UB   DataCopy:32Bytes, DataCopyPad:32Bytes
         } else {
             srcStride310 = burstLength;
         }
@@ -215,7 +216,8 @@ __aicore__ inline void CopyUbufToCbuf(
     const uint16_t dstStride)
 {
     if ASCEND_IS_AIV {
-        copy_ubuf_to_cbuf((__cbuf__ void*)dst, (__ubuf__ void*)src, (uint8_t)0, blockCount, blockLen, srcStride, dstStride);
+        copy_ubuf_to_cbuf(
+            (__cbuf__ void*)dst, (__ubuf__ void*)src, (uint8_t)0, blockCount, blockLen, srcStride, dstStride);
     }
 }
 

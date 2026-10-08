@@ -75,7 +75,10 @@ __aicore__ inline void DumpTensorLocal2GMImpl(const LocalTensor<T>& src, uint32_
     DumpTensorLocal2GMImpl(src, desc, dumpSize, nullptr, 0);
 }
 
-__aicore__ inline void DumpShapeImpl(const ShapeInfo& shapeInfo) { __asc_aicore::asc_dump_shape_impl(shapeInfo.shapeDim, shapeInfo.shape); }
+__aicore__ inline void DumpShapeImpl(const ShapeInfo& shapeInfo)
+{
+    __asc_aicore::asc_dump_shape_impl(shapeInfo.shapeDim, shapeInfo.shape);
+}
 
 template <typename T>
 __aicore__ inline void DumpTensorGM2GMImpl(

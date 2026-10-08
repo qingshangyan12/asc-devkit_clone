@@ -63,8 +63,9 @@ __aicore__ inline __gm__ uint8_t* __gm__ GetSysWorkSpacePtr()
 #if defined(ASCENDC_CPU_DEBUG)
 __aicore__ void SetSysWorkSpacePtr(__gm__ uint8_t* workspace);
 #else
-[[deprecated("NOTICE: SetSysWorkSpacePtr has been deprecated and will be removed in the next version.")]]
-__aicore__ inline void SetSysWorkSpacePtr(__gm__ uint8_t* workspace)
+[[deprecated(
+    "NOTICE: SetSysWorkSpacePtr has been deprecated and will be removed in the next version.")]] __aicore__ inline void
+SetSysWorkSpacePtr(__gm__ uint8_t* workspace)
 {
     g_sysWorkspaceReserved = workspace;
 }
