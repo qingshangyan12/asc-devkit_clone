@@ -8,9 +8,9 @@ This sample implements matrix multiplication using the Matmul high-level API. Ni
 
 | Products | CANN Software Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 training series products/Atlas A3 inference series products | >= CANN 9.0.0 |
-| Atlas A2 training series products/Atlas A2 inference series products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Introduction to directory structure
 
@@ -420,7 +420,7 @@ UnitFlag function diagram:
 
 ## Performance comparison summary
 
-### Atlas A2 training series chip performance data
+### Atlas A2 products chip performance data
 
 **Comprehensive optimization effect**:
 - In this sample, the cube utilization (the ratio of Cube computing unit time to AI Core time, i.e. `aic_mac_ratio`) increased by **67.7 percentage points** (18.7% → 86.4%)
@@ -444,7 +444,7 @@ The key parameters for Matmul theoretical performance evaluation are: Cube compu
 
 #### Cube computing performance analysis
 
-Sample parameters: M=N=K=8192, baseM=128, baseN=256, baseK=64. The performance data of this sample was tested on the Atlas A2 training series product. The computing chip has a main frequency of 1.85GHz and processes 16×16×16 multiplication and addition operations per cycle.
+Sample parameters: M=N=K=8192, baseM=128, baseN=256, baseK=64. The performance data of this sample was tested on the Atlas A2 products. The computing chip has a main frequency of 1.85GHz and processes 16×16×16 multiplication and addition operations per cycle.
 
 Cube theoretical calculation time:
 $$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_num \times cube\_freq} = \frac{8192 \times 8192 \times 8192}{16 \times 16 \times 16 \times 24 \times 1850} = 3022.92\mu s$$
@@ -515,7 +515,7 @@ $$=\frac{256 \times 1024 \times 1024B}{1.6 \times 10^{12}B/s} +\frac{8 \times 10
 
 Case 8 MTE2 time-consuming error:
 $$MTE2 time-consuming error = \frac{{1900.322\mu s} - {1832.1\mu s}}{{1832.1\mu s}} = 3.72\%$$
-Compared with the Atlas A2 training series chip, the Ascend 950PR chip is upgraded and data transfer is more efficient.
+Compared with the Atlas A2 products chip, the Ascend 950PR chip is upgraded and data transfer is more efficient.
 
 ## Tuning suggestions
 
@@ -565,7 +565,7 @@ Perform the following steps in the root directory of this sample to compile and 
   |------|--------|------|
   | `SCENARIO_NUM` | `0`-`8` | Sample type (0-8), default is 0 |
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Operation mode: NPU operation, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 training series products/Atlas A2 inference series products and Atlas A3 training series products/Atlas A3 inference series products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
 
   The execution results are as follows, indicating that the accuracy comparison is successful.
   ```bash
