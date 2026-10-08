@@ -10,9 +10,9 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
+| Atlas A3系列产品 | >= CANN 9.0.0 |
+| Atlas A2系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -140,7 +140,7 @@ $$
 
 以下性能数据为排除单次执行的随机波动，取5次独立运行的平均值。
 
-#### Atlas A2 训练系列产品（dav-2201架构）
+#### Atlas A2系列产品（dav-2201架构）
 
 | 指标 | kernel_no_preload | kernel_with_preload | 优化效果 |
 |------|------------------|---------------------|---------|
@@ -158,7 +158,7 @@ $$
 **Task Duration**：核函数端到端执行耗时，是最直观的性能指标。
 **aiv_scalar_time**：Scalar单元耗时，间接索引场景下Scalar访存是主要瓶颈。
 
-#### 5次独立运行详细数据（Atlas A2 训练系列产品）
+#### 5次独立运行详细数据（Atlas A2系列产品）
 
 | 执行次数 | no_preload Duration(us) | with_preload Duration(us) | 加速比 |
 |---------|------------------------|--------------------------|--------|
@@ -229,7 +229,7 @@ $$
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201对应Atlas A2训练系列产品/Atlas A2推理系列产品及Atlas A3训练系列产品/Atlas A3推理系列产品，dav-3510对应Ascend 950系列产品 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU架构：dav-2201对应Atlas A2系列产品及Atlas A3系列产品，dav-3510对应Ascend 950系列产品 |
   | `SCENARIO_NUM` | `1`（默认）、`2` | 场景编号：1（无preload）、2（有preload） |
 
 - 执行结果
