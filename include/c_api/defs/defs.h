@@ -25,6 +25,7 @@
 #include "c_api/defs/macro.h"
 #include "c_api/defs/type.h"
 #include "c_api/defs/union.h"
+#include "version/asc_devkit_version.h"
 
 #endif
 
