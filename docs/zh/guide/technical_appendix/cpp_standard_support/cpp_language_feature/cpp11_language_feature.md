@@ -1,6 +1,6 @@
 # C++11语言特性<a name="ZH-CN_TOPIC_000000253823119001"></a>
 
-本文介绍C++11语言特性在Ascend C SIMT Device侧的支持情况。部分特性样例请参考[C++11语言特性支持样例](../../../../../../examples/03_simt_api/02_features/02_language_features/README.md)。
+本文介绍C++11语言特性在Ascend C SIMT Device侧的支持情况。语言特性样例请参考[语言特性样例](../../../../../../examples/03_simt_api/02_features/02_language_features/README.md)。
 
 ## 核心语言特性支持列表<a name="section_cpp11_core_features"></a>
 

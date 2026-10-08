@@ -1,6 +1,6 @@
 # C++11限制<a name="ZH-CN_TOPIC_000000253823119002"></a>
 
-本文介绍C++11特性在Ascend C SIMT Device侧的限制。受限特性分为并发类与运行时类两类：并发类特性的标准形式不可用，对应能力由SIMT API提供；运行时类特性因Device侧无对应运行时机制而不支持。每个"不支持"结论均有编译期报错作为证据，可通过[验证样例](../../../../../../examples/03_simt_api/02_features/02_language_features/06_cpp11_unsupported/README.md)中的`SCENARIO_NUM`编译选项逐项复现。
+本文介绍C++11特性在Ascend C SIMT Device侧的限制。受限特性分为并发类与运行时类两类：并发类特性的标准形式不可用，对应能力由SIMT API提供；运行时类特性因Device侧无对应运行时机制而不支持。每个"不支持"结论均有编译期报错作为证据，可在样例中编写同形态最小用例并编译复现。
 
 ## 并发类特性限制<a name="section_cpp11_concurrency_restrictions"></a>
 
@@ -59,4 +59,4 @@ Device侧的"不支持"按根因分为三类，排查编译报错时可按此定
 | `std::atomic_thread_fence` | `asc_threadfence`（设备级）、`asc_threadfence_block`（块级） | 双向内存栅栏。 |
 | （C++11无线程块概念） | `asc_syncthreads` | 线程块内同步。 |
 
-API详细说明请参考[原子操作](../../../../api/SIMT-API/atomic_operations/atomic_operations.md)与[同步与内存栅栏](../../../../api/SIMT-API/sync_and_memory_fence/sync_and_memory_fence.md)。完整验证代码请参考[C++11并发特性样例](../../../../../../examples/03_simt_api/02_features/02_language_features/05_cpp11_concurrency/README.md)。
+API详细说明请参考[原子操作](../../../../api/SIMT-API/atomic_operations/atomic_operations.md)与[同步与内存栅栏](../../../../api/SIMT-API/sync_and_memory_fence/sync_and_memory_fence.md)。

@@ -2,7 +2,7 @@
 
 本文介绍Lambda表达式在Ascend C中的使用方式。SIMT Device侧支持C++11 Lambda表达式的完整形态——值捕获、引用捕获、mutable、嵌套、立即调用（IIFE）、无捕获lambda转函数指针、捕获this、作为函数模板实参等均可直接使用；C++14泛型lambda与init-capture、C++17 constexpr lambda与`[*this]`按值捕获同样可用（见各标准章节）。
 
-Ascend C的Lambda是**Device侧局部闭包**：核函数（Kernel）参数仅支持基础类型、POD结构体与指针（见[核函数（Kernel）参数列表限制](../syntax_restrictions/functions.md#section_kernel_function_argument_list_constraint)），不存在"Host侧lambda传入核函数"的用法（即无`--extended-lambda`机制的等价物，试图传递会报`lambda type cannot be used as template argument for kernel function`），因此也没有跨执行空间的Lambda限制与闭包类型traits。需要按参数定制计算时，将标量参数直接传入核函数，在核函数内定义Lambda消费参数。
+Ascend C的Lambda是**Device侧局部闭包**：核函数（Kernel）参数仅支持基础类型、POD结构体与指针（见[核函数（Kernel）参数列表限制](../cpp_language_restrictions/functions.md#section_kernel_function_argument_list_constraint)），不存在"Host侧lambda传入核函数"的用法（即无`--extended-lambda`机制的等价物，试图传递会报`lambda type cannot be used as template argument for kernel function`），因此也没有跨执行空间的Lambda限制与闭包类型traits。需要按参数定制计算时，将标量参数直接传入核函数，在核函数内定义Lambda消费参数。
 
 SIMT编程与SIMD与SIMT混合编程场景场景下Lambda的使用约束略有不同。下文将会展开说明。
 
@@ -31,7 +31,7 @@ SIMT场景的限制如下：
 - lambda体内不可使用try/throw、动态分配、TLS等Device侧不支持的能力；
 - namespace-scope的lambda对象受全局变量规则约束（非constexpr闭包报`global variable is not allowed in aicore function`，constexpr闭包可用）。
 
-完整形态验证（mutable、嵌套、立即调用、捕获this、作为模板实参等）请参考[Lambda与字面量特性样例](../../../../../../examples/03_simt_api/02_features/02_language_features/03_cpp11_lambda_literals/README.md)。
+Lambda捕获在实际算子开发中的用法请参考[Lambda捕获实战样例](../../../../../../examples/03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)。
 
 ## SIMD与SIMT混合编程场景场景<a name="section_lambda_hybrid"></a>
 
@@ -78,7 +78,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 }
 ```
 
-完整可运行样例（含UB与GM之间的数据搬运、流水同步）请参考[混合编程lambda与标准库样例](../../../../../../examples/03_simt_api/02_features/02_language_features/07_cpp11_hybrid_stdlib/README.md)；标记规则、捕获边界与组合形态的逐项验证见[混合编程Lambda标记规则样例](../../../../../../examples/03_simt_api/02_features/02_language_features/11_lambda_hybrid_rules/README.md)。
+混合编程下Lambda捕获的完整可运行样例（含UB与GM之间的数据搬运、流水同步）请参考[混合编程Lambda捕获实战样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)。
 
 
 ### VF函数内支持的Lambda能力<a name="section_lambda_hybrid_list"></a>
@@ -113,4 +113,4 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 -   **constexpr lambda先落constexpr变量**：在VF函数内使用constexpr lambda时，将结果先赋给`constexpr`局部变量（`constexpr int32_t r64 = sq(8);`）再参与计算；不要在运行期路径直接调用constexpr闭包。
 -   **lambda的类型不可跨执行空间使用**：标记callee的Lambda只能在对应VF函数及其callee链内定义和使用；纯SIMT核函数内直接编写的Lambda无需（也不能）携带callee标记。
 -   **泛型Lambda与init-capture为C++14特性**：C++11语法范围内的Lambda（本节所述形态）在Device侧完整支持；`auto`参数与初始化捕获等C++14扩展见[C++14语言特性](./cpp14_language_feature.md)。
--   **Lambda与AscendC::Std**：混合编程场景下，Lambda可正常操作`AscendC::Std`标准库设施（如tuple，可在lambda体内`make_tuple`/`get`），但注意tuple模板实参不能携带UB地址空间限定类型，需先取值为普通标量局部变量再聚合，详见[混合编程样例](../../../../../../examples/03_simt_api/02_features/02_language_features/07_cpp11_hybrid_stdlib/README.md)说明。
+-   **Lambda与AscendC::Std**：混合编程场景下，Lambda可正常操作`AscendC::Std`标准库设施（如tuple，可在lambda体内`make_tuple`/`get`），但注意tuple模板实参不能携带UB地址空间限定类型，需先取值为普通标量局部变量再聚合，详见[混合编程Lambda捕获实战样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)说明。
