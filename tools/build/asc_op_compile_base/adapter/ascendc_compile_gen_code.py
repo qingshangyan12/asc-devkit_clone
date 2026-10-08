@@ -13,8 +13,9 @@
 ascendc compile gen code
 """
 
-import re
+import math
 import os
+import re
 from functools import reduce
 from tbe.common.buildcfg import get_current_build_config
 from .get_op_tiling import TilingInfo
@@ -31,6 +32,31 @@ from .ascendc_constants import (
 from .get_op_tiling import OpInfo
 from .global_storage import global_var_storage
 from .ascendc_compile_dfx import DFXSectionGenerator
+
+
+OOM_STORAGE_SHAPE_INIT_PATTERN = (
+    "    __gm__ uint8_t *oomStorageShapeCursor = (__gm__ uint8_t *)tiling + "
+    "tmpTilingSizeForOOM + {legacy_len_offset};\n"
+    "    bool hasOomStorageShape = "
+    "AscendC::OOMHasStorageShapeHeader(oomStorageShapeCursor);\n"
+    "    if (hasOomStorageShape) {{\n"
+    "        oomStorageShapeCursor += 2;\n"
+    "    }}\n"
+)
+OOM_TENSOR_REGISTER_PATTERN = (
+    "    if (!hasOomStorageShape || "
+    "!AscendC::OOMTryRegisterTensorWithStorageShape("
+    "oomStorageShapeCursor, {param_name}, static_cast<uint64_t>({element_size}))) {{\n"
+    "        AscendC::OOMCheckAddrRange({param_name}, {input_shape_len});\n"
+    "    }}\n"
+)
+OOM_TENSOR_LIST_REGISTER_PATTERN = (
+    "    if (!hasOomStorageShape || "
+    "!AscendC::OOMTryRegisterTensorListWithStorageShape("
+    "oomStorageShapeCursor, {param_name}, static_cast<uint64_t>({element_size}))) {{\n"
+    "        AscendC::OOMCheckTensorListRange({param_name}, {element_size});\n"
+    "    }}\n"
+)
 
 
 def add_time_stamp_codes(desc_id, space_len: int = 1):
@@ -139,13 +165,44 @@ def gen_global_isolation_macro(compile_info: CompileInfo, tiling_info: TilingInf
             macro_branch_statment = (
                 f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)\n"
             )
+    elif CommonUtility.is_920r1():
+        macro_branch_statment = (
+            f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_VEC__) && __NPU_ARCH__ == 9201)\n"
+        )
+        # judge operator is aic only
+        if compile_info.no_set_kernel_type is False:
+            kernel_type = compile_info.tiling_key_kernel_type[str(tiling_key)]
+            if kernel_type.value in [1, 3, 5, 6, 7]:
+                macro_branch_statment = (
+                    f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 9201)\n"
+                )
+        elif compile_info.code_channel == CORE_TYPE_CUBE:
+            macro_branch_statment = (
+                f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 9201)\n"
+            )
+    elif CommonUtility.is_920r2():
+        macro_branch_statment = (
+            f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_VEC__) && __NPU_ARCH__ == 9202)\n"
+        )
+        # judge operator is aic only
+        if compile_info.no_set_kernel_type is False:
+            kernel_type = compile_info.tiling_key_kernel_type[str(tiling_key)]
+            if kernel_type.value in [1, 3, 5, 6, 7]:
+                macro_branch_statment = (
+                    f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 9202)\n"
+                )
+        elif compile_info.code_channel == CORE_TYPE_CUBE:
+            macro_branch_statment = (
+                f"#if {TILING_KEY_MACRO} == {tiling_key}UL && (defined(__DAV_CUBE__) && __NPU_ARCH__ == 9202)\n"
+            )
     else:
         macro_branch_statment = f"#if {TILING_KEY_MACRO} == {tiling_key}UL\n"
     return macro_branch_statment
 
 
 def get_code_for_l2_cache(compile_info: CompileInfo, source, tiling_info: TilingInfo):
-    source += gen_global_isolation_macro(compile_info, tiling_info)
+    source += "#if (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201) && "
+    source += "defined(__ASCENDC_DEFINE_OP_SYSTEM_RUN_CFG__)\n"
     source += f"    __gm__ struct OpSystemRunCfg g_opSystemRunCfg = {{{0}}};\n"
     source += "#else\n"
     source += "    extern __gm__ struct OpSystemRunCfg g_opSystemRunCfg;\n"
@@ -237,6 +294,8 @@ data_type_map = {
     "DT_FLOAT8_E8M0": 1,
     "DT_FLOAT4_E2M1": (2 << 16) + 1,
     "DT_FLOAT4_E1M2": (2 << 16) + 1,
+    "DT_HIFLOAT4": (2 << 16) + 1,
+    "DT_HIFLOAT4_SCALE": 4,
 }
 
 
@@ -294,7 +353,6 @@ def set_workspace_param(opinfo: OpInfo, tiling_info: TilingInfo):
             source += "    tmpTilingSizeForOOM += 8;\n"
         workspace_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
         source += "    AscendC::OOMCheckAddrRange(workspace, {});\n".format(workspace_len)
-    source += "#endif\n"
     return source
 
 
@@ -318,26 +376,45 @@ def add_op_param_to_workspace(
     source += update_tiling_size_for_oom(compile_info, tiling_info, dyn_input_shape_offset)
     source += skip_mc2_context_size(opinfo)
 
+    if not tiling_info.static_shape_flag:
+        legacy_len_count = len([item for item in input_output_info if item is not None]) + 1
+        if opinfo.output_shape_depend_on_compute is not None and len(opinfo.output_shape_depend_on_compute) > 0:
+            legacy_len_count += 1
+        source += OOM_STORAGE_SHAPE_INIT_PATTERN.format(legacy_len_offset=8 * legacy_len_count)
+
     for io_index, op_param in enumerate(input_output_info):
         if op_param is None:
             continue
         if opinfo.param_type_list[io_index] == "dynamic":
             if dtype_int[io_index]:
-                source += "    AscendC::OOMCheckTensorListRange({}, {});\n".format(
-                    op_param.get("param_name"), dtype_int[io_index]
-                )
+                if tiling_info.static_shape_flag:
+                    source += "    AscendC::OOMCheckTensorListRange({}, {});\n".format(
+                        op_param.get("param_name"), dtype_int[io_index]
+                    )
+                else:
+                    source += OOM_TENSOR_LIST_REGISTER_PATTERN.format(
+                        param_name=op_param.get("param_name"), element_size=dtype_int[io_index]
+                    )
         else:
             if tiling_info.static_shape_flag:
                 input_shape_len = reduce(lambda x, y: x * y, op_param.get("shape")) * INPUT_OUTPUT_DTYPE_LEN.get(
                     op_param.get("dtype")
                 )
+                input_shape_len = math.ceil(input_shape_len)
                 input_shape_len = (input_shape_len + 32 - 1) // 32 * 32
+                source += "    AscendC::OOMCheckAddrRange({}, {});\n".format(
+                    op_param.get("param_name"), input_shape_len
+                )
             else:
                 input_shape_len = "*((__gm__ uint64_t *)((__gm__ uint8_t *)tiling + tmpTilingSizeForOOM))"
-            source += "    AscendC::OOMCheckAddrRange({}, {});\n".format(op_param.get("param_name"), input_shape_len)
+                element_size = INPUT_OUTPUT_DTYPE_LEN.get(op_param.get("dtype"), 0)
+                source += OOM_TENSOR_REGISTER_PATTERN.format(
+                    param_name=op_param.get("param_name"), element_size=element_size, input_shape_len=input_shape_len
+                )
         source += "    tmpTilingSizeForOOM += 8;\n"
         count = count + 1
     source += set_workspace_param(opinfo, tiling_info)
+    source += "#endif\n"
     count = count + 1
     if count > 128:
         raise Exception("input and output num exceed 128")

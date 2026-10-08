@@ -36,12 +36,16 @@ MaskReg寄存器用于指示在计算过程中哪些元素参与计算，宽度�
 ![](../../../../figures/maskreg_process.png "MaskReg计算过程")
 
 ## 函数原型<a name="section620mcpsimp"></a>
+
 - CreateMask接口
+
   ```cpp
   template <typename T, MaskPattern mode = MaskPattern::ALL, const RegTrait& regTrait = RegTraitNumOne>
   __simd_callee__ inline MaskReg CreateMask()
   ```
+
 - UpdateMask接口
+
   ```cpp
   template <typename T, const RegTrait& regTrait = RegTraitNumOne>
   __simd_callee__ inline MaskReg UpdateMask(uint32_t& scalarValue)
@@ -178,6 +182,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
       }
     }
     ```
+
   >[!NOTE]说明
   >
   >当数据类型为int16_t（操作数为16位）时，每次循环内能够处理的元素个数Mask∈[1, 128]。当count>128时，仍按一次repeat（128元素）执行，不支持超过128元素的Mask控制。
@@ -267,6 +272,7 @@ __simd_callee__ inline void Add(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask
   ```
 
 <!-- npu="910b,A3,950" id8 -->
+
 ### NPU架构版本2201与NPU架构版本3510之间Mask机制对比
 
 本节对比[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)在Normal模式的逐bit计算中Mask机制，与[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)基于Reg矢量计算中Mask机制的差异。

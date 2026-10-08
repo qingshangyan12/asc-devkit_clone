@@ -20,9 +20,12 @@
 #ifndef INCLUDE_C_API_ASC_REG_VECTOR_H
 #define INCLUDE_C_API_ASC_REG_VECTOR_H
 
-#if !defined(__NPU_ARCH__) || \
-    (defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201)))
+#include "version/asc_devkit_version.h"
+#if !defined(__NPU_ARCH__) || ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201)))
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+
 #include "utils/base/helpers.h"
+#endif
 #include "c_api/defs/defs.h"
 #include "c_api/atomic/atomic.h"
 #include "c_api/cache_ctrl/cache_ctrl.h"

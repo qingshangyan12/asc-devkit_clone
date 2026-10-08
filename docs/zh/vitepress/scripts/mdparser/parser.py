@@ -199,7 +199,7 @@ def _escape_lone_tildes(md_text: str) -> str:
 
 _MATH_BLOCK_RE = re.compile(r"(?<!\\)\$\$[\s\S]*?(?<!\\)\$\$")
 
-_MATH_INLINE_RE = re.compile(r"(?<!\\)(?<!\$)\$(?!\$)[^\n$]+?(?<!\\)\$(?!\$)")
+_MATH_INLINE_RE = re.compile(r"(?<!\\)(?<!\$)\$(?![\${])[^\n$]+?(?<!\\)\$(?!\$)")
 
 _MATH_PLACEHOLDER_FMT = "@@MATH{n}@@"
 
@@ -634,6 +634,10 @@ def _highlight_code(html: str) -> str:
     def _replace(m):
         lang = m.group(1)
         code = m.group(2)
+        if lang and lang.lower() == "mermaid":
+            source = code.strip()
+            return f'<div class="mermaid-diagram" data-mermaid-diagram><pre class="mermaid">{source}</pre></div>'
+
         text = html_mod.unescape(code)
         text = re.sub(r"<br\s*/?>", "\n", text)
         if not lang:

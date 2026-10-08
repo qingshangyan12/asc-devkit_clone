@@ -74,11 +74,11 @@ __simd_callee__ inline vector_half asc_arange(half value)
 ### 递减模式
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_arange_descend(vector_<dtype>& dst,
                                                <dtype> value)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_arange_descend(<dtype> value)
 ```
 
@@ -138,7 +138,7 @@ __simd_callee__ inline vector_half asc_arange_descend(half value)
 以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
