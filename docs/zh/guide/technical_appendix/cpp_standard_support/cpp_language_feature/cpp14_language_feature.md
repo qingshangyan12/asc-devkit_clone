@@ -1,6 +1,6 @@
 # C++14语言特性<a name="ZH-CN_TOPIC_000000253823119011"></a>
 
-本文介绍C++14语言特性在Ascend C SIMT Device侧的支持情况。SIMT编程默认按C++17标准编译（CMake的`CMAKE_ASC_STANDARD`默认17），C++14特性自然包含其中。支持情况的判定依据与[C++11语言特性](./cpp11_language_feature.md)相同：逐特性编写的最小验证用例。完整验证样例请参考[C++14语言特性样例](../../../../../../examples/03_simt_api/02_features/02_language_features/08_cpp14_features/README.md)。
+本文介绍C++14语言特性在Ascend C SIMT Device侧的支持情况。SIMT编程默认按C++17标准编译（CMake的`CMAKE_ASC_STANDARD`默认17），C++14特性自然包含其中。支持情况的判定依据与[C++11语言特性](./cpp11_language_feature.md)相同：逐特性编写的最小验证用例。
 
 ## C++14语言特性支持列表<a name="section_cpp14_features"></a>
 
