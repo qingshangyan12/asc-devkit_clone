@@ -36,14 +36,13 @@
 ## 函数原型
 
 ```c
-// 占位符形式
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_float2e4m3_rn<sat_mode>(vector_fp8_e4m3fn_t& dst,
                                      vector_float src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn<sat_mode>(vector_float src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
@@ -52,6 +51,25 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn<sat_mode>(vector_fl
 **占位符说明如下：**
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 - `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+
+### 函数原型典型示例
+
+```c
+// 非饱和模式，通过引用参数输出结果
+__simd_callee__ inline void asc_float2e4m3_rn(
+    vector_fp8_e4m3fn_t& dst,
+    vector_float src,
+    vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode,
+                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+
+// 非饱和模式，通过函数返回值返回结果
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn(
+    vector_float src,
+    vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode,
+                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+```
 
 ## 参数说明
 
@@ -84,7 +102,7 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn<sat_mode>(vector_fl
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

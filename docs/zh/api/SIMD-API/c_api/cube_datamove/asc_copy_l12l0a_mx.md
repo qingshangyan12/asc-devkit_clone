@@ -113,7 +113,7 @@ PIPE_MTE1
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-Ascend 950PR&950DT系列产品产品对应的NPU架构为`dav-3510`，编译运行命令如下：
+Ascend 950PR&950DT系列产品对应的NPU架构为`dav-3510`，编译运行命令如下：
 
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
@@ -153,12 +153,14 @@ __global__ __cube__ void AscCopyL12l0aMxKernel(__gm__ uint8_t* a, __gm__ uint8_t
     asc_copy_gm2l1_nd2nz(a_l1, reinterpret_cast<__gm__ fp8_e4m3fn_t*>(a), K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, M, K, 0, false);
     asc_set_gm2l1_nz_para(1, 1, 2, 0);
     asc_copy_gm2l1_dn2nz(reinterpret_cast<__cbuf__ half*>(scale_a_l1),
-        reinterpret_cast<__gm__ half*>(scale_a), SCALE_K, 0, SCALE_K / 2, M, 0, false);
+        reinterpret_cast<__gm__ half*>(scale_a), SCALE_K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, SCALE_K / 2, M, 0,
+        false);
     asc_set_gm2l1_nz_para(1, 1, 128, 0);
     asc_copy_gm2l1_nd2nz(b_l1, reinterpret_cast<__gm__ fp8_e4m3fn_t*>(b), K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, N, K, 0, false);
     asc_set_gm2l1_nz_para(1, 1, 2, 0);
     asc_copy_gm2l1_dn2nz(reinterpret_cast<__cbuf__ half*>(scale_b_l1),
-        reinterpret_cast<__gm__ half*>(scale_b), SCALE_K, 0, SCALE_K / 2, N, 0, false);
+        reinterpret_cast<__gm__ half*>(scale_b), SCALE_K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, SCALE_K / 2, N, 0,
+        false);
     // Wait until matrix and scale transfers finish before PIPE_MTE1 reads L1 Buffer.
     asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
     asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);

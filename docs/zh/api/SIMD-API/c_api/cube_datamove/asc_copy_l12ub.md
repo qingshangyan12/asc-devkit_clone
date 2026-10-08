@@ -77,7 +77,7 @@ PIPE_MTE1
 本示例使用`M=N=K=128`，将128×128个`uint8_t`元素从GM搬入L1 Buffer，再通过本接口搬至UB并回传GM，与Host侧输入进行比较。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
@@ -104,7 +104,7 @@ __global__ __mix__(1, 2) void CopyL12ubKernel(__gm__ uint8_t* input, __gm__ uint
     __cbuf__ uint8_t l1[BYTES];
     __ubuf__ uint8_t* ub = reinterpret_cast<__ubuf__ uint8_t*>(0);
     if ASC_IS_AIC {
-        asc_copy_gm2l1(l1, input, 1, BYTES / 32, 0, 0, 0);
+        asc_copy_gm2l1(l1, input, 1, BYTES / 32, asc_channel_pad_mode::NONE, 0, 0);
         asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
         asc_copy_l12ub(ub, l1, 0, 1, BYTES / 32, 0, 0);

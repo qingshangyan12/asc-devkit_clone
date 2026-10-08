@@ -104,6 +104,7 @@
             -   [硬件约束](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2002.md)
                 -   [NPU架构版本2002](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2002.md)
                 -   [NPU架构版本2201](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_2201.md)
+                -   [NPU架构版本3510](./programming_guide/advanced_programming/hardware_implementation/hardware_constraints/npu_arch_3510.md)
         
         -   [内存模型](./programming_guide/advanced_programming/memory_model/memory_model.md)
             -   [缓存一致性](./programming_guide/advanced_programming/memory_model/cache_coherence.md)
@@ -111,6 +112,10 @@
 
         -   [核间通信](./programming_guide/advanced_programming/inter_core_communication/inter_core_communication.md)
             -   [使用SSBuffer实现核间通信](./programming_guide/advanced_programming/inter_core_communication/ssbuffer_inter_core_memory_feature.md)
+
+        -   [高级核函数编程](./programming_guide/advanced_programming/advanced_kernel_programming/advanced_kernel_programming.md)
+            -   [核内同步](./programming_guide/advanced_programming/advanced_kernel_programming/intra_core_sync/intra_core_sync.md)
+                -   [基于Mutex实现多流水同步](./programming_guide/advanced_programming/advanced_kernel_programming/intra_core_sync/mutex_multi_pipeline_sync.md)
 
         -   [高级AI Core编程模型](./programming_guide/advanced_programming/advanced_ai_core_programming_model/advanced_ai_core_programming_model.md)
             -   [SIMD与SIMT混合编程](./programming_guide/advanced_programming/advanced_ai_core_programming_model/simd_simt_hybrid_programming/overview.md)
@@ -314,6 +319,7 @@
             -   [基于全局掩码复用的计算性能优化](operator_practice/simd_operator_optimization/vector_compute/mask_reuse_optimization.md)
 
         -   [矩阵计算](operator_practice/simd_operator_optimization/matrix_compute/matrix_compute.md)
+            -   [使用hifloat8_t实现Matmul性能优化](operator_practice/simd_operator_optimization/matrix_compute/hifloat8_matmul_optimization.md)
             -   [通过BT Buffer实现高效的bias计算](operator_practice/simd_operator_optimization/matrix_compute/bt_buffer_bias_compute.md)
             -   [通过FP Buffer存放量化参数实现高效随路量化](operator_practice/simd_operator_optimization/matrix_compute/fp_buffer_quantization.md)
             -   [通过L0C Buffer数据暂存实现高效的矩阵乘结果累加](operator_practice/simd_operator_optimization/matrix_compute/l0c_buffer_matmul_accumulate.md)
