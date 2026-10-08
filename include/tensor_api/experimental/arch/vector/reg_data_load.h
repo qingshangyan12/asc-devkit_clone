@@ -61,42 +61,6 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
-/**
- * @brief Gathers elements from a UB tensor at the specified coordinate according to per-lane indexes.
- * @tparam DstType Destination element type. Defaults to the source tensor element type.
- * @param tensor Source tensor located in UB.
- * @param coord Coordinate of the first source element.
- * @param index Register tensor containing per-lane source indexes.
- * @return A register tensor containing the gathered data. The result mask is inherited from index.
- */
-template <
-    typename DstType = void, typename Tensor, typename Coord, typename IndexType,
-    typename = Std::enable_if_t<!is_reg_tensor_v<Tensor>>>
-__simd_callee__ inline decltype(auto) gather(
-    const Tensor& tensor, const Coord& coord, const reg_tensor<IndexType>& index);
-
-/**
- * @brief Gathers elements from the beginning of a UB tensor according to per-lane indexes.
- * @tparam DstType Destination element type. Defaults to the source tensor element type.
- * @param tensor Source tensor located in UB.
- * @param index Register tensor containing per-lane source indexes.
- * @return A register tensor containing the gathered data. The result mask is inherited from index.
- */
-template <
-    typename DstType = void, typename Tensor, typename IndexType,
-    typename = Std::enable_if_t<!is_reg_tensor_v<Tensor>>>
-__simd_callee__ inline decltype(auto) gather(const Tensor& tensor, const reg_tensor<IndexType>& index);
-
-/**
- * @brief Gathers elements from a source register tensor according to per-lane indexes.
- * @param src Source register tensor.
- * @param index Register tensor containing per-lane source indexes.
- * @return A register tensor containing the gathered data. The result mask is inherited from index.
- */
-template <typename DataType, typename IndexType>
-__simd_callee__ inline reg_tensor<DataType> gather(
-    const reg_tensor<DataType>& src, const reg_tensor<IndexType>& index);
-
 } // namespace experimental
 } // namespace te
 } // namespace asc

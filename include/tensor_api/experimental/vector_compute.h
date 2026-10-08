@@ -43,6 +43,7 @@
 #include "tensor_api/experimental/arch/vector/reg_index.h"
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_gather.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
 #endif
 #else
@@ -62,6 +63,7 @@
 #include "tensor_api/experimental/arch/vector/reg_index.h"
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_gather.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
 #endif
 #endif
