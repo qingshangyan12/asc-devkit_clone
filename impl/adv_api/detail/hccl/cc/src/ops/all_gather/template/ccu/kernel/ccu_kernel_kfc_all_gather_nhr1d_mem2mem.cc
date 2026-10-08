@@ -16,6 +16,9 @@
 //  3. 固定 axisId=0（单 die）语义：hccl 的 die1Size/die1LastSize/axisId==1 分支不迁移
 //     （KFC 单 mission 约束，见 docs/migration/ccu-sched-allgather-sole-nhr-migration.md 4.2 节）。
 //  4. GroupCopy 使用 devkit 4 参版本（无 GetCcuVersion）。
+//  5. 步内流水（P0 优化，mesh DoAllGatherWrite/Wait 先例）：slice 数 ≤ 16 位事件预算时
+//     本轮所有 slice 先全部发射（独立事件位、分片互不相交），轮末一次批量 EventWait；
+//     超预算/空步回退原"发一个等一个"串行结构。
 #include "ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
@@ -141,7 +144,25 @@ CcuResult PostSync(KfcAllGatherNhr1DContext& ctx)
     return CCU_SUCCESS;
 }
 
+// 只发射单个 slice 的 Write/占位 EventRecord，不等待；事件位由调用方分配。
+// 流水路径步末批量 EventWait；串行路径逐 slice 等待（mesh DoAllGatherWrite/Wait 先例）。
+CcuResult IssueSendSlice(
+    KfcAllGatherNhr1DContext& ctx, const u32& toRank, ccu::LocalAddr& src, ccu::RemoteAddr& dst, u32 signalIndex,
+    bool islastSlice)
+{
+    const ChannelHandle sendChannel = ctx.channels[ctx.rank2ChannelIdx->at(toRank)];
+    ccu::Variable& sliceSize = islastSlice ? ctx.die0LastSize : ctx.die0Size;
+    const uint16_t signalMask = 1U << signalIndex;
+    CCU_IF(sliceSize != 0)
+    {
+        CCU_CHK_RET(ccu::Write(sendChannel, dst, src, sliceSize, ctx.localEvent, signalMask));
+    }
+    CCU_ELSE { CCU_CHK_RET(ccu::EventRecord(ctx.localEvent, signalMask)); }
+    return CCU_SUCCESS;
+}
+
 // 对应 hccl DoRepeatSendRecvSlices（axisId==0 语义：sliceSize 取 die0 档）。
+// 串行回退路径：发射单个 slice 并立即等待其完成。
 CcuResult DoRepeatSendRecvSlices(
     KfcAllGatherNhr1DContext& ctx, const u32& toRank, ccu::LocalAddr& src, ccu::RemoteAddr& dst, u32 signalIndex,
     bool islastSlice)
@@ -174,11 +195,14 @@ CcuResult DoRepeatSendRecvSlices(
 }
 
 // 对应 hccl DoRepeatAllGatherNHRSingleStep（末步跳过步间同步与 hccl 一致）。
+// 性能优化(P0)：在途 slice 数不超 16 位事件预算时走步内流水——本轮所有 slice 先全部
+// 发射（各占独立事件位；各 slice 的 src/dst 分片互不相交，无数据依赖），轮末一次
+// EventWait 批量等完成，消除"发一个等一个"的完成等待空转间隙。
+// 先例：mesh kernel DoAllGatherWrite/DoAllGatherWait 的 Phase1/Phase2 批量等待。
 CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const KfcNhrStepInfo& nhrStepInfo)
 {
     const u32 toRankIdx = ctx.rank2ChannelIdx->at(nhrStepInfo.toRank);
     const u32 fromRankIdx = ctx.rank2ChannelIdx->at(nhrStepInfo.fromRank);
-    u32 sendSliceIdx = 0;
     const ChannelHandle sendChannel = ctx.channels[toRankIdx];
     const ChannelHandle recvChannel = ctx.channels[fromRankIdx];
     const std::vector<u32>& sendSliceIdxList = nhrStepInfo.txSliceIdxs;
@@ -187,21 +211,59 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
     ctx.srcMem.token = ctx.token[localIdx];
     ctx.dstMem.token = ctx.token[toRankIdx];
 
-    for (u32 i = 0; i < sendSliceIdxList.size(); i++) {
-        sendSliceIdx = sendSliceIdxList[i];
-        if (nhrStepInfo.step == 0) {
-            ctx.srcMem.addr = ctx.input;
-            ctx.srcMem.addr += ctx.myrankInputSliceOffset;
-        } else {
-            ctx.srcMem.addr = ctx.output[localIdx];
-            ctx.srcMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+    const uint32_t sliceNum = static_cast<uint32_t>(sendSliceIdxList.size());
+    if (sliceNum != 0U && sliceNum <= AG_NHR_BIT_NUM_PER_CKE) {
+        // 流水路径 repeat 外层、slice 内层：同一 repeat 轮内所有 slice 共享一组事件位，
+        // 轮末批量等待清位后再进下一轮；各分片地址 = 基址 + 分片偏移 + 帧偏移。
+        const uint16_t waitMask = static_cast<uint16_t>((1U << sliceNum) - 1U);
+        ccu::Variable turnOffsetIn;
+        ccu::Variable turnOffsetOut;
+        turnOffsetIn = 0;
+        turnOffsetOut = 0;
+        ccu::Variable tmpRepeatNum;
+        tmpRepeatNum = ctx.repeatNum;
+        ctx.repeatTimeflag = 0;
+        CCU_WHILE(tmpRepeatNum != UINT64_MAX)
+        {
+            tmpRepeatNum += ctx.constVar1;
+            for (uint32_t sliceSeq = 0; sliceSeq < sliceNum; ++sliceSeq) {
+                const u32 sendSliceIdx = sendSliceIdxList[sliceSeq];
+                const bool islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
+                if (nhrStepInfo.step == 0) {
+                    ctx.srcMem.addr = ctx.input;
+                    ctx.srcMem.addr += ctx.myrankInputSliceOffset;
+                } else {
+                    ctx.srcMem.addr = ctx.output[localIdx];
+                    ctx.srcMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+                }
+                ctx.srcMem.addr += turnOffsetIn;
+                ctx.dstMem.addr = ctx.output[toRankIdx];
+                ctx.dstMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+                ctx.dstMem.addr += turnOffsetOut;
+                CCU_CHK_RET(IssueSendSlice(ctx, nhrStepInfo.toRank, ctx.srcMem, ctx.dstMem, sliceSeq, islastSlice));
+            }
+            CCU_CHK_RET(ccu::EventWait(ctx.localEvent, waitMask));
+            turnOffsetIn += ctx.inputRepeatStride;
+            turnOffsetOut += ctx.outputRepeatStride;
+            ctx.repeatTimeflag = 1;
         }
-        ctx.dstMem.addr = ctx.output[toRankIdx];
-        ctx.dstMem.addr += ctx.outputSliceOffset[sendSliceIdx];
-        bool islastSlice = false;
-        islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
-        CCU_CHK_RET(DoRepeatSendRecvSlices(
-            ctx, nhrStepInfo.toRank, ctx.srcMem, ctx.dstMem, i % AG_NHR_BIT_NUM_PER_CKE, islastSlice));
+    } else {
+        // 串行回退（slice 数超 16 位事件预算或空步）：保持原"发一个等一个"结构。
+        for (u32 i = 0; i < sliceNum; i++) {
+            const u32 sendSliceIdx = sendSliceIdxList[i];
+            if (nhrStepInfo.step == 0) {
+                ctx.srcMem.addr = ctx.input;
+                ctx.srcMem.addr += ctx.myrankInputSliceOffset;
+            } else {
+                ctx.srcMem.addr = ctx.output[localIdx];
+                ctx.srcMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+            }
+            ctx.dstMem.addr = ctx.output[toRankIdx];
+            ctx.dstMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+            const bool islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
+            CCU_CHK_RET(DoRepeatSendRecvSlices(
+                ctx, nhrStepInfo.toRank, ctx.srcMem, ctx.dstMem, i % AG_NHR_BIT_NUM_PER_CKE, islastSlice));
+        }
     }
 
     if (nhrStepInfo.step + 1 != ctx.stepInfoVector->size()) {

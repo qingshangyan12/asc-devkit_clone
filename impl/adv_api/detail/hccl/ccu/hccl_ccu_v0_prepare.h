@@ -335,7 +335,7 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         sliceSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_SIZE_0],
         ccuProtocolVersion_);
     KERNEL_LOG(
-        KERNEL_INFO, "AG sole-NHR prepare: slice=0x%llx, outStride=0x%llx, equal=%llu\n", sliceSize, outputSliceStride,
+        KERNEL_DEBUG, "AG sole-NHR prepare: slice=0x%llx, outStride=0x%llx, equal=%llu\n", sliceSize, outputSliceStride,
         xnData_[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL]);
 }
 
