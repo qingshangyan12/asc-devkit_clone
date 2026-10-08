@@ -38,7 +38,7 @@
 #endif
 #include "batch/batch_copy_cube_in.h"
 #include "batch/batch_copy_cube_in_from_l1.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "base/copy_cube_in_mdl_mx.h"
 #include "base/copy_cube_in_norm_mx.h"
 #endif
