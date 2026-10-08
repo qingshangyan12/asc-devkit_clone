@@ -29,8 +29,8 @@
 <!-- npu="9030" id24 -->
 - Kirin 9030处理器系列产品：不支持
 <!-- end id24 -->
-<!-- npu="KirinDev0001" id25 -->
-- KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003：支持
+<!-- npu="9050" id25 -->
+- Kirin 5090/KirinDev0001/KirinDev0002/KirinDev0003：支持
 <!-- end id25 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToUB_continuous_res.md#id1 -->
 
@@ -99,8 +99,8 @@ __aicore__ inline void DataCopy(const LocalTensor<T>& dst, const LocalTensor<T>&
 <!-- end id5 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopy_UBToUB_continuous_res.md#id2 -->
 
-<!-- npu="KirinDev0001" id6 -->
-- KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003 支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- npu="9050" id6 -->
+- Kirin 5090/KirinDev0001/KirinDev0002/KirinDev0003 支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id6 -->
 
 ## 返回值说明<a name="section44801012174220"></a>

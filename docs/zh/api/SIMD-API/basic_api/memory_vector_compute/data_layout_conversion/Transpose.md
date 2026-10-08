@@ -29,8 +29,8 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
-<!-- npu="KirinDev0001" id10 -->
-- KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003：支持
+<!-- npu="9050" id10 -->
+- Kirin 5090/KirinDev0001/KirinDev0002/KirinDev0003：支持
 <!-- end id10 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_layout_conversion/Transpose_res.md#id1 -->
 

@@ -29,8 +29,8 @@
 <!-- npu="9030" id9 -->
 - Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
-<!-- npu="KirinDev0001" id10 -->
-- KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003：支持
+<!-- npu="9050" id10 -->
+- Kirin 5090/KirinDev0001/KirinDev0002/KirinDev0003：支持
 <!-- end id10 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_layout_conversion/TransDataTo5HD_res.md#id1 -->
 
@@ -127,8 +127,8 @@ Kirin X90处理器系列产品，支持的数据类型为：int8_t、uint8_t、i
 Kirin 9030处理器系列产品，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id17 -->
 
-<!-- npu="KirinDev0000" id18 -->
-KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
+<!-- npu="9050" id18 -->
+Kirin 5090/KirinDev0001/KirinDev0002/KirinDev0003，支持的数据类型为：int8_t、uint8_t、int16_t、uint16_t、half、int32_t、uint32_t、float。
 <!-- end id18 -->
 
 ## 约束说明<a name="zh-cn_topic_0000001521260417_section633mcpsimp"></a>

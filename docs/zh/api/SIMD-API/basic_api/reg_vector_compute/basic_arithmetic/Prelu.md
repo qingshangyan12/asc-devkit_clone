@@ -23,8 +23,8 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
-<!-- npu="KirinDev0001" id8 -->
-- KirinDev0000/KirinDev0001/KirinDev0002/KirinDev0003：支持
+<!-- npu="9050" id8 -->
+- Kirin 5090/KirinDev0001/KirinDev0002/KirinDev0003：支持
 <!-- end id8 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/basic_arithmetic/Prelu_res.md#id1 -->
 
