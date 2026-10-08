@@ -24,10 +24,10 @@
 - Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_padding/Duplicate_res.md#id1 -->
 
@@ -46,6 +46,7 @@ def Duplicate(scalarValue, dst, count):
     for i in range(count):     
         dst[i] = scalarValue
 ```
+
 <!-- npu="950" id26 -->
 针对Ascend 950PR&950DT系列产品，为方便开发者使用，tensor前n个数据计算接口同时也支持直接传入LocalTensor，此时会将LocalTensor的第一个元素复制多次并填充到向量中。
 <!-- end id26 -->
@@ -127,10 +128,10 @@ def Duplicate(scalarValue, dst, count):
 - 针对Atlas训练系列产品，T支持的数据类型为：int16_t、uint16_t、half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id17 -->
 <!-- npu="x90" id18 -->
-- 针对Kirin X90，T支持的数据类型为：half。
+- 针对Kirin X90处理器系列产品，T支持的数据类型为：half。
 <!-- end id18 -->
 <!-- npu="9030" id19 -->
-- 针对Kirin 9030，T支持的数据类型为：half。
+- 针对Kirin 9030处理器系列产品，T支持的数据类型为：half。
 <!-- end id19 -->
 
 ## 返回值说明<a name="section640mcpsimp"></a>	 
@@ -193,6 +194,7 @@ def Duplicate(scalarValue, dst, count):
 <!-- npu="950" id25 -->
 
 - tensor前n个数据计算样例，源操作数为Tensor
+
     ```cpp
     AscendC::Duplicate<half>(dstLocal, srcLocal, srcDataSize);
     ```

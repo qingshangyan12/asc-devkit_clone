@@ -26,10 +26,10 @@
 - Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Rsqrt_res.md#id1 -->
 
@@ -57,10 +57,10 @@
 - Atlas训练系列产品：不支持
 <!-- end id16 -->
 <!-- npu="x90" id17 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id17 -->
 <!-- npu="9030" id18 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id18 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/Rsqrt_res.md#id2 -->
 
@@ -181,6 +181,7 @@ T支持的数据类型为：half、float。
 - 使用Rsqrt时，half的算子结果对比误差不满足双千分之一的要求，float的算子结果对比误差不满足双万分之一的要求，如果需要高精度，建议使用[Div](Div.md)和[Sqrt](Sqrt.md)替代实现。
 
 <!-- npu="950" id35 -->
+
 ## 关键特性<a id="rsqrt-key-features"></a>
 
 针对Ascend 950PR&950DT系列产品，有如下关键特性：

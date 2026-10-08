@@ -10,6 +10,7 @@
 #include "hccl_alloc_ctx_res.h"
 #include "external_alg_resolver.h"
 #include "kfc_server_protocol.h"
+#include "mc2_comm_info_reporter.h"
 
 #include <limits>
 
@@ -935,6 +936,9 @@ HcclResult GetOpParamResCtx(
     }
     CHK_RET(HcclGetAlgRes(comm, opParam, executor, topoInfo, resCtxHost, resCtxOut, isResourceReused));
     CHK_PTR_NULL(*resCtxOut);
+    if (opParam.engine == COMM_ENGINE_AICPU_TS && !isResourceReused) {
+        SaveMc2CommInfoForProfiling(comm, opParam, *resCtxHost);
+    }
     opParam.cacheValid = isResourceReused;
     opParam.resCtx = *resCtxOut;
     return HCCL_SUCCESS;
@@ -957,6 +961,10 @@ HcclResult GetCcuOpParamResCtx(
         executor.get() == nullptr, HCCL_ERROR("Fail to find executor for algName[%s]", algName.c_str()), HCCL_E_PARA);
     std::unique_ptr<AlgResourceCtxSerializable> resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
     CHK_RET(AcquireAlgResources(comm, opParam, executor, topoInfo, resCtxHost, opResCtx, resCtxOut));
+    // die 切分比例走 res[1] 预留槽（不动 OpResCtx 布局：新旧 op 包/host lib 混搭时旧侧读 0=不切分，安全降级）
+    opResCtx.res[1] = DieSplitRatioToPermille(resCtxHost->dieSplitRatio);
+    // KFC mission 数（2die 为动态 dieNum）经 res[2] 下发，AIV 逐 mission commit/wait 消费；非 KFC 为 0（AIV 回退 1）
+    opResCtx.res[2] = resCtxHost->kfcServerArgs.size() / KFC_SERVER_ARG_NUM;
     // 校验路径不申请device ctx，resCtxOut保持nullptr
     if (!opParam.checkRes) {
         CHK_PTR_NULL(*resCtxOut);
