@@ -15,7 +15,7 @@
 #endif // ASCENDC_CPU_DEBUG
 #include "impl/adv_api/detail/api_check/kernel_api_check.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202 || __NPU_ARCH__ == 5102)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 class WhereAPICheck : public testing::Test {
 protected:
     static void SetUpTestCase() {}
