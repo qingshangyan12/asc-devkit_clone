@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <type_traits>
 #include "sys_macros_impl.h"
+#include "version/asc_devkit_version.h"
 
 namespace AscendC {
 enum class Hardware : uint8_t {
@@ -50,7 +51,7 @@ using fp4x2_e1m2_t = float4_e1m2x2_t;
 using fp8_e5m2_t = float8_e5m2_t;
 using fp8_e4m3fn_t = float8_e4m3_t;
 using fp8_e8m0_t = float8_e8m0_t;
-#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 using hif4x2_t = hifloat4x2_t;
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
