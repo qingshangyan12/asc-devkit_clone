@@ -20,6 +20,7 @@
 #ifndef INCLUDE_C_API_CUBE_COMPUTE_CUBE_COMPUTE_H
 #define INCLUDE_C_API_CUBE_COMPUTE_CUBE_COMPUTE_H
 #include "c_api/defs/defs.h"
+#include "version/asc_devkit_version.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/cube_compute_intf_impl.h"
