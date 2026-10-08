@@ -69,7 +69,7 @@ $$
 | aiv_mte3_time(μs) | mte3 type instruction (UB->GM transfer instructions) duration, in μs. |
 | aiv_mte3_ratio | Ratio of mte3 type instruction cycle count to total cycle count. |
 
-The performance data in this chapter was obtained running on Atlas A2 products.
+The performance data in this chapter was obtained running on Atlas A2 Training Series Products.
 
 ### Case 0: Single-Core Scalar Version (Baseline Program)
 
@@ -491,8 +491,8 @@ Since vec instructions read 256B of data per beat (that is, simultaneously readi
 
 ## Performance Comparison Summary
 
-### Atlas A2 products Performance Comparison
-The table below shows performance data comparison for this example running on Atlas A2 products:
+### Atlas A2 Training Series Performance Comparison
+The table below shows performance data comparison for this example running on Atlas A2 Training Series Products:
 
 | Case | Optimization Strategy | Cores | dataCopyLen | Task Duration(μs) | aiv_vec_time(μs) | Theoretical Vector Duration (μs) | Read Bandwidth (TB/S) | Read-Write Mixed Bandwidth (TB/S) | End-to-End Duration vs Case 0 |
 |:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -504,7 +504,7 @@ The table below shows performance data comparison for this example running on At
 | 5 | L2 Cache bypass | 48 | 16384 | 187.68 | 12.846 | 5.904 | NA | 2.2755 | 6605.3x |
 | 6 | Bank Conflict optimization | 48 | 16256 | 184.52 | 6.954 | 5.904 | NA | 2.3456 | 6718.5x |
 
-The "theoretical vector duration" in the table represents the theoretical execution time considering only Vector computation itself under the current core count configuration. The performance data of this example was obtained running on Atlas A2 products. This processor processes 128 half data per cycle, with clock frequency 1.85GHz. The theoretical vector duration formula is:
+The "theoretical vector duration" in the table represents the theoretical execution time considering only Vector computation itself under the current core count configuration. The performance data of this example was obtained running on Atlas A2 Training Series Products. This processor processes 128 half data per cycle, with clock frequency 1.85GHz. The theoretical vector duration formula is:
 $$
 T_{\text{theory}} = \frac{M \times N}{128 \times 1.85 \times 10^9 \times \text{core count}}
 $$

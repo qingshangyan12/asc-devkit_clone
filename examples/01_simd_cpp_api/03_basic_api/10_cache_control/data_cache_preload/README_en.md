@@ -143,7 +143,7 @@ When profiling with `msprof`, compare the execution time of the two kernels:
 
 The following performance data is the average of 5 independent runs to eliminate random fluctuations.
 
-#### Atlas A2 products (dav-2201 Architecture)
+#### Atlas A2 Training Series Products (dav-2201 Architecture)
 
 | Metric | kernel_no_preload | kernel_with_preload | Improvement |
 |------|------------------|---------------------|---------|
@@ -161,7 +161,7 @@ Metric descriptions:
 **Task Duration**: End-to-end kernel execution time, the most direct performance indicator.
 **aiv_scalar_time**: Scalar unit execution time; in indirect index scenarios, Scalar memory access is the main bottleneck.
 
-#### Detailed Data from 5 Independent Runs (Atlas A2 products)
+#### Detailed Data from 5 Independent Runs (Atlas A2 Training Series)
 
 | Run | no_preload Duration(us) | with_preload Duration(us) | Speedup |
 |---------|------------------------|--------------------------|--------|

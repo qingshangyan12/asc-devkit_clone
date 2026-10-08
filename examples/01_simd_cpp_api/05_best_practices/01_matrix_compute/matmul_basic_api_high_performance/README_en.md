@@ -332,7 +332,7 @@ k=8:  WaitFlag(A1Pong ready) -> WaitFlag(B1Ping ready) -> DataLoad -> Compute
 
 ### Performance Data Analysis
 
-#### Atlas A2 products Chip Performance Data
+#### Atlas A2 Training Series Chip Performance Data
 
 - Scenario 1: L2Cache splitting disabled, singleCoreM=2048, singleCoreN=1536, 24 cores full coverage in one round
 - Scenario 2: L2Cache splitting enabled, singleCoreM=1024, singleCoreN=1536, 24 cores in 2 rounds
@@ -364,7 +364,7 @@ Enabling L2Cache splitting shows no significant effect on Ascend 950PR chip. The
 
 #### Cube Computation Performance Analysis
 
-**Atlas A2 products Chip**: Example parameters M=N=K=8192, baseM=128, baseN=256, baseK=64, clock frequency 1.85GHz, processing 16×16×16 multiply-accumulate operations per cycle.
+**Atlas A2 Training Series Chip**: Example parameters M=N=K=8192, baseM=128, baseN=256, baseK=64, clock frequency 1.85GHz, processing 16×16×16 multiply-accumulate operations per cycle.
 
 $$cube\_time = \frac{M \times N \times K}{16 \times 16 \times 16 \times core\_num \times cube\_freq} = \frac{8192 \times 8192 \times 8192}{16 \times 16 \times 16 \times 24 \times 1850} = 3022.92\mu s$$
 
@@ -384,7 +384,7 @@ $$Error = \frac{aic\_mac\_time - cube\_time}{cube\_time} = \frac{2564.813 - 2542
 
 **Total Read Data Volume**:
 
-Atlas A2 products Chip (baseM=128, baseN=256):
+Atlas A2 Training Series Chip (baseM=128, baseN=256):
 
 $$Total Read Data = \left(\frac{N}{baseN} \times M \times K + \frac{M}{baseM} \times K \times N\right) \times sizeof(half) = (32 \times 8192 \times 8192 + 64 \times 8192 \times 8192) \times 2B = 12GB$$
 
@@ -394,7 +394,7 @@ $$Total Read Data = \left(\frac{N}{baseN} \times M \times K + \frac{M}{baseM} \t
 
 **Theoretical MTE2 Duration**:
 
-Atlas A2 products Chip: The peak L2 Cache bandwidth is approximately 5 TB/s, and the HBM bandwidth is approximately 1.8 TB/s. Data is first read from HBM and subsequently read from the L2 Cache.
+Atlas A2 Training Series Chip: The peak L2 Cache bandwidth is approximately 5 TB/s, and the HBM bandwidth is approximately 1.8 TB/s. Data is first read from HBM and subsequently read from the L2 Cache.
 
 $$Total\ Data\ First\ Read\ from\ HBM = M \times K \times sizeof(half) + K \times N \times sizeof(half) = 256MB$$
 
@@ -414,7 +414,7 @@ MTE2 duration error:
 
 $$MTE2\ Duration\ Error = \frac{1874.267 - 1832.10}{1832.10} = 2.30\%$$
 
-Compared with the Atlas A2 products Chip, the Ascend 950PR Chip transfers data more efficiently and achieves higher MTE2 bandwidth utilization.
+Compared with the Atlas A2 Training Series Chip, the Ascend 950PR Chip transfers data more efficiently and achieves higher MTE2 bandwidth utilization.
 
 ## Build and Run
 
