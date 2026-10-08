@@ -28,7 +28,7 @@
 
 头文件路径：`"tensor_api/experimental/arch/vector/basic_arithmetic.h"`。
 
-该接口根据src.mask，对源操作数src中的有效元素逐个求自然对数（以e为底），并返回计算结果。计算公式如下：
+该接口根据`src.mask`，对源操作数`src`中的有效元素逐个求自然对数（以 e 为底），并返回计算结果。`log` 与 `ln` 的计算语义一致，计算公式如下：
 
 $$
 dst_i = \ln(src_i)
