@@ -371,8 +371,16 @@ enum KfcUnifiedPlanParamIndex : uint32_t {
     KFC_UNIFIED_COLLECT_ALL_PARAM_NUM = 15,
     // ReduceSlice 段（R6，2026-09-21）：槽 1..15 == v2 KFC_CONCURRENT_RS_MESH_* 的 1..15
     // （并发布局，KfcConcurrentReduceScatterParamIndex——sole-mesh host 写入方的 12 参
-    // homm 兼容布局是干扰项不抄）。槽 16..31 = 0（未用槽；RS NHR 形态槽位起 16 跨 20 槽
-    // 超 32 槽记录宽，R9 落地时另行评估扩段）。dataType/outputType/reduceType 不占段槽：
+    // homm 兼容布局是干扰项不抄）。槽 16..31 = 0（未用槽）。★R9 M0-④ 槽位实数
+    // 勘误（2026-10-07）：v2 并发 RS 的 NHR 区间为槽 16..24（KFC_CONCURRENT_RS_NHR_*
+    // 至 KFC_CONCURRENT_RS_PARAM_NUM=25，:173-182），含动作 ID 25 槽 ≤ 32 槽记录宽
+    // ——原注"起 16 跨 20 超 32"系未逐槽核数的误传。R9 维持 RS 帧 MESH-only 的真实
+    // 缺口：v3 帧无 pattern 载体（DispatchUnifiedPlanV3 只认槽 0 ∈ {CollectAll,
+    // ReduceSlice}，帧槽按 Mesh 布局解读）+ NHR kernel 形参的 jettyNum/
+    // nhrStepInfoVector/nhrRank2ChannelIdx 三件 ctx.arg 自持量在 unified 注册链
+    // （"CcuAction" 前缀 → UNIFIED_PLAN 覆写分支）无人继承填充——放开须 v5 blob
+    // 协议面 + 注册链继承 + server NHR 分支三件联动（方案文档 R9 M0-④）。
+    // dataType/outputType/reduceType 不占段槽：
     // server 分支与 v2 同式从 ctx.arg->opParam 取（ccu_kernel_kfc_server.cc:337-339）；
     // 头部三槽（KFC_UNIFIED_BLOB_*_TYPE）是**纯维测 dump**（R6 尾款终裁：AICPU 消费方
     // 一律以 exec 期 msg 现值为唯一权威源，头部值仅日志/trace 用，不作语义判定输入），

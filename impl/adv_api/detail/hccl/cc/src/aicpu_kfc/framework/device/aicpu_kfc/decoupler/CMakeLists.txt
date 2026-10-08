@@ -96,6 +96,15 @@ target_include_directories(ccl_kernel_decoupler_open_exec BEFORE PRIVATE
     ${OPEN_HCCL_SRC_ROOT}/common
     ${OPEN_HCCL_SRC_ROOT}/common/hcomm_dlsym
 
+    # R10 · F1 断点②（KFC executor unified 分叉的 include 链，2026-10-08）：
+    # comm_kfc_open_kernel_executor.cc include unified/exec/unified_aicpu_exec.h 与
+    # unified/l5/hcomm_verb_sink.h（后者依赖 unified/inc/verb_sink.h）——三目录进
+    # 目标 include 路径（与 src/CMakeLists.txt INCLUDE_LIST :108-110 的跨目录消费
+    # 口径一致：unified 头被 aicpu_kfc 编译面消费时由消费方目标自带路径）。
+    ${OPEN_HCCL_SRC_ROOT}/ops/unified/inc
+    ${OPEN_HCCL_SRC_ROOT}/ops/unified/exec
+    ${OPEN_HCCL_SRC_ROOT}/ops/unified/l5
+
     ${HCCL_BASE_DIR}/pub_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc
     ${HCCL_HCOMM_HEADER_DIR}/pkg_inc/hccl

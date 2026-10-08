@@ -59,24 +59,38 @@ namespace mc2_ops_hccl::refactor {
 HcclResult RunUnifiedAicpuOp(const OpParam& param, const AlgResourceCtxSerializable& resCtx,
                              HcommVerbSink& sink)
 {
-    HCCL_INFO("[UnifiedExec][AICPU] start, opType[%u], resCtx[%p], ctxSize[%llu], threads[%zu].",
+    HCCL_INFO("[UnifiedExec][AICPU] start, opType[%u], resCtx[%p], ctxSize[%llu], threads[%zu], "
+              "blobAddr[0x%llx], blobSize[%llu].",
         static_cast<u32>(param.opType), param.resCtx,
-        static_cast<unsigned long long>(param.ctxSize), resCtx.threads.size());
+        static_cast<unsigned long long>(param.ctxSize), resCtx.threads.size(),
+        static_cast<unsigned long long>(resCtx.unifiedBlobAddr),
+        static_cast<unsigned long long>(resCtx.unifiedBlobSize));
 
-    // ① blob 取回：param.resCtx 指向 ctx 旁路（HcclEngineCtxCreate 的 device 内存，
-    //    资源期 ④ 段回填）。AICPU kernel 侧该内存本地可读（与 Orchestrate 读
-    //    param.resCtx 的存量模式同源——isResourceReused 反序列化路径）。
-    if (param.resCtx == nullptr || param.ctxSize == 0U) {
-        HCCL_ERROR("[UnifiedExec][AICPU] param.resCtx null or ctxSize 0 (unified blob ctx missing).");
+    // ① blob 取回（R11 · resCtx 双语义修复，2026-10-08）：第二通道 = 资源束序列化
+    //    字段 unifiedBlobAddr/unifiedBlobSize（方案 B，主会话裁决）——资源期
+    //    AssembleUnifiedAicpuResCtx 把 blob 的 device 地址/字节数随资源束序列化
+    //    携带，KFC BuildHolder / kernel_launch MISS 反序列化资源束后经 resCtx 形参
+    //    自然送达（两存量泛型路径零改动——方案 B 的核心优势）。
+    //    R10 形态废除：原"按 param.resCtx/ctxSize 切 u64 槽"——resCtx 语义回归
+    //    资源束后 param.ctxSize 是资源束长度（不保证 8 对齐，706%8=2 实测形态），
+    //    blob 尺寸判据唯一正确源是 unifiedBlobSize。
+    //    三重前置闸（R10 ㊱ 断言迁移非删除——判据改绑新字段源，覆盖面不减）：
+    //      闸 1：blobAddr 空 / blobSize 0 → E_PARA（资源期未回填形态必拒）
+    //      闸 2：blobSize % 8 != 0 → E_PARA（SerializePlanV3 槽数×8 恒 8 对齐）
+    //      闸 3：尺寸不符（槽数 != 7+segs*32）→ ParseUnifiedBlobV4 拒（真入口判据）
+    if (resCtx.unifiedBlobAddr == 0U || resCtx.unifiedBlobSize == 0U) {
+        HCCL_ERROR("[UnifiedExec][AICPU] unifiedBlobAddr null or unifiedBlobSize 0 "
+                   "(unified blob backfill missing in res-ctx).");
         return HCCL_E_PARA;
     }
-    if (param.ctxSize % sizeof(u64) != 0U) {
-        HCCL_ERROR("[UnifiedExec][AICPU] ctxSize %llu not u64-aligned.",
-            static_cast<unsigned long long>(param.ctxSize));
+    if (resCtx.unifiedBlobSize % sizeof(u64) != 0U) {
+        HCCL_ERROR("[UnifiedExec][AICPU] unifiedBlobSize %llu not u64-aligned.",
+            static_cast<unsigned long long>(resCtx.unifiedBlobSize));
         return HCCL_E_PARA;
     }
-    const u64* raw = static_cast<const u64*>(param.resCtx);
-    const std::vector<u64> blob(raw, raw + param.ctxSize / sizeof(u64));
+    const void* blobDeviceAddr = reinterpret_cast<const void*>(resCtx.unifiedBlobAddr);
+    const u64* raw = static_cast<const u64*>(const_cast<void*>(blobDeviceAddr));
+    const std::vector<u64> blob(raw, raw + resCtx.unifiedBlobSize / sizeof(u64));
 
     // 头部校验 + 帧解读：本体 ParseUnifiedBlobV4（三重校验 + 段 ID 对账 +
     // 切轮步长恢复）。此处只取头部三槽做维测 dump 一致性观测（R6 终裁 (a)

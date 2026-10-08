@@ -216,6 +216,74 @@ struct ResourceClaim {
     }
 };
 
+// ---------------------------------------------------------------------------
+// R9 · 档位参数（TierParams）：selector 数据量分档的 Plan 化（§3.6-② 档位参数）
+//
+// 老方案把 4MiB 阈值焊在 selector 代码里（ziliao 树 reduce_scatter_auto_selector.cc:19
+// `PCIE_BASIC_RS_MAX_DATA_SIZE = 4*1024*1024`、:378-381 的 if/else 选两个算法名）；
+// 新方案把同一判断降维成 Plan 里随行的一小块数据：改阈值=调参，不再改代码换名。
+//
+// 机制同构的活样板：AR one_shot/two_shot 分档（recipe_sole.h:118-122——AR 资源期
+// 就有 sliceSize 可在 Expand 内判）。RS 的差别只有一点：资源期 count=0（R6 BLOCKER
+// 根因），所以 4MiB 档位必须挂到 **exec 期实例化层**（Instantiate 单决策点，
+// aicpu_consumer.h 消费侧）——判断时机后移，形态=骨架段带双形态参数集，
+// msg.count 到手后按选中的模板把骨架段复制/实例化成最终序列（§3.6-③）。
+//
+// 缺省语义（加法不改法）：TierParams 缺省=无档位=现状行为零变化——既有 Plan
+// （sole/sequence/split 及无 tier 的 parallel）不携带 tier 字段时，消费方走
+// 原有"骨架即全量"路径，逐字段零变化（防退化断言锁死，见 poc_unified_expand_test
+// R9 节）。hasTier=false 是唯一开关判据（缺省 false）。
+//
+// 数据字段（全部资源期已知——R6 裁决③"带宽是拓扑属性资源期已知"）：
+//   threshBytes   4MiB（对齐 selector :19 常数；totalBytes < THRESH → A 交错，
+//                 否则 B 步进——严格小于，对齐 selector :378 `dataSize <` 同式）
+//   A（交错形态）：partRatio 0.5/0.5（对齐 GetParallelDataSplit 现状——ziliao 树
+//                 ins_reduce_scatter_parallel_executor.cc:229-234 硬编码 splitData=0.5
+//                 两份；hccl 主干 :456-471 已演进为 CalcParallelDataSplitRatio 端口
+//                 配平公式（template_utils.cc:314-337 RS_WITH_LOCAL_REDUCE 时间系数
+//                 + :358 八分位量化），缺省 fallback 仍 0.5（alg_param.h:639）——
+//                 R9 取 0.5 基准（ziliao 口径），端口配平系数化挂 P3（见 R9 记录））
+//   B（步进形态）：带宽加权逐片（非均匀！主会话 02:31 裁决对质结论）——两轴片宽
+//                 按 CalReducescatterDataSize2D 的等比链式递推（ziliao
+//                 omnipipe_data_slice_calc.cc:345-463：bandwidthRatio=yB/xB :359、
+//                 首片 :371-378、链式 x[i]=y[i-1]/y[i]=x[i]*ratio/(xRankSize-1)
+//                 :397-399、末两步 finStepMark 拆步 :405-418）——所以存**带宽
+//                 有理数对**（{num, den} × 两轴，四 u64——分子分母忠实形态，不
+//                 降维为单一 double：裁决"单一比值引入精度与序列化口径问题"；
+//                 nhr 等效带宽 eqBw=bw/(rankSize-1) 常为非整数如 35/3，有理数
+//                 表示无损）+ 对齐粒度 alignBytes，片宽序列由展开器按公式逐片
+//                 计算（unified 侧纯函数，见 inc/tier_expand.h——公式只写一遍纪律）。
+// ---------------------------------------------------------------------------
+struct TierInterleave {                 // A 形态（< THRESH）：两域各取半块交错两批
+    u64 partRatioNum{1};                // part0 = totalBytes * partRatioNum / partRatioDen
+    u64 partRatioDen{2};                // 缺省 1/2 == 0.5（:229-234 口径）
+};
+
+struct TierStepwise {                   // B 形态（≥ THRESH）：两域逐小片交替步进
+    // 带宽以**分子/分母有理数对**承载（不存 double——Plan 是纯数据可序列化，浮点
+    // 序列化口径与跨端一致性是坑；也不存单一比值——主会话 02:31 裁决：分子分母
+    // 是忠实形态，bandwidthRatio=yB/xB 在 :359 就是两带宽值的比）。
+    // 语义：bwFastNum/bwFastDen = 快轴（mesh，level0）等效带宽；
+    //       bwSlowNum/bwSlowDen = 慢轴（nhr，level1）等效带宽（eqBw 口径
+    //       bw/(rankSize-1)，ziliao ins_v2_reduce_scatter_omnipipe_executor.cc:365-366
+    //       ——PCIeMix 16 卡场景 = 35/(4-1) 即 num=35/den=3）。
+    // 带宽来源（ziliao :343-356）：PCIeMix 8 卡=29/16 卡=35（BW_OMNI_PCIE_*_RS_CLOS）、
+    // mesh 缺省 50（BW_OMNI_DEFAULT）——TierParams 由配方按拓扑形态填值。
+    u64 bwFastNum{0};
+    u64 bwFastDen{1};
+    u64 bwSlowNum{0};
+    u64 bwSlowDen{1};
+    u64 alignBytes{512};                // 片宽对齐粒度（AICPU=512 / CCU=128，
+                                        //   ziliao omnipipe_data_slice_calc.h:21-22）
+};
+
+struct TierParams {
+    bool hasTier{false};                // 缺省 false = 无档位 = 现状行为零变化
+    u64 threshBytes{4ULL * 1024 * 1024};    // 4MiB（selector :19 同值）
+    TierInterleave interleave;           // A 模板系数
+    TierStepwise stepwise;               // B 模板系数
+};
+
 // Plan：配方展开的产物，纯数据（可序列化 / 可缓存 / 可 dump）
 struct Plan {
     // 序列化格式 ABI 版本（§6.3 version 字段升版守门）：v3 = KFC 消息槽定长格式
@@ -224,6 +292,14 @@ struct Plan {
     u32 version{3};
     std::vector<ActionSpec> segments;
     ResourceClaim claim;
+    // R9 · 档位参数（§3.6-②）：RS parallel 骨架段的双形态展开系数。缺省 hasTier=
+    // false = 不携带 = 现状行为零变化（防退化断言锁死）。★序列化语义（主会话
+    // 02:31 预防性确认）：blob 仍是**骨架段序列**——v4 blob 头部段数 = 骨架段数
+    //（parallel RS = 每域 1 段共 2 段），A/B 展开在**消费方 exec 期**（R6-③ 裁决
+    // "不预编两个候选 Plan" + RS 资源期 count=0 展不开——TierParams 不进 v4 blob
+    // 槽位，host 侧 Plan 对象携带即可，消费方经 host 上下文取得；tier 进 blob
+    // 协议面（v5）随 RS NHR 一并评估——两件事都动协议，合并一轮审查）。
+    TierParams tier;
 };
 
 // ---------------------------------------------------------------------------

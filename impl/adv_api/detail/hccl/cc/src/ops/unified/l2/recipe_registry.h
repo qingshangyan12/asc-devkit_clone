@@ -37,6 +37,7 @@
 #include "action_spec.h"
 #include "alg_config_parser.h"
 #include "recipe_sole.h"
+#include "tier_expand.h"   // R9：TierParams 字段面（RecipeParallel RS 骨架档位挂载）
 
 namespace mc2_ops_hccl::refactor {
 
@@ -67,6 +68,41 @@ public:
         // parallel 的各段互不依赖：inputRanks 各自独立（与 sequence 的区别就在这里）
         SegmentBuilder::SplitRounds(plan.segments, ctx.capacity);   // §10.2 A2
         SegmentBuilder::SumRes(plan);
+        // R9 · WP-1（2026-10-07）：RS 双域配方挂档位参数——骨架（每域 1 段）+
+        // TierParams 随 Plan 下发，A/B 段序列展开在**消费方 exec 期**（Instantiate
+        // 单决策点，§3.6-②③：RS 资源期 count=0 展不开 + R6-③"不预编两个候选
+        // Plan"）。加法不改法：非 RS op / hasTier 未置位时本块零执行，既有 Plan
+        // 逐字段零变化（防退化断言：poc_unified_expand_test R9 节）。
+        // 带宽值来源 = 拓扑属性（ziliao ins_v2_reduce_scatter_omnipipe_executor.cc
+        // :343-356）：PCIeMix 慢轴按 rankSizeLevel1 分档——2 server=29
+        //（BW_OMNI_PCIE_EIGHT_RS_CLOS）/4 server=35（BW_OMNI_PCIE_SIXTEEN_RS_CLOS）、
+        // 快轴 mesh 缺省 50（BW_OMNI_DEFAULT）；慢轴 eqBw 口径 = bw/(rankSize-1)
+        //（ziliao :365-366）——分母展开进有理数对（35/3 场景无损）。
+        // ★终审 MAJOR-2 修复（2026-10-07）：原实现硬编码 35（16 卡常数），8 卡档
+        //   （域 1 成员 2，29 常数）被错挂 35——现按域 1 成员数分档 {2→29, 4→35}；
+        //   其余慢轴成员数（UBX CLOS 225、非 PCIeMix 缺省等）tier 不置位——骨架
+        //   直跑语义安全（不产步进序列 = 不涉带宽公式，无静默错跑面），per-domain
+        //   实测带宽注入随 §6.11 DomainPlan/LinkProfile 落地（登记 R9 记录，P2）。
+        if (kind == ActionKind::ReduceSlice && !plan.segments.empty() &&
+            plan.segments.size() >= DomainsRequired()) {
+            const u32 slowRankSize = plan.segments[1].domain.Size();
+            u64 slowBwNum = 0;                          // 0 = 无已知分档 → tier 不置位
+            if (slowRankSize == 2U) {
+                slowBwNum = 29U;                        // BW_OMNI_PCIE_EIGHT_RS_CLOS（ziliao :28）
+            } else if (slowRankSize == 4U) {
+                slowBwNum = 35U;                        // BW_OMNI_PCIE_SIXTEEN_RS_CLOS（ziliao :29）
+            }
+            if (slowBwNum != 0U) {
+                plan.tier.hasTier = true;               // 骨架携带双形态参数集
+                plan.tier.threshBytes = TierParams{}.threshBytes;   // 4MiB（selector :19 同值）
+                plan.tier.interleave = TierInterleave{};            // partRatio 1/2（:229-234 口径）
+                plan.tier.stepwise.bwFastNum = 50U;     // BW_OMNI_DEFAULT（ziliao :26）
+                plan.tier.stepwise.bwFastDen = 1U;
+                plan.tier.stepwise.bwSlowNum = slowBwNum;
+                plan.tier.stepwise.bwSlowDen = (slowRankSize > 1U) ? slowRankSize - 1U : 1U;   // eqBw :365-366
+                plan.tier.stepwise.alignBytes = 512U;   // HCCL_MIN_SLICE_ALIGN_OMNIPIPE（ziliao :21）
+            }
+        }
         return HCCL_SUCCESS;
     }
 

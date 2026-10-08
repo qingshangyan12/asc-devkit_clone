@@ -352,15 +352,17 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             // 2die 判定先于 missionNum（其 mission 数为动态 dieNum，勿路由到并发 prepare）
             ccuUsedXnNum_ = KFC_RS_SOLE_NHR_2DIE_PARAM_NUM;
             CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamGM_[handleId]);
-        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
-        // 前瞻护栏（M2 审查条件②，纯新增）：同 ALLREDUCE 注。
-        if (GetAlgorithmType(handleId) == CCU_ALGORITHM_TYPE_UNIFIED_PLAN) {
-            KERNEL_LOG(
-                KERNEL_ERROR,
-                "ApiClient CcuPrepareForOp: unified plan(158) not dispatched under REDUCE_SCATTER (v3 scope is AG only).");
+        } else if (GetAlgorithmType(handleId) == CCU_ALGORITHM_TYPE_UNIFIED_PLAN) {
+            // R7 · WP-1（2026-10-06）：unified Plan(160) 分派放开 RS——与 ALLGATHER 分支
+            // 同式（ccuUsedXnNum_=0 跳过 v2 xn 写循环防写坏 resourceId 首槽；blob 落盘 +
+            // 哨兵 + 逐帧信号由 CcuPrepareForUnifiedPlan 一次性自管，其帧循环按帧动作 ID
+            // 分叉 AG/RS 两套覆写）。原 R6 前瞻护栏（"v3 scope is AG only"拒收）随 RS
+            // instantiation 落地移除——unified 自有分支的替换。PR rebase 勘误（2026-10-16）：
+            // 分派键 158→160（上游 master 尾部已占 158/159）。
+            ccuUsedXnNum_ = 0;
+            CcuPrepareForUnifiedPlan(&handleParamGM_[handleId]);
             return;
-        }
-        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_RS_PARAM_NUM;
             CcuPrepareForConcurrentReduceScatterM2M(&handleParamGM_[handleId]);
         } else if (

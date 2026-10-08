@@ -2953,9 +2953,12 @@ HcclResult SetMultipleDimensionSplitRatio(HcclComm comm, OpParam& param)
 // unified 分层重构 · ResourceBroker 真实现（§10.2 A5，声明在 hccl_alloc_ctx_res.cc）
 // 编译期开关 MC2_UNIFIED_RESOURCE 默认关——关时以下函数零调用（符号保留但不进链路）。
 // 设计：unified 侧 ResourceClaim → 本层翻译为既有资源 API；不改任何既有函数体。
+// R11 · WP-1（2026-10-08）：两函数各加回收出参重载（默认参数保持原签名兼容——
+// 现调用方只有 UnifiedResourceBroker 转发，不传回收容器时行为与 R10 完全一致）。
 // ===========================================================================
 HcclResult HcclGetAlgResUnified(HcclComm comm, const OpParam& param, u32 threadNum, u32 notifyNum,
-    const std::vector<refactor::ChannelReq>& channels, std::string& err)
+    const std::vector<refactor::ChannelReq>& channels, std::string& err,
+    std::vector<ThreadHandle>* threadsOut)
 {
     (void)channels;
     if (threadNum == 0U) {
@@ -2970,12 +2973,22 @@ HcclResult HcclGetAlgResUnified(HcclComm comm, const OpParam& param, u32 threadN
         err = "HcclThreadAcquire failed in unified path";
         HCCL_ERROR("[UnifiedRes] %s, ret[%d], threadNum[%u], notifyNum[%u].", err.c_str(), static_cast<int>(ret),
             threadNum, notifyNum);
+        return ret;
     }
-    return ret;
+    // R11 · WP-1（句柄回收，2026-10-08）：申请成功的 threads 句柄原实现就此丢弃
+    //（vector 析构）——资源束组装段（AssembleUnifiedAicpuResCtx）无句柄来源。
+    // 出参带出（默认参数 nullptr，存量转发调用方 UnifiedResourceBroker::AcquireThreads
+    // 不传 = 行为零变化；unified 组装链传回收容器落束）。
+    if (threadsOut != nullptr) {
+        *threadsOut = std::move(threads);
+    }
+    return HCCL_SUCCESS;
 }
 
+// R11 · WP-1（句柄回收，2026-10-08）：通道申请的带回收出参重载（真实现体）。
 HcclResult HcclChannelAcquireUnified(HcclComm comm, const OpParam& param,
-    const std::vector<refactor::ChannelReq>& channels, std::string& err)
+    const std::vector<refactor::ChannelReq>& channels, std::string& err,
+    std::vector<ChannelHandle>* handlesOut)
 {
     if (channels.empty()) {
         return HCCL_SUCCESS;
@@ -3017,8 +3030,21 @@ HcclResult HcclChannelAcquireUnified(HcclComm comm, const OpParam& param,
         err = "HcclChannelAcquire failed in unified path";
         HCCL_ERROR("[UnifiedRes] %s, ret[%d], channelNum[%zu].", err.c_str(), static_cast<int>(ret),
             expanded.size());
+        return ret;
     }
-    return ret;
+    // R11 · WP-1：句柄回收（申请后丢弃 → 组装段无 channels 来源的病灶半边）。
+    if (handlesOut != nullptr) {
+        *handlesOut = std::move(handles);
+    }
+    return HCCL_SUCCESS;
+}
+
+// R11 · WP-1：三参公开形态（原签名，存量转发调用方零改动）——委托带回收出参的
+// 真实现体（nullptr 回收 = 丢弃，与 R10 行为一致）。
+HcclResult HcclChannelAcquireUnified(HcclComm comm, const OpParam& param,
+    const std::vector<refactor::ChannelReq>& channels, std::string& err)
+{
+    return HcclChannelAcquireUnified(comm, param, channels, err, nullptr);
 }
 
 namespace {
