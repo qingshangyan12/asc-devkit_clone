@@ -83,9 +83,8 @@ Each case launches 8 blocks by default, with 1024 threads per block. Each thread
 
 | Field | Meaning |
 |:---------------------------:|:-------------------------------------------------|
-| execute cycle | Single-thread execution cycles sampled by `clock()` inside the kernel, reflecting the length of the kernel instruction stream and branch overhead. |
-| Task Duration(μs) | Total Task time, including scheduling to the accelerator, execution time on the accelerator, and response completion time. |
-| aiv_total_cycles | Total CPU cycles consumed by the Task executing on the Vector Core. |
+| execute cycle | Execution cycles sampled by [clock](../../../../../docs/zh/api/Utils-API/tuning_interface/clock.md) inside the kernel, reflecting the length of the kernel instruction stream and branch overhead. |
+| aiv_total_cycles | CPU cycles consumed by one block executing on the Vector Core. |
 
 To prevent warp scheduling from affecting the result, execute cycle is collected with 1 block and 32 threads.
 
@@ -154,9 +153,9 @@ __aicore__ inline half hlog10(half x)
 
 **Performance Data**:
 
-| execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:-----------:|:---------------:|:--------------:|
-| 218 | 2.246 | 2458.75 |
+| execute cycle | aiv_total_cycles |
+|:-----------:|:--------------:|
+| 224 | 2498.75 |
 
 **Performance Data Analysis**:
 
@@ -193,14 +192,14 @@ __aicore__ inline half hlog10(half x)
 
 **Performance Data**:
 
-| execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:-----------:|:---------------:|:--------------:|
-| 190 | 2.186 | 2400.62 |
+| execute cycle | aiv_total_cycles |
+|:-----------:|:--------------:|
+| 190 | 2475.50 |
 
 **Optimization Analysis**:
 
 - Early return is difficult to trigger in actual scenarios. SIMT code executes in units of Warps, so all threads in a Warp must contain special values for early return to occur. This probability is negligible. In most scenarios, special-value threads must wait for other threads to finish calculation before continuing.
-- Writing the code as a temporary variable that stores intermediate values, is overwritten level by level, and finally returns uniformly guides the compiler to perform predicate optimization, eliminating jump and branch stack overhead. Compared with Case 0, execute cycle decreases from 218 to 190, a reduction of about 12.8%.
+- Writing the code as a temporary variable that stores intermediate values, is overwritten level by level, and finally returns uniformly guides the compiler to perform predicate optimization, eliminating jump and branch stack overhead. Compared with the 224 cycles of Case 0, execute cycle decreases to 190, a reduction of about 15.2%. aiv_total_cycles decreases from 2498.75 to 2475.50.
 
 Predicate optimization improves performance by eliminating jump and branch stack overhead, but the compiler does not apply it to complex logic. Therefore, simple logic such as special-value handling is recommended for predicate optimization.
 Predicate optimization executes all instructions in all branches, while the divergence mechanism executes only the necessary paths. If a branch has a high hit rate, predicate optimization causes these threads to execute many useless instructions, resulting in performance loss. In this case, using divergence saves computation overhead. The following sample uses different handling methods for branches with different hit rates to show the applicable scope of predicate optimization.
@@ -264,13 +263,13 @@ __aicore__ inline float j0f(float x)
 
 **Performance Data**:
 
-| execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:-----------:|:---------------:|:--------------:|
-| 1111 | 2.486 | 2802.00 |
+| execute cycle | aiv_total_cycles |
+|:-----------:|:--------------:|
+| 1139 | 2837.75 |
 
 **Performance Data Analysis**:
 
-- input2 is in the range `[-1.0e13f,1.0e13f]`. Each thread executes only the branch body in the hit direction, while branches that are not hit still generate jump and branch stack overhead. execute cycle is 1111.
+- input2 is in the range `[-1.0e13f,1.0e13f]`. Each thread executes only the branch body in the hit direction, while branches that are not hit still generate jump and branch stack overhead. execute cycle is 1139.
 
 ### Case 3: j0f Branch Chain Unified Return Version
 
@@ -301,13 +300,13 @@ __aicore__ inline float j0f(float x)
 
 **Performance Data**:
 
-| execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:-----------:|:---------------:|:--------------:|
-| 3490 | 8.587 | 12086.38 |
+| execute cycle | aiv_total_cycles |
+|:-----------:|:--------------:|
+| 2930 | 18512.38 |
 
 **Optimization Analysis**:
 
-- Compared with Case 2, execute cycle increases from 1111 to 3490, Task Duration increases from 2.486 μs to 8.587 μs, and aiv_total_cycles increases from 2802.00 to 12086.38. Case 3 is significantly slower than the baseline because the unified return causes many threads to perform useless calculations, resulting in performance loss.
+- Compared with the 1139 cycles of Case 2, execute cycle increases to 2930; aiv_total_cycles increases from 2837.75 to 18512.38. Case 3 is significantly slower than the baseline because the unified return causes many threads to perform useless calculations, resulting in performance loss.
 - Comparing Case 2 and Case 3 shows that predicate optimization does not always bring performance gains when warp divergence occurs. Case 4 introduces branch hit situations on this basis to explore the applicable boundary of predicate optimization.
 
 ### Case 4: j0f Branch Chain Version with Early Return for High-Hit-Rate Branches and Predicate Optimization for Low-Hit-Rate Branches
@@ -339,43 +338,43 @@ __aicore__ inline float j0f(float x)
 
 **Performance Data**:
 
-| Data Batch | execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:---:|:-----------:|:---------------:|:--------------:|
-| input1 | 3646 | 12.502 | 17648.88 |
-| input2 | 1115 | 2.453 | 2793.00 |
+| Data Batch | execute cycle | aiv_total_cycles |
+|:---:|:-----------:|:--------------:|
+| input1 | 4014 | 20727.38 |
+| input2 | 1090 | 2760.50 |
 
 **Optimization Analysis**:
 
-- input1: The input data covers the real domain and includes special values. Segment jump branches in a Warp produce divergence, and execute cycle is 3646.
-- input2: All threads return early and do not execute subsequent branch calculations that are not hit. execute cycle is 1115, close to the Case 2 baseline of 1111. Task Duration and aiv_total_cycles are 2.453 μs and 2793.00 respectively, basically the same as the Case 2 values of 2.486 μs and 2802.00. The overall overhead is comparable to the baseline.
+- input1: The input data covers the real domain and includes special values. Segment jump branches in a Warp produce divergence, and execute cycle is 4014.
+- input2: All threads return early and do not execute subsequent branch calculations that are not hit. execute cycle is 1090, lower than the Case 2 baseline of 1139. aiv_total_cycles is 2760.50, lower than the Case 2 value of 2837.75. The overall overhead is lower than the baseline.
 
 ## Performance Comparison Summary
 
 **Overall Optimization Effect**:
 
-- hlog10 sample: From the Case 0 baseline to the Case 1 optimized version, execute cycle decreases from 218 to 190, a reduction of about 12.8%.
-- j0f sample: With the same input composition, execute cycle increases from 1111 in the Case 2 baseline to 3490 in Case 3. On input2, Case 4 achieves an execute cycle of 1115, close to Case 2 and significantly faster than Case 3.
+- hlog10 sample: From the Case 0 baseline to the Case 1 optimized version, execute cycle decreases from 224 to 190, a reduction of about 15.2%; aiv_total_cycles decreases from 2498.75 to 2475.50.
+- j0f sample: With the same input composition, execute cycle increases from 1139 in the Case 2 baseline to 2930 in Case 3. On input2, Case 4 achieves an execute cycle of 1090, lower than Case 2 and significantly faster than Case 3.
 
 - hlog10 sample:
 
-| Case | execute cycle | Task Duration(μs) | aiv_total_cycles | Optimization Point |
-|--------|:-----------:|:---------------:|:--------------:|--------------------|
-| Case 0 | 218 | 2.246 | 2458.75 | Baseline version with special values placed first and early return upon hit |
-| Case 1 | **190** | 2.186 | 2400.62 | Correction chain with unified return; the whole chain is predicated to eliminate jump and branch stack overhead |
+| Case | execute cycle | aiv_total_cycles | Optimization Point |
+|--------|:-----------:|:--------------:|--------------------|
+| Case 0 | 224 | 2498.75 | Baseline version with special values placed first and early return upon hit |
+| Case 1 | **190** | 2475.50 | Correction chain with unified return; the whole chain is predicated to eliminate jump and branch stack overhead |
 
 - j0f group, Case 2/3 (input2):
 
-| Case | execute cycle | Task Duration(μs) | aiv_total_cycles | Optimization Point |
-|--------|:-----------:|:---------------:|:--------------:|--------------------|
-| Case 2 | **1111** | 2.486 | 2802.00 | Baseline version with special values placed first and immediate return upon any branch hit |
-| Case 3 | 3490 | 8.587 | 12086.38 | All branches use unified return and level-by-level overwrite; both long and short branches are fully predicated, and execute cycle is higher than the baseline |
+| Case | execute cycle | aiv_total_cycles | Optimization Point |
+|--------|:-----------:|:--------------:|--------------------|
+| Case 2 | **1139** | 2837.75 | Baseline version with special values placed first and immediate return upon any branch hit |
+| Case 3 | 2930 | 18512.38 | All branches use unified return and level-by-level overwrite; both long and short branches are fully predicated, and execute cycle is higher than the baseline |
 
 - j0f group, Case 4 (execute cycle by data batch):
 
 | Data Batch | Case 4 | Hit Rate Characteristics |
 |--------|:-----:|--------------------|
-| input1 | 3646 | Hit rates of the low, middle, and high value segments are close; includes NaN/-Inf special values |
-| input2 | **1115** | High hit rate in the middle value segment |
+| input1 | 4014 | Hit rates of the low, middle, and high value segments are close; includes NaN/-Inf special values |
+| input2 | **1090** | High hit rate in the middle value segment |
 
 ## Tuning Suggestions
 
@@ -429,11 +428,11 @@ Perform the following steps in the sample root directory to build and run the sa
   | 1 | hlog10 | Baseline version |
   | 2 | hlog10 | Optimized version |
   | 3 | j0f | Baseline version |
-  | 4 | j0f | Fully predicated version |
-  | 5 | j0f | Optimized version (input2) |
-  | 6 | j0f | Optimized version (input1) |
+  | 4 | j0f | Unified return version |
+  | 5 | j0f | Early return combined with predicate optimization (input2) |
+  | 6 | j0f | Early return combined with predicate optimization (input1) |
 
-  Each build contains only the selected case. Rebuild and run with different SCENARIO_NUM values to complete the full comparison of all cases and groups. execute cycle must be collected in a separate build with `-DCYCLE_PROFILE=ON`. Task Duration and aiv_total_cycles are collected with the default build and msOpProf.
+  Each build contains only the selected case. Rebuild and run with different SCENARIO_NUM values to complete the full comparison of all cases and groups. execute cycle must be collected in a separate build with `-DCYCLE_PROFILE=ON`. aiv_total_cycles is collected three times with the default build and msOpProf, and its median is used; aiv_total_cycles is the average across 8 blocks.
 
 ## Performance Profiling
 
@@ -465,6 +464,6 @@ After the command completes, a folder named OPPROF_{timestamp}_XXX is generated 
 To view detailed profiling results:
 
 ```
-# For example, view Task Duration data
+# For example, view basic operator information
 cat ./OPPROF_*/OpBasicInfo.csv
 ```

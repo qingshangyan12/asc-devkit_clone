@@ -1,4 +1,4 @@
-# Warp分支发散谓词优化样例
+# Warp分支发散predicate优化样例
 
 ## 概述
 
@@ -20,6 +20,7 @@
 │   ├── README.md                   // 样例说明文档
 │   ├── README_en.md                // 英文样例说明文档
 ```
+
 ## 基础知识说明
 
 - **Warp与分支发散（Warp Divergence）**
@@ -59,7 +60,7 @@
 
 - 样例功能
 
-  以[hlog10](../../../../../docs/zh/api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个避开6个特殊值的正常half元素为输入。对比不同特殊值处理写法在正常值路径上的分支开销，展示predicate优化的收益来源。
+  以[hlog10](../../../../../docs/zh/api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个half元素为输入。对比不同特殊值处理方法的性能，展示predicate优化的收益来源。
 
 - 样例规格：
   <table>
@@ -82,11 +83,10 @@
 
 |             字段名             | 字段含义                                             |
 |:---------------------------:|:-------------------------------------------------|
-|      execute cycle          | kernel内`clock()`采样到的执行周期数，采集时取32个线程中的最大值，反映kernel指令流的长度与分支开销。          |
-|      Task Duration(μs)      | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。          |
-|      aiv_total_cycles       | 单个block在Vector Core上执行所消耗的CPU周期（Cycle）数，性能数据表中取8个block的平均值。          |
+|      execute cycle          | kernel内[clock](../../../../../docs/zh/api/Utils-API/tuning_interface/clock.md)采样到的执行周期数，反映kernel指令流的长度与分支开销。          |
+|      aiv_total_cycles       | 单个block在Vector Core上执行所消耗的CPU周期（Cycle）数。          |
 
-为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程，并取32个线程中的最大值。Task Duration与aiv_total_cycles为msOpProf 3次采集中位数，aiv_total_cycles取8个block的平均值。
+为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程。
 
 ### Case 0: hlog10分支链divergence版本
 
@@ -153,9 +153,9 @@ __aicore__ inline half hlog10(half x)
 
 **性能数据**：
 
-| execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:-----------:|:---------------:|:--------------:|
-| 224 | 2.233 | 2498.75 |
+| execute cycle | aiv_total_cycles |
+|:-----------:|:--------------:|
+| 224 | 2498.75 |
 
 **性能数据分析**：
 
@@ -192,14 +192,14 @@ __aicore__ inline half hlog10(half x)
 
 **性能数据**：
 
-| execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:-----------:|:---------------:|:--------------:|
-| 190 | 2.259 | 2475.50 |
+| execute cycle | aiv_total_cycles |
+|:-----------:|:--------------:|
+| 190 | 2475.50 |
 
 **优化效果分析**：
 
 - 提前return在实际场景中很难触发：SIMT代码实际以warp为单位执行，必须warp内所有线程的数据都是特殊值才能提前return，从概率上可以忽略不计，绝大部分场景下，特殊值线程需要等其他线程完成计算后再一起往下执行。
-- 通过临时变量存储中间值，逐级覆盖最后统一return这种写法，可以引导编译器进行predicate优化，消除跳转与分支栈开销，相比Case 0的224，execute cycle降至190，下降约15.2%；Task Duration基本持平，aiv_total_cycles从2498.75降至2475.50。
+- 通过临时变量存储中间值，逐级覆盖最后统一return这种写法，可以引导编译器进行predicate优化，消除跳转与分支栈开销，相比Case 0的224，execute cycle降至190，下降约15.2%；aiv_total_cycles从2498.75降至2475.50。
 
 predicate优化通过消除跳转与分支栈开销提高性能，但复杂逻辑编译器不会用predicate优化。因此异常值处理这类简单分支建议使用predicate优化。
 predicate优化会执行所有分支的所有指令，divergence机制只执行必要的路径。若某分支命中率较高，使用predicate优化时这部分线程会多执行大量无用指令，会造成性能损失，此时使用divergence可以节省计算开销。后续样例将对不同命中率的分支采用不同处理方式，展示predicate优化的适用范围。
@@ -263,9 +263,9 @@ __aicore__ inline float j0f(float x)
 
 **性能数据**：
 
-| execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:-----------:|:---------------:|:--------------:|
-| 1139 | 2.437 | 2837.75 |
+| execute cycle | aiv_total_cycles |
+|:-----------:|:--------------:|
+| 1139 | 2837.75 |
 
 **性能数据分析**：
 
@@ -300,18 +300,18 @@ __aicore__ inline float j0f(float x)
 
 **性能数据**：
 
-| execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:-----------:|:---------------:|:--------------:|
-| 2930 | 13.224 | 18512.38 |
+| execute cycle | aiv_total_cycles |
+|:-----------:|:--------------:|
+| 2930 | 18512.38 |
 
 **优化效果分析**：
 
-- 相比Case 2的1139，execute cycle升至2930，Task Duration从2.437μs增至13.224μs，aiv_total_cycles从2837.75升至18512.38。Case 3显著慢于基线，原因在于统一return后大量线程做了无用计算，造成性能损耗。
+- 相比Case 2的1139，execute cycle升至2930，aiv_total_cycles从2837.75升至18512.38。Case 3显著慢于基线，原因在于统一return后大量线程做了无用计算，造成性能损耗。
 - 对比Case 2与Case 3可知，warp divergence出现时，predicate优化并非总能带来性能收益。Case 4在此基础上引入分支命中情况，探究predicate优化的适用边界。
 
 ### Case 4: j0f分支链高命中率分支提前return，低命中率分支predicate优化版本
 
-**实现方式**：使用提前return处理高命中率分支，用临时变量暂存低命中率分支的计算结果，从而引导编译器对低命中率分支进行predicate优化。
+**实现方式**：使用提前return处理高命中率分支，用临时变量暂存低命中率分支的计算结果，引导编译器对低命中率分支进行predicate优化。
 
 **关键代码**：
 
@@ -338,36 +338,36 @@ __aicore__ inline float j0f(float x)
 
 **性能数据**：
 
-| 数据批 | execute cycle | Task Duration(μs) | aiv_total_cycles |
-|:---:|:-----------:|:---------------:|:--------------:|
-| input1 | 4014 | 13.616 | 20727.38 |
-| input2 | 1090 | 2.376 | 2760.50 |
+| 数据批 | execute cycle | aiv_total_cycles |
+|:---:|:-----------:|:--------------:|
+| input1 | 4014 | 20727.38 |
+| input2 | 1090 | 2760.50 |
 
 **优化效果分析**：
 
 - input1：输入数据覆盖实数域并混入特殊值，warp内分段跳转分支产生divergence，execute cycle为4014。
-- input2：所有线程都提前return，不执行后续未命中的分支计算，execute cycle为1090，低于Case 2基线1139；Task Duration与aiv_total_cycles分别为2.376μs与2760.50，均低于Case 2的2.437μs与2837.75，整体开销低于基线。
+- input2：所有线程都提前return，不执行后续未命中的分支计算，execute cycle为1090，低于Case 2基线1139；aiv_total_cycles为2760.50，低于Case 2的2837.75，整体开销低于基线。
 
 ## 性能对比总结
 
 **综合优化效果**：
 
-- hlog10样例：从Case 0基线版本到Case 1优化版本，execute cycle从224降低到190，下降约15.2%；Task Duration基本持平，aiv_total_cycles从2498.75降至2475.50；
+- hlog10样例：从Case 0基线版本到Case 1优化版本，execute cycle从224降低到190，下降约15.2%；aiv_total_cycles从2498.75降至2475.50；
 - j0f样例：输入数据构成相同时，从Case 2基线版本到Case 3，execute cycle从1139升至2930；Case 4在input2上execute cycle为1090，低于Case 2，且明显快于Case 3。
 
 - hlog10样例：
 
-| Case | execute cycle | Task Duration(μs) | aiv_total_cycles | 优化点 |
-|--------|:-----------:|:---------------:|:--------------:|--------------------|
-| Case 0 | 224 | 2.233 | 2498.75 | 基线版本，特殊值前置、命中即提前return |
-| Case 1 | **190** | 2.259 | 2475.50 | 修正链统一return，整链谓词化消除跳转与分支栈开销 |
+| Case | execute cycle | aiv_total_cycles | 优化点 |
+|--------|:-----------:|:--------------:|--------------------|
+| Case 0 | 224 | 2498.75 | 基线版本，特殊值前置、命中即提前return |
+| Case 1 | **190** | 2475.50 | 修正链统一return，整链谓词化消除跳转与分支栈开销 |
 
 - j0f组case2/3（input2）：
 
-| Case | execute cycle | Task Duration(μs) | aiv_total_cycles | 优化点 |
-|--------|:-----------:|:---------------:|:--------------:|--------------------|
-| Case 2 | **1139** | 2.437 | 2837.75 | 基线版本，特殊值前置、全部分支命中即返回 |
-| Case 3 | 2930 | 13.224 | 18512.38 | 全部分支统一return、逐级覆盖，长短分支全部谓词化，execute cycle高于基线 |
+| Case | execute cycle | aiv_total_cycles | 优化点 |
+|--------|:-----------:|:--------------:|--------------------|
+| Case 2 | **1139** | 2837.75 | 基线版本，特殊值前置、全部分支命中即返回 |
+| Case 3 | 2930 | 18512.38 | 全部分支统一return、逐级覆盖，长短分支全部谓词化，execute cycle高于基线 |
 
 - j0f组case4（execute cycle，按数据批）：
 
@@ -378,7 +378,7 @@ __aicore__ inline float j0f(float x)
 
 ## 调优建议
 
-1. **使用predicate优化分支链路**：当warp divergence出现在简单分支时，可使用临时变量的写法引导编译器进行predicate优化消除分支跳转开销。
+1. **使用predicate优化分支链路**：当warp divergence出现在简单分支时，可使用临时变量的写法引导编译器进行predicate优化，消除分支跳转开销。
 
 2. **divergence和predicate优化结合使用**：predicate优化会执行所有分支的所有指令，divergence只执行必要的路径，当分支链路中各分支命中率不同时，命中率高的分支保留divergence，命中率低的分支进行predicate优化，既可以避免执行不必要的指令，又可以消除分支跳转的开销。
 
@@ -428,11 +428,11 @@ __aicore__ inline float j0f(float x)
   | 1 | hlog10 | 基线版本 |
   | 2 | hlog10 | 优化版本 |
   | 3 | j0f | 基线版本 |
-  | 4 | j0f | 全谓词化版本 |
-  | 5 | j0f | 优化版本（input2） |
-  | 6 | j0f | 优化版本（input1） |
+  | 4 | j0f | 统一return版本 |
+  | 5 | j0f | 提前return与predicate优化结合版本（input2） |
+  | 6 | j0f | 提前return与predicate优化结合版本（input1） |
 
-  每次编译只包含选定的用例：换用不同的SCENARIO_NUM重新编译并运行，即可逐个完成各用例、各组的完整对比。execute cycle需以`-DCYCLE_PROFILE=ON`单独编译采集，Task Duration与aiv_total_cycles以默认编译配合msOpProf采集3次，取中位数；aiv_total_cycles取8个block的平均值。
+  每次编译只包含选定的用例：换用不同的SCENARIO_NUM重新编译并运行，即可逐个完成各用例、各组的完整对比。execute cycle需以`-DCYCLE_PROFILE=ON`单独编译采集，aiv_total_cycles以默认编译配合msOpProf采集3次，取中位数，并取8个block的平均值。
 
 ## 性能调试
 
@@ -464,6 +464,6 @@ msopprof ./predicate_optimization   # 分析样例的性能（用例由编译时
 查看具体的性能分析结果：
 
 ```
-# 如查看Task Duration 相关数据
+# 如查看算子基本信息
 cat ./OPPROF_*/OpBasicInfo.csv
 ```
