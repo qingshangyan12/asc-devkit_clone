@@ -98,6 +98,20 @@ template <typename T>
 __aicore__ inline void Gather(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& srcOffset,
     const uint32_t srcBaseOffset, const uint32_t count);
+
+/*
+ * @ingroup gather Level 0
+ * @brief gather element from global src according to offsetSrc
+ * @param [out] dst output LocalTensor
+ * @param [in] src input GlobalTensor
+ * @param [in] offsetSrc input LocalTensor, offset type is int32_t or int64_t
+ * @param [in] gatherParam gather parameters, including offsetNum, burstLen and dstStride
+ * @param [in] gatherPadParam gather pad parameters, including padSel and paddingValue
+ */
+template <typename T, typename U = int32_t>
+__aicore__ inline void GatherFromGlobal(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offsetSrc,
+    GatherParams& gatherParam, GatherPadParams<T>& gatherPadParam);
 } // namespace AscendC
 #pragma end_pipe
 #if defined(__NPU_ARCH__)

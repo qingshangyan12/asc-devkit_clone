@@ -37,6 +37,8 @@
 #include "dav_3510/kernel_operator_vec_gather_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_gather_impl.h"
+#elif (__NPU_ARCH__ == 5162)
+#include "dav_v516/kernel_operator_vec_gather_impl.h"
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_gather_impl.h"
 #elif __NPU_ARCH__ == 3113
@@ -180,7 +182,7 @@ __aicore__ inline void Gather(
 {
     using PrimType = PrimT<T>;
 #if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+    ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     ASCENDC_ASSERT(
         (SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()), {
             KERNEL_LOG(
@@ -234,6 +236,33 @@ __aicore__ inline void Gather(
             DEFAULT_REPEAT_STRIDE);
     }
 #endif
+#endif
+}
+/*
+ * @ingroup gather Level 0
+ * @brief gather element from global src according to offsetSrc
+ * @param [out] dst output LocalTensor
+ * @param [in] src input GlobalTensor
+ * @param [in] offsetSrc input LocalTensor, offset type is int32_t or int64_t
+ * @param [in] gatherParam gather parameters, including offsetNum, burstLen and dstStride
+ * @param [in] gatherPadParam gather pad parameters, including padSel and paddingValue
+ */
+template <typename T, typename U>
+__aicore__ inline void GatherFromGlobal(
+    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LocalTensor<U>& offsetSrc,
+    GatherParams& gatherParam, GatherPadParams<T>& gatherPadParam)
+{
+    using PrimType = PrimT<T>;
+    using OffsetPrimType = PrimT<U>;
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+    const uint8_t cacheMode = ExtractCacheMode(src);
+    GatherFromGlobalImpl(
+        (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(),
+        (__ubuf__ OffsetPrimType*)offsetSrc.GetPhyAddr(), gatherParam, gatherPadParam, cacheMode);
+#else
+    ASCENDC_ASSERT(false, {
+        KERNEL_LOG(KERNEL_ERROR, "GatherFromGlobal is not supported on current device");
+    });
 #endif
 }
 } // namespace AscendC

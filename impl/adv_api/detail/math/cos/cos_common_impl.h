@@ -30,7 +30,7 @@
 #endif // ASCENDC_CPU_DEBUG
 #include "../../api_check/kernel_api_check.h"
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || \
-                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+                              __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
 #include "cos_v220_impl.h"
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2002
 #include "cos_v200_impl.h"
@@ -130,7 +130,7 @@ __aicore__ inline void CosRound(
     Adds<float, false>(roundTensor, roundTensor, COS_POINT_FIVE, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
     // tie to even
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
                               __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CosCastFullMask(roundTensor, roundTensor, RoundMode::CAST_RINT);
 #else
@@ -152,7 +152,7 @@ __aicore__ inline void SignCompute(
     Muls<float, false>(dstTensor, roundTensor, COS_POINT_FIVE, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
                               __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
     CosCastFullMask(dstTensor, dstTensor, RoundMode::CAST_FLOOR);
 #else
@@ -204,7 +204,7 @@ __aicore__ inline void CosPolynomialApproximation(
     // res_up = mul(res_up, x^2)
     Mul<float, false>(roundTensor, roundTensor, kpi, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
-    Adds<float, false>(roundTensor, roundTensor, 1.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Adds<float, false>(roundTensor, roundTensor, 1.0f, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
     // sin(x) = xP(x)
     Mul<float, false>(roundTensor, roundTensor, inputX, MASK_PLACEHOLDER, 1, binaryParams);
@@ -212,9 +212,9 @@ __aicore__ inline void CosPolynomialApproximation(
     Mul<float, false>(dstTensor, roundTensor, dstTensor, MASK_PLACEHOLDER, 1, binaryParams);
     PipeBarrier<PIPE_V>();
 
-    Mins<float, false>(dstTensor, dstTensor, 1.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Mins<float, false>(dstTensor, dstTensor, 1.0f, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
-    Maxs<float, false>(dstTensor, dstTensor, -1.0, MASK_PLACEHOLDER, 1, unaryParams);
+    Maxs<float, false>(dstTensor, dstTensor, -1.0f, MASK_PLACEHOLDER, 1, unaryParams);
     PipeBarrier<PIPE_V>();
 }
 
