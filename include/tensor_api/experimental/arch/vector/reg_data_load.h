@@ -70,8 +70,8 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
  * @return A register tensor containing the gathered data.
  */
 template <gather_mode mode = gather_mode::element, typename Tensor, typename Coord, typename Index>
-__simd_callee__ inline decltype(auto) load_gather(const Tensor& tensor, const Coord& coord,
-    const reg_tensor<Index> index, const reg_tensor<bool>& gather_mask);
+__simd_callee__ inline decltype(auto) load_gather(
+    const Tensor& tensor, const Coord& coord, const reg_tensor<Index> index, const reg_tensor<bool>& gather_mask);
 
 /**
  * @brief Gathers elements or data blocks from the beginning of a UB tensor.

@@ -161,13 +161,13 @@ __simd_callee__ inline void store(
 }
 
 template <typename Tensor, typename T, typename Index>
-__simd_callee__ inline void store_scatter(
-    Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index)
+__simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
     static_assert(
-        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store_scatter only supports tensors located in UB");
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "store_scatter only supports tensors located in UB");
     static_assert(Std::is_same_v<data_type, T>, "store_scatter requires matching tensor and register element types");
     asc_scatter(tensor.engine().begin().get(), src.reg, index.reg, src.mask);
 }
@@ -179,7 +179,8 @@ __simd_callee__ inline void store_scatter(
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
     static_assert(
-        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "store_scatter only supports tensors located in UB");
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "store_scatter only supports tensors located in UB");
     static_assert(Std::is_same_v<data_type, T>, "store_scatter requires matching tensor and register element types");
     TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "store_scatter");
 

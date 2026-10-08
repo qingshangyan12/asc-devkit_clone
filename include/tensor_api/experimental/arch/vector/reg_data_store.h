@@ -81,8 +81,7 @@ __simd_callee__ inline void store(
  * @note The tensor and source register element types must match.
  */
 template <typename Tensor, typename T, typename Index>
-__simd_callee__ inline void store_scatter(
-    Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index);
+__simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index);
 
 /**
  * @brief Scatters register data from active source lanes to a UB tensor at the specified coordinate.

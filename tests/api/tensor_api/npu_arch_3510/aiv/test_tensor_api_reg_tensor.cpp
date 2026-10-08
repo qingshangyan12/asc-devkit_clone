@@ -139,36 +139,33 @@ __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* d
 
 template <asc::te::experimental::gather_mode mode>
 __simd_vf__ inline void compile_reg_local_tensor_gather_scatter(
-    __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, vector_uint32_t value, vector_uint32_t index,
-    vector_bool mask)
+    __ubuf__ uint32_t* dst, __ubuf__ uint32_t* src, vector_uint32_t value, vector_uint32_t index, vector_bool mask)
 {
     auto layout = asc::te::make_layout(asc::te::make_shape(64));
     auto dst_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst), layout);
     auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
 
-    asc::te::experimental::reg_tensor<uint32_t> value_reg {mask};
+    asc::te::experimental::reg_tensor<uint32_t> value_reg{mask};
     value_reg.reg = value;
-    asc::te::experimental::reg_tensor<uint32_t> index_reg {};
+    asc::te::experimental::reg_tensor<uint32_t> index_reg{};
     index_reg.reg = index;
-    asc::te::experimental::reg_tensor<bool> gather_mask {};
+    asc::te::experimental::reg_tensor<bool> gather_mask{};
     gather_mask.reg = mask;
 
     static_assert(AscendC::Std::is_same_v<
                   decltype(asc::te::experimental::store_scatter(dst_tensor, value_reg, index_reg)), void>);
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::store_scatter(
-                      dst_tensor, asc::te::make_coord(0), value_reg, index_reg)),
-                  void>);
+    static_assert(
+        AscendC::Std::is_same_v<
+            decltype(asc::te::experimental::store_scatter(dst_tensor, asc::te::make_coord(0), value_reg, index_reg)),
+            void>);
     asc::te::experimental::store_scatter(dst_tensor, value_reg, index_reg);
     asc::te::experimental::store_scatter(dst_tensor, asc::te::make_coord(0), value_reg, index_reg);
 
     auto gathered = asc::te::experimental::load_gather<mode>(src_tensor, index_reg, gather_mask);
     auto gathered_at =
         asc::te::experimental::load_gather<mode>(src_tensor, asc::te::make_coord(0), index_reg, gather_mask);
-    static_assert(
-        AscendC::Std::is_same_v<decltype(gathered), asc::te::experimental::reg_tensor<uint32_t>>);
-    static_assert(
-        AscendC::Std::is_same_v<decltype(gathered_at), asc::te::experimental::reg_tensor<uint32_t>>);
+    static_assert(AscendC::Std::is_same_v<decltype(gathered), asc::te::experimental::reg_tensor<uint32_t>>);
+    static_assert(AscendC::Std::is_same_v<decltype(gathered_at), asc::te::experimental::reg_tensor<uint32_t>>);
     (void)gathered;
     (void)gathered_at;
 }
