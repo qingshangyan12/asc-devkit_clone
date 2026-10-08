@@ -16,6 +16,7 @@
 #ifndef INCLUDE_C_API_DEFS_TYPE_H
 #define INCLUDE_C_API_DEFS_TYPE_H
 
+#include "version/asc_devkit_version.h"
 #include "c_api/defs/macro.h"
 #include "utils/common_types.h"
 
