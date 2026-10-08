@@ -332,7 +332,7 @@ public:
         using src_data_type = typename SrcTensor::element_type;
         using dst_data_type = typename DstTensor::element_type;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<
                 Std::tuple<dst_data_type, src_data_type>, Std::tuple<__ubuf__ half, __gm__ half>,
@@ -356,7 +356,7 @@ public:
         using src_data_type = typename SrcTensor::element_type;
         using dst_data_type = typename DstTensor::element_type;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<
                 Std::tuple<dst_data_type, src_data_type>, Std::tuple<__ubuf__ half, __ubuf__ half>,
@@ -380,7 +380,7 @@ public:
         using src_data_type = typename SrcTensor::element_type;
         using dst_data_type = typename DstTensor::element_type;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<
                 Std::tuple<dst_data_type, src_data_type>, Std::tuple<__gm__ half, __ubuf__ half>,
@@ -404,7 +404,7 @@ public:
         using src_data_type = typename SrcTensor::element_type;
         using dst_data_type = typename DstTensor::element_type;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
         static_assert(
             Std::is_one_of_v<
                 Std::tuple<dst_data_type, src_data_type>, Std::tuple<__cbuf__ half, __ubuf__ half>,

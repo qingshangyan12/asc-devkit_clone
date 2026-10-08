@@ -234,7 +234,9 @@ public:
     }
 };
 
-#if (defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) && !defined(__DAV_CUBE__))
+#if (                                                                                                  \
+    defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) && \
+    !defined(__DAV_CUBE__))
 __BLOCK_LOCAL__ __inline__ AscendC::KfcCommClient* g_kfcClient;
 #endif
 
