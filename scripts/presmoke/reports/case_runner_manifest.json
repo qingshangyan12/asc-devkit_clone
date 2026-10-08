@@ -14521,56 +14521,6 @@
     ]
   },
   {
-    "case": "02_simd_c_api/03_c_api/01_memory_vector_compute/cast__scenario_4",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/03_c_api/01_memory_vector_compute/cast__scenario_4/run.sh",
-    "source": "readme",
-    "confidence": "high",
-    "source_case": "02_simd_c_api/03_c_api/01_memory_vector_compute/cast",
-    "supported_archs": [
-      "dav-2201"
-    ],
-    "supported_modes": [
-      "npu"
-    ],
-    "target_runnable": true,
-    "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "skip_archs": [],
-    "reasons": [],
-    "commands": [
-      "cmake -DSCENARIO_NUM=4 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
-      "make -j",
-      "python3 ../scripts/gen_data.py -scenario_num=4",
-      "./demo"
-    ]
-  },
-  {
-    "case": "02_simd_c_api/03_c_api/01_memory_vector_compute/cast__scenario_32",
-    "runner": "scripts/presmoke/cases/02_simd_c_api/03_c_api/01_memory_vector_compute/cast__scenario_32/run.sh",
-    "source": "readme",
-    "confidence": "high",
-    "source_case": "02_simd_c_api/03_c_api/01_memory_vector_compute/cast",
-    "supported_archs": [
-      "dav-2201"
-    ],
-    "supported_modes": [
-      "npu"
-    ],
-    "target_runnable": true,
-    "skip": false,
-    "skip_reason": "",
-    "skip_modes": [],
-    "skip_archs": [],
-    "reasons": [],
-    "commands": [
-      "cmake -DSCENARIO_NUM=32 .. -DCMAKE_ASC_ARCHITECTURES=dav-2201",
-      "make -j",
-      "python3 ../scripts/gen_data.py -scenario_num=32",
-      "./demo"
-    ]
-  },
-  {
     "case": "02_simd_c_api/03_c_api/01_memory_vector_compute/compare__scenario_1",
     "runner": "scripts/presmoke/cases/02_simd_c_api/03_c_api/01_memory_vector_compute/compare__scenario_1/run.sh",
     "source": "readme",
