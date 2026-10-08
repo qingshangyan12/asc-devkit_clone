@@ -28,7 +28,6 @@
 
 namespace AscendC {
 namespace Internal {
-template <typename T>
 constexpr Reg::CastTrait siluFloat2HalfCastTrait0 = {
     Reg::RegLayout::ZERO, Reg::SatMode::SAT, Reg::MaskMergeMode::MERGING, RoundMode::CAST_RINT};
 constexpr Reg::CastTrait siluFloat2HalfCastTrait1 = {
@@ -68,6 +67,7 @@ __simd_vf__ inline void SiluComputeVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t
     }
 }
 #else
+template <typename T>
 __simd_vf__ inline void SiluComputeVF(__ubuf__ T* dst, __ubuf__ T* src, uint32_t count, const uint16_t repeatTimes)
 {
     constexpr uint32_t oneRepElm = static_cast<uint32_t>(GetVecLen() / sizeof(T));
