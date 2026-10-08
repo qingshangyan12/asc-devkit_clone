@@ -585,7 +585,8 @@ __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent) ||
         algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink)) {
         missionNum = KFC_MAX_MISSION_NUM;
-    } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR) && newCcuFlag_) {
+    } else if ((algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR) ||
+                algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleNHR)) && newCcuFlag_) {
         // 2die 的 mission 数 = dieNum（资源期动态探测），host 经 OpResCtx.res[2] 下发；0/越界回退 1（兼容旧 host lib）
         const uint64_t missionCnt = hcclNewContext_->res[2];
         if (missionCnt >= 1U && missionCnt <= KFC_MAX_MISSION_NUM) {

@@ -12,10 +12,13 @@
 // hccl -> KFC 适配：
 //  1. CcuKernelArg 单参数 + ccu::LoadArg → 显式参数列表（地址/尺寸来自 xnData 队列，token 来自 server ctx）。
 //  2. CcuKernelArgAllGatherNHR1D 成员 → Context + dispatch 传参；rankSize/rankId/stepInfoVector/rank2ChannelIdx
-//     来自 CcuKernelArgKfcServer（InheritKfcServerKernelArg 透传）。
-//  3. 固定 axisId=0（单 die）语义：hccl 的 die1Size/die1LastSize/axisId==1 分支不迁移
-//     （KFC 单 mission 约束，见 docs/migration/ccu-sched-allgather-sole-nhr-migration.md 4.2 节）。
+//     来自 CcuKernelArgKfcServer（InheritKfcServerKernelArg 透传），axisId/axisSize 区分双 die mission 实例。
+//  3. 双 die 语义完整迁移：die0/die1 份额同帧读取，axisId==1 首迭代跳过 die0 份额
+//     （原版 hccl_ccu_v0.cc 的 axisId 分支），本地 GroupCopy 按 axisId 选 goSize 组。
 //  4. GroupCopy 使用 devkit 4 参版本（无 GetCcuVersion）。
+//  5. 步内流水（对齐 RS NHR MultiLink RunStep 先例）：slice 数 ≤ 16 位事件预算时本轮所有
+//     slice 先全部发射（独立事件位、分片互不相交），轮末一次批量 EventWait，消除逐 slice
+//     等待空转；超预算/空步回退原"发一个等一个"串行结构。
 #include "ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
@@ -33,6 +36,8 @@ struct KfcAllGatherNhr1DContext : CcuKernelCtxBase {
     uint32_t channelCount = 0;
     uint32_t rankSize = 0;
     uint32_t rankId = 0;
+    uint32_t axisId = 0;
+    uint32_t axisSize = 1;
     const std::vector<KfcNhrStepInfo>* stepInfoVector = nullptr;
     const std::map<uint32_t, uint32_t>* rank2ChannelIdx = nullptr;
 
@@ -41,6 +46,8 @@ struct KfcAllGatherNhr1DContext : CcuKernelCtxBase {
     std::vector<ccu::Variable> token;
     ccu::Variable die0Size;
     ccu::Variable die0LastSize;
+    ccu::Variable die1Size;
+    ccu::Variable die1LastSize;
     ccu::Variable repeatNum;
     ccu::Variable inputSliceStride;
     ccu::Variable outputSliceStride;
@@ -56,6 +63,7 @@ struct KfcAllGatherNhr1DContext : CcuKernelCtxBase {
     ccu::LocalAddr localDst;
     ccu::Variable constVar1;
     GroupOpSizeVars goSize;
+    GroupOpSizeVars goSizeDie1;
     ccu::Variable groupCopyRepeatNum;
 };
 
@@ -66,10 +74,12 @@ struct KfcAllGatherNhr1DContext : CcuKernelCtxBase {
 CcuResult InitResource(KfcAllGatherNhr1DContext& ctx)
 {
     if (ctx.rankSize == 0U || ctx.rankId >= ctx.rankSize || ctx.channelCount == 0U || ctx.rank2ChannelIdx == nullptr ||
-        ctx.rank2ChannelIdx->size() != ctx.channelCount || ctx.stepInfoVector == nullptr) {
+        ctx.rank2ChannelIdx->size() != ctx.channelCount || ctx.stepInfoVector == nullptr || ctx.axisSize == 0U ||
+        ctx.axisId >= ctx.axisSize) {
         HCCL_ERROR(
-            "[CcuKernelKfcAllGatherNHR1DMem2Mem] invalid resource, rankSize[%u], rankId[%u], channels[%u]",
-            ctx.rankSize, ctx.rankId, ctx.channelCount);
+            "[CcuKernelKfcAllGatherNHR1DMem2Mem] invalid resource, rankSize[%u], rankId[%u], channels[%u], "
+            "axisId[%u], axisSize[%u]",
+            ctx.rankSize, ctx.rankId, ctx.channelCount, ctx.axisId, ctx.axisSize);
         return CCU_E_INTERNAL;
     }
     for (uint32_t channelIdx = 0; channelIdx < ctx.channelCount; ++channelIdx) {
@@ -87,12 +97,14 @@ CcuResult InitResource(KfcAllGatherNhr1DContext& ctx)
 }
 
 // 对应 hccl LoadArgs：本 rank 的 output/token 从队列参数取得，其余形参直赋。
+// die0/die1 份额与各自 goSize 同帧加载（双 die 两 mission 共享帧），axisId 在捕获期选档。
 void LoadNhr1DArgs(
     KfcAllGatherNhr1DContext& ctx, ccu::Variable input, ccu::Variable output, ccu::Variable token,
-    ccu::Variable die0Size, ccu::Variable die0LastSize, ccu::Variable repeatNumInv, ccu::Variable inputSliceStride,
-    ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
-    ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-    ccu::Variable goSize3)
+    ccu::Variable die0Size, ccu::Variable die0LastSize, ccu::Variable die1Size, ccu::Variable die1LastSize,
+    ccu::Variable repeatNumInv, ccu::Variable inputSliceStride, ccu::Variable outputSliceStride,
+    ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual,
+    ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2, ccu::Variable goSize3,
+    ccu::Variable goSizeDie1_0, ccu::Variable goSizeDie1_1, ccu::Variable goSizeDie1_2, ccu::Variable goSizeDie1_3)
 {
     const uint32_t localIdx = ctx.channelCount;
     ctx.input = input;
@@ -100,6 +112,8 @@ void LoadNhr1DArgs(
     ctx.token[localIdx] = token;
     ctx.die0Size = die0Size;
     ctx.die0LastSize = die0LastSize;
+    ctx.die1Size = die1Size;
+    ctx.die1LastSize = die1LastSize;
     ctx.repeatNum = repeatNumInv;
     ctx.inputSliceStride = inputSliceStride;
     ctx.outputSliceStride = outputSliceStride;
@@ -110,6 +124,10 @@ void LoadNhr1DArgs(
     ctx.goSize.loopParam = goSize1;
     ctx.goSize.parallelParam = goSize2;
     ctx.goSize.residual = goSize3;
+    ctx.goSizeDie1.addrOffset = goSizeDie1_0;
+    ctx.goSizeDie1.loopParam = goSizeDie1_1;
+    ctx.goSizeDie1.parallelParam = goSizeDie1_2;
+    ctx.goSizeDie1.residual = goSizeDie1_3;
 }
 
 // 对应 hccl PreSync：向所有 peer 交换本 rank 的 output/token xn 变量。
@@ -141,7 +159,28 @@ CcuResult PostSync(KfcAllGatherNhr1DContext& ctx)
     return CCU_SUCCESS;
 }
 
-// 对应 hccl DoRepeatSendRecvSlices（axisId==0 语义：sliceSize 取 die0 档）。
+// 只发射单个 slice 的 Write/占位 EventRecord，不等待；事件位由调用方分配。
+// 流水路径由调用方统一分配 baseBit 并在轮末批量 EventWait；串行路径逐 slice 等待
+// （对齐 RS NHR MultiLink IssueReduceSlice 先例：零尺寸分片以 EventRecord 占位，保位语义）。
+CcuResult IssueSendSlice(
+    KfcAllGatherNhr1DContext& ctx, const u32& toRank, ccu::LocalAddr& src, ccu::RemoteAddr& dst, u32 signalIndex,
+    bool islastSlice)
+{
+    const ChannelHandle sendChannel = ctx.channels[ctx.rank2ChannelIdx->at(toRank)];
+    ccu::Variable& sliceSize = ctx.axisId == 0 ? (islastSlice ? ctx.die0LastSize : ctx.die0Size) :
+                                                 (islastSlice ? ctx.die1LastSize : ctx.die1Size);
+    const uint16_t signalMask = 1U << signalIndex;
+    CCU_IF(sliceSize != 0)
+    {
+        CCU_CHK_RET(ccu::Write(sendChannel, dst, src, sliceSize, ctx.localEvent, signalMask));
+    }
+    CCU_ELSE { CCU_CHK_RET(ccu::EventRecord(ctx.localEvent, signalMask)); }
+    return CCU_SUCCESS;
+}
+
+// 对应 hccl DoRepeatSendRecvSlices：sliceSize 按 axisId 取 die0/die1 档；
+// axisId==1 首迭代跳过 die0 份额（按所发分片的 Last 口径，与原版一致）。
+// 串行回退路径：发射单个 slice 并立即等待其完成。
 CcuResult DoRepeatSendRecvSlices(
     KfcAllGatherNhr1DContext& ctx, const u32& toRank, ccu::LocalAddr& src, ccu::RemoteAddr& dst, u32 signalIndex,
     bool islastSlice)
@@ -150,6 +189,9 @@ CcuResult DoRepeatSendRecvSlices(
     ccu::Variable tmpRepeatNum;
     tmpRepeatNum = ctx.repeatNum;
     ctx.repeatTimeflag = 0;
+    ccu::Variable& die0Skip = islastSlice ? ctx.die0LastSize : ctx.die0Size;
+    ccu::Variable& sliceSize = ctx.axisId == 0 ? (islastSlice ? ctx.die0LastSize : ctx.die0Size) :
+                                                 (islastSlice ? ctx.die1LastSize : ctx.die1Size);
 
     CCU_WHILE(tmpRepeatNum != UINT64_MAX)
     {
@@ -159,7 +201,13 @@ CcuResult DoRepeatSendRecvSlices(
             src.addr += ctx.inputRepeatStride;
             dst.addr += ctx.outputRepeatStride;
         }
-        ccu::Variable& sliceSize = islastSlice ? ctx.die0LastSize : ctx.die0Size;
+        if (ctx.axisId == 1) {
+            CCU_IF(ctx.repeatTimeflag == 0)
+            {
+                src.addr += die0Skip;
+                dst.addr += die0Skip;
+            }
+        }
 
         const uint16_t signalMask = 1U << signalIndex;
         CCU_IF(sliceSize != 0)
@@ -174,11 +222,15 @@ CcuResult DoRepeatSendRecvSlices(
 }
 
 // 对应 hccl DoRepeatAllGatherNHRSingleStep（末步跳过步间同步与 hccl 一致）。
+// 发射期分流（宿主期值必须用普通 if，只发射命中分支）：
+// 在途 slice 数不超单 event 16 位预算时走步内流水——本轮所有 slice 先全部发射
+// （各占独立事件位；各 slice 的 src/dst 分片互不相交，无数据依赖），轮末一次 EventWait
+// 批量等完成，消除"发一个等一个"的完成等待空转间隙。
+// 先例：RS NHR MultiLink RunStep 与 mesh kernel DoAllGatherWrite/DoAllGatherWait 的批量等待。
 CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const KfcNhrStepInfo& nhrStepInfo)
 {
     const u32 toRankIdx = ctx.rank2ChannelIdx->at(nhrStepInfo.toRank);
     const u32 fromRankIdx = ctx.rank2ChannelIdx->at(nhrStepInfo.fromRank);
-    u32 sendSliceIdx = 0;
     const ChannelHandle sendChannel = ctx.channels[toRankIdx];
     const ChannelHandle recvChannel = ctx.channels[fromRankIdx];
     const std::vector<u32>& sendSliceIdxList = nhrStepInfo.txSliceIdxs;
@@ -187,21 +239,67 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
     ctx.srcMem.token = ctx.token[localIdx];
     ctx.dstMem.token = ctx.token[toRankIdx];
 
-    for (u32 i = 0; i < sendSliceIdxList.size(); i++) {
-        sendSliceIdx = sendSliceIdxList[i];
-        if (nhrStepInfo.step == 0) {
-            ctx.srcMem.addr = ctx.input;
-            ctx.srcMem.addr += ctx.myrankInputSliceOffset;
-        } else {
-            ctx.srcMem.addr = ctx.output[localIdx];
-            ctx.srcMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+    const uint32_t sliceNum = static_cast<uint32_t>(sendSliceIdxList.size());
+    if (sliceNum != 0U && sliceNum <= AG_NHR_BIT_NUM_PER_CKE) {
+        // 流水路径 repeat 外层、slice 内层（与串行路径嵌套相反）：同一 repeat 轮内所有 slice
+        // 共享一组事件位，轮末批量等待清位后再进下一轮；各分片地址 = 基址 + 分片偏移 + 帧偏移。
+        const uint16_t waitMask = static_cast<uint16_t>((1U << sliceNum) - 1U);
+        ccu::Variable turnOffsetIn;
+        ccu::Variable turnOffsetOut;
+        turnOffsetIn = 0;
+        turnOffsetOut = 0;
+        ccu::Variable tmpRepeatNum;
+        tmpRepeatNum = ctx.repeatNum;
+        ctx.repeatTimeflag = 0;
+        CCU_WHILE(tmpRepeatNum != UINT64_MAX)
+        {
+            tmpRepeatNum += ctx.constVar1;
+            for (uint32_t sliceSeq = 0; sliceSeq < sliceNum; ++sliceSeq) {
+                const u32 sendSliceIdx = sendSliceIdxList[sliceSeq];
+                const bool islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
+                ccu::Variable& die0Skip = islastSlice ? ctx.die0LastSize : ctx.die0Size;
+                if (nhrStepInfo.step == 0) {
+                    ctx.srcMem.addr = ctx.input;
+                    ctx.srcMem.addr += ctx.myrankInputSliceOffset;
+                } else {
+                    ctx.srcMem.addr = ctx.output[localIdx];
+                    ctx.srcMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+                }
+                ctx.srcMem.addr += turnOffsetIn;
+                ctx.dstMem.addr = ctx.output[toRankIdx];
+                ctx.dstMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+                ctx.dstMem.addr += turnOffsetOut;
+                if (ctx.axisId == 1) {
+                    CCU_IF(ctx.repeatTimeflag == 0)
+                    {
+                        ctx.srcMem.addr += die0Skip;
+                        ctx.dstMem.addr += die0Skip;
+                    }
+                }
+                CCU_CHK_RET(IssueSendSlice(ctx, nhrStepInfo.toRank, ctx.srcMem, ctx.dstMem, sliceSeq, islastSlice));
+            }
+            CCU_CHK_RET(ccu::EventWait(ctx.localEvent, waitMask));
+            turnOffsetIn += ctx.inputRepeatStride;
+            turnOffsetOut += ctx.outputRepeatStride;
+            ctx.repeatTimeflag = 1;
         }
-        ctx.dstMem.addr = ctx.output[toRankIdx];
-        ctx.dstMem.addr += ctx.outputSliceOffset[sendSliceIdx];
-        bool islastSlice = false;
-        islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
-        CCU_CHK_RET(DoRepeatSendRecvSlices(
-            ctx, nhrStepInfo.toRank, ctx.srcMem, ctx.dstMem, i % AG_NHR_BIT_NUM_PER_CKE, islastSlice));
+    } else {
+        // 串行回退（slice 数超 16 位事件预算或空步）：保持原"发一个等一个"结构。
+        for (u32 i = 0; i < sliceNum; i++) {
+            const u32 sendSliceIdx = sendSliceIdxList[i];
+            if (nhrStepInfo.step == 0) {
+                ctx.srcMem.addr = ctx.input;
+                ctx.srcMem.addr += ctx.myrankInputSliceOffset;
+            } else {
+                ctx.srcMem.addr = ctx.output[localIdx];
+                ctx.srcMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+            }
+            ctx.dstMem.addr = ctx.output[toRankIdx];
+            ctx.dstMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+            const bool islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
+            CCU_CHK_RET(DoRepeatSendRecvSlices(
+                ctx, nhrStepInfo.toRank, ctx.srcMem, ctx.dstMem, i % AG_NHR_BIT_NUM_PER_CKE, islastSlice));
+        }
     }
 
     if (nhrStepInfo.step + 1 != ctx.stepInfoVector->size()) {
@@ -213,8 +311,13 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
 }
 
 // 对应 hccl DoAllGatherGroupCopy：isInputOutputEqual==0 时本地拷贝自身分片。
+// goSize 按 axisId 选组（双 die 切分后各 die 份额不同）；axisId==1 首迭代跳过 die0 份额
+// （本 rank 末分片用 Last 口径，与原版 DoRepeatAllGatherNHR 的 axisId==1 分支一致）。
 CcuResult DoAllGatherGroupCopy(KfcAllGatherNhr1DContext& ctx)
 {
+    const bool localIsLast = (ctx.rankId + 1 == ctx.rankSize);
+    ccu::Variable& die0Skip = localIsLast ? ctx.die0LastSize : ctx.die0Size;
+    GroupOpSizeVars& localGoSize = ctx.axisId == 0 ? ctx.goSize : ctx.goSizeDie1;
     CCU_IF(ctx.isInputOutputEqual == 0)
     {
         CCU_IF(ctx.groupCopyRepeatNum != UINT64_MAX)
@@ -228,7 +331,14 @@ CcuResult DoAllGatherGroupCopy(KfcAllGatherNhr1DContext& ctx)
                     ctx.localDst.addr += ctx.outputRepeatStride;
                     ctx.srcMem.addr += ctx.inputRepeatStride;
                 }
-                CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcMem, ctx.goSize));
+                if (ctx.axisId == 1) {
+                    CCU_IF(ctx.repeatTimeflag == 0)
+                    {
+                        ctx.localDst.addr += die0Skip;
+                        ctx.srcMem.addr += die0Skip;
+                    }
+                }
+                CCU_CHK_RET(GroupCopy(ctx, ctx.localDst, ctx.srcMem, localGoSize));
                 ctx.repeatTimeflag = 1;
             }
         }
@@ -236,7 +346,8 @@ CcuResult DoAllGatherGroupCopy(KfcAllGatherNhr1DContext& ctx)
     return CCU_SUCCESS;
 }
 
-// 对应 hccl DoRepeatAllGatherNHR（axisId==1 的 die0 偏移分支不迁移）。
+// 对应 hccl DoRepeatAllGatherNHR（axisId==1 的 die0 偏移分支已迁移至 DoAllGatherGroupCopy/
+// DoRepeatSendRecvSlices 首迭代，按各自分片的 Last 口径取 die0 份额）。
 CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
 {
     ccu::Variable tmpSliceOffset;
@@ -275,10 +386,12 @@ CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
 
 CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
-    ccu::Variable die0LastSize, ccu::Variable repeatNumInv, ccu::Variable inputSliceStride,
-    ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
-    ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
-    ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
+    ccu::Variable die0LastSize, ccu::Variable die1Size, ccu::Variable die1LastSize, ccu::Variable repeatNumInv,
+    ccu::Variable inputSliceStride, ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride,
+    ccu::Variable outputRepeatStride, ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1,
+    ccu::Variable goSize2, ccu::Variable goSize3, ccu::Variable goSizeDie1_0, ccu::Variable goSizeDie1_1,
+    ccu::Variable goSizeDie1_2, ccu::Variable goSizeDie1_3, const ChannelHandle channels[], uint32_t channelCount,
+    uint32_t rankSize, uint32_t rankId, uint32_t axisId, uint32_t axisSize,
     const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
 {
     KfcAllGatherNhr1DContext ctx;
@@ -286,15 +399,17 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ctx.channelCount = channelCount;
     ctx.rankSize = rankSize;
     ctx.rankId = rankId;
+    ctx.axisId = axisId;
+    ctx.axisSize = axisSize;
     ctx.stepInfoVector = &stepInfoVector;
     ctx.rank2ChannelIdx = &rank2ChannelIdx;
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
 
     LoadNhr1DArgs(
-        ctx, inputAddr, outputAddr, tokenInfo, die0Size, die0LastSize, repeatNumInv, inputSliceStride,
-        outputSliceStride, inputRepeatStride, outputRepeatStride, isInputOutputEqual, goSize0, goSize1, goSize2,
-        goSize3);
+        ctx, inputAddr, outputAddr, tokenInfo, die0Size, die0LastSize, die1Size, die1LastSize, repeatNumInv,
+        inputSliceStride, outputSliceStride, inputRepeatStride, outputRepeatStride, isInputOutputEqual, goSize0,
+        goSize1, goSize2, goSize3, goSizeDie1_0, goSizeDie1_1, goSizeDie1_2, goSizeDie1_3);
 
     CCU_CHK_RET(PreSync(ctx));
 
