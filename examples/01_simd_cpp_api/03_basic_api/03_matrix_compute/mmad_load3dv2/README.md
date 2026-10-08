@@ -38,7 +38,7 @@ LoadData（卷积数据搬运）v2指令以下简称load3dv2，该指令支持�
 
 load3dv2指令对于二维矩阵的转置能力：
 - Ascend 950PR&950DT系列产品，目的地址位于A2，并且类型为b8/b16/b32时，enTranspose参数有效。
-- Atlas A3系列产品和Atlas A2系列产品/Atlas A2 推理系列，目的地址位于A2，并且类型为b16/b32时，enTranspose参数有效。
+- Atlas A3系列产品和Atlas A2系列产品，目的地址位于A2，并且类型为b16/b32时，enTranspose参数有效。
 
 由于本样例暂不支持输入数据类型为int4b_t，因此本样例展示了以下五种load3dv2在矩阵乘法的使用：
 
