@@ -1,4 +1,4 @@
-# Warp分支发散谓词优化样例
+# Warp分支发散predicate优化样例
 
 ## 概述
 
@@ -59,7 +59,7 @@
 
 - 样例功能
 
-  以[hlog10](../../../../../docs/zh/api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个避开6个特殊值的正常half元素为输入。对比不同特殊值处理写法在正常值路径上的分支开销，展示predicate优化的收益来源。
+  以[hlog10](../../../../../docs/zh/api/SIMT-API/math_functions/half_type/half_math_functions/hlog10.md)接口为例。hlog10接口使用$\log_{10}(x) = \dfrac{\log(x)}{\log(10)}$计算输入数据的常用对数，并对6个精度有偏差的特殊值做修正，以8192个half元素为输入。对比不同特殊值处理方法的性能，展示predicate优化的收益来源。
 
 - 样例规格：
   <table>
@@ -82,11 +82,11 @@
 
 |             字段名             | 字段含义                                             |
 |:---------------------------:|:-------------------------------------------------|
-|      execute cycle          | kernel内`clock()`采样到的执行周期数，采集时取32个线程中的最大值，反映kernel指令流的长度与分支开销。          |
+|      execute cycle          | kernel内`clock()`采样到的执行周期数，反映kernel指令流的长度与分支开销。          |
 |      Task Duration(μs)      | Task整体耗时，包含调度到加速器的时间、加速器上的执行时间以及响应结束时间。          |
-|      aiv_total_cycles       | 单个block在Vector Core上执行所消耗的CPU周期（Cycle）数，性能数据表中取8个block的平均值。          |
+|      aiv_total_cycles       | 单个block在Vector Core上执行所消耗的CPU周期（Cycle）数。          |
 
-为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程，并取32个线程中的最大值。Task Duration与aiv_total_cycles为msOpProf 3次采集中位数，aiv_total_cycles取8个block的平均值。
+为防止warp调度带来影响，execute cycle采集时配置为1个block、32个线程。
 
 ### Case 0: hlog10分支链divergence版本
 
@@ -311,7 +311,7 @@ __aicore__ inline float j0f(float x)
 
 ### Case 4: j0f分支链高命中率分支提前return，低命中率分支predicate优化版本
 
-**实现方式**：使用提前return处理高命中率分支，用临时变量暂存低命中率分支的计算结果，从而引导编译器对低命中率分支进行predicate优化。
+**实现方式**：使用提前return处理高命中率分支，用临时变量暂存低命中率分支的计算结果，引导编译器对低命中率分支进行predicate优化。
 
 **关键代码**：
 
@@ -378,7 +378,7 @@ __aicore__ inline float j0f(float x)
 
 ## 调优建议
 
-1. **使用predicate优化分支链路**：当warp divergence出现在简单分支时，可使用临时变量的写法引导编译器进行predicate优化消除分支跳转开销。
+1. **使用predicate优化分支链路**：当warp divergence出现在简单分支时，可使用临时变量的写法引导编译器进行predicate优化，消除分支跳转开销。
 
 2. **divergence和predicate优化结合使用**：predicate优化会执行所有分支的所有指令，divergence只执行必要的路径，当分支链路中各分支命中率不同时，命中率高的分支保留divergence，命中率低的分支进行predicate优化，既可以避免执行不必要的指令，又可以消除分支跳转的开销。
 
@@ -428,9 +428,9 @@ __aicore__ inline float j0f(float x)
   | 1 | hlog10 | 基线版本 |
   | 2 | hlog10 | 优化版本 |
   | 3 | j0f | 基线版本 |
-  | 4 | j0f | 全谓词化版本 |
-  | 5 | j0f | 优化版本（input2） |
-  | 6 | j0f | 优化版本（input1） |
+  | 4 | j0f | 统一return版本 |
+  | 5 | j0f | 提前return与predicate优化结合版本（input2） |
+  | 6 | j0f | 提前return与predicate优化结合版本（input1） |
 
   每次编译只包含选定的用例：换用不同的SCENARIO_NUM重新编译并运行，即可逐个完成各用例、各组的完整对比。execute cycle需以`-DCYCLE_PROFILE=ON`单独编译采集，Task Duration与aiv_total_cycles以默认编译配合msOpProf采集3次，取中位数；aiv_total_cycles取8个block的平均值。
 
