@@ -306,3 +306,5 @@
 02_simd_c_api/03_c_api/01_memory_vector_compute/reduce__scenario_2
 01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_builtin
 01_simd_cpp_api/02_features/00_framework/01_tensorflow/tensorflow_custom
+03_simt_api/presmoke_math__simt
+05_simd_simt_hybrid/presmoke_math__hybrid
