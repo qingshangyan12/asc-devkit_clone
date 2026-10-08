@@ -145,13 +145,11 @@ __simd_callee__ inline void asc_gather(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline void asc_gather(
     vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask)
 {
     asc_gather_impl(dst, src, index, mask);
 }
-#endif
 
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
@@ -330,13 +328,11 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint32_t index, vector_bool mask)
 {
     asc_gather_datablock_impl(dst, src, index, mask);
 }
-#endif
 
 __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index)
 {
@@ -472,13 +468,11 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint32_t index)
 {
     asc_gather_datablock_impl(dst, src, index);
 }
-#endif
 
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask)
 {
@@ -572,14 +566,12 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather(__ubuf__ fp8_e8m0_t* src, ve
     return dst;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline vector_fp8_e6m2_t asc_gather(__ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask)
 {
     vector_fp8_e6m2_t dst;
     asc_gather(dst, src, index, mask);
     return dst;
 }
-#endif
 
 __simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -734,7 +726,6 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(
     return dst;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline vector_fp8_e6m2_t asc_gather_datablock(
     __ubuf__ fp8_e6m2_t* src, vector_uint32_t index, vector_bool mask)
 {
@@ -742,7 +733,6 @@ __simd_callee__ inline vector_fp8_e6m2_t asc_gather_datablock(
     asc_gather_datablock(dst, src, index, mask);
     return dst;
 }
-#endif
 
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index)
 {
@@ -856,14 +846,12 @@ __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(__ubuf__ fp8_e8m0_
     return dst;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline vector_fp8_e6m2_t asc_gather_datablock(__ubuf__ fp8_e6m2_t* src, vector_uint32_t index)
 {
     vector_fp8_e6m2_t dst;
     asc_gather_datablock(dst, src, index);
     return dst;
 }
-#endif
 
 #endif
 
