@@ -64,7 +64,10 @@ bool ValidateObjectFields(const Json& object, const FieldSet& allowedFields, con
 {
     for (const auto& item : object.items()) {
         if (allowedFields.count(item.key()) == 0U) {
-            return CheckAndLog(false, __LINE__, "unknown " + level + " field: " + item.key());
+            return CheckAndLog(
+                false, __LINE__,
+                "unrecognized " + level + " field in the current version: " + item.key() +
+                    ". Please check whether the field is correct or the tool version is too old.");
         }
     }
     return true;
@@ -391,14 +394,16 @@ bool ResourceManifestValidator::ValidateObjectOutputReferences(
         declaredOutputs.insert(value);
         if (!CheckAndLog(
                 referencedOutputs.count(value) != 0U, __LINE__,
-                "invalid object output: output is not referenced by its commands, value=" + value)) {
+                "invalid object output: output is not referenced by its commands, value=" + value +
+                    ". Please check that this object's outputs and commands are consistent.")) {
             return false;
         }
     }
     for (const std::string& value : referencedOutputs) {
         if (!CheckAndLog(
                 declaredOutputs.count(value) != 0U, __LINE__,
-                "invalid object output: command references undeclared output, value=" + value)) {
+                "invalid object output: command references undeclared output, value=" + value +
+                    ". Please declare this output in this object's outputs field.")) {
             return false;
         }
     }
@@ -442,7 +447,8 @@ bool ResourceManifestValidator::ValidateCommand(const Json& command, std::set<st
     const std::string type = command.at("type").get_ref<const std::string&>();
     if (!CheckAndLog(
             type == COMPILE_COMMAND_TYPE || type == OBJCOPY_COMMAND_TYPE, __LINE__,
-            "invalid command type: expected compile or objcopy, value=" + type)) {
+            "invalid command type: the current version only supports compile or objcopy, value=" + type +
+                ". Please check whether the value is correct or the tool version is too old.")) {
         return false;
     }
     if (!ValidateCommandOptions(command.at("cmd"), referencedOutputs)) {
@@ -486,7 +492,8 @@ bool ResourceManifestValidator::ValidateObject(const Json& object, std::set<std:
     const std::string objectType = object.at("object_type").get_ref<const std::string&>();
     if (!CheckAndLog(
             objectType == BASIC_OBJECT_TYPE || objectType == SK_OBJECT_TYPE, __LINE__,
-            "invalid object_type: expected basic or sk, value=" + objectType) ||
+            "invalid object_type: the current version only supports basic or sk, value=" + objectType +
+                ". Please check whether the value is correct or the tool version is too old.") ||
         !CheckAndLog(
             FileUtils::IsSafeRelativePath(objectName) && FileUtils::FileName(objectName) == objectName, __LINE__,
             "invalid object_name: expected a plain name") ||
@@ -517,7 +524,10 @@ bool ResourceManifestValidator::ValidateObjects(const Json& objects)
         }
         hasBasicObject = hasBasicObject || object.at("object_type").get_ref<const std::string&>() == BASIC_OBJECT_TYPE;
     }
-    return CheckAndLog(hasBasicObject, __LINE__, "missing required basic object");
+    return CheckAndLog(
+        hasBasicObject, __LINE__,
+        "missing required basic object: each kernel's objects field must contain at least one object with object_type "
+        "set to basic");
 }
 
 bool ResourceManifestValidator::ValidateKernel(const Json& kernel, std::set<std::string>& kernelNames)
