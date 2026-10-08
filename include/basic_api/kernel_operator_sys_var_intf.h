@@ -64,9 +64,10 @@ __aicore__ inline void ClearSpr();
 
 __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
-                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     return TOTAL_UB_SIZE;
 #else
     return 0;
@@ -75,9 +76,10 @@ __aicore__ inline constexpr uint32_t GetUBSizeInBytes()
 
 __aicore__ inline constexpr uint32_t GetVecLen()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
-                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     return VECTOR_REG_WIDTH;
 #else
     return 0;
@@ -86,9 +88,10 @@ __aicore__ inline constexpr uint32_t GetVecLen()
 
 __aicore__ inline uint32_t GetRuntimeUBSize()
 {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
-                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5101) || \
-                              (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || \
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
     return TOTAL_UB_SIZE;
 #else
@@ -129,7 +132,8 @@ __aicore__ inline __ssbuf__ void* GetSsbufBaseAddr()
 }
 } // namespace AscendC
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || \
+    (__NPU_ARCH__ == 5102)
 __BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
 #endif
 
@@ -146,7 +150,8 @@ struct SkSystemArgs {
     inline __aicore__ uint16_t SkGetTaskSyncCfg() { return skTaskSyncCfg; }
     inline __aicore__ void SkInit() const
     {
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || \
+    (__NPU_ARCH__ == 5102)
         g_super_kernel_early_start_config = skTaskSyncCfg;
 #endif
     }

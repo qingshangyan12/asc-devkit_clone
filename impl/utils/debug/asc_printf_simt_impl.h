@@ -140,11 +140,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline void __internal_nop()
 {
 #pragma unroll 8
     for (uint32_t i = 0; i < count; ++i) {
-#if __NPU_ARCH__ == 3510
         __nop();
-#else
-        asm volatile("NOP wait:0b0000000 stall:15" ::);
-#endif
     }
 }
 
