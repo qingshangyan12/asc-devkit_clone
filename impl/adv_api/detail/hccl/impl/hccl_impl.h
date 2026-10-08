@@ -20,7 +20,7 @@
 #elif __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #include "platform_v310/hccl_aicpu.h"
 #include "platform_v960/hccl_ccu_v0.h"
-#elif __NPU_ARCH__ == 3510
+#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #include "platform_v310/hccl_aicpu.h"
 #include "platform_v310/hccl_ccu_v0.h"
 #endif

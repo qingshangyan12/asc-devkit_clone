@@ -20,7 +20,7 @@
 
 #include "impl/c_api/reg_base_impl/utils_impl.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/storealign_intf_impl.h"
 #endif
 
