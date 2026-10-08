@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "run_id": "core-v10",
+  "devkit_root": "/mnt/workspace/asc-devkit",
+  "source_dir": [
+    "docs/zh/api/SIMD-API/c_api/vector_datamove",
+    "docs/zh/api/SIMD-API/c_api/vector_compute",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/load",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/store",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel"
+  ],
+  "sources": {
+    "docs": [
+      "docs/zh/api/SIMD-API/c_api/vector_datamove",
+      "docs/zh/api/SIMD-API/c_api/vector_compute",
+      "docs/zh/api/SIMD-API/c_api/reg_compute/load",
+      "docs/zh/api/SIMD-API/c_api/reg_compute/store",
+      "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy",
+      "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel"
+    ],
+    "include": "include/c_api",
+    "examples": "examples/02_simd_c_api/03_c_api"
+  },
+  "taxonomy": {
+    "path": "/mnt/workspace/asc-devkit/okf_skills/okf-tag-research/runs/core-v10-base-taxonomy.json",
+    "sha256": "75c517ece5dd6bd9ebd52ea39d662f357db8e671fd6db66b2dfafefc7fd9cff3"
+  },
+  "output_contract": "references/artifact-contract.md",
+  "purpose": "independent_open_discovery_assignment",
+  "worker": "discovery-b",
+  "documents": [
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_brc_datablock_postupdate.md",
+      "title": "asc_loadalign_brc_datablock_postupdate",
+      "sha256": "82c80693fc0b94de266c42fcbace1376e717907220f0ef3824f7cb35c7473237",
+      "group": "load"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign_unpack_postupdate.md",
+      "title": "asc_loadalign_unpack_postupdate",
+      "sha256": "87e61cea682a6d31607ad0d6acbdc80454c7374d50c0c8df264500e968aeb0d5",
+      "group": "load"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_extract_mask.md",
+      "title": "asc_extract_mask",
+      "sha256": "7638225039e5bb9c43a04b3be176c992d329ccdab1eb32292034cbc25e27a108",
+      "group": "reg_copy"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_copy/asc_mask.md",
+      "title": "asc_mask",
+      "sha256": "747e401c3fab2d1372ca32c9d42279228413444fbe9c3b8ca447fe89a1fd0794",
+      "group": "reg_copy"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_intlv.md",
+      "title": "asc_intlv",
+      "sha256": "a43de612c36aa7acfb2b905e2753b1ca127717a36c81848a9f1640b50f4efd0c",
+      "group": "reg_permute_sel"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_squeeze.md",
+      "title": "asc_squeeze",
+      "sha256": "b6fd41bd076e1ee47333a8edefb09afff2e85ca08261aef2f83ccf2f8017e4d2",
+      "group": "reg_permute_sel"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+      "title": "asc_storealign",
+      "sha256": "8f1f9f75bddca780f80cd7a7fa30ec5c065e05e95c3f14df82d6c690d8cbaa1b",
+      "group": "store"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign_pack.md",
+      "title": "asc_storealign_pack",
+      "sha256": "2fa54dff485f323066568bb4c21717be5b241c0ca0ae614e55a96c878138d0d2",
+      "group": "store"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_mul.md",
+      "title": "asc_mul",
+      "sha256": "119f644ae0181a8e24f4bb3a09db46bff3fdb852879da1641f8a3525e8903f0b",
+      "group": "vector_compute/vector_arith"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_rcp.md",
+      "title": "asc_rcp",
+      "sha256": "30fdee91605045ea74a4b29a4a27dbc7b9867768d0e76351c624bfeac9fb8603",
+      "group": "vector_compute/vector_arith"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_brcb.md",
+      "title": "asc_brcb",
+      "sha256": "ef274cb2cf53e0ce71adc48992ff3bb20a718b6a86a6d5ffa8c30fb942623180",
+      "group": "vector_compute/vector_broadcast"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_broadcast/asc_duplicate.md",
+      "title": "asc_duplicate",
+      "sha256": "110df05c66f0ba05232dbb884bf48d5536e1ffd2732b068f02412a502b12eaf5",
+      "group": "vector_compute/vector_broadcast"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_lt.md",
+      "title": "asc_lt",
+      "sha256": "bcf2a81b81a8928875db4da9f3d74561987275a8f490a31415ee48e8be8a2578",
+      "group": "vector_compute/vector_compare"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_compare/asc_ne_scalar.md",
+      "title": "asc_ne_scalar",
+      "sha256": "b81b76e0923f83e88becfa77e3a890fbc97ff3eb0a67fc180b30c25589a958e5",
+      "group": "vector_compute/vector_compare"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_half2int16.md",
+      "title": "asc_half2int16",
+      "sha256": "ee3b212b62fce94fdd1cefd07bf6cbfb763933b255e914f1ca174394db0da1bb",
+      "group": "vector_compute/vector_convert"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_convert/asc_int322int16.md",
+      "title": "asc_int322int16",
+      "sha256": "cf16c4af1cb417d73c54769c5193d65a4cf0d7224c85bdde8b340ec03ac3cab6",
+      "group": "vector_compute/vector_convert"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_add_relu.md",
+      "title": "asc_add_relu",
+      "sha256": "4d5c8f8597eb5c544088deee9b96918ddda71153870fbd2392dfd19b73becc46",
+      "group": "vector_compute/vector_fused"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_deq_int322half.md",
+      "title": "asc_deq_int322half",
+      "sha256": "4f36368479487221d71dbdc92081963624cab71994f745421039b60e447d3405",
+      "group": "vector_compute/vector_fused"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather.md",
+      "title": "asc_gather",
+      "sha256": "83b3d22b6ae5a5159de21ce59f486c8d0dcd8537e18acf043f3d71bf6b8845fa",
+      "group": "vector_compute/vector_gather"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_gather/asc_gather_datablock.md",
+      "title": "asc_gather_datablock",
+      "sha256": "e46a36f96dbbbda4b7067800fa2a87dc2ba16da3dcf3f0f637fb77fd72d48803",
+      "group": "vector_compute/vector_gather"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_or.md",
+      "title": "asc_or",
+      "sha256": "6ae810683c88fe5c2607a50c682d56350b2efba4bdcfb40d381cb5ae8b3cc7cb",
+      "group": "vector_compute/vector_logic"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_logic/asc_shiftright.md",
+      "title": "asc_shiftright",
+      "sha256": "7b83e1a1e54e2acf71a9dd797f3b5f0dc887136a003a03e494b871ae3e6bde66",
+      "group": "vector_compute/vector_logic"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_mask_count.md",
+      "title": "asc_set_mask_count",
+      "sha256": "e634b33d0a2d3130e9d065ccabb975747b12d668a72019ea0e279cb4e155e25f",
+      "group": "vector_compute/vector_mask_config"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_mask_config/asc_set_vector_mask.md",
+      "title": "asc_set_vector_mask",
+      "sha256": "39b0ca5a5e23d826bcc38a8873b1191ec8c755070858519b8b492ed3739a3283",
+      "group": "vector_compute/vector_mask_config"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_set_va_reg.md",
+      "title": "asc_set_va_reg",
+      "sha256": "4f8c46a158270c8e424475aba340e363cf9b1573f30c2a0e4ed24a8e74fe1ba5",
+      "group": "vector_compute/vector_permute_sel"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_permute_sel/asc_transto5hd.md",
+      "title": "asc_transto5hd",
+      "sha256": "d2d8546b99931feb76f7091e7f6d17d53f44436345427307e033d818bcd7469f",
+      "group": "vector_compute/vector_permute_sel"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_get_reduce_max_cnt.md",
+      "title": "asc_get_reduce_max_cnt",
+      "sha256": "56c3d181e2fa066df337a281de47fb966f838b745536ed7306e2a53fcb47c4fb",
+      "group": "vector_compute/vector_reduce"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_min.md",
+      "title": "asc_repeat_reduce_min",
+      "sha256": "63fa50a17844266f570f4f782ddccf4e5539001193a3ad5834e035a7a4907a0c",
+      "group": "vector_compute/vector_reduce"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_get_vms4_sr.md",
+      "title": "asc_get_vms4_sr",
+      "sha256": "a144b99fe4198cc46cc95b3e64106606186b9a1d60a57ae5c848e5ea6c0c76bb",
+      "group": "vector_compute/vector_sort"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_compute/vector_sort/asc_mrgsort4.md",
+      "title": "asc_mrgsort4",
+      "sha256": "5ef42b45a71f91f91ae3c199afddb5926e3ab61dcf8851353822d675d99c6564",
+      "group": "vector_compute/vector_sort"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_2201.md",
+      "title": "asc_copy_gm2ub",
+      "sha256": "6706e617a2e9ec68f2bdbf8178cc94ad4d47d6c86fd01cd60ad2801bd26c8f5e",
+      "group": "vector_datamove/asc_copy_gm2ub"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+      "title": "asc_copy_gm2ub",
+      "sha256": "4ee4dd47b3bbf7fbacd20e8d30b6dea79dd0f141512113b76a259644b7957646",
+      "group": "vector_datamove/asc_copy_gm2ub"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_2201.md",
+      "title": "asc_copy_gm2ub_align",
+      "sha256": "3c12ac80f059567fb68f40117ce105b8a53bbb3b550fdd743f3a5b427a956758",
+      "group": "vector_datamove/asc_copy_gm2ub_align"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+      "title": "asc_copy_gm2ub_align",
+      "sha256": "43e1f02fc8894bec432bf5472932c8e13b2d3ad4a0cd2646ffbe492ecc80c0e5",
+      "group": "vector_datamove/asc_copy_gm2ub_align"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_2201.md",
+      "title": "asc_copy_ub2gm",
+      "sha256": "294d8bc4efa54737b0f9e1d17902eeace8aa4747128957e7e029de0451872fa6",
+      "group": "vector_datamove/asc_copy_ub2gm"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+      "title": "asc_copy_ub2gm",
+      "sha256": "0679c2e7c4f359161e7257a12b60f76b151739ec293c38f16a8d8df1c379026b",
+      "group": "vector_datamove/asc_copy_ub2gm"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_2201.md",
+      "title": "asc_copy_ub2gm_align",
+      "sha256": "2c636d3e81a0415ef7051b029b2b5bca2ebfc6bf5038ef37a89b2dab946b5929",
+      "group": "vector_datamove/asc_copy_ub2gm_align"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md",
+      "title": "asc_copy_ub2gm_align",
+      "sha256": "e19ea0387f54bdc8df1af2e17b0a61156975d442db019cb13ae1032e0d0f6175",
+      "group": "vector_datamove/asc_copy_ub2gm_align"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md",
+      "title": "asc_ndim_copy_gm2ub",
+      "sha256": "e394c855dfa91b6f52699449056949bc2f0e26921d2f5e865f9e35e194196e73",
+      "group": "vector_datamove"
+    },
+    {
+      "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+      "title": "asc_set_ub2gm_loop1_stride",
+      "sha256": "a1332a510602c62cdf956c46c2a9897173528e13bc94e8005f475e0f2420970c",
+      "group": "vector_datamove"
+    }
+  ]
+}
