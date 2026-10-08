@@ -24,7 +24,8 @@ Host侧与clang15一致，支持C++98至C++20及后续各档标准。低于C++11
 | CMake工程 | 设置`CMAKE_ASC_STANDARD`变量 | 编译时自动注入`-std=c++<version>`，默认值为17；设置为低于17的值时CMake会发出警告。 |
 
 > [!NOTE]说明
-> 指定低于C++17的标准（如`-std=c++11`）时，部分高版本语言特性会以clang扩展告警的形式继续可用，而非全部变为编译错误；需要严格限制语言版本时，可配合`-Werror`编译选项将此类告警升级为错误。
+> - 指定低于C++17的标准（如`-std=c++11`）时，部分高版本语言特性会以clang扩展告警的形式继续可用，而非全部变为编译错误；需要严格限制语言版本时，可配合`-Werror`编译选项将此类告警升级为错误。
+> - 部分API接口内部实现依赖c++17标准，若指定低于C++17的标准，可能导致部分API无法使用。
 
 ## 语言特性与限制导航<a name="section_reading_navigation"></a>
 
@@ -33,8 +34,8 @@ Host侧与clang15一致，支持C++98至C++20及后续各档标准。低于C++11
     -   [C++14语言特性](./cpp_language_feature/cpp14_language_feature.md)：C++14语言特性在Device侧的逐项支持列表及使用注意事项。
     -   [C++17语言特性](./cpp_language_feature/cpp17_language_feature.md)：C++17语言特性在Device侧的逐项支持列表及使用注意事项。
     -   [Lambda表达式](./cpp_language_feature/lambda_expressions.md)：纯SIMT与SIMD/SIMT混合编程两种场景下Lambda表达式的使用方式与标记要求。
--   **[Device侧C/C++语法限制](./syntax_restrictions/syntax_restrictions.md)**：Device侧通用的语法与能力限制。
-    -   [不支持的特性](./syntax_restrictions/unsupport_features.md)：虚函数、动态内存、STL、运行时typeid、文件系统IO等能力限制总览。
-    -   [函数](./syntax_restrictions/functions.md)：核函数（Kernel）参数列表限制、SIMT VF函数限制、SIMD与SIMT混合编程结构体使用限制。
-    -   [C++11限制](./syntax_restrictions/cpp11_restrictions.md)：并发类与运行时类特性的限制、根因分类，以及并发能力的SIMT API替代方案。
+-   **[Device侧C/C++语法限制](./cpp_language_restrictions/cpp_language_restrictions.md)**：Device侧通用的语法与能力限制。
+    -   [不支持的特性](./cpp_language_restrictions/unsupport_features.md)：虚函数、动态内存、STL、运行时typeid、文件系统IO等能力限制总览。
+    -   [函数](./cpp_language_restrictions/functions.md)：核函数（Kernel）参数列表限制、SIMT VF函数限制、SIMD与SIMT混合编程结构体使用限制。
+    -   [C++11限制](./cpp_language_restrictions/cpp11_restrictions.md)：并发类与运行时类特性的限制、根因分类，以及并发能力的SIMT API替代方案。
 
