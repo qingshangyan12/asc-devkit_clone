@@ -525,6 +525,17 @@ struct AlgResourceCtxSerializable {
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
     std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
     u32 kfcServerArgSize = 0;             // kfc server算子入参个数
+    // R11 · resCtx 双语义修复（主会话裁决 2026-10-08，方案 B）：unified AICPU 链的
+    // v4 blob 第二通道。资源期 unified 组装段把 blob 的 device 地址/字节数随资源束
+    // 序列化携带——消费方（KFC BuildHolder / kernel_launch DeSerialize）反序列化
+    // 资源束后自然取得，RunUnifiedAicpuOp 据此取 blob（不再按 opParam.resCtx 切槽）。
+    // 序列化位置：kfcServerArgSize 之后、topoInfoSeqSize 之前——topo 保持最后一段，
+    // DeSerialize 的 topo 锚（data.size()-topoInfoSeqSize）数学不动（原"尾部 append
+    // 16B"方案被审查方证伪：topo 锚硬性假设 topo 是缓冲区最后一段，尾部附加静默错位）。
+    // legacy 路径（存量 GetAlgResAICPU/GetAlgResCcu/GetAlgResDPU）不填这两字段，
+    // 恒 0 序列化——旧读端按 0 值占位跳过，无害（R11-② legacy-harmless 判据）。
+    u64 unifiedBlobAddr = 0;              // v4 blob 的 device 地址（HcclSerializeUnifiedPlan 产物）
+    u64 unifiedBlobSize = 0;              // blob 字节数（= SerializePlanV3 槽数×8，恒 8 对齐）
 
     std::vector<char> Serialize()
     {
@@ -555,6 +566,8 @@ struct AlgResourceCtxSerializable {
         binaryStream << parallelPortInfo;
         binaryStream << kfcServerArgs;
         binaryStream << kfcServerArgSize;
+        binaryStream << unifiedBlobAddr;      // R11 方案 B（裁决 2026-10-08）：插 topo 前段——锚数学不动
+        binaryStream << unifiedBlobSize;
         std::vector<char> seq = topoInfo.Serialize();
         topoInfoSeqSize = seq.size();
         binaryStream << topoInfoSeqSize;
@@ -594,6 +607,8 @@ struct AlgResourceCtxSerializable {
         binaryStream >> parallelPortInfo;
         binaryStream >> kfcServerArgs;
         binaryStream >> kfcServerArgSize;
+        binaryStream >> unifiedBlobAddr;      // R11 方案 B：与 Serialize 对称（旧产物读端不触——恒 0 值占位）
+        binaryStream >> unifiedBlobSize;
         binaryStream >> topoInfoSeqSize;
         if ((topoInfoSeqSize == 0) || (topoInfoSeqSize > data.size())) {
             HCCL_ERROR(

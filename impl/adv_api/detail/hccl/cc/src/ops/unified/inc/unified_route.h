@@ -55,16 +55,18 @@ static const RouteEntry kUnifiedRoutes[] = {
     // 引擎分流由 L1Adapter::EngineOf(opParam) 在 Compile 内完成——本行激活 = AG 全引擎
     //（AICPU 维持既有路径，CCU 新增），CCU 专属守卫（checkOnly/组装失败）在分叉处。
     { HcclCMDType::HCCL_CMD_ALLGATHER, ActionKind::CollectAll },
-    // R6 备注行（RS 段生成/L3/序列化 v3/server 分支本轮已交付，**暂不激活**）：
-    // 激活条件 = R7 随 CCU lowering（Emit 真原语接线）+ ST 落地——届时解注释本行并补
-    // "拒收已移除"翻转断言（R7 清单已立案）。当前激活会圈进未接线面：
-    //   ① ReduceSlice 的 AICPU 后端未落（Validate 快速失败 → 恒回退，无收益）；
-    //   ② CCU 引擎被 GetUnifiedOpParamResCtxImpl 的 WP-B0 拒收（count=0 实例化未落，
-    //      Mc2CcTilingInner 无 count → 资源期 sliceSize=0 全零 Plan，R6 实证）。
-    // 开关位：本行解注释即激活（路由表是数据不是代码，扩圈定=加行）；
-    // WP-B0 的引擎拒收移除是另一开关（alloc_ctx_res.cc GetUnifiedOpParamResCtxImpl
-    // 入口的 EngineOf 分支），两开关独立——R7 先移 B0 再开路由行。
-    // { HcclCMDType::HCCL_CMD_REDUCE_SCATTER, ActionKind::ReduceSlice },
+    // R7 · WP-2（2026-10-06）：RS 行激活。前置条件已全部就位——
+    //   ① L3/L4/序列化 v3 RS 布局/server REDUCE_SLICE 分支（R6 交付）；
+    //   ② B0 引擎拒收 R6.5 已拆闸（WP-C3：AG 全引擎放行，入口无拒收分支）；
+    //   ③ CCU 写入方 RS 帧实例化（WP-1：CcuPrepareForUnifiedPlan 帧级动作 ID 分叉，
+    //      ReduceSlice 帧按 v2 并发 RS 写入方逐式覆写槽 1..15）；
+    //   ④ device 侧 CcuPrepareForOp 的 RS 分支 158 分派（WP-1 同轮放开）。
+    // 范围注（半激活语义）：本行激活 = RS × CCU 生产链路贯通；RS × AICPU 仍不可用
+    //（ReduceSlice 的 AICPU 后端未注册——Validate 快速失败 → 灰度回退老路径，
+    // 与 R6 备注的 ① 同因，无静默错跑面）。CCU Emit 真原语（R7 立项②）不阻塞本行：
+    // CCU 消费方是 server 常驻循环直调既有 kernel（CcuReduceScatterMesh1DMem2MemKernel），
+    // 路径不经过 Emit——Emit 动词序只服务 ST 语义 checker。
+    { HcclCMDType::HCCL_CMD_REDUCE_SCATTER, ActionKind::ReduceSlice },
     // { HcclCMDType::HCCL_CMD_ALLREDUCE, ActionKind::CollectAll },  // one_shot/two_shot 段形态
     // { HcclCMDType::HCCL_CMD_ALLTOALL, ActionKind::ExchangeAll },
     // { HcclCMDType::HCCL_CMD_ALLTOALLV, ActionKind::ExchangeAll },

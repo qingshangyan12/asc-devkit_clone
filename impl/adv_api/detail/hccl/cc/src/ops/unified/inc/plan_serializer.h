@@ -200,11 +200,22 @@ inline bool SerializeSegmentV3(const ActionSpec& seg, u64* slots, std::string& e
         case ActionKind::ReduceSlice: {
             // R6：RS 段 v3 布局。槽 1..15 == v2 并发 RS Mesh（KFC_CONCURRENT_RS_MESH_*
             // 槽 1..15，U_V3_RS_* 逐槽相等——server REDUCE_SCATTER_MESH 分支 :327-339
-            // 复用同一读取序）。NHR 拒收（R9 交付物；并发 RS 的 NHR 区间起 16 跨 20
-            // 槽超 32 槽记录宽）。仅 MESH/AUTO 受理（AUTO 的 MESH 语义由 BuildStage
-            // 的拓扑校验保证——CLOS 域已在 Compile 期被拒）。
+            // 复用同一读取序）。NHR 拒收（R9 交付物）。★R9 M0-④ 槽位实数勘误
+            //（2026-10-07，主会话裁决对质）：v2 并发 RS 的 NHR 区间起槽 16 至 24
+            //（KFC_CONCURRENT_RS_NHR_INPUT..OUTPUT_REPEAT_STRIDE，kfc_server_message.h
+            // :173-181），含动作 ID 共 25 槽 ≤ 32 槽记录宽——"跨 20 超 32"系误传
+            //（R6 时未逐槽核数）。本轮维持拒收的**真实理由**改为协议面缺口，非槽宽：
+            // ①v3 帧无 pattern 载体（server DispatchUnifiedPlanV3 只认槽 0 ∈ {0,1}，
+            //  slot 语义按 Mesh 布局解读，NHR 帧会被错读）；②NHR kernel 形参需
+            //  jettyNum/nhrStepInfoVector/nhrRank2ChannelIdx 三件 ctx.arg 自持量
+            //（v2 由 InheritKfcServerKernelArg 从 CcuKernelArg* 继承，unified 的
+            //  "CcuAction" 前缀注册走 UNIFIED_PLAN 覆写分支，三字段无人填）。
+            //  放开须 v5 blob（pattern 槽）+ 注册链三字段继承 + server NHR 分支三件
+            //  联动（方案文档 R9 M0-④）。仅 MESH/AUTO 受理（AUTO 的 MESH 语义由
+            //  BuildStage 的拓扑校验保证——CLOS 域已在 Compile 期被拒）。
             if (seg.pattern == CommPattern::NHR) {
-                err = "SerializeSegmentV3: ReduceSlice NHR not in R6 scope (20-slot span at 16 exceeds 32-slot record)";
+                err = "SerializeSegmentV3: ReduceSlice NHR not in delivery scope "
+                      "(v3 frame has no pattern carrier; NHR dispatch needs v5 protocol, see R9 M0-4)";
                 return false;
             }
             const u32 me = seg.domain.MyAlgRank();

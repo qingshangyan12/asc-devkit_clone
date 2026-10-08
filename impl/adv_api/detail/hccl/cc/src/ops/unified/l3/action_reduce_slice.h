@@ -122,12 +122,15 @@ public:
 
     // ---------------------------------------------------------------- 接口②
     // BuildArgs：把 ActionSpec 编译为后端无关参数集（全部 offset 经 DataLayout 访问器）
-    //   仅受理 MESH 形态（NHR 是 R9 交付物——RS NHR 消息槽起 16 跨 20 槽超 v3 单段
-    //   32 槽边界，SerializeSegmentV3 亦拒收 NHR，双处同一防线）
+    //   仅受理 MESH 形态（NHR 是 R9 交付物——R9 M0-④ 勘误：并发 RS 的 NHR 槽区间
+    //   起 16 至 24 共 25 槽（含动作 ID）≤ 32 槽记录宽，槽宽不是拒收因；真缺口 =
+    //   v3 帧无 pattern 载体 + NHR kernel 的 jettyNum/stepInfoVector/rank2ChannelIdx
+    //   三件 ctx.arg 自持量在 unified 注册链无人填（见 plan_serializer.h R9 M0-④
+    //   注）。SerializeSegmentV3 亦拒收 NHR，双处同一防线）
     static HcclResult BuildArgs(const ActionSpec& a, ReduceSliceArgs& args, std::string& err)
     {
         if (a.pattern == CommPattern::NHR) {
-            err = "ReduceSlice NHR pattern not in R6 scope (v3 record width 32 slots < NHR 20-slot span at 16)";
+            err = "ReduceSlice NHR pattern not in delivery scope (v3 frame has no pattern carrier; NHR dispatch needs v5 protocol, see R9 M0-4)";
             return HCCL_E_NOT_SUPPORT;
         }
         const u32 me = a.domain.MyAlgRank();

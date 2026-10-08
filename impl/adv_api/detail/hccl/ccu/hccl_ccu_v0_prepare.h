@@ -643,6 +643,36 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 //   RS 帧级拒收（R6.5 修订三）：段帧槽 0 != CollectAll → ERROR + return（RS
 //   instantiation 属 R7；与 magic/版本/段数拒发同粒度——不落盘不发信号，本轮
 //   通信由 host 侧调用方超时兜底，M4-④"宁可显式失败"口径族）。
+//   【R7 · WP-1（2026-10-06）：RS 帧级拒收放开——ReduceSlice 帧的 exec 现值实例化】
+//   AG 覆写名单不变；RS 帧（槽 0 == KFC_UNIFIED_ACTION_REDUCE_SLICE）按 v2 并发 RS
+//   写入方（CcuPrepareForConcurrentReduceScatterM2M :528-575，mission0 Mesh 区间）
+//   逐式实例化 RS 槽 1..15：
+//     1  input       = commParam->sendBuf + count*repeatIndex*dts + blob槽1（合成式
+//                     ——blob 槽值是段内 inBaseOff 结构量；与 AG 槽 1 同式）
+//     2  output      = commParam->recvBuf + count*repeatIndex*dts + blob槽2（同式；
+//                     ★v2 并发 RS 的 repeatOffset 用 sliceSize（每 rank 输出份）计
+//                     而 AG 用 count——RS 场景 commParam->count 即每 rank 输出份
+//                     （selector 口径），count×dts == sliceSize，两式在此等价）
+//     3  scratch     = ccuParam_.scratchAddr（v2 :547 直替——资源期 blob 槽 3 是
+//                     scratchBaseOff=0 占位，无结构量可保留）
+//     4  rankSliceOffset = rankId × (strideCount==0 ? sliceSize : strideCount×dts)
+//                     （v2 :548 三分支，strideCount 是 exec 现值——整体覆写丢弃
+//                     blob 编译期占位值）
+//     5  chunkSize   = 64MB / rankNum / 128 × 128（v2 :552-553 双端契约常量，
+//                     rankNum 来自 ccuParam_——设备侧自持，非 blob 字段）
+//     6  chunkLoopNum= UINT64_MAX - chunkCount（chunkCount = (sliceSize-1)/chunkSize+1，
+//                     sliceSize==0 时 0——v2 :554-555 同式）
+//     7  tailSize    = sliceSize - fullChunkCount×chunkSize（v2 :556）
+//     8..11 fullGo   = CalcGoSize(chunkSize, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE)
+//                     （★RS config loopCount=16 ≠ AG 的 8——漏配即 goSize 与
+//                     LoopGroup 步进错位，kernel :26-30 注释的硬约束）
+//     12..15 tailGo  = CalcGoSize(tailSize, 同上)（v2 :561-563 逐式）
+//   RS 无透传数据槽（15 槽全部依赖 count/dataType/strideCount/scratch/rankNum 现值
+//   ——chunk 参数是 scratchSize/rankNum 的函数，rankNum 变则 chunk 变，无资源期
+//   可信值）。未知动作 ID（既非 CollectAll 也非 ReduceSlice）维持帧级拒收
+//   （server v3 白名单 {0,1} 对齐——写入方不产出 server 不认识的帧）。
+//   ★RS goSize 上界不查 2GiB：RS goSize 按 chunkSize（≤64MB/8=8MB）计算而非
+//   sliceSize 全量（v2 无此检查同因——chunk 恒小）；2GiB 防线对 AG 保留。
 // ============================================================================
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForUnifiedPlan(
@@ -684,9 +714,10 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     // R6.5 B-CCU② · 覆写前置计算（exec 现值，v2 :273-296 同式）：
     //   首帧（帧 0）的动作 ID 决定覆写路径——AG（CollectAll）走数据槽覆写；
-    //   其他动作 ID 帧级拒收（RS 属 R7，帧级判据而非 Plan 级）
+    //   其他动作 ID 帧级拒收（R7 起 ReduceSlice 亦受理，未知 ID 仍拒——帧级判据
+    //   而非 Plan 级）
     // ★R7 锚点（审查预核登记，随切轮/多帧设计处理）：
-    //   ①首帧预检（本段）与帧循环内判据（②段）是**双份 CollectAll 检查**——单帧
+    //   ①首帧预检（本段）与帧循环内判据（②段）是**双份动作 ID 检查**——单帧
     //     blob（本轮唯一形态）无害，R7 多帧时二选一（预检可撤或循环判据专职）；
     //   ②槽 3 覆写本轮**丢弃 blob 编译期值**正确（资源期 count=0 → blob 槽 3 恒 0，
     //     无可保留结构量），但 R7 切轮帧若把**轮内偏移**编码进槽 3（帧间基址推进
@@ -694,10 +725,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     //     而非整体覆写——届时本行是改造点。
     __gm__ uint64_t* firstFrame = blob + KFC_UNIFIED_BLOB_HEADER_SLOTS;
     const uint64_t firstActionId = ReadHBMData(firstFrame + KFC_UNIFIED_ACTION_ID);
-    if (firstActionId != KFC_UNIFIED_ACTION_COLLECT_ALL) {
+    if (firstActionId != KFC_UNIFIED_ACTION_COLLECT_ALL &&
+        firstActionId != KFC_UNIFIED_ACTION_REDUCE_SLICE) {
         KERNEL_LOG(
-            KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan action[%llu] != CollectAll "
-            "(RS instantiation lands in R7; refusing, not silently passing through).",
+            KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan action[%llu] not in {CollectAll, ReduceSlice} "
+            "(unknown action id; refusing, not silently passing through).",
             (unsigned long long)firstActionId);
         return;
     }
@@ -746,39 +778,102 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
             for (uint32_t i = 0; i < KFC_UNIFIED_PARAM_NUM_PER_RECORD; ++i) {
                 dst[i] = ReadHBMData(src + i);
             }
-            // R6.5 B-CCU②：AG 段帧数据槽覆写（拷贝后、flush/信号前——落盘值=结构透传
-            // 槽 + exec 现值覆写槽的合成；11 覆写 + 5 透传，M0-1 名单）。
-            // 帧级动作 ID 已在预检（首帧 CollectAll + 后续帧同判——多帧场景 R7 起逐帧
-            // 独立覆写；本轮单帧 blob 恒帧 0）
+            // R6.5 B-CCU② + R7 WP-1：段帧数据槽覆写（拷贝后、flush/信号前——落盘值=
+            // 结构透传槽 + exec 现值覆写槽的合成）。帧级动作 ID 分叉两套覆写：
+            //   CollectAll → AG 名单（11 覆写 + 5 透传，M0-1）
+            //   ReduceSlice → RS 名单（槽 1..15 全覆写，头注 R7·WP-1 段）
+            // 未知 ID 维持帧级拒收（server v3 白名单 {0,1} 对齐）
             const uint64_t frameActionId = dst[KFC_UNIFIED_ACTION_ID];
-            if (frameActionId != KFC_UNIFIED_ACTION_COLLECT_ALL) {
+            if (frameActionId == KFC_UNIFIED_ACTION_REDUCE_SLICE) {
+                // R7 · WP-1：RS 帧实例化（布局基准 = v2 并发 RS 写入方
+                // CcuPrepareForConcurrentReduceScatterM2M :528-575 的 Mesh 区间槽 1..15；
+                // chunk 计数输入取 sole 写入方 CcuPrepareForReduceScatterM2M :455-457 的
+                // 全量 sliceSize 口径——并发版按 meshSize 计数系 10:22 双 mission 切分
+                // 专属，单段 unified 单 server 单 mission 无切分，全量才正确。
+                // commParam->count 在 RS 语义下即每 rank 输出份元素数（selector 口径），
+                // sliceSize = count×dts 与 v2 的 sliceSize 同源）
+                dst[KFC_UNIFIED_REDUCE_SLICE_INPUT] =
+                    (uint64_t)commParam->sendBuf + repeatOffset + dst[KFC_UNIFIED_REDUCE_SLICE_INPUT];
+                dst[KFC_UNIFIED_REDUCE_SLICE_OUTPUT] =
+                    (uint64_t)commParam->recvBuf + repeatOffset + dst[KFC_UNIFIED_REDUCE_SLICE_OUTPUT];
+                // 槽 3：scratch 直替（v2 :547；blob 编译期值是 scratchBaseOff 占位）
+                dst[KFC_UNIFIED_REDUCE_SLICE_SCRATCH] = ccuParam_.scratchAddr;
+                // 槽 4：rankSliceOffset 三分支（v2 :548；strideCount 是 exec 现值）
+                dst[KFC_UNIFIED_REDUCE_SLICE_RANK_SLICE_OFFSET] = ccuParam_.rankId *
+                    ((commParam->strideCount == 0U) ? sliceSize : (commParam->strideCount * dts));
+                // 槽 5..7：chunk 三元组（chunkSize 公式 v2 :552-553 与 sole :454 同式；
+                // chunkCount 输入=全量 sliceSize（sole 语义，见上注）；64MB scratch
+                // 双端契约，128B 对齐下取整；chunkCount 倒计数哨兵）
+                constexpr uint64_t kRsScratchSize = 64ULL * 1024 * 1024;   // v2 :551（host 侧同值契约）
+                constexpr uint64_t kRsSplitAlign = 128ULL;                 // v2 :535 splitAlignment
+                const uint64_t rsChunkSize = kRsScratchSize / ccuParam_.rankNum / kRsSplitAlign * kRsSplitAlign;
+                const uint64_t rsFullChunkCount = (sliceSize == 0U || rsChunkSize == 0U) ? 0 : (sliceSize - 1) / rsChunkSize;
+                const uint64_t rsChunkCount = (sliceSize == 0U || rsChunkSize == 0U) ? 0 : rsFullChunkCount + 1;
+                const uint64_t rsTailSize = sliceSize - rsFullChunkCount * rsChunkSize;
+                dst[KFC_UNIFIED_REDUCE_SLICE_CHUNK_SIZE] = rsChunkSize;
+                dst[KFC_UNIFIED_REDUCE_SLICE_CHUNK_LOOP_NUM] = ~0ULL - rsChunkCount;   // v2 :558 同式
+                dst[KFC_UNIFIED_REDUCE_SLICE_TAIL_SIZE] = rsTailSize;
+                // 槽 8..15：full/tail 双 goSize（★RS config：loopCount=CCU_LOOP_COUNT_M2M_RE=16
+                // 与 AG 的 8 不同源——kernel :26-30 的步进错位硬约束；memSlice=4096 不 ×8，
+                // v2 :561-563 逐式）。本地数组中转：CalcGoSize 形参是 uint64_t*（Local
+                // Memory 地址空间），dst 是 __gm__ 指针——NPU 编译面（__NPU_ARCH__=3510）
+                // 严格拒绝地址空间绑定（MAJOR-1 修复；对齐 v2 写入方 xnData_ 本地数组
+                // 风格，devkit CPU 面（ASCENDC_CPU_DEBUG）无地址空间区分故两侧皆过）
+                uint64_t rsFullGo[4] = {0, 0, 0, 0};
+                uint64_t rsTailGo[4] = {0, 0, 0, 0};
+                CalcGoSize(rsChunkSize, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, rsFullGo);
+                CalcGoSize(rsTailSize, CCU_LOOP_COUNT_M2M_RE, CCU_MEMSLICE_SIZE, rsTailGo);
+                dst[KFC_UNIFIED_REDUCE_SLICE_FULL_GO_ADDR_OFFSET] = rsFullGo[0];
+                dst[KFC_UNIFIED_REDUCE_SLICE_FULL_GO_LOOP_PARAM] = rsFullGo[1];
+                dst[KFC_UNIFIED_REDUCE_SLICE_FULL_GO_PARALLEL_PARAM] = rsFullGo[2];
+                dst[KFC_UNIFIED_REDUCE_SLICE_FULL_GO_RESIDUAL] = rsFullGo[3];
+                dst[KFC_UNIFIED_REDUCE_SLICE_TAIL_GO_ADDR_OFFSET] = rsTailGo[0];
+                dst[KFC_UNIFIED_REDUCE_SLICE_TAIL_GO_LOOP_PARAM] = rsTailGo[1];
+                dst[KFC_UNIFIED_REDUCE_SLICE_TAIL_GO_PARALLEL_PARAM] = rsTailGo[2];
+                dst[KFC_UNIFIED_REDUCE_SLICE_TAIL_GO_RESIDUAL] = rsTailGo[3];
                 KERNEL_LOG(
-                    KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan frame[%llu] action[%llu] != "
-                    "CollectAll (RS instantiation lands in R7; refusing).",
+                    KERNEL_INFO, "ApiClient CcuPrepareForUnifiedPlan RS frame[%llu] instantiated: slice[%llu] "
+                    "chunk[%llu] tail[%llu] rankSliceOff[%llu].",
+                    (unsigned long long)frame, (unsigned long long)sliceSize,
+                    (unsigned long long)rsChunkSize, (unsigned long long)rsTailSize,
+                    (unsigned long long)dst[KFC_UNIFIED_REDUCE_SLICE_RANK_SLICE_OFFSET]);
+            } else if (frameActionId != KFC_UNIFIED_ACTION_COLLECT_ALL) {
+                KERNEL_LOG(
+                    KERNEL_ERROR, "ApiClient CcuPrepareForUnifiedPlan frame[%llu] action[%llu] not in "
+                    "{CollectAll, ReduceSlice} (unknown action id; refusing).",
                     (unsigned long long)frame, (unsigned long long)frameActionId);
                 return;   // 拒发：不落盘剩余帧、不发信号（与头部拒发同粒度）
+            } else {
+                // ── AG（CollectAll）覆写名单：11 覆写 + 5 透传（R6.5 M0-1，v2 :273-296） ──
+                // 槽 1/2：合成式（blob 槽值是段内结构 offset，与 exec 现址相加）
+                dst[KFC_UNIFIED_COLLECT_ALL_INPUT] =
+                    (uint64_t)commParam->sendBuf + repeatOffset + dst[KFC_UNIFIED_COLLECT_ALL_INPUT];
+                dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT] =
+                    (uint64_t)commParam->recvBuf + repeatOffset + dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT];
+                // 槽 3：rankId × stride 分支（strideCount 是 exec 现值——三分支齐）
+                dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT_OFFSET] = outputOffset;
+                // 槽 4：sliceSize 现值
+                dst[KFC_UNIFIED_COLLECT_ALL_SLICE_SIZE] = sliceSize;
+                // 槽 5..8：goSize 重算（覆写后 sliceSize；设备侧 CalcGoSize 同式）。
+                // 本地数组中转（R7 MAJOR-1 修复——R6.5 起该调用点在 NPU 编译面
+                // （__NPU_ARCH__=3510）即有 __gm__ 指针绑定局部指针形参的地址空间
+                // 报错，本修复一并消除；理由同 RS 分支上注）
+                uint64_t agGo[4] = {0, 0, 0, 0};
+                CalcGoSize(sliceSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, agGo);
+                dst[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_0] = agGo[0];
+                dst[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_1] = agGo[1];
+                dst[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_2] = agGo[2];
+                dst[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_3] = agGo[3];
+                // 槽 13：lastSliceSize = 覆写后 sliceSize（AG 等分；尾片重算 P2 扩展位）
+                dst[KFC_UNIFIED_COLLECT_ALL_LAST_SLICE_SIZE] = sliceSize;
+                // 槽 14：inOutEqual 重判（★透传必错：资源期 count=0 下 blob 槽 14 按
+                // 0==0 恒 1 是误判值；v2 :292-296 合成式同源）
+                dst[KFC_UNIFIED_COLLECT_ALL_INPUT_OUTPUT_EQUAL] =
+                    (dst[KFC_UNIFIED_COLLECT_ALL_INPUT] ==
+                     dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT] + dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT_OFFSET]) ?
+                        1U : 0U;
+                // 透传槽（0/9/10/11/12）已由拷贝落值，不覆写
             }
-            // 槽 1/2：合成式（blob 槽值是段内结构 offset，与 exec 现址相加）
-            dst[KFC_UNIFIED_COLLECT_ALL_INPUT] =
-                (uint64_t)commParam->sendBuf + repeatOffset + dst[KFC_UNIFIED_COLLECT_ALL_INPUT];
-            dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT] =
-                (uint64_t)commParam->recvBuf + repeatOffset + dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT];
-            // 槽 3：rankId × stride 分支（strideCount 是 exec 现值——三分支齐）
-            dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT_OFFSET] = outputOffset;
-            // 槽 4：sliceSize 现值
-            dst[KFC_UNIFIED_COLLECT_ALL_SLICE_SIZE] = sliceSize;
-            // 槽 5..8：goSize 重算（覆写后 sliceSize；设备侧 CalcGoSize 同式）
-            CalcGoSize(sliceSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U,
-                &dst[KFC_UNIFIED_COLLECT_ALL_GO_SIZE_0]);
-            // 槽 13：lastSliceSize = 覆写后 sliceSize（AG 等分；尾片重算 P2 扩展位）
-            dst[KFC_UNIFIED_COLLECT_ALL_LAST_SLICE_SIZE] = sliceSize;
-            // 槽 14：inOutEqual 重判（★透传必错：资源期 count=0 下 blob 槽 14 按
-            // 0==0 恒 1 是误判值；v2 :292-296 合成式同源）
-            dst[KFC_UNIFIED_COLLECT_ALL_INPUT_OUTPUT_EQUAL] =
-                (dst[KFC_UNIFIED_COLLECT_ALL_INPUT] ==
-                 dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT] + dst[KFC_UNIFIED_COLLECT_ALL_OUTPUT_OFFSET]) ?
-                    1U : 0U;
-            // 透传槽（0/9/10/11/12）已由拷贝落值，不覆写
         } else {
             // 哨兵帧：槽 0 = INVALID_U64（server 出口判定 param[0]==INVALID_U64），
             // 其余槽清 0（Finalize 先例只写槽 0；此处全清更干净——server 只读槽 0 判

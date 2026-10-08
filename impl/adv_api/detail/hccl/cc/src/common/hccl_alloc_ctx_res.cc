@@ -18,6 +18,7 @@
 #include "plan_serializer.h"   // M2/M3：SerializePlanV3（CCU v3 blob——device 写入方消费）
 #include "unified_aicpu_exec.h" // R6 WP-A2：kUnifiedAicpuAlgKey（AICPU exec 分叉识别键回填）
 
+#include <algorithm>            // R11 · WP-2：AssembleUnifiedAicpuResCtx 的 remoteRank 展开序重放（std::sort）
 #include <limits>
 
 using namespace mc2_ops_hccl;
@@ -47,9 +48,20 @@ public:
     HcclResult AcquireCcuKernel(const std::vector<refactor::CcuKernelPlan>& kernels,
                                 refactor::CcuKernelHandle& kernelHandle, std::string& err) override;
 
+    // R11 · WP-1（句柄回收，2026-10-08）：Materialize 申请的 threads/channels 句柄
+    // 收集口——R10 前真实现申请后丢弃（组装资源束无句柄来源）。GetUnifiedOpParam-
+    // ResCtxImpl 的 ④ 段取回，经 UnifiedResOut 带给 AICPU 组装段落束
+    //（AssembleUnifiedAicpuResCtx）。幂等半边：同 tag 二次调用（CCU marker 跳过/
+    // AICPU 无守卫）时 Materialize 重新走真实现——同参数 Acquire 幂等返回同批句柄
+    //（comm 级线程/通道表，v2 HcclGetAlgRes 缓存命中同型），收集值被覆盖为同值。
+    const std::vector<ThreadHandle>& AcquiredThreads() const { return threads_; }
+    const std::vector<ChannelHandle>& AcquiredChannels() const { return channelHandles_; }
+
 private:
     HcclComm comm_;
     const OpParam& param_;
+    std::vector<ThreadHandle> threads_;         // R11 · WP-1：AcquireThreads 回收
+    std::vector<ChannelHandle> channelHandles_; // R11 · WP-1：AcquireChannels 回收
 };
 
 } // namespace
@@ -67,6 +79,29 @@ private:
 struct UnifiedResOut {
     void* ctx{nullptr};
     mc2_ops_hccl::refactor::CcuKernelHandle kernelHandle{0};
+    // R10 · F1 断点③（ctxSize 尺寸链）：v4 blob 的字节数（= HcclEngineCtxCreate 的
+    // 分配尺寸 = SerializePlanV3 槽数×8）。AICPU 半边消费方 RunUnifiedAicpuOp 的 ① 段
+    // 按 param.ctxSize 切 u64 数组取回 blob（unified_aicpu_exec.cc:69-79：resCtx 非空
+    // 但 ctxSize==0 → E_PARA 拒收）——资源期成功路径必须把该值回填 opParam.ctxSize
+    //（:1228 区域，PrepareCcAlgResources AICPU 半边）。
+    u64 blobSize{0};
+    // R11 · resCtx 双语义修复（2026-10-08）：AICPU 半边资源束产物 + blob 第二通道。
+    // resCtx 语义回归资源束（opParam.resCtx 指 AlgResourceCtxSerializable 序列化 ctx，
+    // tag=UnifiedAlgTag+"_resctx"，组装段 AssembleUnifiedAicpuResCtx 建立并回填
+    // opParam.resCtx/ctxSize——ctx 地址/字节数是组装段局部变量，不经本结构体）。
+    // blob 地址/尺寸随资源束序列化字段携带（方案 B，主会话裁决：unifiedBlobAddr/
+    // unifiedBlobSize 插 kfcServerArgSize 后、topoInfoSeqSize 前，topo 锚数学不动）。
+    // "后续第二件注册产物不再改签名"承诺兑现：仍结构体扩字段，不改函数签名。
+    // R11 · WP-1：Materialize 申请句柄（broker 回收）——AICPU 组装段落束来源。
+    std::vector<ThreadHandle> acquiredThreads;
+    std::vector<ChannelHandle> acquiredChannels;
+    // R11 · WP-2：claim 值透传（资源束 notify/slave 字段与申请参数同源）+ 通道
+    // 申请的 ChannelReq 输入（组装段 remoteRank 对齐重放的输入——HcclChannel-
+    // AcquireUnified 的 desc 展开序数学重放，不重跑 comm 级探测）。
+    u32 claimSlaveThreadNum{0};
+    u32 claimNotifyNumOnMainThread{0};
+    std::vector<u32> claimNotifyNumPerThread;
+    std::vector<refactor::ChannelReq> acquiredChannelReqs;
 };
 HcclResult GetUnifiedOpParamResCtxImpl(
     HcclComm comm, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
@@ -77,9 +112,11 @@ HcclResult GetUnifiedOpParamResCtxImpl(
 // ChannelReq/CcuKernelPlan/ResourceBroker 在 mc2_ops_hccl::refactor 子域。
 namespace mc2_ops_hccl {
 HcclResult HcclGetAlgResUnified(HcclComm comm, const OpParam& param, u32 threadNum, u32 notifyNum,
-    const std::vector<refactor::ChannelReq>& channels, std::string& err);
+    const std::vector<refactor::ChannelReq>& channels, std::string& err,
+    std::vector<ThreadHandle>* threadsOut = nullptr);
 HcclResult HcclChannelAcquireUnified(HcclComm comm, const OpParam& param,
-    const std::vector<refactor::ChannelReq>& channels, std::string& err);
+    const std::vector<refactor::ChannelReq>& channels, std::string& err,
+    std::vector<ChannelHandle>* handlesOut = nullptr);
 HcclResult HcclCcuKernelRegisterUnified(HcclComm comm, const OpParam& param,
     const std::vector<refactor::CcuKernelPlan>& kernels, refactor::CcuKernelHandle& kernelHandle,
     std::string& err);
@@ -935,13 +972,17 @@ HcclResult UnifiedResourceBroker::AcquireThreads(u32 threadNum,
     for (u32 n : notifyNumPerThread) {
         if (n > maxNotifyNum) maxNotifyNum = n;
     }
-    return mc2_ops_hccl::HcclGetAlgResUnified(comm_, param_, threadNum, maxNotifyNum + 1U, {}, err);
+    // R11 · WP-1：句柄回收出参传入（op_common.cc 重载）——失败路径 threads_ 不触
+    //（重载内 HcclThreadAcquire 失败先 return，收集值维持空）。
+    return mc2_ops_hccl::HcclGetAlgResUnified(
+        comm_, param_, threadNum, maxNotifyNum + 1U, {}, err, &threads_);
 }
 
 HcclResult UnifiedResourceBroker::AcquireChannels(const std::vector<refactor::ChannelReq>& channels,
     std::string& err)
 {
-    return mc2_ops_hccl::HcclChannelAcquireUnified(comm_, param_, channels, err);
+    // R11 · WP-1：句柄回收出参传入（op_common.cc 带出参重载——与 AcquireThreads 同批）。
+    return mc2_ops_hccl::HcclChannelAcquireUnified(comm_, param_, channels, err, &channelHandles_);
 }
 
 HcclResult UnifiedResourceBroker::AcquireCcuKernel(const std::vector<refactor::CcuKernelPlan>& kernels,
@@ -1068,23 +1109,286 @@ HcclResult GetUnifiedOpParamResCtxImpl(
     }
 
     // ④ Plan 序列化进 ctx 旁路（OpParam 不动，§12-10 方案 B）。
-    // M2/M3（尾款轮，2026-09-21）：CCU 引擎切 v3 真序列化（SerializePlanV3 定长槽位
-    // 格式——device 写入方 CcuPrepareForUnifiedPlan 消费的 UPL3 blob）；AICPU 引擎
-    // 维持 v1 文本摘要（其消费方只有日志/维测，无 device 写入方）。blob 以 u64 槽
-    // 序列按字节视图写 ctx（vector<u64> → string 视图搬运，第四轮预留的切换点）。
+    // M2/M3（尾款轮，2026-09-21，历史形态）：CCU 引擎切 v3 真序列化（SerializePlanV3
+    // 定长槽位格式——device 写入方 CcuPrepareForUnifiedPlan 消费的 UPL3 blob）；AICPU
+    // 引擎维持 v1 文本摘要（当时的认知：其消费方只有日志/维测，无 device 写入方）。
+    // blob 以 u64 槽序列按字节视图写 ctx（vector<u64> → string 视图搬运）。
+    // R10 · F1 断点①（序列化错配修复，2026-10-08）：AICPU 引擎 v1→v4 切换——exec 期
+    // 消费方 RunUnifiedAicpuOp（unified/exec/unified_aicpu_exec.cc:87）以 ParseUnifiedBlobV4
+    // 解析 param.resCtx（校验 UPL3 魔数/版本 4），v1 文本摘要（SerializePlanForCtx 纯
+    // 日志字符串）必被拒收——两端各自正确、中段格式断裂（R9 审查考古立案的第四轮
+    // BLOCKER-1 同型）。本处即第四轮注释预留的"真注册链接线时切换"点：两引擎统一走
+    // SerializePlanV3 字节视图（v4 blob）。SerializePlanForCtx 函数保留（日志/维测
+    // 口径，action_spec.h:314 退役预留说明）——仅停用本调用点。
     const std::string unifiedAlgTag = UnifiedAlgTag(algConfig, engine);
-    if (engine == Engine::CCU) {
-        std::vector<u64> blobSlots;
-        if (!SerializePlanV3(plan, blobSlots, err)) {
-            HCCL_ERROR("[UnifiedRes] SerializePlanV3 failed, err[%s]. retreating to legacy path.", err.c_str());
-            return HCCL_E_PARA;
-        }
-        const char* blobBytes = reinterpret_cast<const char*>(blobSlots.data());
-        const std::string planBlob(blobBytes, blobSlots.size() * sizeof(u64));
-        return mc2_ops_hccl::HcclSerializeUnifiedPlan(comm, opParam, unifiedAlgTag, planBlob, &resOut.ctx);
+    std::vector<u64> blobSlots;
+    if (!SerializePlanV3(plan, blobSlots, err)) {
+        HCCL_ERROR("[UnifiedRes] SerializePlanV3 failed, err[%s]. retreating to legacy path.", err.c_str());
+        return HCCL_E_PARA;
     }
-    const std::string planBlob = SerializePlanForCtx(plan);   // v1 摘要（AICPU 日志口径）
+    const char* blobBytes = reinterpret_cast<const char*>(blobSlots.data());
+    const std::string planBlob(blobBytes, blobSlots.size() * sizeof(u64));
+    // R10 · F1 断点③：blob 尺寸经 UnifiedResOut 出参带回（AICPU 半边成功路径回填
+    // opParam.ctxSize 的唯一来源；CCU 半边组装段另有 HcclEngineCtxGet 反查校验，
+    // 不消费本字段）。
+    resOut.blobSize = planBlob.size();
+    // R11 · WP-1（句柄落 UnifiedResOut）：broker 回收的 Materialize 申请句柄带出——
+    // AICPU 组装段（AssembleUnifiedAicpuResCtx）落资源束 threads/channels 的唯一
+    // 来源（对照 CCU 半边：组装段 :1546-1557 自行 HcclThreadAcquire——CCU claim
+    // slaveThreadNum=0 只需 1 条，AICPU 需 slave+1 条与通道全量，重申请无缓存
+    // 语义依据，回收是正解）。
+    resOut.acquiredThreads = broker.AcquiredThreads();
+    resOut.acquiredChannels = broker.AcquiredChannels();
+    // R11 · WP-2：claim 值 + 通道申请输入透传（组装段资源束字段同源填充）
+    resOut.claimSlaveThreadNum = plan.claim.slaveThreadNum;
+    resOut.claimNotifyNumOnMainThread = plan.claim.notifyNumOnMainThread;
+    resOut.claimNotifyNumPerThread = plan.claim.notifyNumPerThread;
+    resOut.acquiredChannelReqs = plan.claim.channels;
     return mc2_ops_hccl::HcclSerializeUnifiedPlan(comm, opParam, unifiedAlgTag, planBlob, &resOut.ctx);
+}
+
+// ---------------------------------------------------------------------------
+// R11 · WP-2 AICPU 引擎特定组装段（2026-10-08）——AssembleUnifiedCcuDeliverables
+//（:1541+，CCU 半边）的 AICPU 同构物。位置考据（M0-③）：CCU 组装在
+// ProcessCcuTiling 分叉处（"引擎特定交付物不下沉 AICPU/CCU 共用骨架"的 R5
+// 主会话裁决），AICPU 同理在 PrepareCcAlgResources 分叉处——本函数即其组装体。
+//
+// 职责（对照老路径交付物 GetAlgResAICPU :985-1007 + HcclAllocAlgResourceAICPU
+// :1055-1095 + HcclMemcpyCtxHostToDevice :1059-1077）：
+//   ① AlgResourceCtxSerializable 资源束组装：commInfoPtr=comm（BuildHolder :126
+//      commInfoPtr == param.hcclComm 校验源）、topoInfo、threads=broker 回收
+//     （WP-1）、channels=回收句柄、cclMem=HcclGetHcclBuffer（CCU 组装段 :1622-1626
+//      同式）、notifyNumOnMainThread/slaveThreadNum/notifyNumPerThread=claim 值、
+//      ccuKernels 空（AICPU 无 CCU 注册）、方案 B blob 字段（unifiedBlobAddr=
+//      resOut.ctx、unifiedBlobSize=resOut.blobSize）。
+//   ② Serialize → HcclEngineCtxCreate(tag=UnifiedAlgTag+"_resctx") → H2D。
+//      引擎参数（M0-② 裁定）：COMM_ENGINE_AICPU——镜像 HcclSerializeUnifiedPlan
+//      的 blob ctx 同域（op_common.cc :3194，blob ctx 先例——同一 unified 产物族
+//      两个 ctx 同域管理，反查/probe 接口（AssembleUnifiedCcuDeliverables ⑦ 段
+//      HcclEngineCtxGet(comm, tag, COMM_ENGINE_AICPU, ...) :1527-1529 同域 Get）
+//      才能按域命中）。存量 HcclMemcpyCtxHostToDevice 用 COMM_ENGINE_AICPU_TS
+//      + param.algTag（:1065-1066）——那是 legacy 缓存键体系（tag_algName_launchMode
+//      拼式），unified 的 algTag 是 UnifiedAlgTag 规范形，语义不同源不沿用。
+//   ③ opParam.resCtx/ctxSize 回归资源束（R10 的 blob 回填废除）。
+//   ④ algTag 回填（M0-③：SetOpParamAlgTag 在 op_common.cc:2466（tag_algName_
+//      launchMode 拼式 + CCU 扩展段），unified 的"语法即身份"键（UnifiedAlgTag，
+//      C10 §10.2）与该拼式不兼容——不复用存量函数，仿其 sprintf_s 形态直填
+//      组装段实际 ctx tag 串：UnifiedAlgTag+"_resctx"）。
+//   ⑤ 资源束读回校验（对照 CCU ⑦ 段 blob 头校验：device ctx H2D 后 D2H 首字段
+//      commInfoPtr 比对——资源束语义的往返自证）。
+//
+// 幂等（对照 CCU marker 守卫 :1032-1058）：AICPU 侧重复调用（同 tag 二次
+// PrepareCcAlgResources）现状会重跑 Materialize——系 R6-R10 既有行为非本轮回归；
+// HcclThreadAcquire/HcclChannelAcquire 幂等未证（v2 有 g_hostCtx 缓存摊销，unified
+// 无）——登记 P2 遗留（M0-② 结论），本段不引入 marker 守卫（blob ctx 幂等 Create
+// 的同 tag 覆盖行为未证，守卫反引入新假设）。
+//
+// 【错误路径】组装失败直接上抛不落回（CCU 侧 M3-ERR 裁定同型：blob ctx 已建
+// （HcclSerializeUnifiedPlan 先行）、线程/通道已申请（Materialize 先行）——落回
+// 老路径 = 双份资源状态且老路径无感知）。
+// ---------------------------------------------------------------------------
+static HcclResult AssembleUnifiedAicpuResCtx(HcclComm comm, OpParam& opParam,
+    std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfoUnified, const std::string& unifiedAlgConfig,
+    const UnifiedResOut& unifiedResOut)
+{
+    uint32_t userRank = 0;
+    CHK_RET(HcclGetRankId(comm, &userRank));
+    uint32_t userRankSize = 0;
+    CHK_RET(HcclGetRankSize(comm, &userRankSize));
+    // 单 rank 退化（GetUnifiedOpParamResCtxImpl ① 段 :1020 同判定先行返回 SUCCESS、
+    // resOut 全空）：与现状 HandleSingleRankAndCommMode skipGetRes 语义对齐——无资源
+    // 可申请，组装段不得把空 resOut 当病灶报错（否则单 rank 场景 unified 分叉由
+    // "优雅退化"变"必失败"，破坏灰度契约）。成功直返（调用方随后 FillOpParamAlgName
+    // 后 return SUCCESS——老路径单 rank 同归宿）。
+    if (userRankSize <= 1U) {
+        HCCL_INFO("[UnifiedRes][AICPU] single rank, skip res-ctx assembly (no resource to bundle).");
+        return HCCL_SUCCESS;
+    }
+    const refactor::Engine engine = refactor::L1Adapter::EngineOf(opParam);
+    const std::string unifiedAlgTag = refactor::UnifiedAlgTag(unifiedAlgConfig, engine);
+    const std::string tagResCtx = unifiedAlgTag + "_resctx";
+    HCCL_INFO("[UnifiedRes][AICPU] assemble res-ctx start: rank[%u/%u], algTag[%s], threads[%zu], "
+              "channels[%zu], blob[%p, %lluB].",
+        userRank, userRankSize, tagResCtx.c_str(), unifiedResOut.acquiredThreads.size(),
+        unifiedResOut.acquiredChannels.size(), unifiedResOut.ctx,
+        static_cast<unsigned long long>(unifiedResOut.blobSize));
+
+    // ① 资源束组装（GetAlgResAICPU :992-994 的 commInfoPtr/topoInfo 同式）
+    auto resCtxHost = std::make_unique<AlgResourceCtxSerializable>();
+    resCtxHost->commInfoPtr = static_cast<void*>(comm);   // KFC BuildHolder :126 校验源
+    resCtxHost->topoInfo = *topoInfoUnified;
+    resCtxHost->threads = unifiedResOut.acquiredThreads;  // WP-1 回收（Materialize 申请原批）
+    if (resCtxHost->threads.empty()) {
+        // 空线程不可达（AG 多 rank 域 claim.slaveThreadNum=N-2 → threadNum=N-1≥1）——
+        // 防御性显式报错：KFC BuildHolder :135 threads.empty 拒 / AddOpContext
+        // isDevice950 分支 threads[0]==0 拒，此处提前到资源期暴露。
+        HCCL_ERROR("[UnifiedRes][AICPU] no acquired threads in UnifiedResOut "
+                   "(Materialize thread side missing?).");
+        return HCCL_E_INTERNAL;
+    }
+    // algHierarchyInfo（消费方 ② 段 domainRanks 来源——unified_aicpu_exec.cc :117
+    // resCtx.algHierarchyInfo.infos[0][0]）：单域 PoC 口径 = {domainRanks}
+    //（topo_match_1d.cc :53-55 的 infos[0][0]=全量 rankIds 同形态；GetUnified-
+    // OpParamResCtxImpl ① 段推导的 hierarchyRanks 与 Compile 的 domain 同源）。
+    // 多域 DomainPlan 随 §6.11（届时 Compile 侧 domain 分层数据经 UnifiedResOut 透传）。
+    {
+        std::vector<u32> level0;
+        if (!topoInfoUnified->physicalLevels.empty()) {
+            level0 = topoInfoUnified->physicalLevels[0].localRanks;
+        }
+        if (level0.empty()) {
+            level0 = std::vector<u32>{opParam.userRank};
+        }
+        resCtxHost->algHierarchyInfo.infos.push_back({level0});
+    }
+    // channels：句柄回填进 ChannelInfo（对照 HcclGetChannelImpl :1287-1296 的
+    // isValid/remoteRank/handle 三元组——unified 侧无 HcclRankGraphGetEndpointInfo
+    // 端口探测链，portGroupSize/dieId 维持默认，MakeHcommVerbRes 只消费
+    // remoteRank/handle（hcomm_verb_sink.h:74-85））
+    {
+        std::vector<ChannelInfo> level0;
+        for (const ChannelHandle handle : unifiedResOut.acquiredChannels) {
+            if (handle == 0U) {
+                continue;   // 0 句柄不落束（Acquire 输出占位形态防御）
+            }
+            ChannelInfo ch;
+            ch.isValid = true;
+            ch.remoteRank = INVALID_VALUE_RANKID;   // remoteRank 由 desc 序对齐填（下方第二遍）
+            ch.handle = handle;
+            level0.push_back(ch);
+        }
+        if (level0.empty()) {
+            // 空通道不可达（AG 多 rank 域 claim.channels 非空、Materialize 已申请）——
+            // 防御性显式报错：消费方 RunUnifiedAicpuOp :132 channels 空同样拒
+            //（E_PARA），此处提前到资源期暴露（更早失败点）。
+            HCCL_ERROR("[UnifiedRes][AICPU] no acquired channels in UnifiedResOut "
+                       "(Materialize channel side missing?).");
+            return HCCL_E_INTERNAL;
+        }
+        resCtxHost->channels.push_back(std::move(level0));
+    }
+    // remoteRank 对齐：HcclChannelAcquireUnified 的 desc 展开序（remoteRank 升序×
+    // count 展开，op_common.cc :2894-2906）与回收句柄序同源——按同式重放展开序，
+    // 逐句柄对齐 remoteRank。展开序重放与 Materialize 的 ChannelReq 输入无关
+    //（claim.channels 的 remoteRank 集即探测输入），与真实现共用同一数学。
+    {
+        // 从 plan.claim 重放：desc 序 = CalcChannelRequestMesh1D 探测序（rank graph
+        // 升序），count 展开 = ChannelReq.count（0→1）。本段不重跑探测（comm 级
+        // 探测非幂等保证）——remoteRank 从句柄序与 claim 的对应关系重放。
+        // 简化口径（单域 PoC）：unifiedResOut.acquiredChannels 的展开序 ==
+        // HcclChannelAcquireUnified 内 expanded 序（remoteRank 升序、逐 rank count 条）
+        // ——重放该数学：claim.channels 按 remoteRank 升序 + count 展开。
+        std::vector<u32> rankOrder;
+        for (const auto& cr : unifiedResOut.acquiredChannelReqs) {
+            rankOrder.push_back(cr.remoteRank);
+        }
+        std::sort(rankOrder.begin(), rankOrder.end());
+        size_t idx = 0;
+        for (const u32 remoteRank : rankOrder) {
+            u32 count = 1U;
+            for (const auto& cr : unifiedResOut.acquiredChannelReqs) {
+                if (cr.remoteRank == remoteRank) {
+                    count = (cr.count == 0U) ? 1U : cr.count;
+                    break;
+                }
+            }
+            for (u32 c = 0U; c < count && idx < resCtxHost->channels[0].size(); ++c, ++idx) {
+                resCtxHost->channels[0][idx].remoteRank = remoteRank;
+            }
+        }
+        if (idx != resCtxHost->channels[0].size()) {
+            HCCL_ERROR("[UnifiedRes][AICPU] channel handle/rank count mismatch: handles[%zu], "
+                       "expanded[%zu] (serializer drift).",
+                resCtxHost->channels[0].size(), idx);
+            return HCCL_E_INTERNAL;
+        }
+    }
+    // cclMem：HcclGetHcclBuffer（CCU 组装段 :1622-1626 同式——AG VIA_CCUBUF 的
+    // scratch 基址，消费方 msg.cclBuff 的资源期来源）
+    {
+        void* cclBufferAddr = nullptr;
+        uint64_t cclBufferSize = 0;
+        if (HcclGetHcclBuffer(comm, &cclBufferAddr, &cclBufferSize) == HCCL_SUCCESS &&
+            cclBufferAddr != nullptr) {
+            resCtxHost->cclMem = HcclMem{HCCL_MEM_TYPE_DEVICE, cclBufferAddr, cclBufferSize};
+        } else {
+            HCCL_WARNING("[UnifiedRes][AICPU] HcclGetHcclBuffer unavailable, cclMem left default "
+                         "(AG VIA_CCUBUF scratch degraded).");
+        }
+    }
+    // claim 值：threads/notify 公式（AicpuCollectAll::ClaimEngineRes——
+    // backend_aicpu_collect_all.h:43-49：threadNum=N-1、notifyNumPerThread 各 1、
+    // notifyNumOnMainThread=N-1）。Materialize 的 AcquireThreads 入参即该公式
+    // 产物（l1_adapter.h:222-223），组装段按同式重放（claim 不出 GetUnified-
+    // OpParamResCtxImpl——资源束字段与申请参数的一致性由同源公式保证）。
+    resCtxHost->slaveThreadNum = unifiedResOut.claimSlaveThreadNum;
+    resCtxHost->notifyNumOnMainThread = unifiedResOut.claimNotifyNumOnMainThread;
+    resCtxHost->notifyNumPerThread = unifiedResOut.claimNotifyNumPerThread;
+    // ccuKernels 空（AICPU 无 CCU 注册——kernelHandle 恒 0 不落束）
+    resCtxHost->ccuKernels.clear();
+    // batch-transfer 能力位（消费方 InitHcommBatchTransferOnThreadSupported 的输入——
+    // kernel_launch.cc :324 / comm_kfc_open_kernel_executor.cc :241 两链同判；老路径
+    // GetOpParamResCtx :1417 同式填充）
+    resCtxHost->isHcommBatchTransferOnThreadSupported = HcommIsSupportHcommBatchTransferOnThread();
+    // 方案 B blob 第二通道：地址/尺寸随资源束序列化（消费方 DeSerialize 自然取得）
+    resCtxHost->unifiedBlobAddr = reinterpret_cast<u64>(unifiedResOut.ctx);
+    resCtxHost->unifiedBlobSize = unifiedResOut.blobSize;
+
+    // ② 序列化 → HcclEngineCtxCreate（COMM_ENGINE_AICPU 域——见函数头 M0-② 裁定）
+    //    → H2D（HcclMemcpyCtxHostToDevice :1065-1071 的 Create+Copy 序同式，域/键不同）
+    std::vector<char> seq = resCtxHost->Serialize();
+    void* resCtxSequence = nullptr;
+    CHK_RET(HcclEngineCtxCreate(comm, tagResCtx.c_str(), COMM_ENGINE_AICPU, seq.size(), &resCtxSequence));
+    {
+        const errno_t cpRet = memcpy_s(resCtxSequence, seq.size(), seq.data(), seq.size());
+        CHK_PRT_RET(cpRet != EOK, HCCL_ERROR("[UnifiedRes][AICPU] res-ctx H2D memcpy failed."), HCCL_E_MEMORY);
+    }
+
+    // ③ opParam.resCtx/ctxSize 回归资源束（resCtx 双语义修复核心——R10 的 blob
+    //    回填废除；消费方 KFC BuildHolder / kernel_launch DeSerialize 按资源束
+    //    反序列化从此得到真实资源束）
+    opParam.resCtx = resCtxSequence;
+    opParam.ctxSize = seq.size();
+
+    // ④ algTag 回填（M0-③：仿 SetOpParamAlgTag 的 sprintf_s 形态、规范形直填）
+    {
+        const int tagRet = sprintf_s(
+            opParam.algTag, sizeof(opParam.algTag), "%s", tagResCtx.c_str());
+        CHK_PRT_RET(tagRet <= 0, HCCL_ERROR("[UnifiedRes][AICPU] failed to fill opParam.algTag."),
+            HCCL_E_INTERNAL);
+    }
+
+    // ⑤ 读回校验（对照 CCU ⑦ 段：device 首字段 D2H 比对——commInfoPtr 往返自证）。
+    //    commInfoPtr 的序列化偏移在 algType(12B)+infos.size(8B)+physIdx.size(8B) 之后
+    //    ——精确偏移不硬编码，反序列化全束比对（D2H 全量 + DeSerialize +
+    //    commInfoPtr/threads 计数/blob 字段）。
+    {
+        std::vector<char> back(seq.size());
+        aclError aclRet = aclrtMemcpy(back.data(), back.size(), resCtxSequence, back.size(),
+            ACL_MEMCPY_DEVICE_TO_HOST);
+        CHK_PRT_RET(aclRet != ACL_SUCCESS,
+            HCCL_ERROR("[UnifiedRes][AICPU] res-ctx D2H read-back failed, ret[%d].", aclRet), HCCL_E_RUNTIME);
+        AlgResourceCtxSerializable backCtx;
+        backCtx.DeSerialize(back);
+        CHK_PRT_RET(backCtx.commInfoPtr != static_cast<void*>(comm) ||
+                        backCtx.threads.size() != resCtxHost->threads.size() ||
+                        backCtx.unifiedBlobAddr != resCtxHost->unifiedBlobAddr ||
+                        backCtx.unifiedBlobSize != resCtxHost->unifiedBlobSize,
+            HCCL_ERROR("[UnifiedRes][AICPU] res-ctx round-trip mismatch: comm[%p] threads[%zu] "
+                       "blob[0x%llx, %lluB].",
+                backCtx.commInfoPtr, backCtx.threads.size(),
+                static_cast<unsigned long long>(backCtx.unifiedBlobAddr),
+                static_cast<unsigned long long>(backCtx.unifiedBlobSize)),
+            HCCL_E_INTERNAL);
+    }
+
+    HCCL_INFO("[UnifiedRes][AICPU] assemble res-ctx done: algTag[%s], ctx[%p, %zuB], threads[%zu], "
+              "channels[%zu], blob[0x%llx, %lluB].",
+        tagResCtx.c_str(), resCtxSequence, seq.size(), resCtxHost->threads.size(),
+        resCtxHost->channels.empty() ? 0U : resCtxHost->channels[0].size(),
+        static_cast<unsigned long long>(resCtxHost->unifiedBlobAddr),
+        static_cast<unsigned long long>(resCtxHost->unifiedBlobSize));
+    return HCCL_SUCCESS;
 }
 
 HcclResult GetOpParamResCtx(
@@ -1207,6 +1511,7 @@ HcclResult PrepareCcAlgResources(HcclComm comm, const char* algConfig, OpParam& 
             ? std::string(algConfig) : std::string();
         HcclResult unifiedRet = HCCL_E_INTERNAL;
         UnifiedResOut unifiedResOut{};   // M3-缺口1：AICPU 路径 kernelHandle 恒 0（无 CCU 注册）
+        std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfoUnifiedForAssemble;   // R11：组装段消费（move 语义）
         if (!unifiedAlgConfig.empty()) {
             // 自备 topoInfo（不依赖 TryForced 探测结果——其失败路径重置为空对象）
             std::unique_ptr<TopoInfoWithNetLayerDetails> topoInfoUnified =
@@ -1214,6 +1519,11 @@ HcclResult PrepareCcAlgResources(HcclComm comm, const char* algConfig, OpParam& 
             if (PrepareTopoInfoForOp(comm, opParam, topoInfoUnified) == HCCL_SUCCESS) {
                 unifiedRet = GetUnifiedOpParamResCtxImpl(comm, opParam, topoInfoUnified.get(),
                     unifiedAlgConfig, unifiedResOut);
+                if (unifiedRet == HCCL_SUCCESS) {
+                    // R11：组装段接管 topoInfo 所有权（资源束 topoInfo 字段来源——
+                    // move 后不再触原指针，失败路径也已在分叉内定局）
+                    topoInfoUnifiedForAssemble = std::move(topoInfoUnified);
+                }
             } else {
                 HCCL_WARNING("[UnifiedRes] self topo probe failed, fall through to legacy path.");
             }
@@ -1224,8 +1534,25 @@ HcclResult PrepareCcAlgResources(HcclComm comm, const char* algConfig, OpParam& 
             // BLOCKER-2 修复（审查三轮）：unified 成功路径回填交付物，对齐老路径出口
             //（AcquireAlgResources :876/:879 的 opParam.resCtx/ctxSize 语义）。
             // cacheValid=false：unified 首次申请（无缓存命中），对应 isResourceReused=false。
-            opParam.resCtx = unifiedResOut.ctx;
-            opParam.ctxSize = 0U;   // ctx 旁路由 HcclEngineCtxCreate 自管（tag 关联），非 resCtx 序列化路径
+            // ---------------------------------------------------------------
+            // R11 · resCtx 双语义修复（2026-10-08，AICPU 半边组装段——M0-③ 位置考据：
+            // CCU 组装在 ProcessCcuTiling 分叉处（AssembleUnifiedCcuDeliverables，
+            // "引擎特定交付物不下沉共用骨架"的 R5 主会话裁决），AICPU 同理在
+            // PrepareCcAlgResources 分叉处，不下沉 GetUnifiedOpParamResCtxImpl）：
+            //   ① 组装 AlgResourceCtxSerializable 资源束（commInfoPtr/topoInfo/
+            //      threads/channels/cclMem/claim 值 + 方案 B blob 字段）→ Serialize →
+            //      HcclEngineCtxCreate(UnifiedAlgTag+"_resctx") → H2D；
+            //   ② opParam.resCtx/ctxSize 回归资源束语义（R10 的 blob 回填废除——
+            //      存量 exec 链 KFC BuildHolder/kernel_launch DeSerialize 按资源束
+            //      反序列化，指 blob 必得垃圾 → E_PARA）；
+            //   ③ algTag 回填（M0-③：仿 SetOpParamAlgTag 的 sprintf_s 形态、
+            //      UnifiedAlgTag 规范形——unified 不调存量 SetOpParamAlgTag，
+            //      其 tag_algName_launchMode 拼式与 unified 的"语法即身份"键不兼容）。
+            // 组装失败上抛不落回（对照 CCU 侧 M3-ERR 裁定：blob ctx/线程/通道已
+            // 建，落回=双份资源状态且老路径无感知）。
+            // ---------------------------------------------------------------
+            CHK_RET(AssembleUnifiedAicpuResCtx(
+                comm, opParam, topoInfoUnifiedForAssemble, unifiedAlgConfig, unifiedResOut));
             opParam.cacheValid = false;
             opParam.all2AllVDataDes.sendCounts = origSendCounts;
             // R6 · WP-A2（exec 期分叉接线，2026-09-22；判序随终审 BLOCKER 修复更新）：
@@ -1233,7 +1560,6 @@ HcclResult PrepareCcAlgResources(HcclComm comm, const char* algConfig, OpParam& 
             // 以 strcmp 全串命中该键，在 GetAlgExec **之前**分叉到 RunUnifiedAicpuOp
             //（unified_aicpu_exec.h；不进 CollAlgExecRegistryV2——该名无注册项，
             // 分叉必须前移到查表之前，否则 nullptr 拦截先行、unified 分支永不可达）。
-            // algTag 同步置 UnifiedAlgTag 规范形（ctx 旁路同源键，日志可关联）。
             CHK_RET(FillOpParamAlgName(opParam, refactor::kUnifiedAicpuAlgKey));
             return HCCL_SUCCESS;
         }

@@ -108,6 +108,19 @@ list(APPEND INCLUDE_LIST
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/inc
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/exec
     ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/l5
+    # R10 · F1（2026-10-08）：l2/l3/l4——exec/unified_aicpu_exec.cc 的 include 传递
+    # 闭包（aicpu_consumer.h → l3/action_collect_all.h、l4/backend_registry.h、
+    # l2 配方头）。该 .cc 现随设备侧 mc2_server 一并编译（下方 sources 列表），
+    # unified/CMakeLists 的 target 级 l2/l3/l4 路径只作用于 mc2_client，跨 target
+    # 消费进全局 INCLUDE_LIST（与 :108-110 的既有口径一致）。
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/l2
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/l3
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/l4
+    # R10 · F1（2026-10-08）：unified_exec/（消费方本体 aicpu_consumer.h，纯头）——
+    # exec/unified_aicpu_exec.cc include 它；该 .cc 现随设备侧 mc2_server 一并编译
+    #（下方 sources 列表），缺本路径即报 aicpu_consumer.h not found。mc2_client 侧由
+    # unified/CMakeLists 的 ../unified_exec 覆盖，本行进全局对两 target 均无害。
+    ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified_exec
 
 
     # runtime头文件
@@ -155,6 +168,12 @@ if(PRODUCT_SIDE STREQUAL "device")
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/alg_v2_template_base.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/template_utils.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aicpu/kernel_launch.cc
+        # R10 · F1（2026-10-08）：unified AICPU 执行器进设备侧 mc2_server——
+        # kernel_launch.cc 的 exec 分叉（R6）与 comm_kfc_open_kernel_executor.cc 的
+        # 分叉（本轮 F1 断点②）都调用 refactor::RunUnifiedAicpuOp（impl 本 .cc）；
+        # 该符号此前只编进 host 侧 mc2_client（unified/CMakeLists），设备侧链接
+        # 缺实现（R6 遗留潜伏断链，本轮随 KFC executor 分叉一并闭合）。
+        ${CMAKE_CURRENT_SOURCE_DIR}/ops/unified/exec/unified_aicpu_exec.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aicpu/task_cache/mc2_aicpu_task_cache.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/aicpu/dfx/task_exception_fun.cc
         ${CMAKE_CURRENT_SOURCE_DIR}/ops/op_common/template/registry/alg_template_register.cc

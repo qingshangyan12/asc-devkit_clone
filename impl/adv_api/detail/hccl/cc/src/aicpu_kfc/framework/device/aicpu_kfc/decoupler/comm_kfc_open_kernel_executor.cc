@@ -21,6 +21,16 @@
 #include "hcomm_primitives.h"
 #include "task_cache/mc2_aicpu_task_cache.h"
 #include "task_cache/mc2_aicpu_task_cache_runner.h"
+// R10 · F1 断点②（KFC server 链 unified 分叉，2026-10-08）：unified AICPU 消费方
+// + 真原语后端（unified/exec/ 与 unified/l5/——与 kernel_launch.cc :23-26 同式）。
+// include 链（decoupler CMakeLists 的 ccl_kernel_decoupler_open_exec 目标）：
+//   unified/exec/unified_aicpu_exec.h —— IsUnifiedAicpuAlgName / RunUnifiedAicpuOp
+//     （其自身 include alg_param.h——已在 ${OPEN_HCCL_SRC_ROOT}/ops/op_common/inc）
+//   unified/l5/hcomm_verb_sink.h —— HcommVerbSink / MakeHcommVerbRes
+//     （其自身 include verb_sink.h——词汇表半边在 unified/inc/）
+// 两目录（exec/、l5/）与 inc/ 一并进目标 include 路径（CMakeLists 同轮扩展）。
+#include "unified_aicpu_exec.h"
+#include "hcomm_verb_sink.h"
 
 namespace {
 mc2_ops_hccl::OpParam* AsOpenOpParam(std::vector<uint8_t>& opParam)
@@ -188,6 +198,39 @@ HcclResult LaunchOpenOpParamDataImpl(
                 "[CannBridge] dispatch failed (ret=%d), opType=%u algName[%s]", static_cast<int>(cannRet),
                 static_cast<u32>(param->opType), param->algName),
             cannRet);
+        return HCCL_SUCCESS;
+    }
+
+    // ------------------------------------------------------------------
+    // R10 · F1 断点②（KFC server 链 unified 分叉补齐，2026-10-08）：
+    // algName 携带 unified 识别键（资源期 PrepareCcAlgResources unified 成功路径
+    // 回填，hccl_alloc_ctx_res.cc :1250 区域 FillOpParamAlgName(kUnifiedAicpuAlgKey)）
+    // → 不走存量 executor，走 unified AICPU 消费方（v4 blob 校验 + exec 期现值
+    // 实例化 + L4 Emit + HcommVerbSink 真原语）。
+    // ★判序硬约束（R6 终审 BLOCKER 教训，与 kernel_launch.cc :358-394 同型）：
+    //   "unified_aicpu" 无 CollAlgExecRegistryV2 注册项，GetAlgExec 对它必返
+    //   nullptr——若分叉放在查表之后，下方 :196 的 CHK_SMART_PTR_NULL 拦截会先
+    //   return，unified 分支永不可达（生产死代码）。分叉必须前移到 GetAlgExec
+    //   **之前**；前移后 unified 键根本到不了查表，存量 algName 路径（查表 +
+    //   nullptr 拦截 + Orchestrate）行为零变化。
+    // ★失败语义（与 kernel_launch.cc 挂点一致）：本链无灰度回退语义——执行期
+    //   失败已过资源期灰度回退点，非 SUCCESS 直接上抛（半执行状态回退会造成
+    //   数据不一致）。
+    // ★本改动仅 host 侧执行路径（executor 函数体），不触 device 侧 __gm__/
+    //   地址空间敏感代码（R7 MAJOR-1 教训不适用——无 device 侧数据面改动）。
+    // ------------------------------------------------------------------
+    if (mc2_ops_hccl::refactor::IsUnifiedAicpuAlgName(param->algName)) {
+        // 资源束 threads + 逐 peer 通道（l5/MakeHcommVerbRes——kernel_launch.cc
+        // 分叉点同式：同源不重复；sink 内含真原语分发）
+        mc2_ops_hccl::refactor::HcommVerbSink unifiedSink(mc2_ops_hccl::refactor::MakeHcommVerbRes(resCtx));
+        const HcclResult unifiedRet = mc2_ops_hccl::refactor::RunUnifiedAicpuOp(*param, resCtx, unifiedSink);
+        CHK_PRT_RET(
+            unifiedRet != HCCL_SUCCESS,
+            HCCL_ERROR("[UnifiedExec][AICPU] RunUnifiedAicpuOp failed, ret[%d], algName[%s].",
+                static_cast<int>(unifiedRet), param->algName),
+            unifiedRet);
+        HCCL_INFO("[UnifiedExec][AICPU] unified path done (skipping legacy Orchestrate), algName[%s].",
+            param->algName);
         return HCCL_SUCCESS;
     }
 
