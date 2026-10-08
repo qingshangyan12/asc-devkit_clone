@@ -24,10 +24,10 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB_res.md#id1 -->
 
@@ -77,6 +77,8 @@ __aicore__ inline void DataCopyL1ToUB(const LocalTensor<T>& dst, const LocalTens
 ## 数据类型
 
 支持的数据类型为b8、b16、b32、b64。
+
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/DataCopyL1ToUB_res.md#id1 -->
 
 ## 返回值说明
 
