@@ -26,7 +26,7 @@
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201)
 #include "welfordupdate_check_common.h"
 #elif defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
 #include "welfordupdate_check_c310.h"
 #else
 #include "welfordupdate_check_aicore.h"
@@ -36,7 +36,7 @@ namespace AscendC {
 namespace HighLevelApiCheck {
 
 #if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
 template <typename T, typename U, bool isReuseSource = false, const WelfordUpdateConfig& config = WFUPDATE_DEFAULT_CFG>
 __aicore__ inline void CheckFuncWelfordUpdate(
     __gm__ const char* apiName, const LocalTensor<U>& outputMean, const LocalTensor<U>& outputVariance,

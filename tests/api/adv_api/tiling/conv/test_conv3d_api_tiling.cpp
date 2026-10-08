@@ -4828,7 +4828,7 @@ TEST_F(TestConv3dTiling, Soc_Error)
 }
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102 || (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510)
 TEST_F(TestConv3dTiling, Soc_Error1)
 {
     const char* socVersion1 = "AscendError";

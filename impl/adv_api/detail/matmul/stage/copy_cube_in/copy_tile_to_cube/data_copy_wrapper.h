@@ -27,7 +27,7 @@
 #include "data_copy_wrapper_nz.h"
 #include "data_copy_wrapper_vec.h"
 #include "data_copy_wrapper_using_ub_nd.h"
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "data_copy_wrapper_mx.h"
 #include "data_copy_wrapper_dn.h"
 #endif
