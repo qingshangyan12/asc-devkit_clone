@@ -194,27 +194,28 @@ enum KfcReduceScatterSoleNhr2DieParamIndex : uint32_t {
     KFC_RS_SOLE_NHR_2DIE_PARAM_NUM = 29,
 };
 
-// SoleNHR（CcuSchedAllGatherSoleNHR）单帧 xnData 布局：
-// [0]=opId 哨兵，参数从 1 顺排。AIV prepare（CcuPrepareForAllGatherSoleNhrM2M）写入、
-// KFC dispatch 逐槽转发、kernel 形参三处索引必须一致。
-// 单 die 语义：die0Size/die0LastSize 即全量分片与末分片（hccl dieNum=1 口径），die1 参数省略。
+// SoleNHR（CcuSchedAllGatherSoleNHR）单帧 xnData 布局（N2 压缩至 8 槽 = 64B = 单 DCCI 行，
+// AIV 提交路径 flush 2→1、写槽数 15→8）：
+//  [0]=INPUT 兼作轮次有效哨兵——server 仅检查 param[0] != INVALID_U64（真实地址必不等于），
+//  原 opId 槽纯哨兵用途（kernel 不接收 opId），故由 INPUT 占位。
+//  常量参数不占槽、由 kernel LoadNhr1DArgs 内联（sole executor 恒定）：
+//  die0LastSize=die0Size、repeatNum=1、三 stride=0。
+//  isInputOutputEqual 不占槽：in-place 时 AIV 将 goSize 按 0 字节计算（CalcGoSize(0) →
+//  m=n=p=0 全零），GroupCopy 内部两个 CCU_IF 块（addrOffset/parallelParam != 0）均不触发，
+//  本地拷贝退化为空，kernel 无需该参数。
+// AIV prepare（CcuPrepareForAllGatherSoleNhrM2M）写入、KFC dispatch 逐槽转发、
+// kernel 形参三处索引必须一致。
+// 单 die 语义：die0Size 即全量分片（hccl dieNum=1 口径），die1 参数省略。
 enum KfcAllGatherSoleNhrParamIndex : uint32_t {
-    KFC_AG_SOLE_NHR_OP_ID = 0,
-    KFC_AG_SOLE_NHR_INPUT = 1,
-    KFC_AG_SOLE_NHR_OUTPUT = 2,
-    KFC_AG_SOLE_NHR_DIE0_SIZE = 3,
-    KFC_AG_SOLE_NHR_DIE0_LAST_SIZE = 4,
-    KFC_AG_SOLE_NHR_REPEAT_NUM_INV = 5,
-    KFC_AG_SOLE_NHR_INPUT_SLICE_STRIDE = 6,
-    KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE = 7,
-    KFC_AG_SOLE_NHR_INPUT_REPEAT_STRIDE = 8,
-    KFC_AG_SOLE_NHR_OUTPUT_REPEAT_STRIDE = 9,
-    KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL = 10,
-    KFC_AG_SOLE_NHR_GO_SIZE_0 = 11,
-    KFC_AG_SOLE_NHR_GO_SIZE_1 = 12,
-    KFC_AG_SOLE_NHR_GO_SIZE_2 = 13,
-    KFC_AG_SOLE_NHR_GO_SIZE_3 = 14,
-    KFC_AG_SOLE_NHR_PARAM_NUM = 15,
+    KFC_AG_SOLE_NHR_INPUT = 0,
+    KFC_AG_SOLE_NHR_OUTPUT = 1,
+    KFC_AG_SOLE_NHR_DIE0_SIZE = 2,
+    KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE = 3,
+    KFC_AG_SOLE_NHR_GO_SIZE_0 = 4,
+    KFC_AG_SOLE_NHR_GO_SIZE_1 = 5,
+    KFC_AG_SOLE_NHR_GO_SIZE_2 = 6,
+    KFC_AG_SOLE_NHR_GO_SIZE_3 = 7,
+    KFC_AG_SOLE_NHR_PARAM_NUM = 8,
 };
 
 // ReduceScatter 并发(Mesh+NHR)单帧 xnData 布局：mission0 读 Mesh 区间，mission1 读 NHR 区间。
