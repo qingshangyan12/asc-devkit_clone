@@ -118,11 +118,13 @@
 | [exp](reg_vector_compute/basic_arithmetic/exp.md) | 对源操作数中的有效元素逐元素计算指数。 |
 | [leaky_relu](reg_vector_compute/basic_arithmetic/leaky_relu.md) | 对源操作数逐元素执行Leaky ReLU计算。 |
 | [log](reg_vector_compute/basic_arithmetic/log.md) | 对源操作数中的有效元素逐元素计算自然对数。 |
+| [ln](reg_vector_compute/basic_arithmetic/ln.md) | 对源操作数中的有效元素逐元素计算自然对数。 |
 | [log10](reg_vector_compute/basic_arithmetic/log10.md) | 对源操作数中的有效元素逐元素计算以10为底的对数。 |
 | [log2](reg_vector_compute/basic_arithmetic/log2.md) | 对源操作数中的有效元素逐元素计算以2为底的对数。 |
 | [max](reg_vector_compute/basic_arithmetic/max.md) | 对两个源操作数逐元素计算最大值。 |
 | [min](reg_vector_compute/basic_arithmetic/min.md) | 对两个源操作数逐元素计算最小值。 |
 | [mull](reg_vector_compute/basic_arithmetic/mull.md) | 对两个源操作数逐元素执行高低位乘法计算。 |
+| [neg](reg_vector_compute/basic_arithmetic/neg.md) | 对源操作数逐元素取相反数。 |
 | [+](reg_vector_compute/basic_arithmetic/operator_add.md) | 对两个源操作数逐元素执行加法计算。 |
 | [-](reg_vector_compute/basic_arithmetic/operator_sub.md) | 对两个源操作数逐元素执行减法计算。 |
 | [*](reg_vector_compute/basic_arithmetic/operator_mul.md) | 对两个源操作数逐元素执行乘法计算。 |
