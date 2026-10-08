@@ -61,7 +61,7 @@ TEST(TestSysConstants, PublicConstantsMatchArch)
     EXPECT_EQ(ASC_L0B_SIZE, 32 * 1024);
     EXPECT_EQ(ASC_L0C_SIZE, 64 * 1024);
     EXPECT_EQ(ASC_BT_SIZE, 1 * 1024);
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     EXPECT_EQ(ASC_UB_SIZE, 256 * 1024);
     EXPECT_EQ(ASC_L1_SIZE, 512 * 1024);
     EXPECT_EQ(ASC_L0A_SIZE, 64 * 1024);
