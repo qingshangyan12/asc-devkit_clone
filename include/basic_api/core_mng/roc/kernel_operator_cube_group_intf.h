@@ -30,7 +30,7 @@
 #include "../../../../impl/basic_api/utils/kernel_utils_cube_group.h"
 #if __NPU_ARCH__ == 2201
 #include "../../../../impl/basic_api/dav_c220/core_mng/roc/kernel_operator_cube_group_info.h"
-#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#elif __NPU_ARCH__ == 3510
 #include "../../../../impl/basic_api/dav_3510/core_mng/roc/kernel_operator_cube_group_info.h"
 #endif
 

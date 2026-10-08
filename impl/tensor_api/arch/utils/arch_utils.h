@@ -29,7 +29,7 @@
 namespace asc {
 namespace te {
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define SCALAR_QUANT_MODE                                                                                             \
     QuantMode_t::DEQF16, QuantMode_t::QF322B8_PRE, QuantMode_t::REQ8, QuantMode_t::QS322BF16_PRE,                     \
         QuantMode_t::QF322F16_PRE, QuantMode_t::QF322BF16_PRE, QuantMode_t::QF322FP8_PRE, QuantMode_t::QF322HIF8_PRE, \
@@ -43,7 +43,7 @@ namespace te {
 template <QuantMode_t quant_pre>
 using is_scalar_quant_mode = Std::is_one_of_value<QuantMode_t, quant_pre, SCALAR_QUANT_MODE>;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define TILE_OP_INTERNAL_TENSOR_QUANT_MODE                                                            \
     QuantMode_t::VDEQF16, QuantMode_t::VQF322B8_PRE, QuantMode_t::VREQ8, QuantMode_t::VQS322BF16_PRE, \
         QuantMode_t::VQF322F16_PRE, QuantMode_t::VQF322BF16_PRE, QuantMode_t::VQF322FP8_PRE,          \
@@ -57,7 +57,7 @@ using is_scalar_quant_mode = Std::is_one_of_value<QuantMode_t, quant_pre, SCALAR
 template <QuantMode_t quant_pre>
 using is_vector_quant_mode = Std::is_one_of_value<QuantMode_t, quant_pre, TILE_OP_INTERNAL_TENSOR_QUANT_MODE>;
 
-#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3510
 #define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::F322F16, QuantMode_t::F322BF16
 #elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 2201
 #define TILE_OP_INTERNAL_DIRECT_QUANT_MODE QuantMode_t::F322F16, QuantMode_t::F322BF16

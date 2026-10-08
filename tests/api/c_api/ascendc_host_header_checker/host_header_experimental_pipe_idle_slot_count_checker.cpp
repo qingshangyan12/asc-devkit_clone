@@ -13,7 +13,7 @@
 
 static void test_host_c_api_experimental_pipe_idle_slot_count()
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     using ::asc_get_pipe_fix_idle_slot_count;
     using ::asc_get_pipe_m_idle_slot_count;
     using ::asc_get_pipe_mte1_idle_slot_count;

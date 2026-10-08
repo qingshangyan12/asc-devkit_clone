@@ -75,7 +75,7 @@ __aicore__ inline void SoftmaxGradFrontGenericNDImpl(
 }
 
 #if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
 __aicore__ inline void SoftmaxGradFrontGenericNDImpl(
     const LocalTensor<float>& dstTensor, const LocalTensor<float>& gradTensor, const LocalTensor<float>& srcTensor,
     const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling, const LastAxisShapeND& originalSrcShape)
@@ -122,7 +122,7 @@ __aicore__ inline void SoftmaxGradFrontNDImpl(
     const LocalTensor<float>& workLocal, const SoftMaxTiling& tiling, const LastAxisShapeND& originalSrcShape)
 {
 #if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+    ((__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201) || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
     SoftmaxGradFrontGenericNDImpl(dstTensor, gradTensor, srcTensor, workLocal, tiling, originalSrcShape);
 #else
     ReduceLastND reduceSumParam = {tiling.splitM, originalSrcShape.k, tiling.splitM,
