@@ -226,17 +226,21 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
         } else if (ctx.arg->role == KfcServerRole::ALL_GATHER_SOLE_NHR) {
             // SoleNHR（CcuSchedAllGatherSoleNHR）单帧布局见 KfcAllGatherSoleNhrParamIndex
-            // （[0]=opId 哨兵，[1..14] 为 NHR 参数，token 由 server ctx 注入）。
+            // （[0]=opId 哨兵，[1..20] 为 NHR 参数，token 由 server ctx 注入）。
+            // 双 die 两 mission 共享本帧区间，axisId/axisSize 来自 kernelArg 区分实例。
             CcuKernelKfcAllGatherNHR1DMem2MemKernel(
                 param[KFC_AG_SOLE_NHR_INPUT], param[KFC_AG_SOLE_NHR_OUTPUT], ctx.token,
                 param[KFC_AG_SOLE_NHR_DIE0_SIZE], param[KFC_AG_SOLE_NHR_DIE0_LAST_SIZE],
+                param[KFC_AG_SOLE_NHR_DIE1_SIZE], param[KFC_AG_SOLE_NHR_DIE1_LAST_SIZE],
                 param[KFC_AG_SOLE_NHR_REPEAT_NUM_INV], param[KFC_AG_SOLE_NHR_INPUT_SLICE_STRIDE],
                 param[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE], param[KFC_AG_SOLE_NHR_INPUT_REPEAT_STRIDE],
                 param[KFC_AG_SOLE_NHR_OUTPUT_REPEAT_STRIDE], param[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL],
                 param[KFC_AG_SOLE_NHR_GO_SIZE_0], param[KFC_AG_SOLE_NHR_GO_SIZE_1], param[KFC_AG_SOLE_NHR_GO_SIZE_2],
-                param[KFC_AG_SOLE_NHR_GO_SIZE_3], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->nhrStepInfoVector,
-                ctx.arg->nhrRank2ChannelIdx);
+                param[KFC_AG_SOLE_NHR_GO_SIZE_3], param[KFC_AG_SOLE_NHR_GO_SIZE_DIE1_0],
+                param[KFC_AG_SOLE_NHR_GO_SIZE_DIE1_1], param[KFC_AG_SOLE_NHR_GO_SIZE_DIE1_2],
+                param[KFC_AG_SOLE_NHR_GO_SIZE_DIE1_3], ctx.arg->channels, ctx.arg->channelCount,
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->axisId, ctx.arg->axisSize,
+                ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
         } else {
             // The queue payload layout is
             // [0]=op, [1]=input, [2]=output, [3]=outputOffset, [4]=sliceSize,

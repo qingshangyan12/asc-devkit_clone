@@ -18,9 +18,15 @@ namespace mc2_ops_hccl {
 
 // CcuSchedAllGatherSoleNHR 的 KFC template。kernelFuncName 占位符由 CcuTempKfcServer::CalcRes
 // 替换为 CcuKernelKfcServer；stepInfoVector/rank2ChannelIdx 经 algArg 透明传递机制下发。
+// 双 die（对齐 hccl CcuTempAllGatherNHR1DMem2Mem）：dieNum 由通道探测决定，每 die 一份 kernelInfo
+// （axisId/axisSize 区分实例，channels 为该 die 链路组）；dieSplitRatio 千分比供 AIV prepare
+// 与 ST adapter 消费（1000=不切分）。
 struct CcuKernelArgKfcAllGatherNHR1DMem2Mem : CcuKernelArgBase {
     uint64_t rankSize = 0;
     uint32_t rankId = 0;
+    uint32_t axisId = 0;
+    uint32_t axisSize = 1;
+    uint64_t dieSplitRatioPermille = 1000U; // 1000=不切分；(0,1000)=die0 千分比（ST adapter 消费）
     OpParam opParam;
     std::vector<KfcNhrStepInfo> stepInfoVector;
     std::map<uint32_t, uint32_t> rank2ChannelIdx;
@@ -56,6 +62,7 @@ private:
 
     uint32_t mySubCommRank_ = 0;
     uint32_t tempRankSize_ = 0;
+    std::map<u32, std::vector<HcclChannelDesc>> rankIdToChannelDesc_; // 以对端真实 rank 为键的通道表
 };
 
 } // namespace mc2_ops_hccl
