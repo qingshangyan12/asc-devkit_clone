@@ -194,7 +194,7 @@ __aicore__ inline void emit_unsupported_tensor_location(print_session& session)
     } else {
         print_fragment(session, (__gm__ const char*)"this memory location");
     }
-#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510)
     print_fragment(session, (__gm__ const char*)"; only GM, UB, L1, L0C, and BiasTable are supported.\n");
 #else
     print_fragment(session, (__gm__ const char*)"; only GM and UB are supported.\n");
@@ -223,7 +223,7 @@ __aicore__ inline void emit_addressable_tensor_content(print_session& session, c
     emit_tensor_with_reader(session, tensor, reader);
 }
 
-#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510)
 template <typename Data, AscendC::Hardware Hardware, typename T>
 __aicore__ inline void emit_debug_bus_tensor_content(print_session& session, const T& tensor)
 {
@@ -250,7 +250,7 @@ __aicore__ inline void emit_tensor_content(print_session& session, const T& tens
     }
     if constexpr (Std::is_same_v<tensor_location, location::gm> || Std::is_same_v<tensor_location, location::ub>) {
         emit_addressable_tensor_content<data_type>(session, tensor);
-#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__DAV_CUBE__) && (__NPU_ARCH__ == 3510)
     } else if constexpr (Std::is_same_v<tensor_location, location::l1>) {
         emit_debug_bus_tensor_content<data_type, AscendC::Hardware::L1>(session, tensor);
     } else if constexpr (Std::is_same_v<tensor_location, location::l0c>) {
