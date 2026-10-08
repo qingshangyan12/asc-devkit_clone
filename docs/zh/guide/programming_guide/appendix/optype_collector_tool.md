@@ -75,7 +75,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
     >    <!-- end id7 -->
     ><!-- end id1 -->
     ><!-- npu="A3" id2 -->
-    >- 针对<term>Atlas A3系列产品</term>/<term>Atlas A3系列产品</term>，在安装AI处理器的服务器执行`npu-smi info -t board -i <id> -c <chip_id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>`id`：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。<br>`chip_id`：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id，命令中表示为`<chip_id>`。<br><br>
+    >- 针对Atlas A3系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id> -c <chip_id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。其中：<br>`id`：设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。<br>`chip_id`：芯片id，通过`npu-smi info -m`命令查出的Chip ID即为芯片id，命令中表示为`<chip_id>`。<br><br>
     ><!-- end id2 -->
     ><!-- npu="950" id3 -->
     >- 针对Ascend 950PR&950DT系列产品，在安装AI处理器的服务器执行`npu-smi info -t board -i <id>`命令进行查询，获取Chip Name和NPU Name信息，实际配置值为`Chip Name_NPU Name`。例如Chip Name取值为Ascendxxx，NPU Name取值为1234，实际配置值为Ascendxxx_1234。<br>其中：`id`为设备id，通过`npu-smi info -l`命令查出的NPU ID即为设备id，命令中表示为`<id>`。
@@ -133,9 +133,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
     | ---- | ---- | ---- |
     | `--detect-conflicts {soc_version}` | 必选 | 检测指定AI处理器版本下自定义算子OpType是否与CANN内置算子OpType或其他自定义算子OpType重名。`{soc_version}`表示待检测的AI处理器型号，可填写CANN支持的产品AI处理器型号。 |
 
-## 返回值<a name="section_optype_collector_return_code"></a>
-
-<a name="table_optype_collector_return_code"></a>
+## 返回值<a name="section_optype_collector_return_code"></a><a name="table_optype_collector_return_code"></a>
 
 | 返回值 | 说明 |
 | ---- | ---- |
@@ -145,9 +143,7 @@ optype_collector工具用于采集内置/自定义算子包中指定AI处理器�
 
 ## 输出说明<a name="section_optype_collector_output"></a>
 
-工具执行后会根据命令模式输出如下信息。
-
-<a name="table_optype_collector_output"></a>
+工具执行后会根据命令模式输出如下信息。<a name="table_optype_collector_output"></a>
 
 | 输出项 | 说明 |
 | ---- | ---- |

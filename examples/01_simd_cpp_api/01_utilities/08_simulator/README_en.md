@@ -85,7 +85,7 @@ Perform the following steps in the root directory of this sample to compile and 
   | Options | Description |
   |------|------|
   | `CMAKE_ASC_RUN_MODE` | Specify `sim` to enable NPU simulation mode |
-  | `CMAKE_ASC_ARCHITECTURES` | Specifies the NPU architecture version number. `dav-2201` corresponds to Atlas A2 products/Atlas A2 reasoning series products and Atlas A3 products/Atlas A3 reasoning series products. `dav-3510` corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | Specifies the NPU architecture version number. `dav-2201` corresponds to Atlas A2 products and Atlas A3 products. `dav-3510` corresponds to Ascend 950PR&950DT products |
 
   When the accuracy comparison is successful, the output is as follows:
 
