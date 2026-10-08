@@ -13,6 +13,15 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
+namespace float8_e6m2 {
+struct Fp8e6m2T {
+    uint8_t val;
+};
+} // namespace float8_e6m2
+using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
+using vector_fp8_e6m2_t = vector_f8e6m2;
+
 struct hifloat4x2_t {
     uint8_t val = 0;
 };
@@ -274,11 +283,6 @@ using float8_e5m2_t = fp8_e5m2_t;
 using float4_e1m2x2_t = fp4x2_e1m2_t;
 using float4_e2m1x2_t = fp4x2_e2m1_t;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-struct fp8_e6m2_t {};
-using float8_e6m2_t = fp8_e6m2_t;
-struct vector_f8e6m2 {};
-
 inline void vcvt_bf162e6m2(
     vector_f8e6m2& dst, vector_bf16 src, vector_bool mask, Literal round, Literal part, Literal mode)
 {}
@@ -288,8 +292,17 @@ inline void vcvt_bf162e8m0(
 inline void vcvt_e6m22bf16(vector_bf16& dst, vector_f8e6m2 src, vector_bool mask, Literal part) {}
 inline void vcvt_e8m02bf16(vector_bf16& dst, vector_f8e8m0 src, vector_bool mask, Literal part) {}
 
-template <typename Dst, typename Src>
-inline void vcvt(Dst& dst, Src src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+inline void vcvt(
+    vector_f8e4m3& dst, vector_bf16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+inline void vcvt(
+    vector_f8e5m2& dst, vector_bf16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+inline void vcvt(
+    vector_f8e4m3& dst, vector_f16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+inline void vcvt(
+    vector_f8e5m2& dst, vector_f16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
 {}
 
 inline void vpack(vector_u32& dst, vector_u64 src, Literal part) {}
@@ -306,7 +319,7 @@ inline void vpackv2(vector_s64& dst, vector_s64 src) {}
 inline void vgather2(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u16 index, vector_bool mask) {}
 inline void vgatherb(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u32 index, vector_bool mask) {}
 inline void vgatherb(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u32 index) {}
-#endif
+
 void vcgadd(vector_u32& dst, vector_u16 src, vector_bool pg, int32_t mode);
 void vcgadd(vector_s32& dst, vector_s16 src, vector_bool pg, int32_t mode);
 

@@ -32,19 +32,52 @@ TEST_PACK_DATABLOCK(Float, vector_float);
 TEST_PACK_DATABLOCK(UInt64, vector_uint64_t);
 TEST_PACK_DATABLOCK(Int64, vector_int64_t);
 
+#define TEST_PACK_DATABLOCK_RETURN(type_name, type)              \
+    TEST(PackDatablockReturn, type_name)                         \
+    {                                                            \
+        type src;                                                \
+        MOCKER_CPP(vpackv2, void(type&, type)).times(1);         \
+        auto dst = asc_pack_datablock(src);                      \
+        static_assert(std::is_same<decltype(dst), type>::value); \
+        (void)dst;                                               \
+        GlobalMockObject::verify();                              \
+    }
+
+TEST_PACK_DATABLOCK_RETURN(UInt16, vector_uint16_t);
+TEST_PACK_DATABLOCK_RETURN(Int16, vector_int16_t);
+TEST_PACK_DATABLOCK_RETURN(Half, vector_half);
+TEST_PACK_DATABLOCK_RETURN(UInt32, vector_uint32_t);
+TEST_PACK_DATABLOCK_RETURN(Int32, vector_int32_t);
+TEST_PACK_DATABLOCK_RETURN(Float, vector_float);
+TEST_PACK_DATABLOCK_RETURN(UInt64, vector_uint64_t);
+TEST_PACK_DATABLOCK_RETURN(Int64, vector_int64_t);
+
 TEST(PackTo64, SupportsSignedAndUnsignedSources)
 {
     vector_uint32_t dst;
     vector_uint64_t u_src;
     vector_int64_t s_src;
-    MOCKER_CPP(vpack, void(vector_uint32_t&, vector_uint64_t, Literal)).times(2);
-    MOCKER_CPP(vpack, void(vector_uint32_t&, vector_int64_t, Literal)).times(2);
+    MOCKER_CPP(vpack, void(vector_uint32_t&, vector_uint64_t, Literal)).times(4);
+    MOCKER_CPP(vpack, void(vector_uint32_t&, vector_int64_t, Literal)).times(4);
 
     asc_pack_to_low(dst, u_src);
     asc_pack_to_high(dst, u_src);
     asc_pack_to_low(dst, s_src);
     asc_pack_to_high(dst, s_src);
+    auto u_low = asc_pack_to_low(u_src);
+    auto u_high = asc_pack_to_high(u_src);
+    auto s_low = asc_pack_to_low(s_src);
+    auto s_high = asc_pack_to_high(s_src);
+    static_assert(std::is_same<decltype(u_low), vector_uint32_t>::value);
+    static_assert(std::is_same<decltype(u_high), vector_uint32_t>::value);
+    static_assert(std::is_same<decltype(s_low), vector_uint32_t>::value);
+    static_assert(std::is_same<decltype(s_high), vector_uint32_t>::value);
+    (void)u_low;
+    (void)u_high;
+    (void)s_low;
+    (void)s_high;
     GlobalMockObject::verify();
 }
 
+#undef TEST_PACK_DATABLOCK_RETURN
 #undef TEST_PACK_DATABLOCK
