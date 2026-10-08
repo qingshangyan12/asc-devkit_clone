@@ -44,13 +44,17 @@ enum class ReduceType {
 };
 } // namespace AscendC
 
+using hif4_scale = struct hif4_scale {
+    uint32_t value = 0;
+};
+
 #if !defined(ASCENDC_CPU_DEBUG)
 using fp4x2_e2m1_t = float4_e2m1x2_t;
 using fp4x2_e1m2_t = float4_e1m2x2_t;
 using fp8_e5m2_t = float8_e5m2_t;
 using fp8_e4m3fn_t = float8_e4m3_t;
 using fp8_e8m0_t = float8_e8m0_t;
-#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
 using hif4x2_t = hifloat4x2_t;
 #endif
 #endif

@@ -37,11 +37,15 @@ constexpr size_t fractal_fixed = 16;
 constexpr size_t mx_scale_k0 = 2;
 constexpr uint32_t block_cube = 16;
 constexpr uint64_t hifloat8_mmad_ctrl_mask = 0x200000000000ULL;
+constexpr size_t scale_divisor = 16;
+constexpr size_t scale_divisor_hif4 = 8;
 
 struct arch_version {
     static constexpr uint32_t v3510 = 3510;
+    static constexpr uint32_t v9201 = 9201;
     static constexpr uint32_t v2201 = 2201;
     static constexpr uint32_t V3510 = 3510;
+    static constexpr uint32_t V9201 = 9201;
     static constexpr uint32_t V2201 = 2201;
 };
 
