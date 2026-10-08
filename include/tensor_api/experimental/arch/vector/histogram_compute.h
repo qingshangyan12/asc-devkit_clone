@@ -28,11 +28,10 @@ struct histogram_options {
     histogram_mode mode = histogram_mode::frequency;
 };
 
-inline constexpr histogram_options default_histogram_options {};
+inline constexpr histogram_options default_histogram_options{};
 
-template <const histogram_options& options = default_histogram_options>
-__simd_callee__ inline reg_tensor<uint16_t> histograms(
-    const reg_tensor<uint16_t>& dst, const reg_tensor<uint8_t>& src);
+template <const histogram_options& options = default_histogram_options, typename T, typename U>
+__simd_callee__ inline reg_tensor<T> histograms(const reg_tensor<T>& dst, const reg_tensor<U>& src);
 
 } // namespace experimental
 } // namespace te
