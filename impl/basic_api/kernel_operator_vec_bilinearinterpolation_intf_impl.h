@@ -34,7 +34,7 @@
 #include "dav_m300/kernel_operator_vec_bilinearinterpolation_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_bilinearinterpolation_impl.h"
-#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_bilinearinterpolation_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_bilinearinterpolation_impl.h"
@@ -57,7 +57,7 @@ __aicore__ inline void BilinearInterpolationCheck(
     uint32_t sharedTmpBufferSize = sharedTmpBuffer.GetSize();
 #if __NPU_ARCH__ == 2201
     uint32_t expectedTmpBufferSize = (src0.GetSize() + src1.GetSize()) * 32;
-#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
+#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
     (__NPU_ARCH__ == 3113)
     uint32_t expectedTmpBufferSize = 0;
 #else

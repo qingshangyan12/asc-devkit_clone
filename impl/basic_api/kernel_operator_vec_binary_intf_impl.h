@@ -36,7 +36,7 @@
 #include "dav_m300/kernel_operator_vec_binary_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_binary_impl.h"
-#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_binary_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_binary_impl.h"
@@ -355,7 +355,7 @@ __aicore__ inline void Mul(
  * @param [in] intriParams.src0RepStride src0 repeat stride
  * @param [in] intriParams.src1RepStride src1 repeat stride
  */
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 template <typename T, bool isSetMask, const DivConfig& config>
 __aicore__ inline void Div(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, uint64_t mask[],
@@ -453,7 +453,7 @@ __aicore__ inline void Div(
  * @param [in] src1 input LocalTensor
  * @param [in] count number Number of data involved in calculation
  */
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 template <typename T, const DivConfig& config>
 __aicore__ inline void Div(
     const LocalTensor<T>& dst, const LocalTensor<T>& src0, const LocalTensor<T>& src1, const int32_t& count)
@@ -983,7 +983,7 @@ __aicore__ inline void Or(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 /* **************************************************************************************************
  * ShiftLeft                                             *
@@ -1708,7 +1708,7 @@ __aicore__ inline void SubRelu(
         (__ubuf__ PrimType*)src1.GetPhyAddr(), count);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
                               (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
 /* **************************************************************************************************
  * Prelu                                             *
@@ -1839,7 +1839,7 @@ __aicore__ inline void ExpSub(
     ASCENDC_ASSERT((count <= src0.GetSize() && count <= src1.GetSize() && count <= dst.GetSize()), {
         KERNEL_LOG(KERNEL_ERROR, "count is %u, which should not larger than tensor size of dst / src0 / src1", count);
     });
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
     static_assert(
         SupportType<Tuple<DstPrimType, SrcPrimType>, Tuple<float, half>, Tuple<float, float>>(),
         "Failed to check dtype in "

@@ -34,7 +34,7 @@
 #include "dav_c220/kernel_operator_vec_brcb_impl.h"
 #elif __NPU_ARCH__ == 3002
 #include "dav_m300/kernel_operator_vec_brcb_impl.h"
-#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_brcb_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_brcb_impl.h"

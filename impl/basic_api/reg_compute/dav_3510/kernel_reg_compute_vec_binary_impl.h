@@ -1748,7 +1748,6 @@ __simd_callee__ inline void ShiftLeftImpl(S& dstReg, S& srcReg0, V& srcReg1, Mas
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ShiftLeft api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-#if __NPU_ARCH__ == 3510
     if constexpr (sizeof(ActualT) != 8) {
         vshl(dstReg, srcReg0, srcReg1, mask, modeValue);
     } else {
@@ -1767,29 +1766,6 @@ __simd_callee__ inline void ShiftLeftImpl(S& dstReg, S& srcReg0, V& srcReg1, Mas
             dstReg = dstTemp;
         }
     }
-#else
-    if constexpr (sizeof(ActualT) == 8) {
-        if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-            vshl(dstReg, srcReg0, (RegTensor<uint32_t>&)srcReg1, mask, modeValue);
-        } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            RegTensor<int32_t> tmpSrcReg0, tmpSrcReg1;
-            RegTensor<uint32_t> tmpSrcReg2, tmpSrcReg3;
-            vintlv(tmpSrcReg0, tmpSrcReg1, (RegTensor<int32_t>&)srcReg0.reg[0], (RegTensor<int32_t>&)srcReg0.reg[1]);
-            vdup(tmpSrcReg2, 0, mask, MODE_ZEROING);
-            vintlv(tmpSrcReg3, tmpSrcReg2, (RegTensor<uint32_t>&)srcReg1, tmpSrcReg2);
-            MaskReg maskTrait2Tmp0, maskTrait2Tmp1;
-            pintlv_b32(maskTrait2Tmp0, maskTrait2Tmp1, mask, mask);
-            vshl(dstReg.reg[0], (RegTensor<ActualT>&)tmpSrcReg0, tmpSrcReg3, maskTrait2Tmp0, modeValue);
-            vshl(dstReg.reg[1], (RegTensor<ActualT>&)tmpSrcReg1, tmpSrcReg2, maskTrait2Tmp1, modeValue);
-            vdintlv(
-                (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)dstReg.reg[1],
-                (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)dstReg.reg[1]);
-        }
-    } else {
-        using InstrShiftT = std::make_unsigned_t<ActualU>;
-        vshl(dstReg, srcReg0, (RegTensor<InstrShiftT>&)srcReg1, mask, modeValue);
-    }
-#endif
 }
 
 template <typename T = int32_t, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U, typename S>
@@ -1845,7 +1821,6 @@ __simd_callee__ inline void ShiftRightImpl(S& dstReg, S& srcReg0, V& srcReg1, Ma
         SupportEnum<mode, MaskMergeMode::ZEROING>(),
         "current ShiftRight api only supported Mode ZEROING on current device!");
     constexpr auto modeValue = GetMaskMergeMode<mode>();
-#if __NPU_ARCH__ == 3510
     if constexpr (sizeof(ActualT) != 8) {
         vshr(dstReg, srcReg0, srcReg1, mask, modeValue);
     } else {
@@ -1864,29 +1839,6 @@ __simd_callee__ inline void ShiftRightImpl(S& dstReg, S& srcReg0, V& srcReg1, Ma
             dstReg = dstTemp;
         }
     }
-#else
-    if constexpr (sizeof(ActualT) == 8) {
-        if constexpr (CheckRegTrait<S, RegTraitNumOne>()) {
-            vshr(dstReg, srcReg0, (RegTensor<uint32_t>&)srcReg1, mask, modeValue);
-        } else if constexpr (CheckRegTrait<S, RegTraitNumTwo>()) {
-            RegTensor<int32_t> tmpSrcReg0, tmpSrcReg1;
-            RegTensor<uint32_t> tmpSrcReg2, tmpSrcReg3;
-            vintlv(tmpSrcReg0, tmpSrcReg1, (RegTensor<int32_t>&)srcReg0.reg[0], (RegTensor<int32_t>&)srcReg0.reg[1]);
-            vdup(tmpSrcReg2, 0, mask, MODE_ZEROING);
-            vintlv(tmpSrcReg3, tmpSrcReg2, (RegTensor<uint32_t>&)srcReg1, tmpSrcReg2);
-            MaskReg maskTrait2Tmp0, maskTrait2Tmp1;
-            pintlv_b32(maskTrait2Tmp0, maskTrait2Tmp1, mask, mask);
-            vshr(dstReg.reg[0], (RegTensor<ActualT>&)tmpSrcReg0, tmpSrcReg3, maskTrait2Tmp0, modeValue);
-            vshr(dstReg.reg[1], (RegTensor<ActualT>&)tmpSrcReg1, tmpSrcReg2, maskTrait2Tmp1, modeValue);
-            vdintlv(
-                (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)dstReg.reg[1],
-                (RegTensor<int32_t>&)dstReg.reg[0], (RegTensor<int32_t>&)dstReg.reg[1]);
-        }
-    } else {
-        using InstrShiftT = std::make_unsigned_t<ActualU>;
-        vshr(dstReg, srcReg0, (RegTensor<InstrShiftT>&)srcReg1, mask, modeValue);
-    }
-#endif
 }
 
 template <MaskMergeMode mode = MaskMergeMode::ZEROING, typename T>

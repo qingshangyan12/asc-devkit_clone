@@ -33,7 +33,7 @@
 #include "dav_m300/kernel_operator_vec_scatter_impl.h"
 #elif __NPU_ARCH__ == 3102
 #include "dav_m310/kernel_operator_vec_scatter_impl.h"
-#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+#elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_scatter_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_scatter_impl.h"
@@ -49,7 +49,7 @@ template <typename T>
 __aicore__ inline void ScatterCheck()
 {
     using PrimType = PrimT<T>;
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     ASCENDC_ASSERT(
         (SupportType<
             PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t, uint64_t,
@@ -158,7 +158,7 @@ __aicore__ inline void Scatter(
     using PrimType = PrimT<T>;
     ScatterCheck<T>();
     uint32_t vectorRegWidth = 256;
-#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
     ScatterImpl(
         (__ubuf__ PrimType*)dst.GetPhyAddr(), (__ubuf__ PrimType*)src.GetPhyAddr(),
         (__ubuf__ uint32_t*)dstOffset.GetPhyAddr(), dstBaseAddr, count);
