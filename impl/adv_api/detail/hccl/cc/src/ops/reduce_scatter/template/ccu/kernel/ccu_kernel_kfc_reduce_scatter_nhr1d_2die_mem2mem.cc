@@ -163,8 +163,8 @@ CcuResult DoRepeatWriteReduceSlices(
 // 只发射单个 slice 的 WriteReduce/占位 EventRecord，不等待；事件位 = 1 << sliceSeq。
 // 流水路径由调用方在步末统一 EventWait；串行路径不经过此函数。
 CcuResult IssueReduceSlice2Die(
-    KfcReduceScatterNhr2DieContext& ctx, const ChannelHandle& sendChannel, const ccu::LocalAddr& src,
-    const ccu::RemoteAddr& dst, const ccu::Variable& sliceSize, uint32_t sliceSeq)
+    KfcReduceScatterNhr2DieContext& ctx, const ChannelHandle& sendChannel, ccu::LocalAddr& src, ccu::RemoteAddr& dst,
+    ccu::Variable& sliceSize, uint32_t sliceSeq)
 {
     CCU_IF(sliceSize != 0)
     {
