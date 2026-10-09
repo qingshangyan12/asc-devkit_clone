@@ -12,7 +12,7 @@ Tensor API将Trait（编译期特性）和可选Params（运行时参数）组�
 
 ### copy_traits
 
-`copy_traits`用于描述数据搬运Operation、Trait以及绑定运行时参数后形成的类型组合。`copy_traits`的基础结构定义如下：
+Trait用于在编译期配置搬运通路的静态特性（如L0C到GM搬运的舍入模式、是否使能随路Relu等），使同一`copy`调用形式能够适配不同通路的配置差异。`copy_traits`用于描述数据搬运Operation、Trait以及绑定运行时参数后形成的类型组合。`copy_traits`的基础结构定义如下：
 
 ```cpp
 template <typename CopyOperation, typename... CopyOpArgs>
@@ -70,7 +70,7 @@ struct copy_traits<copy_gm_to_l1> : public copy_traits<copy_gm_to_l1, gm_to_l1_t
 
 ### copy_atom
 
-`copy_atom`是数据搬运的原子对象，其定义如下：
+`copy_atom`是数据搬运的原子对象，封装了特定搬运通路的Operation、Trait与可选运行时Params的组合。将通路信息组合进原子对象后，所有搬运通路都可以通过统一的`copy(atom, dst, src)`入口执行，无需为每条通路记忆不同的接口形式。`copy_atom`通常不直接构造，而是通过`make_copy`接口构造：`make_copy(operation)`使用通路默认Trait，`make_copy(operation, trait)`显式指定Trait；构造出的对象还可通过`.with(params)`绑定运行时参数。其定义如下：
 
 ```cpp
 template <typename... Args>

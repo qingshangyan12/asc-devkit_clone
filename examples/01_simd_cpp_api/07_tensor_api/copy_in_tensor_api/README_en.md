@@ -32,7 +32,7 @@ This example implements dynamic shape matrix multiplication with Bias based on t
 
   1. Dynamic Matmul Functionality
 
-  This example implements multi-core Matmul functionality. Shape parameters (M, N, K, singleCoreM, singleCoreN, singleCoreK) are dynamically passed to the kernel at runtime through the MatmulTiling structure. baseM, baseN, baseK and stepM, stepN, stepK serve as compile-time template parameters, determining the allocation size of L0/L1 level buffers.
+  This example implements multi-core Matmul functionality. Shape parameters (M, N, K, single_core_m, single_core_n, single_core_k) are dynamically passed to the kernel at runtime through the MatmulTiling structure. base_m, base_n, base_k and step_m, step_n, step_k serve as compile-time template parameters, determining the allocation size of L0/L1 level buffers.
 
   2. Bias Functionality
 
@@ -61,9 +61,9 @@ This example implements dynamic shape matrix multiplication with Bias based on t
       int32_t m;            // Number of rows of matrix A
       int32_t n;            // Number of columns of matrix B
       int32_t k;            // Number of columns of matrix A / number of rows of matrix B
-      int32_t singleCoreM;  // M dimension size processed per core
-      int32_t singleCoreN;  // N dimension size processed per core
-      int32_t singleCoreK;  // K dimension size processed per core
+      int32_t single_core_m;  // M dimension size processed per core
+      int32_t single_core_n;  // N dimension size processed per core
+      int32_t single_core_k;  // K dimension size processed per core
   };
   ```
 
@@ -130,12 +130,12 @@ This example implements dynamic shape matrix multiplication with Bias based on t
 
   | Parameter | Default | Description |
   | :------ | :----- | :----------------------- |
-  | BASE_M  | 128    | M dimension base block size |
-  | BASE_N  | 128    | N dimension base block size |
-  | BASE_K  | 64     | K dimension base block size |
-  | STEP_M  | 1      | M dimension L1 cache step |
-  | STEP_N  | 1      | N dimension L1 cache step |
-  | STEP_K  | 4      | K dimension L1 cache step |
+  | base_m  | 128    | M dimension base block size |
+  | base_n  | 128    | N dimension base block size |
+  | base_k  | 64     | K dimension base block size |
+  | step_m  | 1      | M dimension L1 cache step |
+  | step_n  | 1      | N dimension L1 cache step |
+  | step_k  | 4      | K dimension L1 cache step |
 
   Runtime dynamic parameter default values:
 
@@ -144,9 +144,9 @@ This example implements dynamic shape matrix multiplication with Bias based on t
   | m            | 1024   | Number of rows of matrix A |
   | n            | 1024   | Number of columns of matrix B |
   | k            | 256    | Number of columns of matrix A / number of rows of matrix B |
-  | singleCoreM  | 256    | Per-core M dimension size |
-  | singleCoreN  | 128    | Per-core N dimension size |
-  | singleCoreK  | 256    | Per-core K dimension size |
+  | single_core_m  | 256    | Per-core M dimension size |
+  | single_core_n  | 128    | Per-core N dimension size |
+  | single_core_k  | 256    | Per-core K dimension size |
 
 ## Build and Run
 

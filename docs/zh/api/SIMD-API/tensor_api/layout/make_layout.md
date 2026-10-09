@@ -59,7 +59,7 @@ __aicore__ inline constexpr auto make_layout(const Shape& shape)
 | 参数名称 | 输入/输出 | 描述 |
 | :------- | :-------- | :--- |
 | shape | 输入 | 描述逻辑形状的元组对象，可由[make_shape](./make_shape.md)构造。 |
-| stride | 输入 | 描述各维步长的元组对象，可由[make_stride](./make_stride.md)构造。 |
+| stride | 输入 | 描述各维步长的元组对象，可由[make_stride](./make_stride.md)构造。步长单位为元素，即同维度相邻元素在内存中的间隔，详见[stride](./stride.md)。 |
 
 ## 返回值说明
 

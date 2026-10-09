@@ -38,7 +38,7 @@ $$
 C = (\text{ScaleA} \otimes A) \times (\text{ScaleB} \otimes B)
 $$
 
-In MxMatmul, every 32 elements along the K direction share one scale. That is, the number of scales is much fewer than matrix elements, but it broadcasts along the K direction to the corresponding group of MxFP4 data, as shown in the figure:
+In MxMatmul, every 32 elements along the k direction share one scale. That is, the number of scales is much fewer than matrix elements, but it broadcasts along the k direction to the corresponding group of MxFP4 data, as shown in the figure:
 
   <img src="figures/MxMatmul.png"  width="80%">
 
@@ -50,21 +50,21 @@ This example implements a fixed shape `8192 x 8192 x 8192` MxFP4 Matmul, with ou
 
 | Input/Output | Logical Shape | Data Type | Data Layout Type | Description |
 |------|------|----------|------|------|
-| A | `[M, K]` | `fp4x2_e1m2_t` | ND | Left matrix, 2 fp4 elements packed per byte |
-| ScaleA | `[M, scaleK]` | `fp8_e8m0_t` | ND | Scaling factor for A matrix, every 32 elements along K direction share one scale |
-| B | `[N, K]` | `fp4x2_e1m2_t` | DN | Right matrix, input to kernel in `[N, K]` form |
-| ScaleB | `[N, scaleK]` | `fp8_e8m0_t` | DN | Scaling factor for B matrix, every 32 elements along K direction share one scale |
-| C | `[M, N]` | `bfloat16_t` | ND | Output matrix |
+| A | `[m, k]` | `fp4x2_e1m2_t` | ND | Left matrix, 2 fp4 elements packed per byte |
+| ScaleA | `[m, scale_k]` | `fp8_e8m0_t` | ND | Scaling factor for A matrix, every 32 elements along k direction share one scale |
+| B | `[n, k]` | `fp4x2_e1m2_t` | DN | Right matrix, input to kernel in `[n, k]` form |
+| ScaleB | `[n, scale_k]` | `fp8_e8m0_t` | DN | Scaling factor for B matrix, every 32 elements along k direction share one scale |
+| C | `[m, n]` | `bfloat16_t` | ND | Output matrix |
 
 Where:
 
-- Two `fp4x2_e1m2_t` are packed and stored in one byte, so when data type is `fp4`, K must be even
-- `scaleK = align_even(ceil(K / 32))`, meaning first ceil then align to a multiple of 2. Due to hardware constraints requiring scale data to satisfy 2Byte continuous alignment along K direction, scaleK must be even
-- Due to hardware constraints, when ScaleB matrix is input as `[scaleK, N]`, K direction 2 Byte continuity is required, so ScaleB input as `[N, scaleK]` is recommended
+- Two `fp4x2_e1m2_t` are packed and stored in one byte, so when data type is `fp4`, k must be even
+- `scale_k = align_even(ceil(k / 32))`, meaning first ceil then align to a multiple of 2. Due to hardware constraints requiring scale data to satisfy 2Byte continuous alignment along k direction, scale_k must be even
+- Due to hardware constraints, when ScaleB matrix is input as `[scale_k, n]`, k direction 2 Byte continuity is required, so ScaleB input as `[n, scale_k]` is recommended
 
 #### Four-Way Input Description
 
-Compared to standard Matmul, MxMatmul has additional scale transfer, loading, and computation paths in the kernel. A/B and ScaleA/ScaleB must enter the computation pipeline at the same K block pace, otherwise the Cube side cannot obtain matching scaling information.
+Compared to standard Matmul, MxMatmul has additional scale transfer, loading, and computation paths in the kernel. A/B and ScaleA/ScaleB must enter the computation pipeline at the same k block pace, otherwise the Cube side cannot obtain matching scaling information.
 
 - Four-way input data layout format is shown below:
 
@@ -78,24 +78,24 @@ Compared to standard Matmul, MxMatmul has additional scale transfer, loading, an
 
 | Parameter | Value | Description |
 |------|----|------|
-| `M` | `8192` | Matrix M dimension size |
-| `N` | `8192` | Matrix N dimension size |
-| `K` | `8192` | Matrix K dimension size |
-| `baseM` | `256` | Cube computation basic block M dimension size |
-| `baseK` | `256` | Cube computation basic block K dimension size |
-| `baseN` | `256` | Cube computation basic block N dimension size |
-| `singleCoreM` | `2048` | Single core M direction computation range |
-| `singleCoreN` | `1024` | Single core N direction computation range |
-| `singleCoreK` | `8192` | Single core K direction computation range |
-| `stepK` | `2` | GM->L1 transfer, A/B K direction large packet transfer step |
-| `scaleFactorK` | `4` | GM->L1 transfer, ScaleA/ScaleB relative to A/B K direction transfer ratio |
+| `m` | `8192` | Matrix m dimension size |
+| `n` | `8192` | Matrix n dimension size |
+| `k` | `8192` | Matrix k dimension size |
+| `base_m` | `256` | Cube computation basic block m dimension size |
+| `base_k` | `256` | Cube computation basic block k dimension size |
+| `base_n` | `256` | Cube computation basic block n dimension size |
+| `single_core_m` | `2048` | Single core m direction computation range |
+| `single_core_n` | `1024` | Single core n direction computation range |
+| `single_core_k` | `8192` | Single core k direction computation range |
+| `step_k` | `2` | GM->L1 transfer, A/B k direction large packet transfer step |
+| `scale_factor_k` | `4` | GM->L1 transfer, ScaleA/ScaleB relative to A/B k direction transfer ratio |
 | `Block Num` | `32` | Number of cores used |
 
-> **Constraint Description**: This example currently does not support scenarios with K direction tail blocks, requiring `K` to be divisible by `baseK`.
+> **Constraint Description**: This example currently does not support scenarios with k direction tail blocks, requiring `k` to be divisible by `base_k`.
 
 ## Example Implementation
 
-The entire kernel process is: after multi-core splitting, each core is responsible for one singleCoreM * singleCoreN sub-matrix, looping in M/N directions to transfer A/B and ScaleA/ScaleB into L1, then looping in K direction to load into L0A/L0B and L0ScaleA/L0ScaleB, completing Cube accumulation computation, and finally writing results back to GM.
+The entire kernel process is: after multi-core splitting, each core is responsible for one single_core_m * single_core_n sub-matrix, looping in m/n directions to transfer A/B and ScaleA/ScaleB into L1, then looping in k direction to load into L0A/L0B and L0ScaleA/L0ScaleB, completing Cube accumulation computation, and finally writing results back to GM.
 
 ### Data Flow Path
 
@@ -113,7 +113,7 @@ Physical Address                               Pipeline
   v
   L0A / L0B / L0ScaleA / L0ScaleB
   |
-  |  mmad                              M
+  |  mmad                              m
   v
   L0C
   |
@@ -124,23 +124,23 @@ Physical Address                               Pipeline
 
 #### 1. Multi-Core Splitting: Splitting the Large Matrix into 32 Sub-Tasks
 
-The example uses 32 cores in parallel. `M=8192` is split into 4 parts by `singleCoreM=2048`, `N=8192` is split into 8 parts by `singleCoreN=1024`, forming exactly `4 x 8 = 32` sub-matrices.
+The example uses 32 cores in parallel. `m=8192` is split into 4 parts by `single_core_m=2048`, `n=8192` is split into 8 parts by `single_core_n=1024`, forming exactly `4 x 8 = 32` sub-matrices.
 
 ```text
-M direction: 8192 / 2048 = 4 blocks
-N direction: 8192 / 1024 = 8 blocks
+m direction: 8192 / 2048 = 4 blocks
+n direction: 8192 / 1024 = 8 blocks
 
 Total blocks = 4 * 8 = 32
 ```
 
-Each core only processes its assigned `2048 x 1024` output region. Within the core, `baseK=256` blocks loop in the K direction to complete accumulation.
+Each core only processes its assigned `2048 x 1024` output region. Within the core, `base_k=256` blocks loop in the k direction to complete accumulation.
 
 The corresponding core index computation is:
 
 ```cpp
-constexpr uint32_t mIter = AscendC::Std::ceil_div(M, singleCoreM);
-uint32_t mIterIdx = block_idx % mIter;
-uint32_t nIterIdx = block_idx / mIter;
+constexpr uint32_t m_iter = AscendC::Std::ceil_div(m, single_core_m);
+uint32_t m_iter_idx = block_idx % m_iter;
+uint32_t n_iter_idx = block_idx / m_iter;
 ```
 
 #### 2. GM to L1: Matrix and Scale Entering Pipeline Together
@@ -149,25 +149,25 @@ MxMatmul input is not two-way but four-way: A, B, ScaleA, ScaleB. Therefore each
 
 | Data | Transfer Function | GM Data Shape | L1 Data Shape |
 |------|----------|-----------|---------|
-| A | `copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
-| B | `copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
-| ScaleA | `copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
-| ScaleB | `copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseSK]` |
+| A | `copy` | `[single_core_m, single_core_k]` | `[base_m, step_k * base_k]` |
+| B | `copy` | `[single_core_n, single_core_k]` | `[base_n, step_k * base_k]` |
+| ScaleA | `copy` | `[single_core_m, singleCoreSK]` | `[base_m, scale_factor_k * step_k * baseSK]` |
+| ScaleB | `copy` | `[single_core_n, singleCoreSK]` | `[base_n, scale_factor_k * step_k * baseSK]` |
 
-Through `stepK=2`, transfer `stepK * baseM * baseK` A matrix data and `stepK * baseN * baseK` B matrix data at once, reducing transfer instruction count and improving GM to L1 transfer efficiency.
+Through `step_k=2`, transfer `step_k * base_m * base_k` A matrix data and `step_k * base_n * base_k` B matrix data at once, reducing transfer instruction count and improving GM to L1 transfer efficiency.
 
-Scale transfer granularity is controlled by `scaleFactorK=4`, transferring `scaleFactorK * stepK * baseM * baseSK` ScaleA matrix data and `scaleFactorK * stepK * baseN * baseSK` ScaleB matrix data at once, where `baseSK = baseK / 32`. Its purpose is to make ScaleA/ScaleB cover a larger range in K direction compared to A/B per transfer, reducing MTE2 pressure from repeated scale transfers.
+Scale transfer granularity is controlled by `scale_factor_k=4`, transferring `scale_factor_k * step_k * base_m * baseSK` ScaleA matrix data and `scale_factor_k * step_k * base_n * baseSK` ScaleB matrix data at once, where `baseSK = base_k / 32`. Its purpose is to make ScaleA/ScaleB cover a larger range in k direction compared to A/B per transfer, reducing MTE2 pressure from repeated scale transfers.
 
-Taking A matrix data transfer as example, `copy` transfers `stepK` K direction base blocks at once, each base block being `baseM * baseK`:
+Taking A matrix data transfer as example, `copy` transfers `step_k` k direction base blocks at once, each base block being `base_m * base_k`:
 
 ```cpp
-asc::te::copy(gm2L1Atom, l1TensorAPing, a.slice(asc::te::make_coord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), asc::te::make_shape(curM, stepCurK)));
+asc::te::copy(gm2l1_atom, l1_tensor_a_ping, a.slice(asc::te::make_coord(m_block_idx * base_m, data_next_k_chunk_idx * base_k), asc::te::make_shape(cur_m, step_cur_k)));
 ```
 
-Taking ScaleA matrix data transfer as example, `copy` transfers `scaleFactorK * stepK` K direction base blocks at once, each base block being `baseM * baseSK` (where `baseSK = align_even(ceil(baseK / 32))`):
+Taking ScaleA matrix data transfer as example, `copy` transfers `scale_factor_k * step_k` k direction base blocks at once, each base block being `base_m * baseSK` (where `baseSK = align_even(ceil(base_k / 32))`):
 
 ```cpp
-asc::te::copy(gm2L1Atom, l1TensorAsPing, as.slice(asc::te::make_coord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), asc::te::make_shape(curM, stepCurScaleK)));
+asc::te::copy(gm2l1_atom, l1_tensor_as_ping, as.slice(asc::te::make_coord(m_block_idx * base_m, scale_next_k_chunk_idx * base_scale_k), asc::te::make_shape(cur_m, step_cur_scale_k)));
 ```
 
 #### 3. L1 to L0 Entering MX Computation Path
@@ -176,16 +176,16 @@ Standard Matmul only needs to load A/B; MxMatmul also needs to load correspondin
 
 After A/B and ScaleA/ScaleB enter L0, the Cube computation unit can complete scaled matrix multiplication accumulation according to MX semantics.
 
-Taking A matrix data transfer as example, `copy` transfers 1 base block of `baseM * baseK` size at once:
+Taking A matrix data transfer as example, `copy` transfers 1 base block of `base_m * base_k` size at once:
 
 ```cpp
-asc::te::copy(l12l0AAtom, l0TensorA, l1ReadBufA.slice(asc::te::make_coord(0, kOffsetInDataChunk * baseK), asc::te::make_shape(curM, curK)));
+asc::te::copy(l12l0a_atom, l0_tensor_a, l1_read_buf_a.slice(asc::te::make_coord(0, k_offset_in_data_chunk * base_k), asc::te::make_shape(cur_m, cur_k)));
 ```
 
-Taking ScaleA matrix data transfer as example, `copy` transfers 1 base block of `baseM * baseSK` size at once:
+Taking ScaleA matrix data transfer as example, `copy` transfers 1 base block of `base_m * baseSK` size at once:
 
 ```cpp
-asc::te::copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.slice(asc::te::make_coord(0, kOffsetInScaleChunk * baseScaleK), asc::te::make_shape(curM, curScaleK)));
+asc::te::copy(l12l0scalea_atom, l0_tensor_as, l1_read_buf_as.slice(asc::te::make_coord(0, k_offset_in_scale_chunk * base_scale_k), asc::te::make_shape(cur_m, cur_scale_k)));
 ```
 
 #### 4. L0 Double Buffering: Overlapping Loading and Computation
@@ -200,8 +200,8 @@ The main buffer layout of this example is:
 | L1 | `B Ping/Pong` | B large packet data | Stores GM->L1 B data |
 | L1 | `ScaleA Ping/Pong` | Scale data corresponding to A | Stores A side MXScale |
 | L1 | `ScaleB Ping/Pong` | Scale data corresponding to B | Stores B side MXScale |
-| L0A | `A Ping/Pong` | Current K block A data | Cube `mmad` left operand |
-| L0B | `B Ping/Pong` | Current K block B data | Cube `mmad` right operand |
+| L0A | `A Ping/Pong` | Current k block A data | Cube `mmad` left operand |
+| L0B | `B Ping/Pong` | Current k block B data | Cube `mmad` right operand |
 | L0C | `C` | float accumulation result | `mmad` output, for write-back to GM |
 
 A simplified pipeline rhythm is:
@@ -217,32 +217,32 @@ L0C->GM                                                           | copy L0C to 
 
 The horizontal line lengths in the figure only express that different stages may have different durations and do not represent measured ratios; actual durations require `msopprof` collection results.
 
-In the K loop, when the current K block enters Cube computation, the next batch of A/B/ScaleA/ScaleB can initiate transfer in advance. Ping and Pong alternate, with producers and consumers confirming buffer writability and data readability through event synchronization.
+In the k loop, when the current k block enters Cube computation, the next batch of A/B/ScaleA/ScaleB can initiate transfer in advance. Ping and Pong alternate, with producers and consumers confirming buffer writability and data readability through event synchronization.
 
-#### 5. Cube Computation: Accumulation by K Block
+#### 5. Cube Computation: Accumulation by k Block
 
-Each output sub-matrix loops in the K direction at the innermost level. Each round processes one `baseK=256` K block, then loops in M/N directions:
+Each output sub-matrix loops in the k direction at the innermost level. Each round processes one `base_k=256` k block, then loops in m/n directions:
 
 ```text
-for nBlock in N blocks:
-  for mBlock in M blocks:
-    for kBlock in K blocks:
+for nBlock in n blocks:
+  for mBlock in m blocks:
+    for kBlock in k blocks:
         copy(A block, ScaleA block)
         copy(B block, ScaleB block)
         mmad accumulate
 ```
 
-`mmad` input comes from L0A/L0B, output accumulates to L0C. The first K block initializes the accumulation result, subsequent K blocks continue accumulating until the complete K direction computation is finished.
+`mmad` input comes from L0A/L0B, output accumulates to L0C. The first k block initializes the accumulation result, subsequent k blocks continue accumulating until the complete k direction computation is finished.
 
 Key parameters in the computation stage include `m/n/k` dimensions and whether to initialize the C matrix:
 
 ```cpp
-asc::te::mmad_params mmadParams{curM, curN, curK, asc::te::unit_flag_mode::disable, true};
-mmadParams.init_with_zero = (kBlockIdx == 0);
-asc::te::mmad(mmadAtom.with(mmadParams), l0TensorC, l0TensorA, l0TensorB);
+asc::te::mmad_params mmad_params{cur_m, cur_n, cur_k, asc::te::unit_flag_mode::disable, true};
+mmad_params.init_with_zero = (k_block_idx == 0);
+asc::te::mmad(mmad_atom.with(mmad_params), l0_tensor_c, l0_tensor_a, l0_tensor_b);
 ```
 
-Where `init_with_zero` controls the first K block to initialize the accumulation result, and subsequent K blocks continue accumulating on existing L0C data.
+Where `init_with_zero` controls the first k block to initialize the accumulation result, and subsequent k blocks continue accumulating on existing L0C data.
 
 #### 6. L0C Write-Back to GM: Converting from float to bfloat16 Output
 
@@ -253,12 +253,12 @@ L0C float result
       |
       | copy, F32 -> BF16
       v
-GM C [M, N]
+GM C [m, n]
 ```
 
 ```cpp
-asc::te::l0c_to_gm_params fixpipeParams;
-asc::te::copy(l0c2GmAtom.with(fixpipeParams), c.slice(asc::te::make_coord(mBlockIdx * baseM, nBlockIdx * baseN), asc::te::make_shape(curM, curN)), l0TensorC);
+asc::te::l0c_to_gm_params fixpipe_params;
+asc::te::copy(l0c2gm_atom.with(fixpipe_params), c.slice(asc::te::make_coord(m_block_idx * base_m, n_block_idx * base_n), asc::te::make_shape(cur_m, cur_n)), l0_tensor_c);
 ```
 
 ### Pipeline Synchronization
@@ -277,17 +277,17 @@ A/B data have the same lifecycle, so they share slots by Ping/Pong phase. ScaleA
 Large-packet synchronization locks a buffer for reading at the start of the packet and releases it after the last element is consumed:
 
 ```cpp
-if (kOffsetInDataChunk == 0) {
-    asc_lock(PIPE_MTE1, GetDataSlot(dataReadIdx));
+if (k_offset_in_data_chunk == 0) {
+    asc_lock(PIPE_MTE1, get_data_slot(data_read_idx));
 }
-if (((kOffsetInDataChunk + 1) == dataChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, GetDataSlot(dataReadIdx));
+if (((k_offset_in_data_chunk + 1) == data_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
+    asc_unlock(PIPE_MTE1, get_data_slot(data_read_idx));
 }
-if (kOffsetInScaleChunk == 0) {
-    asc_lock(PIPE_MTE1, GetScaleSlot(scaleReadIdx));
+if (k_offset_in_scale_chunk == 0) {
+    asc_lock(PIPE_MTE1, get_scale_slot(scale_read_idx));
 }
-if (((kOffsetInScaleChunk + 1) == scaleChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, GetScaleSlot(scaleReadIdx));
+if (((k_offset_in_scale_chunk + 1) == scale_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
+    asc_unlock(PIPE_MTE1, get_scale_slot(scale_read_idx));
 }
 ```
 
@@ -316,7 +316,7 @@ Reverse events are also important. For example, `MTE1_MTE2` indicates that a Pin
 The performance optimization of this example revolves around three things:
 
 - **Multi-core splitting**: Split the `8192 x 8192` output matrix across 32 cores for parallel computation.
-- **Large packet transfer**: A/B transfer by multiple K blocks, ScaleA/ScaleB transfer with larger K coverage range, reducing MTE2 instruction and data transfer pressure.
+- **Large packet transfer**: A/B transfer by multiple k blocks, ScaleA/ScaleB transfer with larger k coverage range, reducing MTE2 instruction and data transfer pressure.
 - **Double buffer pipeline**: Both L1 and L0 use Ping-Pong, allowing MTE2, MTE1, CUBE, and FIXPIPE pipelines to overlap execution as much as possible.
 
 ## Theoretical Performance Comparison
@@ -353,7 +353,7 @@ The performance data of this example was obtained running on Ascend 950PR, which
 
 Cube theoretical computation time $T_{cube}$ is:
 
-$$T_{cube} = \frac{M \times N \times K}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{core count}} = \frac{8192 \times 8192 \times 8192}{16384 \times 1.65 \times 10^9 \times 32} = 635.5 μs$$
+$$T_{cube} = \frac{m \times n \times k}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{core count}} = \frac{8192 \times 8192 \times 8192}{16384 \times 1.65 \times 10^9 \times 32} = 635.5 μs$$
 
 From the table, `aic_mac_time` is `640.591 μs`, relative to theoretical value `635.5 μs`, error $E_{cube}$ is:
 
@@ -365,13 +365,13 @@ $$E_{cube} = \frac{T_{actual} - T_{cube}}{T_{cube}} = \frac{640.591 - 635.5}{635
 
 In matrix multiplication, each element $C_{i,j}$ of the output matrix C requires row i of A and column j of B to participate in computation. During block computation, the same input data block is reused by multiple output blocks:
 
-- A matrix is split into `M/baseM` row blocks along M direction, each A row block participates in `N/baseN` output blocks along N direction
-- B matrix is split into `N/baseN` column blocks along N direction, each B column block participates in `M/baseM` output blocks along M direction
+- A matrix is split into `m/base_m` row blocks along m direction, each A row block participates in `n/base_n` output blocks along n direction
+- B matrix is split into `n/base_n` column blocks along n direction, each B column block participates in `m/base_m` output blocks along m direction
 
-MxFP4 Matmul also includes two ScaleA/ScaleB inputs, with every 32 elements along K direction sharing one scale, so `scaleK = K/32`:
+MxFP4 Matmul also includes two ScaleA/ScaleB inputs, with every 32 elements along k direction sharing one scale, so `scale_k = k/32`:
 
-- ScaleA shape `[M, scaleK]`, split into `M/baseM` row blocks along M direction, each ScaleA row block participates in `N/baseN` output blocks along N direction
-- ScaleB shape `[N, scaleK]`, split into `N/baseN` column blocks along N direction, each ScaleB column block participates in `M/baseM` output blocks along M direction
+- ScaleA shape `[m, scale_k]`, split into `m/base_m` row blocks along m direction, each ScaleA row block participates in `n/base_n` output blocks along n direction
+- ScaleB shape `[n, scale_k]`, split into `n/base_n` column blocks along n direction, each ScaleB column block participates in `m/base_m` output blocks along m direction
 
 Due to limited L1/L2Cache capacity, not all input data can be cached, and the same data block is transferred from HBM to L2Cache/L1 multiple times, causing repeated data transfers.
 
@@ -379,11 +379,11 @@ Due to limited L1/L2Cache capacity, not all input data can be cached, and the sa
 
 MxFP4 Matmul input includes four-way data: A, B, ScaleA, ScaleB. A/B matrices use `fp4x2_e1m2_t`, with every 2 fp4 elements packed as 1 byte, single element `sizeof = 0.5B`; ScaleA/ScaleB use `fp8_e8m0_t`, single element `sizeof = 1B`.
 
-This example parameters `M=N=K=8192`, `scaleK=256`, block parameters `baseM=baseN=256`.
+This example parameters `m=n=k=8192`, `scale_k=256`, block parameters `base_m=base_n=256`.
 
 Total read data volume $D_{total}$ is:
 
-$$D_{total} = \frac{N}{baseN} \times M \times K \times 0.5B + \frac{M}{baseM} \times K \times N \times 0.5B + \frac{N}{baseN} \times M \times scaleK \times 1B + \frac{M}{baseM} \times scaleK \times N \times 1B$$
+$$D_{total} = \frac{n}{base_n} \times m \times k \times 0.5B + \frac{m}{base_m} \times k \times n \times 0.5B + \frac{n}{base_n} \times m \times scale_k \times 1B + \frac{m}{base_m} \times scale_k \times n \times 1B$$
 
 $$= (32 \times 8192 \times 8192 \times 0.5 + 32 \times 8192 \times 8192 \times 0.5 + 32 \times 8192 \times 256 \times 1 + 32 \times 256 \times 8192 \times 1) B$$
 
@@ -397,7 +397,7 @@ Ascend 950PR chip: L2Cache peak bandwidth approximately 5TB/s, HBM (correspondin
 
 First HBM read data volume $D_{HBM}$ is:
 
-$$D_{HBM} = M \times K \times 0.5B + K \times N \times 0.5B + M \times scaleK \times 1B + N \times scaleK \times 1B = 32MB + 32MB + 2MB + 2MB = 68MB$$
+$$D_{HBM} = m \times k \times 0.5B + k \times n \times 0.5B + m \times scale_k \times 1B + n \times scale_k \times 1B = 32MB + 32MB + 2MB + 2MB = 68MB$$
 
 L2Cache read data volume $D_{L2Cache}$ is:
 
