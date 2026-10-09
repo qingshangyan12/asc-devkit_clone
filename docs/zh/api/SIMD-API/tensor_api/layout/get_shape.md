@@ -28,7 +28,7 @@
 
 头文件路径为：`tensor_api/tensor.h`。
 
-`get_shape`用于从layout中提取shape部分：
+`get_shape`用于从[layout](./layout.md)（布局对象，描述张量各维形状与步长的结构，其中步长stride描述各维在内存中的间隔，单位为元素个数）中提取shape部分：
 
 - **不指定模板参数Is...**：返回完整的shape元组。
 - **指定模板参数Is...**：从shape顶层tuple中选择对应索引的元素。指定单个索引时返回该元素；指定多个索引时返回由这些顶层元素组成的新tuple。
@@ -47,13 +47,13 @@ __aicore__ inline constexpr auto get_shape(const Layout& layout)
 | 参数名 | 输入/输出 | 描述 |
 | -------- | ----------- | ------ |
 | Is... | 输入 | 可选。用于选择shape顶层tuple中的一个或多个索引。 |
-| Layout | 输入 | layout对象的类型。 |
+| Layout | 输入 | [layout](./layout.md)对象的类型。 |
 
 **表2**  参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | -------- | ----------- | ------ |
-| layout | 输入 | layout对象。 |
+| layout | 输入 | [layout](./layout.md)对象。 |
 
 ## 返回值说明
 

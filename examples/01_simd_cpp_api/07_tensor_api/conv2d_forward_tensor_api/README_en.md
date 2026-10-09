@@ -4,7 +4,7 @@
 
 This sample demonstrates how to implement Conv2D Forward computation using the Tensor API. It shows the complete pipeline: moving the FeatureMap from Global Memory to L1 Buffer, performing spatial unfolding via `copy_l1_to_l0a` (Img2Col), accumulating matrix multiplication with `mmad`, and moving results back to Global Memory via `copy_l0c_to_gm`.
 
-This sample supports three Global Memory input/output data formats (NC1HWC0, NCHW, NHWC), switched via the compile-time parameter `SCENARIO_NUM`. It uses a 3x3 convolution kernel with padding, stride=2, dilation=2, and multiple C1 channel combinations to demonstrate common convolution scenarios and Tensor API usage.
+This sample supports three Global Memory input/output data formats (NC1HWC0, NCHW, NHWC), switched via the compile-time parameter `SCENARIO_NUM`. It uses a 3x3 convolution kernel with padding, stride=2, dilation=2, and multiple c1 channel combinations to demonstrate common convolution scenarios and Tensor API usage.
 
 ## Supported Products and CANN Software Versions
 
@@ -34,13 +34,13 @@ This sample uses the following fixed Conv2D specification. The kernel function n
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">📌 Table 1: Sample Specifications</span></caption>
 <tr><td rowspan="1" align="center">Parameter</td><td align="center">Value</td><td align="center">Description</td></tr>
-<tr><td align="center">FeatureMap</td><td align="center">[N, H, W, C] = [4, 9, 9, 32]</td><td>Global Memory input is half type, layout selected per scenario: NC1HWC0/NCHW/NHWC</td></tr>
-<tr><td align="center">Weight</td><td align="center">[Cout, C, Kh, Kw] = [16, 32, 3, 3]</td><td>Global Memory input is half type, laid out as [K, Cout] in 2D</td></tr>
+<tr><td align="center">FeatureMap</td><td align="center">[n, h, w, C] = [4, 9, 9, 32]</td><td>Global Memory input is half type, layout selected per scenario: NC1HWC0/NCHW/NHWC</td></tr>
+<tr><td align="center">Weight</td><td align="center">[Cout, C, Kh, Kw] = [16, 32, 3, 3]</td><td>Global Memory input is half type, laid out as [k, Cout] in 2D</td></tr>
 <tr><td align="center">Convolution params</td><td align="center">stride = [2, 2], dilation = [2, 2], padding = [2, 2, 2, 2], padValue = 1</td><td>padding order is [top, bottom, left, right]</td></tr>
-<tr><td align="center">Output</td><td align="center">[N, HOut, WOut, Cout] = [4, 5, 5, 16]</td><td>Global Memory output is half type, same format as input</td></tr>
+<tr><td align="center">Output</td><td align="center">[n, HOut, WOut, Cout] = [4, 5, 5, 16]</td><td>Global Memory output is half type, same format as input</td></tr>
 </table>
 
-Here, `C1` and `C0` are the channel split dimensions of the FeatureMap when using the NC1HWC0 layout on the L1 Buffer. `C0` represents the number of elements per channel block, which is 16 in this sample; `C1` represents the number of channel blocks. Since `C = 32`, we have `C1 = C / C0 = 2` and `C0 = 16`.
+Here, `c1` and `c0` are the channel split dimensions of the FeatureMap when using the NC1HWC0 layout on the L1 Buffer. `c0` represents the number of elements per channel block, which is 16 in this sample; `c1` represents the number of channel blocks. Since `C = 32`, we have `c1 = C / c0 = 2` and `c0 = 16`.
 
 The effective kernel size is calculated as:
 
@@ -48,16 +48,16 @@ $$
 K_{\text{effective}} = dilation \times (K_h - 1) + 1 = 2 \times (3 - 1) + 1 = 5
 $$
 
-The output H/W is calculated as:
+The output h/w is calculated as:
 
 $$
 \begin{aligned}
-H_{out} &= \frac{H + pad_{top} + pad_{bottom} - K_{\text{effective}}}{stride_h} + 1 = \frac{9 + 2 + 2 - 5}{2} + 1 = 5 \\
-W_{out} &= \frac{W + pad_{left} + pad_{right} - K_{\text{effective}}}{stride_w} + 1 = \frac{9 + 2 + 2 - 5}{2} + 1 = 5
+H_{out} &= \frac{h + pad_{top} + pad_{bottom} - K_{\text{effective}}}{stride_h} + 1 = \frac{9 + 2 + 2 - 5}{2} + 1 = 5 \\
+W_{out} &= \frac{w + pad_{left} + pad_{right} - K_{\text{effective}}}{stride_w} + 1 = \frac{9 + 2 + 2 - 5}{2} + 1 = 5
 \end{aligned}
 $$
 
-The matrix multiplication specification is `M = HOut * WOut = 25`, `K = C * Kh * Kw = 288`, `N = Cout = 16`.
+The matrix multiplication specification is `m = HOut * WOut = 25`, `k = C * Kh * Kw = 288`, `n = Cout = 16`.
 
 ## Scenario Details
 
@@ -68,23 +68,23 @@ This sample selects different Global Memory data formats via the compile paramet
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">📌 Table 2: Meanings of SCENARIO_NUM Values</span></caption>
 <tr><td rowspan="1" align="center">SCENARIO_NUM</td><td align="center">FeatureMap Input Layout</td><td align="center">Output Layout</td><td align="center">Global Memory → L1 Buffer Conversion</td><td align="center">L0C Buffer → Global Memory Conversion</td></tr>
-<tr><td align="center">0</td><td align="center">NC1HWC0 [1, C1, H, W, C0]</td><td align="center">NC1HWC0 [1, Cout_C1, HOut, WOut, C0]</td><td align="center">NC1HWC0 direct copy</td><td align="center">NC1HWC0 direct copy</td></tr>
-<tr><td align="center">1</td><td align="center">NCHW [1, C, H, W]</td><td align="center">NCHW [1, Cout, HOut, WOut]</td><td align="center">NCHW → NC1HWC0 (dn2nz)</td><td align="center">NC1HWC0 → NCHW (nz2dn)</td></tr>
-<tr><td align="center">2</td><td align="center">NHWC [1, H, W, C]</td><td align="center">NHWC [1, HOut, WOut, Cout]</td><td align="center">NHWC → NC1HWC0 (nd2nz)</td><td align="center">NC1HWC0 → NHWC (nz2nd)</td></tr>
+<tr><td align="center">0</td><td align="center">NC1HWC0 [1, c1, h, w, c0]</td><td align="center">NC1HWC0 [1, Cout_C1, HOut, WOut, c0]</td><td align="center">NC1HWC0 direct copy</td><td align="center">NC1HWC0 direct copy</td></tr>
+<tr><td align="center">1</td><td align="center">NCHW [1, C, h, w]</td><td align="center">NCHW [1, Cout, HOut, WOut]</td><td align="center">NCHW → NC1HWC0 (dn2nz)</td><td align="center">NC1HWC0 → NCHW (nz2dn)</td></tr>
+<tr><td align="center">2</td><td align="center">NHWC [1, h, w, C]</td><td align="center">NHWC [1, HOut, WOut, Cout]</td><td align="center">NHWC → NC1HWC0 (nd2nz)</td><td align="center">NC1HWC0 → NHWC (nz2nd)</td></tr>
 </table>
 
 **Scenario 0: NC1HWC0 Input/Output**
-- Input: FeatureMap [1, 2, 9, 9, 16] half type, NC1HWC0 format; Weight [K, Cout] half type
+- Input: FeatureMap [1, 2, 9, 9, 16] half type, NC1HWC0 format; Weight [k, Cout] half type
 - Output: Output [1, 1, 5, 5, 16] half type, NC1HWC0 format
 - Implementation: Global Memory → L1 Buffer uses `copy_gm_to_l1` to directly copy NC1HWC0 data; L0C Buffer → Global Memory uses `copy_l0c_to_gm` direct copy
 
 **Scenario 1: NCHW Input/Output**
-- Input: FeatureMap [1, 32, 9, 9] half type, NCHW format; Weight [K, Cout] half type
+- Input: FeatureMap [1, 32, 9, 9] half type, NCHW format; Weight [k, Cout] half type
 - Output: Output [1, 16, 5, 5] half type, NCHW format
 - Implementation: Global Memory → L1 Buffer uses `copy_gm_to_l1` to convert NCHW to NC1HWC0 on the fly (dn2nz); L0C Buffer → Global Memory uses `copy_l0c_to_gm` to convert NC1HWC0 to NCHW (nz2dn)
 
 **Scenario 2: NHWC Input/Output**
-- Input: FeatureMap [1, 9, 9, 32] half type, NHWC format; Weight [K, Cout] half type
+- Input: FeatureMap [1, 9, 9, 32] half type, NHWC format; Weight [k, Cout] half type
 - Output: Output [1, 5, 5, 16] half type, NHWC format
 - Implementation: Global Memory → L1 Buffer uses `copy_gm_to_l1` to convert NHWC to NC1HWC0 on the fly (nd2nz); L0C Buffer → Global Memory uses `copy_l0c_to_gm` to convert NC1HWC0 to NHWC (nz2nd)
 
