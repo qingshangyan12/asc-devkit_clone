@@ -111,7 +111,7 @@ struct TestS {
 __simt_vf__ void simt_kernel(__gm__ TestS *data1, __ubuf__ TestS *data2)
 {
     uint32_t idx = threadIdx.x;
-    TestS t1 = data1[idx];      // 调用Global Memory拷贝构造函数
+    TestS t = data1[idx];      // 调用Global Memory拷贝构造函数
     data2[0] = t;               // 不支持，编译报错
     ...
 }
