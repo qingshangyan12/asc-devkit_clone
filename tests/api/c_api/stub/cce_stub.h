@@ -283,11 +283,6 @@ using float8_e5m2_t = fp8_e5m2_t;
 using float4_e1m2x2_t = fp4x2_e1m2_t;
 using float4_e2m1x2_t = fp4x2_e2m1_t;
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-struct fp8_e6m2_t {};
-using float8_e6m2_t = fp8_e6m2_t;
-struct vector_f8e6m2 {};
-
 inline void vcvt_bf162e6m2(
     vector_f8e6m2& dst, vector_bf16 src, vector_bool mask, Literal round, Literal part, Literal mode)
 {}
@@ -315,7 +310,7 @@ inline void vpackv2(vector_s64& dst, vector_s64 src) {}
 inline void vgather2(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u16 index, vector_bool mask) {}
 inline void vgatherb(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u32 index, vector_bool mask) {}
 inline void vgatherb(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u32 index) {}
-#endif
+
 void vcgadd(vector_u32& dst, vector_u16 src, vector_bool pg, int32_t mode);
 void vcgadd(vector_s32& dst, vector_s16 src, vector_bool pg, int32_t mode);
 
