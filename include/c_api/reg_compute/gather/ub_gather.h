@@ -302,6 +302,9 @@ __simd_callee__ inline void asc_gather_datablock(vector_int4x2_t& dst, __ubuf__ 
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index);
 
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint32_t index);
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_GATHER_UB_GATHER_H)
