@@ -46,7 +46,7 @@ using vector_hifloat8_t = vector_hif8;
 using vector_fp8_e4m3fn_t = vector_f8e4m3;
 using vector_fp8_e5m2_t = vector_f8e5m2;
 using vector_fp8_e8m0_t = vector_f8e8m0;
-#if (ASC_DEVKIT_VERSION_NUM >= 90200000) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 using vector_fp8_e6m2_t = vector_f8e6m2;
 #endif
 using vector_int4x2_t = vector_s4x2;
