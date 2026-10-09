@@ -213,3 +213,23 @@ run_llt_test(
     TARGET ${HCCL_CCU_ST_TARGET}
     TASK_NUM 1
 )
+
+# Standalone printf test: local ACL stubs must not override the SimNpu stubs.
+add_executable(ascendc_ut_ccu_print
+    ${HCCL_CC_SRC_DIR}/common/log.cc
+    ${ASCENDC_DIR}/tests/main.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/ccu_print_testcase.cpp
+    ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu/ccu_print.cc
+    ${UTILS_DIR}/hccl_proxy/ccu_primitives_stub.cc
+    ${UTILS_DIR}/hccl_proxy/ccu_kernel_proxy.cc
+    ${UTILS_DIR}/hccl_proxy/log_stub.cc
+)
+target_include_directories(ascendc_ut_ccu_print PRIVATE
+    $<TARGET_PROPERTY:${HCCL_CCU_ST_TARGET},INCLUDE_DIRECTORIES>
+)
+target_compile_options(ascendc_ut_ccu_print PRIVATE
+    -std=c++14 -O0 -g -D_GLIBCXX_USE_CXX11_ABI=0
+)
+target_compile_definitions(ascendc_ut_ccu_print PRIVATE UT_TEST MC2_CLIENT_ENABLE_CCU=1)
+target_link_libraries(ascendc_ut_ccu_print PRIVATE GTest::gtest c_sec pthread)
+run_llt_test(TARGET ascendc_ut_ccu_print TASK_NUM 1)
