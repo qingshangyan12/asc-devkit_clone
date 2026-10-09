@@ -92,7 +92,7 @@ bool __hlt(half x, half y)
 输入输出示例如下：
 
 ```text
-x： -1.25 0.5 2.5 -3.75
-y： -1.25 0.5 2.5 -3.75
-output： false false false false
+x：-1.25, 0.5, 2.5, -3.75
+y：0.75, -0.25, 3.25, -2.5
+output：true false true true
 ```

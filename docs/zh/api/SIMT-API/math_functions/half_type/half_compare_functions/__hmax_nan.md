@@ -99,7 +99,7 @@ half __hmax_nan(const half x, const half y)
 输入输出示例如下：
 
 ```text
-x： -1.25 0.5 2.5 -3.75
-y： -1.25 0.5 2.5 -3.75
-output： -1.25 0.5 2.5 -3.75
+x：nan, 0.5, 2.5, -3.75
+y：-1.25, -0.25, 3.25, nan
+output：nan 0.5 3.25 nan
 ```
