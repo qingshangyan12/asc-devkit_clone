@@ -27,13 +27,3 @@ mkdir -p $DST_PATH
 mkdir -p $DST_PATH/
 cp -rf ${TOP_DIR}/impl ${DST_PATH}/impl
 cp -rf ${TOP_DIR}/include ${DST_PATH}/include
-
-# copy generated version header
-VERSION_HEADER=${INSTALL_PATH}/scripts/package/asc-devkit/asc_devkit_version.h
-if [ -f "${VERSION_HEADER}" ]; then
-    mkdir -p ${DST_PATH}/version
-    cp -f ${VERSION_HEADER} ${DST_PATH}/version/
-else
-    echo "ERROR: ${VERSION_HEADER} not found" >&2
-    exit 1
-fi

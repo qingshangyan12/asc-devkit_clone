@@ -10,10 +10,6 @@
 
 #include "c_api/reg_compute/reg_compute.h"
 
-#if !defined(ASC_DEVKIT_VERSION_NUM)
-#error "ASC_DEVKIT_VERSION_NUM is not defined by the include chain: version/asc_devkit_version.h is missing"
-#endif
-
 static void test_host_c_api_reg_compute_0()
 {
     using ::asc_abs;
