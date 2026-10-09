@@ -173,7 +173,7 @@ private:
         const LocalTensor<uint64_t>& dst, const GlobalTensor<uint64_t>& src, int32_t calNSize)
     {
         bool preAllocation = false;
-        if constexpr ((ToMatmulConfig(MM_CFG).preAllocationMode & PreallocationMode::PREALLOCATION_MODE_QUANT) != 0) {
+        if constexpr ((ToMatmulConfig(MM_CFG).preAllocationMode & PreallocationMode::PREALLOCATION_ENABLE_QUANT) != 0) {
             preAllocation = true;
         }
         event_t eventIDFixToMte2 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::FIX_MTE2));
