@@ -127,3 +127,11 @@ half __hsub(const half x, const half y)
         dst[idx] = __hsub(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x： -1.25 0.5 2.5 -3.75
+y： -1.25 0.5 2.5 -3.75
+output： 0 0 0 0
+```
