@@ -94,6 +94,6 @@ inline half __short2half_rz(const short int x)
 输入输出示例如下：
 
 ```text
-x： -4096 -2049 0 2049 4096
+x：-4096, -2049, 0, 2049, 4096
 output： -4096 -2048 0 2048 4096
 ```

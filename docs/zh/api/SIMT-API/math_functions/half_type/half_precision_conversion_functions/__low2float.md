@@ -108,6 +108,6 @@ inline float __low2float(const half2 x)
 输入输出示例如下：
 
 ```text
-x： (-2.5, -1.5) (-0.5, 0.5) (1.5, 2.5) (inf, nan)
+x：(-2.5, -1.5), (-0.5, 0.5), (1.5, 2.5), (inf, nan)
 output： -2.5 -0.5 1.5 inf
 ```

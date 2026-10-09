@@ -96,6 +96,6 @@ inline half __uint2half_rna(const unsigned int x)
 输入输出示例如下：
 
 ```text
-x： 0 1 2049 4097 65535
+x：0, 1, 2049, 4097, 65535
 output： 0 1 2050 4096 inf
 ```

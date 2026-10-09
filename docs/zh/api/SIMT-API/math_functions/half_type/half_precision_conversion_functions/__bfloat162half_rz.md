@@ -89,6 +89,6 @@ inline half __bfloat162half_rz(const bfloat16_t x)
 输入输出示例如下：
 
 ```text
-x： 0 -0 0.5 1.5 65536 9.96920997e+37 inf nan
+x：0, -0, 0.5, 1.5, 65536, 9.96920997e+37, inf, nan
 output： 0 -0 0.5 1.5 inf inf inf nan
 ```

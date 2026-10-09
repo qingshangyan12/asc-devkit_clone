@@ -95,6 +95,6 @@ inline unsigned short int __half2ushort_ru(const half x)
 输入输出示例如下：
 
 ```text
-x： -1.25 0.5 2.5 -3.75
+x：-1.25, 0.5, 2.5, -3.75
 output： 0 1 3 0
 ```

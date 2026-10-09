@@ -96,6 +96,6 @@ inline int __half2int_rn(const half x)
 输入输出示例如下：
 
 ```text
-x： -2.5 -1.5 0.5 1.5 2.5 inf -inf nan
+x：-2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
 output： -2 -2 0 2 2 2147483647 -2147483648 0
 ```

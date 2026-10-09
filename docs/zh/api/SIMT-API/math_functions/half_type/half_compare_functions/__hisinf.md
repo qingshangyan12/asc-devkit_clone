@@ -80,6 +80,6 @@ inline bool __hisinf(half x)
 输入输出示例如下：
 
 ```text
-x： -1.25 0.5 2.5 -3.75
+x：-1.25, 0.5, 2.5, -3.75
 output： false false false false
 ```

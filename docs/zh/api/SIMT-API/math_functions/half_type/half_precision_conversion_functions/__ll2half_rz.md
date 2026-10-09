@@ -92,6 +92,6 @@ inline half __ll2half_rz(const long long int x)
 输入输出示例如下：
 
 ```text
-x： 0 1 -1 2049 4097 -4097
+x：0, 1, -1, 2049, 4097, -4097
 output： 0 1 -1 2048 4096 -4096
 ```

@@ -85,6 +85,6 @@ inline half __ull2half_ru(const unsigned long long int x)
 输入输出示例如下：
 
 ```text
-x： 0 1 2049 4097 65535
+x：0, 1, 2049, 4097, 65535
 output： 0 1 2050 4100 inf
 ```

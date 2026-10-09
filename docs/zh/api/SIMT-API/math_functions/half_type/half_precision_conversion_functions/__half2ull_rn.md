@@ -97,6 +97,6 @@ inline unsigned long long int __half2ull_rn(const half x)
 输入输出示例如下：
 
 ```text
-x： -2.5 -1.5 0.5 1.5 2.5 inf -inf nan
+x：-2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
 output： 0 0 0 2 2 -1 0 0
 ```

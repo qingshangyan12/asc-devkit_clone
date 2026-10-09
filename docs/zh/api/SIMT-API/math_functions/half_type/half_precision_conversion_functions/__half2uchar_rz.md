@@ -95,6 +95,6 @@ inline unsigned char __half2uchar_rz(const half x)
 输入输出示例如下：
 
 ```text
-x： -1.5 -0.5 0.5 1.5 127.5 inf nan
+x：-1.5, -0.5, 0.5, 1.5, 127.5, inf, nan
 output： 0 0 0 1 127 255 0
 ```
