@@ -83,28 +83,38 @@ __simd_callee__ inline void store(
 struct unalign_store {
     __simd_callee__ unalign_store() = default;
 
-    /** @brief Starts a new unaligned store stream. */
-    __simd_callee__ inline void prepare();
-
     /**
      * @brief Stores one full vector register at the beginning of a UB tensor.
      * @param dst_tile Tensor whose beginning is the destination address for this store.
      * @param src Source register tensor. Its mask is not used. An int4b_t destination
      * requires reg_tensor<int4x2_t>.
+     * @param count Number of elements to store.
      */
     template <typename Tensor, typename RegDataType>
-    __simd_callee__ inline void store(Tensor dst_tile, const reg_tensor<RegDataType>& src);
+    __simd_callee__ inline void store(Tensor dst_tile, const reg_tensor<RegDataType>& src, uint32_t count);
+
+    /**
+     * @brief Stores register data to a UB tensor at the specified coordinate.
+     * @param dst_tile Destination tensor in the unaligned store stream.
+     * @param coord Coordinate of the first destination element.
+     * @param src Source register tensor. Its mask is not used. An int4b_t destination
+     * requires reg_tensor<int4x2_t>.
+     * @param count Number of elements to store.
+     */
+    template <typename Tensor, typename Coord, typename RegDataType>
+    __simd_callee__ inline void store(
+        Tensor dst_tile, const Coord& coord, const reg_tensor<RegDataType>& src, uint32_t count);
 
     /**
      * @brief Commits the pending unaligned stores.
      * @param dst_base Tensor whose beginning is the destination address of the first store.
+     * @param coord Coordinate passed to the unaligned-store post operation.
      */
     template <typename Tensor>
-    __simd_callee__ inline void flush(Tensor dst_base);
+    __simd_callee__ inline void flush(Tensor dst_base, int32_t coord);
 
 private:
-    vector_store_unalign ureg_;
-    uint32_t count_ = 0;
+    vector_store_unalign ureg;
 };
 
 } // namespace experimental

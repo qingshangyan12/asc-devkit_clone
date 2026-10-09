@@ -85,8 +85,18 @@ struct unalign_load {
     template <typename Tensor>
     __simd_callee__ inline auto load(const Tensor& src_tile);
 
+    /**
+     * @brief Loads one full vector register from a UB tensor at the specified coordinate.
+     * @param src_tile Source tensor in the prepared unaligned stream.
+     * @param coord Coordinate of the first source element.
+     * @return One register tensor containing the loaded data. An int4b_t source
+     * returns reg_tensor<int4x2_t>.
+     */
+    template <typename Tensor, typename Coord>
+    __simd_callee__ inline auto load(const Tensor& src_tile, const Coord& coord);
+
 private:
-    vector_load_unalign ureg_;
+    vector_load_unalign ureg;
 };
 
 } // namespace experimental

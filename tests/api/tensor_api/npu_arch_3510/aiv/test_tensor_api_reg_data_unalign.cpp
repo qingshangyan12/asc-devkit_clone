@@ -27,24 +27,22 @@ __simd_vf__ inline void compile_unalign_load_store(__ubuf__ T* dst, __ubuf__ T* 
     asc::te::experimental::unalign_load loader;
     asc::te::experimental::unalign_store storer;
     loader.prepare(src_tensor);
-    storer.prepare();
 
     auto first_src =
         src_tensor.slice(asc::te::make_coord(0), asc::te::make_shape(elements_per_register));
-    auto second_src =
-        src_tensor.slice(asc::te::make_coord(elements_per_register), asc::te::make_shape(elements_per_register));
     auto first = loader.load(first_src);
-    auto second = loader.load(second_src);
+    auto second = loader.load(src_tensor, asc::te::make_coord(elements_per_register));
     static_assert(AscendC::Std::is_same_v<decltype(first), asc::te::experimental::reg_tensor<RegDataType>>);
     static_assert(AscendC::Std::is_same_v<decltype(second), asc::te::experimental::reg_tensor<RegDataType>>);
 
     storer.store(
-        dst_tensor.slice(asc::te::make_coord(0), asc::te::make_shape(elements_per_register)), first);
+        dst_tensor.slice(asc::te::make_coord(0), asc::te::make_shape(elements_per_register)), first,
+        elements_per_register);
     storer.store(
-        dst_tensor.slice(asc::te::make_coord(elements_per_register), asc::te::make_shape(elements_per_register)),
-        second);
-    static_assert(AscendC::Std::is_same_v<decltype(storer.flush(dst_tensor)), void>);
-    storer.flush(dst_tensor);
+        dst_tensor, asc::te::make_coord(elements_per_register), second, elements_per_register);
+    constexpr int32_t total_elements = static_cast<int32_t>(elements_per_register * 2);
+    static_assert(AscendC::Std::is_same_v<decltype(storer.flush(dst_tensor, total_elements)), void>);
+    storer.flush(dst_tensor, total_elements);
 }
 
 TEST(tensor_api_reg_data_unalign_3510, compiles_full_register_sessions)
