@@ -44,8 +44,7 @@ __simd_callee__ inline void asc_gather_datablock(
     }
 }
 
-__simd_callee__ inline vector_fp8_e6m2_t asc_gather(
-    __ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask)
+__simd_callee__ inline vector_fp8_e6m2_t asc_gather(__ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask)
 {
     vector_fp8_e6m2_t dst;
     asc_gather(dst, src, index, mask);
