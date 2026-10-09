@@ -16,15 +16,7 @@
 #ifndef INCLUDE_C_API_DEFS_TYPE_H
 #define INCLUDE_C_API_DEFS_TYPE_H
 
-// Prefer the generated version header; fall back to 0 (version gates closed) when it is not on the include path.
-#if defined(__has_include)
-#if __has_include("version/asc_devkit_version.h")
 #include "version/asc_devkit_version.h"
-#endif
-#endif
-#ifndef ASC_DEVKIT_VERSION_NUM
-#define ASC_DEVKIT_VERSION_NUM 0
-#endif
 #include "c_api/defs/macro.h"
 #include "utils/common_types.h"
 
