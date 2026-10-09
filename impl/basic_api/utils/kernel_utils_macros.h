@@ -443,6 +443,7 @@ struct OomAddrRange {
     uintptr_t addr[g_oomAddrRangeMaxSize];
     uint64_t len[g_oomAddrRangeMaxSize];
     uint8_t isLevelOnePointer[g_oomAddrRangeMaxSize];
+    __gm__ uint8_t* tensorListStorageShape[g_oomAddrRangeMaxSize];
     uint64_t count;
 };
 __BLOCK_LOCAL__ __inline__ OomAddrRange g_oomAddrArange;
