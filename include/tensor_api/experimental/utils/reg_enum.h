@@ -52,6 +52,15 @@ enum class cast_sat_mode {
     sat,
 };
 
+enum class div_algorithm {
+    intrinsic,
+    diff_compensation,
+    precision_1ulp_ftz_true,
+    precision_0ulp_ftz_true,
+    precision_0ulp_ftz_false,
+    precision_1ulp_ftz_false,
+};
+
 struct cast_options {
     cast_layout layout = cast_layout::zero;
     cast_round_mode round = cast_round_mode::rint;

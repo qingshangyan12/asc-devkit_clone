@@ -14,6 +14,8 @@
 - **[-](operator_sub.md)**
 - **[*](operator_mul.md)**
 - **[/](div.md)**
+- **[div_precise](div_precise.md)**
+- **[div 模式除法](div_mode.md)**
 - **[prelu](prelu.md)**
 - **[relu](relu.md)**
 - **[sqrt](sqrt.md)**

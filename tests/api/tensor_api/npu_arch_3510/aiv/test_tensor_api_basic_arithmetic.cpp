@@ -176,6 +176,31 @@ __aicore__ inline void TestDiv()
     EXPECT_EQ(dst.mask, src0.mask);
 }
 
+__aicore__ inline void TestDivPrecise()
+{
+    reg_type<float> src0{};
+    reg_type<float> src1{};
+    src0.mask = all_mask<float>().reg;
+    src1.mask = none_mask<float>().reg;
+
+    auto dst = div_precise(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<float>>);
+    EXPECT_EQ(dst.mask, src0.mask);
+}
+
+template <div_algorithm Algorithm, typename T, bool PrecisionMode = false>
+__aicore__ inline void TestDivMode()
+{
+    reg_type<T> src0{};
+    reg_type<T> src1{};
+    src0.mask = all_mask<T>().reg;
+    src1.mask = none_mask<T>().reg;
+
+    auto dst = div<Algorithm, PrecisionMode>(src0, src1);
+    static_assert(AscendC::Std::is_same_v<decltype(dst), reg_type<T>>);
+    EXPECT_EQ(dst.mask, src0.mask);
+}
+
 template <typename T>
 __aicore__ inline void TestMin()
 {
@@ -234,6 +259,34 @@ BASIC_ARITHMETIC_TEST(Div, half)
 BASIC_ARITHMETIC_TEST(Div, int32_t)
 BASIC_ARITHMETIC_TEST(Div, uint32_t)
 BASIC_ARITHMETIC_TEST(Div, float)
+TEST(test_tensor_api_basic_arithmetic, DivPrecise_float)
+{
+    TestDivPrecise();
+}
+#define DIV_MODE_TEST(Name, Algorithm, DataType)              \
+    TEST(test_tensor_api_basic_arithmetic, Name##_##DataType) \
+    {                                                         \
+        TestDivMode<div_algorithm::Algorithm, DataType>();    \
+    }
+
+DIV_MODE_TEST(Intrinsic, intrinsic, float)
+DIV_MODE_TEST(Intrinsic, intrinsic, half)
+DIV_MODE_TEST(Intrinsic, intrinsic, int16_t)
+DIV_MODE_TEST(Intrinsic, intrinsic, int32_t)
+DIV_MODE_TEST(DiffCompensation, diff_compensation, float)
+DIV_MODE_TEST(Precision1UlpFtzTrue, precision_1ulp_ftz_true, float)
+DIV_MODE_TEST(Precision1UlpFtzTrue, precision_1ulp_ftz_true, half)
+DIV_MODE_TEST(Precision0UlpFtzTrue, precision_0ulp_ftz_true, float)
+DIV_MODE_TEST(Precision0UlpFtzFalse, precision_0ulp_ftz_false, float)
+DIV_MODE_TEST(Precision1UlpFtzFalse, precision_1ulp_ftz_false, float)
+DIV_MODE_TEST(Precision1UlpFtzFalse, precision_1ulp_ftz_false, half)
+
+TEST(test_tensor_api_basic_arithmetic, DivPrecisionMode_float)
+{
+    TestDivMode<div_algorithm::intrinsic, float, true>();
+}
+#undef DIV_MODE_TEST
+
 BASIC_ARITHMETIC_TEST(Min, int8_t)
 BASIC_ARITHMETIC_TEST(Min, uint8_t)
 BASIC_ARITHMETIC_TEST(Min, int16_t)

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tensor API Division 3510"
+  short_description: "Continue high-precision Tensor API vector division work"
+  default_prompt: "Use this skill to continue implementing and verifying 3510 Tensor API vector division modes in this repository."

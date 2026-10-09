@@ -17,6 +17,7 @@
 #define IMPL_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_IMPL_H
 
 #include "impl/tensor_api/experimental/arch/utils/reg_utils.h"
+#include "basic_api/reg_compute/kernel_reg_compute_intf.h"
 
 namespace asc {
 namespace te {
@@ -300,6 +301,60 @@ __simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const 
     asc_div(dst.reg, src0.reg, src1.reg, src0.mask);
     dst.mask = src0.mask;
     return dst;
+}
+
+namespace detail {
+template <div_algorithm Algorithm>
+constexpr ::AscendC::DivAlgo to_basic_div_algorithm()
+{
+    if constexpr (Algorithm == div_algorithm::intrinsic) {
+        return ::AscendC::DivAlgo::INTRINSIC;
+    } else if constexpr (Algorithm == div_algorithm::diff_compensation) {
+        return ::AscendC::DivAlgo::DIFF_COMPENSATION;
+    } else if constexpr (Algorithm == div_algorithm::precision_1ulp_ftz_true) {
+        return ::AscendC::DivAlgo::PRECISION_1ULP_FTZ_TRUE;
+    } else if constexpr (Algorithm == div_algorithm::precision_0ulp_ftz_true) {
+        return ::AscendC::DivAlgo::PRECISION_0ULP_FTZ_TRUE;
+    } else if constexpr (Algorithm == div_algorithm::precision_0ulp_ftz_false) {
+        return ::AscendC::DivAlgo::PRECISION_0ULP_FTZ_FALSE;
+    } else {
+        static_assert(Algorithm == div_algorithm::precision_1ulp_ftz_false);
+        return ::AscendC::DivAlgo::PRECISION_1ULP_FTZ_FALSE;
+    }
+}
+}
+
+template <div_algorithm Algorithm, bool PrecisionMode, typename T>
+__simd_callee__ inline reg_tensor<T> div(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+{
+    static_assert(detail::supports_div_v<T>);
+    static_assert(!PrecisionMode || ::AscendC::Std::is_same_v<T, float>);
+    static_assert(
+        (Algorithm == div_algorithm::intrinsic || Algorithm == div_algorithm::precision_1ulp_ftz_true) ||
+        (Algorithm == div_algorithm::precision_1ulp_ftz_false &&
+            ::AscendC::Std::is_one_of_v<T, half, float>) ||
+        (::AscendC::Std::is_same_v<T, float> &&
+            (Algorithm == div_algorithm::diff_compensation ||
+                Algorithm == div_algorithm::precision_0ulp_ftz_true ||
+                Algorithm == div_algorithm::precision_0ulp_ftz_false)));
+
+    static constexpr ::AscendC::Reg::DivSpecificMode mode = {
+        ::AscendC::Reg::MaskMergeMode::ZEROING, PrecisionMode, detail::to_basic_div_algorithm<Algorithm>()};
+    ::AscendC::Reg::RegTensor<T> base_dst, base_src0, base_src1;
+    base_src0.reg[0] = src0.reg;
+    base_src1.reg[0] = src1.reg;
+    ::AscendC::Reg::MaskReg active_mask = src0.mask;
+    ::AscendC::Reg::Div<T, &mode>(base_dst, base_src0, base_src1, active_mask);
+    reg_tensor<T> dst(src0.mask);
+    dst.reg = base_dst.reg[0];
+    return dst;
+}
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> div_precise(const reg_tensor<T>& src0, const reg_tensor<T>& src1)
+{
+    static_assert(::AscendC::Std::is_same_v<T, float>);
+    return div<div_algorithm::precision_0ulp_ftz_true>(src0, src1);
 }
 
 template <typename T>
