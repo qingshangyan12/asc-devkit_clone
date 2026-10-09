@@ -102,5 +102,5 @@ inline half hsqrt(half x)
 
 ```text
 x： -1.25 0.5 2.5 -3.75
-output： nan 0.70703125 1.58105469 nan
+output： nan 0.707031 1.58105 nan
 ```
