@@ -67,6 +67,8 @@ public:
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
         if ASCEND_IS_AIC {
             set_padding(static_cast<uint64_t>(0));
+            uint64_t loopSizePara = (1uL << 21) | 1uL;
+            set_loop_size_outtol1(loopSizePara);
         } else {
             set_vector_mask(static_cast<uint64_t>(-1), static_cast<uint64_t>(-1));
             uint64_t loopSizePara = (1uL << 21) | 1uL;
