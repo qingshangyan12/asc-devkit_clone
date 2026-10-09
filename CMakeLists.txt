@@ -45,14 +45,12 @@ add_subdirectory(cmake)
 
 
 include(version.cmake)
+include(cmake/gen_version_headers.cmake)
+
 if(BUILD_OPEN_PROJECT)
   check_cann_pkg_build_deps("asc-devkit")
 endif()
 add_cann_version_info_targets()
-
-if(ENABLE_TEST OR PACKAGE_OPEN_PROJECT)
-  include(cmake/version_info.cmake)
-endif()
 
 if(ENABLE_TEST)
   add_subdirectory(tests)
