@@ -31,7 +31,7 @@
 
   1. 动态Matmul功能
 
-     样例在Kernel中通过Tensor API构造GM、L1、L0A、L0B、L0C上的Tensor对象，使用copy接口完成GM到L1、L1到L0的分块搬运，并通过mmad接口完成矩阵乘法。矩阵A按ND布局读取，矩阵B按DN布局读取（输入文件中以转置后的[N, K]保存）。Shape参数（M、N、K、singleCoreM、singleCoreN、singleCoreK）通过在运行时传递到Kernel中，baseM、baseN、baseK和stepM、stepN、stepK、ENABLE_UNITFLAG作为编译期模板参数决定L1/L0 Buffer分配大小和分块步进。
+     样例在Kernel中通过Tensor API构造GM、L1、L0A、L0B、L0C上的Tensor对象，使用copy接口完成GM到L1、L1到L0的分块搬运，并通过mmad接口完成矩阵乘法。矩阵A按ND布局读取，矩阵B按DN布局读取（输入文件中以转置后的[N, K]保存）。Shape参数（m、n、k、single_core_m、single_core_n、single_core_k）通过在运行时传递到Kernel中，base_m、base_n、base_k和step_m、step_n、step_k、enable_unitflag作为编译期模板参数决定L1/L0 Buffer分配大小和分块步进。
 
   2. Fixpipe随路量化功能/反量化
 
@@ -40,14 +40,14 @@
       1. per_tensor：对整个Tensor进行量化/反量化，Tensor具有唯一的缩放因子。这种方法可以降低模型的存储和计算成本，但会降低模型的精度。
       2. per_channel：对Tensor的每个通道单独进行量化/反量化，同一通道内共享同一缩放因子，通道间缩放因子则各不相同。这种方法可以更好地保留模型的精度，但会增加模型的存储和计算成本。
 
-  3. ENABLE_UNITFLAG
+  3. enable_unitflag
 
-     样例通过`ENABLE_UNITFLAG`模板参数控制unitFlag功能的开关，默认值为true。
+     样例通过`enable_unitflag`模板参数控制unitFlag功能的开关，默认值为true。
      unitFlag具体介绍可见[mmad unitFlag特性样例](../../03_basic_api/03_matrix_compute/mmad_unitflag/README.md)
 
 - 样例规格：
 
-  在核函数直调样例中，样例默认支持的shape为：M = 1024, N = 1024, K = 256。
+  在核函数直调样例中，样例默认支持的shape为：m = 1024, n = 1024, k = 256。
 
   <a name="表1"></a>
   <table border="2" align="center">
@@ -55,10 +55,10 @@
       <span style="font-weight: bold; font-size: 1.2em;">表1：样例规格表</span></caption>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul with Quant</td></tr>
   <tr><td rowspan="4" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x (矩阵A)</td><td align="center">[M, K]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x (矩阵A)</td><td align="center">[m, k]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
   <tr><td align="center">y (矩阵B，转置存储)</td><td align="center">[N, K]</td><td align="center">int8_t</td><td align="center">DN</td></tr>
-  <tr><td align="center">quant</td><td align="center">[N]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z (矩阵C)</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">quant</td><td align="center">[n]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z (矩阵C)</td><td align="center">[m, n]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">mmad_quant_custom</td></tr>
   </table>
 
@@ -66,13 +66,13 @@
 
   | 参数    | 默认值 | 说明                    |
   | :------ | :----- | :---------------------- |
-  | BASE_M  | 256    | M维度基础分块大小       |
-  | BASE_N  | 256    | N维度基础分块大小       |
-  | BASE_K  | 64     | K维度基础分块大小       |
-  | STEP_M  | 1      | M维度L1缓存步进         |
-  | STEP_N  | 1      | N维度L1缓存步进         |
-  | STEP_K  | 4      | K维度L1缓存步进         |
-  | ENABLE_UNITFLAG  | true      | unitFlag功能的开关         |
+  | base_m  | 256    | M维度基础分块大小       |
+  | base_n  | 256    | N维度基础分块大小       |
+  | base_k  | 64     | K维度基础分块大小       |
+  | step_m  | 1      | M维度L1缓存步进         |
+  | step_n  | 1      | N维度L1缓存步进         |
+  | step_k  | 4      | K维度L1缓存步进         |
+  | enable_unitflag  | true      | unitFlag功能的开关         |
 
   运行时动态参数默认值：
 
@@ -81,10 +81,10 @@
   | m            | 1024   | 矩阵A的行数                |
   | n            | 1024   | 矩阵B的列数                |
   | k            | 256    | 矩阵A的列数/矩阵B的行数    |
-  | singleCoreM  | 256    | 单核M维度大小              |
-  | singleCoreN  | 128    | 单核N维度大小              |
-  | singleCoreK  | 256    | 单核K维度大小              |
-  | NUM_BLOCKS   | 32     | Kernel启动的Block数量      |
+  | single_core_m  | 256    | 单核M维度大小              |
+  | single_core_n  | 128    | 单核N维度大小              |
+  | single_core_k  | 256    | 单核K维度大小              |
+  | num_blocks   | 32     | Kernel启动的Block数量      |
 
 ## 编译运行
 

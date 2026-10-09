@@ -57,7 +57,7 @@ __aicore__ inline constexpr auto get_stride(const Layout& layout)
 
 ## 返回值说明
 
-返回描述内存访问步长的stride对象（或其子结构）。
+返回描述内存访问步长的stride对象（或其子结构）。步长单位为元素个数，详见[stride](./stride.md)。
 
 ## 约束说明
 

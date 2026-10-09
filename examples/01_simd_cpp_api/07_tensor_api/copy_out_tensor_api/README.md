@@ -30,7 +30,7 @@
 
   1. 动态Matmul功能
 
-  本样例实现了多核Matmul功能。Shape参数（M、N、K、singleCoreM、singleCoreN、singleCoreK）通过`MatmulTiling`结构体在运行时动态传入kernel。`BASE_M`、`BASE_N`、`BASE_K`和`STEP_M`、`STEP_N`、`STEP_K`作为编译期模板参数，决定了L0/L1级buffer的分配大小。
+  本样例实现了多核Matmul功能。Shape参数（m、n、k、single_core_m、single_core_n、single_core_k）通过`MatmulTiling`结构体在运行时动态传入kernel。`base_m`、`base_n`、`base_k`和`step_m`、`step_n`、`step_k`作为编译期模板参数，决定了L0/L1级buffer的分配大小。
 
   2. Bias功能
 
@@ -59,14 +59,14 @@
       int32_t m;            // 矩阵A的行数
       int32_t n;            // 矩阵B的列数
       int32_t k;            // 矩阵A的列数/矩阵B的行数
-      int32_t singleCoreM;  // 单核处理的M维度大小
-      int32_t singleCoreN;  // 单核处理的N维度大小
-      int32_t singleCoreK;  // 单核处理的K维度大小
+      int32_t single_core_m;  // 单核处理的M维度大小
+      int32_t single_core_n;  // 单核处理的N维度大小
+      int32_t single_core_k;  // 单核处理的K维度大小
   };
   ```
 
 - 样例规格：
-  在核函数直调样例中，样例默认支持的shape为：M = 1024, N = 1024, K = 256。
+  在核函数直调样例中，样例默认支持的shape为：m = 1024, n = 1024, k = 256。
 
   **场景0：普通模式，L0C -> GM**
 
@@ -74,11 +74,11 @@
   <caption>表1：场景0规格表</caption>
   <tr><td rowspan="1" align="left">样例类型(OpType)</td><td colspan="4" align="left">Matmul with Bias</td></tr>
   <tr><td rowspan="5" align="left">样例输入</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x（矩阵A）</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">y（矩阵B）</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">x（矩阵A）</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">y（矩阵B）</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling结构体</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z（矩阵C）</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z（矩阵C）</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">核函数名</td><td colspan="4" align="left">copy_out_tensor_api</td></tr>
   </table>
 
@@ -88,11 +88,11 @@
   <caption>表2：场景1规格表</caption>
   <tr><td rowspan="1" align="left">样例类型(OpType)</td><td colspan="4" align="left">Matmul with Bias</td></tr>
   <tr><td rowspan="5" align="left">样例输入</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x（矩阵A）</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">y（矩阵B）</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">x（矩阵A）</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">y（矩阵B）</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling结构体</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z（矩阵C）</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z（矩阵C）</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">核函数名</td><td colspan="4" align="left">copy_out_tensor_api</td></tr>
   </table>
 
@@ -102,11 +102,11 @@
   <caption>表3：场景2规格表</caption>
   <tr><td rowspan="1" align="left">样例类型(OpType)</td><td colspan="4" align="left">Matmul with Bias</td></tr>
   <tr><td rowspan="5" align="left">样例输入</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x（矩阵A）</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">y（矩阵B）</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">x（矩阵A）</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">y（矩阵B）</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling结构体</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z（矩阵C）</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z（矩阵C）</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">核函数名</td><td colspan="4" align="left">copy_out_tensor_api</td></tr>
   </table>
 
@@ -116,11 +116,11 @@
   <caption>表4：场景3规格表</caption>
   <tr><td rowspan="1" align="left">样例类型(OpType)</td><td colspan="4" align="left">Matmul with Bias</td></tr>
   <tr><td rowspan="5" align="left">样例输入</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x（矩阵A）</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">y（矩阵B）</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">x（矩阵A）</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">y（矩阵B）</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling结构体</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z（矩阵C）</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">样例输出</td><td align="left">z（矩阵C）</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">核函数名</td><td colspan="4" align="left">copy_out_tensor_api</td></tr>
   </table>
 
@@ -128,12 +128,12 @@
 
   | 参数    | 默认值 | 说明                     |
   | :------ | :----- | :----------------------- |
-  | BASE_M  | 128    | M维度基础分块大小        |
-  | BASE_N  | 128    | N维度基础分块大小        |
-  | BASE_K  | 64     | K维度基础分块大小        |
-  | STEP_M  | 1      | M维度L1缓存步进          |
-  | STEP_N  | 1      | N维度L1缓存步进          |
-  | STEP_K  | 4      | K维度L1缓存步进          |
+  | base_m  | 128    | M维度基础分块大小        |
+  | base_n  | 128    | N维度基础分块大小        |
+  | base_k  | 64     | K维度基础分块大小        |
+  | step_m  | 1      | M维度L1缓存步进          |
+  | step_n  | 1      | N维度L1缓存步进          |
+  | step_k  | 4      | K维度L1缓存步进          |
 
   运行时动态参数默认值：
 
@@ -142,9 +142,9 @@
   | m            | 1024   | 矩阵A的行数            |
   | n            | 1024   | 矩阵B的列数            |
   | k            | 256    | 矩阵A的列数/矩阵B的行数 |
-  | singleCoreM  | 256    | 单核M维度大小           |
-  | singleCoreN  | 128    | 单核N维度大小           |
-  | singleCoreK  | 256    | 单核K维度大小           |
+  | single_core_m  | 256    | 单核M维度大小           |
+  | single_core_n  | 128    | 单核N维度大小           |
+  | single_core_k  | 256    | 单核K维度大小           |
 
 ## 编译运行
 

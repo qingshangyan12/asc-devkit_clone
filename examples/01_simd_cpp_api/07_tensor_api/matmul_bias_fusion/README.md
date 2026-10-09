@@ -41,11 +41,11 @@ $$
 
   2. **Vector侧Residual加法**
 
-     Cube侧把L0C中的`float`结果搬运到UB。`dual_dst_mode::split_m`将一个tile沿M轴平均拆为两个目标，分别提供给两个AIV。每个AIV从对应半块读取Cube结果和GM中的Residual，调用`ComputeAdd`完成逐元素相加，再将结果写回GM。
+     Cube侧把L0C中的`float`结果搬运到UB。`dual_dst_mode::split_m`将一个tile沿M轴平均拆为两个目标，分别提供给两个AIV。每个AIV从对应半块读取Cube结果和GM中的Residual，调用`compute_add`完成逐元素相加，再将结果写回GM。
 
   3. **CV流水协同**
 
-     输出tile使用两组UB slot（`PIPE_DEPTH=2`）交替复用。AIC在复用slot前等待两个AIV完成上一轮消费；完成L0C到UB搬运后通知AIV；两个AIV完成加法和UB到GM写回后再通知AIC。跨AIC/AIV通知使用`asc_sync_block_wait`和`asc_sync_block_arrive`，不会为Vector路径另起一个kernel。
+     输出tile使用两组UB slot（`pipe_depth=2`）交替复用。AIC在复用slot前等待两个AIV完成上一轮消费；完成L0C到UB搬运后通知AIV；两个AIV完成加法和UB到GM写回后再通知AIC。跨AIC/AIV通知使用`asc_sync_block_wait`和`asc_sync_block_arrive`，不会为Vector路径另起一个kernel。
 
   4. **计算公式**
 
@@ -58,13 +58,13 @@ $$
      Y_{m,n}=T_{m,n}+Residual_{m,n}
      $$
 
-- `ComputeAdd`实现：
+- `compute_add`实现：
 
-  `ComputeAdd`是标记为`__simd_vf__`的Vector函数，输入和输出均为UB中的一维Tensor。函数先通过`update_mask<float>(length)`生成有效元素掩码，再对两个输入Tensor执行带掩码的`load`，计算`lhs + rhs`，最后使用`store`写入输出Tensor。`length`由当前列尾块的有效元素数决定，因此不会访问tile中的padding元素。
+  `compute_add`是标记为`__simd_vf__`的Vector函数，输入和输出均为UB中的一维Tensor。函数先通过`update_mask<float>(length)`生成有效元素掩码，再对两个输入Tensor执行带掩码的`load`，计算`lhs + rhs`，最后使用`store`写入输出Tensor。`length`由当前列尾块的有效元素数决定，因此不会访问tile中的padding元素。
 
   ```cpp
   template <typename Src0Tensor, typename Src1Tensor, typename DstTensor>
-  __simd_vf__ inline void ComputeAdd(Src0Tensor src0, Src1Tensor src1,
+  __simd_vf__ inline void compute_add(Src0Tensor src0, Src1Tensor src1,
       DstTensor dst, uint32_t length)
   {
       const auto coord = asc::te::make_coord(0);
@@ -77,18 +77,18 @@ $$
 
 - 样例规格：
 
-  默认Shape为`M=1024`、`N=1024`、`K=256`。每个Cube block处理`singleCoreM=256`、`singleCoreN=128`的输出区域，共启动32个mixed block。
+  默认Shape为`m=1024`、`n=1024`、`k=256`。每个Cube block处理`single_core_m=256`、`single_core_n=128`的输出区域，共启动32个mixed block。
 
   <table border="2">
   <caption>样例规格表</caption>
   <tr><td rowspan="1" align="left">样例类型(OpType)</td><td colspan="4" align="left">Matmul with Bias and Residual</td></tr>
   <tr><td rowspan="6" align="left">样例输入</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">A（矩阵A）</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">B（矩阵B）</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">Bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
-  <tr><td align="left">Residual</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">A（矩阵A）</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">B（矩阵B）</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">Bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">Residual</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling结构体</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">样例输出</td><td align="left">Y（输出矩阵）</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">样例输出</td><td align="left">Y（输出矩阵）</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">核函数名</td><td colspan="4" align="left">matmul_bias_fusion</td></tr>
   </table>
 
@@ -96,14 +96,14 @@ $$
 
   | 参数 | 默认值 | 说明 |
   | :--- | :---: | :--- |
-  | `BASE_M` | 128 | Cube输出tile的M维大小 |
-  | `BASE_N` | 128 | Cube输出tile的N维大小 |
-  | `BASE_K` | 64 | Cube K维基础分块大小 |
-  | `STEP_M` | 1 | L1 M维步进 |
-  | `STEP_N` | 1 | L1 N维步进 |
-  | `STEP_K` | 4 | L1 K维步进 |
-  | `VECTOR_LEN` | 64 | 一次Vector加法的最大元素数 |
-  | `PIPE_DEPTH` | 2 | UB slot数量 |
+  | `base_m` | 128 | Cube输出tile的M维大小 |
+  | `base_n` | 128 | Cube输出tile的N维大小 |
+  | `base_k` | 64 | Cube K维基础分块大小 |
+  | `step_m` | 1 | L1 M维步进 |
+  | `step_n` | 1 | L1 N维步进 |
+  | `step_k` | 4 | L1 K维步进 |
+  | `vector_len` | 64 | 一次Vector加法的最大元素数 |
+  | `pipe_depth` | 2 | UB slot数量 |
 
   运行时Tiling参数默认值如下：
 
@@ -112,9 +112,9 @@ $$
   | `m` | 1024 | 矩阵A的行数 |
   | `n` | 1024 | 矩阵B的列数 |
   | `k` | 256 | 矩阵A的列数/矩阵B的行数 |
-  | `singleCoreM` | 256 | 单个Cube block处理的M维大小 |
-  | `singleCoreN` | 128 | 单个Cube block处理的N维大小 |
-  | `singleCoreK` | 256 | 单个Cube block处理的K维大小 |
+  | `single_core_m` | 256 | 单个Cube block处理的M维大小 |
+  | `single_core_n` | 128 | 单个Cube block处理的N维大小 |
+  | `single_core_k` | 256 | 单个Cube block处理的K维大小 |
 
 ## 样例实现
 
@@ -141,16 +141,16 @@ $$
 | 5 | `copy(copy_l0c_to_ub)` | 使用`dual_dst_mode::split_m`把L0C tile拆成两个M半块 | L0C结果按M轴双目标搬运到两个AIV各自的UB |
 | 6 | `asc_sync_block_wait/arrive` | 在AIC和两个AIV之间传递每个slot的就绪和消费完成事件 | CV同步 |
 | 7 | `copy(copy_ub_to_ub)`、`copy(copy_gm_to_ub)` | 读取Cube半块和Residual到Vector临时UB | AIV/Vector |
-| 8 | `ComputeAdd` | 对有效元素执行masked `load`、逐元素加法和`store` | AIV/VF |
+| 8 | `compute_add` | 对有效元素执行masked `load`、逐元素加法和`store` | AIV/VF |
 | 9 | `copy(copy_ub_to_gm)` | 将加法结果写回Y对应的GM区域 | AIV到GM |
 
 ### Cube侧Matmul流程
 
-每个AIC block根据`block_idx`定位一个`singleCoreM × singleCoreN`区域，在该区域内按`BASE_M`、`BASE_N`划分输出tile。对每个tile，A和B沿K轴按`BASE_K`循环搬运并调用`mmad`：第一次调用设置`init_with_zero=true`并传入L0Bias，后续调用设置`init_with_zero=false`，从而得到`A × B + Bias`的L0C结果。
+每个AIC block根据`block_idx`定位一个`single_core_m × single_core_n`区域，在该区域内按`base_m`、`base_n`划分输出tile。对每个tile，A和B沿K轴按`base_k`循环搬运并调用`mmad`：第一次调用设置`init_with_zero=true`并传入L0Bias，后续调用设置`init_with_zero=false`，从而得到`A × B + Bias`的L0C结果。
 
 ### Vector侧加法流程
 
-每个AIV通过`asc_get_sub_block_id()`确定自己负责的M半块。收到AIC对应slot的通知后，逐行、逐`VECTOR_LEN`列处理：先将UB中的Cube结果复制到Vector临时Tensor，再把Residual从GM搬到UB，调用`ComputeAdd`，最后将输出Tensor复制到Y的GM切片。两个AIV负责互不重叠的行区间。
+每个AIV通过`asc_get_sub_block_id()`确定自己负责的M半块。收到AIC对应slot的通知后，逐行、逐`vector_len`列处理：先将UB中的Cube结果复制到Vector临时Tensor，再把Residual从GM搬到UB，调用`compute_add`，最后将输出Tensor复制到Y的GM切片。两个AIV负责互不重叠的行区间。
 
 ### L0C到UB的双目标和同步
 
@@ -161,7 +161,7 @@ $$
   asc::te::dual_dst_mode::split_m }
 ```
 
-对于每个输出tile，AIC把前半M写入sub-block 0、后半M写入sub-block 1。两组slot按`sequence % PIPE_DEPTH`复用，AIC到AIV的flag为8、9，AIV到AIC的flag为10、11。AIC在重用slot前通过`PIPE_MTE2`等待两个AIV完成，AIC完成搬运后在`PIPE_FIX`通知AIV；AIV在`PIPE_S`等待数据就绪，并在`PIPE_MTE3`完成写回后通知AIC，保证UB不会在Vector读取前被覆盖，形成完整的CV流水依赖。
+对于每个输出tile，AIC把前半M写入sub-block 0、后半M写入sub-block 1。两组slot按`sequence % pipe_depth`复用，AIC到AIV的flag为8、9，AIV到AIC的flag为10、11。AIC在重用slot前通过`PIPE_MTE2`等待两个AIV完成，AIC完成搬运后在`PIPE_FIX`通知AIV；AIV在`PIPE_S`等待数据就绪，并在`PIPE_MTE3`完成写回后通知AIC，保证UB不会在Vector读取前被覆盖，形成完整的CV流水依赖。
 
 ## Tensor API实现特点
 
@@ -171,9 +171,9 @@ $$
 | 矩阵计算 | 使用`mmad`完成Cube侧矩阵乘加，Bias仅在首次K迭代注入 |
 | CV融合 | 使用一个`__mix__(1, 2)` kernel连接1个AIC和2个AIV |
 | 双目标搬运 | 使用`copy_l0c_to_ub`的`dual_dst_mode::split_m`按M轴拆分 |
-| Vector计算 | 使用`__simd_vf__`函数`ComputeAdd`完成加法 |
+| Vector计算 | 使用`__simd_vf__`函数`compute_add`完成加法 |
 | 数据同步 | 使用固定flag的`asc_sync_block_wait/arrive`实现slot级交接 |
-| 尾块处理 | 以`curM`、`curN`和`length`限制有效区域，避免读取padding |
+| 尾块处理 | 以`cur_m`、`cur_n`和`length`限制有效区域，避免读取padding |
 
 ## 编译运行
 
