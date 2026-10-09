@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements multi-core matrix multiplication based on the static Tensor API programming paradigm. It uses the high-level Tensor API interfaces for data movement, slicing, and multiply-accumulate operations. The computation is split along the K axis, and each core's partial result is accumulated into the output matrix with atomic addition.
+This example implements multi-core matrix multiplication based on the static Tensor API programming paradigm. It uses the high-level Tensor API interfaces for data movement, slicing, and multiply-accumulate operations. The computation is split along the k axis, and each core's partial result is accumulated into the output matrix with atomic addition.
 
 ## Supported Products and CANN Software Versions
 
@@ -31,13 +31,13 @@ This example implements multi-core matrix multiplication based on the static Ten
   C = A * B
   $$
 - Example specifications:
-  This example uses M = 16, N = 16, and K = 1024. The K axis is evenly split into four parts, and four cores perform the computation. The input and output specifications are shown in the following table.
+  This example uses m = 16, n = 16, and k = 1024. The k axis is evenly split into four parts, and four cores perform the computation. The input and output specifications are shown in the following table.
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Example Output</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float32</td><td align="center">ND</td></tr>
+  <tr><td align="center">A</td><td align="center">[m, k]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">B</td><td align="center">[k, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Example Output</td><td align="center">C</td><td align="center">[m, n]</td><td align="center">float32</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">matmul_split_k_kernel</td></tr>
   </table>
 
@@ -46,10 +46,10 @@ This example implements multi-core matrix multiplication based on the static Ten
     <table>
     <tr><th align="left">Step</th><th align="left">Tensor API Operation</th><th align="left">Function</th><th align="left">Layout Transformation</th></tr>
     <tr><td align="left">1</td><td align="left">Constant Tiling Parameters</td><td align="left">Define the parameters required by the kernel through compile-time constants</td><td align="left">Not applicable</td></tr>
-    <tr><td align="left">2</td><td align="left">make_tensor + slice</td><td align="left">Create GM tensors, split the K axis into four equal parts, and slice the data block processed by the current core according to its core index</td><td align="left">ND format</td></tr>
-    <tr><td align="left">3</td><td align="left">copy(copy_gm_to_l1)</td><td align="left">Move the current K-axis slices of matrices A and B from GM to L1</td><td align="left">ND->NZ format conversion</td></tr>
+    <tr><td align="left">2</td><td align="left">make_tensor + slice</td><td align="left">Create GM tensors, split the k axis into four equal parts, and slice the data block processed by the current core according to its core index</td><td align="left">ND format</td></tr>
+    <tr><td align="left">3</td><td align="left">copy(copy_gm_to_l1)</td><td align="left">Move the current k-axis slices of matrices A and B from GM to L1</td><td align="left">ND->NZ format conversion</td></tr>
     <tr><td align="left">4</td><td align="left">copy(copy_l1_to_l0a/copy_l1_to_l0b)</td><td align="left">Move data from L1 to L0A and L0B</td><td align="left">L1->L0A: NZ->NZ<br>L1->L0B: NZ->ZN</td></tr>
-    <tr><td align="left">5</td><td align="left">mmad</td><td align="left">Complete matrix multiply-accumulate computation for the current K-axis slice</td><td align="left">The matrix multiplication result is in NZ format</td></tr>
+    <tr><td align="left">5</td><td align="left">mmad</td><td align="left">Complete matrix multiply-accumulate computation for the current k-axis slice</td><td align="left">The matrix multiplication result is in NZ format</td></tr>
     <tr><td align="left">6</td><td align="left">asc_set_atomic_add_float + copy(copy_l0c_to_gm)</td><td align="left">Enable float atomic addition and accumulate the L0C results from all cores into the same GM output matrix</td><td align="left">NZ->ND format conversion</td></tr>
     </table>
 
@@ -69,10 +69,10 @@ This example implements multi-core matrix multiplication based on the static Ten
        - Accumulation control is managed automatically through the `init_with_zero` parameter.
 
     4. **Slicing interface**: Use `slice` + `make_coord` + `make_shape` to obtain tensor sub-regions.
-       - Implement the multi-core split: split the K axis evenly so that each core processes one K-axis slice.
+       - Implement the multi-core split: split the k axis evenly so that each core processes one k-axis slice.
 
     5. **Atomic accumulation interface**: Use `asc_set_atomic_add_float` to configure float atomic addition for L0C to GM write-back.
-       - Accumulate the results of all K-axis slices into the same output matrix, then use `asc_disable_dma_atomic` to disable atomic addition after write-back.
+       - Accumulate the results of all k-axis slices into the same output matrix, then use `asc_disable_dma_atomic` to disable atomic addition after write-back.
 
   - Invocation implementation:
     Use the kernel call operator `<<<>>>` to invoke the kernel function.
@@ -87,7 +87,7 @@ This example primarily uses the following Tensor API capabilities:
 | Tensor representation | Use tensor objects to describe GM, L1, and L0 data directly |
 | Data movement | Use `copy` for movement between memory levels |
 | Format conversion | Rely on layout patterns to automatically convert between NZ and ZN |
-| Multi-core split | Use `slice` along the K axis to obtain the data slice processed by the current core |
+| Multi-core split | Use `slice` along the k axis to obtain the data slice processed by the current core |
 | Computation interface | Use `mmad` for matrix multiply-accumulate and atomic addition to accumulate partial results |
 
 ## Build and Run

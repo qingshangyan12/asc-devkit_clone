@@ -432,9 +432,12 @@ Tensor相关类型本身为类型定义，不直接返回值。
 
 using namespace asc::te;
 
+// gm_addr为Global Memory的地址偏移量；make_mem_ptr<location::gm, float>将其标记为
+// GM位置、元素类型为float的指针适配器（地址与对齐要求见make_mem_ptr约束）。
 constexpr uint64_t gm_addr = 128;
 
 // 示例1：构造一个GM张量
+// shape为(128, 128)、stride为(128, 1)：行优先连续布局，相邻元素间隔1个元素（单位：元素个数）
 auto gm_layout = make_layout(make_shape(128, 128), make_stride(128, 1));
 auto gm_tensor = make_tensor(make_mem_ptr<location::gm, float>(gm_addr), gm_layout);
 

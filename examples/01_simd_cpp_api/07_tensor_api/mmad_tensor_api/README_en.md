@@ -33,7 +33,7 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
 
   1. Dynamic Matmul functionality
 
-     The example constructs Tensor objects on GM, L1, L0A, L0B, L0C through Tensor API in the Kernel, uses the copy interface to complete block transfers from GM to L1 and L1 to L0, and performs matrix multiplication through the mmad interface. Matrix A is read in ND layout, matrix B is read in DN layout (stored as transposed [N, K] in input files). Shape parameters (M, N, K, singleCoreM, singleCoreN, singleCoreK) are passed to the Kernel at runtime, while baseM, baseN, baseK and stepM, stepN, stepK, ENABLE_UNITFLAG serve as compile-time template parameters determining L1/L0 Buffer allocation sizes and block stepping.
+     The example constructs Tensor objects on GM, L1, L0A, L0B, L0C through Tensor API in the Kernel, uses the copy interface to complete block transfers from GM to L1 and L1 to L0, and performs matrix multiplication through the mmad interface. Matrix A is read in ND layout, matrix B is read in DN layout (stored as transposed [N, K] in input files). Shape parameters (m, n, k, single_core_m, single_core_n, single_core_k) are passed to the Kernel at runtime, while base_m, base_n, base_k and step_m, step_n, step_k, enable_unitflag serve as compile-time template parameters determining L1/L0 Buffer allocation sizes and block stepping.
 
   2. Fixpipe inline quantization/dequantization functionality
 
@@ -42,14 +42,14 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
       1. per_tensor: Quantize/dequantize the entire Tensor, with the Tensor having a unique scaling factor. This approach can reduce model storage and computation costs but decreases model accuracy.
       2. per_channel: Quantize/dequantize each channel of the Tensor individually, with the same scaling factor shared within a channel and different scaling factors between channels. This approach better preserves model accuracy but increases model storage and computation costs.
 
-  3. ENABLE_UNITFLAG
+  3. enable_unitflag
 
-     The example controls the unitFlag feature switch through the `ENABLE_UNITFLAG` template parameter, with default value true.
+     The example controls the unitFlag feature switch through the `enable_unitflag` template parameter, with default value true.
      For detailed unitFlag description, see [mmad unitFlag Feature Example](../../03_basic_api/03_matrix_compute/mmad_unitflag/README_en.md)
 
 - Example specifications:
 
-  In the kernel function direct invocation example, the default supported shape is: M = 1024, N = 1024, K = 256.
+  In the kernel function direct invocation example, the default supported shape is: m = 1024, n = 1024, k = 256.
 
   <a name="table1"></a>
   <table border="2" align="center">
@@ -57,10 +57,10 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
       <span style="font-weight: bold; font-size: 1.2em;">Table 1: Example Specifications</span></caption>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">Matmul with Quant</td></tr>
   <tr><td rowspan="4" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x (Matrix A)</td><td align="center">[M, K]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
+  <tr><td align="center">x (Matrix A)</td><td align="center">[m, k]</td><td align="center">int8_t</td><td align="center">ND</td></tr>
   <tr><td align="center">y (Matrix B, transposed storage)</td><td align="center">[N, K]</td><td align="center">int8_t</td><td align="center">DN</td></tr>
-  <tr><td align="center">quant</td><td align="center">[N]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Example Output</td><td align="center">z (Matrix C)</td><td align="center">[M, N]</td><td align="center">half</td><td align="center">ND</td></tr>
+  <tr><td align="center">quant</td><td align="center">[n]</td><td align="center">uint64_t</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Example Output</td><td align="center">z (Matrix C)</td><td align="center">[m, n]</td><td align="center">half</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">mmad_quant_custom</td></tr>
   </table>
 
@@ -68,13 +68,13 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
 
   | Parameter    | Default | Description                    |
   | :------ | :----- | :---------------------- |
-  | BASE_M  | 256    | M dimension base block size       |
-  | BASE_N  | 256    | N dimension base block size       |
-  | BASE_K  | 64     | K dimension base block size       |
-  | STEP_M  | 1      | M dimension L1 cache step         |
-  | STEP_N  | 1      | N dimension L1 cache step         |
-  | STEP_K  | 4      | K dimension L1 cache step         |
-  | ENABLE_UNITFLAG  | true      | unitFlag feature switch         |
+  | base_m  | 256    | M dimension base block size       |
+  | base_n  | 256    | N dimension base block size       |
+  | base_k  | 64     | K dimension base block size       |
+  | step_m  | 1      | M dimension L1 cache step         |
+  | step_n  | 1      | N dimension L1 cache step         |
+  | step_k  | 4      | K dimension L1 cache step         |
+  | enable_unitflag  | true      | unitFlag feature switch         |
 
   Runtime dynamic parameter defaults:
 
@@ -83,10 +83,10 @@ This example implements dynamic Shape matrix multiplication and inline quantizat
   | m            | 1024   | Number of rows in Matrix A                |
   | n            | 1024   | Number of columns in Matrix B                |
   | k            | 256    | Number of columns in Matrix A / Number of rows in Matrix B    |
-  | singleCoreM  | 256    | Single-core M dimension size              |
-  | singleCoreN  | 128    | Single-core N dimension size              |
-  | singleCoreK  | 256    | Single-core K dimension size              |
-  | NUM_BLOCKS   | 32     | Number of Blocks launched by Kernel      |
+  | single_core_m  | 256    | Single-core M dimension size              |
+  | single_core_n  | 128    | Single-core N dimension size              |
+  | single_core_k  | 256    | Single-core K dimension size              |
+  | num_blocks   | 32     | Number of Blocks launched by Kernel      |
 
 ## Build and Run
 

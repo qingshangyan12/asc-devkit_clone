@@ -42,7 +42,7 @@
         const DstTensor& dst, const SrcTensor& src)
     ```
 
-- 根据源张量和目的张量的存储位置自动推导搬运通路，使用默认trait执行L1 Buffer到UB搬运。
+- 根据源张量和目的张量的存储位置自动推导搬运通路，使用[默认trait](../../algorithm.md#copy_traits)执行L1 Buffer到UB搬运。
 
     ```cpp
     template <typename DstTensor, typename SrcTensor>
@@ -103,7 +103,7 @@
 
 | 参数名 | 输入/输出 | 描述 |
 | :--- | :---: | :--- |
-| atom | 输入 | 搬运原子对象，可由`make_copy`接口构造。 |
+| atom | 输入 | 搬运原子对象，封装特定搬运通路的Operation、Trait与可选运行时Params组合，可由`make_copy`接口构造，详见[Algorithm](../../algorithm.md#copy_atom)。 |
 | dst | 输出 | 目的张量，存储位置必须为`location::ub`。 |
 | src | 输入 | 源张量，存储位置必须为`location::l1`。 |
 | dst_coord | 输入 | 搬运区域在目的张量中的起始坐标。 |
