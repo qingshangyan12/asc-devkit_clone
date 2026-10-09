@@ -60,6 +60,11 @@ target_include_directories(
             $<BUILD_INTERFACE:${ASCENDC_DIR}/impl/simt_api>
 )
 
+target_link_libraries(
+        asc_kernel_headers
+        INTERFACE $<BUILD_INTERFACE:cann_version_headers>
+)
+
 add_library(asc_host_headers INTERFACE)
 target_include_directories(
   asc_host_headers

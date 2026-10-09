@@ -18,15 +18,7 @@
 #include <cstdint>
 #include <type_traits>
 #include "sys_macros_impl.h"
-// Prefer the generated version header; fall back to 0 (version gates closed) when it is not on the include path.
-#if defined(__has_include)
-#if __has_include("version/asc_devkit_version.h")
 #include "version/asc_devkit_version.h"
-#endif
-#endif
-#ifndef ASC_DEVKIT_VERSION_NUM
-#define ASC_DEVKIT_VERSION_NUM 0
-#endif
 
 namespace AscendC {
 enum class Hardware : uint8_t {
