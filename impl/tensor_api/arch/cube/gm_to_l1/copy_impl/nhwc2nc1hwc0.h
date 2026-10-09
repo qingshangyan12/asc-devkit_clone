@@ -59,7 +59,7 @@ public:
 
         copy_gm_to_l1_multi_nd2nz_instr::data_copy(
             dst.data().get(), src.data().get(), nd_num, loop2_dst_stride, loop3_dst_stride, loop4_dst_stride,
-            loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false);
+            loop1_src_stride, cache_mode, n_value, d_value, loop4_src_stride, false, trait.pre_allocation);
     }
 
     template <
@@ -88,7 +88,7 @@ public:
         copy_gm_to_l1_multi_nd2nz_instr::data_copy_with_offset(
             dst, src, dst_offset, src_offset, nd_num, 1, loop3_dst_stride, loop4_dst_stride, loop1_src_stride,
             static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), n_value, d_value, loop4_src_stride,
-            false);
+            false, trait.pre_allocation);
     }
 };
 
