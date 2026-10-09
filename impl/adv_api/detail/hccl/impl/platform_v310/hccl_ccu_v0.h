@@ -510,14 +510,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         resourceId);
     GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
     ccuMsg_.xnAddr = xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
+    // 性能优化(W1)：xnData 绕过数据 cache 直写 HBM（WriteGmBypassDCache），省去逐 64B 行
+    // FlushDataCache 的 Barrier+DCCI+DSB 重屏障；末尾单次 DataSyncBarrier 保证参数全部
+    // 全局可见后再写 commit CKE（WriteHBMData 内含 Barrier/DSB）。消费方仅 CCU server 的
+    // ccu::Load（直读 HBM，不经 AIV cache），与 AIV cache 行为无耦合，语义等价。
     for (int i = 0; i < ccuUsedXnNum_; i++) {
-        *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
+        WriteGmBypassDCache(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i), xnData_[i]);
     }
-
-    // 循环刷新xn, ccuUsedXnNum_ + 7) / 8 向上取整
-    for (int i = 0; i < ((ccuUsedXnNum_ + 7) / 8); i++) {
-        FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
-    }
+    DataSyncBarrier<MemDsbT::ALL>();
 
     // 性能优化(P1)：原 26 参日志的参数表达式（26 次 __gm__ 读）在日志级别过滤前
     // 无条件求值，每轮必付 26 次 GM 读；降为 0 GM 读的单行摘要。
@@ -669,8 +669,8 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
                 }
             }
         }
-        finishNumTemp_++;
-        WriteHBMData(finishCntGM_, finishNumTemp_);
+        // 性能优化(W2)：workingFlag 路径下 finishCntGM_ 无读者（唯一读者是非 workingFlag
+        // 分支的轮询，二者互斥；上游 hccl 亦无此变量），删除每轮一次的重屏障 GM 写。
     } else {
         while (true) {
             uint64_t finshCnt = ReadHBMData(finishCntGM_);
