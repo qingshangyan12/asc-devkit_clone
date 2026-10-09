@@ -5682,10 +5682,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
     int32_t result = __internal_ilogbf_finite_abs(ax);
 
     if (ax == ASCRT_INF_F) {
-        result = static_cast<int32_t>(0x7FFFFFFFU); // INT_MAX: infinity maps to this sentinel.
+        result = ASCRT_MAX_VAL_S; // INT_MAX: infinity maps to this sentinel.
     }
     if (__isnan(x) || x == 0.0f) {
-        result = static_cast<int32_t>(0x80000000U); // INT_MIN: NaN and 0 map to this sentinel.
+        result = ASCRT_MIN_VAL_S; // INT_MIN: NaN and 0 map to this sentinel.
     }
 
     return result;
