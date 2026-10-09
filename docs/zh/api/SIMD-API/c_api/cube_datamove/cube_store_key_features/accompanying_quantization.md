@@ -59,13 +59,15 @@ Scalar和Vector模式使用相同架构下的量化参数编码，区别在于�
 
 1. 在当前架构的搬出接口中确认源/目的类型、量化模式和目标格式可组合使用。
 2. Scalar模式：通过[asc_set_l0c_copy_prequant](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置系数。
-<!-- npu="A3,910b" id15 -->
-Atlas A3系列产品和Atlas A2系列产品使用`uint64_t config`重载。
-<!-- end id15 -->
 
-<!-- npu="950" id16 -->
-Ascend 950PR&950DT系列产品可使用`scale, offset, is_signed`重载或原始编码重载。
-<!-- end id16 -->
+    <!-- npu="A3,910b" id15 -->
+    Atlas A3系列产品和Atlas A2系列产品使用`uint64_t config`重载。
+    <!-- end id15 -->
+
+    <!-- npu="950" id16 -->
+    Ascend 950PR&950DT系列产品可使用`scale, offset, is_signed`重载或原始编码重载。
+    <!-- end id16 -->
+
 3. Vector模式：将每列参数准备在L1 Buffer，经[asc_copy_l12fb](../cube_compute_load/asc_copy_l12fb.md)搬入Fixpipe Buffer的量化参数区，再用[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)设置`quant_pre_addr`。若原始参数位于GM，先通过当前架构的[asc_copy_gm2l1](../cube_compute_load/asc_copy_gm2l1.md)搬入L1。
 4. 根据输入数据及参数搬运的依赖关系完成[核内同步](../../sync/intra_core_sync/intra_core_sync.md)后，在L0C搬出接口中选择对应量化模式；若还需激活，结合[随路ReLU](accompanying_relu.md)配置。
 
@@ -142,13 +144,15 @@ VQF322F32_PRE,         // Vector_Quant_Float32_2_Float32: float量化成float，
 - 量化参数不能为inf、nan或非规格化数；配置前需检查缩放系数，具体限制见对应配置接口。
 - 缩放系数按表中有效位参与计算，不保留完整FP32尾数精度。输出仍为float的量化模式也会受到该有效精度的影响。
 - Offset、Sign只在表中列出的模式下生效。
-<!-- npu="A3,910b" id17 -->
-- Atlas A3系列产品和Atlas A2系列产品的N/MCB只在表中列出的模式下生效。
-<!-- end id17 -->
 
-<!-- npu="950" id18 -->
-- Ascend 950PR&950DT系列产品中32~36位无效，不能沿用Atlas A3系列产品和Atlas A2系列产品的右移配置。
-<!-- end id18 -->
+  <!-- npu="A3,910b" id17 -->
+  Atlas A3系列产品和Atlas A2系列产品的N/MCB只在表中列出的模式下生效。
+  <!-- end id17 -->
+
+  <!-- npu="950" id18 -->
+  Ascend 950PR&950DT系列产品中32~36位无效，不能沿用Atlas A3系列产品和Atlas A2系列产品的右移配置。
+  <!-- end id18 -->
+
 - Vector量化的参数按原始C矩阵的N维列索引对应。分块搬出时，应同步检查参数区偏移、列数、对齐及占用范围。Fixpipe Buffer的量化区和激活区独立寻址，不能把元素下标直接传给地址索引参数。
 - 不同搬出任务需要不同系数时，应在对应搬出执行前重新配置。`asc_set_l0c_copy_config`每次同时覆盖激活地址、量化地址和UnitFlag初始化参数，三者的含义见该接口的参数说明。
 

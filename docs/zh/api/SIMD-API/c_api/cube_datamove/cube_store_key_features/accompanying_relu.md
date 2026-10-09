@@ -14,8 +14,7 @@ Atlas A3系列产品和Atlas A2系列产品的`relu_pre`使用整数参数，需
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
-下表的`asc_relu_pre_mode`枚举及其配置接口适用于Ascend 950PR&950DT系列产品；Atlas A3系列产品和Atlas A2系列产品使用前文所述的整数`relu_pre`参数。
-<!-- end id4 -->
+下表的`asc_relu_pre_mode`枚举及其配置接口适用于Ascend 950PR&950DT系列产品。
 
 | `asc_relu_pre_mode`枚举值 | 编码 | 作用及配置 |
 | --- | --- | --- |
@@ -23,6 +22,7 @@ Atlas A3系列产品和Atlas A2系列产品的`relu_pre`使用整数参数，需
 | `NORMAL` | 1 | Normal ReLU，负半轴系数为0 |
 | `SCALAR` | 2 | 全矩阵共享激活系数，使用[asc_set_l0c_copy_relu_alpha](../cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md)配置 |
 | `VECTOR` | 3 | 每个N通道独立激活系数，先将系数搬入，再用[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)配置`relu_pre_addr` |
+<!-- end id4 -->
 
 与随路量化组合使用的详细信息请参考[随路量化与随路ReLU场景组合](accompanying_quantization_and_relu_scenario_combination.md)。
 
