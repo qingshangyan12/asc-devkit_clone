@@ -28,7 +28,7 @@
 
 头文件路径为：`tensor_api/tensor.h`。
 
-`get_shape`用于从layout中提取shape部分：
+`get_shape`用于从[layout](./layout.md)（布局，通过形状和步长信息描述张量的内存布局）中提取shape部分：
 
 - **不指定模板参数Is...**：返回完整的shape元组。
 - **指定模板参数Is...**：从shape顶层tuple中选择对应索引的元素。指定单个索引时返回该元素；指定多个索引时返回由这些顶层元素组成的新tuple。
