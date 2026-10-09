@@ -10,8 +10,18 @@
 #ifndef __TESTS_C_API_STUB__
 #define __TESTS_C_API_STUB__
 #include <cstdint>
+#include <array>
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
+
+// Temporary CPU stubs: current tikicpulib stub_def.h has no vector_f8e6m2 / vector_hif4x2 yet.
+// Keep include/c_api/defs/type.h aliases compiling for 9201 UT.
+#if !defined(ASCENDC_HAS_VECTOR_F8E6M2)
+using vector_f8e6m2 = std::array<uint8_t, ConstantsInternal::b8EleSize>;
+#endif
+#if !defined(ASCENDC_HAS_VECTOR_HIF4X2)
+using vector_hif4x2 = std::array<uint8_t, ConstantsInternal::b8EleSize>;
+#endif
 
 struct hifloat4x2_t {
     uint8_t val = 0;
@@ -1493,6 +1503,14 @@ inline void vstur(vector_align& alignData, vector_f8e5m2 src, __ubuf__ fp8_e5m2_
 inline void vstur(vector_align& alignData, vector_f8e8m0 src, __ubuf__ fp8_e8m0_t* base, Literal post) {}
 inline void vstur(vector_align& alignData, vector_f4e2m1x2 src, __ubuf__ fp4x2_e2m1_t* base, Literal post) {}
 inline void vstur(vector_align& alignData, vector_f4e1m2x2 src, __ubuf__ fp4x2_e1m2_t* base, Literal post) {}
+
+// npu_arch_9201 merging convert: vcvt(dst, src, mask, rnd, sat, part, mode) for fp4
+inline void vcvt(
+    vector_f4e1m2x2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+inline void vcvt(
+    vector_f4e2m1x2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
 
 inline void nd_dma_dci() {}
 
