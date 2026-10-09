@@ -56,7 +56,7 @@ namespace te {
     M(fp8_e5m2_t, __VA_ARGS__)        \
     M(fp8_e4m3fn_t, __VA_ARGS__)      \
     M(fp8_e8m0_t, __VA_ARGS__)        \
-    M(int4b_t, __VA_ARGS__) 
+    M(int4b_t, __VA_ARGS__)
 
 #define TENSOR_API_TYPE_ALIAS(qual, type) qual##_##type
 
