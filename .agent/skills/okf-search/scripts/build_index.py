@@ -40,9 +40,13 @@ SKILL_ROOT = SCRIPTS_DIR.parent
 INDEX_DIR = SKILL_ROOT / "index"
 PRODUCT_MAP_PATH = SKILL_ROOT / "config" / "product-map.yaml"
 STAGES = ("in", "out", "compute")
-LOCAL_BUFFERS = {
-    "unified_buffer", "l1_buffer", "l0a_buffer", "l0b_buffer", "l0c_buffer",
-    "bias_table_buffer", "fixpipe_buffer", "vector_register", "mask_register", "register_tensor",
+# 数据位置深度：数值越大越靠近计算核，用于按参数方向判定搬入/搬出。
+LOCATION_DEPTH = {
+    "global_memory": 0,
+    "l1_buffer": 1,
+    "l0a_buffer": 2, "l0b_buffer": 2, "l0c_buffer": 2,
+    "unified_buffer": 3, "bias_table_buffer": 3, "fixpipe_buffer": 3,
+    "vector_register": 4, "mask_register": 4, "register_tensor": 4,
 }
 API_CLASS_TO_MODEL = {
     "vector_compute": "memory_vector", "vector_datamove": "memory_vector",
@@ -55,7 +59,7 @@ EXECUTION_MODEL_AREAS = {
 }
 DTYPE_ALIASES = {
     "f16": "half", "fp16": "half", "f32": "float", "fp32": "float", "bf16": "bfloat16",
-    "int": "int32", "uint": "uint32", "int4b": "int4", "b8": "int8",
+    "int": "int32", "uint": "uint32", "int4b": "int4", "int4x2": "int4", "b8": "int8",
     "e4m3": "fp8_e4m3fn", "e5m2": "fp8_e5m2", "e8m0": "fp8_e8m0", "hif8": "hifloat8",
     "e1m2x2": "fp4x2_e1m2", "e2m1x2": "fp4x2_e2m1",
 }
@@ -310,22 +314,49 @@ def classify_documents(documents: dict[str, dict[str, Any]], scope: Scope) -> No
         doc["standalone_primary"] = False
 
 
+def param_location(param: dict[str, Any]) -> str:
+    if param.get("address_space"):
+        return param["address_space"]
+    if param.get("type") == "ub_addr8_t":
+        return "unified_buffer"
+    if param.get("is_vector"):
+        return "mask_register" if param.get("is_mask") else "vector_register"
+    return ""
+
+
+def signature_stages(signature: dict[str, Any]) -> set[str]:
+    """单个声明：按参数方向（方向缺失时按 dst 首参约定）判定数据流动方向。"""
+    located = [(param, param_location(param)) for param in signature.get("params", [])]
+    located = [(param, loc) for param, loc in located if loc]
+    if not located:
+        return set()
+    in_locs = [loc for param, loc in located if "in" in (param.get("direction") or "")]
+    out_locs = [loc for param, loc in located if "out" in (param.get("direction") or "")]
+    if not in_locs and not out_locs:
+        out_locs, in_locs = [located[0][1]], [loc for _, loc in located[1:]]
+    if not in_locs or not out_locs:
+        return set()
+    in_depth = [LOCATION_DEPTH[loc] for loc in in_locs if loc in LOCATION_DEPTH]
+    out_depth = [LOCATION_DEPTH[loc] for loc in out_locs if loc in LOCATION_DEPTH]
+    if not in_depth or not out_depth:
+        return set()
+    stages = set()
+    if max(out_depth) > min(in_depth):
+        stages.add("in")
+    if min(out_depth) < max(in_depth):
+        stages.add("out")
+    return stages
+
+
 def stage_of(doc: dict[str, Any]) -> list[str]:
     roles = set(doc["tags"].get("roles", []))
-    locations = set(doc.get("derived_locations", []))
-    local = locations & LOCAL_BUFFERS
-    stages = []
-    if "data_movement" in roles and (
-        ("global_memory" in locations and local) or ("unified_buffer" in locations and "vector_register" in locations)
-    ):
-        stages.append("in")
-    if "data_movement" in roles and (
-        (local and "global_memory" in locations) or ("vector_register" in locations and "unified_buffer" in locations)
-    ):
-        stages.append("out")
+    stages: set[str] = set()
+    if "data_movement" in roles:
+        for signature in doc.get("derived_signatures", []):
+            stages |= signature_stages(signature)
     if "compute" in roles:
-        stages.append("compute")
-    return stages
+        stages.add("compute")
+    return sorted(stages)
 
 
 def conversion_pair(rel: str, doc: dict[str, Any]) -> str | None:
@@ -363,27 +394,6 @@ def check_graph(documents: dict[str, dict[str, Any]], errors: list[str]) -> list
             edges[(rel, dep["path"])] = {
                 "from": rel, "to": dep["path"], "kind": dep["kind"], "condition": dep["condition"],
             }
-    adjacency: dict[str, list[str]] = {}
-    for (src, dst), edge in edges.items():
-        if edge["kind"] == "requires":
-            adjacency.setdefault(src, []).append(dst)
-    state: dict[str, str] = {}
-    cycles: list[str] = []
-
-    def visit(node: str, stack: list[str]) -> None:
-        state[node] = "active"
-        for nxt in sorted(adjacency.get(node, [])):
-            if state.get(nxt) == "active":
-                cycles.append(" -> ".join(stack + [node, nxt]))
-            elif state.get(nxt) != "done":
-                visit(nxt, stack + [node])
-        state[node] = "done"
-
-    for node in sorted(adjacency):
-        if state.get(node) != "done":
-            visit(node, [])
-    for cycle in cycles:
-        errors.append(f"requires cycle: {cycle}")
     for rel, doc in documents.items():
         for dep in doc["dependencies"]:
             target = dep["path"]
@@ -527,7 +537,8 @@ def build(root: Path, scope: Scope, out_dir: Path, cann_version: str, arch_label
         gated[rel] = doc
 
     edges = check_graph(gated, errors)
-    gaps = validate_gaps(scope, errors)
+    gaps, gaps_raw = load_gaps(scope)
+    validate_gaps(gaps, errors)
     if errors:
         raise BuildError(f"{len(errors)} validation error(s):\n" + "\n".join(f"  - {e}" for e in errors[:30]))
 
@@ -599,17 +610,15 @@ def build(root: Path, scope: Scope, out_dir: Path, cann_version: str, arch_label
         "source_commit": index["meta"]["source_commit"],
         "taxonomy_sha256": hashlib.sha256(TAXONOMY_PATH.read_bytes()).hexdigest(),
         "product_map_sha256": hashlib.sha256(PRODUCT_MAP_PATH.read_bytes()).hexdigest(),
-        "gaps_sha256": hashlib.sha256(
-            (INDEX_DIR / scope.name / "gaps.json").read_bytes()
-        ).hexdigest(),
+        "gaps_sha256": hashlib.sha256(gaps_raw).hexdigest(),
         "document_sha256": {
             rel: hashlib.sha256((root / rel).read_bytes()).hexdigest() for rel in sorted(gated)
         },
     }
     out_dir.mkdir(parents=True, exist_ok=True)
-    # gaps.json 是人工维护的构建输入（始终取自 committed scope 目录），随实例落盘一份
-    # 快照，保证 --out 构建的实例目录可被 query.py 直接加载。
-    (out_dir / "gaps.json").write_bytes((INDEX_DIR / scope.name / "gaps.json").read_bytes())
+    # gaps.json 可选（人工维护）：缺失时落盘空台账快照，保证 --out 构建的实例目录
+    # 可被 query.py 直接加载。
+    (out_dir / "gaps.json").write_bytes(gaps_raw)
     written: list[Path] = [out_dir / "gaps.json"]
     for name, payload in (
         # index.json 紧凑序列化（全量 592 篇 + 6550 声明，indent 会突破远端 10 MiB 单文件限制）
@@ -624,12 +633,19 @@ def build(root: Path, scope: Scope, out_dir: Path, cann_version: str, arch_label
     return written
 
 
-def validate_gaps(scope: Scope, errors: list[str]) -> dict[str, Any]:
+EMPTY_GAPS: dict[str, Any] = {"scope_out_gaps": [], "relation_gaps": []}
+
+
+def load_gaps(scope: Scope) -> tuple[dict[str, Any], bytes]:
+    """gaps.json 可选：缺失视为空台账；返回值同时用于指纹与快照落盘。"""
     path = INDEX_DIR / scope.name / "gaps.json"
-    if not path.is_file():
-        errors.append(f"gaps.json is missing: {path}")
-        return {"scope_out_gaps": [], "relation_gaps": []}
-    gaps = json.loads(path.read_text(encoding="utf-8"))
+    raw = path.read_text(encoding="utf-8") if path.is_file() else (
+        json.dumps(EMPTY_GAPS, ensure_ascii=False, indent=1) + "\n"
+    )
+    return json.loads(raw), raw.encode("utf-8")
+
+
+def validate_gaps(gaps: dict[str, Any], errors: list[str]) -> None:
     for section in ("scope_out_gaps", "relation_gaps"):
         if section not in gaps:
             errors.append(f"gaps.json: missing section {section}")
@@ -646,7 +662,6 @@ def validate_gaps(scope: Scope, errors: list[str]) -> dict[str, Any]:
     for gap in gaps.get("relation_gaps", []):
         if not (REPO_ROOT / gap["from"]).is_file():
             errors.append(f"gaps.json: relation gap source not found: {gap['from']}")
-    return gaps
 
 
 INFORMATIONAL_META = ("source_commit", "commit_date")

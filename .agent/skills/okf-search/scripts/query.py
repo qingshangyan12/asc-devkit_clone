@@ -15,14 +15,15 @@ from typing import Any
 
 SCRIPTS = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPTS))
-from build_index import INDEX_DIR, SCOPES, STAGES, normalize_dtype  # noqa: E402
+from build_index import EMPTY_GAPS, INDEX_DIR, SCOPES, normalize_dtype  # noqa: E402
 
 FILTER_KEYS = ("stage", "operation", "category", "api_class", "dtype", "kw", "convert", "feature", "version", "product")
 
 
 def load(index_dir: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     index = json.loads((index_dir / "index.json").read_text(encoding="utf-8"))
-    gaps = json.loads((index_dir / "gaps.json").read_text(encoding="utf-8"))
+    gaps_path = index_dir / "gaps.json"
+    gaps = json.loads(gaps_path.read_text(encoding="utf-8")) if gaps_path.is_file() else dict(EMPTY_GAPS)
     return index, gaps
 
 
@@ -30,7 +31,10 @@ def csv(value: str | None) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()] if value else []
 
 
-def resolve_api(index: dict[str, Any], name: str) -> str:
+def resolve_api(index: dict[str, Any], name: str) -> str | None:
+    """API 名 / 文档全路径 / 文件名 → 索引文档路径；未命中返回 None（由调用方空结果处理）。"""
+    if name in index["documents"]:
+        return name
     view = index["views"]["by_api"]
     if name in view:
         candidates = view[name]
@@ -42,7 +46,7 @@ def resolve_api(index: dict[str, Any], name: str) -> str:
     for path in index["documents"]:
         if Path(path).stem == name or Path(path).name == f"{name}.md":
             return path
-    raise ValueError(f"unknown API or document: {name}")
+    return None
 
 
 def why_tags(index: dict[str, Any], path: str, dims: dict[str, list[str]]) -> list[str]:
@@ -102,22 +106,7 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
         raise ValueError(
             "no filter given; use --stage/--operation/--category/--api-class/--dtype/--kw/--convert/--feature/--version/--product"
         )
-    unknown_stage = [s for s in dims["stage"] if s not in STAGES]
-    if unknown_stage:
-        raise ValueError(f"unknown stage(s): {unknown_stage}; valid: {list(STAGES)}")
-    for cat in dims["category"]:
-        if cat not in index["views"]["by_category"]:
-            raise ValueError(f"unknown category: {cat}; valid: {sorted(index['views']['by_category'])}")
-    for cls in dims["api_class"]:
-        if cls not in index["views"]["by_api_class"]:
-            raise ValueError(f"unknown api_class: {cls}; valid: {sorted(index['views']['by_api_class'])}")
-    for op in dims["operation"]:
-        if op not in index["views"]["by_operation"]:
-            raise ValueError(f"unknown operation: {op}")
-    for dtype in dims["dtype"]:
-        if dtype not in index["views"]["by_dtype"]:
-            raise ValueError(f"unknown dtype: {dtype}")
-
+    # 维度值不合法时不报错：视作空结果，交由 Agent 走降级链并用同义词重试
     candidates: set[str] | None = None
     for key, view_name in (
         ("stage", "by_stage"), ("operation", "by_operation"), ("category", "by_category"),
@@ -146,6 +135,8 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
 
 def api_card(index: dict[str, Any], name: str) -> list[dict[str, Any]]:
     owner = resolve_api(index, name)
+    if owner is None:
+        return []
     doc = index["documents"][owner]
     results = [{"path": owner, "why": ["api:owner"]}]
     for member in index["views"]["by_api"].get(doc["family"], []):
@@ -158,11 +149,16 @@ def api_card(index: dict[str, Any], name: str) -> list[dict[str, Any]]:
 
 def deps_query(index: dict[str, Any], target: str, kind: str | None, reverse: bool) -> list[dict[str, Any]]:
     path = resolve_api(index, target)
+    if path is None:
+        return []
     doc = index["documents"][path]
     results: list[dict[str, Any]] = []
     if reverse:
+        # 反向按解析到的家族聚合：族名/成员名/全路径都能查到全族入边
+        family_paths = set(index["views"]["by_api"].get(doc["family"], []))
+        family_paths.add(path)
         for edge in index["graph"]["edges"]:
-            if edge["to"] == path and (not kind or edge["kind"] == kind):
+            if edge["to"] in family_paths and (not kind or edge["kind"] == kind):
                 results.append({"path": edge["from"], "why": [f"reverse:{edge['kind']}"],
                                 "condition": edge["condition"], "out_of_scope": edge["from"] not in index["documents"]})
     else:

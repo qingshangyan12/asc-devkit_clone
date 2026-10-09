@@ -18,7 +18,7 @@ okf-search/
   derive-overrides/c_api.json   # LLM/人工裁决残留（unresolved.json 的固化结论，可审查可回放）
   index/c_api/index.json        # 索引实例（构建产物）：documents + 15 视图 + 依赖图 + defs 目录
   index/c_api/build-meta.json   # 源 commit、文档 sha256、词表/映射指纹
-  index/c_api/gaps.json         # 缺口登记（人工维护、构建校验、随实例落盘快照）
+  index/c_api/gaps.json         # 缺口登记（可选、人工维护；缺失视为空台账，随实例落盘快照）
   index/c_api/概览.md            # 人读概览（构建产物）
   tests/test_index.py           # 门控 + 推导正确性 + 确定性 + ensure 决策 + dryrun 回归
   tests/dryrun.yaml             # 查询清单（A5/A3 双实例）
@@ -93,7 +93,7 @@ scope 文档数 + 词表/映射/gaps 哈希，毫秒级），`--strict` 走全�
   检索侧触发 ensure 重建产生的本地 diff 同样只在维护流程确认后提交。
 - `derive-overrides/<surface>.json` 只登记脚本无法裁决、经人工核对的事实，每条附 reason；
   新增推导规则可消除的条目应删除。
-- gaps.json 人工按证据增补（hint/evidence 必须是真实仓库路径），构建只做存在性校验；
-  `--out` 构建的实例目录会落盘 gaps.json 快照供 query 直接加载。
+- gaps.json 可选：人工按证据增补（hint/evidence 必须是真实仓库路径）；缺失或为空时构建照常
+  出索引（`--gap` 返回空），`--out` 构建的实例目录始终落盘快照供 query 直接加载。
 - 词表合法性以本 skill `config/tag-taxonomy.json`（随包分发的冻结词表）校验；
   接入新范围时在 `SCOPES` 登记并扩充 dryrun 清单（c_api 全量已放开 categories=None）。

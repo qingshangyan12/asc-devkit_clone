@@ -180,7 +180,7 @@ def _parse_param(text: str, directions: dict[str, str]) -> Param:
         else:
             param.base_type = f"vector_{token}"
             param.dtype = DTYPE_ALIASES.get(token, "")
-    else:
+    elif not template:
         base = re.match(r"(\w+)", text)
         if base:
             param.base_type = base.group(1)
