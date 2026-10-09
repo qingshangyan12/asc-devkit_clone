@@ -84,10 +84,24 @@ __simd_callee__ inline decltype(auto) load_gather(
 
 | `mode` | Tensor元素类型 | `Index`类型 |
 | --- | --- | --- |
-| `element` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t` | `uint16_t` |
-| `element` | `int32_t`、`uint32_t`、`float` | `uint32_t` |
-| `element` | `int64_t`、`uint64_t` | `uint32_t`、`uint64_t` |
-| `data_block` | 8bit、16bit、32bit和64bit类型 | `uint32_t` |
+| `element` | `int8_t` | `uint16_t` |
+| `element` | `uint8_t` | `uint16_t` |
+| `element` | `int16_t` | `uint16_t` |
+| `element` | `int16_t` | `uint32_t` |
+| `element` | `uint16_t` | `uint16_t` |
+| `element` | `uint16_t` | `uint32_t` |
+| `element` | `half` | `uint16_t` |
+| `element` | `half` | `uint32_t` |
+| `element` | `bfloat16_t` | `uint16_t` |
+| `element` | `bfloat16_t` | `uint32_t` |
+| `element` | `int32_t` | `uint32_t` |
+| `element` | `uint32_t` | `uint32_t` |
+| `element` | `float` | `uint32_t` |
+| `element` | `hifloat8_t` | `uint16_t` |
+| `element` | `fp8_e4m3fn_t` | `uint16_t` |
+| `element` | `fp8_e5m2_t` | `uint16_t` |
+| `element` | `fp8_e8m0_t` | `uint16_t` |
+| `data_block` | `int4b_t`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t` | `uint32_t` |
 
 未列出的类型或模式组合会产生编译期错误。
 
