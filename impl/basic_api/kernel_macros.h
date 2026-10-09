@@ -127,8 +127,7 @@ extern int32_t g_matmulCount;
 namespace AscendC {
 namespace Reg {} // namespace Reg
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-                              (__NPU_ARCH__ == 3003) || ((__NPU_ARCH__ == 3113)))
-                              (__NPU_ARCH__ == 3103) || ((__NPU_ARCH__ == 3113)))
+                              (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
 namespace MicroAPI = Reg;
 #endif
 } // namespace AscendC
