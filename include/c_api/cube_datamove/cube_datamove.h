@@ -20,7 +20,6 @@
 #ifndef INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 #define INCLUDE_C_API_CUBE_DATAMOVE_CUBE_DATAMOVE_H
 #include "c_api/defs/defs.h"
-#include "version/asc_devkit_version.h"
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
 #include "impl/c_api/memory_base_impl/cube_datamove_intf_impl.h"
@@ -2634,7 +2633,7 @@ __aicore__ inline void asc_copy_gm2l1(
     __cbuf__ void* dst, __gm__ void* src, uint32_t m_start_position, uint32_t k_start_position, uint16_t dst_stride,
     uint16_t m_step, uint16_t k_step, uint8_t decomp_mode, uint8_t l2_cache_ctl);
 
-#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+#if (ASC_DEVKIT_VERSION_NUM >= 902000000)
 // ==========asc_copy_l0c2l1 (9201 unique: quant_pre_rnd)==========
 __aicore__ inline void asc_copy_l0c2l1(
     __cbuf__ half* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride, uint16_t src_stride,
