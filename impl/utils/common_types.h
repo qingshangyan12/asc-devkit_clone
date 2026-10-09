@@ -18,7 +18,6 @@
 #include <cstdint>
 #include <type_traits>
 #include "sys_macros_impl.h"
-#include "version/asc_devkit_version.h"
 
 namespace AscendC {
 enum class Hardware : uint8_t {
