@@ -95,3 +95,11 @@ inline half __hmin(half x, half y)
         dst[idx] = __hmin(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x： -1.25 0.5 2.5 -3.75
+y： -1.25 0.5 2.5 -3.75
+output： -1.25 0.5 2.5 -3.75
+```

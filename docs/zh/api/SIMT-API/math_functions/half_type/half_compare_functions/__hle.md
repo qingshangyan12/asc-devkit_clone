@@ -77,3 +77,11 @@ bool __hle(half x, half y)
         dst[idx] = __hle(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x： -1.25 0.5 2.5 -3.75
+y： -1.25 0.5 2.5 -3.75
+output： true true true true
+```
