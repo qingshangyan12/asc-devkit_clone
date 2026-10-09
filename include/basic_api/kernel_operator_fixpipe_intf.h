@@ -178,6 +178,82 @@ __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace,
     const FixpipeParamsArch3510<config.format>& intriParams);
 #endif
+
+/* ========== AscendC CUBE pointer overloads ==========
+ * CUBE pointer overloads (Fixpipe / SetFixPipeConfig)
+ * Declarations only; definitions in corresponding *_ptr_impl.h
+ * ======================================================= */
+template <typename T>
+__aicore__ inline void SetFixPipeAddr(__cbuf__ T* eleWiseData, uint16_t c0ChStride);
+
+template <typename T, bool setRelu = false>
+__aicore__ inline void SetFixPipeConfig(__cc__ T* preData, bool isUnitFlag = false);
+
+template <typename T>
+__aicore__ inline void SetFixPipeConfig(__cc__ T* reluPre, __cc__ T* quantPre, bool isUnitFlag = false);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3003 || \
+__NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 3510 || \
+                              __NPU_ARCH__ == 5102)
+// Note: FixpipeParamsM300 / M310 are typedef aliases of FixpipeParamsV220.
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__ubuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __cbuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __ubuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+#endif
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__ubuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __cbuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __ubuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams, uint8_t cacheMode);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams, uint8_t cacheMode);
+
+#endif
+
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

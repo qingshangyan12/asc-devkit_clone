@@ -54,6 +54,17 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
  * @param [in] global memory workspace
  */
 __aicore__ inline void NotifyNextBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTensor<int32_t>& ubWorkspace);
+
+/* ========== AscendC CUBE pointer overloads ==========
+ * CUBE pointer overloads (InitDetermineComputeWorkspace / WaitPreBlock / NotifyNextBlock)
+ * Declarations only; definitions in corresponding *_ptr_impl.h
+ * ======================================================= */
+__aicore__ inline void InitDetermineComputeWorkspace(__gm__ int32_t* gmWorkspace, __ubuf__ int32_t* ubWorkspace);
+
+__aicore__ inline void WaitPreBlock(__gm__ int32_t* gmWorkspace, __ubuf__ int32_t* ubWorkspace);
+
+__aicore__ inline void NotifyNextBlock(__gm__ int32_t* gmWorkspace, __ubuf__ int32_t* ubWorkspace);
+
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

@@ -99,6 +99,34 @@ public:
     __aicore__ inline void WaitFlag(TEventID id);
 };
 
+
+/* ========== AscendC CUBE pointer overloads ==========
+ * CUBE pointer overloads (SyncAll / IBSet / IBWait)
+ * Declarations only; definitions in corresponding *_ptr_impl.h
+ * ======================================================= */
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+__aicore__ inline void BlockSyncPtrCopyGm2Ub(__ubuf__ int32_t* dst, __gm__ int32_t* src);
+
+__aicore__ inline void BlockSyncPtrCopyUb2Gm(__gm__ int32_t* dst, __ubuf__ int32_t* src);
+
+#else
+__aicore__ inline void BlockSyncPtrCopyGm2Ub(__ubuf__ int32_t* dst, __gm__ int32_t* src);
+
+__aicore__ inline void BlockSyncPtrCopyUb2Gm(__gm__ int32_t* dst, __ubuf__ int32_t* src);
+
+#endif
+template <bool isAIVOnly = true>
+__aicore__ inline void SyncAll(
+    __gm__ int32_t* gmWorkspace, __ubuf__ int32_t* ubWorkspace, const int32_t usedCores = 0);
+
+template <bool isAIVOnly = true>
+__aicore__ inline void IBSet(
+    __gm__ int32_t* gmWorkspace, __ubuf__ int32_t* ubWorkspace, int32_t blockIdx, int32_t eventID);
+
+template <bool isAIVOnly = true>
+__aicore__ inline void IBWait(
+    __gm__ int32_t* gmWorkspace, __ubuf__ int32_t* ubWorkspace, int32_t blockIdx, int32_t eventID);
+
 } // namespace AscendC
 #if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_block_sync_intf_impl.h"

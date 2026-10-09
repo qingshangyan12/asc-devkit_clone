@@ -56,6 +56,68 @@ __aicore__ inline void DumpAccChkPoint(
 
 using __asc_aicore::printf;
 using __asc_aicore::PRINTF;
+
+/* ========== AscendC CUBE pointer overloads ==========
+ * CUBE pointer overloads (DumpTensor / DumpAccChkPoint)
+ * Declarations only; definitions in corresponding *_ptr_impl.h
+ * ======================================================= */
+#if !(defined(ASCENDC_DUMP) && ASCENDC_DUMP == 0) || defined(ASCENDC_ACC_DUMP)
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__ubuf__ T* tensor, uint32_t desc, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__cbuf__ T* tensor, uint32_t desc, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__gm__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__ubuf__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__cbuf__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__cc__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__ca__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo);
+
+template <typename T>
+__aicore__ inline void DumpTensor(__cb__ T* tensor, uint32_t desc, uint32_t dumpSize, const ShapeInfo& shapeInfo);
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__gm__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__ubuf__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__cbuf__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__cc__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__ca__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize);
+
+template <typename T>
+__aicore__ inline void DumpAccChkPoint(__cb__ T* tensor, uint32_t index, uint32_t countOff, uint32_t dumpSize);
+
+#endif
+
 } // namespace AscendC
 
 #include "../../impl/basic_api/kernel_operator_dump_tensor_intf_impl.h"

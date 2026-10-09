@@ -99,6 +99,15 @@ __aicore__ inline void SetScalarCacheMode();
 
 template <CacheRwMode rwMode>
 __aicore__ inline CacheMode GetScalarCacheMode();
+
+/* ========== AscendC CUBE pointer overloads ==========
+ * CUBE pointer overloads (InitOutput)
+ * Declarations only; definitions in corresponding *_ptr_impl.h
+ * ======================================================= */
+template <typename T>
+__aicore__ inline __in_pipe__(V) __out_pipe__(MTE3) void InitOutput(__gm__ T* gmWorkspaceAddr, uint32_t size,
+    T value = 0);
+
 } // namespace AscendC
 
 #if defined(__NPU_ARCH__)

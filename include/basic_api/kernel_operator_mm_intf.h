@@ -517,6 +517,202 @@ __aicore__ inline void SetMMColumnMajor();
 // SetMMLayoutTransform has been updated, please use SetMMRowMajor/SetMMColumnMajor instead.
 __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode);
 
+
+/* ========== AscendC CUBE pointer overloads ==========
+ * CUBE pointer overloads (LoadData / Mmad / InitConstValue / LoadImageToLocal)
+ * Declarations only; definitions in corresponding *_ptr_impl.h
+ * ======================================================= */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
+(__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+template <typename T, typename U = T, typename V = fp8_e8m0_t>
+__aicore__ inline void LoadData(
+    __ca__ U* dst, __cbuf__ T* src, __cbuf__ V* srcMx, const LoadData2DParamsV2& loadDataParams,
+    const LoadData2DMxParams& loadMxDataParams);
+
+template <typename T, typename U = T, typename V = fp8_e8m0_t>
+__aicore__ inline void LoadData(
+    __cb__ U* dst, __cbuf__ T* src, __cbuf__ V* srcMx, const LoadData2DParamsV2& loadDataParams,
+    const LoadData2DMxParams& loadMxDataParams);
+
+#endif
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams);
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG>
+__aicore__ inline void LoadDataWithStride(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<T>& loadDataParams);
+
+template <typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG>
+__aicore__ inline void LoadDataWithStride(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<T>& loadDataParams);
+
+#endif
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadParams& mmadParams);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadBitModeParams& mmadParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadParams& mmadParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadBitModeParams& mmadParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, __cc__ T* bias, const MmadBitModeParams& mmadParams);
+
+#endif
+#if __NPU_ARCH__ == 2201
+__aicore__ inline void MmadWithSparse(
+    __cc__ int32_t* dst, __ca__ int8_t* fm, __cb__ int8_t* filter, const MmadParams& mmadParams);
+
+__aicore__ inline void LoadDataWithSparse(
+    __cb__ int8_t* dst, __cbuf__ int8_t* src, __cbuf__ uint8_t* idx, const LoadData2dParams& loadDataParam);
+
+#endif
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __ca__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParams& loadDataParams, uint8_t cacheMode);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams, uint8_t cacheMode);
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102)
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(MTE2) void LoadData(
+    __cbuf__ T* dst, __gm__ U* src, const LoadData2DParamsV2& loadDataParams, const Nd2NzParamsV2& nd2nzParams);
+
+#endif
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const Load2DBitModeParam& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const Load3DBitModeParam& loadDataParams);
+
+#endif
+template <typename T, typename U = T, typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T, typename U = T, typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T, typename U = T, typename std::enable_if<IsSameType<T, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T>
+__aicore__ inline __inout_pipe__(MTE2) void LoadImageToLocal(
+    __cbuf__ T* dst, const LoadImageToLocalParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cbuf__ T* dst, __gm__ T* src);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__ca__ T* dst, __gm__ T* src);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cb__ T* dst, __gm__ T* src);
+
 } // namespace AscendC
 #if defined(__NPU_ARCH__)
 #include "../../impl/basic_api/kernel_operator_mm_intf_impl.h"
