@@ -202,16 +202,19 @@ struct check_scalea_dn_layout_pattern {
     template <typename Tensor, typename TraitType>
     __aicore__ inline static constexpr void check()
     {
+        constexpr auto c0_element = TraitType::c0_element;
         using shape_row0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::row, 0>::type;
         using shape_column0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::column, 0>::type;
         static_assert(Std::is_same_v<shape_row0, _1>, "Layout->Shape->Row->ZeroDim must be Int<1>!");
-        static_assert(Std::is_same_v<shape_column0, _2>, "Layout->Shape->Column->ZeroDim must be Int<2>!");
+        static_assert(
+            Std::is_same_v<shape_column0, Std::Int<c0_element>>, "Layout->Shape->Column->ZeroDim must be c0_element!");
 
         using stride_row0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::row, 0>::type;
         using stride_row1 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::row, 1>::type;
         using stride_column0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::column, 0>::type;
         static_assert(Std::is_same_v<stride_row0, _0>, "Layout->Stride->Row->ZeroDim must be Int<0>!");
-        static_assert(Std::is_same_v<stride_row1, _2>, "Layout->Stride->Row->OneDim must be Int<2>!");
+        static_assert(
+            Std::is_same_v<stride_row1, Std::Int<c0_element>>, "Layout->Stride->Row->OneDim must be c0_element!");
         static_assert(Std::is_same_v<stride_column0, _1>, "Layout->Stride->Column->ZeroDim must be Int<1>!");
     }
 };
@@ -220,9 +223,11 @@ struct check_scaleb_nd_layout_pattern {
     template <typename Tensor, typename TraitType>
     __aicore__ inline static constexpr void check()
     {
+        constexpr auto c0_element = TraitType::c0_element;
         using shape_row0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::row, 0>::type;
         using shape_column0 = typename get_n_dim_type<Tensor, attr_info::shape, attr_info::column, 0>::type;
-        static_assert(Std::is_same_v<shape_row0, _2>, "Layout->Shape->Row->ZeroDim must be Int<2>!");
+        static_assert(
+            Std::is_same_v<shape_row0, Std::Int<c0_element>>, "Layout->Shape->Row->ZeroDim must be c0_element!");
         static_assert(Std::is_same_v<shape_column0, _1>, "Layout->Shape->Column->ZeroDim must be Int<1>!");
 
         using stride_row0 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::row, 0>::type;
@@ -230,7 +235,8 @@ struct check_scaleb_nd_layout_pattern {
         using stride_column1 = typename get_n_dim_type<Tensor, attr_info::stride, attr_info::column, 1>::type;
         static_assert(Std::is_same_v<stride_row0, _1>, "Layout->Stride->Row->ZeroDim must be Int<1>!");
         static_assert(Std::is_same_v<stride_column0, _0>, "Layout->Stride->Column->ZeroDim must be Int<0>!");
-        static_assert(Std::is_same_v<stride_column1, _2>, "Layout->Stride->Column->OneDim must be Int<2>!");
+        static_assert(
+            Std::is_same_v<stride_column1, Std::Int<c0_element>>, "Layout->Stride->Column->OneDim must be c0_element!");
     }
 };
 
