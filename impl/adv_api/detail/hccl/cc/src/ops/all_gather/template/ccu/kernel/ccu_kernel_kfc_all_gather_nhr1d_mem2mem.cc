@@ -19,6 +19,8 @@
 //  5. 步内流水（P0 优化，mesh DoAllGatherWrite/Wait 先例）：slice 数 ≤ 16 位事件预算时
 //     本轮所有 slice 先全部发射（独立事件位、分片互不相交），轮末一次批量 EventWait；
 //     超预算/空步回退原"发一个等一个"串行结构。
+//  6. 本地拷贝与首步写重叠（P3 优化，mesh Phase1/2/3 先例）：首步写非阻塞发射后，
+//     GroupCopy 本地拷贝与写并发（源相同只读不冲突、目的不同），EventWait 后再步间同步。
 #include "ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
@@ -299,6 +301,12 @@ CcuResult DoAllGatherGroupCopy(KfcAllGatherNhr1DContext& ctx)
 }
 
 // 对应 hccl DoRepeatAllGatherNHR（axisId==1 的 die0 偏移分支不迁移）。
+// 性能优化(P3)：本地拷贝与首步远端写重叠——mesh kernel Phase1/Phase2/Phase3 先例。
+// 首步(step0)写源 = input（与本地拷贝同源、只读不冲突），目的 = peer output（与本地
+// 拷贝目的 output[localIdx] 不同，不冲突），二者完全独立可并发。CCU 指令流：
+//   Issue step0 Write(非阻塞) → GroupCopy(本地拷贝) → EventWait(等写完成) → StepSync
+// 本地拷贝 ~6.5us 被 step0 写 ~6.1us 完全覆盖，节省关键路径 ~6us。
+// 首步 nSlices 恒为 1（NHR 算法性质：deltaRank 最大 → nSlices 最小），事件位仅需 bit0。
 CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
 {
     ccu::Variable tmpSliceOffset;
@@ -325,10 +333,45 @@ CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
     ctx.localDst.token = ctx.token[localIdx];
     ctx.groupCopyRepeatNum = ctx.repeatNum;
 
-    CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
+    // P3：首步写发射 + 本地拷贝重叠
+    if (!ctx.stepInfoVector->empty()) {
+        const KfcNhrStepInfo& firstStep = (*ctx.stepInfoVector)[0];
+        const u32 toRankIdx = ctx.rank2ChannelIdx->at(firstStep.toRank);
+        const u32 fromRankIdx = ctx.rank2ChannelIdx->at(firstStep.fromRank);
+        const ChannelHandle sendChannel = ctx.channels[toRankIdx];
+        const ChannelHandle recvChannel = ctx.channels[fromRankIdx];
 
-    for (const auto& nhrStepInfo : *ctx.stepInfoVector) {
-        CCU_CHK_RET(DoRepeatAllGatherNHRSingleStep(ctx, nhrStepInfo));
+        ctx.dstMem.token = ctx.token[toRankIdx];
+        // step0 的源 = input（srcMem 已指向正确位置，IssueSendSlice 按值捕获不冲突）
+        for (u32 i = 0; i < firstStep.txSliceIdxs.size(); i++) {
+            const u32 sendSliceIdx = firstStep.txSliceIdxs[i];
+            ctx.dstMem.addr = ctx.output[toRankIdx];
+            ctx.dstMem.addr += ctx.outputSliceOffset[sendSliceIdx];
+            const bool islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
+            CCU_CHK_RET(IssueSendSlice(ctx, firstStep.toRank, ctx.srcMem, ctx.dstMem, i, islastSlice));
+        }
+        const uint32_t firstSliceNum = static_cast<uint32_t>(firstStep.txSliceIdxs.size());
+        const uint16_t firstWaitMask = static_cast<uint16_t>((1U << firstSliceNum) - 1U);
+
+        // 本地拷贝与首步写并发执行（GroupCopy 引擎与 XN 写引擎独立）
+        CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
+
+        // 等首步写完成
+        CCU_CHK_RET(ccu::EventWait(ctx.localEvent, firstWaitMask));
+
+        // 首步步间同步（若非末步）
+        if (firstStep.step + 1 != ctx.stepInfoVector->size()) {
+            CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
+            CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
+        }
+
+        // 后续步骤正常处理（P0 流水化已在 DoRepeatAllGatherNHRSingleStep 内）
+        for (size_t stepIdx = 1; stepIdx < ctx.stepInfoVector->size(); stepIdx++) {
+            CCU_CHK_RET(DoRepeatAllGatherNHRSingleStep(ctx, (*ctx.stepInfoVector)[stepIdx]));
+        }
+    } else {
+        // 空步骤向量（防御）：退化为仅本地拷贝
+        CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
     }
 
     return CCU_SUCCESS;
