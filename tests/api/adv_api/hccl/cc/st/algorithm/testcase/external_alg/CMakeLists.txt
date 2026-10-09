@@ -59,6 +59,8 @@ list(FILTER EXT_ALG_TEMPLATES EXCLUDE REGEX "kfc_server")
 # KFC Mem2Mem 系列与 all_to_all_v direct-launch 系列，后者用现行 CcuKernelArgBase API）。
 # all_reduce / all_to_all_v 的 ccu 模板产品全编，无需排除。
 set(EXT_ALG_EXCLUDED_TEMPLATES
+    # Host printf consumer has no algorithm registrations; tested by ascendc_ut_ccu_print.
+    op_common/template/ccu/ccu_print.cc
     # 产品 mc2_client（host，SHARED）编入 load_kernel.cc / mc2_aicpu_task_cache_clear.cc，
     # 但二者依赖 UT 环境无法满足的 aclrtCreateStreamWithConfig / LoadBinaryFromFile
     # （adapter_acl.cc，AIC kernel 目标同样注释停编），且其符号无人引用——
