@@ -58,7 +58,7 @@ __aicore__ inline void WaitPreBlock(GlobalTensor<int32_t>& gmWorkspace, LocalTen
 - 使用接口前，请确保已经调用[InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md)接口，初始化共享内存（`gmWorkspace`）。
 - [InitDetermineComputeWorkspace](InitDetermineComputeWorkspace.md)、[WaitPreBlock](WaitPreBlock.md)和[NotifyNextBlock](NotifyNextBlock.md)组合使用时，三个接口的`gmWorkspace`必须指向同一块Global Memory，`ubWorkspace`必须指向当前AIV上的同一块Unified Buffer，通常应向三个接口传入同一组变量。否则，WaitPreBlock可能无法从`gmWorkspace`读取InitDetermineComputeWorkspace初始化或NotifyNextBlock写入的核间同步状态，NotifyNextBlock也可能无法从`ubWorkspace`读取InitDetermineComputeWorkspace初始化或前一次NotifyNextBlock更新的同步轮次状态，导致执行顺序错误或程序卡死。
 
-`gmWorkspace`和`ubWorkspace`申请的空间须满足以下公式：
+- `gmWorkspace`和`ubWorkspace`申请的空间须满足以下公式：
 
 $$
 \begin{aligned}
@@ -67,12 +67,10 @@ $$
 \end{aligned}
 $$
 
-公式中的`GetBlockNum()`表示当前任务配置的逻辑AI Core数量，接口说明请参考[GetBlockNum](../../tool_interface/system_resources_and_variables/GetBlockNum.md)。
-
 - [分离模式](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/basic_architecture.md)下，WaitPreBlock和NotifyNextBlock仅对AIV核生效。在AIC核中调用任一接口时，接口直接返回，不执行等待、通知或核间同步。
 - WaitPreBlock和NotifyNextBlock之间仅支持插入矢量计算相关指令，对矩阵计算相关指令不生效。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 
 ## 调用示例<a name="section177231425115410"></a>
 
-完整样例请参考[调用示例](InitDetermineComputeWorkspace.md#section177231425115410)。
+完整样例请参考[InitDetermineComputeWorkspace调用示例](InitDetermineComputeWorkspace.md#调用示例)。
