@@ -161,8 +161,8 @@ __simd_vf__ inline void CompileStoreScatter(__ubuf__ T* dst)
     asc::te::experimental::reg_tensor<T> src{};
     asc::te::experimental::reg_tensor<Index> index{};
 
-    static_assert(AscendC::Std::is_same_v<
-                  decltype(asc::te::experimental::store_scatter(dst_tensor, src, index)), void>);
+    static_assert(
+        AscendC::Std::is_same_v<decltype(asc::te::experimental::store_scatter(dst_tensor, src, index)), void>);
     static_assert(
         AscendC::Std::is_same_v<
             decltype(asc::te::experimental::store_scatter(dst_tensor, asc::te::make_coord(0), src, index)), void>);
@@ -202,27 +202,24 @@ __simd_vf__ inline void compile_reg_mask_data_reorder(vector_bool src0, vector_b
 
 class TensorApiGatherScatter3510 : public testing::Test {};
 
-#define LOAD_GATHER_TEST(TestName, DataType, IndexType, Mode)                     \
-    TEST_F(TensorApiGatherScatter3510, LoadGather_##TestName##_##IndexType)        \
-    {                                                                              \
-        auto compile = &CompileLoadGather<DataType, IndexType,                     \
-            asc::te::experimental::gather_mode::Mode>;                             \
-        (void)compile;                                                              \
-        SUCCEED();                                                                  \
+#define LOAD_GATHER_TEST(TestName, DataType, IndexType, Mode)                                             \
+    TEST_F(TensorApiGatherScatter3510, LoadGather_##TestName##_##IndexType)                               \
+    {                                                                                                     \
+        auto compile = &CompileLoadGather<DataType, IndexType, asc::te::experimental::gather_mode::Mode>; \
+        (void)compile;                                                                                    \
+        SUCCEED();                                                                                        \
     }
 
-#define LOAD_GATHER_ELEMENT_TEST(DataType, IndexType) \
-    LOAD_GATHER_TEST(Element_##DataType, DataType, IndexType, element)
+#define LOAD_GATHER_ELEMENT_TEST(DataType, IndexType) LOAD_GATHER_TEST(Element_##DataType, DataType, IndexType, element)
 
-#define LOAD_GATHER_DATABLOCK_TEST(DataType) \
-    LOAD_GATHER_TEST(DataBlock_##DataType, DataType, uint32_t, data_block)
+#define LOAD_GATHER_DATABLOCK_TEST(DataType) LOAD_GATHER_TEST(DataBlock_##DataType, DataType, uint32_t, data_block)
 
 #define STORE_SCATTER_TEST(DataType, IndexType)                               \
-    TEST_F(TensorApiGatherScatter3510, StoreScatter_##DataType##_##IndexType)  \
-    {                                                                          \
-        auto compile = &CompileStoreScatter<DataType, IndexType>;              \
-        (void)compile;                                                          \
-        SUCCEED();                                                              \
+    TEST_F(TensorApiGatherScatter3510, StoreScatter_##DataType##_##IndexType) \
+    {                                                                         \
+        auto compile = &CompileStoreScatter<DataType, IndexType>;             \
+        (void)compile;                                                        \
+        SUCCEED();                                                            \
     }
 
 LOAD_GATHER_ELEMENT_TEST(int8_t, uint16_t)
