@@ -63,23 +63,24 @@ __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 
 ## 调用示例
 
-以下示例展示接口在AIV计算函数中的典型调用方式。
-
 ```cpp
-#include "tensor_api/tensor.h"
-#include "tensor_api/experimental/arch/vector/logical_compute.h"
-#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
+#include "tensor_api/experimental/vector_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void not_example(InputTensor input, OutputTensor output)
+__simd_vf__ inline void not_vf(
+    const InputTensor input, OutputTensor output, uint16_t repeat_times, uint32_t total,
+    uint32_t one_repeat_size)
 {
     using asc::te::experimental::operator!;
-
-    auto mask = asc::te::experimental::all_mask<int32_t>();
-    auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
-    auto result = !src;
-    asc::te::experimental::store(output, asc::te::make_coord(0), result);
+    using data_type = typename InputTensor::data_type;
+    uint32_t remain = total;
+    for (uint16_t i = 0; i < repeat_times; ++i) {
+        const uint32_t offset = i * one_repeat_size;
+        const auto coord = asc::te::make_coord(offset);
+        auto mask = asc::te::experimental::update_mask<data_type>(remain);
+        auto src_reg = asc::te::experimental::load(input, coord).with_mask(mask);
+        auto dst_reg = !src_reg;
+        asc::te::experimental::store(output, coord, dst_reg);
+    }
 }
 ```
