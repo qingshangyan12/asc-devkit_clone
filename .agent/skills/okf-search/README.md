@@ -40,9 +40,9 @@
 
 ### 2.1 接入方式
 
-如果你的 AI 工具支持自动加载 skill，把 `okf-search` 目录接到它的 skill 目录里
-（例如 opencode 的 `.opencode/skills/`；建议用软链接、不要复制，脚本要靠仓库目录结构找文档）。
-没接 skill 也可以，在对话里补一句"按 `okf_skills/okf-search/SKILL.md` 的流程帮我找……"。
+`okf-search` 已放在仓库 `.agent/skills/okf-search/`，opencode 等客户端通过 `.opencode/skills`
+（软链到 `.agent/skills`）自动发现，无需额外接入。若工具不支持自动加载，在对话里补一句
+"按 `.agent/skills/okf-search/SKILL.md` 的流程帮我找……"。
 
 ### 2.2 直接提问
 

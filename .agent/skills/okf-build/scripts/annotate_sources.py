@@ -55,7 +55,7 @@ LEVEL_TWO_HEADING_RE = re.compile(r"^\s{0,3}##(?!#)\s+")
 DEFAULT_DOC_DIR = "docs/zh/api/SIMD-API/c_api"
 DEFAULT_EXAMPLE_DIR = "examples/02_simd_c_api"
 SKILL_ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = Path(__file__).resolve().parents[3]
+REPO_ROOT = Path(__file__).resolve().parents[4]
 
 
 def _parameter_direction(value: str) -> str | None:

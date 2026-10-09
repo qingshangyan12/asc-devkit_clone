@@ -14,7 +14,7 @@ examples marker）的纯派生数据，查询统一走本 skill 的 `scripts/que
 ## 建立索引
 
 ```bash
-python3 okf_skills/okf-search/scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] [--check]
+python3 .agent/skills/okf-search/scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] [--check]
 ```
 
 构建按「CANN 版本 × 架构 × 层级」门控，只索引同时满足 version 覆盖、archs 命中、层级命中的 API；
@@ -27,7 +27,7 @@ python3 okf_skills/okf-search/scripts/build_index.py --scope c_api [--arch A5] [
 任何检索开始前先运行（用户显式指定架构/版本时透传参数，否则默认 A5 + 本地自动检测）：
 
 ```bash
-python3 okf_skills/okf-search/scripts/ensure_index.py --json [--arch A3] [--cann-version 9.2.0]
+python3 .agent/skills/okf-search/scripts/ensure_index.py --json [--arch A3] [--cann-version 9.2.0]
 ```
 
 门控匹配且指纹新鲜 → 零动作；缺失、门控不符或漂移 → 原地重建（本地 diff，不主动提交）。

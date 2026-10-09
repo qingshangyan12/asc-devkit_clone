@@ -8,7 +8,7 @@ import unittest
 from pathlib import Path
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
-REPO_ROOT = SCRIPTS.parents[2]
+REPO_ROOT = SCRIPTS.parents[3]
 sys.path.insert(0, str(SCRIPTS))
 
 import controller  # noqa: E402
@@ -124,7 +124,7 @@ class VersionTests(unittest.TestCase):
 class PipelineTests(unittest.TestCase):
     """真实文档 prepare→validate→write dry-run；不写真实文件。"""
 
-    RUN = REPO_ROOT / "okf_skills/okf-build/tmp/test-run"
+    RUN = REPO_ROOT / ".agent/skills/okf-build/tmp/test-run"
 
     @classmethod
     def setUpClass(cls) -> None:

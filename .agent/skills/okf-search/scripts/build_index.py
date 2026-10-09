@@ -22,7 +22,7 @@ from typing import Any
 
 SCRIPTS_DIR = Path(__file__).resolve().parent
 SKILL_ROOT = SCRIPTS_DIR.parent
-REPO_ROOT = SKILL_ROOT.parent.parent
+REPO_ROOT = SKILL_ROOT.parents[2]
 sys.path.insert(0, str(SCRIPTS_DIR))
 
 from derive import docparse, gate, overrides as overrides_mod  # noqa: E402

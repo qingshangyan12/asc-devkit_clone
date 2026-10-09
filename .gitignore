@@ -33,8 +33,8 @@ build_device/
 .cursor/
 .opencode/
 docs/zh/vitepress/docs/.vitepress/theme/outline-index.json
-okf_skills/okf-build/tmp/
-okf_skills/okf-search/index/
+.agent/skills/okf-build/tmp/
+.agent/skills/okf-search/index/
 
 oat_reports/
 

@@ -42,7 +42,7 @@ C API 文档有 800 多篇，靠人翻目录找接口很慢。检索侧 skill `o
 ## 2. 怎么快速使用
 
 前提：本地有 asc-devkit 仓库、Python 3（脚本依赖 PyYAML，缺了就 `pip install pyyaml`）。
-打标脚本从本 skill 目录执行（`okf_skills/okf-build/`）；运行目录每次新建，不要复用人家的。
+打标脚本从本 skill 目录执行（`.agent/skills/okf-build/`）；运行目录每次新建，不要复用人家的。
 提示：让 AI 按 `SKILL.md` 路由使用最简单，下面是手工命令。
 
 ### 2.1 新范围全量接入（推荐入口）

@@ -16,6 +16,8 @@
 | `asc-api-ut-gen` | 生成或补齐 `tests/api/` 下的 AscendC API UT | `skills/asc-api-ut-gen/SKILL.md` |
 | `asc-ar-dev` | AscendC 需求分析、实现方案、host/device 代码评审与验证规划 | `skills/asc-ar-dev/SKILL.md` |
 | `asc-npu-arch` | 维护芯片、架构、`SocVersion`、`__NPU_ARCH__` 和 dtype 事实 | `skills/asc-npu-arch/SKILL.md` |
+| `okf-build` | OKF 建设侧：tag 词表调研、三类头标注写入、新范围接入编排与独立检索评测 | `skills/okf-build/SKILL.md` |
+| `okf-search` | OKF 用户侧：C API 文档索引建立与需求检索 | `skills/okf-search/SKILL.md` |
 | `public-skills` | 从 `https://gitcode.com/cann-agent/skills.git` 安装或更新公共远程 skill | `skills/public-skills/SKILL.md` |
 | `gitcode-pr` | 通过公共远程 skill 处理 GitCode PR、评论、讨论和变更查询 | `skills/gitcode-pr/SKILL.md` |
 
