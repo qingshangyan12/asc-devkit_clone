@@ -31,13 +31,13 @@ This example implements multi-core matrix multiplication computation based on th
   C = A * B
   $$
 - Sample Specifications:
-  This example uses parameters M = 512, N = 1024, K = 512, and invokes 16 cores to complete the computation. The input specifications are shown in the following table:
+  This example uses parameters m = 512, n = 1024, k = 512, and invokes 16 cores to complete the computation. The input specifications are shown in the following table:
   <table>
   <tr><td rowspan="1" align="center">Sample Type(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">Sample Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Sample Output</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">A</td><td align="center">[m, k]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">B</td><td align="center">[k, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Sample Output</td><td align="center">C</td><td align="center">[m, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
@@ -68,7 +68,7 @@ This example implements multi-core matrix multiplication computation based on th
 
     4. **Slicing Interface**: Use slice + make_coord + make_shape to get tensor sub-regions
        - Implements multi-core logic: each core processes different data blocks
-       - Implements tiling logic: baseM/baseK/baseN basic block partitioning
+       - Implements tiling logic: base_m/base_k/base_n basic block partitioning
 
   - Invocation Implementation
     Use the kernel call operator <<<>>> to invoke the kernel function.
