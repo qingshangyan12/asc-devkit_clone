@@ -1,0 +1,4 @@
+interface:
+  display_name: "OKF Maintain"
+  short_description: "维护侧：指定文档的三类头漂移体检与修复"
+  default_prompt: "使用 $okf-maintain 对指定 C API 文档执行 check 体检三类头漂移，DET 项用 update --write 修复，SEM 项按真实语义走 okf-build 标注管线并刷新账本。"

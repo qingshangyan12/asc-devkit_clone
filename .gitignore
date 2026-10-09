@@ -34,6 +34,7 @@ build_device/
 .opencode/
 docs/zh/vitepress/docs/.vitepress/theme/outline-index.json
 .agent/skills/okf-build/tmp/
+.agent/skills/okf-maintain/tmp/
 .agent/skills/okf-search/index/
 
 oat_reports/

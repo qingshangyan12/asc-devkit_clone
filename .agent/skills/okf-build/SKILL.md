@@ -19,8 +19,8 @@ description: OKF 建设侧入口：为 Ascend C API 文档建设知识资产。�
 | 接入编排 | 流水线 | 新 API 文档范围接入（调研→重标注→索引） | [references/maintain.md](references/maintain.md) |
 | 检索评测 | 独立功能 | 建测试集、测检索效率与质量、基线与对照 | [references/evaluate.md](references/evaluate.md) |
 
-索引构建与检索属于 okf-search，不在本 skill 内；接入编排只负责分派与复核；
-检索评测按需单独使用，不被建设流程或接入编排引用。
+索引构建与检索属于 okf-search，不在本 skill 内；存量头的漂移体检与修复属于
+okf-maintain；接入编排只负责分派与复核；检索评测按需单独使用，不被建设流程或接入编排引用。
 
 ## 全局约束
 
