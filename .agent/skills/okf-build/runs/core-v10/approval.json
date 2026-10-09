@@ -1,9 +1,0 @@
-{
-  "schema_version": 1,
-  "purpose": "human_taxonomy_approval",
-  "run_id": "core-v10",
-  "decision": "approve",
-  "approver": "项目维护者（交互会话批准）",
-  "approved_at": "2026-09-30T12:50:00+08:00",
-  "comment": "批准 core-v10：3 语义 namespace（roles/operations/traits）、新增 aligned_transfer 与 datablock_granularity、6 个可推导 namespace 与 masked/deprecated 改为索引期推导；strided_transfer 等遗留候选记录在案待下轮复议。"
-}
