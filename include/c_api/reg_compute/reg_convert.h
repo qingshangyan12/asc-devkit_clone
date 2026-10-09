@@ -7294,7 +7294,7 @@ __simd_callee__ inline void asc_float2e5m2_rn_sat_v4(vector_fp8_e5m2_t& dst, vec
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_half2float)
 __simd_callee__ inline void asc_half2float_v2(vector_float& dst, vector_half src, vector_bool mask);
 
-#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000) && defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 __simd_callee__ inline void asc_half2e4m3_rn(
     vector_fp8_e4m3fn_t& dst, vector_half src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos);
