@@ -20,13 +20,17 @@ namespace mc2_ops_hccl {
 // CcuSchedAllGatherSoleNHR 的 KFC kernel。与 hccl CcuAllGatherNHR1DMem2MemKernel 逐行对照移植；
 // KFC 单 mission 约束下固定 axisId=0（单 die）语义，die1 参数省略。
 // xnData 槽位见 KfcAllGatherSoleNhrParamIndex（kfc_server_message.h），三处索引必须一致。
+// turnEndAddr：本轮完成信号在 HBM 上的地址（WAIT 槽 CKE），由 KFC server 按队列游标传入；
+// kernel 在末步接收同步后、PostSync 前提前写入（P4，见 .cc 头部注释 7），server 侧相应
+// 跳过本轮 SetTurnEndSig。
 CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
     ccu::Variable die0LastSize, ccu::Variable repeatNumInv, ccu::Variable inputSliceStride,
     ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
     ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
     ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx,
+    ccu::Variable turnEndAddr);
 
 } // namespace mc2_ops_hccl
 

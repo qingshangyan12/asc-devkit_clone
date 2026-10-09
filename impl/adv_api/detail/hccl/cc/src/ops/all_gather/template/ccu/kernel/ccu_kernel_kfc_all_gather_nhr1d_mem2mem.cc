@@ -21,6 +21,12 @@
 //     超预算/空步回退原"发一个等一个"串行结构。
 //  6. 本地拷贝与首步写重叠（P3 优化，mesh Phase1/2/3 先例）：首步写非阻塞发射后，
 //     GroupCopy 本地拷贝与写并发（源相同只读不冲突、目的不同），EventWait 后再步间同步。
+//  7. turn-end 提前（P4 优化）：末步补做步间同步（接收到达保证，multi-jetty RunStep 每步
+//     均同步的先例），kernel 在末步同步后、PostSync 前直接写 turn-end HBM 信号（地址由
+//     server 按队列游标传入），AIV Wait 不再等待 PostSync 跨轮屏障（实测 ~7us）；
+//     PostSync 保留在 server 指令流中，仅承担下一轮 PreSync 前的跨轮 XN 保护。
+//     正确性依据：各步接收分片由该步 NotifyWait(recvChannel) 保证到达；本地拷贝为
+//     LoopGroup 阻塞指令，retire 即数据落位；对端 XN 消费完毕由 PostSync NotifyWait 保证。
 #include "ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
@@ -196,7 +202,9 @@ CcuResult DoRepeatSendRecvSlices(
     return CCU_SUCCESS;
 }
 
-// 对应 hccl DoRepeatAllGatherNHRSingleStep（末步跳过步间同步与 hccl 一致）。
+// 对应 hccl DoRepeatAllGatherNHRSingleStep。P4：末步不再跳过步间同步——turn-end 提前到
+// PostSync 前后，末步接收分片的到达保证由本步 NotifyWait(recvChannel) 承担（multi-jetty
+// RunStep 每步均同步的先例）；非末步行为与 hccl 一致。
 // 性能优化(P0)：在途 slice 数不超 16 位事件预算时走步内流水——本轮所有 slice 先全部
 // 发射（各占独立事件位；各 slice 的 src/dst 分片互不相交，无数据依赖），轮末一次
 // EventWait 批量等完成，消除"发一个等一个"的完成等待空转间隙。
@@ -268,10 +276,9 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
         }
     }
 
-    if (nhrStepInfo.step + 1 != ctx.stepInfoVector->size()) {
-        CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-        CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-    }
+    // P4：末步也同步（单步配置的接收到达同样需要保证），record 先于 wait 且不阻塞，无死锁。
+    CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
+    CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
 
     return CCU_SUCCESS;
 }
@@ -353,17 +360,16 @@ CcuResult DoRepeatAllGatherNHR(KfcAllGatherNhr1DContext& ctx)
         const uint32_t firstSliceNum = static_cast<uint32_t>(firstStep.txSliceIdxs.size());
         const uint16_t firstWaitMask = static_cast<uint16_t>((1U << firstSliceNum) - 1U);
 
-        // 本地拷贝与首步写并发执行（GroupCopy 引擎与 XN 写引擎独立）
+        // 本地拷贝与首步写并发执行（GroupCopy 引擎与 XN 写引擎独立）；LoopGroup 为
+        // 阻塞指令，retire 即拷贝数据落位——P4 提前 turn-end 的正确性依据之一。
         CCU_CHK_RET(DoAllGatherGroupCopy(ctx));
 
         // 等首步写完成
         CCU_CHK_RET(ccu::EventWait(ctx.localEvent, firstWaitMask));
 
-        // 首步步间同步（若非末步）
-        if (firstStep.step + 1 != ctx.stepInfoVector->size()) {
-            CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-            CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-        }
+        // 首步步间同步（P4：末步也不跳过——单步配置下这是唯一的接收到达保证）
+        CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
+        CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
 
         // 后续步骤正常处理（P0 流水化已在 DoRepeatAllGatherNHRSingleStep 内）
         for (size_t stepIdx = 1; stepIdx < ctx.stepInfoVector->size(); stepIdx++) {
@@ -384,7 +390,8 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable outputSliceStride, ccu::Variable inputRepeatStride, ccu::Variable outputRepeatStride,
     ccu::Variable isInputOutputEqual, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
     ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx,
+    ccu::Variable turnEndAddr)
 {
     KfcAllGatherNhr1DContext ctx;
     ctx.channels = channels;
@@ -404,6 +411,11 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     CCU_CHK_RET(PreSync(ctx));
 
     CCU_CHK_RET(DoRepeatAllGatherNHR(ctx));
+
+    // P4：末步同步完成后本 rank 输出已完整（各步接收分片到达 + GroupCopy 阻塞落位），
+    // 在 PostSync 前写 turn-end，AIV Wait 提前返回（省 PostSync 等待 ~7us + 检测串行）；
+    // PostSync 仍在 server 指令流中顺序执行于下一轮 PreSync 之前，跨轮 XN 保护不变。
+    CCU_CHK_RET(ccu::Store(turnEndAddr, ctx.constVar1));
 
     CCU_CHK_RET(PostSync(ctx));
 
