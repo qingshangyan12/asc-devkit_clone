@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * Copyright (c) 2025 Huawei Technologies Co., Ltd.
  * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
  * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+
 #ifndef HCCL_H_
 #define HCCL_H_
 
@@ -24,8 +25,8 @@ extern "C" {
  * @param sendBuf A pointer identifying the input data address of the operator.
  * @param recvBuf A pointer identifying the output data address of the operator.
  * @param count An integer(u64) identifying the number of the output data.
- * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64,
- * float16, float32, bfp16.
+ * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64, uint64,
+ * float16, float32, float64, bfp16.
  * @param op The reduction type of the operator, must be one of the following types: sum, min, max, prod.
  * @param comm A pointer identifying the communication resource based on.
  * @param stream A pointer identifying the stream information.
@@ -47,8 +48,8 @@ extern HcclResult HcclAllReduce(
  * @param stream A pointer identifying the stream information.
  * @return HcclResult
  */
-extern HcclResult HcclBroadcast(
-    void* buf, uint64_t count, HcclDataType dataType, uint32_t root, HcclComm comm, aclrtStream stream);
+extern HcclResult
+HcclBroadcast(void* buf, uint64_t count, HcclDataType dataType, uint32_t root, HcclComm comm, aclrtStream stream);
 
 /**
  * @brief ReduceScatter operator.
@@ -56,8 +57,8 @@ extern HcclResult HcclBroadcast(
  * @param sendBuf A pointer identifying the input data address of the operator.
  * @param recvBuf A pointer identifying the output data address of the operator.
  * @param recvCount An integer(u64) identifying the number of the output data.
- * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64,
- * float16, float32, bfp16.
+ * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64, uint64,
+ * float16, float32, float64, bfp16.
  * @param op The reduction type of the operator, must be one of the following types: sum, min, max, prod.
  * @param comm A pointer identifying the communication resource based on.
  * @param stream A pointer identifying the stream information.
@@ -76,7 +77,7 @@ extern HcclResult HcclReduceScatter(
  * sendtype) from which to send data to rank i.
  * @param recvBuf A pointer identifying the output data address of the operator.
  * @param recvCount An integer(u64) identifying the number of the output data.
- * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32,
+ * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64,
  * float16, float32, bfp16.
  * @param op The reduction type of the operator, must be one of the following types: sum, max, min.
  * @param comm A pointer identifying the communication resource based on.
@@ -141,7 +142,7 @@ extern HcclResult HcclAllGatherV(
 /**
  * @brief Send operator.
  *
- * @param sendBuff A pointer identifying the input data address of the operator.
+ * @param sendBuf A pointer identifying the input data address of the operator.
  * @param count An integer(u64) identifying the number of the send data.
  * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64,
  * uint8, uint16, uint32, uint64, float16, float32, float64, bfp16.
@@ -150,12 +151,12 @@ extern HcclResult HcclAllGatherV(
  * @param stream A pointer identifying the stream information.
  * @return HcclResult
  */
-extern HcclResult HcclSend(
-    void* sendBuf, uint64_t count, HcclDataType dataType, uint32_t destRank, HcclComm comm, aclrtStream stream);
+extern HcclResult
+HcclSend(void* sendBuf, uint64_t count, HcclDataType dataType, uint32_t destRank, HcclComm comm, aclrtStream stream);
 /**
  * @brief Recv operator.
  *
- * @param recvBuff A pointer identifying the output data address of the operator.
+ * @param recvBuf A pointer identifying the output data address of the operator.
  * @param count An integer(u64) identifying the number of the receive data.
  * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64,
  * uint8, uint16, uint32, uint64, float16, float32, float64, bfp16.
@@ -164,13 +165,13 @@ extern HcclResult HcclSend(
  * @param stream A pointer identifying the stream information.
  * @return HcclResult
  */
-extern HcclResult HcclRecv(
-    void* recvBuf, uint64_t count, HcclDataType dataType, uint32_t srcRank, HcclComm comm, aclrtStream stream);
+extern HcclResult
+HcclRecv(void* recvBuf, uint64_t count, HcclDataType dataType, uint32_t srcRank, HcclComm comm, aclrtStream stream);
 
 /**
  * @brief AlltoAllVC operator.
  *
- * @param sendBuff A pointer identifying the input data address of the operator.
+ * @param sendBuf A pointer identifying the input data address of the operator.
  * @param sendCountMatrix A two-dimensional(uint64) array representing the data volume directly sent by all ranks.
  * @param sendType Datatype of send buffer elements, must be one of the following types: int8, int16, int32, int64,
  * uint8, uint16, uint32, uint64, float16, float32, float64, bfp16.
@@ -188,7 +189,7 @@ extern HcclResult HcclAlltoAllVC(
 /**
  * @brief AlltoAllV operator.
  *
- * @param sendBuff A pointer identifying the input data address of the operator.
+ * @param sendBuf A pointer identifying the input data address of the operator.
  * @param sendCounts Integer(uint64) array, where entry i specifies the number of elements to send to rank i.
  * @param sdispls Integer(uint64) array, where entry i specifies the displacement (offset from sendbuf, in units of
  * sendtype) from which to send data to rank i.
@@ -211,7 +212,7 @@ extern HcclResult HcclAlltoAllV(
 /**
  * @brief AlltoAll operator.
  *
- * @param sendBuff A pointer identifying the input data address of the operator.
+ * @param sendBuf A pointer identifying the input data address of the operator.
  * @param sendCount Integer, number of elements to send to each process.
  * @param sendType Datatype of send buffer elements, must be one of the following types: int8, int16, int32, int64,
  * uint8, uint16, uint32, uint64, float16, float32, float64, bfp16.
@@ -233,8 +234,8 @@ extern HcclResult HcclAlltoAll(
  * @param sendBuf A pointer identifying the input data address of the operator.
  * @param recvBuf A pointer identifying the output data address of the operator.
  * @param count An integer(u64) identifying the number of the output data.
- * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64,
- * float16, float32, bfp16.
+ * @param dataType The data type of the operator, must be one of the following types: int8, int16, int32, int64, uint64,
+ * float16, float32, float64, bfp16.
  * @param op The reduction type of the operator, must be one of the following types: sum, min, max, prod.
  * @param root An integer(u32) identifying the root rank in the operator.
  * @param comm A pointer identifying the communication resource based on.
@@ -252,10 +253,10 @@ extern HcclResult HcclReduce(
  * @param comm A pointer identifying the communication resource based on.
  * @param stream A pointer identifying the stream information.
  */
-extern HcclResult HcclBatchSendRecv(
-    HcclSendRecvItem* sendRecvInfo, uint32_t itemNum, HcclComm comm, aclrtStream stream);
+extern HcclResult
+HcclBatchSendRecv(HcclSendRecvItem* sendRecvInfo, uint32_t itemNum, HcclComm comm, aclrtStream stream);
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
-#endif // HCCL_OPS_H
+#endif // HCCL_H_
