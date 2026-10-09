@@ -54,10 +54,6 @@ ASCEND_610B = "Ascend610B"
 ASCEND_SD = "SD3403"
 KIRIN_X90 = "KirinX90"
 KIRIN_9030 = "Kirin9030"
-KIRIN_DEV_0000 = "KirinDev0000"
-KIRIN_DEV_0001 = "KirinDev0001"
-KIRIN_DEV_0002 = "KirinDev0002"
-KIRIN_DEV_0003 = "KirinDev0003"
 _AIC_ENGINE = "AiCore"
 _VEC_ENGINE = "VectorCore"
 MC32DM11A = "MC32DM11A"
@@ -187,16 +183,12 @@ def get_soc_spec(key):
             assert 0 <= int_value <= 1
             value = int_value == 1
         except Exception as casting_error:
-            raise RuntimeError(
-                "return value %s cannot be interpret as 'bool' type" % value
-            ) from casting_error
+            raise RuntimeError("return value %s cannot be interpret as 'bool' type" % value) from casting_error
     return value
 
 
 # Example: pylint: disable=unused-argument
-def set_current_compile_soc_info(
-    soc_version, core_type="AiCore", aicore_num=None, l1_fusion=None
-):
+def set_current_compile_soc_info(soc_version, core_type="AiCore", aicore_num=None, l1_fusion=None):
     """
     set version info
 
@@ -288,13 +280,7 @@ def get_block_size():
 
 
 def te_update_version(
-    soc_version=None,
-    core_type=None,
-    aicore_num=None,
-    l1_fusion=None,
-    l2_mode=None,
-    l2_fusion=None,
-    kwargs=None,
+    soc_version=None, core_type=None, aicore_num=None, l1_fusion=None, l2_mode=None, l2_fusion=None, kwargs=None
 ):
     """
     set version info

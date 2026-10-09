@@ -51,10 +51,6 @@ template <typename T>
 class GlobalTensor;
 } // namespace AscendC
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510)
-__BLOCK_LOCAL__ __inline__ uint32_t g_super_kernel_early_start_config;
-#endif
-
 // disabled on CPU mode for compatiablilty
 #if defined(ASCENDC_DEBUG) && !defined(ASCENDC_CPU_DEBUG)
 #ifdef SPLIT_CORE_CUBE
@@ -75,8 +71,7 @@ __BLOCK_LOCAL__ __inline__ AscendC::TPipe* g_tPipePtr;
 #endif
 #endif // end ASCENDC_DEBUG
 
-#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5101 || \
-    __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163
+#if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102 || __NPU_ARCH__ == 3510
 __BLOCK_LOCAL__ __inline__ uint64_t g_maskCount;
 #if __NPU_ARCH__ == 3002 || __NPU_ARCH__ == 3102
 __BLOCK_LOCAL__ __inline__ half g_deqValue;
@@ -140,8 +135,7 @@ public:
     template <pipe_t pipe>
     static __aicore__ inline void Lock(MutexID id)
     {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
         ASCENDC_ASSERT((id <= MAX_MUTEXID), {
             KERNEL_LOG(KERNEL_ERROR, "For Mutex::Lock current id is %u, max MutexID is %u", id, MAX_MUTEXID);
         });
@@ -152,8 +146,7 @@ public:
     template <pipe_t pipe>
     static __aicore__ inline void Unlock(MutexID id)
     {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-                              (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
         ASCENDC_ASSERT((id <= MAX_MUTEXID), {
             KERNEL_LOG(KERNEL_ERROR, "For Mutex::Unlock current id is %u, max MutexID is %u", id, MAX_MUTEXID);
         });

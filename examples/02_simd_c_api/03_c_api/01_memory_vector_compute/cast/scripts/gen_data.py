@@ -21,23 +21,20 @@ ELEMENT_COUNT = 512
 
 
 def make_input():
-    return ((np.arange(ELEMENT_COUNT, dtype=np.float32) % 31) - 15 + 0.25).astype(
-        np.float16
-    )
+    return ((np.arange(ELEMENT_COUNT, dtype=np.float32) % 31) - 15 + 0.25).astype(np.float16)
 
 
 def make_golden(input_data, scenario_num):
     rounded = np.ceil(input_data.astype(np.float32))
     if scenario_num == 1:
         converted = np.clip(rounded, -8, 7).astype(np.int8).astype(np.uint8)
+        converted &= 0x0F
         return (converted[0::2] | (converted[1::2] << 4)).astype(np.uint8)
     return rounded.astype(np.int32)
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate deterministic cast input and golden data."
-    )
+    parser = argparse.ArgumentParser(description="Generate deterministic cast input and golden data.")
     parser.add_argument("-scenario_num", type=int, choices=[1, 2], default=1)
     args = parser.parse_args()
 

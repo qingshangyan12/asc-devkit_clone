@@ -34,6 +34,8 @@
 
 其中，index中仅前8个元素有效，每个元素对应一个DataBlock。例如，第一个元素为96（3 * 32），表示选取DataBlock3写入dst中对应的位置。
 
+本接口为Reg矢量搬运接口，仅在AIV上生效。
+
 ## 函数原型
 
 ### 支持掩码控制
@@ -170,8 +172,7 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 
 ## 约束说明
 
-- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
-- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - b64数据类型属于编译器软件仿真实现，通过函数返回值输出结果的函数原型不做支持。
 - 源操作数在UB中的起始地址需要32B对齐。
 - 索引位置要大于等于0且32B对齐，即一个索引值对应一个DataBlock。
@@ -184,7 +185,7 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

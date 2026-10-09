@@ -45,13 +45,13 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 **表1** 参数说明
 
-| 参数名  | 输入/输出 | 描述 |
+| 参数名 | 输入/输出 | 描述 |
 | :----- | :------- | :------- |
 | mem_type | 输入 | 同步流水线的类型，类型为`MEM_TYPE`，取值范围见表2 `mem_type`取值说明。 |
 
 **表2** 本接口支持的mem_type取值范围说明（源流水线/目的流水线表示的含义见表3 Reg计算流水线说明）
 
-| 值  | 源流水线 | 目的流水线 |
+| 值 | 源流水线 | 目的流水线 |
 | ------ | -------- | -------- |
 | `VV_ALL` | `VEC_ALL` | `VEC_ALL` |
 | `VST_VLD` | `VEC_STORE` | `VEC_LOAD` |
@@ -85,8 +85,7 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 
 ### 通用约束
 
-- 非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 
 ### 指令约束
 
@@ -103,7 +102,7 @@ __simd_callee__ inline void asc_mem_bar(MEM_TYPE mem_type)
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

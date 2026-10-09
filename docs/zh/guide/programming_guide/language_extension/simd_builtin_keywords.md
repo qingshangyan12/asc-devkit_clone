@@ -511,15 +511,13 @@ $$
 
 -   使用**C API**时，对于纯Cube/纯Vector/Mix（1,1）场景，应使用内置变量block_idx获取当前核的逻辑位置；对于Mix（1,2）场景，应使用内置变量block_idx、asc_get_sub_block_num和asc_get_sub_block_id按公式计算logic_idx。
 
-## API内置数据类型
+## 内置数据类型
 
-使用以下数据类型时需要导入[SIMD API的头文件](../../../api/api_list.md#调用接口依赖的头文件和库文件说明)。
-
-**表5**  API内置数据类型
+**表5**  内置数据类型
 
 | 类型 | 数据类型 | 描述 | Size（bit） | 取值范围 |
 | --- | --- | --- | --- | --- |
-| 整型 | int4b_t | 有符号4位整数。 | 4 | [-8, 7] |
+| 整型 | int4b_t | 有符号4位整数。 | 8 | [-8, 7] |
 | 布尔型 | bool | 全0代表false，否则代表true。 | 8 | true、false |
 | 整型 | int4x2_t | 两个有符号4位整数打包为一个8比特存储单元。 | 8 | 每个元素的取值范围为[-8, 7]。 |
 | 整型 | int8_t | signed char | 8 | [-128, 127] |
@@ -568,7 +566,7 @@ $$
     >- 如果开发者使用了Device资源限制特性，那么算子设置的numBlocks不应超过[PlatformAscendC](../../../api/Utils-API/platform_info/PlatformAscendC/PlatformAscendC.md)提供核数的API（GetCoreNum/GetCoreNumAic/GetCoreNumAiv等）返回的核数。例如，使用aclrtSetStreamResLimit设置Stream级别的Vector核数为8，那么GetCoreNumAiv接口返回值为8，针对Vector算子设置的numBlocks不应超过8，否则会抢占其他Stream的资源，导致资源限制失效。
 
 -   dynUBufSize：Dynamic UB Size，是配置UB动态内存分配的空间的大小（仅限UB，不包括L1等），单位为Byte，默认设置为0；
--   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+-   stream：类型为aclrtStream，stream用于维护一些异步操作的执行顺序，确保按照应用程序中的代码调用顺序在device上执行，默认设置为nullptr。stream创建等管理接口请参考[《Runtime运行时API》](https://gitcode.com/cann/runtime/blob/9.2.0/docs/zh/api_ref/README.md)。
 
 以下示例展示了核函数（Kernel）的声明与调用方式。
 

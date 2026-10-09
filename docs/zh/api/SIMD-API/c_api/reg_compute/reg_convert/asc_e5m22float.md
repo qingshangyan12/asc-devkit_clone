@@ -29,19 +29,18 @@
 
 根据`mask`将`src`中参与计算的`fp8_e5m2_t`类型元素转换为`float`类型，结果写入`dst`。由于源操作数与目的操作数的类型位宽比为1:4，`src`中的元素按索引分为四组，参数`src_quarter_pos`从`src`中离散选取每隔4个元素的索引位置读取数据，具体为索引0、4、8、…，索引1、5、9、…，索引2、6、10、…或索引3、7、11、…。
 
-本接口为`reg`矢量计算接口，仅在AIV上生效。
+本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
 
 ```c
-// 占位符形式
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_e5m22float(vector_float& dst,
                                      vector_fp8_e5m2_t src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_float asc_e5m22float(vector_fp8_e5m2_t src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
@@ -70,11 +69,8 @@ __simd_callee__ inline vector_float asc_e5m22float(vector_fp8_e5m2_t src,
 
 ## 约束说明
 
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
-- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
-- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- `mask`需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
 ## 调用示例
@@ -82,7 +78,7 @@ __simd_callee__ inline vector_float asc_e5m22float(vector_fp8_e5m2_t src,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

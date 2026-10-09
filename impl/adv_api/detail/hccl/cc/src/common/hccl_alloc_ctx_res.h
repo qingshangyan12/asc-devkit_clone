@@ -23,6 +23,7 @@
 #include "mc2_type.h"
 #include "ccu_assist_pub.h"
 #include "hccl_tiling_msg.h"
+#include "external_alg_parser.h"
 
 #include <vector>
 #include <memory>
@@ -89,6 +90,7 @@ enum class AlgorithmType {
     CcuAllGatherMeshMem2Mem1D = 1,
     CcuAllGatherMesh2D = 2,
     CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
+    CcuSchedAllGatherParallelMeshNHRMultiLink = 4,
     CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D = 51,
     CcuReduceScatterMesh2D = 52,
@@ -112,6 +114,7 @@ static const std::unordered_map<std::string, AlgorithmType> algorithmMap = {
     {"CcuAllGatherMesh1DMem2Mem", AlgorithmType::CcuAllGatherMeshMem2Mem1D},
     {"CcuAllGatherMeshMem2Mem1D", AlgorithmType::CcuAllGatherMeshMem2Mem1D},
     {"CcuSchedAllGatherConcurMeshNHRMultiLink", AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink},
+    {"CcuSchedAllGatherParallelMeshNHRMultiLink", AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink},
     {"CcuSchedReduceScatterSoleMesh", AlgorithmType::CcuReduceScatterMeshMem2Mem1D},
     {"CcuSchedReduceScatterSoleMeshPeerOnly", AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly},
     {"CcuSchedAllToAllSoleMesh", AlgorithmType::CcuSchedAllToAllSoleMesh},

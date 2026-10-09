@@ -28,12 +28,12 @@
 
 头文件路径为：`"c_api/composite/storeunalign_composite.h"`。
 
-将矢量数据寄存器中的数据搬出到Unified Buffer（UB），目的地址需按照`dtype`对齐。底层经非对齐搬出指令完成单次连续写入，搬运过程中数据格式和内容保持不变。在追求极致性能时，对齐场景推荐使用[asc_storealign](asc_storealign.md)接口。本接口在Vector Function（`__simd_vf__`标记的函数）内使用。本接口提供两种参数列表不同的功能模式：
+将矢量数据寄存器中的数据搬出到Unified Buffer（UB），目的地址需按照`dtype`对齐。底层经非对齐搬出指令完成单次连续写入，搬运过程中数据格式和内容保持不变。在追求极致性能时，对齐场景推荐使用[asc_storealign](asc_storealign.md)接口。本接口提供两种参数列表不同的功能模式：
 
 - **连续搬出模式**：将整个矢量数据寄存器内容写入`dst`起始地址，搬出量为一个矢量长度（`VL`，默认256字节）。
 - **带搬出数量模式**：仅将矢量数据寄存器前`count`个元素写入`dst`起始地址，用于部分搬出场景。
 
-本接口在AIV上执行有效。
+本接口为Reg矢量搬运接口，仅在AIV上生效。
 
 ## 函数原型
 
@@ -107,8 +107,8 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 
 ### 通用约束
 
-- 本接口非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数为矢量数据寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为`dst`传入。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- 源操作数为矢量数据寄存器，目的操作数为UB地址，UB地址空间外的指针不可作为`dst`传入。
 - `dst`起始地址需按照`dtype`对齐。本接口按非对齐方式将矢量数据寄存器内容写入UB，不要求对齐，不会报错。
 - UB容量上限：UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的地址不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
@@ -122,7 +122,7 @@ __simd_callee__ inline void asc_store(__ubuf__ int8_t* dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

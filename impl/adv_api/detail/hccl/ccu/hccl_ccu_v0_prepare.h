@@ -26,6 +26,7 @@ static_assert(
     KFC_RS_SOLE_NHR_PARAM_NUM <= CCU_USED_XN_NUM, "Sole NHR MultiLink ReduceScatter parameters exceed XN capacity");
 static_assert(KFC_CONCURRENT_A2A_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent AllToAll parameters exceed XN capacity");
 static_assert(KFC_CONCURRENT_RS_PARAM_NUM <= CCU_USED_XN_NUM, "Concurrent ReduceScatter parameters exceed XN capacity");
+static_assert(KFC_PARALLEL_AG_STORAGE_NUM <= CCU_USED_XN_NUM, "Parallel AllGather parameters exceed XN capacity");
 static_assert(CCU_USED_XN_NUM <= CCU_MSG_XN_NUM, "KFC loaded parameters exceed the message slot");
 
 __aicore__ inline void CalcPeerOnlyChunkParams(uint64_t sliceSize, uint64_t* tailSize, uint64_t* chunkLoopNum)
@@ -350,9 +351,11 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForConcurrentAllToAll(
     __gm__ CommonPrepareParamCcu* commParam)
 {
-    constexpr uint64_t meshBandwidth = 11U;
-    constexpr uint64_t totalBandwidth = 21U;
+    constexpr uint64_t meshBandwidth = 100U; // mesh:clos = 100:93，与 hccl executor 侧 MESH_BW/CLOS_BW 同步
+    constexpr uint64_t totalBandwidth = 193U;
     constexpr uint64_t splitAlignment = 128U;
+    constexpr uint64_t meshJettyNum = 1U; // 与 CcuTempAllToAllMesh1DMultiJetty 的 A2A_JETTY_NUM 保持一致
+    constexpr uint64_t closJettyNum = 1U; // 与 CcuTempAllToAllMesh1DMultiJetty 的 A2A_JETTY_NUM 保持一致
     const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
     const uint64_t totalSize = commParam->count * dataTypeSize;
     const uint64_t repeatOffset = totalSize * ccuParam_.repeatIndex;
@@ -370,6 +373,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_A2A_MESH_SRC_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_A2A_MESH_DST_OFFSET] = strideSize * ccuParam_.rankId;
     CalcGoSize(meshSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_A2A_MESH_GO_SIZE_0]);
+    xnData_[KFC_CONCURRENT_A2A_MESH_SLICE_SIZE_PER_JETTY] = meshSize / meshJettyNum / splitAlignment * splitAlignment;
+    xnData_[KFC_CONCURRENT_A2A_MESH_LAST_SLICE_SIZE_PER_JETTY] =
+        meshSize - (meshJettyNum - 1U) * xnData_[KFC_CONCURRENT_A2A_MESH_SLICE_SIZE_PER_JETTY];
 
     xnData_[KFC_CONCURRENT_A2A_CLOS_INPUT] = inputBase + meshSize;
     xnData_[KFC_CONCURRENT_A2A_CLOS_OUTPUT] = outputBase + meshSize;
@@ -378,6 +384,50 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     xnData_[KFC_CONCURRENT_A2A_CLOS_SRC_OFFSET] = 0U;
     xnData_[KFC_CONCURRENT_A2A_CLOS_DST_OFFSET] = strideSize * ccuParam_.rankId;
     CalcGoSize(closSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_CONCURRENT_A2A_CLOS_GO_SIZE_0]);
+    xnData_[KFC_CONCURRENT_A2A_CLOS_SLICE_SIZE_PER_JETTY] = closSize / closJettyNum / splitAlignment * splitAlignment;
+    xnData_[KFC_CONCURRENT_A2A_CLOS_LAST_SLICE_SIZE_PER_JETTY] =
+        closSize - (closJettyNum - 1U) * xnData_[KFC_CONCURRENT_A2A_CLOS_SLICE_SIZE_PER_JETTY];
+}
+
+template <const auto& config>
+__aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CcuPrepareForParallelAllGatherM2M(
+    __gm__ CommonPrepareParamCcu* commParam)
+{
+    // Keep the split identical to InsV2AllGatherParallelExecutor: split by
+    // element count so neither half can cut through an element.
+    constexpr uint64_t nhrJettyNum = 1U;
+    const uint64_t dataTypeSize = GetHcclDataTypeSize(commParam->dataType);
+    const uint64_t totalSize = commParam->count * dataTypeSize;
+    const uint64_t part0Size = (commParam->count / 2U) * dataTypeSize;
+    const uint64_t part1Size = totalSize - part0Size;
+    const uint64_t repeatOffset = totalSize * ccuParam_.repeatIndex;
+    const uint64_t outputStride = commParam->strideCount == 0U ? totalSize : commParam->strideCount * dataTypeSize;
+    const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
+    const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
+
+    GM_ADDR queueBase = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
+    queueBase += static_cast<uint64_t>(ccuParam_.alltoallvCnt) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
+
+    xnData_[KFC_PARALLEL_AG_OP_ID] = GetOpId(commParam);
+    xnData_[KFC_PARALLEL_AG_INPUT] = inputBase;
+    xnData_[KFC_PARALLEL_AG_OUTPUT] = outputBase;
+    xnData_[KFC_PARALLEL_AG_TOTAL_SIZE] = totalSize;
+    xnData_[KFC_PARALLEL_AG_OUTPUT_STRIDE] = outputStride;
+    xnData_[KFC_PARALLEL_AG_PART0_SIZE] = part0Size;
+    xnData_[KFC_PARALLEL_AG_PART1_SIZE] = part1Size;
+    xnData_[KFC_PARALLEL_AG_PART1_OFFSET] = part0Size;
+    xnData_[KFC_PARALLEL_AG_MESH_PHASE_DONE_ADDR] =
+        reinterpret_cast<uint64_t>(queueBase + KFC_PARALLEL_AG_MESH_PHASE_DONE_STORAGE * CCU_XN_DATA_SIZE);
+    xnData_[KFC_PARALLEL_AG_NHR_PHASE_DONE_ADDR] =
+        reinterpret_cast<uint64_t>(queueBase + KFC_PARALLEL_AG_NHR_PHASE_DONE_STORAGE * CCU_XN_DATA_SIZE);
+    CalcGoSize(part0Size, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_PARALLEL_AG_PART0_GO_SIZE_0]);
+    CalcGoSize(part1Size, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_PARALLEL_AG_PART1_GO_SIZE_0]);
+    xnData_[KFC_PARALLEL_AG_PART0_SLICE_PER_JETTY] = part0Size / nhrJettyNum;
+    xnData_[KFC_PARALLEL_AG_PART0_LAST_SLICE_PER_JETTY] = part0Size;
+    xnData_[KFC_PARALLEL_AG_PART1_SLICE_PER_JETTY] = part1Size / nhrJettyNum;
+    xnData_[KFC_PARALLEL_AG_PART1_LAST_SLICE_PER_JETTY] = part1Size;
+    xnData_[KFC_PARALLEL_AG_MESH_PHASE_DONE_STORAGE] = 0U;
+    xnData_[KFC_PARALLEL_AG_NHR_PHASE_DONE_STORAGE] = 0U;
 }
 
 template <const auto& config>

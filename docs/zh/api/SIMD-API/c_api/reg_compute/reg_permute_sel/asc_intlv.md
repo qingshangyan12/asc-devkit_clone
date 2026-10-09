@@ -33,11 +33,11 @@
 - **操作数为矢量数据寄存器：** 以元素为单位进行交织。`src0`和`src1`前半部分的元素依次交替写入`dst0`，后半部分的元素依次交替写入`dst1`。以`int8_t`类型为例，交织过程如下图所示。
 - **操作数为掩码寄存器：** 根据接口后缀指定的粒度进行交织。`asc_intlv_b8`以1bit为一组，`asc_intlv_b16`以2bit为一组，`asc_intlv_b32`以4bit为一组。
 
-**图 1**  int8_t类型交织过程
+**图 1** int8_t类型交织过程
 
 ![](../../figures/asc_intlv.png)
 
-本接口仅在AIV上生效，非AIV调用直接返回。
+本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
 
@@ -115,8 +115,8 @@ __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0,
 
 ### 通用约束
 
-- 本接口仅在AIV上生效，非AIV调用直接返回。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用，源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- 源操作数和目的操作数为矢量数据寄存器或掩码寄存器。
 
 ### 寄存器约束
 
@@ -129,7 +129,7 @@ __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
