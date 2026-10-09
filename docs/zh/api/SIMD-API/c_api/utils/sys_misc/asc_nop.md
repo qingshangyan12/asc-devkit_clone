@@ -51,6 +51,7 @@ PIPE_S
 ## 约束说明
 
 如果需要精确阻塞n拍流水，需要在n个`asc_nop`接口调用前后插入[`asc_sync`](../../sync/intra_core_sync/asc_sync.md)，例如：
+
 ```c
 // 阻塞3拍流水
 asc_sync();
@@ -65,7 +66,7 @@ asc_sync();
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

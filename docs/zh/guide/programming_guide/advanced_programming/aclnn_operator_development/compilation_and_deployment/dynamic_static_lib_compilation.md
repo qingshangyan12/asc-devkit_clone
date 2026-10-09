@@ -19,10 +19,10 @@
 - Ascend 950PR&950DT系列产品
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3训练系列产品 / Atlas A3推理系列产品
+- Atlas A3系列产品
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2训练系列产品 / Atlas A2推理系列产品
+- Atlas A2系列产品
 <!-- end id3 -->
 
 开始前需完成以下准备：
@@ -151,6 +151,7 @@ target_link_libraries(op_runner PRIVATE # op_runner需要替换成调用方的�
     ${vendor_name}::${vendor_name}  # 已自动包含相关的target依赖，需要把${vendor_name}替换为实际的算子package名称
 )
 ```
+
 `${vendor_name}::${vendor_name}`在`TYPE STATIC`模式下指向`lib${vendor_name}.a`。
 静态库集成的完整样例可参考[custom_op_static_lib](../../../../../../../examples/01_simd_cpp_api/02_features/99_acl_based/00_acl_compilation/custom_op_static_lib)。
 
