@@ -107,7 +107,7 @@ __simd_callee__ inline decltype(auto) load_gather(
 
 ## 返回值说明
 
-返回`reg_tensor<typename Tensor::data_type>`，其`reg`成员保存收集结果。接口不初始化返回对象的`mask`成员。
+通常返回`reg_tensor<typename Tensor::data_type>`；当Tensor元素类型为`int4b_t`时，返回`reg_tensor<int4x2_t>`。返回对象的`reg`成员保存收集结果，接口不初始化其`mask`成员。
 
 ## 约束说明
 

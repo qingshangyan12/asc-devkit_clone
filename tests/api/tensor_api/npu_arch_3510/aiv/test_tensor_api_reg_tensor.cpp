@@ -140,6 +140,7 @@ __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* d
 template <typename T, typename Index, asc::te::experimental::gather_mode Mode>
 __simd_vf__ inline void CompileLoadGather(__ubuf__ T* src)
 {
+    using RegDataType = asc::te::experimental::detail::get_reg_data_type<T>;
     auto layout = asc::te::make_layout(asc::te::make_shape(64));
     auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
     asc::te::experimental::reg_tensor<Index> index{};
@@ -147,8 +148,8 @@ __simd_vf__ inline void CompileLoadGather(__ubuf__ T* src)
 
     auto gathered = asc::te::experimental::load_gather<Mode>(src_tensor, index, mask);
     auto gathered_at = asc::te::experimental::load_gather<Mode>(src_tensor, asc::te::make_coord(0), index, mask);
-    static_assert(AscendC::Std::is_same_v<decltype(gathered), asc::te::experimental::reg_tensor<T>>);
-    static_assert(AscendC::Std::is_same_v<decltype(gathered_at), asc::te::experimental::reg_tensor<T>>);
+    static_assert(AscendC::Std::is_same_v<decltype(gathered), asc::te::experimental::reg_tensor<RegDataType>>);
+    static_assert(AscendC::Std::is_same_v<decltype(gathered_at), asc::te::experimental::reg_tensor<RegDataType>>);
     (void)gathered;
     (void)gathered_at;
 }
