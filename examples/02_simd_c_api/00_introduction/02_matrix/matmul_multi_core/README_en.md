@@ -8,7 +8,7 @@ This sample implements multi-core matrix multiplication computation based on the
 
 | Product | CANN Software Version |
 |---------|-----------------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -112,7 +112,7 @@ This sample implements multi-core matrix multiplication computation based on the
       src_stride,        // Source start address interval between adjacent K-direction fractals, unit: 512B
       dst_stride);       // Destination start address interval between adjacent K-direction fractals, unit: 512B
   ```
-  On Ascend 950PR/Ascend 950DT products, the layout format in L0A Buffer is Nz. When transferring matrix A, use `asc_copy_l12l0a(a2Local, a1Local, 0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK)` to complete the A matrix Nz-to-Nz transfer in one operation. When transferring matrix B, use `asc_copy_l12l0b_transpose(b2Local, b1Local, 0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK)` to complete the B matrix Nz-to-Zn transfer in one operation.
+  On Ascend 950PR&950DT products, the layout format in L0A Buffer is Nz. When transferring matrix A, use `asc_copy_l12l0a(a2Local, a1Local, 0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK)` to complete the A matrix Nz-to-Nz transfer in one operation. When transferring matrix B, use `asc_copy_l12l0b_transpose(b2Local, b1Local, 0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK)` to complete the B matrix Nz-to-Zn transfer in one operation.
 
   **[`asc_mmad`](../../../../../docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad.md)** — Describes matrix multiplication parameters:
   ```cpp
@@ -190,7 +190,7 @@ Execute the following steps in the root directory of this sample to compile and 
   | Option | Available Values | Description |
   |--------|------------------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default) | NPU architecture for Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` (default) | NPU architecture for Ascend 950PR&950DT products |
 
 - Execution Result  
   The execution result is as follows, indicating successful precision comparison.

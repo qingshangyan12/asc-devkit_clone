@@ -74,11 +74,12 @@ PIPE_S
 - 调用后配置会持续生效，直至再次调用本接口覆盖，不同3D搬运任务使用的配置不同时，需在对应搬运接口执行前重新配置。
 
 <!-- npu="950" id8 -->
+
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
