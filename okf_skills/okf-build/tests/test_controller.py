@@ -20,7 +20,7 @@ class RenderTests(unittest.TestCase):
         "okftype": "reference.api",
         "fields": ["okftype", "description", "tag", "dependencies", "version"],
         "required": ["okftype", "description", "tag", "dependencies", "version"],
-        "version": "9.0.0-",
+        "version": ">=9.0.0",
     }
 
     def test_full_header(self) -> None:
@@ -35,7 +35,7 @@ class RenderTests(unittest.TestCase):
         self.assertIn("- roles: [compute]", text)
         self.assertIn("- operations: [divide]", text)
         self.assertIn("kind: constrained_by", text)
-        self.assertIn("version: 9.0.0-", text)
+        self.assertIn('version: ">=9.0.0"', text)
         header = text[4:-5]
         keys = [line.split(":")[0] for line in header.splitlines() if line and not line[0].isspace() and not line.startswith("-")]
         self.assertEqual(keys, ["okftype", "description", "tag", "dependencies", "version"])
@@ -112,13 +112,13 @@ class VersionTests(unittest.TestCase):
         self.assertEqual(vm["floors"]["asc_transto5hd"], "9.2.0")
         self.assertEqual(vm["floors"]["asc_copy_ub2ub"], "9.1.0")
         result = version_for("docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md", vm)
-        self.assertEqual(result["version"], "9.1.0-")
+        self.assertEqual(result["version"], ">=9.1.0")
 
     def test_arch_page_maps_to_family(self) -> None:
         vm = {"floors": {"asc_copy_gm2ub": "9.1.0"}, "deprecated_in": {}}
         result = version_for("docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md", vm)
         self.assertEqual(result["api"], "asc_copy_gm2ub")
-        self.assertEqual(result["version"], "9.1.0-")
+        self.assertEqual(result["version"], ">=9.1.0")
 
 
 class PipelineTests(unittest.TestCase):
@@ -144,7 +144,7 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(len(manifest["documents"]), 1)
         task = manifest["documents"][0]
         self.assertEqual(task["okftype"], "reference.api")
-        self.assertEqual(task["version"], "9.1.0-")
+        self.assertEqual(task["version"], ">=9.1.0")
         self.assertTrue(task["needs_annotation"])
 
     def test_validate_and_write_dryrun(self) -> None:

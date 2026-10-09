@@ -57,7 +57,7 @@ cases:
     min: 1
 
   - name: A5 版本视图
-    args: {version: 9.1.0-}
+    args: {version: ">=9.1.0"}
     min: 2
     contains: [asc_set_copy_pad_val]
 

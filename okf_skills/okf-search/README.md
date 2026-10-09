@@ -153,7 +153,7 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-version: 9.0.0-
+version: ">=9.0.0"
 ---
 ```
 
@@ -251,7 +251,7 @@ archs:
 | `--dtype` / `--convert src dst` | 数据类型 / 类型转换对（别名归一：f32→float、e4m3→fp8_e4m3fn） |
 | `--feature low_precision` | 特性族（低精度、int4 等） |
 | `--kw 非对齐,填充` | 标题 + 描述子串 |
-| `--version 9.1.0-` / `--product 950,A3` | 版本区间 / 产品标记 |
+| `--version '>=9.1.0'` / `--product 950,A3` | 按 version 区间精确匹配 / 产品标记 |
 | `--api asc_copy_gm2ub` | 家族卡：主页 + 同族成员 + 分类页 |
 | `--deps-of <api\|path> [--kind K] [--reverse]` | 依赖图遍历 |
 | `--param` / `--enum` | 参数名或枚举类型 / 枚举名或枚举值反查使用方 |

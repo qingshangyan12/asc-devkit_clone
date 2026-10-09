@@ -137,7 +137,7 @@ def version_for(doc_rel: str, version_map: dict[str, Any]) -> dict[str, Any]:
     floor = version_map["floors"].get(name, "9.0.0")
     is_deprecated_doc = "/deprecated_interface/" in doc_rel
     ceil = version_map["deprecated_in"].get(name) if is_deprecated_doc else None
-    value = f"{floor}-" if ceil is None or ceil <= floor else f"{floor}-{ceil}"
+    value = f">={floor}" if ceil is None or ceil <= floor else f">={floor},<={ceil}"
     return {"api": name, "version": value, "floor": floor, "ceil": ceil}
 
 

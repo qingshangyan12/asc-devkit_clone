@@ -60,7 +60,7 @@ python3 scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] 
 --kw 非对齐,填充                # title+description 子串
 --convert half int4            # 类型转换对
 --feature low_precision        # 特性（low_precision/low_precision_matrix/int4...）
---version 9.1.0-               # CANN 版本区间
+--version '>=9.1.0'           # 按 version 区间精确匹配（含 >= 需引号）
 --product 950,A3               # 产品 npu 标记
 --api asc_copy_gm2ub           # 家族卡：主页+同族成员+分类页
 --deps-of <api|path> [--kind K] [--reverse]   # 依赖图遍历

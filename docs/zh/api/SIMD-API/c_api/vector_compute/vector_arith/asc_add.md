@@ -8,7 +8,7 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-version: 9.0.0-
+version: ">=9.0.0"
 ---
 # asc_add
 

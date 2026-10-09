@@ -13,7 +13,9 @@ from typing import Any
 
 import yaml
 
-VERSION_RANGE_RE = re.compile(r"^(?P<floor>\d+\.\d+(?:\.\d+)?)-(?P<ceil>\d+\.\d+(?:\.\d+)?)?$")
+VERSION_RANGE_RE = re.compile(
+    r"^>=(?P<floor>\d+\.\d+(?:\.\d+)?)(?:,<=(?P<ceil>\d+\.\d+(?:\.\d+)?))?$"
+)
 
 
 def load_product_map(path: Path) -> dict[str, Any]:
@@ -54,7 +56,7 @@ def detect_cann_version(explicit: str | None, repo_root: Path) -> str:
 
 
 def version_covers(version: str, cann_version: str) -> bool:
-    """version 形如 9.0.0- 或 9.0.0-9.2.0；判定是否覆盖给定 CANN 版本。"""
+    """version 形如 >=9.0.0 或 >=9.0.0,<=9.2.0；判定是否覆盖给定 CANN 版本。"""
     match = VERSION_RANGE_RE.fullmatch(version)
     if not match:
         return False
@@ -70,4 +72,5 @@ def version_covers(version: str, cann_version: str) -> bool:
 
 
 def version_sort_key(version: str) -> tuple[int, ...]:
-    return tuple(int(x) for x in version.rstrip("-").split("."))
+    floor = version.split(",", 1)[0].removeprefix(">=")
+    return tuple(int(x) for x in floor.split("."))

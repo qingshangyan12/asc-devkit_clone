@@ -32,7 +32,7 @@ python3 okf_skills/okf-search/scripts/ensure_index.py --json [--arch A3] [--cann
 | API 分类 | 只看搬运类/寄存器计算类 | `--api-class vector_datamove,reg_compute,…` |
 | 数据类型/精度 | half→fp8、int4、低精度 | `--convert <src> <dst[,dst2]>`（别名 f32/e4m3 可用）、`--dtype`、`--feature` |
 | 行为约束 | 非对齐、填充、掩码、舍入 | `--kw`（title+description 子串） |
-| 版本/产品 | 9.1.0 起可用、950 支持 | `--version 9.1.0-`、`--product 950,A3` |
+| 版本/产品 | 9.1.0 起可用、950 支持 | `--version '>=9.1.0'`、`--product 950,A3` |
 | 具名 API 全貌 | asc_copy_gm2ub 家族 | `--api <name>`（主页+家族成员+分类页） |
 | 参数/枚举/宏反查 | round_mode、ASC_CAST_RN | `--param`、`--enum` |
 | 配套关系 | 掩码/填充/循环搬运配置 | `--deps-of <api> [--kind requires|configures] [--reverse]` |

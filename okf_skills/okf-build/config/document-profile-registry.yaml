@@ -37,7 +37,7 @@ field_catalog:
     含义: 关联 API 或文档及关系类型；replaced_by 表示当前废弃实体指向替代目标。
     事实来源: Markdown 正文明确表达的关联语句。
   version:
-    含义: 接口原型的 CANN 生命周期区间，如 9.0.0- 或 9.0.0-9.2.0。
+    含义: 接口原型的 CANN 生命周期区间，如 >=9.0.0 或 >=9.0.0,<=9.2.0（写入时加引号）。
     事实来源: Release Notes 逐版本清单（derive_version 脚本推导）。
 
 output_contracts:

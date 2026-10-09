@@ -518,7 +518,8 @@ def render_front_matter(task: dict[str, Any], annotation: dict[str, Any] | None)
             else:
                 lines.append("dependencies: []")
         if "version" in task.get("required", []):
-            lines.append(f"version: {task.get('version', '9.0.0-')}")
+            value = task.get("version", ">=9.0.0")
+            lines.append(f'version: "{value}"')
     return "---\n" + "\n".join(lines) + "\n---\n"
 
 

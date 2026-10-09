@@ -207,7 +207,7 @@ tag:
 dependencies:
   - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
     kind: constrained_by
-version: 9.0.0-
+version: ">=9.0.0"
 ---
 ```
 
@@ -217,7 +217,7 @@ version: 9.0.0-
 | `description` | 中文单段摘要，8–180 字，讲清动作、对象和关键约束 | 实体页/概念页等必填 |
 | `tag` | 语义标签，仅 `roles/operations/traits` 三个 namespace | 实体页必填 `roles` |
 | `dependencies` | 配套文档及关系，可空数组 | 实体页必填 |
-| `version` | CANN 生命周期区间：`9.0.0-` 表示起于 9.0.0，`9.0.0-9.2.0` 表示闭区间 | 实体页必填 |
+| `version` | CANN 生命周期区间：`>=9.0.0` 表示 9.0.0 及以后，`>=9.0.0,<=9.2.0` 表示仅该区间可用 | 实体页必填 |
 
 `okftype` 取值（来自 Profile 注册表）：
 

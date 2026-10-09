@@ -92,7 +92,7 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
         "kw": csv(args.kw),
         "pair": [],
         "feature": csv(args.feature),
-        "version": csv(args.version),
+        "version": [args.version.strip()] if args.version and args.version.strip() else [],
         "product": csv(args.product),
     }
     if args.convert:
@@ -315,7 +315,7 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--kw", help="title+description 子串")
     p.add_argument("--convert", nargs=2, metavar=("SRC", "DST"), help="类型转换对，DST 可为逗号列表")
     p.add_argument("--feature", help="特性（如 low_precision,low_precision_matrix,int4）")
-    p.add_argument("--version", help="CANN 版本区间（如 9.0.0-,9.1.0-）")
+    p.add_argument("--version", help="按 version 区间精确匹配（如 '>=9.1.0'；含 >= 按 shell 规则加引号）")
     p.add_argument("--product", help="产品 npu 标记（如 950,A3,910b）")
     p.add_argument("--api", help="家族卡：主页+同族成员+分类页")
     p.add_argument("--deps-of", dest="deps_of", help="依赖图遍历（API 名或路径）")
