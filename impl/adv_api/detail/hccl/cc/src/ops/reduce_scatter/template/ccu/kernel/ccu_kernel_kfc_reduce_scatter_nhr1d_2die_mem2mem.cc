@@ -292,6 +292,7 @@ CcuResult DoRepeatReduceScatterNHR(KfcReduceScatterNhr2DieContext& ctx)
     ccu::Variable repeatNumAdd2;
     bool islastSlice = (ctx.rankId + 1 == ctx.rankSize);
     repeatNumAdd2 = 1;
+    ctx.isRepeatIter = 0;
     CCU_WHILE(ctx.repeatNumVar != UINT64_MAX)
     {
         ctx.repeatNumVar += repeatNumAdd2;
