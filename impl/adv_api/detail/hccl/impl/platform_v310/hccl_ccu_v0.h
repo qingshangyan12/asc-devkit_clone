@@ -471,7 +471,10 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         handleParamGM_[handleId].op = commonPrepareParam.op;
         handleParamGM_[handleId].strideCount = commonPrepareParam.strideCount;
         InitCcuParam(handleId);
-        FlushDataCache(&handleParamGM_[handleId]);
+        // 性能优化(N1)：handleParamGM_ 在 workingFlag 路径仅 AIV 自身读写（本函数写入，
+        // InitCcuParam/CcuPrepareForOp/GetAlgorithmType 读取），同核 cache 一致无需
+        // FlushDataCache 重屏障；CCU server 只读 xnData/CKE（CcuSendMsg 路径已 flush），
+        // 此处 flush 为老 CcuKernelArg 流程（CCU 内核读 GM 参数）遗留，KFC 路径删除。
         if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
             for (uint32_t i = 0; i < rankNum; i++) {
                 allToAllVParam_[handleId].sendCounts[i] = commonPrepareParam.paramExt.sendCounts[i];
