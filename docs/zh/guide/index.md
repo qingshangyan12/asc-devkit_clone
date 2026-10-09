@@ -412,4 +412,3 @@
         -   [C/C++语法限制](./technical_appendix/cpp_standard_support/cpp_language_restrictions/cpp_language_restrictions.md)
             -   [不支持的特性](./technical_appendix/cpp_standard_support/cpp_language_restrictions/unsupport_features.md)
             -   [函数](./technical_appendix/cpp_standard_support/cpp_language_restrictions/functions.md)
-            -   [C++11限制](./technical_appendix/cpp_standard_support/cpp_language_restrictions/cpp11_restrictions.md)
