@@ -24,12 +24,14 @@ namespace experimental {
 template <const histogram_options& options, typename T, typename U>
 __simd_callee__ inline reg_tensor<T> histograms(const reg_tensor<T>& dst, const reg_tensor<U>& src)
 {
-    static_assert(::AscendC::Std::is_same_v<T, uint16_t> && ::AscendC::Std::is_same_v<U, uint8_t>,
-                  "histograms currently supports reg_tensor<uint16_t> dst and reg_tensor<uint8_t> src");
-    static_assert(options.half == histogram_half::low || options.half == histogram_half::high,
-                  "unsupported histogram half");
-    static_assert(options.mode == histogram_mode::frequency || options.mode == histogram_mode::cumulative,
-                  "unsupported histogram mode");
+    static_assert(
+        ::AscendC::Std::is_same_v<T, uint16_t> && ::AscendC::Std::is_same_v<U, uint8_t>,
+        "histograms currently supports reg_tensor<uint16_t> dst and reg_tensor<uint8_t> src");
+    static_assert(
+        options.half == histogram_half::low || options.half == histogram_half::high, "unsupported histogram half");
+    static_assert(
+        options.mode == histogram_mode::frequency || options.mode == histogram_mode::cumulative,
+        "unsupported histogram mode");
 
     reg_tensor<T> result = dst;
     if constexpr (options.mode == histogram_mode::frequency) {

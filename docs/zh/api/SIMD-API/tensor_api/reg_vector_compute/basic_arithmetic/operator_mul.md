@@ -93,20 +93,12 @@ $$
 #include "tensor_api/experimental/vector_compute.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void mul_vf(
-    const InputTensor input, OutputTensor output, uint16_t repeat_times, uint32_t total,
-    uint32_t one_repeat_size)
+__simd_vf__ inline void mul_example(InputTensor input, OutputTensor output)
 {
     using asc::te::experimental::operator*;
-    using data_type = typename InputTensor::data_type;
-    uint32_t remain = total;
-    for (uint16_t i = 0; i < repeat_times; ++i) {
-        const uint32_t offset = i * one_repeat_size;
-        const auto coord = asc::te::make_coord(offset);
-        auto mask = asc::te::experimental::update_mask<data_type>(remain);
-        auto src_reg = asc::te::experimental::load(input, coord).with_mask(mask);
-        auto dst_reg = src_reg * 2.0f;
-        asc::te::experimental::store(output, coord, dst_reg);
-    }
+    auto src = asc::te::experimental::load(input, asc::te::make_coord(0))
+                   .with_mask(asc::te::experimental::all_mask<float>());
+    auto dst = src * 2.0f;
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```

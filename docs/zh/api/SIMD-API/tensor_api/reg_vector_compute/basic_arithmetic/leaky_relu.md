@@ -76,22 +76,18 @@ src与返回值的数据类型保持一致。支持的数据类型为：half、f
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void leaky_relu_vf(
-    const InputTensor input, OutputTensor output, uint16_t repeat_times, uint32_t total,
-    uint32_t one_repeat_size)
+__simd_vf__ inline void leaky_relu_example(InputTensor input, OutputTensor output)
 {
-    using data_type = typename InputTensor::data_type;
-    uint32_t remain = total;
-    for (uint16_t i = 0; i < repeat_times; ++i) {
-        const uint32_t offset = i * one_repeat_size;
-        const auto coord = asc::te::make_coord(offset);
-        auto mask = asc::te::experimental::update_mask<data_type>(remain);
-        auto src_reg = asc::te::experimental::load(input, coord).with_mask(mask);
-        auto dst_reg = asc::te::experimental::leaky_relu(src_reg, 0.1f);
-        asc::te::experimental::store(output, coord, dst_reg);
-    }
+    auto mask = asc::te::experimental::all_mask<float>();
+    auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
+    auto dst = asc::te::experimental::leaky_relu(src, 0.1f);
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```

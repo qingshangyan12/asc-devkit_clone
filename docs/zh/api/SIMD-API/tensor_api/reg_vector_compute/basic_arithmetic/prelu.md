@@ -76,23 +76,19 @@ src、slope与返回值的数据类型保持一致。支持的数据类型为：
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/tensor.h"
+#include "tensor_api/experimental/arch/vector/basic_arithmetic.h"
+#include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
+#include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_data_store.h"
 
 template <typename InputTensor, typename OutputTensor>
-__simd_vf__ inline void prelu_vf(
-    const InputTensor input, const InputTensor slope_input, OutputTensor output, uint16_t repeat_times,
-    uint32_t total, uint32_t one_repeat_size)
+__simd_vf__ inline void prelu_example(InputTensor input, InputTensor slope_input, OutputTensor output)
 {
-    using data_type = typename InputTensor::data_type;
-    uint32_t remain = total;
-    for (uint16_t i = 0; i < repeat_times; ++i) {
-        const uint32_t offset = i * one_repeat_size;
-        const auto coord = asc::te::make_coord(offset);
-        auto mask = asc::te::experimental::update_mask<data_type>(remain);
-        auto src_reg = asc::te::experimental::load(input, coord).with_mask(mask);
-        auto slope_reg = asc::te::experimental::load(slope_input, coord);
-        auto dst_reg = asc::te::experimental::prelu(src_reg, slope_reg);
-        asc::te::experimental::store(output, coord, dst_reg);
-    }
+    auto mask = asc::te::experimental::all_mask<float>();
+    auto src = asc::te::experimental::load(input, asc::te::make_coord(0)).with_mask(mask);
+    auto slope = asc::te::experimental::load(slope_input, asc::te::make_coord(0));
+    auto dst = asc::te::experimental::prelu(src, slope);
+    asc::te::experimental::store(output, asc::te::make_coord(0), dst);
 }
 ```

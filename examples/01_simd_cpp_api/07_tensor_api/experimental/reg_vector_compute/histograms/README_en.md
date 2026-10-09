@@ -6,7 +6,7 @@ This sample demonstrates how to use the experimental Tensor API `asc::te::experi
 
 ## Supported Products
 
-- Ascend 950PR/Ascend 950DT
+- Ascend 950PR&950DT products
 
 ## Directory Structure
 
@@ -35,7 +35,7 @@ Perform the following steps in the sample root directory to build and run the sa
 
 - Configure environment variables
 
-  Configure the CANN package environment variables by following the [environment configuration guide](https://gitcode.com/cann/asc-devkit/blob/master/docs/en/quick_start.md).
+  Configure the CANN package environment variables by following the [environment configuration guide](../../../../../../docs/en/quick_start.md#prepare&install).
 
   ```bash
   source ${install_path}/set_env.sh
