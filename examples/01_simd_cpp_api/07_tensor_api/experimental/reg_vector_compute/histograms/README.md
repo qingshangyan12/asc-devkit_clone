@@ -35,7 +35,7 @@
 
 - 配置环境变量
 
-  配置 CANN 软件包环境变量，详细操作请参考[环境变量配置](../../../../../../docs/zh/quick_start.md#prepare&install)。
+  配置 CANN 软件包环境变量，详细操作请参考[环境变量配置](https://gitcode.com/cann/asc-devkit/blob/master/docs/zh/quick_start.md)。
 
   ```bash
   source ${install_path}/set_env.sh
