@@ -45,13 +45,14 @@ Reg向量计算C API提供了下表所示多种搬运指令，合理选择搬运
 
 | 场景 | C API接口 | 描述 |
 | :-- | :-- | :-- |
-| 连续对齐搬入 | [asc_loadalign](./load/asc_loadalign.md) | 从32字节对齐的UB起始地址连续搬入到向量数据寄存器或掩码寄存器。|
-| 非连续对齐搬入 | [asc_loadalign](./load/asc_loadalign.md) | 从32字节对齐的UB起始地址非连续搬入多个DataBlock。|
+| 连续对齐搬入 | [asc_loadalign](./load/asc_loadalign_continuous.md) | 从32字节对齐的UB起始地址连续搬入到向量数据寄存器。|
+| 非连续对齐搬入 | [asc_loadalign](./load/asc_loadalign_noncontinuous.md) | 从32字节对齐的UB起始地址非连续搬入多个DataBlock。|
 | 连续非对齐搬入 | [asc_loadunalign](./load/asc_loadunalign.md) | 从非32字节对齐的UB起始地址连续搬入到向量数据寄存器。|
-| 掩码寄存器搬入 | [asc_loadalign](./load/asc_loadalign.md)、[asc_loadalign_mask](./load/asc_loadalign_mask.md) | 从UB连续搬入掩码寄存器。|
+| 掩码寄存器搬入 | [asc_loadalign、asc_loadalign_mask](./load/asc_loadalign_mask.md) | 从UB连续搬入掩码寄存器。|
 | 离散搬入 | [asc_gather](./ub_gather/asc_gather.md) | 根据索引值将UB中的元素收集到向量数据寄存器。|
 | DataBlock离散搬入 | [asc_gather_datablock](./ub_gather/asc_gather_datablock.md) | 根据索引值将UB中的元素按DataBlock（32B）收集到向量数据寄存器。|
-| 连续对齐搬出 | [asc_storealign](./store/asc_storealign.md) | 将向量数据寄存器或掩码寄存器连续搬出到32字节对齐的UB地址。|
+| 连续对齐搬出 | [asc_storealign](./store/asc_storealign_continuous.md) | 将向量数据寄存器连续搬出到32字节对齐的UB地址。|
+| 掩码寄存器搬出 | [asc_storealign](./store/asc_storealign_mask.md) | 将掩码寄存器连续搬出到32字节对齐的UB地址。|
 | 连续非对齐搬出 | [asc_storeunalign](./store/asc_storeunalign.md) | 将向量数据寄存器连续搬出到非32字节对齐的UB地址。|
 | 离散搬出 | [asc_scatter](./scatter/asc_scatter.md) | 根据索引值将向量数据寄存器中的元素离散搬出到UB。|
 | 寄存器间搬运 | [asc_copy](./reg_copy/asc_copy.md) | 支持向量数据寄存器复制到向量数据寄存器，掩码寄存器复制到掩码寄存器，向量数据寄存器复制到掩码寄存器三种模式。|
@@ -60,13 +61,13 @@ Reg向量计算C API提供了下表所示多种搬运指令，合理选择搬运
 
 - 连续对齐搬入
 
-  如图[half转int32_t类型转换过程](#fig1)，将UB地址`x_addr`上数据量为VL/2的`half`类型元素通过[asc_loadalign_unpack](./load/asc_loadalign_unpack.md)搬入`x_reg`，调用[asc_half2int32_rd](./reg_convert/asc_half2int32.md)将`half`转换为`int32_t`并写入`y_reg`，最后通过[asc_storealign](./store/asc_storealign.md)搬出至UB地址`y_addr`。
+  如图[half转int32_t类型转换过程](#fig1)，将UB地址`x_addr`上数据量为VL/2的`half`类型元素通过[asc_loadalign_unpack](./load/asc_loadalign_unpack.md)搬入`x_reg`，调用[asc_half2int32_rd](./reg_convert/asc_half2int32.md)将`half`转换为`int32_t`并写入`y_reg`，最后通过[asc_storealign](./store/asc_storealign_continuous.md)搬出至UB地址`y_addr`。
 
   **图1** half转int32_t类型转换过程<a id="fig1"></a>
 
   ![](../figures/capi_half_to_int32_conversion.png "half转int32_t类型转换过程")
 
-  ```cpp
+  ```c
   __simd_vf__ inline void half_to_int32_vf(__ubuf__ int32_t* y_addr, __ubuf__ half* x_addr)
   {
       vector_half x_reg;
@@ -82,13 +83,13 @@ Reg向量计算C API提供了下表所示多种搬运指令，合理选择搬运
 
 - 连续对齐搬出
 
-  如图[float转int16_t类型转换过程](#fig2)，将UB地址`x_addr`上数据量为VL的`float`类型元素通过[asc_loadalign](./load/asc_loadalign.md)搬入`x_reg`，调用[asc_float2int16_rn](./reg_convert/asc_float2int16.md)将`float`转换为`int16_t`并写入`y_reg`，最后通过[asc_storealign_pack](./store/asc_storealign_pack.md)搬出至UB地址`y_addr`。
+  如图[float转int16_t类型转换过程](#fig2)，将UB地址`x_addr`上数据量为VL的`float`类型元素通过[asc_loadalign](./load/asc_loadalign_continuous.md)搬入`x_reg`，调用[asc_float2int16_rn](./reg_convert/asc_float2int16.md)将`float`转换为`int16_t`并写入`y_reg`，最后通过[asc_storealign_pack](./store/asc_storealign_pack.md)搬出至UB地址`y_addr`。
 
   **图2** float转int16_t类型转换过程<a id="fig2"></a>
 
   ![](../figures/capi_float_to_int16_conversion.png "float转int16_t类型转换过程")
 
-  ```cpp
+  ```c
   __simd_vf__ inline void float_to_int16_vf(__ubuf__ int16_t* y_addr, __ubuf__ float* x_addr)
   {
       vector_float x_reg;

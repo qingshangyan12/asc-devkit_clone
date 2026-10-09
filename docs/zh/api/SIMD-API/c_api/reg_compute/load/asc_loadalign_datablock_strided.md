@@ -1,4 +1,4 @@
-# asc_loadalign_datablock_strided
+# asc_loadalign_datablock_strided（对齐搬入，非连续模式，NPU架构版本3510）
 
 ## 产品支持情况
 
@@ -30,7 +30,7 @@
 
 从Unified Buffer（UB）中32字节对齐的起始地址非连续搬入8个`DataBlock`，并通过函数返回值返回保存搬入结果的矢量数据寄存器。每个`DataBlock`的数据量为32字节，支持配置相邻数据块之间的地址步长和本次搬入的起始读取位置。
 
-本接口与[asc_loadalign](asc_loadalign.md)的非连续对齐搬入模式功能相同，区别在于本接口通过函数返回值返回结果。
+本接口与[asc_loadalign（对齐搬入，非连续模式，NPU架构版本3510）](asc_loadalign_noncontinuous.md)功能相同，区别在于本接口通过函数返回值返回结果。
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
@@ -93,7 +93,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>

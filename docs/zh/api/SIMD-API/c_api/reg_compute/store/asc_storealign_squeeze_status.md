@@ -32,7 +32,7 @@
 
 ## 函数原型
 
-```cpp
+```c
 __simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst)
 
 __simd_callee__ inline void asc_storealign_squeeze_status(__ubuf__ uint32_t* dst,
@@ -71,7 +71,7 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>

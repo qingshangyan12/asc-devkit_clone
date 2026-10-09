@@ -28,22 +28,15 @@
 
 头文件路径为：`"c_api/reg_compute/load/loadalign.h"`。
 
-从Unified Buffer（UB）中满足对应对齐要求的起始地址读取连续数据并进行2倍上采样，结果通过函数返回值返回或写入目的寄存器。
-
-- 当`dst`为矢量数据寄存器时，从UB中32字节对齐的起始地址读取VL/2长度数据，将每个源元素重复两次后写入VL长度数据。
-- 当`dst`为掩码寄存器时，从UB中16字节对齐的起始地址读取VL/16长度数据，将每个bit重复两次后写入VL/8长度数据。
+从Unified Buffer（UB）中32字节对齐的起始地址读取VL/2长度的连续数据，将每个源元素重复两次，并通过函数返回值返回或写入VL长度的目的矢量数据寄存器。
 
 本接口提供三种功能模式：
 
-- **对齐搬入模式**：将UB源地址的数据上采样后搬入到矢量数据寄存器或掩码寄存器，由用户自行更新源地址。
+- **对齐搬入模式**：将UB源地址的数据上采样后搬入到矢量数据寄存器，由用户自行更新源地址。
 - **立即数偏移搬入模式**：从相对源起始地址偏移指定距离的位置搬入数据。本接口不会自动更新源地址。
 - **地址寄存器偏移搬入模式**：通过地址寄存器指定相对源起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬入场景。需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。
 
-对齐搬入模式中，通过函数返回值返回掩码寄存器时，请使用[asc_loadalign_mask_upsample](asc_loadalign_mask_upsample.md)。
-
-**图1** 上采样搬入掩码寄存器
-
-![](../../figures/capi_loadalign_mask_upsample.png)
+掩码寄存器上采样搬入请使用[asc_loadalign_mask_upsample](asc_loadalign_mask_upsample.md)。
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
 
@@ -58,9 +51,6 @@ __simd_callee__ inline vector_<dtype> asc_loadalign_upsample(__ubuf__ <dtype>* s
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_upsample(vector_<dtype>& dst,
                                                    __ubuf__ <dtype>* src)
-// 搬入掩码寄存器。
-__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst,
-                                                   __ubuf__ uint32_t* src)
 ```
 
 #### dtype支持数据类型
@@ -84,10 +74,6 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 __simd_callee__ inline void asc_loadalign_upsample(vector_<dtype>& dst,
                                                    __ubuf__ <dtype>* src,
                                                    int32_t offset)
-// 搬入掩码寄存器。
-__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst,
-                                                   __ubuf__ uint32_t* src,
-                                                   int32_t offset)
 ```
 
 #### dtype支持数据类型
@@ -109,10 +95,6 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 // 搬入矢量数据寄存器。
 __simd_callee__ inline void asc_loadalign_upsample(vector_<dtype>& dst,
                                                    __ubuf__ <dtype>* src,
-                                                   addr_reg offset)
-// 搬入掩码寄存器。
-__simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst,
-                                                   __ubuf__ uint32_t* src,
                                                    addr_reg offset)
 ```
 
@@ -137,8 +119,8 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址。<br>&bull; 当`dst`为矢量数据寄存器，实际读取地址必须按32字节对齐。<br>&bull; 当`dst`为掩码寄存器，实际读取地址必须按16字节对齐。 |
+| dst | 输出 | 目的矢量数据寄存器，仅无返回值类型接口包含该参数。dtype必须与`src`一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
 
 ### 立即数偏移搬入模式
 
@@ -146,9 +128,9 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址。<br>&bull; 当`dst`为矢量数据寄存器，实际读取地址必须按32字节对齐。<br>&bull; 当`dst`为掩码寄存器，实际读取地址必须按16字节对齐。 |
-| offset | 输入 | 相对`src`起始地址的偏移。<br>&bull; 当`dst`为矢量数据寄存器，单位为元素个数。<br>&bull; 当`dst`为掩码寄存器，单位为字节。 |
+| dst | 输出 | 目的矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
+| offset | 输入 | 相对`src`起始地址的偏移，单位为元素个数。 |
 
 ### 地址寄存器偏移搬入模式
 
@@ -156,11 +138,11 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
-| dst | 输出 | 目的矢量数据寄存器或掩码寄存器。<br>&bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。<br>&bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。 |
-| src | 输入 | 源UB地址。<br>&bull; 当`dst`为矢量数据寄存器，实际读取地址必须按32字节对齐。<br>&bull; 当`dst`为掩码寄存器，实际读取地址必须按16字节对齐。 |
-| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录相对`src`起始地址的偏移，单位为元素个数。b8、b16、b32模式分别表示每个元素占1字节、2字节、4字节。当`dst`为`vector_bool`时，应使用b32模式。 |
+| dst | 输出 | 目的矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 |
+| src | 输入 | 源UB地址，实际读取地址必须按32字节对齐。 |
+| offset | 输入 | 地址寄存器，类型为`addr_reg`，必须通过`asc_update_addr_reg`生成。该寄存器记录相对`src`起始地址的偏移，单位为元素个数。b8、b16、b32模式分别表示每个元素占1字节、2字节、4字节。 |
 
-矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
+矢量数据寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
@@ -171,7 +153,7 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 ### 通用约束
 
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
-- 当`dst`为矢量数据寄存器时，各功能模式下的实际读取地址必须按32字节对齐；当`dst`为掩码寄存器时，实际读取地址必须按16字节对齐。实际读取范围必须在UB地址空间内且不越界，否则会报错。
+- 各功能模式下的实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
 - 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
@@ -184,14 +166,14 @@ __simd_callee__ inline void asc_loadalign_upsample(vector_half& dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构版本为3510）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
 
-```cpp
+```c
 #include <cstdint>
 #include <iostream>
 #include <vector>

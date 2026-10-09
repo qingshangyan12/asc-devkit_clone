@@ -59,7 +59,7 @@
 
 `b64`操作数的每个元素对应8 bit掩码，且仅最低有效位有效。由于掩码创建接口不支持`b64`模式，需要先通过[asc_create_mask_b32](../../reg_compute/reg_mask/asc_create_mask.md)创建`b32`掩码，再通过[asc_unpack_lower](../../reg_compute/reg_permute_sel/asc_unpack.md)将其展开为`b64`掩码。例如，创建所有`b64`元素均有效的掩码：
 
-```cpp
+```c
 vector_bool mask_b32 = asc_create_mask_b32(PAT_ALL);
 vector_bool mask_b64;
 asc_unpack_lower(mask_b64, mask_b32);
@@ -73,7 +73,7 @@ asc_unpack_lower(mask_b64, mask_b32);
 | :-- | :------------ | :------------ | :------------ |
 | 1 | 调用接口设置 | [asc_create_mask](../../reg_compute/reg_mask/asc_create_mask.md) | 通过参数指定掩码模式，即指定参与计算的元素位置。 |
 | 2 | 调用接口设置 | [asc_update_mask](../../reg_compute/reg_mask/asc_update_mask.md) | &bull; 在循环外调用时，设置固定掩码，表示每次循环中前`count`个元素参与计算。<br>&bull; 在循环内调用时，根据剩余的`count`生成当前循环的掩码，并自动更新`count`。 |
-| 3 | 从UB搬入 | [asc_loadalign](../../reg_compute/load/asc_loadalign.md)、[asc_loadalign_postupdate](../../reg_compute/load/asc_loadalign_postupdate.md)等接口 | 将掩码从UB搬入掩码寄存器。 |
+| 3 | 从UB搬入 | [asc_loadalign、asc_loadalign_mask](../../reg_compute/load/asc_loadalign_mask.md)、[asc_loadalign_postupdate](../../reg_compute/load/asc_loadalign_mask_postupdate.md)等接口 | 将掩码从UB搬入掩码寄存器。 |
 | 4 | 从矢量数据寄存器搬入 | [asc_copy](../../reg_compute/reg_copy/asc_copy.md) | 从`vector_uint16_t`或`vector_uint32_t`搬运至掩码寄存器。 |
 
 **注意：**
@@ -94,7 +94,7 @@ asc_unpack_lower(mask_b64, mask_b32);
 
 以下示例中，每次循环处理一个完整的`VL`。
 
-```cpp
+```c
 __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_addr,
                                uint16_t one_repeat_size, uint16_t repeat_count)
 {
@@ -127,7 +127,7 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 
 - `asc_update_addr_reg`未提供`b64`模式。搬运`int64_t`或`uint64_t`数据时，应使用`asc_update_addr_reg_b32`生成地址寄存器。一个`int64_t`或`uint64_t`元素占用两个`b32`偏移单元，因此传入`asc_update_addr_reg_b32`的各维偏移量必须设置为期望的64位元素偏移量的2倍。例如：
 
-    ```cpp
+    ```c
     __simd_vf__ inline void load_int64_vf(__ubuf__ int64_t* src_addr,
                                           uint32_t elements_per_repeat,
                                           uint16_t repeat_count)
@@ -149,7 +149,7 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 
 - 单参数版本
 
-    ```cpp
+    ```c
     __simd_vf__ inline void add_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src0_addr,
                                    __ubuf__ int8_t* src1_addr, uint32_t count,
                                    uint16_t one_repeat_size, uint16_t repeat_count)
@@ -172,7 +172,7 @@ __simd_vf__ inline void neg_vf(__ubuf__ int8_t* dst_addr, __ubuf__ int8_t* src_a
 
 - 多参数版本（以4个步长参数为例）
 
-    ```cpp
+    ```c
     __simd_vf__ inline void addr_reg_4d_vf(
         __ubuf__ float* dst_addr,
         __ubuf__ float* src_addr,
