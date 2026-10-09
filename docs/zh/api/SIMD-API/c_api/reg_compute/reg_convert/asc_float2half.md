@@ -64,12 +64,12 @@ __simd_callee__ inline void asc_float2half_<round_mode><sat_mode>(vector_half& d
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_half asc_float2half_<round_mode><sat_mode>(vector_float src,
-                                                                  vector_bool mask,
-                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+                                                                         vector_bool mask,
+                                                                         std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
 __simd_callee__ inline vector_half asc_float2half_<round_mode><sat_mode>(vector_float src,
-                                                                  vector_bool mask,
-                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+                                                                         vector_bool mask,
+                                                                         std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
 - `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ro`（`ODD`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。

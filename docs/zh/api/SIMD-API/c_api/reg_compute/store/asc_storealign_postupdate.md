@@ -48,9 +48,9 @@
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst,
-                                                       vector_<dtype> src,
-                                                       int32_t offset,
-                                                       vector_bool mask)
+                                                      vector_<dtype> src,
+                                                      int32_t offset,
+                                                      vector_bool mask)
 ```
 
 #### dtype支持数据类型
@@ -61,9 +61,9 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`ha
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t*& dst,
-                                                       vector_int8_t src,
-                                                       int32_t offset,
-                                                       vector_bool mask)
+                                                      vector_int8_t src,
+                                                      int32_t offset,
+                                                      vector_bool mask)
 ```
 
 ### 矢量数据寄存器非连续对齐搬出模式
@@ -85,10 +85,10 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e8m0_t`�
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t*& dst,
-                                                       vector_int8_t src,
-                                                       uint16_t block_stride,
-                                                       uint16_t repeat_stride,
-                                                       vector_bool mask)
+                                                      vector_int8_t src,
+                                                      uint16_t block_stride,
+                                                      uint16_t repeat_stride,
+                                                      vector_bool mask)
 ```
 
 ### 掩码寄存器立即数偏移搬出模式
@@ -108,8 +108,8 @@ dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst,
-                                                       vector_bool src,
-                                                       int32_t offset)
+                                                      vector_bool src,
+                                                      int32_t offset)
 ```
 
 ## 参数说明

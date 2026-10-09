@@ -38,14 +38,14 @@
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_float2e4m3_rn<sat_mode>(vector_fp8_e4m3fn_t& dst,
-                                     vector_float src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                        vector_float src,
+                                                        vector_bool mask,
+                                                        std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn<sat_mode>(vector_float src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                                       vector_bool mask,
+                                                                       std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
@@ -57,18 +57,18 @@ __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn<sat_mode>(vector_fl
 ```c
 // 非饱和模式，通过引用参数输出结果
 __simd_callee__ inline void asc_float2e4m3_rn(
-    vector_fp8_e4m3fn_t& dst,
-    vector_float src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+                                              vector_fp8_e4m3fn_t& dst,
+                                              vector_float src,
+                                              vector_bool mask,
+                                              std::integral_constant<asc_position_quarter_mode,
+                                                                     asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 
 // 非饱和模式，通过函数返回值返回结果
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn(
-    vector_float src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+                                                             vector_float src,
+                                                             vector_bool mask,
+                                                             std::integral_constant<asc_position_quarter_mode,
+                                                                                    asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 ```
 
 ## 参数说明

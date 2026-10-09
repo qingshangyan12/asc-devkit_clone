@@ -38,14 +38,14 @@
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_int322uint8<sat_mode>(vector_uint8_t& dst,
-                                     vector_int32_t src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                      vector_int32_t src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_uint8_t asc_int322uint8<sat_mode>(vector_int32_t src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                                vector_bool mask,
+                                                                std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
@@ -57,18 +57,18 @@ __simd_callee__ inline vector_uint8_t asc_int322uint8<sat_mode>(vector_int32_t s
 ```c
 // 非饱和模式，通过引用参数输出结果
 __simd_callee__ inline void asc_int322uint8(
-    vector_uint8_t& dst,
-    vector_int32_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+                                            vector_uint8_t& dst,
+                                            vector_int32_t src,
+                                            vector_bool mask,
+                                            std::integral_constant<asc_position_quarter_mode,
+                                                                   asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 
 // 非饱和模式，通过函数返回值返回结果
 __simd_callee__ inline vector_uint8_t asc_int322uint8(
-    vector_int32_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+                                                      vector_int32_t src,
+                                                      vector_bool mask,
+                                                      std::integral_constant<asc_position_quarter_mode,
+                                                                             asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 ```
 
 ## 参数说明

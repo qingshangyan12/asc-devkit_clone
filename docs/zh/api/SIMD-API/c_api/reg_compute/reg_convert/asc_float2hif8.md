@@ -38,14 +38,14 @@
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_float2hif8_<round_mode><sat_mode>(vector_hifloat8_t& dst,
-                                     vector_float src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                                  vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_hifloat8_t asc_float2hif8_<round_mode><sat_mode>(vector_float src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                                               vector_bool mask,
+                                                                               std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
@@ -58,18 +58,18 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_<round_mode><sat_mode>(v
 ```c
 // ROUND舍入模式，非饱和模式，通过引用参数输出结果
 __simd_callee__ inline void asc_float2hif8_rna(
-    vector_hifloat8_t& dst,
-    vector_float src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+                                               vector_hifloat8_t& dst,
+                                               vector_float src,
+                                               vector_bool mask,
+                                               std::integral_constant<asc_position_quarter_mode,
+                                                                      asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 
 // ROUND舍入模式，非饱和模式，通过函数返回值返回结果
 __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna(
-    vector_float src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+                                                            vector_float src,
+                                                            vector_bool mask,
+                                                            std::integral_constant<asc_position_quarter_mode,
+                                                                                   asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 ```
 
 ## 参数说明

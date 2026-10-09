@@ -54,13 +54,13 @@ __aicore__ inline void asc_copy_gm2l1_nd2nz(__cbuf__ <dtype>* dst,
                                             uint64_t loop4_src_stride,
                                             bool enable_small_c0)
 __aicore__ inline void asc_copy_gm2l1_nd2nz_sync(__cbuf__ <dtype>* dst,
-                                            __gm__ <dtype>* src,
-                                            uint64_t loop1_src_stride,
-                                            uint8_t l2_cache_ctl,
-                                            uint16_t n_value,
-                                            uint32_t d_value,
-                                            uint64_t loop4_src_stride,
-                                            bool enable_small_c0)
+                                                 __gm__ <dtype>* src,
+                                                 uint64_t loop1_src_stride,
+                                                 uint8_t l2_cache_ctl,
+                                                 uint16_t n_value,
+                                                 uint32_t d_value,
+                                                 uint64_t loop4_src_stride,
+                                                 bool enable_small_c0)
 ```
 
 ### dtype支持的数据类型

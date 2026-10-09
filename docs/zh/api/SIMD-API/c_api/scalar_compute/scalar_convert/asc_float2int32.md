@@ -45,7 +45,7 @@ __aicore__ inline int32_t asc_float2int32_<round_mode>(float value)
 
 ```c
 __aicore__ inline int32_t asc_float2int32_rn(
-    float value)
+                                             float value)
 ```
 
 ## 参数说明

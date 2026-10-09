@@ -37,10 +37,10 @@
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
-    __ubuf__ <dtype>*& dst,
-    vector_<dtype> src,
-    int32_t offset,
-    vector_bool mask)
+                                                                   __ubuf__ <dtype>*& dst,
+                                                                   vector_<dtype> src,
+                                                                   int32_t offset,
+                                                                   vector_bool mask)
 ```
 
 ### dtype支持数据类型
@@ -51,10 +51,10 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
 
 ```c
 __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
-    __ubuf__ int32_t*& dst,
-    vector_int32_t src,
-    int32_t offset,
-    vector_bool mask)
+                                                                   __ubuf__ int32_t*& dst,
+                                                                   vector_int32_t src,
+                                                                   int32_t offset,
+                                                                   vector_bool mask)
 ```
 
 ## 参数说明

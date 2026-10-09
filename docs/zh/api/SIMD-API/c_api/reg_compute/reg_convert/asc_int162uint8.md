@@ -62,12 +62,12 @@ __simd_callee__ inline void asc_int162uint8<sat_mode>(vector_uint8_t& dst,
 
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_uint8_t asc_int162uint8<sat_mode>(vector_int16_t src,
-                                                      vector_bool mask,
-                                                      std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+                                                                vector_bool mask,
+                                                                std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
 __simd_callee__ inline vector_uint8_t asc_int162uint8<sat_mode>(vector_int16_t src,
-                                                      vector_bool mask,
-                                                      std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+                                                                vector_bool mask,
+                                                                std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。

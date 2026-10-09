@@ -94,13 +94,13 @@ dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`�
 ```cpp
 // 示例：half类型的2D搬运。
 __aicore__ inline void asc_copy_l12l0a_transpose(__ca__ half* dst,
-                                       __cbuf__ half* src,
-                                       uint16_t m_start_position,
-                                       uint16_t k_start_position,
-                                       uint8_t m_step,
-                                       uint8_t k_step,
-                                       int16_t src_stride,
-                                       uint16_t dst_stride)
+                                                 __cbuf__ half* src,
+                                                 uint16_t m_start_position,
+                                                 uint16_t k_start_position,
+                                                 uint8_t m_step,
+                                                 uint8_t k_step,
+                                                 int16_t src_stride,
+                                                 uint16_t dst_stride)
 ```
 
 ## 参数说明

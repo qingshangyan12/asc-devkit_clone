@@ -68,14 +68,14 @@
 // 占位符形式
 __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
-                                             uint32_t burst_count,
-                                             uint32_t burst_len,
+                                            uint32_t burst_count,
+                                            uint32_t burst_len,
                                             uint8_t left_padding_count,
                                             uint8_t right_padding_count,
-                                             bool enable_data_select,
-                                             asc_load_l2_cache_mode l2_cache_mode,
-                                             uint64_t src_stride,
-                                             uint32_t dst_stride)
+                                            bool enable_data_select,
+                                            asc_load_l2_cache_mode l2_cache_mode,
+                                            uint64_t src_stride,
+                                            uint32_t dst_stride)
 ```
 
 ### dtype支持的数据类型
@@ -88,14 +88,14 @@ dtype取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`int16_t`、`uint16_t`、
 // 示例：int8_t类型的搬运
 __aicore__ inline void asc_copy_gm2l1_align(__cbuf__ int8_t* dst,
                                             __gm__ int8_t* src,
-                                             uint32_t burst_count,
-                                             uint32_t burst_len,
+                                            uint32_t burst_count,
+                                            uint32_t burst_len,
                                             uint8_t left_padding_count,
                                             uint8_t right_padding_count,
-                                             bool enable_data_select,
-                                             asc_load_l2_cache_mode l2_cache_mode,
-                                             uint64_t src_stride,
-                                             uint32_t dst_stride)
+                                            bool enable_data_select,
+                                            asc_load_l2_cache_mode l2_cache_mode,
+                                            uint64_t src_stride,
+                                            uint32_t dst_stride)
 ```
 
 ## 参数说明

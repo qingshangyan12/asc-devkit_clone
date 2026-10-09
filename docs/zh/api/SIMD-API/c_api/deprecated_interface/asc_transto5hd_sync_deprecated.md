@@ -50,11 +50,11 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 
 ```cpp
 __aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride)
+                                               uint16_t dst_stride, uint16_t src_stride)
 __aicore__ inline void asc_transto5hd_b16_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride)
+                                               uint16_t dst_stride, uint16_t src_stride)
 __aicore__ inline void asc_transto5hd_b8_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
-    uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
+                                              uint16_t dst_stride, uint16_t src_stride, bool dst_high_half, bool src_high_half)
 ```
 
 ## 参数说明

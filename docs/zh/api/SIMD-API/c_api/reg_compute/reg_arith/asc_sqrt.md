@@ -44,12 +44,12 @@ $$
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_sqrt(vector_<dtype>& dst,
-                                    vector_<dtype> src,
-                                    vector_bool mask)
+                                     vector_<dtype> src,
+                                     vector_bool mask)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_sqrt(vector_<dtype> src,
-                                              vector_bool mask)
+                                               vector_bool mask)
 ```
 
 ### dtype支持数据类型
@@ -61,8 +61,8 @@ __simd_callee__ inline vector_<dtype> asc_sqrt(vector_<dtype> src,
 ```c
 // 通过引用参数输出结果示例：float类型
 __simd_callee__ inline void asc_sqrt(vector_float& dst,
-                                    vector_float src,
-                                    vector_bool mask)
+                                     vector_float src,
+                                     vector_bool mask)
 
 // 通过函数返回值返回结果示例：float类型
 __simd_callee__ inline vector_float asc_sqrt(vector_float src,

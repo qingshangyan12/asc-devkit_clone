@@ -38,14 +38,14 @@
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_bfloat162e2m1x2_<round_mode>(vector_fp4x2_e2m1_t& dst,
-                                     vector_bfloat16_t src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                             vector_bfloat16_t src,
+                                                             vector_bool mask,
+                                                             std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_<round_mode>(vector_bfloat16_t src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                                            vector_bool mask,
+                                                                            std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
@@ -57,18 +57,18 @@ __simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_<round_mode>(vect
 ```c
 // 通过引用参数输出结果
 __simd_callee__ inline void asc_bfloat162e2m1x2_rn(
-    vector_fp4x2_e2m1_t& dst,
-    vector_bfloat16_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+                                                   vector_fp4x2_e2m1_t& dst,
+                                                   vector_bfloat16_t src,
+                                                   vector_bool mask,
+                                                   std::integral_constant<asc_position_quarter_mode,
+                                                                          asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 
 // 通过函数返回值返回结果
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_bfloat162e2m1x2_rn(
-    vector_bfloat16_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+                                                                  vector_bfloat16_t src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_quarter_mode,
+                                                                                         asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 ```
 
 ## 参数说明
