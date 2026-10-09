@@ -20,7 +20,7 @@ Host侧与clang15一致，支持C++98至C++20及后续各档标准。低于C++11
 
 | 指定方式 | 用法 | 说明 |
 | --- | --- | --- |
-| bisheng命令行编译 | 在编译命令中追加`-std=c++<version>` | 例如`bisheng <source_file>.asc -o <output_file> --npu-arch=dav-<npu architecture> -std=c++20`，SIMT编程场景另需追加`--enable-simt`。完整编译命令说明参考[AI Core编译基本用法](../../programming_guide/compilation_and_execution/operator_compilation/ai_core_operator_compilation.md)。 |
+| bisheng命令行编译 | 在编译命令中追加`-std=c++<version>` | —— |
 | CMake工程 | 设置`CMAKE_ASC_STANDARD`变量 | 编译时自动注入`-std=c++<version>`，默认值为17；设置为低于17的值时CMake会发出警告。 |
 
 > [!NOTE]说明
@@ -29,13 +29,12 @@ Host侧与clang15一致，支持C++98至C++20及后续各档标准。低于C++11
 
 ## 语言特性与限制导航<a name="section_reading_navigation"></a>
 
--   **[C++语言支持](./cpp_language_feature/cpp_language_feature.md)**：C++语言特性在SIMT Device侧的逐项支持情况，各项结论以逐特性编写的最小验证用例为依据。
+-   **[Device侧C++语言支持](./cpp_language_feature/cpp_language_feature.md)**：C++语言特性在SIMT Device侧的逐项支持情况。
     -   [C++11语言特性](./cpp_language_feature/cpp11_language_feature.md)：C++11核心语言特性与C99特性在Device侧的逐项支持列表及使用注意事项。
     -   [C++14语言特性](./cpp_language_feature/cpp14_language_feature.md)：C++14语言特性在Device侧的逐项支持列表及使用注意事项。
     -   [C++17语言特性](./cpp_language_feature/cpp17_language_feature.md)：C++17语言特性在Device侧的逐项支持列表及使用注意事项。
-    -   [Lambda表达式](./cpp_language_feature/lambda_expressions.md)：纯SIMT与SIMD/SIMT混合编程两种场景下Lambda表达式的使用方式与标记要求。
+    -   [Lambda表达式](./cpp_language_feature/lambda_expressions.md)：不同编程场景下Lambda表达式的使用方式与注意事项。
 -   **[Device侧C/C++语法限制](./cpp_language_restrictions/cpp_language_restrictions.md)**：Device侧通用的语法与能力限制。
     -   [不支持的特性](./cpp_language_restrictions/unsupport_features.md)：虚函数、动态内存、STL、运行时typeid、文件系统IO等能力限制总览。
     -   [函数](./cpp_language_restrictions/functions.md)：核函数（Kernel）参数列表限制、SIMT VF函数限制、SIMD与SIMT混合编程结构体使用限制。
-    -   [C++11限制](./cpp_language_restrictions/cpp11_restrictions.md)：并发类与运行时类特性的限制、根因分类，以及并发能力的SIMT API替代方案。
 
