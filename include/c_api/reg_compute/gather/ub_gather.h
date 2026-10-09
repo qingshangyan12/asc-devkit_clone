@@ -21,8 +21,12 @@
 #define INCLUDE_C_API_REG_COMPUTE_GATHER_UB_GATHER_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
 #include "impl/c_api/reg_base_impl/ub_gather_intf_impl.h"
+#endif
+
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/ub_gather_intf_impl.h"
 #endif
 
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);
@@ -51,6 +55,8 @@ __simd_callee__ inline vector_hifloat8_t asc_gather(__ubuf__ hifloat8_t* src, ve
 __simd_callee__ inline vector_fp8_e5m2_t asc_gather(__ubuf__ fp8_e5m2_t* src, vector_uint16_t index, vector_bool mask);
 
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather(__ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask);
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_gather(__ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask);
 
 __simd_callee__ inline vector_int16_t asc_gather(__ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask);
 
@@ -102,6 +108,9 @@ __simd_callee__ inline void asc_gather(
 
 __simd_callee__ inline void asc_gather(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint16_t index, vector_bool mask);
+
+__simd_callee__ inline void asc_gather(
+    vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint16_t index, vector_bool mask);
 
 __simd_callee__ inline void asc_gather(
     vector_int16_t& dst, __ubuf__ int16_t* src, vector_uint32_t index, vector_bool mask);
@@ -160,6 +169,9 @@ __simd_callee__ inline vector_int4x2_t asc_gather_datablock(
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(
     __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask);
 
+__simd_callee__ inline vector_fp8_e6m2_t asc_gather_datablock(
+    __ubuf__ fp8_e6m2_t* src, vector_uint32_t index, vector_bool mask);
+
 __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src, vector_uint32_t index);
 
 __simd_callee__ inline vector_uint8_t asc_gather_datablock(__ubuf__ uint8_t* src, vector_uint32_t index);
@@ -191,6 +203,8 @@ __simd_callee__ inline vector_fp4x2_e1m2_t asc_gather_datablock(__ubuf__ fp4x2_e
 __simd_callee__ inline vector_int4x2_t asc_gather_datablock(__ubuf__ int4b_t* src, vector_uint32_t index);
 
 __simd_callee__ inline vector_fp8_e8m0_t asc_gather_datablock(__ubuf__ fp8_e8m0_t* src, vector_uint32_t index);
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_gather_datablock(__ubuf__ fp8_e6m2_t* src, vector_uint32_t index);
 
 __simd_callee__ inline void asc_gather_datablock(
     vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index, vector_bool mask);
@@ -246,6 +260,9 @@ __simd_callee__ inline void asc_gather_datablock(
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index, vector_bool mask);
 
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint32_t index, vector_bool mask);
+
 __simd_callee__ inline void asc_gather_datablock(vector_int8_t& dst, __ubuf__ int8_t* src, vector_uint32_t index);
 
 __simd_callee__ inline void asc_gather_datablock(vector_uint8_t& dst, __ubuf__ uint8_t* src, vector_uint32_t index);
@@ -288,6 +305,9 @@ __simd_callee__ inline void asc_gather_datablock(vector_int4x2_t& dst, __ubuf__ 
 
 __simd_callee__ inline void asc_gather_datablock(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, vector_uint32_t index);
+
+__simd_callee__ inline void asc_gather_datablock(
+    vector_fp8_e6m2_t& dst, __ubuf__ fp8_e6m2_t* src, vector_uint32_t index);
 
 #endif
 

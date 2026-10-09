@@ -16,6 +16,15 @@
 #ifndef INCLUDE_C_API_DEFS_TYPE_H
 #define INCLUDE_C_API_DEFS_TYPE_H
 
+// Prefer the generated version header; fall back to 0 (version gates closed) when it is not on the include path.
+#if defined(__has_include)
+#if __has_include("version/asc_devkit_version.h")
+#include "version/asc_devkit_version.h"
+#endif
+#endif
+#ifndef ASC_DEVKIT_VERSION_NUM
+#define ASC_DEVKIT_VERSION_NUM 0
+#endif
 #include "c_api/defs/macro.h"
 #include "utils/common_types.h"
 
@@ -37,6 +46,9 @@ using vector_hifloat8_t = vector_hif8;
 using vector_fp8_e4m3fn_t = vector_f8e4m3;
 using vector_fp8_e5m2_t = vector_f8e5m2;
 using vector_fp8_e8m0_t = vector_f8e8m0;
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+using vector_fp8_e6m2_t = vector_f8e6m2;
+#endif
 using vector_int4x2_t = vector_s4x2;
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;

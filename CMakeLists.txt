@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.16.0)
 include(cmake/fetch_cann_cmake.cmake)
-project(asc-devkit)
+project(asc-devkit VERSION 1.0.0)
 
 init_cann_project(PREPEND_MODULE_PATH)
 add_cann_target_options()
@@ -50,14 +50,15 @@ if(BUILD_OPEN_PROJECT)
 endif()
 add_cann_version_info_targets()
 
+if(ENABLE_TEST OR PACKAGE_OPEN_PROJECT)
+  include(cmake/version_info.cmake)
+endif()
+
 if(ENABLE_TEST)
   add_subdirectory(tests)
 endif()
 
 if(PACKAGE_OPEN_PROJECT)
-  cmake_minimum_required(VERSION 3.16)
-  project(asc-devkit VERSION 1.0.0)
   include(CMakePrintHelpers)
   include(cmake/package.cmake)
-  include(cmake/version_info.cmake)
 endif()
