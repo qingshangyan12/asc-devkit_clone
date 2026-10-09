@@ -59,15 +59,10 @@ from .ascendc_common_utility import (
 )
 from .ascendc_compile_dfx import DFXParamType, DFXPointType, DFXArgInfo, DFXSectionGenerator
 from .ascendc_compile_v220 import (
-    gen_compile_cmd_v220,
-    get_compile_core_types,
-    get_compile_target_name,
-    get_compile_target_options,
+    _get_compile_cmd_and_section_content,
     get_v220_kernel_type_mix_flag,
     call_bisheng_v220,
-    get_ktype_section_variable,
     get_code_channel_v220_by_first_tiling_key,
-    set_dynamic_sub_func_names_of_super_kernel_with_kernel_type_group,
     gen_compile_cmd_for_meta_info,
 )
 from .ascendc_compile_v200 import call_bisheng_v200_static, call_bisheng_v200_dynamic
@@ -101,6 +96,8 @@ from .ascendc_compile_gen_json import (
     _generate_final_json,
 )
 from .ascendc_compile_base import (
+    _compile_ascendc_cce,
+    get_compile_core_types,
     compile_multi_tilingkey,
     link_relocatable,
     fatbin_objs,
@@ -110,12 +107,8 @@ from .ascendc_compile_base import (
     link_relocatable_meta_file,
     link_sk_norm_combine,
 )
-from .super_kernel_sub_op_compile import (
-    gen_sub_kernel_name,
-    split_sub_kernel_objs,
-    gen_sub_super_kernel_compile_options,
-)
-from .static_compile_resource_generator import KernelSpecCompilation
+from .super_kernel_sub_op_compile import split_sub_kernel_objs, gen_sub_super_kernel_compile_options
+from .static_compile_resource_generator import KernelSpecCompilation, gen_sk_bind_source
 from .super_kernel_option_parse import parse_super_kernel_options
 from .kernel_info_infer import KernelInfoInfer
 from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_placehoder
@@ -161,7 +154,10 @@ def _gen_kernel_func_declare_head_with_workspace(tiling_info: TilingInfo, super_
                 super_kernel_params.append("workspace")
         else:
             func_params.append("GM_ADDR workspace")
-            func_params.append("GM_ADDR tiling")
+            if CommonUtility.is_920r1() or CommonUtility.is_920r2():
+                func_params.append("GM_ADDR __early_read_before_pre_task_done__ tiling")
+            else:
+                func_params.append("GM_ADDR tiling")
             super_kernel_params.append("workspace")
             super_kernel_params.append("tiling")
             dfx_generator.insert_param(DFXArgInfo("tiling", DFXParamType.TILING))
@@ -176,7 +172,9 @@ def _gen_kernel_func_declare_head(
     dfx_generator = DFXSectionGenerator()
     func_params = []
     super_kernel_params = []
-    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (CommonUtility.is_c310() or CommonUtility.is_m510())
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (
+        CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510()
+    )
     workspace_idx = 0
     if needs_ffts:
         func_params.append("GM_ADDR ffts_addr")
@@ -250,6 +248,7 @@ def _gen_kernel_func_declare_head(
         source += ", ".join(func_params) + ") {\n"
         called_func_params_type = ", ".join(func_params)
         called_func_params = called_func_params_type.replace("GM_ADDR ", "")
+        called_func_params = called_func_params.replace("__early_read_before_pre_task_done__ ", "")
     return source, workspace_idx, called_func_params, called_func_params_type
 
 
@@ -280,7 +279,9 @@ def _gen_set_workspace_codes(
     if "oom" in get_current_build_config("tir.op_debug_config"):
         source = add_op_param_to_workspace(opinfo, tiling_info, source, compile_options, compile_info)
 
-    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not CommonUtility.is_c310()
+    needs_ffts = (is_mix or is_single_and_using_hard_sync) and not (
+        CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2()
+    )
     # set ffts_addr for ascend910b mix op or is_single_and_using_hard_sync scene
     if needs_ffts:
         source += "    icache_preload(1);\n"
@@ -293,7 +294,8 @@ def _gen_set_workspace_codes(
         source += "do {\n"
 
     # is_single_and_using_hard_sync scene not need clear workspace
-    if is_mix and (not CommonUtility.is_c310()):  # c310 doesn't need clearWorkspace
+    # c310/920r1/920r2 do not need clearWorkspace
+    if is_mix and not (CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2()):
         source += f"#ifdef {MIX_CORE_MACRO} \n"
         source += "    if constexpr (g_coreType == AscendC::AIC) {\n"
         source += "        matmul::clearWorkspace(workspace);\n"
@@ -465,37 +467,32 @@ def gen_kernel_fun(
             source += "do {\n"
 
     need_ffts = is_mix or is_single_and_using_hard_sync
-    context = get_context()
-    enable_inner_core_sync_check = (
-        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
-        and context is not None
-        and context.get_addition("super_kernel_sub_combine") is True
-        and compile_info.super_kernel_info["sp_options"].get("debug-per-op-max-core-num", "0") == "1"
-    )
 
     # call usr kernel function call
-    if enable_inner_core_sync_check:
-        source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+    source += "#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__\n"
+    source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+    source += "#endif\n"
     source += "#if defined(TEMPLATE_PARAMS_LEN) && TEMPLATE_PARAMS_LEN != 0\n"
     source += gen_usr_origin_kernel_function_call(func_name, opinfo, tiling_info, has_template=True)
     source += "#else\n"
     source += gen_usr_origin_kernel_function_call(func_name, opinfo, tiling_info, has_template=False)
     source += "#endif\n"
-    if enable_inner_core_sync_check:
-        source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
-        source += '        assert(false, "SuperKernel: current operator has %d more '
-        source += 'SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
-        source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
-        source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
-        source += '        assert(false, "SuperKernel: current operator has %d more '
-        source += 'WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
-        source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
-        source += "    }\n"
+    source += "#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__\n"
+    source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+    source += '        assert(false, "SuperKernel: current operator has %d more '
+    source += 'SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
+    source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
+    source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+    source += '        assert(false, "SuperKernel: current operator has %d more '
+    source += 'WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
+    source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
+    source += "    }\n"
+    source += "#endif\n"
 
     if len(compile_info.tiling_key_struct_map) > 0:
         source += _gen_tpl_tiling_struct_section(compile_info, tiling_info)
@@ -557,7 +554,7 @@ def gen_kernel_fun(
         source += "    AscendC::WriteBackOverflow(overflowStatus);\n"
 
     if not global_var_storage.get_variable("ascendc_enable_super_kernel") and (
-        CommonUtility.is_c310() or CommonUtility.is_m510()
+        CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510()
     ):
         check_custom_dcci_end_false(compile_option_tuple)
 
@@ -591,7 +588,7 @@ def gen_kernel_fun_with_tiling_key_slave(
     source_declare: str,
 ):
     source = ""
-    if CommonUtility.is_v220() or CommonUtility.is_c310():
+    if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
         chip_version = CommonUtility.get_chip_version().upper()
         cube_core_type = f"__DAV_{chip_version}_CUBE__"
         vec_core_type = f"__DAV_{chip_version}_VEC__"
@@ -838,7 +835,7 @@ def gen_op_stub_kernel_func(
         file_name_tag = distinct_tag + "_norm_kernel.cpp"
     compile_info.gen_kernel_func_file = os.path.join(kernel_meta_dir, op_info.kernel_name + file_name_tag)
 
-    if CommonUtility.is_c310():
+    if CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2():
         gen_meta_info_section(compile_info, op_info)
     workspace_idx = gen_kernel_fun(
         compile_info, compile_info.origin_func_name, op_info, tiling_info, compile_option_tuple
@@ -885,7 +882,7 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
 
     DFXSectionGenerator().generate_dfx_binary(compile_info, op_info, tiling_info)
 
-    if CommonUtility.is_v220() or CommonUtility.is_c310():
+    if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
         if compile_info.no_set_kernel_type is True:
             _compile_ascendc_cce_v220(compile_info, compile_option_tuple, tiling_info)
         else:
@@ -910,7 +907,7 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
         tiling_key_struct_size_map = _get_tiling_struct_without_register_size(compile_info)
         gen_tiling_struct_size_and_dfx_section_file(compile_info, tiling_info, tiling_key_struct_size_map)
         chip_version = CommonUtility.get_chip_version()
-        if CommonUtility.is_c310() or CommonUtility.is_v220():
+        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
             arch = f"dav-{chip_version}-vec"
         else:
             arch = f"dav-{chip_version}"
@@ -981,52 +978,17 @@ def _match_regex(pattern: str, op_name: str) -> bool:
     return dp[m][n]
 
 
-def _get_dcci_disable_cap_bitmap(compile_info: CompileInfo, kernel_symbols: list) -> int:
-    """
-    Check if DCCI should be disabled for any kernel in kernel_symbols.
-    Returns 4 if matched, 0 otherwise.
-    """
-    sp_options = compile_info.super_kernel_info.get("sp_options", {})
-    patterns = sp_options.get("dcci-disable-on-kernel", [])
-    if isinstance(patterns, list) and patterns:
-        for kernel_name in kernel_symbols:
-            if any(_match_regex(p, kernel_name) for p in patterns):
-                return 4
-    return 0
-
-
-def _get_sk_cap_bitmap(compile_info: CompileInfo, basic_kernel_symbols: list) -> int:
-    """Encode early-start and DCCI capabilities for SK_BIND generation."""
-
-    cap_bitmap = 0
-    if global_var_storage.get_variable("ascendc_sub_super_kernel_early_start_wait_flag") is True:
-        cap_bitmap |= 1
-    if global_var_storage.get_variable("ascendc_sub_super_kernel_early_start_set_flag") is True:
-        cap_bitmap |= 2
-    return cap_bitmap | _get_dcci_disable_cap_bitmap(compile_info, basic_kernel_symbols)
-
-
-def _gen_sk_bind_source(source, compile_info, compile_info_origin, cap_bitmap):
-    for idx, global_syb in enumerate(compile_info_origin.global_kernel_symbols):
-        sk_syb = compile_info.global_kernel_symbols[idx]
-        source += f'extern "C" {compile_info_origin.global_kernel_attribute} void {global_syb}();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split1();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split2();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split3();\n'
-        source += f"SK_BIND({global_syb}, {cap_bitmap}, {sk_syb}, {sk_syb}_split1, {sk_syb}_split2, {sk_syb}_split3);\n"
-    return source
-
-
 def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo, compile_option_tuple, kernel_meta_dir):
     sk_bind_src_file = os.path.join(kernel_meta_dir, "sk_bind.cpp")
     sk_bind_dst_file = os.path.join(kernel_meta_dir, "sk_bind.o")
-    source = '#include "kernel_operator.h"\n'
-
-    # bitmap definition: bit0:wait_flag(1), bit1:set_flag(2), bit2:dcci_disable(4)
-    cap_bitmap = _get_sk_cap_bitmap(compile_info, compile_info_origin.global_kernel_symbols)
-
-    source = _gen_sk_bind_source(source, compile_info, compile_info_origin, cap_bitmap)
+    source = gen_sk_bind_source(
+        [
+            (symbol, compile_info.global_kernel_symbols[index])
+            for index, symbol in enumerate(compile_info_origin.global_kernel_symbols)
+        ],
+        compile_info_origin.global_kernel_attribute,
+        compile_info.global_kernel_attribute,
+    ).decode("utf-8")
 
     # write code into file
     try:
@@ -1099,7 +1061,6 @@ def _record_kernel_spec_sk_commands(kernel_spec, op_info, infered_info, tiling_i
         command.compiled_symbol for command in compile_info.compile_command_session.records
     ]
     compile_sk_bind(compile_info, basic_compile_info, compile_options, kernel_meta_dir)
-    kernel_spec.finish_sk_recording(_get_sk_cap_bitmap(compile_info, basic_compile_info.global_kernel_symbols))
 
 
 def compile_op_common_part(
@@ -1335,7 +1296,7 @@ def compile_op(
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510())
+        (CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510())
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -1410,7 +1371,7 @@ def compile_op_with_customized_config(
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_m510())
+        (CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510())
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -1441,204 +1402,11 @@ def compile_op_with_customized_config(
     )
 
 
-def _compile_single_tiling(tiling_key, compile_info, tiling_info, compile_option_tuple):
-    dst_file = compile_info.dst_file[:-2] + "_%s.o" % tiling_key
-    compile_cmd = _gen_compile_cmd(
-        compile_info.gen_kernel_func_file, dst_file, compile_option_tuple, tiling_info.tiling_data_file_path
-    )
-    compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_key}UL"]
-    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
-        tiling_data_hash_src = tiling_info.tiling_data
-        if isinstance(tiling_data_hash_src, str):
-            tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
-        elif not tiling_data_hash_src:
-            tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
-        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
-        compile_cmd += [
-            f"-D{compile_info.origin_func_name}="
-            f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_key}_tilingkey"
-        ]
-    else:
-        compile_cmd += [f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"]
-    kernel_func_name = compile_info.kernel_name + "_%s" % tiling_key
-    compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={kernel_func_name}"]
-    section_content = DFXSectionGenerator().generate_dfx_section(
-        tiling_key, tiling_info, kernel_func_name, compile_info, True
-    )
-    return compile_cmd, section_content
-
-
-def _compile_ascendc_cce(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):
-    """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
-
-    Args:
-        compile_info (CompileInfo): compile info for generate .o and .json
-        compile_options (list): compile options for bisheng
-        tiling_info (TilingInfo): tiling info
-    """
-    sources = CommonUtility().ascendc_read_file(compile_info.gen_kernel_func_file)
-
-    new_sources = sources[:-1]
-    if tiling_info.static_shape_flag:
-        compile_cmd = _gen_compile_cmd(
-            compile_info.gen_kernel_func_file,
-            compile_info.dst_file,
-            compile_option_tuple,
-            tiling_info.tiling_data_file_path,
-        )
-        # tbe-pass add "__kernel0" in tbe-codegen and json, we use -D to change function name
-        compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={compile_info.get_kernel_func_name()}"]
-        if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
-            tiling_data_hash_src = tiling_info.tiling_data
-            if isinstance(tiling_data_hash_src, str):
-                tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
-            elif not tiling_data_hash_src:
-                tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
-            tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
-            compile_cmd += [
-                f"-D{compile_info.origin_func_name}="
-                f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_info.tiling_key}_tilingkey"
-            ]
-        compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_info.tiling_key}UL"]
-        new_sources += DFXSectionGenerator().generate_dfx_section(
-            str(tiling_info.tiling_key), tiling_info, compile_info.get_kernel_func_name(), compile_info, True
-        )
-        new_sources += "#endif\n"
-        # add dfx info section to sourse file
-        CommonUtility().ascendc_write_file(compile_info.gen_kernel_func_file, new_sources)
-
-        CommonUtility.run_cmd_inner(compile_cmd, CompileStage.COMPILE, compile_info.compile_log_path)
-        target = "cce_core"
-        tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_num)
-    else:
-        obj_files = []
-        for tiling_key in compile_info.tiling_key_list:
-            dst_file = compile_info.dst_file[:-2] + "_%s.o" % tiling_key
-            obj_files.append(dst_file)
-        cmds_list = []
-        for tiling_key in compile_info.tiling_key_list:
-            compile_cmd, section_content = _compile_single_tiling(
-                tiling_key, compile_info, tiling_info, compile_option_tuple
-            )
-            cmds_list.append(compile_cmd)
-            new_sources += section_content
-        new_sources += "#endif\n"
-        # add dfx info section to sourse file
-        CommonUtility().ascendc_write_file(compile_info.gen_kernel_func_file, new_sources)
-        # compile binary
-        compile_multi_tilingkey(
-            compile_info.tiling_key_list,
-            cmds_list,
-            os.path.basename(compile_info.dst_file)[:-2],
-            compile_info.compile_log_path,
-        )
-        fatbin_objs(obj_files, compile_info.dst_file, compile_info.is_debug, compile_info.compile_log_path)
-        target = "cce_core"
-        tvm_callback_cce_postproc(target, compile_info.kernel_name, tiling_info.block_num)
-        _dynamic_kernel_list_to_json(
-            compile_info.kernel_name,
-            compile_info.tiling_key_list,
-            compile_info.enable_deterministic,
-            compile_info.tiling_key_deterministic,
-        )
-
-
 def _get_sub_kernel_name(compile_info: CompileInfo, core_type: int):
     core_type_marker = "_mix_aic" if core_type == CORE_TYPE_CUBE else "_mix_aiv"
     # i.e. change demo_kernel.o to demo_kernel_mix_aic.o
     sub_kernel_name = compile_info.kernel_name + core_type_marker
     return sub_kernel_name
-
-
-def _generate_section_content(
-    kernel_name: str, tiling_key: str, kernel_type: KernelMetaType, tiling_info: TilingInfo, compile_info: CompileInfo
-):
-    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
-        return ""
-    section_content = ""
-    section_content += f"\n#if {TILING_KEY_MACRO} == {tiling_key}UL\n"
-    section_content += get_ktype_section_variable(f"{kernel_name}_section", f"{kernel_name}", kernel_type)
-    if compile_info.tiling_key_group_map is not None:
-        if tiling_key in compile_info.tiling_key_group_map.keys():
-            for tiling_key_slave in compile_info.tiling_key_group_map[tiling_key]:
-                kernel_name_slave = get_kernel_fun_name_with_tiling_key_and_kernel_type(compile_info, tiling_key_slave)
-                if compile_info.tiling_key_kernel_type.get(tiling_key_slave) is not None:
-                    kernel_type_slave = compile_info.tiling_key_kernel_type.get(str(tiling_key_slave))
-                else:
-                    raise Exception(f"the kernel type of tiling key {tiling_key_slave} is None")
-                section_content += get_ktype_section_variable(
-                    f"{kernel_name_slave}_section", f"{kernel_name_slave}", kernel_type_slave
-                )
-    section_content += "#endif\n"
-    section_content += DFXSectionGenerator().generate_dfx_section(tiling_key, tiling_info, kernel_name, compile_info)
-    return section_content
-
-
-def _resolve_kernel_name_into_cmd(compile_cmd, compile_info, arch, tiling_info, tiling_key, kernel_type):
-    if tiling_info.static_shape_flag:
-        if kernel_type.value >= 2:
-            current_kernel_name = compile_info.kernel_name
-            current_kernel_name = gen_sub_kernel_name(
-                current_kernel_name, arch, kernel_type.name, compile_info.dst_file
-            )
-            compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={current_kernel_name}"]
-        else:
-            current_kernel_name = compile_info.get_kernel_func_name()
-            current_kernel_name = gen_sub_kernel_name(
-                current_kernel_name, "AiCore", kernel_type.name, compile_info.dst_file
-            )
-            compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={current_kernel_name}"]
-    else:
-        core_type = "cube" if arch.endswith("-cube") else "vec"
-        current_kernel_name = get_compile_target_name(compile_info, tiling_key, core_type)
-        compile_cmd += [f"-Dauto_gen_{compile_info.origin_func_name}_kernel={current_kernel_name}"]
-        if kernel_type.value >= 2:
-            set_dynamic_sub_func_names_of_super_kernel_with_kernel_type_group(
-                tiling_key, arch, kernel_type.name, current_kernel_name, compile_info
-            )
-        else:
-            set_dynamic_sub_func_names_of_super_kernel_with_kernel_type_group(
-                tiling_key, "AiCore", kernel_type.name, current_kernel_name, compile_info
-            )
-    return compile_cmd, current_kernel_name
-
-
-def _get_compile_cmd_and_section_content(
-    compile_info: CompileInfo, arch: str, compile_option_tuple, tiling_info: TilingInfo, tiling_key: str
-):
-    compile_cmd = gen_compile_cmd_v220(
-        compile_info.gen_kernel_func_file,
-        compile_info.dst_file,
-        compile_option_tuple,
-        arch,
-        tiling_info.tiling_data_file_path,
-    )
-
-    current_kernel_name = ""
-    kernel_type = compile_info.tiling_key_kernel_type[str(tiling_key)]
-    compile_cmd, current_kernel_name = _resolve_kernel_name_into_cmd(
-        compile_cmd, compile_info, arch, tiling_info, tiling_key, kernel_type
-    )
-    compile_cmd.extend(get_compile_target_options(compile_info, tiling_key, CommonUtility.is_c310()))
-    compile_cmd += [f"-D{TILING_KEY_MACRO}={tiling_key}UL"]
-    if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
-        tiling_data_hash_src = tiling_info.tiling_data
-        if isinstance(tiling_data_hash_src, str):
-            tiling_data_hash_src = tiling_data_hash_src.encode("utf-8")
-        elif not tiling_data_hash_src:
-            tiling_data_hash_src = tiling_info.file_content.encode("utf-8")
-        tiling_data_hash = hashlib.sha256(tiling_data_hash_src).hexdigest()[:8]
-        compile_cmd += [
-            f"-D{compile_info.origin_func_name}="
-            f"{compile_info.origin_func_name}_{tiling_data_hash}_{tiling_key}_tilingkey"
-        ]
-    else:
-        compile_cmd += [f"-D{compile_info.origin_func_name}={compile_info.origin_func_name}_{tiling_key}_tilingkey"]
-    section_content = _generate_section_content(current_kernel_name, tiling_key, kernel_type, tiling_info, compile_info)
-    if global_var_storage.get_variable("ascendc_sk_double_compile") is True:
-        compile_info.global_kernel_symbols.append(current_kernel_name)
-    compile_info.last_compiled_symbol = current_kernel_name
-    return compile_cmd, section_content
 
 
 def _is_mix_aic_1x_kernel_type(kernel_type):

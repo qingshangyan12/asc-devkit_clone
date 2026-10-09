@@ -23,6 +23,18 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9050" id8 -->
+- Kirin 9050处理器系列产品：支持
+<!-- end id8 -->
+<!-- npu="kirin1" id9 -->
+- KirinDev0001处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="kirin2" id10 -->
+- KirinDev0002处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="kirin3" id11 -->
+- KirinDev0003处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/type_conversion/Cast_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -289,6 +301,7 @@ result[i][7 :0] = saturation(tmp[7 : 0]) according to control bit;
 ```
 
 ### half转hifloat8_t转换规则
+
 ```
 tmp2[15 : 0] = f16_src_data[i][15 : 0];
 Ev = tmp2[14 : 10] - 5'b01111, thr = {tmp2[0], 1’b1};

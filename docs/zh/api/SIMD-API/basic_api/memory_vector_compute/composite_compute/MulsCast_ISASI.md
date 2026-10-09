@@ -15,10 +15,10 @@
 - Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
@@ -84,6 +84,7 @@ __aicore__ inline void MulsCast(const T2 &dst, const T3 &src0, const T4 &src1, c
 | float | half | 将源操作数按照CAST_ROUND模式取到half所能表示的数，以half格式（溢出默认按照饱和处理）存入dst中。 |
 
 ## 数据类型
+
 <!-- npu="950" id8 -->
 Ascend 950PR&950DT系列产品，src支持的数据类型为：float。dst支持的数据类型为：half。
 <!-- end id8 -->
