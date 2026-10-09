@@ -150,7 +150,7 @@ unsigned int __heqx2_mask(half2 x, half2 y)
 输入输出示例如下：
 
 ```text
-x： (-1, 0) (1, -1) (inf, -inf) (nan, 0.5)
-y： (1, 0) (1, -2) (inf, inf) (0.5, nan)
+x：(-1, 0), (1, -1), (inf, -inf), (nan, 0.5)
+y：(1, 0), (1, -2), (inf, inf), (0.5, nan)
 output： 4294901760 65535 65535 0
 ```

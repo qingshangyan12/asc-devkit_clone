@@ -106,6 +106,6 @@ half2 __hnegx2(const half2 x)
 输入输出示例如下：
 
 ```text
-x： (-1, 0) (1, -1) (inf, -inf) (nan, 0.5)
+x：(-1, 0), (1, -1), (inf, -inf), (nan, 0.5)
 output： (1, -0) (-1, 1) (-inf, inf) (nan, -0.5)
 ```
