@@ -1,0 +1,59 @@
+{
+  "examples": [
+    {
+      "example": "examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode",
+      "apis": ["asc_copy_gm2ub_align"],
+      "evidence": [
+        "MTE2将数据从Global Memory（GM）搬运到Unified Buffer（UB）时，可通过`asc_copy_gm2ub_align`接口的`l2_cache_mode`参数",
+        "本样例说明**复用数据**和**流式数据**两大类场景下，如何选择合适的L2 Cache模式来优化MTE2搬运性能"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/02_features/01_reg_vector_compute/00_add_double_buffer",
+      "apis": ["asc_lock", "asc_unlock", "asc_sync_pipe"],
+      "evidence": [
+        "`asc_lock`和`asc_unlock`用于控制两组Buffer的读写顺序。",
+        "所有轮次下发后调用`asc_sync_pipe(PIPE_ALL)`等待流水结束。"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/02_features/02_matrix_compute/00_mmad_double_buffer",
+      "apis": ["asc_mmad", "asc_lock", "asc_unlock", "asc_sync_pipe"],
+      "evidence": [
+        "M流水调用`asc_mmad`计算`[128, 64] x [64, 128]`",
+        "最后调用`asc_sync_pipe(PIPE_FIX)`等待写回完成。",
+        "各场景均使用[asc_lock](../../../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md)和[asc_unlock](../../../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md)控制Buffer复用依赖。"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/02_features/02_matrix_compute/01_mmad_direction",
+      "apis": [
+        "asc_set_gm2l1_nz_para",
+        "asc_copy_gm2l1_nd2nz",
+        "asc_copy_l12l0a",
+        "asc_copy_l12l0b",
+        "asc_set_l0c_copy_prequant",
+        "asc_set_l0c_copy_nz_para",
+        "asc_set_mmad_direction_m",
+        "asc_set_mmad_direction_n",
+        "asc_mmad",
+        "asc_copy_l0c2gm"
+      ],
+      "evidence": [
+        "1. 结果为float，Nz2Nz搬出：推荐使用`asc_set_mmad_direction_m()`；",
+        "调用一次`asc_mmad`完成矩阵乘，随后调用一次`asc_copy_l0c2gm`",
+        "本样例为Mmad计算方向优化样例"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/05_best_practices/03_fusion_compute/ssbuf_aiv_aic_comm",
+      "apis": ["asc_get_sub_block_id", "asc_init", "asc_sync_intra_arrive"],
+      "evidence": [
+        "AIV通过`asc_get_sub_block_id()`获取自己的Vector核编号，并选择对应的消息队列。",
+        "SSBuffer初始内容不保证为0，`asc_init`也不会清空SSBuffer。",
+        "asc_sync_intra_arrive(PIPE_S, MESSAGE_READY_SYNC_ID);",
+        "AIC通过模式4核间同步通知两个AIV开始发送。"
+      ]
+    }
+  ]
+}

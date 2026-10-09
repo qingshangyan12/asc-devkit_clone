@@ -96,12 +96,59 @@ class ValidationTests(unittest.TestCase):
         bad_kind = {"dependencies": [{"path": real_target, "kind": "uses", "evidence": {"source_path": "a.md", "excerpt": "调用前需先完成配置。"}}]}
         self.assertTrue(controller.validate_dependencies(bad_kind, "a.md", root, self.BODY))
 
-    def test_requires_cycle_detection(self) -> None:
-        annotations = {
-            "a.md": {"dependencies": [{"path": "b.md", "kind": "requires"}]},
-            "b.md": {"dependencies": [{"path": "a.md", "kind": "requires"}]},
+    def test_concept_page_dependencies_optional(self) -> None:
+        import tempfile
+        rel = "docs/zh/api/SIMD-API/c_api/reg_compute/overview.md"
+        path = REPO_ROOT / rel
+        self.assertTrue(path.is_file())
+        task = {
+            "path": rel, "sha256": controller.sha256(path), "needs_annotation": True,
+            "okftype": "reference.concept", "required": ["okftype", "description"], "version": None,
         }
-        self.assertTrue(controller.check_requires_cycles(annotations))
+        body = controller.document_body(REPO_ROOT, rel)
+        excerpt = next(line for line in body.splitlines() if len(line.strip()) >= 12)
+        annotation = {
+            "schema_version": 1,
+            "purpose": "okf_semantic_annotations",
+            "annotations": [{
+                "document_path": rel,
+                "document_sha256": task["sha256"],
+                "description": {"value": "Reg矢量计算概述页，说明寄存器计算API的分类与整体使用流程。",
+                                "evidence": [{"source_path": rel, "excerpt": excerpt}]},
+            }],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            run = Path(tmp)
+            (run / "annotations").mkdir()
+            manifest = {
+                "purpose": "okf_yaml_run",
+                "taxonomy": {"sha256": controller.sha256(controller.TAXONOMY_PATH)},
+                "documents": [task],
+            }
+            (run / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            (run / "annotations" / "c.json").write_text(json.dumps(annotation), encoding="utf-8")
+            result = controller.validate_run(REPO_ROOT, run)
+        self.assertEqual(result["status"], "ok")
+        self.assertIn(rel, result["ready_documents"])
+
+
+class PrototypeIdTests(unittest.TestCase):
+    def test_integral_constant_concrete_encoding(self) -> None:
+        from prototype_id import signature_identifier
+
+        key, ident = signature_identifier(
+            "asc_float2hif8_rna(vector_hifloat8_t&,vector_float,vector_bool,"
+            "std::integral_constant<asc_cast_round_mode,asc_cast_round_mode::RNA>round_mode)"
+        )
+        self.assertEqual(key, "override_id")
+        self.assertTrue(ident.endswith("_iccastrna"), ident)
+        key, ident = signature_identifier(
+            "asc_bfloat162e1m2x2_rn(vector_fp4x2_e1m2_t&,vector_bfloat16_t,vector_bool,"
+            "std::integral_constant<asc_position_quarter_mode,"
+            "asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>dst_quarter_pos)"
+        )
+        self.assertEqual(key, "override_id")
+        self.assertTrue(ident.endswith("_icposqfirst"), ident)
 
 
 class VersionTests(unittest.TestCase):

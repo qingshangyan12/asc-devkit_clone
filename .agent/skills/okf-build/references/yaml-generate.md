@@ -60,7 +60,7 @@ deprecated_interface 文档闭合区间）。线上 release_notes.html 与本地
 ## 失败处理
 
 - 未分类文档、taxonomy 非冻结、文档或词表在 prepare 后变化：停止，重跑 prepare。
-- 证据不逐字、tag 值越界、缺必填 namespace、依赖目标缺失、requires 成环：
+- 证据不逐字、tag 值越界、缺必填 namespace、依赖目标缺失：
   修正标注后重跑 validate；validate 未通过不得 `--write`（`--allow-partial` 仅写
   就绪文档）。
 - 写入后正文必须字节不变；front matter 解析失败立即报错。

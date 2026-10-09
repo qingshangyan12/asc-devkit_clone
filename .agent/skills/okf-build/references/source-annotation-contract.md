@@ -45,7 +45,7 @@
 
 ## 样例 marker 契约
 
-1. **featured 名单**（agent 产出，`tmp/<run-id>/featured/*.json`）：
+1. **featured 名单**（agent 产出，随包版本化在 `featured/*.json`，默认目录）：
    `{"example": "examples/...", "apis": ["asc_xxx"], "evidence": ["README 逐字摘录"]}`；
    只收录 README 明示重点展示的 API；无 API 线索时收样例主体接口或置空。
 2. **调用匹配**：featured 名单对应文档解析出的声明集合 → 扫描样例目录 → 只保留

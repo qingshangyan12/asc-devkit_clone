@@ -98,7 +98,7 @@ python3 scripts/tag_research.py approve --run-dir runs/<run-id> \
 
 ```bash
 python3 scripts/annotate_sources.py include   [--only <doc子串>] [--refresh] [--write]
-python3 scripts/annotate_sources.py examples  [--featured-dir <dir>] [--refresh] [--write]
+python3 scripts/annotate_sources.py examples  [--featured-dir featured/] [--refresh] [--write]
 ```
 
 默认 dry-run，只产出 diff 预览和问题清单到 `tmp/source-annotate/`；`--write` 才落盘，且幂等。
@@ -149,6 +149,7 @@ okf-build/
 │   ├── source-context-v1.yaml      # 源文档范围与文档族配置
 │   ├── document-profile-registry.yaml  # 页面种类 → 允许/必填字段
 │   └── prototype-id/type-registry.yaml # C 类型 → 原型 ID 类型码表
+├── featured/                       # 样例重点展示名单（agent 产出、随包版本化；examples marker 输入）
 ├── references/                     # 规则与流程文档（按需阅读）
 │   ├── README.md                   # reference 导航
 │   ├── tag-research.md             # 词表调研流程
@@ -426,8 +427,9 @@ floors:
 ### 3.6 门禁与硬约束
 
 - **词表先冻结再标注**：`provisional` 词表不得传给写入器；合法性以 `config/tag-taxonomy.json` 校验。
-- **validate 不过不写**：哈希不一致、词表越界、证据不逐字、依赖目标缺失或成环、version 冲突，
-  任一失败都阻断写入；`--allow-partial` 只写已就绪文档。
+- **validate 不过不写**：哈希不一致、词表越界、证据不逐字、依赖目标缺失、version 冲突，
+  任一失败都阻断写入；`--allow-partial` 只写已就绪文档。`requires` 允许成环
+  （接口间存在真实互配关系），由使用者按 `condition` 判断调用顺序。
 - **证据必须逐字**：description/tag/dependencies 的证据都取自目标文档正文的原始子串；
   目录、API 名、dtype、架构、头文件属性不能当语义证据。
 - **只写该写的**：文档只写 front matter；include 只在声明上方补 Doxygen；样例只插 marker；

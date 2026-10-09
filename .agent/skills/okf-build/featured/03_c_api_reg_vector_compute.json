@@ -1,0 +1,105 @@
+{
+  "examples": [
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs",
+      "apis": ["asc_abs"],
+      "evidence": ["abs_vf函数内调用asc_abs接口进行计算，结果写回UB"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/arange",
+      "apis": ["asc_arange"],
+      "evidence": ["asc_arange接口不需要输入数据，只需指定起始标量值"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/cast",
+      "apis": ["asc_half2int32_rd", "asc_float2int16_rna_sat"],
+      "evidence": [
+        "cast_vf函数内从half到int32_t的asc_half2int32_rd接口每次处理64个数据",
+        "cast_vf函数内从float到int16_t的asc_float2int16_rna_sat接口每次处理64个数据"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/compare",
+      "apis": ["asc_gt", "asc_gt_scalar", "asc_select"],
+      "evidence": ["asc_gt接口一般与asc_select接口配合使用，该样例仅演示asc_gt和asc_select配合的用法。"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/data_relayout",
+      "apis": ["asc_intlv", "asc_pack_to_low"],
+      "evidence": [
+        "interleave_vf函数内调用asc_intlv接口进行数据交织。",
+        "pack_vf函数内调用asc_pack_to_low接口提取低16位。"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div",
+      "apis": ["asc_div"],
+      "evidence": ["使用asc_div接口执行除法运算"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/duplicate",
+      "apis": ["asc_duplicate_scalar"],
+      "evidence": ["duplicate_vf函数内调用asc_duplicate_scalar接口进行标量填充"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/elu",
+      "apis": ["asc_exp", "asc_mul_scalar", "asc_select"],
+      "evidence": ["本样例基于C API编程接口实现ELU（Exponential Linear Unit）激活运算，主要调用 `asc_exp`、`asc_mul_scalar`、`asc_select` 接口。"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/gather",
+      "apis": ["asc_gather"],
+      "evidence": ["gather_vf函数内调用asc_gather接口按索引收集元素。"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/histogram",
+      "apis": ["asc_frequency_histogram_bin0", "asc_frequency_histogram_bin1"],
+      "evidence": ["调用asc_frequency_histogram_bin0/asc_frequency_histogram_bin1接口进行统计计算，dst0统计[0-127]区间、dst1统计[128-255]区间"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mergemode",
+      "apis": ["asc_copy"],
+      "evidence": ["演示使用asc_copy接口在MERGING模式下进行矢量数据寄存器间的数据搬运。"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/mul",
+      "apis": ["asc_mul"],
+      "evidence": ["mul_vf函数内调用asc_mul接口进行计算，结果写回UB。"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/muls",
+      "apis": ["asc_mul_scalar"],
+      "evidence": ["muls_vf函数内调用asc_mul_scalar接口进行计算，结果写回UB。"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce",
+      "apis": ["asc_reduce_sum"],
+      "evidence": ["reduce_sum_vf函数内调用asc_reduce_sum接口进行归约计算"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_block",
+      "apis": ["asc_reduce_sum_datablock"],
+      "evidence": ["reduce_block_vf函数内调用asc_reduce_sum_datablock接口进行归约计算"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/reduce_pair",
+      "apis": ["asc_pair_reduce_sum"],
+      "evidence": ["reduce_pair_vf函数内调用asc_pair_reduce_sum接口进行归约计算"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/select",
+      "apis": ["asc_select"],
+      "evidence": ["select_vf函数内调用asc_select接口进行计算，结果写回UB"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/squeeze",
+      "apis": ["asc_squeeze"],
+      "evidence": ["squeeze_vf函数内调用asc_squeeze接口进行压缩计算"]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/truncate",
+      "apis": ["asc_floor"],
+      "evidence": ["truncate_vf函数内调用asc_floor接口进行计算，结果写回UB"]
+    }
+  ]
+}

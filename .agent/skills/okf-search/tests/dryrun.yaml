@@ -89,10 +89,9 @@ cases:
     min: 1
     contains: [asc_add]
 
-  - name: 缺口登记
+  - name: 缺口登记（可选台账，允许为空）
     args: {gap: compare}
-    min: 1
-    contains: [asc_get_cmp_mask]
+    min: 0
 
   # ---- 全量轮新增 ----
 

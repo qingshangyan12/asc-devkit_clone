@@ -225,14 +225,14 @@ archs:
 记录 `source_commit`、`taxonomy_sha256`、`product_map_sha256`、`gaps_sha256`、逐文档
 `document_sha256`。`ensure_index.py` 用它在毫秒级判断索引是否过期。
 
-#### `index/c_api/gaps.json`（缺口登记，人工维护）
+#### `index/c_api/gaps.json`（缺口登记，可选）
 
 | 段 | 字段 | 含义 |
 | --- | --- | --- |
 | `scope_out_gaps[]` | `id` / `keywords` / `conclusion` / `hints` / `evidence` | 范围内未覆盖的能力：关键词、结论、范围外线索、证据 |
 | `relation_gaps[]` | `from` 等 | 关系维度的已知缺口 |
 
-构建时校验 hint/evidence 指向的文件真实存在；`--gap` 查询命中即返回。
+缺失视为空台账、不阻断构建；存在时校验 hint/evidence 指向的文件真实存在；`--gap` 查询命中即返回。
 
 #### `derive-overrides/<surface>.json`（人工/LLM 裁决）
 

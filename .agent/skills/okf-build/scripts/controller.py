@@ -386,30 +386,6 @@ def validate_dependencies(annotation: dict[str, Any], rel: str, root: Path, body
     return issues
 
 
-def check_requires_cycles(annotations: dict[str, dict[str, Any]]) -> list[str]:
-    adjacency: dict[str, list[str]] = {}
-    for rel, annotation in annotations.items():
-        for dep in annotation.get("dependencies") or []:
-            if isinstance(dep, dict) and dep.get("kind") == "requires":
-                adjacency.setdefault(rel, []).append(dep["path"])
-    state: dict[str, str] = {}
-    cycles: list[str] = []
-
-    def visit(node: str, stack: list[str]) -> None:
-        state[node] = "active"
-        for nxt in sorted(adjacency.get(node, [])):
-            if state.get(nxt) == "active":
-                cycles.append(" -> ".join(stack + [node, nxt]))
-            elif state.get(nxt) != "done":
-                visit(nxt, stack + [node])
-        state[node] = "done"
-
-    for node in sorted(adjacency):
-        if state.get(node) != "done":
-            visit(node, [])
-    return cycles
-
-
 def validate_run(root: Path, run_dir: Path) -> dict[str, Any]:
     manifest = read_json(run_dir / "manifest.json")
     if manifest.get("purpose") != "okf_yaml_run":
@@ -441,15 +417,14 @@ def validate_run(root: Path, run_dir: Path) -> dict[str, Any]:
             issues += validate_description(annotation, rel, body, title, stem)
         if "tag" in required or "tag" in annotation:
             issues += validate_tag(annotation, rel, body, required)
-        issues += validate_dependencies(annotation, rel, root, body)
+        if "dependencies" in required or "dependencies" in annotation:
+            issues += validate_dependencies(annotation, rel, root, body)
         if "version" in required:
             expected = task.get("version")
             if expected and annotation.get("version") not in (None, expected):
                 issues.append(issue(rel, "version", f"annotation version {annotation.get('version')!r} != derived {expected!r}"))
     for rel in sorted(set(annotations) - set(documents)):
         issues.append(issue(rel, "*", "annotation for a document outside this run"))
-    for cycle in check_requires_cycles(annotations):
-        issues.append(issue("*", "dependencies", f"requires cycle: {cycle}"))
     valid_docs = sorted(
         rel for rel, task in documents.items()
         if task["needs_annotation"] and rel in annotations

@@ -269,7 +269,19 @@ def collect_signatures(
             )
             if record is None:
                 continue
-            records_by_header.setdefault(record["header"], []).append(record)
+            header_records = records_by_header.setdefault(record["header"], [])
+            identifier = record.get("override_id") or record.get("macro_id")
+            existing = next(
+                (
+                    item for item in header_records
+                    if (item.get("override_id") or item.get("macro_id")) == identifier
+                ),
+                None,
+            )
+            if existing is None:
+                header_records.append(record)
+            else:
+                _merge_include_records(existing, record)
     grouped = {symbol: tuple(items) for symbol, items in signatures_by_symbol.items()}
     if not partial:
         payload = {
@@ -352,6 +364,25 @@ def _build_include_record(
         "template_parameters": list(mapping.template_parameters),
         "doxygen": {"params": params} if params else {},
     }
+
+
+def _merge_include_records(existing: dict[str, Any], new: dict[str, Any]) -> None:
+    """同一声明被多篇文档命中：合并 archs/模板参数，补齐缺失的 @param（契约第 6 条）。"""
+    existing["archs"] = sorted(set(existing.get("archs", [])) | set(new.get("archs", [])))
+    existing["template_parameters"] = sorted(
+        set(existing.get("template_parameters", [])) | set(new.get("template_parameters", []))
+    )
+    base_doxygen = existing.get("doxygen") or {}
+    new_doxygen = new.get("doxygen") or {}
+    for field in ("level", "brief"):
+        if not base_doxygen.get(field) and new_doxygen.get(field):
+            base_doxygen[field] = new_doxygen[field]
+    base_params = {item["name"]: item for item in base_doxygen.get("params", [])}
+    for item in new_doxygen.get("params", []):
+        base_params.setdefault(item["name"], item)
+    if base_params:
+        base_doxygen["params"] = list(base_params.values())
+    existing["doxygen"] = base_doxygen
 
 
 def _bounded_diff(before: str, after: str, limit: int = 120) -> list[str]:
@@ -569,7 +600,7 @@ def parser() -> argparse.ArgumentParser:
     inc.add_argument("--list-mappings", action="store_true", help="仅按 symbol 打印映射统计")
 
     exa = sub.add_parser("examples", parents=[common], help="读取 featured 名单并写入样例 marker")
-    exa.add_argument("--featured-dir", default=str(SKILL_ROOT / "tmp" / "source-annotate" / "featured"))
+    exa.add_argument("--featured-dir", default=str(SKILL_ROOT / "featured"))
     exa.add_argument("--source-dir", action="append", default=[], help="样例目录（默认 examples/02_simd_c_api）")
     return p
 

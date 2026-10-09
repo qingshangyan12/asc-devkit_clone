@@ -420,6 +420,12 @@ def _strip_parameter_name(value: str) -> str:
     )
     if pointer_name_match:
         return pointer_name_match.group("type").strip()
+    template_name_match = re.fullmatch(
+        r"(?P<type>.+>)\s*[A-Za-z_][A-Za-z0-9_]*",
+        value,
+    )
+    if template_name_match:
+        return template_name_match.group("type").strip()
     parameter_pack_name_match = re.fullmatch(
         r"(?P<type>.+?\.\.\.)\s*[A-Za-z_][A-Za-z0-9_]*",
         value,

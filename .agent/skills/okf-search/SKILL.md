@@ -43,8 +43,9 @@ python3 .agent/skills/okf-search/scripts/ensure_index.py --json [--arch A3] [--c
 3. **空结果降级链**：精确 `--operation` → `--kw` 同义词 → `--api-class` + `--kw` →
    `--gap` 确认范围外；仍无则如实说明。
 4. **配套展开**：`--deps-of`（含 `--reverse`）、`--enum`/`--param` 反查，保留家族变体。
-5. **收敛**：意图要素全部有候选或确认范围外、依赖闭合后按固定格式作答；按需只读候选文档
-   支撑推荐所需的章节，禁止全量精读。
+5. **收敛与把关**：意图要素全部有候选或确认范围外、依赖闭合后按固定格式作答；
+   脚本只给候选，输出前由你复核相关性与适用条件（门控/condition/deprecated），
+   不相关的不展示；按需只读候选文档支撑推荐所需的章节，禁止全量精读。
 
 完整维度映射表、降级链与策略要点见 [references/retrieve.md](references/retrieve.md)；
 查询 CLI 全部参数见 [references/index.md](references/index.md)。

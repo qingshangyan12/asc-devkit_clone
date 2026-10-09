@@ -50,7 +50,7 @@ class DeriveTests(unittest.TestCase):
         cls.include_db = build_include_db(REPO_ROOT / "include" / "c_api")
 
     def test_declaration_derivation(self) -> None:
-        decls, mode = declarations_for("asc_copy_gm2ub", self.include_db, "vector_datamove")
+        decls, mode = declarations_for("asc_copy_gm2ub_align", self.include_db, "vector_datamove")
         self.assertEqual(mode, "exact")
         annotated = [d for d in decls if d.override_id]
         self.assertTrue(any("2201" in d.archs for d in annotated))
@@ -153,6 +153,15 @@ class BuildTests(unittest.TestCase):
         )
         self.assertEqual(first, second)
 
+    def test_gaps_optional(self) -> None:
+        """gaps.json 缺失视为空台账：构建照常出索引并落盘空快照。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            with mock.patch.object(build_index, "INDEX_DIR", Path(tmp)):
+                out = self.out / "no-gaps"
+                build_index.build(REPO_ROOT, build_index.SCOPES["c_api"], out, "9.2.0", "A3")
+        gaps = json.loads((out / "gaps.json").read_text(encoding="utf-8"))
+        self.assertEqual(gaps, {"scope_out_gaps": [], "relation_gaps": []})
+
 
 class DryrunTests(unittest.TestCase):
     """dryrun.yaml 查询清单回归。"""
@@ -185,6 +194,21 @@ class DryrunTests(unittest.TestCase):
         }
         namespace = type("Args", (), {**defaults, **args, "json": True, "surface": "c_api", "index_dir": None})()
         return query_mod.run_query(namespace, index, gaps)
+
+    def test_reverse_deps_by_family(self) -> None:
+        # 族名与成员全路径应得到同一组反向入边
+        by_family = self._run("a5", {"deps_of": "asc_copy_gm2ub", "reverse": True})
+        by_path = self._run("a5", {
+            "deps_of": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+            "reverse": True,
+        })
+        self.assertGreaterEqual(len(by_family), 1)
+        self.assertEqual({r["path"] for r in by_family}, {r["path"] for r in by_path})
+
+    def test_unknown_named_query_returns_empty(self) -> None:
+        self.assertEqual(self._run("a5", {"api": "asc_no_such_api"}), [])
+        self.assertEqual(self._run("a5", {"deps_of": "asc_no_such_api"}), [])
+        self.assertEqual(self._run("a5", {"operation": "no_such_operation"}), [])
 
     def test_dryrun_cases(self) -> None:
         for case in self.cases["cases"]:
@@ -266,8 +290,8 @@ class EnsureTests(unittest.TestCase):
             result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A5")
         self.assertEqual(result["status"], "ready")
         self.assertEqual(result["actions"], [])
-        # 全量轮：14 个分类全部入索引（含 defs/deprecated_interface/experimental）
-        self.assertEqual(len(result["categories"]), 14)
+        # 全量轮：15 个分类全部入索引（含 defs/deprecated_interface/experimental）
+        self.assertEqual(len(result["categories"]), 15)
         for marker in ("vector_compute", "deprecated_interface", "defs", "sync"):
             self.assertIn(marker, result["categories"])
 
