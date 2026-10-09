@@ -26,6 +26,7 @@ DstType tensor_api_print_test_bit_cast(const SrcType& src)
 
 #define __builtin_bit_cast(dst_type, src) tensor_api_print_test_bit_cast<dst_type>(src)
 #include "include/tensor_api/tensor.h"
+#include "tensor_api/utils/print.h"
 #undef __builtin_bit_cast
 
 namespace {
