@@ -25,6 +25,12 @@
 //     引擎并发推进，拷贝被末步写耗时完全掩盖（P3 首步重叠下拷贝 8.1us 有 ~2us 暴露，
 //     且 step1 转发读 own slot 依赖拷贝完成仅余 ~1us 余量）。repeatNum>1 时经
 //     groupCopyRepeatNum 哨兵保证仅首轮提交，后续轮次空转。
+//  7. turn-end 提前（D3，P4 重试）：末步补做步间同步（与 hccl 仅末步跳过不同——本优化
+//     要求末步接收分片在 turn-end 前到达，机制与其它步同步完全一致），kernel 在末步同步
+//     后、PostSync 前直接写 turn-end HBM 信号（地址由 server 按队列游标传入），AIV 提前
+//     返回；PostSync 仍在 server 指令流中先于下一轮 PreSync 执行，跨轮 XN 保护不变。
+//     正确性：末步接收分片由末步 NotifyWait(recvChannel) 保证到达；本地拷贝为 LoopGroup
+//     阻塞指令，retire 即数据落位；本 rank 写已 EventWait。
 #include "ccu_kernel_kfc_all_gather_nhr1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
@@ -223,7 +229,7 @@ CcuResult DoAllGatherGroupCopy(KfcAllGatherNhr1DContext& ctx)
     return CCU_SUCCESS;
 }
 
-// 对应 hccl DoRepeatAllGatherNHRSingleStep（末步跳过步间同步与 hccl 一致）。
+// 对应 hccl DoRepeatAllGatherNHRSingleStep（D3：末步也做步间同步——turn-end 提前的前置条件）。
 // D1（对齐 hccl）：own slot 在各步均由 input 直发——txSliceIdxs 每步以 own slot 开头
 // （见 ccu_temp_kfc_all_gather_nhr_1d_mem2mem.cc GetStepInfo），若走 output 转发会依赖
 // GroupCopy 先落位；直发后 GroupCopy 推迟至末步提交，转发读 output 与拷贝写 own slot 无依赖。
@@ -318,10 +324,10 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
         }
     }
 
-    if (!isLastStep) {
-        CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-        CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-    }
+    // D3：末步也做步间同步——turn-end 提前到 PostSync 前的前置条件（末步接收分片的
+    // 到达保证由此承担），与 hccl 仅末步跳过同步不同；record 先于 wait 且不阻塞，无死锁。
+    CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
+    CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
 
     return CCU_SUCCESS;
 }
@@ -370,7 +376,8 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
     ccu::Variable outputSliceStride, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
     ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx,
+    ccu::Variable turnEndAddr)
 {
     KfcAllGatherNhr1DContext ctx;
     ctx.channels = channels;
@@ -388,6 +395,11 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     CCU_CHK_RET(PreSync(ctx));
 
     CCU_CHK_RET(DoRepeatAllGatherNHR(ctx));
+
+    // D3：末步同步完成后本 rank 输出已完整（各步接收分片到达 + GroupCopy 阻塞落位 +
+    // 本 rank 写 EventWait），在 PostSync 前写 turn-end，AIV 提前返回；PostSync 仍在
+    // server 指令流中先于下一轮 PreSync 执行，跨轮 XN 保护不变。
+    CCU_CHK_RET(ccu::Store(turnEndAddr, ctx.constVar1));
 
     CCU_CHK_RET(PostSync(ctx));
 

@@ -672,8 +672,8 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
                 }
             }
         }
-        finishNumTemp_++;
-        WriteHBMData(finishCntGM_, finishNumTemp_);
+        // 性能优化(W2)：workingFlag 路径下 finishCntGM_ 无读者（唯一读者是非 workingFlag
+        // 分支的轮询，二者互斥；上游 hccl 亦无此变量），删除每轮一次的重屏障 GM 写。
     } else {
         while (true) {
             uint64_t finshCnt = ReadHBMData(finishCntGM_);

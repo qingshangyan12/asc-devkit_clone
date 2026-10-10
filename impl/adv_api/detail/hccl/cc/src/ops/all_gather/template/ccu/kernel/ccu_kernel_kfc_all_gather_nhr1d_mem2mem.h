@@ -23,11 +23,14 @@ namespace mc2_ops_hccl {
 // N2：常量参数（die0LastSize/repeatNum/三 stride）与 isInputOutputEqual 不占 xnData 槽——
 // 前者由 LoadNhr1DArgs 内联（sole executor 恒定），后者经 goSize 全零表达（in-place 时
 // AIV 按 0 字节计算 goSize，GroupCopy 内部 CCU_IF 块均不触发）。
+// turnEndAddr：本轮完成信号在 HBM 上的地址（WAIT 槽 CKE），由 KFC server 按队列游标传入；
+// kernel 在末步同步后、PostSync 前提前写入（D3），server 侧相应跳过本轮 SetTurnEndSig。
 CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
     ccu::Variable outputSliceStride, ccu::Variable goSize0, ccu::Variable goSize1, ccu::Variable goSize2,
     ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount, uint32_t rankSize, uint32_t rankId,
-    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+    const std::vector<KfcNhrStepInfo>& stepInfoVector, const std::map<uint32_t, uint32_t>& rank2ChannelIdx,
+    ccu::Variable turnEndAddr);
 
 } // namespace mc2_ops_hccl
 

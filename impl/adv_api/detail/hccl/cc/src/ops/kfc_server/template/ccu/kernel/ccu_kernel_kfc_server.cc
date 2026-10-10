@@ -182,7 +182,19 @@ CcuResult LoadFuncParamFromMemory(
     return CCU_SUCCESS;
 }
 
-static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerContext& ctx)
+// SoleNHR AG kernel 在内部（末步同步后、PostSync 前）提前写 turn-end，server 侧跳过
+// 本轮 SetTurnEndSig（D3）。判断须与 DispatchKfcSubKernel 的 SoleNHR AG 分支严格一致
+// （opType+role，二者由 algName 唯一决定，不会交叉）。不可对同一 WAIT 槽二次置位：
+// AIV 检测清零后残留的 1 会在 64 轮槽位回绕时造成假完成信号。
+static bool KernelEmitsEarlyTurnEnd(const KfcServerContext& ctx)
+{
+    return ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER &&
+           ctx.arg->role == KfcServerRole::ALL_GATHER_SOLE_NHR;
+}
+
+// turnEndAddr：本轮完成信号的 HBM 地址（WAIT 槽 CKE），仅 SoleNHR AG 分支消费（D3）。
+static void DispatchKfcSubKernel(
+    ccu::Array<ccu::Variable>& param, KfcServerContext& ctx, const ccu::Variable& turnEndAddr)
 {
     if (ctx.arg->opParam.opType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         const auto* arg = static_cast<const KfcParallelAllGatherArg*>(ctx.arg->algArg.get());
@@ -226,14 +238,15 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
         } else if (ctx.arg->role == KfcServerRole::ALL_GATHER_SOLE_NHR) {
             // SoleNHR（CcuSchedAllGatherSoleNHR）单帧布局见 KfcAllGatherSoleNhrParamIndex
-            // （N2：8 槽，[0]=INPUT 兼作哨兵，常量参数 kernel 内联，token 由 server ctx 注入）。
+            // （N2：8 槽，[0]=INPUT 兼作哨兵，常量参数 kernel 内联，token 由 server ctx 注入；
+            // turnEndAddr 由 server 传入，kernel 末步同步后、PostSync 前写 turn-end——D3）。
             CcuKernelKfcAllGatherNHR1DMem2MemKernel(
                 param[KFC_AG_SOLE_NHR_INPUT], param[KFC_AG_SOLE_NHR_OUTPUT], ctx.token,
                 param[KFC_AG_SOLE_NHR_DIE0_SIZE], param[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE],
                 param[KFC_AG_SOLE_NHR_GO_SIZE_0], param[KFC_AG_SOLE_NHR_GO_SIZE_1], param[KFC_AG_SOLE_NHR_GO_SIZE_2],
                 param[KFC_AG_SOLE_NHR_GO_SIZE_3], ctx.arg->channels, ctx.arg->channelCount,
                 static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->nhrStepInfoVector,
-                ctx.arg->nhrRank2ChannelIdx);
+                ctx.arg->nhrRank2ChannelIdx, turnEndAddr);
         } else {
             // The queue payload layout is
             // [0]=op, [1]=input, [2]=output, [3]=outputOffset, [4]=sliceSize,
@@ -431,9 +444,13 @@ CcuResult KfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
         {
             MissionPreSync(param[HBM_PARAM_IDX_0], ctx);
-            DispatchKfcSubKernel(param, ctx);
+            DispatchKfcSubKernel(param, ctx, recordAddr);
             MissionPostSync(ctx);
-            CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
+            // D3：SoleNHR AG kernel 已在末步同步后、PostSync 前写 turn-end（AIV 提前返回），
+            // 其余角色维持 dispatch 后统一发放。条件为宿主侧常量，不产生运行时分支指令。
+            if (!KernelEmitsEarlyTurnEnd(ctx)) {
+                CCU_CHK_RET(SetTurnEndSig(recordAddr, turnEndSig, ctx));
+            }
         }
         waitAddr += ckeSize;
         recordAddr += ckeSize;
@@ -468,7 +485,11 @@ CcuResult SlaveKfcServerGenCircularQueue(KfcServerContext& ctx)
         CCU_CHK_RET(LoadFuncParamFromMemory(paramAddr, param, ctx)); // 读取本轮参数
 
         CCU_IF(param[HBM_PARAM_IDX_0] == INVALID_U64) { repeatCond = 1; }
-        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64) { DispatchKfcSubKernel(param, ctx); }
+        CCU_IF(param[HBM_PARAM_IDX_0] != INVALID_U64)
+        {
+            // turnEndAddr 仅 SoleNHR AG 消费；slave 不会以该角色 dispatch（单 mission 算子）。
+            DispatchKfcSubKernel(param, ctx, ctx.recordAddr);
+        }
         MissionPostSync(ctx);
     }
     return CCU_SUCCESS;
