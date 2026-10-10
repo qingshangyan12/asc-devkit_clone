@@ -697,6 +697,7 @@ static void test_host_c_api_reg_compute_19()
     using ::asc_xor;
 }
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201) && (ASC_DEVKIT_VERSION_NUM >= 90200000)
 static void test_host_c_api_reg_compute_20()
 {
     using ::asc_bfloat162e4m3_rn;
