@@ -23,11 +23,9 @@
 #define ASCENDC_MODULE_OPERATOR_MACRO_BIT_MODE_STRUCT_H
 #if defined(__NPU_ARCH__) && \
     (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
-
-#if defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #include "dav_5161/kernel_operator_macro_bitmode_impl.h"
-#endif
+#elif defined(__NPU_ARCH__) && __NPU_ARCH__ == 5162
+#include "dav_5162/kernel_operator_macro_bitmode_impl.h"
 
 #endif // __NPU_ARCH__
 #endif // ASCENDC_MODULE_OPERATOR_MACRO_BIT_MODE_STRUCT_H
