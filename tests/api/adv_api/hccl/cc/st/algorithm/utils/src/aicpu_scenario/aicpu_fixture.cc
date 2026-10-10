@@ -1,0 +1,245 @@
+/**
+ * Copyright (c) 2026 Huawei Technologies Co., Ltd.
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
+ * Please refer to the License for details. You may not use this file except in compliance with the License.
+ * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+ * See LICENSE in the root of the software repository for the full text of the License.
+ */
+
+#include "aicpu_fixture.h"
+
+#include <cstdlib>
+#include <thread>
+
+#include "acl/acl_rt.h"
+#include "checker_def.h"
+#include "hccl_alloc_ctx_res.h"
+#include "hccl_sim_pub.h"
+#include "op_common.h"
+#include "securec.h"
+#include "sim_communicator.h"
+#include "sim_npu.h"
+#include "sim_task_queue.h"
+#include "sim_world.h"
+#include "task_graph_executor.h"
+
+namespace HcclSim {
+namespace AicpuSt {
+
+uint32_t AicpuStFixture::CountRanks(const TopoMeta& topoMeta)
+{
+    uint32_t total = 0;
+    for (const auto& superPod : topoMeta) {
+        for (const auto& server : superPod) {
+            total += static_cast<uint32_t>(server.size());
+        }
+    }
+    return total;
+}
+
+Mc2CcTilingInner AicpuStFixture::BuildTiling(HcclCMDType opType, HcclDataType dataType, const std::string& algConfig)
+{
+    Mc2CcTilingInner tiling{};
+    tiling.opType = static_cast<uint32_t>(opType);
+    tiling.commEngine = static_cast<uint8_t>(mc2_ops_hccl::OpExecuteConfig::AICPU_TS); // 与 CCU ST 的唯一差异
+    tiling.srcDataType = static_cast<uint8_t>(dataType);
+    tiling.dstDataType = static_cast<uint8_t>(dataType);
+    (void)strcpy_s(tiling.groupName, sizeof(tiling.groupName), "test_group");
+    (void)strcpy_s(tiling.algConfig, sizeof(tiling.algConfig), algConfig.empty() ? "default" : algConfig.c_str());
+    return tiling;
+}
+
+// 单 rank 全链路：内存分配 → OpParam 准备 → selector → 资源 → HcclExecOp（内部 launch+Orchestrate）
+// （AicpuStFixture 私有静态成员，以访问 protected 虚函数/静态工具）
+void AicpuStFixture::RunRank(
+    AicpuStFixture* fixture, const AicpuStScenario& scenario, uint32_t rank, uint32_t rankSize,
+    const RankMemLayout& layout, RankResult& result)
+{
+    if (aclrtSetDevice(static_cast<int32_t>(rank)) != ACL_SUCCESS) {
+        result.error = "aclrtSetDevice failed";
+        return;
+    }
+    aclrtStream stream = nullptr;
+    if (aclrtCreateStream(&stream) != ACL_SUCCESS) {
+        result.error = "aclrtCreateStream failed";
+        return;
+    }
+
+    RankMem mem;
+    mem.inputBytes = layout.inputBytes;
+    mem.outputBytes = layout.outputBytes;
+    // 零长度场景仍分配 1 字节，保证指针有效（模板 sliceSize==0 时提前返回，不会触碰数据）
+    const uint64_t inAlloc = (layout.inputBytes == 0) ? 1 : layout.inputBytes;
+    const uint64_t outAlloc = (layout.outputBytes == 0) ? 1 : layout.outputBytes;
+    if (aclrtMalloc(&mem.inputPtr, inAlloc, static_cast<aclrtMemMallocPolicy>(BUFFER_INPUT_MARK)) != ACL_SUCCESS) {
+        result.error = "aclrtMalloc input failed";
+        return;
+    }
+    if (aclrtMalloc(&mem.outputPtr, outAlloc, static_cast<aclrtMemMallocPolicy>(BUFFER_OUTPUT_MARK)) != ACL_SUCCESS) {
+        result.error = "aclrtMalloc output failed";
+        return;
+    }
+
+    // 填输入数据（直接写 SimNpu 后备内存）
+    if (layout.inputBytes > 0) {
+        SimNpu& npu = SimWorld::Global()->GetSimNpuByRankId(rank);
+        uint8_t* base = npu.GetBufferBase(BufferType::INPUT, layout.inputBytes);
+        for (uint64_t i = 0; i < layout.inputBytes; ++i) {
+            base[i] = AicpuStFixture::MakeInputByte(rank, i);
+        }
+    }
+
+    HcclComm comm = nullptr;
+    if (Sim_HcclCommInitClusterInfo(scenario.topoMeta, rank, &comm) != HCCL_SUCCESS) {
+        result.error = "Sim_HcclCommInitClusterInfo failed";
+        return;
+    }
+
+    const Mc2CcTilingInner tiling = AicpuStFixture::BuildTiling(scenario.opType, scenario.dataType, scenario.algConfig);
+    OpParam opParam{};
+    if (InitOpParamByTiling(comm, stream, "aicpu_st", &tiling, opParam) != HCCL_SUCCESS) {
+        result.error = "InitOpParamByTiling failed";
+        (void)HcclCommDestroy(comm);
+        return;
+    }
+
+    // PrepareOpParam：见 aicpu_fixture.h 注释（count/ptr 必须在 selector 前补齐）
+    fixture->PrepareOpParam(opParam, rankSize, scenario, mem);
+
+    auto topoInfo = std::make_unique<TopoInfoWithNetLayerDetails>();
+    std::string algName;
+    bool forcedAlgAccepted = false;
+    if (TryForcedAlgAndPrepareEngine(comm, &tiling, opParam, algName, topoInfo, forcedAlgAccepted) != HCCL_SUCCESS) {
+        result.error = "TryForcedAlgAndPrepareEngine failed";
+        (void)HcclCommDestroy(comm);
+        return;
+    }
+    if (!forcedAlgAccepted) {
+        if (SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo) != HCCL_SUCCESS) {
+            result.error = "SelectAlgAndPrepareEngine failed";
+            (void)HcclCommDestroy(comm);
+            return;
+        }
+    }
+    if (rank == 0 && !scenario.expectedAlgName.empty() && algName != scenario.expectedAlgName) {
+        result.error = "algName mismatch: expected[" + scenario.expectedAlgName + "] got[" + algName + "]";
+        (void)HcclCommDestroy(comm);
+        return;
+    }
+    result.algName = algName;
+
+    if (FillOpParamAlgName(opParam, algName) != HCCL_SUCCESS) {
+        result.error = "FillOpParamAlgName failed";
+        (void)HcclCommDestroy(comm);
+        return;
+    }
+
+    bool skipGetRes = false;
+    if (HandleSingleRankAndCommMode(comm, opParam, skipGetRes) != HCCL_SUCCESS || skipGetRes) {
+        result.error = "HandleSingleRankAndCommMode failed or skipped";
+        (void)HcclCommDestroy(comm);
+        return;
+    }
+
+    void* resCtxOut = nullptr;
+    if (GetOpParamResCtx(comm, algName, opParam, topoInfo.get(), &resCtxOut) != HCCL_SUCCESS) {
+        result.error = "GetOpParamResCtx failed";
+        (void)HcclCommDestroy(comm);
+        return;
+    }
+
+    ResPackGraphMode resPack{};
+    if (HcclExecOp(comm, opParam, topoInfo, algName, resPack) != HCCL_SUCCESS) {
+        result.error = "HcclExecOp failed";
+        (void)HcclCommDestroy(comm);
+        return;
+    }
+
+    (void)HcclCommDestroy(comm);
+    result.ok = true;
+}
+
+void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
+{
+    const uint32_t rankSize = CountRanks(scenario.topoMeta);
+    ASSERT_GE(rankSize, 1U);
+
+    SimTaskQueue::Global()->Clear();
+
+    // RAII：保证断言失败也能清理
+    struct ScopeGuard {
+        ~ScopeGuard()
+        {
+            SimWorld::Global()->Deinit();
+            unsetenv("HCCL_OP_EXPANSION_MODE");
+            unsetenv("HCCL_ENABLE_OPEN_AICPU");
+        }
+    } guard;
+
+    setenv("HCCL_OP_EXPANSION_MODE", "AI_CPU", 1);
+    setenv("HCCL_ENABLE_OPEN_AICPU", "1", 1);
+    SimWorld::Global()->Init(scenario.topoMeta, scenario.devType);
+
+    const RankMemLayout layout = BuildMemLayout(rankSize, scenario);
+
+    std::vector<RankResult> results(rankSize);
+    std::vector<std::thread> threads;
+    for (uint32_t rank = 0; rank < rankSize; ++rank) {
+        threads.emplace_back([this, &scenario, rank, rankSize, &layout, &results]() {
+            RunRank(this, scenario, rank, rankSize, layout, results[rank]);
+        });
+    }
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    for (uint32_t rank = 0; rank < rankSize; ++rank) {
+        ASSERT_TRUE(results[rank].ok) << "rank " << rank << " failed: " << results[rank].error;
+    }
+
+    // 静态检查：任务图非空（零长度场景除外）
+    AllRankTaskQueues& queues = SimTaskQueue::Global()->GetAllRankTaskQueues();
+    {
+        size_t taskCount = 0;
+        for (const auto& pod : queues) {
+            for (const auto& ser : pod.second) {
+                for (const auto& phy : ser.second) {
+                    for (const auto& stream : phy.second) {
+                        taskCount += stream.size();
+                    }
+                }
+            }
+        }
+        if (layout.inputBytes > 0) {
+            EXPECT_GT(taskCount, 0U) << "task graph is empty";
+        }
+    }
+
+    // golden 期望
+    std::vector<std::vector<uint8_t>> expected(rankSize);
+    for (uint32_t rank = 0; rank < rankSize; ++rank) {
+        expected[rank] = BuildExpectedOutput(rankSize, scenario, rank);
+    }
+
+    // 任务图真执行 + 死锁定位
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(queues, report), ExecResult::SUCCESS) << report;
+
+    // 逐字节比对（期望为空=零长度场景，跳过）
+    for (uint32_t rank = 0; rank < rankSize; ++rank) {
+        if (expected[rank].empty()) {
+            continue;
+        }
+        SimNpu& npu = SimWorld::Global()->GetSimNpuByRankId(rank);
+        const uint8_t* out = npu.GetBufferBase(BufferType::OUTPUT, layout.outputBytes);
+        ASSERT_EQ(layout.outputBytes, expected[rank].size()) << "rank " << rank << " expected output size mismatch";
+        for (uint64_t i = 0; i < layout.outputBytes; ++i) {
+            ASSERT_EQ(out[i], expected[rank][i]) << "rank " << rank << " output mismatch at byte " << i;
+        }
+    }
+}
+
+} // namespace AicpuSt
+} // namespace HcclSim

@@ -72,6 +72,15 @@ void ReduceInto(
         THROW<InvalidParamsException>(
             "[TaskGraphExecutor] reduce invalid elem size[%llu] dataType[%u]", elem, static_cast<uint32_t>(dt));
     }
+    switch (op) {
+        case HcclReduceOp::HCCL_REDUCE_SUM:
+        case HcclReduceOp::HCCL_REDUCE_PROD:
+        case HcclReduceOp::HCCL_REDUCE_MAX:
+        case HcclReduceOp::HCCL_REDUCE_MIN:
+            break;
+        default:
+            THROW<InvalidParamsException>("[TaskGraphExecutor] unsupported reduce op[%u]", static_cast<uint32_t>(op));
+    }
     const u8* srcPtr = nullptr;
     u8* dstPtr = nullptr;
     ResolveEndpoints(srcRank, srcSlice, dstRank, dstSlice, srcPtr, dstPtr);

@@ -25,7 +25,14 @@ add_executable(
     aicpu_float_convert_test.cpp
     sim_backing_test.cpp
     task_graph_executor_test.cpp
+    aicpu_fixture_test.cpp
     ${UTILS_DIR}/aicpu_scenario/task_graph_executor.cc
+    ${UTILS_DIR}/aicpu_scenario/aicpu_fixture.cc
+    ${CC_SRC}/common/hccl_alloc_ctx_res.cc
+    ${CC_SRC}/ops/op_common/external_alg/external_alg_rules.cc
+    ${CC_SRC}/ops/op_common/external_alg/external_alg_resolver.cc
+    ${CC_SRC}/ops/op_common/topo/physical_level_build.cc
+    ${CC_SRC}/ops/op_common/topo/physical_level_normalize.cc
 )
 
 target_include_directories(
@@ -35,6 +42,10 @@ target_include_directories(
     ${UTILS_DIR}/sim_world
     ${UTILS_DIR}/common/utils
     ${UTILS_DIR}/aicpu_scenario
+    ${CC_SRC}/common
+    ${CC_SRC}/ops/op_common
+    ${CC_SRC}/ops/op_common/inc
+    ${CC_SRC}/ops/op_common/template/wrapper
 )
 
 target_compile_options(
