@@ -114,7 +114,7 @@ bool __hbeqx2(bfloat16x2_t x, bfloat16x2_t y)
 输入输出示例如下：
 
 ```text
-x：1.0, -1.0, -1.0, 0.0, inf, -inf, nan, 0.5
-y：1.0, -1.0, 0.0, 1.0, inf, inf, 0.5, nan
+x：(1.0, -1.0), (-1.0, 0.0), (inf, -inf), (nan, 0.5)
+y：(1.0, -1.0), (0.0, 1.0), (inf, inf), (0.5, nan)
 result: true false false false
 ```
