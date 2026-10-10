@@ -42,6 +42,7 @@ protected:
         if (it == streamCache_.end()) {
             SimNpu& npu = SimWorld::Global()->GetSimNpuByRankId(rank);
             void* stream = (streamIdx == 0) ? npu.AllocMainStream() : npu.AllocSlaveStream();
+            ASSERT_NE(stream, nullptr);
             it = streamCache_.emplace(key, reinterpret_cast<SimStream*>(stream)).first;
         }
         SimTaskQueue::Global()->AppendTask(SimWorld::Global()->GetNpuPosByRankId(rank), it->second, task);
@@ -78,7 +79,18 @@ TEST_F(TaskGraphExecutorTest, LocalCopyMovesBytes)
     ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
     u8* out = Base(0, BufferType::OUTPUT, 8);
     EXPECT_EQ(memcmp(out, in, 8), 0);
-    EXPECT_EQ(executor.ExecutionLog().size(), 1U);
+    const auto& log = executor.ExecutionLog();
+    ASSERT_EQ(log.size(), 1U);
+    ASSERT_EQ(log[0].accesses.size(), 2U);
+    EXPECT_EQ(log[0].rank, 0U);
+    EXPECT_EQ(log[0].streamId, 0U);
+    EXPECT_EQ(log[0].taskIndex, 0U);
+    EXPECT_EQ(log[0].type, TaskTypeStub::LOCAL_COPY);
+    EXPECT_FALSE(log[0].accesses[0].isWrite); // src 读
+    EXPECT_TRUE(log[0].accesses[1].isWrite);  // dst 写
+    EXPECT_EQ(log[0].accesses[1].bufferType, BufferType::OUTPUT);
+    EXPECT_EQ(log[0].accesses[1].offset, 0U);
+    EXPECT_EQ(log[0].accesses[1].size, 8U);
 }
 
 TEST_F(TaskGraphExecutorTest, WriteMovesBytesCrossRank)
@@ -169,4 +181,27 @@ TEST_F(TaskGraphExecutorTest, ReallocSmallerKeepsBackingAndSliceBoundsFollowNewS
     EXPECT_EQ(Base(0, BufferType::INPUT, 64)[63], 0xEF);                // 后备不缩
     DataSlice slice;
     EXPECT_NE(npu0.GetSlice(addr + 40, 8, slice), HcclResult::HCCL_SUCCESS); // 越界按新 size 拒绝
+}
+
+// 执行期同块扩容：src/dst 同在 rank0 CCL（未预分配，后备从空开始），
+// 解析 src 触发扩容后 dst 指针必须仍有效（预扩容防御的真实场景）。
+TEST_F(TaskGraphExecutorTest, SameBackingGrowthDuringExecuteKeepsBothEndsValid)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    MemBlock ccl = npu0.GetMemBlock(BufferType::CCL);
+    // CCL 块布局声明 200MB，GetSlice 可直接成功，后备内存为空
+    DataSlice src;
+    ASSERT_EQ(npu0.GetSlice(ccl.startAddr, 4, src), HcclResult::HCCL_SUCCESS);
+    DataSlice dst;
+    ASSERT_EQ(npu0.GetSlice(ccl.startAddr + 8, 4, dst), HcclResult::HCCL_SUCCESS);
+    Base(0, BufferType::CCL, 4)[0] = 0x9E; // 写入 src[0]（首次触碰，后备长到 4）
+    Base(0, BufferType::CCL, 4)[1] = 0x9F;
+
+    Append(0, 0, std::make_shared<TaskStubLocalCopy>(src, dst));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(Base(0, BufferType::CCL, 12)[8], 0x9E); // dst 未因扩容悬空
+    EXPECT_EQ(Base(0, BufferType::CCL, 12)[9], 0x9F);
 }

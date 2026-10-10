@@ -12,6 +12,7 @@
 
 #include <cstring>
 
+#include "exception_util.h"
 #include "sim_npu.h"
 #include "sim_world.h"
 
@@ -26,6 +27,24 @@ u8* ResolveSlicePtr(RankId rank, const DataSlice& slice)
     SimNpu& npu = SimWorld::Global()->GetSimNpuByRankId(rank);
     u8* base = npu.GetBufferBase(slice.GetType(), slice.GetOffset() + slice.GetSize());
     return base + slice.GetOffset();
+}
+
+// 先对两端各完成一次后备扩容（防同块扩容使先取的指针悬空），再解析出双端指针。
+// 所有搬运/归约任务必须经此取指针，禁止直接分别调 ResolveSlicePtr。
+void ResolveEndpoints(
+    RankId srcRank, const DataSlice& srcSlice, RankId dstRank, const DataSlice& dstSlice, const u8*& srcPtr,
+    u8*& dstPtr)
+{
+    SimNpu& srcNpu = SimWorld::Global()->GetSimNpuByRankId(srcRank);
+    (void)srcNpu.GetBufferBase(srcSlice.GetType(), srcSlice.GetOffset() + srcSlice.GetSize());
+    SimNpu& dstNpu = SimWorld::Global()->GetSimNpuByRankId(dstRank);
+    (void)dstNpu.GetBufferBase(dstSlice.GetType(), dstSlice.GetOffset() + dstSlice.GetSize());
+    srcPtr = ResolveSlicePtr(srcRank, srcSlice);
+    dstPtr = ResolveSlicePtr(dstRank, dstSlice);
+    if (srcSlice.GetSize() != dstSlice.GetSize()) {
+        THROW<InvalidParamsException>(
+            "[TaskGraphExecutor] slice size mismatch: src[%llu] dst[%llu]", srcSlice.GetSize(), dstSlice.GetSize());
+    }
 }
 
 MemAccess MakeAccess(RankId rank, const DataSlice& slice, bool isWrite)
@@ -87,15 +106,10 @@ void TaskGraphExecutor::ExecuteOne(QueueCtx& ctx, TaskStub* task)
     switch (task->GetType()) {
         case TaskTypeStub::LOCAL_COPY: {
             auto* t = static_cast<TaskStubLocalCopy*>(task);
-            // 先对两端各完成一次后备扩容（防同块扩容使先取的指针悬空），再取裸指针搬数据
-            SimNpu& npu = SimWorld::Global()->GetSimNpuByRankId(ctx.rank);
-            (void)npu.GetBufferBase(
-                t->GetSrcSlice().GetType(), t->GetSrcSlice().GetOffset() + t->GetSrcSlice().GetSize());
-            (void)npu.GetBufferBase(
-                t->GetDstSlice().GetType(), t->GetDstSlice().GetOffset() + t->GetDstSlice().GetSize());
-            memmove(
-                ResolveSlicePtr(ctx.rank, t->GetDstSlice()), ResolveSlicePtr(ctx.rank, t->GetSrcSlice()),
-                t->GetSrcSlice().GetSize());
+            const u8* srcPtr = nullptr;
+            u8* dstPtr = nullptr;
+            ResolveEndpoints(ctx.rank, t->GetSrcSlice(), ctx.rank, t->GetDstSlice(), srcPtr, dstPtr);
+            memmove(dstPtr, srcPtr, t->GetSrcSlice().GetSize());
             event.accesses.push_back(MakeAccess(ctx.rank, t->GetSrcSlice(), false));
             event.accesses.push_back(MakeAccess(ctx.rank, t->GetDstSlice(), true));
             break;
@@ -103,16 +117,10 @@ void TaskGraphExecutor::ExecuteOne(QueueCtx& ctx, TaskStub* task)
         case TaskTypeStub::WRITE: {
             auto* t = static_cast<TaskStubWrite*>(task);
             const RankId remote = t->GetRemoteRank();
-            // 同上：先扩容两端（跨 rank 也可能同块类型）
-            SimNpu& localNpu = SimWorld::Global()->GetSimNpuByRankId(ctx.rank);
-            (void)localNpu.GetBufferBase(
-                t->GetLocalSlice().GetType(), t->GetLocalSlice().GetOffset() + t->GetLocalSlice().GetSize());
-            SimNpu& remoteNpu = SimWorld::Global()->GetSimNpuByRankId(remote);
-            (void)remoteNpu.GetBufferBase(
-                t->GetRemoteSlice().GetType(), t->GetRemoteSlice().GetOffset() + t->GetRemoteSlice().GetSize());
-            memmove(
-                ResolveSlicePtr(remote, t->GetRemoteSlice()), ResolveSlicePtr(ctx.rank, t->GetLocalSlice()),
-                t->GetLocalSlice().GetSize());
+            const u8* srcPtr = nullptr;
+            u8* dstPtr = nullptr;
+            ResolveEndpoints(ctx.rank, t->GetLocalSlice(), remote, t->GetRemoteSlice(), srcPtr, dstPtr);
+            memmove(dstPtr, srcPtr, t->GetLocalSlice().GetSize());
             event.accesses.push_back(MakeAccess(ctx.rank, t->GetLocalSlice(), false));
             event.accesses.push_back(MakeAccess(remote, t->GetRemoteSlice(), true));
             break;
@@ -120,15 +128,10 @@ void TaskGraphExecutor::ExecuteOne(QueueCtx& ctx, TaskStub* task)
         case TaskTypeStub::READ: {
             auto* t = static_cast<TaskStubRead*>(task);
             const RankId remote = t->GetRemoteRank();
-            SimNpu& localNpu = SimWorld::Global()->GetSimNpuByRankId(ctx.rank);
-            (void)localNpu.GetBufferBase(
-                t->GetLocalSlice().GetType(), t->GetLocalSlice().GetOffset() + t->GetLocalSlice().GetSize());
-            SimNpu& remoteNpu = SimWorld::Global()->GetSimNpuByRankId(remote);
-            (void)remoteNpu.GetBufferBase(
-                t->GetRemoteSlice().GetType(), t->GetRemoteSlice().GetOffset() + t->GetRemoteSlice().GetSize());
-            memmove(
-                ResolveSlicePtr(ctx.rank, t->GetLocalSlice()), ResolveSlicePtr(remote, t->GetRemoteSlice()),
-                t->GetLocalSlice().GetSize());
+            const u8* srcPtr = nullptr;
+            u8* dstPtr = nullptr;
+            ResolveEndpoints(remote, t->GetRemoteSlice(), ctx.rank, t->GetLocalSlice(), srcPtr, dstPtr);
+            memmove(dstPtr, srcPtr, t->GetLocalSlice().GetSize());
             event.accesses.push_back(MakeAccess(remote, t->GetRemoteSlice(), false));
             event.accesses.push_back(MakeAccess(ctx.rank, t->GetLocalSlice(), true));
             break;
