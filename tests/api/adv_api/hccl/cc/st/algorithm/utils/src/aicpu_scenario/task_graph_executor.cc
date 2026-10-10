@@ -47,6 +47,13 @@ void ResolveEndpoints(
     }
 }
 
+// WAIT 系任务的统一取 notifyId 入口（TaskStubWait / TaskStubLocalWaitFrom）
+uint32_t GetWaitNotifyId(const TaskStub* task)
+{
+    return (task->GetType() == TaskTypeStub::WAIT) ? static_cast<const TaskStubWait*>(task)->GetTopicId() :
+                                                     static_cast<const TaskStubLocalWaitFrom*>(task)->GetTopicId();
+}
+
 MemAccess MakeAccess(RankId rank, const DataSlice& slice, bool isWrite)
 {
     MemAccess access;
@@ -85,9 +92,7 @@ std::map<std::tuple<uint32_t, uint32_t, uint32_t>, RankId> BuildPosToRank()
 bool TaskGraphExecutor::CanExecute(const TaskStub* task) const
 {
     if (task->GetType() == TaskTypeStub::WAIT || task->GetType() == TaskTypeStub::LOCAL_WAIT_FROM) {
-        const uint32_t notifyId = (task->GetType() == TaskTypeStub::WAIT) ?
-                                      static_cast<const TaskStubWait*>(task)->GetTopicId() :
-                                      static_cast<const TaskStubLocalWaitFrom*>(task)->GetTopicId();
+        const uint32_t notifyId = GetWaitNotifyId(task);
         auto it = notifyState_.find(notifyId);
         return it != notifyState_.end() && it->second;
     }
@@ -136,8 +141,38 @@ void TaskGraphExecutor::ExecuteOne(QueueCtx& ctx, TaskStub* task)
             event.accesses.push_back(MakeAccess(ctx.rank, t->GetLocalSlice(), true));
             break;
         }
+        case TaskTypeStub::POST: {
+            auto* t = static_cast<TaskStubPost*>(task);
+            event.notifyId = t->GetTopicId();
+            notifyState_[t->GetTopicId()] = true;
+            lastPostSeq_[t->GetTopicId()] = event.seq;
+            break;
+        }
+        case TaskTypeStub::LOCAL_POST_TO: {
+            auto* t = static_cast<TaskStubLocalPostTo*>(task);
+            event.notifyId = t->GetTopicId();
+            notifyState_[t->GetTopicId()] = true;
+            lastPostSeq_[t->GetTopicId()] = event.seq;
+            break;
+        }
+        case TaskTypeStub::WAIT: {
+            auto* t = static_cast<TaskStubWait*>(task);
+            event.notifyId = t->GetTopicId();
+            event.satisfiedBySeq = lastPostSeq_[t->GetTopicId()];
+            notifyState_[t->GetTopicId()] = false; // 一次性信号，消费即清零
+            lastPostSeq_.erase(t->GetTopicId());
+            break;
+        }
+        case TaskTypeStub::LOCAL_WAIT_FROM: {
+            auto* t = static_cast<TaskStubLocalWaitFrom*>(task);
+            event.notifyId = t->GetTopicId();
+            event.satisfiedBySeq = lastPostSeq_[t->GetTopicId()];
+            notifyState_[t->GetTopicId()] = false;
+            lastPostSeq_.erase(t->GetTopicId());
+            break;
+        }
         default:
-            // POST/WAIT/REDUCE 系在 Task 3/4 接入
+            // LOCAL_REDUCE/WRITE_REDUCE 系在 Task 4 接入
             break;
     }
 
@@ -153,11 +188,10 @@ std::string TaskGraphExecutor::BuildDeadlockReport(const std::vector<QueueCtx>& 
             continue;
         }
         const TaskStub* task = (*ctx.tasks)[ctx.next].get();
-        std::string detail = task->Describe();
+        // 类型名（如 TaskTypeStub::LOCAL_WAIT_FROM）供脚本化死锁解析，Describe() 供人读
+        std::string detail = task->GetType().Describe() + " " + task->Describe();
         if (task->GetType() == TaskTypeStub::WAIT || task->GetType() == TaskTypeStub::LOCAL_WAIT_FROM) {
-            const uint32_t notifyId = (task->GetType() == TaskTypeStub::WAIT) ?
-                                          static_cast<const TaskStubWait*>(task)->GetTopicId() :
-                                          static_cast<const TaskStubLocalWaitFrom*>(task)->GetTopicId();
+            const uint32_t notifyId = GetWaitNotifyId(task);
             auto it = notifyState_.find(notifyId);
             const bool pending = (it != notifyState_.end() && it->second);
             detail += " pending=" + std::to_string(pending ? 1 : 0);

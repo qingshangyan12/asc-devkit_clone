@@ -205,3 +205,72 @@ TEST_F(TaskGraphExecutorTest, SameBackingGrowthDuringExecuteKeepsBothEndsValid)
     EXPECT_EQ(Base(0, BufferType::CCL, 12)[8], 0x9E); // dst 未因扩容悬空
     EXPECT_EQ(Base(0, BufferType::CCL, 12)[9], 0x9F);
 }
+
+TEST_F(TaskGraphExecutorTest, PostThenWaitSynchronizes)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
+    // rank1 先 WAIT 再做搬运；rank0 POST。跨队列同步由 notify 兑现。
+    const uint64_t rmtAddr = npu1.AllocMemory(BufferType::OUTPUT, 4);
+    const uint64_t inAddr = npu0.AllocMemory(BufferType::INPUT, 4);
+    Base(0, BufferType::INPUT, 4)[0] = 0x77;
+
+    DataSlice local;
+    ASSERT_EQ(npu0.GetSlice(inAddr, 4, local), HcclResult::HCCL_SUCCESS);
+    DataSlice remote;
+    ASSERT_EQ(npu1.GetSlice(rmtAddr, 4, remote), HcclResult::HCCL_SUCCESS);
+
+    const uint32_t notifyId = 0x40;
+    Append(1, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId));
+    Append(1, 0, std::make_shared<TaskStubWrite>(1, LinkInfo(LinkProtoStub::SDMA), local, remote)); // 占位顺序任务
+    Append(0, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    const auto& log = executor.ExecutionLog();
+    bool foundWait = false;
+    for (const auto& e : log) {
+        if (e.type == TaskTypeStub::LOCAL_WAIT_FROM && e.rank == 1 && e.notifyId == notifyId) {
+            foundWait = true;
+            EXPECT_NE(e.satisfiedBySeq, 0U);
+        }
+    }
+    EXPECT_TRUE(foundWait);
+}
+
+TEST_F(TaskGraphExecutorTest, WaitWithoutPostIsDeadlock)
+{
+    const uint32_t notifyId = 0x99;
+    Append(0, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    EXPECT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::DEADLOCK);
+    EXPECT_NE(report.find("deadlock detected"), std::string::npos);
+    EXPECT_NE(report.find("LOCAL_WAIT_FROM"), std::string::npos);
+    EXPECT_NE(report.find("pending=0"), std::string::npos);
+}
+
+TEST_F(TaskGraphExecutorTest, ChannelNotifyRecordPostsRemoteWaitConsumes)
+{
+    // channel 语义：POST 到远端 rank 的 notifyId；本端 WAIT 消费本端 notifyId。
+    // notifyId 全局唯一，执行引擎仅按 id 配对。
+    const uint32_t rmtNotifyId = 0x100;
+    const uint32_t locNotifyId = 0x101;
+    Append(
+        0, 0,
+        std::make_shared<TaskStubPost>(1, LinkInfo(LinkProtoStub::SDMA), rmtNotifyId, NotifyTypeStub::READY, "POST"));
+    Append(
+        1, 0,
+        std::make_shared<TaskStubWait>(0, LinkInfo(LinkProtoStub::SDMA), rmtNotifyId, NotifyTypeStub::READY, "WAIT"));
+    Append(1, 1, std::make_shared<TaskStubLocalPostTo>(locNotifyId));
+    Append(
+        0, 1,
+        std::make_shared<TaskStubWait>(1, LinkInfo(LinkProtoStub::SDMA), locNotifyId, NotifyTypeStub::READY, "WAIT"));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(executor.ExecutionLog().size(), 4U);
+}
