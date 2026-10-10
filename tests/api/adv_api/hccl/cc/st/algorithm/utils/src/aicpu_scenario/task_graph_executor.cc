@@ -58,6 +58,163 @@ uint32_t GetWaitNotifyId(const TaskStub* task)
                                                      static_cast<const TaskStubLocalWaitFrom*>(task)->GetTopicId();
 }
 
+float HalfToFloat(uint16_t h)
+{
+    const uint32_t sign = static_cast<uint32_t>(h & 0x8000) << 16;
+    const uint32_t exp = (h >> 10) & 0x1F;
+    const uint32_t frac = h & 0x3FF;
+    uint32_t bits = 0;
+    if (exp == 0) {
+        if (frac == 0) {
+            bits = sign;
+        } else {
+            // 次正规数归一化
+            uint32_t e = 0;
+            uint32_t f = frac;
+            while ((f & 0x400) == 0) {
+                f <<= 1;
+                ++e;
+            }
+            bits = sign | ((127 - 15 - e + 1) << 23) | ((f & 0x3FF) << 13);
+        }
+    } else if (exp == 0x1F) {
+        bits = sign | 0x7F800000 | (frac << 13);
+    } else {
+        bits = sign | ((exp - 15 + 127) << 23) | (frac << 13);
+    }
+    float out = 0.0f;
+    (void)memcpy(&out, &bits, sizeof(out));
+    return out;
+}
+
+uint16_t FloatToHalf(float f)
+{
+    uint32_t bits = 0;
+    (void)memcpy(&bits, &f, sizeof(bits));
+    const uint32_t sign = (bits >> 16) & 0x8000;
+    const int32_t exp = static_cast<int32_t>((bits >> 23) & 0xFF) - 127 + 15;
+    const uint32_t frac = bits & 0x7FFFFF;
+    if (((bits >> 23) & 0xFF) == 0xFF) {
+        return static_cast<uint16_t>(sign | 0x7C00 | (frac >> 13)); // Inf/NaN
+    }
+    if (exp >= 0x1F) {
+        return static_cast<uint16_t>(sign | 0x7C00); // 溢出→Inf
+    }
+    if (exp <= 0) {
+        return static_cast<uint16_t>(sign); // 欠溢出→0
+    }
+    return static_cast<uint16_t>(sign | (static_cast<uint32_t>(exp) << 10) | (frac >> 13));
+}
+
+float Bfp16ToFloat(uint16_t v)
+{
+    const uint32_t bits = static_cast<uint32_t>(v) << 16;
+    float out = 0.0f;
+    (void)memcpy(&out, &bits, sizeof(out));
+    return out;
+}
+
+uint16_t FloatToBfp16(float f)
+{
+    uint32_t bits = 0;
+    (void)memcpy(&bits, &f, sizeof(bits));
+    return static_cast<uint16_t>(bits >> 16);
+}
+
+float LoadElem(const u8* p, HcclDataType dt)
+{
+    switch (dt) {
+        case HcclDataType::HCCL_DATA_TYPE_INT8:
+            return static_cast<float>(*reinterpret_cast<const s8*>(p));
+        case HcclDataType::HCCL_DATA_TYPE_INT32:
+            return static_cast<float>(*reinterpret_cast<const s32*>(p));
+        case HcclDataType::HCCL_DATA_TYPE_FP16:
+            return HalfToFloat(*reinterpret_cast<const uint16_t*>(p));
+        case HcclDataType::HCCL_DATA_TYPE_BFP16:
+            return Bfp16ToFloat(*reinterpret_cast<const uint16_t*>(p));
+        case HcclDataType::HCCL_DATA_TYPE_FP32:
+            return *reinterpret_cast<const float*>(p);
+        default:
+            return 0.0f;
+    }
+}
+
+void StoreElem(u8* p, HcclDataType dt, float v)
+{
+    switch (dt) {
+        case HcclDataType::HCCL_DATA_TYPE_INT8:
+            *reinterpret_cast<s8*>(p) = static_cast<s8>(v);
+            return;
+        case HcclDataType::HCCL_DATA_TYPE_INT32:
+            *reinterpret_cast<s32*>(p) = static_cast<s32>(v);
+            return;
+        case HcclDataType::HCCL_DATA_TYPE_FP16:
+            *reinterpret_cast<uint16_t*>(p) = FloatToHalf(v);
+            return;
+        case HcclDataType::HCCL_DATA_TYPE_BFP16:
+            *reinterpret_cast<uint16_t*>(p) = FloatToBfp16(v);
+            return;
+        case HcclDataType::HCCL_DATA_TYPE_FP32:
+            *reinterpret_cast<float*>(p) = v;
+            return;
+        default:
+            return;
+    }
+}
+
+float ApplyOp(float a, float b, HcclReduceOp op)
+{
+    switch (op) {
+        case HcclReduceOp::HCCL_REDUCE_SUM:
+            return a + b;
+        case HcclReduceOp::HCCL_REDUCE_PROD:
+            return a * b;
+        case HcclReduceOp::HCCL_REDUCE_MAX:
+            return (a > b) ? a : b;
+        case HcclReduceOp::HCCL_REDUCE_MIN:
+            return (a < b) ? a : b;
+        default:
+            return b;
+    }
+}
+
+uint64_t ElemSize(HcclDataType dt)
+{
+    switch (dt) {
+        case HcclDataType::HCCL_DATA_TYPE_INT8:
+            return 1;
+        case HcclDataType::HCCL_DATA_TYPE_INT32:
+        case HcclDataType::HCCL_DATA_TYPE_FP32:
+            return 4;
+        case HcclDataType::HCCL_DATA_TYPE_FP16:
+        case HcclDataType::HCCL_DATA_TYPE_BFP16:
+            return 2;
+        default:
+            return 0;
+    }
+}
+
+// 逐元素归约 src 进 dst。端点解析必须经 ResolveEndpoints（先两端扩容，防同块扩容悬空；
+// 内含 size 一致性 THROW 防护）——这是 Task 2 质量审查确立的强制契约。
+void ReduceInto(
+    RankId dstRank, const DataSlice& dstSlice, RankId srcRank, const DataSlice& srcSlice, HcclDataType dt,
+    HcclReduceOp op)
+{
+    const uint64_t elem = ElemSize(dt);
+    if (elem == 0 || dstSlice.GetSize() % elem != 0) {
+        THROW<InvalidParamsException>(
+            "[TaskGraphExecutor] reduce invalid elem size[%llu] dataType[%u]", elem, static_cast<uint32_t>(dt));
+    }
+    const u8* srcPtr = nullptr;
+    u8* dstPtr = nullptr;
+    ResolveEndpoints(srcRank, srcSlice, dstRank, dstSlice, srcPtr, dstPtr);
+    const uint64_t count = dstSlice.GetSize() / elem;
+    for (uint64_t i = 0; i < count; ++i) {
+        const float acc = ApplyOp(LoadElem(dstPtr + i * elem, dt), LoadElem(srcPtr + i * elem, dt), op);
+        StoreElem(dstPtr + i * elem, dt, acc);
+    }
+}
+
 MemAccess MakeAccess(RankId rank, const DataSlice& slice, bool isWrite)
 {
     MemAccess access;
@@ -175,8 +332,31 @@ void TaskGraphExecutor::ExecuteOne(QueueCtx& ctx, TaskStub* task)
             lastPostSeq_.erase(t->GetTopicId());
             break;
         }
+        case TaskTypeStub::LOCAL_REDUCE: {
+            auto* t = static_cast<TaskStubLocalReduce*>(task);
+            ReduceInto(ctx.rank, t->GetDstSlice(), ctx.rank, t->GetSrcSlice(), t->GetDataType(), t->GetReduceOp());
+            event.accesses.push_back(MakeAccess(ctx.rank, t->GetSrcSlice(), false));
+            event.accesses.push_back(MakeAccess(ctx.rank, t->GetDstSlice(), true));
+            break;
+        }
+        case TaskTypeStub::WRITE_REDUCE: {
+            auto* t = static_cast<TaskStubWriteReduce*>(task);
+            const RankId remote = t->GetRemoteRank();
+            ReduceInto(remote, t->GetRemoteSlice(), ctx.rank, t->GetLocalSlice(), t->GetDataType(), t->GetReduceOp());
+            event.accesses.push_back(MakeAccess(ctx.rank, t->GetLocalSlice(), false));
+            event.accesses.push_back(MakeAccess(remote, t->GetRemoteSlice(), true));
+            break;
+        }
+        case TaskTypeStub::READ_REDUCE: {
+            auto* t = static_cast<TaskStubReadReduce*>(task);
+            const RankId remote = t->GetRemoteRank();
+            ReduceInto(ctx.rank, t->GetLocalSlice(), remote, t->GetRemoteSlice(), t->GetDataType(), t->GetReduceOp());
+            event.accesses.push_back(MakeAccess(remote, t->GetRemoteSlice(), false));
+            event.accesses.push_back(MakeAccess(ctx.rank, t->GetLocalSlice(), true));
+            break;
+        }
         default:
-            // LOCAL_REDUCE/WRITE_REDUCE 系在 Task 4 接入
+            // LOCAL_BATCH_REDUCE 暂未接入（首期算法未使用）
             break;
     }
 
