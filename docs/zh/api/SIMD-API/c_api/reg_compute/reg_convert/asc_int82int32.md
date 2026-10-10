@@ -34,14 +34,13 @@
 ## 函数原型
 
 ```c
-// 占位符形式
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_int82int32(vector_int32_t& dst,
                                      vector_int8_t src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_int32_t asc_int82int32(vector_int8_t src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
@@ -49,6 +48,25 @@ __simd_callee__ inline vector_int32_t asc_int82int32(vector_int8_t src,
 
 **占位符说明如下：**
 - `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+
+### 函数原型典型示例
+
+```c
+// 通过引用参数输出结果
+__simd_callee__ inline void asc_int82int32(
+    vector_int32_t& dst,
+    vector_int8_t src,
+    vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode,
+                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_int32_t asc_int82int32(
+    vector_int8_t src,
+    vector_bool mask,
+    std::integral_constant<asc_position_quarter_mode,
+                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
+```
 
 ## 参数说明
 
@@ -79,7 +97,7 @@ __simd_callee__ inline vector_int32_t asc_int82int32(vector_int8_t src,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

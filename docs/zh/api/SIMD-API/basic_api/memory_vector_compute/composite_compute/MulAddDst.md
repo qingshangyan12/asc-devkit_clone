@@ -15,19 +15,19 @@
 - Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品 AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品 Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/memory_vector_compute/composite_compute/MulAddDst_res.md#id1 -->
 
@@ -159,7 +159,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 
 <!-- npu="x90" id15 -->
 
-**表**  Kirin X90支持的数据类型约束
+**表**  Kirin X90处理器系列产品支持的数据类型约束
 
 | src0数据类型 | src1数据类型 | dst数据类型 | PAR  |
 | :----------- | :----------- | :---------- | :--- |
@@ -171,7 +171,7 @@ PAR列表示矢量计算单元一个迭代能够处理的元素个数。
 
 <!-- npu="9030" id16 -->
 
-**表**  Kirin 9030支持的数据类型约束
+**表**  Kirin 9030处理器系列产品支持的数据类型约束
 
 | src0数据类型 | src1数据类型 | dst数据类型 | PAR  |
 | :----------- | :----------- | :---------- | :--- |

@@ -170,7 +170,17 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
 
     AlgResourceCtxSerializable tempCtx;
     tempCtx.DeSerialize(seq);
-    if (!resCtxHost->kfcServerArgs.empty()) {
+    resCtxHost->dieSplitRatio = tempCtx.dieSplitRatio;
+    if (!resCtxHost->kfcServerArgs.empty() && tempCtx.kfcServerArgs.size() >= KFC_SERVER_ARG_NUM) {
+        // 保留缓存 args 的 mission 结构（2die 的动态 dieNum/missionNum 注册期已修正；AcquireAlgResources
+        // 按静态名单重生成会丢 mission1），仅原地刷新每 mission 的 xn/cke
+        const uint64_t xnAddr = resCtxHost->kfcServerArgs[0];
+        const uint64_t ckeAddr = resCtxHost->kfcServerArgs[1];
+        for (size_t offset = 0; offset + 1U < tempCtx.kfcServerArgs.size(); offset += KFC_SERVER_ARG_NUM) {
+            tempCtx.kfcServerArgs[offset] = xnAddr;
+            tempCtx.kfcServerArgs[offset + 1U] = ckeAddr;
+        }
+    } else if (!resCtxHost->kfcServerArgs.empty()) {
         tempCtx.kfcServerArgs = resCtxHost->kfcServerArgs;
         tempCtx.kfcServerArgSize = resCtxHost->kfcServerArgSize;
     }
@@ -186,6 +196,9 @@ static HcclResult UpdateCcuCtxTokenOnReuse(
          offset += KFC_SERVER_ARG_NUM) {
         tempCtx.kfcServerArgs[offset + KFC_SERVER_TOKEN_ARG_INDEX] = token;
     }
+    // 同步回 host 侧：res[2] 的 mission 计数与重序列化同源（reuse 下保持注册期修正的动态 mission 数）
+    resCtxHost->kfcServerArgs = tempCtx.kfcServerArgs;
+    resCtxHost->kfcServerArgSize = tempCtx.kfcServerArgSize;
 
     std::vector<char> updatedSeq = tempCtx.Serialize();
     CHK_PRT_RET(
@@ -913,6 +926,29 @@ HcclResult HcclGetAlgRes(
             "[asc][AlgoResource][HcclGetAlgRes] after CcuKfcServer CalcRes, "
             "ccuKernelInfos.size()[%zu], ccuKernelNum.size()[%zu]",
             resRequest.ccuKernelInfos.size(), resRequest.ccuKernelNum.size());
+        // SoleNHR 2Die：mission 数由 dieNum（模板 CalcRes 通道探测）决定，AcquireAlgResources 构造
+        // kfcServerArgs 时按静态 GetKfcServerMissionNum（=1）生成——双 die 时此处按源 kernel 数修正
+        // missionNum 与 dieNum（ccuKernelNum 尾值即模板 push 的 kernelNum=dieNum）
+        if (std::strcmp(param.algName, KFC_RS_SOLE_NHR_2DIE_ALG_NAME) == 0 && !resRequest.ccuKernelNum.empty() &&
+            resCtxHost->kfcServerArgs.size() >= KFC_SERVER_ARG_NUM) {
+            const uint32_t dieNum = std::min<uint32_t>(resRequest.ccuKernelNum.back(), KFC_MAX_MISSION_NUM);
+            const uint32_t staticMissionNum = GetKfcServerMissionNum(param.algName);
+            if (dieNum != staticMissionNum) {
+                HCCL_INFO(
+                    "[asc][AlgoResource][HcclGetAlgRes] SoleNHR 2Die regen kfcServerArgs, dieNum[%u] -> "
+                    "missionNum[%u] (static[%u])",
+                    dieNum, dieNum, staticMissionNum);
+                const uint64_t xnAddr = resCtxHost->kfcServerArgs[0];
+                const uint64_t ckeAddr = resCtxHost->kfcServerArgs[1];
+                const uint64_t token = resCtxHost->kfcServerArgs[KFC_SERVER_TOKEN_ARG_INDEX];
+                resCtxHost->kfcServerArgs.clear();
+                resCtxHost->kfcServerArgs.reserve(dieNum * KFC_SERVER_ARG_NUM);
+                for (uint32_t missionIndex = 0; missionIndex < dieNum; ++missionIndex) {
+                    resCtxHost->kfcServerArgs.insert(
+                        resCtxHost->kfcServerArgs.end(), {xnAddr, ckeAddr, dieNum, dieNum, missionIndex, token});
+                }
+            }
+        }
     }
 
     // host侧资源
@@ -1504,6 +1540,7 @@ HcclResult HcclAllocAlgResourceCcu(
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
     resCtxHost->parallelPortInfo = resRequest.parallelPortInfo;
+    resCtxHost->dieSplitRatio = resRequest.dieSplitRatio;
     if (!param.checkRes) {
         CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
         CHK_RET(HcclGetChannelForCcu(comm, param, resRequest));
@@ -1652,6 +1689,18 @@ static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_LOOP_MS = 128;
 static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_CCU_BUF_MS = 1024;
 static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_EVENT_MS = 160;
 
+// V2(960) 资源规格，与 V1 一致的也单独定义，方便后续独立调整
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_ADDRESS_V2 = 0;
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_LOOP_V2 = 16;
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_CCU_BUF_V2 = 128;
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_VARIABLE_V2 = 800;
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_EVENT_V2 = 64;
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_CCU_THREAD_V2 = 2;
+
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_LOOP_MS_V2 = 128;
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_CCU_BUF_MS_V2 = 1024;
+static constexpr uint32_t CCU_DEFAULT_RES_FRACTION_EVENT_MS_V2 = 400;
+
 // 即使本算子未在所有 die 上下 kernel，
 // 也需为所有 die 创建 reqDesc，保证后续算子在该 die 上有 kernel 时容量充足。
 static constexpr uint32_t CCU_DEFAULT_DIE_NUM = 2;
@@ -1677,8 +1726,8 @@ static const std::vector<HcommCcuResType>& GetCcuInsCreateResTypes()
     return types;
 }
 
-// opMode 为 CCU_MS 时 LOOP/CCU_BUF/EVENT 使用 MS 模式专用阈值，其他资源类型与其他模式保持一致
-static uint32_t GetDefaultResFraction(HcommCcuResType resType, OpExecuteConfig opMode)
+// V1(950) 默认资源规格
+static uint32_t GetDefaultResFractionV1(HcommCcuResType resType, OpExecuteConfig opMode)
 {
     bool isCcuMs = (opMode == OpExecuteConfig::CCU_MS);
     switch (resType) {
@@ -1697,6 +1746,37 @@ static uint32_t GetDefaultResFraction(HcommCcuResType resType, OpExecuteConfig o
         default:
             return 0;
     }
+}
+
+// V2(960) 默认资源规格
+static uint32_t GetDefaultResFractionV2(HcommCcuResType resType, OpExecuteConfig opMode)
+{
+    bool isCcuMs = (opMode == OpExecuteConfig::CCU_MS);
+    switch (resType) {
+        case HCOMM_CCU_RES_TYPE_ADDRESS:
+            return CCU_DEFAULT_RES_FRACTION_ADDRESS_V2;
+        case HCOMM_CCU_RES_TYPE_LOOP:
+            return isCcuMs ? CCU_DEFAULT_RES_FRACTION_LOOP_MS_V2 : CCU_DEFAULT_RES_FRACTION_LOOP_V2;
+        case HCOMM_CCU_RES_TYPE_CCU_BUF:
+            return isCcuMs ? CCU_DEFAULT_RES_FRACTION_CCU_BUF_MS_V2 : CCU_DEFAULT_RES_FRACTION_CCU_BUF_V2;
+        case HCOMM_CCU_RES_TYPE_VARIABLE:
+            return CCU_DEFAULT_RES_FRACTION_VARIABLE_V2;
+        case HCOMM_CCU_RES_TYPE_EVENT:
+            return isCcuMs ? CCU_DEFAULT_RES_FRACTION_EVENT_MS_V2 : CCU_DEFAULT_RES_FRACTION_EVENT_V2;
+        case HCOMM_CCU_RES_TYPE_CCU_THREAD:
+            return CCU_DEFAULT_RES_FRACTION_CCU_THREAD_V2;
+        default:
+            return 0;
+    }
+}
+
+// 根据设备类型分发：960 走 V2，其余走 V1
+// opExpansionMode 为 CCU_MS 时 LOOP/CCU_BUF/EVENT 使用 MS 模式专用阈值，其他资源类型与其他模式保持一致
+static uint32_t GetDefaultResFraction(HcommCcuResType resType, OpExecuteConfig opMode)
+{
+    DevType deviceType;
+    bool isV2 = (hrtGetDeviceType(deviceType) == HCCL_SUCCESS) && (deviceType == DevType::DEV_TYPE_960);
+    return isV2 ? GetDefaultResFractionV2(resType, opMode) : GetDefaultResFractionV1(resType, opMode);
 }
 
 // 将 HcommCcuResType 转字符串
@@ -1729,7 +1809,8 @@ static bool IsCcuDynamicResApiSupported()
            HcommIsSupportHcommCcuInsCreate() && HcommIsSupportHcommCcuInsDestroy() &&
            HcommIsSupportHcommCcuInsQueryResDesc() && HcommIsSupportHcommCcuQueryRemainResDesc() &&
            HcommIsSupportHcommCcuKernelQueryResReq() && HcommIsSupportHcclCommAssignCcuIns() &&
-           HcommIsSupportHcclChannelDestroy() && HcommIsSupportHcclChannelQuery();
+           HcommIsSupportHcclChannelDestroy() && HcommIsSupportHcclChannelQuery() &&
+           HcommIsSupportHcclCommQueryAssignedCcuIns();
 }
 
 // 按 dieId 维护资源描述符集合；HcommCcuInsResDescCreate 接口要求每个 desc 必须绑定一个 dieId，
@@ -2229,17 +2310,18 @@ static HcclResult HcclGetCcuKernelDynamic(
     // 接口语义：未绑定 CcuIns 时返回 HCCL_E_UNAVAIL（不是 insNum=0），需走新建路径
     CcuInsHandle insHandle = 0;
     uint32_t insNum = 0;
-    HcclResult queryRet = HcclCommQueryCcuIns(comm, &insHandle, &insNum);
+    HcclResult queryRet = HcclCommQueryAssignedCcuIns(comm, &insHandle, &insNum);
     bool hasReusableIns = false;
     if (queryRet == HCCL_SUCCESS) {
         hasReusableIns = (insNum != 0);
         HCCL_INFO(
-            "[HcclGetCcuKernelDynamic] HcclCommQueryCcuIns success, insHandle[%p] insNum[%u].", insHandle, insNum);
+            "[HcclGetCcuKernelDynamic] HcclCommQueryAssignedCcuIns success, insHandle[%p] insNum[%u].", insHandle,
+            insNum);
     } else if (queryRet == HCCL_E_UNAVAIL) {
-        HCCL_INFO(
-            "[HcclGetCcuKernelDynamic] HcclCommQueryCcuIns returns UNAVAIL, no reusable CcuIns, will create new.");
+        HCCL_INFO("[HcclGetCcuKernelDynamic] HcclCommQueryAssignedCcuIns returns UNAVAIL, no reusable CcuIns, will "
+                  "create new.");
     } else {
-        HCCL_ERROR("[HcclGetCcuKernelDynamic] HcclCommQueryCcuIns failed: ret -> %d", queryRet);
+        HCCL_ERROR("[HcclGetCcuKernelDynamic] HcclCommQueryAssignedCcuIns failed: ret -> %d", queryRet);
         DestroyAllDescs(reqDescs);
         return queryRet;
     }

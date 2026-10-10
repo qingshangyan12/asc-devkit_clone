@@ -24,10 +24,10 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadDataWithStride_res.md#id1 -->
 
@@ -35,7 +35,7 @@
 
 头文件路径为：`"basic_api/kernel_operator_mm_intf.h"`。
 
-本接口本质上实现功能和[LoadData（卷积数据搬运）](./LoadData_3D.md)接口一致，用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。与LoadData（卷积数据搬运）接口的差异在于，本接口仅支持Ascend 950PR&950DT系列产品产品，支持配置输出矩阵K轴方向偏移量dstStride的能力且必须配置该参数，调用之前必须使用辅助配置接口[SetLoadDataRepeatWithStride](../cube_load_aux_config/SetLoadDataRepeatWithStride.md)配置dstStride参数。此外，相比于LoadData（卷积数据搬运），本接口内部不包含针对其他芯片版本的兼容性实现，减少了兼容造成的额外开销，性能表现有所优化。
+本接口本质上实现功能和[LoadData（卷积数据搬运）](./LoadData_3D.md)接口一致，用于将NC1HWC0格式的Feature Map完成Image to Column展开，然后再从展开后的二维矩阵中选取指定数据块搬入对应内存位置。与LoadData（卷积数据搬运）接口的差异在于，本接口仅支持Ascend 950PR&950DT系列产品，支持配置输出矩阵K轴方向偏移量dstStride的能力且必须配置该参数，调用之前必须使用辅助配置接口[SetLoadDataRepeatWithStride](../cube_load_aux_config/SetLoadDataRepeatWithStride.md)配置dstStride参数。此外，相比于LoadData（卷积数据搬运），本接口内部不包含针对其他芯片版本的兼容性实现，减少了兼容造成的额外开销，性能表现有所优化。
 
 LoadDataWithStride支持的数据通路为：L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
