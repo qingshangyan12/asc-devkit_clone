@@ -18,6 +18,7 @@
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem.h"
 #include "ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.h"
 #include "ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.h"
+#include "ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.h"
 // Legacy direct-launch CCU headers are retained in source but are incompatible with the current hcomm API.
 #endif
 #include "alg_meta_registry.h"
@@ -44,8 +45,8 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
+    CHK_PTR_NULL(topoInfo);
     if (std::is_same<InsAlgTemplate, InsTempReduceScatterMesh1DZAxisDetour>::value) {
-        CHK_PTR_NULL(topoInfo);
         const bool meshConnected = IsAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH);
         const bool supportedTopo = topoInfo->level0Topo == Level0Shape::MESH_1D ||
             (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix);
@@ -130,6 +131,13 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchest
     // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
+#ifdef AICPU_COMPILE
+    // Host CalcRes and the KFC server use separate template instances.
+    // Restore the allocated lanes before the device template splits data and assigns threads.
+    if (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) {
+        CHK_RET(algTemplate->SetchannelsPerRank(templateAlgRes.channels));
+    }
+#endif
     u32 templateScratchMultiplier =
         algTemplate->CalcScratchMultiple(tempAlgParams.buffInfo.inBuffType, tempAlgParams.buffInfo.outBuffType);
     // 计算最小传输大小
@@ -273,16 +281,22 @@ REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE,
     0);
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DMeshChunk, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleMeshChunk, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     InsTempReduceScatterMesh1DMeshChunk);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DMeshChunk, AlgEngine::AICPU, "sole[mesh.chunk]",
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleMeshChunk, AlgEngine::AICPU, "sole[mesh.chunk]",
     COND_NONE, FLAG_NONE, 0);
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterNHR, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     InsTempReduceScatterNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterNHR, AlgEngine::AICPU, "sole[nhr]", COND_NONE, FLAG_NONE, 0);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleNHRMultiLink, InsV2ReduceScatterSoleExecutor,
+    TopoMatch1D, InsTempReduceScatterNHR);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleNHRMultiLink, AlgEngine::AICPU,
+    "sole[nhr.multi_channel]", COND_NONE, FLAG_NONE, 0);
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterAicpuReduceNHR, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     InsTempReduceScatterAicpuReduceNHR);
@@ -314,6 +328,12 @@ REGISTER_EXEC_V2(
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHRMultiLink, AlgEngine::CCU,
     "sole[nhr.multi_channel]", COND_NONE, FLAG_NONE, 0);
+REGISTER_EXEC_V2(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHR, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
+    CcuTempKfcReduceScatterNHR1D2DieMem2Mem);
+REGISTER_ALG_META(
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHR, AlgEngine::CCU, "sole[nhr]", COND_NONE,
+    FLAG_MULTI_LEVEL, 0);
 #endif
 
 } // namespace mc2_ops_hccl

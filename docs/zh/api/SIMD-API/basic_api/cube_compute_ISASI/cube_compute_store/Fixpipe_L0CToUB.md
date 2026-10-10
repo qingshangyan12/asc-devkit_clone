@@ -24,10 +24,10 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB_res.md#id1 -->
 
@@ -142,6 +142,7 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 | unitFlag | 输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不会设置寄存器；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，会将unitFlag关闭。 |
 | [isChannelSplit](../cube_store_key_features/F32-Channel-Split.md) | 输入 | 此参数仅在L0C Buffer到Global Memory通路下有效。 |
 
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToUB_res.md#id2 -->
 ## 数据类型<a id="zh-cn_topic_0000002549846732_section4219135304818"></a>
 
 **源矩阵与目的矩阵支持的数据类型组合**
@@ -203,6 +204,7 @@ L0C Buffer到UB数据搬运提供矩阵搬出的组合接口Fixpipe，接口内�
 <!-- end id18 -->
 
 <!-- npu="950" id20 -->
+
 ## 关键特性说明
 
 以下图片和说明仅适用于Ascend 950PR&950DT系列产品：

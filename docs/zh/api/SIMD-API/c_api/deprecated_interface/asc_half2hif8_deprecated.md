@@ -66,15 +66,16 @@ def asc_half2hif8_rna_v2(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型（占位符形式）
+### 模板原型
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_half2hif8_<round_mode><sat_mode><position_mode>(vector_hifloat8_t& dst,
                                                                                 vector_half src,
                                                                                 vector_bool mask)
 ```
 
-### 占位符说明
+**占位符说明如下：**
 
 - `<round_mode>`表示支持的舍入模式，支持`rna`（`ROUND`）和`rh`（`HYBRID`）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。

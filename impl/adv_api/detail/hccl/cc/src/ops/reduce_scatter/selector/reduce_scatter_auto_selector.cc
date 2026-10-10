@@ -348,15 +348,15 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoAicpuForMesh1D(
                 selectAlgName = "AicpuReduceScatterSoleMeshConcur";
             } else if (topoInfo->userRankSize != 0 &&
                        dataSize > RS_AICPU_1D_TWO_LEVER_DATA_SIZE_THRESHOLD / topoInfo->userRankSize) {
-                selectAlgName = "InsReduceScatterMesh1DMeshChunk";
+                selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else if (dataSize * ratio > RS_AICPU_1D_MAX_DATA_SIZE) {
-                selectAlgName = "InsReduceScatterMesh1DMeshChunk";
+                selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else {
                 selectAlgName = "InsReduceScatterMesh1D";
             }
         } else {
             if (dataSize * ratio > RS_AICPU_1D_MAX_DATA_SIZE) {
-                selectAlgName = "InsReduceScatterMesh1DMeshChunk";
+                selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else {
                 selectAlgName = "InsReduceScatterMesh1D";
             }
@@ -395,7 +395,7 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoAicpuForMesh1DClos(
             selectAlgName = "AicpuReduceScatterConcurMeshNHR";
         } else {
             if (dataSize * ratio > RS_AICPU_1D_MAX_DATA_SIZE) {
-                selectAlgName = "InsReduceScatterMesh1DMeshChunk";
+                selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else {
                 selectAlgName = "InsReduceScatterMesh1D";
             }

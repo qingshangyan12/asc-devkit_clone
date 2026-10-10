@@ -49,7 +49,7 @@ def asc_int322uint16(dst, src, mask, dst_pos):
 ## 函数原型
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_int322uint16<sat_mode>(vector_uint16_t& dst,
                                                        vector_int32_t src,
                                                        vector_bool mask,
@@ -60,7 +60,7 @@ __simd_callee__ inline void asc_int322uint16<sat_mode>(vector_uint16_t& dst,
                                                        vector_bool mask,
                                                        std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_uint16_t asc_int322uint16<sat_mode>(vector_int32_t src,
                                                        vector_bool mask,
                                                        std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
@@ -70,7 +70,8 @@ __simd_callee__ inline vector_uint16_t asc_int322uint16<sat_mode>(vector_int32_t
                                                        std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
-`<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+**占位符说明如下：**
+- `<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
 ### 函数原型典型示例
 
@@ -111,7 +112,7 @@ __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

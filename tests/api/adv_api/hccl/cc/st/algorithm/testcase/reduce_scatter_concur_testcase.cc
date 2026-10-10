@@ -120,7 +120,7 @@ TEST(ReduceScatterConcur, SelectorThresholdAndUnsupportedReductions)
         topo = MeshTopo(ranks);
         EXPECT_NE(Select(topo, threshold), "AicpuReduceScatterSoleMeshConcur");
         for (u64 bytes : {1536ULL * 1024 * 1024 / ranks, 1536ULL * 1024 * 1024 / ranks + 4}) {
-            EXPECT_EQ(Select(topo, bytes), "InsReduceScatterMesh1DMeshChunk");
+            EXPECT_EQ(Select(topo, bytes), "AicpuReduceScatterSoleMeshChunk");
         }
     }
 }
