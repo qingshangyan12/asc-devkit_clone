@@ -107,7 +107,7 @@ __simd_callee__ inline decltype(auto) load_gather(
 
 ## 返回值说明
 
-通常返回`reg_tensor<typename Tensor::data_type>`；当Tensor元素类型为`int4b_t`时，返回`reg_tensor<int4x2_t>`。返回对象的`reg`成员保存收集结果，接口不初始化其`mask`成员。
+通常返回`reg_tensor<typename Tensor::data_type>`；当Tensor元素类型为`int4b_t`时，返回`reg_tensor<int4x2_t>`。返回对象的`reg`成员保存收集结果，`mask`成员与输入参数`gather_mask.reg`一致。
 
 ## 约束说明
 
@@ -121,18 +121,20 @@ __simd_callee__ inline decltype(auto) load_gather(
 ## 调用示例
 
 ```cpp
-#include "tensor_api/tensor.h"
-#include "tensor_api/experimental/arch/vector/reg_data_load.h"
-
-template <typename SrcTensor>
-__simd_vf__ inline void GatherData(
-    const SrcTensor& src,
-    const asc::te::experimental::reg_tensor<uint32_t>& index,
-    const asc::te::experimental::reg_tensor<bool>& mask)
+template <typename SrcTensor, typename IndexTensor, typename DstTensor>
+__simd_vf__ inline void GatherData(SrcTensor src, IndexTensor index,
+    DstTensor dst, uint32_t repeat_times, uint32_t total_length,
+    uint32_t one_repeat_size)
 {
-    auto value = asc::te::experimental::load_gather(
-        src, asc::te::make_coord(0), index, mask);
-    value.with_mask(mask);
-    // 使用value完成后续寄存器计算。
+    using data_type = typename Src0TensorType::data_type;
+    uint32_t count = total_length;
+    for (uint16_t i = 0; i < repeat_times; ++i) {
+        auto mask = asc::te::experimental::update_mask<data_type>(count);
+        uint32_t offset = i * one_repeat_size;
+        const auto coord = asc::te::make_coord(offset);
+        auto index_reg = asc::te::experimental::load(index);
+        auto src_reg = asc::te::experimental::load_gather<gather_mode::element>(src, coord, index, mask);
+        asc::te::experimental::store(dst, coord, src_reg);
+    }
 }
 ```

@@ -238,6 +238,7 @@ __simd_callee__ inline decltype(auto) load_gather(
     } else {
         asc_gather_datablock(dst.reg, src_engine.begin().get(), index.reg, gather_mask.reg);
     }
+    dst.mask = gather_mask.reg;
     return dst;
 }
 
@@ -256,6 +257,7 @@ __simd_callee__ inline decltype(auto) load_gather(
     } else {
         asc_gather_datablock(dst.reg, tensor.engine().begin().get(), index.reg, gather_mask.reg);
     }
+    dst.mask = gather_mask.reg;
     return dst;
 }
 

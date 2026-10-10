@@ -86,16 +86,20 @@ Tensor元素类型与`src`元素类型必须一致，支持的数据类型组合
 ## 调用示例
 
 ```cpp
-#include "tensor_api/tensor.h"
-#include "tensor_api/experimental/arch/vector/reg_data_store.h"
-
-template <typename DstTensor, typename T>
-__simd_vf__ inline void ScatterData(
-    DstTensor& dst,
-    const asc::te::experimental::reg_tensor<T>& value,
-    const asc::te::experimental::reg_tensor<uint32_t>& index)
+template <typename SrcTensor, typename IndexTensor, typename DstTensor>
+__simd_vf__ inline void ScatterData(SrcTensor src, IndexTensor index,
+    DstTensor dst, uint32_t repeat_times, uint32_t total_length,
+    uint32_t one_repeat_size)
 {
-    asc::te::experimental::store_scatter(
-        dst, asc::te::make_coord(0), value, index);
+    using data_type = typename SrcTensor::data_type;
+    uint32_t count = total_length;
+    for (uint16_t i = 0; i < repeat_times; ++i) {
+        auto mask = asc::te::experimental::update_mask<data_type>(count);
+        uint32_t offset = i * one_repeat_size;
+        const auto coord = asc::te::make_coord(offset);
+        auto src_reg = asc::te::experimental::load(src, coord).with_mask(mask);
+        auto index_reg = asc::te::experimental::load(index);
+        asc::te::experimental::store_scatter(dst, coord, src_reg, index_reg);
+    }
 }
 ```

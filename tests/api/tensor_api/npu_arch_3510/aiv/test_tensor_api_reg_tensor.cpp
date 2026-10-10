@@ -144,14 +144,14 @@ __simd_vf__ inline void CompileLoadGather(__ubuf__ T* src)
     auto layout = asc::te::make_layout(asc::te::make_shape(64));
     auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src), layout);
     asc::te::experimental::reg_tensor<Index> index{};
-    asc::te::experimental::reg_tensor<bool> mask{};
+    auto mask = asc::te::experimental::make_mask<asc::te::experimental::mask_pattern::vl8, uint32_t>();
 
     auto gathered = asc::te::experimental::load_gather<Mode>(src_tensor, index, mask);
     auto gathered_at = asc::te::experimental::load_gather<Mode>(src_tensor, asc::te::make_coord(0), index, mask);
     static_assert(AscendC::Std::is_same_v<decltype(gathered), asc::te::experimental::reg_tensor<RegDataType>>);
     static_assert(AscendC::Std::is_same_v<decltype(gathered_at), asc::te::experimental::reg_tensor<RegDataType>>);
-    (void)gathered;
-    (void)gathered_at;
+    EXPECT_EQ(gathered.mask, mask.reg);
+    EXPECT_EQ(gathered_at.mask, mask.reg);
 }
 
 template <typename T, typename Index>
