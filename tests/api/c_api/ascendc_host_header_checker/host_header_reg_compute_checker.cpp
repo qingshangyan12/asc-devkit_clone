@@ -683,3 +683,23 @@ static void test_host_c_api_reg_compute_19()
     using ::asc_update_mask_b8;
     using ::asc_xor;
 }
+
+static void test_host_c_api_reg_compute_20()
+{
+    using ::asc_half2e4m3_rn;
+    using ::asc_half2e4m3_rn_merge;
+    using ::asc_half2e4m3_rn_sat;
+    using ::asc_half2e4m3_rn_sat_merge;
+    using ::asc_half2e4m3_rn_sat_v2;
+    using ::asc_half2e4m3_rn_v2;
+    using ::asc_half2e5m2_rn;
+    using ::asc_half2e5m2_rn_merge;
+    using ::asc_half2e5m2_rn_sat;
+    using ::asc_half2e5m2_rn_sat_merge;
+    using ::asc_half2e5m2_rn_sat_v2;
+    using ::asc_half2e5m2_rn_v2;
+    using ::asc_pack_datablock;
+    using ::asc_pack_to_high;
+    using ::asc_pack_to_low;
+}
+#endif
