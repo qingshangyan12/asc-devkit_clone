@@ -2189,10 +2189,10 @@ __aicore__ inline void DataCopy(
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #ifdef ASCENDC_TIME_STAMP_ON
     PrintTimeStamp(static_cast<uint32_t>(TimeStampId::TIME_STAMP_MTE2_DATACOPY));
+#endif
     if ASCEND_IS_AIC {
         return;
     }
-#endif
     const uint8_t cacheMode = ExtractCacheMode(src);
     DataCopyWithNDDMAImpl<T, dim, config>(
         (__ubuf__ PrimT<T>*)dst.GetPhyAddr(), (__gm__ PrimT<T>*)src.GetPhyAddr(), params.loopInfo, params.constantValue,
