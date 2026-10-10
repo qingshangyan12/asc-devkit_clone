@@ -66,10 +66,10 @@ __simd_callee__ inline decltype(auto) load_gather(
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `tensor` | 输入 | 位于UB的源Tensor。 |
+| `tensor` | 输入 | 位于UB的源Tensor, 基地址必须32B对齐。 |
 | `coord` | 输入 | 基地址在`tensor`逻辑布局中的坐标。 |
-| `index` | 输入 | 相对于基地址的索引。元素模式下单位为元素；DataBlock模式下单位为字节。 |
-| `gather_mask` | 输入 | 收集操作的有效位Mask。元素模式下逐元素生效；DataBlock模式下按b32格式解释，仅bit 0、4、8、12、16、20、24、28有效。 |
+| `index` | 输入 | 相对于基地址的索引。元素模式下单位为元素；DataBlock模式下单位为字节, index仅前8个元素有效。索引可以存在相同的值。 |
+| `gather_mask` | 输入 | 收集操作的有效位Mask。元素模式下逐元素生效；DataBlock模式下按b32格式解释，一个DataBlock对应4bit，仅每4bit中的最低位有效，对应的仅bit 0、4、8、12、16、20、24、28有效。 |
 
 <a id="表3-gather_mode参数说明"></a>
 
@@ -111,10 +111,11 @@ __simd_callee__ inline decltype(auto) load_gather(
 
 ## 约束说明
 
-- 仅支持位于UB的Tensor，基地址必须32B对齐。
-- 索引对应的数据必须在UB有效地址范围内。
-- `gather_mode::data_block`仅使用`index`的前8个元素，且每个索引必须32B对齐。
 - 传入`coord`时，坐标维数必须与Tensor布局匹配，且坐标不能越界。
+- 索引对应的数据必须在UB有效地址范围内。
+- `gather_mode::data_block`仅使用`index`的前8个元素，且每个索引必须大于等于0且32B对齐。
+- 索引可以存在相同的值。
+- 当`tensor`与`index`数据类型不一致时，数据写入结果寄存器索引为偶数的位置，奇数索引位置置零。
 - 寄存器数据搬入应在`__simd_vf__`函数或`__simd_callee__`函数中完成。
 
 ## 调用示例
