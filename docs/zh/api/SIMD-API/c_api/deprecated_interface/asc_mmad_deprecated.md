@@ -110,7 +110,7 @@ __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix,
                                      bool c_matrix_init_val)
 ```
 
-**dtype支持的数据类型：**
+### dtype支持数据类型
 
 `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 

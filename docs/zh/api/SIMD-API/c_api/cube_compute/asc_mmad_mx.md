@@ -80,7 +80,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
                                    bool disable_gemv)
 ```
 
-**dtype支持的数据类型：**
+### dtype支持数据类型
 
 `a_dtype`、`b_dtype`的取值组合见下表：
 

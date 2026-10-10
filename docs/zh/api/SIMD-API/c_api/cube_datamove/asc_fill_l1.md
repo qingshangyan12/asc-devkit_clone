@@ -40,8 +40,7 @@ __aicore__ inline void asc_fill_l1(__cbuf__ <dst_dtype>* dst,
                                    const asc_fill_value_config& config)
 ```
 
-### dtype支持的数据类型
-
+### dtype支持数据类型
 dst dtype与value dtype支持以下组合：
 
 - `dst_dtype`为`int16_t`、`uint16_t`、`half`、`int32_t`、`uint32_t`或`float`时，`value_dtype`支持`half`、`uint32_t`。
