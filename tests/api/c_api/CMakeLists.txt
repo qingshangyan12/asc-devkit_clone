@@ -114,7 +114,6 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
 
     target_include_directories(ascendc_ut_c_api_${product_type} PRIVATE
         ${ASCENDC_UT_HEADER}
-        ${ASCEND_CANN_PACKAGE_PATH}/include
         ${ASCEND_CANN_PACKAGE_PATH}/include/base/
         ${ASCEND_CANN_PACKAGE_PATH}/include/metadef/
     )
