@@ -37,9 +37,7 @@
 
 本接口仅在AIC上执行有效。
 
-<!-- npu="950" id9 -->
 Bias矩阵的格式见[辅助矩阵分形格式详解](../../cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md)；在[asc_mmad](../../cube_compute/mmad_compute/asc_mmad.md)中按对应架构的重载选择Bias作为C矩阵初始值。
-<!-- end id9 -->
 
 ## 函数原型
 

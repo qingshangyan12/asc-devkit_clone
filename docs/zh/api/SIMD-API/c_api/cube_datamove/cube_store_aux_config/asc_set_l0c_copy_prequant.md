@@ -24,28 +24,17 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 
-<!-- npu="A3,910b" id9 -->
-Atlas A2系列产品和Atlas A3系列产品仅支持`uint64_t config`重载。
-<!-- end id9 -->
-<!-- npu="950" id10 -->
-Ascend 950PR&950DT系列产品支持`uint64_t config`重载以及分项传入`scale`、`offset`和`is_signed`的重载。
-<!-- end id10 -->
-
 ## 功能说明
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
-本接口用于在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号。配置完成后，由后续调用的[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm.md)或[asc_copy_l0c2l1](../cube_compute_store/asc_copy_l0c2l1.md)接口使用，并在搬出接口中选择对应的Scalar量化模式。
+本接口用于在L0C Buffer搬出过程中进行随路Scalar量化时，配置量化计算所需的缩放系数、偏移量和量化结果符号。本接口仅在AIC上生效，实际量化由后续的矩阵搬出接口执行，因此还需在搬出接口中选择对应的Scalar量化模式。
 
 <!-- npu="950" id11 -->
-Ascend 950PR&950DT系列产品还可通过[asc_copy_l0c2ub](../cube_compute_store/asc_copy_l0c2ub.md)搬出；搬出接口使用`quant_pre_mode`选择量化模式，下方枚举列表适用于该系列产品。
-<!-- end id11 -->
+针对Ascend 950PR&950DT系列产品：
 
-<!-- npu="A3,910b" id12 -->
-Atlas A3系列产品和Atlas A2系列产品使用`uint64_t config`重载配置Scalar系数，并在搬出接口的`quant_pre`中选择当前接口支持的模式，参见[asc_copy_l0c2gm（Atlas A3系列产品和Atlas A2系列产品）](../cube_compute_store/asc_copy_l0c2gm_arch_2201.md)和[asc_copy_l0c2l1（Atlas A3系列产品和Atlas A2系列产品）](../cube_compute_store/asc_copy_l0c2l1_arch_2201.md)。
-<!-- end id12 -->
+先调用本接口配置量化参数，再调用[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm_arch_3510.md)、[asc_copy_l0c2l1](../cube_compute_store/asc_copy_l0c2l1_arch_3510.md)或[asc_copy_l0c2ub](../cube_compute_store/asc_copy_l0c2ub.md)搬出，并通过`quant_pre_mode`选择[asc_quant_mode](../../defs/enum/asc_quant_mode.md)中的Scalar量化模式。
 
-<!-- npu="950" id13 -->
 `quant_pre_mode`量化模式参数支持的Scalar量化枚举值如下：
 
 - DEQF16：int32_t量化成half， scalar量化。
@@ -60,21 +49,28 @@ Atlas A3系列产品和Atlas A2系列产品使用`uint64_t config`重载配置Sc
 - QF322HIF8_PRE：float量化成hifloat8_t(Half to Away Round)，scalar量化。
 - QF322HIF8_PRE_HYBRID：float量化成hifloat8_t(Hybrid Round)，scalar量化。
 - QF322F32_PRE：float量化成float，scalar量化，精度可以达到双千分之一，无法达到双万分之一。
-<!-- end id13 -->
+<!-- end id11 -->
 
-本接口为矩阵搬出相关配置接口，仅在AIC上生效。
+<!-- npu="A3,910b" id12 -->
+针对以下产品型号：
+
+<!-- npu="A3" id13 -->
+- Atlas A3系列产品
+<!-- end id13 -->
+<!-- npu="910b" id14 -->
+- Atlas A2系列产品
+<!-- end id14 -->
+
+仅支持调用入参为`uint64_t config`的接口配置量化参数，再通过[asc_copy_l0c2gm](../cube_compute_store/asc_copy_l0c2gm_arch_2201.md)或[asc_copy_l0c2l1](../cube_compute_store/asc_copy_l0c2l1_arch_2201.md)搬出。
+<!-- end id12 -->
 
 量化模式、参数编码和准备流程见[随路量化](../cube_store_key_features/accompanying_quantization.md)；量化与激活参数的配合见[随路量化与随路ReLU场景组合](../cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。
 
 ## 函数原型
 
-<!-- npu="A3,910b" id17 -->
-```cpp
-__aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
-```
-<!-- end id17 -->
-
 <!-- npu="950" id18 -->
+Ascend 950PR&950DT系列产品支持以下两种参数传入方式的函数原型：
+
 ```cpp
 __aicore__ inline void asc_set_l0c_copy_prequant(float scale, uint16_t offset, bool is_signed);
 
@@ -82,21 +78,26 @@ __aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
 ```
 <!-- end id18 -->
 
-`uint64_t config`重载适用于各架构，原始编码必须按当前架构解释。
-<!-- npu="950" id14 -->
-`float scale, uint16_t offset, bool is_signed`重载适用于Ascend 950PR&950DT系列产品。
-<!-- end id14 -->
-<!-- npu="A3,910b" id15 -->
-Atlas A3系列产品和Atlas A2系列产品的N/MCB字段在Ascend 950PR&950DT系列产品中不生效，不能跨架构照搬配置值。
-<!-- end id15 -->
+<!-- npu="A3,910b" id17 -->
+以下产品仅支持传入打包后的参数：
+
+<!-- npu="A3" id9 -->
+- Atlas A3系列产品
+<!-- end id9 -->
+<!-- npu="910b" id10 -->
+- Atlas A2系列产品
+<!-- end id10 -->
+
+```cpp
+__aicore__ inline void asc_set_l0c_copy_prequant(uint64_t config);
+```
+<!-- end id17 -->
 
 ## 参数说明
 
-<!-- npu="A3,910b" id19 -->
-Atlas A3系列产品和Atlas A2系列产品使用`uint64_t config`传入打包后的Scalar量化参数，字段含义见[随路量化参数编码表](../cube_store_key_features/accompanying_quantization.md#quant-pre-2201)。
-<!-- end id19 -->
-
 <!-- npu="950" id20 -->
+针对Ascend 950PR&950DT系列产品，参数说明和config比特位含义如下：
+
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
@@ -104,11 +105,9 @@ Atlas A3系列产品和Atlas A2系列产品使用`uint64_t config`传入打包�
 | scale | 输入 | 随路scalar量化所使用的缩放系数。取值不能为inf或nan。 |
 | offset | 输入 | 随路量化计算所需的偏移量，取值范围为[0, 511]。不使用偏移量时，配置为0。在REQ8/QF322B8_PRE/REQ4/QF322S4_PRE模式下生效。 |
 | is_signed | 输入 | 量化结果是否为有符号数据。取值为`true`时，量化结果为int8_t；取值为`false`时，量化结果为uint8_t。在REQ8/QF322B8_PRE模式下生效。 |
-| config | 输入 | Scalar量化参数，由`scale`、`offset`和`is_signed`拼装而成；比特位含义参见下方表2或[随路量化参数编码表](../cube_store_key_features/accompanying_quantization.md#quant-pre-3510)。 |
-<!-- end id20 -->
+| config | 输入 | Scalar量化参数，由`scale`，`offset`，`is_signed`拼装而成，config各比特位含义参见表2。 |
 
-<!-- npu="950" id16 -->
-**表2** config比特位含义（3510架构）
+**表2** config比特位含义
 
 | 比特位数 | 变量名 | 描述 |
 | --- | --- | --- |
@@ -118,7 +117,20 @@ Atlas A3系列产品和Atlas A2系列产品使用`uint64_t config`传入打包�
 | 37~45 | offset | 9位整型数据。源数据乘以量化系数后的结果与Offset相加。不使用偏移量时，配置为0。在REQ8/QF322B8_PRE/REQ4/QF322S4_PRE模式下生效。 |
 | 46 | is_signed | 取值为1时，量化结果为int8_t；取值为0时，量化结果为uint8_t。在REQ8/QF322B8_PRE模式下生效。 |
 | 47~63 | - | 无效比特位。 |
+<!-- end id20 -->
+
+<!-- npu="A3,910b" id19 -->
+针对以下产品型号：
+
+<!-- npu="A3" id15 -->
+- Atlas A3系列产品
+<!-- end id15 -->
+<!-- npu="910b" id16 -->
+- Atlas A2系列产品
 <!-- end id16 -->
+
+`config`编码见[随路量化参数编码表](../cube_store_key_features/accompanying_quantization.md#quant-pre-2201)，不能跨产品直接复用编码值。
+<!-- end id19 -->
 
 当前提供了REQ8量化算法Python示例代码，请参考[\(V\)REQ8量化算法](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/fixpipe_l0c2gm/scripts/gen_data_s322s8.py)。
 

@@ -42,9 +42,7 @@
 
 本接口仅在AIC上执行有效。
 
-<!-- npu="950" id9 -->
 每列量化参数的编码及Scalar/Vector区别见[随路量化](../cube_store_key_features/accompanying_quantization.md)。将参数搬入后，通过[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)配置参数区起始地址索引，再调用当前架构的L0C搬出接口；若同时启用激活，参见[随路量化与随路ReLU场景组合](../cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。
-<!-- end id9 -->
 
 ## 函数原型
 

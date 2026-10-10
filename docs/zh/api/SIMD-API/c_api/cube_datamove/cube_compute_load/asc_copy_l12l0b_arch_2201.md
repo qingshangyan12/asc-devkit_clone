@@ -32,9 +32,7 @@
 
 搬入前的数据排布参见[关键分形格式详解](../../cube_compute/cube_compute_fractal_intro/key_fractal_format_details.md)；地址对齐与搬运粒度要求参见[矩阵计算输入搬运约束](cube_compute_input_move_constraint.md)，并结合本接口的参数和约束说明使用。
 
-<!-- npu="A3,910b" id8 -->
 3D搬运的Feature Map配置参见[asc_set_l13d_fmatrix](../cube_load_aux_config/asc_set_l13d_fmatrix.md)和[asc_set_l13d_fmatrix_b](../cube_load_aux_config/asc_set_l13d_fmatrix_b.md)；填充值及L1边界分别通过[asc_set_l12l0a_3d_padding](../cube_load_aux_config/asc_set_l12l0a_3d_padding.md)和[asc_set_l13d_size](../cube_load_aux_config/asc_set_l13d_size.md)配置，使用时选择Atlas A3系列产品和Atlas A2系列产品对应的重载。
-<!-- end id8 -->
 
 ## 函数原型
 

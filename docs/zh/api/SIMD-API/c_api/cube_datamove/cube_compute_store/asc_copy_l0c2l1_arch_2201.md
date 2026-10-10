@@ -43,9 +43,7 @@
 
 随路处理的模式选择、系数准备及限制参见[随路量化](../cube_store_key_features/accompanying_quantization.md)、[随路ReLU](../cube_store_key_features/accompanying_relu.md)和[场景组合](../cube_store_key_features/accompanying_quantization_and_relu_scenario_combination.md)。各特性是否可组合使用，应以本接口支持的数据类型、模式和约束为准。
 
-<!-- npu="A3,910b" id8 -->
 Scalar量化参数通过[asc_set_l0c_copy_prequant(uint64_t config)](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置；Vector量化参数通过[asc_copy_l12fb（Atlas A3系列产品和Atlas A2系列产品）](../cube_compute_load/asc_copy_l12fb_arch_2201.md)搬入，并由[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)配置起始地址索引。Nz2ND的矩阵数量与矩阵间隔通过[asc_set_l0c_copy_params](../cube_store_aux_config/asc_set_l0c_copy_params.md)配置。
-<!-- end id8 -->
 
 ## 函数原型
 

@@ -30,9 +30,7 @@
 
 将数据从L1 Buffer搬运到BiasTable Buffer中，BiasTable Buffer用于存放矩阵计算中的Bias。
 
-<!-- npu="A3,910b" id8 -->
 Bias矩阵的格式见[辅助矩阵分形格式详解](../../cube_compute/cube_compute_fractal_intro/aux_cube_fractal_format_details.md)；在[asc_mmad](../../cube_compute/mmad_compute/asc_mmad.md)中按对应架构的重载选择Bias作为C矩阵初始值。
-<!-- end id8 -->
 
 ## 函数原型
 
