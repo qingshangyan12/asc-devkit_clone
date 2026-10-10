@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include "ins_v2_reduce_scatter_sole_executor.h"
+#include <type_traits>
 #include "ins_temp_reduce_scatter_mesh_1D.h"
 #include "ins_temp_reduce_scatter_nhr.h"
 #include "ins_temp_reduce_scatter_mesh_1D_meshchunk.h"
@@ -45,6 +46,20 @@ HcclResult InsV2ReduceScatterSoleExecutor<AlgTopoMatch, InsAlgTemplate>::CalcRes
     const AlgHierarchyInfoForAllLevel& algHierarchyInfo, AlgResourceRequest& resourceRequest)
 {
     CHK_PTR_NULL(topoInfo);
+    if (std::is_same<InsAlgTemplate, InsTempReduceScatterMesh1DZAxisDetour>::value) {
+        const bool meshConnected = IsAllConnetedWithTopo(topoInfo, 0, CommTopo::COMM_TOPO_1DMESH);
+        const bool supportedTopo = topoInfo->level0Topo == Level0Shape::MESH_1D ||
+            (topoInfo->level0Topo == Level0Shape::MESH_1D_CLOS && topoInfo->level0PcieMix);
+        CHK_PRT_RET(
+            topoInfo->topoLevelNums != 1 || !supportedTopo || !meshConnected ||
+                (param.engine != COMM_ENGINE_AICPU && param.engine != COMM_ENGINE_AICPU_TS) ||
+                param.DataDes.dataType == HCCL_DATA_TYPE_INT64 ||
+                param.DataDes.dataType == HCCL_DATA_TYPE_UINT64 ||
+                param.DataDes.dataType == HCCL_DATA_TYPE_FP64 ||
+                param.reduceType == HCCL_REDUCE_PROD,
+            HCCL_ERROR("[ReduceScatterSoleMeshConcur] Unsupported topology, engine or reduction"),
+            HCCL_E_NOT_SUPPORT);
+    }
     // 构建template
     std::shared_ptr<InsAlgTemplate> algTemplate =
         std::make_shared<InsAlgTemplate>(param, topoInfo->userRank, algHierarchyInfo.infos[0]);
@@ -289,10 +304,10 @@ REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterAicpuReduceNHR, AlgEngine::AICPU, "sole[nhr]",
     COND_SPECIAL_DT, FLAG_NONE, 0);
 REGISTER_EXEC_V2(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DZAxisDetour, InsV2ReduceScatterSoleExecutor,
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleMeshConcur, InsV2ReduceScatterSoleExecutor,
     TopoMatch1D, InsTempReduceScatterMesh1DZAxisDetour);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterMesh1DZAxisDetour, AlgEngine::AICPU, "sole[mesh]",
+    HcclCMDType::HCCL_CMD_REDUCE_SCATTER, AicpuReduceScatterSoleMeshConcur, AlgEngine::AICPU, "sole[mesh]",
     COND_Z_AXIS, FLAG_NONE, 0);
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 REGISTER_EXEC_V2(
