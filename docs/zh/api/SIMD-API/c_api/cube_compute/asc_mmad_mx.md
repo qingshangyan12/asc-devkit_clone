@@ -97,7 +97,7 @@ __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,
 | `fp8_e5m2_t` | `fp8_e4m3fn_t` | `fp8_e8m0_t` | `float` | `float` |
 | `fp8_e5m2_t` | `fp8_e5m2_t` | `fp8_e8m0_t` | `float` | `float` |
 
-**典型示例：**
+### 函数原型典型示例
 
 ```c
 // 不显式传入Bias起始地址

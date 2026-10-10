@@ -127,7 +127,7 @@ __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix,
 | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
 | `float` | `float` | `float` | `float` |
 
-**典型示例：**
+### 函数原型典型示例
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
