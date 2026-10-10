@@ -67,6 +67,7 @@ protected:
         OpParam& opParam, uint32_t rankSize, const AicpuStScenario& scenario, const RankMem& mem) = 0;
 
     // 每 rank 输入输出字节数
+    // 注意：默认布局按 AllGather 语义（输出 = rankSize × 输入）——非 AllGather 算子必须 override。
     virtual RankMemLayout BuildMemLayout(uint32_t rankSize, const AicpuStScenario& scenario)
     {
         RankMemLayout layout;
@@ -87,14 +88,21 @@ protected:
 
     static Mc2CcTilingInner BuildTiling(HcclCMDType opType, HcclDataType dataType, const std::string& algConfig);
 
-    // 输入数据模式：rank 与 byte 偏移的可区分编码，保证逐字节可溯源
+    // 输入数据模式：rank 与 byte 偏移的可区分编码，保证逐字节可溯源。
+    // rank < 16 时字节模式全局唯一（rank ≥ 16 会回绕混叠，当前拓扑不超过 8 rank）。
     static uint8_t MakeInputByte(RankId rank, uint64_t offset)
     {
         return static_cast<uint8_t>((rank + 1) * 0x10 + (offset & 0x0F));
     }
 
 private:
-    // 单 rank 全链路（成员函数以访问 protected 虚函数/静态工具）
+    // 单 rank 全链路实际执行体（成员函数以访问 protected 虚函数/静态工具）
+    static void RunRankInner(
+        AicpuStFixture* fixture, const AicpuStScenario& scenario, uint32_t rank, uint32_t rankSize,
+        const RankMemLayout& layout, RankResult& result);
+
+    // RunRankInner 的异常保护包装：rank 线程内未捕获异常会 std::terminate 崩掉整个测试进程，
+    // 此处将异常转为 result.error 优雅报告（comm 若泄漏由 SimWorld::Deinit 兜底回收）
     static void RunRank(
         AicpuStFixture* fixture, const AicpuStScenario& scenario, uint32_t rank, uint32_t rankSize,
         const RankMemLayout& layout, RankResult& result);

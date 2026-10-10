@@ -52,8 +52,10 @@ Mc2CcTilingInner AicpuStFixture::BuildTiling(HcclCMDType opType, HcclDataType da
 }
 
 // 单 rank 全链路：内存分配 → OpParam 准备 → selector → 资源 → HcclExecOp（内部 launch+Orchestrate）
-// （AicpuStFixture 私有静态成员，以访问 protected 虚函数/静态工具）
-void AicpuStFixture::RunRank(
+// RunRankInner 为实际执行体；RunRank 为异常保护包装（见下）——rank 线程内未捕获异常会
+// std::terminate 使整个测试进程崩溃、后续用例全丢，违背框架"优雅报告失败"的设计目标，
+// 故所有 THROW 点（如 SimNpu::AllocMemory 对超大 len 的 InvalidParamsException）必须在此兜住。
+void AicpuStFixture::RunRankInner(
     AicpuStFixture* fixture, const AicpuStScenario& scenario, uint32_t rank, uint32_t rankSize,
     const RankMemLayout& layout, RankResult& result)
 {
@@ -161,10 +163,29 @@ void AicpuStFixture::RunRank(
     result.ok = true;
 }
 
+// 异常保护包装：任何 THROW/异常转为 result.error 优雅报告。
+// comm 泄漏兜底：若异常发生在 comm 创建之后的未包裹 THROW 点，comm 由 SimWorld::Deinit 统一回收。
+void AicpuStFixture::RunRank(
+    AicpuStFixture* fixture, const AicpuStScenario& scenario, uint32_t rank, uint32_t rankSize,
+    const RankMemLayout& layout, RankResult& result)
+{
+    try {
+        RunRankInner(fixture, scenario, rank, rankSize, layout, result);
+    } catch (const std::exception& e) {
+        result.error = std::string("exception: ") + e.what();
+        result.ok = false;
+    } catch (...) {
+        result.error = "unknown exception in rank thread";
+        result.ok = false;
+    }
+}
+
 void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
 {
     const uint32_t rankSize = CountRanks(scenario.topoMeta);
     ASSERT_GE(rankSize, 1U);
+    // 守卫：非法 dataType 会让 DATATYPE_SIZE_TABLE 越界读
+    ASSERT_GT(DATATYPE_SIZE_TABLE[scenario.dataType], 0U) << "invalid dataType in scenario";
 
     SimTaskQueue::Global()->Clear();
 
@@ -198,21 +219,22 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
         ASSERT_TRUE(results[rank].ok) << "rank " << rank << " failed: " << results[rank].error;
     }
 
-    // 静态检查：任务图非空（零长度场景除外）
+    // 静态检查：任务图非空（零长度场景除外；per-rank——每 rank 名下至少一个队列有任务）
     AllRankTaskQueues& queues = SimTaskQueue::Global()->GetAllRankTaskQueues();
-    {
-        size_t taskCount = 0;
-        for (const auto& pod : queues) {
-            for (const auto& ser : pod.second) {
-                for (const auto& phy : ser.second) {
-                    for (const auto& stream : phy.second) {
-                        taskCount += stream.size();
-                    }
-                }
+    if (layout.inputBytes > 0) {
+        for (uint32_t rank = 0; rank < rankSize; ++rank) {
+            const NpuPos pos = SimWorld::Global()->GetNpuPosByRankId(rank);
+            auto podIt = queues.find(pos.superpodId);
+            ASSERT_TRUE(podIt != queues.end()) << "rank " << rank << " has no task queue";
+            auto serIt = podIt->second.find(pos.serverId);
+            ASSERT_TRUE(serIt != podIt->second.end()) << "rank " << rank << " has no task queue";
+            auto phyIt = serIt->second.find(pos.phyId);
+            ASSERT_TRUE(phyIt != serIt->second.end()) << "rank " << rank << " has no task queue";
+            size_t rankTasks = 0;
+            for (const auto& stream : phyIt->second) {
+                rankTasks += stream.size();
             }
-        }
-        if (layout.inputBytes > 0) {
-            EXPECT_GT(taskCount, 0U) << "task graph is empty";
+            EXPECT_GT(rankTasks, 0U) << "rank " << rank << " enqueued no tasks";
         }
     }
 

@@ -421,3 +421,25 @@ TEST_F(TaskGraphExecutorTest, ReadReduceBfp16Max)
     EXPECT_EQ(locU16[0], 0x4000);
     EXPECT_EQ(locU16[1], 0x4000);
 }
+
+// 非法 reduce op 必须 THROW（fail-fast，不静默降级为拷贝）
+TEST_F(TaskGraphExecutorTest, LocalReduceInvalidOpThrows)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    const uint64_t srcAddr = npu0.AllocMemory(BufferType::INPUT, 4);
+    const uint64_t dstAddr = npu0.AllocMemory(BufferType::OUTPUT, 4);
+    DataSlice srcSlice;
+    ASSERT_EQ(npu0.GetSlice(srcAddr, 4, srcSlice), HcclResult::HCCL_SUCCESS);
+    DataSlice dstSlice;
+    ASSERT_EQ(npu0.GetSlice(dstAddr, 4, dstSlice), HcclResult::HCCL_SUCCESS);
+    Append(
+        0, 0,
+        std::make_shared<TaskStubLocalReduce>(
+            srcSlice, dstSlice, HcclDataType::HCCL_DATA_TYPE_INT8, static_cast<HcclReduceOp>(0xFF))); // 非法 op
+
+    TaskGraphExecutor executor;
+    std::string report;
+    // THROW 在 Execute 的调度路径中抛出，未被捕获将终止进程——本用例验证其抛出。
+    // 抛出后执行器状态已部分推进，用例只断言抛出，不检查后续状态。
+    EXPECT_ANY_THROW((void)executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report));
+}
