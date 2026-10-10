@@ -790,3 +790,4 @@ static void test_host_c_api_reg_compute_22()
     using ::asc_pack_to_high;
     using ::asc_pack_to_low;
 }
+#endif
