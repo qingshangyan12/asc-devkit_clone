@@ -53,7 +53,8 @@ struct RankResult {
 class AicpuStFixture : public ::testing::Test {
 public:
     // 输入数据模式：rank 与 byte 偏移的可区分编码。周期 256 字节、跨 rank 每字节基数差 41，
-    // 可检出分片内 256B 对齐块乱序与跨 rank 混淆（对齐 CCU ST 的 golden 模式强度）。
+    // 可检出分片内非 256 整数倍间距的块乱序与跨 rank 混淆（对齐 CCU ST 的 golden 模式强度）；
+    // 256B 整数倍间距的同相位块置换不可检出——单字节函数的数学上限，如需覆盖须引入按块校验和。
     // public：adapter 的 golden 构造器（非成员函数）需与 fixture 填充共用同一公式。
     static uint8_t MakeInputByte(RankId rank, uint64_t offset)
     {
