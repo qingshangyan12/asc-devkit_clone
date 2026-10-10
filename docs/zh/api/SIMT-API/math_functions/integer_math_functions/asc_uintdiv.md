@@ -107,3 +107,10 @@ $$
         asc_vf_call<simt_fast_div>(dim3(1024), output, value, magic, shift, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+dividend：12, 23, 35, 47
+result: 1 3 5 6
+```
