@@ -251,11 +251,17 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
     std::string report;
     ASSERT_EQ(executor.Execute(queues, report), ExecResult::SUCCESS) << report;
 
-    // DAG 内存冲突检测（WAW/WAR/RAW 无同步并发）
+    // DAG 内存冲突检测（WAW/WAR/RAW 无同步并发）；封顶输出避免刷屏
     const std::vector<DagConflict> conflicts = AicpuDagChecker().Check(executor.ExecutionLog());
-    for (const auto& conflict : conflicts) {
-        ADD_FAILURE() << "DAG conflict [" << conflict.kind << "]: A(" << conflict.detailA << ") vs B("
-                      << conflict.detailB << ")";
+    constexpr size_t maxReported = 5;
+    for (size_t i = 0; i < conflicts.size(); ++i) {
+        if (i < maxReported) {
+            ADD_FAILURE() << "DAG conflict [" << conflicts[i].kind << "]: A(" << conflicts[i].detailA << ") vs B("
+                          << conflicts[i].detailB << ")";
+        }
+    }
+    if (conflicts.size() > maxReported) {
+        ADD_FAILURE() << "DAG conflicts total " << conflicts.size() << ", first " << maxReported << " reported";
     }
 
     // 逐字节比对（期望为空=零长度场景，跳过）

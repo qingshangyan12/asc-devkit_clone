@@ -119,6 +119,31 @@ TEST_F(AicpuDagCheckerTest, UnsynchronizedWawIsConflict)
     EXPECT_NE(conflicts[0].detailA.find("WRITE"), std::string::npos);
 }
 
+// 部分重叠：[0,8) 与 [4,12) 交叠 [4,8)，仍报 1 条 WAW（区间判定含部分交叠，非仅全包含）。
+TEST_F(AicpuDagCheckerTest, PartialOverlapWawIsConflict)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    const uint64_t outAddr = npu0.AllocMemory(BufferType::OUTPUT, 12);
+    DataSlice a;
+    ASSERT_EQ(npu0.GetSlice(outAddr, 8, a), HcclResult::HCCL_SUCCESS);
+    DataSlice b;
+    ASSERT_EQ(npu0.GetSlice(outAddr + 4, 8, b), HcclResult::HCCL_SUCCESS); // [4,12) 与 [0,8) 部分交叠
+    DataSlice src0;
+    DataSlice src1;
+    MakeInSlice(0, 8, src0);
+    MakeInSlice(1, 8, src1);
+    Append(0, 0, std::make_shared<TaskStubLocalCopy>(src0, a)); // rank0 写 rank0 OUTPUT[0,8)
+    Append(1, 0, std::make_shared<TaskStubWrite>(0, LinkInfo(LinkProtoStub::SDMA), src1, b)); // 写 [4,12)
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    AicpuDagChecker checker;
+    const auto conflicts = checker.Check(executor.ExecutionLog());
+    ASSERT_EQ(conflicts.size(), 1U);
+    EXPECT_EQ(conflicts[0].kind, "WAW");
+}
+
 // 无同步的跨队列读写：rank1 READ（读 rank0 INPUT）与 rank0 本地写 INPUT 并发 → 报冲突。
 TEST_F(AicpuDagCheckerTest, UnsynchronizedReadWriteIsConflict)
 {
@@ -139,14 +164,43 @@ TEST_F(AicpuDagCheckerTest, UnsynchronizedReadWriteIsConflict)
     ASSERT_EQ(npu0.GetSlice(inAddr, 8, selfA), HcclResult::HCCL_SUCCESS);
     ASSERT_EQ(npu0.GetSlice(inAddr, 8, selfB), HcclResult::HCCL_SUCCESS);
     Append(0, 0, std::make_shared<TaskStubLocalCopy>(selfA, selfB));
-
     TaskGraphExecutor executor;
     std::string report;
     ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
     AicpuDagChecker checker;
     const auto conflicts = checker.Check(executor.ExecutionLog());
     ASSERT_EQ(conflicts.size(), 1U);
-    EXPECT_TRUE(conflicts[0].kind == "RAW" || conflicts[0].kind == "WAR");
+    // 时序推导：执行器按 (pod,server,phy) 有序 map 轮询，rank0 队列先于 rank1；首个 sweep 中
+    // rank0 的 LocalCopy（seq1）先执行、rank1 的 READ（seq2）后执行。INPUT 组唯一跨队列重叠对是
+    // (LocalCopy dst 写@seq1, READ remote 读@seq2)——写先读后 => RAW。
+    EXPECT_EQ(conflicts[0].kind, "RAW");
+}
+
+// RAR（双读）不报：两个队列无同步并发读同一区间，双读无写不构成冲突。
+// 两个 READ 的写落点分别在各自 rank 的 OUTPUT 组，不与 INPUT 组双读交叉。
+TEST_F(AicpuDagCheckerTest, ReadAfterReadNeverConflicts)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
+    const uint64_t inAddr = npu0.AllocMemory(BufferType::INPUT, 8);
+    const uint64_t out1 = npu1.AllocMemory(BufferType::OUTPUT, 8);
+    const uint64_t out0 = npu0.AllocMemory(BufferType::OUTPUT, 8);
+    DataSlice local1; // rank1 读结果的落点（rank1 OUTPUT）
+    ASSERT_EQ(npu1.GetSlice(out1, 8, local1), HcclResult::HCCL_SUCCESS);
+    DataSlice remote; // rank0 INPUT[0,8)
+    ASSERT_EQ(npu0.GetSlice(inAddr, 8, remote), HcclResult::HCCL_SUCCESS);
+    DataSlice dst2; // rank0 读结果的落点（rank0 OUTPUT）
+    ASSERT_EQ(npu0.GetSlice(out0, 8, dst2), HcclResult::HCCL_SUCCESS);
+    DataSlice src2; // rank0 也读自己的 INPUT[0,8)（remote=0 自读）
+    ASSERT_EQ(npu0.GetSlice(inAddr, 8, src2), HcclResult::HCCL_SUCCESS);
+    // rank1 与 rank0 各自读 rank0 的 INPUT[0,8)（无同步，双读）
+    Append(1, 0, std::make_shared<TaskStubRead>(0, LinkInfo(LinkProtoStub::SDMA), local1, remote));
+    Append(0, 0, std::make_shared<TaskStubRead>(0, LinkInfo(LinkProtoStub::SDMA), dst2, src2));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_TRUE(AicpuDagChecker().Check(executor.ExecutionLog()).empty()); // RAR 不报
 }
 
 // 同队列内读写：程序序保证，不报。
