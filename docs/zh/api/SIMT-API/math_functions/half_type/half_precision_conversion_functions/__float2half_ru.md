@@ -90,5 +90,5 @@ inline half __float2half_ru(const float x)
 
 ```text
 x：128, 128.0625, 128.1875, -128.1875, inf, -inf, nan
-output： 128 128.125 128.25 -128.125 inf -inf nan
+result: 128 128.125 128.25 -128.125 inf -inf nan
 ```

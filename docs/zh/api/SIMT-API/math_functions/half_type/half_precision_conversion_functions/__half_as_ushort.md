@@ -94,5 +94,5 @@ inline unsigned short int __half_as_ushort(const half x)
 
 ```text
 x：0, 1, -1, inf, -inf, nan
-output： 0 15360 48128 31744 64512 32256
+result: 0 15360 48128 31744 64512 32256
 ```

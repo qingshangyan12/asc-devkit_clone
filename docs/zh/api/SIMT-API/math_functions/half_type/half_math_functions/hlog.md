@@ -91,5 +91,5 @@ inline half hlog(half x)
 
 ```text
 x：-1.25, 0.5, 2.5, -3.75
-output： nan -0.693359 0.916504 nan
+result: nan -0.693359 0.916504 nan
 ```

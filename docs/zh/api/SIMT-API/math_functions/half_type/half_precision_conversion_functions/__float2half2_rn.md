@@ -94,5 +94,5 @@ inline half2 __float2half2_rn(const float x)
 
 ```text
 x：128, 128.0625, 128.1875, -128.1875, inf, -inf, nan
-output： (128, 128) (128, 128) (128.25, 128.25) (-128.25, -128.25) (inf, inf) (-inf, -inf) (nan, nan)
+result: (128, 128) (128, 128) (128.25, 128.25) (-128.25, -128.25) (inf, inf) (-inf, -inf) (nan, nan)
 ```

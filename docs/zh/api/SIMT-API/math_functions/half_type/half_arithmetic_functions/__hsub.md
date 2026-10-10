@@ -133,5 +133,5 @@ half __hsub(const half x, const half y)
 ```text
 x：-1.25, 0.5, 2.5, -3.75
 y：-1.25, 0.5, 2.5, -3.75
-output： 0 0 0 0
+result: 0 0 0 0
 ```

@@ -87,5 +87,5 @@ half __hneg(const half x)
 
 ```text
 x：-1.25, 0.5, 2.5, -3.75
-output： 1.25 -0.5 -2.5 3.75
+result: 1.25 -0.5 -2.5 3.75
 ```

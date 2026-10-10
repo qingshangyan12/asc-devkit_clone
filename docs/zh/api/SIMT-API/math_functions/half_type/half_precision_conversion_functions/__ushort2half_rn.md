@@ -95,5 +95,5 @@ inline half __ushort2half_rn(const unsigned short int x)
 
 ```text
 x：0, 1, 2049, 4097, 65535
-output： 0 1 2048 4096 inf
+result: 0 1 2048 4096 inf
 ```

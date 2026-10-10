@@ -98,5 +98,5 @@ inline half __int2half_rn(const int x)
 
 ```text
 x：0, 1, -1, 2049, 4097, -4097
-output： 0 1 -1 2048 4096 -4096
+result: 0 1 -1 2048 4096 -4096
 ```

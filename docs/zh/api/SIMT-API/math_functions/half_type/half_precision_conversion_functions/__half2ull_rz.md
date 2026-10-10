@@ -97,5 +97,5 @@ inline unsigned long long int __half2ull_rz(const half x)
 
 ```text
 x：-2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
-output： 0 0 0 1 2 -1 0 0
+result: 0 0 0 1 2 -1 0 0
 ```

@@ -96,5 +96,5 @@ inline unsigned char __half2uchar_rz(const half x)
 
 ```text
 x：-1.5, -0.5, 0.5, 1.5, 127.5, inf, nan
-output： 0 0 0 1 127 255 0
+result: 0 0 0 1 127 255 0
 ```

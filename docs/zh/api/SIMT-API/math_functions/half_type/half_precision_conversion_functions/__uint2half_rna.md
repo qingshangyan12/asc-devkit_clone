@@ -97,5 +97,5 @@ inline half __uint2half_rna(const unsigned int x)
 
 ```text
 x：0, 1, 2049, 4097, 65535
-output： 0 1 2050 4096 inf
+result: 0 1 2050 4096 inf
 ```

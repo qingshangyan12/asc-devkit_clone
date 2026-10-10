@@ -109,5 +109,5 @@ inline float __low2float(const half2 x)
 
 ```text
 x：(-2.5, -1.5), (-0.5, 0.5), (1.5, 2.5), (inf, nan)
-output： -2.5 -0.5 1.5 inf
+result: -2.5 -0.5 1.5 inf
 ```

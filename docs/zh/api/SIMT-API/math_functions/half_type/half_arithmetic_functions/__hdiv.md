@@ -136,5 +136,5 @@ half __hdiv(const half x, const half y)
 ```text
 x：-1.25, 0.5, 2.5, -3.75
 y：-1.25, 0.5, 2.5, -3.75
-output： 1 1 1 1
+result: 1 1 1 1
 ```

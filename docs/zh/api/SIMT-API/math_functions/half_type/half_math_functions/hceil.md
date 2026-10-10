@@ -88,5 +88,5 @@ inline half hceil(half x)
 
 ```text
 x：-1.25, 0.5, 2.5, -3.75
-output： -1 1 3 -3
+result: -1 1 3 -3
 ```

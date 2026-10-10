@@ -104,5 +104,5 @@ inline unsigned int __half2uint_rn(const half x)
 
 ```text
 x：-2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
-output： 0 0 0 2 2 4294967295 0 0
+result: 0 0 0 2 2 4294967295 0 0
 ```

@@ -89,5 +89,5 @@ inline half __half2half_ru(const half x)
 
 ```text
 x：-2, -0.5, 0.5, 2, nan
-output： -2 0 1 2 nan
+result: -2 0 1 2 nan
 ```

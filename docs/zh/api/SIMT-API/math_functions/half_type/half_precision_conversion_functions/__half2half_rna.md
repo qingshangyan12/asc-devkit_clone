@@ -89,5 +89,5 @@ inline half __half2half_rna(const half x)
 
 ```text
 x：-2, -0.5, 0.5, 2, nan
-output： -2 -1 1 2 nan
+result: -2 -1 1 2 nan
 ```

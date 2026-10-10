@@ -90,5 +90,5 @@ inline half hrint(half x)
 
 ```text
 x：-1.25, 0.5, 2.5, -3.75
-output： -1 0 2 -4
+result: -1 0 2 -4
 ```

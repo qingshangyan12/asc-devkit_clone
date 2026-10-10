@@ -96,5 +96,5 @@ inline unsigned short int __half2ushort_rn(const half x)
 
 ```text
 x：-1.25, 0.5, 2.5, -3.75
-output： 0 0 2 0
+result: 0 0 2 0
 ```

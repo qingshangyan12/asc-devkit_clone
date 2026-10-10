@@ -96,5 +96,5 @@ inline short int __half2short_ru(const half x)
 
 ```text
 x：-32768, -2048, -1.5, 0.5, 1.5, 2048, inf, nan
-output： -32768 -2048 -1 1 2 2048 32767 0
+result: -32768 -2048 -1 1 2 2048 32767 0
 ```

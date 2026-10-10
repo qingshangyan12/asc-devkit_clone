@@ -111,5 +111,5 @@ inline half2 __float22half2_ro(const float2 x)
 
 ```text
 x：(128, 128.0625), (128.1875, -128.1875), (inf, -inf), (nan, 65536)
-output： (128, 128.125) (128.125, -128.125) (inf, -inf) (nan, inf)
+result: (128, 128.125) (128.125, -128.125) (inf, -inf) (nan, inf)
 ```

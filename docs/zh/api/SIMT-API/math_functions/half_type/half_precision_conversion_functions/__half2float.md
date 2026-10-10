@@ -99,5 +99,5 @@ inline float __half2float(const half x)
 
 ```text
 x：-2, -0.5, 0.5, 2, inf, -inf, nan
-output： -2 -0.5 0.5 2 inf -inf nan
+result: -2 -0.5 0.5 2 inf -inf nan
 ```

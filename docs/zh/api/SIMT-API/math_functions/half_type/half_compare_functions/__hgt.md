@@ -81,7 +81,7 @@ bool __hgt(half x, half y)
 输入输出示例如下：
 
 ```text
-x：-1.25, 0.5, 2.5, nan
-y：-1.25, 0.5, 2.5, nan
-result: false false false false
+x：2.5, 0.5, 1.0, nan
+y：1.0, 0.5, 2.5, nan
+result: true false false false
 ```

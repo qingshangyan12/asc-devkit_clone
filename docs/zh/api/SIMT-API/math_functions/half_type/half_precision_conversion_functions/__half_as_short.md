@@ -94,5 +94,5 @@ inline short int __half_as_short(const half x)
 
 ```text
 x：0, 1, -1, inf, -inf, nan
-output： 0 15360 -17408 31744 -1024 32256
+result: 0 15360 -17408 31744 -1024 32256
 ```

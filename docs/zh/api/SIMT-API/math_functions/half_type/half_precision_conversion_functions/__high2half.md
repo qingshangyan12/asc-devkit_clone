@@ -105,5 +105,5 @@ inline half __high2half(const half2 x)
 
 ```text
 x：(-2.5, -1.5), (-0.5, 0.5), (1.5, 2.5), (inf, nan)
-output： -1.5 0.5 2.5 nan
+result: -1.5 0.5 2.5 nan
 ```
