@@ -22,6 +22,7 @@ set(CC_SRC ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc/src)
 add_executable(
     ${HCCL_AICPU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
+    aicpu_float_convert_test.cpp
     sim_backing_test.cpp
     task_graph_executor_test.cpp
     ${UTILS_DIR}/aicpu_scenario/task_graph_executor.cc
