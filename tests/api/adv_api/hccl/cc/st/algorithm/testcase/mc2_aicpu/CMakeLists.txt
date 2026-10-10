@@ -23,6 +23,8 @@ add_executable(
     ${HCCL_AICPU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
     sim_backing_test.cpp
+    task_graph_executor_test.cpp
+    ${UTILS_DIR}/aicpu_scenario/task_graph_executor.cc
 )
 
 target_include_directories(
