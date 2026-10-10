@@ -55,7 +55,7 @@ __simd_callee__ inline void asc_trunc(vector_<dtype>& dst,
 
 ### dtype支持数据类型
 
-`<dtype>`取值为：`half`、`bfloat16_t`、`float`。
+`dtype`取值为：`half`、`bfloat16_t`、`float`。
 
 ### 函数原型典型示例
 
