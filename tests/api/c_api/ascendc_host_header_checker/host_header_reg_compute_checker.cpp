@@ -10,6 +10,10 @@
 
 #include "c_api/reg_compute/reg_compute.h"
 
+#if !defined(ASC_DEVKIT_VERSION_NUM)
+#error "ASC_DEVKIT_VERSION_NUM is not defined by the include chain: version/asc_devkit_version.h is missing"
+#endif
+
 static void test_host_c_api_reg_compute_0()
 {
     using ::asc_abs;
@@ -684,9 +688,12 @@ static void test_host_c_api_reg_compute_19()
     using ::asc_xor;
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201) && (ASC_DEVKIT_VERSION_NUM >= 90200000)
 static void test_host_c_api_reg_compute_20()
 {
+    using ::asc_e6m22bfloat16;
+    using ::asc_e6m22bfloat16_v2;
+    using ::asc_e8m02bfloat16;
+    using ::asc_e8m02bfloat16_v2;
     using ::asc_half2e4m3_rn;
     using ::asc_half2e4m3_rn_merge;
     using ::asc_half2e4m3_rn_sat;
@@ -703,4 +710,3 @@ static void test_host_c_api_reg_compute_20()
     using ::asc_pack_to_high;
     using ::asc_pack_to_low;
 }
-#endif
