@@ -24,34 +24,20 @@ void AicpuStAllGather::RegisterVariant(const std::string& algName, const Expecta
     GetVariantRegistry()[algName] = builder;
 }
 
-RankMemLayout AicpuStAllGather::BuildMemLayout(uint32_t rankSize, const AicpuStScenario& scenario)
-{
-    RankMemLayout layout;
-    layout.inputBytes = scenario.count * DATATYPE_SIZE_TABLE[scenario.dataType];
-    layout.outputBytes = layout.inputBytes * rankSize; // AllGather: 输出=各 rank 输入拼接
-    return layout;
-}
-
 void AicpuStAllGather::PrepareOpParam(
     OpParam& opParam, uint32_t rankSize, const AicpuStScenario& scenario, const RankMem& mem)
 {
     (void)rankSize;
     opParam.DataDes.count = scenario.count;
-    opParam.DataDes.dataType = scenario.dataType;
+    opParam.DataDes.dataType = scenario.dataType; // tiling 已设，此处冗余兜底
     opParam.inputPtr = mem.inputPtr;
     opParam.outputPtr = mem.outputPtr;
     opParam.inputSize = mem.inputBytes;
     opParam.outputSize = mem.outputBytes;
 }
 
-std::vector<uint8_t> AicpuStAllGather::BuildExpectedOutput(
-    uint32_t rankSize, const AicpuStScenario& scenario, RankId rank)
+std::vector<uint8_t> AicpuStAllGather::BuildConcatExpectation(uint32_t rankSize, const AicpuStScenario& scenario)
 {
-    (void)rank;
-    const auto it = GetVariantRegistry().find(scenario.expectedAlgName);
-    if (it != GetVariantRegistry().end()) {
-        return it->second(rankSize, scenario, rank);
-    }
     // 默认 AllGather 拼接语义：output[r] = concat(input[0..N-1])
     const uint64_t sliceBytes = scenario.count * DATATYPE_SIZE_TABLE[scenario.dataType];
     std::vector<uint8_t> expected;
@@ -62,6 +48,16 @@ std::vector<uint8_t> AicpuStAllGather::BuildExpectedOutput(
         }
     }
     return expected;
+}
+
+std::vector<uint8_t> AicpuStAllGather::BuildExpectedOutput(
+    uint32_t rankSize, const AicpuStScenario& scenario, RankId rank)
+{
+    const auto it = GetVariantRegistry().find(scenario.expectedAlgName);
+    if (it != GetVariantRegistry().end()) {
+        return it->second(rankSize, scenario, rank);
+    }
+    return BuildConcatExpectation(rankSize, scenario);
 }
 
 } // namespace AicpuSt

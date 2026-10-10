@@ -30,9 +30,10 @@ public:
     // 按 expectedAlgName 注册变体的 golden 构造器；未注册的算法走默认拼接语义
     static void RegisterVariant(const std::string& algName, const ExpectationBuilder& builder);
 
-protected:
-    RankMemLayout BuildMemLayout(uint32_t rankSize, const AicpuStScenario& scenario) override;
+    // 拼接语义 golden：output[r] = concat(input[0..N-1])；默认回退与各算法变体共用
+    static std::vector<uint8_t> BuildConcatExpectation(uint32_t rankSize, const AicpuStScenario& scenario);
 
+protected:
     void PrepareOpParam(
         OpParam& opParam, uint32_t rankSize, const AicpuStScenario& scenario, const RankMem& mem) override;
 

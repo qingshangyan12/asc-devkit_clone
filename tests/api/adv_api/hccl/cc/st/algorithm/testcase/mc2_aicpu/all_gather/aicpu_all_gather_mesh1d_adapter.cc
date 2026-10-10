@@ -19,15 +19,7 @@ namespace {
 std::vector<uint8_t> BuildMesh1DExpectation(uint32_t rankSize, const AicpuStScenario& scenario, RankId rank)
 {
     (void)rank; // AllGather 语义与观察者 rank 无关
-    const uint64_t sliceBytes = scenario.count * DATATYPE_SIZE_TABLE[scenario.dataType];
-    std::vector<uint8_t> expected;
-    expected.reserve(sliceBytes * rankSize);
-    for (uint32_t src = 0; src < rankSize; ++src) {
-        for (uint64_t i = 0; i < sliceBytes; ++i) {
-            expected.push_back(AicpuStFixture::MakeInputByte(src, i));
-        }
-    }
-    return expected;
+    return AicpuStAllGather::BuildConcatExpectation(rankSize, scenario);
 }
 
 } // namespace

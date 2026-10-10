@@ -26,8 +26,10 @@ add_executable(
     sim_backing_test.cpp
     task_graph_executor_test.cpp
     aicpu_fixture_test.cpp
+    aicpu_dag_checker_test.cpp
     ${UTILS_DIR}/aicpu_scenario/task_graph_executor.cc
     ${UTILS_DIR}/aicpu_scenario/aicpu_fixture.cc
+    ${UTILS_DIR}/aicpu_scenario/aicpu_dag_checker.cc
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/all_gather_testcase.cpp
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/aicpu_all_gather.cc
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/aicpu_all_gather_mesh1d_adapter.cc
