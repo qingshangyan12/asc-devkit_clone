@@ -153,6 +153,13 @@ HcclResult InsTempAllGatherNHR::ValidateKernelRunParams(const TemplateResource& 
 HcclResult InsTempAllGatherNHR::KernelRun(
     const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource)
 {
+    return KernelRunBoundary(param, tempAlgParams, templateResource, mc2_boundary::TurnPolicy{});
+}
+
+HcclResult InsTempAllGatherNHR::KernelRunBoundary(
+    const OpParam& param, const TemplateDataParams& tempAlgParams, const TemplateResource& templateResource,
+    const mc2_boundary::TurnPolicy& policy)
+{
     HCCL_INFO("[InsTempAllGatherNHR] Run start");
     if (tempAlgParams.sliceSize == 0 && tempAlgParams.tailSize == 0) {
         HCCL_INFO("[InsTempAllGatherNHR] Rank [%d], get slicesize zero.", myRank_);
@@ -163,6 +170,8 @@ HcclResult InsTempAllGatherNHR::KernelRun(
     enableRemoteMemAccess_ = tempAlgParams.enableRemoteMemAccess;
     threadNum_ = GetThreadNum();
     CHK_RET(ValidateKernelRunParams(templateResource));
+    CHK_PRT_RET((policy.enabled || policy.skipEntry) && (channelsPerRank_ != 1U || threadNum_ != 2U),
+        HCCL_ERROR("Boundary policy requires one communication thread and one copy thread."), HCCL_E_PARA);
 
     isDmaRead_ = IsPcieProtocol(templateResource.channels);
     HCCL_DEBUG("[InsTempAllGatherNHR] Use Dma Read[%d]", isDmaRead_);
@@ -177,7 +186,9 @@ HcclResult InsTempAllGatherNHR::KernelRun(
         std::vector<ThreadHandle> subThreads(
             templateResource.threads.begin() + 1, templateResource.threads.begin() + threadNum_);
         GetNotifyIdxMainToSub(notifyIdxMainToSub_);
-        CHK_RET(PreSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxMainToSub_));
+        if (!policy.skipEntry) {
+            CHK_RET(PreSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxMainToSub_));
+        }
     }
 
     for (u32 channelIdx = 0; channelIdx < channelsPerRank_; channelIdx++) {
@@ -195,6 +206,9 @@ HcclResult InsTempAllGatherNHR::KernelRun(
         std::vector<ThreadHandle> subThreads(
             templateResource.threads.begin() + 1, templateResource.threads.begin() + threadNum_);
         GetNotifyIdxSubToMain(notifyIdxSubToMain_);
+        if (policy.enabled) {
+            notifyIdxSubToMain_.assign(1U, policy.exitNotify);
+        }
         CHK_RET(PostSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxSubToMain_));
     }
 

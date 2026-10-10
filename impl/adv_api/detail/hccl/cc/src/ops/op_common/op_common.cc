@@ -37,6 +37,7 @@
 #include "alg_param.h"
 #include "alg_type.h"
 #include "op_common.h"
+#include "mc2_algorithm_boundary_sync.h"
 #include "dpu/kernel_launch.h"
 #include "hcomm_host_profiling_dl.h"
 #include "hcomm_primitives_dl.h"
@@ -821,7 +822,8 @@ void CompReqChannelWithExistChannel(
 
 HcclResult HcclGetAlgRes(
     HcclComm comm, OpParam& param, std::unique_ptr<InsCollAlgBase>& executor, TopoInfoWithNetLayerDetails* topoInfo,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused)
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, void** resCtxSequence, bool& isResourceReused,
+    uint32_t boundaryTurns)
 {
     CHK_PTR_NULL(topoInfo);
     CHK_PTR_NULL(resCtxSequence);
@@ -974,7 +976,7 @@ HcclResult HcclGetAlgRes(
             param.algTag);
         HcclResult aicpuRet = GetAlgResAICPU(
             comm, param, resRequest, resCtxHost, topoInfo, algHierarchyInfo, resCtxSequence, size,
-            increCreateChannelFlag);
+            increCreateChannelFlag, boundaryTurns);
         HCCL_INFO(
             "[asc][AlgoResource][HcclGetAlgRes] after GetAlgResAICPU, ret[%d], ctxSize[%llu], "
             "resCtxSequence[%p].",
@@ -1005,7 +1007,7 @@ HcclResult GetAlgResAICPU(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
     std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, TopoInfoWithNetLayerDetails* topoInfo,
     AlgHierarchyInfoForAllLevel& algHierarchyInfo, void** resCtxSequence, uint64_t& ctxSize,
-    bool increCreateChannelFlag)
+    bool increCreateChannelFlag, uint32_t boundaryTurns)
 {
     std::string tagStr = param.algTag;
     HCCL_INFO(
@@ -1022,7 +1024,7 @@ HcclResult GetAlgResAICPU(
             "[asc][AlgoResource][GetAlgResAICPU] before HcclAllocAlgResourceAICPU, opType[%d], "
             "algTag[%s].",
             param.opType, param.algTag);
-        HcclResult ret = HcclAllocAlgResourceAICPU(comm, param, resRequest, resCtxHost);
+        HcclResult ret = HcclAllocAlgResourceAICPU(comm, param, resRequest, resCtxHost, boundaryTurns);
         HCCL_INFO(
             "[asc][AlgoResource][GetAlgResAICPU] after HcclAllocAlgResourceAICPU, ret[%d], "
             "slaveThreadNum[%u], channelLevels[%zu].",
@@ -1101,7 +1103,7 @@ HcclResult HcclMemcpyCtxHostToDevice(
 
 HcclResult HcclAllocAlgResourceAICPU(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, uint32_t boundaryTurns)
 {
     HCCL_INFO("Start to execute AllocAlgResource.");
     void* cclBufferAddr;
@@ -1113,14 +1115,14 @@ HcclResult HcclAllocAlgResourceAICPU(
     resCtxHost->notifyNumOnMainThread = resRequest.notifyNumOnMainThread;
     resCtxHost->slaveThreadNum = resRequest.slaveThreadNum;
     resCtxHost->notifyNumPerThread = resRequest.notifyNumPerThread;
-    CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost));
+    CHK_RET(HcclGetThread(comm, param, resRequest, resCtxHost, boundaryTurns));
     CHK_RET(HcclGetChannel(comm, param, resRequest, resCtxHost));
     return HCCL_SUCCESS;
 }
 
 HcclResult HcclGetThread(
     HcclComm comm, const OpParam& param, AlgResourceRequest& resRequest,
-    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost)
+    std::unique_ptr<AlgResourceCtxSerializable>& resCtxHost, uint32_t boundaryTurns)
 {
     if ((param.engine == COMM_ENGINE_AICPU_TS) || (param.engine == COMM_ENGINE_CPU)) {
         u32 maxNotifyNum = resRequest.notifyNumOnMainThread;
@@ -1132,7 +1134,12 @@ HcclResult HcclGetThread(
         u32 threadNum = resRequest.slaveThreadNum + 1;
         std::vector<ThreadHandle> threads(threadNum);
         // maxNotifyNum需要再增加一个用于host-device同步
-        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, maxNotifyNum + 1, threads.data()));
+        uint32_t allocatedNotify = maxNotifyNum + 1U;
+        if (boundaryTurns > 1U && allocatedNotify < mc2_boundary::NOTIFY_LIMIT &&
+            boundaryTurns <= mc2_boundary::NOTIFY_LIMIT - allocatedNotify) {
+            allocatedNotify += boundaryTurns;
+        }
+        CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, allocatedNotify, threads.data()));
         CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));
         // MC2 and HCCL share the communication-domain unfold thread. Resource preparation is serialized.
         const auto unfoldRet = GetUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread);

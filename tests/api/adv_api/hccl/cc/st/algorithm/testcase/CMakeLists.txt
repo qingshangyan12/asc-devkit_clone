@@ -178,3 +178,20 @@ add_custom_command(TARGET ${MESHCHUNK_TEST_TARGET} POST_BUILD
     COMMAND $<TARGET_FILE:${MESHCHUNK_TEST_TARGET}>
     COMMENT "Run isolated MeshChunk primitive and data-semantics tests")
 add_dependencies(${HCCL_CHECKER_TARGET} ${MESHCHUNK_TEST_TARGET})
+
+set(BOUNDARY_TEST_TARGET ascendc_ut_adv_api_hccl_cc_boundary)
+add_executable(${BOUNDARY_TEST_TARGET} main.cc mc2_boundary_sync_testcase.cc)
+target_include_directories(${BOUNDARY_TEST_TARGET} PRIVATE ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+    ${HCCL_CC_SRC_DIR}/aicpu_kfc/framework/device/aicpu_kfc/decoupler)
+target_compile_options(${BOUNDARY_TEST_TARGET} PRIVATE -std=c++14 -Werror -O0 -g -D_GLIBCXX_USE_CXX11_ABI=0)
+target_compile_definitions(${BOUNDARY_TEST_TARGET} PRIVATE UT_TEST AICPU_COMPILE)
+target_link_libraries(${BOUNDARY_TEST_TARGET} PRIVATE ${MESHCHUNK_TEST_LIBS})
+foreach(primitive HcommChannelNotifyRecordOnThread HcommChannelNotifyWaitOnThread
+        HcommThreadNotifyRecordOnThread HcommThreadNotifyWaitOnThread HcommLocalCopyOnThread
+        HcommReadOnThread HcommWriteOnThread)
+    target_link_options(${BOUNDARY_TEST_TARGET} PRIVATE "-Wl,--wrap=${primitive}")
+endforeach()
+add_custom_command(TARGET ${BOUNDARY_TEST_TARGET} POST_BUILD
+    COMMAND $<TARGET_FILE:${BOUNDARY_TEST_TARGET}>
+    COMMENT "Run MC2 boundary primitive queues and ordinary-Notify dependency tests")
+add_dependencies(${HCCL_CHECKER_TARGET} ${BOUNDARY_TEST_TARGET})

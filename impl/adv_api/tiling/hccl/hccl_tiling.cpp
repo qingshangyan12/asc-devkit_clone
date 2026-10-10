@@ -247,12 +247,35 @@ uint32_t Mc2CcTilingConfig::GetTiling(::Mc2CcTiling& tiling)
     tilingInner->srcDataType = impl_.srcDataType_;
     tilingInner->dstDataType = impl_.dstDataType_;
     tilingInner->commEngine = impl_.commEngine_;
+    static_assert(sizeof(tilingInner->reserved2) >= sizeof(mc2_boundary::Config), "No tiling extension space");
+    mc2_boundary::Config boundary;
+    boundary.mode = impl_.boundarySyncMode_;
+    boundary.groupId = impl_.boundarySyncGroupId_;
+    boundary.totalTurns = impl_.boundarySyncTotalTurns_;
+    if (boundary.mode != 0U) {
+        mc2_boundary::Encode(tilingInner->reserved2, boundary);
+    } else {
+        (void)memset_s(tilingInner->reserved2, sizeof(tilingInner->reserved2), 0, sizeof(boundary));
+    }
     uint64_t ccTilingAddr = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&tiling));
     ASCENDC_HOST_ASSERT(
         UpdateMc2InitTiling(impl_.initTilingAddr_, ccTilingAddr) == EXIT_SUCCESS, return EXIT_FAILURE,
         "UpdateMc2InitTiling failed.");
     PrintMc2CcTiling(*tilingInner);
 
+    return EXIT_SUCCESS;
+}
+
+uint32_t Mc2CcTilingConfig::SetAlgorithmBoundarySync(
+    Mc2AlgorithmBoundarySyncMode mode, uint32_t groupId, uint32_t totalTurns)
+{
+    const auto value = static_cast<uint8_t>(mode);
+    ASCENDC_HOST_ASSERT(
+        value <= 2U && (value == 0U || totalTurns != 0U), return EXIT_FAILURE,
+        "Invalid boundary sync mode[%u] or totalTurns[%u].", value, totalTurns);
+    impl_.boundarySyncMode_ = value;
+    impl_.boundarySyncGroupId_ = value == 0U ? 0U : groupId;
+    impl_.boundarySyncTotalTurns_ = value == 0U ? 0U : totalTurns;
     return EXIT_SUCCESS;
 }
 

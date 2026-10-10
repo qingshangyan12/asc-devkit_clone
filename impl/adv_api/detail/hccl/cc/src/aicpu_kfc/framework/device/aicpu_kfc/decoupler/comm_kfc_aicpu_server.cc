@@ -329,7 +329,8 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
 
         std::vector<uint8_t> baseOpParam{};
         std::string commName{};
-        CHK_RET(LoadOpenOpParamData(opParamKey, ctx->opParamSize[i], commName, baseOpParam));
+        mc2_boundary::Config boundary;
+        CHK_RET(LoadOpenOpParamData(opParamKey, ctx->opParamSize[i], commName, baseOpParam, &boundary));
         CHK_PRT_RET(
             commName.empty(), HCCL_ERROR("Group %u: empty comm name for opParamKey %#llx.", groupIdx_, opParamKey),
             HCCL_E_PARA);
@@ -350,6 +351,7 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
             HCCL_E_INTERNAL);
 
         ServerExecCtx execCtx{};
+        execCtx.boundary = boundary;
         execCtx.offset = algInfo.offset;
         execCtx.opParamKey = opParamKey;
         execCtx.commName = commName;
@@ -619,6 +621,47 @@ HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(
     return ret;
 }
 
+HcclResult CommKfcAicpuServer::CheckBoundaryGroup(const ServerExecCtx& current, bool& eligible) const
+{
+    eligible = current.boundary.mode == 1U && current.boundary.totalTurns > 1U;
+    uint32_t currentBase = current.resCtxHolder->notifyNumOnMainThread;
+    for (const auto count : current.resCtxHolder->notifyNumPerThread) {
+        currentBase = std::max(currentBase, count);
+    }
+    for (const auto& member : execCtxList_) {
+        if (member.boundary.mode == 0U || member.boundary.groupId != current.boundary.groupId) {
+            continue;
+        }
+        CHK_PRT_RET(
+            member.boundary.mode != current.boundary.mode ||
+                member.boundary.totalTurns != current.boundary.totalTurns,
+            HCCL_ERROR("[MC2_BOUNDARY_SYNC] inconsistent group configuration."), HCCL_E_PARA);
+        const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(member.baseOpParam.data());
+        const auto& res = *member.resCtxHolder;
+        uint32_t notifyBase = res.notifyNumOnMainThread;
+        for (const auto count : res.notifyNumPerThread) {
+            notifyBase = std::max(notifyBase, count);
+        }
+        // Do not restore/change the NHR multi-channel configuration in this feature.
+        bool singleChannel = res.channels.size() == 1U && !res.channels[0].empty();
+        std::set<uint32_t> peers;
+        for (const auto& level : res.channels) {
+            for (const auto& channel : level) {
+                singleChannel = peers.insert(channel.remoteRank).second && singleChannel;
+            }
+        }
+        eligible = eligible && member.resourceType == ServerExecResourceType::NEXT_AICPU &&
+            param->opType == HCCL_CMD_ALLGATHER && param->engine == COMM_ENGINE_AICPU_TS &&
+            std::string(param->algName) == "AicpuAllGatherSoleNHR" && singleChannel &&
+            res.threads.size() == 2U && res.threads[0] != 0U && res.threads[1] != 0U &&
+            res.threads[0] != res.threads[1] && res.threads == current.resCtxHolder->threads &&
+            notifyBase == currentBase &&
+            notifyBase < mc2_boundary::NOTIFY_LIMIT - 1U &&
+            current.boundary.totalTurns <= mc2_boundary::NOTIFY_LIMIT - notifyBase - 1U;
+    }
+    return HCCL_SUCCESS;
+}
+
 HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMsg, u32 msgPos)
 {
     KeepAlive();
@@ -639,6 +682,17 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     const HcclHandle handle = msg.addMsg.v1Msg.selfHandleID;
     CHK_PRT_RET(handle < 0, HCCL_ERROR("Group %u: invalid handle id %d.", groupIdx_, handle), HCCL_E_INTERNAL);
     const u32 repeatCnt = static_cast<u32>(msg.addMsg.v1Msg.repeatCnt);
+    bool boundaryEligible = false;
+    if (execCtx->boundary.mode != 0U) {
+        CHK_RET(CheckBoundaryGroup(*execCtx, boundaryEligible));
+    }
+    CHK_PRT_RET(!boundaryGroup_.Begin(execCtx->boundary, repeatCnt),
+        HCCL_ERROR("[MC2_BOUNDARY_SYNC] invalid group order/count, group[%u].", execCtx->boundary.groupId),
+        HCCL_E_PARA);
+    if (execCtx->boundary.mode != 0U && boundaryGroup_.Turn() == 0U) {
+        boundaryRemovedEntry_ = 0U;
+        boundaryFallbackTurns_ = 0U;
+    }
     const u64 waitAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.commitTurnCnt[msgPos].cnt));
     const u64 recordAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.finishedTurnCnt[msgPos].cnt));
     HCCL_INFO(
@@ -720,6 +774,23 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             dfxRegistered = true;
         }
 
+        mc2_boundary::TurnPolicy boundaryPolicy;
+        if (boundaryEligible) {
+            PrepareOpenBoundaryPolicy(
+                runParam, *execCtx->resCtxHolder, execCtx->boundary, boundaryGroup_.Turn(), boundaryPolicy);
+        }
+        CHK_PRT_RET(!boundaryGroup_.StartTurn(),
+            HCCL_ERROR("[MC2_BOUNDARY_SYNC] previous submission failed."), HCCL_E_INTERNAL);
+        if (execCtx->boundary.mode != 0U && boundaryGroup_.Turn() == 0U) {
+            HCCL_DEBUG(
+                "[MC2_BOUNDARY_SYNC][BEGIN] group[%u] turns[%u] mode[%u] eligible[%d] effective[%d] "
+                "fallback_reason[%s].",
+                execCtx->boundary.groupId, execCtx->boundary.totalTurns, execCtx->boundary.mode,
+                boundaryEligible, boundaryPolicy.enabled,
+                boundaryPolicy.enabled ? "none" :
+                    (boundaryEligible ? "runtime_range_or_alias" : "unsupported_path_or_notify_budget"));
+
+        }
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "BeforeWait", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -747,7 +818,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         HCCL_INFO(
             "[MC2_OPEN_DIAG][LoopBeforeKernel] group %u, msgPos %u, repeatIdx %u, turnIdx %u.", groupIdx_, msgPos, i,
             turnIdx);
-        ret = LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
+        ret = boundaryPolicy.enabled ?
+            LaunchOpenOpParamData(runParam, *execCtx->resCtxHolder, boundaryPolicy) :
+            LaunchOpenAicpuKernelServer(runParam, *execCtx->resCtxHolder);
         UpdateProgress("AfterKernel", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "AfterKernel", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -780,6 +853,18 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
             break;
         }
 
+        if (execCtx->boundary.mode != 0U) {
+            boundaryRemovedEntry_ += boundaryPolicy.skipEntry ? 1U : 0U;
+            boundaryFallbackTurns_ += boundaryPolicy.enabled ? 0U : 1U;
+        }
+        boundaryGroup_.CommitTurn();
+        if (execCtx->boundary.mode != 0U && boundaryGroup_.Complete()) {
+            HCCL_DEBUG(
+                "[MC2_BOUNDARY_SYNC][SUMMARY] group[%u] total_turns[%u] removed_entry[%u] "
+                "removed_exit[0] fallback_turns[%u].",
+                execCtx->boundary.groupId, execCtx->boundary.totalTurns,
+                boundaryRemovedEntry_, boundaryFallbackTurns_);
+        }
         UpdateProgress("LoopEnd", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
             "LoopEnd", groupIdx_, msgArea_, msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr, turnNumsAddr_,
@@ -821,6 +906,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
 
 HcclResult CommKfcAicpuServer::Finalize(u32 msgPos)
 {
+    CHK_PRT_RET(!boundaryGroup_.Complete(),
+        HCCL_ERROR("[MC2_BOUNDARY_SYNC] Finalize before complete group."), HCCL_E_PARA);
     KeepAlive();
     if (msgArea_ != nullptr && msgPos < HCCL_MSG_CNT) {
         const u64 waitAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.commitTurnCnt[msgPos].cnt));
@@ -836,6 +923,8 @@ HcclResult CommKfcAicpuServer::IsAllTaskFinished(u32 msgPos, bool& isFinish)
     CHK_PTR_NULL(msgArea_);
 
     isFinish = false;
+    CHK_PRT_RET(!boundaryGroup_.Complete(),
+        HCCL_ERROR("[MC2_BOUNDARY_SYNC] incomplete group cannot report completion."), HCCL_E_PARA);
     if (syncExecCtx_ != nullptr && syncExecCtx_->resourceType == ServerExecResourceType::NEXT_AICPU) {
         const u64 waitAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.commitTurnCnt[msgPos].cnt));
         const u64 recordAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.finishedTurnCnt[msgPos].cnt));

@@ -23,6 +23,20 @@
 
 namespace mc2_ops_hccl {
 namespace {
+template <typename T>
+HcclResult RunBoundaryTemplate(
+    T& algorithm, const OpParam& param, const TemplateDataParams& data, TemplateResource& res,
+    const mc2_boundary::TurnPolicy&)
+{
+    return algorithm.KernelRun(param, data, res);
+}
+HcclResult RunBoundaryTemplate(
+    InsTempAllGatherNHR& algorithm, const OpParam& param, const TemplateDataParams& data,
+    TemplateResource& res, const mc2_boundary::TurnPolicy& policy)
+{
+    return algorithm.KernelRunBoundary(param, data, res, policy);
+}
+
 template <typename InsAlgTemplate>
 typename std::enable_if<std::is_base_of<InsAlgTemplateBase, InsAlgTemplate>::value, HcclResult>::type
 SetChannelsPerRankIfSupported(InsAlgTemplate& algTemplate, const std::map<u32, std::vector<ChannelInfo>>& channels)
@@ -80,6 +94,20 @@ template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate(
     const OpParam& param, const AlgResourceCtxSerializable& resCtx)
 {
+    return OrchestrateImpl(param, resCtx, mc2_boundary::TurnPolicy{});
+}
+
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateBoundary(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const mc2_boundary::TurnPolicy& policy)
+{
+    return OrchestrateImpl(param, resCtx, policy);
+}
+
+template <typename AlgTopoMatch, typename InsAlgTemplate>
+HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateImpl(
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const mc2_boundary::TurnPolicy& policy)
+{
     HCCL_INFO(
         "[MC2_OPEN_DIAG][InsV2AllGatherSoleExecutor][Orchestrate] Orchestrate Start, file[%s:%d], "
         "sizeof(OpParam) %zu, varMemSizeOffset %zu, varMemSize %llu, opType %u, algName[%s].",
@@ -101,7 +129,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         "[InsV2AllGatherSoleExecutor][Orchestrate] myRank[%u], threadsSize[%lu], "
         "dataCount[%llu], dataTypeSize[%lu]",
         myRank_, threads_.size(), dataCount_, dataTypeSize_);
-    HcclResult ret = OrchestrateLoop(param, resCtx);
+    HcclResult ret = OrchestrateLoop(param, resCtx, policy);
     CHK_PRT_RET(
         ret != HCCL_SUCCESS,
         HCCL_ERROR(
@@ -113,7 +141,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
 
 template <typename AlgTopoMatch, typename InsAlgTemplate>
 HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::OrchestrateLoop(
-    const OpParam& param, const AlgResourceCtxSerializable& resCtx)
+    const OpParam& param, const AlgResourceCtxSerializable& resCtx, const mc2_boundary::TurnPolicy& policy)
 {
     HCCL_INFO("[InsV2AllGatherSoleExecutor][OrchestrateLoop] Start");
 
@@ -206,7 +234,11 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
             tempAlgParams.outputSliceStride, tempAlgParams.buffInfo.inBuffBaseOff,
             tempAlgParams.buffInfo.outBuffBaseOff, tempAlgParams.repeatNum);
 
-        CHK_RET(algTemplate.KernelRun(param, tempAlgParams, templateAlgRes));
+        auto loopPolicy = policy;
+        loopPolicy.skipEntry = policy.skipEntry && loop == 0U;
+        // Intermediate payload-loop barriers always retain their original Notify slots.
+        loopPolicy.enabled = policy.enabled && loop + 1U == loopTimes;
+        CHK_RET(RunBoundaryTemplate(algTemplate, param, tempAlgParams, templateAlgRes, loopPolicy));
         processedDataCount += currDataCount;
     }
     HCCL_INFO("[InsV2AllGatherSoleExecutor][OrchestrateLoop] End.");
@@ -224,6 +256,8 @@ REGISTER_EXEC_V2(
     InsTempAllGatherNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHR, AlgEngine::AICPU, "sole[nhr]", COND_NONE, FLAG_NONE, 0);
+
+template class InsV2AllGatherSoleExecutor<TopoMatch1D, InsTempAllGatherNHR>;
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHRMultiLink, InsV2AllGatherSoleExecutor, TopoMatch1D,
