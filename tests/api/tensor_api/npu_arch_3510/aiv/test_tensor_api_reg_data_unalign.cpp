@@ -30,8 +30,8 @@ __simd_vf__ inline void compile_unalign_load_store(__ubuf__ T* dst, __ubuf__ T* 
 
     auto first_src =
         src_tensor.slice(asc::te::make_coord(0), asc::te::make_shape(elements_per_register));
-    auto first = loader.load(first_src);
-    auto second = loader.load(src_tensor, asc::te::make_coord(elements_per_register));
+    auto first = loader.load(first_src, elements_per_register);
+    auto second = loader.load(src_tensor, asc::te::make_coord(elements_per_register), elements_per_register);
     static_assert(AscendC::Std::is_same_v<decltype(first), asc::te::experimental::reg_tensor<RegDataType>>);
     static_assert(AscendC::Std::is_same_v<decltype(second), asc::te::experimental::reg_tensor<RegDataType>>);
 

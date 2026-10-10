@@ -34,7 +34,7 @@ CANN 软件包须包含 PR 6049 新增的 `unalign_load` / `unalign_store` 接�
 1. 将输入从 GM 搬入 UB，并使用 `fill/store` 将输出 UB 清零。
 2. 在核函数中通过 `slice` 创建源、目的 Tensor 视图，均从第 1 个元素开始，即偏移 4 字节，再将视图传入 VF。
 3. 创建 `unalign_load` 和 `unalign_store` 会话，调用 `loader.prepare(src_stream)` 初始化连续加载状态。
-4. 通过 `loader.load` 和 `storer.store`，按相对视图的坐标连续加载、存储两个完整寄存器，每次存储显式传入元素数量。
+4. 通过 `loader.load` 和 `storer.store`，按相对视图的坐标连续加载、存储两个完整寄存器，每次加载和存储显式传入 `count`。
 5. 调用 `storer.flush(dst_stream, 2 * elements_per_register)` 提交尚未写出的数据，再将输出搬回 GM。
 
 核心代码如下：
@@ -45,7 +45,7 @@ asc::te::experimental::unalign_store storer;
 loader.prepare(src_stream);
 for (uint32_t repeat = 0; repeat < 2; ++repeat) {
     auto coord = asc::te::make_coord(repeat * elements_per_register);
-    auto src = loader.load(src_stream, coord);
+    auto src = loader.load(src_stream, coord, elements_per_register);
     storer.store(dst_stream, coord, src, elements_per_register);
 }
 storer.flush(dst_stream, static_cast<int32_t>(2 * elements_per_register));
@@ -59,7 +59,7 @@ storer.flush(dst_stream, static_cast<int32_t>(2 * elements_per_register));
 4. 使用 `update_mask<uint16_t>` 屏蔽最后一个无效元素，调用 `reduce_max<reduce_scope::datablock>` 完成每 32 字节数据块的最大值归约，数据类型由输入推导。
 5. 使用 `storer.store` 在目的行的坐标 0、8 各非对齐存储 8 个结果，最后调用 `storer.flush(dst_row, output_columns)`，将输出搬回 GM。
 
-**接口约束：** 每段连续加载前先调用 `prepare`，第一次加载的地址须与准备地址一致，后续加载地址须连续。加载和存储坐标相对传入的 Tensor 视图，显式由样例计算，不会更新外部 Tensor 或坐标。`load` 读取完整寄存器，`store` 按 `count` 个元素写出，不使用 Reg Tensor 的 mask；有效元素屏蔽在归约计算阶段完成。每段存储结束时调用一次 `flush`，传入首次存储使用的目的 Tensor 视图和流末尾相对该视图的元素偏移。CANN 9.3.0 的 `slice` 不可在 VF 中直接调用，因此视图在核函数中构造。
+**接口约束：** 每段连续加载前先调用 `prepare`，第一次加载的地址须与准备地址一致，后续加载地址须连续。加载和存储坐标相对传入的 Tensor 视图，显式由样例计算，不会更新外部 Tensor 或坐标。`load` 读取完整寄存器，其 `count` 指定加载流推进的元素数量，本样例传入每个寄存器的元素数；`store` 按 `count` 个元素写出，不使用 Reg Tensor 的 mask。有效元素屏蔽在归约计算阶段完成。每段存储结束时调用一次 `flush`，传入首次存储使用的目的 Tensor 视图和流末尾相对该视图的元素偏移。CANN 9.3.0 的 `slice` 不可在 VF 中直接调用，因此视图在核函数中构造。
 
 ### 结果校验
 

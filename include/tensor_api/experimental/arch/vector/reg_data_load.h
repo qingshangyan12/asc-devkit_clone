@@ -79,21 +79,23 @@ struct unalign_load {
     /**
      * @brief Loads one full vector register from the next address in an unaligned stream.
      * @param src_tile Tensor whose beginning is the source address for this load.
+     * @param count Number of elements by which to advance the load stream.
      * @return One register tensor containing the loaded data. An int4b_t source
      * returns reg_tensor<int4x2_t>.
      */
     template <typename Tensor>
-    __simd_callee__ inline auto load(const Tensor& src_tile);
+    __simd_callee__ inline auto load(const Tensor& src_tile, uint32_t count);
 
     /**
      * @brief Loads one full vector register from a UB tensor at the specified coordinate.
      * @param src_tile Source tensor in the prepared unaligned stream.
      * @param coord Coordinate of the first source element.
+     * @param count Number of elements by which to advance the load stream.
      * @return One register tensor containing the loaded data. An int4b_t source
      * returns reg_tensor<int4x2_t>.
      */
     template <typename Tensor, typename Coord>
-    __simd_callee__ inline auto load(const Tensor& src_tile, const Coord& coord);
+    __simd_callee__ inline auto load(const Tensor& src_tile, const Coord& coord, uint32_t count);
 
 private:
     vector_load_unalign ureg;

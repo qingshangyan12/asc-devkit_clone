@@ -34,7 +34,7 @@ The CANN installation must include the `unalign_load` / `unalign_store` APIs add
 1. Copy the input from GM to UB and zero the output UB using `fill/store`.
 2. Create source and destination tensor views using `slice` in the kernel, offset both by one element (four bytes), and pass the views into the VF.
 3. Create `unalign_load` and `unalign_store` sessions and prepare the load stream with `loader.prepare(src_stream)`.
-4. Load and store two full registers with `loader.load` and `storer.store`, using coordinates relative to the views and an explicit element count for each store.
+4. Load and store two full registers with `loader.load` and `storer.store`, using coordinates relative to the views and an explicit `count` for each load and store.
 5. Commit pending stores with `storer.flush(dst_stream, 2 * elements_per_register)` and copy the output back to GM.
 
 ```cpp
@@ -43,7 +43,7 @@ asc::te::experimental::unalign_store storer;
 loader.prepare(src_stream);
 for (uint32_t repeat = 0; repeat < 2; ++repeat) {
     auto coord = asc::te::make_coord(repeat * elements_per_register);
-    auto src = loader.load(src_stream, coord);
+    auto src = loader.load(src_stream, coord, elements_per_register);
     storer.store(dst_stream, coord, src, elements_per_register);
 }
 storer.flush(dst_stream, static_cast<int32_t>(2 * elements_per_register));
@@ -57,7 +57,7 @@ storer.flush(dst_stream, static_cast<int32_t>(2 * elements_per_register));
 4. Mask the last invalid element using `update_mask<uint16_t>` and call `reduce_max<reduce_scope::datablock>` for the maximum of every 32-byte datablock. The data type is deduced from the input.
 5. Store eight results at destination row coordinates 0 and 8 with `storer.store`. Call `storer.flush(dst_row, output_columns)` and copy results back to GM.
 
-**Session requirements:** Call `prepare` before each contiguous load stream; the first load must use the prepared address. Coordinates are relative to the supplied tensor view and are computed explicitly by the sample; the API does not update external tensors or coordinates. Loads read a full register; stores write `count` elements without using the Reg Tensor mask. Apply masks during reduction. Call `flush` once per store stream, passing the first destination view and the end-of-stream element offset relative to that view. In CANN 9.3.0, `slice` cannot be called directly inside a VF, so views are constructed in the kernel.
+**Session requirements:** Call `prepare` before each contiguous load stream; the first load must use the prepared address. Coordinates are relative to the supplied tensor view and are computed explicitly by the sample; the API does not update external tensors or coordinates. Loads read a full register, with `count` specifying the number of elements by which to advance the load stream; this sample uses the number of elements per register. Stores write `count` elements without using the Reg Tensor mask. Apply masks during reduction. Call `flush` once per store stream, passing the first destination view and the end-of-stream element offset relative to that view. In CANN 9.3.0, `slice` cannot be called directly inside a VF, so views are constructed in the kernel.
 
 ### Verification
 
