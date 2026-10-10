@@ -1,4 +1,4 @@
-# okf-search dryrun 查询清单（c_api 全量 × A5/A3 × CANN 9.2.0）。
+# asc-search dryrun 查询清单（c_api 全量 × A5/A3 × CANN 9.2.0）。
 # 每条用例验证一个能力面；前 19 条为试点基线，后 10 条为全量轮新增
 # （reg_compute/sync/atomic/deprecated/defs 维度）。
 # args 键与 query.py 参数一一对应；arch 选构建实例（a5=默认提交实例）。

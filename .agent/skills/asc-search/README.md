@@ -1,13 +1,13 @@
 # OKF Search README
 
-这是用户侧 skill `okf-search` 的全貌说明。看这一篇就能知道：它是干什么的、怎么让 AI 用它、
+这是用户侧 skill `asc-search` 的全貌说明。看这一篇就能知道：它是干什么的、怎么让 AI 用它、
 每个文件是干什么的、索引和配置里每个字段是什么意思。
 
 ## 1. 这个 skill 是干什么的
 
 ### 1.1 背景
 
-写 Ascend C 算子要用 C API 时，面对的是 800 多篇文档，凭记忆按目录翻很慢。`okf-search` 把这些
+写 Ascend C 算子要用 C API 时，面对的是 800 多篇文档，凭记忆按目录翻很慢。`asc-search` 把这些
 文档整理成一个能检索的库：你把需求说给 AI，它返回候选接口文档的路径和用途。
 
 ### 1.2 它靠什么工作
@@ -20,7 +20,7 @@
 | include 头 | `include/c_api/**/*.h` 声明上方的 Doxygen | 结构：重载编号、适用架构、参数方向 |
 | examples 头 | 样例源码里的 `//! [override_id]` 成对标记 | 关联：样例和哪个重载对应 |
 
-`okf-search` 把三类头推导成一份持久索引，查询时只查索引、按需打开候选文档，不需要现场全文搜索。
+`asc-search` 把三类头推导成一份持久索引，查询时只查索引、按需打开候选文档，不需要现场全文搜索。
 
 ### 1.3 两个工作流
 
@@ -40,9 +40,9 @@
 
 ### 2.1 接入方式
 
-`okf-search` 已放在仓库 `.agent/skills/okf-search/`，opencode 等客户端通过 `.opencode/skills`
+`asc-search` 已放在仓库 `.agent/skills/asc-search/`，opencode 等客户端通过 `.opencode/skills`
 （软链到 `.agent/skills`）自动发现，无需额外接入。若工具不支持自动加载，在对话里补一句
-"按 `.agent/skills/okf-search/SKILL.md` 的流程帮我找……"。
+"按 `.agent/skills/asc-search/SKILL.md` 的流程帮我找……"。
 
 ### 2.2 直接提问
 
@@ -104,7 +104,7 @@
 ### 3.2 目录与文件作用
 
 ```text
-okf-search/
+asc-search/
 ├── SKILL.md                        # 给 AI 的入口：建索引 + 检索的完整流程与输出规范
 ├── README.md                       # 本文件：给人的全貌说明
 ├── config/                         # 运行配置（脚本直接读取，随包分发）

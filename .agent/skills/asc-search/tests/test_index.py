@@ -1,4 +1,4 @@
-"""okf-search 推导引擎、门控与查询测试（不写入已提交索引，用临时目录构建）。"""
+"""asc-search 推导引擎、门控与查询测试（不写入已提交索引，用临时目录构建）。"""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ class GateTests(unittest.TestCase):
         self.assertFalse(gate.version_covers(">=9.0.0,<=9.1.0", "9.2.0"))
 
     def test_arch_label_mapping(self) -> None:
-        pm = gate.load_product_map(REPO_ROOT / ".agent/skills/okf-search/config/product-map.yaml")
+        pm = gate.load_product_map(REPO_ROOT / ".agent/skills/asc-search/config/product-map.yaml")
         self.assertEqual(gate.arch_label_to_number("A5", pm), "3510")
         self.assertEqual(gate.arch_label_to_number("A3", pm), "2201")
         self.assertEqual(gate.npu_to_arch("950", pm), "3510")

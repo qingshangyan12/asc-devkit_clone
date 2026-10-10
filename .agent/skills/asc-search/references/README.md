@@ -1,6 +1,6 @@
-# okf-search reference 导航
+# asc-search reference 导航
 
-本目录保存 okf-search 两个工作流（建立索引、使用索引）的流程文档与推导契约。运行所需配置、
+本目录保存 asc-search 两个工作流（建立索引、使用索引）的流程文档与推导契约。运行所需配置、
 脚本与测试在各同级目录。
 
 ## 目录划分

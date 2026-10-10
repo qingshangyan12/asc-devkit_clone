@@ -10,7 +10,7 @@
 任何检索开始前先运行（用户显式指定架构/版本时透传参数，否则默认 A5 + 本地自动检测）：
 
 ```bash
-python3 .agent/skills/okf-search/scripts/ensure_index.py --json [--arch A3] [--cann-version 9.2.0]
+python3 .agent/skills/asc-search/scripts/ensure_index.py --json [--arch A3] [--cann-version 9.2.0]
 ```
 
 - ensure 按「CANN 版本 × 架构 × 层级」检测 committed 索引：门控匹配且指纹新鲜 → 零动作；

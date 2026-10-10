@@ -8,7 +8,7 @@
 ## 资产结构
 
 ```
-okf-search/
+asc-search/
   scripts/build_index.py        # 构建 + 校验 + 漂移检测（--check）；--arch/--cann-version 门控
   scripts/ensure_index.py       # 前置保障（检索步骤 0）：门控匹配 + 指纹新鲜 → 按需原地重建
   scripts/query.py              # 查询 CLI（唯一检索入口）

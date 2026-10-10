@@ -1,9 +1,9 @@
 ---
-name: okf-search
+name: asc-search
 description: OKF 用户侧入口：把 Ascend C API 文档的三类头建立为门控化持久索引，并按算子需求检索候选接口文档。用户需要建索引/检查索引新鲜度、询问“用哪个接口/怎么找 API/某接口配什么用/哪个版本可用”时使用；写头、改词表、标注文档不在本 skill 范围。
 ---
 
-# OKF 索引与检索（okf-search）
+# OKF 索引与检索（asc-search）
 
 本 Skill 覆盖「建立索引 → 使用索引」全流程：索引是三类头（文档 slim 头、include Doxygen、
 examples marker）的纯派生数据，查询统一走本 skill 的 `scripts/query.py`。推导规则唯一事实源是
@@ -14,7 +14,7 @@ examples marker）的纯派生数据，查询统一走本 skill 的 `scripts/que
 ## 建立索引
 
 ```bash
-python3 .agent/skills/okf-search/scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] [--check]
+python3 .agent/skills/asc-search/scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] [--check]
 ```
 
 构建按「CANN 版本 × 架构 × 层级」门控，只索引同时满足 version 覆盖、archs 命中、层级命中的 API；
@@ -27,7 +27,7 @@ python3 .agent/skills/okf-search/scripts/build_index.py --scope c_api [--arch A5
 任何检索开始前先运行（用户显式指定架构/版本时透传参数，否则默认 A5 + 本地自动检测）：
 
 ```bash
-python3 .agent/skills/okf-search/scripts/ensure_index.py --json [--arch A3] [--cann-version 9.2.0]
+python3 .agent/skills/asc-search/scripts/ensure_index.py --json [--arch A3] [--cann-version 9.2.0]
 ```
 
 门控匹配且指纹新鲜 → 零动作；缺失、门控不符或漂移 → 原地重建（本地 diff，不主动提交）。
