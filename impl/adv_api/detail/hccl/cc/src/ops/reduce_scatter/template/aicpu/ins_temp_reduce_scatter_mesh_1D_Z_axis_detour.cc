@@ -37,6 +37,12 @@ HcclResult InsTempReduceScatterMesh1DZAxisDetour::CalcRes(
     level0ChannelNumPerRank_ = level0Channels.empty() ? 0 : CalcChannelsPerRank(level0Channels);
     level1ChannelNumPerRank_ = level1Channels.empty() ? 0 : CalcChannelsPerRank(level1Channels);
     channelsPerRank_ = level0ChannelNumPerRank_ + level1ChannelNumPerRank_;
+    CHK_PRT_RET(
+        templateRankSize_ > 1 &&
+            (level0ChannelNumPerRank_ != MESH_CHANNELS_NUM ||
+             level0Channels.size() != (templateRankSize_ - 1) * level0ChannelNumPerRank_ ||
+             level1Channels.size() != (templateRankSize_ - 1) * level1ChannelNumPerRank_),
+        HCCL_ERROR("[Detour][CalcRes] Inconsistent per-rank channel counts"), HCCL_E_NOT_SUPPORT);
     CHK_RET(GetRes(resourceRequest));
     HCCL_DEBUG(
         "[InsTempReduceScatterMesh1DZAxisDetour][CalcRes] myRank[%u], channelsPerRank_[%u], "
@@ -45,8 +51,8 @@ HcclResult InsTempReduceScatterMesh1DZAxisDetour::CalcRes(
         resourceRequest.slaveThreadNum);
     HCCL_INFO(
         "[InsTempReduceScatterMesh1DZAxisDetour][CalcRes]myRank[%u], channelsPerRank_[%u], "
-        "level0ChannelNumPerRank_[%u], level1ChannelNumPerRank_[%u], level0DataRatio_[%.2f]",
-        myRank_, channelsPerRank_, level0ChannelNumPerRank_, level1ChannelNumPerRank_, level0DataRatio_);
+        "level0ChannelNumPerRank_[%u], level1ChannelNumPerRank_[%u]",
+        myRank_, channelsPerRank_, level0ChannelNumPerRank_, level1ChannelNumPerRank_);
     return HCCL_SUCCESS;
 }
 
@@ -65,9 +71,9 @@ HcclResult InsTempReduceScatterMesh1DZAxisDetour::CalcDataSplitByPortGroup(
     std::vector<u64>& elemCountOut, std::vector<u64>& sizeOut, std::vector<u64>& elemOffset)
 {
     HCCL_INFO("[InsTempReduceScatterMesh1DZAxisDetour][CalcDataSplitByPortGroup] Run Start");
-    return CalcDataSplitByPortGroupZAxisDetour(
+    return CalcDataSplitByBandwidthZAxisDetour(
         totalDataCount, dataTypeSize, channels, elemCountOut, sizeOut, elemOffset, level0ChannelNumPerRank_,
-        level1ChannelNumPerRank_, level0DataRatio_);
+        level1ChannelNumPerRank_, templateRankSize_);
 }
 
 HcclResult InsTempReduceScatterMesh1DZAxisDetour::SetchannelsPerRank(
@@ -75,15 +81,19 @@ HcclResult InsTempReduceScatterMesh1DZAxisDetour::SetchannelsPerRank(
 {
     CHK_PRT_RET(channels.empty(), HCCL_ERROR("[SetchannelsPerRank] channels is empty."), HCCL_E_INTERNAL);
     channelsPerRank_ = CalcChannelsPerRank(channels);
-    if (channelsPerRank_ > 1) {
-        level0ChannelNumPerRank_ = MESH_CHANNELS_NUM;
-        level1ChannelNumPerRank_ = channelsPerRank_ - level0ChannelNumPerRank_;
-        level0DataRatio_ = (templateRankSize_ == 2) ? 0.25f : 0.5f;
+    CHK_PRT_RET(
+        channelsPerRank_ < MESH_CHANNELS_NUM || channels.size() != templateRankSize_ - 1,
+        HCCL_ERROR("[Detour][SetchannelsPerRank] Missing peer channels"), HCCL_E_PARA);
+    for (const auto& entry : channels) {
+        CHK_PRT_RET(entry.second.size() != channelsPerRank_,
+            HCCL_ERROR("[Detour][SetchannelsPerRank] Unequal per-rank channel counts"), HCCL_E_PARA);
     }
+    level0ChannelNumPerRank_ = MESH_CHANNELS_NUM;
+    level1ChannelNumPerRank_ = channelsPerRank_ - level0ChannelNumPerRank_;
     HCCL_INFO(
         "[InsTempReduceScatterMesh1DZAxisDetour][SetchannelsPerRank], channelsPerRank_[%u], "
-        "level0ChannelNumPerRank_[%u], level1ChannelNumPerRank_[%u], level0DataRatio_[%.2f]",
-        channelsPerRank_, level0ChannelNumPerRank_, level1ChannelNumPerRank_, level0DataRatio_);
+        "level0ChannelNumPerRank_[%u], level1ChannelNumPerRank_[%u]",
+        channelsPerRank_, level0ChannelNumPerRank_, level1ChannelNumPerRank_);
     return HCCL_SUCCESS;
 }
 
