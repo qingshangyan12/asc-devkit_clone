@@ -142,7 +142,7 @@ const CannSyms& LoadCannSyms()
 bool UseCannBridge(const OpParam& param)
 {
     return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
-           (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV || param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+           (param.opType == HcclCMDType::HCCL_CMD_ALLTOALLV);
 }
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)
