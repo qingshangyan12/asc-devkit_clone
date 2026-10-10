@@ -57,7 +57,7 @@ __aicore__ inline GM_ADDR GetUserWorkspace(GM_ADDR workspace)
 __aicore__ inline int64_t GetStoreAtomicConfigImpl()
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "GetStoreAtomicConfig is not supported on current device"); });
-    return get_st_atomic_cfg();
+    return 0;
 }
 
 __aicore__ inline void GetStoreAtomicConfigImpl(uint16_t& atomicType, uint16_t& atomicOp)
