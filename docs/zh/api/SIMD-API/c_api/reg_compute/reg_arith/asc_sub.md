@@ -86,9 +86,10 @@ __simd_callee__ inline vector_float asc_sub(vector_float src0,
                                             vector_bool mask)
 ```
 
-### 带借位输出减法（占位符形式）
+### 带借位输出减法
 
 ```c
+// 占位符形式
 __simd_callee__ inline void asc_sub(vector_bool& carry,
                                     vector_<dtype>& dst,
                                     vector_<dtype> src0,
