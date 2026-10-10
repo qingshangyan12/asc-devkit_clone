@@ -300,21 +300,34 @@ __aicore__ inline void PipeBarrierInternal()
 #endif
 }
 
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+__BLOCK_LOCAL__ __inline__ int32_t g_superKernelSetWaitFlagCountDifference;
+#endif
+
 template <pipe_t srcPipe, pipe_t dstPipe>
 __aicore__ inline void SetFlagInternal(event_t evt)
 {
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
         if ASCEND_IS_AIV {
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+            g_superKernelSetWaitFlagCountDifference += 1;
+#endif
             set_flag(srcPipe, dstPipe, evt);
         }
     }
     if constexpr (IsSplitCubePipe<srcPipe>() && IsSplitCubePipe<dstPipe>()) {
         if ASCEND_IS_AIC {
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+            g_superKernelSetWaitFlagCountDifference += 1;
+#endif
             set_flag(srcPipe, dstPipe, evt);
         }
     }
 #else
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+    g_superKernelSetWaitFlagCountDifference += 1;
+#endif
     set_flag(srcPipe, dstPipe, evt);
 #endif
 }
@@ -326,15 +339,24 @@ __aicore__ inline void WaitFlagInternal(event_t evt)
     (void)evt;
     if constexpr (IsSplitVectorPipe<srcPipe>() && IsSplitVectorPipe<dstPipe>()) {
         if ASCEND_IS_AIV {
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+            g_superKernelSetWaitFlagCountDifference -= 1;
+#endif
             wait_flag(srcPipe, dstPipe, evt);
         }
     }
     if constexpr (IsSplitCubePipe<srcPipe>() && IsSplitCubePipe<dstPipe>()) {
         if ASCEND_IS_AIC {
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+            g_superKernelSetWaitFlagCountDifference -= 1;
+#endif
             wait_flag(srcPipe, dstPipe, evt);
         }
     }
 #else
+#if defined(__ASCENDC_SUPER_KERNEL_DEBUG__)
+    g_superKernelSetWaitFlagCountDifference -= 1;
+#endif
     wait_flag(srcPipe, dstPipe, evt);
 #endif
 }
