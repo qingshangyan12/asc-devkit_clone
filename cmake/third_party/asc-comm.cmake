@@ -79,6 +79,9 @@ install(DIRECTORY ${ASC_COMM_INCLUDE_DIR}/
     COMPONENT asc-devkit
     FILES_MATCHING PATTERN "*.h"
     PATTERN "hcomm" EXCLUDE
+    PATTERN "hcomm_primitives.h" EXCLUDE
+    PATTERN "hcomm_res_defs.h" EXCLUDE
+    PATTERN "hcomm_team_defs.h" EXCLUDE
     REGEX "aicore/hcomm" EXCLUDE
     REGEX "direct_drive" EXCLUDE
 )
@@ -123,6 +126,23 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
             DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/include/ccu/hcomm
             COMPONENT asc-devkit
             FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+        # pod 契约头与 hcomm 仓源码树对齐后分布于三处：
+        # pkg_inc/hcomm/（4 个契约头）、include/hcomm/ccu/（CCU 实体契约头）与 include/ 根（3 个基础头），
+        # 统一装载到 include/hcomm
+        install(DIRECTORY ${ASC_COMM_SOURCE_PATH}/pkg_inc/hcomm/
+            DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/include/hcomm
+            COMPONENT asc-devkit
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+        install(DIRECTORY ${ASC_COMM_SOURCE_PATH}/include/hcomm/
+            DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/include/hcomm
+            COMPONENT asc-devkit
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+        install(FILES
+            ${ASC_COMM_INCLUDE_DIR}/hcomm_primitives.h
+            ${ASC_COMM_INCLUDE_DIR}/hcomm_res_defs.h
+            ${ASC_COMM_INCLUDE_DIR}/hcomm_team_defs.h
+            DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/include/hcomm
+            COMPONENT asc-devkit)
     endif()
 else()
     message(STATUS "[ThirdPartyLib][asc-comm] Missing CCU cmake dir: ${ASC_COMM_CCU_CMAKE_DIR}, skip CCU so build")
