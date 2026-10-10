@@ -69,6 +69,8 @@ PIPE_S
 
 ## 调用示例
 
+适用 CANN 软件版本：>= 9.2.0（商用版）。
+
 本示例模拟算子部署诊断场景：核函数（Kernel）读取架构版本并写入GM，Host侧检查返回值是否属于当前接口支持的架构。返回值可用于确认编译产物的目标架构。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。

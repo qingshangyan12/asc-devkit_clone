@@ -72,6 +72,8 @@ PIPE_MTE1
 
 ## 调用示例
 
+适用 CANN 软件版本：>= 9.2.0（商用版）。
+
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 本示例使用`M=N=K=128`，将128×128个`uint8_t`元素从GM搬入L1 Buffer，再通过本接口搬至UB并回传GM，与Host侧输入进行比较。

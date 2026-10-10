@@ -58,6 +58,8 @@ PIPE_MTE2
 
 ## 调用示例
 
+适用 CANN 软件版本：>= 9.2.0（商用版）。
+
 2D Padding场景，使用固定值填充方式
 ![ ](../figures/asc_ndim_copy_gm2ub_2d_padding_constant.png)
 

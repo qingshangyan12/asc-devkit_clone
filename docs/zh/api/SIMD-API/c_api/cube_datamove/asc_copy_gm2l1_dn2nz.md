@@ -115,6 +115,8 @@ PIPE_MTE2
 
 ## 调用示例
 
+适用 CANN 软件版本：>= 9.2.0（商用版）。
+
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->

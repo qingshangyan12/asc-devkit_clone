@@ -123,6 +123,8 @@ PIPE_V
 
 ## 调用示例
 
+适用 CANN 软件版本：>= 9.2.0（商用版）。
+
 以下示例将256个乱序float类型score及其index分别作为输入，通过[asc_bitsort](asc_bitsort.md)与`asc_mrgsort4`配合完成全局降序排序，每个输出数据单元包含一个score及其对应的index，占8字节，总体计算流程为：
 
 1. 调用`asc_bitsort`，以`repeat = 8`对每组32个元素分别排序，生成8条有序队列。此时各队列内部有序，全部数据尚未全局有序。

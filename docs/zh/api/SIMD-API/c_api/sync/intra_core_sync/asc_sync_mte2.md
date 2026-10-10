@@ -61,6 +61,8 @@ PIPE_S
 
 ## 调用示例
 
+适用 CANN 软件版本：>= 9.2.0（商用版）。
+
 本示例展示`asc_sync_mte2`作为易用性接口的价值：GM->UB一次搬入`src0`、`src1`、`src2`三份数据后，`PIPE_V`上的矢量计算（依赖`src0`与`src1`）与`PIPE_MTE3`上的数据搬出（依赖`src2`）两条独立路径都需要依赖该次搬入。若手工同步，需分别对`PIPE_V`与`PIPE_MTE3`各执行一组`asc_sync_notify`与`asc_sync_wait`；而使用`asc_sync_mte2`一次调用即可同时完成对`PIPE_MTE3`与`PIPE_V`的同步，减少手写代码量。示例中`PIPE_V`到`PIPE_MTE3`的依赖则使用`asc_sync_notify`与`asc_sync_wait`进行精准同步，以便与`asc_sync_mte2`的易用性写法形成对比。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。

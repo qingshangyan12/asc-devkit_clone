@@ -58,6 +58,8 @@ PIPE_S
 
 ## 调用示例
 
+适用 CANN 软件版本：>= 9.2.0（商用版）。
+
 本示例模拟核函数（Kernel）手工规划Unified Buffer（UB）的场景：通过0字节、32字节和64字节三个偏移分别获取两个源操作数和一个目的操作数的物理地址，在UB中完成加法后将结果写入GM。该方法适用于需要自行管理片上内存布局的底层实现；不能与[以数组方式申请内存的方法](../../general_description_and_constraints.md#以数组方式申请内存)混用。
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。

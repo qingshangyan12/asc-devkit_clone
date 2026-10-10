@@ -75,6 +75,8 @@ PIPE_S
 
 ## 调用示例
 
+适用 CANN 软件版本：>= 9.2.0（商用版）。
+
 `asc_set_l3d_rpt_b`需要调用者自行拼装64位配置。相同功能推荐使用参数化接口[asc_set_l13d_rpt_b](asc_set_l13d_rpt_b.md)，以下示例使用该接口配置右矩阵的repeat参数。
 
 以下示例使用`asc_copy_l12l0b`将2×2、16通道的全零Feature Map扩展为带一圈padding的4×4矩阵，并自动转置写入L0B Buffer。B侧padding值设置为2，`f_matrix_ctrl`设置为`true`。使用全1的L0A矩阵进行MMAD后，每个输出累加4×4区域中的12个padding位置，期望值为`12 × 2 = 24`。
