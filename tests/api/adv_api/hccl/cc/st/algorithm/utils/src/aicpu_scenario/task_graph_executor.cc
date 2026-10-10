@@ -50,6 +50,10 @@ void ResolveEndpoints(
 // WAIT 系任务的统一取 notifyId 入口（TaskStubWait / TaskStubLocalWaitFrom）
 uint32_t GetWaitNotifyId(const TaskStub* task)
 {
+    if (task->GetType() != TaskTypeStub::WAIT && task->GetType() != TaskTypeStub::LOCAL_WAIT_FROM) {
+        THROW<InvalidParamsException>(
+            "[TaskGraphExecutor] GetWaitNotifyId on non-wait task[%s]", task->GetType().Describe().c_str());
+    }
     return (task->GetType() == TaskTypeStub::WAIT) ? static_cast<const TaskStubWait*>(task)->GetTopicId() :
                                                      static_cast<const TaskStubLocalWaitFrom*>(task)->GetTopicId();
 }

@@ -41,7 +41,7 @@ struct ExecEvent {
     uint32_t taskIndex = 0;
     TaskTypeStub type;
     std::vector<MemAccess> accesses;
-    uint32_t notifyId = 0;       // POST/WAIT 系任务有效
+    uint32_t notifyId = 0; // POST/WAIT 系任务有效；0 并非哨兵（真实 notifyId 可为 0），判别必须按 event.type
     uint64_t seq = 0;            // 全局执行序号（从 1 开始）
     uint64_t satisfiedBySeq = 0; // 仅 WAIT 系事件有效：满足它的 POST 的 seq
 };
@@ -68,6 +68,9 @@ private:
     std::string BuildDeadlockReport(const std::vector<QueueCtx>& ctxs) const;
 
     std::vector<ExecEvent> executionLog_;
+    // notify 配对不变量：算法层按 1:1 使用 notifyId（一次 POST 恰好满足一次 WAIT，设备 notify 语义）。
+    // 违反 1:1（如连续双 POST）时 lastPostSeq_ 记录最新一次 POST——WAIT 的 satisfiedBySeq 反映实际唤醒者，
+    // 但更早的 POST→WAIT happens-before 边会丢失（Task 7 DAG 检测将无法看到），此类误用应由算法层排查。
     std::map<uint32_t, bool> notifyState_;     // notifyId -> posted
     std::map<uint32_t, uint64_t> lastPostSeq_; // notifyId -> 最近一次 POST 的 seq
     uint64_t nextSeq_ = 1;
