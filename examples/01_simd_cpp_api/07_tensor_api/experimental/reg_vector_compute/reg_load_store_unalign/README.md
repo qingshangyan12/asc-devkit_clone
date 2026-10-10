@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例使用实验性 Tensor API `asc::te::experimental::unalign_load` 和 `unalign_store`，演示 UB 与寄存器之间的非对齐数据搬运，不直接调用非对齐 C API 或基础 API 的 `AscendC::Reg::LoadUnAlign/StoreUnAlign`。GM 与 UB 之间通过 Tensor API `copy` 搬运，寄存器计算使用实验性 Tensor API，流水同步仍使用 C API `asc_lock/asc_unlock`。
+本样例使用实验性 Tensor API `asc::te::experimental::unalign_load` 和 `unalign_store`，演示 UB 与寄存器之间的非对齐数据搬运。场景 1 完成非对齐复制，场景 2 完成非对齐加载、归约和存储，两个场景均不直接调用非对齐 C API。GM 与 UB 之间通过 Tensor API `copy` 搬运，寄存器清零和归约使用实验性 Tensor API，流水同步使用 C API `asc_lock/asc_unlock`。
 
 样例包含两个场景，通过 `SCENARIO_NUM` 选择：
 
@@ -14,8 +14,6 @@
 ## 支持的产品
 
 - Ascend 950PR/Ascend 950DT
-
-CANN 软件包须包含 PR 6049 新增的 `unalign_load` / `unalign_store` 接口。本次验证使用同步了这些接口并修正连续加载状态推进的 CANN 9.3.0；未同步接口的安装包不能直接编译本样例。`unalign_load` 内部使用 postupdate 操作更新加载状态，外部 Tensor 和坐标保持不变。CMake 从 CANN 包中加载接口，不引用本仓头文件。
 
 ## 目录结构介绍
 
@@ -32,10 +30,10 @@ CANN 软件包须包含 PR 6049 新增的 `unalign_load` / `unalign_store` 接�
 ### 场景 1：地址非对齐复制
 
 1. 将输入从 GM 搬入 UB，并使用 `fill/store` 将输出 UB 清零。
-2. 在核函数中通过 `slice` 创建源、目的 Tensor 视图，均从第 1 个元素开始，即偏移 4 字节，再将视图传入 VF。
-3. 创建 `unalign_load` 和 `unalign_store` 会话，调用 `loader.prepare(src_stream)` 初始化连续加载状态。
-4. 通过 `loader.load` 和 `storer.store`，按相对视图的坐标连续加载、存储两个完整寄存器，每次加载和存储显式传入 `count`。
-5. 调用 `storer.flush(dst_stream, 2 * elements_per_register)` 提交尚未写出的数据，再将输出搬回 GM。
+2. 在核函数中通过 `slice` 创建从第 1 个元素开始的源、目的 Tensor 视图，计算 `repeat_time = ceil(copy_elements / elements_per_register)` 并传入 VF。在 `Ascend 950PR/Ascend 950DT` 上每个 `float` 寄存器包含 64 个元素，循环执行 2 次。
+3. 在 VF 中创建 `unalign_load` 和 `unalign_store` 会话，并在循环外调用一次 `loader.prepare(src_stream)`。
+4. 每次循环以 `repeat * elements_per_register` 为相对元素坐标，通过 `loader.load(src_stream, coord)` 加载一个完整寄存器，再通过 `storer.store(dst_stream, coord, src, elements_per_register)` 连续存储。
+5. 调用 `storer.flush(dst_stream, repeat_time * elements_per_register)` 提交尚未写出的数据，再将输出搬回 GM。输出索引 1 至 128 与输入一致，其余元素为 0。
 
 核心代码如下：
 
@@ -43,27 +41,25 @@ CANN 软件包须包含 PR 6049 新增的 `unalign_load` / `unalign_store` 接�
 asc::te::experimental::unalign_load loader;
 asc::te::experimental::unalign_store storer;
 loader.prepare(src_stream);
-for (uint32_t repeat = 0; repeat < 2; ++repeat) {
+for (uint32_t repeat = 0; repeat < repeat_time; ++repeat) {
     auto coord = asc::te::make_coord(repeat * elements_per_register);
-    auto src = loader.load(src_stream, coord, elements_per_register);
+    auto src = loader.load(src_stream, coord);
     storer.store(dst_stream, coord, src, elements_per_register);
 }
-storer.flush(dst_stream, static_cast<int32_t>(2 * elements_per_register));
+storer.flush(dst_stream, static_cast<int32_t>(repeat_time * elements_per_register));
 ```
 
 ### 场景 2：多核地址和数据量非对齐归约
 
 1. 使用 `block_idx` 计算当前核的起始行和实际行数，将各核输入按连续的一维数据搬入 UB。
 2. 每行包含 255 个 `uint16_t` 元素，行间不插入填充；后续行的 UB 起始地址非 32 字节对齐，后续核的 GM 输入地址也非 32 字节对齐。
-3. 在核函数中按行创建源、目的 Tensor 视图，每行调用一次 VF 并建立独立的 `unalign_load` / `unalign_store` 会话，连续加载两个 256 字节寄存器。源 UB 区域额外预留一个寄存器的空间，避免尾部完整寄存器加载访问输出区域。
+3. 在核函数中为每行创建源、目的 Tensor 视图，计算 `repeat_time = ceil(input_columns / elements_per_register)` 并传入 VF。在循环外调用一次 `loader.prepare(src_row)`，循环内通过 `loader.load(src_row, make_coord(repeat * elements_per_register))` 读取两个 256 字节寄存器。源 UB 区域额外预留一个寄存器的空间，避免尾部完整寄存器加载访问输出区域。
 4. 使用 `update_mask<uint16_t>` 屏蔽最后一个无效元素，调用 `reduce_max<reduce_scope::datablock>` 完成每 32 字节数据块的最大值归约，数据类型由输入推导。
-5. 使用 `storer.store` 在目的行的坐标 0、8 各非对齐存储 8 个结果，最后调用 `storer.flush(dst_row, output_columns)`，将输出搬回 GM。
-
-**接口约束：** 每段连续加载前先调用 `prepare`，第一次加载的地址须与准备地址一致，后续加载地址须连续。加载和存储坐标相对传入的 Tensor 视图，显式由样例计算，不会更新外部 Tensor 或坐标。`load` 读取完整寄存器，其 `count` 指定加载流推进的元素数量，本样例传入每个寄存器的元素数；`store` 按 `count` 个元素写出，不使用 Reg Tensor 的 mask。有效元素屏蔽在归约计算阶段完成。每段存储结束时调用一次 `flush`，传入首次存储使用的目的 Tensor 视图和流末尾相对该视图的元素偏移。CANN 9.3.0 的 `slice` 不可在 VF 中直接调用，因此视图在核函数中构造。
+5. 使用 `storer.store` 在目的行的坐标 `repeat * results_per_register` 各非对齐存储 8 个结果，最后调用 `storer.flush(dst_row, repeat_time * results_per_register)`，将输出搬回 GM。
 
 ### 结果校验
 
-主机端生成确定性输入，并直接计算 golden，不依赖 Python 或外部数据文件。场景 1 校验全部 1024 个输出，包括复制范围之外的零值；场景 2 校验全部 224 个归约结果，包括每行的尾数据块和尾核。ACL 调用失败或结果不一致时程序返回非零值。
+场景 1 校验全部 1024 个输出，包括复制范围之外的零值；场景 2 校验全部 224 个归约结果，包括每行的尾数据块和尾核。ACL 调用失败或结果不一致时程序返回非零值。
 
 ## 编译运行
 
@@ -75,7 +71,7 @@ storer.flush(dst_stream, static_cast<int32_t>(2 * elements_per_register));
   ```bash
   source ${install_path}/set_env.sh
   ```
-  `${install_path}` 为 CANN 软件包安装目录。样例通过 `find_package(ASC REQUIRED)` 使用 CANN 软件包中的 Tensor/C API 头文件、编译器、ACL 运行库及仿真库。
+  `${install_path}` 为 CANN 软件包安装目录。
 
 - 样例执行
 

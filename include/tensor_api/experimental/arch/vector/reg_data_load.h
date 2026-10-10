@@ -62,9 +62,9 @@ template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
 /**
- * @brief Maintains the hardware state for a sequence of unaligned UB-to-register loads.
- * @note Call prepare() before load(). The prepared address and all load addresses must
- * form one contiguous stream, with the first load using the prepared address.
+ * @brief Maintains the hardware state for an unaligned UB-to-register load.
+ * @note load() does not advance the prepared state. Call prepare() for each new
+ * source address, using a tensor whose beginning matches the load address.
  */
 struct unalign_load {
     __simd_callee__ unalign_load() = default;
@@ -77,25 +77,23 @@ struct unalign_load {
     __simd_callee__ inline void prepare(const Tensor& src_base);
 
     /**
-     * @brief Loads one full vector register from the next address in an unaligned stream.
+     * @brief Loads one full vector register from the prepared source address.
      * @param src_tile Tensor whose beginning is the source address for this load.
-     * @param count Number of elements by which to advance the load stream.
      * @return One register tensor containing the loaded data. An int4b_t source
      * returns reg_tensor<int4x2_t>.
      */
     template <typename Tensor>
-    __simd_callee__ inline auto load(const Tensor& src_tile, uint32_t count);
+    __simd_callee__ inline auto load(const Tensor& src_tile);
 
     /**
      * @brief Loads one full vector register from a UB tensor at the specified coordinate.
      * @param src_tile Source tensor in the prepared unaligned stream.
      * @param coord Coordinate of the first source element.
-     * @param count Number of elements by which to advance the load stream.
      * @return One register tensor containing the loaded data. An int4b_t source
      * returns reg_tensor<int4x2_t>.
      */
     template <typename Tensor, typename Coord>
-    __simd_callee__ inline auto load(const Tensor& src_tile, const Coord& coord, uint32_t count);
+    __simd_callee__ inline auto load(const Tensor& src_tile, const Coord& coord);
 
 private:
     vector_load_unalign ureg;

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates unaligned transfers between UB and registers using the experimental Tensor APIs `asc::te::experimental::unalign_load` and `unalign_store`. It does not directly call unaligned C APIs or the Basic APIs `AscendC::Reg::LoadUnAlign/StoreUnAlign`. GM/UB transfers use Tensor API `copy`, register computation uses experimental Tensor APIs, and pipeline synchronization still uses the C APIs `asc_lock/asc_unlock`.
+This sample demonstrates unaligned transfers between UB and registers using the experimental Tensor APIs `asc::te::experimental::unalign_load` and `unalign_store`. Scenario 1 performs an unaligned copy, while scenario 2 performs unaligned loading, reduction, and storing. Neither scenario directly calls unaligned C APIs. GM/UB transfers use Tensor API `copy`, register zeroing and reduction use experimental Tensor APIs, and pipeline synchronization uses the C APIs `asc_lock/asc_unlock`.
 
 Select a scenario with `SCENARIO_NUM`:
 
@@ -15,7 +15,7 @@ Select a scenario with `SCENARIO_NUM`:
 
 - Ascend 950PR/Ascend 950DT
 
-The CANN installation must include the `unalign_load` / `unalign_store` APIs added by PR 6049. Verification uses CANN 9.3.0 with those APIs synchronized into the package and the contiguous-load state advancement corrected. Internally, `unalign_load` uses a postupdate operation to advance hardware state without modifying external tensors or coordinates. An unmodified package without these APIs cannot build this sample. CMake loads the package headers, not the repository headers.
+The CANN installation must provide the experimental Tensor APIs `unalign_load/unalign_store` used by both scenarios. CMake loads the package headers, not the repository headers. If the package lacks these APIs, update the corresponding headers before building this sample.
 
 ## Directory Structure
 
@@ -32,32 +32,32 @@ The CANN installation must include the `unalign_load` / `unalign_store` APIs add
 ### Scenario 1: Unaligned Copy
 
 1. Copy the input from GM to UB and zero the output UB using `fill/store`.
-2. Create source and destination tensor views using `slice` in the kernel, offset both by one element (four bytes), and pass the views into the VF.
-3. Create `unalign_load` and `unalign_store` sessions and prepare the load stream with `loader.prepare(src_stream)`.
-4. Load and store two full registers with `loader.load` and `storer.store`, using coordinates relative to the views and an explicit `count` for each load and store.
-5. Commit pending stores with `storer.flush(dst_stream, 2 * elements_per_register)` and copy the output back to GM.
+2. Create source and destination Tensor views beginning at element 1 using `slice` in the kernel. Calculate `repeat_time = ceil(copy_elements / elements_per_register)` and pass it to the VF. On `dav-3510`, each `float` register holds 64 elements, so the loop runs twice.
+3. In the VF, create `unalign_load` and `unalign_store` sessions and call `loader.prepare(src_stream)` once before the loop.
+4. In each iteration, use `repeat * elements_per_register` as the relative element coordinate. Load one full register with `loader.load(src_stream, coord)`, then store it consecutively with `storer.store(dst_stream, coord, src, elements_per_register)`.
+5. Commit pending stores with `storer.flush(dst_stream, repeat_time * elements_per_register)` and copy the output back to GM. Output indices 1 through 128 match the input; all other elements are zero.
 
 ```cpp
 asc::te::experimental::unalign_load loader;
 asc::te::experimental::unalign_store storer;
 loader.prepare(src_stream);
-for (uint32_t repeat = 0; repeat < 2; ++repeat) {
+for (uint32_t repeat = 0; repeat < repeat_time; ++repeat) {
     auto coord = asc::te::make_coord(repeat * elements_per_register);
-    auto src = loader.load(src_stream, coord, elements_per_register);
+    auto src = loader.load(src_stream, coord);
     storer.store(dst_stream, coord, src, elements_per_register);
 }
-storer.flush(dst_stream, static_cast<int32_t>(2 * elements_per_register));
+storer.flush(dst_stream, static_cast<int32_t>(repeat_time * elements_per_register));
 ```
 
 ### Scenario 2: Multicore Reduction with Unaligned Addresses and Lengths
 
 1. Use `block_idx` to compute the first row and actual row count. Copy each core's input into a contiguous, one-dimensional UB buffer.
 2. Keep the 255-element rows packed without inter-row padding. Subsequent UB rows and subsequent cores' GM input addresses are not 32-byte aligned.
-3. Create per-row tensor views in the kernel and call the VF once per row. Each VF creates separate `unalign_load` / `unalign_store` sessions and loads two 256-byte registers. Reserve an additional register of source UB space so a full-register tail load cannot access the output buffer.
+3. Create source and destination row views in the kernel, calculate `repeat_time = ceil(input_columns / elements_per_register)`, and pass it to the VF. Call `loader.prepare(src_row)` once before the loop, then read two 256-byte registers with `loader.load(src_row, make_coord(repeat * elements_per_register))`. Reserve an additional register of source UB space so a full-register tail load cannot access the output buffer.
 4. Mask the last invalid element using `update_mask<uint16_t>` and call `reduce_max<reduce_scope::datablock>` for the maximum of every 32-byte datablock. The data type is deduced from the input.
-5. Store eight results at destination row coordinates 0 and 8 with `storer.store`. Call `storer.flush(dst_row, output_columns)` and copy results back to GM.
+5. Store eight results at destination row coordinates `repeat * results_per_register` with `storer.store`. Call `storer.flush(dst_row, repeat_time * results_per_register)` and copy results back to GM.
 
-**Session requirements:** Call `prepare` before each contiguous load stream; the first load must use the prepared address. Coordinates are relative to the supplied tensor view and are computed explicitly by the sample; the API does not update external tensors or coordinates. Loads read a full register, with `count` specifying the number of elements by which to advance the load stream; this sample uses the number of elements per register. Stores write `count` elements without using the Reg Tensor mask. Apply masks during reduction. Call `flush` once per store stream, passing the first destination view and the end-of-stream element offset relative to that view. In CANN 9.3.0, `slice` cannot be called directly inside a VF, so views are constructed in the kernel.
+**Interface usage:** Scenario 1 calls `prepare` once before the loop for the source view, while scenario 2 calls `prepare` once before the loop for each row. Both scenarios advance the source coordinate by one register per iteration; this sequential loading pattern should not be generalized to arbitrary address jumps with the same prepared state. Loads read a full register and take no `count` argument. Scenario 2 uses `with_mask(mask)` to select valid elements for reduction. Stores write `count` elements without using the Reg Tensor mask. Call `flush` once after each contiguous store stream, passing the first destination view and the end-of-stream element offset relative to that view. Both scenarios construct views using `slice` in the kernel rather than inside the VF.
 
 ### Verification
 

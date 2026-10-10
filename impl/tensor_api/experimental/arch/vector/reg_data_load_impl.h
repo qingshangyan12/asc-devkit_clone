@@ -239,7 +239,7 @@ __simd_callee__ inline void unalign_load::prepare(const Tensor& src_base)
 }
 
 template <typename Tensor>
-__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, uint32_t count)
+__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
@@ -255,12 +255,12 @@ __simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, uint32_t 
 
     reg_tensor<reg_data_type> dst;
     auto src_addr = src_tile.engine().begin().get();
-    asc_loadunalign_postupdate(dst.reg, ureg, src_addr, count);
+    asc_loadunalign(dst.reg, ureg, src_addr);
     return dst;
 }
 
 template <typename Tensor, typename Coord>
-__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, const Coord& coord, uint32_t count)
+__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, const Coord& coord)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
@@ -277,7 +277,7 @@ __simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, const Coo
 
     reg_tensor<reg_data_type> dst;
     auto src_addr = (src_tile.data() + src_tile.layout()(coord)).get();
-    asc_loadunalign_postupdate(dst.reg, ureg, src_addr, count);
+    asc_loadunalign(dst.reg, ureg, src_addr);
     return dst;
 }
 
