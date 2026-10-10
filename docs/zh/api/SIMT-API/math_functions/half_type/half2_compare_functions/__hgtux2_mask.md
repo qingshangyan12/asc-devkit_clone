@@ -109,5 +109,5 @@ unsigned int __hgtux2_mask(half2 x, half2 y)
 ```text
 x：(-1, 0), (1, -1), (inf, -inf), (nan, 0.5)
 y：(1, 0), (1, -2), (inf, inf), (0.5, nan)
-output： 0 4294901760 0 4294967295
+result: 0 4294901760 0 4294967295
 ```

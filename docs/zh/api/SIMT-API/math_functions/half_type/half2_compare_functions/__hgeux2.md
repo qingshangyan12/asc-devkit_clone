@@ -111,5 +111,5 @@ half2 __hgeux2(half2 x, half2 y)
 ```text
 x：(-1, 0), (1, -1), (inf, -inf), (nan, 0.5)
 y：(1, 0), (1, -2), (inf, inf), (0.5, nan)
-output： (0, 1) (1, 1) (1, 0) (1, 1)
+result: (0, 1) (1, 1) (1, 0) (1, 1)
 ```
