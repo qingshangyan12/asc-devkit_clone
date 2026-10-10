@@ -76,6 +76,8 @@ public:
         TQue<QuePosition::B1, 1> queuePaddingL1;
         TQue<QuePosition::CO1, 1> queueOutputL1;
         TQue<QuePosition::CO1, 1> queueOutputL0;
+        TQue<QuePosition::CO1, 1> queuePartialReadWrite0;
+        TQue<QuePosition::CO1, 1> queuePartialReadWrite1;
 
         TQue<TPosition::C2, 1> queueBiasBT;
         TQue<TPosition::C2PIPE2GM, 1> queuePreQuantFB;
@@ -110,6 +112,8 @@ public:
         LocalTensor<typename Config::FmapT> fmapL0;
         LocalTensor<typename Config::WeightT> weightL0;
         LocalTensor<typename Config::L0cT> outputL0;
+        LocalTensor<typename Config::L0cT> partialReadWrite0L1;
+        LocalTensor<typename Config::L0cT> partialReadWrite1L1;
 
         LocalTensor<typename Config::L0cT> biasBT;
         LocalTensor<typename Config::PreQuantT> preQuantFB;
@@ -177,6 +181,8 @@ public:
 
         uint64_t iter;
         uint64_t kIter;
+        mutable uint64_t currentFmapL1Offset;
+        mutable uint64_t fmapL1OffsetStep;
         uint64_t batchIter;
         uint64_t kAL1Iter;
         uint64_t kBL1Iter;

@@ -23,13 +23,17 @@
 #include "tiling/platform/platform_ascendc.h"
 #include "conv2d_tilingdata.h"
 #include "../../../impl/conv/common/conv_common.h"
+#include "conv2d_tiling_util.h"
+#include "conv2d_tiling_algorithm.h"
 #include "../../matmul/matmul_tiling_base.h"
 #else
 #include "kernel_tiling/kernel_tiling.h"
-#include "include/utils/tiling/platform/platform_ascendc.h"
+#include "utils/tiling/platform/platform_ascendc.h"
 #include "conv2d_tilingdata.h"
+#include "conv2d_tiling_util.h"
+#include "conv2d_tiling_algorithm.h"
 #include "impl/adv_api/detail/conv/common/conv_common.h"
-#include "include/adv_api/matmul/matmul_tiling_base.h"
+#include "adv_api/matmul/matmul_tiling_base.h"
 #endif
 
 namespace Conv2dTilingApi {
@@ -218,7 +222,19 @@ public:
     void SetPadding(uint8_t mode);
 
 protected:
+    /**
+     * @brief Copy the inner tiling result to the output tiling
+     * @param [in] tiling: the output tiling
+     */
+    void SaveTilingResult(optiling::TConv2DApiTiling& tiling);
+
     virtual int64_t Compute() = 0;
+
+protected:
+    BufferInfo bufferInfo_;
+    Conv2dArgs convArgs_;
+    optiling::TConv2DApiTiling innerTilingResult_;
+    ConvTilingAlgoType algoType_ = ConvTilingAlgoType::TILING_1_CUT_H_L0_CUT_N;
 };
 } // namespace Conv2dTilingApi
 

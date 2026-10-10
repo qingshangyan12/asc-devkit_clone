@@ -16,6 +16,8 @@
 #ifndef ADV_API_CONV_CONV2D_CONV2D_INTF_IMPL_H
 #define ADV_API_CONV_CONV2D_CONV2D_INTF_IMPL_H
 
+#include "conv2d_util.h"
+
 namespace Conv2dApi {
 
 template<class Config, template<typename, class>class Impl>
@@ -274,6 +276,10 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::GetTensorC(const GlobalTensor<O
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
         ctx.queueOutputL1.FreeTensor(ctx.outputL1);
+        if (ctx.maxKL0Iter > 0) {
+            ctx.queuePartialReadWrite0.FreeTensor(ctx.partialReadWrite0L1);
+            ctx.queuePartialReadWrite1.FreeTensor(ctx.partialReadWrite1L1);
+        }
 #else
         ctx.queueOutputL0.FreeTensor(ctx.outputL0);
 #endif
@@ -329,6 +335,8 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::End()
         ctx.queuePaddingPT.FreeAllEvent();
         ctx.queueOutputL1.FreeAllEvent();
         ctx.queueOutputL0.FreeAllEvent();
+        ctx.queuePartialReadWrite0.FreeAllEvent();
+        ctx.queuePartialReadWrite1.FreeAllEvent();
     }
 }
 
@@ -348,10 +356,15 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::InitAIC()
     ctx.dilatedKernelH = 1 + (ctx.kernelH - 1) * ctx.convTiling->dilationH;
     ctx.dilatedKernelW = 1 + (ctx.kernelW - 1) * ctx.convTiling->dilationW;
 
-    uint64_t alignCinKhKwA = AlignB(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW, k0Fmap);
-    uint64_t alignCinKhKwB = AlignB(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW, k0Weight);
-    ctx.kAL1fullload = alignCinKhKwA == ctx.convTiling->kAL1;
-    ctx.kBL1fullload = alignCinKhKwB == ctx.convTiling->kBL1;
+    uint64_t alignCinKhKwA = AlignB(ctx.singleCoreCi, k0Fmap) * ctx.convTiling->kernelHxkernelW;
+    uint64_t alignCinKhKwB;
+    if constexpr (sizeof(WeightT) == S8SIZE && sizeof(FmapT) == S16SIZE) {
+        alignCinKhKwB = AlignB(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW, k0Weight); // 16-8 compact
+    } else {
+        alignCinKhKwB = AlignB(ctx.singleCoreCi, k0Weight) * ctx.convTiling->kernelHxkernelW; // not compact
+    }
+    ctx.kAL1fullload = alignCinKhKwA <= ctx.convTiling->kAL1;
+    ctx.kBL1fullload = alignCinKhKwB <= ctx.convTiling->kBL1;
 
     ctx.kL0FullLoadAl0PingPongFlag = 0;
     ctx.kL0FullLoadBl0PingPongFlag = 0;
@@ -408,9 +421,9 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::InitAIC()
     } else {
         InitValueHWMode();
     }
-    InitBuffer();
     InitKDirectionValue();
     InitCoDirectionValue();
+    InitBuffer();
     InitSubApiParams();
 }
 
@@ -477,6 +490,7 @@ template<class Config, template<typename, class>class Impl>
 __aicore__ inline void Conv2dIntf<Config, Impl>::InitWoDirectionValue()
 {
     ctx.maxWoL1Iter = 0;
+    ctx.woL1SmallTail = 0;
     ctx.woAL1Tail = ctx.singleCoreWo % ctx.convTiling->woL1;
     ctx.woAL1Tail = ctx.woAL1Tail == 0 ?  ctx.convTiling->woL1 : ctx.woAL1Tail;
     ctx.currentWoL1 = ctx.woAL1Tail;
@@ -515,14 +529,18 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::InitKDirectionValue()
     ctx.maxKBL1Iter = CeilDIV(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW,
                               ctx.convTiling->kBL1) - 1;
     if constexpr (formatFmap == ConvCommonApi::ConvFormat::NC1HWC0) {
-        ctx.kAL1Tail = (AlignB(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW, k0Fmap)) % ctx.convTiling->kAL1;
+        ctx.kAL1Tail = (AlignB(ctx.singleCoreCi, k0Fmap) * ctx.convTiling->kernelHxkernelW) % ctx.convTiling->kAL1;
         ctx.kAL1Tail = ctx.kAL1Tail == 0 ? ctx.convTiling->kAL1 : ctx.kAL1Tail;
     } else {
         ctx.kAL1Tail = (ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW) % ctx.convTiling->kAL1;
         ctx.kAL1Tail = ctx.kAL1Tail == 0 ? ctx.convTiling->kAL1 : ctx.kAL1Tail;
     }
     if constexpr (formatWeight == ConvCommonApi::ConvFormat::FRACTAL_Z) {
-        ctx.kBL1Tail = (AlignB(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW, k0Weight)) % ctx.convTiling->kBL1;
+        if constexpr (sizeof(WeightT) == S8SIZE && sizeof(FmapT) == S16SIZE) { // compact
+            ctx.kBL1Tail = (AlignB(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW, k0Weight)) % ctx.convTiling->kBL1;
+        } else {
+            ctx.kBL1Tail = (AlignB(ctx.singleCoreCi, k0Weight) * ctx.convTiling->kernelHxkernelW) % ctx.convTiling->kBL1;
+        }
         ctx.kBL1Tail = ctx.kBL1Tail == 0 ? ctx.convTiling->kBL1 : ctx.kBL1Tail;
     } else {
         ctx.kBL1Tail = (ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW) % ctx.convTiling->kBL1;
@@ -532,7 +550,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::InitKDirectionValue()
     ctx.ddr2l0LoopK = CeilDIV(AlignB(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW, k0),
                               ctx.convTiling->kL0);
     ctx.maxKL0Iter = ctx.ddr2l0LoopK - 1;
-    ctx.kL0Tail = (AlignB(ctx.singleCoreCi * ctx.convTiling->kernelHxkernelW, k0)) % ctx.convTiling->kL0;
+    ctx.kL0Tail = (AlignB(ctx.singleCoreCi, k0Fmap) * ctx.convTiling->kernelHxkernelW) % ctx.convTiling->kL0;
     ctx.kL0Tail = ctx.kL0Tail == 0 ? ctx.convTiling->kL0 : ctx.kL0Tail;
 
     ctx.multiKAL1 = CeilDIV(ctx.convTiling->kAL1, ctx.convTiling->kL0);
@@ -554,7 +572,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::InitCoDirectionValue()
         ctx.ddr2l1LoopN = CeilDIV(ctx.singleCoreCo, ctx.convTiling->nBL1);
         ctx.maxNBL1Iter = ctx.ddr2l1LoopN - 1;
     }
-    ctx.nBL1Tail = ctx.singleCoreCo % ctx.convTiling->nBL1;
+    ctx.nBL1Tail = AlignB(ctx.singleCoreCo, k0Output) % ctx.convTiling->nBL1;
     ctx.nBL1Tail = ctx.nBL1Tail == 0 ? ctx.convTiling->nBL1 : ctx.nBL1Tail;
     ctx.currentNBL1 = ctx.nBL1Tail;
 
@@ -619,6 +637,16 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::InitBufferOutput()
         ctx.pipe->InitBuffer(ctx.queueOutputL1, 1, ctx.convTiling->c0SpaceSize);
     } else {
         ctx.pipe->InitBuffer(ctx.queueOutputL1, DOUBLE_BUF, ctx.convTiling->c0SpaceSize);
+    }
+    if (ctx.maxKL0Iter > 0) {
+        const uint32_t partialSize = ctx.convTiling->c0SpaceSize * sizeOfL0c / sizeOfOutput;
+        if constexpr (!outputl0DBFlag) {
+            ctx.pipe->InitBuffer(ctx.queuePartialReadWrite0, 1, partialSize);
+            ctx.pipe->InitBuffer(ctx.queuePartialReadWrite1, 1, partialSize);
+        } else {
+            ctx.pipe->InitBuffer(ctx.queuePartialReadWrite0, DOUBLE_BUF, partialSize);
+            ctx.pipe->InitBuffer(ctx.queuePartialReadWrite1, DOUBLE_BUF, partialSize);
+        }
     }
 #else
     if constexpr (!outputl0DBFlag) {
@@ -1106,7 +1134,8 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceKCloseL0PingPong(bool isF
     if (ctx.iter >= 1) {
         WaitFlag<HardEvent::M_MTE1>(static_cast<TEventID>(0x0));
     }
-    if (!((ctx.convTiling->kAL1 == ctx.convTiling->kL0) && (!ctx.loadAL0Flag))) {
+    if (!((ctx.convTiling->kAL1 <= ctx.convTiling->kL0) && (!ctx.loadAL0Flag))) {
+        // 16-8 compact时应<=.
         ctx.fmapL0 = ctx.wholeAL0;
         ctx.kAL0Iter = ctx.kIter % ctx.multiKAL1;
         loadFmapL0Ins.LoadAL0(ctx, isFirst);
@@ -1118,7 +1147,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceKCloseL0PingPong(bool isF
     }
     SetFlag<HardEvent::MTE1_M>(static_cast<TEventID>(0x0));
     WaitFlag<HardEvent::MTE1_M>(static_cast<TEventID>(0x0));
-    madIns.Mad(ctx);
+    madIns.Mad(ctx, 0);
     SetFlag<HardEvent::M_MTE1>(static_cast<TEventID>(0x0));
     ctx.kIter++;
 }
@@ -1140,7 +1169,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceKOpenL0APingPong(uint16_t
     }
     SetFlag<HardEvent::MTE1_M>(static_cast<TEventID>(al0PingPongFlag & 0x1));
     WaitFlag<HardEvent::MTE1_M>(static_cast<TEventID>(al0PingPongFlag & 0x1));
-    madIns.Mad(ctx);
+    madIns.Mad(ctx, al0PingPongFlag & 0x1);
     SetFlag<HardEvent::M_MTE1>(static_cast<TEventID>(al0PingPongFlag & 0x1));
     al0PingPongFlag += 1;
     ctx.kIter++;
@@ -1164,7 +1193,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceKOpenL0BPingPong(uint16_t
     loadWeightL0Ins.LoadBL0(ctx, isFirst);
     SetFlag<HardEvent::MTE1_M>(static_cast<TEventID>(bl0PingPongFlag & 0x1));
     WaitFlag<HardEvent::MTE1_M>(static_cast<TEventID>(bl0PingPongFlag & 0x1));
-    madIns.Mad(ctx);
+    madIns.Mad(ctx, bl0PingPongFlag & 0x1);
     SetFlag<HardEvent::M_MTE1>(static_cast<TEventID>(bl0PingPongFlag & 0x1));
     bl0PingPongFlag += 1;
     ctx.kIter++;
@@ -1190,7 +1219,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceKOpenL0AL0BPingPong(uint1
 
     SetFlag<HardEvent::MTE1_M>(static_cast<TEventID>(al0PingPongFlag & 0x1));
     WaitFlag<HardEvent::MTE1_M>(static_cast<TEventID>(al0PingPongFlag & 0x1));
-    madIns.Mad(ctx);
+    madIns.Mad(ctx, al0PingPongFlag & 0x1);
     SetFlag<HardEvent::M_MTE1>(static_cast<TEventID>(al0PingPongFlag & 0x1));
     al0PingPongFlag += 1;
     ctx.kIter++;
@@ -1607,11 +1636,10 @@ __aicore__ inline bool Conv2dIntf<Config, Impl>::IterateNFirstHWMode()
         return true;
     }
 
-    if (ctx.kBL1fullload) {
-        ctx.queueWeightL1.FreeTensor(ctx.weightL1);
-    }
-
     if constexpr (hasNL1IterFlag) {
+        if (ctx.kBL1fullload) {
+            ctx.queueWeightL1.FreeTensor(ctx.weightL1);
+        }
         ctx.nBL1Iter++;
         ctx.loadBL1Flag = true;
         if (ctx.nBL1Iter == ctx.ddr2l1LoopN) {
@@ -1633,9 +1661,19 @@ __aicore__ inline bool Conv2dIntf<Config, Impl>::IterateNFirstHWMode()
 
     ctx.batchIter++;
     if (likely(ctx.batchIter != ctx.ddr2l1LoopBatch)) {
+        if constexpr (!hasNL1IterFlag) {
+            if (ctx.kBL1fullload) {
+                ctx.queueWeightL1.FreeTensor(ctx.weightL1);
+            }
+        }
         ctx.loadAL1Flag = true;
         ctx.loadBL1Flag = true;
         return true;
+    }
+    if constexpr (!hasNL1IterFlag) {
+        if (ctx.kBL1fullload) {
+            ctx.queueWeightL1.FreeTensor(ctx.weightL1);
+        }
     }
     return false;
 }
@@ -2034,12 +2072,14 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceOneK()
                 }
             }
             ctx.fmapL1 = fmapL1;
+            ctx.currentFmapL1Offset = 0;
             ctx.loadAL1Flag = false;
         }
     } else {
         if (unlikely(ctx.loadAL1Flag)) {
             LoadAL1Moudle();
             ctx.fmapL1 = ctx.queueFmapL1.template DeQue<FmapT>();
+            ctx.currentFmapL1Offset = 0;
         }
     }
 
@@ -2069,6 +2109,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceKPreload()
         if (ctx.kAL1fullload) {
             ctx.fmapL1 = ctx.queueFmapL1.template DeQue<FmapT>();
             ctx.loadAL0Flag = true;
+            ctx.currentFmapL1Offset = 0;
         }
     }
 
@@ -2101,6 +2142,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceKPreload()
             if (ctx.kIter % ctx.multiKAL1 == 0) {
                 ctx.fmapL1 = ctx.queueFmapL1.template DeQue<FmapT>();
                 ctx.loadAL0Flag = true;
+                ctx.currentFmapL1Offset = 0;
             }
         }
 
@@ -2143,6 +2185,7 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::ReduceK()
             LoadAL1Moudle();
             ctx.fmapL1 = ctx.queueFmapL1.template DeQue<FmapT>();
             ctx.loadAL0Flag = true;
+            ctx.currentFmapL1Offset = 0;
         }
         if (ctx.loadBL1Flag || (!ctx.kBL1fullload && ctx.kIter % ctx.multiKBL1 == 0)) {
             if (ctx.kIter != 0) {
@@ -2279,6 +2322,10 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::IterateK()
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     ctx.outputL1 = ctx.queueOutputL1.template AllocTensor<OutputT>();
+    if (ctx.maxKL0Iter > 0) {
+        ctx.partialReadWrite0L1 = ctx.queuePartialReadWrite0.template AllocTensor<L0cT>();
+        ctx.partialReadWrite1L1 = ctx.queuePartialReadWrite1.template AllocTensor<L0cT>();
+    }
 #else
     ctx.outputL0 = ctx.queueOutputL0.template AllocTensor<L0cT>();
 #endif
@@ -2301,12 +2348,19 @@ __aicore__ inline void Conv2dIntf<Config, Impl>::IterateK()
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
     ctx.queueOutputL1.EnQue(ctx.outputL1);
     ctx.outputL1 = ctx.queueOutputL1.template DeQue<OutputT>();
+    if (ctx.maxKL0Iter > 0) {
+        ctx.queuePartialReadWrite0.EnQue(ctx.partialReadWrite0L1);
+        ctx.partialReadWrite0L1 = ctx.queuePartialReadWrite0.template DeQue<L0cT>();
+        ctx.queuePartialReadWrite1.EnQue(ctx.partialReadWrite1L1);
+        ctx.partialReadWrite1L1 = ctx.queuePartialReadWrite1.template DeQue<L0cT>();
+    }
 #else
     ctx.queueOutputL0.EnQue(ctx.outputL0);
     ctx.outputL0 = ctx.queueOutputL0.template DeQue<L0cT>();
 #endif
 
     ctx.kIter = 0;
+    ctx.currentFmapL1Offset = 0;
 }
 
 template<class Config, template<typename, class>class Impl>

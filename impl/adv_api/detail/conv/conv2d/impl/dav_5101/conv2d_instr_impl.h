@@ -268,9 +268,10 @@ public:
         uint64_t currentKBL1 = isLastKBL1 ? ctx.kBL1Tail : ctx.convTiling->kBL1;
 
         if constexpr (Intf::formatWeight == ConvCommonApi::ConvFormat::FRACTAL_Z) {
+            // bGmOffset to check: orgCo / Align OrgCo.
             bGmOffset = nBL1Iter * ctx.convTiling->nBL1 * Intf::k0Weight +
                         (kBL1Iter * ctx.convTiling->kBL1) / Intf::k0Weight *
-                            ctx.convTiling->orgCo +
+                        ctx.convTiling->orgCo * Intf::k0Weight +
                         (kBL1Iter * ctx.convTiling->kBL1) % Intf::k0Weight;
             DataCopyExtParams intriParams;
             intriParams.blockCount = currentKBL1 / Intf::k0Weight;
@@ -389,7 +390,7 @@ public:
         currentNL0_ = n;
     }
 
-    __aicore__ inline void Mad(const typename Intf::ContextType &ctx)
+    __aicore__ inline void Mad(const typename Intf::ContextType &ctx, uint8_t pingPongId)
     {
         SetKernel(ctx);
         SetMFpc(ctx);
@@ -401,19 +402,42 @@ public:
         SetMEltSrcPara(ctx);
         SetCubeStridePara(ctx);
         SetChannelSize(ctx);
-        SetConvParams(ctx);
+        SetConvParams(ctx, pingPongId);
 
         ConvFixBitModeParams params;
         params.SetConfig0(convConfig);
         printf("[conv]convConfig: %ld\n", params.GetConfig0());
-        if (ctx.hasBias) {
-            if (biasMatrixBrc) {
-                ConvFix(ctx.outputL1, ctx.fmapL1, ctx.weightL0, ctx.biasBT, params);
+
+        LocalTensor<typename Intf::FmapT> fmL1 = ctx.fmapL1[ctx.currentFmapL1Offset / sizeof(typename Intf::FmapT)];
+        if (ctx.kIter == ctx.maxKL0Iter) {
+            if (ctx.maxKL0Iter > 0) {
+                LocalTensor<typename Intf::L0cT> partialSrc =
+                    (ctx.kIter % 2 == 1) ? ctx.partialReadWrite0L1 : ctx.partialReadWrite1L1;
+                ConvFix(ctx.outputL1, fmL1, ctx.weightL0, partialSrc, params);
+            } else if (ctx.hasBias && biasMatrixBrc) {
+                ConvFix(ctx.outputL1, fmL1, ctx.weightL0, ctx.biasBT, params);
+            } else if (ctx.hasBias) {
+                ConvFix(ctx.outputL1, fmL1, ctx.weightL0, ctx.biasL1, params);
             } else {
-                ConvFix(ctx.outputL1, ctx.fmapL1, ctx.weightL0, ctx.biasL1, params);
+                ConvFix(ctx.outputL1, fmL1, ctx.weightL0, params);
             }
         } else {
-            ConvFix(ctx.outputL1, ctx.fmapL1, ctx.weightL0, params);
+            LocalTensor<typename Intf::L0cT> dstPartial =
+                (ctx.kIter % 2 == 0) ? ctx.partialReadWrite0L1 : ctx.partialReadWrite1L1;
+            if (ctx.kIter != 0) {
+                LocalTensor<typename Intf::L0cT> partialSrc =
+                    (ctx.kIter % 2 == 1) ? ctx.partialReadWrite0L1 : ctx.partialReadWrite1L1;
+                ConvFix(dstPartial, fmL1, ctx.weightL0, partialSrc, params);
+            } else if (ctx.hasBias && biasMatrixBrc) {
+                ConvFix(dstPartial, fmL1, ctx.weightL0, ctx.biasBT, params);
+            } else if (ctx.hasBias) {
+                ConvFix(dstPartial, fmL1, ctx.weightL0, ctx.biasL1, params);
+            } else {
+                ConvFix(dstPartial, fmL1, ctx.weightL0, params);
+            }
+        }
+        if (ctx.kIter != ctx.maxKL0Iter) {
+            ctx.currentFmapL1Offset += ctx.fmapL1OffsetStep;
         }
     }
 
@@ -489,7 +513,9 @@ private:
 
     __aicore__ inline void SetMpreQuant(const typename Intf::ContextType &ctx)
     {
-        uint64_t preQuantSpr = 0;
+        // 纯浮点 deq scale(1>>16).
+        constexpr uint64_t DEFAULT_PREQUANT_VALUE = 0x37800000;
+        uint64_t preQuantSpr = DEFAULT_PREQUANT_VALUE;
         if (ctx.hasPreQuant && !ctx.hasVectorPreQuant) {
             typename Intf::PreQuantT preQuant = ctx.preQuantGm.GetValue(0);
             preQuantSpr = (uint64_t)(preQuant);
@@ -580,7 +606,7 @@ private:
             }
 
             params.SetC0Indicator(0); // zj: C0_INDICATOR
-            params.SetEltSrcAddr((((uint64_t)(ctx.eltwiseL1[offsetL1].GetPhyAddr() >> ALIGN_32B) & BITS_L1_ADDR)));
+            params.SetEltSrcAddr(((uint64_t)(ctx.eltwiseL1[offsetL1].GetPhyAddr()) >> ALIGN_32B) & BITS_L1_ADDR);
             params.SetSrcStride1(WC0_stride);
             params.SetSrcStride2(HWC0_stride);
         }
@@ -590,6 +616,7 @@ private:
 
     __aicore__ inline void SetCubeStridePara(const typename Intf::ContextType &ctx)
     {
+        const uint64_t strideScale = (ctx.maxKL0Iter > 0 && ctx.kIter != ctx.maxKL0Iter) ? 2 : 1;
         uint64_t WC0_stride = 0;
         uint64_t HWC0_stride = 0;
         if constexpr (Intf::outputOrder == static_cast<int8_t>(Conv2dApi::ConvOutputOrder::M_MODE)) {
@@ -599,6 +626,8 @@ private:
             WC0_stride = ctx.currentWoL1;
             HWC0_stride = ctx.currentHoL1 * ctx.currentWoL1;
         }
+        WC0_stride *= strideScale;
+        HWC0_stride *= strideScale;
 
         ConvStrideBitModeParams params;
         params.SetLoop3DstStride(WC0_stride);
@@ -642,7 +671,7 @@ private:
         printf("[conv]channelSize_: %ld\n", channelSize_);
     }
 
-    __aicore__ inline void SetConvParams(const typename Intf::ContextType &ctx)
+    __aicore__ inline void SetConvParams(const typename Intf::ContextType &ctx, uint8_t pingPongId)
     {
         constexpr uint8_t POS_BIAS_MATRIX_INIT = 0;
         constexpr uint8_t POS_BIAS_MATRIX_BRC = 1;
@@ -682,8 +711,7 @@ private:
         constexpr uint64_t BITS_NBRC_BIAS_CTRL = 0x1;
         constexpr uint64_t BITS_CIN = 0xffff;
 
-        // zj：bias
-        biasMatrixInitVal = (!ctx.hasBias && ctx.kIter != 0);
+        biasMatrixInitVal = (!ctx.hasBias && ctx.kIter == 0);
         biasMatrixBrc = (ctx.hasBias && ctx.kIter == 0);
 
         // fixpipe
@@ -703,17 +731,21 @@ private:
         convConfig = 0;
         convConfig |= (((uint64_t)biasMatrixInitVal) << POS_BIAS_MATRIX_INIT);
         convConfig |= (((uint64_t)biasMatrixBrc) << POS_BIAS_MATRIX_BRC);
-        convConfig |= (((uint64_t)preQuantMode) << POS_PRE_QUANT_MODE);
-        convConfig |= (((uint64_t)preReluMode) << POS_PRE_RELU_MODE);
-        convConfig |= (((uint64_t)postQuantMode) << POS_POST_QUANT_MODE);
-        convConfig |= (((uint64_t)preClipReluMode) << POS_PRE_CLIP_RELU_MODE);
-        convConfig |= (((uint64_t)eltwiseOp) << POS_ELTWISE_OP);
-        convConfig |= (((uint64_t)eltwiseAntiqEn) << POS_ELTWISE_ANTIQ_EN);
-        convConfig |= (((uint64_t)eltwiseBrcEn) << POS_ELTWISE_M_BRC);
+        if (ctx.maxKL0Iter == ctx.kIter) {
+            convConfig |= (((uint64_t)preQuantMode) << POS_PRE_QUANT_MODE);
+            convConfig |= (((uint64_t)preReluMode) << POS_PRE_RELU_MODE);
+            convConfig |= (((uint64_t)postQuantMode) << POS_POST_QUANT_MODE);
+            convConfig |= (((uint64_t)preClipReluMode) << POS_PRE_CLIP_RELU_MODE);
+            convConfig |= (((uint64_t)eltwiseOp) << POS_ELTWISE_OP);
+            convConfig |= (((uint64_t)eltwiseAntiqEn) << POS_ELTWISE_ANTIQ_EN);
+            convConfig |= (((uint64_t)eltwiseBrcEn) << POS_ELTWISE_M_BRC);
+        }
         // zj: check
         convConfig |= (((uint64_t)lsbMask) << POS_MASK_CTRL);
         convConfig |= (((uint64_t)dualSrcEnable) << POS_DUAL_SRC_EN);
         convConfig |= (((uint64_t)compactEnable) << POS_COMPACT_EN);
+        dependEnable = (ctx.maxKL0Iter > 0);
+        instrId = static_cast<instr_id_t>(pingPongId & 0x3);
         convConfig |= (((uint64_t)dependEnable) << POS_DEPEND_EN);
         convConfig |= (((uint64_t)instrId) << POS_INSTR_ID);
         convConfig |= (((uint64_t)postProcessBandwithCtrl) << POS_POST_PROC_HALF);
@@ -723,6 +755,10 @@ private:
 private:
     inline __aicore__ pre_quant_t GetPreQuantMode(ConvPreQuantMode preQuant)
     {
+        // F16F16, fixpipe 走 DEQF16_Scalar
+        if (IsSameType<typename Intf::FmapT, half>::value && IsSameType<typename Intf::OutputT, half>::value) {
+            return pre_quant_t::DEQF16_Scalar;
+        }
         switch (preQuant) {
             case ConvPreQuantMode::NoQuant:
                 return pre_quant_t::No_Quant;

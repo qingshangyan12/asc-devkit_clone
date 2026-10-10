@@ -16,6 +16,8 @@
 #ifndef ADV_API_CONV_CONV2D_CONV2D_TILING_H
 #define ADV_API_CONV_CONV2D_CONV2D_TILING_H
 
+#include <memory>
+
 #if defined(ASCENDC_CANN) && (ASCENDC_CANN == 0)
 #include "kernel_tiling/kernel_tiling.h"
 #include "conv2d_tilingdata.h"
@@ -25,7 +27,7 @@
 #include "kernel_tiling/kernel_tiling.h"
 #include "conv2d_tilingdata.h"
 #include "conv2d_tiling_base.h"
-#include "include/utils/tiling/platform/platform_ascendc.h"
+#include "utils/tiling/platform/platform_ascendc.h"
 #endif
 
 namespace Conv2dTilingApi {
@@ -63,6 +65,11 @@ public:
 
 protected:
     int64_t Compute() override;
+
+private:
+    std::unique_ptr<ConvTilingAlgorithm> CreateAlgorithm();
+    int64_t SetTilingResult();
+    std::unique_ptr<ConvTilingAlgorithm> algo_;
 };
 } // namespace Conv2dTilingApi
 

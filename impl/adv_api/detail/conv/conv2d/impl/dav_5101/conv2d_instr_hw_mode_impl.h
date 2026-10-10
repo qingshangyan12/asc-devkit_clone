@@ -185,6 +185,10 @@ public:
         UpdatePaddingHiWiAL1(ctx);
         UpdatePadIdxAL1(ctx, woAL1Iter, hoAL1Iter);
         UpdateHiWiAL1(ctx);
+        uint64_t c1PerKL0Iter = ctx.convTiling->kStep * Intf::k0Weight /
+                                (Intf::k0Fmap * ctx.kernelH * ctx.kernelW);
+        ctx.fmapL1OffsetStep = c1PerKL0Iter * (uint64_t)hiLoadL1 * (uint64_t)wiLoadL1 *
+                               ConvApi::C0_SIZE;
         LoadAl1Data(ctx, kAL1Iter, batchIter);
     }
 
@@ -201,7 +205,7 @@ private:
     __aicore__ inline void UpdatePaddingHiWiAL1(const typename Intf::ContextType &ctx)
     {
         paddingHiAL1 = (ctx.currentHoL1 - 1) * ctx.convTiling->strideH + ctx.dilatedKernelH;
-        if (ctx.convTiling->singleCoreWo <= ctx.convTiling->woL1 && ctx.convTiling->isC04Flag) {
+        if ((ctx.convTiling->singleCoreWo <= ctx.convTiling->woL1 && ctx.convTiling->isC04Flag) || ctx.convTiling->orgWo <= ctx.convTiling->woL1) {
             paddingWiAL1 = ctx.convTiling->orgWi + ctx.convTiling->padLeft +
                            ctx.convTiling->padRight;
         } else {
@@ -273,18 +277,20 @@ private:
             intriParams.blockCount = hiLoadL1;
             intriParams.blockLen = wiLoadL1 * ConvApi::C0_SIZE;
             intriParams.srcStride = (ctx.orgWi - wiLoadL1) * ConvApi::C0_SIZE;
-            intriParams.dstStride = 0;
+            intriParams.dstStride = intriParams.blockLen;
+            const uint64_t planeStrideGm = ctx.orgHi * ctx.orgWi * Intf::k0Fmap;
+            const uint64_t planeStrideL1 = (uint64_t)hiLoadL1 * wiLoadL1 * Intf::k0Fmap;
             uint64_t currentC1 = ConvApi::CeilDIV(currentCi, Intf::k0Fmap);
             for (uint64_t i = 0; i < currentC1; i++) {
-                aL1GmOffset = aL1GmOffset + ctx.orgHi * ctx.orgWi * Intf::k0Fmap;
-                printf("[fmapL1]aL1GmOffset: %ld, blockCount: %ld, blockLen: %ld, ",
-                    "srcStride: %ld, dstStride: %ld\n",
-                    aL1GmOffset, intriParams.blockCount, intriParams.blockLen,
+                int64_t planeGmOffset = aL1GmOffset + (int64_t)(i * planeStrideGm);
+                printf("[fmapL1]aL1GmOffset: %ld, blockCount: %hd, blockLen: %hd, srcStride: %hd, dstStride: %hd\n",
+                    planeGmOffset, intriParams.blockCount, intriParams.blockLen,
                     intriParams.srcStride, intriParams.dstStride);
-                DataCopyPad<typename Intf::FmapT, PaddingMode::Normal>(ctx.fmapL1,
-                                                                       ctx.fmapGm[aL1GmOffset],
-                                                                       intriParams,
-                                                                       padParams);
+                DataCopyPad<typename Intf::FmapT, PaddingMode::Normal>(
+                    ctx.fmapL1[static_cast<uint32_t>(i * planeStrideL1)],
+                    ctx.fmapGm[planeGmOffset],
+                    intriParams,
+                    padParams);
             }
         }
     }
@@ -548,7 +554,10 @@ public:
                                           uint64_t offset)
     {
         DataCopyExtParams intriParams;
-        if (unlikely(ctx.convTiling->hoL1 == 1 || ctx.convTiling->woL1 == ctx.orgWo)) {
+        // fixpipe 的 loop2_size 有 16bit 位宽限制.
+        constexpr uint16_t MAX_LOOP2_SIZE = 0xffff;
+        if (unlikely((ctx.convTiling->hoL1 == 1 || ctx.convTiling->woL1 == ctx.orgWo) &&
+                     currentML0_ * ConvApi::C0_SIZE / sizeof(typename Intf::OutputT) <= MAX_LOOP2_SIZE)) {
             intriParams.blockCount = currentNL0_ / Intf::k0Output;
             intriParams.blockLen = currentML0_ * ConvApi::C0_SIZE;
             intriParams.srcStride = 0;
@@ -564,15 +573,15 @@ public:
             for (uint64_t i = 0; i < currentN1; i++) {
                 intriParams.blockCount = ctx.currentHoL0;
                 intriParams.blockLen = ctx.currentWoL0 * ConvApi::C0_SIZE;
-                intriParams.srcStride = (ctx.orgWo - ctx.currentWoL0) * ConvApi::C0_SIZE;
-                intriParams.dstStride = 0;
-                offset = offset + ctx.orgHo * ctx.orgWo * Intf::k0Output;
+                intriParams.srcStride = 0;
+                intriParams.dstStride = (ctx.orgWo - ctx.currentWoL0) * ConvApi::C0_SIZE;
+                DataCopyPad<typename Intf::OutputT, PaddingMode::Normal>(
+                    output[offset + i * ctx.orgHo * ctx.orgWo * Intf::k0Output],
+                    ctx.outputL1[i * ctx.currentHoL0 * ctx.currentWoL0 * Intf::k0Output],
+                    intriParams);
                 printf("[cL1]cL1GmOffset: %ld, blockCount: %ld, blockLen: %ld, srcStride: %ld, dstStride: %ld\n",
-                    offset, intriParams.blockCount, intriParams.blockLen,
+                    offset + i * ctx.orgHo * ctx.orgWo * Intf::k0Output, intriParams.blockCount, intriParams.blockLen,
                     intriParams.srcStride, intriParams.dstStride);
-                DataCopyPad<typename Intf::OutputT, PaddingMode::Normal>(output[offset],
-                                                                         ctx.outputL1,
-                                                                         intriParams);
             }
         }
     }

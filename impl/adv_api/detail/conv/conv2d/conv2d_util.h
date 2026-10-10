@@ -67,6 +67,9 @@ const static uint32_t FB_BLOCK_SIZE = 32;
 const static uint8_t C04_CIN_SIZE  = 4;
 const static uint8_t DOUBLE_BUF = 2;
 
+const static uint64_t S8SIZE = 1;   // sizeof(int8_t)
+const static uint64_t S16SIZE = 2;  // sizeof(int16_t)
+
 #define FIX_VAL 16
 #define FIXED_SHIFT_VAL_FP16 42 // 58 - 16
 #define FIXED_SHIFT_VAL_FP8 10 // 26 - 16
