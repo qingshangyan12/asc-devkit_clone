@@ -239,7 +239,7 @@ __simd_callee__ inline void unalign_load::prepare(const Tensor& src_base)
 }
 
 template <typename Tensor>
-__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile)
+__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, uint32_t count)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
@@ -254,12 +254,13 @@ __simd_callee__ inline auto unalign_load::load(const Tensor& src_tile)
         "unalign_load supports b4, b8, b16, b32, and b64 element types only");
 
     reg_tensor<reg_data_type> dst;
-    asc_loadunalign(dst.reg, ureg, src_tile.engine().begin().get());
+    auto src_addr = src_tile.engine().begin().get();
+    asc_loadunalign_postupdate(dst.reg, ureg, src_addr, count);
     return dst;
 }
 
 template <typename Tensor, typename Coord>
-__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, const Coord& coord)
+__simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, const Coord& coord, uint32_t count)
 {
     using engine_type = typename Tensor::engine_type;
     using data_type = typename Tensor::data_type;
@@ -275,7 +276,8 @@ __simd_callee__ inline auto unalign_load::load(const Tensor& src_tile, const Coo
     TENSOR_API_DEBUG_CHECK(debug_check_coord, src_tile.layout(), coord, "unalign_load::load");
 
     reg_tensor<reg_data_type> dst;
-    asc_loadunalign(dst.reg, ureg, (src_tile.data() + src_tile.layout()(coord)).get());
+    auto src_addr = (src_tile.data() + src_tile.layout()(coord)).get();
+    asc_loadunalign_postupdate(dst.reg, ureg, src_addr, count);
     return dst;
 }
 
