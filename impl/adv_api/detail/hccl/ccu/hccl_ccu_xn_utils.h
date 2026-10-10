@@ -48,10 +48,6 @@ constexpr uint64_t V2_TOTAL_LOOP_NUM_MASK = 0x3ffU;
 
 __aicore__ inline uint64_t GetOpId(__gm__ CommonPrepareParamCcu* commParam)
 {
-    if (commParam->commType.msgType == ControlMsgType::HCCL_CMD_FINALIZE) {
-        return 0xffffffffffffffff;
-    }
-
     uint64_t algoType = 0U;
     uint64_t commType = static_cast<uint64_t>(commParam->commType.prepareType);
     uint64_t dataType = static_cast<uint64_t>(commParam->dataType);
