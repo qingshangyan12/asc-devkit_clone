@@ -754,3 +754,22 @@ static void test_host_c_api_reg_compute_21()
     using ::asc_reduce_sum_last_elem;
 }
 #endif
+
+static void test_host_c_api_reg_compute_22()
+{
+    using ::asc_half2e4m3_rn;
+    using ::asc_half2e4m3_rn_merge;
+    using ::asc_half2e4m3_rn_sat;
+    using ::asc_half2e4m3_rn_sat_merge;
+    using ::asc_half2e4m3_rn_sat_v2;
+    using ::asc_half2e4m3_rn_v2;
+    using ::asc_half2e5m2_rn;
+    using ::asc_half2e5m2_rn_merge;
+    using ::asc_half2e5m2_rn_sat;
+    using ::asc_half2e5m2_rn_sat_merge;
+    using ::asc_half2e5m2_rn_sat_v2;
+    using ::asc_half2e5m2_rn_v2;
+    using ::asc_pack_datablock;
+    using ::asc_pack_to_high;
+    using ::asc_pack_to_low;
+}
