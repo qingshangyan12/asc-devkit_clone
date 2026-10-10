@@ -417,7 +417,8 @@ __aicore__ inline void DataCopy(
             CheckTensorAlign<T>(
                 src, ONE_BLK_SIZE, "src",
                 "DataCopy from L1 Buffer(A1/B1/C1) to Fixpipe Buffer(C2PIPE2GM)"); // 32B align
-#if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+#if (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || \
+    (__NPU_ARCH__ == 5162)
             DataCopyL12FBImpl((uint64_t)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);
 #else
             DataCopyL12FBImpl((__fbuf__ PrimType*)dst.GetPhyAddr(), (__cbuf__ PrimType*)src.GetPhyAddr(), repeatParams);

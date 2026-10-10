@@ -27,26 +27,7 @@
 namespace AscendC {
 // all input params: C220 version, not C310 version, thus need conversion by *32
 constexpr uint8_t BYTE_32_ALIGN = 32; // in unit of 32 bytes
-
-__aicore__ inline void ValidateUbL1Address(uint64_t absUbAddr, uint64_t absL1Addr, uint32_t tensorSize)
-{
-    ASCENDC_ASSERT((absUbAddr < TOTAL_UB_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "absUbAddr is 0x%lx, which should be in range of [0, %u)", absUbAddr, TOTAL_UB_SIZE);
-    });
-    ASCENDC_ASSERT(((uint64_t)(absUbAddr + tensorSize) < TOTAL_UB_SIZE), {
-        KERNEL_LOG(
-            KERNEL_ERROR, "absUbAddr is 0x%lx, tensorSize is %u, which exceeds the limit of ub %d)", absUbAddr,
-            tensorSize, TOTAL_UB_SIZE);
-    });
-    ASCENDC_ASSERT((absL1Addr < TOTAL_L1_SIZE), {
-        KERNEL_LOG(KERNEL_ERROR, "absL1Addr is 0x%lx, which should be in range [0, %u)", absL1Addr, TOTAL_L1_SIZE);
-    });
-    ASCENDC_ASSERT(((uint64_t)(absL1Addr + tensorSize) < TOTAL_L1_SIZE), {
-        KERNEL_LOG(
-            KERNEL_ERROR, "absL1Addr is 0x%lx, tensorSize is %u, which exceeds the limit of l1 %u)", absL1Addr,
-            tensorSize, TOTAL_L1_SIZE);
-    });
-}
+constexpr uint8_t FIX_VAL = 16;
 
 // only support VecCore    PIPE_MTE2
 // GM -> UB: copy_gm_to_ubuf_align_v2: support changing padding value
@@ -61,34 +42,34 @@ __aicore__ inline void CopyGmToUbufAlignV2(
     uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
     uint32_t burstLength = blockLen * unitOfBytes;
     uint32_t padLength = leftPaddingCount * sizeof(T) + rightPaddingCount * sizeof(T);
-    uint64_t srcStride310 = srcStride * unitOfBytes + burstLength; // GM  DataCopy:32Bytes, DataCopyPad:1Byte
-    uint32_t dstStride310 = 0;
+    uint64_t actSrcStride = srcStride * unitOfBytes + burstLength; // GM  DataCopy:32Bytes, DataCopyPad:1Byte
+    uint32_t actDstStride = 0;
     uint8_t leftPaddingCnt = leftPaddingCount;
     uint8_t rigntPaddingCnt = rightPaddingCount;
     if constexpr (mode == PaddingMode::Normal) {
-        dstStride310 =
+        actDstStride =
             AlignUp(static_cast<uint32_t>(dstStride) * BYTE_32_ALIGN + burstLength + padLength, BYTE_32_ALIGN);
     } else {
-        dstStride310 = burstLength;
+        actDstStride = burstLength;
         rigntPaddingCnt = 0;
         leftPaddingCnt = 0;
     }
-    if constexpr (sizeof(T) == 8) { // B64
+    if constexpr (sizeof(T) == B64_BYTE_SIZE) {
         copy_gm_to_ubuf_align_v2(
             (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt * 2,
-            rigntPaddingCnt * 2, isPad, srcStride310, dstStride310);
-    } else if constexpr (sizeof(T) == 4) {
+            rigntPaddingCnt * 2, isPad, actSrcStride, actDstStride);
+    } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
         copy_gm_to_ubuf_align_v2(
             (__ubuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
-            isPad, srcStride310, dstStride310);
-    } else if constexpr (sizeof(T) == 2) {
+            isPad, actSrcStride, actDstStride);
+    } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
         copy_gm_to_ubuf_align_v2(
             (__ubuf__ uint16_t*)dst, (__gm__ uint16_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
-            isPad, srcStride310, dstStride310);
-    } else if constexpr (sizeof(T) == 1) {
+            isPad, actSrcStride, actDstStride);
+    } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
         copy_gm_to_ubuf_align_v2(
             (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
-            isPad, srcStride310, dstStride310);
+            isPad, actSrcStride, actDstStride);
     }
 }
 
@@ -102,18 +83,18 @@ __aicore__ inline void CopyUbufToGmAlignV2(
     // DataCopy is in unit of 32 bytes, DataCopyPad is in unit of 1byte / 32bytes
     uint32_t unitOfBytes = (isDataCopyPad) ? 1 : BYTE_32_ALIGN;
     uint32_t burstLength = blockLen * unitOfBytes;
-    uint32_t srcStride310 = 0;
+    uint32_t actSrcStride = 0;
     if constexpr (mode == PaddingMode::Normal) {
-        srcStride310 = static_cast<uint32_t>(srcStride) * BYTE_32_ALIGN +
+        actSrcStride = static_cast<uint32_t>(srcStride) * BYTE_32_ALIGN +
                        burstLength; // UB   DataCopy:32Bytes, DataCopyPad:32Bytes
         // srcstride should be 32B aligned
-        srcStride310 = DivCeil(srcStride310, BYTE_32_ALIGN) * BYTE_32_ALIGN;
+        actSrcStride = DivCeil(actSrcStride, BYTE_32_ALIGN) * BYTE_32_ALIGN;
     } else {
-        srcStride310 = burstLength;
+        actSrcStride = burstLength;
     }
-    uint64_t dstStride310 = dstStride * unitOfBytes + burstLength; // GM   DataCopy:32Bytes, DataCopyPad:1Byte
+    uint64_t actDstStride = dstStride * unitOfBytes + burstLength; // GM   DataCopy:32Bytes, DataCopyPad:1Byte
     copy_ubuf_to_gm_align_v2(
-        (__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLength, dstStride310, srcStride310);
+        (__gm__ void*)dst, (__ubuf__ void*)src, 0, blockCount, burstLength, actDstStride, actSrcStride);
 }
 
 // only support CubeCore   PIPE_MTE2
@@ -142,19 +123,19 @@ __aicore__ inline void CopyGmToCbufAlignV2(
         rigntPaddingCnt = 0;
     }
 
-    if constexpr (sizeof(T) == 8) { // B64
+    if constexpr (sizeof(T) == B64_BYTE_SIZE) {
         copy_gm_to_cbuf_align_v2(
             (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt * 2,
             rigntPaddingCnt * 2, true, actSrcStride, actDstStride);
-    } else if constexpr (sizeof(T) == 4) {
+    } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
         copy_gm_to_cbuf_align_v2(
             (__cbuf__ uint32_t*)dst, (__gm__ uint32_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
             true, actSrcStride, actDstStride);
-    } else if constexpr (sizeof(T) == 2) {
+    } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
         copy_gm_to_cbuf_align_v2(
             (__cbuf__ uint16_t*)dst, (__gm__ uint16_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
             true, actSrcStride, actDstStride);
-    } else if constexpr (sizeof(T) == 1) {
+    } else if constexpr (sizeof(T) == B8_BYTE_SIZE) {
         copy_gm_to_cbuf_align_v2(
             (__cbuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, blockCount, burstLength, leftPaddingCnt, rigntPaddingCnt,
             true, actSrcStride, actDstStride);
@@ -724,12 +705,22 @@ __aicore__ inline void DataCopyL12GMImpl(
 }
 
 template <typename T>
-__aicore__ inline __in_pipe__(MTE1) __out_pipe__(MTE1) void DataCopyL12BTImpl(
-    const uint64_t dst, __cbuf__ T* src, const uint16_t isEnableConv, const DataCopyParams& intriParams)
+__aicore__ inline void DataCopyL12BTImpl(
+    const uint64_t dst, __cbuf__ T* src, const uint16_t isenableConv, const DataCopyParams& intriParams)
 {
-    CopyCbufToBt(
-        dst, src, isEnableConv, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride,
-        intriParams.dstStride, intriParams.fixShiftVal);
+    uint8_t fixVal = 0;
+    if constexpr (std::is_same<T, half>::value) {
+        fixVal = intriParams.fixShiftVal == 0 ? FIX_VAL : intriParams.fixShiftVal;
+    }
+    if constexpr (std::is_same<T, float>::value || std::is_same<T, int32_t>::value || std::is_same<T, half>::value) {
+        // the destination gap size must be even.
+        uint16_t dstStrideAlign = AlignUp(intriParams.dstStride, 2);
+        copy_cbuf_to_bt(
+            dst, src, isenableConv, intriParams.blockCount, intriParams.blockLen, intriParams.srcStride, dstStrideAlign,
+            fixVal);
+    } else {
+        ASSERT(false && "unsupported data type of copy from cbuf to bt on current device");
+    }
 }
 
 template <typename T, typename U>
@@ -1115,7 +1106,7 @@ __aicore__ inline void DataCopyL0C2GMImpl(
 }
 
 template <typename T>
-__aicore__ inline __in_pipe__(MTE1) __out_pipe__(MTE1) void DataCopyL12UBIntf(
+__aicore__ inline void DataCopyL12UBIntf(
     const LocalTensor<T>& dstLocal, const LocalTensor<T>& srcLocal, const DataCopyParams& intriParams)
 {
     DataCopyL12UBImpl((__ubuf__ T*)dstLocal.GetPhyAddr(), (__cbuf__ T*)srcLocal.GetPhyAddr(), intriParams);
@@ -1142,11 +1133,12 @@ __aicore__ inline void DataCopyUB2UBIntf(
 #pragma end_pipe
 
 template <typename T>
-__aicore__ inline __in_pipe__(FIX)
-    __out_pipe__(FIX) void DataCopyL12FBImpl(__fbuf__ T* dst, __cbuf__ T* src, const DataCopyParams& intriParams)
+__aicore__ inline void DataCopyL12FBImpl(uint64_t dst, __cbuf__ T* src, const DataCopyParams& intriParams)
 {
+    constexpr uint8_t POS_DST_MEM_BLOCK = 16;
+    dst |= static_cast<uint64_t>(intriParams.postProcBufBlock) << POS_DST_MEM_BLOCK;
     copy_cbuf_to_fbuf_v2(
-        (__fbuf__ void*)dst, (__cbuf__ void*)src, 0, intriParams.blockCount, intriParams.blockLen,
+        (__fbuf__ void*)dst, (__cbuf__ void*)src, false, intriParams.blockCount, intriParams.blockLen,
         intriParams.srcStride, intriParams.dstStride);
 }
 
@@ -1276,17 +1268,17 @@ __aicore__ inline void DataCopyWithNDDMAImpl(
     set_loop3_stride_nddma(loop3Stride);
     set_loop4_stride_nddma(loop4Stride);
 
-    if constexpr (sizeof(T) == 1) {
+    if constexpr (sizeof(T) == B8_BYTE_SIZE) {
         set_pad_val_nddma(*reinterpret_cast<const uint8_t*>(&constValue));
         nddma_out_to_ub_b8(
             dst, src, sid, loop0Size, loop1Size, loop2Size, loop3Size, loop4Size, loop0LeftPadSize, loop0RightPadSize,
             !config.isNearestValueMode, cacheMode);
-    } else if constexpr (sizeof(T) == 2) {
+    } else if constexpr (sizeof(T) == B16_BYTE_SIZE) {
         set_pad_val_nddma(*reinterpret_cast<const uint16_t*>(&constValue));
         nddma_out_to_ub_b16(
             dst, src, sid, loop0Size, loop1Size, loop2Size, loop3Size, loop4Size, loop0LeftPadSize, loop0RightPadSize,
             !config.isNearestValueMode, cacheMode);
-    } else if constexpr (sizeof(T) == 4) {
+    } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
         set_pad_val_nddma(*reinterpret_cast<const uint32_t*>(&constValue));
         nddma_out_to_ub_b32(
             dst, src, sid, loop0Size, loop1Size, loop2Size, loop3Size, loop4Size, loop0LeftPadSize, loop0RightPadSize,
