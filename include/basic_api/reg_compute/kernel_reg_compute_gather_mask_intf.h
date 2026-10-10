@@ -37,6 +37,9 @@ template <typename T = DefaultType, typename U>
 __simd_callee__ inline void Unsqueeze(U& dstReg, MaskReg& mask);
 
 template <SpecialPurposeReg spr>
+__aicore__ inline int64_t GetSpr();
+
+template <SpecialPurposeReg spr>
 __simd_callee__ inline void ClearSpr();
 
 template <typename T = DefaultType, typename U = DefaultType, typename S, typename V>

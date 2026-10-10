@@ -29,6 +29,7 @@ const static uint64_t KIRIN_UB_RESERVED_SIZE = 8 * 1024;
 const static uint32_t WORK_SPACE_SIZE_MC62 = 1024;
 const static uint32_t WORK_SPACE_SIZE_910B = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE_950 = 16 * 1024 * 1024;
+const static uint32_t WORK_SPACE_SIZE_960DT = 16 * 1024 * 1024;
 const static uint32_t WORK_SPACE_SIZE = 2 * 1024 * 1024;
 const static uint32_t MIX_AIC_AIV_RATION_910B1 = 2;
 const static uint32_t CUBE_GROUP_WORK_SPACE_SIZE_910B = 1 * 1024 * 1024;
@@ -51,6 +52,8 @@ static const std::map<std::string, SocVersion> convertMap{
     {"Ascend310B", SocVersion::ASCEND310B},
     {"Ascend950", SocVersion::ASCEND950},
     {"Ascend350", SocVersion::ASCEND350},
+    {"Ascend960DT", SocVersion::ASCEND960DT},
+    {"Ascend960PR", SocVersion::ASCEND960PR},
     {"AS31XM1", SocVersion::AS31XM1},
     {"Ascend031", SocVersion::ASCEND031},
     {"Ascend035", SocVersion::ASCEND035},
@@ -282,6 +285,8 @@ uint32_t PlatformAscendC::GetLibApiWorkSpaceSize(void) const
         return WORK_SPACE_SIZE_910B;
     } else if (npuArch == NpuArch::DAV_3510) {
         return WORK_SPACE_SIZE_950;
+    } else if (npuArch == NpuArch::DAV_9201 || npuArch == NpuArch::DAV_9202) {
+        return WORK_SPACE_SIZE_960DT;
     }
     return WORK_SPACE_SIZE;
 }
@@ -377,6 +382,19 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend950DT_9578", "Ascend950"}, // ascend950_list
     {"Ascend350_354f", "Ascend350"},
     {"Ascend350_355e", "Ascend350"}, // ascend350_list
+    {"Ascend960DT", "Ascend960DT"},
+    {"Ascend960DT_969B5", "Ascend960DT"},
+    {"Ascend960DT_968B7", "Ascend960DT"},
+    {"Ascend960DT_966B7", "Ascend960DT"},
+    {"Ascend960DT_969B6", "Ascend960DT"},
+    {"Ascend960DT_966B8", "Ascend960DT"},
+    {"Ascend960DT_966B8Z", "Ascend960DT"},
+    {"Ascend960DT_961BZ", "Ascend960DT"},
+    {"Ascend960DT_961BY", "Ascend960DT"}, // ascend960DT_list
+    {"Ascend960PR", "Ascend960PR"},
+    {"Ascend960PR_969A1", "Ascend960PR"},
+    {"Ascend960PR_963A1", "Ascend960PR"},
+    {"Ascend960PR_964A1", "Ascend960PR"}, // ascend960PR_list
     {"MC62CM12AA", "MC62"},
     {"MC62DM22AA", "MC62"},
     {"MC62CM13AA", "MC62"},
@@ -406,10 +424,10 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
 
 const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
     {"Ascend910B", "2201"}, // ascend910b_list
-    {"Ascend910", "1001"},   {"Ascend310P", "2002"},   {"Ascend310B", "3002"},   {"Ascend950", "3510"},
-    {"Ascend350", "3510"},   {"MC62", "5102"},         {"KirinX90", "3003"},     {"Kirin9030", "3113"},
-    {"MC32DM11A", "5102"},   {"KirinDev0000", "5101"}, {"KirinDev0001", "5161"}, {"KirinDev0002", "5165"},
-    {"KirinDev0003", "5163"}};
+    {"Ascend910", "1001"},    {"Ascend310P", "2002"},   {"Ascend310B", "3002"},  {"Ascend950", "3510"},
+    {"Ascend350", "3510"},    {"Ascend960DT", "9201"},  {"Ascend960PR", "9202"}, {"MC62", "5102"},
+    {"KirinX90", "3003"},     {"Kirin9030", "3113"},    {"MC32DM11A", "5102"},   {"KirinDev0000", "5101"},
+    {"KirinDev0001", "5161"}, {"KirinDev0002", "5165"}, {"KirinDev0003", "5163"}};
 
 bool SwitchIntoShortSocVersion(const char* socVersionStr, std::string& shortSocVersion)
 {

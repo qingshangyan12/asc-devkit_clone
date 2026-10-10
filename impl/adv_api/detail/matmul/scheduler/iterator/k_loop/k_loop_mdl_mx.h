@@ -33,11 +33,13 @@ namespace Detail {
     We retain the freedom to make incompatible changes, but do not guarantee the stability.
     KLoop is only for internal usage, does not support extension or customized specialization!
 */
-template <typename IMPL, typename TRANS_T, class A_TYPE, const auto& MM_CFG>
+template <typename IMPL, typename TRANS_T, class A_TYPE, class B_TYPE, const auto& MM_CFG>
 class KLoop<
-    IMPL, TRANS_T, A_TYPE, MM_CFG,
-    enable_if_t<(DoMatmulMDL(MM_CFG) && !IsKdimReorderLoad<MM_CFG>)&&HasScalePosition<A_TYPE>::value>>
-    : public KLoopMDLBase<IMPL, TRANS_T, A_TYPE, MM_CFG> {
+    IMPL, TRANS_T, A_TYPE, B_TYPE, MM_CFG,
+    enable_if_t<
+        (DoMatmulMDL(MM_CFG) && !IsKdimReorderLoad<MM_CFG>) &&
+        (HasScalePosition<A_TYPE>::value || HasScalePosition<B_TYPE>::value)>>
+    : public KLoopMDLBase<IMPL, TRANS_T, A_TYPE, B_TYPE, MM_CFG> {
     MATMUL_USE_MODULE(MLoop);
     MATMUL_USE_MODULE(NLoop);
     MATMUL_USE_MODULE(KLoop);
@@ -55,8 +57,11 @@ class KLoop<
     MATMUL_USE_MODULE(MatmulShapeInfo);
     MATMUL_USE_MODULE(MatmulCrossCoreSync);
 
+    using SrcScaleAT = typename A_TYPE::SCALE_T;
+    using SrcScaleBT = typename B_TYPE::SCALE_T;
+
 public:
-    using BASE_MODULE = AscendC::Impl::Detail::KLoopMDLBase<IMPL, TRANS_T, A_TYPE, MM_CFG>;
+    using BASE_MODULE = AscendC::Impl::Detail::KLoopMDLBase<IMPL, TRANS_T, A_TYPE, B_TYPE, MM_CFG>;
     __aicore__ inline KLoop() = default;
     __aicore__ inline ~KLoop() = default;
 
@@ -88,8 +93,16 @@ public:
             tailScaleStepKb_ = baseK * stepKb * scaleFactorKb_;
         }
 
-        tailScaleStepKa_ = Ceil(tailScaleStepKa_, MX_BASEK_FACTOR) * MX_EVEN_FACTOR;
-        tailScaleStepKb_ = Ceil(tailScaleStepKb_, MX_BASEK_FACTOR) * MX_EVEN_FACTOR;
+        if (IsSameTypeV<SrcScaleAT, AscendC::hif4_scale>) {
+            tailScaleStepKa_ = Ceil(tailScaleStepKa_, MX_BASEK_FACTOR);
+        } else {
+            tailScaleStepKa_ = Ceil(tailScaleStepKa_, MX_BASEK_FACTOR) * MX_EVEN_FACTOR;
+        }
+        if (IsSameTypeV<SrcScaleBT, AscendC::hif4_scale>) {
+            tailScaleStepKb_ = Ceil(tailScaleStepKb_, MX_BASEK_FACTOR);
+        } else {
+            tailScaleStepKb_ = Ceil(tailScaleStepKb_, MX_BASEK_FACTOR) * MX_EVEN_FACTOR;
+        }
 
         isScaleA1KFullLoad_ = (stepKa * scaleFactorKa_) >= BASE_MODULE::kIter_;
         isScaleB1KFullLoad_ = (stepKb * scaleFactorKb_) >= BASE_MODULE::kIter_;
@@ -223,13 +236,13 @@ protected:
         if (curScaleKaOuterIdx + 1 >= Ceil(BASE_MODULE::outerKaIter_, scaleFactorKa_)) {
             tileShapeScaleKa_ = tailScaleStepKa_;
         } else {
-            tileShapeScaleKa_ = Ceil(tilingStepKa * tilingBaseK * scaleFactorKa_, MX_K_FACTOR);
+            tileShapeScaleKa_ = Ceil(tilingStepKa * tilingBaseK * scaleFactorKa_, GetMxKfactor<SrcScaleAT>());
         }
 
         if (curScaleKbOuterIdx + 1 >= Ceil(BASE_MODULE::outerKbIter_, scaleFactorKb_)) {
             tileShapeScaleKb_ = tailScaleStepKb_;
         } else {
-            tileShapeScaleKb_ = Ceil(tilingStepKb * tilingBaseK * scaleFactorKb_, MX_K_FACTOR);
+            tileShapeScaleKb_ = Ceil(tilingStepKb * tilingBaseK * scaleFactorKb_, GetMxKfactor<SrcScaleBT>());
         }
     }
 
