@@ -25,8 +25,12 @@
 #ifndef ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
 #define ASCENDC_MODULE_REG_COMPUTE_STRUCT_INTERFACE_H
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || defined(__ASC_NPU_HOST__)
+#if (__NPU_ARCH__ == 3510)
 #include "../../../impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_datatype_impl.h"
+#elif (__NPU_ARCH__ == 9201)
+#include "../../../impl/basic_api/reg_compute/dav_9201/kernel_reg_compute_datatype_impl.h"
+#elif (__NPU_ARCH__ == 9202)
+#include "../../../impl/basic_api/reg_compute/dav_9202/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 5102
 #include "../../../impl/basic_api/reg_compute/dav_m510/kernel_reg_compute_datatype_impl.h"
 #elif __NPU_ARCH__ == 5162
@@ -41,6 +45,8 @@
 #include "../../../impl/basic_api/reg_compute/dav_l311/kernel_reg_compute_datatype_impl.h"
 #elif (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5165)
 #include "../../../impl/basic_api/reg_compute/dav_5161/kernel_reg_compute_datatype_impl.h"
+#elif defined(__ASC_NPU_HOST__)
+#include "../../../impl/basic_api/reg_compute/dav_3510/kernel_reg_compute_datatype_impl.h"
 #endif
 
 namespace AscendC {
