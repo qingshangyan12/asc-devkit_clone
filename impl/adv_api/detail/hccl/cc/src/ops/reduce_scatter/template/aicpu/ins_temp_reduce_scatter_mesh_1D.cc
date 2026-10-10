@@ -96,7 +96,7 @@ HcclResult InsTempReduceScatterMesh1D::KernelRun(
             CHK_RET(static_cast<HcclResult>(HcommThreadJoin(thread, CUSTOM_TIMEOUT)));
         }
     }
-    PostCopy(param, tempAlgParams, templateResource.threads);
+    CHK_RET(PostCopy(param, tempAlgParams, templateResource.threads));
     HCCL_INFO("[InsTempReduceScatterMesh1D] Run End");
     return HcclResult::HCCL_SUCCESS;
 }
