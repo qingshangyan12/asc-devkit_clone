@@ -147,8 +147,8 @@ __aicore__ inline uint32_t DataCopyGetPhyStartIndex(
     return phyStartIndex;
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
-    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopyGM2L1ND2NZ(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
