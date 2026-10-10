@@ -288,7 +288,8 @@ TEST_F(TaskGraphExecutorTest, PingPongReuseNotifyIdWithExactSatisfiedBySeq)
 
     const auto& log = executor.ExecutionLog();
     ASSERT_EQ(log.size(), 4U);
-    // 按执行序找事件：POST/POST/WAIT/WAIT（rank0 队列 FIFO + rank1 队列 FIFO，轮询下第一轮先完成）
+    // 按执行序找事件：POST/WAIT/POST/WAIT（轮询每个 sweep 内 rank0 与 rank1 各推进队头，第一轮 POST1→WAIT1 完成后第二轮
+    // POST2→WAIT2）
     const ExecEvent* post1 = nullptr;
     const ExecEvent* wait1 = nullptr;
     const ExecEvent* post2 = nullptr;
@@ -329,4 +330,94 @@ TEST_F(TaskGraphExecutorTest, SecondWaitAfterConsumedPostDeadlocks)
     std::string report;
     EXPECT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::DEADLOCK);
     EXPECT_NE(report.find("deadlock detected"), std::string::npos);
+}
+
+TEST_F(TaskGraphExecutorTest, LocalReduceInt32Sum)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    const uint64_t srcAddr = npu0.AllocMemory(BufferType::INPUT, 8);
+    const uint64_t dstAddr = npu0.AllocMemory(BufferType::OUTPUT, 8);
+    auto* src = reinterpret_cast<int32_t*>(Base(0, BufferType::INPUT, 8));
+    auto* dst = reinterpret_cast<int32_t*>(Base(0, BufferType::OUTPUT, 8));
+    src[0] = 1;
+    src[1] = 2;
+    dst[0] = 10;
+    dst[1] = 20;
+
+    DataSlice srcSlice;
+    ASSERT_EQ(npu0.GetSlice(srcAddr, 8, srcSlice), HcclResult::HCCL_SUCCESS);
+    DataSlice dstSlice;
+    ASSERT_EQ(npu0.GetSlice(dstAddr, 8, dstSlice), HcclResult::HCCL_SUCCESS);
+    Append(
+        0, 0,
+        std::make_shared<TaskStubLocalReduce>(
+            srcSlice, dstSlice, HcclDataType::HCCL_DATA_TYPE_INT32, HcclReduceOp::HCCL_REDUCE_SUM));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(dst[0], 11);
+    EXPECT_EQ(dst[1], 22);
+}
+
+TEST_F(TaskGraphExecutorTest, WriteReduceFp16Sum)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
+    const uint64_t inAddr = npu0.AllocMemory(BufferType::INPUT, 4);
+    const uint64_t rmtAddr = npu1.AllocMemory(BufferType::OUTPUT, 4);
+    // FP16 位模式：1.0=0x3C00, 2.0=0x4000, 3.0=0x4200
+    auto* inU16 = reinterpret_cast<uint16_t*>(Base(0, BufferType::INPUT, 4));
+    auto* rmtU16 = reinterpret_cast<uint16_t*>(Base(1, BufferType::OUTPUT, 4));
+    inU16[0] = 0x3C00;
+    inU16[1] = 0x4000;
+    rmtU16[0] = 0x4000;
+    rmtU16[1] = 0x3C00;
+
+    DataSlice local;
+    ASSERT_EQ(npu0.GetSlice(inAddr, 4, local), HcclResult::HCCL_SUCCESS);
+    DataSlice remote;
+    ASSERT_EQ(npu1.GetSlice(rmtAddr, 4, remote), HcclResult::HCCL_SUCCESS);
+    Append(
+        0, 0,
+        std::make_shared<TaskStubWriteReduce>(
+            1, LinkInfo(LinkProtoStub::SDMA), local, remote, HcclDataType::HCCL_DATA_TYPE_FP16,
+            HcclReduceOp::HCCL_REDUCE_SUM));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(rmtU16[0], 0x4200); // 2.0 + 1.0 = 3.0
+    EXPECT_EQ(rmtU16[1], 0x4200);
+}
+
+TEST_F(TaskGraphExecutorTest, ReadReduceBfp16Max)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
+    const uint64_t locAddr = npu0.AllocMemory(BufferType::OUTPUT, 4);
+    const uint64_t rmtAddr = npu1.AllocMemory(BufferType::CCL, 4);
+    // BFP16 = FP32 高 16 位：1.0=0x3F80, 2.0=0x4000
+    auto* locU16 = reinterpret_cast<uint16_t*>(Base(0, BufferType::OUTPUT, 4));
+    auto* rmtU16 = reinterpret_cast<uint16_t*>(Base(1, BufferType::CCL, 4));
+    rmtU16[0] = 0x3F80;
+    rmtU16[1] = 0x4000;
+    locU16[0] = 0x4000; // local 2.0 > remote 1.0：MAX 取 local，可区分 OVERRIDE 误实现
+    locU16[1] = 0x3F80; // local 1.0 < remote 2.0：MAX 取 remote，可区分空执行
+
+    DataSlice local;
+    ASSERT_EQ(npu0.GetSlice(locAddr, 4, local), HcclResult::HCCL_SUCCESS);
+    DataSlice remote;
+    ASSERT_EQ(npu1.GetSlice(rmtAddr, 4, remote), HcclResult::HCCL_SUCCESS);
+    Append(
+        0, 0,
+        std::make_shared<TaskStubReadReduce>(
+            1, LinkInfo(LinkProtoStub::SDMA), local, remote, HcclDataType::HCCL_DATA_TYPE_BFP16,
+            HcclReduceOp::HCCL_REDUCE_MAX));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(locU16[0], 0x4000);
+    EXPECT_EQ(locU16[1], 0x4000);
 }
