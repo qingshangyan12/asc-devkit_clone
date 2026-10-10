@@ -21,13 +21,14 @@ namespace HcclSim {
 namespace AicpuSt {
 
 struct DagConflict {
-    std::string kind; // "WAW" / "WAR" / "RAW"
+    std::string kind; // "WAW" / "RAW"(写先读后) / "WAR"(读先写后)；A 为时序在先的访问
     std::string detailA;
     std::string detailB;
 };
 
 // DAG 内存冲突检测：
-// happens-before = 同队列程序序 + （POST -> 被其满足的 WAIT）同步边；
+// happens-before = 同队列程序序 + （POST -> 被其满足的 WAIT）同步边
+// （WAIT / LOCAL_WAIT_FROM；新增同步原语需同步此处与 checker 实现）；
 // 两个来自不同队列、无 happens-before 关系的内存访问，区间重叠且至少一个写 => 冲突。
 // 算法按 notify 同步设计时不应有冲突；冲突即同步缺失或 slice 计算错误的信号。
 class AicpuDagChecker {

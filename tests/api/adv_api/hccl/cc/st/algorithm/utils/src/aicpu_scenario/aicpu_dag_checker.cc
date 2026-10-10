@@ -21,10 +21,10 @@ namespace {
 
 std::string AccessToString(const ExecEvent& event, const MemAccess& access)
 {
-    return "rank " + std::to_string(access.rank) + " stream " + std::to_string(event.streamId) + " task[" +
-           std::to_string(event.taskIndex) + "] seq " + std::to_string(event.seq) + " " +
-           (access.isWrite ? "WRITE" : "READ") + " [" + std::to_string(access.offset) + ", " +
-           std::to_string(access.offset + access.size) + ")";
+    return "rank " + std::to_string(access.rank) + " (exec rank " + std::to_string(event.rank) + ") stream " +
+           std::to_string(event.streamId) + " task[" + std::to_string(event.taskIndex) + "] seq " +
+           std::to_string(event.seq) + " " + (access.isWrite ? "WRITE" : "READ") + " [" +
+           std::to_string(access.offset) + ", " + std::to_string(access.offset + access.size) + ")";
 }
 
 } // namespace
@@ -113,6 +113,9 @@ std::vector<DagConflict> AicpuDagChecker::Check(const std::vector<ExecEvent>& lo
                 if (a.event->rank == b.event->rank && a.event->streamId == b.event->streamId) {
                     continue; // 同队列：程序序已保证先后
                 }
+                if (a.access->size == 0 || b.access->size == 0) {
+                    continue; // 零长度访问不构成冲突
+                }
                 const uint64_t aEnd = a.access->offset + a.access->size;
                 const uint64_t bEnd = b.access->offset + b.access->size;
                 if (a.access->offset >= bEnd || b.access->offset >= aEnd) {
@@ -127,7 +130,7 @@ std::vector<DagConflict> AicpuDagChecker::Check(const std::vector<ExecEvent>& lo
                     continue; // 有 happens-before，合法
                 }
                 DagConflict conflict;
-                conflict.kind = (a.access->isWrite && b.access->isWrite) ? "WAW" : (a.access->isWrite ? "WAR" : "RAW");
+                conflict.kind = (a.access->isWrite && b.access->isWrite) ? "WAW" : (a.access->isWrite ? "RAW" : "WAR");
                 conflict.detailA = AccessToString(*a.event, *a.access);
                 conflict.detailB = AccessToString(*b.event, *b.access);
                 conflicts.push_back(conflict);
