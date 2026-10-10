@@ -392,6 +392,8 @@ def _gen_compile_cmd_516r2(
         "-mllvm",
         "-cce-aicore-stack-size=0x4000",
         "-mllvm",
+        "-cce-aicore-function-stack-size=0x4000",
+        "-mllvm",
         "-cce-aicore-record-overflow=false",
         "-mllvm",
         "-cce-aicore-addr-transform",
@@ -408,7 +410,7 @@ def _gen_compile_cmd_516r2(
         "-instcombine-code-sinking=false",
         "-mllvm",
         "-cce-aicore-mask-opt=false",
-        "cce-simd-vf-fusion=true",
+        "--cce-simd-vf-fusion=true",
     ]
     if global_var_storage.get_variable("ascendc_enable_sanitizer"):
         compile_cmd += ["--cce-enable-sanitizer", "-gline-tables-only"]
