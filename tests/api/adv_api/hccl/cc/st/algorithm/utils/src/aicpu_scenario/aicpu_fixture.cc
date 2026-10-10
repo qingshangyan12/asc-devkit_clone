@@ -184,8 +184,9 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
 {
     const uint32_t rankSize = CountRanks(scenario.topoMeta);
     ASSERT_GE(rankSize, 1U);
-    // 守卫：非法 dataType 会让 DATATYPE_SIZE_TABLE 越界读
-    ASSERT_GT(DATATYPE_SIZE_TABLE[scenario.dataType], 0U) << "invalid dataType in scenario";
+    // 守卫：dataType 越界（≥ RESERVED）会使后续 DATATYPE_SIZE_TABLE 索引越界读，先检查枚举界
+    ASSERT_LT(static_cast<uint32_t>(scenario.dataType), HCCL_DATA_TYPE_RESERVED)
+        << "invalid dataType in scenario, value=" << static_cast<uint32_t>(scenario.dataType);
 
     SimTaskQueue::Global()->Clear();
 
