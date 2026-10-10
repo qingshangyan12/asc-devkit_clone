@@ -2,34 +2,37 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
-- Ascend 950PR&950DT系列产品：支持
+<!-- npu="960" id1 -->
+- Ascend 960PR&960DT系列产品：支持
 <!-- end id1 -->
-<!-- npu="A3" id2 -->
-- Atlas A3系列产品：不支持
+<!-- npu="950" id2 -->
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id2 -->
-<!-- npu="910b" id3 -->
-- Atlas A2系列产品：不支持
+<!-- npu="A3" id3 -->
+- Atlas A3系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2推理产品：不支持
+<!-- npu="910b" id4 -->
+- Atlas A2系列产品：不支持
 <!-- end id4 -->
-<!-- npu="310p" id5 -->
-- Atlas推理系列产品AI Core：不支持
+<!-- npu="310b" id5 -->
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas训练系列产品：不支持
+<!-- npu="310p" id7 -->
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas训练系列产品：不支持
+<!-- end id8 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
-根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，并支持多种舍入模式与饱和模式，结果写入`dst`。
-由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。伪代码如下：
+根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，支持多种舍入模式、饱和/非饱和模式与置零/合并模式，结果写入`dst`或通过函数返回值返回。
+由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。以置零模式为例，伪代码如下：
 
 ```python
 # 位置判断仅用于说明接口语义，实际位置参数为编译期常量。
@@ -43,6 +46,8 @@ def asc_float2bfloat16_rn(dst, src, mask, dst_pos):
             dst[2 * i + offset] = bfloat16(src[i])  # float -> bfloat16，RINT舍入
 ```
 
+合并模式下，上述伪代码中置0的元素保留`dst`中原值。
+
 关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
 本接口为Reg矢量计算接口，仅在AIV上生效。
@@ -51,38 +56,53 @@ def asc_float2bfloat16_rn(dst, src, mask, dst_pos):
 
 ```c
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode>(vector_bfloat16_t& dst,
+__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_bfloat16_t& dst,
                                                                       vector_float src,
                                                                       vector_bool mask,
                                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode>(vector_bfloat16_t& dst,
+__simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_bfloat16_t& dst,
                                                                       vector_float src,
                                                                       vector_bool mask,
                                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode>(vector_float src,
+__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_float src,
                                                                       vector_bool mask,
                                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode>(vector_float src,
+__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_float src,
                                                                       vector_bool mask,
                                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
 - `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+- `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和未写入结果的位置置0；取值为`_merge`时表示合并模式，`mask`未选中的元素和未写入结果的位置保留`dst`中原值。
+<!-- npu="960" id9 -->
+- 合并模式（`<merge_mode>`取值为`_merge`）仅在Ascend 960PR&960DT系列产品上支持。
+<!-- end id9 -->
 
 ### 函数原型典型示例
 
 ```c
-// RINT舍入模式，非饱和模式，数据写入索引为偶数的位置
+// RINT舍入模式，非饱和模式，置零模式，数据写入索引为偶数的位置
 __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
                                                   vector_float src,
                                                   vector_bool mask,
                                                   std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 ```
+
+<!-- npu="960" id10 -->
+
+```c
+// TRUNC舍入模式，饱和模式，合并模式，数据写入索引为奇数的位置，结果通过函数返回值返回
+__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rz_sat_merge(vector_float src,
+                                                                     vector_bool mask,
+                                                                     std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+```
+
+<!-- end id10 -->
 
 ## 参数说明
 
@@ -90,7 +110,7 @@ __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
 
 | 参数名 | 输入/输出 | 描述 |
 | ------ | --------- | ------------------------------------------------------------------------------------------------------------------ |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。合并模式下，未写入结果的位置保留`dst`原值。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 | dst_pos | 输入 | 位置选择标签（编译期标签分发，通过编译期重载选择对应实现），类型为`std::integral_constant<asc_position_mode, asc_position_mode::EVEN>`或`std::integral_constant<asc_position_mode, asc_position_mode::ODD>`。取`ASC_POSITION_EVEN`时选择将结果写入目的操作数索引为偶数的位置，其他位置清零；取`ASC_POSITION_ODD`时选择将结果写入目的操作数索引为奇数的位置，其他位置清零。 |
@@ -108,21 +128,30 @@ __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
 - 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
 - 位置选择标签选择目的操作数的写入地址，其他位置清零。
 - `src`与`dst`的数据类型需要与函数原型匹配。
-- `mask`掩码位为0时，`dst`对应元素置0。
-- 结果写入`dst`的奇数索引位置时，偶数索引位置置0；结果写入偶数索引位置时，奇数索引位置置0。
+- 置零模式下，`mask`掩码位为0的元素置0，结果写入奇数索引位置时偶数索引位置置0，写入偶数索引位置时奇数索引位置置0；合并模式下，上述元素保留`dst`原值。
 - 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-<!-- npu="950" id8 -->
+<!-- npu="950" id11 -->
 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
-<!-- end id8 -->
+
+<!-- end id11 -->
+
+<!-- npu="960" id12 -->
+以Ascend 960PR&960DT系列产品（对应NPU架构为`dav-9201`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-9201 && ./main
+```
+
+<!-- end id12 -->
 
 ```c
 #include <cstdint>

@@ -2,32 +2,54 @@
 
 ## 产品支持情况
 
-<!-- npu="950" id1 -->
-- Ascend 950PR&950DT系列产品：支持
+<!-- npu="960" id1 -->
+- Ascend 960PR&960DT系列产品：支持
 <!-- end id1 -->
-<!-- npu="A3" id2 -->
-- Atlas A3系列产品：不支持
+<!-- npu="950" id2 -->
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id2 -->
-<!-- npu="910b" id3 -->
-- Atlas A2系列产品：不支持
+<!-- npu="A3" id3 -->
+- Atlas A3系列产品：不支持
 <!-- end id3 -->
-<!-- npu="310b" id4 -->
-- Atlas 200I/500 A2推理产品：不支持
+<!-- npu="910b" id4 -->
+- Atlas A2系列产品：不支持
 <!-- end id4 -->
-<!-- npu="310p" id5 -->
-- Atlas推理系列产品AI Core：不支持
+<!-- npu="310b" id5 -->
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id6 -->
-<!-- npu="910" id7 -->
-- Atlas训练系列产品：不支持
+<!-- npu="310p" id7 -->
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id7 -->
+<!-- npu="910" id8 -->
+- Atlas训练系列产品：不支持
+<!-- end id8 -->
 
 
 ## 功能说明
 
-根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e5m2_t`类型，结果写入`dst`。由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组，参数`dst_quarter_pos`从`dst`中离散选取每隔4个元素的索引位置写入转换结果，具体为索引0、4、8、…，索引1、5、9、…，索引2、6、10、…或索引3、7、11、…，其他位置置零。
+根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e5m2_t`类型，结果写入`dst`或通过函数返回值返回。由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组，参数`dst_quarter_pos`从`dst`中离散选取每隔4个元素的索引位置写入转换结果，具体为索引0、4、8、…，索引1、5、9、…，索引2、6、10、…或索引3、7、11、…。以置零模式为例，伪代码如下：
+
+```python
+# 位置判断仅用于说明接口语义，实际位置参数为编译期常量。
+# VL表示矢量数据寄存器位宽，取值256字节。
+def asc_float2e5m2_rn(dst, src, mask, dst_quarter_pos):
+    # ASC_DISPERSE_FIRST_QUARTER、ASC_DISPERSE_SECOND_QUARTER、ASC_DISPERSE_THIRD_QUARTER和
+    # ASC_DISPERSE_FOURTH_QUARTER分别对应offset取0、1、2、3
+    offset = {ASC_DISPERSE_FIRST_QUARTER: 0, ASC_DISPERSE_SECOND_QUARTER: 1,
+              ASC_DISPERSE_THIRD_QUARTER: 2, ASC_DISPERSE_FOURTH_QUARTER: 3}[dst_quarter_pos]
+    for i in range(VL // 4):
+        dst[4 * i] = 0
+        dst[4 * i + 1] = 0
+        dst[4 * i + 2] = 0
+        dst[4 * i + 3] = 0
+        if mask[i]:
+            dst[4 * i + offset] = fp8_e5m2(src[i])  # float -> fp8_e5m2_t，RINT舍入
+```
+
+合并模式下，上述伪代码中置0的元素保留`dst`中原值。
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
@@ -37,19 +59,23 @@
 
 ```c
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_float2e5m2_rn<sat_mode>(vector_fp8_e5m2_t& dst,
+__simd_callee__ inline void asc_float2e5m2_rn<sat_mode><merge_mode>(vector_fp8_e5m2_t& dst,
                                      vector_float src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_fp8_e5m2_t asc_float2e5m2_rn<sat_mode>(vector_float src,
+__simd_callee__ inline vector_fp8_e5m2_t asc_float2e5m2_rn<sat_mode><merge_mode>(vector_float src,
                                      vector_bool mask,
                                      std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+- `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和组内未写入结果的位置置0；取值为`_merge`时表示合并模式，`mask`未选中的元素和组内未写入结果的位置保留`dst`中原值。
+<!-- npu="960" id9 -->
+- 合并模式（`<merge_mode>`取值为`_merge`）仅在Ascend 960PR&960DT系列产品上支持。
+<!-- end id9 -->
 - `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
 
 ### 函数原型典型示例
@@ -71,13 +97,25 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_float2e5m2_rn(
                            asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 ```
 
+<!-- npu="960" id10 -->
+
+```c
+// RINT舍入模式，饱和模式，合并模式，数据写入每4个元素中第3个的位置，结果通过函数返回值返回
+__simd_callee__ inline vector_fp8_e5m2_t asc_float2e5m2_rn_sat_merge(vector_float src,
+                                                                   vector_bool mask,
+                                                                   std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
+                                                                       dst_quarter_pos)
+```
+
+<!-- end id10 -->
+
 ## 参数说明
 
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | ------ | --------- | ---- |
-| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。合并模式下，未写入结果的位置保留`dst`原值。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 | dst_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。 |
@@ -94,19 +132,30 @@ __simd_callee__ inline vector_fp8_e5m2_t asc_float2e5m2_rn(
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
 - 位置选择标签选择目的操作数的写入地址，其他位置清零。
-- `mask`掩码位为0时，`dst`对应元素置0。
+- 置零模式下，`mask`掩码位为0的元素和组内未写入结果的位置置0；合并模式下保留`dst`原值。
 - 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
 
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-<!-- npu="950" id8 -->
+<!-- npu="950" id11 -->
 以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+
+<!-- end id11 -->
+
+<!-- npu="960" id12 -->
+以Ascend 960PR&960DT系列产品（对应NPU架构为`dav-9201`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-9201 && ./main
+```
+
+<!-- end id12 -->
 
 ```c
 #include <cstdint>
@@ -170,4 +219,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-<!-- end id8 -->
