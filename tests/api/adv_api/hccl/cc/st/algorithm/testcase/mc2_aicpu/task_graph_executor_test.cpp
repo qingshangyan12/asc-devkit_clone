@@ -208,21 +208,17 @@ TEST_F(TaskGraphExecutorTest, SameBackingGrowthDuringExecuteKeepsBothEndsValid)
 
 TEST_F(TaskGraphExecutorTest, PostThenWaitSynchronizes)
 {
-    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
     SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
     // rank1 先 WAIT 再做搬运；rank0 POST。跨队列同步由 notify 兑现。
-    const uint64_t rmtAddr = npu1.AllocMemory(BufferType::OUTPUT, 4);
-    const uint64_t inAddr = npu0.AllocMemory(BufferType::INPUT, 4);
-    Base(0, BufferType::INPUT, 4)[0] = 0x77;
-
-    DataSlice local;
-    ASSERT_EQ(npu0.GetSlice(inAddr, 4, local), HcclResult::HCCL_SUCCESS);
-    DataSlice remote;
-    ASSERT_EQ(npu1.GetSlice(rmtAddr, 4, remote), HcclResult::HCCL_SUCCESS);
+    // rank1 本地占位任务：WAIT 通过后执行
+    DataSlice localB;
+    ASSERT_EQ(npu1.GetSlice(npu1.AllocMemory(BufferType::INPUT, 4), 4, localB), HcclResult::HCCL_SUCCESS);
+    DataSlice remoteB;
+    ASSERT_EQ(npu1.GetSlice(npu1.AllocMemory(BufferType::OUTPUT, 4), 4, remoteB), HcclResult::HCCL_SUCCESS);
 
     const uint32_t notifyId = 0x40;
     Append(1, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId));
-    Append(1, 0, std::make_shared<TaskStubWrite>(1, LinkInfo(LinkProtoStub::SDMA), local, remote)); // 占位顺序任务
+    Append(1, 0, std::make_shared<TaskStubLocalCopy>(localB, remoteB));
     Append(0, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));
 
     TaskGraphExecutor executor;
@@ -273,4 +269,64 @@ TEST_F(TaskGraphExecutorTest, ChannelNotifyRecordPostsRemoteWaitConsumes)
     std::string report;
     ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
     EXPECT_EQ(executor.ExecutionLog().size(), 4U);
+}
+
+// 同 id 多轮 POST/WAIT（ping-pong，AllGather ring 的实际同步模式）：
+// 每轮 WAIT 必须由"最近一次 POST"满足（satisfiedBySeq 精确指向），且消费后清零。
+TEST_F(TaskGraphExecutorTest, PingPongReuseNotifyIdWithExactSatisfiedBySeq)
+{
+    const uint32_t notifyId = 0x50;
+    // 第一轮：rank0 POST → rank1 WAIT；第二轮：rank1 POST → rank0 WAIT
+    Append(0, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));
+    Append(1, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId));
+    Append(1, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));
+    Append(0, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+
+    const auto& log = executor.ExecutionLog();
+    ASSERT_EQ(log.size(), 4U);
+    // 按执行序找事件：POST/POST/WAIT/WAIT（rank0 队列 FIFO + rank1 队列 FIFO，轮询下第一轮先完成）
+    const ExecEvent* post1 = nullptr;
+    const ExecEvent* wait1 = nullptr;
+    const ExecEvent* post2 = nullptr;
+    const ExecEvent* wait2 = nullptr;
+    for (const auto& e : log) {
+        if (e.type == TaskTypeStub::LOCAL_POST_TO && e.notifyId == notifyId) {
+            if (post1 == nullptr) {
+                post1 = &e;
+            } else {
+                post2 = &e;
+            }
+        }
+        if (e.type == TaskTypeStub::LOCAL_WAIT_FROM && e.notifyId == notifyId) {
+            if (wait1 == nullptr) {
+                wait1 = &e;
+            } else {
+                wait2 = &e;
+            }
+        }
+    }
+    ASSERT_NE(post1, nullptr);
+    ASSERT_NE(wait1, nullptr);
+    ASSERT_NE(post2, nullptr);
+    ASSERT_NE(wait2, nullptr);
+    EXPECT_EQ(wait1->satisfiedBySeq, post1->seq); // 精确指向第一轮 POST
+    EXPECT_EQ(wait2->satisfiedBySeq, post2->seq); // 精确指向第二轮 POST（非第一轮残留）
+}
+
+// 一次性信号：POST→WAIT 消费后，同 id 第二次 WAIT 无重 POST 必须死锁。
+TEST_F(TaskGraphExecutorTest, SecondWaitAfterConsumedPostDeadlocks)
+{
+    const uint32_t notifyId = 0x51;
+    Append(0, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));
+    Append(0, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId));
+    Append(0, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId)); // 消费后再等 → 死锁
+
+    TaskGraphExecutor executor;
+    std::string report;
+    EXPECT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::DEADLOCK);
+    EXPECT_NE(report.find("deadlock detected"), std::string::npos);
 }
