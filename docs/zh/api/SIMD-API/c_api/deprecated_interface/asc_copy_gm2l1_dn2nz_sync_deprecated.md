@@ -58,7 +58,8 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ <dtype>* dst,
                                                  bool smallc0_en)
 ```
 
-### dtype支持数据类型
+#### dtype支持数据类型
+
 `dtype`取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ## 参数说明

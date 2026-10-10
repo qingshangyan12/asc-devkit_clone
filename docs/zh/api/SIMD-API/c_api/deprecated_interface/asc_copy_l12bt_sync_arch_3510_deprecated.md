@@ -42,6 +42,7 @@ __aicore__ inline void asc_copy_l12bt_sync(uint64_t dst,
 ```
 
 ### dtype支持数据类型
+
 `dtype`取值为：`half`、`bfloat16_t`、`int32_t`、`float`。
 
 ## 参数说明

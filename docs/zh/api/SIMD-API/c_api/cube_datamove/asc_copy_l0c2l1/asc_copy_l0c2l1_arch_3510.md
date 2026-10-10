@@ -96,6 +96,7 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ <dst_dtype>* dst,
 ```
 
 ### dtype支持数据类型
+
 src dtype与dst dtype支持以下组合：
 
 - `src_dtype`为`int32_t`时，`dst_dtype`支持`int4b_t`、`int8_t`、`uint8_t`、`half`、`bfloat16_t`、`int32_t`。

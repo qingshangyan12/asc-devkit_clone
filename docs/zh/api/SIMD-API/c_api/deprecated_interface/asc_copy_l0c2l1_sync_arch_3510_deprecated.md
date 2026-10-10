@@ -96,6 +96,7 @@ __aicore__ inline void asc_copy_l0c2l1_sync(__cbuf__ int4b_t* dst,
 ```
 
 ### dtype支持数据类型
+
 `src_dtype`支持`int32_t`、`float`。
 
 ## 参数说明

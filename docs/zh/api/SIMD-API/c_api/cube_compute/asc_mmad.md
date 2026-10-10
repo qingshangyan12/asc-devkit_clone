@@ -95,7 +95,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 bool disable_gemv)
 ```
 
-### dtype支持数据类型
+#### dtype支持数据类型
 
 `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
