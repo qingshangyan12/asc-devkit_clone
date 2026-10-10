@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：支持
+- Atlas推理系列产品Vector Core：支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/tool_interface/system_init/InitSocState_res.md#id1 -->
 
@@ -48,7 +48,7 @@
 **各产品实际执行的初始化项如下：**
 
 <!-- npu="950" id8 -->
-**表1** 针对Ascend 950PR/Ascend 950DT本接口执行的初始化项
+**表1** 针对Ascend 950PR&950DT系列产品本接口执行的初始化项
 
 | 状态类别 | 初始化内容 |
 | ---- | ---- |
@@ -60,10 +60,11 @@
 | AIC | LoadData（卷积数据搬运）接口调用时Pad填充的数值 |
 | AIV | Mask |
 | AIV | loop mode的参数 |
+
 <!-- end id8 -->
 
 <!-- npu="A3" id9 -->
-**表2** 针对Atlas A3 训练系列产品/Atlas A3 推理系列产品本接口执行的初始化项
+**表2** 针对Atlas A3系列产品本接口执行的初始化项
 
 | 状态类别 | 初始化内容 |
 | ---- | ---- |
@@ -72,10 +73,11 @@
 | AIC | LoadData（卷积数据搬运）接口调用时Pad填充的数值 |
 | AIC | 使用LoadData（卷积数据搬运）时L1 Buffer（A1/B1）的边界值 |
 | AIV | Mask |
+
 <!-- end id9 -->
 
 <!-- npu="910b" id10 -->
-**表3** 针对Atlas A2 训练系列产品/Atlas A2 推理系列产品本接口执行的初始化项
+**表3** 针对Atlas A2系列产品本接口执行的初始化项
 
 | 状态类别 | 初始化内容 |
 | ---- | ---- |
@@ -84,14 +86,16 @@
 | AIC | LoadData（卷积数据搬运）接口调用时Pad填充的数值 |
 | AIC | 使用LoadData（卷积数据搬运）时L1 Buffer（A1/B1）的边界值 |
 | AIV | Mask |
+
 <!-- end id10 -->
 
 <!-- npu="310p" id11 -->
-**表4** 针对Atlas 推理系列产品AI Core和Atlas 推理系列产品Vector Core本接口执行的初始化项
+**表4** 针对Atlas推理系列产品AI Core和Atlas推理系列产品Vector Core本接口执行的初始化项
 
 | 状态类别 | 初始化内容 |
 | ---- | ---- |
 | 公共状态 | 原子累加状态 |
+
 <!-- end id11 -->
 
 ## 函数原型

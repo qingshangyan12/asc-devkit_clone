@@ -4,13 +4,11 @@
 
 This sample implements a one-dimensional Gather operator in a simple scenario (with fixed shape) using the Ascend C SIMT programming mode. It collects elements at specified indices from a one-dimensional input, demonstrating the development method for discrete memory access operators in simplified scenarios.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Versions
-
-- \>= CANN 9.0.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -75,11 +73,21 @@ Execute the following steps in the root directory of this sample to build and ru
   ./demo                        # Run the sample
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
   Build Option Description
 
   | Option | Available Values | Description |
   |------|--------|------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: This sample only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: This sample only supports dav-3510 (Ascend 950PR&950DT products) |
 
   The following execution result indicates that the accuracy comparison succeeds.
 

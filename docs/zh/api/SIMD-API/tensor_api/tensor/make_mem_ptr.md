@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -49,14 +49,14 @@ make_mem_ptr提供三种调用形式：
 
   ```cpp
   template <typename PtrPattern, typename Iterator>
-  __aicore__ inline constexpr auto make_mem_ptr(Iterator iterator)
+  __aicore__ inline auto make_mem_ptr(Iterator iterator)
   ```
 
 - 从已有迭代器中自动推导物理位置：
 
   ```cpp
   template <typename Iterator>
-  __aicore__ inline constexpr auto make_mem_ptr(Iterator iterator)
+  __aicore__ inline auto make_mem_ptr(Iterator iterator)
   ```
 
 ## 参数说明
@@ -72,7 +72,7 @@ make_mem_ptr提供三种调用形式：
 | location::l0scalea | L0 ScaleA Buffer | MX矩阵计算ScaleA缓存 |
 | location::l0scaleb | L0 ScaleB Buffer | MX矩阵计算ScaleB缓存 |
 | location::l0c | L0C Buffer | 矩阵计算结果缓存 |
-| location::ub | UB | 统一缓存，矢量计算的数据存储区 |
+| location::ub | Unified Buffer（UB） | 统一缓存，矢量计算的数据存储区 |
 | location::bias | BiasTable Buffer | 偏置表缓存，带偏置矩阵计算的偏置存放区 |
 | location::fixbuf | Fixpipe Buffer | Fixpipe输出缓存，L0C到GM/UB的中转区 |
 
@@ -116,7 +116,10 @@ constexpr uint64_t gm_offset = 128;
 constexpr uint64_t l1_offset = 128;
 constexpr uint64_t l0a_offset = 128;
 constexpr uint64_t ub_offset = 128;
+constexpr uint32_t m = 32;
+constexpr uint32_t n = 32;
 // 1. 从原始地址构造：指定物理位置和数据类型
+// gm_offset、l1_offset、l0a_offset和ub_offset均为uint64_t类型的地址偏移量。
 auto gm_ptr = make_mem_ptr<location::gm, float>(gm_offset);
 auto l1_ptr = make_mem_ptr<location::l1, float>(l1_offset);
 auto l0a_ptr = make_mem_ptr<location::l0a, half>(l0a_offset);
@@ -127,8 +130,11 @@ auto gm_a = make_tensor(gm_ptr, make_frame_layout<nd_ext_layout_ptn, layout_trai
 auto l1_a = make_tensor(l1_ptr, make_frame_layout<nz_layout_ptn, layout_trait_default<float>>(m, n));
 
 // 3. 从已有指针适配器继承位置（自动推导）
+// gm_ptr为hardware_mem_ptr<location::gm, __gm__ float*>类型的指针适配器。
 auto another_ptr = make_mem_ptr(gm_ptr);
 
 // 4. 从已有迭代器指定新位置
-auto l1_from_iter = make_mem_ptr<location::l1>(some_iterator);
+// l1_iterator为由l1_ptr派生的L1 Buffer地址迭代器。
+auto l1_iterator = l1_ptr + 1;
+auto l1_from_iter = make_mem_ptr<location::l1>(l1_iterator);
 ```

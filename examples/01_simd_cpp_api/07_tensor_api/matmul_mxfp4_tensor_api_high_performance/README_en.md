@@ -8,9 +8,7 @@ This example introduces how to implement a high-performance MxFP4 Matmul kernel 
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | > CANN 9.1.0 |
-
-> **Note:** This example depends on CANN features that have not been officially released yet. Please use the latest CANN master package.
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -140,7 +138,7 @@ Each core only processes its assigned `2048 x 1024` output region. Within the co
 The corresponding core index computation is:
 
 ```cpp
-constexpr uint32_t mIter = DivCeil(M, singleCoreM);
+constexpr uint32_t mIter = AscendC::Std::ceil_div(M, singleCoreM);
 uint32_t mIterIdx = block_idx % mIter;
 uint32_t nIterIdx = block_idx / mIter;
 ```

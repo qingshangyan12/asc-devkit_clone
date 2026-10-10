@@ -138,7 +138,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     } else {
         hcclContext_ = (__gm__ HcclCombineOpParam*)context;
     }
-
     constexpr uint64_t workspaceAlignMask = 0x1ffU;
     constexpr uint64_t layoutSize =
         MAX_DCCI_CNT + sizeof(CommonPrepareParamCcu) * static_cast<uint64_t>(HCCL_MAX_HANDLE_ID) +
@@ -212,13 +211,27 @@ template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitV2(
     GM_ADDR context, const void* initTiling)
 {
-    HcclTilingVersion version =
-        (initTiling != nullptr ? HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION :
-                                 HcclTilingVersion::DEPRECATED_TILING_VERSION);
+    newCcuFlag_ = false;
+    HcclTilingVersion version = HcclTilingVersion::DEPRECATED_TILING_VERSION;
     if (initTiling != nullptr) {
+        version = HcclTilingVersion::ONLINE_COMPILATION_TILING_VERSION;
         const Mc2InitTilingInner* tilingInner = static_cast<const Mc2InitTilingInner*>(initTiling);
         if (tilingInner->version == INIT_TILING_CCU_NEW_VERSION) {
             newCcuFlag_ = true;
+            if (tilingInner->devType == HCCL_CCU_DEV_TYPE_A5) {
+                ccuProtocolVersion_ = CcuProtocolVersion::CCU_V1;
+            } else if (tilingInner->devType == HCCL_CCU_DEV_TYPE_A6) {
+                ccuProtocolVersion_ = CcuProtocolVersion::CCU_V2;
+            } else {
+                ccuProtocolVersion_ = CcuProtocolVersion::INVALID;
+                KERNEL_LOG(KERNEL_ERROR, "ApiClient InitV2 invalid CCU devType:%d", tilingInner->devType);
+            }
+        }
+    } else if (context != nullptr) {
+        __gm__ const HcclApi::OpResCtx* opResCtx = reinterpret_cast<__gm__ const HcclApi::OpResCtx*>(context);
+        if (opResCtx->version == static_cast<uint32_t>(HcclApi::Mc2LaunchVersion::MC2_CCU_LAUNCH_VERSION)) {
+            newCcuFlag_ = true;
+            version = HcclTilingVersion::CONTEXT_DECOUPLE_VERSION;
         }
     }
     InitInner(context, version);
@@ -265,7 +278,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
     FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
-        if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+        if (GetAlgorithmType(handleId) ==
+            static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink)) {
+            ccuUsedXnNum_ = KFC_PARALLEL_AG_STORAGE_NUM;
+            CcuPrepareForParallelAllGatherM2M(&handleParamGM_[handleId]);
+        } else if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleNHR)) {
+            ccuUsedXnNum_ = KFC_AG_SOLE_NHR_PARAM_NUM;
+            CcuPrepareForAllGatherSoleNhrM2M(&handleParamGM_[handleId]);
+        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
             ccuUsedXnNum_ = KFC_CONCURRENT_AG_PARAM_NUM;
             CcuPrepareForConcurrentAllGatherM2M(&handleParamGM_[handleId]);
         } else {
@@ -276,8 +296,16 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         ccuUsedXnNum_ = 26;
         CcuPrepareForAllReduceM2M(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALL) {
-        ccuUsedXnNum_ = 11;
-        CcuPrepareForAllToAll(&handleParamGM_[handleId]);
+        if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllMesh1DMultiJetty)) {
+            ccuUsedXnNum_ = KFC_A2A_MJ_PARAM_NUM;
+            CcuPrepareForAllToAllMultiJetty(&handleParamGM_[handleId]);
+        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+            ccuUsedXnNum_ = KFC_CONCURRENT_A2A_PARAM_NUM;
+            CcuPrepareForConcurrentAllToAll(&handleParamGM_[handleId]);
+        } else {
+            ccuUsedXnNum_ = 11;
+            CcuPrepareForAllToAll(&handleParamGM_[handleId]);
+        }
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
         ccuUsedXnNum_ = 10;
         FlushDataCache(&allToAllVParam_[handleId]);
@@ -291,8 +319,25 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(reinterpret_cast<__gm__ uint8_t*>(&handleParamGM_[handleId]) + MAX_DCCI_CNT);
         CcuPrepareForAllToAllVWrite(&handleParamGM_[handleId]);
     } else if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
-        ccuUsedXnNum_ = 24;
-        CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
+        if (GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR)) {
+            // 2die 判定先于 missionNum（其 mission 数为动态 dieNum，勿路由到并发 prepare）
+            ccuUsedXnNum_ = KFC_RS_SOLE_NHR_2DIE_PARAM_NUM;
+            CcuPrepareForReduceScatterSoleNhr2DieM2M(&handleParamGM_[handleId]);
+        } else if (GetKfcMissionNum(handleId) == KFC_MAX_MISSION_NUM) {
+            ccuUsedXnNum_ = KFC_CONCURRENT_RS_PARAM_NUM;
+            CcuPrepareForConcurrentReduceScatterM2M(&handleParamGM_[handleId]);
+        } else if (
+            GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuReduceScatterMeshMem2Mem1DPeerOnly)) {
+            ccuUsedXnNum_ = 9;
+            CcuPrepareForReduceScatterPeerOnlyM2M(&handleParamGM_[handleId]);
+        } else if (
+            GetAlgorithmType(handleId) == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHRMultiLink)) {
+            ccuUsedXnNum_ = KFC_RS_SOLE_NHR_PARAM_NUM;
+            CcuPrepareForReduceScatterSoleNhrM2M(&handleParamGM_[handleId]);
+        } else {
+            ccuUsedXnNum_ = 24;
+            CcuPrepareForReduceScatterM2M(&handleParamGM_[handleId]);
+        }
     }
 }
 
@@ -348,6 +393,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
     ccuParam_.rankId = newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId;
     ccuParam_.scratchAddr = newCcuFlag_ ? hcclNewContext_->res[0] : hcclContext_->windowsOut[0];
+    // res[1]=die 切分千分比（1000/0=不切分），host 侧 GetCcuOpParamResCtx 写入
+    ccuParam_.dieSplitRatioPermille = newCcuFlag_ ? hcclNewContext_->res[1] : 1000U;
 }
 
 template <const auto& config>
@@ -365,6 +412,9 @@ template <bool commit>
 __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::CommonPrepareImpl(
     const CommonPrepareParam& commonPrepareParam)
 {
+    ASCENDC_HCCL_API_ASSERT(
+        isInited_, { return INVALID_HANDLE_ID; },
+        "Call Prepare failed, please ensure Hccl::Init func has been called successfully already!");
     if (unlikely(commonPrepareParam.repeat == 0U)) {
         return INVALID_HANDLE_ID;
     }
@@ -508,24 +558,39 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 }
 
 template <const auto& config>
+__aicore__ inline uint32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetAlgorithmType(
+    HcclHandle handleId) const
+{
+    if (!newCcuFlag_ || handleId < 0 || handleId >= HCCL_MAX_HANDLE_ID) {
+        return UINT32_MAX;
+    }
+    const uint32_t prepareType = static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType);
+    for (uint32_t index = 0U; index < HCCL_API_MAX_OP_NUM; ++index) {
+        if (prepareType != static_cast<uint32_t>(HcclCMDType::HCCL_CMD_INVALID) &&
+            hcclNewContext_->opType[index] == prepareType) {
+            return hcclNewContext_->algorithmType[index];
+        }
+    }
+    return UINT32_MAX;
+}
+
+template <const auto& config>
 __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::GetKfcMissionNum(
     HcclHandle handleId) const
 {
-    uint32_t prepareType = UINT32_MAX;
-    uint32_t algorithmType = UINT32_MAX;
-    if (newCcuFlag_ && handleId >= 0 && handleId < HCCL_MAX_HANDLE_ID) {
-        prepareType = static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType);
-        for (uint32_t index = 0U; index < HCCL_API_MAX_OP_NUM; ++index) {
-            if (prepareType != static_cast<uint32_t>(HcclCMDType::HCCL_CMD_INVALID) &&
-                hcclNewContext_->opType[index] == prepareType) {
-                algorithmType = hcclNewContext_->algorithmType[index];
-                break;
-            }
-        }
-    }
+    const uint32_t algorithmType = GetAlgorithmType(handleId);
     uint8_t missionNum = 1U;
-    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink)) {
+    if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherConcurMeshNHRMultiLink) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllToAllSoleMeshConcurrent) ||
+        algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterConcurMeshNHRMultiLink)) {
         missionNum = KFC_MAX_MISSION_NUM;
+    } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedReduceScatterSoleNHR) && newCcuFlag_) {
+        // 2die 的 mission 数 = dieNum（资源期动态探测），host 经 OpResCtx.res[2] 下发；0/越界回退 1（兼容旧 host lib）
+        const uint64_t missionCnt = hcclNewContext_->res[2];
+        if (missionCnt >= 1U && missionCnt <= KFC_MAX_MISSION_NUM) {
+            missionNum = static_cast<uint8_t>(missionCnt);
+        }
     }
     return missionNum;
 }
@@ -597,17 +662,16 @@ __aicore__ inline int32_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
     ASCENDC_HCCL_API_ASSERT(
         isInited_, { return HCCL_FAILED; },
         "Call Wait failed, please ensure Hccl::Init func has been called successfully already!");
-    ASCENDC_HCCL_API_ASSERT(
-        handleCommitCnt_[handleId] > 0, { return HCCL_FAILED; }, "Call Wait failed,  commitCnt [%u] is invalid.",
-        handleCommitCnt_[handleId]);
-    ASCENDC_HCCL_API_ASSERT(
-        handleId < curHandleId_, { return HCCL_FAILED; },
-        "Call Wait failed,  handleId = %u is invalid please call Preapre Interface before Wait.", handleId);
-
     if (unlikely(handleId >= HCCL_MAX_HANDLE_ID || handleId <= INVALID_HANDLE_ID)) {
         KERNEL_LOG(KERNEL_ERROR, "Call Wait failed, handleId[%u] is invalid.", handleId);
         return HCCL_FAILED;
     }
+    ASCENDC_HCCL_API_ASSERT(
+        handleId < curHandleId_, { return HCCL_FAILED; },
+        "Call Wait failed,  handleId = %u is invalid please call Preapre Interface before Wait.", handleId);
+    ASCENDC_HCCL_API_ASSERT(
+        handleCommitCnt_[handleId] > 0, { return HCCL_FAILED; }, "Call Wait failed,  commitCnt [%u] is invalid.",
+        handleCommitCnt_[handleId]);
 
     if (unlikely(handleNeedCommitCnt_[handleId] <= 0)) {
         KERNEL_LOG(

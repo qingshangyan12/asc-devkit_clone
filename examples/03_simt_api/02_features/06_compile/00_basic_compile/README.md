@@ -11,13 +11,11 @@
 图1：代码结构与调用关系
 </p>
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -62,6 +60,8 @@ bisheng host.cpp kernel.asc -o demo --npu-arch=dav-3510 --enable-simt -I${ASCEND
 # 1、设置编译配置变量
 # CMAKE_ASC_ARCHITECTURES：指定NPU架构版本，本样例仅支持 dav-3510，可通过-DCMAKE_ASC_ARCHITECTURES=dav-xxxx配置
 set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture")
+# CMAKE_ASC_ENABLE_SIMT：启用SIMT编译模式
+set(CMAKE_ASC_ENABLE_SIMT ON)
 
 # 2、find_package(ASC)是CMake中用于查找和配置Ascend C编译工具链的命令
 find_package(ASC)
@@ -76,18 +76,6 @@ add_executable(demo
 
 # 5、设置链接器语言为ASC
 set_target_properties(demo PROPERTIES LINKER_LANGUAGE ASC)
-
-# 6、配置编译选项：--npu-arch指定架构版本，--enable-simt启用SIMT模式
-target_compile_options(demo PRIVATE
-    $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=${CMAKE_ASC_ARCHITECTURES} --enable-simt>)
-```
-
-在后续版本，可通过设置 `CMAKE_ASC_ENABLE_SIMT` 为ON启用SIMT模式替代上述步骤6的 `--enable-simt`编译选项：
-
-```cmake
-# 启用SIMT编译模式
-set(CMAKE_ASC_ENABLE_SIMT ON)
-```
 
 ## 编译运行
 
@@ -122,13 +110,13 @@ set(CMAKE_ASC_ENABLE_SIMT ON)
     ./demo                                                          # 执行样例
     ```
 
-    使用 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。示例如下：
+    使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：
 
     ```bash
     cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
     ```
 
-    > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+    > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 执行结果
 

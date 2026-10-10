@@ -37,7 +37,7 @@ __aicore__ inline int64_t GetBitCountImpl(uint64_t valueIn)
 
 __aicore__ inline int64_t CountLeadingZeroImpl(uint64_t valueIn) { return clz(valueIn); }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 __aicore__ inline uint64_t GetUintDivMagic(uint64_t dividend, uint64_t divisor)
 {
     uint64_t quotient = 0;
@@ -114,14 +114,25 @@ __aicore__ inline int64_t GetSFFValueImpl(uint64_t valueIn)
     }
 }
 
-#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 template <typename T>
-__aicore__ inline void WriteGmByPassDCacheImpl(__gm__ T* addr, T value)
+__aicore__ inline void WriteGmBypassDCacheImpl(__gm__ T* addr, T value)
 {
     static_assert(
         SupportType<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t>(),
-        "WriteGmByPassDCache only support int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t "
+        "WriteGmBypassDCache only support int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t "
         "data type on current device!");
+
+#if __NPU_ARCH__ == 2201
+    // The write only takes effect in the first 32 bytes of each 128-byte aligned range.
+    ASCENDC_DEBUG_ASSERT(
+        (static_cast<uint32_t>(reinterpret_cast<uint64_t>(addr) % 128) < 32),
+        KERNEL_LOG_INTERNAL(
+            KERNEL_ERROR,
+            "For WriteGmBypassDCache, current addr offset in a 128-byte aligned range is %u, which should be in "
+            "range [0, 32).",
+            static_cast<uint32_t>(reinterpret_cast<uint64_t>(addr) % 128)));
+#endif
 
     if constexpr (SupportBytes<T, 8>()) {
         st_dev(*(reinterpret_cast<uint64_t*>(&value)), reinterpret_cast<__gm__ uint64_t*>(addr), 0);
@@ -135,11 +146,11 @@ __aicore__ inline void WriteGmByPassDCacheImpl(__gm__ T* addr, T value)
 }
 
 template <typename T>
-__aicore__ inline T ReadGmByPassDCacheImpl(__gm__ T* addr)
+__aicore__ inline T ReadGmBypassDCacheImpl(__gm__ T* addr)
 {
     static_assert(
         SupportType<T, int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t>(),
-        "ReadGmByPassDCache only support int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t "
+        "ReadGmBypassDCache only support int8_t/uint8_t/int16_t/uint16_t/int32_t/uint32_t/int64_t/uint64_t "
         "data type on current device!");
 
     if constexpr (SupportBytes<T, 8>()) {
@@ -190,9 +201,9 @@ template <typename T, typename U, RoundMode roundMode>
 __aicore__ inline U CastImpl(T valueIn)
 {
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3113) || \
-     (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+     (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || \
+     (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
     if constexpr (std::is_same<U, half>::value) {
         return CastF322F16Impl<roundMode>(valueIn);
     } else if constexpr (std::is_same<U, int32_t>::value) {
@@ -212,9 +223,10 @@ template <typename T, typename U, RoundMode roundMode>
 __aicore__ inline U ScalarCastImpl(T valueIn)
 {
 #if defined(__NPU_ARCH__) &&                                                                                 \
-    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 2103) || \
-     (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3510) || \
-     (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163))
+    ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+     (__NPU_ARCH__ == 2103) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3003) || \
+     (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || \
+     (__NPU_ARCH__ == 5163))
     return CastImpl<T, U, roundMode>(valueIn);
 #else
     ASCENDC_ASSERT((false), "ScalarCast is not supported on current device");

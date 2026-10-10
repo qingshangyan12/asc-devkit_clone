@@ -3,26 +3,38 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9050" id8 -->
+- Kirin 9050处理器系列产品：支持
+<!-- end id8 -->
+<!-- npu="kirin1" id9 -->
+- KirinDev0001处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="kirin2" id10 -->
+- KirinDev0002处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="kirin3" id11 -->
+- KirinDev0003处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/data_compression/UnPack_res.md#id1 -->
 
 
@@ -46,6 +58,7 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 ## 参数说明<a name="section622mcpsimp"></a>
 
 **表 1**  模板参数说明
+
 | 参数名称 | 描述 |
 | ------ | ------ |
 | T | 目的操作数数据类型。<br> 源操作数和目的操作数的数据类型约束参考见[表 源操作数和目的操作数的数据类型对应表](#table3)。|
@@ -55,6 +68,7 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 | V | 源操作数RegTensor类型。 |
 
 **表 2**  函数参数说明
+
 | 参数名称 | 描述 |
 | ------ | ------ |
 | dstReg | 目的操作数。<br> 类型为[RegTensor](../register_data_types/RegTensor.md)。|
@@ -67,6 +81,7 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 ## 数据类型
 
 **表 3**  源操作数和目的操作数的数据类型对应表<a id="table3"></a> 
+
 | T数据类型 | U数据类型 |
 | ------ | ------ |
 | int16_t | int8_t |
@@ -75,6 +90,7 @@ __simd_callee__ inline void UnPack(S& dstReg, V& srcReg)
 | uint32_t | uint16_t |
 | int64_t | int32_t |
 | uint64_t | uint32_t |
+
 ## 约束说明<a name="section633mcpsimp"></a>
 
 无

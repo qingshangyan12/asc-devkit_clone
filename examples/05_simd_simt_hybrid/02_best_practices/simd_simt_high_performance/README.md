@@ -18,7 +18,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -29,6 +29,7 @@
 │   ├── figures               // 图示
 │   ├── floor_mod.asc         // Ascend C样例实现
 │   ├── README.md             // 样例说明文档
+│   ├── README_en.md          // 英文样例说明文档
 │   └── scripts
 │       ├── gen_data.py       // 输入数据和真值数据生成脚本
 │       └── verify_result.py  // 真值对比脚本
@@ -282,7 +283,7 @@ __aicore__ inline void process_tiles(
 
 Case 2的索引方式为 `index = tid * elems_per_thread + i`，其中 `elems_per_thread = 8`。从单个线程看，它会连续处理8个元素；
 
-Ascend 950PR/950DT的UB划分为16个bank、组织为8个bank group，每个bank每行为32B（连续每32B落到下一个bank），向量计算单元每拍可从每个bank group读/写一行（32B）。Warp内的32个线程同拍执行同一条指令、各自寻址。
+Ascend 950PR&950DT系列产品的UB划分为16个bank、组织为8个bank group，每个bank每行为32B（连续每32B落到下一个bank），向量计算单元每拍可从每个bank group读/写一行（32B）。Warp内的32个线程同拍执行同一条指令、各自寻址。
 
 在Case 2中，相邻线程 `tid` 与 `tid+1` 在同一轮迭代 `i` 下访问的元素相差 `elems_per_thread = 8`，即字节地址相差 `8 * sizeof(int32) = 32B`，恰好为一条bank行的跨度。这意味着相邻线程分别落在**不同的bank行**上，硬件无法用一次行读取（32B）同时服务多个线程，相同数量的数据需要更多拍才能取完，UB访问被拉长。
 
@@ -353,8 +354,6 @@ __aicore__ inline void process_tiles(
 
 ## 性能对比总结
 
-### Ascend 950PR性能对比
-
 下表为本样例在Ascend 950系列产品上运行的性能数据对比：
 
 | Case | 实现方式 | 核数 | Task Duration(μs) | aiv_vec_time(μs) | aiv_vec_ratio | aiv_mte2_time(μs) | aiv_mte2_ratio | aiv_mte3_time(μs) | aiv_mte3_ratio | 主要瓶颈 |
@@ -364,7 +363,7 @@ __aicore__ inline void process_tiles(
 | 2 | SIMT非连续访问UB | 64 | 538.098 | 501.605 | 0.942 | 527.987 | 0.991 | 40.091 | 0.075 | 跨bank行访问UB |
 | 3 | SIMT连续访问UB | 64 | **463.179** | **301.474** | 0.668 | 437.055 | 0.968 | 110.788 | 0.245 | MTE2 bound |
 
-### 优化要点总结
+## 调优建议
 
 | 优化手段 | 核心原理 | 样例体现 |
 |:---|:---|:---|
@@ -412,14 +411,21 @@ __aicore__ inline void process_tiles(
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
   ```
 
-  使用NPU仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DSCENARIO_NUM=$SCENARIO_NUM -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 编译选项说明
 
   | 选项 | 可选值 | 说明 |
   |:---|:---|:---|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，对应 Ascend 950PR&950DT系列产品 |
   | `SCENARIO_NUM` | `0`、`1`、`2`、`3` | Case编号：0=SIMT直接访问GM，1=SIMD Reg矢量计算，2=SIMT非连续访问，3=SIMT连续访问 |
 
 - 执行结果
@@ -429,35 +435,34 @@ __aicore__ inline void process_tiles(
   test pass!
   ```
 
-### 性能分析
+## 性能调试
 
 ### msOpProf工具介绍
+
 msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
-- 上板性能采集
+通过上板性能采集，可以直接测定算子在昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
 
-    通过上板性能采集，可以直接测定算子昇腾AI处理器上的运行时间。该方式适合在板环境中快速定位算子性能问题。
+基于可执行文件demo通过msopprof执行算子调优：
 
-    基于可执行文件demo通过msopprof执行算子调优：
-    ```
-    msopprof ./demo
-    ```
+```bash
+msopprof ./demo
+```
 
-    - 性能数据说明  
-      命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的文件夹,性能数据文件夹结构示例如下：
+命令完成后，会在默认目录下生成以“OPPROF_{timestamp}_XXX”命名的性能数据文件夹，文件夹结构示例如下：
 
-      ```bash
-      ├──dump                       # 原始的性能数据，用户无需关注
-      ├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
-      ├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
-      ├──Memory.csv                 # UB，L1和主存储器读写带宽速率
-      ├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
-      ├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
-      ├──OpBasicInfo.csv            # 算子基础信息
-      ├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
-      ├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
-      └──visualize_data.bin         # MindStudio Insight呈现文件
-      ```
+```bash
+├──dump                       # 原始的性能数据，用户无需关注
+├──ArithmeticUtilization.csv  # cube/vector指令cycle占比
+├──L2Cache.csv                # L2 Cache命中率，影响MTE2，建议合理规划数据搬运逻辑，增加命中率
+├──Memory.csv                 # UB，L1和主存储器读写带宽速率
+├──MemoryL0.csv               # L0A，L0B，和L0C读写带宽速率
+├──MemoryUB.csv               # Vector和Scalar到UB的读写带宽速率
+├──OpBasicInfo.csv            # 算子基础信息
+├──PipeUtilization.csv        # 采集计算单元和搬运单元耗时和占比
+├──ResourceConflictRatio.csv  # UB上的bank group、bank conflict和资源冲突率在所有指令中的占比
+└──visualize_data.bin         # MindStudio Insight呈现文件
+```
 
 查看具体的性能分析结果：
 

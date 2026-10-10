@@ -1,8 +1,7 @@
 # 术语表<a name="ZH-CN_TOPIC_0000002191896252"></a>
 
-**表1**  术语表
+**表1**  术语表<a name="table276611752817"></a>
 
-<a name="table276611752817"></a>
 <table><thead align="left"><tr id="row117661277289"><th class="cellrowborder" valign="top" width="22.978822978822976%" id="mcps1.2.3.1.1"><p id="p17766117132820"><a name="p17766117132820"></a><a name="p17766117132820"></a>术语/缩略语</p>
 </th>
 <th class="cellrowborder" valign="top" width="77.02117702117702%" id="mcps1.2.3.1.2"><p id="p47664714282"><a name="p47664714282"></a><a name="p47664714282"></a>含义</p>
@@ -233,7 +232,7 @@
 </tr>
 <tr id="row34231332175613"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p614234735610"><a name="p614234735610"></a><a name="p614234735610"></a>Kernel Launch</p>
 </td>
-<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p1814254735611"><a name="p1814254735611"></a><a name="p1814254735611"></a>将kernel程序提交至硬件进行启动执行的过程。</p>
+<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p1814254735611"><a name="p1814254735611"></a><a name="p1814254735611"></a>将核函数（Kernel）程序提交至硬件进行启动执行的过程。</p>
 </td>
 </tr>
 <tr id="row8135612193319"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p9390122165118"><a name="p9390122165118"></a><a name="p9390122165118"></a>L0A Buffer</p>

@@ -40,7 +40,7 @@ $$
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
 
 ## 算子实现
 
@@ -118,7 +118,7 @@ __global__ __vector__ void gelu_custom(__gm__ uint8_t* x, __gm__ uint8_t* y)
 
     // Stage 2: 寄存器计算
     constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-    uint32_t loopNum = DivCeil(singleCoreLength, oneRepeatSize);
+    uint32_t loopNum = AscendC::Std::ceil_div(singleCoreLength, oneRepeatSize);
     __ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
     __ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
     asc_vf_call<GeluVfMethod2>(xAddr, yAddr, singleCoreLength, loopNum);
@@ -272,7 +272,7 @@ cat ./OPPROF_*/PipeUtilization.csv
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU架构：Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU架构：Ascend 950PR&950DT系列产品 |
   | `CMAKE_VF_MODE` | `true`（默认）、`false` | VF融合模式：启用或禁用 `--cce-simd-vf-fusion` |
 
 

@@ -8,9 +8,9 @@ This example introduces the invocation of DataSyncBarrier. This interface blocks
 
 | Product | CANN Version |
 |---------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT products | >= CANN 9.1.0 |
+| Atlas A3 products | >= CANN 9.0.0 |
+| Atlas A2 products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -40,7 +40,7 @@ This example introduces the invocation of DataSyncBarrier. This interface blocks
 The following describes the usage scenario of `DataSyncBarrier` in this example step by step:
 
 1. The system has two AIV cores, denoted as Core 0 and Core 1. Two variables `x` and `y` in GM both have an initial value of 1.
-2. Core 0 first writes `x=7` to `srcGm[1]` through the scalar pipeline interface `WriteGmByPassDCache`.
+2. Core 0 first writes `x=7` to `srcGm[1]` through the scalar pipeline interface `WriteGmBypassDCache`.
 3. Core 0 then inserts `DataSyncBarrier<AscendC::MemDsbT::DDR>()` to wait for the previous GM write operation to complete.
 4. Core 0 subsequently writes `y=6` to `srcGm[0]`.
 5. Core 1 continuously polls `srcGm[0]` until it reads `y=6`, then reads `srcGm[1]` and writes `2 * x` to the output.
@@ -90,7 +90,7 @@ Run the following steps in the root directory of this example to build and run t
   | Option | Values | Description |
   |--------|--------|-------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu` | Run mode: NPU execution, CPU debug |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
 
 - Execution result
 

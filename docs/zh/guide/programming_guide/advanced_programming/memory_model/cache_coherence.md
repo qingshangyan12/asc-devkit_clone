@@ -1,6 +1,6 @@
 # 缓存一致性
 
-本文介绍NPU编程中常见的缓存一致性问题，说明DCache、ICache、SIMT DCache与GM的数据一致性。芯片的硬件架构参考[NPU架构版本2201](../hardware_implementation/architecture_spec/npu_arch_2201.md)和[NPU架构版本3510](../hardware_implementation/architecture_spec/npu_arch_3510.md)。
+本文介绍NPU编程中常见的缓存一致性问题，说明Data Cache（DCache）、Instruction Cache（ICache）、SIMT DCache与Global Memory（GM）的数据一致性。芯片的硬件架构参考[NPU架构版本2201](../hardware_implementation/architecture_spec/npu_arch_2201.md)和[NPU架构版本3510](../hardware_implementation/architecture_spec/npu_arch_3510.md)。
 
 ## 缓存一致性的基本概念
 
@@ -8,7 +8,7 @@
 
 Cache用于缓存后续可能重复访问的数据或指令，降低访问GM的开销。一次Cache加载通常不是只加载被访问的单个字节或单个变量，而是把该地址所在的一段连续数据作为一个整体加载到Cache中，这个整体称为Cache Line。
 
-Cache Line是Cache加载、失效、写回的最小操作粒度。例如访问GM内存时，会将GM里一个Cache Line长度内相邻的数据加载到L2 Cache缓存，利用空间局部性提高访问效率。Cache Line是硬件真正搬入、标记、替换和写回缓存数据的最小粒度，直接影响性能和一致性。<!-- npu="950" id1 -->[NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)支持L2 Cache、DCache、ICache、SIMT DCache、NDDMA Cache；<!-- end id1 -->[NPU架构版本2201](../../language_extension/simd_builtin_keywords.md)支持L2 Cache、DCache和ICache。本文讨论的通用Cache单元信息如下：
+Cache Line是Cache加载、失效、写回的最小操作粒度。例如访问GM内存时，会将GM里一个Cache Line长度内相邻的数据加载到L2 Cache缓存，利用空间局部性提高访问效率。Cache Line是硬件真正搬入、标记、替换和写回缓存数据的最小粒度，直接影响性能和一致性。<!-- npu="950" id1 -->[NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)支持L2 Cache、DCache、ICache、SIMT DCache、NDDMA Cache；<!-- end id1 -->[NPU架构版本2201](../../language_extension/simd_builtin_keywords.md)支持L2 Cache、DCache和ICache。本文讨论的通用Cache单元信息如下：<a name="cache_unit_info"></a>
 
 <!-- npu="950" id15 -->
 **NPU架构版本3510Cache单元信息**
@@ -21,6 +21,7 @@ Cache Line是Cache加载、失效、写回的最小操作粒度。例如访问GM
 | AIC DCache | Scalar数据缓存 | 每个核独立缓存，需要考虑多个核之间的数据一致性问题 | 64B | 32KB |
 | AIV DCache | Scalar数据缓存 | 每个核独立缓存，需要考虑多个核之间的数据一致性问题 | 64B | 32KB |
 | SIMT DCache | SIMT数据缓存 | 每个核独立缓存，需要考虑多个核之间的数据一致性问题 | 128B | 32KB~128KB |
+
 <!-- end id15 -->
 
 <!-- npu="A3,910b" id20 -->
@@ -33,6 +34,7 @@ Cache Line是Cache加载、失效、写回的最小操作粒度。例如访问GM
 | AIV ICache | Scalar取指缓存 | 只读，不考虑多个核之间的数据不一致问题 | 128B | 16KB |
 | AIC DCache | Scalar数据缓存 | 每个核独立缓存，需要考虑多个核之间的数据一致性问题 | 64B | 16KB |
 | AIV DCache | Scalar数据缓存 | 每个核独立缓存，需要考虑多个核之间的数据一致性问题 | 64B | 32KB |
+
 <!-- end id20 -->
 
 同一份数据可能同时存在于GM、L2 Cache、DCache<!-- npu="950" id2 -->、SIMT DCache<!-- end id2 -->等多个位置。对于每个核独立维护的Cache，同一地址或同一Cache Line可能在不同核内形成不同副本：
@@ -54,7 +56,7 @@ Data Cache Clean and Invalid（[DCCI](../../../../api/SIMD-API/c_api/cache_ctrl/
 
 实际使用时，可根据一致性目标选择不同DCCI接口：使用[`asc_dcci_single`](../../../../api/SIMD-API/c_api/cache_ctrl/asc_dcci.md)刷新指定地址所在的单个Cache Line；使用[`asc_dcci_entire_out`](../../../../api/SIMD-API/c_api/cache_ctrl/asc_dcci.md)刷新面向GM的一致性目标；原子相关目标按产品支持情况选择[`asc_dcci_entire_atomic`](../../../../api/SIMD-API/c_api/cache_ctrl/asc_dcci.md)等接口。
 
-对于需要等待DCCI触发的写回真正完成的场景，还需要配合Data Sync Barrier（[DSB](../../../../api/SIMD-API/c_api/sync/asc_sync_data_barrier.md)）等待前序内存访问完成，DSB只用于阻塞后续指令执行，直到之前的内存访问指令执行结束，参数可选择`DSB_ALL`、`DSB_DDR`或`DSB_UB`。
+对于需要等待DCCI触发的写回真正完成的场景，还需要配合Data Sync Barrier（[DSB](../../../../api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md)）等待前序内存访问完成，DSB只用于阻塞后续指令执行，直到之前的内存访问指令执行结束，参数可选择`DSB_ALL`、`DSB_DDR`或`DSB_UB`。
 
 Cache写入策略决定写操作是否会形成Dirty副本，常见策略包括直写和写回：
 
@@ -64,7 +66,7 @@ Cache写入策略决定写操作是否会形成Dirty副本，常见策略包括�
 
 ### 缓存一致性与内存一致性的区别
 
-缓存一致性（cache一致性）关注的是同一地址或同一Cache Line在不同缓存副本之间的值是否一致。例如，某个核的DCache已经把`A`修改为新值，但GM中仍是旧值；或者GM已经被其他路径更新，但当前核DCache仍保留旧副本。此时问题的关键是是否需要写回Dirty副本、失效旧副本，或者绕过Cache访问。
+缓存一致性关注的是同一地址或同一Cache Line在不同缓存副本之间的值是否一致。例如，某个核的DCache已经把`A`修改为新值，但GM中仍是旧值；或者GM已经被其他路径更新，但当前核DCache仍保留旧副本。此时问题的关键是是否需要写回Dirty副本、失效旧副本，或者绕过Cache访问。
 
 内存一致性关注的是不同执行单元、不同线程或不同核之间的读写顺序是否符合程序预期。例如，生产者先写数据再写标志，消费者看到标志后是否一定能按预期读取到数据。同步接口、内存栅栏主要解决执行顺序和访问完成问题；DCCI主要解决Cache副本写回和失效问题。实际编程时，两类问题经常同时出现，但本文重点讨论Cache副本与GM、UB之间的数据一致性。
 
@@ -213,11 +215,12 @@ T6                                                Scalar.LOAD A -> 1
 
 - 生产者通过Scalar写GM后，如果消费者需要从GM或其他路径读取该数据，生产者需要执行DCCI（例如`asc_dcci_single`）把Dirty数据写回GM。
 - 消费者如果担心本核DCache中有旧副本，读取前需要执行DCCI使旧副本失效。
-- 如果算法本身不需要DCache缓存，可以使用[ReadGmByPassDCache](<../../../../api/SIMD-API/basic_api/scalar_compute/ReadGmByPassDCache_ISASI.md>)和[WriteGmByPassDCache](<../../../../api/SIMD-API/basic_api/scalar_compute/WriteGmByPassDCache_ISASI.md>)直接读写GM。
+- 如果算法本身不需要DCache缓存，可以使用[ReadGmBypassDCache](<../../../../api/SIMD-API/basic_api/scalar_compute/ReadGmBypassDCache_ISASI.md>)和[WriteGmBypassDCache](<../../../../api/SIMD-API/basic_api/scalar_compute/WriteGmBypassDCache_ISASI.md>)直接读写GM。
 
-还有一类问题来自Cache Line粒度。普通Scalar写后续以64B Cache Line为单位写回；多个核即使写的是同一条Cache Line中的不同字段，也可能在各自写回整条Cache Line时覆盖对方结果。此类场景可以通过让不同核操作的地址至少相隔Cache Line大小，或使用ReadGmByPassDCache和WriteGmByPassDCache降低风险。
+还有一类问题来自Cache Line粒度。普通Scalar写后续以64B Cache Line为单位写回；多个核即使写的是同一条Cache Line中的不同字段，也可能在各自写回整条Cache Line时覆盖对方结果。此类场景可以通过让不同核操作的地址至少相隔Cache Line大小，或使用ReadGmBypassDCache和WriteGmBypassDCache降低风险。
 
 <!-- npu="950" id3 -->
+
 #### Atomic访问导致的DCache缓存一致性
 
 [NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)支持Scalar原子操作，Scalar原子操作可以看成对某个GM地址执行的读-改-写事件，但是Scalar原子操作会绕过DCache，因此会导致缓存一致性。例如C API [asc_atomic_add](../../../../api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md)，该接口在指定GM地址上执行原子加操作。原子操作保证的是这一次读-改-写不会被其他原子更新打断，但它不会自动清理同一地址在DCache中的旧副本或Dirty副本。
@@ -249,6 +252,7 @@ T1        asc_atomic_add(A, 1)
 上面的关键不是`asc_atomic_add`本身不原子，而是原子操作看到的GM值没有包含此前停留在DCache中的普通Scalar写入。
 
 反过来，如果`asc_atomic_add(A, 1)`已经把GM更新为1，而本核DCache里还保留`A == 0`的旧副本，后续普通Scalar读也可能继续读到旧副本。
+
 ```text
 Case 2：Atomic在前，普通Scalar读在后
 初始状态：
@@ -320,7 +324,6 @@ T3        Scalar.DCCI A
 T4        Scalar.LOAD A -> 1
           // 重新从GM获取Atomic更新后的新值
 ```
-
 <!-- end id3 -->
 
 #### 软件维护Scalar访问GM的DCache一致性
@@ -329,7 +332,7 @@ T4        Scalar.LOAD A -> 1
 
 Scalar写GM可以分为两类：
 - cache: 普通Scalar写通过DCache修改GM，例如直接写`__gm__`地址；
-- no cache: 不经过DCache，直接向GM发起写操作，例如`WriteGmByPassDCache`等。
+- no cache: 不经过DCache，直接向GM发起写操作，例如`WriteGmBypassDCache`等。
 
 按照访问顺序，常见需要软件维护一致性的场景可以分为RAW、WAW和WAR三类：
 
@@ -343,7 +346,7 @@ RAW（Read After Write）场景要求后序读操作读取到前序写操作产�
 
 下表列出同一AI Core内Scalar写GM之后、消费者读取GM完整的软件维护操作序列。假设生产者和消费者访问同一地址，每个单元格都是从写后处理到读前处理的完整操作序列。
 
-表中的cache表示经过cache的访问，no cache表示不经过cache的访问,`VF_SIMT`表示经过cache的SIMT线程函数，MTE2表示经过MTE2的读取操作，MTE2（cache）指[多维数据搬运NDDMA](../../../../api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md)，MTE2.DCI指NDDMA Cache的[失效操作](../../../../api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/NdDmaDci.md)或[asc_ndim_copy_dci](../../../../api/appendix/Release_Notes/CANN_9_1_0.md)。
+表中的cache表示经过cache的访问，no cache表示不经过cache的访问,`VF_SIMT`表示经过cache的SIMT线程函数，MTE2表示经过MTE2的读取操作，MTE2（cache）指[多维数据搬运NDDMA](../../../../api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md)，MTE2.DCI指NDDMA Cache的[失效操作](../../../../api/SIMD-API/basic_api/memory_vector_compute/data_move_aux_config/NdDmaDci.md)或[asc_ndim_copy_dci](../../../../api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md)。
 
 | 后续读取方式（列，后发生）<br>╲<br>前序写入方式（行，先发生） | Scalar（cache） | Scalar（no cache） | VF_SIMT（cache） | VF_SIMT（no cache） | MTE2（cache） | MTE2（no cache） |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -446,6 +449,7 @@ ICache用于缓存Scalar单元最近使用或频繁使用的指令。Scalar读�
 从缓存一致性角度看，ICache缓存的是指令而不是普通数据，并且是只读Cache，因此一般不涉及普通数据路径上的Cache副本不一致问题。
 
 <!-- npu="950" id4 -->
+
 ### SIMT DCache与GM的缓存一致性
 
 #### SIMT DCache访问路径
@@ -606,6 +610,7 @@ C API中提供了[`asc_ub_dcci_single`](../../../../api/SIMD-API/c_api/cache_ctr
 下面按atomic事件发起路径分类说明：<!-- npu="950" id6 -->Scalar原子、<!-- end id6 -->MTE3随路原子、FixPipe随路原子<!-- npu="950" id7 -->和SIMT原子<!-- end id7 -->。本节只说明这些atomic事件放入一致性分析时需要关注的Cache行为，接口细节可参考对应API文档。
 
 <!-- npu="950" id8 -->
+
 ### Scalar原子操作与DCache一致性
 
 [NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)支持Scalar原子操作，Scalar原子操作和普通Scalar读写GM混用时，需要按DCache与GM的一致性来分析，详细处理方式参考[Atomic访问导致的DCache缓存一致性](#atomic访问导致的dcache缓存一致性)。
@@ -633,6 +638,7 @@ FixPipe常用于`L0C Buffer -> GM`或相关矩阵搬出路径。对一致性分�
 - 如果多个流水或多个核都对同一GM地址做随路原子，原子操作只保证每次GM读-改-写不被打断；不同流水、不同核之间的启动顺序仍应由同步或算法协议保证。
 
 <!-- npu="950" id9 -->
+
 ### SIMT原子操作与缓存一致性
 
 [NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)支持SIMT原子操作，SIMT原子操作可能作用于UB，也可能作用于GM；接口例子可参考[asc_atomic_add](../../../../api/SIMT-API/atomic_operations/asc_atomic_add.md)。它保证的是同一地址上这一次读-改-写具有原子性，不保证多个线程之间的执行顺序。

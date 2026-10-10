@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -33,7 +33,7 @@
 不同产品的初始化范围和初始化后的状态如下。
 
 <!-- npu="950" id8 -->
-**表 1**  Ascend 950PR/Ascend 950DT初始化结果
+**表 1**  Ascend 950PR&950DT系列产品初始化结果
 
 | 状态类别 | 初始化项                                           | 初始化后的状态                                                                                                                 |
 | -------- | -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
@@ -44,10 +44,11 @@
 | AIC      | `asc_copy_l12l0a`进行3D格式搬运时的`Padding`填充值 | 设置为0。                                                                                                                      |
 | AIV      | `Mask`                                             | 高位`Mask`和低位`Mask`均设置为`0xffffffffffffffff`。在`Normal`模式下，单次迭代内的所有元素均参与计算。                         |
 | AIV      | `GM->UB`与`UB->GM`搬运的循环次数                   | 内层循环次数和外层循环次数均设置为1，恢复为普通搬运模式。                                                                      |
+
 <!-- end id8 -->
 
 <!-- npu="A3" id9 -->
-**表 2**  Atlas A3 训练系列产品/Atlas A3 推理系列产品初始化结果
+**表 2**  Atlas A3系列产品初始化结果
 
 | 状态类别 | 初始化项       | 初始化后的状态                                                                                         |
 | -------- | -------------- | ------------------------------------------------------------------------------------------------------ |
@@ -55,10 +56,11 @@
 | AIV      | 原子累加状态   | 清空原子累加状态，后续数据搬运不执行原子累加。                                                         |
 | AIV      | `Mask`工作模式 | 设置为`Normal`模式。                                                                                   |
 | AIV      | `Mask`         | 高位`Mask`和低位`Mask`均设置为`0xffffffffffffffff`。在`Normal`模式下，单次迭代内的所有元素均参与计算。 |
+
 <!-- end id9 -->
 
 <!-- npu="910b" id10 -->
-**表 3**  Atlas A2 训练系列产品/Atlas A2 推理系列产品初始化结果
+**表 3**  Atlas A2系列产品初始化结果
 
 | 状态类别 | 初始化项       | 初始化后的状态                                                                                         |
 | -------- | -------------- | ------------------------------------------------------------------------------------------------------ |
@@ -66,6 +68,7 @@
 | AIV      | 原子累加状态   | 清空原子累加状态，后续数据搬运不执行原子累加。                                                         |
 | AIV      | `Mask`工作模式 | 设置为`Normal`模式。                                                                                   |
 | AIV      | `Mask`         | 高位`Mask`和低位`Mask`均设置为`0xffffffffffffffff`。在`Normal`模式下，单次迭代内的所有元素均参与计算。 |
+
 <!-- end id10 -->
 
 ## 函数原型
@@ -97,10 +100,10 @@ __aicore__ inline void asc_init()
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id11 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
-bisheng example.asc -o main --npu-arch=dav-3510; ./main
+bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id11 -->
 
@@ -130,7 +133,7 @@ __global__ __vector__ void asc_init_kernel(__gm__ uint64_t* output, __gm__ uint6
     __ubuf__ uint32_t local[BYTES / sizeof(uint32_t)];
     asc_copy_gm2ub_align(local, reinterpret_cast<__gm__ uint32_t*>(input), BYTES);
     asc_sync_mte2(0);
-    asc_set_atomic_add_int();
+    asc_set_atomic_add_int32();
     // Reinitialize the core and clear persistent state such as the atomic mode.
     asc_init();
     // asc_init resets the atomic mode, so this is an ordinary Unified Buffer（UB）-to-GM copy.

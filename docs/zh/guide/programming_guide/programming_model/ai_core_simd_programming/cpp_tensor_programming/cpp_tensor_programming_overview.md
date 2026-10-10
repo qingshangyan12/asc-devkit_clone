@@ -68,9 +68,10 @@ Tensor本质是基于数组的编程抽象，而非简单的内存地址封装�
 
 前文的Tensor抽象示例中已展示了GlobalTensor和LocalTensor的基本用法。下面从硬件存储层级的角度，进一步介绍外部存储和内部存储的特性及Tensor管理方式。
 GM是昇腾NPU的设备内存，位于AI Core外部，容量大、带宽高但访问延迟较长。用于存储算子的输入数据、输出结果和中间计算数据。GM具有持久性：其中存储的数据持续保留，直到内存空间被释放或应用程序终止。
-用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数（Kernel）执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://hiascend.com/document/redirect/CannCommunityRuntimeApi)。
+用户通过Runtime API管理Device侧全局内存。Host侧使用`aclrtMalloc`分配Device内存，通过`aclrtMemcpy`完成Host与Device间的数据拷贝，通过`<<<>>>`拉起核函数（Kernel）执行，最后使用`aclrtFree`释放内存。有关Runtime API的详细信息，可参考[《Runtime运行时API》](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/README.md)。
 
 如下示例展示了在Host侧通过Runtime API管理分配Device内存、在Host与Device之间数据拷贝以及核函数（Kernel）的调用过程：
+
 ```cpp
 // Kernel function definition (using __global__ prefix to indicate Host call, Device execution)
 __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm__ uint8_t* z)
@@ -120,6 +121,7 @@ std::vector<float> kernel_add(std::vector<float> &x, std::vector<float> &y) {
     return z;
 }
 ```
+
 GM作为大容量全局内存，用于Host与Device交互及算子输入输出数据存储，但访问延迟较长，无法满足AI Core低延迟计算需求。所有Cube/Vector计算必须将数据预加载至片上内部存储，下面分UB、寄存器、L1/L0缓冲区介绍内部存储Tensor管理方式。
 
 ### 内部存储
@@ -157,6 +159,7 @@ __global__ __vector__ void add_custom(__gm__ uint8_t* x, __gm__ uint8_t* y, __gm
   AscendC::LocalTensor<float> zLocalPing(AscendC::TPosition::VECCALC, zAddrPing, 256);
 }
 ```
+
 > 📌 其中AscendC::TPosition::VECCALC为对物理位置的逻辑抽象定义，与物理位置的映射参考文件[逻辑位置和物理存储的映射](../../../../../api/SIMD-API/general_description_and_constraints.md)。
 
 相比基础Tensor，[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)引入Layout描述并将其作为Tensor的核心属性，开发者可在Tensor创建时直接关联Shape与Stride信息，简化多维数据的布局管理。通过`make_tensor`，开发者可灵活指定内存地址和Layout布局，更便捷地描述ND、NZ等典型数据排布。
@@ -168,6 +171,7 @@ auto ub_ptr = make_mem_ptr(ub_buffer);
 // Extended Tensor: create through make_tensor
 auto ub_tensor = make_tensor(ub_ptr, make_layout(make_shape(128, 64)));
 ```
+
 > 📌 UB地址必须32字节对齐，以匹配硬件总线粒度和SIMD计算单元并行度，非对齐访问将导致运行时错误。
 
 #### AIV内部存储之Register File
@@ -217,7 +221,7 @@ Cube计算单元专用的缓存为：L0A Buffer存储左矩阵，L0B Buffer存�
 每个bank一拍只能完成一读或者一写，每个bank group最多只允许2读0写或者1读1写。根据内存结构，bank冲突主要可以分为以下三种类型：
 - 读写冲突：读操作和写操作同时尝试访问同一个bank，或者两个读操作和一个写操作同时尝试访问同一个bank group。
 - 写写冲突：多个写操作同时尝试访问同一个bank group。
-- 读读冲突：两个读操作访问同一个bank，或两个以上操作同时尝试访问同一个bank group。
+- 读读冲突：两个读操作访问同一个bank，或两个以上读操作同时尝试访问同一个bank group。
 
 以读写冲突为例，当进行一组`dst = src0 + src1`的矢量加法计算时，如果`src0`的起始地址在0x0000，`dst`的起始地址为0x4000，结合Bank的排布，可以看到当前`src0`和`dst`的地址分别属于同一个bank和同一个bank group，则存在读写冲突。
 
@@ -265,7 +269,7 @@ AI Core上的执行单元分别属于不同的执行流水，同步即是保证�
 
 | 同步类型 | 核心作用及场景说明 | 关键接口 | 实现代码示例 |
 |---------|-------------------|----------|-------------|
-| **多流水同步（机制一）** | Mutex互斥锁用于核内异步流水间的同步，功能类似传统CPU锁机制。[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)新引入，比SetFlag/WaitFlag更简便。 | `Mutex::Lock` & `Mutex::Unlock` | `AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);`<br>`AscendC::DataCopy(srcLocal, srcGlobal, dataSize);`<br>`AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);`<br>`AscendC::Mutex::Lock<PIPE_V>(mutexId);`<br>`AscendC::Add(dstLocal, src0Local, src1Local, dataSize);`<br>`AscendC::Mutex::Unlock<PIPE_V>(mutexId);` |
+| **多流水同步（机制一）** | Mutex互斥锁用于核内异步流水间的同步，功能类似传统CPU锁机制。[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)新引入，比SetFlag/WaitFlag更简便。关于`Mutex::Lock`/`Mutex::Unlock`与`SetFlag`/`WaitFlag`的同步方式差异，以及双缓冲场景下的`MutexID`规划和使用约束，请参考[基于Mutex实现多流水同步](../../../advanced_programming/advanced_kernel_programming/intra_core_sync/mutex_multi_pipeline_sync.md)。 | `Mutex::Lock` & `Mutex::Unlock` | `AscendC::Mutex::Lock<PIPE_MTE2>(mutexId);`<br>`AscendC::DataCopy(srcLocal, srcGlobal, dataSize);`<br>`AscendC::Mutex::Unlock<PIPE_MTE2>(mutexId);`<br>`AscendC::Mutex::Lock<PIPE_V>(mutexId);`<br>`AscendC::Add(dstLocal, src0Local, src1Local, dataSize);`<br>`AscendC::Mutex::Unlock<PIPE_V>(mutexId);` |
 | **多流水同步（机制二）** | SetFlag与WaitFlag实现两条流水间同步等待。引入Mutex后仍保持兼容，但优先推荐Mutex机制。 | `SetFlag` & `WaitFlag` | `AscendC::DataCopy(srcLocal, srcGlobal, dataSize);`<br>`AscendC::SetFlag<HardEvent::MTE2_V>(eventId);`<br>`AscendC::WaitFlag<HardEvent::MTE2_V>(eventId);`<br>`AscendC::Add(dstLocal, src0Local, src1Local, count);` |
 | **单流水同步** | PipeBarrier等待同一流水内前序指令完成，用于同一流水内的前后数据依赖。 | `PipeBarrier` | `AscendC::Add(dstLocal, src0Local, src1Local, count);`<br>`AscendC::PipeBarrier<PIPE_V>();`<br>`AscendC::Sub(dstLocal, dstLocal, src0Local, count);` |
 | **内存访问顺序控制** | 等待所有前序内存访问完成，用于存在数据依赖或内存依赖的场景。 | `DataSyncBarrier` | `AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();` |
@@ -347,7 +351,7 @@ __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ 
     AscendC::LocalMemAllocator<AscendC::Hardware::L0A> l0aAllocator;
     AscendC::LocalMemAllocator<AscendC::Hardware::L0B> l0bAllocator;
     AscendC::LocalMemAllocator<AscendC::Hardware::L0C> l0cAllocator;
-    
+
     AscendC::LocalTensor<half> a_l1_buf = l1Allocator.Alloc<half, BLOCK_M * BLOCK_K>();
     AscendC::LocalTensor<half> b_l1_buf = l1Allocator.Alloc<half, BLOCK_K * BLOCK_N>();
     AscendC::LocalTensor<half> l0a_buf = l0aAllocator.Alloc<half, BLOCK_M * BLOCK_K>();
@@ -401,9 +405,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 ## 支持的API范围<a name="section2633193623711"></a>
 
 <!-- npu="310p" id1 -->
-**表1**  针对Atlas 推理系列产品AI Core，支持的API范围
+**表1**  针对Atlas推理系列产品AI Core，支持的API范围<a name="table56285428438"></a>
 
-<a name="table56285428438"></a>
 <table><thead align="left"><tr id="row46697425436"><th class="cellrowborder" valign="top" width="30.28%" id="mcps1.2.3.1.1"><p id="p866911429430"><a name="p866911429430"></a><a name="p866911429430"></a>接口分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="69.72%" id="mcps1.2.3.1.2"><p id="p186691442174319"><a name="p186691442174319"></a><a name="p186691442174319"></a>接口名称</p>
@@ -511,9 +514,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 <!-- end id1 -->
 
 <!-- npu="910b" id2 -->
-**表2**  针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的API范围
+**表2**  针对Atlas A2系列产品，支持的API范围<a name="table1842818536431"></a>
 
-<a name="table1842818536431"></a>
 <table><thead align="left"><tr id="row104742531436"><th class="cellrowborder" valign="top" width="29.9%" id="mcps1.2.4.1.1"><p id="p10474205364319"><a name="p10474205364319"></a><a name="p10474205364319"></a>接口分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="44.25%" id="mcps1.2.4.1.2"><p id="p1047418533430"><a name="p1047418533430"></a><a name="p1047418533430"></a>接口名称</p>
@@ -714,9 +716,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 <!-- end id2 -->
 
 <!-- npu="A3" id3 -->
-**表3**  针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的API范围
+**表3**  针对Atlas A3系列产品，支持的API范围<a name="table167051848128"></a>
 
-<a name="table167051848128"></a>
 <table><thead align="left"><tr id="row07054481922"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p135155581014"><a name="p135155581014"></a><a name="p135155581014"></a>接口分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="44.519999999999996%" id="mcps1.2.4.1.2"><p id="p12351955181013"><a name="p12351955181013"></a><a name="p12351955181013"></a>接口名称</p>
@@ -930,9 +931,8 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
-**表4**  针对Ascend 950PR/Ascend 950DT，支持的API范围
+**表4**  针对Ascend 950PR&950DT系列产品，支持的API范围<a name="table1798673512413"></a>
 
-<a name="table1798673512413"></a>
 <table><thead align="left"><tr id="row109864353413"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p1098613524117"><a name="p1098613524117"></a><a name="p1098613524117"></a>接口分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="44.519999999999996%" id="mcps1.2.4.1.2"><p id="p29871535174117"><a name="p29871535174117"></a><a name="p29871535174117"></a>接口名称</p>
@@ -943,7 +943,7 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 </thead>
 <tbody><tr id="row1298763513418"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p15987173524114"><a name="p15987173524114"></a><a name="p15987173524114"></a>基础API &gt; 标量计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p12167195363614"><a name="p12167195363614"></a><a name="p12167195363614"></a>GetBitCount、CountLeadingZero、CountBitsCntSameAsSignBit、GetSFFValue、Cast（float转half、int32_t）、Cast（float转bfloat16_t）、Cast（多类型转float）、Nop、GetUintDivMagicAndShift、WriteGmByPassDCache、ReadGmByPassDCache</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p12167195363614"><a name="p12167195363614"></a><a name="p12167195363614"></a>GetBitCount、CountLeadingZero、CountBitsCntSameAsSignBit、GetSFFValue、Cast（float转half、int32_t）、Cast（float转bfloat16_t）、Cast（多类型转float）、Nop、GetUintDivMagicAndShift、WriteGmBypassDCache、ReadGmBypassDCache</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p298711352411"><a name="p298711352411"></a><a name="p298711352411"></a>-</p>
 </td>
@@ -1160,6 +1160,7 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 | --- | --- |
 | 基础API | AddDeqRelu、Select |
 | 高阶API | Digamma、Lgamma、Power、Sign、LayerNorm、DropOut、SelectWithBytesMask |
+
 <!-- end id5 -->
 
 <!-- npu="950" id6 -->
@@ -1178,4 +1179,5 @@ __global__ __mix__ void mix_kernel(__gm__ float* x, __gm__ float* y, __gm__ floa
 | 基础API > Kernel-Tiling | GET_TILING_DATA、GET_TILING_DATA_WITH_STRUCT、GET_TILING_DATA_MEMBER |
 | Utils API > 调测接口（SIMD VF） | printf、asc_dump_reg、asc_dump、asc_dump_ubuf |
 | 高阶API | AscendAntiQuant、AdjustSoftMaxRes、TopK |
+
 <!-- end id6 -->

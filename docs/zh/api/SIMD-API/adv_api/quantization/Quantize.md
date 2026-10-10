@@ -3,23 +3,23 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/quantization/Quantize_res.md#id1 -->
 
@@ -151,6 +151,7 @@ struct QuantizeParams {
 | bfloat16_t | float | CAST_ROUND(默认)<br>CAST_HYBRID |
 
 **表5**  DstT为int8_t支持的数据类型组合
+
 | SrcT | ScaleT/OffsetT |  roundMode |
 | --- | --- | --- |
 | half | half | CAST_RINT(默认)<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
@@ -160,6 +161,7 @@ struct QuantizeParams {
 | bfloat16_t | float | CAST_RINT(默认)<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |
 
 **表6**  DstT为fp4x2_e1m2_t/fp4x2_e2m1_t支持的数据类型组合（当前均只支持PER_GROUP场景）
+
 | SrcT | ScaleT/OffsetT |  roundMode |
 | --- | --- | --- |
 | half | half | CAST_RINT(默认)<br>CAST_ROUND<br>CAST_FLOOR<br>CAST_CEIL<br>CAST_TRUNC |

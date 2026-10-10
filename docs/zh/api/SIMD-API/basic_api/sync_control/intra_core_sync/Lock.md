@@ -3,25 +3,25 @@
 ## 产品支持情况<a name="section73648168211"></a>
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/Lock_res.md#id1 -->
 
@@ -62,8 +62,16 @@ static __aicore__ inline void Lock(MutexID id)
 ## 约束说明<a name="section184751024101111"></a>
 
 - 每个锁有固定的一个MutexID，在不同编程范式中，该ID的获取以及释放方式不同：
-    - 采用[TPipe-TQue框架编程范式](../../../../../guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_paradigm.md)时，MutexID需要通过[AllocMutexID](AllocMutexID_ISASI.md)/[ReleaseMutexID](ReleaseMutexID_ISASI.md)进行申请释放。
-    - 采用[静态Tensor编程范式](../../../../../guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md)时，MutexID由开发者自行管理，建议使用0-27，28-31为系统内部规划预留，不建议使用。
+    - 采用[TPipe-TQue框架编程范式](../../../../../guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_paradigm.md)时，MutexID需要通过[AllocMutexID](AllocMutexID_ISASI.md)/[ReleaseMutexID](ReleaseMutexID_ISASI.md)进行申请释放，由框架统一管理MutexID分配记录，避免与TQue等资源管理接口使用的MutexID冲突。
+    - 采用[静态Tensor编程范式](../../../../../guide/programming_guide/programming_model/ai_core_simd_programming/cpp_tensor_programming/static_tensor_programming.md)时，MutexID可以通过[AllocMutexID](AllocMutexID_ISASI.md)/[ReleaseMutexID](ReleaseMutexID_ISASI.md)申请释放，也可以由开发者自行管理。自行管理可减少接口调用开销，但开发者需要自行保证MutexID不与其他同步或资源管理接口使用的MutexID冲突。自行管理MutexID时，建议使用0-27，28-31为系统内部规划预留，不建议使用。
+<a id="mutexid_resource_management_constraint"></a>
+- 调用`Lock`/`Unlock`时，如果由开发者自行管理MutexID，不得同时使用以下可能申请、取得或操作MutexID的资源管理接口：
+    - `TPipe`接口：[InitBuffer](../../resource_management/TPipe/InitBuffer.md)（仅指参数类型为`TQue`或`TQueBind`的重载）、[InitBufPool](../../resource_management/TPipe/InitBufPool.md)。
+    - `TBufPool`接口：[InitBuffer](../../resource_management/TBufPool/InitBuffer.md)、[InitBufPool](../../resource_management/TBufPool/InitBufPool.md)、[Reset](../../resource_management/TBufPool/Reset.md)。
+    - `TQue`接口：[AllocTensor](../../resource_management/TQue/AllocTensor.md)、[FreeTensor](../../resource_management/TQue/FreeTensor.md)、[EnQue](../../resource_management/TQue/EnQue.md)、[DeQue](../../resource_management/TQue/DeQue.md)。
+    - `TQueBind`接口：[InitBufHandle](../../resource_management/TQueBind/InitBufHandle.md)、[AllocTensor](../../resource_management/TQueBind/AllocTensor.md)、[FreeTensor](../../resource_management/TQueBind/FreeTensor.md)、[EnQue](../../resource_management/TQueBind/EnQue.md)、[DeQue](../../resource_management/TQueBind/DeQue.md)。
+
+    在相应架构和配置下，上述资源管理接口可能申请、分配或使用MutexID。开发者自行管理的MutexID不会登记到资源管理机制的MutexID分配记录中，可能与上述资源管理接口使用的MutexID重复，导致同步行为未定义。同时使用上述资源管理接口和`Lock`/`Unlock`时，`Lock`/`Unlock`使用的MutexID必须通过[AllocMutexID](AllocMutexID_ISASI.md)申请，并在使用结束后通过[ReleaseMutexID](ReleaseMutexID_ISASI.md)释放。
 - Lock与Unlock必须严格成对使用，并使用相同的pipe和id。此外，对应的Unlock必须始终写在Lock之后，否则属于未定义行为。
 
     ```cpp

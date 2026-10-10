@@ -2,12 +2,12 @@
 
 ## Overview
 
-This example uses C_API interfaces to implement the Add operator example, based on synchronous data movement and computation interfaces.
+This example uses C_API interfaces to implement the Add operator, pairing asynchronous data movement and computation interfaces with explicit `asc_sync` calls.
 
 ## Supported Products
 
-- Atlas A3 Training Series Products/Atlas A3 Inference Series Products
-- Atlas A2 Training Series Products/Atlas A2 Inference Series Products
+- Atlas A3 products
+- Atlas A2 products
 
 ## Directory Structure
 ```

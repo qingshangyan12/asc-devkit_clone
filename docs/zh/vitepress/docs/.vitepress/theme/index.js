@@ -12,17 +12,21 @@ import DefaultTheme from 'vitepress/theme'
 import Layout from './Layout.vue'
 import BackToTop from './BackToTop.vue'
 import SidebarResizer from './SidebarResizer.vue'
+import { installBaiduAnalytics } from '../baidu-analytics.mjs'
 import './code-theme.css'
 import './search-overrides.css'
+import './mermaid.css'
 
 import './filter.css'
+import './ascendops-theme.css'
 import './code-copy.js'
 
 export default {
   extends: DefaultTheme,
   Layout,
-  enhanceApp({ app }) {
+  enhanceApp({ app, router }) {
     app.component('BackToTop', BackToTop)
     app.component('SidebarResizer', SidebarResizer)
+    installBaiduAnalytics(router)
   }
 }

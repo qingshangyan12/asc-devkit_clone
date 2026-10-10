@@ -10,9 +10,13 @@
 
 #include "channel.h"
 #include <algorithm>
+#include <cstring>
 
 namespace mc2_ops_hccl {
 namespace {
+constexpr u32 MULTI_JETTY_CHANNEL_NUM = 4U;
+constexpr char MULTI_JETTY_ALGORITHM_NAME[] = "InsAllGatherParallelMesh1DNHRMultiJetty";
+
 CommProtocol SelectLocalProtocol(const OpParam& param)
 {
     if (param.engine == CommEngine::COMM_ENGINE_CPU || param.engine == CommEngine::COMM_ENGINE_CPU_TS) {
@@ -98,7 +102,19 @@ HcclResult CalcChannelRequestNhr(
     HcclComm comm, const OpParam& param, const TopoInfoWithNetLayerDetails* topoInfo,
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels)
 {
-    return CalcChannelRequestMesh1D(comm, param, topoInfo, subcommInfo, channels);
+    if (std::strcmp(param.algName, "AicpuReduceScatterSoleNHRMultiLink") != 0) {
+        return CalcChannelRequestMesh1D(comm, param, topoInfo, subcommInfo, channels);
+    }
+    // Model a CLOS peer with three links for the MC2 host resource-allocation test.
+    CHK_PTR_NULL(topoInfo);
+    CHK_PRT_RET(subcommInfo.empty(), HCCL_ERROR("[CalcChannelRequestNhr] empty subcommInfo"), HCCL_E_PARA);
+    channels.clear();
+    for (u32 rank : subcommInfo[COMM_LEVEL0]) {
+        if (rank != topoInfo->userRank) {
+            CHK_RET(AddChannelRequest(param, rank, channels, 3U));
+        }
+    }
+    return HCCL_SUCCESS;
 }
 
 HcclResult CalcChannelRequestNhrMultiJetty(
@@ -106,7 +122,19 @@ HcclResult CalcChannelRequestNhrMultiJetty(
     const std::vector<std::vector<u32>>& subcommInfo, std::vector<HcclChannelDesc>& channels, bool isIsolation)
 {
     (void)isIsolation;
-    return CalcChannelRequestNhr(comm, param, topoInfo, subcommInfo, channels);
+    if (std::strcmp(param.algName, MULTI_JETTY_ALGORITHM_NAME) != 0) {
+        return CalcChannelRequestNhr(comm, param, topoInfo, subcommInfo, channels);
+    }
+
+    CHK_PTR_NULL(topoInfo);
+    CHK_PRT_RET(subcommInfo.empty(), HCCL_ERROR("[CalcChannelRequestNhrMultiJetty] empty subcommInfo"), HCCL_E_PARA);
+    channels.clear();
+    for (u32 rank : subcommInfo[COMM_LEVEL0]) {
+        if (rank != topoInfo->userRank) {
+            CHK_RET(AddChannelRequest(param, rank, channels, MULTI_JETTY_CHANNEL_NUM));
+        }
+    }
+    return HCCL_SUCCESS;
 }
 
 HcclResult CalcChannelRequestMesh2D(
@@ -148,7 +176,7 @@ HcclResult ProcessLinksForChannelMutiJetty(
     (void)isIsolation;
     OpParam param{};
     param.engine = CommEngine::COMM_ENGINE_AICPU_TS;
-    return AddChannelRequest(param, remoteRank, channels, 4U);
+    return AddChannelRequest(param, remoteRank, channels, MULTI_JETTY_CHANNEL_NUM);
 }
 
 HcclResult CalcChannelRequestMeshClosMultiJetty(
@@ -165,7 +193,7 @@ HcclResult CalcChannelRequestMeshClosMultiJetty(
     channels.clear();
     for (u32 rank : subcommInfo[COMM_LEVEL0]) {
         if (rank != topoInfo->userRank) {
-            CHK_RET(AddChannelRequest(param, rank, channels, 4U));
+            CHK_RET(AddChannelRequest(param, rank, channels, MULTI_JETTY_CHANNEL_NUM));
         }
     }
     return HCCL_SUCCESS;

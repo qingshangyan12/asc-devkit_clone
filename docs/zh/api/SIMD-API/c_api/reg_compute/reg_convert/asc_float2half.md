@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -32,7 +32,7 @@
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
-由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据不同接口选择数据写入索引为奇数的位置或偶数的位置。
+由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。
 
 ```python
 # 位置判断仅用于说明接口语义，实际位置参数为编译期常量。
@@ -46,18 +46,28 @@ def asc_float2half_rn(dst, src, mask, dst_pos):
             dst[2 * i + offset] = half(src[i])  # float -> half，RINT舍入
 ```
 
+本接口为Reg矢量计算接口，仅在AIV上生效。
+
 ## 函数原型
 
 ```c
-// 占位符形式
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_float2half_<round_mode><sat_mode>(vector_half& dst,
                                                                   vector_float src,
                                                                   vector_bool mask,
                                                                   std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-// 占位符形式
 __simd_callee__ inline void asc_float2half_<round_mode><sat_mode>(vector_half& dst,
                                                                   vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline vector_half asc_float2half_<round_mode><sat_mode>(vector_float src,
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+
+__simd_callee__ inline vector_half asc_float2half_<round_mode><sat_mode>(vector_float src,
                                                                   vector_bool mask,
                                                                   std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
@@ -84,17 +94,20 @@ __simd_callee__ inline void asc_float2half_rn(vector_half& dst,
 | dst | 输出 | 目的操作数（矢量数据寄存器）。|
 | src | 输入 | 源操作数（矢量数据寄存器）。|
 | mask | 输入 | 源操作数掩码（掩码寄存器），用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。`mask`未筛选的元素在输出中置零。 |
-| dst_pos | 输入 | 位置选择标签（编译器标签类型），取值如下：<br>&bull; `ASC_POSITION_EVEN`：选择将结果写入目的操作数索引为偶数的位置<br>&bull; `ASC_POSITION_ODD`：选择将结果写入目的操作数索引为奇数的位置。 |
+| dst_pos | 输入 | 位置选择标签（编译期标签分发，通过编译期重载选择对应实现），取值如下：<br>&bull; `ASC_POSITION_EVEN`：选择将结果写入目的操作数索引为偶数的位置，其他位置清零<br>&bull; `ASC_POSITION_ODD`：选择将结果写入目的操作数索引为奇数的位置，其他位置清零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回计算结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
 
-- 本接口非AIV调用直接返回。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
+- 位置选择标签选择目的操作数的写入地址，其他位置清零。
 - `src`与`dst`的数据类型需要与函数原型匹配。
 - `mask`掩码位为0时，`dst`对应元素置0。
 - 结果写入`dst`的奇数索引位置时，偶数索引位置置零；结果写入偶数索引位置时，奇数索引位置置零。
@@ -102,16 +115,15 @@ __simd_callee__ inline void asc_float2half_rn(vector_half& dst,
 
 ## 调用示例
 
+将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-
-f代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
-
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
+<!-- end id8 -->
 
 ```c
 #include <cstdint>
@@ -212,5 +224,3 @@ int main()
     return passed ? 0 : 1;
 }
 ```
-
-<!-- end id8 -->

@@ -11,13 +11,11 @@ This example uses fixed-divisor integer division computation to demonstrate inte
 | Case 0 | 0 | Standard division | SIMT threads directly use `/` for integer division, serving as the baseline version before fixed-divisor division optimization. |
 | Case 1 | 1 | Fast division | Precompute `magic` and `shift` for the fixed divisor. SIMT threads use multiplication and shift to replace standard division. |
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Versions
-
-- \>= CANN 9.2.0
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -25,7 +23,8 @@ This example uses fixed-divisor integer division computation to demonstrate inte
 ├── simd_simt_integer_fast_div
 │   ├── CMakeLists.txt          // Build project file
 │   ├── integer_div.asc         // Integer division example implementation
-│   └── README.md
+│   ├── README.md               // Sample documentation
+│   └── README_en.md            // English sample documentation
 ```
 
 ## Example Description
@@ -62,10 +61,8 @@ The shared data transfer and SIMT invocation flow for both cases is as follows:
 ```cpp
 asc_copy_gm2ub_align(input_buf, input + block_offset, 1, blk_length, 0, 0, false, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
 
-if ASC_IS_AIV {
-    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
-    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
-}
+asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
 
 if constexpr (scenario == 0) {
     asc_vf_call<simt_normal_div>(dim3(THREAD_COUNT), input_buf, output_buf, divisor, total_length);
@@ -73,10 +70,8 @@ if constexpr (scenario == 0) {
     asc_vf_call<simt_fast_div>(dim3(THREAD_COUNT), input_buf, output_buf, magic, shift, total_length);
 }
 
-if ASC_IS_AIV {
-    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
-    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
-}
+asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
 
 asc_copy_ub2gm_align(output + block_offset, output_buf, 1, blk_length, asc_store_l2_cache_mode::NORMAL_FIRST_VICTIM, 0, 0);
 ```
@@ -133,8 +128,8 @@ uint32_t result = value / divisor;
 
 **Core Implementation**:
 
-- On the SIMD side, compute the `magic` and `shift` required for fast division based on the fixed divisor. The computation results can be reused by SIMT threads.
-- Each SIMT thread reads 1 input element from UB and uses `__umulhi` and right shift within the thread to complete the equivalent division computation.
+- In the SIMD scalar computation logic, call the [asc_get_uintdiv_magic_and_shift](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) API to compute the `magic` and `shift` required for fast division based on the fixed divisor. The computation results can be reused by SIMT threads.
+- Each SIMT thread reads 1 input element from UB and calls the [asc_uintdiv](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md) API within the thread to complete the equivalent division computation using multiplication and shift.
 
 #### Fast Division Conversion Principle
 
@@ -163,24 +158,22 @@ $$
 $$
 
 Where `magic` and `shift` represent the multiplication magic number and shift bits required for fast division.
-In this example, based on the above division conversion approach, the SIMD part uses the `clz()` and `bcnt1()` scalar computation interfaces in the Scalar computation unit to obtain the `magic` and `shift` required for fast division, for reuse by SIMT threads.
+In this example, based on the above division conversion approach, the SIMD scalar computation logic calls the fast division precomputation API [asc_get_uintdiv_magic_and_shift](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) to obtain the `magic` and `shift` required for fast division, for reuse by SIMT threads; SIMT threads call the fast division API [asc_uintdiv](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md) to complete the division computation.
 
 **Key Code**:
 
-The `calc_magic_shift()` function computes `magic` and `shift` for fast division:
+The `integer_div_kernel()` kernel function calls the [asc_get_uintdiv_magic_and_shift](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) API to compute `magic` and `shift` for fast division:
 
 ```cpp
-int64_t pos = BIT_64_LEN - count_leading_zero(divisor);
-int64_t cnt1 = get_bit_count1(divisor);
-uint32_t shift = (cnt1 == 1) ? (pos - 1) : pos;
-uint32_t magic = (1l << BIT_32_LEN) * ((1l << shift) - divisor) / divisor + 1;
+uint32_t magic = 0;
+uint32_t shift = 0;
+asc_get_uintdiv_magic_and_shift(&magic, &shift, divisor);
 ```
 
-The `simt_fast_div()` function performs fast division on the input element `value` processed by the current thread:
+The `simt_fast_div()` function calls the [asc_uintdiv](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md) API to perform fast division on the input element `value` processed by the current thread:
 
 ```cpp
-uint32_t q = __umulhi(value, magic);
-uint32_t result = (value + q) >> shift;
+uint32_t result = asc_uintdiv(value, magic, shift);
 ```
 
 **Performance Data**:
@@ -199,8 +192,6 @@ uint32_t result = (value + q) >> shift;
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 **Overall Optimization Effect**:
 
 - Through the fast division optimization from Case 0 to Case 1, the example `Task Duration` decreases from 117.229μs to 103.889μs, a latency reduction of approximately 11.4%.
@@ -211,12 +202,12 @@ uint32_t result = (value + q) >> shift;
 | Case 0 | Standard division | 117.229 | 1.277 | 0.497 | 0.390 | 0.128 | 0.099 | 0.423 | 0.331 | 0.222 | 0.174 |
 | Case 1 | Fast division | 103.889 | 1.068 | 0.270 | 0.254 | 0.142 | 0.132 | 0.425 | 0.398 | 0.221 | 0.208 |
 
-### Optimization Key Points Summary
+## Tuning Recommendations
 
 | Optimization Method | Core Principle | Example Demonstration |
 |:---|:---|:---|
-| Fixed divisor precomputation | When the divisor is fixed during kernel function execution, `magic` and `shift` can be computed in advance, and SIMT threads reuse these results for fast division. | Case 1 calls `calc_magic_shift()` in the kernel function, and SIMT threads no longer directly execute `/`. |
-| Multiplication and shift replacing standard division | Standard integer division instructions have high overhead. Using multiplication and shift operations reduces per-element computation overhead. | Case 1 reduces `Task Duration` from 117.229μs to 103.889μs compared to Case 0. |
+| Fixed divisor precomputation | When the divisor is fixed during kernel function execution, the [asc_get_uintdiv_magic_and_shift](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) API can be called in the SIMD scalar computation logic to compute `magic` and `shift`, and SIMT threads reuse these results for fast division. | Case 1 calls [asc_get_uintdiv_magic_and_shift](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_get_uintdiv_magic_and_shift.md) in the kernel function, and SIMT threads no longer directly execute `/`. |
+| Multiplication and shift replacing standard division | Standard integer division instructions have high overhead. SIMT threads call the [asc_uintdiv](../../../../docs/zh/api/SIMT-API/math_functions/integer_math_functions/asc_uintdiv.md) API to use multiplication and shift operations to reduce per-element computation overhead. | Case 1 reduces `Task Duration` from 117.229μs to 103.889μs compared to Case 0. |
 
 ## Build and Run
 
@@ -254,11 +245,21 @@ Run the following steps in the root directory of this example to build and run t
   ./integer_div                                                        # Run the example
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build option description
 
   | Option | Values | Description |
   |:---|:---|:---|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture, corresponding to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture, corresponding to Ascend 950PR&950DT products |
   | `SCENARIO_NUM` | `0`, `1` | Case number: 0=standard division version, 1=fast division version |
 
 - Execution result
@@ -269,39 +270,36 @@ Run the following steps in the root directory of this example to build and run t
   [Success] Case accuracy is verification passed.
   ```
 
-### Performance Analysis
+## Performance Debugging
 
 ### Introduction to the msOpProf Tool
 
 `msOpProf` is a single-operator performance analysis tool. It offers two usage methods: `msopprof` and `msopprof simulator`. The tool helps users identify anomalies in operator memory, operator code, and operator instructions, enabling comprehensive operator tuning. It currently supports performance data collection and automatic parsing for different run modes (on-device or simulation) and different file types (executables or operator binary `.o` files).
 
-- On-device performance collection
+On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
 
-    On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
+Use the `msOpProf` tool to obtain detailed performance data.
 
-    Use the `msOpProf` tool to obtain detailed performance data.
+```bash
+msopprof ./integer_div
+```
 
-    ```bash
-    msopprof ./integer_div   # Analyze performance
-    ```
+After the command completes, a performance data folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The folder structure is as follows:
 
-    - Performance data description  
-      After the command completes, a folder named "OPPROF_{timestamp}_XXX" will be generated in the default directory. The performance data folder structure is as follows:
+```bash
+├──dump                       # Raw performance data; users do not need to inspect it
+├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+├──OpBasicInfo.csv            # Basic operator information
+├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+└──visualize_data.bin         # MindStudio Insight presentation file
+```
 
-      ```bash
-      ├──dump                       # Raw performance data; users do not need to inspect it
-      ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-      ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-      ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-      ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-      ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-      ├──OpBasicInfo.csv            # Basic operator information
-      ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-      ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-      └──visualize_data.bin         # MindStudio Insight presentation file
-      ```
-
-View the specific performance analysis results:
+View performance analysis results:
 
 ```bash
 # View Task Duration and various metrics

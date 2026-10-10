@@ -7,9 +7,9 @@ Multi-core unaligned split, that is, a Matmul example where the actual computati
 
 | Product | CANN Version |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
+| Atlas A3 products | >= CANN 9.2.0 |
+| Atlas A2 products | >= CANN 9.2.0 |
 
 ## Directory Structure
 ```
@@ -43,9 +43,9 @@ Multi-core unaligned split, that is, a Matmul example where the actual computati
   - Key Kernel Steps
     - Calculate tailM, tailN, and tailK. When tailM < singleCoreM || tailN < singleCoreN || tailK < singleCoreK, handle the tail block by calling the SetTail interface to set the tail block size.
       ```cpp
-      auto temp0 = DivCeil(tiling.M, tiling.singleCoreM);
-      auto temp1 = DivCeil(tiling.N, tiling.singleCoreN);
-      auto temp2 = DivCeil(tiling.Ka, tiling.singleCoreK);
+      auto temp0 = AscendC::Std::ceil_div(tiling.M, tiling.singleCoreM);
+      auto temp1 = AscendC::Std::ceil_div(tiling.N, tiling.singleCoreN);
+      auto temp2 = AscendC::Std::ceil_div(tiling.Ka, tiling.singleCoreK);
 
       auto divideKCoreNum = tiling.usedCoreNum / temp2;
       auto mCoreIndex = (blockIdx % divideKCoreNum) % temp0;
@@ -104,7 +104,7 @@ Run the following steps in the root directory of this example to build and run t
   | Option | Values | Description |
   | ----------------| -----------------------------| ---------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU run, CPU debug, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Training Series Products/Atlas A2 Inference Series Products and Atlas A3 Training Series Products/Atlas A3 Inference Series Products, dav-3510 corresponds to Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
 
 - Execution Result
 

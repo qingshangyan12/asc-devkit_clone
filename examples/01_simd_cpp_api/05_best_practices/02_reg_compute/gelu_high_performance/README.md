@@ -15,7 +15,7 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构介绍
 
@@ -345,7 +345,7 @@ __simd_vf__ inline void GeluVfBasic(__ubuf__ float* xAddr, __ubuf__ float* yAddr
 ```cpp
 // 核函数中调用 VF 函数的代码片段
 constexpr uint32_t oneRepeatSize = AscendC::GetVecLen() / sizeof(float);
-uint32_t loopNum = DivCeil(n, oneRepeatSize);
+uint32_t loopNum = AscendC::Std::ceil_div(n, oneRepeatSize);
 __ubuf__ float* xAddr = reinterpret_cast<__ubuf__ float*>(xLocal.GetPhyAddr());
 __ubuf__ float* yAddr = reinterpret_cast<__ubuf__ float*>(yLocal.GetPhyAddr());
 // 通过 asc_vf_call 调用 VF 函数，传入 UB 地址、元素数 n 和循环次数
@@ -673,7 +673,7 @@ $$
   | 选项　　　　　 | 可选值　　　　　　　　　　　| 说明　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真　　　　　　　　　　　　　　　　　　　　　　　　 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：Ascend 950PR&950DT系列产品 |
   | `SCENARIO_NUM` | `0`、`1`、`2`　　　　　| Case编号：0=Gelu未使能VF融合，1=启用RegBase API和VF融合，2=启用RegBase API、VF融合和循环展开 |
   | `CMAKE_VF_MODE` | `true`、`false`　　　　　| VF融合模式：case 0时需设置为false关闭VF自动融合，case 1/2时需设置为true使能VF融合 |
 

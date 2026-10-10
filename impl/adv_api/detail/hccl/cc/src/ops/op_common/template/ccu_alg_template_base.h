@@ -47,6 +47,14 @@ public:
     HcclResult GetChannelDieId(
         HcclComm comm, uint32_t rankId, const HcclChannelDesc& channelDesc, uint32_t& dieId) const;
 
+    // 查询 channel 本端 endpoint 的带宽系数（2die 场景按带宽比切分数据，SoleNHR 用）
+    HcclResult GetChannelBwCoeff(
+        HcclComm comm, uint32_t rankId, const HcclChannelDesc& channelDesc, uint32_t& bwCoeff) const;
+
+    // 跨框 die0 连 die1 场景下，将出框端口数多的 die 的 channel 组放在前面，避免建链失败
+    HcclResult ReverseChannelPerDieIfNeed(
+        const HcclComm comm, const u32 myRankId, std::vector<std::vector<HcclChannelDesc>>& channelsPerDie) const;
+
 protected:
     OpMode opMode_ = OpMode::OPBASE;
     u32 myRank_ = INVALID_VALUE_RANKID;
@@ -64,11 +72,11 @@ protected:
     HcclResult SelectChannelToVec(
         const HcclComm comm, const u32 myRankId, const u32 rmtRankId,
         const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, const u32 dieId,
-        std::map<u32, u32>& rank2ChannelIdx, std::vector<HcclChannelDesc>& channels);
+        std::map<u32, u32>& rank2ChannelIdx, std::vector<HcclChannelDesc>& channels) const;
 
     HcclResult GetDieInfoFromChannelDescs(
-        HcclComm comm, const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, u32 myRankId,
-        uint32_t& dieNum, uint32_t& dieId);
+        const HcclComm comm, const std::map<u32, std::vector<HcclChannelDesc>>& rankIdToChannelDesc, u32 myRankId,
+        uint32_t& dieNum, uint32_t& dieId) const;
 };
 } // namespace mc2_ops_hccl
 #endif // HCCLV2_CCU_ALG_TEMPLATE_BASE

@@ -3,7 +3,7 @@
 本节介绍\_\_NPU\_ARCH\_\_版本号为3002的硬件架构和其功能说明。对应的产品型号为：
 
 <!-- npu="310b" id1 -->
--   Atlas 200I/500 A2 推理产品
+-   Atlas 200I/500 A2推理产品
 <!-- end id1 -->
 
 ## 硬件架构图<a name="section129231322122015"></a>
@@ -30,9 +30,8 @@
 
 开发者可以通过[平台信息获取](../../../../../api/Utils-API/platform_info/platform_info.md)接口查询各存储单元的内存空间大小。
 
-**各存储单元的最小访问粒度（对齐要求）**
+**各存储单元的最小访问粒度（对齐要求）**<a name="table12348145512210"></a>
 
-<a name="table12348145512210"></a>
 <table><thead align="left"><tr id="row3348175522218"><th class="cellrowborder" valign="top" width="7.5200000000000005%" id="mcps1.1.4.1.1"><p id="p1680716381143"><a name="p1680716381143"></a><a name="p1680716381143"></a>核</p>
 </th>
 <th class="cellrowborder" valign="top" width="46.22%" id="mcps1.1.4.1.2"><p id="p5348145515229"><a name="p5348145515229"></a><a name="p5348145515229"></a>存储单元</p>

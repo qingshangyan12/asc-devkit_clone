@@ -3,32 +3,32 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
 
-提供数据非对齐搬运的功能，将数据从Unified Buffer (UB)搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。
+提供数据非对齐搬运的功能，将数据从Unified Buffer（UB）搬运到Global Memory (GM)，并支持8位/16位/32位数据类型搬运。
 
 本接口支持以下两种数据搬运方式，均不支持设置填充值：
 
@@ -49,15 +49,22 @@
     - Compact模式下将`src_stride`设置为48，各数据块在UB中的起始偏移依次为0、48、96，仅在144字节有效数据的末尾补充16字节dummy假数据。
     - Normal模式下将`src_stride`设置为64，各数据块在UB中的起始偏移依次为0、64、128，每个数据块分别补充16字节dummy假数据。
 
+    **图1**  Compact模式32字节对齐读数示意图
+    ![](../../figures/asc_copy_ub2gm_align_compact_padding.png "Compact模式32字节补齐示意图")
+
+    **图2**  Normal模式32字节对齐读数示意图
+    ![](../../figures/asc_copy_ub2gm_align_normal_padding.png "Normal模式32字节补齐示意图")
+
     两种模式下，dummy假数据均不会写入GM。当只搬运1个数据块，或`burst_len`已经32字节对齐时，两种模式的搬运结果相同。
 
 本接口仅在AIV上生效。
 
 ## 函数原型
 
-### 连续数据搬运（占位符形式）
+### 连续数据搬运
 
 ```c
+// 占位符形式
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
                                             __ubuf__ <dtype>* src,
                                             uint32_t size)
@@ -76,9 +83,10 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst,
                                             uint32_t size)
 ```
 
-### 高维切分数据搬运（占位符形式）
+### 高维切分数据搬运
 
 ```c
+// 占位符形式
 __aicore__ inline void asc_copy_ub2gm_align(__gm__ <dtype>* dst,
                                             __ubuf__ <dtype>* src,
                                             uint32_t burst_count,
@@ -125,7 +133,7 @@ __aicore__ inline void asc_copy_ub2gm_align(__gm__ bfloat16_t* dst,
 | :--- | :--- | :--- |
 | dst | 输出 | 目的GM的起始地址。需要1字节对齐。 |
 | src | 输入 | 源UB的起始地址。需要32字节对齐。 |
-| burst_count | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, $2^{12}−1$]。 |
+| burst_count | 输入 | 待搬运的连续传输数据块个数。取值范围：[1, $2^{21}−1$]。 |
 | burst_len | 输入 | 待搬运的每个连续传输数据块的长度，单位为字节。取值范围：[1, $2^{21}−1$]。 |
 | l2_cache_mode | 输入 | [asc_store_l2_cache_mode](../../defs/enum/asc_store_l2_cache_mode.md)类型的枚举值，配置数据在L2 Cache中的管理策略。 |
 | dst_stride | 输入 | 目的操作数相邻连续数据块的距离（前面一个数据块的头与后面一个数据块的头的间隔），单位为字节。取值范围：[0, $2^{40}−1$]。<br>只搬运1个数据块，即`burst_count`设置为1时，可以将此参数设置为0。 |
@@ -145,15 +153,15 @@ PIPE_MTE3
 
 - 本接口在非AIV上调用直接返回。
 - 各存储单元的空间大小和对齐要求请参考[存储单元说明](../../general_description_and_constraints.md#存储单元说明)。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_sync_notify](../../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../../sync/intra_core_sync/asc_sync_wait.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 连续数据搬运约束
 
-- `size`需满足dtype字节对齐：dtype为`int16_t`、`uint16_t`、`half`、`bfloat16_t`时需为2的倍数，dtype为`int32_t`、`uint32_t`、`float`时需为4的倍数。
+- `size`需满足dtype字节对齐：dtype为b16时需为2的倍数，dtype为b32时需为4的倍数。
 
 ### 高维切分数据搬运约束
 
-- `len_burst`需满足dtype字节对齐：dtype为`int16_t`、`uint16_t`、`half`、`bfloat16_t`时需为2的倍数，dtype为`int32_t`、`uint32_t`、`float`时需为4的倍数。
+- `len_burst`需满足dtype字节对齐：dtype为b16时需为2的倍数，dtype为b32时需为4的倍数。
 - 当`src_stride`不等于`burst_len`时，`src_stride`要求32字节对齐。
 - 当`src_stride`设置为0时，可能会出现**硬件未定义行为**。如需将同一个源数据块Broadcast到GM的多个连续位置，建议使用loop功能，具体请参考[关键特性说明](#关键特性说明)。
 
@@ -188,7 +196,7 @@ asc_set_ub2gm_loop_size(1, 1);
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

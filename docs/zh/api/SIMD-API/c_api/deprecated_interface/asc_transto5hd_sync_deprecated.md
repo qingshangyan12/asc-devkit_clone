@@ -3,30 +3,32 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-**`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/asc_sync.md)接口替代。**
+头文件路径为：`"c_api/composite/vector_compute_composite.h"`。
+
+**`asc_transto5hd_b8_sync`、`asc_transto5hd_b16_sync`和`asc_transto5hd_b32_sync`接口已废弃。请使用[asc_transto5hd](../vector_compute/vector_permute_sel/asc_transto5hd.md)接口和[asc_sync](../sync/intra_core_sync/asc_sync.md)接口替代。**
 
 数据格式转换，一般用于将NCHW格式转换成NC1HWC0格式。特别的，也可以用于二维矩阵数据块的转置。本接口单次Repeat内可处理512Byte的数据（16个DataBlock），根据数据类型不同，支持不同shape的矩阵转置（比如数据类型为half时，单次Repeat可完成16*16大小的矩阵转置），同时还可以支持多次Repeat操作。
 
@@ -45,6 +47,7 @@ NCHW格式转换成NC1HWC0格式时，如果是数据类型的位宽为32位或�
 ## 函数原型
 
 - 同步计算
+
 ```cpp
 __aicore__ inline void asc_transto5hd_b32_sync(ub_addr8_t dst, ub_addr8_t src, uint8_t repeat,
     uint16_t dst_stride, uint16_t src_stride)
@@ -139,7 +142,7 @@ asc_set_va_reg(VA1, dst_list + VA_REG_ARRAY_LEN);
 asc_set_va_reg(VA2, src_list);
 asc_set_va_reg(VA3, src_list + VA_REG_ARRAY_LEN);
 
-asc_transto5hd_b16(VA0, VA2, repeat, dst_stride, src_stride);
+asc_transto5hd_b16_sync(VA0, VA2, repeat, dst_stride, src_stride);
 
 // 示例二：
 constexpr uint64_t total_length = 2 * 32 * 16 * 16;    // total_length指参与计算的数据长度
@@ -170,6 +173,6 @@ for (int j = 0; j < 4; ++j) {
     asc_set_va_reg(VA2, src_list);
     asc_set_va_reg(VA3, src_list + VA_REG_ARRAY_LEN);
 
-    asc_transto5hd_b16(VA0, VA2, repeat, dst_stride, src_stride);
+    asc_transto5hd_b16_sync(VA0, VA2, repeat, dst_stride, src_stride);
 }
 ```

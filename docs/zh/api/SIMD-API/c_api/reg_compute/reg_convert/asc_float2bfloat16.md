@@ -3,28 +3,28 @@
 ## 产品支持情况
 
 <!-- npu="960" id1 -->
-- Ascend 960PR/Ascend 960DT：支持
+- Ascend 960PR&960DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="950" id2 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id2 -->
 <!-- npu="A3" id3 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id3 -->
 <!-- npu="910b" id4 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id4 -->
 <!-- npu="310b" id5 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id6 -->
 <!-- npu="310p" id7 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id7 -->
 <!-- npu="910" id8 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id8 -->
 
 ## 功能说明
@@ -32,7 +32,7 @@
 头文件路径为：`"c_api/reg_compute/reg_convert.h"`。
 
 根据`mask`将`src`中的每个`float`类型数据转换成`bfloat16_t`类型，支持多种舍入模式、饱和/非饱和模式与置零/合并模式，结果写入`dst`或通过函数返回值返回。
-由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据位置参数选择数据写入索引为奇数的位置或偶数的位置。以置零模式为例，伪代码如下：
+由于源操作数与目的操作数类型位宽比为2:1，写入数据时需要将一个`VL`大小的数据分为两部分，根据参数`dst_pos`选择写入`dst`索引为偶数的位置或奇数的位置。以置零模式为例，伪代码如下：
 
 ```python
 # 位置判断仅用于说明接口语义，实际位置参数为编译期常量。
@@ -50,39 +50,37 @@ def asc_float2bfloat16_rn(dst, src, mask, dst_pos):
 
 关于舍入模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
-本接口为`reg`矢量计算接口，仅在AIV上生效。
+本接口为Reg矢量计算接口，仅在AIV上生效。
 
 ## 函数原型
 
 ```c
-// 占位符形式：通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_bfloat16_t& dst,
-                                                                                  vector_float src,
-                                                                                  vector_bool mask,
-                                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+                                                                      vector_float src,
+                                                                      vector_bool mask,
+                                                                      std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-// 占位符形式：通过引用参数输出结果
 __simd_callee__ inline void asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_bfloat16_t& dst,
-                                                                                  vector_float src,
-                                                                                  vector_bool mask,
-                                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+                                                                      vector_float src,
+                                                                      vector_bool mask,
+                                                                      std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 
-// 占位符形式：通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_float src,
-                                                                                               vector_bool mask,
-                                                                                               std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+                                                                      vector_bool mask,
+                                                                      std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-// 占位符形式：通过函数返回值返回结果
 __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mode><merge_mode>(vector_float src,
-                                                                                               vector_bool mask,
-                                                                                               std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+                                                                      vector_bool mask,
+                                                                      std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
 - `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 - `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和未写入结果的位置置0；取值为`_m`时表示合并模式，`mask`未选中的元素和未写入结果的位置保留`dst`中原值。
 <!-- npu="960" id9 -->
-- 合并模式（`<merge_mode>`取值为`_m`）仅在Ascend 960PR/Ascend 960DT产品上支持。
+- 合并模式（`<merge_mode>`取值为`_m`）仅在Ascend 960PR&960DT系列产品上支持。
 <!-- end id9 -->
 
 ### 函数原型典型示例
@@ -111,22 +109,24 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rz_sat_m(vector_floa
 **表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
-| ------ | --------- | ---- |
+| ------ | --------- | ------------------------------------------------------------------------------------------------------------------ |
 | dst | 输出 | 目的操作数（矢量数据寄存器）。合并模式下，未写入结果的位置保留`dst`原值。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| dst_pos | 输入 | 位置选择标签（编译器标签类型），类型为`std::integral_constant<asc_position_mode, asc_position_mode::EVEN>`或`std::integral_constant<asc_position_mode, asc_position_mode::ODD>`。取`ASC_POSITION_EVEN`时选择将结果写入目的操作数索引为偶数的位置；取`ASC_POSITION_ODD`时选择将结果写入目的操作数索引为奇数的位置。 |
+| dst_pos | 输入 | 位置选择标签（编译期标签分发，通过编译期重载选择对应实现），类型为`std::integral_constant<asc_position_mode, asc_position_mode::EVEN>`或`std::integral_constant<asc_position_mode, asc_position_mode::ODD>`。取`ASC_POSITION_EVEN`时选择将结果写入目的操作数索引为偶数的位置，其他位置清零；取`ASC_POSITION_ODD`时选择将结果写入目的操作数索引为奇数的位置，其他位置清零。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
 ## 返回值说明
 
 - 通过引用参数输出结果的函数原型无返回值。
-- 通过函数返回值返回结果的函数原型返回转换结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用），即`vector_bfloat16_t`。
+- 通过函数返回值输出结果的函数原型返回计算结果，返回值类型与对应引用输出函数原型中`dst`参数的类型一致（去除引用）。
 
 ## 约束说明
 
-- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回；通过函数返回值返回结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
+- 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
+- 位置选择标签选择目的操作数的写入地址，其他位置清零。
 - `src`与`dst`的数据类型需要与函数原型匹配。
 - 置零模式下，`mask`掩码位为0的元素置0，结果写入奇数索引位置时偶数索引位置置0，写入偶数索引位置时奇数索引位置置0；合并模式下，上述元素保留`dst`原值。
 - 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
@@ -136,13 +136,22 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rz_sat_m(vector_floa
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id11 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 
 <!-- end id11 -->
+
+<!-- npu="960" id12 -->
+以Ascend 960PR&960DT系列产品（对应NPU架构为`dav-9201`）为例，编译运行命令如下：
+
+```bash
+bisheng example.asc -o main --npu-arch=dav-9201 && ./main
+```
+
+<!-- end id12 -->
 
 ```c
 #include <cstdint>
@@ -297,14 +306,6 @@ __simd_vf__ inline void convert(__ubuf__ uint8_t* output, __ubuf__ uint8_t* inpu
     asc_loadalign(src_19, reinterpret_cast<__ubuf__ float*>(input));
     asc_float2bfloat16_rd(dst_19, src_19, mask, ASC_POSITION_EVEN);
     asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst_19, mask);
-    vector_float src_20;
-    asc_loadalign(src_20, reinterpret_cast<__ubuf__ float*>(input));
-    vector_bfloat16_t dst_20 = asc_float2bfloat16_rn_sat(src_20, mask, ASC_POSITION_ODD);
-    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst_20, mask);
-    vector_float src_21;
-    asc_loadalign(src_21, reinterpret_cast<__ubuf__ float*>(input));
-    vector_bfloat16_t dst_21 = asc_float2bfloat16_rd(src_21, mask, ASC_POSITION_EVEN);
-    asc_storealign(reinterpret_cast<__ubuf__ bfloat16_t*>(output), dst_21, mask);
 }
 __global__ __vector__ void asc_float2bfloat16_kernel(__gm__ uint8_t* output, __gm__ uint8_t* input)
 {
@@ -353,17 +354,17 @@ int main()
     print_data("Golden 1.0 (raw bytes)", golden);
     const bool passed = compare_data(output, golden);
     std::cout << (passed ? "[Success] asc_float2bfloat16_rd/asc_float2bfloat16_rd_sat/"
-                            "asc_float2bfloat16_rn/asc_float2bfloat16_rn_sat/"
-                            "asc_float2bfloat16_rna/asc_float2bfloat16_rna_sat/"
-                            "asc_float2bfloat16_ru/asc_float2bfloat16_ru_sat/"
-                            "asc_float2bfloat16_rz/asc_float2bfloat16_rz_sat/"
-                            "ASC_POSITION_ODD/ASC_POSITION_EVEN passed."
-                          : "[Failed] asc_float2bfloat16_rd/asc_float2bfloat16_rd_sat/"
-                            "asc_float2bfloat16_rn/asc_float2bfloat16_rn_sat/"
-                            "asc_float2bfloat16_rna/asc_float2bfloat16_rna_sat/"
-                            "asc_float2bfloat16_ru/asc_float2bfloat16_ru_sat/"
-                            "asc_float2bfloat16_rz/asc_float2bfloat16_rz_sat/"
-                            "ASC_POSITION_ODD/ASC_POSITION_EVEN failed.")
+                           "asc_float2bfloat16_rn/asc_float2bfloat16_rn_sat/"
+                           "asc_float2bfloat16_rna/asc_float2bfloat16_rna_sat/"
+                           "asc_float2bfloat16_ru/asc_float2bfloat16_ru_sat/"
+                           "asc_float2bfloat16_rz/asc_float2bfloat16_rz_sat/"
+                           "ASC_POSITION_ODD/ASC_POSITION_EVEN passed."
+                         : "[Failed] asc_float2bfloat16_rd/asc_float2bfloat16_rd_sat/"
+                           "asc_float2bfloat16_rn/asc_float2bfloat16_rn_sat/"
+                           "asc_float2bfloat16_rna/asc_float2bfloat16_rna_sat/"
+                           "asc_float2bfloat16_ru/asc_float2bfloat16_ru_sat/"
+                           "asc_float2bfloat16_rz/asc_float2bfloat16_rz_sat/"
+                           "ASC_POSITION_ODD/ASC_POSITION_EVEN failed.")
               << std::endl;
     aclrtFree(input_device);
     aclrtFree(output_device);

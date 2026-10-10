@@ -17,23 +17,34 @@
 
 namespace AscendC {
 
+// 本枚举为 AIC 侧 hccl_alloc_ctx_res.h AlgorithmType 的镜像，显式值处（3/53/153）必须与宿主侧一致
 enum class AlgorithmType : uint8_t {
     CcuAllGatherMesh1D = 0,
     CcuAllGatherMeshMem2Mem1D,
     CcuAllGatherMesh2D,
     CcuSchedAllGatherConcurMeshNHRMultiLink = 3,
+    CcuSchedAllGatherParallelMeshNHRMultiLink = 4,
     CcuReduceScatterMesh1D = 50,
     CcuReduceScatterMeshMem2Mem1D,
     CcuReduceScatterMesh2D,
+    CcuReduceScatterMeshMem2Mem1DPeerOnly = 53,
     CcuAllReduceMesh1D = 100,
     CcuAllReduceMeshMem2Mem1D,
     CcuAllReduceMesh2DOneShot,
     CcuReduceMesh1D,
     CcuReduceMesh2D,
-    CcuSchedAllToAllSoleMesh,
+    CcuSchedAllToAllSoleMesh = 150,
     CcuSchedAllToAllVSoleMesh,
     CcuHalfAll2AllVMesh1D,
-    CcuSchedAllGatherSoleMesh
+    CcuSchedAllGatherSoleMesh,
+    CcuSchedReduceScatterSoleNHRMultiLink = 154,
+    CcuSchedAllToAllSoleMeshConcurrent,
+    // 与宿主侧 hccl_alloc_ctx_res.h 的 AlgorithmType 同值（156，master 尾部隐式编号已占用 153/155）。
+    CcuSchedReduceScatterConcurMeshNHRMultiLink = 156,
+    CcuSchedAllToAllMesh1DMultiJetty = 157,
+    // 与宿主侧 hccl_alloc_ctx_res.h 的 AlgorithmType 同值（158，两级拓扑 L1 NHR 中继 RS）
+    CcuSchedReduceScatterSoleNHR = 158,
+    CcuSchedAllGatherSoleNHR = 159
 };
 
 template <const auto& config>
@@ -105,6 +116,8 @@ private:
 
     __aicore__ inline uint8_t GetKfcMissionNum(HcclHandle handleId) const;
 
+    __aicore__ inline uint32_t GetAlgorithmType(HcclHandle handleId) const;
+
     __aicore__ inline bool IsFinish(uint8_t reqId);
 
     __aicore__ inline void InitHandleInfo(uint8_t handleId);
@@ -119,6 +132,7 @@ private:
     __aicore__ inline void CcuPrepareForAllGather(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllReduce(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllToAll(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForAllToAllMultiJetty(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllToAllV(
         __gm__ CommonPrepareParamCcu* commParam, __gm__ AlltoAllVParamCcu* allToAllVParam);
     __aicore__ inline void CcuPrepareForAllToAllVWrite(__gm__ CommonPrepareParamCcu* commParam);
@@ -126,7 +140,14 @@ private:
     __aicore__ inline void CcuPrepareForAllReduceM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForConcurrentAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForConcurrentAllToAll(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForParallelAllGatherM2M(__gm__ CommonPrepareParamCcu* commParam);
     __aicore__ inline void CcuPrepareForReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForConcurrentReduceScatterM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForReduceScatterPeerOnlyM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForReduceScatterSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForReduceScatterSoleNhr2DieM2M(__gm__ CommonPrepareParamCcu* commParam);
+    __aicore__ inline void CcuPrepareForAllGatherSoleNhrM2M(__gm__ CommonPrepareParamCcu* commParam);
 
 private:
     __gm__ HcclCombineOpParam* hcclContext_;
@@ -134,6 +155,7 @@ private:
 
     HcclHandle curHandleId_ = INVALID_HANDLE_ID;
     bool newCcuFlag_ = false;
+    CcuProtocolVersion ccuProtocolVersion_ = CcuProtocolVersion::CCU_V1;
 
     uint8_t workingFlag_ = false;
     bool isInited_ = false;

@@ -3,25 +3,25 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：支持
+- Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/DataSyncBarrier_ISASI_res.md#id1 -->
 
@@ -59,22 +59,22 @@ __aicore__ inline void DataSyncBarrier()
 ```cpp
     if (blockIdx == 0) {
         // 先写入被依赖数据，再通过DataSyncBarrier等待GM访问完成。
-        AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm) + 1, DATA_VALUE);
+        AscendC::WriteGmBypassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm) + 1, DATA_VALUE);
         // DataSyncBarrier<DDR>阻塞后续GM写，确保上一条GM写对其他核可见。
         AscendC::DataSyncBarrier<AscendC::MemDsbT::DDR>();
         // 最后写入同步标记，block 1读到该标记后即可安全读取srcGm[1]。
-        AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm), SYNC_FLAG);
+        AscendC::WriteGmBypassDCache<T>(reinterpret_cast<__gm__ T *>(srcGm), SYNC_FLAG);
     }
 
     if (blockIdx == 1) {
         while (true) {
             __gm__ T *addr = const_cast<__gm__ T *>(srcGlobal.GetPhyAddr());
             // 轮询GM第0个元素，等待block 0写入同步标记。
-            T flagValue = AscendC::ReadGmByPassDCache<T>(addr);
+            T flagValue = AscendC::ReadGmBypassDCache<T>(addr);
             if (flagValue == SYNC_FLAG) {
                 // DataSyncBarrier保证同步标记之前的srcGm[1]写入已完成。
-                T dataValue = AscendC::ReadGmByPassDCache<T>(addr + 1);
-                AscendC::WriteGmByPassDCache<T>(reinterpret_cast<__gm__ T *>(dstGm), 2 * dataValue);
+                T dataValue = AscendC::ReadGmBypassDCache<T>(addr + 1);
+                AscendC::WriteGmBypassDCache<T>(reinterpret_cast<__gm__ T *>(dstGm), 2 * dataValue);
                 return;
             }
         }

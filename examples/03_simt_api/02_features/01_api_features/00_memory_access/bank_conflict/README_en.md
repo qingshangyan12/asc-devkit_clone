@@ -4,13 +4,11 @@
 
 This example introduces UB bank conflicts that may occur when multiple threads in the same Warp access UB in the Ascend C SIMT programming model. The example constructs 5 cases with different UB read address patterns, demonstrating typical scenarios such as same-address merge, cross-bank/subbank distributed access, same 8B-range merge for contiguous float access, same-subbank different-row conflicts, and same-index subbank conflicts within the same bank group.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -48,7 +46,7 @@ On the Host side, the input array is constructed and copied to GM. The kernel fi
 
 In this document, UB bank conflict in SIMT programming mainly refers to a subbank conflict where multiple threads in the same Warp compete for same-index subbank resources in the same bank group in one UB access instruction.
 
-Taking Ascend 950PR/Ascend 950DT as an example, the following figure shows the UB bank structure. The total UB size is 256KB and is divided into 8 bank groups. Each bank group contains 2 banks. The 16 banks are numbered from bank0 to bank15. Bank i and bank i+8 belong to bank group i, namely `bank_group_number = bank_number % 8`. Each bank is 16KB and contains 512 rows, with each row being 32B. In SIMT programming mode, each 32B row in a bank is further divided into 4 subbanks at 8B granularity.
+Taking Ascend 950PR&950DT products as an example, the following figure shows the UB bank structure. The total UB size is 256KB and is divided into 8 bank groups. Each bank group contains 2 banks. The 16 banks are numbered from bank0 to bank15. Bank i and bank i+8 belong to bank group i, namely `bank_group_number = bank_number % 8`. Each bank is 16KB and contains 512 rows, with each row being 32B. In SIMT programming mode, each 32B row in a bank is further divided into 4 subbanks at 8B granularity.
 
 In SIMT scenarios, multiple threads in the same Warp may access UB at the same time in one UB access instruction. When the accessed data belongs to subbank resources with the same index in the same bank group, for example, subbank2 in bank0 and subbank2 in bank8, the hardware cannot process all requests in one cycle, so the requests need to wait in sequence, forming subbank conflicts and increasing access latency. If the accessed data belongs to the same 8B address range in the same row of the same subbank, the hardware merges these requests, and no subbank conflict is formed.
 
@@ -318,11 +316,22 @@ Run the following steps in the root directory of this example to build and execu
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;  # Build the project
   ./demo                               # Run the example
   ```
+
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build Options Description
 
   | Option                      | Values       | Description                                                                       |
   | --------------------------- | ------------ | --------------------------------------------------------------------------------- |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR&950DT products) |
   | `SCENARIO_NUM`            | `0`-`4`  | Example type, default value is 0                                                  |
 
   The following output indicates that the accuracy verification is successful.

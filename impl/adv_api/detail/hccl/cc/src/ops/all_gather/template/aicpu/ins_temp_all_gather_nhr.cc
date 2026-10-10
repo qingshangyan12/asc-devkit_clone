@@ -75,6 +75,17 @@ HcclResult InsTempAllGatherNHR::GetRes(AlgResourceRequest& resourceRequest) cons
 }
 u64 InsTempAllGatherNHR::GetThreadNum() const { return maxChannelsPerRank_ * 2; }
 
+HcclResult InsTempAllGatherNHR::SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels)
+{
+    CHK_PRT_RET(channels.empty(), HCCL_ERROR("[SetchannelsPerRank] channels is empty."), HCCL_E_INTERNAL);
+    channelsPerRank_ = CalcChannelsPerRankMin(channels);
+    maxChannelsPerRank_ = CalcChannelsPerRank(channels);
+    HCCL_INFO(
+        "[InsTempAllGatherNHR][SetchannelsPerRank] channelsPerRank_[%u], maxChannelsPerRank_[%u]", channelsPerRank_,
+        maxChannelsPerRank_);
+    return HCCL_SUCCESS;
+}
+
 u64 InsTempAllGatherNHR::CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType)
 {
     (void)inBuffType;
@@ -336,8 +347,8 @@ HcclResult InsTempAllGatherNHR::RunStepNHR(
             "[InsTempAllGatherNHR][%s] rank[%u] invalid channel access, fromRankKey[%u] toRankKey[%u] channelIdx[%u] "
             "channels.size[%zu] fromChannelSize[%zu] toChannelSize[%zu]",
             __func__, myRank_, fromRankKey, toRankKey, channelIdx, channels.size(),
-            channels.count(fromRankKey) ? channels.at(fromRankKey).size() : 0,
-            channels.count(toRankKey) ? channels.at(toRankKey).size() : 0),
+            channels.count(fromRankKey) != 0 ? channels.at(fromRankKey).size() : 0,
+            channels.count(toRankKey) != 0 ? channels.at(toRankKey).size() : 0),
         HCCL_E_INTERNAL);
     const ChannelInfo& channelRecv = channels.at(fromRankKey)[channelIdx];
     const ChannelInfo& channelSend = channels.at(toRankKey)[channelIdx];
@@ -430,6 +441,7 @@ HcclResult InsTempAllGatherNHR::LocalDataCopy(const std::vector<ThreadHandle>& t
     CHK_RET(GetAlgRank(myRank_, subCommRanks_[0], myAlgRank));
 
     u64 sliceSize = tempAlgParams_.sliceSize;
+    (void)sliceSize;
     const u32 dataTypeSize = DATATYPE_SIZE_TABLE[dataType_];
     u64 partialSliceSize = dataSplit_[channelIdx];
     u64 partialOffset = dataOffset_[channelIdx];
@@ -495,13 +507,13 @@ HcclResult InsTempAllGatherNHR::PostLocalCopy(const ThreadHandle& thread, const 
     }
     return HCCL_SUCCESS;
 }
-void InsTempAllGatherNHR::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMianToSub)
+void InsTempAllGatherNHR::GetNotifyIdxMainToSub(std::vector<u32>& notifyIdxMainToSub)
 {
-    notifyIdxMianToSub.clear();
+    notifyIdxMainToSub.clear();
     u32 threadNum = GetThreadNum();
     u32 slaveThreadNum = threadNum - 1;
     for (u32 slaveThreadIdx = 0; slaveThreadIdx < slaveThreadNum; slaveThreadIdx++) {
-        notifyIdxMianToSub.push_back(0);
+        notifyIdxMainToSub.push_back(0);
     }
 }
 

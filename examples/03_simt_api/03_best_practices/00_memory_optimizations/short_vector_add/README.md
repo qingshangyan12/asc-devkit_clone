@@ -10,24 +10,24 @@
 - Case 1: half类型数据处理（基准）
 - Case 2: half2类型数据处理
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|------|-------------|
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
-```
-short_vector_add
+```text
+├── short_vector_add
 │   ├── scripts/             // 测试脚本目录
 │   │   ├── gen_data.py      // 生成测试输入和golden数据
 │   │   └── verify_result.py // 验证输出结果
 │   ├── CMakeLists.txt       // 编译工程文件
 │   ├── data_utils.h         // 数据读写工具函数
-│   └── short_vector_add.asc // Ascend C算子实现 & 调用样例
+│   ├── short_vector_add.asc // Ascend C算子实现 & 调用样例
+│   ├── README.md            // 样例说明文档
+│   └── README_en.md         // 英文样例说明文档
 ```
 
 ## 样例描述
@@ -188,6 +188,8 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
   这个宽度覆盖了一整行物理Cache Line的边界，带宽占用率100%，传输效率达到最大化，在同样的物理拉取周期下，读带宽由7.77 GB/s拉升至14.51 GB/s。
 
 
+## 性能对比总结
+
 **最终性能总结**：
 - **耗时**：从**86.478 μs**骤降至**45.371 μs**，耗时减少了**47.5%**，换算整体性能提升达**1.91**倍。
 - **cycles数**：CPU总周期数从**8,832,432**减至**4,584,309**，降幅达**48.1%**，证明指令发射密度得到精简。
@@ -195,7 +197,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
 
 ---
 
-### 优化要点总结
+## 调优建议
 
 | 优化手段 | 核心原理              | 适用场景                                                                                                                                                                                                                                                                                                                                               |
 |:-----|:------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -227,15 +229,15 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
   python3 ../scripts/verify_result.py output/output.bin output/golden.bin;  # 验证输出结果
   ```
 
-  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
   示例如下：
 
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行 `rm CMakeCache.txt` 后重新cmake。
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 编译选项说明
 
@@ -243,7 +245,7 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
   |:--------------------------|:----------------|:--------------------------------------------------|
   | `SCENARIO_NUM`            | `1`（默认）、`2`     | 1: half Add计算；<br/>2: 短向量half2 Add计算；             |
   | `CMAKE_ASC_RUN_MODE`      | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真                                 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`      | NPU架构：本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT） |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`      | NPU架构：本样例仅支持dav-3510（Ascend 950PR&950DT系列产品） |
 
 - 执行结果
   执行结果如下，说明精度对比成功。
@@ -252,7 +254,11 @@ SIMT编程模式下，L2 Cache是以Cache Line=128字节为单位进行访问。
   test pass!
   ```
 
-## 性能数据获取
+## 性能调试
+
+### msOpProf工具介绍
+
+msOpProf工具是单算子性能分析工具。包含msopprof和msopprof simulator两种使用方式。该工具协助用户定位算子内存、算子代码以及算子指令的异常，实现全方位的算子调优。当前支持基于不同运行模式（上板或仿真）和不同文件形式（可执行文件或算子二进制.o文件）进行性能数据的采集和自动解析。
 
 使用 `msOpProf` 工具获取单个组件上的性能数据：
 

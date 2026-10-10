@@ -11,9 +11,9 @@
 #define HCCL_RES_H
 
 #include <stdint.h>
-#include "acl/acl_rt.h"
 #include "hccl_types.h"
 #include "../hcomm_res_defs.h"
+#include "acl_base_rt.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,6 +169,28 @@ extern HcclResult HcclThreadAcquireWithStream(
 extern HcclResult HcclChannelAcquire(
     HcclComm comm, CommEngine engine, const HcclChannelDesc* channelDescs, uint32_t channelNum,
     ChannelHandle* channels);
+
+/**
+ * @brief 查询通信域上已存在的通信通道
+ * @param[in] comm 通信域句柄
+ * @param[in] engine 通信引擎类型
+ * @param[in] channelDescs 通道描述列表
+ * @param[in] channelNum channel数量
+ * @param[out] channels 查询结果句柄列表，非0表示该通道已存在可复用，0表示需新建
+ * @return HcclResult 执行结果状态码
+ */
+extern HcclResult HcclChannelQuery(
+    HcclComm comm, CommEngine engine, const HcclChannelDesc* channelDescs, uint32_t channelNum,
+    ChannelHandle* channels);
+
+/**
+ * @brief 销毁指定句柄列表对应的通信通道
+ * @param[in] comm 通信域句柄
+ * @param[in] channels 待销毁的通道句柄列表
+ * @param[in] channelNum 通道数量
+ * @return HcclResult 执行结果状态码
+ */
+extern HcclResult HcclChannelDestroy(HcclComm comm, const ChannelHandle* channels, uint32_t channelNum);
 
 /**
  * @brief 获取指定channel的Hccl通信缓存

@@ -41,6 +41,30 @@ extern "C" unsigned int HcclLaunchAicpuKernel(mc2_ops_hccl::OpParam* param) { re
 namespace mc2_ops_hccl {
 
 bool g_stubCcuAlgorithmRegistered = true;
+// IsRegistered按名字打桩：非空且匹配时返回false，供闸门B一好一坏用例使用
+std::string g_stubCcuAlgNotRegisteredName;
+
+// 强制算法执行器获取打桩：置true且（g_stubCcuAlgExecNullName为空或算法名匹配）时
+// CollAlgExecRegistryV2::GetAlgExec返回nullptr，使CheckForcedAlgResource校验失败，
+// 用于验证强制算法失败后回退到默认selector。指定算法名可避免影响回退后其他算法的资源计算。
+bool g_stubCcuAlgExecNull = false;
+std::string g_stubCcuAlgExecNullName;
+
+// 默认selector输出打桩：非空时ExecuteSelector::Run直接返回该算法名，用于控制回退后的算法选择结果。
+std::string g_stubSelectorAlgName;
+
+// HcclGetAlgRes资源不足打桩：置true时HcclGetAlgRes直接返回HCCL_E_UNAVAIL，
+// 用于验证checkOnly场景下UNAVAIL被翻译为HCCL_E_RES_NOT_SUFFICIENT（非checkOnly保持UNAVAIL原样）。
+bool g_stubCcuAlgResUnavailable = false;
+
+// HcclGetAlgRes按算法名资源不足打桩：非空且param.algName匹配时返回HCCL_E_UNAVAIL，
+// 用于验证GetOpParam资源失败回退（限定名可让回退后的算法资源计算成功）。模式仿g_stubCcuAlgExecNullName。
+std::string g_stubCcuAlgResUnavailableName;
+
+HcclResult g_stubHcomCheckDataTypeResult = HCCL_SUCCESS;
+HcclResult g_stubHcomCheckReductionOpResult = HCCL_SUCCESS;
+// HcclCalcTopoInfo打桩返回值：置非SUCCESS模拟topo准备失败，供外部名定名链失败复位用例使用
+HcclResult g_stubCalcTopoInfoResult = HCCL_SUCCESS;
 
 HcclResult GetOrCreateCcuCtx(HcclComm comm, const std::string& tag, uint64_t ctxSize, void** ctx)
 {
@@ -104,9 +128,9 @@ HcclResult HcclCheckTag(const char* tag) { return HcclResult::HCCL_SUCCESS; }
 
 HcclResult CheckDataType(HcclDataType dataType, bool needReduce) { return HcclResult::HCCL_SUCCESS; }
 
-HcclResult HcomCheckDataType(HcclDataType dataType) { return HcclResult::HCCL_SUCCESS; }
+HcclResult HcomCheckDataType(HcclDataType dataType) { return g_stubHcomCheckDataTypeResult; }
 
-HcclResult HcomCheckReductionOp(HcclReduceOp op) { return HcclResult::HCCL_SUCCESS; }
+HcclResult HcomCheckReductionOp(HcclReduceOp op) { return g_stubHcomCheckReductionOpResult; }
 
 HcclResult HcomCheckUserRank(const u32 totalRanks, const u32 userRank) { return HcclResult::HCCL_SUCCESS; }
 
@@ -131,7 +155,7 @@ HcclResult HcclGetOpExpansionMode(HcclComm comm, OpParam& param)
 
 HcclResult HcclCalcTopoInfo(HcclComm comm, OpParam& param, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo)
 {
-    return HcclResult::HCCL_SUCCESS;
+    return g_stubCalcTopoInfoResult;
 }
 
 HcclResult InitRankInfo(HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo) { return HcclResult::HCCL_SUCCESS; }
@@ -147,6 +171,21 @@ ExecuteSelector::ExecuteSelector() {}
 
 HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* topoInfo, std::string& algName) const
 {
+    // 复刻真实selector的不支持组合校验（与reduce_scatter_auto_selector一致）：
+    // ReduceScatter不支持64位数据类型与PROD归约，校验失败直接返回NOT_SUPPORT。
+    // 该检查需在g_stubSelectorAlgName旁路之前，确保64位/PROD组合即使显式指定输出也被拒绝。
+    if (param.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER &&
+        (param.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
+         param.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
+         param.DataDes.dataType == HcclDataType::HCCL_DATA_TYPE_FP64 ||
+         param.reduceType == HcclReduceOp::HCCL_REDUCE_PROD)) {
+        return HcclResult::HCCL_E_NOT_SUPPORT;
+    }
+    // 测试打桩：显式指定selector输出时直接返回，用于验证强制算法失败后的回退选择
+    if (!g_stubSelectorAlgName.empty()) {
+        algName = g_stubSelectorAlgName;
+        return HcclResult::HCCL_SUCCESS;
+    }
     static const std::map<HcclCMDType, std::string> ccuAlgMap = {
         {HcclCMDType::HCCL_CMD_ALLGATHER, "CcuAllGatherMesh1D"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "CcuReduceScatterMesh1D"},
@@ -156,7 +195,7 @@ HcclResult ExecuteSelector::Run(OpParam& param, TopoInfoWithNetLayerDetails* top
     static const std::map<HcclCMDType, std::string> aicpuAlgMap = {
         {HcclCMDType::HCCL_CMD_ALLGATHER, "InsAllGatherMesh"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "InsReduceScatterNHR"},
-        {HcclCMDType::HCCL_CMD_ALLREDUCE, "InsAllReduceNHR"},
+        {HcclCMDType::HCCL_CMD_ALLREDUCE, "AicpuAllReduceSoleNHR"},
         {HcclCMDType::HCCL_CMD_ALLTOALL, "InsAlltoAllMesh"},
         {HcclCMDType::HCCL_CMD_ALLTOALLV, "InsAlltoAllvMesh"},
     };
@@ -239,6 +278,16 @@ const bool& GetExternalInputHcclAicpuUnfold()
     return value;
 }
 
+bool GetExternalInputExecTimeout(double& execTimeOut)
+{
+    const char* envValue = std::getenv("HCCL_EXEC_TIMEOUT");
+    if (envValue == nullptr) {
+        return false;
+    }
+    execTimeOut = std::strtod(envValue, nullptr);
+    return true;
+}
+
 HcclResult SetOpParamAlgTag(OpParam& param, const std::string& algName)
 {
     // 生成 algTag: tag_algName_host_dataType_reduceType
@@ -283,11 +332,17 @@ CollAlgExecRegistryV2& CollAlgExecRegistryV2::Instance()
 
 bool CollAlgExecRegistryV2::IsRegistered(HcclCMDType opType, const std::string& algTag) const
 {
+    if (!g_stubCcuAlgNotRegisteredName.empty() && algTag == g_stubCcuAlgNotRegisteredName) {
+        return false;
+    }
     return g_stubCcuAlgorithmRegistered;
 }
 
 std::unique_ptr<InsCollAlgBase> CollAlgExecRegistryV2::GetAlgExec(HcclCMDType opType, const std::string& algTag)
 {
+    if (g_stubCcuAlgExecNull && (g_stubCcuAlgExecNullName.empty() || algTag == g_stubCcuAlgExecNullName)) {
+        return nullptr;
+    }
     return std::make_unique<MockInsCollAlgBase>();
 }
 
@@ -297,6 +352,16 @@ HcclResult HcclGetAlgRes(
 {
     if (resCtxDevice == nullptr) {
         return HCCL_E_PTR;
+    }
+
+    // 资源不足打桩：模拟CCU通道/实例资源不足，供checkOnly的UNAVAIL→RES_NOT_SUFFICIENT用例使用
+    if (g_stubCcuAlgResUnavailable) {
+        return HCCL_E_UNAVAIL;
+    }
+
+    // 按算法名资源不足打桩：供GetOpParam资源失败回退用例使用（限定名，回退算法不受影响）
+    if (!g_stubCcuAlgResUnavailableName.empty() && g_stubCcuAlgResUnavailableName == param.algName) {
+        return HCCL_E_UNAVAIL;
     }
 
     // 资源复用逻辑：先尝试获取已存在的资源
@@ -325,6 +390,9 @@ HcclResult HcclGetAlgRes(
                 resCtxHost->kfcServerArgs[5] = token;
             }
         }
+        // Provide one valid launch pair so the public MC2 launch UT reaches HcommCcuKernelLaunch.
+        resCtxHost->threads = {1U};
+        resCtxHost->ccuKernels = {1U};
     }
 
     // 序列化并创建新资源

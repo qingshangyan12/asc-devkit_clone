@@ -24,6 +24,9 @@
 #include "kernel_utils.h"
 #include "kernel_operator_layout.h"
 #include "kernel_operator_tensor_trait.h"
+#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__
+#include "../utils/debug/asc_aicore_printf_impl.h"
+#endif
 
 namespace AscendC {
 using TBufHandle = uint8_t*;
@@ -83,7 +86,7 @@ enum class TBufState : uint8_t {
 struct TBufType {
     TBufState state;
     HardEvent freeBufEvt;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     union {
         struct {
             TEventID enQueEvtID;
@@ -124,7 +127,7 @@ public:
                  "Please do not use it!")]] void
     InitBuffer(const uint32_t bufferOffset, const uint32_t bufferSize)
     {
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
         if constexpr (
             IsSameType<PrimType, int4b_t>::value || IsSameType<PrimType, int2b_t>::value ||
             IsSameType<PrimType, uint1b_t>::value) {
@@ -158,7 +161,7 @@ public:
                                          positionHardMap.at(AscendC::TPosition(this->address_.logicPos))) +
                                      bufferOffset;
             this->address_.dataLen = bufferSize * INT4_BIT_NUM / ONE_BYTE_BIT_SIZE;
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
         } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
             ASCENDC_DEBUG_ASSERT(
                 (bufferOffset + bufferSize * INT2_BIT_NUM / ONE_BYTE_BIT_SIZE <=
@@ -211,7 +214,7 @@ public:
         this->address_.bufferAddr = get_imm(0) + bufferOffset;
         if constexpr (IsSameType<PrimType, int4b_t>::value) {
             this->address_.dataLen = bufferSize * INT4_BIT_NUM / ONE_BYTE_BIT_SIZE;
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
         } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
             this->address_.dataLen = bufferSize * INT2_BIT_NUM / ONE_BYTE_BIT_SIZE;
         } else if constexpr (IsSameType<PrimType, uint1b_t>::value) {
@@ -234,10 +237,11 @@ public:
     using PrimType = PrimT<T>;
     __aicore__ inline void SetAddr(const uint64_t offset)
     {
+        CheckGlobalBuffer("SetAddr");
         if constexpr (IsSameType<PrimType, int4b_t>::value) {
             address_ = address_ + offset / INT4_TWO;
             oriAddress_ = oriAddress_ + offset / INT4_TWO;
-#if (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
         } else if constexpr (IsSameType<PrimType, int2b_t>::value) {
             address_ = address_ + offset / INT2_FOUR;
             oriAddress_ = oriAddress_ + offset / INT2_FOUR;
@@ -252,8 +256,30 @@ public:
     }
 
 public:
+#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__
+    __gm__ PrimType* address_ = nullptr;
+    __gm__ PrimType* oriAddress_ = nullptr;
+#else
     __gm__ PrimType* address_;
     __gm__ PrimType* oriAddress_;
+#endif
+
+protected:
+    __aicore__ inline void CheckGlobalBuffer(__gm__ const char* apiName) const
+    {
+#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__
+        if (address_ == nullptr || oriAddress_ == nullptr) {
+            __asc_aicore::printf_impl_assert(
+                "[ASSERT] GlobalTensor::%s requires a non-null GM buffer. "
+                "Call SetGlobalBuffer before accessing the tensor.\n",
+                apiName);
+            // Keep the guard effective even when diagnostic printing is disabled.
+            trap();
+        }
+#else
+        (void)apiName;
+#endif
+    }
 };
 
 template <typename T>

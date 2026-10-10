@@ -21,10 +21,10 @@ constexpr int A2AV_OUTPUT_XN_ID = 0;
 constexpr int A2AV_TOKEN_XN_ID = 1;
 constexpr int A2AV_PRE_SYNC_CKE_IDX = 0;
 constexpr int A2AV_POST_SYNC_CKE_IDX = 1;
-constexpr uint16_t A2AV_OUTPUT_BIT = 1U << A2AV_OUTPUT_XN_ID;
-constexpr uint16_t A2AV_TOKEN_BIT = 1U << A2AV_TOKEN_XN_ID;
+constexpr uint16_t A2AV_OUTPUT_BIT = static_cast<uint16_t>(1U << A2AV_OUTPUT_XN_ID);
+constexpr uint16_t A2AV_TOKEN_BIT = static_cast<uint16_t>(1U << A2AV_TOKEN_XN_ID);
 constexpr uint16_t A2AV_PRE_SYNC_BITS = A2AV_OUTPUT_BIT | A2AV_TOKEN_BIT;
-constexpr uint16_t A2AV_POST_SYNC_BIT = 1U << 5;
+constexpr uint16_t A2AV_POST_SYNC_BIT = static_cast<uint16_t>(1U << 5);
 constexpr uint32_t A2AV_BITS_PER_EVENT = 16;
 constexpr uint64_t A2AV_MAX_TRANSPORT_SIZE = 256ULL * 1024ULL * 1024ULL;
 constexpr uint64_t A2AV_GROUP_MEMSLICE_SIZE = 32ULL * 1024ULL;
@@ -110,53 +110,68 @@ CcuResult CcuAlltoAllVMesh1DKernel(
     completedRankCount = 0;
     one = 1;
     maxTransportSize = A2AV_MAX_TRANSPORT_SIZE;
-    CCU_WHILE(completedRankCount != rankSize)
+    CCU_WHILE(completedRankCount != static_cast<uint64_t>(rankSize))
     {
         channelIdx = 0;
-        for (uint32_t rankIdx = 0; rankIdx < rankSize; rankIdx++) {
-            const uint32_t extBase = rankIdx * A2AV_EXT_FIELD_NUM;
-            const uint32_t eventIdx = rankIdx / A2AV_BITS_PER_EVENT;
-            const uint16_t rankMask = 1U << (rankIdx % A2AV_BITS_PER_EVENT);
-            ccu::Variable& loopNum = extArgs[extBase + A2AV_LOOP_NUM_IDX];
-            ccu::Variable& tailSize = extArgs[extBase + A2AV_TAIL_SIZE_IDX];
+        // Start remote transfers before the local self-copy so the latter can overlap
+        // with remote DMA. This matches the legacy HCOMM ordering.
+        for (uint32_t transferPass = 0; transferPass < 2; transferPass++) {
+            const uint32_t transferBegin = transferPass == 0 ? 0 : rankId;
+            const uint32_t transferEnd = transferPass == 0 ? rankSize : rankId + 1;
+            for (uint32_t rankIdx = transferBegin; rankIdx < transferEnd; rankIdx++) {
+                if (transferPass == 0 && rankIdx == rankId) {
+                    continue;
+                }
+                const uint32_t extBase = rankIdx * A2AV_EXT_FIELD_NUM;
+                const uint32_t eventIdx = rankIdx / A2AV_BITS_PER_EVENT;
+                const uint16_t rankMask = static_cast<uint16_t>(1U << (rankIdx % A2AV_BITS_PER_EVENT));
+                ccu::Variable& loopNum = extArgs[extBase + A2AV_LOOP_NUM_IDX];
+                ccu::Variable& tailSize = extArgs[extBase + A2AV_TAIL_SIZE_IDX];
 
-            CCU_IF(loopNum == UINT64_MAX) { CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask)); }
-            CCU_IF(loopNum != UINT64_MAX)
-            {
-                CCU_IF(loopNum == UINT64_MAX - 1U)
+                CCU_IF(loopNum == static_cast<uint64_t>(UINT64_MAX))
                 {
-                    if (rankIdx == rankId) {
-                        CCU_IF(tailSize != 0) { CCU_CHK_RET(GroupCopy(ctx, localDst, src[rankIdx], tailGoSize)); }
-                        CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
-                    } else {
-                        CCU_IF(tailSize != 0)
-                        {
-                            CCU_CHK_RET(ccu::Write(
-                                channels[channelIdx], dst[rankIdx], src[rankIdx], tailSize, events[eventIdx],
-                                rankMask));
+                    CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
+                }
+                CCU_IF(loopNum != static_cast<uint64_t>(UINT64_MAX))
+                {
+                    CCU_IF(loopNum == static_cast<uint64_t>(UINT64_MAX - 1U))
+                    {
+                        if (rankIdx == rankId) {
+                            CCU_IF(tailSize != 0)
+                            {
+                                CCU_CHK_RET(GroupCopy(ctx, localDst, src[rankIdx], tailGoSize, GetCcuVersion()));
+                            }
+                            CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
+                        } else {
+                            CCU_IF(tailSize != 0)
+                            {
+                                CCU_CHK_RET(ccu::Write(
+                                    channels[channelIdx], dst[rankIdx], src[rankIdx], tailSize, events[eventIdx],
+                                    rankMask));
+                            }
+                            CCU_IF(tailSize == 0) { CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask)); }
                         }
-                        CCU_IF(tailSize == 0) { CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask)); }
+                        completedRankCount += one;
                     }
-                    completedRankCount += one;
-                }
-                CCU_IF(loopNum != UINT64_MAX - 1U)
-                {
-                    if (rankIdx == rankId) {
-                        CCU_CHK_RET(GroupCopy(ctx, localDst, src[rankIdx], fullBlockGoSize));
-                        CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
-                        localDst.addr += maxTransportSize;
-                    } else {
-                        CCU_CHK_RET(ccu::Write(
-                            channels[channelIdx], dst[rankIdx], src[rankIdx], maxTransportSize, events[eventIdx],
-                            rankMask));
-                        dst[rankIdx].addr += maxTransportSize;
+                    CCU_IF(loopNum != static_cast<uint64_t>(UINT64_MAX - 1U))
+                    {
+                        if (rankIdx == rankId) {
+                            CCU_CHK_RET(GroupCopy(ctx, localDst, src[rankIdx], fullBlockGoSize));
+                            CCU_CHK_RET(ccu::EventRecord(events[eventIdx], rankMask));
+                            localDst.addr += maxTransportSize;
+                        } else {
+                            CCU_CHK_RET(ccu::Write(
+                                channels[channelIdx], dst[rankIdx], src[rankIdx], maxTransportSize, events[eventIdx],
+                                rankMask));
+                            dst[rankIdx].addr += maxTransportSize;
+                        }
+                        src[rankIdx].addr += maxTransportSize;
                     }
-                    src[rankIdx].addr += maxTransportSize;
+                    loopNum += one;
                 }
-                loopNum += one;
-            }
-            if (rankIdx != rankId) {
-                channelIdx++;
+                if (rankIdx != rankId) {
+                    channelIdx++;
+                }
             }
         }
 

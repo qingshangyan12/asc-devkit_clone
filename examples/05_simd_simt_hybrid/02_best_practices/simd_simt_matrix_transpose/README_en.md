@@ -4,13 +4,11 @@
 
 Based on the [matrix_transpose_practice sample](../../../03_simt_api/03_best_practices/00_memory_optimizations/matrix_transpose_practice) in SIMT scenarios, this sample further optimizes the custom transpose operator by using SIMD and SIMT hybrid programming. It improves matrix transpose performance by running MTE movement and SIMT computation in parallel in hybrid programming. To show the step-by-step optimization process, this sample starts from direct global memory (GM) transpose. It then introduces Memory Transfer Engine (MTE) movement, Unified Buffer (UB) staging, and 32x32 tiling. It compares two Thread Block mapping methods: launching Thread Blocks by tile groups and fixing the Thread Block count. It reduces bank conflicts by using UB padding. Finally, it uses double buffering (Double Buffer) to run the MTE2 load, SIMT Vector Function (VF) transpose, and MTE3 store pipelines in parallel. This path shows the tuning process for SIMD and SIMT hybrid matrix transpose.
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Version
-
-- CANN >= 9.2.0
+| Product | CANN Version |
+|------|-------------|
+| Ascend 950PR&950DT products | >= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -60,7 +58,7 @@ This sample constructs an optimization path through five cases. The kernel, Thre
 
 Here, `core` is the hardware vector core count. The runtime queries this value by using `aclrtGetDeviceInfo(ACL_DEV_ATTR_VECTOR_CORE_NUM)`. The performance data in this sample was collected in a test environment where `core=64`. `tiles` is the total tile count `(W/32) x (H/32)`. When processing a 1024x1024 matrix, the matrix is divided into 32x32 tiles, so `tiles=1024`.
 
-#### Performance Metrics
+### Performance Metrics
 
 | Metric | Description |
 | ------ | ----------- |
@@ -202,7 +200,7 @@ Compared with the matrix_transpose_practice sample in the SIMT scenario, SIMD an
 - `out_tile` still uses a contiguous 32x32 layout. The SIMT VF writes it continuously along the output tile row direction, and MTE3 then stores it continuously to GM.
 - The SIMT VF still processes only the valid 32x32 data.
 
-On Ascend 950PR/Ascend 950DT, UB is divided into 16 banks and organized as 8 bank groups. Each bank is further divided into 4 subbanks. If multiple threads in the same Warp access subbanks with the same subbank ID in the same bank group in one UB access instruction inside the SIMT VF, the hardware queues the requests. This causes a subbank conflict and increases access latency.
+On Ascend 950PR&950DT products, UB is divided into 16 banks and organized as 8 bank groups. Each bank is further divided into 4 subbanks. If multiple threads in the same Warp access subbanks with the same subbank ID in the same bank group in one UB access instruction inside the SIMT VF, the hardware queues the requests. This causes a subbank conflict and increases access latency.
 
 **Figure 1: UB bank structure**
 
@@ -338,8 +336,6 @@ Figure 5 shows that Case 4 uses double buffering to overlap adjacent iterations.
 
 ## Performance Comparison Summary
 
-### Ascend 950PR Performance Data
-
 The following table shows the performance data of each case when processing a 1024x1024 float matrix on Ascend 950PR.
 
 | Case | Task Duration(μs) | aiv_time(μs) | aiv_total_cycles | aiv_vec_time(μs) | aiv_vec_ratio | aiv_scalar_time(μs) | aiv_scalar_ratio |
@@ -399,11 +395,21 @@ In the sample root directory, perform the following steps to build and run the s
   ./matrix_transpose                                                                 # Run the sample.
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..;make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build options
 
   | Option | Value | Description |
   | ------ | ----- | ----------- |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. This sample supports only dav-3510 (Ascend 950PR/Ascend 950DT). |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture. This sample supports only dav-3510 (Ascend 950PR&950DT products). |
   | `SCENARIO_NUM` | `0`-`4` | Sample type. The default value is 4. |
 
   The following output indicates that the accuracy comparison is successful.
@@ -412,7 +418,7 @@ In the sample root directory, perform the following steps to build and run the s
   [Success] Case accuracy verification passed.
   ```
 
-## Performance Analysis
+## Performance Debugging
 
 ### Introduction to the msOpProf Tool
 
@@ -422,27 +428,26 @@ In the sample root directory, perform the following steps to build and run the s
 
   On-device performance collection directly measures the execution time of an operator on an Ascend AI Processor. This method is suitable for quickly locating operator performance issues in an on-device environment.
 
-  Run operator tuning on the `matrix_transpose` executable with `msopprof`:
+  Run operator tuning on the executable `matrix_transpose` with `msopprof`:
 
   ```bash
   msopprof ./matrix_transpose
   ```
 
-  - Performance data description
-    After the command completes, a folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The performance data folder structure is as follows:
+  After the command completes, a performance data folder named "OPPROF_{timestamp}_XXX" is generated in the default directory. The folder structure is as follows:
 
-    ```bash
-    ├──dump                       # Raw performance data; users do not need to inspect it
-    ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
-    ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
-    ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
-    ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
-    ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
-    ├──OpBasicInfo.csv            # Basic operator information
-    ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
-    ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
-    └──visualize_data.bin         # MindStudio Insight presentation file
-    ```
+  ```bash
+  ├──dump                       # Raw performance data; users do not need to inspect it
+  ├──ArithmeticUtilization.csv  # Cube/Vector instruction cycle proportions
+  ├──L2Cache.csv                # L2 Cache hit rate; affects MTE2. Plan data transfer logic properly to increase the hit rate
+  ├──Memory.csv                 # Read/write bandwidth rates of UB, L1, and main memory
+  ├──MemoryL0.csv               # Read/write bandwidth rates of L0A, L0B, and L0C
+  ├──MemoryUB.csv               # Read/write bandwidth rates from Vector and Scalar to UB
+  ├──OpBasicInfo.csv            # Basic operator information
+  ├──PipeUtilization.csv        # Durations and proportions of computation and data transfer units
+  ├──ResourceConflictRatio.csv  # Proportions of UB bank groups, bank conflicts, and resource conflicts among all instructions
+  └──visualize_data.bin         # MindStudio Insight presentation file
+  ```
 
   View the specific performance analysis results:
 

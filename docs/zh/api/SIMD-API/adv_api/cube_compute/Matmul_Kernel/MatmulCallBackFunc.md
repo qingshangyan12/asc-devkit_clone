@@ -3,29 +3,29 @@
 ## 产品支持情况
 
 <!-- npu="950" id3 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id3 -->
 <!-- npu="A3" id4 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id4 -->
 <!-- npu="910b" id5 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id5 -->
 <!-- npu="310b" id6 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id6 -->
 <!-- npu="310p" id7 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id7 -->
 <!-- npu="910" id8 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id8 -->
 <!-- npu="x90" id1 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id1 -->
 <!-- npu="9030" id2 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id2 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/adv_api/cube_compute/Matmul_Kernel/MatmulCallBackFunc_res.md#id1 -->
 
@@ -41,6 +41,7 @@ MatmulCallBackFunc中包含3个可由用户自定义的回调函数接口，即�
 **表1**  MatmulCallBackFunc回调函数接口及参数说明
 
 <a name="table10989848113111"></a>
+
 | 回调函数功能 | 回调函数接口 | 参数说明 |
 | --- | --- | --- |
 | 可自定义设置不同的搬出数据片段数目等参数，实现将Matmul计算结果从L0C Buffer（CO1）搬出到GM的功能 | void DataCopyOut(const __gm__ void* gm, const LocalTensor<int8_t>& co1Local, const void* dataCopyOutParams, const uint64_t tilingPtr, const uint64_t dataPtr) | gm：输出的GM地址。<br><br>co1Local: L0C Buffer（CO1）上的计算结果。<br><br>dataCopyOutParams：Matmul定义的DataCopyOutParams结构体指针，具体定义如下方代码所示，供用户参考使用。<br><br>tilingPtr: 用户使用[SetUserDefInfo](SetUserDefInfo.md)设置的tiling参数地址。<br><br>dataPtr: 用户使用[SetSelfDefineData](SetSelfDefineData.md)设置的计算数据地址。 |

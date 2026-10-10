@@ -11,10 +11,24 @@
 #ifndef HCCL_CCU_TEMP_KFC_ALL_GATHER_NHR_1D_MULTI_JETTY_MEM2MEM_H
 #define HCCL_CCU_TEMP_KFC_ALL_GATHER_NHR_1D_MULTI_JETTY_MEM2MEM_H
 
+#include "utils.h"
 #include "ccu_alg_template_base.h"
-#include "kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.h"
+#include "kfc_server_protocol.h"
 
 namespace mc2_ops_hccl {
+
+constexpr uint32_t KFC_PARALLEL_ALL_GATHER_SUB_TYPE = 4U;
+
+// 只在 Host 上构建两阶段 CCU 程序时读取。运行时地址/长度仍从 XN 队列读取。
+struct KfcParallelAllGatherArg {
+    uint32_t rankSizeLevel0 = 0;
+    uint32_t rankIdxLevel0 = 0;
+    uint32_t rankSizeLevel1 = 0;
+    uint32_t rankIdxLevel1 = 0;
+    uint32_t jettyNum = 1;
+    std::vector<KfcNhrStepInfo> stepInfoVector;
+    std::map<uint32_t, uint32_t> rank2ChannelIdx;
+};
 
 struct CcuKernelArgKfcAllGatherNHR1DMultiJettyMem2Mem : CcuKernelArgBase {
     uint64_t rankSize = 0;
@@ -48,6 +62,14 @@ public:
     HcclResult GetRes(AlgResourceRequest& resourceRequest) const override;
     u64 GetThreadNum() const override;
     u64 CalcScratchMultiple(BufferType inBuffType, BufferType outBuffType) override;
+    // The generic parallel executor contains an AICPU-only runtime branch.
+    // CCU never consumes that channel map; keeping this no-op interface lets
+    // the shared executor instantiate without changing its control flow.
+    HcclResult SetchannelsPerRank(const std::map<u32, std::vector<ChannelInfo>>& channels) const
+    {
+        (void)channels;
+        return HCCL_SUCCESS;
+    }
 
 private:
     HcclResult CalcNhrInfo(std::vector<KfcNhrStepInfo>& stepInfoVector) const;

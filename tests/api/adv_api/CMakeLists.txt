@@ -368,6 +368,7 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     index/arithprogression/test_operator_arithprogression.cpp
     #math
     math/clamp/test_operator_clamp.cpp
+    math/bessel_i0/test_operator_bessel_i0.cpp
     math/bitwise_and/test_operator_bitwise_and.cpp
     math/logical_and/test_operator_logical_and.cpp
     math/logical_ands/test_operator_logical_ands.cpp
@@ -387,6 +388,8 @@ file(GLOB ASCENDC_TEST_ascend950pr_9599_AIV_CASE_SRC_FILES
     math/fmod/test_operator_fmod.cpp
     math/hypot/test_operator_hypot.cpp
     math/log/test_operator_log.cpp
+    math/ndtri/test_operator_ndtri.cpp
+    api_check/math/ndtri/kernel_ndtri_check.cpp
     math/philox/test_operator_philox_c310.cpp
     math/power/test_operator_power_c310.cpp
     math/sin/test_operator_sin_c310.cpp
@@ -561,6 +564,7 @@ file(GLOB ASCENDC_TILING_SRC_FILES
     ${ASCENDC_ADV_API_IMPL}/tiling/transpose/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/conv/*.cpp
     ${ASCENDC_ADV_API_IMPL}/tiling/conv_backprop/*.cpp
+    ${ASCENDC_ADV_API_IMPL}/tiling/experimental/math/*.cpp
     ${ASCENDC_ADV_API_IMPL}/detail/host_log.cpp
 )
 
@@ -592,6 +596,7 @@ foreach(product_type ${TILING_PRODUCT_TYPE_LIST})
         ${ASCENDC_TEST_HEADER_FILES}
         ${ASCENDC_DEP_HEADER_DIR}
         ${ASCENDC_TEST_${product_type}_HEADER_FILES}
+        ${ASCENDC_ADV_API_IMPL}/detail/hccl/cc/src/ops/op_common/external_alg
         ${ASCENDC_ADV_API_INCLUDE}/
         ${ASCENDC_ADV_API_INCLUDE}/activation/
         ${ASCENDC_ADV_API_INCLUDE}/filter/

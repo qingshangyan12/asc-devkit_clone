@@ -3,31 +3,31 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：支持
+- Atlas推理系列产品AI Core：支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：支持
+- Atlas训练系列产品：支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：支持
+- Kirin 9030处理器系列产品：支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/sync_control/intra_core_sync/SetFlag_WaitFlag_ISASI_res.md#id1 -->
 
@@ -38,7 +38,7 @@
 如图1所示，SetFlag/WaitFlag接口用于核内多流水间的同步：
 
 > [!NOTE]说明
->该接口标注为ISASI类别，不能保证跨硬件版本兼容。如需保证跨硬件版本兼容的同步控制接口，请参见[TQueSync SetFlag/WaitFlag](SetFlag-WaitFlag.md)。二者的区别在于，TQueSync类接口可以保证跨硬件版本兼容。
+>该接口标注为ISASI类别，不能保证跨硬件版本兼容。如需保证跨硬件版本兼容的同步控制接口，请参见[TQueSync类](TQueSync.md)。二者的区别在于，TQueSync类接口可以保证跨硬件版本兼容。
 
 - SetFlag：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。SetFlag只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。
 - WaitFlag：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。
@@ -81,19 +81,19 @@ __aicore__ inline void WaitFlag(int32_t eventID)
 - eventID的取值范围如下：
 
     <!-- npu="950" id10 -->
-    - Ascend 950PR/Ascend 950DT，数据范围为：0-7。
+    - Ascend 950PR&950DT系列产品，数据范围为：0-7。
     <!-- end id10 -->
     <!-- npu="A3" id11 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品，数据范围为：0-7。
+    - Atlas A3系列产品，数据范围为：0-7。
     <!-- end id11 -->
     <!-- npu="910b" id12 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品，数据范围为：0-7。
+    - Atlas A2系列产品，数据范围为：0-7。
     <!-- end id12 -->
     <!-- npu="310p" id13 -->
-    - Atlas 推理系列产品AI Core，数据范围为：0-7。
+    - Atlas推理系列产品AI Core，数据范围为：0-7。
     <!-- end id13 -->
     <!-- npu="910" id14 -->
-    - Atlas 训练系列产品，数据范围为：0-3。
+    - Atlas训练系列产品，数据范围为：0-3。
     <!-- end id14 -->
 
 - 相同流水、相同eventID下，连续使用SetFlag会引发未定义行为，此时再执行PipeBarrier<PIPE\_ALL\>会出现卡死现象：

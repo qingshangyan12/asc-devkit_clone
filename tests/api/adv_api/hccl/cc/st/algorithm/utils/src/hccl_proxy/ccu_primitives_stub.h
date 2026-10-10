@@ -47,6 +47,10 @@ public:
     ResourceHandle CreateLoopGroup(
         ResourceHandle parallelCfg, ResourceHandle offsetCfg, uint32_t maxLoopNum,
         const std::vector<ResourceHandle>& loopHandles, const std::vector<ResourceHandle>& loopParamHandles);
+    ResourceHandle CreateLoopGroupV2(
+        ResourceHandle parallelCfg, ResourceHandle offsetCfg, ResourceHandle varOffsetCfg, uint32_t maxLoopNum,
+        const std::vector<ResourceHandle>& loopHandles, const std::vector<ResourceHandle>& loopParamHandles,
+        const std::vector<ResourceHandle>& addrOffsetHandles);
 
     static CompilerContext& Current();
     static void SetCurrent(CompilerContext* context);
@@ -88,15 +92,21 @@ using HcclSim::CcuSt::Condition;
 using HcclSim::CcuSt::ResourceHandle;
 using HcclSim::CcuSt::Result;
 
+enum class ArithmeticOp { ADD, SUB, MUL };
+
 class VariableExpr {
 public:
-    VariableExpr(ResourceHandle lhs, ResourceHandle rhs) : lhsHandle(lhs), rhsHandle(rhs) {}
+    VariableExpr(ResourceHandle lhs, ResourceHandle rhs, ArithmeticOp op = ArithmeticOp::ADD)
+        : lhsHandle(lhs), rhsHandle(rhs), op(op)
+    {}
     ResourceHandle LhsHandle() const { return lhsHandle; }
     ResourceHandle RhsHandle() const { return rhsHandle; }
+    ArithmeticOp Op() const { return op; }
 
 private:
     ResourceHandle lhsHandle{0};
     ResourceHandle rhsHandle{0};
+    ArithmeticOp op{ArithmeticOp::ADD};
 };
 
 class Variable {
@@ -112,6 +122,8 @@ public:
     void operator=(uint64_t immediate) const;
     void operator+=(const Variable& other) const;
     VariableExpr operator+(const Variable& other) const;
+    VariableExpr operator-(const Variable& other) const;
+    VariableExpr operator*(const Variable& other) const;
     Condition operator==(uint64_t immediate) const;
     Condition operator!=(uint64_t immediate) const;
 
@@ -119,7 +131,7 @@ public:
 
 private:
     template <typename T>
-    friend T GetResByChannel(ChannelHandle channel, uint32_t index);
+    friend T GetResByChannel(ChannelHandle channel, uint32_t varIndex);
 };
 
 class AddressExpr {
@@ -171,6 +183,8 @@ public:
     LocalAddr(const LocalAddr& other) = default;
     LocalAddr(LocalAddr&& other) noexcept = default;
     LocalAddr& operator=(LocalAddr&& other) noexcept = default;
+    // 对齐 hcomm ccu_local_addr.hpp 的拷贝赋值：IR 快照语义（addr/token 逐成员发射赋值 IR，handle 不复制）
+    void operator=(const LocalAddr& other);
 
     Address addr;
     Variable token;
@@ -186,6 +200,8 @@ public:
     RemoteAddr(const RemoteAddr& other) = default;
     RemoteAddr(RemoteAddr&& other) noexcept = default;
     RemoteAddr& operator=(RemoteAddr&& other) noexcept = default;
+    // 对齐 hcomm ccu_remote_addr.hpp 的拷贝赋值：IR 快照语义（addr/token 逐成员发射赋值 IR，handle 不复制）
+    void operator=(const RemoteAddr& other);
 
     Address addr;
     Variable token;
@@ -233,10 +249,11 @@ private:
 };
 
 template <typename T>
-T GetResByChannel(ChannelHandle channel, uint32_t index) = delete;
+T GetResByChannel(ChannelHandle channel, uint32_t varIndex);
 
 template <>
-Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t index);
+Variable GetResByChannel<Variable>(ChannelHandle channel, uint32_t varIndex);
+
 Result LoadArg(Variable variable, uint32_t argId);
 Result Load(Variable address, Variable destination);
 Result Load(Variable address, Array<Variable>& destinations, uint32_t count);
@@ -299,15 +316,20 @@ class Loop {
 public:
     Loop();
     Loop(Variable& loopParam, const Func& func);
+    Loop(Variable& iterNum, Variable& addrOffset, const Func& func);
     Loop(const Loop&) = default;
     ResourceHandle handle{0};
     ResourceHandle loopParamHandle{0};
+    ResourceHandle addrOffsetHandle{0};
 };
 
 class LoopGroup {
 public:
     LoopGroup();
     LoopGroup(Variable& parallelCfg, Variable& offsetCfg, uint32_t maxLoopNum, const std::vector<Loop>& loops);
+    LoopGroup(
+        Variable& parallelCfg, Variable& offsetCfg, Variable& varOffsetCfg, uint32_t maxLoopNum,
+        const std::vector<Loop>& loops);
     ResourceHandle handle{0};
 };
 } // namespace ccu

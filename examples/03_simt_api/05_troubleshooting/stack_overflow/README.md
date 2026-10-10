@@ -9,13 +9,11 @@
 - Case 1：在栈空间中使用大数组导致栈溢出，可通过配置文件扩大栈空间，但更推荐使用UB存储大量临时数据。
 - Case 2：使用递归函数时，递归层数过大导致栈溢出，需控制递归层数或使用迭代算法替代递归算法。
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -309,11 +307,21 @@ __global__ void simt_recursive_stack_overflow(int32_t* input, float* output, uin
     ./demo                               # 执行样例
     ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DSCENARIO_NUM=$SCENARIO_NUM ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 **编译选项说明**：
 
 | 选项                        | 可选值        | 说明                                                                   |
 |---------------------------|------------|----------------------------------------------------------------------|
-| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，本样例仅支持dav-3510（Ascend 950PR/Ascend 950DT）                      |
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
+| `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构，本样例仅支持dav-3510（Ascend 950PR&950DT系列产品）                      |
 | `SCENARIO_NUM`            | `1-4`      | 样例场景编号，默认值为1。1：Case 1的溢出场景，2：Case 1的优化场景，3：Case 2的溢出场景，4：Case 2的优化场景 |
 
 **执行结果示例**：

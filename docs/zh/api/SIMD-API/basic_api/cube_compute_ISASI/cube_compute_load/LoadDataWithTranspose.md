@@ -3,31 +3,31 @@
 ## 产品支持情况<a id="zh-cn_topic_0000002543851571_section796754519912"></a>
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：支持
+- Atlas 200I/500 A2推理产品：支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 <!-- npu="x90" id8 -->
-- Kirin X90：支持
+- Kirin X90处理器系列产品：支持
 <!-- end id8 -->
 <!-- npu="9030" id9 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id9 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadDataWithTranspose_res.md#id1 -->
 
@@ -40,7 +40,7 @@ LoadDataWithTranspose负责完成普通矩阵计算所需的2D格式的数据的
 L1 Buffer->L0A Buffer、L1 Buffer->L0B Buffer。
 
 <!-- npu="950" id10 -->
-针对Ascend 950PR/Ascend 950DT，本接口不支持L1 Buffer->L0A Buffer通路，仅支持L1 Buffer->L0B Buffer通路。
+针对Ascend 950PR&950DT系列产品，本接口不支持L1 Buffer->L0A Buffer通路，仅支持L1 Buffer->L0B Buffer通路。
 <!-- end id10 -->
 
 实现原理可参考伪代码：[LoadDataWithTranspose伪代码](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0/scripts/load_data_with_transpose.py)。
@@ -53,7 +53,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 ```
 
 <!-- npu="950" id11 -->
-针对Ascend 950PR/Ascend 950DT：
+针对Ascend 950PR&950DT系列产品：
 
 ```cpp
 template <typename T>
@@ -83,7 +83,7 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 
 - 类型为LoadData2dTransposeParams，参数说明请参考[表3](#zh-cn_topic_0000002543851571_table13526111319538)。
 <!-- npu="950" id12 -->
-- 特别针对Ascend 950PR/Ascend 950DT，类型为LoadData2dTransposeParamsV2。参数说明请参考[表4](#zh-cn_topic_0000002543851571_table64891930194618)。
+- 特别针对Ascend 950PR&950DT系列产品，类型为LoadData2dTransposeParamsV2。参数说明请参考[表4](#zh-cn_topic_0000002543851571_table64891930194618)。
 <!-- end id12 -->
 
 **表3** LoadData2dTransposeParams结构体内参数说明<a id="zh-cn_topic_0000002543851571_table13526111319538"></a>
@@ -91,14 +91,14 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 | 参数名称 | 输入/输出 | 含义 |
 | ---------- | ----------- | ------ |
 | startIndex | 输入 | 方块矩阵ID，搬运起始位置为源操作数中第几个方块矩阵（0为源操作数中第1个方块矩阵）。取值范围：startIndex∈[0, 65535]。默认为0。<br>例如，源操作数中有20个大小为16\*8\*4字节的分形（数据类型为float），startIndex=1表示搬运起始位置为第2个方块矩阵，即将第3和第4个分形从源操作数中转置到目的操作数中（第1、2个分形组成第1个方块矩阵，第3、4个分形组成第2个方块矩阵）。<br>特性细节可参考：[设置搬运起始位置](#zh-cn_topic_0000002543851571_section520575413118)。 |
-| repeatTimes | 输入 | 迭代次数。<br>对于uint8_t/int8_t数据类型，每次迭代处理32\*32\*1字节数据；<br>对于half/bfloat16_t数据类型，每次迭代处理16\*16\*2字节数据；<br>对于float/int32_t/uint32_t数据类型，每次迭代处理16\*16\*4字节数据。<br>对于int4b_t数据类型，每次迭代处理16\*64\*0.5字节数据。<br>取值范围：repeatTimes∈[0, 255]。默认为0。<br>**注：repeatTimes = 0表示不执行搬运，该接口将被视为NOP（空操作）。** |
+| repeatTimes | 输入 | 迭代次数。<br>对于uint8_t/int8_t数据类型，每次迭代处理32\*32\*1字节数据；<br>对于half/bfloat16_t数据类型，每次迭代处理16\*16\*2字节数据；<br>对于float/int32_t/uint32_t数据类型，每次迭代处理16\*16\*4字节数据。<br>对于int4b_t数据类型，每次迭代处理64\*64\*0.5字节数据。<br>取值范围：repeatTimes∈[0, 255]。默认为0。<br>**注：repeatTimes = 0表示不执行搬运，该接口将被视为NOP（空操作）。** |
 | srcStride | 输入 | 相邻迭代间，源操作数前一个分形与后一个分形起始地址的间隔。这里的单位实际上是拼接后的方块矩阵的大小。<br>对于uint8_t/int8_t数据类型，单位是32\*32\*1字节；<br>对于half/bfloat16_t数据类型，单位是16\*16\*2字节；<br>对于float/int32_t/uint32_t数据类型，单位是16\*16\*4字节。<br>对于int4b_t数据类型，每次迭代处理16\*64\*0.5字节数据。<br>取值范围：srcStride∈[0, 65535]。默认为0。<br>**注：srcStride = 0表示在连续的重复执行周期之间，重复获取相同的分形矩阵。**<br>特性细节可参考：[非连续搬入](#zh-cn_topic_0000002543851571_section1750533101219)。 |
 | dstGap | 输入 | 相邻迭代间，目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址的间隔，单位：512字节。取值范围：dstGap∈[0, 65535]。默认为0。<br>**注：dstGap = 0表示目的操作数前一个迭代第一个分形的结束地址到下一个迭代第一个分形起始地址无间隔，分形连续排布。**<br>特性细节可参考：[非连续搬入](#zh-cn_topic_0000002543851571_section1750533101219)。 |
 | dstFracGap | 输入 | 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔，单位为512字节，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t/int4b_t时有效。取值范围：dstFracGap∈[0, 65535]。默认为0。<br>**注：dstFracGap = 0表示每个迭代内目的操作数前一个分形结束地址与后一个分形起始地址无间隔，分形连续排布。**<br>特性细节可参考：[非连续搬入](#zh-cn_topic_0000002543851571_section1750533101219)。 |
 | addrMode | 输入 | 控制地址更新方式，默认为false：<br>&nbsp;&nbsp;&bull; true：递减，每次迭代在前一个地址的基础上减去srcStride。<br>&nbsp;&nbsp;&bull; false：递增，每次迭代在前一个地址的基础上加上srcStride。<br>特性细节可参考：[控制地址更新方式](#zh-cn_topic_0000002543851571_section26691915141315)。<br>**注：保持默认值即可，该参数不涉及性能。** |
 
 <!-- npu="950" id13 -->
-针对Ascend 950PR/Ascend 950DT，类型为LoadData2dTransposeParamsV2，请参考下表：
+针对Ascend 950PR&950DT系列产品，类型为LoadData2dTransposeParamsV2，请参考下表：
 
 **表4** LoadData2dTransposeParamsV2结构体内参数说明<a id="zh-cn_topic_0000002543851571_table64891930194618"></a>
 
@@ -111,34 +111,35 @@ __aicore__ inline void LoadDataWithTranspose(const LocalTensor<T>& dst, const Lo
 | dstFracGap | 输入 | 每个迭代内目的操作数转置前一个分形结束地址与后一个分形起始地址的间隔，单位为512字节，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t/int4b_t时有效。 |
 | srcFracGap | 输入 | 每个迭代内源操作数前一个分形结束地址与后一个分形起始地址的间隔，单位为512字节，仅在数据类型为float/int32_t/uint32_t/uint8_t/int8_t/int4b_t时有效。 |
 | addrMode | 输入 | 控制地址更新方式，默认为false：<br>&nbsp;&nbsp;&bull; true：递减，每次迭代在前一个地址的基础上减去srcStride。<br>&nbsp;&nbsp;&bull; false：递增，每次迭代在前一个地址的基础上加上srcStride。 |
+
 <!-- end id13 -->
 
 ## 数据类型<a id="zh-cn_topic_0000002543851571_section4219135304818"></a>
 
 <!-- npu="950" id14 -->
-Ascend 950PR/Ascend 950DT，支持数据类型为：int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
+Ascend 950PR&950DT系列产品，支持数据类型为：int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id14 -->
 
 <!-- npu="A3" id15 -->
-Atlas A3 训练系列产品/Atlas A3 推理系列产品：
+Atlas A3系列产品：
 
 - 对于载入L0A Buffer支持int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
 - 对于载入L0B Buffer支持int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id15 -->
 
 <!-- npu="910b" id16 -->
-Atlas A2 训练系列产品/Atlas A2 推理系列产品：
+Atlas A2系列产品：
 
 - 对于载入L0A Buffer支持int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
 - 对于载入L0B Buffer支持int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id16 -->
 
 <!-- npu="310b" id17 -->
-Atlas 200I/500 A2 推理产品，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
+Atlas 200I/500 A2推理产品，支持数据类型为：int4b_t、int8_t、uint8_t、half、bfloat16_t、int32_t、uint32_t、float。
 <!-- end id17 -->
 
 <!-- npu="x90" id18 -->
-Kirin X90，支持数据类型：int8_t、half。
+Kirin X90处理器系列产品，支持数据类型：int8_t、half。
 <!-- end id18 -->
 
 ## 返回值说明<a id="zh-cn_topic_0000002543851571_section640mcpsimp"></a>
@@ -153,8 +154,9 @@ Kirin X90，支持数据类型：int8_t、half。
 - fp32场景下，源操作数2个连续的16\*8分形将被合并为1个16\*16的方块矩阵，然后再基于该方块矩阵做转置，因此要求两个连续分形合并为方块矩阵，要求L1 Buffer上的A矩阵满足ZZ或ZN排布。
 - 开发者需要保证目的操作数转置后的分形没有重叠。
 <!-- npu="950" id19 -->
-- 针对Ascend 950PR/Ascend 950DT，推荐使用LoadData2dTransposeParamsV2作为参数，该参数具有更精细的搬运粒度。
+- 针对Ascend 950PR&950DT系列产品，推荐使用LoadData2dTransposeParamsV2作为参数，该参数具有更精细的搬运粒度。
 <!-- end id19 -->
+
 ## 关键特性说明<a id="zh-cn_topic_0000002543851571_section1891111310132"></a>
 
 ### 功能和参数讲解
@@ -513,6 +515,7 @@ for (int i = 0; i < CeilDivision(k, fractalShape[0]); ++i) {
 ```
 
 <!-- npu="950" id20 -->
+
 ### 使用LoadData2dTransposeParamsV2结构体作为参数的场景示例
 
 该示例使用了LoadData2dTransposeParamsV2结构体作为参数，输入a矩阵为int8_t类型，shape为[128,128]，输入数据格式为NZ，输入b矩阵为int8_t类型，shape为[128,256]，输入数据格式为NZ，输出c的类型为float。a矩阵从L1 Buffer（A1）搬运到L0A Buffer（A2）且不转置，b矩阵从L1 Buffer（B1）搬运到L0B Buffer（B2）并转置，示例仅展示接口调用过程，其余计算和搬运不作参考。完整示例请参考：[load_data_l12l0样例](../../../../../../../examples/01_simd_cpp_api/03_basic_api/03_matrix_compute/load_data_l12l0)。

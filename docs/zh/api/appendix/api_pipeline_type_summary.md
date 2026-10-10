@@ -3,22 +3,23 @@
 本节汇总介绍了一些主要的API的流水类型，以下内容针对如下型号生效：
 
 <!-- npu="950" id2 -->
-- Ascend 950PR/Ascend 950DT
+- Ascend 950PR&950DT系列产品
 <!-- end id2 -->
 <!-- npu="A3" id3 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品
+- Atlas A3系列产品
 <!-- end id3 -->
 <!-- npu="910b" id4 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品
+- Atlas A2系列产品
 <!-- end id4 -->
 
 <!-- npu="950" id5 -->
-针对Ascend 950PR/Ascend 950DT：<br>单个VF是PIPE_V流水，用户不需要管理VF和VF之间的同步，VF内的不同的Reg矢量接口存在数据依赖时需要调用[LocalMemBar](../SIMD-API/basic_api/reg_vector_compute/sync_control/LocalMemBar.md)进行同步。
+针对Ascend 950PR&950DT系列产品：<br>单个VF是PIPE_V流水，用户不需要管理VF和VF之间的同步，VF内的不同的Reg矢量接口存在数据依赖时需要调用[LocalMemBar](../SIMD-API/basic_api/reg_vector_compute/sync_control/LocalMemBar.md)进行同步。
 <!-- end id5 -->
 
 **表1**  Memory矢量计算API流水类型汇总
 
 <a name="table132070121817"></a>
+
 | API类型 | API接口名称 | 执行核（AIC/AIV） | 流水类型 |
 | --- | --- | --- | --- |
 | 基础算术 | Exp | AIV | PIPE_V |
@@ -119,6 +120,7 @@
 **表2**  Cube API流水类型汇总
 
 <a name="table12311219174812"></a>
+
 | API接口名称 | 执行核（AIC/AIV） | 流水类型 |
 | --- | --- | --- |
 | DataCopy(GM->L1) | AIC | PIPE_MTE2 |
@@ -130,7 +132,7 @@
 | LoadDataWithSparse(L1->L0) | AIC | PIPE_MTE1 |
 | DataCopy(L1->BT) | AIC | PIPE_MTE1 |
 | DataCopy(L1->FB) | AIC | PIPE_FIX |
-| DataCopyPad(UB->L1) | AIC | <!-- npu="950" id6 -->针对Ascend 950PR/Ascend 950DT：<br>PIPE_MTE3。<br><!-- end id6 --><!-- npu="A3" id7 -->针对Atlas A3 训练系列产品/Atlas A3 推理系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id7 --><!-- npu="910b" id8 -->针对Atlas A2 训练系列产品/Atlas A2 推理系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id8 --> |
+| DataCopyPad(UB->L1) | AIC | <!-- npu="950" id6 -->针对Ascend 950PR&950DT系列产品：<br>PIPE_MTE3。<br><!-- end id6 --><!-- npu="A3" id7 -->针对Atlas A3系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id7 --><!-- npu="910b" id8 -->针对Atlas A2系列产品：<br>PIPE_MTE3、PIPE_MTE2。<br><!-- end id8 --> |
 | Fill(L1) | AIC | PIPE_MTE2 |
 | Fill(L0) | AIC | PIPE_MTE1 |
 | SetFmatrix | AIC | PIPE_S |
@@ -171,6 +173,7 @@
 **表4**  同步指令流水类型汇总
 
 <a name="table1054353913238"></a>
+
 | API接口名称 | 流水类型 |
 | --- | --- |
 | SetFlag/WaitFlag | PIPE_S |
@@ -187,6 +190,7 @@
 **表5**  原子操作流水类型汇总
 
 <a name="table25871912193814"></a>
+
 | API接口名称 | 流水类型 |
 | --- | --- |
 | SetAtomicAdd | PIPE_S |
@@ -205,6 +209,7 @@
 **表6**  工具接口流水类型汇总
 
 <a name="table1147331317457"></a>
+
 | API接口名称 | 流水类型 |
 | --- | --- |
 | InitSocState | PIPE_S |
@@ -227,10 +232,9 @@
 
 | API接口名称 | 流水类型 |
 | --- | --- |
-| ReadGmByPassDCache(ISASI) | PIPE_S |
-| WriteGmByPassDCache(ISASI) | PIPE_S |
+| ReadGmBypassDCache(ISASI) | PIPE_S |
+| WriteGmBypassDCache(ISASI) | PIPE_S |
 | DataCachePreload | PIPE_S |
 | DataCacheCleanAndInvalid | PIPE_S |
 | ICachePreLoad(ISASI) | PIPE_S |
 | GetICachePreloadStatus(ISASI) | PIPE_S |
-

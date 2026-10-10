@@ -29,9 +29,8 @@
 -   算子类型（OpType）：MATMUL\_LEAKYRELU
 -   算子输入输出：
 
-    **表1**  MATMUL\_LEAKYRELU算子输入输出规格
+    **表1**  MATMUL\_LEAKYRELU算子输入输出规格<a name="table4934296305"></a>
 
-    <a name="table4934296305"></a>
     <table><thead align="left"><tr id="row59358913304"><th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.1"><p id="p5503181819300"><a name="p5503181819300"></a><a name="p5503181819300"></a><strong id="b1850331853010"><a name="b1850331853010"></a><a name="b1850331853010"></a>name</strong></p>
     </th>
     <th class="cellrowborder" valign="top" width="25%" id="mcps1.2.5.1.2"><p id="p1550381833017"><a name="p1550381833017"></a><a name="p1550381833017"></a><strong id="b7503171811309"><a name="b7503171811309"></a><a name="b7503171811309"></a>shape</strong></p>
@@ -127,14 +126,14 @@ Tiling策略的设计主要包括多核切分和核内切分策略。
 
 ## 算子实现<a name="zh-cn_topic_0000001644252364_section770213024816"></a>
 
-在[矩阵编程章节](../../matrix_advanced_api/matrix_advanced_api.md)，我们得知Ascend C提供一组Matmul高阶API，封装了常用的切分和数据搬运、计算的算法逻辑，方便用户快速实现Matmul矩阵乘法的运算操作。融合算子中矩阵编程部分的实现与之类似，开发者在host侧通过调用API自动获取Tiling参数，该参数传递到kernel侧后，在初始化操作时传入，通过几个简单的API即可完成矩阵乘操作。再结合上文的融合算子的编程范式，融合算子实现的步骤如下。完整样例请参考[MatmulLeakyRelu](../../../../../../../examples/01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu_advanced_api)。
+在[矩阵编程章节](../../matrix_advanced_api/matrix_advanced_api.md)，我们得知Ascend C提供一组Matmul高阶API，封装了常用的切分和数据搬运、计算的算法逻辑，方便用户快速实现Matmul矩阵乘法的运算操作。融合算子中矩阵编程部分的实现与之类似，开发者在host侧通过调用API自动获取Tiling参数，该参数传递到核函数（Kernel）侧后，在初始化操作时传入，通过几个简单的API即可完成矩阵乘操作。再结合上文的融合算子的编程范式，融合算子实现的步骤如下。完整样例请参考[MatmulLeakyRelu](../../../../../../../examples/01_simd_cpp_api/00_introduction/03_fusion_operation/matmul_leakyrelu_advanced_api)。
 
 ![](../../../../figures/mm_flow_50.png)
 
-kernel侧实现的代码框架如下，在完成Matmul对象的初始化、左矩阵A、右矩阵B、Bias的设置后，通过单次Iterate叠加while循环的方式完成后续的Matmul计算、LeakyRelu计算、CopyOut流程。
+核函数（Kernel）侧实现的代码框架如下，在完成Matmul对象的初始化、左矩阵A、右矩阵B、Bias的设置后，通过单次Iterate叠加while循环的方式完成后续的Matmul计算、LeakyRelu计算、CopyOut流程。
 
 ```
-// kernel入口函数，mix场景，AIC:AIV=1:2
+// 核函数（Kernel）入口函数，mix场景，AIC:AIV=1:2
 __global__ __mix__(1, 2) void matmul_leakyrelu_custom(__gm__ uint8_t* a, __gm__ uint8_t* b, __gm__ uint8_t* bias,
     __gm__ uint8_t* c, __kfc_workspace__ __gm__ uint8_t* workspace, AscendC::tiling::TCubeTiling tiling)
 {
@@ -284,10 +283,11 @@ host侧实现GenerateTiling函数，在该函数中自动获取Tiling参数，�
 >    - 通过[ASCEND\_IS\_AIV和ASCEND\_IS\_AIC](../../../../programming_guide/language_extension/simd_builtin_keywords.md#li19530175294118)实现AIV和AIC代码之间的隔离。
 >    - 自行实现AIC和AIV核之间的同步：比如Matmul + LeakyRelu算子样例中，需要确保在AIC完成矩阵计算后，AIV再进行LeakyRelu的计算。
 >    - 使用高阶API Matmul时需要设置ASCENDC\_CUBE\_ONLY，表示仅在AIC侧调用Matmul API。
->    - 使用[设置核函数（Kernel）类型接口](../../../../../api/SIMD-API/basic_api/Kernel-Tiling/set_Kernel_type.md)设置核函数（Kernel）类型为KERNEL\_TYPE\_MIX\_xxx，同时启用AIV核和AIC核。
+>
+>    完整样例请参考[matmul_fused_manual样例](../../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fused_manual)。
+>
 >    ```
 >    #define ASCENDC_CUBE_ONLY // 指定Matmul运行在AIC上
->    KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_MIX_AIC_1_2);  // 设置核函数（Kernel）类型为KERNEL_TYPE_MIX_xxx
 >    if ASCEND_IS_AIC {
 >        ...
 >        // AIC核进行Matmul计算
@@ -299,4 +299,4 @@ host侧实现GenerateTiling函数，在该函数中自动获取Tiling参数，�
 >        // AIV核进行LeakyRelu计算
 >    } 
 >    ```
->    完整样例请参考[matmul_fused_manual样例](../../../../../../../examples/01_simd_cpp_api/04_advanced_api/00_matmul/matmul_fused_manual)。
+>

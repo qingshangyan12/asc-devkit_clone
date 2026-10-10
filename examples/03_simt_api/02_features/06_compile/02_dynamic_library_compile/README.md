@@ -11,13 +11,11 @@
 图1：代码结构与调用关系
 </p>
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -53,6 +51,8 @@ bisheng -shared kernel.asc -o libkernel.so -fPIC --npu-arch=dav-3510 --enable-si
 在 CMake 工程中，使用 `add_library` 配置 `SHARED` 关键字即可将 `.asc` 文件编译为动态共享库：
 
 ```cmake
+# 启用SIMT编译模式
+set(CMAKE_ASC_ENABLE_SIMT ON)
 # 将.asc文件编译为动态共享库
 add_library(gather_kernel SHARED
     gather_kernel.asc
@@ -93,13 +93,13 @@ add_library(gather_kernel SHARED
     ./demo                                                          # 执行样例
     ```
 
-    使用 NPU 仿真模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。示例如下：
+    使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。示例如下：
 
     ```bash
     cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
     ```
 
-    > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+    > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 执行结果
 

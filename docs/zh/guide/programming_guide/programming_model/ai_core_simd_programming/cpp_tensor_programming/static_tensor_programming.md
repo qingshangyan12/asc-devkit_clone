@@ -185,9 +185,8 @@
 ## 支持的API范围<a name="section2633193623711"></a>
 
 <!-- npu="310p" id1 -->
-**表1**  针对Atlas 推理系列产品AI Core，支持的API范围
+**表1**  针对Atlas推理系列产品AI Core，支持的API范围<a name="table56285428438"></a>
 
-<a name="table56285428438"></a>
 <table><thead align="left"><tr id="row46697425436"><th class="cellrowborder" valign="top" width="30.28%" id="mcps1.2.3.1.1"><p id="p866911429430"><a name="p866911429430"></a><a name="p866911429430"></a>接口分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="69.72%" id="mcps1.2.3.1.2"><p id="p186691442174319"><a name="p186691442174319"></a><a name="p186691442174319"></a>接口名称</p>
@@ -295,9 +294,8 @@
 <!-- end id1 -->
 
 <!-- npu="910b" id2 -->
-**表2**  针对Atlas A2 训练系列产品/Atlas A2 推理系列产品，支持的API范围
+**表2**  针对Atlas A2系列产品，支持的API范围<a name="table1842818536431"></a>
 
-<a name="table1842818536431"></a>
 <table><thead align="left"><tr id="row104742531436"><th class="cellrowborder" valign="top" width="29.9%" id="mcps1.2.4.1.1"><p id="p10474205364319"><a name="p10474205364319"></a><a name="p10474205364319"></a>接口分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="44.25%" id="mcps1.2.4.1.2"><p id="p1047418533430"><a name="p1047418533430"></a><a name="p1047418533430"></a>接口名称</p>
@@ -498,9 +496,8 @@
 <!-- end id2 -->
 
 <!-- npu="A3" id3 -->
-**表3**  针对Atlas A3 训练系列产品/Atlas A3 推理系列产品，支持的API范围
+**表3**  针对Atlas A3系列产品，支持的API范围<a name="table167051848128"></a>
 
-<a name="table167051848128"></a>
 <table><thead align="left"><tr id="row07054481922"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p135155581014"><a name="p135155581014"></a><a name="p135155581014"></a>接口分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="44.519999999999996%" id="mcps1.2.4.1.2"><p id="p12351955181013"><a name="p12351955181013"></a><a name="p12351955181013"></a>接口名称</p>
@@ -714,9 +711,8 @@
 <!-- end id3 -->
 
 <!-- npu="950" id4 -->
-**表4**  针对Ascend 950PR/Ascend 950DT，支持的API范围
+**表4**  针对Ascend 950PR&950DT系列产品，支持的API范围<a name="table1798673512413"></a>
 
-<a name="table1798673512413"></a>
 <table><thead align="left"><tr id="row109864353413"><th class="cellrowborder" valign="top" width="29.630000000000003%" id="mcps1.2.4.1.1"><p id="p1098613524117"><a name="p1098613524117"></a><a name="p1098613524117"></a>接口分类</p>
 </th>
 <th class="cellrowborder" valign="top" width="44.519999999999996%" id="mcps1.2.4.1.2"><p id="p29871535174117"><a name="p29871535174117"></a><a name="p29871535174117"></a>接口名称</p>
@@ -727,7 +723,7 @@
 </thead>
 <tbody><tr id="row1298763513418"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p15987173524114"><a name="p15987173524114"></a><a name="p15987173524114"></a>基础API &gt; 标量计算</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p12167195363614"><a name="p12167195363614"></a><a name="p12167195363614"></a>GetBitCount、CountLeadingZero、CountBitsCntSameAsSignBit、GetSFFValue、Cast（float转half、int32_t）、Cast（float转bfloat16_t）、Cast（多类型转float）、Nop、GetUintDivMagicAndShift、WriteGmByPassDCache、ReadGmByPassDCache</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p12167195363614"><a name="p12167195363614"></a><a name="p12167195363614"></a>GetBitCount、CountLeadingZero、CountBitsCntSameAsSignBit、GetSFFValue、Cast（float转half、int32_t）、Cast（float转bfloat16_t）、Cast（多类型转float）、Nop、GetUintDivMagicAndShift、WriteGmBypassDCache、ReadGmBypassDCache</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p298711352411"><a name="p298711352411"></a><a name="p298711352411"></a>-</p>
 </td>
@@ -864,7 +860,7 @@
 </tr>
 <tr id="row6778713162710"><td class="cellrowborder" valign="top" width="29.630000000000003%" headers="mcps1.2.4.1.1 "><p id="p20882139162713"><a name="p20882139162713"></a><a name="p20882139162713"></a>基础API &gt; 同步控制 &gt; 核内同步</p>
 </td>
-<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p2882133915277"><a name="p2882133915277"></a><a name="p2882133915277"></a>SetFlag/WaitFlag、PipeBarrier、DataSyncBarrier</p>
+<td class="cellrowborder" valign="top" width="44.519999999999996%" headers="mcps1.2.4.1.2 "><p id="p2882133915277"><a name="p2882133915277"></a><a name="p2882133915277"></a>SetFlag/WaitFlag、PipeBarrier、DataSyncBarrier、Mutex::Lock、Mutex::Unlock、AllocMutexID、ReleaseMutexID</p>
 </td>
 <td class="cellrowborder" valign="top" width="25.85%" headers="mcps1.2.4.1.3 "><p id="p8882133922716"><a name="p8882133922716"></a><a name="p8882133922716"></a>-</p>
 </td>
@@ -943,6 +939,7 @@
 | --- | --- |
 | 基础API | AddDeqRelu、Select |
 | 高阶API | Digamma、Lgamma、Power、Sign、LayerNorm、DropOut、SelectWithBytesMask |
+
 <!-- end id5 -->
 
 <!-- npu="950" id6 -->
@@ -961,4 +958,5 @@
 | 基础API > Kernel-Tiling | GET_TILING_DATA、GET_TILING_DATA_WITH_STRUCT、GET_TILING_DATA_MEMBER |
 | Utils API > 调测接口（SIMD VF） | printf、asc_dump_reg、asc_dump、asc_dump_ubuf |
 | 高阶API | AscendAntiQuant、AdjustSoftMaxRes、TopK |
+
 <!-- end id6 -->
