@@ -123,5 +123,5 @@ bool __heq(half x, half y)
 ```text
 x：-1.25, 0.5, 2.5, -3.75
 y：-1.25, -0.25, 3.25, nan
-output：true false false false
+result: true false false false
 ```

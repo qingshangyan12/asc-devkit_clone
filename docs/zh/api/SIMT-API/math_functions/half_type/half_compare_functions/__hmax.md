@@ -97,7 +97,7 @@ inline half __hmax(half x, half y)
 输入输出示例如下：
 
 ```text
-x：-1.25, 0.5, 2.5, -3.75
-y：0.75, -0.25, 3.25, -2.5
-output：0.75 0.5 3.25 -2.5
+x：nan, 0.5, 2.5, nan
+y：nan, 0.5, 2.5, nan
+result: nan 0.5 2.5 nan
 ```

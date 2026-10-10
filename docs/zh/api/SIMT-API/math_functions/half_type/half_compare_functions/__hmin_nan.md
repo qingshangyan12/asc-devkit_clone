@@ -96,5 +96,5 @@ half __hmin_nan(const half x, const half y)
 ```text
 x：nan, 0.5, 2.5, -3.75
 y：-1.25, -0.25, 3.25, nan
-output：nan -0.25 2.5 nan
+result: nan -0.25 2.5 nan
 ```
