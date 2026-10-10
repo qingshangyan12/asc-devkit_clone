@@ -114,3 +114,11 @@ $$
         asc_vf_call<simt_fast_div>(dim3(1024), output, value, magic, shift, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+divisor：3, 5, 7, 12
+magic: 1431655766 2576980378 613566757 1431655766
+shift: 2 3 3 4
+```
