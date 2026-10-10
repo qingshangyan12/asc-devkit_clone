@@ -12,31 +12,44 @@
 
 // ==========asc_half2e4m3==========
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Half2e4m3_rn_even, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, 0);
+    Half2e4m3_rn_even, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R, RS_DISABLE,
+    PART_EVEN, MODE_ZEROING, 0);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Half2e4m3_rn_odd, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, 1);
+    Half2e4m3_rn_odd, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R, RS_DISABLE,
+    PART_ODD, MODE_ZEROING, 1);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Half2e4m3_rn_sat_even, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, 2);
+    Half2e4m3_rn_sat_even, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
+    RS_ENABLE, PART_EVEN, MODE_ZEROING, 2);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Half2e4m3_rn_sat_odd, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, 3);
+    Half2e4m3_rn_sat_odd, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R,
+    RS_ENABLE, PART_ODD, MODE_ZEROING, 3);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Half2e4m3_rn_merge_even, asc_half2e4m3_rn_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, 4);
+    Half2e4m3_rn_merge_even, asc_half2e4m3_rn_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
+    RS_DISABLE, PART_EVEN, MODE_MERGING, 4);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
-    Half2e4m3_rn_merge_odd, asc_half2e4m3_rn_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, 5);
+    Half2e4m3_rn_merge_odd, asc_half2e4m3_rn_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R,
+    RS_DISABLE, PART_ODD, MODE_MERGING, 5);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
     Half2e4m3_rn_sat_merge_even, asc_half2e4m3_rn_sat_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN,
-    6);
+    ROUND_R, RS_ENABLE, PART_EVEN, MODE_MERGING, 6);
 TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
     Half2e4m3_rn_sat_merge_odd, asc_half2e4m3_rn_sat_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD,
-    7);
+    ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING, 7);
 TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
-    Half2e4m3_rn_even, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, 8);
+    Half2e4m3_rn_even, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R, RS_DISABLE,
+    PART_EVEN, MODE_ZEROING, 8);
 TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
-    Half2e4m3_rn_odd, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, 9);
+    Half2e4m3_rn_odd, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R, RS_DISABLE,
+    PART_ODD, MODE_ZEROING, 9);
 TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
-    Half2e4m3_rn_sat_even, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, 10);
+    Half2e4m3_rn_sat_even, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
+    RS_ENABLE, PART_EVEN, MODE_ZEROING, 10);
 TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
-    Half2e4m3_rn_sat_odd, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, 11);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_2(Half2e4m3_rn_v2, asc_half2e4m3_rn_v2, vcvt, vector_fp8_e4m3fn_t, vector_half, 12);
+    Half2e4m3_rn_sat_odd, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R,
+    RS_ENABLE, PART_ODD, MODE_ZEROING, 11);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_2(
-    Half2e4m3_rn_sat_v2, asc_half2e4m3_rn_sat_v2, vcvt, vector_fp8_e4m3fn_t, vector_half, 13);
+    Half2e4m3_rn_v2, asc_half2e4m3_rn_v2, vcvt, vector_fp8_e4m3fn_t, vector_half, ROUND_R, RS_DISABLE, PART_ODD,
+    MODE_ZEROING, 12);
+TEST_VECTOR_COMPUTE_VCVT_INSTR_2(
+    Half2e4m3_rn_sat_v2, asc_half2e4m3_rn_sat_v2, vcvt, vector_fp8_e4m3fn_t, vector_half, ROUND_R, RS_ENABLE, PART_ODD,
+    MODE_ZEROING, 13);
