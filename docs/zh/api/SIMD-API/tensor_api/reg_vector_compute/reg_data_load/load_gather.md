@@ -101,7 +101,7 @@ __simd_callee__ inline decltype(auto) load_gather(
 | `element` | `fp8_e4m3fn_t` | `uint16_t` |
 | `element` | `fp8_e5m2_t` | `uint16_t` |
 | `element` | `fp8_e8m0_t` | `uint16_t` |
-| `data_block` | `int4b_t`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t` | `uint32_t` |
+| `data_block` | `int4b_t`、`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`uint64_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t` | `uint32_t` |
 
 未列出的类型或模式组合会产生编译期错误。
 
