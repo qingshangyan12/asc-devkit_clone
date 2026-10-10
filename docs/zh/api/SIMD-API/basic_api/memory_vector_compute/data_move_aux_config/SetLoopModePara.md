@@ -58,7 +58,7 @@ __aicore__ inline void SetLoopModePara(const LoopModeParams& loopParams, DataCop
 | 参数名 | 描述 |
 | --- | --- |
 | loop1Size | 用于设置内层循环的循环次数，数据类型为uint32_t，取值范围为[0, 2^21)。 |
-| loop2Size | 用于设置外层循环的循环次数，数据类型为uint32_t，取值范围为[0, 2^21)。 |
+| loop2Size | 用于设置外层循环的循环次数，数据类型为uint32_t，取值范围为[0, 2^22)。 |
 | loop1SrcStride | 用于设置内层循环中相邻迭代源操作数的数据块间的间隔，单位为字节，数据类型为uint64_t。<br>&bull;当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^21)，并且loop1SrcStride必须32字节对齐。<br>&bull;当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^40)。 |
 | loop1DstStride | 用于设置内层循环中相邻迭代目的操作数的数据块间的间隔，单位为字节，数据类型为uint64_t。<br>&bull;当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^40)。<br>&bull;当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^21)，并且loop1DstStride必须32字节对齐。 |
 | loop2SrcStride | 用于设置外层循环中相邻迭代源操作数的数据块间的间隔，单位为字节，数据类型为uint64_t。<br>&bull;当数据搬运模式是UB_TO_OUT的时候取值范围为[0, 2^21)，并且loop2SrcStride必须32字节对齐。<br>&bull;当数据搬运模式是OUT_TO_UB的时候取值范围为[0, 2^40)。 |

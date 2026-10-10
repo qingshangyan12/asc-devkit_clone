@@ -431,8 +431,8 @@ __aicore__ inline void DataCopyGM2UBND2NZImpl(
 
 __aicore__ inline void SetLoopModeOutParaImpl(const LoopModeParams& loopParams)
 {
-    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big, needs less than 2^21");
+    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big, needs less than 2^22");
     });
     ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
         KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big, needs less than 2^21");
@@ -466,8 +466,8 @@ __aicore__ inline void SetLoopModeOutParaImpl(const LoopModeParams& loopParams)
 
 __aicore__ inline void SetLoopModeOutToL1ParaImpl(const LoopModeParams& loopParams)
 {
-    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^21");
+    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big and needs to be less than 2^22");
     });
     ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
         KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big and needs to be less than 2^21");
@@ -505,8 +505,8 @@ __aicore__ inline void SetLoopModeOutToL1ParaImpl(const LoopModeParams& loopPara
 
 __aicore__ inline void SetLoopModeUBParaImpl(const LoopModeParams& loopParams)
 {
-    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big, needs less than 2^21");
+    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big, needs less than 2^22");
     });
     ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
         KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big, needs less than 2^21");
