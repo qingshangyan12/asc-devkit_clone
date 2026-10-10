@@ -464,6 +464,41 @@ __aicore__ inline void SetLoopModeOutParaImpl(const LoopModeParams& loopParams)
     set_loop2_stride_outtoub(loop2StridePara);
 }
 
+__aicore__ inline void SetLoopModeUBParaImpl(const LoopModeParams& loopParams)
+{
+    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big, needs less than 2^22");
+    });
+    ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big, needs less than 2^21");
+    });
+    ASCENDC_ASSERT((loopParams.loop1SrcStride < (1ul << 21)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big, needs less than 2^21");
+    });
+    ASCENDC_ASSERT((loopParams.loop2SrcStride < (1ul << 21)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big, needs less than 2^21");
+    });
+    ASCENDC_ASSERT((loopParams.loop1DstStride < (1ul << 40)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big, needs less than 2^40");
+    });
+    ASCENDC_ASSERT((loopParams.loop2DstStride < (1ul << 40)), {
+        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big, needs less than 2^40");
+    });
+    uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21; // LOOP_SIZE_UBTOOUT[42:21]
+    loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);               // LOOP_SIZE_UBTOOUT[20:0]
+
+    // LOOP1_STRIDE_UBTOOUT[60:40], must be 32B aligned
+    uint64_t loop1StridePara = (loopParams.loop1SrcStride) << 40;
+    loop1StridePara |= loopParams.loop1DstStride; // LOOP1_STRIDE_UBTOOUT[39:0]
+    // LOOP2_STRIDE_UBTOOUT[60:40], must be 32B aligned
+    uint64_t loop2StridePara = (loopParams.loop2SrcStride) << 40;
+    loop2StridePara |= loopParams.loop2DstStride; // LOOP2_STRIDE_UBTOOUT[39:0]
+
+    set_loop_size_ubtoout(loopSizePara);
+    set_loop1_stride_ubtoout(loop1StridePara);
+    set_loop2_stride_ubtoout(loop2StridePara);
+}
+
 __aicore__ inline void SetLoopModeOutToL1ParaImpl(const LoopModeParams& loopParams)
 {
     ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
@@ -501,41 +536,6 @@ __aicore__ inline void SetLoopModeOutToL1ParaImpl(const LoopModeParams& loopPara
     set_loop_size_outtol1(loopSizePara);
     set_loop1_stride_outtol1(loop1StridePara);
     set_loop2_stride_outtol1(loop2StridePara);
-}
-
-__aicore__ inline void SetLoopModeUBParaImpl(const LoopModeParams& loopParams)
-{
-    ASCENDC_ASSERT((loopParams.loop2Size < (1ul << 22)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2Size is too big, needs less than 2^22");
-    });
-    ASCENDC_ASSERT((loopParams.loop1Size < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1Size is too big, needs less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop1SrcStride < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big, needs less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop2SrcStride < (1ul << 21)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big, needs less than 2^21");
-    });
-    ASCENDC_ASSERT((loopParams.loop1DstStride < (1ul << 40)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop1SrcStride is too big, needs less than 2^40");
-    });
-    ASCENDC_ASSERT((loopParams.loop2DstStride < (1ul << 40)), {
-        KERNEL_LOG(KERNEL_ERROR, "loopParams.loop2SrcStride is too big, needs less than 2^40");
-    });
-    uint64_t loopSizePara = static_cast<uint64_t>(loopParams.loop2Size) << 21; // LOOP_SIZE_UBTOOUT[42:21]
-    loopSizePara |= static_cast<uint64_t>(loopParams.loop1Size);               // LOOP_SIZE_UBTOOUT[20:0]
-
-    // LOOP1_STRIDE_UBTOOUT[60:40], must be 32B aligned
-    uint64_t loop1StridePara = (loopParams.loop1SrcStride) << 40;
-    loop1StridePara |= loopParams.loop1DstStride; // LOOP1_STRIDE_UBTOOUT[39:0]
-    // LOOP2_STRIDE_UBTOOUT[60:40], must be 32B aligned
-    uint64_t loop2StridePara = (loopParams.loop2SrcStride) << 40;
-    loop2StridePara |= loopParams.loop2DstStride; // LOOP2_STRIDE_UBTOOUT[39:0]
-
-    set_loop_size_ubtoout(loopSizePara);
-    set_loop1_stride_ubtoout(loop1StridePara);
-    set_loop2_stride_ubtoout(loop2StridePara);
 }
 
 __aicore__ inline void ResetUBLoopModeParaImpl(void)
