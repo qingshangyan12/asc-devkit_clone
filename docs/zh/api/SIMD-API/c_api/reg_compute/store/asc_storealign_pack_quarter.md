@@ -107,7 +107,6 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst,
                                                         vector_bool mask)
 ```
 
-
 ## 参数说明
 
 ### 对齐搬出模式

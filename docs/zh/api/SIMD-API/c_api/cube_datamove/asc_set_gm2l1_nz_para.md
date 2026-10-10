@@ -105,7 +105,6 @@ bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 
 示例中每次搬运一个16×16的`half`类型ND矩阵。目的Nz矩阵的相邻行起始地址偏移为1个32B块，相邻Z矩阵起始地址偏移为16个32B块；由于每次只搬运一个矩阵，相邻Nz矩阵起始地址偏移配置为0。
 
-
 ```cpp
 #include <cstdint>
 #include <iostream>

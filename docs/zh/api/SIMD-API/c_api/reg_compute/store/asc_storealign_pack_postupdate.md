@@ -89,7 +89,6 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t*& ds
                                                            int32_t offset)
 ```
 
-
 ## 参数说明
 
 ### 矢量数据寄存器搬出模式

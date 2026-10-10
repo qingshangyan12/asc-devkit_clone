@@ -107,7 +107,6 @@ __simd_callee__ inline void asc_storealign_intlv(__ubuf__ int8_t* dst,
                                                  addr_reg offset)
 ```
 
-
 ## 参数说明
 
 ### 对齐搬出模式
