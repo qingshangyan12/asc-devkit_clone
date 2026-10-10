@@ -51,6 +51,15 @@ struct RankResult {
 };
 
 class AicpuStFixture : public ::testing::Test {
+public:
+    // 输入数据模式：rank 与 byte 偏移的可区分编码，保证逐字节可溯源。
+    // rank < 16 时字节模式全局唯一（rank ≥ 16 会回绕混叠，当前拓扑不超过 8 rank）。
+    // public：adapter 的 golden 构造器（非成员函数）需与 fixture 填充共用同一公式。
+    static uint8_t MakeInputByte(RankId rank, uint64_t offset)
+    {
+        return static_cast<uint8_t>((rank + 1) * 0x10 + (offset & 0x0F));
+    }
+
 protected:
     void VerifyScenario(const AicpuStScenario& scenario);
 
@@ -87,13 +96,6 @@ protected:
     static uint32_t CountRanks(const TopoMeta& topoMeta);
 
     static Mc2CcTilingInner BuildTiling(HcclCMDType opType, HcclDataType dataType, const std::string& algConfig);
-
-    // 输入数据模式：rank 与 byte 偏移的可区分编码，保证逐字节可溯源。
-    // rank < 16 时字节模式全局唯一（rank ≥ 16 会回绕混叠，当前拓扑不超过 8 rank）。
-    static uint8_t MakeInputByte(RankId rank, uint64_t offset)
-    {
-        return static_cast<uint8_t>((rank + 1) * 0x10 + (offset & 0x0F));
-    }
 
 private:
     // 单 rank 全链路实际执行体（成员函数以访问 protected 虚函数/静态工具）

@@ -28,6 +28,9 @@ add_executable(
     aicpu_fixture_test.cpp
     ${UTILS_DIR}/aicpu_scenario/task_graph_executor.cc
     ${UTILS_DIR}/aicpu_scenario/aicpu_fixture.cc
+    ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/all_gather_testcase.cpp
+    ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/aicpu_all_gather.cc
+    ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/aicpu_all_gather_mesh1d_adapter.cc
     ${CC_SRC}/common/hccl_alloc_ctx_res.cc
     ${CC_SRC}/ops/op_common/external_alg/external_alg_rules.cc
     ${CC_SRC}/ops/op_common/external_alg/external_alg_resolver.cc
@@ -42,6 +45,7 @@ target_include_directories(
     ${UTILS_DIR}/sim_world
     ${UTILS_DIR}/common/utils
     ${UTILS_DIR}/aicpu_scenario
+    ${HCCL_MC2_AICPU_ALL_GATHER_DIR}
     ${CC_SRC}/common
     ${CC_SRC}/ops/op_common
     ${CC_SRC}/ops/op_common/inc
