@@ -69,7 +69,6 @@ from asc_op_compile_base.asc_op_compiler.compile_op import (
     _update_compile_option,
     gen_meta_info_section,
     _match_regex,
-    _get_dcci_disable_cap_bitmap,
 )
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_base import get_compile_core_types
 from asc_op_compile_base.asc_op_compiler.ascendc_compile_v220 import (
@@ -154,10 +153,10 @@ def manifest_compile_include_options():
     ]
 
 
-def read_resource_id_section_for_test(binary_file):
+def read_meta_entries_for_test(binary_file, meta_type):
     objcopy = os.path.join(os.environ["ASCEND_HOME_PATH"], "bin", "llvm-objcopy")
     with TemporaryDirectory() as temp_dir:
-        dump_file = os.path.join(temp_dir, "resource_id")
+        dump_file = os.path.join(temp_dir, "ascend_meta")
         output_file = os.path.join(temp_dir, "binary.o")
         result = subprocess.run(
             [objcopy, "--dump-section", f".ascend.meta={dump_file}", binary_file, output_file],
@@ -167,7 +166,7 @@ def read_resource_id_section_for_test(binary_file):
             text=True,
         )
         if result.returncode != 0:
-            raise AssertionError(f"Failed to read Resource ID: {result.stdout}")
+            raise AssertionError(f"Failed to read .ascend.meta: {result.stdout}")
         section_data = Path(dump_file).read_bytes()
         head_size = 4  # TLV head: unsigned short type + unsigned short len
         values = []
@@ -175,13 +174,22 @@ def read_resource_id_section_for_test(binary_file):
         while offset + head_size <= len(section_data):
             entry_type = int.from_bytes(section_data[offset : offset + 2], "little")
             length = int.from_bytes(section_data[offset + 2 : offset + 4], "little")
+            if offset + head_size + length > len(section_data):
+                raise AssertionError("Truncated .ascend.meta entry")
             value = section_data[offset + head_size : offset + head_size + length]
-            if entry_type == static_compile_resource_id._RESOURCE_ID_TYPE:
+            if entry_type == meta_type:
                 values.append(value)
             offset += head_size + length
-        if len(values) != 1:
-            raise AssertionError(f"expected exactly one Resource ID entry in .ascend.meta, got {len(values)}")
-        return values[0].decode("ascii")
+        if offset != len(section_data):
+            raise AssertionError("Truncated .ascend.meta header")
+        return values
+
+
+def read_resource_id_section_for_test(binary_file):
+    values = read_meta_entries_for_test(binary_file, static_compile_resource_id._RESOURCE_ID_TYPE)
+    if len(values) != 1:
+        raise AssertionError(f"expected exactly one Resource ID entry in .ascend.meta, got {len(values)}")
+    return values[0].decode("ascii")
 
 
 def compile_manifest_resources(manifest, manifest_dir, source_file_path):
@@ -226,6 +234,50 @@ def compile_manifest_resources(manifest, manifest_dir, source_file_path):
                     output_name = output[len("${output}/") :]
                     if not os.path.isfile(os.path.join(output_root, output_name)):
                         raise AssertionError(f"Manifest output is missing: {output}")
+
+
+class TestIcachePreloadMeta(unittest.TestCase):
+    def test_icache_preload_meta(self):
+        repo = Path(TOP_PATH).resolve()
+        cann = Path(os.environ["ASCEND_HOME_PATH"])
+        compiler = cann / "tools/bisheng_compiler/bin/bisheng"
+        for arch in ("2201", "3510"):
+            for api in ("c_api", "basic_api"):
+                for enabled in (False, True):
+                    with self.subTest(arch=arch, api=api, preload=enabled), TemporaryDirectory() as temp_dir:
+                        source = Path(temp_dir) / "probe.asc"
+                        if api == "c_api":
+                            headers = '#include "c_api/utils/sys_var.h"\n#include "c_api/cache_ctrl/cache_ctrl.h"\n'
+                            call = (
+                                "int64_t pc = asc_get_program_counter() & 0xFFFFFFFFFFFF;\n"
+                                "asc_icache_preload(reinterpret_cast<void *>(pc), 2);"
+                            )
+                        else:
+                            headers = '#include "kernel_operator.h"\n'
+                            call = "AscendC::ICachePreLoad(2);"
+                        source.write_text(
+                            headers
+                            + 'extern "C" __global__ __vector__ void probe(__gm__ float* x) {\n'
+                            + (call if enabled else "")
+                            + "\nx[0] = 1.0f;\n}\n",
+                            encoding="utf-8",
+                        )
+                        command = [str(compiler), f"--npu-arch=dav-{arch}", "-c", "-save-temps"]
+                        # bisheng prepends installed headers to -I; quoted includes must use the checkout.
+                        for path in (repo / "include", repo / "include/basic_api", repo / "include/utils", repo):
+                            command.extend(("-iquote", str(path)))
+                        command.extend((str(source), "-o", "probe.o"))
+                        result = subprocess.run(command, cwd=temp_dir, capture_output=True, text=True, check=False)
+                        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                        device_objects = [
+                            path
+                            for path in Path(temp_dir).glob("probe-cce-*.o")
+                            if not path.name.endswith(("-vec.o", "-cube.o"))
+                        ]
+                        self.assertEqual(len(device_objects), 1, list(Path(temp_dir).iterdir()))
+                        values = read_meta_entries_for_test(device_objects[0], 7)
+                        # Payload: uint16_t flag = 1, uint16_t reserved = 0.
+                        self.assertEqual(values, [b"\x01\x00\x00\x00"] if enabled else [])
 
 
 class TestCompileOp(unittest.TestCase):
@@ -627,7 +679,6 @@ class TestCompileOp(unittest.TestCase):
         kernel_spec.resource_id = "resource-id"
         kernel_spec.basic_compile_info = compile_info
         kernel_spec.sk_compile_info = None
-        kernel_spec.sk_cap_bitmap = None
 
         cases = (
             (
@@ -2887,7 +2938,7 @@ class TestCompileOp(unittest.TestCase):
         )
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         wrapper_text = Path(compile_info.gen_kernel_func_file).read_text(encoding="utf-8")
-        self.assertNotIn("__ASCENDC_SUPER_KERNEL_DEBUG__", wrapper_text)
+        self.assertIn("#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__", wrapper_text)
         self.assertIn(f'#include "{cce_file}"', wrapper_text)
         source_include = ["-I", os.path.dirname(os.path.realpath(cce_file))]
         self.assertEqual(
@@ -9036,7 +9087,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         )
         self.assertTrue(os.path.exists(compile_info.gen_kernel_func_file))
         with open(compile_info.gen_kernel_func_file, "r") as file:
-            self.assertNotIn("__ASCENDC_SUPER_KERNEL_DEBUG__", file.read())
+            self.assertIn("#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__", file.read())
         os.remove(compile_info.gen_kernel_func_file)
         compile_info.super_kernel_info["sp_options"]["debug-per-op-max-core-num"] = "1"
         with asc_op_compile_base.common.context.op_context.OpContext() as ctx:
@@ -9050,7 +9101,7 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
             lines = " ".join(lines)
             self.assertNotEqual(lines.find(" __attribute__((aligned(512))) "), -1)
             self.assertNotEqual(lines.find(" __sk__"), -1)
-            self.assertNotIn("__ASCENDC_SUPER_KERNEL_DEBUG__", lines)
+            self.assertIn("#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__", lines)
             self.assertIn(
                 "AscendC::g_superKernelSetWaitFlagCountDifference = "
                 "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;",
@@ -9506,63 +9557,3 @@ const static uint64_t L0A_SIZE = 65536 * block_idx;
         self.assertTrue(_match_regex("", ""))
         self.assertFalse(_match_regex("", "a"))
         self.assertFalse(_match_regex("a", ""))
-
-    def test_get_dcci_disable_cap_bitmap_empty_patterns(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
-        self.assertEqual(result, 0)
-
-    def test_get_dcci_disable_cap_bitmap_patterns_not_list(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": "not_a_list"}}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
-        self.assertEqual(result, 0)
-
-    def test_get_dcci_disable_cap_bitmap_patterns_empty_list(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": []}}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
-        self.assertEqual(result, 0)
-
-    def test_get_dcci_disable_cap_bitmap_matched(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_a", "kernel_b"]}}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
-        self.assertEqual(result, 4)
-
-    def test_get_dcci_disable_cap_bitmap_not_matched(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_x", "kernel_y"]}}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
-        self.assertEqual(result, 0)
-
-    def test_get_dcci_disable_cap_bitmap_wildcard_match(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_.*", ".*_test"]}}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_abc"])
-        self.assertEqual(result, 4)
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["op_test"])
-        self.assertEqual(result, 4)
-
-    def test_get_dcci_disable_cap_bitmap_multi_symbols_first_match(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_b"]}}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a", "kernel_b", "kernel_c"])
-        self.assertEqual(result, 4)
-
-    def test_get_dcci_disable_cap_bitmap_multi_symbols_no_match(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {"sp_options": {"dcci-disable-on-kernel": ["kernel_x"]}}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a", "kernel_b", "kernel_c"])
-        self.assertEqual(result, 0)
-
-    def test_get_dcci_disable_cap_bitmap_no_sp_options(self):
-        compile_info = CompileInfo()
-        compile_info.super_kernel_info = {"other_option": "value"}
-        result = _get_dcci_disable_cap_bitmap(compile_info, ["kernel_a"])
-        self.assertEqual(result, 0)
-
-
-if __name__ == "__main__":
-    unittest.main()
