@@ -73,9 +73,9 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_<round_mode><sat_mode><m
 **占位符说明如下：**
 - `<round_mode>`支持`rna`（ROUND）和`rh`（HIFLOAT8专用舍入模式）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和组内未写入结果的位置置0；取值为`_m`时表示合并模式，`mask`未选中的元素和组内未写入结果的位置保留`dst`中原值。
+- `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和组内未写入结果的位置置0；取值为`_merge`时表示合并模式，`mask`未选中的元素和组内未写入结果的位置保留`dst`中原值。
 <!-- npu="960" id9 -->
-- 合并模式（`<merge_mode>`取值为`_m`）仅在Ascend 960PR&960DT系列产品上支持。
+- 合并模式（`<merge_mode>`取值为`_merge`）仅在Ascend 960PR&960DT系列产品上支持。
 <!-- end id9 -->
 - `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
 
@@ -102,7 +102,7 @@ __simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna(
 
 ```c
 // ROUND舍入模式，饱和模式，合并模式，数据写入每4个元素中第3个的位置，结果通过函数返回值返回
-__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_m(vector_float src,
+__simd_callee__ inline vector_hifloat8_t asc_float2hif8_rna_sat_merge(vector_float src,
                                                                    vector_bool mask,
                                                                    std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
                                                                        dst_quarter_pos)

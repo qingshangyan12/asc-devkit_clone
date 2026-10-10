@@ -78,9 +78,9 @@ __simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_<round_mode><sat_mod
 
 - `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和未写入结果的位置置0；取值为`_m`时表示合并模式，`mask`未选中的元素和未写入结果的位置保留`dst`中原值。
+- `<merge_mode>`表示掩码未选中元素的处理模式：为空时表示置零模式，`mask`未选中的元素和未写入结果的位置置0；取值为`_merge`时表示合并模式，`mask`未选中的元素和未写入结果的位置保留`dst`中原值。
 <!-- npu="960" id9 -->
-- 合并模式（`<merge_mode>`取值为`_m`）仅在Ascend 960PR&960DT系列产品上支持。
+- 合并模式（`<merge_mode>`取值为`_merge`）仅在Ascend 960PR&960DT系列产品上支持。
 <!-- end id9 -->
 
 ### 函数原型典型示例
@@ -97,7 +97,7 @@ __simd_callee__ inline void asc_float2bfloat16_rn(vector_bfloat16_t& dst,
 
 ```c
 // TRUNC舍入模式，饱和模式，合并模式，数据写入索引为奇数的位置，结果通过函数返回值返回
-__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rz_sat_m(vector_float src,
+__simd_callee__ inline vector_bfloat16_t asc_float2bfloat16_rz_sat_merge(vector_float src,
                                                                      vector_bool mask,
                                                                      std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
