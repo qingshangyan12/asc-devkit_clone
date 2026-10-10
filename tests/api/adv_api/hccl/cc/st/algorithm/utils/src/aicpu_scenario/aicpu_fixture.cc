@@ -14,6 +14,7 @@
 #include <thread>
 
 #include "acl/acl_rt.h"
+#include "aicpu_dag_checker.h"
 #include "checker_def.h"
 #include "hccl_alloc_ctx_res.h"
 #include "hccl_sim_pub.h"
@@ -249,6 +250,13 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
     TaskGraphExecutor executor;
     std::string report;
     ASSERT_EQ(executor.Execute(queues, report), ExecResult::SUCCESS) << report;
+
+    // DAG 内存冲突检测（WAW/WAR/RAW 无同步并发）
+    const std::vector<DagConflict> conflicts = AicpuDagChecker().Check(executor.ExecutionLog());
+    for (const auto& conflict : conflicts) {
+        ADD_FAILURE() << "DAG conflict [" << conflict.kind << "]: A(" << conflict.detailA << ") vs B("
+                      << conflict.detailB << ")";
+    }
 
     // 逐字节比对（期望为空=零长度场景，跳过）
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
