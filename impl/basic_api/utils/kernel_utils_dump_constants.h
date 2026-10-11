@@ -35,7 +35,7 @@ const uint32_t BLOCK_INFO_MAGIC_POS = 4;
 const uint32_t BLOCK_INFO_RSV_POS = 5;
 const uint32_t BLOCK_INFO_DUMP_ADDR = 6;
 const uint32_t BLOCK_INFO_MAGIC_NUM = 0x5aa5bccd;
-// DUMP_META Pos ��uint8_tΪ��λ����λ��
+// DUMP_META Pos 以uint8_t为单位计算位置
 const uint32_t DUMP_META_TYPE_POS = 0;
 const uint32_t DUMP_META_LEN_POS = 4;
 const uint16_t DUMP_META_BLOCK_DIM_POS = 8;
@@ -53,7 +53,8 @@ const uint32_t DUMP_MESSAGE_HEAD_BUFFERID_POS = 5;
 const uint32_t DUMP_MESSAGE_HEAD_POSITION_POS = 6;
 const uint32_t DUMP_MESSAGE_HEAD_DUMP_SIZE_POS = 7;
 const uint32_t DUMP_SCALAR_POS = 8;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 const uint32_t DUMP_CORE_COUNT = 108;
 #ifdef ASCENDC_RECOGNIZE_SIMT_VF
 constexpr uint32_t DUMP_SIMT_CORE_COUNT = 72;
@@ -107,7 +108,8 @@ enum class DumpTensorDataType : uint32_t {
 };
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 namespace ConstantsInternal {
 // L12UBDumpCtrlMessage signal
 const uint32_t L1_2_UB_DUMP_CTRL_SIGNAL_DUMP = 1;
