@@ -23,7 +23,8 @@
 
 #include "kernel_operator_data_copy_intf_impl.h"
 #include "kernel_operator_dump_tensor_intf_impl.h"
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #include "kernel_operator_mm_bitmode_intf_impl.h"
 #endif
 #include "kernel_operator_mm_intf_impl.h"
@@ -55,6 +56,10 @@
 #include "kernel_operator_set_atomic_intf_impl.h"
 #include "kernel_prof_trace_intf_impl.h"
 #include "kernel_operator_atomic_intf_impl.h"
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#include "inner_kernel_operator_hscb_intf.h"
+#include "kernel_operator_gqm_intf_impl.h"
+#endif
 
 #endif // ASCENDC_MODULE_OPERATOR_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_INTF_IMPL_H__)
