@@ -267,12 +267,13 @@ __simd_callee__ inline void asc_add(
  * @ingroup simd_c_api.reg_compute.reg_arith
  * @override_id asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb
  * @archs 3510
- * @param [out] carry 目的操作数（掩码寄存器）。存储加法计算后的进位数据。
- * @param [out] dst 目的操作数（矢量数据寄存器）。
- * @param [in] src0 源操作数（矢量数据寄存器）。
- * @param [in] src1 源操作数（矢量数据寄存器）。
- * @param [in] carry_src 源操作数（掩码寄存器），输入的进位标志。
- * @param [in] mask 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ * @param [out] carry Destination operand (mask register). Stores the carry output of the addition.
+ * @param [out] dst Destination operand (vector data register).
+ * @param [in] src0 Source operand (vector data register).
+ * @param [in] src1 Source operand (vector data register).
+ * @param [in] carry_src Source operand (mask register). Provides the input carry flags.
+ * @param [in] mask Source operand mask (mask register). A value of 1 at the corresponding position selects an element
+ * for computation; a value of 0 excludes it. Unselected elements are set to zero in the output.
  */
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
@@ -282,12 +283,13 @@ __simd_callee__ inline void asc_addc(
  * @ingroup simd_c_api.reg_compute.reg_arith
  * @override_id asc_addc__Rvb_Rvi32_vi32_vi32_vb_vb
  * @archs 3510
- * @param [out] carry 目的操作数（掩码寄存器）。存储加法计算后的进位数据。
- * @param [out] dst 目的操作数（矢量数据寄存器）。
- * @param [in] src0 源操作数（矢量数据寄存器）。
- * @param [in] src1 源操作数（矢量数据寄存器）。
- * @param [in] carry_src 源操作数（掩码寄存器），输入的进位标志。
- * @param [in] mask 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ * @param [out] carry Destination operand (mask register). Stores the carry output of the addition.
+ * @param [out] dst Destination operand (vector data register).
+ * @param [in] src0 Source operand (vector data register).
+ * @param [in] src1 Source operand (vector data register).
+ * @param [in] carry_src Source operand (mask register). Provides the input carry flags.
+ * @param [in] mask Source operand mask (mask register). A value of 1 at the corresponding position selects an element
+ * for computation; a value of 0 excludes it. Unselected elements are set to zero in the output.
  */
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src,
