@@ -15,7 +15,7 @@
 #ifndef IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 #define IMPL_UTILS_DEBUG_ASC_AICORE_TIME_IMPL_H
 
-#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102
+#if __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202 || __NPU_ARCH__ == 5102
 #ifndef ASCENDC_CPU_DEBUG
 #include "impl/utils/debug/asc_debug_utils.h"
 
@@ -89,7 +89,7 @@ __aicore__ inline uint64_t clock_impl(void) { return static_cast<uint64_t>(get_s
 
 __aicore__ inline uint64_t clock(void) { return clock_impl(); }
 
-#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202 || __NPU_ARCH__ == 5102
 template <pipe_t pipe>
 __aicore__ inline void asc_mark_stamp(uint16_t idx)
 {
@@ -159,7 +159,7 @@ __aicore__ inline void prof_mark_event(void)
 #define TRACE_STOP_INTERNAL(N, ...) TRACE_STOP_FUNC(N, __VA_ARGS__)
 #define TRACE_STOP_FUNC(N, ...) TRACE_STOP_##N(__VA_ARGS__)
 #define TRACE_STOP_IMPL(...) TRACE_STOP_INTERNAL(GET_ARG_COUNT(__VA_ARGS__), __VA_ARGS__)
-#if __NPU_ARCH__ == 3510
+#if __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #define TRACE_START_2(pipe, idx) __asc_aicore::asc_mark_stamp<pipe>(static_cast<uint16_t>(idx) | 0x400)
 #define TRACE_STOP_2(pipe, idx) __asc_aicore::asc_mark_stamp<pipe>(static_cast<uint16_t>(idx) | 0xc00)
 #else
@@ -171,7 +171,7 @@ __aicore__ inline void prof_mark_event(void)
 __aicore__ inline void TRACE_START_1(TraceId apid) {}
 __aicore__ inline void TRACE_STOP_1(TraceId apid) {}
 
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 #define TRACE_START_1(apid) __asc_aicore::asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0x400)
 #define TRACE_STOP_1(apid) __asc_aicore::asc_mark_stamp<PIPE_S>(static_cast<uint16_t>(apid) | 0xc00)
 
