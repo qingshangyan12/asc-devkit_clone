@@ -42,6 +42,10 @@
 #include "dav_m310/kernel_operator_data_copy_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_data_copy_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_data_copy_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_data_copy_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_data_copy_impl.h"
 #elif (__NPU_ARCH__ == 5162)
@@ -147,7 +151,19 @@ __aicore__ inline uint32_t DataCopyGetPhyStartIndex(
     return phyStartIndex;
 }
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+template <typename T, bool enableSmallC0 = false>
+__aicore__ inline void DataCopyGM2L1ND2NZ(
+    const LocalTensor<T>& dstLocal, const GlobalTensor<T>& srcGlobal, const Nd2NzParams& intriParams,
+    const bool enablePreReadIgnoreSync = false)
+{
+    using PrimType = PrimT<T>;
+    const uint8_t cacheMode = ExtractCacheMode(srcGlobal);
+    DataCopyGM2L1ND2NZImpl<PrimType, enableSmallC0>(
+        (__cbuf__ PrimType*)dstLocal.GetPhyAddr(), (__gm__ PrimType*)srcGlobal.GetPhyAddr(), intriParams, cacheMode,
+        enablePreReadIgnoreSync);
+}
+#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
     (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopyGM2L1ND2NZ(
@@ -158,15 +174,19 @@ __aicore__ inline void DataCopyGM2L1ND2NZ(
     DataCopyGM2L1ND2NZImpl<PrimType, enableSmallC0>(
         (__cbuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
 }
+#endif
 
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 5101) || \
+    (__NPU_ARCH__ == 5161) || (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T>
 __aicore__ inline void DataCopyGM2UBND2NZ(
-    const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Nd2NzParams& intriParams)
+    const LocalTensor<T>& dstLocal, const GlobalTensor<T>& srcGlobal, const Nd2NzParams& intriParams)
 {
     using PrimType = PrimT<T>;
-    const uint8_t cacheMode = ExtractCacheMode(src);
+    const uint8_t cacheMode = ExtractCacheMode(srcGlobal);
     DataCopyGM2UBND2NZImpl(
-        (__ubuf__ PrimType*)dst.GetPhyAddr(), (__gm__ PrimType*)src.GetPhyAddr(), intriParams, cacheMode);
+        (__ubuf__ PrimType*)dstLocal.GetPhyAddr(), (__gm__ PrimType*)srcGlobal.GetPhyAddr(), intriParams, cacheMode);
 }
 #endif
 } // namespace AscendC
