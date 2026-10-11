@@ -97,6 +97,7 @@ struct GatherPadParams {
 #endif
 };
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 struct GatherParams {
     __aicore__ GatherParams() {}
 
@@ -117,6 +118,7 @@ struct ScatterParams {
     uint32_t burstLen = 0;
     uint32_t srcStride = DEFAULT_DATA_COPY_STRIDE;
 };
+#endif
 } // namespace AscendC
 #endif // ASCENDC_MODULE_STRUCT_GATHER_H
 
