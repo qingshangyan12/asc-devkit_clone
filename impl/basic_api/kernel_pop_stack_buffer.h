@@ -31,7 +31,8 @@ __aicore__ inline uint64_t GetEndAddress()
     // the last 64B reserved for ub kfc msg send
 #if __NPU_ARCH__ == 2201
     return TOTAL_UB_SIZE - sizeof(KfcMsg);
-#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
     return TMP_UB_OFFSET;
 #else
     return TOTAL_UB_SIZE;
