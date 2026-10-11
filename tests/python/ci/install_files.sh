@@ -23,7 +23,7 @@ echo "DST_PATH is ---- $DST_PATH"
 [ -n "$DST_PATH" ] && rm -rf $DST_PATH
 mkdir -p $DST_PATH
 
-# copy basic api
+# copy basic api test
 mkdir -p $DST_PATH/
 cp -rf ${TOP_DIR}/impl ${DST_PATH}/impl
 cp -rf ${TOP_DIR}/include ${DST_PATH}/include
