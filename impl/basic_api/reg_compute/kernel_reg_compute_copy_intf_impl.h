@@ -43,22 +43,12 @@
 
 namespace AscendC {
 namespace Reg {
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::MERGING, typename U>
-__simd_callee__ inline void Copy(U& dstReg, U& srcReg, MaskReg mask)
-{
-    CopyImpl<T, mode, U>(dstReg, srcReg, mask);
-}
 template <typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void Move(U& dstReg, U& srcReg, MaskReg mask)
 {
     CopyImpl<T, mode, U>(dstReg, srcReg, mask);
 }
 
-template <typename T = DefaultType, typename U>
-__simd_callee__ inline void Copy(U& dstReg, U& srcReg)
-{
-    CopyImpl<T, U>(dstReg, srcReg);
-}
 template <typename T, typename U>
 __simd_callee__ inline void Move(U& dstReg, U& srcReg)
 {
