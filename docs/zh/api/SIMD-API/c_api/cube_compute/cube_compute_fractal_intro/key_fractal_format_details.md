@@ -8,10 +8,10 @@
 - Zz × Zn = Nz（A × B = C）组合
   矩阵乘法A × B = C要求：左矩阵A使用Zz格式，右矩阵B使用Zn格式，结果矩阵C使用Nz格式，如图1所示。这种分形格式组合适用于：
   <!-- npu="910b" id2 -->
-  - Atlas A2训练系列产品/Atlas A2推理系列产品
+  - Atlas A2系列产品
   <!-- end id2 -->
   <!-- npu="A3" id3 -->
-  - Atlas A3训练系列产品/Atlas A3推理系列产品
+  - Atlas A3系列产品
   <!-- end id3 -->
 
   **图1** 矩阵乘法场景涉及的数据格式  
@@ -57,10 +57,11 @@
     ![列优先排布](../../../../figures/column_major_layout.png)
 - 场景：通常存在于Global Memory（GM）中。若此输入要作为矩阵计算的输入，需要转换成Nz格式。
 <!-- npu="950" id5 -->
-- 转换示例：针对Ascend 950PR&950DT系列产品，可以使用[矩阵搬入数据搬运 DN2Nz接口](../../cube_datamove/asc_copy_gm2l1_dn2nz.md)将其转换为Nz格式以适配Cube单元。
+- 转换示例：针对Ascend 950PR&950DT系列产品，可以使用[矩阵搬入数据搬运 DN2Nz接口](../../cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md)将其转换为Nz格式以适配Cube单元。
 <!-- end id5 -->
 
 <!-- npu="910b,A3" id6 -->
+
 ## Zz格式（FRACTAL_Zz）
 
 - **定义：** 大Z外部row major（行主序）+ 小z内部row major（行主序），见下图。
@@ -226,7 +227,7 @@ C0表示元素个数。对于这里的输入FeatureMap，`C0 = 32B / sizeof(Data
 
 - **物理位置：** 通常位于Global Memory（GM）或者L1 Buffer中，作为卷积的Feature Map输入。
 
-- **格式转换过程：** 通常使用[数据搬运（GMToL1随路转换-ND2Nz搬运）](../../cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md)指令来进行NHWC格式到NC1HWC0格式的转换。
+- **格式转换过程：** 通常使用[数据搬运（GMToL1随路转换-ND2Nz搬运）](../../cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz.md)指令来进行NHWC格式到NC1HWC0格式的转换。
 
     通过二维数据排布变换表达格式转换过程：
 

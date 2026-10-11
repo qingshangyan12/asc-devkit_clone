@@ -63,6 +63,7 @@ Cube单元采用分块计算逻辑，硬件最小计算粒度为分形块，可�
 ND格式是通用的N维张量格式，数据在内存中连续线性存放，通常存在于`Global Memory (GM)`中。在进行矩阵运算前，通常需要将其转换为Nz格式以适配Cube计算单元。
 
 #### Nz 格式
+
 Nz格式主要用于L1 Buffer和L0C Buffer中存放数据。针对[NPU架构版本3510](../../../language_extension/simd_builtin_keywords.md)，L0A Buffer也采用Nz分形格式。该格式采用大N（外部列主序）+ 小z（内部行主序）的方式排布。
 
 <img src="../../../../figures/nz_format.png" alt="Nz数据排布格式" width="400"/>
@@ -179,6 +180,7 @@ asc_copy_gm2l1_nd2nz(dst, src, src_d_value, l2_cache_ctrl, n_value, d_value, src
 <img src="../../../../figures/l1_l0a_copy.png" alt="L12L0A非转置搬运" width="700"/>
 
 通过如下方式调用可完成上述的`L1 Buffer`到`L0A Buffer`的搬入操作。
+
 ```c
 __cbuf__ half l1_buffer[6400];
 __ca__ half l0a_buffer[2304];
@@ -230,6 +232,7 @@ asc_copy_l12l0a_transpose(l0a_buffer, l1_buffer, m_start_position, k_start_posit
 <img src="../../../../figures/l0c_gm_950.png" alt="L0C2GM搬运" width="800"/>
 
 C语言编程提供了`asc_copy_l0c2gm`来使能发挥芯片的各种随路能力，通过直接传入配置参数可完成随路搬运的操作。
+
 ```c
 __aicore__ inline void asc_copy_l0c2gm(
     __gm__ bfloat16_t* dst, __cc__ float* src, uint16_t n_size, uint16_t m_size, uint32_t dst_stride,
@@ -240,6 +243,7 @@ __aicore__ inline void asc_copy_l0c2gm(
 ```
 
 另外，对于`unit_flag_mode`、`enable_nz2nd`参数的设置，需配置相应寄存器参数以启用不同功能。对应的接口和处理能力如下：
+
 ```c
 // 1.0 When performing inline quantization during data movement, call this interface to set vector quantization parameters in the quantization flow.
 __aicore__ inline void asc_set_l0c_copy_config(
@@ -253,7 +257,7 @@ __aicore__ inline void asc_set_l0c_copy_nz_para(
 __aicore__ inline void asc_set_l0c_copy_lrelu_alpha(float scalar_relu_pre_alpha);
 ```
 
-详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm.md)。
+详细说明可参考接口说明文档[Cube接口说明](../../../../../api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm.md)。
 
 
 ## 矩阵计算能力说明

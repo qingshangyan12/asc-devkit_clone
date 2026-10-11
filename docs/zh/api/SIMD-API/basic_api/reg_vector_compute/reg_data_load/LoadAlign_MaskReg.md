@@ -23,6 +23,18 @@
 <!-- npu="910" id7 -->
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
+<!-- npu="9050" id8 -->
+- Kirin 9050处理器系列产品：支持
+<!-- end id8 -->
+<!-- npu="kirin1" id9 -->
+- KirinDev0001处理器系列产品：支持
+<!-- end id9 -->
+<!-- npu="kirin2" id10 -->
+- KirinDev0002处理器系列产品：支持
+<!-- end id10 -->
+<!-- npu="kirin3" id11 -->
+- KirinDev0003处理器系列产品：支持
+<!-- end id11 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/reg_vector_compute/reg_data_load/LoadAlign_MaskReg_res.md#id1 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -117,6 +129,7 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../regist
 ## 调用示例<a name="section642mcpsimp"></a>
 
 - 普通搬运接口
+
     ```cpp
     template <typename T>
     __simd_vf__ inline void ComputeMode01(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
@@ -130,6 +143,7 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../regist
     ```
 
 - PostUpdate扩展搬运接口
+
     ```cpp
     template <typename T>
     __simd_vf__ inline void StoreAlignVF(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)
@@ -143,6 +157,7 @@ LoadAlign能够实现数据从Unified Buffer（UB）搬运至[MaskReg](../regist
     ```
 
 - 使用AddrReg存储偏移量接口
+
     ```cpp
     template <typename T>
     __simd_vf__ inline void ComputeMode03(__ubuf__ T* dstAddr, __ubuf__ T* srcAddr, uint16_t oneRepeatSize, uint16_t repeatTimes)

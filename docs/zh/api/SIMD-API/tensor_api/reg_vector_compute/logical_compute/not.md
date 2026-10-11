@@ -6,10 +6,10 @@
 - Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3训练系列产品/Atlas A3推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2训练系列产品/Atlas A2推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
 - Atlas 200I/500 A2推理产品：不支持
@@ -56,7 +56,10 @@ __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src)
 
 ## 约束说明
 
-本接口不是数值零值判断。对于非`bool`类型，结果是输入二进制编码逐位取反后的同类型数据。
+- 本接口不是数值零值判断。对于非`bool`类型，结果是输入二进制编码逐位取反后的同类型数据。
+- `src.mask`需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
+- 参与计算的元素个数由矢量长度（VL）决定：`T`不为`bool`时为`VL / sizeof(T)`，`T`为`bool`时为`VL`个bit。
+- `src.mask`未选中的位置不参与计算，返回值对应位置置零。
 
 ## 调用示例
 
