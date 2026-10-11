@@ -43,6 +43,12 @@
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_proposal_impl.h"
 #include "dav_3510/kernel_operator_vec_gather_mask_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_proposal_impl.h"
+#include "dav_9201/kernel_operator_vec_gather_mask_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_proposal_impl.h"
+#include "dav_9202/kernel_operator_vec_gather_mask_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_proposal_impl.h"
 #include "dav_m510/kernel_operator_vec_gather_mask_impl.h"
@@ -325,7 +331,8 @@ __aicore__ inline void Concat(
     ASCENDC_CHECK_VALUE_RANGE(repeatTime, 0, 255, "repeatTime", "Concat");
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     concat = src;
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     ProposalConcat(tmp, src, repeatTime, REGION_PROPOSAL_SCORE_POSITION);
@@ -364,7 +371,8 @@ __aicore__ inline void Extract(
         ASCENDC_REPORT_CHECK_ERROR("Extract", KernelFuncType::NONE_MODE);
     }
 #endif
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     ExtractImpl(
         (__ubuf__ PrimType*)dstValue.GetPhyAddr(), (__ubuf__ uint32_t*)dstIndex.GetPhyAddr(),
         (__ubuf__ PrimType*)sorted.GetPhyAddr(), repeatTime);
@@ -440,14 +448,15 @@ __aicore__ inline void MrgSort(
     MrgSort4Info mrgSortInfo(elementCountList, isExhaustedSuspension, validBit, (uint16_t)repeatTime);
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     MrgSort(dst, sortList, mrgSortInfo);
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     MrgSort4(dst, sortList, mrgSortInfo);
 #endif
     if (isExhaustedSuspension) {
 #if __NPU_ARCH__ == 2201 || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
         constexpr uint32_t validBitMask = 0xFFFF;
         constexpr uint32_t shiftBase = 16; // register is 16 bit per num
 #elif __NPU_ARCH__ == 2002
@@ -494,7 +503,8 @@ __aicore__ inline void Sort(
 #endif
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     Sort32(dst, concat, index, repeatTime);
 #elif (__NPU_ARCH__ == 1001) || (__NPU_ARCH__ == 2002)
     if (index.GetSize() != 0) {
@@ -553,7 +563,8 @@ __aicore__ inline uint32_t GetSortOffset(const uint32_t elemOffset)
     });
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     if constexpr (Std::is_same<PrimType, half>::value) {
         return elemOffset * halfSortedDataSize;
     } else {
@@ -581,7 +592,8 @@ __aicore__ inline uint32_t GetSortLen(const uint32_t elemCount)
     });
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 5102) || \
-     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510))
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     if constexpr (Std::is_same<PrimType, half>::value) {
         return elemCount * halfSortedDataSize;
     } else {
