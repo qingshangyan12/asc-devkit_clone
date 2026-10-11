@@ -35,6 +35,10 @@
 #include "dav_m300/kernel_operator_vec_gather_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_gather_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_vec_gather_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_vec_gather_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_gather_impl.h"
 #elif (__NPU_ARCH__ == 5162)
@@ -181,8 +185,9 @@ __aicore__ inline void Gather(
     const uint32_t srcBaseOffset, const uint32_t count)
 {
     using PrimType = PrimT<T>;
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || \
-                              (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || \
+     (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
     ASCENDC_ASSERT(
         (SupportType<PrimType, uint8_t, int8_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t>()), {
             KERNEL_LOG(
@@ -238,6 +243,43 @@ __aicore__ inline void Gather(
 #endif
 #endif
 }
+
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+/*
+ * @brief gather element from srcGlobal according to srcOffsetLocal
+ * @param [out] dstLocal output LocalTensor
+ * @param [in] srcGlobal input GlobalTensor
+ * @param [in] offsetLocal input LocalTensor
+ * @param [in] GatherParams basic configuration
+ * @param [in] GatherPadParam padding configuration
+ */
+template <typename T, typename U>
+__aicore__ inline void GatherDataCopy(
+    LocalTensor<T> dstLocal, GlobalTensor<T> srcGlobal, LocalTensor<U> offsetLocal, GatherParams& gatherParam,
+    GatherPadParams<T>& gatherPadParam)
+{
+    ASCENDC_ASSERT(
+        (SupportType<
+            T, uint8_t, int8_t, fp8_e4m3fn_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, int32_t, int64_t,
+            uint64_t>()),
+        {
+            KERNEL_LOG(
+                KERNEL_ERROR,
+                "Failed to check dtype in GatherDataCopy, current api support dtype combination is src and "
+                "dst both: uint8_t, int8_t, fp8_e4m3fn_t, half, bfloat16_t, uint16_t, int16_t, float, uint32_t, "
+                "int32_t, int64_t, uint64_t");
+        });
+    ASCENDC_ASSERT((SupportType<U, int32_t, int64_t>()), {
+        KERNEL_LOG(
+            KERNEL_ERROR,
+            "Failed to check dtype in GatherDataCopy, current api support index dtype in int32_t, int64_t");
+    });
+    const uint8_t cacheMode = ExtractCacheMode(srcGlobal);
+    GatherFromGlobalImpl(
+        (__ubuf__ T*)dstLocal.GetPhyAddr(), (__gm__ T*)srcGlobal.GetPhyAddr(), (__ubuf__ U*)offsetLocal.GetPhyAddr(),
+        gatherParam, gatherPadParam, cacheMode);
+}
+#endif
 } // namespace AscendC
 #pragma end_pipe
 #endif // ASCENDC_MODULE_OPERATOR_VEC_GATHER_INTERFACE_IMPL_H
