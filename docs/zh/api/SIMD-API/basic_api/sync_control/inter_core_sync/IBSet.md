@@ -29,9 +29,9 @@
 
 头文件路径为：`"basic_api/kernel_operator_block_sync_intf.h"`。
 
-设置由`blockIdx`和`eventID`共同指定的核间同步标志。不同核操作同一块全局内存且存在读后写、写后读或写后写等数据依赖时，被等待核（生产者）在完成相关操作后调用本接口，将同步标志置为1，通知等待核（消费者）可以继续执行，从而避免因核间执行顺序不确定而产生数据读写错误。
+设置核间同步标志。不同核操作同一块全局内存且存在读后写、写后读或写后写等数据依赖时，被等待核（生产者）在完成相关操作后调用本接口，将同步标志置为1，通知等待核（消费者）可以继续执行，从而避免因核间执行顺序不确定而产生数据读写错误。
 
-本接口须与[IBWait](IBWait.md)成对使用。等待核（消费者）在访问依赖数据前调用IBWait，并为`gmWorkspace`、`blockIdx`和`eventID`传入与本接口相同的值。
+本接口须与[IBWait](IBWait.md)成对使用。等待核（消费者）在访问依赖数据前调用IBWait，IBSet和IBWait用于同一个同步事件时，相关参数配置须保持一致。
 
 ## 函数原型<a name="section620mcpsimp"></a>
 
@@ -46,7 +46,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 
 | 参数名 | 描述 |
 | --- | --- |
-| isAIVOnly | 控制同步标志的寻址模式。取值为true（默认值）时，按AIVOnly模式寻址；取值为false时，按MIX模式寻址。MIX模式下须显式配置为false。 |
+| isAIVOnly | 控制同步标志在`gmWorkspace`中的存储位置计算方式。取值为true（默认值）时，按AIVOnly模式计算同步标志的存储位置；取值为false时，按MIX模式计算同步标志的存储位置。MIX模式下须显式配置为false。 |
 
 **表2**  接口参数说明
 
@@ -55,7 +55,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 | gmWorkspace | 输入 | 多个AIV共享的全局内存，用于存储核间同步标志，位于Global Memory，类型为[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。首次进行核间同步前，必须将其中的核间同步标志初始化为0。 |
 | ubWorkspace | 输入 | 当前AIV的核内缓存，用于将`gmWorkspace`中的核间同步标志搬运到Unified Buffer后读取和修改，并将修改后的同步标志写回`gmWorkspace`。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的[TPosition](../../aux_data_structures/TPosition.md)为VECIN/VECCALC/VECOUT。 |
 | blockIdx | 输入 | 同步标志对应的逻辑AIV索引，即被等待核（生产者，调用IBSet的核）的逻辑AIV索引。取值范围由算子调用时设置的逻辑AI Core核数`numBlocks`和AIV配比决定，例如`__mix__(1, 2)`修饰核函数且`numBlocks`为4时，`blockIdx`取值范围为`[0, 7]`。 |
-| eventID | 输入 | 同步事件的逻辑编号，与`blockIdx`共同确定`gmWorkspace`中的同步标志，用于区分同一对生产者和消费者之间的不同软件同步事件。<br>该参数与[SetFlag/WaitFlag](../intra_core_sync/SetFlag_WaitFlag_ISASI.md)的入参名称相同，但含义不同：本接口的`eventID`用于软件同步标志寻址，SetFlag/WaitFlag的`eventID`用于硬件指令中的核内流水同步事件。<br>因此，本接口的`eventID`不适用SetFlag/WaitFlag中0-7的取值限制。取值为非负整数，建议从0开始连续编号。 |
+| eventID | 输入 | 同步事件的逻辑编号，与`blockIdx`共同确定`gmWorkspace`中的同步标志，用于区分同一对生产者和消费者之间的不同软件同步事件。<br>该参数与[SetFlag/WaitFlag](../intra_core_sync/SetFlag_WaitFlag_ISASI.md)的入参名称相同，但含义不同：本接口的`eventID`用于定位软件同步标志，SetFlag/WaitFlag的`eventID`用于硬件指令中的核内流水同步事件。<br>因此，本接口的`eventID`不适用SetFlag/WaitFlag中0-7的取值限制。取值为非负整数，建议从0开始连续编号。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
