@@ -263,10 +263,32 @@ __simd_callee__ inline void asc_add(
 __simd_callee__ inline void asc_add(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb
+ * @archs 3510
+ * @param [out] carry 目的操作数（掩码寄存器）。存储加法计算后的进位数据。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] carry_src 源操作数（掩码寄存器），输入的进位标志。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_addc__Rvb_Rvi32_vi32_vi32_vb_vb
+ * @archs 3510
+ * @param [out] carry 目的操作数（掩码寄存器）。存储加法计算后的进位数据。
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src0 源操作数（矢量数据寄存器）。
+ * @param [in] src1 源操作数（矢量数据寄存器）。
+ * @param [in] carry_src 源操作数（掩码寄存器），输入的进位标志。
+ * @param [in] mask 源操作数掩码（掩码寄存器）。用于指示在计算过程中哪些元素参与计算。对应位置为1时参与计算，为0时不参与计算。mask未筛选的元素在输出中置零。
+ */
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src,
     vector_bool mask);

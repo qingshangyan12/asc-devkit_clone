@@ -56,9 +56,12 @@
 
 一句话里可以同时带上阶段、数据类型、版本、产品、行为约束（如非对齐、填充），说得越具体候选越准。
 
-示例：你说"在 A3 上想把两个 float 向量逐元素相加"，AI 会先按 A3 门控准备索引，再按
-"操作=add、类型=float"查询，最后返回 `docs/zh/api/SIMD-API/c_api/vector_compute/vector_arith/asc_add.md`
-及一句话用途；如果需求有歧义，它会先反问你。
+示例：你说"在 A5 上想把两个 uint32_t 向量和输入进位逐元素相加，并输出进位"，AI 会先按 A5 门控准备索引，
+再按"操作=add、类型=uint32"查询，结合带进位语义返回
+`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md` 及一句话用途；如果需求有歧义，它会先反问你。
+
+本分支以 `asc_addc` 为三类头示范：文档 front matter、两个声明的 include Doxygen 头，以及
+[Addc 源码样例](../../../examples/02_simd_c_api/03_c_api/02_reg_vector_compute/addc/README.md) 中的成对 marker。
 
 ### 2.3 AI 会做什么
 
