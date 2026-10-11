@@ -36,6 +36,10 @@
 #include "dav_m310/kernel_operator_vec_createvecindex_impl.h"
 #elif __NPU_ARCH__ == 3510
 #include "dav_3510/kernel_operator_vec_createvecindex_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_vec_createvecindex_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_vec_createvecindex_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_vec_createvecindex_impl.h"
 #elif (__NPU_ARCH__ == 5162)

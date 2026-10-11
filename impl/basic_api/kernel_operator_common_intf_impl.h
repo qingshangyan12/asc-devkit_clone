@@ -76,6 +76,34 @@
 #endif
 #include "dav_3510/core_mng/roc/kernel_operator_cube_group_handle_impl.h"
 #include "dav_3510/core_mng/roc/kernel_operator_group_barrier_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "dav_9201/kernel_operator_set_atomic_impl.h"
+#include "dav_9201/kernel_operator_common_impl.h"
+#include "dav_9201/kernel_operator_sync_impl.h"
+#include "dav_9201/kernel_operator_vec_duplicate_impl.h"
+#if KFC_C310_SSBUF == 1
+#include "dav_9201/kfc/kfc_comm_client.h"
+#include "dav_9201/kfc/kfc_comm_server.h"
+#else
+#include "dav_9201/kfc/kfc_comm_client_gm.h"
+#include "dav_9201/kfc/kfc_comm_server_gm.h"
+#endif
+#include "dav_9201/core_mng/roc/kernel_operator_cube_group_handle_impl.h"
+#include "dav_9201/core_mng/roc/kernel_operator_group_barrier_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "dav_9202/kernel_operator_set_atomic_impl.h"
+#include "dav_9202/kernel_operator_common_impl.h"
+#include "dav_9202/kernel_operator_sync_impl.h"
+#include "dav_9202/kernel_operator_vec_duplicate_impl.h"
+#if KFC_C310_SSBUF == 1
+#include "dav_9202/kfc/kfc_comm_client.h"
+#include "dav_9202/kfc/kfc_comm_server.h"
+#else
+#include "dav_9202/kfc/kfc_comm_client_gm.h"
+#include "dav_9202/kfc/kfc_comm_server_gm.h"
+#endif
+#include "dav_9202/core_mng/roc/kernel_operator_cube_group_handle_impl.h"
+#include "dav_9202/core_mng/roc/kernel_operator_group_barrier_impl.h"
 #elif (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_set_atomic_impl.h"
 #include "dav_m510/kernel_operator_common_impl.h"
@@ -118,12 +146,16 @@ __aicore__ inline void SetNextTaskStart()
 template <bool FORCE>
 __aicore__ inline void WaitPreTaskEnd()
 {
+#if (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    WaitPreTaskEndImpl<-1, PIPE_S>();
+#else
 #ifdef __ASCENDC_ENABLE_WAIT_PRE_TASK_END
     WaitPreTaskEndImpl();
 #else
     if constexpr (FORCE) {
         WaitPreTaskEndImpl<-1, true>();
     }
+#endif
 #endif
 }
 
@@ -134,7 +166,8 @@ template <typename T>
 __aicore__ inline __in_pipe__(V)
     __out_pipe__(MTE3) void InitOutput(GlobalTensor<T> gmWorkspaceAddr, uint32_t size, T value)
 {
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #if (__NPU_ARCH__ != 5102 && __NPU_ARCH__ != 5162)
     if ASCEND_IS_AIC {
         return;
@@ -210,7 +243,7 @@ __aicore__ inline void HWaitFlag(int32_t eventID)
 #endif
 
 #if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
-    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 template <int8_t startBit, int8_t endBit>
 __aicore__ static inline void SetCtrlSpr(int64_t value)
 {
@@ -232,7 +265,7 @@ __aicore__ static inline void ResetCtrlSpr()
 #endif
 #endif
 
-#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 namespace Internal {
 template <SaturationMode mode>
 __aicore__ inline constexpr int8_t GetSaturationModeBit()
@@ -289,7 +322,7 @@ __aicore__ inline bool GetSaturationFlag()
 }
 #endif
 
-#if (__NPU_ARCH__ == 3510)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 template <OverrideStrategy strategy>
 __aicore__ inline void SetSaturationStrategy()
 {
