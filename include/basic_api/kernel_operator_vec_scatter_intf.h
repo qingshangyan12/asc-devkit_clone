@@ -78,6 +78,7 @@ __aicore__ inline void Scatter(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<uint32_t>& dstOffset,
     const uint32_t dstBaseAddr, const uint32_t count);
 
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 /*
  * @brief scatther element from srcLocal according to srcOffsetLocal
  * @param [out] dst output GlobalTensor
@@ -89,6 +90,7 @@ __aicore__ inline void Scatter(
 template <typename T, typename U>
 __aicore__ inline void ScatterDataCopy(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const LocalTensor<U>& offset, ScatterParams& scatterParams);
+#endif
 } // namespace AscendC
 #pragma end_pipe
 
