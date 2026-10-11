@@ -33,18 +33,32 @@
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_copy_impl.h"
 #elif __NPU_ARCH__ == 5162
 #include "../../basic_api/reg_compute/dav_5162/kernel_reg_compute_copy_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "../../basic_api/reg_compute/dav_9201/kernel_reg_compute_copy_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "../../basic_api/reg_compute/dav_9202/kernel_reg_compute_copy_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_copy_impl.h"
 #endif
 
 namespace AscendC {
 namespace Reg {
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::MERGING, typename U>
+__simd_callee__ inline void Copy(U& dstReg, U& srcReg, MaskReg mask)
+{
+    CopyImpl<T, mode, U>(dstReg, srcReg, mask);
+}
 template <typename T, MaskMergeMode mode, typename U>
 __simd_callee__ inline void Move(U& dstReg, U& srcReg, MaskReg mask)
 {
     CopyImpl<T, mode, U>(dstReg, srcReg, mask);
 }
 
+template <typename T = DefaultType, typename U>
+__simd_callee__ inline void Copy(U& dstReg, U& srcReg)
+{
+    CopyImpl<T, U>(dstReg, srcReg);
+}
 template <typename T, typename U>
 __simd_callee__ inline void Move(U& dstReg, U& srcReg)
 {
