@@ -115,7 +115,7 @@ __aicore__ inline constexpr auto GetAuxDataType()
         uint8_t auxData = 0;
         return auxData;
     } else if constexpr (HasScalePosition<INPUT_TYPE>::value) {
-        using ScaleT = typename INPUT_TYPE::ScaleT;
+        using ScaleT = typename INPUT_TYPE::SCALE_T;
         if constexpr (IsSameTypeV<ScaleT, fp8_e8m0_t>) {
 #ifdef IS_AICORE
             uint8_t mxData = get_imm(0);
