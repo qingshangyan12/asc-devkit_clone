@@ -89,7 +89,16 @@ __simd_callee__ inline void ClearSpr()
 template <typename T, typename U, typename S, typename V>
 __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    using ActualU = typename V::ActualT;
+    if constexpr (std::is_same_v<ActualU, int4x2_t>) {
+        GatherImplV2<T, U, S, V>(dstReg, srcReg, indexReg);
+    } else {
+        GatherImpl<T, U, S, V>(dstReg, srcReg, indexReg);
+    }
+#else
     GatherImpl<T, U, S, V>(dstReg, srcReg, indexReg);
+#endif
 }
 #endif
 
@@ -109,20 +118,6 @@ __simd_callee__ inline void PrefixSum(U& dstReg, MaskReg& mask)
 }
 #endif
 
-template <typename T, typename U, typename S, typename V>
-__simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
-{
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
-    using ActualU = typename V::ActualT;
-    if constexpr (std::is_same_v<ActualU, int4x2_t>) {
-        GatherImplV2<T, U, S, V>(dstReg, srcReg, indexReg);
-    } else {
-        GatherImpl<T, U, S, V>(dstReg, srcReg, indexReg);
-    }
-#else
-    GatherImpl<T, U, S, V>(dstReg, srcReg, indexReg);
-#endif
-}
 } // namespace Reg
 } // namespace AscendC
 
