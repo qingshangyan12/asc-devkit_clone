@@ -22,9 +22,14 @@
 #define ASCENDC_MODULE_OPERATOR_ATOMIC_INTERFACE_IMPL_H
 #include "../../include/basic_api/kernel_tensor.h"
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3510))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3510) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #if (__NPU_ARCH__ == 5102)
 #include "dav_m510/kernel_operator_atomic_impl.h"
+#elif (__NPU_ARCH__ == 9201)
+#include "dav_9201/kernel_operator_atomic_impl.h"
+#elif (__NPU_ARCH__ == 9202)
+#include "dav_9202/kernel_operator_atomic_impl.h"
 #elif (__NPU_ARCH__ == 5162)
 #include "dav_5162/kernel_operator_atomic_impl.h"
 #else

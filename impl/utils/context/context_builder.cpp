@@ -40,6 +40,8 @@ enum class SocVersion {
     ASCEND310B,    // Ascend310B1, Ascend310B2, Ascend310B3, Ascend310B4
     ASCEND950,     // ASCEND950, __DAV_C310__
     ASCEND350,     // ASCEND350, __DAV_C310__
+    ASCEND960DT,   // Ascend960DT, 920R1
+    ASCEND960PR,   // Ascend960PR, 920R2
     RESERVED_VERSION = 99999
 };
 
@@ -261,10 +263,11 @@ ContextBuilder& ContextBuilder::PlatformInfo(void* platformInfo)
 ContextBuilder& ContextBuilder::AddPlatformInfo(const char* customSocVersion)
 {
     static std::map<std::string, SocVersion> convertMap = {
-        {"Ascend310P", SocVersion::ASCEND310P}, {"Ascend910", SocVersion::ASCEND910},
-        {"Ascend910B", SocVersion::ASCEND910B}, {"Ascend910_93", SocVersion::ASCEND910B},
-        {"Ascend310B", SocVersion::ASCEND310B}, {"Ascend950", SocVersion::ASCEND950},
-        {"Ascend350", SocVersion::ASCEND350},
+        {"Ascend310P", SocVersion::ASCEND310P},   {"Ascend910", SocVersion::ASCEND910},
+        {"Ascend910B", SocVersion::ASCEND910B},   {"Ascend910_93", SocVersion::ASCEND910B},
+        {"Ascend310B", SocVersion::ASCEND310B},   {"Ascend950", SocVersion::ASCEND950},
+        {"Ascend350", SocVersion::ASCEND350},     {"Ascend960DT", SocVersion::ASCEND960DT},
+        {"Ascend960PR", SocVersion::ASCEND960PR},
     };
     const static std::string labelVersion = "version";
     const static std::string labelShortSocVersion = "Short_SoC_version";

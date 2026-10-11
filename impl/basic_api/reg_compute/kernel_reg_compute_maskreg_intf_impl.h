@@ -33,6 +33,10 @@
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_maskreg_impl.h"
 #elif __NPU_ARCH__ == 5162
 #include "../../basic_api/reg_compute/dav_5162/kernel_reg_compute_maskreg_impl.h"
+#elif __NPU_ARCH__ == 9201
+#include "../../basic_api/reg_compute/dav_9201/kernel_reg_compute_maskreg_impl.h"
+#elif __NPU_ARCH__ == 9202
+#include "../../basic_api/reg_compute/dav_9202/kernel_reg_compute_maskreg_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_maskreg_impl.h"
 #endif
@@ -92,6 +96,22 @@ template <typename T>
 __simd_callee__ inline void DeInterleave(MaskReg& dst0, MaskReg& dst1, MaskReg& src0, MaskReg& src1)
 {
     MaskDeInterleaveImpl<T>(dst0, dst1, src0, src1);
+}
+
+template <typename T, HighLowPart part>
+__simd_callee__ inline void Interleave(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    MaskInterleaveV2Impl<T, part>(dstMask, srcMask0, srcMask1);
+#endif
+}
+
+template <typename T, HighLowPart part>
+__simd_callee__ inline void DeInterleave(MaskReg& dstMask, MaskReg& srcMask0, MaskReg& srcMask1)
+{
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
+    MaskDeInterleaveV2Impl<T, part>(dstMask, srcMask0, srcMask1);
+#endif
 }
 
 __simd_callee__ inline void Select(MaskReg& dst, MaskReg& src0, MaskReg& src1, MaskReg& mask)
