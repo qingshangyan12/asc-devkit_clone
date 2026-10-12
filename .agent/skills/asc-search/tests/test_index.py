@@ -85,6 +85,23 @@ class DeriveTests(unittest.TestCase):
         marker_id = next(iter(db))
         self.assertIn("file", db[marker_id][0])
 
+    def test_shared_example_range_and_header_source(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "legacy.asc").write_text("//! [asc_old__z]\nasc_old();\n//! [asc_old__z]\n")
+            (root / "shared.h").write_text(
+                "//! [asc_add__i32, asc_copy__z]\nvoid first() { asc_add(1); }\n"
+                "void second() { asc_copy(); }\n//! [asc_copy__z, asc_add__i32]\n"
+            )
+            db = build_examples_db(root)
+            self.assertEqual({"asc_old__z", "asc_add__i32", "asc_copy__z"}, set(db))
+            self.assertEqual("shared.h", db["asc_add__i32"][0]["file"])
+            self.assertEqual((2, 3), (db["asc_add__i32"][0]["start_line"], db["asc_add__i32"][0]["end_line"]))
+            self.assertEqual(db["asc_add__i32"], db["asc_copy__z"])
+            (root / "broken.asc").write_text("//! [asc_bad__z]\nasc_bad();\n")
+            with self.assertRaisesRegex(ValueError, "unclosed"):
+                build_examples_db(root)
+
     def test_product_support_parse(self) -> None:
         body = (REPO_ROOT / "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md").read_text(encoding="utf-8")
         support = doc_product_support(body.split("---\n", 2)[-1])

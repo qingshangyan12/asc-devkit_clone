@@ -56,13 +56,13 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 ### 1.2 它靠什么工作
 
-靠文档里预先写好的三类"头"（由建设侧预先写入，随文档与源码一起提供）：
+靠文档里预先写好的三类"头"（由建设侧 skill `asc-knowledge-build` 生产）：
 
 | 头 | 在哪 | 给检索提供什么 |
 | --- | --- | --- |
 | 文档头 | 每篇 Markdown 顶部的 5 字段 YAML | 语义：做什么、什么操作、配套什么、哪个版本可用 |
 | include 头 | `include/c_api/**/*.h` 声明上方的 Doxygen | 结构：重载编号、适用架构、参数方向 |
-| examples 头 | 样例源码里的 `//! [override_id]` 成对标记 | 关联：样例和哪个重载对应 |
+| examples 头 | 每源文件重点 API 共同范围首尾的 `//! [id1, id2, ...]` 成对标记 | 关联：同一展示范围对应哪些重载；单 ID 标记仍兼容 |
 
 `asc-search` 把三类头推导成一份持久索引，查询时只查索引、按需打开候选文档，不需要现场全文搜索。
 
@@ -78,11 +78,9 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 - 只帮找文档，不生成算子代码、不替你写 kernel。
 - 当前只覆盖 C API（`docs/zh/api/SIMD-API/c_api/`）；其他层级会如实标注"范围外"。
-- 不改文档、不改索引构建产物；写头、改词表不在本 skill 范围内。
+- 不改文档、不改索引构建产物；写头、改词表是 `asc-knowledge-build` 的事，两个 skill 互不引用对方文件。
 
-## 2. 怎么用（AI 使用方法）
-
-这个 skill 是给 AI 用的：你只需要把需求说清楚，检索由 AI 按 `SKILL.md` 的流程完成。
+## 2. 怎么用（skill 使用方法）
 
 ### 2.1 接入方式
 
@@ -98,7 +96,6 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 - "想把 half 转成 fp8，有哪些接口？"
 - "asc_xxx 这个接口要搭配什么接口一起用？"
 - "9.1.0 起可用的拷贝接口有哪些？"
-- "round_mode 这个参数哪些接口在用？"
 
 一句话里可以同时带上阶段、数据类型、版本、产品、行为约束（如非对齐、填充），说得越具体候选越准。
 
@@ -106,10 +103,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 再按"操作=add、类型=uint32"查询，结合带进位语义返回
 `docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md` 及一句话用途；如果需求有歧义，它会先反问你。
 
-本分支以 `asc_addc` 为三类头示范：文档 front matter、两个声明的 include Doxygen 头，以及
-[Addc 源码样例](../../../examples/02_simd_c_api/03_c_api/02_reg_vector_compute/addc/README.md) 中的成对 marker。
-
-### 2.3 AI 会做什么
+### 2.3 skill 会做什么
 
 1. **索引前置保障**：按本机 CANN 版本 × 目标架构检查索引，缺失或不匹配就原地重建；
    换架构/版本等于换一套文档范围，AI 会以检查结果作为本次检索的边界。
@@ -120,212 +114,119 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 4. **配套展开**：对候选接口展开依赖、配置关系，反查参数用到的枚举/宏，家族变体一起保留。
 5. **按需核对**：只读候选文档里支撑推荐所需的章节，区分"已确认适用 / 条件待确认 / 范围内未覆盖"。
 
-### 2.4 AI 给什么结果
+### 2.4 skill 给什么结果
 
-固定格式，不落盘：
+回答包含候选接口、文档路径和用途，以及适用条件、待确认事项或文档范围内未覆盖的能力。
+信息不足时会先澄清；未检索到时会如实说明，不把空结果当成“仓库不支持”。正式检索的输出结构为：
 
 ```text
 ## 候选
 - 路径: docs/zh/api/SIMD-API/c_api/xxx/yyy.md | API: asc_yyy | 用途: 一句话
 ## 文档范围内未覆盖
-- 能力描述（及源码或范围外线索，若有）
+- 能力描述；没有未覆盖项时写“无”。
 ```
 
-必要时附"待确认"事项。想深入看某个接口细节或算子实现，直接追问即可。
+下面四张问答卡片来自实际检索与候选文档核对，按 **CANN 9.2.0 × A5 × C API** 整理。
+卡片将候选压成表格，点击接口名即可打开对应文档。换版本或架构后，应重新检索，结果可能不同。
 
-## 3. 内部实现方案
+<details>
+<summary>问答 1：把 GM 上的数据搬到 UB，用哪个接口？</summary>
 
-### 3.1 整体架构
+**答：** 先看 `asc_copy_gm2ub`；需要非对齐填充或多维搬运时，再看对应候选。
 
-```text
-三类头（文档 slim 头 / include Doxygen / examples marker）
-   │
-   ├─ build_index.py：解析 → 推导 → 门控（CANN 版本 × 架构 × 层级）→ 视图/依赖图/defs → 落盘
-   │       产物：index/c_api/{index.json, build-meta.json, gaps.json, 概览.md}
-   │
-   ├─ ensure_index.py：检索前检查索引是否匹配本机环境、指纹是否新鲜；不匹配就原地重建
-   │
-   └─ query.py：唯一检索入口，按维度查视图，输出 路径 | API | 命中原因
-```
+**候选**
 
-设计原则：能在构建期算一遍的，绝不在查询期现算；查询只做索引查表和按需读文档。
-
-### 3.2 目录与文件作用
-
-```text
-asc-search/
-├── SKILL.md                        # 给 AI 的入口：建索引 + 检索的完整流程与输出规范
-├── README.md                       # 本文件：给人的全貌说明
-├── config/                         # 运行配置（脚本直接读取，随包分发）
-│   ├── tag-taxonomy.json           # 冻结词表：构建时校验文档头 tag 是否合法
-│   └── product-map.yaml            # 架构/产品映射：A5↔3510、标记→产品支持
-├── references/                     # 规则与流程文档（按需阅读）
-│   ├── README.md                   # reference 导航
-│   ├── index.md                    # 建立索引流程、构建门控、查询参数全集
-│   ├── retrieve.md                 # 检索流程：意图分析、多轮查询、输出格式
-│   └── 索引推导契约.md              # 推导规则唯一事实源：推导维度、兜底边界、门控
-├── scripts/                        # 全部可执行脚本（见下表）
-│   └── derive/                     # 推导引擎（被 build_index/query 复用）
-├── tests/
-│   ├── test_index.py               # 门控/推导/确定性/ensure 决策/dryrun 回归
-│   └── dryrun.yaml                 # 查询清单（A5/A3 双实例）
-├── index/                          # 索引实例（构建产物，运行期生成，不提交）
-└── derive-overrides/               # 人工/LLM 裁决残留（如有，构建确定性消费）
-```
-
-脚本作用：
-
-| 脚本 | 作用 |
+| 接口与文档 | 用途与选择条件 |
 | --- | --- |
-| `scripts/build_index.py` | 构建索引：解析三类头、推导、门控、生成视图与依赖图；`--check` 做文档漂移检测 |
-| `scripts/ensure_index.py` | 前置保障：检测本地 CANN/架构门控与指纹新鲜度，按需原地重建 |
-| `scripts/query.py` | 查询 CLI：按维度过滤、家族卡、依赖遍历、参数/枚举反查、缺口检索 |
-| `derive/slim_header.py` | 解析文档 slim 头、加载冻结词表并校验 tag 合法性 |
-| `derive/include_db.py` | 解析 include 声明与 Doxygen：签名、架构、dtype、位置、参数、掩码、废弃 |
-| `derive/docparse.py` | 解析文档正文：标题、导航链接、产品支持标记 |
-| `derive/examples_db.py` | 解析样例 marker，建立重载 ↔ 样例关联 |
-| `derive/gate.py` | 门控：CANN 版本检测链、架构标签映射、版本区间判定 |
-| `derive/overrides.py` | derive-overrides 兜底：读取人工裁决并确定性应用 |
+| [asc_copy_gm2ub](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md) | GM→UB，支持连续搬运和高维切分搬运；目的 UB 地址须 32 字节对齐，长度非 32 字节整数倍时需要为 UB 侧补齐写入预留空间。 |
+| [asc_copy_gm2ub_align](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md) | 非对齐 GM→UB 搬运，可按原型与参数选择填充方式；手动填充、循环搬运等场景有配套配置接口。 |
+| [asc_ndim_copy_gm2ub](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md) | 最多 5 维、各维独立步长的 GM→UB 搬运，支持随路 Padding。 |
 
-### 3.3 三类头（索引输入）的字段含义
+以上接口仅在 AIV 上生效。具体选择还需确认数据类型、搬运维度、对齐和填充要求。
+与其他指令存在 UB 地址重叠时，要配合
+[asc_sync_notify](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md)、
+[asc_sync_wait](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md) 同步。
 
-#### 文档头（5 字段）
+**文档范围内未覆盖：** 无。
 
-```yaml
----
-okftype: reference.api
-description: "对两个源矢量执行逐元素加法并将结果写入目的矢量，……"
-tag:
-  - roles: [compute]
-  - operations: [add]
-  - traits: [elementwise, high_dimensional]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/general_description_and_constraints.md
-    kind: constrained_by
-version: ">=9.0.0"
----
-```
+</details>
 
-| 字段 | 检索里的用途 |
+<details>
+<summary>问答 2：想把 half 转成 fp8，有哪些接口？</summary>
+
+**答：** 当前范围没有检出 half→`fp8_e4m3fn_t` / `fp8_e5m2_t` 的单步转换接口。
+可以继续核对“half→float→fp8”的分步转换候选：
+
+**候选**
+
+| 接口与文档 | 用途 |
 | --- | --- |
-| `okftype` | 区分接口页/常量页/导航页等；导航页不会当候选推荐 |
-| `description` | 关键词匹配的来源之一（`--kw`） |
-| `tag` | 三组语义标签：`roles`（流程角色）、`operations`（操作）、`traits`（稳定特性）；对应 `--stage/--operation/--feature` 等查询 |
-| `dependencies` | 配套文档与关系；`--deps-of` 遍历依赖图时使用 |
-| `version` | CANN 生命周期区间；构建期门控参与过滤，`--version` 可反查 |
+| [asc_half2float](../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md) | 将 half 矢量寄存器元素转换为 float，作为中间步骤。 |
+| [asc_float2e4m3_rn / asc_float2e4m3_rn_sat](../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md) | 将 float 转为 `fp8_e4m3fn_t`，分别对应非饱和与饱和形式。 |
+| [asc_float2e5m2_rn / asc_float2e5m2_rn_sat](../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md) | 将 float 转为 `fp8_e5m2_t`，分别对应非饱和与饱和形式。 |
 
-`dependencies[].kind` 含义：`requires` 要配合它、`configures` 用它配置、`constrained_by` 受它约束、
-`related` 相关、`replaced_by` 被它取代（废弃接口指向替代目标）。
+待确认目标 fp8 格式、饱和策略和结果布局。这些接口按位置标签选取源或目的元素，
+不能直接假定组合调用后得到连续打包的 fp8 数据；使用饱和或非饱和模式时，还需按文档配置
+[asc_set_ctrl](../../../docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md)。
 
-#### include 头
+**文档范围内未覆盖：** 未检出上述两种 fp8 格式的 half 单步直转接口；分步候选的存在不等于已验证完整转换实现。
 
-| 标签 | 推导出什么 |
+</details>
+
+<details>
+<summary>问答 3：asc_xxx 这个接口要搭配什么接口一起用？</summary>
+
+**答：** 请把 `asc_xxx` 换成完整接口名，也可以提供接口文档路径。
+不同接口的配置、同步与条件依赖不同，明确名称后才能检索配套关系。
+
+**补充提问示例：** “asc_ndim_copy_gm2ub 要搭配什么接口一起用？”
+
+**候选**
+
+| 配套接口与文档 | 何时使用 |
 | --- | --- |
-| `@override_id` | 重载级别标识；样例 marker 和参数反查都挂靠它 |
-| `@archs` | 每个重载适用架构，决定门控是否收录 |
-| `@param [方向]` | 参数名、类型、方向（in/out/in,out）→ `--param` 反查 |
-| `@ingroup` | API 分类（api_class）佐证 |
-| `ASC_DEPRECATED(...)` | 推导废弃状态与替代目标 |
+| [asc_set_ndim_loop0_stride 至 asc_set_ndim_loop4_stride](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_loop_stride.md) | 搬运前配置各维源、目的步长，单位为元素个数。 |
+| [asc_set_ndim_pad_count](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md) | 配置 loop1 至 loop4 的左右填充数；loop0 填充数由搬运接口参数设置。 |
+| [asc_set_ndim_pad_value](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md) | `padding_mode=true` 时，搬运前配置与数据类型一致的常数填充值。 |
+| [asc_ndim_copy_dci](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md) | 多核可能读取同一 GM 地址，且数据可能被其他核更新时，搬运前刷新 NDDMA DataCache。 |
+| [asc_sync_notify](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md)、[asc_sync_wait](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md) | 与其他指令存在 UB 地址重叠时，配对同步以保证相关读写串行化。 |
 
-#### examples 头
+配套关系有各自的触发条件，并非每次搬运都需要调用表中的全部接口。
 
-成对的 `//! [override_id]` 包住一次样例调用，id 与 include 头的重载编号一致，用于建立
-"接口 ↔ 可运行样例"的关联。
+**文档范围内未覆盖：** 对补充提问，无；原问题中的占位符需要先澄清。
 
-### 3.4 索引与配置文件格式
+</details>
 
-#### `config/tag-taxonomy.json`（本 skill 自带的冻结词表）
+<details>
+<summary>问答 4：9.1.0 起可用的拷贝接口有哪些？</summary>
 
-构建索引时用它校验文档头 tag 的合法性（namespace 是否固定 3 个、值是否在册）。
+**答：** 这里需要先确认：你想找“文档标为从 9.1.0 开始支持”的接口，
+还是“在 CANN 9.1.0 中可用的全部拷贝接口”？后者也包括更早版本引入的接口，需要按目标架构与 9.1.0 重新准备索引。
 
-| 键 | 含义 |
+**补充提问示例：** “目标 A5、当前 CANN 9.2.0，找文档 version 标为 `>=9.1.0` 的拷贝接口。”
+
+**候选**
+
+| 接口与文档 | 用途 |
 | --- | --- |
-| `taxonomy_id` / `status` | 词表版本号；必须 `frozen` |
-| `required_namespaces` | 必填 namespace（roles） |
-| `namespaces.<name>.values` | 合法值及英文定义（roles / operations / traits） |
-| `approval` | 人工批准记录（谁、何时、批了什么） |
+| [asc_copy_gm2ub](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md) | GM→UB。 |
+| [asc_copy_ub2gm](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md) | UB→GM。 |
+| [asc_copy_ub2l1](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md) | UB→L1。 |
+| [asc_copy_ub2ub](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md) | UB 内部搬运。 |
+| [asc_copy_gm2l1_align](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md) | GM→L1，支持非对齐搬运与填充。 |
+| [asc_copy_gm2l1_dn2nz](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md) | GM→L1，并做 DN→Nz 格式转换。 |
+| [asc_copy_gm2l1_nd2nz](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md) | GM→L1，并做 ND→Nz 格式转换。 |
+| [asc_copy_l0c2gm](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md) | L0C→GM，可组合随路量化、激活与格式转换。 |
+| [asc_copy_l0c2ub](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md) | L0C→UB，可组合随路量化、激活与格式转换。 |
+| [asc_copy_l12bt](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md) | L1→BiasTable Buffer。 |
+| [asc_copy_l12fb](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md) | L1→Fixpipe Buffer，搬运量化或激活参数。 |
+| [asc_copy_l12l0b_mx](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md) | L1→L0B_MX Buffer，搬运右矩阵量化系数。 |
+| [asc_copy_l12l0b_trans](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md) | L1→L0B，并做二维分形转置。 |
+| [asc_copy_l12ub](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md) | L1→UB。 |
 
-#### `config/product-map.yaml`（架构与产品映射）
+此处按文档 `version` 区间精确匹配并筛去废弃接口；更早引入或标为 `>=9.2.0` 的接口不在这张表中。
+表中结果反映当前门控下的文档标注，不代表已验证这些 A5 接口能在历史 CANN 9.1.0 环境运行。
 
-```yaml
-archs:
-  "3510":
-    labels: [A5]                  # 检索用代际标签
-    soc_versions: [Ascend950]     # SoC 版本名
-    npu_markers: ["950"]          # 文档正文 <!-- npu="950" --> 标记
-    products: [...]               # 对应产品线
-```
+**文档范围内未覆盖：** 对补充提问，无；“9.1.0 当时可用的全部接口”需要另行检索。
 
-用途：`--arch A5` 先映射成架构号 3510 再做门控；文档正文的 npu 标记反推产品支持矩阵；
-`--product 950,A3` 按标记过滤。
-
-#### `index/c_api/index.json`（索引实例）
-
-| 段 | 内容 |
-| --- | --- |
-| `schema` / `meta` | 格式版本；`surface`、`cann_version`、`arch_label`、`arch`、`doc_count`、`filtered_by_version/arch`、`pending_no_okf`、`unresolved_count`、`source_commit` |
-| `documents` | 每篇文档一个记录：原始 5 字段 + 推导出的 api_class、execution_model、signatures、dtypes、locations、masked、deprecated、headers、examples、enum_types、family、category、product_support、applied_overrides |
-| `views` | 15 个倒排视图：by_stage、by_role、by_operation、by_category、by_api_class、by_dtype、by_dtype_pair、by_override_id、by_header、by_api、by_param、by_enum、by_feature、by_version、by_product |
-| `graph` | 依赖图：`edges`（from/to/kind/condition）与反查用 `reverse` |
-| `defs` | include defs 目录：enums、constants、ASC_ 宏、类型别名等 |
-
-#### `index/c_api/build-meta.json`（新鲜度指纹）
-
-记录 `source_commit`、`taxonomy_sha256`、`product_map_sha256`、`gaps_sha256`、逐文档
-`document_sha256`。`ensure_index.py` 用它在毫秒级判断索引是否过期。
-
-#### `index/c_api/gaps.json`（缺口登记，可选）
-
-| 段 | 字段 | 含义 |
-| --- | --- | --- |
-| `scope_out_gaps[]` | `id` / `keywords` / `conclusion` / `hints` / `evidence` | 范围内未覆盖的能力：关键词、结论、范围外线索、证据 |
-| `relation_gaps[]` | `from` 等 | 关系维度的已知缺口 |
-
-缺失视为空台账、不阻断构建；存在时校验 hint/evidence 指向的文件真实存在；`--gap` 查询命中即返回。
-
-#### `derive-overrides/<surface>.json`（人工/LLM 裁决）
-
-脚本推不出来的残留（`unresolved.json`）经单轮裁决后固化在此，每条含
-`document` / `field` / `value` / `reason`，构建时确定性应用，可审查、可回放；构建过程本身不调 LLM。
-
-### 3.5 查询维度（query.py）
-
-维度之间是 AND，逗号分隔的多个值是 OR：
-
-| 参数 | 含义 |
-| --- | --- |
-| `--stage in,out,compute` | 分阶段候选（roles + 推导位置判定） |
-| `--operation copy,divide` | 操作语义 |
-| `--category` / `--api-class` | 文档目录分类 / include 子目录分类 |
-| `--dtype` / `--convert src dst` | 数据类型 / 类型转换对（别名归一：f32→float、e4m3→fp8_e4m3fn） |
-| `--feature low_precision` | 特性族（低精度、int4 等） |
-| `--kw 非对齐,填充` | 标题 + 描述子串 |
-| `--version '>=9.1.0'` / `--product 950,A3` | 按 version 区间精确匹配 / 产品标记 |
-| `--api asc_copy_gm2ub` | 家族卡：主页 + 同族成员 + 分类页 |
-| `--deps-of <api\|path> [--kind K] [--reverse]` | 依赖图遍历 |
-| `--param` / `--enum` | 参数名或枚举类型 / 枚举名或枚举值反查使用方 |
-| `--gap 同步,寄存器` | 缺口登记检索 |
-| `--json` | 机器可读输出 |
-
-输出统一为 `路径 | API 名 | 命中原因`。
-
-### 3.6 门控与前置保障
-
-- CANN 版本检测链：显式 `--cann-version` > `$ASCEND_HOME_PATH` 安装目录 > 仓 `version.cmake`。
-- 架构：`--arch`（默认 A5）经 `product-map.yaml` 映射架构号。
-- 只索引同时满足三条件的 API：`version` 覆盖本地 CANN 版本 ∧ 推导架构含目标架构 ∧ 属于目标层级；
-  被过滤的 API 计入 `meta.filtered_by_version/arch`。
-- `ensure_index.py` 检查门控与指纹：匹配且新鲜 → 零动作；缺失、不匹配或漂移 → 原地重建。
-  轻量指纹为毫秒级，`--strict` 走全量重建比对。输出 JSON 就是本次检索的上下文
-  （`surface`、`cann_version`、`arch_label`、`arch`、`categories`、`doc_count`、`actions`）。
-- 换架构或版本门控 = 换索引实例与文档范围，不能把门控外的缺失说成"仓库不支持"。
-
-### 3.7 维护规则与当前状态
-
-- **自含性**：只依赖三类头与本 skill 的 `config/`，不 import 或读取其他 skill 的文件。
-- 建设侧重新打标或 include/examples 变化后：重跑 `build_index.py --scope c_api` 并提交索引 diff；
-  `--check` 报漂移属预期报警；检索触发 ensure 重建产生的本地 diff 只在维护确认后提交。
-- `derive-overrides` 只登记脚本无法裁决、经人工核对的事实，每条附 reason；
-  新增推导规则可消除的条目应删除。
-- 当前实例：c_api 全量，SCOPES categories=None（838 篇 slim 头中 592 篇过 A5 门控）；
-  历史遗留见文档问题登记（建设侧维护）与 unresolved 裁决记录。
+</details>

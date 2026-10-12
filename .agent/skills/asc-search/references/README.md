@@ -15,6 +15,9 @@
 
 ## 维护规则
 
+- `okf-test` 与 `okf-knowledge-user` 的 `.agent/skills/asc-search/` 完整目录始终保持一致，
+  包括 README、指令、reference、配置、脚本、测试和图片。任何修改都需同步两分支并提交、推送；
+  交付前运行 `git diff okf-test okf-knowledge-user -- .agent/skills/asc-search`，结果必须为空。
 - 推导规则只在《索引推导契约.md》维护；流程文档只引用，不复述推导规则。
 - 构建与前置保障只依赖三类头与本 skill `config/`，不得引用其他 skill 的文件。
 - 文档头/include/examples 变化后重跑 `scripts/build_index.py --scope c_api` 并提交索引 diff；

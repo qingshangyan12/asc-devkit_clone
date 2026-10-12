@@ -1,24 +1,43 @@
-"""样例目录解析：//! [override_id] marker → 样例文件映射。"""
+"""样例目录解析：单 ID 或集中 ID 列表的成对 marker → 样例文件映射。"""
 
 from __future__ import annotations
 
 import re
 from pathlib import Path
 
-MARKER_RE = re.compile(r"//!\s*\[(?P<id>[^\]]+)\]")
+MARKER_RE = re.compile(
+    r"^[ \t]*//![ \t]*\[(?P<ids>[A-Za-z0-9_.:-]+(?:[ \t]*,[ \t]*[A-Za-z0-9_.:-]+)*)\][ \t]*$",
+    re.MULTILINE,
+)
 
 
-def build_examples_db(examples_root: Path) -> dict[str, list[dict[str, str]]]:
-    """override_id → [{path, file}]；path 为仓内相对目录，file 为样例源文件名。"""
-    db: dict[str, list[dict[str, str]]] = {}
+def build_examples_db(examples_root: Path) -> dict[str, list[dict[str, str | int]]]:
+    """override_id → [{path, file, start_line, end_line}]，行号不含 marker。"""
+    db: dict[str, list[dict[str, str | int]]] = {}
     if not examples_root.is_dir():
         return db
-    for path in sorted(examples_root.rglob("*.asc")):
-        ids = {m.group("id") for m in MARKER_RE.finditer(path.read_text(encoding="utf-8", errors="replace"))}
-        entry = {
-            "path": f"/{path.parent.as_posix()}",
-            "file": path.name,
-        }
-        for identifier in sorted(ids):
-            db.setdefault(identifier, []).append(entry)
+    for path in sorted(examples_root.rglob("*")):
+        if not path.is_file() or path.suffix.lower() not in {".asc", ".c", ".cc", ".cpp", ".cxx", ".h", ".hpp"}:
+            continue
+        active = None
+        source = path.read_text(encoding="utf-8", errors="replace")
+        for match in MARKER_RE.finditer(source):
+            group = frozenset(part.strip() for part in match.group("ids").split(","))
+            line = source.count("\n", 0, match.start()) + 1
+            if active is None:
+                active = (group, line)
+            elif group == active[0]:
+                entry = {
+                    "path": f"/{path.parent.as_posix()}",
+                    "file": path.name,
+                    "start_line": active[1] + 1,
+                    "end_line": line - 1,
+                }
+                for identifier in sorted(group):
+                    db.setdefault(identifier, []).append(entry)
+                active = None
+            else:
+                raise ValueError(f"unpaired or nested example markers: {path}")
+        if active is not None:
+            raise ValueError(f"unclosed example markers: {path}")
     return db
