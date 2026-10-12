@@ -43,8 +43,8 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
 | 参数名称 | 输入/输出 | 含义 |
 | :--- | :--- | :--- |
-| gmWorkspace | 输入 | 临时空间，初始化核间同步的共享内存，类型为GlobalTensor。 |
-| ubWorkspace | 输入 | 临时空间，用于操作gmWorkspace，类型为LocalTensor。 |
+| gmWorkspace | 输入 | 位于Global Memory、由参与同步的多个AIV核共享，用于保存核间顺序执行的同步状态，本接口会对其进行初始化，类型为GlobalTensor。 |
+| ubWorkspace | 输入 | 位于当前AIV核的Unified Buffer（UB），除暂存从Global Memory搬入或待写回的数据外，还保存当前AIV核的同步轮次状态，用于操作gmWorkspace，类型为LocalTensor。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -52,7 +52,9 @@ __aicore__ inline void InitDetermineComputeWorkspace(GlobalTensor<int32_t>& gmWo
 
 ## 约束说明<a name="section633mcpsimp"></a>
 
-- gmWorkspace申请的空间最少要求为：GetBlockNum()*32Bytes，ubWorkspace申请的空间最少要求为：GetBlockNum()*32+32Bytes。
+- gmWorkspace申请的空间最少要求为：GetBlockNum()*32Bytes，ubWorkspace申请的空间最少要求为：GetBlockNum()*32Bytes+32Bytes。
+- 对于同一次核间顺序执行，本接口与[WaitPreBlock](WaitPreBlock.md)、[NotifyNextBlock](NotifyNextBlock.md)必须传入保持同一组对应关系的gmWorkspace和ubWorkspace（即同一块GM共享内存与同一块UB空间），否则无法正确同步。
+- 分离模式下，该接口的同步逻辑仅在AIV核生效：在AIC核中调用时接口会直接返回，不做任何初始化。
 - 与IBSet/SyncAll不同，该接口输入参数gmWorkspace缓存的值不需要初始化为0。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 
