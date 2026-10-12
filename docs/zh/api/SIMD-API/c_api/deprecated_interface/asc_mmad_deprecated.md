@@ -127,7 +127,7 @@ __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix,
 | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
 | `float` | `float` | `float` | `float` |
 
-### 函数原型典型示例
+#### 函数原型典型示例
 
 ```c
 __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
@@ -150,22 +150,169 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 - `asc_mmad`及`asc_mmad_sync`：
 
   ```c
-  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  // 占位符形式
+  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
+                                  __ca__ <a_dtype>* a_matrix,
+                                  __cb__ <b_dtype>* b_matrix,
+                                  uint16_t left_height,
+                                  uint16_t n_dim,
+                                  uint16_t right_width,
+                                  uint8_t unit_flag,
+                                  bool k_direction_align,
+                                  bool c_matrix_source,
+                                  bool c_matrix_init_val)
+
+  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
+                                  __ca__ <a_dtype>* a_matrix,
+                                  __cb__ <b_dtype>* b_matrix,
+                                  uint16_t left_height,
+                                  uint16_t n_dim,
+                                  uint16_t right_width,
+                                  uint8_t feat_offset,
+                                  uint8_t smask_offset,
+                                  uint8_t unit_flag,
+                                  bool k_direction_align,
+                                  bool is_weight_offset,
+                                  bool c_matrix_source,
+                                  bool c_matrix_init_val)
+
+  __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix,
+                                       __ca__ <a_dtype>* a_matrix,
+                                       __cb__ <b_dtype>* b_matrix,
+                                       uint16_t left_height,
+                                       uint16_t n_dim,
+                                       uint16_t right_width,
+                                       uint8_t unit_flag,
+                                       bool k_direction_align,
+                                       bool c_matrix_source,
+                                       bool c_matrix_init_val)
+
+  __aicore__ inline void asc_mmad_sync(__cc__ <c_dtype>* c_matrix,
+                                       __ca__ <a_dtype>* a_matrix,
+                                       __cb__ <b_dtype>* b_matrix,
+                                       uint16_t left_height,
+                                       uint16_t n_dim,
+                                       uint16_t right_width,
+                                       uint8_t feat_offset,
+                                       uint8_t smask_offset,
+                                       uint8_t unit_flag,
+                                       bool k_direction_align,
+                                       bool is_weight_offset,
+                                       bool c_matrix_source,
+                                       bool c_matrix_init_val)
   ```
 
-  `c_dtype`、`a_dtype`、`b_dtype`支持以下组合：`float/bfloat16_t/bfloat16_t`、`float/half/half`、`float/float/float`和`int32_t/int8_t/int8_t`。
+#### dtype支持数据类型
+
+`c_dtype`、`a_dtype`、`b_dtype`支持以下组合：`float/bfloat16_t/bfloat16_t`、`float/half/half`、`float/float/float`和`int32_t/int8_t/int8_t`。
 
 - `asc_mmad_s4`及`asc_mmad_s4_sync`：
 
   ```c
-  __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t unit_flag, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
-  __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t left_height, uint16_t n_dim, uint16_t right_width, uint8_t feat_offset, uint8_t smask_offset, uint8_t unit_flag, bool k_direction_align, bool is_weight_offset, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix,
+                                     __ca__ int4b_t* a_matrix,
+                                     __cb__ int4b_t* b_matrix,
+                                     uint16_t left_height,
+                                     uint16_t n_dim,
+                                     uint16_t right_width,
+                                     uint8_t unit_flag,
+                                     bool k_direction_align,
+                                     bool c_matrix_source,
+                                     bool c_matrix_init_val)
+
+  __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix,
+                                     __ca__ int4b_t* a_matrix,
+                                     __cb__ int4b_t* b_matrix,
+                                     uint16_t left_height,
+                                     uint16_t n_dim,
+                                     uint16_t right_width,
+                                     uint8_t feat_offset,
+                                     uint8_t smask_offset,
+                                     uint8_t unit_flag,
+                                     bool k_direction_align,
+                                     bool is_weight_offset,
+                                     bool c_matrix_source,
+                                     bool c_matrix_init_val)
+
+  __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix,
+                                          __ca__ int4b_t* a_matrix,
+                                          __cb__ int4b_t* b_matrix,
+                                          uint16_t left_height,
+                                          uint16_t n_dim,
+                                          uint16_t right_width,
+                                          uint8_t unit_flag,
+                                          bool k_direction_align,
+                                          bool c_matrix_source,
+                                          bool c_matrix_init_val)
+
+  __aicore__ inline void asc_mmad_s4_sync(__cc__ int32_t* c_matrix,
+                                          __ca__ int4b_t* a_matrix,
+                                          __cb__ int4b_t* b_matrix,
+                                          uint16_t left_height,
+                                          uint16_t n_dim,
+                                          uint16_t right_width,
+                                          uint8_t feat_offset,
+                                          uint8_t smask_offset,
+                                          uint8_t unit_flag,
+                                          bool k_direction_align,
+                                          bool is_weight_offset,
+                                          bool c_matrix_source,
+                                          bool c_matrix_init_val)
   ```
+
+#### 函数原型典型示例
+
+```c
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix,
+                                __ca__ bfloat16_t* a_matrix,
+                                __cb__ bfloat16_t* b_matrix,
+                                uint16_t left_height,
+                                uint16_t n_dim,
+                                uint16_t right_width,
+                                uint8_t unit_flag,
+                                bool k_direction_align,
+                                bool c_matrix_source,
+                                bool c_matrix_init_val)
+
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix,
+                                __ca__ bfloat16_t* a_matrix,
+                                __cb__ bfloat16_t* b_matrix,
+                                uint16_t left_height,
+                                uint16_t n_dim,
+                                uint16_t right_width,
+                                uint8_t feat_offset,
+                                uint8_t smask_offset,
+                                uint8_t unit_flag,
+                                bool k_direction_align,
+                                bool is_weight_offset,
+                                bool c_matrix_source,
+                                bool c_matrix_init_val)
+
+__aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix,
+                                     __ca__ bfloat16_t* a_matrix,
+                                     __cb__ bfloat16_t* b_matrix,
+                                     uint16_t left_height,
+                                     uint16_t n_dim,
+                                     uint16_t right_width,
+                                     uint8_t unit_flag,
+                                     bool k_direction_align,
+                                     bool c_matrix_source,
+                                     bool c_matrix_init_val)
+
+__aicore__ inline void asc_mmad_sync(__cc__ float* c_matrix,
+                                     __ca__ bfloat16_t* a_matrix,
+                                     __cb__ bfloat16_t* b_matrix,
+                                     uint16_t left_height,
+                                     uint16_t n_dim,
+                                     uint16_t right_width,
+                                     uint8_t feat_offset,
+                                     uint8_t smask_offset,
+                                     uint8_t unit_flag,
+                                     bool k_direction_align,
+                                     bool is_weight_offset,
+                                     bool c_matrix_source,
+                                     bool c_matrix_init_val)
+```
 <!-- end id20 -->
 
 ## 参数说明
