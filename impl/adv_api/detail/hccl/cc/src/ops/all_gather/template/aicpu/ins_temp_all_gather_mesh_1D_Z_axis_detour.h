@@ -44,19 +44,9 @@ protected:
     HcclResult LocalDataCopy(const std::vector<ThreadHandle>& threads) override;
 
 private:
-    std::vector<ChannelInfo> PrepareMergedChannels(const std::map<u32, std::vector<ChannelInfo>>& channels);
-    u64 CalcSliceSizeForChannel(u32 myAlgRank, u32 connectedAlgRank, bool dmaRead) const;
-    void BuildDataSlicesForChannel(
-        u32 connectedRank, u32 myAlgRank, u32 connectedAlgRank, u32 idx, const ChannelInfo& linkRemote,
-        void* remoteCclBuffAddr, std::vector<DataSlice>& txSrcSlicesAll, std::vector<DataSlice>& txDstSlicesAll,
-        std::vector<DataSlice>& rxDstSlicesAll, std::vector<DataSlice>& rxSrcSlicesAll);
-    HcclResult ExecuteSendRecvForChannel(
-        u32 threadIdx, bool dmaRead, const std::vector<ThreadHandle>& threads, const ChannelInfo& linkRemote,
-        const std::vector<DataSlice>& txSrcSlicesAll, const std::vector<DataSlice>& txDstSlicesAll,
-        const std::vector<DataSlice>& rxSrcSlicesAll, const std::vector<DataSlice>& rxDstSlicesAll);
-    HcclResult ProcessSingleChannel(
-        u32 threadIdx, u32 myAlgRank, bool dmaRead, const u32 dataTypeSize, const std::vector<ThreadHandle>& threads,
-        const std::map<u32, std::vector<ChannelInfo>>& channels, const std::vector<ChannelInfo>& mergedChannels);
+    HcclResult RunAllGatherMeshOnChannel(
+        const ThreadHandle& thread, const ChannelInfo& linkRemote, const u32 connectedRank,
+        const u32 connectedAlgRank, const u32 channelIdx);
     static bool isNew;
     u32 level0ChannelNumPerRank_{1};
     u32 level1ChannelNumPerRank_{0};
