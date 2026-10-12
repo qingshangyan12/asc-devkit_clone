@@ -80,3 +80,10 @@ SIMT编程场景当前不支持使用该接口。
         asc_vf_call<simt_e4m3x22float2>(dim3(1024), (__gm__ float8_e4m3x2_t*)input, (__gm__ float2*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (56, 64), (112, 120), (128, 128), (nan, 448)
+result: (56.0, 64.0), (112.0, 120.0), (128.0, 128.0), (nan, 448.0)
+```
