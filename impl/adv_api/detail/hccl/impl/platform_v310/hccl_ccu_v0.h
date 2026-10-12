@@ -563,6 +563,13 @@ __aicore__ inline uint8_t HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>
         if (missionCnt >= 1U && missionCnt <= KFC_MAX_MISSION_NUM) {
             missionNum = static_cast<uint8_t>(missionCnt);
         }
+    } else if (algorithmType == static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherSoleNHR) && newCcuFlag_) {
+        // D4：AG SoleNHR 双 die——mission 数 = dieNum（res[2]，注册期按通道探测修正）；
+        // 0/越界回退 1（兼容旧 host lib）
+        const uint64_t missionCnt = hcclNewContext_->res[2];
+        if (missionCnt >= 1U && missionCnt <= KFC_MAX_MISSION_NUM) {
+            missionNum = static_cast<uint8_t>(missionCnt);
+        }
     }
     return missionNum;
 }
