@@ -10,10 +10,12 @@
 
 // 与 hccl src/ops/all_gather/algorithm/template/ccu/ccu_temp_all_gather_nhr_1D_mem2mem.cc 逐行对照移植。
 // hccl -> KFC 适配：
-//  1. CalcRes 只建 1 个 placeholder kernelInfo（KFC 单 mission），kernelFuncName 由 CcuTempKfcServer::CalcRes
-//     识别替换；hccl 的 dieNum(1-2) kernel 划分与带宽比切分不迁移（框架限制，见迁移文档 4.2 节）。
+//  1. CalcRes 按 dieNum(1-2) 建 kernelInfo（D4，RS SoleNHR 2Die 先例）：GetDieInfoFromChannelDescs
+//     探测 die 数、链路按 die 分组（channelsPerDie，SelectChannelToVec）、GetChannelBwCoeff 带宽比
+//     切分（dieSplitRatio）；KFC 下每 kernel 映射一个 mission（CcuTempKfcServer::CalcRes 按尾部
+//     源 kernel 数修正 mission 数，op_common.cc 再生 kfcServerArgs）。
 //  2. 通道走 CalcChannelRequestNhr（hccl 非 MESH_1D_CLOS 路径）；rank2ChannelIdx 以 sub-rank 为键，
-//     每 peer 保留首条通道（与 RS SoleNHR KFC 先例的 channelResort 语义一致）。
+//     每 peer 每 die 保留一条链路（SelectChannelToVec，RS 2die 同构）。
 //  3. KernelRun 为空壳：每轮参数由 AIV 侧 CcuPrepareForAllGatherSoleNhrM2M 写入 xnData 队列。
 //  4. GetStepInfo 的 toRank/fromRank/nSlices/tx/rx 公式与 hccl 逐行一致（sub-rank 口径）。
 #include "alg_data_trans_wrapper.h"
@@ -21,6 +23,11 @@
 #include "ccu_temp_kfc_all_gather_nhr_1d_mem2mem.h"
 
 namespace mc2_ops_hccl {
+
+namespace {
+constexpr u32 DIE_NUM_1 = 1;
+constexpr u32 DIE_NUM_2 = 2;
+} // namespace
 
 CcuTempKfcAllGatherNHR1DMem2Mem::CcuTempKfcAllGatherNHR1DMem2Mem(
     const OpParam& param, u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
@@ -39,38 +46,80 @@ HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::CalcRes(
     AlgResourceRequest& resourceRequest)
 {
     CHK_RET(GetRes(resourceRequest));
-    resourceRequest.ccuKernelNum.push_back(1U);
 
+    // 与 hccl 一致：通道走两级拓扑 Nhr 计算（非 UBX 的 NhrMultiJetty）
     std::vector<HcclChannelDesc> channelDescs;
     CHK_RET(CalcChannelRequestNhr(comm, param, topoInfo, subCommRanks_, channelDescs));
+    CHK_RET(RestoreChannelMap(channelDescs, rankIdToChannelDesc_));
 
-    auto kernelArg = std::make_shared<CcuKernelArgKfcAllGatherNHR1DMem2Mem>();
-    // 每 peer 只保留首条通道，保证 kernel 的 rank2ChannelIdx.size() == channels.size() 不变式。
-    std::vector<HcclChannelDesc> channelResort;
-    for (const auto& channel : channelDescs) {
-        const uint32_t remoteSubRank = RemoteRankIdToSubRank(channel.remoteRank);
-        if (kernelArg->rank2ChannelIdx.count(remoteSubRank) == 0U) {
-            kernelArg->rank2ChannelIdx[remoteSubRank] = static_cast<uint32_t>(channelResort.size());
-            channelResort.push_back(channel);
-        }
+    // 1. 从 channelDesc 探测 die 数（RS SoleNHR 2Die 先例）
+    uint32_t dieNum = 0;
+    uint32_t enableDieId = 0;
+    CHK_RET(GetDieInfoFromChannelDescs(comm, rankIdToChannelDesc_, myRank_, dieNum, enableDieId));
+    CHK_PRT_RET(
+        dieNum < DIE_NUM_1 || dieNum > DIE_NUM_2,
+        HCCL_ERROR("[CcuTempKfcAllGatherNHR1DMem2Mem::CalcRes] get channelDescs fail, dieNum[%u]", dieNum),
+        HCCL_E_INTERNAL);
+
+    // 双 die 时每个 die 一个 kernel 实例（KFC 下映射为双 mission，由 kfc server 模板继承调度）
+    uint32_t kernelNum = dieNum;
+    resourceRequest.ccuKernelNum.push_back(kernelNum);
+
+    // 2. 将 channelDescs 分到 die 组（每 step 的 from/to peer 各 die 选一条链路，
+    //    rank2ChannelIdx 保持 peer → 该 die 链路组内索引）
+    std::vector<std::vector<HcclChannelDesc>> channelsPerDie;
+    channelsPerDie.resize(dieNum);
+    std::map<u32, u32> rank2ChannelIdx;
+    std::vector<KfcNhrStepInfo> stepInfoVector;
+    CHK_RET(ProcessNHRStepInfo(comm, stepInfoVector, rank2ChannelIdx, dieNum, enableDieId, channelsPerDie));
+    if (dieNum > DIE_NUM_1) { // 跨框 die0 连 die1 场景端口序修正
+        CHK_RET(ReverseChannelPerDieIfNeed(comm, myRank_, channelsPerDie));
     }
 
-    kernelArg->rankSize = tempRankSize_;
-    kernelArg->rankId = mySubCommRank_;
-    kernelArg->opParam = param;
-    kernelArg->subCommRanks = subCommRanks_;
-    CHK_RET(CalcNhrInfo(kernelArg->stepInfoVector));
+    // 3. 双 die 按通道带宽比切分数据（AIV prepare 消费 dieSplitRatio 计算 die0/die1 尺寸）
+    double ratio = 1.0;
+    if (dieNum == DIE_NUM_2) {
+        uint32_t p0 = 0;
+        uint32_t p1 = 0;
+        CHK_RET(GetChannelBwCoeff(comm, myRank_, channelsPerDie[0][0], p0));
+        CHK_RET(GetChannelBwCoeff(comm, myRank_, channelsPerDie[1][0], p1));
+        if (p0 + p1 > 0) {
+            ratio = static_cast<double>(p0) / (p0 + p1);
+        }
+    }
+    resourceRequest.dieSplitRatio = ratio;
 
-    CcuKernelInfo kernelInfo{};
-    CHK_SAFETY_FUNC_RET(
-        strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllGatherNHR1DMem2Mem"));
-    kernelInfo.channels = channelResort;
-    kernelInfo.setKernelArg(kernelArg);
-    resourceRequest.ccuKernelInfos.push_back(kernelInfo);
+    // 4. 构造 kernelInfo：每个 die 一份（axisId 区分），channels 为该 die 的链路组
+    for (uint32_t kernelIdx = 0; kernelIdx < kernelNum; kernelIdx++) {
+        CcuKernelInfo kernelInfo{};
+        CHK_SAFETY_FUNC_RET(strcpy_s(
+            kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllGatherNHR1DMem2Mem"));
+        auto kernelArg = std::make_shared<CcuKernelArgKfcAllGatherNHR1DMem2Mem>();
+        kernelArg->rankSize = tempRankSize_;
+        kernelArg->rankId = mySubCommRank_;
+        kernelArg->axisId = kernelIdx;
+        kernelArg->axisSize = dieNum;
+        kernelArg->opParam = param;
+        kernelArg->subCommRanks = subCommRanks_;
+        kernelArg->stepInfoVector = stepInfoVector;
+        kernelArg->rank2ChannelIdx = rank2ChannelIdx;
+        kernelInfo.setKernelArg(kernelArg);
+        kernelInfo.channels = channelsPerDie[kernelIdx];
+        resourceRequest.ccuKernelInfos.push_back(kernelInfo);
+    }
+
+    HCCL_INFO(
+        "[CcuTempKfcAllGatherNHR1DMem2Mem::CalcRes] channelDescs.size()=%zu, dimsize=%u, dieNum=%u, "
+        "dieSplitRatio=%.3f, ccuKernelInfos(contributed)=%u",
+        channelDescs.size(), tempRankSize_, dieNum, ratio, kernelNum);
     return HCCL_SUCCESS;
 }
 
-HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::CalcNhrInfo(std::vector<KfcNhrStepInfo>& stepInfoVector) const
+// 按 step 序列逐个选 from/to 的 channel（单 die 用 enableDieId 的链路；双 die 加两个 die 的
+// 链路，供跨框 die0 连 die1 场景两条链路并存）——RS 2die ProcessNHRStepInfo 同构。
+HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::ProcessNHRStepInfo(
+    const HcclComm comm, std::vector<KfcNhrStepInfo>& stepInfoVector, std::map<u32, u32>& rank2ChannelIdx,
+    u32 enableDieNum, u32 enableDieId, std::vector<std::vector<HcclChannelDesc>>& channelsPerDie) const
 {
     u32 stepNum = 0;
     for (u32 ranks = tempRankSize_ - 1U; ranks != 0U; ranks >>= 1U) {
@@ -80,6 +129,23 @@ HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::CalcNhrInfo(std::vector<KfcNhrStepIn
         KfcNhrStepInfo stepInfo;
         CHK_RET(GetStepInfo(step, stepNum, stepInfo));
         stepInfoVector.push_back(stepInfo);
+        if (enableDieNum == DIE_NUM_1) {
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, stepInfo.fromRank, rankIdToChannelDesc_, enableDieId, rank2ChannelIdx,
+                channelsPerDie[0]));
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, stepInfo.toRank, rankIdToChannelDesc_, enableDieId, rank2ChannelIdx, channelsPerDie[0]));
+        } else if (enableDieNum == DIE_NUM_2) {
+            // 加入 fromRank/toRank 两个 die 的链路
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, stepInfo.fromRank, rankIdToChannelDesc_, 0, rank2ChannelIdx, channelsPerDie[0]));
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, stepInfo.fromRank, rankIdToChannelDesc_, 1, rank2ChannelIdx, channelsPerDie[1]));
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, stepInfo.toRank, rankIdToChannelDesc_, 0, rank2ChannelIdx, channelsPerDie[0]));
+            CHK_RET(SelectChannelToVec(
+                comm, myRank_, stepInfo.toRank, rankIdToChannelDesc_, 1, rank2ChannelIdx, channelsPerDie[1]));
+        }
     }
     return HCCL_SUCCESS;
 }
@@ -105,13 +171,6 @@ HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::GetStepInfo(u32 step, u32 stepNum, K
         rxSliceIdx = (rxSliceIdx + tempRankSize_ - deltaSlice) % tempRankSize_;
     }
     return HCCL_SUCCESS;
-}
-
-uint32_t CcuTempKfcAllGatherNHR1DMem2Mem::RemoteRankIdToSubRank(uint32_t remoteRankId) const
-{
-    const auto& ranks = subCommRanks_[0];
-    const auto it = std::find(ranks.begin(), ranks.end(), remoteRankId);
-    return it == ranks.end() ? 0U : static_cast<uint32_t>(std::distance(ranks.begin(), it));
 }
 
 HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::KernelRun(
