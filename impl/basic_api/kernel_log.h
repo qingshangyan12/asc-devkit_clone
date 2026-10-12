@@ -22,8 +22,9 @@
 
 #ifndef ASCENDC_MODULE_KERNEL_LOG_INTF_H
 #define ASCENDC_MODULE_KERNEL_LOG_INTF_H
-#if defined(__NPU_ARCH__) &&                                                                                  \
-    ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510)) && \
+#if defined(__NPU_ARCH__) &&                                                                                 \
+    ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
+     (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) &&                                                    \
     !(defined(ASCENDC_CPU_DEBUG) && (ASCENDC_CPU_DEBUG == 1))
 #include "impl/utils/debug/asc_aicore_printf_impl.h"
 #endif
@@ -73,7 +74,8 @@ namespace AscendC {
 
 #endif // !defined(__NPU_DEVICE__) && !defined(__ASCC_DEVICE__)
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2002 || __NPU_ARCH__ == 2201 || \
+                              (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202))
 #define ASCENDC_REPORT_OVERFLOW_MEM(cond) \
     do {                                  \
         if (!(cond)) {                    \
@@ -435,8 +437,8 @@ namespace AscendC {
 #ifdef ASCENDC_DEBUG
 #define KERNEL_LOG_INTERNAL(level, format, ...) format, ##__VA_ARGS__
 #define ASCENDC_DEBUG_ASSERT(...) ASCENDC_DEBUG_ASSERT_IMPL(__VA_ARGS__)
-#if defined(__NPU_ARCH__) && \
-    ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || \
+                              (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 #define ASCENDC_DEBUG_WARNING(...) ASCENDC_DEBUG_WARNING_IMPL(__VA_ARGS__)
 #else
 #define ASCENDC_DEBUG_WARNING(...)
