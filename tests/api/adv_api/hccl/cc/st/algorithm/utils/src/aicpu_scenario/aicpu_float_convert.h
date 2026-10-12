@@ -247,12 +247,12 @@ inline int64_t LoadIntElem(const u8* p, HcclDataType dt)
     switch (dt) {
         case HcclDataType::HCCL_DATA_TYPE_INT8: {
             s8 v = 0;
-            memcpy(&v, p, sizeof(v));
+            (void)memcpy(&v, p, sizeof(v));
             return v;
         }
         case HcclDataType::HCCL_DATA_TYPE_INT32: {
             s32 v = 0;
-            memcpy(&v, p, sizeof(v));
+            (void)memcpy(&v, p, sizeof(v));
             return v;
         }
         default:
@@ -271,7 +271,7 @@ inline void StoreIntElem(u8* p, HcclDataType dt, int64_t v)
                 v = 127;
             }
             const s8 out = static_cast<s8>(v);
-            memcpy(p, &out, sizeof(out));
+            (void)memcpy(p, &out, sizeof(out));
             return;
         }
         case HcclDataType::HCCL_DATA_TYPE_INT32: {
@@ -284,7 +284,7 @@ inline void StoreIntElem(u8* p, HcclDataType dt, int64_t v)
                 v = kInt32Max;
             }
             const s32 out = static_cast<s32>(v);
-            memcpy(p, &out, sizeof(out));
+            (void)memcpy(p, &out, sizeof(out));
             return;
         }
         default:

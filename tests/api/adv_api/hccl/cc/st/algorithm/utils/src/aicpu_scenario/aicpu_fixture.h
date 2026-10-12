@@ -54,8 +54,9 @@ class AicpuStFixture : public ::testing::Test {
 public:
     // 输入数据模式（检测力设计）：
     // - 每 256B 块的前 254 字节为数据字节（17 + rank*41 + offset，周期 256）：检测一切非 256 倍数位移；
-    // - 末 2 字节（inBlock 0xFE/0xFF）为块标签：位打包 (rank 低 4 位 | blockIdx 低 4 位) 与 blockIdx 高 8 位，
-    //   在 (rank < 16, blockIdx < 4096) 内双射——覆盖 1MB 分片，检测 256 对齐块置换（含 32KB chunk 乱序）；
+    // - 末 2 字节（inBlock 0xFE/0xFF）为块标签：0xFE 位打包（高 4 位 blockIdx 低 4 位 | 低 4 位 rank），
+    //   0xFF 为 blockIdx 位 4-11；在 (rank < 16, blockIdx < 4096) 内双射——覆盖 1MB 分片，
+    //   检测 256 对齐块置换（含 32KB chunk 乱序）；
     // - 残余盲区：>1MB 分片的 1MB 对齐置换（当前用例上限 1MB，为零盲区；需更大覆盖时增加标签位数）。
     // fill 与 golden 同源（共用本函数），比对自洽。
     // public：adapter 的 golden 构造器（非成员函数）需与 fixture 填充共用同一公式。
