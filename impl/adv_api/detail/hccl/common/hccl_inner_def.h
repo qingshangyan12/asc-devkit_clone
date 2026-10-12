@@ -75,7 +75,8 @@ struct CommonPrepareParamCcu {
     HcclReduceOp op;
     uint64_t strideCount;
     uint8_t repeat = 1U;
-    uint8_t reservedPartA[7];
+    uint8_t skipLocalRankCopy = 0U;
+    uint8_t reservedPartA[6];
     AlltoAllVParamExt paramExt;       // only used by AlltoAllV
     AlltoAllvWriteParamExt wParamExt; // only used by AlltoAllvWrite
     uint8_t reservedPartB[8];
@@ -207,6 +208,7 @@ struct CcuPrepareParam {
     uint8_t alltoallvCnt = 0;
     __gm__ CCUMsgExt* ccuMsgExt;
     uint64_t scratchAddr;
+    uint64_t dieSplitRatioPermille = 1000U; // 1000=不切分；(0,1000)=die0 千分比（KFC 经 OpResCtx 传入）
 };
 
 struct AlltoAllVParamCcu {

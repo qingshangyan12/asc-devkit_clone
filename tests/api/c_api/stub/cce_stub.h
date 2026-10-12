@@ -13,6 +13,28 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
+namespace float8_e6m2 {
+struct Fp8e6m2T {
+    uint8_t val;
+};
+} // namespace float8_e6m2
+using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
+using vector_fp8_e6m2_t = vector_f8e6m2;
+
+inline void vcvt(
+    vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+inline void vcvt(
+    vector_f8e5m2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+inline void vcvt_bf162e6m2(
+    vector_f8e6m2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2)
+{}
+inline void vcvt_bf162e8m0(
+    vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+
 struct hifloat4x2_t {
     uint8_t val = 0;
 };
@@ -161,9 +183,6 @@ inline void mad_mx(
     __cb__ fp8_e5m2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
     bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
-
-// The compiler supports this overload, but it is missing from the CPU debug stub header.
-int64_t ld_dev(__gm__ int64_t* src, int16_t offset);
 
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
@@ -1525,10 +1544,5 @@ inline int32_t g_coreType = 1;
 #else
 inline int32_t g_coreType = 2;
 #endif
-
-typedef std::integral_constant<Pos, Pos::LOWEST> Lowest_Type;
-typedef std::integral_constant<Pos, Pos::HIGHEST> Highest_Type;
-constexpr Lowest_Type POS_LOWEST = Lowest_Type();
-constexpr Highest_Type POS_HIGHEST = Highest_Type();
 
 #endif

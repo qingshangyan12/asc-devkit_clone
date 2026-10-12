@@ -85,3 +85,10 @@ inline half __half2half_rz(const half x)
         dst[idx] = __half2half_rz(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2, -0.5, 0.5, 2, nan
+result: -2, 0, 0, 2, nan
+```

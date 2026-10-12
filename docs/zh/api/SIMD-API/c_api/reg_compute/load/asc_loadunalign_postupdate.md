@@ -53,7 +53,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。当dtype为`int4b_t`时，`dst`的实际类型为`vector_int4x2_t`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。当`dtype`为`int4b_t`时，`dst`的实际类型为`vector_int4x2_t`。
 
 #### 函数原型典型示例
 
@@ -77,7 +77,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_<dtype>& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。当dtype为`int4b_t`时，`dst`的实际类型为`vector_int4x2_t`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`。当`dtype`为`int4b_t`时，`dst`的实际类型为`vector_int4x2_t`。
 
 #### 函数原型典型示例
 
@@ -138,6 +138,7 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
 - 每次循环迭代中，必须先调用`asc_update_addr_reg`生成该次迭代的起始偏移，再调用[asc_loadunalign_pre](asc_loadunalign_pre.md)初始化`src0`。该初始化调用与紧随其后的首次搬入必须使用相同的`src1`和`offset`。
 - 同一循环迭代内，后续搬入继续使用上一次本接口调用按`inc`更新后的`offset`时，可复用同步更新后的`src0`。如果`src1`或`offset`被另行修改，必须根据修改后的实际读取地址重新初始化`src0`。
 - 当dtype为`int64_t`时，由于地址寄存器更新接口不支持b64模式，需要使用[asc_update_addr_reg_b32](../reg_addr_reg/asc_update_addr_reg.md)生成地址寄存器。一个b64元素占用两个b32寻址单元，因此传入`asc_update_addr_reg_b32`的各维偏移量以及本接口的`inc`都必须设置为期望的b64元素偏移量的2倍。
+
     ```c
     vector_int64_t src_reg;
     vector_bool mask_b32 = asc_create_mask_b32(PAT_ALL);
@@ -154,13 +155,12 @@ __simd_callee__ inline void asc_loadunalign_postupdate(vector_int8_t& dst,
     }
     ```
 
-
 ## 调用示例
 
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

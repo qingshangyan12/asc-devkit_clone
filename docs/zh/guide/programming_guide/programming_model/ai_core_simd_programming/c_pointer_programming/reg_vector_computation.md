@@ -481,6 +481,7 @@ asc_storeunalign_post(dst_addr, store_ureg, 0);
 ```
 
 #### PostUpdate模式
+
 PostUpdate表示搬运接口在完成本次访问后自动更新UB地址指针。在搬运接口会以*_postupdate结尾表示。例如：使用对齐搬运的[`asc_loadalign_postupdate`](../../../../../api/SIMD-API/c_api/reg_compute/load/asc_loadalign_postupdate.md)。当i = 0时：搬入数据地址src_addr，同时在搬运后硬件更新src_addr = src_addr + offset；当i = 1时：搬入数据地址为更新后的src_addr,同时在搬运后硬件再次更新src_addr = src_addr + stride；以此类推。
 
 ```cpp
@@ -522,7 +523,7 @@ Reg矢量计算接口直接操作矢量数据寄存器或掩码寄存器，通�
 vector_float src0_reg;
 vector_float src1_reg;
 vector_float dst_reg;
-vector_bool mask = asc_create_mask_b32(MASK_PATTERN_ALL);
+vector_bool mask = asc_create_mask_b32(PAT_ALL);
 
 // 矢量加法
 asc_add(dst_reg, src0_reg, src1_reg, mask);
@@ -543,10 +544,10 @@ asc_div(dst_reg, src0_reg, src1_reg, mask);
 float scalar_value = 2.0f;
 
 // 矢量加标量
-asc_adds(dst_reg, src_reg, scalar_value, mask);
+asc_add_scalar(dst_reg, src0_reg, scalar_value, mask);
 
 // 矢量乘标量
-asc_muls(dst_reg, src_reg, scalar_value, mask);
+asc_mul_scalar(dst_reg, src0_reg, scalar_value, mask);
 ```
 
 #### 掩码寄存器计算

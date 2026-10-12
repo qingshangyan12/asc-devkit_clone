@@ -104,6 +104,9 @@ def check_is_regbase_v2():
     from .platform.platform_info import BS9SX2A
     from .platform.platform_info import MC61AM21A
     from .platform.platform_info import ASCEND_950
+    from .platform.platform_info import ASCEND_960DT
+    from .platform.platform_info import ASCEND_960PR
+    from .platform.platform_info import ASCEND_5162
     from .platform.platform_info import KIRIN_X90
     from .platform.platform_info import KIRIN_9030
     from .platform.platform_info import KIRIN_DEV_0000
@@ -119,12 +122,15 @@ def check_is_regbase_v2():
         MC61AM21A,
         AS31XM1,
         ASCEND_950,
+        ASCEND_960DT,
+        ASCEND_960PR,
         KIRIN_X90,
         KIRIN_9030,
         KIRIN_DEV_0000,
         KIRIN_DEV_0001,
         KIRIN_DEV_0002,
         KIRIN_DEV_0003,
+        ASCEND_5162,
     ]:
         return True
     return False
@@ -179,9 +185,12 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
     from .platform.platform_info import ASCEND_610
     from .platform.platform_info import ASCEND_310P
     from .platform.platform_info import ASCEND_610LITE
+    from .platform.platform_info import ASCEND_5162
     from .platform.platform_info import BS9SX2A
     from .platform.platform_info import MC61AM21A
     from .platform.platform_info import ASCEND_950
+    from .platform.platform_info import ASCEND_960DT
+    from .platform.platform_info import ASCEND_960PR
     from .platform.platform_info import COMPILER_ARCH
     from .buildcfg.buildcfg_mapping import tbe_debug_level, op_debug_config
     from .buildcfg.buildcfg_mapping import enable_cce_licm_safe_hoist
@@ -225,7 +234,11 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
             "-o",
             dst_file,
         ]
-        if is_c220 or is_enable_vector_core or get_soc_spec("SHORT_SOC_VERSION") == ASCEND_950:
+        if (
+            is_c220
+            or is_enable_vector_core
+            or get_soc_spec("SHORT_SOC_VERSION") in (ASCEND_950, ASCEND_960DT, ASCEND_960PR)
+        ):
             aicore_type = get_soc_spec("AICORE_TYPE")
             from asc_op_compile_base.common.buildcfg.buildcfg_mapping import enforce_mix_mode
 
@@ -253,6 +266,9 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
             cmd += ["-mllvm", "-cce-aicore-weight-for-reg-operand-remat=higher"]
     elif get_soc_spec("SHORT_SOC_VERSION") == ASCEND_910:
         cmd += ["-mllvm", "-cce-aicore-function-stack-size=16000"]
+        cmd = _set_cce_overflow(cmd)
+    elif get_soc_spec("SHORT_SOC_VERSION") == ASCEND_5162:
+        cmd += ["-mllvm", "-cce-aicore-function-stack-size=4000"]
         cmd = _set_cce_overflow(cmd)
     elif get_soc_spec("SOC_VERSION") in [HI3796CV300ES, HI3796CV300CS, SD3403]:
         cmd += ["-mllvm", "-cce-aicore-sk-transform"]
@@ -289,10 +305,11 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
         if cce_runtime.CceFlag.BatchBindOnly is True:
             cmd += ["-mllvm", "-cce-aicore-sk-transform"]
             cce_runtime.CceFlag.BatchBindOnly = False
-    if get_soc_spec("SHORT_SOC_VERSION") != ASCEND_610LITE and get_soc_spec("SHORT_SOC_VERSION") != BS9SX2A:
-        if get_soc_spec("SHORT_SOC_VERSION") != MC61AM21A and get_soc_spec("SHORT_SOC_VERSION") != ASCEND_950:
+    short_soc_version = get_soc_spec("SHORT_SOC_VERSION")
+    if short_soc_version != ASCEND_610LITE and short_soc_version != BS9SX2A:
+        if short_soc_version != MC61AM21A and short_soc_version not in (ASCEND_950, ASCEND_960DT, ASCEND_960PR):
             cmd += ["--cce-auto-sync=off"]
-    if get_soc_spec("SHORT_SOC_VERSION") == ASCEND_950:
+    if short_soc_version in (ASCEND_950, ASCEND_960DT, ASCEND_960PR):
         cmd += ["--cce-long-scbz=true"]
         cmd += ["--cce-simd-vf-fusion=false"]
     if current_build_config().get(enable_cce_licm_safe_hoist):

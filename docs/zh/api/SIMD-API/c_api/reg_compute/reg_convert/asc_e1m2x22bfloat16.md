@@ -24,7 +24,6 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 
-
 ## 功能说明
 
 根据`mask`将`src`中参与计算的`fp4x2_e1m2_t`类型元素转换为`bfloat16_t`类型，结果写入`dst`。由于源操作数与目的操作数的类型位宽比为1:4，`src`中的元素按索引分为四组，参数`src_quarter_pos`从`src`中离散选取每隔4个元素的索引位置读取数据，具体为索引0、4、8、…，索引1、5、9、…，索引2、6、10、…或索引3、7、11、…。
@@ -36,18 +35,45 @@
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_e1m2x22bfloat16(vector_bfloat16_t& dst,
-                                     vector_fp4x2_e1m2_t src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
+                                                vector_fp4x2_e1m2_t src,
+                                                vector_bool mask,
+                                                std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_bfloat16_t asc_e1m2x22bfloat16(vector_fp4x2_e1m2_t src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
+                                                             vector_bool mask,
+                                                             std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
 ```
 
 **占位符说明如下：**
-- `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+
+`<quarter_pos>`支持`asc_position_quarter_mode`枚举类的四个取值：
+
+```c
+enum class asc_position_quarter_mode {
+    DISPERSE_FIRST_QUARTER = 0,
+    DISPERSE_SECOND_QUARTER,
+    DISPERSE_THIRD_QUARTER,
+    DISPERSE_FOURTH_QUARTER
+};
+```
+
+### 函数原型典型示例
+
+```c
+// 通过引用参数输出结果
+__simd_callee__ inline void asc_e1m2x22bfloat16(vector_bfloat16_t& dst,
+                                                vector_fp4x2_e1m2_t src,
+                                                vector_bool mask,
+                                                std::integral_constant<asc_position_quarter_mode,
+                                                                       asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline vector_bfloat16_t asc_e1m2x22bfloat16(vector_fp4x2_e1m2_t src,
+                                                             vector_bool mask,
+                                                             std::integral_constant<asc_position_quarter_mode,
+                                                                                    asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
+```
 
 ## 参数说明
 
@@ -58,7 +84,7 @@ __simd_callee__ inline vector_bfloat16_t asc_e1m2x22bfloat16(vector_fp4x2_e1m2_t
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| src_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择源操作数的读取位置。 |
+| src_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择源操作数的读取位置。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
@@ -78,7 +104,7 @@ __simd_callee__ inline vector_bfloat16_t asc_e1m2x22bfloat16(vector_fp4x2_e1m2_t
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

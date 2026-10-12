@@ -99,3 +99,10 @@ half2 __habsx2(const half2 x)
         asc_vf_call<simt_habsx2>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)dst, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1, 0), (1, -1), (inf, -inf), (nan, 0.5)
+result: (1, 0), (1, 1), (inf, inf), (nan, 0.5)
+```

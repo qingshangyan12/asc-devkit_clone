@@ -319,6 +319,7 @@
             -   [基于全局掩码复用的计算性能优化](operator_practice/simd_operator_optimization/vector_compute/mask_reuse_optimization.md)
 
         -   [矩阵计算](operator_practice/simd_operator_optimization/matrix_compute/matrix_compute.md)
+            -   [使用hifloat8_t实现Matmul性能优化](operator_practice/simd_operator_optimization/matrix_compute/hifloat8_matmul_optimization.md)
             -   [通过BT Buffer实现高效的bias计算](operator_practice/simd_operator_optimization/matrix_compute/bt_buffer_bias_compute.md)
             -   [通过FP Buffer存放量化参数实现高效随路量化](operator_practice/simd_operator_optimization/matrix_compute/fp_buffer_quantization.md)
             -   [通过L0C Buffer数据暂存实现高效的矩阵乘结果累加](operator_practice/simd_operator_optimization/matrix_compute/l0c_buffer_matmul_accumulate.md)
@@ -338,6 +339,7 @@
             -   [合理配置线程数避免寄存器溢出](operator_practice/simt_operator_optimization/execution_config/thread_count_register_overflow.md)
         -   [控制流](operator_practice/simt_operator_optimization/control_flow/avoid_warp_branch.md)
             -   [同一Warp内避免分支跳转](operator_practice/simt_operator_optimization/control_flow/avoid_warp_branch.md)
+            -   [分支处理](operator_practice/simt_operator_optimization/control_flow/branch_handing.md)
         -   [指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
             -   [原子操作指令优化](operator_practice/simt_operator_optimization/instruction_optimization/atomic_instruction_optimization.md)
             -   [原地加法指令优化](operator_practice/simt_operator_optimization/instruction_optimization/inplace_add_instruction_optimization.md)

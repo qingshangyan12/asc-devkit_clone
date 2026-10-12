@@ -42,13 +42,13 @@
 下图展示了随路量化、随路ReLU、随路格式转换、随路通道拆分以及随路通道合并的有效组合、中间数据类型和数据路径。下图中的F32-\>F16与F32-\>BF16为非量化模式，仅为Cast，其余为随路scalar/tensor量化模式。
 
 <!-- npu="A3,910b" id11 -->
-**图1** L0C2GM流程图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>  
+**图1** L0C2GM流程图（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig542810249417"></a>
 
 ![](../../../../figures/L0C2GM_Function_Combination.png)
 <!-- end id11 -->
 
 <!-- npu="950" id13 -->
-**图 2** L0C2GM流程图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig542810249613"></a>  
+**图 2** L0C2GM流程图（[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）<a id="zh-cn_topic_0000002542828493_fig542810249613"></a>
 
 ![](../../../../figures/L0C2GM_Function_Combination_950.png)
 <!-- end id13 -->
@@ -176,6 +176,7 @@
 | unitFlag | 输入 | unitFlag是一种Mmad指令和Fixpipe指令细粒度的并行，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出，该功能不适用于在L0C Buffer累加的场景。取值说明如下：<br>&nbsp;&nbsp;&bull; 0（2'b00）：不开启unitFlag；<br>&nbsp;&nbsp;&bull; 2（2'b10）：开启unitFlag，硬件执行完指令之后，不会设置寄存器；<br>&nbsp;&nbsp;&bull; 3（2'b11）：开启unitFlag，硬件执行完指令之后，会将unitFlag关闭。 |
 | isChannelSplit | 输入 | 是否开启通道拆分的功能。默认为false，不开启该功能。仅在src和dst都为float时才能开启通道拆分，且不能同时开启ChannelSplit和NZ2ND功能。 |
 
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id2 -->
 ## 数据类型<a id="zh-cn_topic_0000002542828493_section4219135304818"></a>
 
 **源矩阵与目的矩阵支持的数据类型组合**
@@ -296,6 +297,7 @@
     对于整数类型只有饱和模式。
     L0C Buffer到GM搬运接口的边界值汇总请见[矩阵计算搬出相关接口边界值汇总](../../../../appendix/matrix_compute_move_out_interface_boundary_value_summary.md)。
 <!-- end id29 -->
+<!-- @ref: asc-devkit/res/docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM_res.md#id3 -->
 
 ## 调用示例<a id="zh-cn_topic_0000002542828493_section088124295117"></a>
 
@@ -307,7 +309,7 @@ Fixpipe完整样例请参考[fixpipe\_l0c2gm样例](../../../../../../../example
     ```cpp
         AscendC::GlobalTensor<outputType> cGM;
         cGM.SetGlobalBuffer((__gm__ outputType *)c);
-    
+
     #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
         AscendC::FixpipeParamsV220 fixpipeParams;
         fixpipeParams.ndNum = 1;

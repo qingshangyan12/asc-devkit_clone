@@ -28,13 +28,14 @@
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
-**`asc_copy_l12ub_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_copy_l12ub.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**
+**`asc_copy_l12ub_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/cube_compute_store/asc_copy_l12ub.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**
 
 将数据从L1 Buffer搬运到Unified Buffer（UB）中。
 
 ## 函数原型
 
 - 同步搬运
+
     ```cpp
     __aicore__ inline void asc_copy_l12ub_sync(__ubuf__ void* dst_addr, __cbuf__ void* src_addr, int8_t sub_blockid, uint16_t burst_count, uint16_t burst_len, uint16_t src_gap, uint16_t dst_gap)
     ```

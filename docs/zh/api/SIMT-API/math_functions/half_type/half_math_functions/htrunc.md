@@ -83,3 +83,10 @@ inline half htrunc(half x)
         dst[idx] = htrunc(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: -1, 0, 2, -3
+```

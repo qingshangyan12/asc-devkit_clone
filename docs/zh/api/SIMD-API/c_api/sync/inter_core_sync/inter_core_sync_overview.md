@@ -14,7 +14,7 @@ AIC/AIV多核结构如下图2所示，AIC/AIV按group划分。一个group内包�
 **图2**  block和subblock之间关系（灰色部分表示一个group，即1个block和N个subblock）<a id="fig_block_subblock_relationship"></a>    
 ![](../../../../figures/block_subblock_relationship_3510.png)
 
-**表1**  group配置
+**表1** group配置
 
 | 算子类型 | 函数执行空间限定符 | 核函数（Kernel）类型 | block/subblock | 1：N |
 | --- | --- | --- | --- | --- |
@@ -25,7 +25,7 @@ AIC/AIV多核结构如下图2所示，AIC/AIV按group划分。一个group内包�
 | Mix算子 | `__mix__(1, 1)` | `KERNEL_TYPE_MIX_AIC_1_1` | AIC为block，AIV为subblock | 1：1 |
 | Mix算子 | `__mix__(1, 2)` | `KERNEL_TYPE_MIX_AIC_1_2` | AIC为block，AIV为subblock | 1：2 |
 
-**表2**  支持的核间同步场景
+**表2** 支持的核间同步场景
 
 | 接口名称 | 同步范围 | 对应模式 | 功能简述 |
 | --- | --- | --- | --- |
