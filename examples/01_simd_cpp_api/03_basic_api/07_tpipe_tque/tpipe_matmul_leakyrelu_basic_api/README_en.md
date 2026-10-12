@@ -477,57 +477,50 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
 
   `CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG+slot)` publishes readiness after FIX completes. `CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG+slot)` acknowledges a completed AIV read. `slot=mIndex%2`; READY uses 8/9 and FREE uses 10/11. The AIC waits for both AIV acknowledgements. The default waiting-pipeline semantics differ between 2201 and 3510; this code retains `CrossCoreWaitFlag<0x2>` without an explicit pipeline argument.
 
-## Build and Run
+## Compilation and Execution
 
-Build and run the example from its root directory as follows.
+Execute the following steps in the root directory of this example to compile and run the example.
 
-- Configure environment variables
+- Configure Environment Variables
 
-  Configure the environment according to your CANN installation's [installation method](../../../../../docs/zh/quick_start.md#prepare&install).
-
+  Configure the environment variables according to the [installation method](../../../../../docs/en/quick_start.md#prepare&install) of the CANN development kit package in the current environment.
   ```bash
   source ${install_path}/cann/set_env.sh
   ```
 
-  > **Note:** `${install_path}` is the CANN installation directory. If no directory was specified during installation, the default is `/usr/local/Ascend`.
+  > **Note:** `${install_path}` is the CANN package installation directory. When no installation directory is specified, it defaults to `/usr/local/Ascend`.
 
-- Run the example
+- Example Execution
 
-  Execute the following commands from the example directory:
-
+  Execute the following commands in this example directory.
   ```bash
-  mkdir -p build && cd build                                               # Create and enter the build directory
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
-  cmake --build . -j                                                       # Build (npu mode by default)
-  python3 ../scripts/gen_data.py                                           # Generate test inputs
-  ./demo                                                                  # Run the example
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # Verify the result
+  mkdir -p build && cd build;                                               # Create and enter build directory
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j;                      # Compile project (default npu mode)
+  python3 ../scripts/gen_data.py                                            # Generate test input data
+  ./demo                                                                    # Execute the compiled executable program to run the example
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # Verify output results for correctness, confirm algorithm logic is correct
   ```
 
-  Examples for CPU debugging and NPU simulation:
+  When using CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
 
+  Examples:
   ```bash
-  # Create separate build directories from the example root.
-  cmake -S . -B build_cpu -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201
-  cmake --build build_cpu -j
-  cmake -S . -B build_sim -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201
-  cmake --build build_sim -j
+  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # CPU debugging mode
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201 ..;make -j; # NPU simulation mode
   ```
 
-  > **Note:** Use a new build directory when changing the architecture or run mode to avoid mixing cached settings. `ASC_DEVKIT_ROOT` specifies the repository headers. CMake uses `-iquote` to prefer these interfaces, but this cannot add support for new attributes to an older compiler.
+  > **Note:** Before switching compilation modes, you need to clean the cmake cache. You can execute `rm CMakeCache.txt` in the build directory and then run cmake again.
 
-- Build options
+- Compilation Option Description
 
-  | Option | Values | Description |
-  |--------|--------|-------------|
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | NPU execution, CPU debugging or NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | dav-2201: Atlas A2/A3 Training and Inference Series; dav-3510: Ascend 950PR/Ascend 950DT |
-  | `ASC_DEVKIT_ROOT` | Absolute asc-devkit path | Header source; defaults to the current repository root derived from the example location |
+  | Option | Possible Values | Description |
+  | -------| ----------------| --------------------------------------------------------------------------------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
 
-- Expected result
+- Execution Result
 
-  Successful accuracy verification prints:
-
+  The execution result is as follows, indicating precision comparison passed.
   ```bash
   test pass!
   ```

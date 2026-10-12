@@ -34,8 +34,7 @@ def verify_result(output, golden):
         raise ValueError("Output and golden data must contain only finite values")
     output_float = output.astype(np.float32)
     golden_float = golden.astype(np.float32)
-    different_element_results = np.isclose(
-        output_float, golden_float, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
+    different_element_results = np.isclose(output_float, golden_float, rtol=RELATIVE_TOL, atol=ABSOLUTE_TOL)
     different_element_indexes = np.where(different_element_results == False)[0]
     for index in range(len(different_element_indexes)):
         real_index = different_element_indexes[index]
@@ -43,7 +42,12 @@ def verify_result(output, golden):
         output_data = output[real_index]
         print(
             "data index: %06d, expected: %-.9f, actual: %-.9f, rdiff: %-.6f"
-            % (real_index, golden_data, output_data, abs(float(output_data) - float(golden_data)) / max(abs(float(golden_data)), ABSOLUTE_TOL))
+            % (
+                real_index,
+                golden_data,
+                output_data,
+                abs(float(output_data) - float(golden_data)) / max(abs(float(golden_data)), ABSOLUTE_TOL),
+            )
         )
         if index == 100:
             break
