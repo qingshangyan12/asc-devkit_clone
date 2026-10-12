@@ -56,7 +56,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 ### 1.2 它靠什么工作
 
-靠文档里预先写好的三类"头"（由建设侧 skill `asc-knowledge-build` 生产）：
+靠文档里预先写好的三类"头"（由建设侧 skill `asc-knowledge-create` 生产）：
 
 | 头 | 在哪 | 给检索提供什么 |
 | --- | --- | --- |
@@ -78,7 +78,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 - 只帮找文档，不生成算子代码、不替你写 kernel。
 - 当前只覆盖 C API（`docs/zh/api/SIMD-API/c_api/`）；其他层级会如实标注"范围外"。
-- 不改文档、不改索引构建产物；写头、改词表是 `asc-knowledge-build` 的事，两个 skill 互不引用对方文件。
+- 不改文档、不改索引构建产物；写头、改词表是 `asc-knowledge-create` 的事，两个 skill 互不引用对方文件。
 
 ## 2. 怎么用（skill 使用方法）
 
