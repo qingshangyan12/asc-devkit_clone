@@ -63,4 +63,4 @@ CANN Runtime内置默认计算流，所有未显式指定计算流的运算操�
 |`aclrtSynchronizeStream()` |阻塞Host侧当前线程直到指定Stream中的所有操作都已完成。 |
 
 ## 更多的Runtime高级特性
-更多的Runtime编程方式及接口，可以参考[《应用开发（C&C++）》](https://hiascend.com/document/redirect/CannCommunityadev)。
+更多的Runtime编程方式及接口，可以参考《[应用开发](https://gitcode.com/cann/docs/blob/9.2.0/docs/zh/app-dev/README.md)》。
