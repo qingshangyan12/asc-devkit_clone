@@ -24,7 +24,7 @@
 #include "impl/utils/debug/npu_arch_2201/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 3002
 #include "impl/utils/debug/npu_arch_3002/asc_aicore_printf_utils.h"
-#elif __NPU_ARCH__ == 3510
+#elif __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
 #include "impl/utils/debug/npu_arch_3510/asc_aicore_printf_utils.h"
 #elif __NPU_ARCH__ == 5102
 #include "impl/utils/debug/npu_arch_5102/asc_aicore_printf_utils.h"
@@ -34,7 +34,7 @@
 
 namespace __asc_aicore {
 #if (__NPU_ARCH__ == 2002) || (__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3510) || \
-    (__NPU_ARCH__ == 5102)
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
 template <typename T>
 __aicore__ inline void set_scalar_param(__gm__ uint8_t* paramAddr, uint32_t paramIdx, T scalar)
 {
