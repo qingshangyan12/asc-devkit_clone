@@ -86,6 +86,6 @@ inline float nanf(const char* tagp)
 输入输出示例如下：
 
 ```text
-tagp："0x1A", "123", "abc", "0"
-result: nan(0x7fc0001a) nan(0x7fc0007b) nan(0x7fc00000) nan(0x7fc00000)
+tagp: "0x1A", "123", "abc", "0"
+result: nan(0x7fc0001a), nan(0x7fc0007b), nan(0x7fc00000), nan(0x7fc00000)
 ```
