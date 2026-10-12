@@ -686,6 +686,45 @@ static void test_host_c_api_reg_compute_19()
 
 static void test_host_c_api_reg_compute_20()
 {
+    using ::asc_bfloat162e4m3_rn;
+    using ::asc_bfloat162e4m3_rn_merge;
+    using ::asc_bfloat162e4m3_rn_sat;
+    using ::asc_bfloat162e4m3_rn_sat_merge;
+    using ::asc_bfloat162e5m2_rn;
+    using ::asc_bfloat162e5m2_rn_merge;
+    using ::asc_bfloat162e5m2_rn_sat;
+    using ::asc_bfloat162e5m2_rn_sat_merge;
+    using ::asc_bfloat162e6m2_rn;
+    using ::asc_bfloat162e8m0_ru;
+    using ::asc_bfloat162e8m0_ru_sat;
+    using ::asc_bfloat162e8m0_rz;
+    using ::asc_bfloat162e8m0_rz_sat;
+    using ::asc_cast;
+    using ::asc_cast_merge;
+    using ::asc_half2int4x2_rd_merge;
+    using ::asc_half2int4x2_rd_sat_merge;
+    using ::asc_half2int4x2_rn_merge;
+    using ::asc_half2int4x2_rn_sat_merge;
+    using ::asc_half2int4x2_rna_merge;
+    using ::asc_half2int4x2_rna_sat_merge;
+    using ::asc_half2int4x2_ru_merge;
+    using ::asc_half2int4x2_ru_sat_merge;
+    using ::asc_half2int4x2_rz_merge;
+    using ::asc_half2int4x2_rz_sat_merge;
+    using ::asc_half2int8_rd_merge;
+    using ::asc_half2int8_rd_sat_merge;
+    using ::asc_half2int8_rn_merge;
+    using ::asc_half2int8_rn_sat_merge;
+    using ::asc_half2int8_rna_merge;
+    using ::asc_half2int8_rna_sat_merge;
+    using ::asc_half2int8_ru_merge;
+    using ::asc_half2int8_ru_sat_merge;
+    using ::asc_half2int8_rz_merge;
+    using ::asc_half2int8_rz_sat_merge;
+}
+
+static void test_host_c_api_reg_compute_21()
+{
     using ::asc_bfloat162e1m2x2_rd_merge;
     using ::asc_bfloat162e1m2x2_rn_merge;
     using ::asc_bfloat162e1m2x2_rna_merge;
@@ -700,11 +739,6 @@ static void test_host_c_api_reg_compute_20()
     using ::asc_float2bfloat16_rd_sat_merge;
     using ::asc_float2bfloat16_rn_merge;
     using ::asc_float2bfloat16_rn_sat_merge;
-}
-
-static void test_host_c_api_reg_compute_21()
-{
-    using ::asc_cast_merge;
     using ::asc_float2bfloat16_rna_merge;
     using ::asc_float2bfloat16_rna_sat_merge;
     using ::asc_float2bfloat16_ru_merge;
@@ -720,3 +754,4 @@ static void test_host_c_api_reg_compute_21()
     using ::asc_float2hif8_rna_merge;
     using ::asc_float2hif8_rna_sat_merge;
 }
+

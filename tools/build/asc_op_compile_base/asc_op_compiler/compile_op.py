@@ -108,7 +108,7 @@ from .ascendc_compile_base import (
     link_sk_norm_combine,
 )
 from .super_kernel_sub_op_compile import split_sub_kernel_objs, gen_sub_super_kernel_compile_options
-from .static_compile_resource_generator import KernelSpecCompilation
+from .static_compile_resource_generator import KernelSpecCompilation, gen_sk_bind_source
 from .super_kernel_option_parse import parse_super_kernel_options
 from .kernel_info_infer import KernelInfoInfer
 from .ascendc_compile_utils import check_custom_dcci_end_false, check_if_gen_placehoder
@@ -467,37 +467,32 @@ def gen_kernel_fun(
             source += "do {\n"
 
     need_ffts = is_mix or is_single_and_using_hard_sync
-    context = get_context()
-    enable_inner_core_sync_check = (
-        global_var_storage.get_variable("ascendc_enable_super_kernel") is True
-        and context is not None
-        and context.get_addition("super_kernel_sub_combine") is True
-        and compile_info.super_kernel_info["sp_options"].get("debug-per-op-max-core-num", "0") == "1"
-    )
 
     # call usr kernel function call
-    if enable_inner_core_sync_check:
-        source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+    source += "#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__\n"
+    source += "    AscendC::g_superKernelSetWaitFlagCountDifference = "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE;\n"
+    source += "#endif\n"
     source += "#if defined(TEMPLATE_PARAMS_LEN) && TEMPLATE_PARAMS_LEN != 0\n"
     source += gen_usr_origin_kernel_function_call(func_name, opinfo, tiling_info, has_template=True)
     source += "#else\n"
     source += gen_usr_origin_kernel_function_call(func_name, opinfo, tiling_info, has_template=False)
     source += "#endif\n"
-    if enable_inner_core_sync_check:
-        source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
-        source += '        assert(false, "SuperKernel: current operator has %d more '
-        source += 'SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
-        source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
-        source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
-        source += '        assert(false, "SuperKernel: current operator has %d more '
-        source += 'WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
-        source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
-        source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
-        source += "    }\n"
+    source += "#ifdef __ASCENDC_SUPER_KERNEL_DEBUG__\n"
+    source += "    if (AscendC::g_superKernelSetWaitFlagCountDifference > "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+    source += '        assert(false, "SuperKernel: current operator has %d more '
+    source += 'SetFlag calls than WaitFlag calls; Please check synchronization within the current operator.\\n", '
+    source += "AscendC::g_superKernelSetWaitFlagCountDifference - "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE);\n"
+    source += "    } else if (AscendC::g_superKernelSetWaitFlagCountDifference < "
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE) {\n"
+    source += '        assert(false, "SuperKernel: current operator has %d more '
+    source += 'WaitFlag calls than SetFlag calls; Please check synchronization within the current operator.\\n", '
+    source += "AscendC::SUPER_KERNEL_SET_WAIT_FLAG_COUNT_INITIAL_VALUE - "
+    source += "AscendC::g_superKernelSetWaitFlagCountDifference);\n"
+    source += "    }\n"
+    source += "#endif\n"
 
     if len(compile_info.tiling_key_struct_map) > 0:
         source += _gen_tpl_tiling_struct_section(compile_info, tiling_info)
@@ -896,6 +891,10 @@ def compile_kernel_and_meta(compile_info: CompileInfo, op_info: OpInfo, compile_
         compile_info.code_channel = CORE_TYPE_CUBE
         compile_info.hard_sync = False
         _compile_ascendc_cce_m510(compile_info, compile_option_tuple, tiling_info)
+    elif CommonUtility.is_516r2():
+        compile_info.code_channel = CORE_TYPE_CUBE
+        compile_info.hard_sync = False
+        _compile_ascendc_cce_516r2(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_regbase():
         _compile_ascendc_cce_regbase(compile_info, compile_option_tuple, tiling_info)
     elif CommonUtility.is_v200() and compile_info.no_set_kernel_type is False:
@@ -983,52 +982,17 @@ def _match_regex(pattern: str, op_name: str) -> bool:
     return dp[m][n]
 
 
-def _get_dcci_disable_cap_bitmap(compile_info: CompileInfo, kernel_symbols: list) -> int:
-    """
-    Check if DCCI should be disabled for any kernel in kernel_symbols.
-    Returns 4 if matched, 0 otherwise.
-    """
-    sp_options = compile_info.super_kernel_info.get("sp_options", {})
-    patterns = sp_options.get("dcci-disable-on-kernel", [])
-    if isinstance(patterns, list) and patterns:
-        for kernel_name in kernel_symbols:
-            if any(_match_regex(p, kernel_name) for p in patterns):
-                return 4
-    return 0
-
-
-def _get_sk_cap_bitmap(compile_info: CompileInfo, basic_kernel_symbols: list) -> int:
-    """Encode early-start and DCCI capabilities for SK_BIND generation."""
-
-    cap_bitmap = 0
-    if global_var_storage.get_variable("ascendc_sub_super_kernel_early_start_wait_flag") is True:
-        cap_bitmap |= 1
-    if global_var_storage.get_variable("ascendc_sub_super_kernel_early_start_set_flag") is True:
-        cap_bitmap |= 2
-    return cap_bitmap | _get_dcci_disable_cap_bitmap(compile_info, basic_kernel_symbols)
-
-
-def _gen_sk_bind_source(source, compile_info, compile_info_origin, cap_bitmap):
-    for idx, global_syb in enumerate(compile_info_origin.global_kernel_symbols):
-        sk_syb = compile_info.global_kernel_symbols[idx]
-        source += f'extern "C" {compile_info_origin.global_kernel_attribute} void {global_syb}();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split1();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split2();\n'
-        source += f'extern "C" {compile_info.global_kernel_attribute} void {sk_syb}_split3();\n'
-        source += f"SK_BIND({global_syb}, {cap_bitmap}, {sk_syb}, {sk_syb}_split1, {sk_syb}_split2, {sk_syb}_split3);\n"
-    return source
-
-
 def compile_sk_bind(compile_info: CompileInfo, compile_info_origin: CompileInfo, compile_option_tuple, kernel_meta_dir):
     sk_bind_src_file = os.path.join(kernel_meta_dir, "sk_bind.cpp")
     sk_bind_dst_file = os.path.join(kernel_meta_dir, "sk_bind.o")
-    source = '#include "kernel_operator.h"\n'
-
-    # bitmap definition: bit0:wait_flag(1), bit1:set_flag(2), bit2:dcci_disable(4)
-    cap_bitmap = _get_sk_cap_bitmap(compile_info, compile_info_origin.global_kernel_symbols)
-
-    source = _gen_sk_bind_source(source, compile_info, compile_info_origin, cap_bitmap)
+    source = gen_sk_bind_source(
+        [
+            (symbol, compile_info.global_kernel_symbols[index])
+            for index, symbol in enumerate(compile_info_origin.global_kernel_symbols)
+        ],
+        compile_info_origin.global_kernel_attribute,
+        compile_info.global_kernel_attribute,
+    ).decode("utf-8")
 
     # write code into file
     try:
@@ -1101,7 +1065,6 @@ def _record_kernel_spec_sk_commands(kernel_spec, op_info, infered_info, tiling_i
         command.compiled_symbol for command in compile_info.compile_command_session.records
     ]
     compile_sk_bind(compile_info, basic_compile_info, compile_options, kernel_meta_dir)
-    kernel_spec.finish_sk_recording(_get_sk_cap_bitmap(compile_info, basic_compile_info.global_kernel_symbols))
 
 
 def compile_op_common_part(
@@ -1337,7 +1300,13 @@ def compile_op(
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510())
+        (
+            CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+            or CommonUtility.is_m510()
+            or CommonUtility.is_516r2()
+        )
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -1412,7 +1381,13 @@ def compile_op_with_customized_config(
 
     compile_option_tuple = CompileOptionTuple([] if compile_options is None else compile_options, [])
     need_impl_mode_macro = (
-        (CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2() or CommonUtility.is_m510())
+        (
+            CommonUtility.is_c310()
+            or CommonUtility.is_920r1()
+            or CommonUtility.is_920r2()
+            or CommonUtility.is_m510()
+            or CommonUtility.is_516r2()
+        )
         and isinstance(op_info.impl_mode, str)
         and op_info.impl_mode != ""
     )
@@ -1955,6 +1930,31 @@ def get_core_info(compile_info: CompileInfo):
 
 
 def _compile_ascendc_cce_m510(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):
+    """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
+
+    Args:
+        compile_info (CompileInfo): compile info for generate .o and .json
+        compile_options (list): compile options for bisheng
+        tiling_info (TilingInfo): tiling info
+    """
+    sub_core_type = "AIC"
+    optional_core = "AiCore"
+    arch = None
+    set_soc_spec(optional_core)
+    tiling_key_list = call_bisheng_v220(
+        compile_info, compile_option_tuple, tiling_info, arch, compile_info.code_channel
+    )
+    _gen_non_mix_sub_json(compile_info, tiling_info, sub_core_type)
+    if not tiling_info.static_shape_flag:
+        _dynamic_kernel_list_to_json(
+            compile_info.kernel_name,
+            tiling_key_list,
+            compile_info.enable_deterministic,
+            compile_info.tiling_key_deterministic,
+        )
+
+
+def _compile_ascendc_cce_516r2(compile_info: CompileInfo, compile_option_tuple, tiling_info: TilingInfo):
     """call cce-c to compile a AscendC.cce file, generate a binary file and a json file
 
     Args:

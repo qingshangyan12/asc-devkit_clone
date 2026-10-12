@@ -276,7 +276,6 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const HcclHandle handleId)
 {
     ccuUsedXnNum_ = 8; // 算法默认使用的xn num
-    FlushDataCache(&handleParamGM_[handleId]);
     if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_ALLGATHER) {
         if (GetAlgorithmType(handleId) ==
             static_cast<uint32_t>(AlgorithmType::CcuSchedAllGatherParallelMeshNHRMultiLink)) {
@@ -370,6 +369,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitCcuParam(const HcclHandle handleId)
 {
+    // Snapshot the tiling mode per handle, including deferred Commit and legacy callers.
+    handleParamGM_[handleId].skipLocalRankCopy = 0U;
     uint64_t ccTiling = 0;
     if (curVersion_ == HcclTilingVersion::NEW_TILING_VERSION) {
         ccTiling = ccOpTilingDataTable_[static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType)];
@@ -388,6 +389,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         handleParamGM_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
         handleParamGM_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);
         handleParamGM_[handleId].op = static_cast<HcclReduceOp>(tilingPtr->reduceType);
+        if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+            handleParamGM_[handleId].skipLocalRankCopy = (tilingPtr->skipLocalRankCopy == 1U) ? 1U : 0U;
+        }
     }
 
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
@@ -470,7 +474,6 @@ __aicore__ inline HcclHandle HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, conf
         handleParamGM_[handleId].op = commonPrepareParam.op;
         handleParamGM_[handleId].strideCount = commonPrepareParam.strideCount;
         InitCcuParam(handleId);
-        FlushDataCache(&handleParamGM_[handleId]);
         if (commonPrepareParam.commType.prepareType == HcclCMDType::HCCL_CMD_ALLTOALLV) {
             for (uint32_t i = 0; i < rankNum; i++) {
                 allToAllVParam_[handleId].sendCounts[i] = commonPrepareParam.paramExt.sendCounts[i];
@@ -518,37 +521,11 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
     }
 
+    // 性能优化：原 26 参日志的参数表达式（26 次 __gm__ 读）在日志级别过滤前
+    // 无条件求值，每轮必付 26 次 GM 读；降为 0 GM 读的单行摘要。
     KERNEL_LOG(
-        KERNEL_INFO,
-        "ApiClient CcuSendMsg ccuMsg_.xnAddr, Id0: 0x%llx, Id1: 0x%llx, Id2: 0x%llx, Id3: 0x%llx, Id4: 0x%llx, Id5: "
-        "0x%llx, Id6: 0x%llx, Id7: 0x%llx, Id8: 0x%llx, Id9: 0x%llx, Id10: 0x%llx, Id11: 0x%llx, Id12: 0x%llx, Id13: "
-        "0x%llx, Id14: 0x%llx, Id15: 0x%llx, Id16: 0x%llx, Id17: 0x%llx, Id18: 0x%llx, Id19: 0x%llx, Id20: 0x%llx, "
-        "Id21: 0x%llx, Id22: 0x%llx, Id23: 0x%llx, Id24: 0x%llx, Id25: 0x%llx",
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr), *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 8),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 16),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 24),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 32),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 40),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 48),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 56),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 64),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 72),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 80),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 88),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 96),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 104),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 112),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 120),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 128),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 136),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 144),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 152),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 160),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 168),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 176),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 184),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 192),
-        *reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + 200));
+        KERNEL_INFO, "ApiClient CcuSendMsg xnAddr: 0x%llx, xnNum: %u", ccuMsg_.xnAddr,
+        static_cast<uint32_t>(ccuUsedXnNum_));
 
     const uint8_t missionNum = GetKfcMissionNum(handleId);
     for (uint8_t mission = 0; mission < missionNum; ++mission) {

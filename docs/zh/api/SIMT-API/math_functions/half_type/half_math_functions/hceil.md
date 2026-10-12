@@ -83,3 +83,10 @@ inline half hceil(half x)
         dst[idx] = hceil(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: -1, 1, 3, -3
+```

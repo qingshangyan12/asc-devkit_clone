@@ -42,7 +42,7 @@ AI Core内部并行的指令流水类型和解释如下所示：
 > [!NOTE]说明
 > 不同的硬件架构，每一种硬件流水类型包含的具体流水会有所差异，详细介绍请参考[硬件实现](../../../../../guide/programming_guide/advanced_programming/hardware_implementation/hardware_implementation.md)章节。
 
-**表1**  指令流水类型和相关说明
+**表1** 指令流水类型和相关说明
 
 | 流水类型 | 含义 |
 | --- | --- |
@@ -70,7 +70,6 @@ typedef enum {
     PIPE_FIX = 10
 } pipe_t;
 ```
-
 
 ## 核内同步分类
 
@@ -101,7 +100,7 @@ typedef enum {
 
 <a id="aic_intra_core_sync_combinations"></a>
 
-**表2**  AIC中所有合法的核内同步组合
+**表2** AIC中所有合法的核内同步组合
 
 | 源流水/目的流水 | PIPE_S | PIPE_M | PIPE_MTE1 | PIPE_MTE2 | PIPE_MTE3 | PIPE_FIX |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -114,7 +113,7 @@ typedef enum {
 
 <a id="aiv_intra_core_sync_combinations"></a>
 
-**表3**  AIV中所有合法的核内同步组合
+**表3** AIV中所有合法的核内同步组合
 
 | 源流水/目的流水 | PIPE_S | PIPE_V | PIPE_MTE2 | PIPE_MTE3 |
 | --- | --- | --- | --- | --- |

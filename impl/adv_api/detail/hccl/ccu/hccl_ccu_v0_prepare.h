@@ -319,24 +319,20 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const uint64_t inputBase = reinterpret_cast<uint64_t>(commParam->sendBuf) + repeatOffset;
     const uint64_t outputBase = reinterpret_cast<uint64_t>(commParam->recvBuf) + repeatOffset;
 
-    xnData_[KFC_AG_SOLE_NHR_OP_ID] = GetOpId(commParam);
     xnData_[KFC_AG_SOLE_NHR_INPUT] = inputBase;
     xnData_[KFC_AG_SOLE_NHR_OUTPUT] = outputBase;
     xnData_[KFC_AG_SOLE_NHR_DIE0_SIZE] = sliceSize;
-    xnData_[KFC_AG_SOLE_NHR_DIE0_LAST_SIZE] = sliceSize;
-    xnData_[KFC_AG_SOLE_NHR_REPEAT_NUM_INV] = UINT64_MAX - 1U; // sole executor repeatNum=1
-    xnData_[KFC_AG_SOLE_NHR_INPUT_SLICE_STRIDE] = 0U;
     xnData_[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE] = outputSliceStride;
-    xnData_[KFC_AG_SOLE_NHR_INPUT_REPEAT_STRIDE] = 0U; // sole executor 双 repeat stride=0
-    xnData_[KFC_AG_SOLE_NHR_OUTPUT_REPEAT_STRIDE] = 0U;
-    xnData_[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL] =
-        (inputBase == outputBase + outputSliceStride * ccuParam_.rankId) ? 1U : 0U;
+    // in-place（input == output + stride*rankId）时按 0 字节计算 goSize：CalcGoSize(0) 得
+    // m=n=p=0 全零，GroupCopy 内部 CCU_IF 块均不触发——kernel 无需 isInputOutputEqual 参数
+    const bool isInputOutputEqual = (inputBase == outputBase + outputSliceStride * ccuParam_.rankId);
+    const uint64_t copySize = isInputOutputEqual ? 0U : sliceSize;
     CalcGoSize(
-        sliceSize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_SIZE_0],
+        copySize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_SIZE_0],
         ccuProtocolVersion_);
     KERNEL_LOG(
-        KERNEL_INFO, "AG sole-NHR prepare: slice=0x%llx, outStride=0x%llx, equal=%llu\n", sliceSize, outputSliceStride,
-        xnData_[KFC_AG_SOLE_NHR_INPUT_OUTPUT_EQUAL]);
+        KERNEL_INFO, "AG sole-NHR prepare: slice=0x%llx, outStride=0x%llx, copySize=0x%llu\n", sliceSize,
+        outputSliceStride, copySize);
 }
 
 template <const auto& config>
@@ -541,14 +537,14 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 
     const uint64_t sliceSize = commParam->count * dataSize;
     xnData_[4] = ccuParam_.rankId * ((commParam->strideCount == 0) ? sliceSize : (commParam->strideCount * dataSize));
-    xnData_[5] = 0;
+    xnData_[5] = commParam->skipLocalRankCopy;
     xnData_[6] = 0;
     CalcPeerOnlyChunkParams(sliceSize, &xnData_[7], &xnData_[8]);
     KERNEL_LOG(
         KERNEL_INFO,
-        "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, "
+        "PeerOnly RS prepare: input=0x%llx, output=0x%llx, rankOffset=0x%llx, slice=0x%llx, skipLocalRankCopy=%llu, "
         "chunk=0x%llx, tail=0x%llx, loop=0x%llx\n",
-        xnData_[1], xnData_[2], xnData_[4], sliceSize, CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
+        xnData_[1], xnData_[2], xnData_[4], sliceSize, xnData_[5], CCU_MAX_COMM_DATA, xnData_[7], xnData_[8]);
 }
 
 // SoleNHRMultiLink（CcuSchedReduceScatterSoleNHRMultiLink）的 AIV prepare：

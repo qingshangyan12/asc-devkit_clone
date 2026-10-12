@@ -105,3 +105,11 @@ half2 __hltux2(half2 x, half2 y)
         asc_vf_call<simt_hltux2>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, (__gm__ half2*)dst, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1, 0), (1, -1), (inf, -inf), (nan, 0.5)
+y: (1, 0), (1, -2), (inf, inf), (0.5, nan)
+result: (1, 0), (0, 0), (0, 1), (1, 1)
+```

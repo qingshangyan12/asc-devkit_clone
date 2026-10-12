@@ -93,3 +93,10 @@ inline half __int2half_rn(const int x)
         dst[idx] = __int2half_rn(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 1, -1, 2049, 4097, -4097
+result: 0, 1, -1, 2048, 4096, -4096
+```

@@ -91,3 +91,10 @@ inline signed char __bfloat162char_rz(const bfloat16_t x)
         dst[idx] = __bfloat162char_rz(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, 1.5, 2.5, -1.5, -2.5, 127.5, -127.5, inf
+result: 0, 1, 2, -1, -2, 127, -127, 127
+```

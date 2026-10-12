@@ -80,7 +80,7 @@ PIPE_S
 - 调用本接口的核函数（Kernel）不能使用`__cube__`或`__vector__`[函数执行空间限定符](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#函数执行空间限定符)。使用这两种函数执行空间限定符时，硬件不会开启调度模块，无法正常进行核间同步。对于`asc_sync_intra_arrive`和`asc_sync_intra_wait`这对接口，支持的函数执行空间限定符为`__mix__(1, 2)`。
 - 针对`asc_sync_intra_arrive`接口，传入的`pipe`参数**生效**，AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe)所示。<a id="supported_pipe_combinations"></a>
 
-  **表2**  AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe"></a>
+  **表2** AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe"></a>
 
   | 核类型 | 支持的pipe取值 |
   | :--- | :--- |
@@ -104,7 +104,7 @@ PIPE_S
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

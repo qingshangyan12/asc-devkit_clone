@@ -86,3 +86,10 @@ SIMT编程场景由于无法设置CTRL寄存器，本接口的饱和模式不生
         asc_vf_call<simt_float22half2_ro_sat>(dim3(1024), (__gm__ float2*)input, (__gm__ half2*)output, input_total_length);
     }
     ```
+
+    输入输出示例如下：
+
+    ```text
+    x: (128, 128.0625), (128.1875, -128.1875), (inf, -inf), (nan, 65536)
+    result: (128, 128.125), (128.125, -128.125), (65504, -65504), (0, 65504)
+    ```

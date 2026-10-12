@@ -26,6 +26,10 @@
 #include "impl/c_api/reg_base_impl/npu_arch_9201/reg_convert_intf_impl.h"
 #endif
 
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/reg_convert_intf_impl.h"
+#endif
+
 __simd_callee__ inline void asc_float2half_rd(
     vector_half& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
@@ -6658,7 +6662,7 @@ __simd_callee__ inline vector_int16_t asc_half2int16_rz_sat(vector_half src, vec
     return dst;
 }
 
-// rd - sat:dis/en - v1 v2 v3 v4
+// rd - sat:dis/en
 __simd_callee__ inline void asc_half2int4x2_rd(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6673,7 +6677,7 @@ __simd_callee__ inline void asc_half2int4x2_rd_sat(vector_int4x2_t& dst, vector_
     }
 }
 
-// ru - sat:dis/en - v1 v2 v3 v4
+// ru - sat:dis/en
 __simd_callee__ inline void asc_half2int4x2_ru(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6688,7 +6692,7 @@ __simd_callee__ inline void asc_half2int4x2_ru_sat(vector_int4x2_t& dst, vector_
     }
 }
 
-// rz - sat:dis/en - v1 v2 v3 v4
+// rz - sat:dis/en
 __simd_callee__ inline void asc_half2int4x2_rz(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6703,7 +6707,7 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat(vector_int4x2_t& dst, vector_
     }
 }
 
-// rn - sat:dis/en - v1 v2 v3 v4
+// rn - sat:dis/en
 __simd_callee__ inline void asc_half2int4x2_rn(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
@@ -6718,7 +6722,7 @@ __simd_callee__ inline void asc_half2int4x2_rn_sat(vector_int4x2_t& dst, vector_
     }
 }
 
-// rna - sat:dis/en - v1 v2 v3 v4
+// rna - sat:dis/en
 __simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst, vector_half src, vector_bool mask)
 {
     if ASC_IS_AIV {
