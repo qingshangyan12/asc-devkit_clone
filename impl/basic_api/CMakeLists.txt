@@ -142,6 +142,7 @@ install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_proposal.h \$ENV{DESTD
 install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_transpose.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_transpose.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_unary.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_unary.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_vdeq.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_vdeq.h SYMBOLIC)" COMPONENT asc-devkit)
+install(CODE "file(CREATE_LINK ../basic_api/kernel_struct_waipp.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_struct_waipp.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_tensor.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_tensor.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_tpipe.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_tpipe.h SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../basic_api/kernel_type.h \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/interface/kernel_type.h SYMBOLIC)" COMPONENT asc-devkit)
