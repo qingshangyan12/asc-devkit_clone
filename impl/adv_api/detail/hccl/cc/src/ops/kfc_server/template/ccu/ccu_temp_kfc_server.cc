@@ -89,6 +89,8 @@ HcclResult InheritKfcServerKernelArg(
         CHK_PTR_NULL(srcArg);
         kfcArg->rankSize = srcArg->rankSize;
         kfcArg->rankId = srcArg->rankId;
+        kfcArg->axisId = srcArg->axisId;
+        kfcArg->axisSize = srcArg->axisSize;
         kfcArg->opParam = srcArg->opParam;
         kfcArg->subCommRanks = srcArg->subCommRanks;
         kfcArg->nhrStepInfoVector = srcArg->stepInfoVector;
@@ -170,16 +172,39 @@ HcclResult CcuTempKfcServer::CalcRes(
         resourceRequest.notifyNumOnMainThread, resourceRequest.slaveThreadNum);
 
     const uint32_t missionNum = GetKfcServerMissionNum(param.algName);
+    // SoleNHR 动态 mission 特例（AG SoleNHR D4）：mission 数 = dieNum（模板 CalcRes 按通道探测塞入的源 kernel 数），
+    // 静态名单不可知（单 die=1 / 双 die=2），按尾部同名源 kernel 计数修正
+    const bool isAgSoleNhrDynDie =
+        param.algName != nullptr && std::strcmp(param.algName, KFC_AG_SOLE_NHR_ALG_NAME) == 0;
+    uint32_t soleNhr2DieMissionNum = missionNum;
+    if (isAgSoleNhrDynDie) {
+        const char* dynMissionKernelName = "CcuKernelKfcAllGatherNHR1DMem2Mem";
+        uint32_t trailingCount = 0;
+        for (auto it = resourceRequest.ccuKernelInfos.rbegin(); it != resourceRequest.ccuKernelInfos.rend(); ++it) {
+            if (std::strcmp(it->kernelFuncName, dynMissionKernelName) != 0) {
+                break;
+            }
+            ++trailingCount;
+        }
+        CHK_PRT_RET(
+            trailingCount == 0U,
+            HCCL_ERROR(
+                "[CcuTempKfcServer::CalcRes] SoleNHR dyn-mission expects at least one source kernel, got [%zu]",
+                resourceRequest.ccuKernelInfos.size()),
+            HCCL_E_PARA);
+        soleNhr2DieMissionNum = std::min(trailingCount, KFC_MAX_MISSION_NUM);
+    }
+    const uint32_t effectiveMissionNum = isAgSoleNhrDynDie ? soleNhr2DieMissionNum : missionNum;
     CHK_PRT_RET(
-        resourceRequest.ccuKernelInfos.size() < missionNum,
+        resourceRequest.ccuKernelInfos.size() < effectiveMissionNum,
         HCCL_ERROR(
             "[CcuTempKfcServer::CalcRes] kernel count[%zu] is less than mission count[%u]",
-            resourceRequest.ccuKernelInfos.size(), missionNum),
+            resourceRequest.ccuKernelInfos.size(), effectiveMissionNum),
         HCCL_E_PARA);
-    resourceRequest.slaveThreadNum = missionNum - 1U;
-    const size_t firstKernelIndex = resourceRequest.ccuKernelInfos.size() - missionNum;
+    resourceRequest.slaveThreadNum = effectiveMissionNum - 1U;
+    const size_t firstKernelIndex = resourceRequest.ccuKernelInfos.size() - effectiveMissionNum;
 
-    for (uint32_t missionIndex = 0; missionIndex < missionNum; ++missionIndex) {
+    for (uint32_t missionIndex = 0; missionIndex < effectiveMissionNum; ++missionIndex) {
         const size_t kernelIndex = firstKernelIndex + missionIndex;
         CcuKernelInfo kernelInfo{};
         CHK_SAFETY_FUNC_RET(
