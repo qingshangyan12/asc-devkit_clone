@@ -235,8 +235,8 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
                 param[KFC_AG_SOLE_NHR_DIE0_SIZE], param[KFC_AG_SOLE_NHR_DIE1_SIZE],
                 param[KFC_AG_SOLE_NHR_OUTPUT_SLICE_STRIDE], param[goSizeBase], param[goSizeBase + 1U],
                 param[goSizeBase + 2U], param[goSizeBase + 3U], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->axisId,
-                ctx.arg->nhrStepInfoVector, ctx.arg->nhrRank2ChannelIdx);
+                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->axisId, ctx.arg->nhrStepInfoVector,
+                ctx.arg->nhrRank2ChannelIdx);
         } else {
             // The queue payload layout is
             // [0]=op, [1]=input, [2]=output, [3]=outputOffset, [4]=sliceSize,

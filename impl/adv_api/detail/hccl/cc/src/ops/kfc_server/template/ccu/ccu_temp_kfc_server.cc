@@ -211,8 +211,7 @@ HcclResult CcuTempKfcServer::CalcRes(
             HCCL_E_PARA);
         soleNhr2DieMissionNum = std::min(trailingCount, KFC_MAX_MISSION_NUM);
     }
-    const uint32_t effectiveMissionNum =
-        (isSoleNhr2Die || isAgSoleNhrDynDie) ? soleNhr2DieMissionNum : missionNum;
+    const uint32_t effectiveMissionNum = (isSoleNhr2Die || isAgSoleNhrDynDie) ? soleNhr2DieMissionNum : missionNum;
     CHK_PRT_RET(
         resourceRequest.ccuKernelInfos.size() < effectiveMissionNum,
         HCCL_ERROR(

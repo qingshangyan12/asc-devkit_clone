@@ -92,8 +92,8 @@ HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::CalcRes(
     // 4. 构造 kernelInfo：每个 die 一份（axisId 区分），channels 为该 die 的链路组
     for (uint32_t kernelIdx = 0; kernelIdx < kernelNum; kernelIdx++) {
         CcuKernelInfo kernelInfo{};
-        CHK_SAFETY_FUNC_RET(
-            strcpy_s(kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllGatherNHR1DMem2Mem"));
+        CHK_SAFETY_FUNC_RET(strcpy_s(
+            kernelInfo.kernelFuncName, sizeof(kernelInfo.kernelFuncName), "CcuKernelKfcAllGatherNHR1DMem2Mem"));
         auto kernelArg = std::make_shared<CcuKernelArgKfcAllGatherNHR1DMem2Mem>();
         kernelArg->rankSize = tempRankSize_;
         kernelArg->rankId = mySubCommRank_;
@@ -134,8 +134,7 @@ HcclResult CcuTempKfcAllGatherNHR1DMem2Mem::ProcessNHRStepInfo(
                 comm, myRank_, stepInfo.fromRank, rankIdToChannelDesc_, enableDieId, rank2ChannelIdx,
                 channelsPerDie[0]));
             CHK_RET(SelectChannelToVec(
-                comm, myRank_, stepInfo.toRank, rankIdToChannelDesc_, enableDieId, rank2ChannelIdx,
-                channelsPerDie[0]));
+                comm, myRank_, stepInfo.toRank, rankIdToChannelDesc_, enableDieId, rank2ChannelIdx, channelsPerDie[0]));
         } else if (enableDieNum == DIE_NUM_2) {
             // 加入 fromRank/toRank 两个 die 的链路
             CHK_RET(SelectChannelToVec(

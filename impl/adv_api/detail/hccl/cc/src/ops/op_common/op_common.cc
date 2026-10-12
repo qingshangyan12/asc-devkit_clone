@@ -929,9 +929,8 @@ HcclResult HcclGetAlgRes(
         // 双 die 时此处按源 kernel 数修正 missionNum 与 dieNum（ccuKernelNum 尾值即模板 push 的
         // kernelNum=dieNum）
         const bool isSoleNhrDynMission =
-            param.algName != nullptr &&
-            (std::strcmp(param.algName, KFC_RS_SOLE_NHR_2DIE_ALG_NAME) == 0 ||
-             std::strcmp(param.algName, KFC_AG_SOLE_NHR_ALG_NAME) == 0);
+            param.algName != nullptr && (std::strcmp(param.algName, KFC_RS_SOLE_NHR_2DIE_ALG_NAME) == 0 ||
+                                         std::strcmp(param.algName, KFC_AG_SOLE_NHR_ALG_NAME) == 0);
         if (isSoleNhrDynMission && !resRequest.ccuKernelNum.empty() &&
             resCtxHost->kfcServerArgs.size() >= KFC_SERVER_ARG_NUM) {
             const uint32_t dieNum = std::min<uint32_t>(resRequest.ccuKernelNum.back(), KFC_MAX_MISSION_NUM);
