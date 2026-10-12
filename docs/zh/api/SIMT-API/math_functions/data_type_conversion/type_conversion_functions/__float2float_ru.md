@@ -88,6 +88,6 @@ inline float __float2float_ru(const float x)
 输入输出示例如下：
 
 ```text
-x: -1.5, -0.5, 0.5, 1.5, inf, -inf, nan
-result: -1, 0, 1, 2, inf, -inf, nan
+x: -5.5, -0.25, 2.25, 5.5, inf, -inf, nan
+result: -5.0, 0.0, 3.0, 6.0, inf, -inf, nan
 ```

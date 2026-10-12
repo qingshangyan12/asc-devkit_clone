@@ -99,6 +99,6 @@ __simt_vf__ __launch_bounds__(1024) inline void kernel__float2float_rz(__gm__ fl
 输入输出示例如下：
 
 ```text
-x: -1.5, -0.5, 0.5, 1.5, inf, -inf, nan
-result: -1, 0, 0, 1, inf, -inf, nan
+x: -6.5, -1.75, 1.75, 6.5, inf, -inf, nan
+result: -6.0, -1.0, 1.0, 6.0, inf, -inf, nan
 ```

@@ -92,5 +92,5 @@ inline float __uint_as_float(const unsigned int x)
 
 ```text
 x: 0, 2147483648, 1, 1065353216, 3212836864, 2139095040, 4286578688, 2143289344
-result: 0, -0, 1.40129846e-45, 1, -1, inf, -inf, nan
+result: 0.0, -0.0, 1.40129846e-45, 1.0, -1.0, inf, -inf, nan
 ```

@@ -94,6 +94,6 @@ inline unsigned int __float_as_uint(const float x)
 输入输出示例如下：
 
 ```text
-x: 0, -0, 1, -1, inf, -inf, nan
+x: 0.0, -0.0, 1.0, -1.0, inf, -inf, nan
 result: 0, 2147483648, 1065353216, 3212836864, 2139095040, 4286578688, 2143289344
 ```

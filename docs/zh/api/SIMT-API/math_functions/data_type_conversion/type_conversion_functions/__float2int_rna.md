@@ -87,6 +87,6 @@ inline int __float2int_rna(const float x)
 输入输出示例如下：
 
 ```text
-x: -1.5, -0.5, 0.5, 1.5, inf, -inf, nan
-result: -2, -1, 1, 2, 2147483647, -2147483648, 0
+x: -4.5, -1.25, 1.25, 4.5, inf, -inf, nan
+result: -5, -1, 1, 5, 2147483647, -2147483648, 0
 ```
