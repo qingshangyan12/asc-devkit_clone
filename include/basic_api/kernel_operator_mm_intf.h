@@ -426,7 +426,7 @@ __aicore__ inline void SetLoadDataPaddingValue(const T padValue);
  */
 __aicore__ inline void SetFmatrix(uint16_t l1H, uint16_t l1W, const uint8_t padList[4], const FmatrixMode& fmatrixMode);
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
 __aicore__ inline void SetFmatrix(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode);
 #endif
 /* **************************************************************************************************
@@ -462,6 +462,29 @@ __aicore__ inline void SetLoadDataRepeatWithStride(const LoadDataRepeatParamWith
  */
 template <typename T>
 __aicore__ inline void LoadImageToLocal(const LocalTensor<T>& dst, const LoadImageToLocalParams& loadDataParams);
+
+/* **************************************************************************************************
+ * StoreImageToGlobal                                             *
+ * ************************************************************************************************* */
+/*
+ * @ingroup StoreImageToGlobal
+ * @brief store image from L1 to global memory
+ * @param [out] dst output GlobalTensor
+ * @param [in] src input LocalTensor, stored in L1
+ * @param [in] storeImageToGlobalParams.outputDataType output data type
+ * @param [in] storeImageToGlobalParams.channelTransformMode channel transform mode
+ * @param [in] storeImageToGlobalParams.dtcParams data type conversion parameters (dtcGain, dtcOffset, roundingMode)
+ * @param [in] storeImageToGlobalParams.dstImageWidth destination image width
+ * @param [in] storeImageToGlobalParams.dstImageHeight destination image height
+ * @param [in] storeImageToGlobalParams.srcImageStride source image stride
+ * @param [in] storeImageToGlobalParams.dstImageStride destination image stride
+ * @param [in] storeImageToGlobalParams.sid SMMU SID
+ */
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5162)
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(MTE3) void StoreImageToGlobal(
+    const GlobalTensor<T>& dst, const LocalTensor<U>& src, const StoreImageToGlobalParams& params);
+#endif
 
 /* **************************************************************************************************
  * LoadDataUnzip                                             *
