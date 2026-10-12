@@ -11,6 +11,10 @@ examples marker）的纯派生数据，查询统一走本 skill 的 `scripts/que
 建索引细节见 [references/index.md](references/index.md)，检索流程细节见
 [references/retrieve.md](references/retrieve.md)。命令均从仓库根目录执行。
 
+通过用户 skill 目录的软链加载时，先将当前 `SKILL.md` 路径解析为真实路径，向上三级取得
+对应的 asc-devkit 仓库根目录，并从该目录执行以下命令和读取候选文档。用户当前目录
+可以位于其他项目；检索始终使用安装入口指向的 devkit 仓库。
+
 ## 建立索引
 
 ```bash

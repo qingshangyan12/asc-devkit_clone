@@ -68,7 +68,9 @@ bash .agent/skills/public-skills/scripts/install-public-skills.sh
 
 ### 用户目录安装
 
-日常使用不需要安装；本仓不再维护用户目录安装脚本。如果某个客户端只读取 `${CODEX_HOME:-$HOME/.codex}/skills`，用户目录安装由客户端或用户环境自行管理，不作为本仓事实源的一部分。
+`asc-search` 提供用户目录安装命令，支持 Codex、Claude Code 和 OpenCode；用法见
+[asc-search 快速开始](skills/asc-search/README.md#快速开始)。安装入口以软链指向本仓 skill，
+`.agent/skills` 仍是唯一维护位置。其余 skill 的用户目录安装由客户端或用户环境管理。
 
 兼容入口损坏时，恢复为“真实目录 + 内部软链”，不要把入口根目录恢复成指向 `.agent` 的软链：
 

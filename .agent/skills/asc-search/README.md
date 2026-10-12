@@ -3,6 +3,50 @@
 这是用户侧 skill `asc-search` 的全貌说明。看这一篇就能知道：它是干什么的、怎么让 AI 用它、
 每个文件是干什么的、索引和配置里每个字段是什么意思。
 
+## 快速开始
+
+先克隆完整的 asc-devkit 仓库，在仓库根目录执行（Linux/macOS，Python 3.10+）：
+
+```bash
+python3 .agent/skills/asc-search/scripts/install.py
+```
+
+这一条命令将 `asc-search` 以软链安装到 Codex、Claude Code、OpenCode 的用户 skill 目录，
+重复执行无需重新安装，已有同名且指向其他位置的 skill 会保留并报出冲突。
+
+| 智能体 | 默认安装位置 |
+| --- | --- |
+| Codex | `~/.agents/skills/asc-search` |
+| Claude Code | `~/.claude/skills/asc-search` |
+| OpenCode | `~/.config/opencode/skills/asc-search`（设置 `XDG_CONFIG_HOME` 时使用对应配置目录） |
+
+安装路径依据 [Codex](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills)、
+[Claude Code](https://code.claude.com/docs/en/skills#choose-where-skills-load) 和
+[OpenCode](https://opencode.ai/docs/skills/#place-files) 的官方发现规则。
+
+只安装到一个智能体或仅在本项目启用时，可选择：
+
+```bash
+python3 .agent/skills/asc-search/scripts/install.py --agent codex
+python3 .agent/skills/asc-search/scripts/install.py --scope project
+```
+
+`--agent` 可选 `codex`、`claude`、`opencode` 或 `all`（默认）；`--scope project` 使用项目内的
+`.agents/skills`、`.claude/skills`、`.opencode/skills`。加 `--dry-run` 可预览安装位置。
+
+检索脚本还依赖 PyYAML；当前 Python 环境未安装时执行：
+
+```bash
+python3 -m pip install PyYAML
+```
+
+安装后重启或重新加载智能体，在对话中输入：
+
+> 使用 asc-search，帮我找 A5 上将两个 uint32_t 向量与输入进位相加并输出进位的接口。
+
+skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选接口及文档路径。请保留该仓库；
+仓库移动后，需要移除旧安装软链并重新运行安装命令。仓库更新后，安装入口会同步使用更新后的 skill。
+
 ## 1. 这个 skill 是干什么的
 
 ### 1.1 背景
@@ -40,8 +84,8 @@
 
 ### 2.1 接入方式
 
-`asc-search` 已放在仓库 `.agent/skills/asc-search/`，opencode 等客户端通过 `.opencode/skills`
-（软链到 `.agent/skills`）自动发现，无需额外接入。若工具不支持自动加载，在对话里补一句
+按前面的[快速开始](#快速开始)安装到智能体的 skill 目录。`asc-search` 的源码统一放在
+`.agent/skills/asc-search/`，安装入口通过软链访问它。若工具不支持自动加载，在对话里补一句
 "按 `.agent/skills/asc-search/SKILL.md` 的流程帮我找……"。
 
 ### 2.2 直接提问
