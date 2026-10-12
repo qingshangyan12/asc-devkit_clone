@@ -9,7 +9,6 @@
 | 目录名称 | 功能描述 |
 | --- | --- |
 | [abs](./abs) | 本样例基于C API编程接口实现Abs运算，主要调用asc_abs接口。asc_relu/asc_exp/asc_sqrt/asc_ln/asc_neg接口皆可参考该样例 |
-| [addc](./addc) | A5 架构的 asc_addc 带进位加法样例及三类头示范 |
 | [arange](./arange) | 本样例基于C API编程接口实现Arange运算，主要调用asc_arange接口，以标量值为起始值生成递增/递减的索引序列 |
 | [cast](./cast) | 本样例基于C API编程接口实现Cast运算，主要调用asc_half2int32_rd/asc_float2int16_rna_sat接口实现数据类型转换（位宽小转大/大转小） |
 | [compare](./compare) | 本样例基于C API编程接口实现asc_gt、asc_gt_scalar接口完成多场景下的数据比较功能 |

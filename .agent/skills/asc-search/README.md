@@ -233,9 +233,10 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 ## 3. 三类头的标准格式与真实示例
 
-三类头分别描述 API 的语义、具体重载的结构和源码调用范围。本章以 A5（3510）的 `asc_addc`
-为贯穿示例，真实片段取自 `okf-knowledge-user` 分支的三类头示范；本 README 在 user、test
-两分支保持一致，示范文件的标注范围可以不同。索引如何推导这些字段见
+三类头分别描述 API 的语义、具体重载的结构和源码调用范围。文档头与 include 头以 A5（3510）
+的 `asc_addc` 为例；样例头使用仓库原有的 A5 `abs.asc`。仓库没有原有的 `asc_addc` `.asc`
+样例，因此不为补齐三类头新建源码。真实片段取自 `okf-knowledge-user` 分支；本 README
+在 user、test 两分支保持一致，示范文件的标注范围可以不同。索引如何推导这些字段见
 [索引推导契约](references/索引推导契约.md)。
 
 ### 3.1 文档头：Markdown YAML front matter
@@ -351,7 +352,7 @@ __simd_callee__ inline void asc_addc(
 
 每个源文件用一对 marker 包住所有重点 API 的共同展示范围，从首次重点调用所在行到末次
 重点调用结束行，可跨函数。首尾 ID 列表一致，ID 去重，并与 include 中的 `@override_id`
-精确对应。范围是展示片段，不要求独立编译。
+精确对应。范围是展示片段，不要求独立编译。只在仓库已有样例上增加 marker 注释，不新建样例或改写代码逻辑。
 
 ```cpp
 //! [id1, id2, ...]
@@ -363,28 +364,43 @@ __simd_callee__ inline void asc_addc(
 
 **真实示例**
 
-来源：`examples/02_simd_c_api/03_c_api/02_reg_vector_compute/addc/addc.asc`，以下为 `addc_vf` 函数内片段。
+来源：`examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs/abs.asc`，以下为 `abs_vf` 函数内片段。
+该文件原本就存在，标注只增加首尾两行注释。
 
 ```cpp
-vector_uint32_t dst_reg;
-vector_uint32_t src0_reg;
-vector_uint32_t src1_reg;
-vector_bool carry;
-uint32_t count = ELEMENT_COUNT;
-vector_bool mask = asc_update_mask_b32(count);
-vector_bool carry_src = mask;
-asc_loadalign(src0_reg, src0);
-asc_loadalign(src1_reg, src1);
-//! [asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb]
-asc_addc(carry, dst_reg, src0_reg, src1_reg, carry_src, mask);
-//! [asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb]
-asc_storealign(dst, dst_reg, mask);
-asc_storealign(carry_out, carry);
+vector_bool vmask;
+vector_float src_reg;
+vector_float dst_reg;
+for (uint16_t i = 0; i < repeat_time; ++i) {
+    vmask = asc_update_mask_b32(data_len);
+    asc_loadalign(src_reg, x_local + i * one_rep_size);
+    //! [asc_abs__Rvf32_vf32_vb]
+    asc_abs(dst_reg, src_reg, vmask);
+    //! [asc_abs__Rvf32_vf32_vb]
+    asc_storealign(y_local + i * one_rep_size, dst_reg, vmask);
+}
 ```
 
-本例只有一个重点 `asc_addc` 调用，因此 marker 的共同范围只包含该行。外围加载、掩码和
-存储代码提供调用上下文；marker 中的 `asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb` 与 3.2 节
-无符号整数重载的 ID 完全相同。
+本例只有一个重点 `asc_abs` 调用语句，因此 marker 的共同范围只包含该行；循环运行时多次
+调用仍使用同一对 marker。该 ID 只关联 `asc_abs` 的 `float` 重载，不关联 3.2 节的 Addc。
+对应 `include/c_api/reg_compute/compute/reg_arith.h` 中的声明与标注为：
+
+```cpp
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__Rvf32_vf32_vb
+ * @archs 3510
+ * @param [out] dst Destination operand (vector data register).
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
+__simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask);
+```
+
+索引再通过 API 名称和原型将该声明匹配到
+`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md`。`asc_addc` 没有已标注的原有
+源码样例时，索引如实返回空样例关联。
 
 三类头通过“文档的 API 名称与原型 → include 具体声明 → `override_id` → 样例范围”关联。
 `build_index.py` 消费它们生成索引，`ensure_index.py` 检查索引新鲜度，`query.py` 再从索引检索
