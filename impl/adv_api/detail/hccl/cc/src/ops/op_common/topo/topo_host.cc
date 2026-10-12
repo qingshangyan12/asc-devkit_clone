@@ -1042,15 +1042,26 @@ HcclResult CalAllLevelEndpointAttrBwCoeff(
             uint32_t endPointNums = 0;
             CHK_RET(HcclRankGraphGetEndpointNum(
                 comm, netLayerId, topoInstId, &endPointNums)); // 获取endPointNums，计算同层有多少节点
-            EndpointDesc* endPointDescs = nullptr;
+            // GetEndpointDesc将描述写入调用方预分配的数组，需先按endPointNums分配缓冲区
+            std::vector<EndpointDesc> endPointDescs;
+            EXECEPTION_CATCH(endPointDescs.resize(endPointNums), return HCCL_E_MEMORY);
+            if (endPointDescs.empty()) {
+                continue;
+            }
             CHK_RET(HcclRankGraphGetEndpointDesc(
                 comm, netLayerId, topoInstId, &endPointNums,
-                endPointDescs)); // 根据Layer和topoInstId，拿到所有的Endpoint信息；返回vector(获取EndpointDesc)
+                endPointDescs.data())); // 根据Layer和topoInstId，拿到所有的Endpoint信息
+            CHK_PRT_RET(
+                endPointNums > endPointDescs.size(),
+                HCCL_ERROR("[Topo][CalAllLevelEndpointAttrBwCoeff] Invalid endpoint num[%u].", endPointNums),
+                HCCL_E_INTERNAL);
             uint32_t infoLen = sizeof(EndpointAttrBwCoeff);
             EndpointAttrBwCoeff bwCoeff{};
             CHK_RET(HcclRankGraphGetEndpointInfo(
-                comm, rankId, endPointDescs, ENDPOINT_ATTR_BW_COEFF, infoLen, &bwCoeff)); // 获取该维度的带宽
-            endpointAttrBw.emplace_back(bwCoeff);
+                comm, rankId, endPointDescs.data(), ENDPOINT_ATTR_BW_COEFF, infoLen,
+                &bwCoeff)); // 获取该维度的带宽
+            // 单元素vector保存带宽值；emplace_back(bwCoeff)会被解释为“bwCoeff个0”而非保存该值
+            endpointAttrBw.emplace_back(1, bwCoeff);
         }
     }
     return HCCL_SUCCESS;
