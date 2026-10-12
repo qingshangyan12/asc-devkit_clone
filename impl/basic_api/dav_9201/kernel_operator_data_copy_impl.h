@@ -1615,6 +1615,9 @@ __aicore__ inline void DataCopyPadUB2L1Impl(
 __aicore__ inline void NdDmaDciImpl()
 {
 #if ((!defined(ASCENDC_CPU_DEBUG)) || ASCENDC_CPU_DEBUG == 0)
+    if ASCEND_IS_AIC {
+        return;
+    }
     nd_dma_dci();
 #endif
 }
