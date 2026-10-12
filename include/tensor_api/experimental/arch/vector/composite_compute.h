@@ -16,27 +16,38 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_COMPOSITE_COMPUTE_H
 
+#include "tensor_api/experimental/utils/reg_enum.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
 namespace te {
 namespace experimental {
 
-template <typename T, typename scalar_type>
-__simd_callee__ inline reg_tensor<T> axpy(
-    const reg_tensor<T>& dst, const reg_tensor<T>& src, const scalar_type& scalar);
+template <typename T>
+__simd_callee__ inline reg_tensor<T> axpy(reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
+template <typename T, typename U>
+__simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const reg_tensor<U>& src1);
+
+template <typename T, typename U, typename PositionType>
+__simd_callee__ inline reg_tensor<T> exp_diff(
+    const reg_tensor<U>& src0, const reg_tensor<U>& src1, PositionType src_pos);
+
 template <typename T>
-__simd_callee__ inline reg_tensor<float> exp_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> mula(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> fma(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
 
-__simd_callee__ inline reg_tensor<half> muls_cast(const reg_tensor<float>& src, const float& scalar);
+template <cast_layout Layout = cast_layout::zero, typename T, typename U>
+__simd_callee__ inline reg_tensor<T> muls_cast(const reg_tensor<U>& src, const U& scalar);
 
 } // namespace experimental
 } // namespace te
