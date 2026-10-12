@@ -813,6 +813,38 @@ __simd_callee__ inline void asc_addc(
     }
 }
 
+__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_bool>
+asc_add_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    c_api::reg_pair<vector_uint32_t, vector_bool> result;
+    asc_add(result.second, result.first, src0, src1, mask);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_bool>
+asc_add_carry(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    c_api::reg_pair<vector_int32_t, vector_bool> result;
+    asc_add(result.second, result.first, src0, src1, mask);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_bool>
+asc_add_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask)
+{
+    c_api::reg_pair<vector_uint32_t, vector_bool> result;
+    asc_addc(result.second, result.first, src0, src1, carry_src, mask);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_bool>
+asc_add_carry(vector_int32_t src0, vector_int32_t src1, vector_bool carry_src, vector_bool mask)
+{
+    c_api::reg_pair<vector_int32_t, vector_bool> result;
+    asc_addc(result.second, result.first, src0, src1, carry_src, mask);
+    return result;
+}
+
 __simd_callee__ inline vector_uint8_t asc_sub(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask)
 {
     vector_uint8_t dst;
@@ -892,6 +924,38 @@ __simd_callee__ inline void asc_subc(
     if ASC_IS_AIV {
         vsubcs(carry, dst, src0, src1, carry_src, mask);
     }
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_bool>
+asc_sub_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
+{
+    c_api::reg_pair<vector_uint32_t, vector_bool> result;
+    asc_sub(result.second, result.first, src0, src1, mask);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_bool>
+asc_sub_carry(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
+{
+    c_api::reg_pair<vector_int32_t, vector_bool> result;
+    asc_sub(result.second, result.first, src0, src1, mask);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_bool>
+asc_sub_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask)
+{
+    c_api::reg_pair<vector_uint32_t, vector_bool> result;
+    asc_subc(result.second, result.first, src0, src1, carry_src, mask);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_bool>
+asc_sub_carry(vector_int32_t src0, vector_int32_t src1, vector_bool carry_src, vector_bool mask)
+{
+    c_api::reg_pair<vector_int32_t, vector_bool> result;
+    asc_subc(result.second, result.first, src0, src1, carry_src, mask);
+    return result;
 }
 
 __simd_callee__ inline vector_int8_t asc_min(vector_int8_t src0, vector_int8_t src1, vector_bool mask)
