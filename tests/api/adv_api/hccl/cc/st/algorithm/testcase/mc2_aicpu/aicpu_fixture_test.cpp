@@ -9,6 +9,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <gtest/gtest-spi.h> // EXPECT_NONFATAL_FAILURE（golden 空守卫用例）
 
 #include <vector>
 
@@ -40,6 +41,9 @@ protected:
         (void)rank;
         return {};
     }
+
+    // 刻意跳过比对：显式豁免 golden 空守卫（非零场景空 golden 默认会 FAIL）
+    bool ExpectOutputCheck() override { return false; }
 };
 } // namespace
 
@@ -52,6 +56,42 @@ TEST_F(AicpuStSmokeFixture, ChainSmoke_AllGatherMesh1D_2Rank_Int8)
     scenario.count = 16;
     scenario.expectedAlgName = "InsAllGatherMesh1D";
     VerifyScenario(scenario);
+}
+
+// golden 空守卫：非零场景的 BuildExpectedOutput 意外返回空（adapter bug）必须 FAIL（防假绿）
+namespace {
+class AicpuStEmptyGoldenFixture : public AicpuStFixture {
+protected:
+    void PrepareOpParam(
+        OpParam& opParam, uint32_t rankSize, const AicpuStScenario& scenario, const RankMem& mem) override
+    {
+        (void)rankSize;
+        opParam.DataDes.count = scenario.count;
+        opParam.inputPtr = mem.inputPtr;
+        opParam.outputPtr = mem.outputPtr;
+        opParam.inputSize = mem.inputBytes;
+        opParam.outputSize = mem.outputBytes;
+    }
+
+    std::vector<uint8_t> BuildExpectedOutput(uint32_t rankSize, const AicpuStScenario& scenario, RankId rank) override
+    {
+        (void)rankSize;
+        (void)scenario;
+        (void)rank;
+        return {}; // 模拟 adapter bug：非零场景返回空 golden
+    }
+};
+} // namespace
+
+TEST_F(AicpuStEmptyGoldenFixture, UnexpectedEmptyGoldenFailsForNonZeroScenario)
+{
+    AicpuStScenario scenario;
+    scenario.topoMeta = TopoMeta{{{{0, 1}}}};
+    scenario.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    scenario.dataType = HCCL_DATA_TYPE_INT8;
+    scenario.count = 16;
+    scenario.expectedAlgName = "InsAllGatherMesh1D";
+    EXPECT_NONFATAL_FAILURE(VerifyScenario(scenario), "golden unexpectedly empty");
 }
 
 // 块标签双射性质：不同 (rank, blockIdx) 的标签对必不同——256 对齐块置换可检出

@@ -100,9 +100,14 @@ protected:
         return layout;
     }
 
-    // golden 期望输出；返回空 vector 表示跳过逐字节比对（零长度场景天然为空）
+    // golden 期望输出；返回空 vector 表示跳过逐字节比对（零长度场景天然为空）。
+    // 非零长度场景返回空属于 adapter bug——默认会 FAIL（防假绿）；链路级冒烟等
+    // 刻意不比对的场景应 override ExpectOutputCheck 返回 false 显式豁免。
     virtual std::vector<uint8_t> BuildExpectedOutput(
         uint32_t rankSize, const AicpuStScenario& scenario, RankId rank) = 0;
+
+    // 非零场景的 golden 空守卫开关（默认开）：BuildExpectedOutput 意外返回空时 FAIL
+    virtual bool ExpectOutputCheck() { return true; }
 
     // ===== 框架提供的静态工具 =====
 
