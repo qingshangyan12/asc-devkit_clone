@@ -424,7 +424,7 @@ inQueueY.FreeTensor(yLocal);
 |--------------|----------------------|-------------------|
 | SPMD vs SIMD vs SIMT | SPMD=programming model, SIMD=instruction execution mode, SIMT=thread execution mode | Hierarchy diagram |
 | Four-step (Tiling→Transfer→Compute→Transfer) vs TPipe four steps (Alloc→EnQue→...) | Programming flow vs pipeline management paradigm | Comparison table |
-| DMA vs MTE vs DataCopy | Three-layer name for the same operation | Terminology mapping table |
+| DMA vs MTE vs DataCopy | Direct Memory Access unit / data transfer unit / data transfer API | Terminology mapping table |
 | MemBase (Basic API) vs RegBase (VF fusion API) | Different compute locations (UB vs register), different Load/Store counts | Comparison table + scenario recommendation |
 | Block vs CTA | Ascend C programming unit vs CUDA equivalent concept | Competitive mapping table |
 | `LocalTensor` vs `GlobalTensor` vs `TBuf` | Compute buffer / external buffer / temporary buffer | Comparison table + scenario recommendation |
