@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_COMPUTE_REG_PERMUTE_SEL_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
 #include "impl/c_api/reg_base_impl/reg_permute_sel_intf_impl.h"
 #endif
 
@@ -415,6 +415,286 @@ __simd_callee__ inline vector_int32_t asc_unpack_lower(vector_int16_t src);
 __simd_callee__ inline vector_bool asc_unpack_upper(vector_bool src);
 
 __simd_callee__ inline vector_bool asc_unpack_lower(vector_bool src);
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+//=================asc_intlv_half (for 9201)==================
+__simd_callee__ inline void asc_intlv_half_low_b8(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_intlv_half_low_b16(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_intlv_half_low_b32(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_intlv_half_high_b8(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_intlv_half_high_b16(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_intlv_half_high_b32(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_intlv_half_low_b8(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_intlv_half_low_b16(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_intlv_half_low_b32(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_intlv_half_high_b8(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_intlv_half_high_b16(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_intlv_half_high_b32(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_half& dst, vector_half src0, vector_half src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_float& dst, vector_float src0, vector_float src1);
+
+__simd_callee__ inline void asc_intlv_half_low(
+    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_fp8_e6m2_t& dst, vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+
+__simd_callee__ inline void asc_intlv_half_low(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
+
+__simd_callee__ inline vector_uint8_t asc_intlv_half_low(vector_uint8_t src0, vector_uint8_t src1);
+
+__simd_callee__ inline vector_int8_t asc_intlv_half_low(vector_int8_t src0, vector_int8_t src1);
+
+__simd_callee__ inline vector_uint16_t asc_intlv_half_low(vector_uint16_t src0, vector_uint16_t src1);
+
+__simd_callee__ inline vector_int16_t asc_intlv_half_low(vector_int16_t src0, vector_int16_t src1);
+
+__simd_callee__ inline vector_uint32_t asc_intlv_half_low(vector_uint32_t src0, vector_uint32_t src1);
+
+__simd_callee__ inline vector_int32_t asc_intlv_half_low(vector_int32_t src0, vector_int32_t src1);
+
+__simd_callee__ inline vector_half asc_intlv_half_low(vector_half src0, vector_half src1);
+
+__simd_callee__ inline vector_float asc_intlv_half_low(vector_float src0, vector_float src1);
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_intlv_half_low(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_intlv_half_low(vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
+
+__simd_callee__ inline vector_hifloat8_t asc_intlv_half_low(vector_hifloat8_t src0, vector_hifloat8_t src1);
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_intlv_half_low(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_intlv_half_low(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+
+__simd_callee__ inline vector_bfloat16_t asc_intlv_half_low(vector_bfloat16_t src0, vector_bfloat16_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_half& dst, vector_half src0, vector_half src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_float& dst, vector_float src0, vector_float src1);
+
+__simd_callee__ inline void asc_intlv_half_high(
+    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_fp8_e6m2_t& dst, vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+
+__simd_callee__ inline void asc_intlv_half_high(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
+
+__simd_callee__ inline vector_uint8_t asc_intlv_half_high(vector_uint8_t src0, vector_uint8_t src1);
+
+__simd_callee__ inline vector_int8_t asc_intlv_half_high(vector_int8_t src0, vector_int8_t src1);
+
+__simd_callee__ inline vector_uint16_t asc_intlv_half_high(vector_uint16_t src0, vector_uint16_t src1);
+
+__simd_callee__ inline vector_int16_t asc_intlv_half_high(vector_int16_t src0, vector_int16_t src1);
+
+__simd_callee__ inline vector_uint32_t asc_intlv_half_high(vector_uint32_t src0, vector_uint32_t src1);
+
+__simd_callee__ inline vector_int32_t asc_intlv_half_high(vector_int32_t src0, vector_int32_t src1);
+
+__simd_callee__ inline vector_half asc_intlv_half_high(vector_half src0, vector_half src1);
+
+__simd_callee__ inline vector_float asc_intlv_half_high(vector_float src0, vector_float src1);
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_intlv_half_high(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_intlv_half_high(vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
+
+__simd_callee__ inline vector_hifloat8_t asc_intlv_half_high(vector_hifloat8_t src0, vector_hifloat8_t src1);
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_intlv_half_high(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_intlv_half_high(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+
+__simd_callee__ inline vector_bfloat16_t asc_intlv_half_high(vector_bfloat16_t src0, vector_bfloat16_t src1);
+
+//=================asc_deintlv_half (for 9201)==================
+__simd_callee__ inline void asc_deintlv_even_b8(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_deintlv_even_b16(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_deintlv_even_b32(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_deintlv_odd_b8(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_deintlv_odd_b16(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_deintlv_odd_b32(vector_bool& dst, vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_deintlv_even_b8(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_deintlv_even_b16(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_deintlv_even_b32(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_deintlv_odd_b8(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_deintlv_odd_b16(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline vector_bool asc_deintlv_odd_b32(vector_bool src0, vector_bool src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_half& dst, vector_half src0, vector_half src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_float& dst, vector_float src0, vector_float src1);
+
+__simd_callee__ inline void asc_deintlv_even(
+    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_fp8_e6m2_t& dst, vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+
+__simd_callee__ inline void asc_deintlv_even(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
+
+__simd_callee__ inline vector_uint8_t asc_deintlv_even(vector_uint8_t src0, vector_uint8_t src1);
+
+__simd_callee__ inline vector_int8_t asc_deintlv_even(vector_int8_t src0, vector_int8_t src1);
+
+__simd_callee__ inline vector_uint16_t asc_deintlv_even(vector_uint16_t src0, vector_uint16_t src1);
+
+__simd_callee__ inline vector_int16_t asc_deintlv_even(vector_int16_t src0, vector_int16_t src1);
+
+__simd_callee__ inline vector_uint32_t asc_deintlv_even(vector_uint32_t src0, vector_uint32_t src1);
+
+__simd_callee__ inline vector_int32_t asc_deintlv_even(vector_int32_t src0, vector_int32_t src1);
+
+__simd_callee__ inline vector_half asc_deintlv_even(vector_half src0, vector_half src1);
+
+__simd_callee__ inline vector_float asc_deintlv_even(vector_float src0, vector_float src1);
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_deintlv_even(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_deintlv_even(vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
+
+__simd_callee__ inline vector_hifloat8_t asc_deintlv_even(vector_hifloat8_t src0, vector_hifloat8_t src1);
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_deintlv_even(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_deintlv_even(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+
+__simd_callee__ inline vector_bfloat16_t asc_deintlv_even(vector_bfloat16_t src0, vector_bfloat16_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_uint8_t& dst, vector_uint8_t src0, vector_uint8_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_int8_t& dst, vector_int8_t src0, vector_int8_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_uint16_t& dst, vector_uint16_t src0, vector_uint16_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_int16_t& dst, vector_int16_t src0, vector_int16_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_half& dst, vector_half src0, vector_half src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_float& dst, vector_float src0, vector_float src1);
+
+__simd_callee__ inline void asc_deintlv_odd(
+    vector_fp8_e4m3fn_t& dst, vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_fp8_e6m2_t& dst, vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_hifloat8_t& dst, vector_hifloat8_t src0, vector_hifloat8_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_fp8_e5m2_t& dst, vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_fp8_e8m0_t& dst, vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+
+__simd_callee__ inline void asc_deintlv_odd(vector_bfloat16_t& dst, vector_bfloat16_t src0, vector_bfloat16_t src1);
+
+__simd_callee__ inline vector_uint8_t asc_deintlv_odd(vector_uint8_t src0, vector_uint8_t src1);
+
+__simd_callee__ inline vector_int8_t asc_deintlv_odd(vector_int8_t src0, vector_int8_t src1);
+
+__simd_callee__ inline vector_uint16_t asc_deintlv_odd(vector_uint16_t src0, vector_uint16_t src1);
+
+__simd_callee__ inline vector_int16_t asc_deintlv_odd(vector_int16_t src0, vector_int16_t src1);
+
+__simd_callee__ inline vector_uint32_t asc_deintlv_odd(vector_uint32_t src0, vector_uint32_t src1);
+
+__simd_callee__ inline vector_int32_t asc_deintlv_odd(vector_int32_t src0, vector_int32_t src1);
+
+__simd_callee__ inline vector_half asc_deintlv_odd(vector_half src0, vector_half src1);
+
+__simd_callee__ inline vector_float asc_deintlv_odd(vector_float src0, vector_float src1);
+
+__simd_callee__ inline vector_fp8_e4m3fn_t asc_deintlv_odd(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1);
+
+__simd_callee__ inline vector_fp8_e6m2_t asc_deintlv_odd(vector_fp8_e6m2_t src0, vector_fp8_e6m2_t src1);
+
+__simd_callee__ inline vector_hifloat8_t asc_deintlv_odd(vector_hifloat8_t src0, vector_hifloat8_t src1);
+
+__simd_callee__ inline vector_fp8_e5m2_t asc_deintlv_odd(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1);
+
+__simd_callee__ inline vector_fp8_e8m0_t asc_deintlv_odd(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1);
+
+__simd_callee__ inline vector_bfloat16_t asc_deintlv_odd(vector_bfloat16_t src0, vector_bfloat16_t src1);
+#endif
 
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_squeeze_and_storeunalign)
 __simd_callee__ inline void asc_squeeze_with_status(vector_uint8_t& dst, vector_uint8_t src, vector_bool mask);
