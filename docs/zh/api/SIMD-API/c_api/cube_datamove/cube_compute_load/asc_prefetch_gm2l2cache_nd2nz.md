@@ -34,6 +34,7 @@
 将矩阵数据从Global Memory预加载到L2 Cache中，在此过程中执行ND->NZ/NCHW->NC1HWC0/NCHW->C1HWNC0操作。仅预加载到L2 Cache，不实际搬进L1 Buffer。仅Cube核支持。
 
 GM中的数据以ND类型存储；预加载后在L2 Cache中以NZ形式缓存。
+
 ND->NZ的搬运形式参考[asc_copy_gm2l1_nd2nz](asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz.md)。
 
 ## 函数原型
@@ -105,31 +106,19 @@ bisheng examples.asc -o main --npu-arch=dav-9201 && ./main
 #include <cstdio>
 #include <vector>
 #include "acl/acl.h"
-#include "kernel_operator.h"
-#include "c_api/cube_datamove/cube_datamove.h"
-using namespace AscendC;
+#include "c_api/asc_simd.h"
 
 namespace {
 constexpr uint32_t M = 128, K = 128;
 constexpr uint32_t TOTAL = M * K;
+constexpr int64_t READY_FLAG = 11;
 
 __global__ __mix__(1, 2) void PrefetchGm2l2cacheNd2nzKernel(__gm__ int16_t* a, __gm__ int16_t* output)
 {
-    __gm__ int16_t* srcGm = a;
-    GlobalTensor<int16_t> srcGlobal, cGlobal;
-    srcGlobal.SetGlobalBuffer(a, TOTAL);
-    cGlobal.SetGlobalBuffer(output, TOTAL);
-
-    TPipe pipe;
-    TQue<TPosition::A1, 1> qidA1;
-    TQue<TPosition::VECOUT, 1> qidUB;
-    pipe.InitBuffer(qidA1, 1, TOTAL * sizeof(int16_t));
-    pipe.InitBuffer(qidUB, 1, TOTAL * sizeof(int16_t));
-
-    LocalTensor<int16_t> a_l1 = qidA1.template AllocTensor<int16_t>();
-    LocalTensor<int16_t> output_ub = qidUB.template AllocTensor<int16_t>();
-
-    if ASCEND_IS_AIC {
+    asc_init();
+    __cbuf__ int16_t a_l1[TOTAL];
+    __ubuf__ int16_t* output_ub = reinterpret_cast<__ubuf__ int16_t*>(0);
+    if ASC_IS_AIC {
         // Prefetch: 将GM中的ND矩阵预加载到L2 Cache，预加载过程中执行ND->NZ格式转换，
         // 不实际搬进L1 Buffer
         // 源矩阵按ND格式存放：128×128（行×列）的行主序矩阵，每行128个元素连续存放
@@ -137,20 +126,25 @@ __global__ __mix__(1, 2) void PrefetchGm2l2cacheNd2nzKernel(__gm__ int16_t* a, _
         uint16_t nValue = M;                             // ND矩阵的行数：128
         uint32_t dValue = K;                             // ND矩阵的列数：128
         uint64_t loop4SrcStride = 0;                     // 仅预加载1个ND矩阵，设置为0
-        asc_prefetch_gm2l2cache_nd2nz(srcGm, loop1SrcStride, nValue, dValue, loop4SrcStride);
+        asc_prefetch_gm2l2cache_nd2nz(a, loop1SrcStride, nValue, dValue, loop4SrcStride);
 
         // CopyIn: GM -> L1，访问已预加载的GM地址时可命中L2 Cache中缓存的数据
-        DataCopy(a_l1, srcGlobal, TOTAL);
-        pipe_barrier(PIPE_ALL);
+        asc_copy_gm2l1_align(a_l1, a, M, K * sizeof(int16_t), 0, 0, false,
+            asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, K * sizeof(int16_t), K * sizeof(int16_t));
+        asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
 
         // CopyOut: L1 -> UB
-        copy_cbuf_to_ubuf((__ubuf__ void*)output_ub.GetPhyAddr(), (__cbuf__ void*)a_l1.GetPhyAddr(), 0, 1,
-            static_cast<uint16_t>(TOTAL * sizeof(int16_t) / 32), 0, 0);
+        asc_copy_l12ub(output_ub, a_l1, 0, 1, TOTAL * sizeof(int16_t) / 32, 0, 0);
+        asc_sync_pipe(PIPE_MTE1);
+        asc_sync_block_arrive(PIPE_MTE1, READY_FLAG);
     }
-    SyncAll<false>();
-    if (GetSubBlockIdx() == 0) {
-        DataCopy(cGlobal, output_ub, TOTAL);
+    if ASC_IS_AIV {
+        asc_sync_block_wait(PIPE_MTE3, READY_FLAG);
+        if (asc_get_sub_block_id() == 0)
+            asc_copy_ub2gm_align(output, output_ub, TOTAL * sizeof(int16_t));
     }
+    asc_sync_pipe(PIPE_ALL);
 }
 } // namespace
 
@@ -167,7 +161,7 @@ int main()
     aclInit(nullptr);
     aclrtSetDevice(0);
     int16_t *ad = nullptr, *od = nullptr;
-    aclrtMalloc(reinterpret_cast<void**>(&ad), a.size() * sizeof(int16_t), ACL_MEM_MALLOC_HUGE_FIRST);
+    aclrtMalloc(reinterpret_cast<void**>(&ad), a.size(), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&od), output.size() * sizeof(int16_t), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMemcpy(ad, a.size() * sizeof(int16_t), a.data(), a.size() * sizeof(int16_t), ACL_MEMCPY_HOST_TO_DEVICE);
     PrefetchGm2l2cacheNd2nzKernel<<<1, 0>>>(ad, od);
