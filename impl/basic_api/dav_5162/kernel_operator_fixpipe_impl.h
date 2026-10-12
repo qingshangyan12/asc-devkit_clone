@@ -251,7 +251,8 @@ __aicore__ inline void FixpipeL1ToUb(
 /* fix data L1 to Out */
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL1ToOut(
-    __gm__ DstT* dst, __cbuf__ SrcT* src, const FixpipeParamsV516& params, uint16_t nIterIndex = 0)
+    __gm__ DstT* dst, __cbuf__ SrcT* src, const FixpipeParamsV516& params, uint16_t nIterIndex = 0,
+    const uint8_t sid = 4)
 {
     uint64_t config1 = 0;
 
@@ -264,7 +265,7 @@ __aicore__ inline void FixpipeL1ToOut(
         uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
         fix_cbuf_to_gm(
             (__gm__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0,
-            transMode, 0);
+            transMode, sid);
     } else if constexpr (config.format == CO2Layout::COLUMN_MAJOR) {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NZ2DN;
         config1 |= (((uint64_t)params.ndNum & 0xffff) << 0);
@@ -274,12 +275,12 @@ __aicore__ inline void FixpipeL1ToOut(
         uint32_t loop2DstStride = params.dstStride * sizeof(DstT);
         fix_cbuf_to_gm(
             (__gm__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.nSize, params.mSize, loop2DstStride, params.srcStride, 0,
-            transMode, 0);
+            transMode, sid);
     } else {
         fixp_trans_mode_t transMode = fixp_trans_mode_t::NORMAL_DMA;
         fix_cbuf_to_gm(
             (__gm__ DstT*)(dst), (__cbuf__ SrcT*)(src), params.mSize, params.nSize, params.dstStride, params.srcStride,
-            0, transMode, 0);
+            0, transMode, sid);
     }
 }
 
@@ -308,10 +309,11 @@ __aicore__ inline void FixpipeL12UbImpl(__ubuf__ DstT* dst, __cbuf__ SrcT* src, 
 /* fix data L1 to Out */
 template <typename DstT, typename SrcT, const FixpipeConfig& config>
 __aicore__ inline void FixpipeL12GmImpl(
-    __gm__ DstT* dst, __cbuf__ SrcT* src, const FixpipeParamsV516& params, const uint8_t cacheMode = 0)
+    __gm__ DstT* dst, __cbuf__ SrcT* src, const FixpipeParamsV516& params, const uint8_t cacheMode = 0,
+    const uint8_t sid = 4)
 {
     CheckFixpipeParams<DstT, SrcT, config>(params);
-    FixpipeL1ToOut<DstT, SrcT, config>(dst, src, params);
+    FixpipeL1ToOut<DstT, SrcT, config>(dst, src, params, 0, sid);
 }
 
 } // namespace AscendC
