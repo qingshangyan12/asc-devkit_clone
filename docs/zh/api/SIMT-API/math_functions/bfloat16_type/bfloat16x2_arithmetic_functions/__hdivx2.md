@@ -157,3 +157,11 @@ bfloat16x2_t __hdivx2(const bfloat16x2_t x, const bfloat16x2_t y)
         asc_vf_call<simt_hdivx2>(dim3(1024), (__gm__ bfloat16x2_t*)x, (__gm__ bfloat16x2_t*)y, (__gm__ bfloat16x2_t*)dst, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1.25, 0.5), (2.5, -3.75), (-2, 1.25), (0.75, -0.25)
+y: (0.5, -2), (1.25, 3), (1.5, -1), (-0.5, 2.25)
+result: (-2.5, -0.25), (2, -1.25), (-1.33594, -1.25), (-1.5, -0.111328)
+```

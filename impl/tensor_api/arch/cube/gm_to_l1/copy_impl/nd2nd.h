@@ -81,7 +81,8 @@ public:
         }
         auto cache_mode = static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode());
         copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
-            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+            dst, src, dst_offset, src_offset, block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
 private:
@@ -152,7 +153,8 @@ private:
             dst_stride = dst_stride >> 1;
         }
         copy_gm_to_l1_align_v2_instr::data_copy(
-            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 
     // Batch case: layout is (B, (M, N)) with strides (sB, (sM, sN)). Per-matrix internal
@@ -206,7 +208,8 @@ private:
             dst_stride = dst_stride >> 1;
         }
         copy_gm_to_l1_align_v2_instr::data_copy(
-            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+            dst.data().get(), src.data().get(), block_count, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+            trait.pre_allocation);
     }
 };
 } // namespace te

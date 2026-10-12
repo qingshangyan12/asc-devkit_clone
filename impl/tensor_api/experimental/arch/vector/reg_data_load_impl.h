@@ -220,6 +220,47 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor)
     return detail::load_broadcast_from_ptr<brc_mode, data_type>(tensor.engine().begin().get());
 }
 
+template <gather_mode mode, typename Tensor, typename Coord, typename Index>
+__simd_callee__ inline decltype(auto) load_gather(
+    const Tensor& tensor, const Coord& coord, const reg_tensor<Index> index, const reg_tensor<bool>& gather_mask)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "load_gather only supports tensors located in UB");
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, tensor.layout(), coord, "load_gather");
+
+    auto src_engine = tensor.engine() + tensor.layout()(coord);
+    reg_tensor<reg_data_type> dst;
+    if constexpr (mode == gather_mode::element) {
+        asc_gather(dst.reg, src_engine.begin().get(), index.reg, gather_mask.reg);
+    } else {
+        asc_gather_datablock(dst.reg, src_engine.begin().get(), index.reg, gather_mask.reg);
+    }
+    dst.mask = gather_mask.reg;
+    return dst;
+}
+
+template <gather_mode mode, typename Tensor, typename Index>
+__simd_callee__ inline decltype(auto) load_gather(
+    const Tensor& tensor, const reg_tensor<Index> index, const reg_tensor<bool>& gather_mask)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>, "load_gather only supports tensors located in UB");
+    reg_tensor<reg_data_type> dst;
+    if constexpr (mode == gather_mode::element) {
+        asc_gather(dst.reg, tensor.engine().begin().get(), index.reg, gather_mask.reg);
+    } else {
+        asc_gather_datablock(dst.reg, tensor.engine().begin().get(), index.reg, gather_mask.reg);
+    }
+    dst.mask = gather_mask.reg;
+    return dst;
+}
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

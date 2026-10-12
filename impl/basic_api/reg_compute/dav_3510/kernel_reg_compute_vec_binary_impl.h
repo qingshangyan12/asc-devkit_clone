@@ -153,7 +153,7 @@ __simd_callee__ inline void AddImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     } else if constexpr (mode == MaskMergeMode::MERGING) {
         U dstCopyReg;
         AddOperator<T, MaskMergeMode::ZEROING, U>(dstCopyReg, srcReg0, srcReg1, mask);
-        CopyMerging(dstReg, dstCopyReg, mask);
+        CopyMergingImpl(dstReg, dstCopyReg, mask);
     }
 }
 
@@ -1635,7 +1635,7 @@ __simd_callee__ inline void MaxImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     } else if constexpr (mode == MaskMergeMode::MERGING) {
         U dstCopyReg;
         MaxOperator<T, MaskMergeMode::ZEROING, U>(dstCopyReg, srcReg0, srcReg1, mask);
-        CopyMerging(dstReg, dstCopyReg, mask);
+        CopyMergingImpl(dstReg, dstCopyReg, mask);
     }
 }
 
@@ -1691,7 +1691,7 @@ __simd_callee__ inline void MinImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& 
     } else if constexpr (mode == MaskMergeMode::MERGING) {
         U dstCopyReg;
         MinOperator<T, MaskMergeMode::ZEROING, U>(dstCopyReg, srcReg0, srcReg1, mask);
-        CopyMerging(dstReg, dstCopyReg, mask);
+        CopyMergingImpl(dstReg, dstCopyReg, mask);
     }
 }
 

@@ -91,3 +91,10 @@ inline bfloat16_t __bfloat162bfloat16_rd(const bfloat16_t x)
         dst[idx] = __bfloat162bfloat16_rd(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, -0.5, -0.0, 0.0, inf, -inf, nan, 1.5
+result: 0.0, -1.0, 0.0, 0.0, inf, -inf, nan, 1.0
+```
