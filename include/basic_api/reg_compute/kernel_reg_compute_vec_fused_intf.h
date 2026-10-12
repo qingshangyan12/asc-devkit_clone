@@ -46,23 +46,11 @@ template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING,
 __simd_callee__ inline void MulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
 
 #if __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
-// FusedMulDstSub will be deperaceted. Use MulDstSub instead
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void FusedMulDstSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
-
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void MulDstSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
 
-// FusedNegMulDstAdd will be deperaceted. Use NegMulDstAdd instead
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void FusedNegMulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
-
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void NegMulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
-
-// FusedNegMulDstSub will be deperaceted. Use NegMulDstSub instead
-template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
-__simd_callee__ inline void FusedNegMulDstSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void NegMulDstSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
@@ -75,10 +63,6 @@ __simd_callee__ inline void FusedNegMulAddDst(U& dstReg, U& srcReg0, U& srcReg1,
 
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename U>
 __simd_callee__ inline void FusedNegMulSubDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask);
-
-template <RegLayout layoutMode>
-__simd_callee__ inline void FusedReciprocalCast(
-    RegTensor<bfloat16_t>& dstReg, RegTensor<fp8_e6m2_t>& srcReg, MaskReg& mask);
 
 template <
     typename T = DefaultType, typename U = DefaultType, const CastTrait& trait = castTrait, typename S, typename V>
