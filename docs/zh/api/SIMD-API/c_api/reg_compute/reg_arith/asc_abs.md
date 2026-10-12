@@ -41,7 +41,7 @@ $$
 ```c
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dtype> asc_abs(vector_<dtype> src,
-                                               vector_bool mask)
+                                              vector_bool mask)
 
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_abs(vector_<dtype>& dst,

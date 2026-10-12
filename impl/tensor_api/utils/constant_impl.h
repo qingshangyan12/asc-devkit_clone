@@ -37,12 +37,14 @@ constexpr size_t fractal_fixed = 16;
 constexpr size_t mx_scale_k0 = 2;
 constexpr uint32_t block_cube = 16;
 constexpr uint64_t hifloat8_mmad_ctrl_mask = 0x200000000000ULL;
+constexpr size_t scale_divisor = 16;
+constexpr size_t scale_divisor_hif4 = 8;
 
 struct arch_version {
     static constexpr uint32_t v3510 = 3510;
-    static constexpr uint32_t v2201 = 2201;
     static constexpr uint32_t V3510 = 3510;
-    static constexpr uint32_t V2201 = 2201;
+    static constexpr uint32_t v9201 = 9201;
+    static constexpr uint32_t V9201 = 9201;
 };
 
 struct get_arch_version {
@@ -139,11 +141,11 @@ template <typename DataType>
 inline constexpr bool is_data_type =
     is_one_of_attr_v<
         Std::remove_cvref_t<DataType>, hifloat8_t, bfloat16_t, fp4x2_e1m2_t, fp4x2_e2m1_t, fp8_e5m2_t, fp8_e4m3fn_t,
-        fp8_e8m0_t> ||
+        fp8_e8m0_t, int4b_t, hifloat4x2_t> ||
     Std::is_integral_v<Std::remove_cvref_t<DataType>> || Std::is_floating_point_v<Std::remove_cvref_t<DataType>>;
 
 template <typename DataType>
-inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
+inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t, int4b_t, hifloat4x2_t>;
 
 template <typename DataType = Std::ignore_t>
 __aicore__ inline constexpr size_t get_c0_size()

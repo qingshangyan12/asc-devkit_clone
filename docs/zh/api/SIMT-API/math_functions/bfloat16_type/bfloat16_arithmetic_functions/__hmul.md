@@ -95,3 +95,11 @@ bfloat16_t __hmul(const bfloat16_t x, const bfloat16_t y)
         asc_vf_call<kernel_hmul>(dim3(1024), dst, x, y, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, -0.5, 1.0, -1.0, 2.0, -2.0, 0.0, 4.0
+y: 2.0, 0.5, -1.0, -1.0, 0.5, 2.0, 4.0, 0.5
+result: 1.0, -0.25, -1.0, 1.0, 1.0, -4.0, 0.0, 2.0
+```

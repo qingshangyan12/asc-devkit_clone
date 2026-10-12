@@ -90,3 +90,10 @@ inline bfloat16_t __ushort2bfloat16_rz(const unsigned short int x)
         dst[idx] = __ushort2bfloat16_rz(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 129, 257, 258, 259, 10000, 65535, 0, 1
+result: 129.0, 256.0, 258.0, 258.0, 9984.0, 65280.0, 0.0, 1.0
+```

@@ -56,7 +56,9 @@ __simd_callee__ inline vector_float asc_int322float_<round_mode>(vector_int32_t 
                                                                  vector_bool mask)
 ```
 
-`<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
+**占位符说明如下：**
+
+- `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 
 ### 函数原型典型示例
 
