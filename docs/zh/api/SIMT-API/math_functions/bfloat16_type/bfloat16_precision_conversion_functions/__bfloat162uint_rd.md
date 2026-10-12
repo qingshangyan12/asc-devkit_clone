@@ -85,3 +85,10 @@ inline unsigned int __bfloat162uint_rd(const bfloat16_t x)
         dst[idx] = __bfloat162uint_rd(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, 1.5, 2.5, 63.5, 64.5, 127.5, 255.0, inf
+result: 0, 1, 2, 63, 64, 127, 255, 4294967295
+```

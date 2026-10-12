@@ -83,3 +83,10 @@ inline bfloat16_t __half2bfloat16_rna(const half x)
         dst[idx] = __half2bfloat16_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 128.5, 129.5, 0.5, -0.5, inf, -inf, nan, 0.0
+result: 129.0, 130.0, 0.5, -0.5, inf, -inf, nan, 0.0
+```

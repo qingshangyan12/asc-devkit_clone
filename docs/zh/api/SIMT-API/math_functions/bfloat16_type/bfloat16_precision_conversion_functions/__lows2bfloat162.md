@@ -111,3 +111,11 @@ inline bfloat16x2_t __lows2bfloat162(const bfloat16x2_t x, const bfloat16x2_t y)
         asc_vf_call<simt_lows2bfloat162>(dim3(1024), (__gm__ bfloat16x2_t*)input1, (__gm__ bfloat16x2_t*)input2, (__gm__ bfloat16x2_t*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (0.5, -1.0), (1.0, 2.0), (3.0, 4.0), (0.0, 3.0), (nan, 1.0), (1.0, 2.0), (inf, -inf), (nan, nan)
+y: (1.0, 0.5), (1.0, 2.0), (2.0, 3.0), (1.0, 2.0), (0.0, 1.0), (1.0, nan), (inf, 0.0), (nan, nan)
+result: (0.5, 1.0), (1.0, 1.0), (3.0, 2.0), (0.0, 1.0), (nan, 0.0), (1.0, 1.0), (inf, inf), (nan, nan)
+```
