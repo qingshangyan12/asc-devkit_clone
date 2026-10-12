@@ -1,5 +1,33 @@
 # Collective DSL
 
+## 新的数据与依赖 core：先从这里阅读
+
+新接口使用短命名空间 `asc::ir`，与下文旧 Plan 适配层暂时并存。
+**新执行图目前经过 CPU 模拟验证，不宣称已由 AICPU/CCU/AIV 执行。**
+此前未完成的 CCU server 草稿暂停，不属于本次 core 验证。
+
+| 阅读顺序 | 文件 | 重点 |
+|---|---|---|
+| 1 | [core/program.h](core/program.h) | Buffer/Slice 精确表示哪一个 rank 的哪段内存；Queue/Event 只表达依赖 |
+| 2 | [core/program.cc](core/program.cc) | submit 如何构图，finish 如何连接跨 rank 的 buffer-ready 和完成 |
+| 3 | [primitives/exchange.cc](primitives/exchange.cc) | Mesh 展开明确的逐 peer 操作；NHR 逐轮计算 peer/block |
+| 4 | [algorithms/allgather/](algorithms/allgather/) | 每个具体组合一个文件，不通过大 switch 解释算法 |
+| 5 | [engines/sim/sim_engine.cc](engines/sim/sim_engine.cc) | engine 执行同一个 IR；检查未初始化读取、缺失依赖和随机调度 |
+
+例如 [Parallel](algorithms/allgather/parallel_mesh_nhr.cc) 明确写出两条路径：
+`Mesh→NHR` 处理第一段，`NHR→Mesh` 处理第二段；第二阶段明确传播第一阶段收集的 owner 槽位。
+算法参数不含 Channel；输入 Slice 本身含长度，不再重复传 `bytesPerRank`。
+
+```bash
+cmake --build build --target ascendc_ut_hccl_dataflow -j4
+```
+
+该目标使用 C++14、`-Wall -Wextra -Werror`，编译后自动执行数据与依赖测试。
+Program 在本阶段保存整个通信域的图，以检查跨 rank 的依赖；不能把它直接当作已支持数千 rank 的部署 runtime。
+后续真实 backend 需要将图按 rank 切分，映射 Channel 与物理资源，并验证远端可见性协议。
+
+## 原 Plan 与 native 适配层（尚未切换到新 core）
+
 目标是把原来混在一起的三个维度拆开：
 
 ```text

@@ -2,6 +2,15 @@
 # Licensed under the CANN Open Software License Agreement Version 2.0.
 
 target_sources(mc2_client PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/core/program.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/primitives/exchange.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/allgather/slices.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/allgather/sole_mesh.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/allgather/sole_nhr.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/allgather/sequence_mesh_nhr.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/allgather/concurrent_mesh_nhr.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/allgather/parallel_mesh_nhr.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/allgather/pipeline_mesh_nhr.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/model/collective_plan.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/model/logical_resources.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/model/execution_route.cc
@@ -17,6 +26,8 @@ target_sources(mc2_client PRIVATE
 )
 
 target_include_directories(mc2_client PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/algorithms/allgather
     ${CMAKE_CURRENT_SOURCE_DIR}/model
     ${CMAKE_CURRENT_SOURCE_DIR}/primitives
     ${CMAKE_CURRENT_SOURCE_DIR}/algorithms
