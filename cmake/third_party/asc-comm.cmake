@@ -120,7 +120,7 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
             LIBRARY DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/lib64 ${INSTALL_OPTIONAL}
             COMPONENT asc-devkit)
         install(DIRECTORY ${ASC_COMM_SOURCE_PATH}/include/ccu/hcomm/
-            DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/include/ccu/hcomm
+            DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/comm_api/ccu/hcomm
             COMPONENT asc-devkit
             FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
     endif()
