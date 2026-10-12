@@ -96,3 +96,11 @@ inline bfloat16_t __hmin(bfloat16_t x, bfloat16_t y)
         dst[idx] = __hmin(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.0, 0.5, 2.0, 2.0, nan, 1.0, inf, -inf
+y: 0.5, 0.5, 2.0, 3.0, 1.0, nan, inf, 0.0
+result: -1.0, 0.5, 2.0, 2.0, 1.0, 1.0, inf, -inf
+```
