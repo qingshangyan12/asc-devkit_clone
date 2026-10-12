@@ -25,6 +25,9 @@ namespace te {
 namespace experimental {
 namespace detail {
 
+template <typename DataType>
+using reg_data_type_t = AscendC::Std::conditional_t<AscendC::Std::is_same_v<DataType, int4b_t>, int4x2_t, DataType>;
+
 template <typename T>
 struct reg_tensor_traits;
 

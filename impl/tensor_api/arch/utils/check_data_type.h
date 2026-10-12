@@ -243,6 +243,7 @@ public:
                           Std::tuple<__ubuf__ int32_t, __gm__ int32_t>, Std::tuple<__ubuf__ uint32_t, __gm__ uint32_t>,
                           Std::tuple<__ubuf__ int64_t, __gm__ int64_t>, Std::tuple<__ubuf__ uint64_t, __gm__ uint64_t>,
                           Std::tuple<__ubuf__ fp4x2_e1m2_t, __gm__ fp4x2_e1m2_t>,
+                          Std::tuple<__ubuf__ int4b_t, __gm__ int4b_t>,
                           Std::tuple<__ubuf__ fp4x2_e2m1_t, __gm__ fp4x2_e2m1_t>,
                           Std::tuple<__ubuf__ fp8_e5m2_t, __gm__ fp8_e5m2_t>,
                           Std::tuple<__ubuf__ fp8_e4m3fn_t, __gm__ fp8_e4m3fn_t>,

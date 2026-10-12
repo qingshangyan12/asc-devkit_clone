@@ -108,6 +108,34 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_one_dim)
     EXPECT_EQ(g_copy_gm_to_ub_capture.dst_stride, 0);
 }
 
+TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_int4_logical_elements)
+{
+    using namespace asc::te;
+
+    constexpr uint32_t copy_size = 512;
+    __gm__ int4b_t src[copy_size / 2];
+    __ubuf__ int4b_t dst[copy_size / 2];
+
+    auto layout = make_layout(make_shape(copy_size), make_stride(1));
+    auto gm_tensor = make_tensor_at<location::gm>(src, layout);
+    auto ub_tensor = make_tensor_at<location::ub>(dst, layout);
+
+    MOCKER_CPP(copy_gm_to_ubuf_align_v2, void(__ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t,
+                                              uint8_t, uint8_t, bool, uint8_t, uint64_t, uint32_t))
+        .times(1)
+        .will(invoke(copy_gm_to_ub_stub));
+
+    copy(ub_tensor, gm_tensor);
+
+    GlobalMockObject::verify();
+    EXPECT_EQ(g_copy_gm_to_ub_capture.dst, reinterpret_cast<__ubuf__ uint8_t*>(dst));
+    EXPECT_EQ(g_copy_gm_to_ub_capture.src, reinterpret_cast<__gm__ uint8_t*>(src));
+    EXPECT_EQ(g_copy_gm_to_ub_capture.block_count, 1);
+    EXPECT_EQ(g_copy_gm_to_ub_capture.block_len, copy_size / 2);
+    EXPECT_EQ(g_copy_gm_to_ub_capture.src_stride, 0);
+    EXPECT_EQ(g_copy_gm_to_ub_capture.dst_stride, 0);
+}
+
 TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_nd_to_nd)
 {
     using namespace asc::te;
