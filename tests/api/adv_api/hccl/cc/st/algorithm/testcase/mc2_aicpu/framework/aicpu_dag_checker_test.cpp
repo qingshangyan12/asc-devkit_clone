@@ -218,3 +218,97 @@ TEST_F(AicpuDagCheckerTest, SameQueueNeverConflicts)
     AicpuDagChecker checker;
     EXPECT_TRUE(checker.Check(executor.ExecutionLog()).empty());
 }
+
+// 无同步的跨队列 WAR（读先写后）：rank0 先执行 READ（远端读打在 (r0, INPUT)），
+// rank1 后执行 WRITE（远端写同一区间）→ a=读 时序在先 → kind 必须是 WAR
+TEST_F(AicpuDagCheckerTest, UnsynchronizedWarIsConflict)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
+    const uint64_t inAddr = npu0.AllocMemory(BufferType::INPUT, 8);
+    const uint64_t out0 = npu0.AllocMemory(BufferType::OUTPUT, 8);
+    const uint64_t out1 = npu1.AllocMemory(BufferType::OUTPUT, 8);
+    DataSlice remote;
+    ASSERT_EQ(npu0.GetSlice(inAddr, 8, remote), HcclResult::HCCL_SUCCESS);
+    DataSlice local;
+    ASSERT_EQ(npu0.GetSlice(out0, 8, local), HcclResult::HCCL_SUCCESS);
+    DataSlice wLocal;
+    ASSERT_EQ(npu1.GetSlice(out1, 8, wLocal), HcclResult::HCCL_SUCCESS);
+    DataSlice wRemote;
+    ASSERT_EQ(npu0.GetSlice(inAddr, 8, wRemote), HcclResult::HCCL_SUCCESS);
+
+    // rank0（轮询序在前）：READ 自读——远端读打在 (r0, INPUT)
+    Append(0, 0, std::make_shared<TaskStubRead>(0, LinkInfo(LinkProtoStub::SDMA), local, remote));
+    // rank1（后执行）：WRITE 远端写同一 (r0, INPUT)
+    Append(1, 0, std::make_shared<TaskStubWrite>(0, LinkInfo(LinkProtoStub::SDMA), wLocal, wRemote));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    AicpuDagChecker checker;
+    const auto conflicts = checker.Check(executor.ExecutionLog());
+    ASSERT_EQ(conflicts.size(), 1U);
+    EXPECT_EQ(conflicts[0].kind, "WAR"); // 读先写后
+    EXPECT_NE(conflicts[0].detailA.find("READ"), std::string::npos);
+}
+
+// 三队列两跳传递 HB：writeA(qA) --PO--> POST1 --sync--> WAIT1(qB) --PO--> writeB --PO--> POST2
+//                  --sync--> WAIT2(qC) --PO--> writeC。writeA 与 writeC 仅靠传递性建立先后，
+// 若 Reachable 退化为单跳邻接，writeA vs writeC 会被误报 WAW。
+TEST_F(AicpuDagCheckerTest, TransitiveHappensBeforeAcrossThreeQueues)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
+    const uint64_t out0 = npu0.AllocMemory(BufferType::OUTPUT, 16); // [0,8)=争用区 [8,16)=源
+    const uint64_t out1 = npu1.AllocMemory(BufferType::OUTPUT, 8);
+    DataSlice srcA;
+    ASSERT_EQ(npu0.GetSlice(out0 + 8, 8, srcA), HcclResult::HCCL_SUCCESS);
+    DataSlice targetA;
+    ASSERT_EQ(npu0.GetSlice(out0, 8, targetA), HcclResult::HCCL_SUCCESS);
+    DataSlice bSrc;
+    ASSERT_EQ(npu1.GetSlice(out1, 8, bSrc), HcclResult::HCCL_SUCCESS);
+    DataSlice bDst;
+    ASSERT_EQ(npu0.GetSlice(out0, 8, bDst), HcclResult::HCCL_SUCCESS);
+
+    const uint32_t id1 = 0x80;
+    const uint32_t id2 = 0x81;
+    // qA = rank0 主流：写争用区 → POST id1
+    Append(0, 0, std::make_shared<TaskStubLocalCopy>(srcA, targetA));
+    Append(0, 0, std::make_shared<TaskStubLocalPostTo>(id1));
+    // qB = rank1 主流：等 id1 → 跨 rank 写同一争用区 → POST id2
+    Append(1, 0, std::make_shared<TaskStubLocalWaitFrom>(id1));
+    Append(1, 0, std::make_shared<TaskStubWrite>(0, LinkInfo(LinkProtoStub::SDMA), bSrc, bDst));
+    Append(1, 0, std::make_shared<TaskStubLocalPostTo>(id2));
+    // qC = rank0 从流：等 id2 → 再写争用区
+    Append(0, 1, std::make_shared<TaskStubLocalWaitFrom>(id2));
+    Append(0, 1, std::make_shared<TaskStubLocalCopy>(srcA, targetA));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    // 传递 HB 覆盖 writeA/writeB/writeC 三对跨队列写——零冲突
+    EXPECT_TRUE(AicpuDagChecker().Check(executor.ExecutionLog()).empty());
+}
+
+// 零大小访问豁免：size=0 的 slice 与重叠区间不构成冲突（守卫回归——无守卫时 [4,4) 会误判入 [0,8)）
+TEST_F(AicpuDagCheckerTest, ZeroSizeAccessIsExemptFromConflict)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
+    const uint64_t out0 = npu0.AllocMemory(BufferType::OUTPUT, 8);
+    const uint64_t out1 = npu1.AllocMemory(BufferType::OUTPUT, 8);
+    DataSlice zero;
+    ASSERT_EQ(npu0.GetSlice(out0 + 4, 0, zero), HcclResult::HCCL_SUCCESS); // size=0 @offset 4
+    DataSlice wLocal;
+    ASSERT_EQ(npu1.GetSlice(out1, 8, wLocal), HcclResult::HCCL_SUCCESS);
+    DataSlice wRemote;
+    ASSERT_EQ(npu0.GetSlice(out0, 8, wRemote), HcclResult::HCCL_SUCCESS);
+
+    Append(0, 0, std::make_shared<TaskStubLocalCopy>(zero, zero));                                    // 零大小搬运
+    Append(1, 0, std::make_shared<TaskStubWrite>(0, LinkInfo(LinkProtoStub::SDMA), wLocal, wRemote)); // 整段写
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_TRUE(AicpuDagChecker().Check(executor.ExecutionLog()).empty());
+}

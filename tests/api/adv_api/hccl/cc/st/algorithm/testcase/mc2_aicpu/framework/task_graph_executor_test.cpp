@@ -544,3 +544,121 @@ TEST_F(TaskGraphExecutorTest, DoublePostAbsorbedKeepsOldestSeq)
     // 覆盖式（吸收前）实现会记录 secondPost->seq，本断言可检出该回归
     EXPECT_EQ(wait->satisfiedBySeq, firstPost->seq);
 }
+
+// PROD + 负数 + INT8 双向饱和（int64 精确路径）
+TEST_F(TaskGraphExecutorTest, LocalReduceInt8ProdNegativeAndSaturation)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    const uint64_t srcAddr = npu0.AllocMemory(BufferType::INPUT, 4);
+    const uint64_t dstAddr = npu0.AllocMemory(BufferType::OUTPUT, 4);
+    auto* src = reinterpret_cast<int8_t*>(Base(0, BufferType::INPUT, 4));
+    auto* dst = reinterpret_cast<int8_t*>(Base(0, BufferType::OUTPUT, 4));
+    src[0] = -3;
+    src[1] = 20;
+    src[2] = -20;
+    src[3] = 5;
+    dst[0] = 1;
+    dst[1] = 10;
+    dst[2] = 10;
+    dst[3] = -1;
+
+    DataSlice srcSlice;
+    ASSERT_EQ(npu0.GetSlice(srcAddr, 4, srcSlice), HcclResult::HCCL_SUCCESS);
+    DataSlice dstSlice;
+    ASSERT_EQ(npu0.GetSlice(dstAddr, 4, dstSlice), HcclResult::HCCL_SUCCESS);
+    Append(
+        0, 0,
+        std::make_shared<TaskStubLocalReduce>(
+            srcSlice, dstSlice, HcclDataType::HCCL_DATA_TYPE_INT8, HcclReduceOp::HCCL_REDUCE_PROD));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(dst[0], -3);   // 1 × (-3)
+    EXPECT_EQ(dst[1], 127);  // 10 × 20 = 200 → 饱和上界
+    EXPECT_EQ(dst[2], -128); // 10 × (-20) = -200 → 饱和下界
+    EXPECT_EQ(dst[3], -5);   // (-1) × 5
+}
+
+// MIN + INT32 负数
+TEST_F(TaskGraphExecutorTest, LocalReduceInt32MinNegative)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    const uint64_t srcAddr = npu0.AllocMemory(BufferType::INPUT, 8);
+    const uint64_t dstAddr = npu0.AllocMemory(BufferType::OUTPUT, 8);
+    auto* src = reinterpret_cast<int32_t*>(Base(0, BufferType::INPUT, 8));
+    auto* dst = reinterpret_cast<int32_t*>(Base(0, BufferType::OUTPUT, 8));
+    src[0] = -100;
+    src[1] = 7;
+    dst[0] = 50;
+    dst[1] = -7;
+
+    DataSlice srcSlice;
+    ASSERT_EQ(npu0.GetSlice(srcAddr, 8, srcSlice), HcclResult::HCCL_SUCCESS);
+    DataSlice dstSlice;
+    ASSERT_EQ(npu0.GetSlice(dstAddr, 8, dstSlice), HcclResult::HCCL_SUCCESS);
+    Append(
+        0, 0,
+        std::make_shared<TaskStubLocalReduce>(
+            srcSlice, dstSlice, HcclDataType::HCCL_DATA_TYPE_INT32, HcclReduceOp::HCCL_REDUCE_MIN));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(dst[0], -100); // min(50, -100)
+    EXPECT_EQ(dst[1], -7);   // min(-7, 7)
+}
+
+// PROD + FP16 负数（float 路径 + 跨 rank WriteReduce）：-1.5 × 2.0 = -3.0
+TEST_F(TaskGraphExecutorTest, WriteReduceFp16ProdNegative)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
+    const uint64_t inAddr = npu0.AllocMemory(BufferType::INPUT, 2);
+    const uint64_t rmtAddr = npu1.AllocMemory(BufferType::OUTPUT, 2);
+    auto* inU16 = reinterpret_cast<uint16_t*>(Base(0, BufferType::INPUT, 2));
+    auto* rmtU16 = reinterpret_cast<uint16_t*>(Base(1, BufferType::OUTPUT, 2));
+    inU16[0] = 0xBE00;  // -1.5
+    rmtU16[0] = 0x4000; // 2.0
+
+    DataSlice local;
+    ASSERT_EQ(npu0.GetSlice(inAddr, 2, local), HcclResult::HCCL_SUCCESS);
+    DataSlice remote;
+    ASSERT_EQ(npu1.GetSlice(rmtAddr, 2, remote), HcclResult::HCCL_SUCCESS);
+    Append(
+        0, 0,
+        std::make_shared<TaskStubWriteReduce>(
+            1, LinkInfo(LinkProtoStub::SDMA), local, remote, HcclDataType::HCCL_DATA_TYPE_FP16,
+            HcclReduceOp::HCCL_REDUCE_PROD));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(rmtU16[0], 0xC200); // 2.0 × (-1.5) = -3.0
+}
+
+// 多队列死锁：报告必须列出每个阻塞队列的卡点（诊断完整性——BuildDeadlockReport 遍历全部队列）
+TEST_F(TaskGraphExecutorTest, MultiQueueDeadlockReportsAllBlockedQueues)
+{
+    const uint32_t idA = 0x71;
+    const uint32_t idB = 0x72;
+    const uint32_t idC = 0x73;
+    Append(0, 0, std::make_shared<TaskStubLocalWaitFrom>(idA));
+    Append(1, 0, std::make_shared<TaskStubLocalWaitFrom>(idB));
+    Append(1, 1, std::make_shared<TaskStubLocalWaitFrom>(idC)); // rank1 从流也阻塞
+
+    TaskGraphExecutor executor;
+    std::string report;
+    EXPECT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::DEADLOCK);
+    EXPECT_NE(report.find("rank 0 stream 0"), std::string::npos);
+    EXPECT_NE(report.find("rank 1 stream 0"), std::string::npos);
+    EXPECT_NE(report.find("rank 1 stream 1"), std::string::npos);
+    // 三条 pending=0（从未 POST）
+    size_t pos = 0;
+    uint32_t pendingCount = 0;
+    while ((pos = report.find("pending=0", pos)) != std::string::npos) {
+        ++pendingCount;
+        pos += sizeof("pending=0") - 1;
+    }
+    EXPECT_EQ(pendingCount, 3U);
+}

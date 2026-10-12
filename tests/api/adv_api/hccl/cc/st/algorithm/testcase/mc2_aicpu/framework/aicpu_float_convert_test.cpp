@@ -73,3 +73,17 @@ TEST(AicpuStFloatConvert, StoreElemSaturatesIntegers)
     memcpy(&out, buf32, sizeof(out));
     EXPECT_EQ(out, 12345);
 }
+
+// 穷举：全部 65536 个 BFP16 位模式 bfp16→float→bfp16 恒等（BFP16 ⊂ FP32，截断返回必还原）；
+// 附截断语义锚点（BFP16 按截断而非 RNE，与 FP16 不同——见头文件声明）
+TEST(AicpuStFloatConvert, Bfp16RoundTripAllBitPatterns)
+{
+    for (uint32_t v = 0; v <= 0xFFFF; ++v) {
+        const uint16_t bits = static_cast<uint16_t>(v);
+        EXPECT_EQ(FloatToBfp16(Bfp16ToFloat(bits)), bits) << "roundtrip mismatch at 0x" << std::hex << v;
+    }
+    // 截断锚点：BFP16 尾数 7 位，[1,2) 区间 ULP=2^-7、半 ULP=2^-8
+    EXPECT_EQ(FloatToBfp16(1.0f + 0x1p-9f), 0x3F80);           // 1/4 ULP：半 ULP 以下截断 → 1.0
+    EXPECT_EQ(FloatToBfp16(1.0f + 0x1p-8f + 0x1p-9f), 0x3F80); // 3/4 ULP：超半 ULP 仍截断 → 1.0（RNE 会入到 0x3F81）
+    EXPECT_EQ(FloatToBfp16(1.0f + 0x1p-7f + 0x1p-8f), 0x3F81); // 1.5 ULP：超 1 ULP 截断进位 → 1 + 2^-7
+}
