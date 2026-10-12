@@ -108,3 +108,11 @@ half2 __hminx2(const half2 x, const half2 y)
         asc_vf_call<simt_hminx2>(dim3(1024), (__gm__ half2*)x, (__gm__ half2*)y, (__gm__ half2*)dst, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1.25, 0.5), (2.5, -3.75), (nan, 1.25), (0.75, nan)
+y: (0.5, -2), (1.25, 3), (-2, nan), (nan, -0.25)
+result: (-1.25, -2), (1.25, -3.75), (-2, 1.25), (0.75, -0.25)
+```
