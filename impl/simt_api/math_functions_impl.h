@@ -1410,7 +1410,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erff(float x)
 {
     float abs_x = fabsf(x);
     float x_squared = x * x;
-    float res;
     if (abs_x >= 1.00296f) {
         float term = abs_x;
         const float a1 = 0.000112198715f;
@@ -1429,12 +1428,12 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erff(float x)
         poly_term = fmaf(poly_term, term, a7);
 
         float result = fmaf(poly_term, -abs_x, -abs_x);
-        float exp_result = __powf(2.0f, result);
+        float exp_result = exp2f(result);
         float adjusted_exp = 1.0f - exp_result;
         uint32_t sign_bit = *reinterpret_cast<uint32_t*>(&x) & 0x80000000;
         uint32_t final_bits = sign_bit | *reinterpret_cast<uint32_t*>(&adjusted_exp);
 
-        res = *reinterpret_cast<float*>(&final_bits);
+        return *reinterpret_cast<float*>(&final_bits);
     } else {
         float term = x_squared;
         const float a1 = 0.000084834944f;
@@ -1452,9 +1451,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erff(float x)
         poly_term = fmaf(poly_term, term, a6);
         poly_term = fmaf(poly_term, term, a7);
 
-        res = fmaf(poly_term, x, x);
+        return fmaf(poly_term, x, x);
     }
-    return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_cal_poly(float abs_x)
@@ -1487,7 +1485,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfinvf(float x)
     float temp1 = fmaf(x, opposite_x, 1.0f);
     float log2_temp = log2f(temp1);
     float neg_log2 = -log2_temp;
-    float result;
     if (log2_temp < -8.2f) {
         float rsqrt_neg_log = rsqrtf(neg_log2);
         float poly = fmaf(-0.5899144f, rsqrt_neg_log, -0.6630042f);
@@ -1540,7 +1537,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcinvf(float x)
         float term2 = is_gt_one ? term : x;
         float log_term = log2f(term2);
         float neg_log = -log_term;
-        float rsqrt_log = 1.0f / __sqrtf(neg_log);
+        float rsqrt_log = rsqrtf(neg_log);
         float poly = fmaf(-63.113224f, rsqrt_log, 127.48469f);
         poly = fmaf(poly, rsqrt_log, -114.10568f);
         poly = fmaf(poly, rsqrt_log, 60.325786f);
@@ -1557,7 +1554,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcinvf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcxf(float x)
 {
-    float res;
+    if (x < -9.43f) {
+        return ASCRT_INF_F;
+    }
     float abs_x = fabsf(x);
     if (abs_x < 10.055f) {
         float poly = __internal_cal_poly(abs_x);
@@ -1568,27 +1567,27 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcxf(float x)
         float u = t - q;
         float result = fmaf(u, inv_term3, q);
         if (x > 0) {
-            res = result;
-        } else {
-            float x_sq = abs_x * abs_x;
-            float neg_x2 = -x_sq;
-            float term4 = fmaf(abs_x, abs_x, neg_x2);
-            float term5 = fmaf(x_sq, 0.00572498f, 0.5f);
-            term5 = fminf(term5, ASCRT_INF_F); // prevent overflow
-            float term6 = fmaf(term5, 252.0f, 12582913.0f);
-            float term7 = term6 - 12583039.0f;
-            float neg_term7 = -term7;
-            float term8 = fmaf(x_sq, 1.442695f, neg_term7);
-            float term9 = fmaf(x_sq, 1.925963e-8f, term8);
-            uint32_t exponent = *reinterpret_cast<uint32_t*>(&term6) << 23; // Extract exponent bits from term6
-            float exponent_scale = *reinterpret_cast<float*>(&exponent);
-            float term9_exp = __powf(2.0f, term9);
-            float scaled_exp = term9_exp * exponent_scale;
-            float exp_approx = fmaf(term9_exp, exponent_scale, scaled_exp);
-            float finalexp_approx = fmaf(exp_approx, term4, exp_approx);
-            bool is_inf = isinf(exp_approx);
-            res = is_inf ? exp_approx : (finalexp_approx - result);
+            return result;
         }
+        float x_sq = abs_x * abs_x;
+        float neg_x2 = -x_sq;
+        float term4 = fmaf(abs_x, abs_x, neg_x2);
+        float term5 = fmaf(x_sq, 0.00572498f, 0.5f);
+        term5 = fminf(term5, ASCRT_INF_F); // prevent overflow
+        float term6 = fmaf(term5, 252.0f, 12582913.0f);
+        float term7 = term6 - 12583039.0f;
+        float neg_term7 = -term7;
+        float term8 = fmaf(x_sq, 1.442695f, neg_term7);
+        float term9 = fmaf(x_sq, 1.925963e-8f, term8);
+        uint32_t exponent = *reinterpret_cast<uint32_t*>(&term6) << 23; // Extract exponent bits from term6
+        float exponent_scale = *reinterpret_cast<float*>(&exponent);
+        float term9_exp = exp2f(term9);
+        float scaled_exp = term9_exp * exponent_scale;
+        float exp_approx = fmaf(term9_exp, exponent_scale, scaled_exp);
+        float finalexp_approx = fmaf(exp_approx, term4, exp_approx);
+        bool is_inf = isinf(exp_approx);
+        result = is_inf ? exp_approx : (finalexp_approx - result);
+        return result;
     } else {
         float scaled_x = abs_x * 0.25f;
         float reciprocal_x = 0.25f / scaled_x;
@@ -1598,12 +1597,9 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcxf(float x)
         poly = fmaf(poly, w, -0.5f);
         poly = fmaf(poly, w, 1.0f);
         float scaled_reciprocal = reciprocal_x * 0.5641896f;
-        res = scaled_reciprocal * poly;
+        float result = scaled_reciprocal * poly;
+        return result;
     }
-    if (x < -9.43f) {
-        res = ASCRT_INF_F;
-    }
-    return res;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_compute_sinpi(float x)
@@ -5686,10 +5682,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
     int32_t result = __internal_ilogbf_finite_abs(ax);
 
     if (ax == ASCRT_INF_F) {
-        result = static_cast<int32_t>(0x7FFFFFFFU); // INT_MAX: infinity maps to this sentinel.
+        result = ASCRT_MAX_VAL_S; // INT_MAX: infinity maps to this sentinel.
     }
     if (__isnan(x) || x == 0.0f) {
-        result = static_cast<int32_t>(0x80000000U); // INT_MIN: NaN and 0 map to this sentinel.
+        result = ASCRT_MIN_VAL_S; // INT_MIN: NaN and 0 map to this sentinel.
     }
 
     return result;
