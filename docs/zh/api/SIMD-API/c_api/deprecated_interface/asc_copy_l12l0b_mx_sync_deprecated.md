@@ -58,7 +58,7 @@ __aicore__ inline void asc_copy_l12l0b_mx_sync(uint64_t dst,
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 含义 |
 | --- | --- | --- |

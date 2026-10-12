@@ -40,42 +40,48 @@
 
 ```cpp
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_half2int4x2_<round_mode><sat_mode>(
-    vector_int4x2_t& dst,
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+__simd_callee__ inline void asc_half2int4x2_<round_mode><sat_mode>(vector_int4x2_t& dst,
+                                                                   vector_half src,
+                                                                   vector_bool mask,
+                                                                   std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_int4x2_t asc_half2int4x2_<round_mode><sat_mode>(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+__simd_callee__ inline vector_int4x2_t asc_half2int4x2_<round_mode><sat_mode>(vector_half src,
+                                                                              vector_bool mask,
+                                                                              std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
 
 - `<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+
+`<quarter_pos>`支持`asc_position_quarter_mode`枚举类的四个取值：
+
+```c
+enum class asc_position_quarter_mode {
+    DISPERSE_FIRST_QUARTER = 0,
+    DISPERSE_SECOND_QUARTER,
+    DISPERSE_THIRD_QUARTER,
+    DISPERSE_FOURTH_QUARTER
+};
+```
 
 ### 函数原型典型示例
 
 ```cpp
 // ROUND舍入模式，非饱和模式，通过引用参数输出结果
-__simd_callee__ inline void asc_half2int4x2_rna(
-    vector_int4x2_t& dst,
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst,
+                                                vector_half src,
+                                                vector_bool mask,
+                                                std::integral_constant<asc_position_quarter_mode,
+                                                                       asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 
 // ROUND舍入模式，非饱和模式，通过函数返回值返回结果
-__simd_callee__ inline vector_int4x2_t asc_half2int4x2_rna(
-    vector_half src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+__simd_callee__ inline vector_int4x2_t asc_half2int4x2_rna(vector_half src,
+                                                           vector_bool mask,
+                                                           std::integral_constant<asc_position_quarter_mode,
+                                                                                  asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 ```
 
 ## 参数说明
@@ -87,7 +93,7 @@ __simd_callee__ inline vector_int4x2_t asc_half2int4x2_rna(
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| dst_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入位置，其他位置清零。 |
+| dst_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入位置，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 

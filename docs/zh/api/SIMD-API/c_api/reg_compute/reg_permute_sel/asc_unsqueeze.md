@@ -54,9 +54,9 @@ __simd_callee__ inline void asc_unsqueeze(vector_<dtype>& dst,
                                           vector_bool mask)
 ```
 
-#### dtype支持数据类型
+### dtype支持数据类型
 
-dtype支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、uint32_t。返回值类型接口通过函数名后缀区分数据类型，对应关系如下：
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`。返回值类型接口通过函数名后缀区分数据类型，对应关系如下：
 
 | 函数名后缀 | 数据类型 |
 |---|---|
@@ -67,7 +67,7 @@ dtype支持的数据类型：int8_t、uint8_t、int16_t、uint16_t、int32_t、u
 | u32 | uint32_t |
 | s32 | int32_t |
 
-#### 函数原型典型示例
+### 函数原型典型示例
 
 ```c
 // 示例：对int8_t矢量数据寄存器执行解压缩，通过函数返回值返回结果。

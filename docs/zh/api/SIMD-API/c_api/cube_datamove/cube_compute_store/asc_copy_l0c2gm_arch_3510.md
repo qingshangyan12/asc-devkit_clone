@@ -97,7 +97,7 @@ __aicore__ inline void asc_copy_l0c2gm(__gm__ <dst_dtype>* dst,
                                        bool enable_clip_relu_pre)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
 src dtype与dst dtype支持以下组合：
 

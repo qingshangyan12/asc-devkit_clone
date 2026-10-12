@@ -37,23 +37,23 @@
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_half2int32_<round_mode>(vector_int32_t& dst,
-                                                       vector_half src,
-                                                       vector_bool mask,
-                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+                                                        vector_half src,
+                                                        vector_bool mask,
+                                                        std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 
 __simd_callee__ inline void asc_half2int32_<round_mode>(vector_int32_t& dst,
-                                                       vector_half src,
-                                                       vector_bool mask,
-                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+                                                        vector_half src,
+                                                        vector_bool mask,
+                                                        std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_int32_t asc_half2int32_<round_mode>(vector_half src,
-                                                                 vector_bool mask,
-                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
 
 __simd_callee__ inline vector_int32_t asc_half2int32_<round_mode>(vector_half src,
-                                                                 vector_bool mask,
-                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 ```
 
 **占位符说明如下：**`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。

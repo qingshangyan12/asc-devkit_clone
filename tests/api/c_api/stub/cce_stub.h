@@ -13,6 +13,28 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
+namespace float8_e6m2 {
+struct Fp8e6m2T {
+    uint8_t val;
+};
+} // namespace float8_e6m2
+using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
+using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
+using vector_fp8_e6m2_t = vector_f8e6m2;
+
+inline void vcvt(
+    vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+inline void vcvt(
+    vector_f8e5m2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+inline void vcvt_bf162e6m2(
+    vector_f8e6m2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2)
+{}
+inline void vcvt_bf162e8m0(
+    vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+{}
+
 struct hifloat4x2_t {
     uint8_t val = 0;
 };

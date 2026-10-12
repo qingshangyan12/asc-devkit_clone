@@ -39,9 +39,9 @@ __aicore__ inline void asc_set_l12l0a_3d_padding(<dtype> padding_value)
 __aicore__ inline void asc_set_l12l0a_3d_padding(uint64_t config)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 函数原型典型示例
 

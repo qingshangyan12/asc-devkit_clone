@@ -91,15 +91,15 @@ __simd_callee__ inline vector_int8_t asc_gather_datablock(__ubuf__ int8_t* src,
                                                           vector_bool mask)
 ```
 
-### 无掩码控制（占位符形式）
+### 无掩码控制
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_gather_datablock(vector_<dst_dtype>& dst,
                                                  __ubuf__ <src_dtype>* src,
                                                  vector_uint32_t index)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_<dst_dtype> asc_gather_datablock(__ubuf__ <src_dtype>* src,
                                                                vector_uint32_t index)
 ```

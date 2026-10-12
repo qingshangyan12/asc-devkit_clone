@@ -16,6 +16,7 @@
 #ifndef INCLUDE_C_API_DEFS_TYPE_H
 #define INCLUDE_C_API_DEFS_TYPE_H
 
+#include "version/asc_devkit_version.h"
 #include "c_api/defs/macro.h"
 #include "utils/common_types.h"
 
@@ -40,6 +41,11 @@ using vector_fp8_e8m0_t = vector_f8e8m0;
 using vector_int4x2_t = vector_s4x2;
 using vector_fp4x2_e2m1_t = vector_f4e2m1x2;
 using vector_fp4x2_e1m2_t = vector_f4e1m2x2;
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+using vector_fp8_e6m2_t = vector_f8e6m2;
+#endif
+
 // iter_reg has been deprecated, please use addr_reg instead.
 using iter_reg ASC_DEPRECATED(9.2.0, "2027/09/07", addr_reg) = addr_reg;
 

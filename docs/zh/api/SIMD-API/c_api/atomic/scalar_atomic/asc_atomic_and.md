@@ -39,7 +39,7 @@ __aicore__ inline <dtype> asc_atomic_and(__gm__ <dtype>* address,
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
+`dtype`取值为：`int32_t`、`uint32_t`、`int64_t`、`uint64_t`。
 
 ### 函数原型典型示例
 

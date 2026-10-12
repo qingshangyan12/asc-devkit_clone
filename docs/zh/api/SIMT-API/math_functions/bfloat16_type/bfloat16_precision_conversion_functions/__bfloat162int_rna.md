@@ -85,3 +85,10 @@ inline int __bfloat162int_rna(const bfloat16_t x)
         dst[idx] = __bfloat162int_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, 1.5, 2.5, -1.5, -2.5, 127.5, -127.5, inf
+result: 1, 2, 3, -2, -3, 128, -128, 2147483647
+```

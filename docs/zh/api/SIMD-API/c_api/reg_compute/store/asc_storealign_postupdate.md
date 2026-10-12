@@ -48,22 +48,22 @@
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst,
-                                                       vector_<dtype> src,
-                                                       int32_t offset,
-                                                       vector_bool mask)
+                                                      vector_<dtype> src,
+                                                      int32_t offset,
+                                                      vector_bool mask)
 ```
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 #### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t*& dst,
-                                                       vector_int8_t src,
-                                                       int32_t offset,
-                                                       vector_bool mask)
+                                                      vector_int8_t src,
+                                                      int32_t offset,
+                                                      vector_bool mask)
 ```
 
 ### 矢量数据寄存器非连续对齐搬出模式
@@ -79,16 +79,16 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 #### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ int8_t*& dst,
-                                                       vector_int8_t src,
-                                                       uint16_t block_stride,
-                                                       uint16_t repeat_stride,
-                                                       vector_bool mask)
+                                                      vector_int8_t src,
+                                                      uint16_t block_stride,
+                                                      uint16_t repeat_stride,
+                                                      vector_bool mask)
 ```
 
 ### 掩码寄存器立即数偏移搬出模式
@@ -102,21 +102,21 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ <dtype>*& dst,
 
 #### dtype支持数据类型
 
-dtype支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`取值为：`uint8_t`、`uint16_t`、`uint32_t`。
 
 #### 函数原型典型示例
 
 ```c
 __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst,
-                                                       vector_bool src,
-                                                       int32_t offset)
+                                                      vector_bool src,
+                                                      int32_t offset)
 ```
 
 ## 参数说明
 
 ### 矢量数据寄存器立即数偏移搬出模式
 
-**表 1** 参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -127,7 +127,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst,
 
 ### 矢量数据寄存器非连续对齐搬出模式
 
-**表 2** 参数说明
+**表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|
@@ -139,7 +139,7 @@ __simd_callee__ inline void asc_storealign_postupdate(__ubuf__ uint8_t*& dst,
 
 ### 掩码寄存器立即数偏移搬出模式
 
-**表 3** 参数说明
+**表3** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 |---|---|---|

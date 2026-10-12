@@ -40,9 +40,9 @@ $$
 
 ```c
 __simd_callee__ inline void asc_madd(vector_<dtype>& dst,
-                                      vector_<dtype> src0,
-                                      vector_<dtype> src1,
-                                      vector_bool mask)
+                                     vector_<dtype> src0,
+                                     vector_<dtype> src1,
+                                     vector_bool mask)
 ```
 
 ### dtype支持数据类型
@@ -54,9 +54,9 @@ __simd_callee__ inline void asc_madd(vector_<dtype>& dst,
 ```c
 // 示例：对float矢量数据寄存器执行乘加计算
 __simd_callee__ inline void asc_madd(vector_float& dst,
-                                      vector_float src0,
-                                      vector_float src1,
-                                      vector_bool mask)
+                                     vector_float src0,
+                                     vector_float src1,
+                                     vector_bool mask)
 ```
 
 ## 参数说明

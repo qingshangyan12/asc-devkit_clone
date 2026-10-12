@@ -43,7 +43,6 @@ Ascend 950PR&950DT系列产品使用[asc_set_l0c_copy_nz_para](asc_set_l0c_copy_
 __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_stride, uint16_t dst_nd_stride)
 ```
 
-
 ## 参数说明
 
 **表1** 参数说明
@@ -53,9 +52,6 @@ __aicore__ inline void asc_set_l0c_copy_params(uint16_t nd_num, uint16_t src_nd_
 | nd_num       | 输入    | 	ND矩阵的数量，取值范围：nd_num∈[1, 65535]。            |
 | src_nd_stride | 输入    | 以分形大小为单位的源步长，源相邻nz矩阵的起始地址间的偏移。<br> src_nd_stride∈[1, 512]，单位：fractal_size 1024B。|
 | dst_nd_stride | 输入    | 	目的相邻ND矩阵的起始地址间的偏移。单位为元素。 <br> dst_nd_stride∈[1, 65535]。      |
-
-
-
 
 ## 返回值说明
 

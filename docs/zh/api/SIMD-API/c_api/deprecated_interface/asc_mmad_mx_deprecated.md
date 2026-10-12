@@ -82,7 +82,7 @@ __aicore__ inline void asc_mmad_mx_sync(__cc__ float* c_matrix,
                                         bool c_matrix_init_val)
 ```
 
-**dtype支持的数据类型：**
+### dtype支持数据类型
 
 `a_dtype`、`b_dtype`的取值组合见下表：
 
@@ -99,7 +99,7 @@ __aicore__ inline void asc_mmad_mx_sync(__cc__ float* c_matrix,
 | `fp8_e5m2_t` | `fp8_e4m3fn_t` | `fp8_e8m0_t` | `float` | `float` |
 | `fp8_e5m2_t` | `fp8_e5m2_t` | `fp8_e8m0_t` | `float` | `float` |
 
-**典型示例：**
+### 函数原型典型示例
 
 ```c
 __aicore__ inline void asc_mmad_mx(__cc__ float* c_matrix,

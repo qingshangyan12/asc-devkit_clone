@@ -56,9 +56,9 @@ __aicore__ inline void asc_copy_l12l0b(__cb__ <dtype>* dst,
                                        uint16_t dst_stride)
 ```
 
-### dtype支持的数据类型
+#### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 函数原型典型示例
 
@@ -87,27 +87,27 @@ __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ <dtype>* dst,
                                                  uint16_t dst_stride)
 ```
 
-### dtype支持的数据类型
+#### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 函数原型典型示例
 
 ```cpp
 // 示例：half类型的2D搬运。
 __aicore__ inline void asc_copy_l12l0b_transpose(__cb__ half* dst,
-                                       __cbuf__ half* src,
-                                       uint16_t m_start_position,
-                                       uint16_t k_start_position,
-                                       uint8_t m_step,
-                                       uint8_t k_step,
-                                       int16_t src_stride,
-                                       uint16_t dst_stride)
+                                                 __cbuf__ half* src,
+                                                 uint16_t m_start_position,
+                                                 uint16_t k_start_position,
+                                                 uint8_t m_step,
+                                                 uint8_t k_step,
+                                                 int16_t src_stride,
+                                                 uint16_t dst_stride)
 ```
 
 ## 参数说明
 
-**表1**  参数说明
+**表1** 参数说明
 
 | 参数名 | 输入/输出 | 含义 |
 | --- | --- | --- |
