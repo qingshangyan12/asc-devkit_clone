@@ -36,9 +36,7 @@ struct local_tensor : public base_tensor<EngineT, LayoutT> {
 } // namespace te
 } // namespace asc
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/tensor_api/tensor/local_tensor_impl.h"
-#endif
 
 #endif // INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 
