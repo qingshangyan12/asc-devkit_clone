@@ -107,5 +107,5 @@ half2 __hnegx2(const half2 x)
 
 ```text
 x: (-1, 0), (1, -1), (inf, -inf), (nan, 0.5)
-result: (1, -0) (-1, 1) (-inf, inf) (nan, -0.5)
+result: (1, -0), (-1, 1), (-inf, inf), (nan, -0.5)
 ```

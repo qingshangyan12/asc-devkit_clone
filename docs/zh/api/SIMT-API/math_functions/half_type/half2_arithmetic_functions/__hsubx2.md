@@ -169,5 +169,5 @@ half2 __hsubx2(const half2 x, const half2 y)
 ```text
 x: (-1, 0), (1, -1), (inf, -inf), (nan, 0.5)
 y: (1, 0), (1, -2), (inf, inf), (0.5, nan)
-result: (-2, 0) (0, 1) (nan, -inf) (nan, nan)
+result: (-2, 0), (0, 1), (nan, -inf), (nan, nan)
 ```
