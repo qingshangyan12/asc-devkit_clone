@@ -262,9 +262,9 @@ static void DispatchKfcSubKernel(ccu::Array<ccu::Variable>& param, KfcServerCont
             std::strcmp(ctx.arg->opParam.algName, KFC_REDUCE_SCATTER_PEER_ONLY_ALG_NAME) == 0) {
             CcuReduceScatterMeshMem2Mem1DPeerOnlyKernel(
                 param[HBM_PARAM_IDX_1], param[HBM_PARAM_IDX_2], ctx.token, param[HBM_PARAM_IDX_4],
-                param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels, ctx.arg->channelCount,
-                static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId, ctx.arg->opParam.DataDes.dataType,
-                ctx.arg->opParam.reduceType);
+                param[HBM_PARAM_IDX_5], param[HBM_PARAM_IDX_7], param[HBM_PARAM_IDX_8], ctx.arg->channels,
+                ctx.arg->channelCount, static_cast<uint32_t>(ctx.arg->rankSize), ctx.arg->rankId,
+                ctx.arg->opParam.DataDes.dataType, ctx.arg->opParam.reduceType);
         } else if (ctx.arg->role == KfcServerRole::REDUCE_SCATTER_SOLE_NHR) {
             // SoleNHRMultiLink 单帧布局见 KfcReduceScatterSoleNhrParamIndex（[0]=opId，[1..9] 为 NHR 参数）。
             CcuKfcReduceScatterNHR1DMultiJettyMem2MemKernel(

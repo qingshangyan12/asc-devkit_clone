@@ -45,7 +45,7 @@ enum class ReduceType {
 } // namespace AscendC
 
 using hif4_scale = struct hif4_scale {
-    uint32_t value = 0; // 在Kernel 内不需要对此数据类型解析。 作为整体使用。
+    uint32_t value = 0;
 };
 
 #if !defined(ASCENDC_CPU_DEBUG)

@@ -68,8 +68,29 @@ public:
     __aicore__ inline static void data_copy(
         __cbuf__ DataType* dst, __gm__ DataType* src, uint32_t block_count, uint32_t block_len,
         uint8_t left_padding_cnt, uint8_t right_padding_cnt, asc_load_l2_cache_mode cache_mode, uint64_t src_stride,
-        uint32_t dst_stride)
+        uint32_t dst_stride, bool pre_allocation = false)
     {
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+        if constexpr (sizeof(DataType) == sizeof(int8_t)) {
+            asc_copy_gm2l1_align(
+                reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), block_count,
+                block_len, left_padding_cnt, right_padding_cnt, true, pre_allocation, cache_mode, src_stride,
+                dst_stride);
+        } else if constexpr (sizeof(DataType) == sizeof(half)) {
+            asc_copy_gm2l1_align(
+                reinterpret_cast<__cbuf__ half*>(dst), reinterpret_cast<__gm__ half*>(src), block_count, block_len,
+                left_padding_cnt, right_padding_cnt, true, pre_allocation, cache_mode, src_stride, dst_stride);
+        } else if constexpr (sizeof(DataType) == sizeof(float)) {
+            asc_copy_gm2l1_align(
+                reinterpret_cast<__cbuf__ float*>(dst), reinterpret_cast<__gm__ float*>(src), block_count, block_len,
+                left_padding_cnt, right_padding_cnt, true, pre_allocation, cache_mode, src_stride, dst_stride);
+        } else if constexpr (sizeof(DataType) == sizeof(uint64_t)) {
+            asc_copy_gm2l1_align(
+                reinterpret_cast<__cbuf__ uint32_t*>(dst), reinterpret_cast<__gm__ uint32_t*>(src), block_count,
+                block_len, left_padding_cnt, right_padding_cnt, true, pre_allocation, cache_mode, src_stride,
+                dst_stride);
+        }
+#else
         if constexpr (sizeof(DataType) == sizeof(int8_t)) {
             asc_copy_gm2l1_align(
                 reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), block_count,
@@ -87,6 +108,7 @@ public:
                 reinterpret_cast<__cbuf__ uint32_t*>(dst), reinterpret_cast<__gm__ uint32_t*>(src), block_count,
                 block_len, left_padding_cnt, right_padding_cnt, true, cache_mode, src_stride, dst_stride);
         }
+#endif
     }
 };
 
@@ -120,13 +142,28 @@ public:
         __cbuf__ DataType* dst, __gm__ DataType* src, uint16_t nd_num, uint16_t loop2_dst_stride,
         uint16_t loop3_dst_stride, uint16_t loop4_dst_stride, uint64_t loop1_src_stride,
         asc_load_l2_cache_mode cache_mode, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride,
-        bool enable_small_c0)
+        bool enable_small_c0, bool pre_allocation = false)
     {
         uint64_t mte2_nz_para = static_cast<uint64_t>(loop4_dst_stride) << 48; // MTE2_NZ_PARA[63:48]
         mte2_nz_para |= static_cast<uint64_t>(loop3_dst_stride) << 32;         // MTE2_NZ_PARA[47:32]
         mte2_nz_para |= static_cast<uint64_t>(loop2_dst_stride) << 16;         // MTE2_NZ_PARA[31:16]
         mte2_nz_para |= static_cast<uint64_t>(nd_num);                         // MTE2_NZ_PARA[15:0]
         set_mte2_nz_para(mte2_nz_para);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+        if constexpr (sizeof(DataType) == sizeof(int8_t)) {
+            asc_copy_gm2l1_nd2nz(
+                reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), loop1_src_stride,
+                cache_mode, n_value, d_value, loop4_src_stride, enable_small_c0, pre_allocation);
+        } else if constexpr (sizeof(DataType) == sizeof(half)) {
+            asc_copy_gm2l1_nd2nz(
+                reinterpret_cast<__cbuf__ half*>(dst), reinterpret_cast<__gm__ half*>(src), loop1_src_stride,
+                cache_mode, n_value, d_value, loop4_src_stride, enable_small_c0, pre_allocation);
+        } else if constexpr (sizeof(DataType) == sizeof(float)) {
+            asc_copy_gm2l1_nd2nz(
+                reinterpret_cast<__cbuf__ float*>(dst), reinterpret_cast<__gm__ float*>(src), loop1_src_stride,
+                cache_mode, n_value, d_value, loop4_src_stride, enable_small_c0, pre_allocation);
+        }
+#else
         if constexpr (sizeof(DataType) == sizeof(int8_t)) {
             asc_copy_gm2l1_nd2nz(
                 reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), loop1_src_stride,
@@ -140,6 +177,7 @@ public:
                 reinterpret_cast<__cbuf__ float*>(dst), reinterpret_cast<__gm__ float*>(src), loop1_src_stride,
                 cache_mode, n_value, d_value, loop4_src_stride, enable_small_c0);
         }
+#endif
     }
 };
 
@@ -173,13 +211,28 @@ public:
         __cbuf__ DataType* dst, __gm__ DataType* src, uint16_t dn_num, uint16_t loop2_dst_stride,
         uint16_t loop3_dst_stride, uint16_t loop4_dst_stride, uint64_t loop1_src_stride,
         asc_load_l2_cache_mode cache_mode, uint16_t n_value, uint32_t d_value, uint64_t loop4_src_stride,
-        bool enable_small_c0)
+        bool enable_small_c0, bool pre_allocation = false)
     {
         uint64_t mte2_nz_para = static_cast<uint64_t>(loop4_dst_stride) << 48; // MTE2_NZ_PARA[63:48]
         mte2_nz_para |= static_cast<uint64_t>(loop3_dst_stride) << 32;         // MTE2_NZ_PARA[47:32]
         mte2_nz_para |= static_cast<uint64_t>(loop2_dst_stride) << 16;         // MTE2_NZ_PARA[31:16]
         mte2_nz_para |= static_cast<uint64_t>(dn_num);                         // MTE2_NZ_PARA[15:0]
         set_mte2_nz_para(mte2_nz_para);
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+        if constexpr (sizeof(DataType) == sizeof(int8_t)) {
+            asc_copy_gm2l1_dn2nz(
+                reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), loop1_src_stride,
+                cache_mode, n_value, d_value, loop4_src_stride, enable_small_c0, pre_allocation);
+        } else if constexpr (sizeof(DataType) == sizeof(half)) {
+            asc_copy_gm2l1_dn2nz(
+                reinterpret_cast<__cbuf__ half*>(dst), reinterpret_cast<__gm__ half*>(src), loop1_src_stride,
+                cache_mode, n_value, d_value, loop4_src_stride, enable_small_c0, pre_allocation);
+        } else if constexpr (sizeof(DataType) == sizeof(float)) {
+            asc_copy_gm2l1_dn2nz(
+                reinterpret_cast<__cbuf__ float*>(dst), reinterpret_cast<__gm__ float*>(src), loop1_src_stride,
+                cache_mode, n_value, d_value, loop4_src_stride, enable_small_c0, pre_allocation);
+        }
+#else
         if constexpr (sizeof(DataType) == sizeof(int8_t)) {
             asc_copy_gm2l1_dn2nz(
                 reinterpret_cast<__cbuf__ uint8_t*>(dst), reinterpret_cast<__gm__ uint8_t*>(src), loop1_src_stride,
@@ -193,6 +246,7 @@ public:
                 reinterpret_cast<__cbuf__ float*>(dst), reinterpret_cast<__gm__ float*>(src), loop1_src_stride,
                 cache_mode, n_value, d_value, loop4_src_stride, enable_small_c0);
         }
+#endif
     }
 };
 

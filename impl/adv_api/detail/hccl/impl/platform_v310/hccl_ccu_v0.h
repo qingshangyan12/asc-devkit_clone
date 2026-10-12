@@ -370,6 +370,8 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
 template <const auto& config>
 __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::InitCcuParam(const HcclHandle handleId)
 {
+    // Snapshot the tiling mode per handle, including deferred Commit and legacy callers.
+    handleParamGM_[handleId].skipLocalRankCopy = 0U;
     uint64_t ccTiling = 0;
     if (curVersion_ == HcclTilingVersion::NEW_TILING_VERSION) {
         ccTiling = ccOpTilingDataTable_[static_cast<uint32_t>(handleParamGM_[handleId].commType.prepareType)];
@@ -388,6 +390,9 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         handleParamGM_[handleId].dataType = static_cast<HcclDataType>(tilingPtr->srcDataType);
         handleParamGM_[handleId].dstDataType = static_cast<HcclDataType>(tilingPtr->dstDataType);
         handleParamGM_[handleId].op = static_cast<HcclReduceOp>(tilingPtr->reduceType);
+        if (handleParamGM_[handleId].commType.prepareType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER) {
+            handleParamGM_[handleId].skipLocalRankCopy = (tilingPtr->skipLocalRankCopy == 1U) ? 1U : 0U;
+        }
     }
 
     ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
