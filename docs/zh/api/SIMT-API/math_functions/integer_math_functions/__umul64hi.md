@@ -79,3 +79,11 @@ unsigned long long __umul64hi(unsigned long long x, unsigned long long y)
         dst[idx] = __umul64hi(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 4294967296, 18446744073709551615, 1, 4294967295
+y: 4294967296, 18446744073709551615, 1, 4294967295
+result: 1, 18446744073709551614, 0, 0
+```
