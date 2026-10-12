@@ -10,6 +10,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cstring>
+
 #include "sim_common.h"
 #include "sim_npu.h"
 #include "sim_task_queue.h"
@@ -115,8 +117,7 @@ TEST_F(TaskGraphExecutorTest, WriteMovesBytesCrossRank)
     std::string report;
     ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
     u8* out = Base(1, BufferType::OUTPUT, 4);
-    EXPECT_EQ(out[0], 1);
-    EXPECT_EQ(out[3], 4);
+    EXPECT_EQ(memcmp(out, in, 4), 0);
 }
 
 TEST_F(TaskGraphExecutorTest, ReadPullsFromRemoteRank)
@@ -206,33 +207,69 @@ TEST_F(TaskGraphExecutorTest, SameBackingGrowthDuringExecuteKeepsBothEndsValid)
     EXPECT_EQ(Base(0, BufferType::CCL, 12)[9], 0x9F);
 }
 
+// 跨队列门控（数据因果版）：被门控的读取所取数据，由 rank1 在 POST 之后的轮次才写入。
+// 轮询序 ctxs=[r0主流, r1主流]（队列 map 按 (pod,server,phy) 升序，同一 sweep 内 r0 先于 r1 推进队头）。
+// 三轮推演（门控正确，CanExecute 拦 WAIT）：
+//   round1: r0 的 WAIT 因 0x40 未置位而阻塞（r1 的 POST 尚未执行）；r1 的 POST 置位 0x40。
+//   round2: r0 的 WAIT 消费信号放行（satisfiedBySeq=POST 的 seq）；r1 的 Write 将新值 0x22
+//           写入 r1 自己的 INPUT(src) 块（Write 在 rank1 队列中位于 POST 之后）。
+//   round3: r0 的 Read 拉取 r1 的 INPUT → r0 的 OUTPUT=0x22——读发生在写之后，读到新值。
+// 门控失效（CanExecute 恒 true）：
+//   round1: r0 的 WAIT 立即执行（satisfiedBySeq=0）；r1 的 POST 置位。
+//   round2: r0 的 Read 先于 r1 的 Write 执行（r0 轮询在前）→ 读到旧值 0x11 → 数据断言 FAIL
+//           （且 WAIT.satisfiedBySeq==0 亦 FAIL）——门控回归可被数据面观测。
+// 注：src 块在 rank1 名下，跨 rank 读取须用 TaskStubRead（LocalCopy 双端均按入队 rank 解析，
+// 读不到远端块）；rank1 的 Write 为自写：local 端是自己的 OUTPUT 暂存块（预填新值 0x22），
+// remote 端是自己的 src(INPUT) 块。
 TEST_F(TaskGraphExecutorTest, PostThenWaitSynchronizes)
 {
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
     SimNpu& npu1 = SimWorld::Global()->GetSimNpuByRankId(1);
-    // rank1 先 WAIT 再做搬运；rank0 POST。跨队列同步由 notify 兑现。
-    // rank1 本地占位任务：WAIT 通过后执行
-    DataSlice localB;
-    ASSERT_EQ(npu1.GetSlice(npu1.AllocMemory(BufferType::INPUT, 4), 4, localB), HcclResult::HCCL_SUCCESS);
-    DataSlice remoteB;
-    ASSERT_EQ(npu1.GetSlice(npu1.AllocMemory(BufferType::OUTPUT, 4), 4, remoteB), HcclResult::HCCL_SUCCESS);
+    // rank0 的读取源 = rank1 将在 POST 之后写入的 INPUT 块
+    const uint64_t srcAddr = npu1.AllocMemory(BufferType::INPUT, 4);
+    const uint64_t dstAddr = npu0.AllocMemory(BufferType::OUTPUT, 4);
+    // rank1 的 Write 暂存块（新值来源）
+    const uint64_t stagingAddr = npu1.AllocMemory(BufferType::OUTPUT, 4);
+    u8* srcBase = Base(1, BufferType::INPUT, 4);    // 旧值预填
+    u8* stageBase = Base(1, BufferType::OUTPUT, 4); // 新值暂存
+    for (uint64_t i = 0; i < 4; ++i) {
+        srcBase[i] = 0x11;
+        stageBase[i] = 0x22;
+    }
+
+    DataSlice srcSlice; // rank1 的 INPUT 块
+    ASSERT_EQ(npu1.GetSlice(srcAddr, 4, srcSlice), HcclResult::HCCL_SUCCESS);
+    DataSlice dstSlice; // rank0 的 OUTPUT 块
+    ASSERT_EQ(npu0.GetSlice(dstAddr, 4, dstSlice), HcclResult::HCCL_SUCCESS);
+    DataSlice stagingSlice; // rank1 的 OUTPUT 暂存块
+    ASSERT_EQ(npu1.GetSlice(stagingAddr, 4, stagingSlice), HcclResult::HCCL_SUCCESS);
 
     const uint32_t notifyId = 0x40;
-    Append(1, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId));
-    Append(1, 0, std::make_shared<TaskStubLocalCopy>(localB, remoteB));
-    Append(0, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));
+    // rank1：先发信号，下一轮才把新值写进自己的 INPUT(src)
+    Append(1, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));
+    Append(1, 0, std::make_shared<TaskStubWrite>(1, LinkInfo(LinkProtoStub::SDMA), stagingSlice, srcSlice));
+    // rank0：等信号，放行后才拉取 rank1 的 INPUT
+    Append(0, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId));
+    Append(0, 0, std::make_shared<TaskStubRead>(1, LinkInfo(LinkProtoStub::SDMA), dstSlice, srcSlice));
 
     TaskGraphExecutor executor;
     std::string report;
     ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+
     const auto& log = executor.ExecutionLog();
-    bool foundWait = false;
+    const ExecEvent* wait = nullptr;
     for (const auto& e : log) {
-        if (e.type == TaskTypeStub::LOCAL_WAIT_FROM && e.rank == 1 && e.notifyId == notifyId) {
-            foundWait = true;
-            EXPECT_NE(e.satisfiedBySeq, 0U);
+        if (e.type == TaskTypeStub::LOCAL_WAIT_FROM && e.rank == 0 && e.notifyId == notifyId) {
+            wait = &e;
         }
     }
-    EXPECT_TRUE(foundWait);
+    ASSERT_NE(wait, nullptr);
+    EXPECT_NE(wait->satisfiedBySeq, 0U); // 门控正确：WAIT 由真实 POST 满足（非空跑）
+    // 门控因果：被门控的读必须观察到 POST 之后写入的新值（失效路径读到 0x11）
+    const u8* out = Base(0, BufferType::OUTPUT, 4);
+    for (uint64_t i = 0; i < 4; ++i) {
+        EXPECT_EQ(out[i], 0x22U) << "gated read must observe the post-POST write (byte " << i << ")";
+    }
 }
 
 TEST_F(TaskGraphExecutorTest, WaitWithoutPostIsDeadlock)

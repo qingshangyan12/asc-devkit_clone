@@ -100,3 +100,12 @@ TEST_F(AicpuStAllGather, InsAllGatherMesh1D_ForcedAlg_2Rank_SingleDie_Int8_16B)
     scenario.algConfig = "InsAllGatherMesh1D";
     VerifyScenario(scenario);
 }
+
+// ===== expectedAlgName 留空模式 =====
+// 留空 expectedAlgName：跳过算法断言，golden 仍按实际选中算法（InsAllGatherMesh1D）选择，数据面照常逐字节验证
+TEST_F(AicpuStAllGather, EmptyExpectedAlgName_SkipsAssertion_StillVerifiesData)
+{
+    AicpuStScenario scenario = MakeScenario(TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_INT8, 16);
+    scenario.expectedAlgName = ""; // 框架支持的合法模式：不关心 selector 选择
+    VerifyScenario(scenario);
+}

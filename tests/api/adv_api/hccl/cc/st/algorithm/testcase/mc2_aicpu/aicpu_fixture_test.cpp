@@ -27,18 +27,21 @@ protected:
     {
         (void)rankSize;
         opParam.DataDes.count = scenario.count;
+        opParam.DataDes.dataType = scenario.dataType; // tiling 已设，此处冗余兜底
         opParam.inputPtr = mem.inputPtr;
         opParam.outputPtr = mem.outputPtr;
         opParam.inputSize = mem.inputBytes;
         opParam.outputSize = mem.outputBytes;
     }
 
-    std::vector<uint8_t> BuildExpectedOutput(uint32_t rankSize, const AicpuStScenario& scenario, RankId rank) override
+    std::vector<uint8_t> BuildExpectedOutput(
+        uint32_t rankSize, const AicpuStScenario& scenario, RankId rank, const std::string& actualAlgName) override
     {
         // 冒烟阶段不比对数据（Task 6 由 adapter 提供真实 golden）
         (void)rankSize;
         (void)scenario;
         (void)rank;
+        (void)actualAlgName;
         return {};
     }
 
@@ -67,17 +70,20 @@ protected:
     {
         (void)rankSize;
         opParam.DataDes.count = scenario.count;
+        opParam.DataDes.dataType = scenario.dataType; // tiling 已设，此处冗余兜底
         opParam.inputPtr = mem.inputPtr;
         opParam.outputPtr = mem.outputPtr;
         opParam.inputSize = mem.inputBytes;
         opParam.outputSize = mem.outputBytes;
     }
 
-    std::vector<uint8_t> BuildExpectedOutput(uint32_t rankSize, const AicpuStScenario& scenario, RankId rank) override
+    std::vector<uint8_t> BuildExpectedOutput(
+        uint32_t rankSize, const AicpuStScenario& scenario, RankId rank, const std::string& actualAlgName) override
     {
         (void)rankSize;
         (void)scenario;
         (void)rank;
+        (void)actualAlgName;
         return {}; // 模拟 adapter bug：非零场景返回空 golden
     }
 };

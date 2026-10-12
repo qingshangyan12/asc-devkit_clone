@@ -100,11 +100,13 @@ protected:
         return layout;
     }
 
-    // golden 期望输出；返回空 vector 表示跳过逐字节比对（零长度场景天然为空）。
+    // golden 期望输出；按 actualAlgName（selector 实际选中）选择算法变体——与
+    // scenario.expectedAlgName 解耦（后者仅为算法选择断言字段，空=跳过断言，不影响 golden 选择）。
+    // 返回空 vector 表示跳过逐字节比对（零长度场景天然为空）。
     // 非零长度场景返回空属于 adapter bug——默认会 FAIL（防假绿）；链路级冒烟等
     // 刻意不比对的场景应 override ExpectOutputCheck 返回 false 显式豁免。
     virtual std::vector<uint8_t> BuildExpectedOutput(
-        uint32_t rankSize, const AicpuStScenario& scenario, RankId rank) = 0;
+        uint32_t rankSize, const AicpuStScenario& scenario, RankId rank, const std::string& actualAlgName) = 0;
 
     // 非零场景的 golden 空守卫开关（默认开）：BuildExpectedOutput 意外返回空时 FAIL
     virtual bool ExpectOutputCheck() { return true; }

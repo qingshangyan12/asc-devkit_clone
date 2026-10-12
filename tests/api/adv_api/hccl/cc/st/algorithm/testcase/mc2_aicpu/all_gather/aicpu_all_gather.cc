@@ -51,9 +51,11 @@ std::vector<uint8_t> AicpuStAllGather::BuildConcatExpectation(uint32_t rankSize,
 }
 
 std::vector<uint8_t> AicpuStAllGather::BuildExpectedOutput(
-    uint32_t rankSize, const AicpuStScenario& scenario, RankId rank)
+    uint32_t rankSize, const AicpuStScenario& scenario, RankId rank, const std::string& actualAlgName)
 {
-    const auto it = GetVariantRegistry().find(scenario.expectedAlgName);
+    // golden 按实际选中算法键控：expectedAlgName 仅为算法选择断言字段（空=跳过断言），
+    // 留空模式下 golden 仍按 actualAlgName 正确选择变体
+    const auto it = GetVariantRegistry().find(actualAlgName);
     if (it != GetVariantRegistry().end()) {
         return it->second(rankSize, scenario, rank);
     }
