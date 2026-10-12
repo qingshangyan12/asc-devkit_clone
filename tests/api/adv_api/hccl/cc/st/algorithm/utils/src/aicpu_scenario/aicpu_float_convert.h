@@ -235,6 +235,79 @@ inline float ApplyOp(float a, float b, HcclReduceOp op)
     }
 }
 
+// ===== 整数精确路径：INT8/INT32 归约经 int64 中间值，规避 float 在 |v| > 2^24 的舍入 =====
+
+inline bool IsIntegerReduceType(HcclDataType dt)
+{
+    return dt == HcclDataType::HCCL_DATA_TYPE_INT8 || dt == HcclDataType::HCCL_DATA_TYPE_INT32;
+}
+
+inline int64_t LoadIntElem(const u8* p, HcclDataType dt)
+{
+    switch (dt) {
+        case HcclDataType::HCCL_DATA_TYPE_INT8: {
+            s8 v = 0;
+            memcpy(&v, p, sizeof(v));
+            return v;
+        }
+        case HcclDataType::HCCL_DATA_TYPE_INT32: {
+            s32 v = 0;
+            memcpy(&v, p, sizeof(v));
+            return v;
+        }
+        default:
+            return 0;
+    }
+}
+
+inline void StoreIntElem(u8* p, HcclDataType dt, int64_t v)
+{
+    switch (dt) {
+        case HcclDataType::HCCL_DATA_TYPE_INT8: {
+            if (v < -128) {
+                v = -128; // 饱和为 ST 框架约定（超范围输入本不应出现）
+            }
+            if (v > 127) {
+                v = 127;
+            }
+            const s8 out = static_cast<s8>(v);
+            memcpy(p, &out, sizeof(out));
+            return;
+        }
+        case HcclDataType::HCCL_DATA_TYPE_INT32: {
+            constexpr int64_t kInt32Min = -2147483648LL;
+            constexpr int64_t kInt32Max = 2147483647LL;
+            if (v < kInt32Min) {
+                v = kInt32Min;
+            }
+            if (v > kInt32Max) {
+                v = kInt32Max;
+            }
+            const s32 out = static_cast<s32>(v);
+            memcpy(p, &out, sizeof(out));
+            return;
+        }
+        default:
+            return;
+    }
+}
+
+inline int64_t ApplyIntOp(int64_t a, int64_t b, HcclReduceOp op)
+{
+    switch (op) {
+        case HcclReduceOp::HCCL_REDUCE_SUM:
+            return a + b;
+        case HcclReduceOp::HCCL_REDUCE_PROD:
+            return a * b; // 长链可溢出 int64——golden 与执行器同路径，自洽；声明即可
+        case HcclReduceOp::HCCL_REDUCE_MAX:
+            return (a > b) ? a : b;
+        case HcclReduceOp::HCCL_REDUCE_MIN:
+            return (a < b) ? a : b;
+        default:
+            return b;
+    }
+}
+
 inline uint64_t ElemSize(HcclDataType dt)
 {
     switch (dt) {

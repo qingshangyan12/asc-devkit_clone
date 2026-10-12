@@ -69,10 +69,13 @@ private:
 
     std::vector<ExecEvent> executionLog_;
     // notify 配对不变量：算法层按 1:1 使用 notifyId（一次 POST 恰好满足一次 WAIT，设备 notify 语义）。
-    // 违反 1:1（如连续双 POST）时 lastPostSeq_ 记录最新一次 POST——WAIT 的 satisfiedBySeq 反映实际唤醒者，
-    // 但更早的 POST→WAIT happens-before 边会丢失（Task 7 DAG 检测将无法看到），此类误用应由算法层排查。
+    // 违反 1:1（如连续双 POST）时由下方置位吸收语义兜底——最老 POST→WAIT 边保留（HB sound），
+    // 此类误用仍应由算法层排查。
+    // 置位吸收语义：notify 是标志位非计数器（设备 record 置位/wait 清零）。置位期间的后续 POST 被吸收
+    // （不覆盖已记录 seq）——WAIT 的 satisfiedBySeq 指向"置位期间最老"的 POST：跨队列 double-post 时
+    // 最新 POST→WAIT 不蕴含最老 POST→WAIT（跨队列无先后边），取最老是 HB sound 方向。
     std::map<uint32_t, bool> notifyState_;     // notifyId -> posted
-    std::map<uint32_t, uint64_t> lastPostSeq_; // notifyId -> 最近一次 POST 的 seq
+    std::map<uint32_t, uint64_t> lastPostSeq_; // notifyId -> 置位期间最老 POST 的 seq（见上方不变量）
     uint64_t nextSeq_ = 1;
 };
 

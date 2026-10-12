@@ -88,3 +88,8 @@ target_link_libraries(
     pthread
     dl
 )
+
+run_llt_test(
+    TARGET ${HCCL_AICPU_ST_TARGET}
+    TASK_NUM 1
+)
