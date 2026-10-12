@@ -1,24 +1,18 @@
-# TPipe-TQue Matmul and LeakyRelu Fusion Example
+# Matmul and LeakyRelu Fusion Example Based on the TPipe-TQue Framework
 
 ## Overview
 
-This example implements fused Matmul and LeakyRelu using the TPipe-TQue programming model. TPipe manages local resources, while TQue manages data transfer between stages and safe buffer reuse. Cube cores perform matrix multiplication, and their paired Vector cores apply LeakyRelu.
+This example implements fused Matmul and LeakyRelu using the TPipe-TQue programming model, with TPipe managing local resources and TQue managing data synchronization and buffer reuse. Double Buffer is enabled to demonstrate cooperative computation between the Cube and Vector units. Cube cores perform matrix multiplication, and Vector cores apply LeakyRelu.
 
-A1, A2, CO1, VECIN and VECOUT use double buffering so that transfers, computation and stores for different tiles can overlap. B is loaded once per Cube core and retained in L0B across M tiles.
-
-The example retains the original introduction sample's structure: one templated `KernelMatmul` class, its `Init` and `Process` methods, private helpers, the templated `mmad_vec_custom` kernel, and a main function that calls ACL directly.
+In this example, the A1 (physically in L1 Buffer), A2 (L0A Buffer), CO1 (L0C Buffer), VECIN (UB) and VECOUT (UB) queues enable Double Buffer so that transfers and computation for different tiles can overlap. The right-hand matrix B is reused across M tiles, loaded only once and retained in L0B Buffer.
 
 ## Supported Products and CANN Versions
 
-| Product | Architecture | Toolchain requirements and validation |
-|---------|--------------|---------------------------------------|
-| Ascend 950PR/Ascend 950DT | dav-3510 | Requires a compiler compatible with the repository APIs; tested on Ascend950PR |
-| Atlas A3 Training/Inference Series | dav-2201 | Architecture branch provided; validation on the corresponding toolchain and hardware is pending |
-| Atlas A2 Training/Inference Series | dav-2201 | Architecture branch provided; validation on the corresponding toolchain and hardware is pending |
-
-API headers are taken from the repository containing this example by default. `ASC_DEVKIT_ROOT` can override that location. The compiler and runtime still come from the installed CANN package. The original validation on October 10, 2026 used `/home/developer/Ascend/cann-9.2.0` and headers from `/workspace/asc-devkit`.
-
-That older compiler rejected the repository's `__callee__` attribute in `kernel_struct_data_copy.h` when targeting 2201. After migration, the same compiler also rejects `__callee__` on the `ScalarBitcode` constructor in the target repository's `kernel_utils_struct_norm_sort.h`. The minimum CANN version documented for the original static-tensor sample is therefore not sufficient evidence that this version can compile. See [validation notes](VALIDATION.md) for the original results and the checks performed after migration.
+| Product | CANN Version |
+|---------|--------------|
+| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
+| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -31,8 +25,7 @@ tpipe_matmul_leakyrelu_basic_api/
 ├── data_utils.h                          # File I/O helpers
 ├── tpipe_matmul_leakyrelu_basic_api.asc  # Device implementation and host invocation
 ├── README.md                             # Chinese documentation
-├── README_en.md                          # English documentation
-└── VALIDATION.md                         # Validation scope and results
+└── README_en.md                          # English documentation
 ```
 
 ## Operator Description
@@ -142,45 +135,13 @@ tpipe_matmul_leakyrelu_basic_api/
 
   `GlobalTensor<half>` offsets are measured in elements, not bytes. Cube A/C base addresses advance by `GetBlockIdx()*singleCoreM*K` and `GetBlockIdx()*singleCoreM*N`. On the Vector side, `GetBlockIdx()/2` maps to the paired Cube core. Both Cube cores load the complete B matrix without an M-dependent offset.
 
-  The following `Init` method is taken from the templated class; comments are omitted here. The full class and declarations are in the [source](tpipe_matmul_leakyrelu_basic_api.asc).
+  The queue members and shared constants match the source. Tile dimensions in these excerpts are supplied by the nine template parameters of KernelMatmul. Comments are omitted from the code excerpts; the complete template is in the [source](tpipe_matmul_leakyrelu_basic_api.asc).
 
 ```cpp
-__aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
-{
-
-    static_assert(M % singleCoreM == 0 && singleCoreM % baseM == 0, "M must be divisible by tiles");
-    static_assert(singleCoreK == K && baseK == K && singleCoreN == N && baseN == N,
-        "This sample only partitions M");
-    static_assert(baseM == 32 || baseM == 64 || baseM == 128, "Supported baseM: 32, 64, 128");
-    static_assert(K == 128 && N == 128, "This sample requires K=N=128");
-    static_assert(singleCoreM / baseM >= BUFFER_NUM, "At least two tiles are required for double buffer");
-    aGM.SetGlobalBuffer((__gm__ half*)xMatrix);
-    bGM.SetGlobalBuffer((__gm__ half*)yMatrix);
-    cGM.SetGlobalBuffer((__gm__ half*)zMatrix);
-
-    if ASCEND_IS_AIC {
-        aGM = aGM[AscendC::GetBlockIdx() * singleCoreM * K];
-        cGM = cGM[AscendC::GetBlockIdx() * singleCoreM * N];
-
-        pipe.InitBuffer(a1Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
-        pipe.InitBuffer(a2Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
-        pipe.InitBuffer(cQueue, BUFFER_NUM, baseM * baseN * sizeof(float));
-
-        pipe.InitBuffer(b1Queue, 1, baseK * baseN * sizeof(half));
-        pipe.InitBuffer(b2Queue, 1, baseK * baseN * sizeof(half));
-    }
-    if ASCEND_IS_AIV {
-
-        cGM = cGM[AscendC::GetBlockIdx() / 2 * singleCoreM * N];
-        pipe.InitBuffer(vecInQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
-        pipe.InitBuffer(vecOutQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
-    }
-}
-```
-
-  The queues are class members:
-
-```cpp
+constexpr uint32_t CUBE_BLOCK = 16;
+constexpr uint32_t BUFFER_NUM = 2;
+constexpr uint16_t READY_FLAG = 8;
+constexpr uint16_t FREE_FLAG = 10;
 AscendC::TPipe pipe;
 AscendC::TQue<AscendC::TPosition::A1, BUFFER_NUM> a1Queue;
 AscendC::TQue<AscendC::TPosition::B1, 1> b1Queue;
@@ -191,7 +152,36 @@ AscendC::TQue<AscendC::TPosition::VECIN, 1> vecInQueue;
 AscendC::TQue<AscendC::TPosition::VECOUT, 1> vecOutQueue;
 ```
 
-  Global constants are `CUBE_BLOCK=16`, `BUFFER_NUM=2`, `READY_FLAG=8`, and `FREE_FLAG=10`.
+  The following is the template class's Init method:
+
+```cpp
+__aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
+{
+    static_assert(M % singleCoreM == 0 && singleCoreM % baseM == 0, "M must be divisible by tiles");
+    static_assert(singleCoreK == K && baseK == K && singleCoreN == N && baseN == N,
+        "This sample only partitions M");
+    static_assert(baseM == 32 || baseM == 64 || baseM == 128, "Supported baseM: 32, 64, 128");
+    static_assert(K == 128 && N == 128, "This sample requires K=N=128");
+    static_assert(singleCoreM / baseM >= BUFFER_NUM, "At least two tiles are required for double buffer");
+    aGM.SetGlobalBuffer((__gm__ half*)xMatrix);
+    bGM.SetGlobalBuffer((__gm__ half*)yMatrix);
+    cGM.SetGlobalBuffer((__gm__ half*)zMatrix);
+    if ASCEND_IS_AIC {
+        aGM = aGM[AscendC::GetBlockIdx() * singleCoreM * K];
+        cGM = cGM[AscendC::GetBlockIdx() * singleCoreM * N];
+        pipe.InitBuffer(a1Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
+        pipe.InitBuffer(a2Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
+        pipe.InitBuffer(cQueue, BUFFER_NUM, baseM * baseN * sizeof(float));
+        pipe.InitBuffer(b1Queue, 1, baseK * baseN * sizeof(half));
+        pipe.InitBuffer(b2Queue, 1, baseK * baseN * sizeof(half));
+    }
+    if ASCEND_IS_AIV {
+        cGM = cGM[AscendC::GetBlockIdx() / 2 * singleCoreM * N];
+        pipe.InitBuffer(vecInQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
+        pipe.InitBuffer(vecOutQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
+    }
+}
+```
 
   **Memory transfers and computation**
 
@@ -201,114 +191,94 @@ AscendC::TQue<AscendC::TPosition::VECOUT, 1> vecOutQueue;
   - **L0A/L0B → L0C:** Each Mmad computes the complete K reduction for one M tile. Each call initializes a fresh accumulator; there is no accumulation across K tiles.
   - **L0C → GM:** Fixpipe converts the result to ND half and writes the current tile's GM region.
 
-  The `Process` method also shows where the Vector branch invokes the half-tile helper:
+  The Cube branch of Process is shown below. The Vector branch is described separately afterward:
 
 ```cpp
 __aicore__ inline void Process()
-{
-    constexpr uint32_t mLoops = singleCoreM / baseM;
-    if ASCEND_IS_AIC {
-
-        AscendC::LocalTensor<half> b1Local = b1Queue.AllocTensor<half>();
-        AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
-        b1Queue.EnQue(b1Local);
-
-        for (uint32_t mIndex = 0; mIndex < BUFFER_NUM; ++mIndex) {
-            CopyInA(mIndex);
-        }
-        LoadB();
-        AscendC::LocalTensor<half> b2Local = b2Queue.DeQue<half>();
-        for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
-
-            AscendC::LocalTensor<half> a1Local = a1Queue.DeQue<half>();
-            AscendC::LocalTensor<half> a2Local = a2Queue.AllocTensor<half>();
+    {
+        constexpr uint32_t mLoops = singleCoreM / baseM;
+        if ASCEND_IS_AIC {
+            AscendC::LocalTensor<half> b1Local = b1Queue.AllocTensor<half>();
+            AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
+            b1Queue.EnQue(b1Local);
+            for (uint32_t mIndex = 0; mIndex < BUFFER_NUM; ++mIndex) {
+                CopyInA(mIndex);
+            }
+            LoadB();
+            AscendC::LocalTensor<half> b2Local = b2Queue.DeQue<half>();
+            for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
+                AscendC::LocalTensor<half> a1Local = a1Queue.DeQue<half>();
+                AscendC::LocalTensor<half> a2Local = a2Queue.AllocTensor<half>();
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-            for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
-                AscendC::LoadData(
-                    a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
-                    AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0});
-            }
+                for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
+                    AscendC::LoadData(
+                        a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
+                        AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0});
+                }
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-            AscendC::LoadData(
-                a2Local, a1Local,
-                AscendC::LoadData2DParamsV2{
-                    0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
+                AscendC::LoadData(
+                    a2Local, a1Local,
+                    AscendC::LoadData2DParamsV2{
+                        0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
 #endif
-            a2Queue.EnQue(a2Local);
-            a1Queue.FreeTensor(a1Local);
-
-            if (mIndex + BUFFER_NUM < mLoops) {
-                CopyInA(mIndex + BUFFER_NUM);
+                a2Queue.EnQue(a2Local);
+                a1Queue.FreeTensor(a1Local);
+                if (mIndex + BUFFER_NUM < mLoops) {
+                    CopyInA(mIndex + BUFFER_NUM);
+                }
+                a2Local = a2Queue.DeQue<half>();
+                AscendC::LocalTensor<float> cLocal = cQueue.AllocTensor<float>();
+                AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
+                cQueue.EnQue(cLocal);
+                a2Queue.FreeTensor(a2Local);
+                cLocal = cQueue.DeQue<float>();
+                uint32_t slot = mIndex % BUFFER_NUM;
+                if (mIndex >= BUFFER_NUM) {
+                    AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + slot);
+                }
+                AscendC::Fixpipe(
+                    cGM[mIndex * baseM * N], cLocal,
+                    AscendC::FixpipeParamsV220{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0});
+                AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + slot);
+                cQueue.FreeTensor(cLocal);
             }
-            a2Local = a2Queue.DeQue<half>();
-            AscendC::LocalTensor<float> cLocal = cQueue.AllocTensor<float>();
-
-            AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
-            cQueue.EnQue(cLocal);
-            a2Queue.FreeTensor(a2Local);
-
-            cLocal = cQueue.DeQue<float>();
-            uint32_t slot = mIndex % BUFFER_NUM;
-            if (mIndex >= BUFFER_NUM) {
-
+            for (uint32_t slot = 0; slot < BUFFER_NUM; ++slot) {
                 AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + slot);
             }
-
-            AscendC::Fixpipe(
-                cGM[mIndex * baseM * N], cLocal,
-                AscendC::FixpipeParamsV220{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0});
-            AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + slot);
-            cQueue.FreeTensor(cLocal);
-        }
-
-        for (uint32_t slot = 0; slot < BUFFER_NUM; ++slot) {
-            AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + slot);
-        }
-        b2Queue.FreeTensor(b2Local);
-    }
-    if ASCEND_IS_AIV {
-        for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
-
-            LeakyReluCompute(mIndex, 0, baseM / 2 * baseN);
+            b2Queue.FreeTensor(b2Local);
         }
     }
-}
 ```
 
   Private helpers handle A prefetch and architecture-specific B loading:
 
 ```cpp
 __aicore__ inline void CopyInA(uint32_t mIndex)
-{
-    AscendC::LocalTensor<half> a1Local = a1Queue.AllocTensor<half>();
-    AscendC::DataCopy(
-        a1Local, aGM[mIndex * baseM * K], AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
-    a1Queue.EnQue(a1Local);
-}
-
-__aicore__ inline void LoadB()
-{
-    AscendC::LocalTensor<half> b1Local = b1Queue.DeQue<half>();
-    AscendC::LocalTensor<half> b2Local = b2Queue.AllocTensor<half>();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-
-    for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
-        AscendC::LoadData(
-            b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
-            AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
+    {
+        AscendC::LocalTensor<half> a1Local = a1Queue.AllocTensor<half>();
+        AscendC::DataCopy(
+            a1Local, aGM[mIndex * baseM * K], AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
+        a1Queue.EnQue(a1Local);
     }
+    __aicore__ inline void LoadB()
+    {
+        AscendC::LocalTensor<half> b1Local = b1Queue.DeQue<half>();
+        AscendC::LocalTensor<half> b2Local = b2Queue.AllocTensor<half>();
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+        for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
+            AscendC::LoadData(
+                b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
+                AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
+        }
 #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-
-    AscendC::LoadData(
-        b2Local, b1Local,
-        AscendC::LoadData2DParamsV2{
-            0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
+        AscendC::LoadData(
+            b2Local, b1Local,
+            AscendC::LoadData2DParamsV2{
+                0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
 #endif
-    b2Queue.EnQue(b2Local);
-    b1Queue.FreeTensor(b1Local);
-}
+        b2Queue.EnQue(b2Local);
+        b1Queue.FreeTensor(b1Local);
+    }
 ```
 
   **Vector computation**
@@ -320,30 +290,33 @@ __aicore__ inline void LoadB()
   - **UB → GM:** DataCopyPad writes the same half-tile region; release the output tensor and continue to the next tile.
 
 ```cpp
+if ASCEND_IS_AIV {
+    for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
+        LeakyReluCompute(mIndex, 0, baseM / 2 * baseN);
+    }
+}
+```
+
+```cpp
 __aicore__ inline void LeakyReluCompute(uint32_t mIndex, uint32_t nIndex, uint32_t tileLen)
 {
     uint32_t blockLen = baseN * sizeof(half);
     uint32_t srcStride = (N - baseN) * sizeof(half);
-
     uint32_t gmOffset = (mIndex * baseM * N + nIndex * baseN) + AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
     uint32_t slot = mIndex % BUFFER_NUM;
     AscendC::LocalTensor<half> vecInLocal = vecInQueue.AllocTensor<half>();
     AscendC::CrossCoreWaitFlag<0x2>(READY_FLAG + slot);
-
     AscendC::DataCopyPad<half>(
         vecInLocal, cGM[gmOffset],
         AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, srcStride, 0, 0},
         AscendC::DataCopyPadExtParams<half>{true, 0, 0, 0});
-
     AscendC::CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG + slot);
     vecInQueue.EnQue(vecInLocal);
-
     vecInLocal = vecInQueue.DeQue<half>();
     AscendC::LocalTensor<half> vecOutLocal = vecOutQueue.AllocTensor<half>();
     AscendC::LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, tileLen);
     vecInQueue.FreeTensor(vecInLocal);
     vecOutQueue.EnQue(vecOutLocal);
-
     vecOutLocal = vecOutQueue.DeQue<half>();
     AscendC::DataCopyPad<half>(
         cGM[gmOffset], vecOutLocal,
@@ -379,13 +352,6 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
     op.Process();
     AscendC::PipeBarrier<PIPE_ALL>();
 }
-```
-
-  Main directly initializes ACL, selects device 0, creates a stream, allocates input/output buffers, copies inputs to the device, launches the kernel once, synchronizes, copies output to the host, writes it to disk, and releases resources. The launch is:
-
-```cpp
-mmad_vec_custom<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, baseN>
-    <<<numBlocks, 0, stream>>>(aDevice, bDevice, cDevice);
 ```
 
 - **API parameters**
@@ -438,8 +404,8 @@ mmad_vec_custom<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, ba
 
   | Constructor parameter | Meaning |
   |-----------------------|---------|
-  | mStartPosition | Starting position in the first logical fractal direction |
-  | kStartPosition | Starting position in the second logical fractal direction |
+  | mStartPosition | Starting position in the M direction, in 512-byte units |
+  | kStartPosition | Starting position in the K direction, in 512-byte units |
   | mStep | Number of fractals in the first direction |
   | kStep | Number of fractals in the second direction |
   | srcStride | Source fractal stride, in 512-byte units |
@@ -456,8 +422,8 @@ mmad_vec_custom<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, ba
   | m | baseM=128, output rows |
   | n | baseN=128, output columns |
   | k | baseK=128, complete reduction length |
-  | unitFlag | 0; dependencies are managed through queues |
-  | cmatrixSource | false, retaining the original C-source setting |
+  | unitFlag | Fine-grained parallelism control for Mmad and Fixpipe; 0 by default |
+  | cmatrixSource | Source of the initial C matrix: false for CO1, true for C2; false by default |
   | cmatrixInitVal | true for every M tile, initializing a separate accumulator |
 
   The call is `{baseM, baseN, baseK, 0, false, true}`. M tiles cover different output rows, not successive segments of a K reduction.
@@ -474,8 +440,8 @@ mmad_vec_custom<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, ba
   | quantPre | QuantMode_t::F322F16 |
   | deqScalar | 0; no additional dequantization scale is used |
   | ndNum | 1 matrix |
-  | srcNdStride | 0; unused for one matrix |
-  | dstNdStride | 0; unused for one matrix |
+  | srcNdStride | Distance between source NZ matrix starts, in units of 16×C0_SIZE; 0 for one matrix |
+  | dstNdStride | Distance between destination ND matrix starts, in elements; 0 for one matrix |
   | unitFlag | 0, consistent with Mmad |
 
   The call is `{baseN,baseM,baseM,N,false,QuantMode_t::F322F16,0,1,0,0,0}` and writes to `cGM[mIndex*baseM*N]`. The 3510 branch also uses this interface form; the V220 name does not mean only the 2201 branch executes it.
@@ -494,7 +460,7 @@ mmad_vec_custom<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, ba
 
   Input uses `{baseM/2, blockLen, srcStride, 0, 0}` with the required uint16_t cast on the first argument. Output uses `{baseM/2, blockLen, 0, srcStride, 0}`.
 
-  **[DataCopyPadExtParams<half>](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB.md)** — padding settings:
+  **[DataCopyPadExtParams\<half\>](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB.md)** — padding settings:
 
   | Constructor parameter | Meaning |
   |-----------------------|---------|
@@ -513,43 +479,62 @@ mmad_vec_custom<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, ba
 
 ## Build and Run
 
-From the sample directory:
+Build and run the example from its root directory as follows.
 
-```bash
-source ${install_path}/cann/set_env.sh
-mkdir -p build
-cd build
-cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
-cmake --build . -j
-python3 ../scripts/gen_data.py
-./demo
-python3 ../scripts/verify_result.py output/output.bin output/golden.bin
-```
+- Configure environment variables
 
-Load the environment script from the actual CANN installation. Python requires NumPy. The program uses device 0 and one kernel launch; file paths are relative to the working directory.
+  Configure the environment according to your CANN installation's [installation method](../../../../../docs/zh/quick_start.md#prepare&install).
 
-The CMake architecture default remains dav-2201, while the command explicitly selects the verified 3510 target. Use dav-2201 only with the corresponding compatible toolchain and hardware. Create a separate build directory when changing architectures or run modes.
+  ```bash
+  source ${install_path}/cann/set_env.sh
+  ```
 
-CMake prefers repository headers using `-iquote`, since compiler-injected package paths could otherwise select older headers. `ASC_DEVKIT_ROOT` defaults to the repository root computed relative to this sample. Override it with `-DASC_DEVKIT_ROOT=/absolute/path/to/asc-devkit` if using a different source tree. This does not add new capabilities to an old compiler.
+  > **Note:** `${install_path}` is the CANN installation directory. If no directory was specified during installation, the default is `/usr/local/Ascend`.
 
-CPU and simulation options from the original sample are retained. Only npu mode has been validated; cpu/sim availability depends on the installed tools and mixed-kernel support. Example configurations, using separate directories from the sample root:
+- Run the example
 
-```bash
-cmake -S . -B build_cpu -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201
-cmake --build build_cpu -j
-cmake -S . -B build_sim -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201
-cmake --build build_sim -j
-```
+  Execute the following commands from the example directory:
 
-| Option | Values | Description |
-|--------|--------|-------------|
-| CMAKE_ASC_RUN_MODE | npu (default), cpu, sim | Run mode; only npu verified |
-| CMAKE_ASC_ARCHITECTURES | dav-2201 (default), dav-3510 | Device architecture |
-| ASC_DEVKIT_ROOT | Absolute repository path | Defaults to the enclosing repository |
+  ```bash
+  mkdir -p build && cd build                                               # Create and enter the build directory
+  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..
+  cmake --build . -j                                                       # Build (npu mode by default)
+  python3 ../scripts/gen_data.py                                           # Generate test inputs
+  ./demo                                                                  # Run the example
+  python3 ../scripts/verify_result.py output/output.bin output/golden.bin  # Verify the result
+  ```
 
-Successful verification prints `test pass!`. The verifier requires exactly 65,536 half elements (131,072 bytes) in each file and rejects empty, truncated, oversized or nonfinite data. The default integer comparison retains rtol=1e-6, atol=1e-9 and a maximum mismatch fraction of 1e-4. See [validation notes](VALIDATION.md) for the actual checks, numerical comparison criteria and architecture limitations.
+  Examples for CPU debugging and NPU simulation:
+
+  ```bash
+  # Create separate build directories from the example root.
+  cmake -S . -B build_cpu -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-2201
+  cmake --build build_cpu -j
+  cmake -S . -B build_sim -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-2201
+  cmake --build build_sim -j
+  ```
+
+  > **Note:** Use a new build directory when changing the architecture or run mode to avoid mixing cached settings. `ASC_DEVKIT_ROOT` specifies the repository headers. CMake uses `-iquote` to prefer these interfaces, but this cannot add support for new attributes to an older compiler.
+
+- Build options
+
+  | Option | Values | Description |
+  |--------|--------|-------------|
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | NPU execution, CPU debugging or NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | dav-2201: Atlas A2/A3 Training and Inference Series; dav-3510: Ascend 950PR/Ascend 950DT |
+  | `ASC_DEVKIT_ROOT` | Absolute asc-devkit path | Header source; defaults to the current repository root derived from the example location |
+
+- Expected result
+
+  Successful accuracy verification prints:
+
+  ```bash
+  test pass!
+  ```
 
 ## Implementation Flow Analysis
+
+The following tables break down the Cube and Vector operations in execution order.
 
 ### Cube Core Flow
 
@@ -590,35 +575,21 @@ With two tiles per core, the AIC publishes READY8/READY9 and consumes FREE10/FRE
 
 FREE indicates that the corresponding GM read is complete, not that activation and final output are complete. Tiles occupy distinct GM regions, so a later Cube tile does not overwrite an earlier Vector output. Queue dependencies and the final PipeBarrier complete the writes. No extra GM workspace is used.
 
-## Further Optimization
-
-| Direction | Current implementation | Further analysis and constraints |
-|-----------|------------------------|----------------------------------|
-| L1/L0 double buffering | Enabled for A1/A2/CO1 | Compare with a single-buffer control and inspect M/FIX overlap; account for capacity |
-| B reuse | Loaded once and retained in L0B | Redesign lifetime if N/K tiling is introduced |
-| Tile size | baseM=128, two tiles/core | Compare 32/64/128; smaller tiles add queue/sync overhead, larger tiles consume more local memory |
-| UB double buffering | Enabled separately for VECIN/VECOUT | Inspect MTE2/V/MTE3 utilization and cross-core waits |
-| Vector VF fusion | One LeakyRelu Basic API | Evaluate RegBase/VF fusion if more elementwise operations are added |
-| Core partitioning | Two Cube cores, M partitioning | Evaluate more cores for larger matrices and update constraints/data generation |
-| GM intermediate | L0C→GM→UB | A 3510-only direct-to-UB path needs a new cross-core protocol and numerical review |
-
-Preserve FP32 accumulation → FP16 conversion → FP16 activation during optimization. Setting Fixpipe reluEn=true would implement a different operation.
-
 ## Functional Debugging
 
 ### printf
 
-Use device-side formatted output to inspect core and tile indices:
+The printf interface provides formatted output for CPU and NPU debugging. Call it wherever logging is needed in the operator kernel, for example to inspect the core index:
 
 ```cpp
 AscendC::printf("matmul blockIdx=%d\n", AscendC::GetBlockIdx());
 ```
 
-Debug output changes timing. Remove it before measuring performance, or use the installed toolkit's ASCENDC_DUMP controls as appropriate.
+printf output affects operator performance and is normally used during debugging. Set ASCENDC_DUMP=0 as needed to disable printing.
 
 ### DumpTensor
 
-[DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md) can inspect a local tensor with a uint32_t identifier. For example, replace the existing LeakyRelu call in LeakyReluCompute with the following debug-only sequence, before releasing or enqueuing the output:
+[DumpTensor](../../../../../docs/zh/api/SIMD-API/basic_api/debug_interface/onboard_print/DumpTensor.md) can print the contents of a specified [LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md), together with custom uint32_t information such as a line number. For example, replace the existing LeakyRelu call in LeakyReluCompute with the following debug-only sequence, before releasing or enqueuing the output:
 
 ```cpp
 AscendC::LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, tileLen);
@@ -626,47 +597,42 @@ AscendC::PipeBarrier<PIPE_ALL>(); // Debug only: wait for the producer.
 AscendC::DumpTensor(vecOutLocal, mIndex, 16);
 ```
 
-The tensor must still be valid; never dump after FreeTensor. Remove the extra barrier and printing before profiling because they alter the intended overlap. The repository's debug documentation describes the ASCENDC_DUMP controls.
+The tensor must still be valid; never dump after FreeTensor. Remove the extra barrier and printing before profiling because they alter the intended overlap. Printing through DumpTensor affects operator performance and is normally used during debugging. Set ASCENDC_DUMP=0 as needed to disable printing.
 
 ## Performance Debugging
 
-### msOpProf
+### Introduction to msOpProf
 
-msOpProf supports operator-level analysis of execution, memory access and resource conflicts. On supported hardware, run the installed tool from the build directory after generating input/output files:
+msOpProf is a single-operator performance analysis tool with two usage modes: `msopprof` and `msopprof simulator`. It helps identify issues in operator memory access, code and instructions. It supports performance data collection and automatic analysis for hardware execution and simulation, using either executables or operator binary `.o` files.
+
+- Hardware performance collection
+
+  Hardware profiling directly measures the operator's execution time on the Ascend AI processor and helps quickly locate performance issues on the device.
+
+  From the build directory with input/output files already generated, run the installed msopprof tool that supports the target chip:
+
+  ```bash
+  msopprof ./demo
+  ```
+
+  Performance data is typically written to an `OPPROF_{timestamp}_XXX` directory. The following is an example; the exact files depend on the tool version, chip and collection configuration:
+
+  ```text
+  ├── dump                       # Raw performance data; normally requires no inspection
+  ├── ArithmeticUtilization.csv  # Cycle ratios for Cube/Vector instructions
+  ├── L2Cache.csv                 # L2 cache hit rate; optimize transfers to improve hits and MTE2 performance
+  ├── Memory.csv                  # Read/write bandwidth for UB, L1 and main memory
+  ├── MemoryL0.csv                # Read/write bandwidth for L0A, L0B and L0C
+  ├── MemoryUB.csv                # Vector/Scalar read/write bandwidth to UB
+  ├── OpBasicInfo.csv             # Basic operator information
+  ├── PipeUtilization.csv         # Time and ratios for compute and transfer units
+  ├── ResourceConflictRatio.csv   # UB bank-group, bank and resource conflict ratios across instructions
+  └── visualize_data.bin          # Visualization file for MindStudio Insight
+  ```
+
+View the detailed performance analysis results:
 
 ```bash
-msopprof ./demo
-```
-
-Typical output is an `OPPROF_{timestamp}_XXX` directory; exact files depend on the tool version, device and collection options:
-
-```text
-dump/                       # Raw data
-ArithmeticUtilization.csv  # Cube/Vector arithmetic utilization
-L2Cache.csv                # L2 access and hit information
-Memory.csv                 # Memory access metrics
-MemoryL0.csv               # L0A/L0B/L0C access
-MemoryUB.csv               # UB access
-OpBasicInfo.csv            # Operator configuration
-PipeUtilization.csv        # Compute and transfer pipeline metrics
-ResourceConflictRatio.csv  # Resource conflicts
-visualize_data.bin         # Visualization data
-```
-
-```bash
+# View Task Duration and other metrics.
 cat ./OPPROF_*/PipeUtilization.csv
 ```
-
-Main launches once. For microsecond-level comparisons, use identical inputs, warmup and launch counts, and separate device execution from process startup, file I/O and H2D/D2H transfer time. The original benchmark launched 110 times, discarded the first 10, and summarized 100 AI_CORE tasks.
-
-Historical results from October 10, 2026 on 3510 are shown below. They were obtained before migration, with the same device source but a different API repository checkout; they are not fresh performance measurements of this checkout.
-
-| Version | Median device time (μs) |
-|---------|------------------------:|
-| Original static-tensor example | 4.3665 |
-| TPipe-TQue, double buffer | 4.0175 |
-| Same tile, single buffer | 4.6995 |
-
-The measured median was approximately 8.0% lower than the original and 14.5% lower than the single-buffer control for that shape/environment. Eight input cases produced exactly matching outputs between the old and new NPU kernels. 2201 validation remains pending. See [validation notes](VALIDATION.md) for the migration checks and measurement scope.
-
-API documentation links use repository-relative paths. The compiler header location is controlled independently by `ASC_DEVKIT_ROOT`.
