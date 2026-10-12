@@ -1,8 +1,8 @@
 // Copyright (c) 2026 Huawei Technologies Co., Ltd.
 // Licensed under the CANN Open Software License Agreement Version 2.0.
 
-#ifndef MC2_COLLECTIVE_DSL_TRACE_H
-#define MC2_COLLECTIVE_DSL_TRACE_H
+#ifndef MC2_COLLECTIVE_DSL_TRACE_ENGINE_H
+#define MC2_COLLECTIVE_DSL_TRACE_ENGINE_H
 
 #include "collective_plan.h"
 

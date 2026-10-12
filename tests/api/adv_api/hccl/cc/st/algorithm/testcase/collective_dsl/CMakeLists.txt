@@ -6,18 +6,23 @@ set(COLLECTIVE_DSL_DIR ${HCCL_CC_SRC_DIR}/ops/op_common/collective_dsl)
 
 add_executable(${COLLECTIVE_DSL_TEST}
     collective_dsl_test.cc
-    ${COLLECTIVE_DSL_DIR}/core/collective_plan.cc
-    ${COLLECTIVE_DSL_DIR}/core/resource_plan.cc
+    ${COLLECTIVE_DSL_DIR}/model/collective_plan.cc
+    ${COLLECTIVE_DSL_DIR}/model/logical_resources.cc
+    ${COLLECTIVE_DSL_DIR}/model/execution_route.cc
     ${COLLECTIVE_DSL_DIR}/primitives/all_gather_primitives.cc
     ${COLLECTIVE_DSL_DIR}/algorithms/all_gather_algorithms.cc
-    ${COLLECTIVE_DSL_DIR}/backends/trace_backend.cc
+    ${COLLECTIVE_DSL_DIR}/dispatch/kfc_dispatch.cc
+    ${COLLECTIVE_DSL_DIR}/engines/trace/trace_engine.cc
+    ${COLLECTIVE_DSL_DIR}/trace/native_binding_trace.cc
 )
 
 target_include_directories(${COLLECTIVE_DSL_TEST} PRIVATE
-    ${COLLECTIVE_DSL_DIR}/core
+    ${COLLECTIVE_DSL_DIR}/model
     ${COLLECTIVE_DSL_DIR}/primitives
     ${COLLECTIVE_DSL_DIR}/algorithms
-    ${COLLECTIVE_DSL_DIR}/backends
+    ${COLLECTIVE_DSL_DIR}/dispatch
+    ${COLLECTIVE_DSL_DIR}/engines/trace
+    ${COLLECTIVE_DSL_DIR}/trace
 )
 
 target_compile_options(${COLLECTIVE_DSL_TEST} PRIVATE

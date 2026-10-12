@@ -1,55 +1,58 @@
 # Collective DSL
 
-这层把 collective 算法与执行后端分开，但不会另造一套脱离 asc-devkit 的运行时：
+目标是把原来混在一起的三个维度拆开：
 
 ```text
-TopoMatch 产生的 rank 分组
-        ↓
-Mesh / NHR + Sole / Concurrent / Parallel / Pipeline
-        ↓
-dsl::Plan（LocalCopy / Exchange / Wait / Complete）
-        ├─ CalcResources：提前计算 channel / queue / event 资源
-        ├─ AICPU backend：TemplateResource + HComm wrapper
-        └─ trace backend：与既有算法的提交轨迹比较
+算法：Sole / Parallel / Concurrent / Pipeline + Mesh / NHR
+发起与调度：Host 直提，或 AIC/AIV → KFC server
+执行：AICPU HComm、CCU mission、AIC/AIV 直驱或通信 kernel
 ```
 
-代码位于 `mc2_ops_hccl::dsl`，asc-devkit 现有代码中可直接写 `dsl::Plan`。
+## 目录边界
 
-## 文件
+- `model/`：Plan、Stage、逻辑资源和 `Initiator/Dispatcher/Executor` 路由。
+- `primitives/`：Mesh、NHR。这里只保留 rank group、owner 集合、数据区间和依赖。
+- `algorithms/`：Sole、Concurrent、Parallel、Pipeline 的组合。
+- `dispatch/`：KFC 请求路径。KFC 是 dispatcher，不是算法或执行引擎。
+- `engines/trace/`：把 Plan lowering 成验证 trace；不申请真实通信资源。
+- `adapters/ascend/`：唯一允许出现 `OpParam`、`AlgResourceRequest`、`TemplateResource`、
+  `HcclChannelDesc` 和 CCU submit info 等旧框架类型的位置。
 
-- `core/`：最小 IR 和资源需求分析；这里不实现任何 collective 原语。
-- `primitives/`：可复用的 Mesh、NHR 等通信原语。
-- `algorithms/`：Sole、Concurrent、Parallel、Pipeline 等组合。
-- `backends/`：AICPU lowering 和 trace，不定义算法。
+算法参数中没有 channel。MultiLink、port group、协议、thread、notify、AIV comm info、CCU kernel/mission
+都由具体执行路线结合真实拓扑绑定。
 
-这些源文件通过 `op_common/collective_dsl/CMakeLists.txt` 编进现有的
-`libmc2_client.so`，不是单独的示例库。
+## MC2 路线
 
-## 资源申请与执行
+`ExecutionRoute` 把“谁发起”和“谁执行”拆开，显式覆盖：
 
-Executor 的 `CalcRes` 阶段先构造 Plan，再把 Plan 映射到 asc-devkit 已有的资源请求：
-
-```cpp
-dsl::AllGatherArgs args{rank, rankSize, count * dtypeSize};
-dsl::ChannelLayout channels = /* 由拓扑与 HcclChannelDesc 构造 */;
-dsl::Plan plan = dsl::SoleNhr(args, channels, dimension);
-CHK_RET(dsl::CalcAicpuResources(plan, channelDescs, resourceRequest));
+```text
+AIC/AIV → HcclMsgArea/KFC queue → AICPU server → HComm primitive
+AIC/AIV → HcclMsgArea/KFC queue → CCU server   → CCU mission
+Host                                      → AICPU HComm
+AIC/AIV                                   → 直驱或 AIV 通信 kernel
 ```
 
-框架按 `AlgResourceRequest` 分配资源并生成 `TemplateResource` 后，执行阶段复用同一个 Plan：
+`dispatch/kfc_dispatch.*` 只规划 client request slot、server queue 和是否需要 CCU mission。
+真正的 `HcclMsgArea` 发布/消费仍由现有 Ascend C HCCL API 和 KFC server 完成，不能在算法 DSL 中伪造。
 
-```cpp
-dsl::AicpuMemory memory{/* input/output 和各 rank 的远端地址 */};
-CHK_RET(dsl::RunAicpu(plan, memory, templateResource));
+## 已接入的真实链路
+
+- `InsAllGatherMesh1D` → `DslAicpuAllGatherSoleMesh` → 真实 `InsTempAllGatherMesh1D`
+- `CcuSchedAllGatherSoleMesh` → `DslCcuAllGatherSoleMesh` → 真实
+  `CcuTempKfcAllGatherMesh1DMem2Mem`
+
+两条链路的 `CalcRes` 与 `KernelRun` 都经过 DSL：
+
+```text
+CalcRes:   Plan → binding → channel request / thread+notify / CcuKernelInfo
+KernelRun: Plan → binding → HComm operations 或 CcuKernelSubmitInfo/KFC CCU mission
 ```
 
-`CalcAicpuResources` 会验证 Plan 所需的每个 `(peer, path)` 都能被传入的
-`HcclChannelDesc` 覆盖，并把 channel 需求写进 `AlgResourceRequest::channels`。
-当前 AICPU lowering 有意使用一个 HComm thread 顺序提交，所以只申请主线程资源；在该约束下，
-Plan 中的 queue/event 依赖由同一线程的提交顺序满足。后续如果改成多线程并发 lowering，必须同时把
-queue 映射为 thread，并把跨 queue event 映射为 thread notify，不能只改执行代码而漏掉 `CalcRes`。
+adapter 当前复用旧 primitive 的成熟 lowering，先稳定边界，算法组合不复制 engine 细节。
+AIV Mesh 的真实实现位于 HCCL/HComm，而 asc-devkit 当前只有 selector 名称，没有可链接 template，
+所以这里明确返回不支持，不以假 channel 实现冒充 AIV backend。
 
-## 初始算法
+## 初始 Plan
 
 - `SoleMesh`
 - `SoleNhr`
@@ -57,27 +60,14 @@ queue 映射为 thread，并把跨 queue event 映射为 thread notify，不能�
 - `ParallelMeshNhr`
 - `PipelineMeshNhr`
 
-同一 peer 的多条 `Channel{peer, path, weight}` 表达 MultiLink；Mesh/NHR 按 weight 切片，
-因此算法组合本身不复制 MultiLink 专用实现。
+Stage 只包含：原语、rank group、进入该阶段前各 rank 持有的 owner、字节区间、queue 和依赖。
+NHR 轮次、Mesh peer/thread 展开属于 engine binding。
 
-## Trace 对比
-
-```cpp
-std::ofstream out("dsl.trace");
-dsl::WriteTrace(plan, out);
-```
-
-trace 包含 rank、queue、send/recv peer、path、数据切片和完成 event。既有 HCCL/asc-devkit 算法可在
-`LocalCopy`、`SendRecvBatchWrite` 等实际提交点记录相同字段，再通过 `CompareTrace` 比较。
-这一级验证的是算法展开与依赖；CCU 的 `DumpInstruction()` 是更低层的微码，需等 CCU backend lowering
-完成后再做第二层比较。
-
-## 在 asc-devkit 中编译验证
+## 验证
 
 ```bash
-cmake --build build --target mc2_client -j4
-cmake --build build --target ascendc_ut_hccl_collective_dsl -j4
-ctest --test-dir build -R ascendc_ut_hccl_collective_dsl --output-on-failure
+cmake --build build --target mc2_client ascendc_ut_hccl_collective_dsl -j4
 ```
 
-测试覆盖 4/5 rank Mesh/NHR、8 rank 二维 Parallel/Pipeline、双 Channel、资源计算和 trace。
+测试检查五种 Plan、逻辑资源、KFC AICPU/CCU 路由、AIV direct 能力边界和 trace engine。
+`mc2_client` 构建验证 adapter 能与现有 AICPU/CCU 实现真正链接。

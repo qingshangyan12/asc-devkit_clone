@@ -18,6 +18,7 @@
 #include "topo_match_ubx.h"
 #include "alg_meta_registry.h"
 #include "external_alg_rules.h"
+#include "dsl_all_gather_sole_templates.h"
 #include <cstddef>
 #include <type_traits>
 
@@ -215,7 +216,7 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    InsTempAllGatherMesh1D);
+    DslAicpuAllGatherSoleMesh);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMesh1D, AlgEngine::AICPU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 
@@ -236,7 +237,7 @@ REGISTER_ALG_META(
 
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, InsV2AllGatherSoleExecutor, TopoMatch1D,
-    CcuTempKfcAllGatherMesh1DMem2Mem);
+    DslCcuAllGatherSoleMesh);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_ALLGATHER, CcuSchedAllGatherSoleMesh, AlgEngine::CCU, "sole[mesh]", COND_NONE, FLAG_NONE, 0);
 
