@@ -70,6 +70,8 @@ struct TurnPolicy {
     bool enabled = false;
     bool skipEntry = false;
     uint32_t exitNotify = 0U;
+    // Diagnostic only; not part of the wire format or task-cache identity.
+    const char* fallbackReason = "disabled";
 };
 }
 #endif

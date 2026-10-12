@@ -9,6 +9,7 @@
  */
 #include <array>
 #include <cstring>
+#include <cstdlib>
 #include <deque>
 #include <map>
 #include <numeric>
@@ -18,6 +19,13 @@
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_gather_nhr.h"
 #include "mc2_boundary_group_state.h"
+#include "ins_v2_all_gather_sole_executor.h"
+#include "topo_match_1d.h"
+#include "hcomm_primitives_dl.h"
+#include "comm_kfc_open_kernel_adapter.h"
+#include "task_cache/mc2_aicpu_task_cache_runner.h"
+#include "task_cache_test_stub.h"
+#include "alg_env_config.h"
 
 using namespace mc2_ops_hccl;
 namespace {
@@ -36,8 +44,79 @@ uint32_t internalRecords = 0;
 uint32_t payloads = 0;
 constexpr uint32_t RANKS = 8;
 constexpr uint32_t TURNS = 3;
-constexpr uint32_t COUNT = 16;
-constexpr uint32_t STRIDE = 19;
+constexpr uint32_t COUNT = 144;
+constexpr uint32_t STRIDE = 148;
+bool batchSupported = false;
+uint32_t batchCalls = 0;
+using Queues = std::map<ThreadHandle, std::deque<Task>>;
+std::map<std::string, Queues> cachedQueues;
+std::map<ThreadHandle, size_t> captureOffsets;
+uint32_t replayCalls = 0;
+
+// Model the existing HCOMM cache API, not hardware SQE relocation. The real runner
+// chooses miss/hit/bypass and the real executor supplies all captured primitives.
+int32_t Lookup(const char* tag, bool* hit)
+{
+    *hit = cachedQueues.count(tag) != 0U;
+    return HCCL_SUCCESS;
+}
+int32_t CaptureStart(const char*, void**, uint64_t*, uint64_t)
+{
+    captureOffsets.clear();
+    for (const auto& q : queues) {
+        captureOffsets[q.first] = q.second.size();
+    }
+    return HCCL_SUCCESS;
+}
+int32_t CaptureEnd(const char* tag)
+{
+    auto& graph = cachedQueues[tag];
+    for (const auto& q : queues) {
+        graph[q.first] = std::deque<Task>(q.second.begin() + captureOffsets[q.first], q.second.end());
+    }
+    return HCCL_SUCCESS;
+}
+int32_t Replay(const char* tag, void**, uint64_t*, uint64_t)
+{
+    ++replayCalls;
+    for (const auto& q : cachedQueues.at(tag)) {
+        queues[q.first].insert(queues[q.first].end(), q.second.begin(), q.second.end());
+    }
+    return HCCL_SUCCESS;
+}
+int32_t Clear(const char* tag)
+{
+    cachedQueues.erase(tag);
+    return HCCL_SUCCESS;
+}
+struct CacheHooks {
+    CacheHooks()
+    {
+        ResetAlgEnvConfigInitState();
+        ResetMc2TaskCacheTestStubState();
+        cachedQueues.clear();
+        replayCalls = 0U;
+        Mc2HcommAicpuTsTaskCacheSetTestFunctions(Lookup, CaptureStart, CaptureEnd, Replay, Clear);
+    }
+    ~CacheHooks() { Mc2HcommAicpuTsTaskCacheResetTestFunctions(); }
+};
+
+void ExpectSameQueues(const Queues& expected)
+{
+    ASSERT_EQ(queues.size(), expected.size());
+    for (const auto& q : expected) {
+        const auto& actual = queues.at(q.first);
+        ASSERT_EQ(actual.size(), q.second.size());
+        for (size_t i = 0; i < actual.size(); ++i) {
+            EXPECT_EQ(actual[i].kind, q.second[i].kind);
+            EXPECT_EQ(actual[i].owner, q.second[i].owner);
+            EXPECT_EQ(actual[i].slot, q.second[i].slot);
+            EXPECT_EQ(actual[i].dst, q.second[i].dst);
+            EXPECT_EQ(actual[i].src, q.second[i].src);
+            EXPECT_EQ(actual[i].bytes, q.second[i].bytes);
+        }
+    }
+}
 uint64_t ChannelMailbox(ChannelHandle c, bool remote)
 {
     const uint64_t from = (c - 1U) / RANKS;
@@ -137,6 +216,32 @@ extern "C" int32_t __wrap_HcommWriteOnThread(ThreadHandle t, ChannelHandle, void
     return HCCL_SUCCESS;
 }
 
+extern "C" bool __wrap_HcommIsSupportHcommBatchTransferOnThread() { return batchSupported; }
+extern "C" int32_t __wrap_HcclHcommBatchTransferOnThread(
+    ThreadHandle t, ChannelHandle c, const HcclHcommBatchTransferDesc* desc, uint32_t num)
+{
+    ++batchCalls;
+    for (uint32_t i = 0; i < num; ++i) {
+        if (desc[i].transType == HCCL_HCOMM_TRANSFER_TYPE_READ) {
+            const auto& d = desc[i].transferInfo.read;
+            Copy(t, d.dst, d.src, d.len);
+        } else if (desc[i].transType == HCCL_HCOMM_TRANSFER_TYPE_WRITE) {
+            const auto& d = desc[i].transferInfo.write;
+            Copy(t, d.dst, d.src, d.len);
+        } else if (desc[i].transType == HCCL_HCOMM_TRANSFER_TYPE_WRITE_WITH_NOTIFY) {
+            const auto& d = desc[i].transferInfo.writeWithNotify;
+            Copy(t, d.dst, d.src, d.len);
+            __wrap_HcommChannelNotifyRecordOnThread(t, c, d.notifyIdx);
+        } else if (desc[i].transType == HCCL_HCOMM_TRANSFER_TYPE_NOTIFY_RECORD) {
+            __wrap_HcommChannelNotifyRecordOnThread(t, c, desc[i].transferInfo.notifyRecord.notifyIdx);
+        } else {
+            ADD_FAILURE() << "Unexpected AllGather descriptor " << desc[i].transType;
+            return HCCL_E_PARA;
+        }
+    }
+    return HCCL_SUCCESS;
+}
+
 TEST(Mc2Boundary, WireRoundTripAndMalformedExtension)
 {
     mc2_boundary::Config config;
@@ -194,16 +299,23 @@ TEST(Mc2Boundary, FailedSubmissionCannotFinalize)
     EXPECT_FALSE(group.Begin(config, 1));
 }
 
-static void RunNhrCase(uint32_t loops)
+static void RunNhrCase(uint32_t loops, bool batch, HcclDataType dtype, uint32_t elementSize)
 {
     for (const bool enabled : {false, true}) {
         for (const bool slaveFirst : {false, true}) {
+            CacheHooks hooks;
+            Mc2AicpuTaskCacheManager cache(128U, 4096U);
+            Mc2AicpuTaskCacheManager fullCache(1U, 4096U);
+            ASSERT_EQ(fullCache.TryReserve(reinterpret_cast<void*>(1U), "occupied"),
+                Mc2TaskCacheReserveResult::RESERVED);
             queues.clear();
             entryRecords = internalRecords = payloads = 0U;
-            ASSERT_EQ(InitHcommBatchTransferOnThreadSupported(false), HCCL_SUCCESS);
+            batchSupported = batch;
+            batchCalls = 0;
+            ASSERT_EQ(InitHcommBatchTransferOnThreadSupported(batch), HCCL_SUCCESS);
             std::array<std::array<int8_t, TURNS * COUNT>, RANKS> input{};
             std::array<std::array<int8_t, TURNS * RANKS * STRIDE>, RANKS> output{};
-            std::array<std::array<int8_t, RANKS * COUNT>, RANKS> scratch{};
+            std::array<std::array<int8_t, RANKS * 256>, RANKS> scratch{};
             std::array<std::array<int8_t, RANKS * STRIDE>, TURNS> expected{};
             std::vector<u32> ranks(RANKS);
             std::iota(ranks.begin(), ranks.end(), 0U);
@@ -221,56 +333,87 @@ static void RunNhrCase(uint32_t loops)
                 }
                 for (uint32_t rank = 0; rank < RANKS; ++rank) {
                     OpParam param{};
-                    param.DataDes.dataType = HCCL_DATA_TYPE_INT8;
-                    TemplateResource resource{};
+                    param.DataDes.dataType = dtype;
+                    param.DataDes.count = COUNT / elementSize;
+                    param.DataDes.strideCount = STRIDE / elementSize;
+                    param.opType = HCCL_CMD_ALLGATHER;
+                    param.engine = COMM_ENGINE_AICPU_TS;
+                    param.opMode = OpMode::OPBASE;
+                    param.hcclComm = reinterpret_cast<void*>(rank + 1U);
+                    std::strcpy(param.algTag, "boundary-integration");
+                    std::strcpy(param.commName, "boundary-test");
+                    std::strcpy(param.algName, "AicpuAllGatherSoleNHR");
+                    param.inputPtr = input[rank].data() + turn * COUNT;
+                    param.outputPtr = output[rank].data() + turn * RANKS * STRIDE;
+                    param.inputSize = COUNT;
+                    param.outputSize = RANKS * STRIDE;
+                    AlgResourceCtxSerializable resource{};
+                    resource.topoInfo.userRank = rank;
+                    resource.topoInfo.userRankSize = RANKS;
+                    resource.algHierarchyInfo.infos = {{ranks}};
+                    resource.cclMem.addr = scratch[rank].data();
+                    resource.cclMem.size = RANKS * (loops == 1U ? 256U : 128U);
+                    resource.notifyNumOnMainThread = 1U;
+                    resource.notifyNumPerThread = {2U};
+                    resource.channels.resize(1);
                     resource.threads = {rank * 2U + 1U, rank * 2U + 2U};
                     for (uint32_t peer = 0; peer < RANKS; ++peer) {
                         if (peer == rank) {
                             continue;
                         }
                         ChannelInfo channel{};
+                        channel.isValid = true;
                         channel.remoteRank = peer;
                         channel.handle = rank * RANKS + peer + 1U;
                         channel.protocol = COMM_PROTOCOL_UBC_CTP;
                         channel.remoteCclMem.addr = scratch[peer].data();
                         channel.remoteCclMem.size = scratch[peer].size();
-                        resource.channels[peer] = {channel};
+                        resource.channels[0].push_back(channel);
                     }
-                    TemplateDataParams data{};
-                    data.buffInfo.inputPtr = input[rank].data() + turn * COUNT;
-                    data.buffInfo.outputPtr = output[rank].data() + turn * RANKS * STRIDE;
-                    data.buffInfo.hcclBuff.addr = scratch[rank].data();
-                    data.buffInfo.hcclBuff.size = scratch[rank].size();
-                    data.buffInfo.inBuffType = BufferType::INPUT;
-                    data.buffInfo.outBuffType = BufferType::OUTPUT;
-                    data.buffInfo.hcclBuffType = BufferType::HCCL_BUFFER;
-                    data.count = data.sliceSize = data.tailSize = COUNT;
-                    data.outputSliceStride = STRIDE;
-                    data.repeatNum = 1U;
-                    InsTempAllGatherNHR nhr(param, rank, {ranks});
+                    InsV2AllGatherSoleExecutor<TopoMatch1D, InsTempAllGatherNHR> executor;
+                    mc2_boundary::Config config;
+                    config.mode = enabled ? 1U : 0U;
+                    config.totalTurns = TURNS;
+                    std::vector<uint8_t> bytes(sizeof(param));
+                    std::memcpy(bytes.data(), &param, sizeof(param));
                     mc2_boundary::TurnPolicy policy;
-                    policy.enabled = enabled;
-                    policy.skipEntry = enabled && turn != 0U;
-                    policy.exitNotify = 3U + turn;
-                    for (uint32_t loop = 0; loop < loops; ++loop) {
-                        // The two-loop case includes a smaller tail with a different scratch layout.
-                        data.buffInfo.inBuffBaseOff = loop == 0U ? 0U : 12U;
-                        data.buffInfo.outBuffBaseOff = data.buffInfo.inBuffBaseOff;
-                        data.count = data.sliceSize = data.tailSize =
-                            loops == 1U ? COUNT : (loop == 0U ? 12U : 4U);
-                        auto loopPolicy = policy;
-                        loopPolicy.skipEntry = policy.skipEntry && loop == 0U;
-                        loopPolicy.enabled = policy.enabled && loop + 1U == loops;
-                        ASSERT_EQ(nhr.KernelRunBoundary(param, data, resource, loopPolicy), HCCL_SUCCESS);
-                    }
+                    ASSERT_EQ(PrepareOpenBoundaryPolicy(bytes, resource, config, turn, policy), enabled);
+                    const auto before = queues;
+                    uint32_t executions = 0U;
+                    auto execute = [&]() {
+                        ++executions;
+                        return executor.OrchestrateBoundary(param, resource, policy);
+                    };
+                    const auto tag = enabled ? ":mb1:" + std::to_string(policy.skipEntry) + ":" +
+                        std::to_string(policy.exitNotify) : std::string();
+                    // Clear each case so the first call must capture even when disabled
+                    // turns share a shape; relocation belongs to HCOMM's separate tests.
+                    cachedQueues.clear();
+                    ASSERT_EQ(RunWithMc2TaskCache(param, resource, execute, cache, tag), HCCL_SUCCESS);
+                    const auto captured = queues;
+                    const auto entries = entryRecords;
+                    const auto internals = internalRecords;
+                    const auto replays = replayCalls;
+                    queues = before;
+                    ASSERT_EQ(RunWithMc2TaskCache(param, resource, execute, cache, tag), HCCL_SUCCESS);
+                    EXPECT_EQ(replayCalls, replays + 1U);
+                    EXPECT_EQ(executions, 1U);
+                    ExpectSameQueues(captured);
+                    queues = before;
+                    ASSERT_EQ(RunWithMc2TaskCache(param, resource, execute, fullCache, tag), HCCL_SUCCESS);
+                    EXPECT_EQ(executions, 2U);
+                    ExpectSameQueues(captured);
+                    entryRecords = entries;
+                    internalRecords = internals;
                     // CCoreRecord follows the final exit on the main thread.
                     queues[resource.threads[0]].push_back(
-                        {Kind::CHECK, 0, 0, data.buffInfo.outputPtr, expected[turn].data(), RANKS * STRIDE});
+                        {Kind::CHECK, 0, 0, param.outputPtr, expected[turn].data(), RANKS * STRIDE});
                 }
             }
             EXPECT_EQ(entryRecords, RANKS * (enabled ? 1U + TURNS * (loops - 1U) : TURNS * loops));
             EXPECT_EQ(internalRecords, RANKS * TURNS * loops);
             ASSERT_GT(payloads, 0U);
+            EXPECT_EQ(batchCalls > 0U, batch);
             ASSERT_TRUE(Execute(slaveFirst));
             for (uint32_t rank = 0; rank < RANKS; ++rank) {
                 for (uint32_t turn = 0; turn < TURNS; ++turn) {
@@ -288,6 +431,69 @@ static void RunNhrCase(uint32_t loops)
 
 TEST(Mc2Boundary, CapturedNhrQueuesPreserveDataWithFastAndSlowCopyThreads)
 {
-    RunNhrCase(1U);
-    RunNhrCase(2U);
+    // Capability is immutable for a process, just as on device. CMake runs this
+    // executable twice instead of mutating production capability state for a test.
+    const char* value = std::getenv("MC2_BOUNDARY_TEST_BATCH");
+    const bool batch = value != nullptr && std::strcmp(value, "1") == 0;
+    for (const auto dtype : {HCCL_DATA_TYPE_INT8, HCCL_DATA_TYPE_FP16,
+                            HCCL_DATA_TYPE_BFP16, HCCL_DATA_TYPE_FP32}) {
+        const uint32_t elementSize = dtype == HCCL_DATA_TYPE_INT8 ? 1U :
+            (dtype == HCCL_DATA_TYPE_FP32 ? 4U : 2U);
+        RunNhrCase(1U, batch, dtype, elementSize);
+        RunNhrCase(2U, batch, dtype, elementSize);
+    }
+}
+
+TEST(Mc2Boundary, RuntimeFallbackReasonsAndPolicyReset)
+{
+    std::array<uint8_t, 64> input{}, output{}, scratch{};
+    OpParam param{};
+    param.opType = HCCL_CMD_ALLGATHER;
+    param.engine = COMM_ENGINE_AICPU_TS;
+    param.opMode = OpMode::OPBASE;
+    param.DataDes.dataType = HCCL_DATA_TYPE_INT8;
+    param.DataDes.count = 8U;
+    param.inputPtr = input.data();
+    param.outputPtr = output.data();
+    std::strcpy(param.algName, "AicpuAllGatherSoleNHR");
+    AlgResourceCtxSerializable res{};
+    res.threads = {1U, 2U};
+    res.topoInfo.userRankSize = 2U;
+    res.cclMem.addr = scratch.data();
+    res.cclMem.size = scratch.size();
+    res.notifyNumOnMainThread = 2U;
+    mc2_boundary::Config config;
+    config.mode = 1U;
+    config.totalTurns = 3U;
+    mc2_boundary::TurnPolicy policy;
+    auto prepare = [&]() {
+        std::vector<uint8_t> bytes(sizeof(param));
+        std::memcpy(bytes.data(), &param, sizeof(param));
+        return PrepareOpenBoundaryPolicy(bytes, res, config, 1U, policy);
+    };
+    ASSERT_TRUE(prepare());
+    EXPECT_TRUE(policy.skipEntry);
+    EXPECT_EQ(policy.exitNotify, 4U);
+    param.outputPtr = input.data();
+    EXPECT_FALSE(prepare());
+    EXPECT_STREQ(policy.fallbackReason, "buffer_alias_or_invalid_span");
+    EXPECT_FALSE(policy.skipEntry);
+    EXPECT_EQ(policy.exitNotify, 0U);
+    param.outputPtr = output.data();
+    ASSERT_TRUE(prepare()); // A later Prepare must recompute policy for its new addresses.
+    param.DataDes.count = 0U;
+    EXPECT_FALSE(prepare());
+    EXPECT_STREQ(policy.fallbackReason, "zero_count");
+    param.DataDes.count = 8U;
+    param.DataDes.strideCount = 7U;
+    EXPECT_FALSE(prepare());
+    EXPECT_STREQ(policy.fallbackReason, "invalid_range_or_stride");
+    param.DataDes.strideCount = 0U;
+    res.notifyNumOnMainThread = 62U;
+    EXPECT_FALSE(prepare());
+    EXPECT_STREQ(policy.fallbackReason, "notify_budget");
+    res.notifyNumOnMainThread = 2U;
+    std::strcpy(param.algName, "AicpuAllGatherSoleNHRMultiLink");
+    EXPECT_FALSE(prepare());
+    EXPECT_STREQ(policy.fallbackReason, "unsupported_algorithm_or_mode");
 }

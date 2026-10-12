@@ -72,3 +72,38 @@ API 不推断业务算子，不放宽每轮结果完成语义。默认 DISABLED�
 主尾块、非连续 stride、不同 dtype、cache miss/hit/bypass、快慢 Rank、
 关闭配置的原任务图以及启用后的逐轮 Wait 结果正确性。
 正式性能关闭 Profiling 采集，不预先承诺收益。
+
+## 当前主线适配与回退诊断
+
+本功能仍只支持单 Channel、两个 Thread 的 `AicpuAllGatherSoleNHR`。
+主线的 `AicpuAllGatherSoleNHRMultiLink` 即使复用同一 NHR 模板也不在白名单中；
+多 Channel 的 scratch 所有权及出口 Notify 分配需要独立设计，不能仅放宽算法名称匹配。
+CCU、其他 AllGather、ReduceScatter 和 CANN bridge AllReduce 均保持原任务图。
+
+DEBUG 级别可检索 `[MC2_BOUNDARY_SYNC][BEGIN]`、`[FALLBACK]` 和 `[SUMMARY]`。
+每组每种回退原因最多记录一次，后续 Prepare 地址变化导致的首次回退也会记录，
+不输出逐任务日志。常见原因：
+
+| 原因 | 含义 |
+| --- | --- |
+| `unsupported_mode` / `single_turn` | 未接入的模式或只有一轮 |
+| `unsupported_algorithm` | 整组包含不支持的引擎或算法，包括 MultiLink |
+| `multi_channel` / `thread_layout` | 多 Channel 或线程数量、句柄、映射不符合单 Channel 约束 |
+| `notify_budget_or_layout` / `notify_budget` | Notify 资源不足或组内布局不一致 |
+| `zero_count` / `invalid_range_or_stride` | 当前轮无数据或地址范围计算不满足条件 |
+| `buffer_alias_or_invalid_span` | 用户 buffer 与彼此或 scratch 重叠，或范围无效 |
+| `unsupported_algorithm_or_mode` | 本轮参数属于未接入的算法、对称内存或非 OPBASE 模式 |
+
+配置默认关闭。benchmark 的 `-n` 不等于同一 Kernel 的 `totalTurns`；
+须先构造同一 Kernel 的多轮 Prepare/repeat，并确认 SUMMARY 的 `removed_entry` 大于零。
+对当前一个从线程的布局，N 轮理想减少 `2 × (N − 1)` 个入口 Notify 任务；
+内部后拷贝通知、Channel 握手、payload-loop 同步和每轮出口均不减少。
+每轮出口槽位对应不同缓存任务图，需同时记录首次捕获、缓存命中率与占用，不能承诺固定微秒收益。
+
+依赖模拟直接执行真实 Sole executor（不再手写其 loop 策略），覆盖完整 loop 加尾 loop、
+非连续 stride、开关关闭/开启、BatchTransfer 开启/关闭和快慢线程调度；
+运行时准入测试检查别名、零长度、Notify 容量和 MultiLink 回退，并验证复用策略对象不残留裁剪标志。
+通过真实 task-cache runner 加 Host 缓存模型，对 miss、hit、容量满 bypass 的任务类型、
+地址、长度、Notify 槽位及每线程顺序逐项比较，再执行快慢线程模拟验证结果。
+BatchTransfer 能力在进程内不可改变，因此开关覆盖使用两个独立测试进程；不修改生产能力缓存。
+这些仍是 Host 队列模拟，不等于真实 HCOMM SQE/WQE 地址重定位或 NPU 验收。

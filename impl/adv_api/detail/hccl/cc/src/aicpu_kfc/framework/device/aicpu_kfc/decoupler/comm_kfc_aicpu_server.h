@@ -85,7 +85,7 @@ private:
 #endif
     HcclResult GetServerInfoForSync(HcclHandle handle, u32& msgPos, u32& repeat) const;
     void DumpTimeoutDfx(u32 msgPos, bool isHardTimeout) const;
-    HcclResult CheckBoundaryGroup(const ServerExecCtx& current, bool& eligible) const;
+    HcclResult CheckBoundaryGroup(const ServerExecCtx& current, bool& eligible, const char*& reason) const;
     void UpdateProgress(
         const char* stage, u32 msgPos, u32 repeatIdx, u32 turnIdx, u64 opParamKey, u64 waitAddr, u64 recordAddr);
     void KeepAlive() { lastMsgTimestamp_ = GetCurCpuTimestamp(); }
@@ -109,6 +109,7 @@ private:
     mc2_boundary::GroupState boundaryGroup_{};
     uint32_t boundaryRemovedEntry_{0U};
     uint32_t boundaryFallbackTurns_{0U};
+    std::set<std::string> boundaryFallbackReasons_;
 };
 
 #endif // HCCL_COMM_KFC_AICPU_SERVER_H

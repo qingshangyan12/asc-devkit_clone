@@ -621,9 +621,11 @@ HcclResult CommKfcAicpuServer::LaunchOpenAicpuKernelServer(
     return ret;
 }
 
-HcclResult CommKfcAicpuServer::CheckBoundaryGroup(const ServerExecCtx& current, bool& eligible) const
+HcclResult CommKfcAicpuServer::CheckBoundaryGroup(
+    const ServerExecCtx& current, bool& eligible, const char*& reason) const
 {
     eligible = current.boundary.mode == 1U && current.boundary.totalTurns > 1U;
+    reason = current.boundary.mode != 1U ? "unsupported_mode" : "single_turn";
     uint32_t currentBase = current.resCtxHolder->notifyNumOnMainThread;
     for (const auto count : current.resCtxHolder->notifyNumPerThread) {
         currentBase = std::max(currentBase, count);
@@ -650,14 +652,28 @@ HcclResult CommKfcAicpuServer::CheckBoundaryGroup(const ServerExecCtx& current, 
                 singleChannel = peers.insert(channel.remoteRank).second && singleChannel;
             }
         }
-        eligible = eligible && member.resourceType == ServerExecResourceType::NEXT_AICPU &&
-            param->opType == HCCL_CMD_ALLGATHER && param->engine == COMM_ENGINE_AICPU_TS &&
-            std::string(param->algName) == "AicpuAllGatherSoleNHR" && singleChannel &&
-            res.threads.size() == 2U && res.threads[0] != 0U && res.threads[1] != 0U &&
-            res.threads[0] != res.threads[1] && res.threads == current.resCtxHolder->threads &&
-            notifyBase == currentBase &&
-            notifyBase < mc2_boundary::NOTIFY_LIMIT - 1U &&
-            current.boundary.totalTurns <= mc2_boundary::NOTIFY_LIMIT - notifyBase - 1U;
+        if (!eligible) {
+            continue;
+        }
+        if (member.resourceType != ServerExecResourceType::NEXT_AICPU ||
+            param->opType != HCCL_CMD_ALLGATHER || param->engine != COMM_ENGINE_AICPU_TS ||
+            std::string(param->algName) != "AicpuAllGatherSoleNHR") {
+            reason = "unsupported_algorithm";
+        } else if (!singleChannel) {
+            reason = "multi_channel";
+        } else if (res.threads.size() != 2U || res.threads[0] == 0U || res.threads[1] == 0U ||
+                   res.threads[0] == res.threads[1] || res.threads != current.resCtxHolder->threads) {
+            reason = "thread_layout";
+        } else if (notifyBase != currentBase || notifyBase >= mc2_boundary::NOTIFY_LIMIT - 1U ||
+                   current.boundary.totalTurns > mc2_boundary::NOTIFY_LIMIT - notifyBase - 1U) {
+            reason = "notify_budget_or_layout";
+        } else {
+            continue;
+        }
+        eligible = false;
+    }
+    if (eligible) {
+        reason = "none";
     }
     return HCCL_SUCCESS;
 }
@@ -683,8 +699,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     CHK_PRT_RET(handle < 0, HCCL_ERROR("Group %u: invalid handle id %d.", groupIdx_, handle), HCCL_E_INTERNAL);
     const u32 repeatCnt = static_cast<u32>(msg.addMsg.v1Msg.repeatCnt);
     bool boundaryEligible = false;
+    const char* boundaryReason = "disabled";
     if (execCtx->boundary.mode != 0U) {
-        CHK_RET(CheckBoundaryGroup(*execCtx, boundaryEligible));
+        CHK_RET(CheckBoundaryGroup(*execCtx, boundaryEligible, boundaryReason));
     }
     CHK_PRT_RET(!boundaryGroup_.Begin(execCtx->boundary, repeatCnt),
         HCCL_ERROR("[MC2_BOUNDARY_SYNC] invalid group order/count, group[%u].", execCtx->boundary.groupId),
@@ -692,6 +709,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     if (execCtx->boundary.mode != 0U && boundaryGroup_.Turn() == 0U) {
         boundaryRemovedEntry_ = 0U;
         boundaryFallbackTurns_ = 0U;
+        boundaryFallbackReasons_.clear();
     }
     const u64 waitAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.commitTurnCnt[msgPos].cnt));
     const u64 recordAddr = reinterpret_cast<u64>(&(msgArea_->commMsg.singleMsg.finishedTurnCnt[msgPos].cnt));
@@ -775,6 +793,7 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         }
 
         mc2_boundary::TurnPolicy boundaryPolicy;
+        boundaryPolicy.fallbackReason = boundaryReason;
         if (boundaryEligible) {
             PrepareOpenBoundaryPolicy(
                 runParam, *execCtx->resCtxHolder, execCtx->boundary, boundaryGroup_.Turn(), boundaryPolicy);
@@ -787,9 +806,15 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
                 "fallback_reason[%s].",
                 execCtx->boundary.groupId, execCtx->boundary.totalTurns, execCtx->boundary.mode,
                 boundaryEligible, boundaryPolicy.enabled,
-                boundaryPolicy.enabled ? "none" :
-                    (boundaryEligible ? "runtime_range_or_alias" : "unsupported_path_or_notify_budget"));
+                boundaryPolicy.fallbackReason);
 
+        }
+        if (execCtx->boundary.mode != 0U && !boundaryPolicy.enabled &&
+            boundaryFallbackReasons_.insert(boundaryPolicy.fallbackReason).second) {
+            HCCL_DEBUG("[MC2_BOUNDARY_SYNC][FALLBACK] group[%u] turn[%u] alg[%s] reason[%s].",
+                execCtx->boundary.groupId, boundaryGroup_.Turn(),
+                reinterpret_cast<const mc2_ops_hccl::OpParam*>(runParam.data())->algName,
+                boundaryPolicy.fallbackReason);
         }
         UpdateProgress("BeforeWait", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
