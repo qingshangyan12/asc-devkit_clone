@@ -95,10 +95,81 @@ PIPE_V
 ## 调用示例
 
 ```cpp
-//total_length指参与计算的数据长度
-constexpr uint64_t total_length = 64;
-__ubuf__ half src0[total_length];
-__ubuf__ half src1[total_length];
-__ubuf__ half dst[total_length];
-asc_add(dst, src0, src1, total_length);
+#include <cstdlib>
+#include <iostream>
+#include <vector>
+
+#include "acl/acl.h"
+#include "c_api/asc_simd.h"
+
+#define CHECK_ACL(x)                                                                        \
+    do {                                                                                    \
+        aclError __ret = x;                                                                 \
+        if (__ret != ACL_ERROR_NONE) {                                                      \
+            std::cerr << __FILE__ << ":" << __LINE__ << " aclError:" << __ret << std::endl; \
+        }                                                                                   \
+    } while (0);
+
+#define CHECK_NOT_NULL(ptr) do { \
+    if ((ptr) == nullptr) { \
+        std::cerr << #ptr << " is nullptr" << std::endl; \
+        std::exit(1); \
+    } \
+} while (0)
+
+constexpr uint64_t TOTAL_LENGTH = 64;
+constexpr uint64_t DATA_BYTES = TOTAL_LENGTH * sizeof(half);
+
+__global__ __vector__ void add_kernel(__gm__ half* dst, __gm__ half* src0, __gm__ half* src1)
+{
+    asc_init();
+    __ubuf__ half src0_ub[TOTAL_LENGTH];
+    __ubuf__ half src1_ub[TOTAL_LENGTH];
+    __ubuf__ half dst_ub[TOTAL_LENGTH];
+
+    asc_copy_gm2ub_align(src0_ub, src0, DATA_BYTES);
+    asc_copy_gm2ub_align(src1_ub, src1, DATA_BYTES);
+    asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0);
+    asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID0);
+
+    asc_add(dst_ub, src0_ub, src1_ub, TOTAL_LENGTH);
+
+    asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_sync_wait(PIPE_V, PIPE_MTE3, EVENT_ID0);
+    asc_copy_ub2gm_align(dst, dst_ub, DATA_BYTES);
+    asc_sync();
+}
+
+int main()
+{
+    std::vector<half> src0(TOTAL_LENGTH, half(1.0f));
+    std::vector<half> src1(TOTAL_LENGTH, half(2.0f));
+    std::vector<half> dst(TOTAL_LENGTH, half(0.0f));
+
+    CHECK_ACL(aclInit(nullptr));
+    CHECK_ACL(aclrtSetDevice(0));
+
+    half* src0_device = nullptr;
+    half* src1_device = nullptr;
+    half* dst_device = nullptr;
+    CHECK_ACL(aclrtMalloc(reinterpret_cast<void**>(&src0_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_NOT_NULL(src0_device);
+    CHECK_ACL(aclrtMalloc(reinterpret_cast<void**>(&src1_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_NOT_NULL(src1_device);
+    CHECK_ACL(aclrtMalloc(reinterpret_cast<void**>(&dst_device), DATA_BYTES, ACL_MEM_MALLOC_HUGE_FIRST));
+    CHECK_NOT_NULL(dst_device);
+
+    CHECK_ACL(aclrtMemcpy(src0_device, DATA_BYTES, src0.data(), DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE));
+    CHECK_ACL(aclrtMemcpy(src1_device, DATA_BYTES, src1.data(), DATA_BYTES, ACL_MEMCPY_HOST_TO_DEVICE));
+    add_kernel<<<1, 0>>>(dst_device, src0_device, src1_device);
+    CHECK_ACL(aclrtSynchronizeDevice());
+    CHECK_ACL(aclrtMemcpy(dst.data(), DATA_BYTES, dst_device, DATA_BYTES, ACL_MEMCPY_DEVICE_TO_HOST));
+
+    CHECK_ACL(aclrtFree(dst_device));
+    CHECK_ACL(aclrtFree(src1_device));
+    CHECK_ACL(aclrtFree(src0_device));
+    CHECK_ACL(aclrtResetDevice(0));
+    CHECK_ACL(aclFinalize());
+    return 0;
+}
 ```
