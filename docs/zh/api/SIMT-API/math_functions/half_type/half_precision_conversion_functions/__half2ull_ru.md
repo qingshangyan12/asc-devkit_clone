@@ -92,3 +92,10 @@ inline unsigned long long int __half2ull_ru(const half x)
         dst[idx] = __half2ull_ru(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
+result: 0, 0, 1, 2, 3, -1, 0, 0
+```

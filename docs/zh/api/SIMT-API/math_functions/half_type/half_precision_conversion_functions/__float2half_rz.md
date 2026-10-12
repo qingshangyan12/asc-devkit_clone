@@ -86,3 +86,10 @@ inline half __float2half_rz(const float x)
         dst[idx] = __float2half_rz(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 128, 128.0625, 128.1875, -128.1875, inf, -inf, nan
+result: 128, 128, 128.125, -128.125, inf, -inf, nan
+```
