@@ -14,12 +14,12 @@
 | 右值初始化类对象（Initialization of class objects by rvalues） | [N1610](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1610.html) | ✅ | 工厂函数返回右值时移动构造或返回值优化（RVO）均生效。 |
 | 变参模板（Variadic templates） | [N2242](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2242.pdf) | ✅ | 支持参数包、`sizeof...`、包展开进数组初始化/函数实参/基类列表、递归继承展开。 |
 | 静态断言（Static assertions） | [N1720](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1720.html) | ✅ | 支持命名空间级与函数内`static_assert`，可在模板中使用。 |
-| auto类型变量（auto-typed variables） | [N1984](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1984.pdf) | ✅ | 支持从初始化表达式、lambda表达式推导类型。 |
-| 多声明符auto（Multi-declarator auto） | [N1737](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1737.pdf) | ✅ | 一条语句声明多个auto变量，要求各声明符推导类型一致。 |
+| auto类型变量（auto-typed variables） | [N1984](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1984.pdf) | ✅ | 支持从初始化表达式、lambda表达式推导类型。注意auto推导的设备指针传入核函数的限制，见[auto类型推导限制](../cpp_language_restrictions/cpp11_restrictions.md)。 |
+| 多声明符auto（Multi-declarator auto） | [N1737](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2004/n1737.pdf) | ✅ | 一条语句声明多个auto变量，要求各声明符推导类型一致，不一致时编译报错（写法示例见[auto类型推导限制](../cpp_language_restrictions/cpp11_restrictions.md)）。 |
 | Lambda表达式（Lambda expressions） | [N2927](https://www.open-std.org/JTC1/SC22/WG21/docs/papers/2009/n2927.pdf) | ✅ | 纯SIMT核函数内直接使用；SIMD/SIMT混合编程场景需显式标记函数属性（标记选择规则与逐项验证见[Lambda表达式](./lambda_expressions.md)）。 |
 | 表达式的声明类型（Declared type of an expression，decltype） | [N2343](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2343.pdf) | ✅ | 值类别语义与标准一致：具名实体推导声明类型，表达式按左值/右值推导引用。 |
 | 右尖括号（Right angle brackets） | [N1757](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2005/n1757.html) | ✅ | 嵌套模板关闭符`>>`无需空格分隔。 |
-| 别名模板（Alias templates） | [N2258](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2258.pdf) | ✅ | 支持`template <typename T> using Alias = ...`及元函数级联。 |
+| 别名模板（Alias templates） | [N2258](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2258.pdf) | ✅ | 支持`template <typename T> using Alias = ...`及元函数级联。注意核函数/SIMT VF函数以依赖模板参数的别名作形参的限制，见[别名模版约束限制](../cpp_language_restrictions/cpp11_restrictions.md)。 |
 | 空指针常量（Null pointer constant，nullptr） | [N2431](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2431.pdf) | ✅ | 支持nullptr初始化、比较与函数重载决议。 |
 | 强类型枚举（Strongly-typed enums） | [N2347](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2347.pdf) | ✅ | 支持enum class及底层类型指定。 |
 | 对齐支持（Alignment support） | [N2341](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2341.pdf) | ✅ | 支持alignas/alignof，可作用于类、全局与局部变量。 |
