@@ -1054,7 +1054,7 @@ bool, int4b_t, int8_t, uint8_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat8_t, fp8_e8m0
 
 [Level] Mandatory
 
-[Description] Chinese text must use Founder Lanting Hei Simplified, and English text must use Huawei Sans. Chinese text must not be smaller than 9pt (equivalent to 12 pixels), full-width characters; English text must not be smaller than 8pt (equivalent to 10 pixels), half-width characters.
+[Description] Founder Lanting Hei Simplified must be used. Chinese text must not be smaller than 9pt (equivalent to 12 pixels), full-width characters; English text must not be smaller than 8pt (equivalent to 10 pixels), half-width characters.
 
 ### API-FIGURE-01 Figure Width Must Meet Requirements
 
