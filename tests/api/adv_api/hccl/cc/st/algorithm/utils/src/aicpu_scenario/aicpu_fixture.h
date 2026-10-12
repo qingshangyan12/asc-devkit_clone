@@ -52,12 +52,23 @@ struct RankResult {
 
 class AicpuStFixture : public ::testing::Test {
 public:
-    // 输入数据模式：rank 与 byte 偏移的可区分编码。周期 256 字节、跨 rank 每字节基数差 41，
-    // 可检出分片内非 256 整数倍间距的块乱序与跨 rank 混淆（对齐 CCU ST 的 golden 模式强度）；
-    // 256B 整数倍间距的同相位块置换不可检出——单字节函数的数学上限，如需覆盖须引入按块校验和。
+    // 输入数据模式（检测力设计）：
+    // - 每 256B 块的前 254 字节为数据字节（17 + rank*41 + offset，周期 256）：检测一切非 256 倍数位移；
+    // - 末 2 字节（inBlock 0xFE/0xFF）为块标签：位打包 (rank 低 4 位 | blockIdx 低 4 位) 与 blockIdx 高 8 位，
+    //   在 (rank < 16, blockIdx < 4096) 内双射——覆盖 1MB 分片，检测 256 对齐块置换（含 32KB chunk 乱序）；
+    // - 残余盲区：>1MB 分片的 1MB 对齐置换（当前用例上限 1MB，为零盲区；需更大覆盖时增加标签位数）。
+    // fill 与 golden 同源（共用本函数），比对自洽。
     // public：adapter 的 golden 构造器（非成员函数）需与 fixture 填充共用同一公式。
     static uint8_t MakeInputByte(RankId rank, uint64_t offset)
     {
+        const uint64_t inBlock = offset & 0xFFU;
+        if (inBlock >= 0xFEU) {
+            const uint64_t blockIdx = offset >> 8;
+            if (inBlock == 0xFEU) {
+                return static_cast<uint8_t>(((blockIdx & 0x0FU) << 4) | (rank & 0x0FU));
+            }
+            return static_cast<uint8_t>((blockIdx >> 4) & 0xFFU);
+        }
         return static_cast<uint8_t>(17U + rank * 41U + offset);
     }
 

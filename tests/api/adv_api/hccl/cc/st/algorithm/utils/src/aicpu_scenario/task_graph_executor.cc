@@ -61,8 +61,7 @@ uint32_t GetWaitNotifyId(const TaskStub* task)
 
 // 逐元素归约 src 进 dst。端点解析必须经 ResolveEndpoints（先两端扩容，防同块扩容悬空；
 // 内含 size 一致性 THROW 防护）——这是 Task 2 质量审查确立的强制契约。
-// 精度边界（spec §12.2）：归约经 float 中间精度——INT32 输入 |值|>2^24 引入舍入误差；
-// INT8/INT32 存储饱和（StoreElem）；FP16 按 RNE、BFP16 按截断（aicpu_float_convert.h）。
+// 精度边界：INT8/INT32 走 int64 精确路径；FP16 按 RNE、BFP16 按截断、FP32 按 float 累加（对齐设备浮点语义）。
 void ReduceInto(
     RankId dstRank, const DataSlice& dstSlice, RankId srcRank, const DataSlice& srcSlice, HcclDataType dt,
     HcclReduceOp op)
@@ -85,9 +84,16 @@ void ReduceInto(
     u8* dstPtr = nullptr;
     ResolveEndpoints(srcRank, srcSlice, dstRank, dstSlice, srcPtr, dstPtr);
     const uint64_t count = dstSlice.GetSize() / elem;
-    for (uint64_t i = 0; i < count; ++i) {
-        const float acc = ApplyOp(LoadElem(dstPtr + i * elem, dt), LoadElem(srcPtr + i * elem, dt), op);
-        StoreElem(dstPtr + i * elem, dt, acc);
+    if (IsIntegerReduceType(dt)) {
+        for (uint64_t i = 0; i < count; ++i) {
+            const int64_t acc = ApplyIntOp(LoadIntElem(dstPtr + i * elem, dt), LoadIntElem(srcPtr + i * elem, dt), op);
+            StoreIntElem(dstPtr + i * elem, dt, acc);
+        }
+    } else {
+        for (uint64_t i = 0; i < count; ++i) {
+            const float acc = ApplyOp(LoadElem(dstPtr + i * elem, dt), LoadElem(srcPtr + i * elem, dt), op);
+            StoreElem(dstPtr + i * elem, dt, acc);
+        }
     }
 }
 
@@ -181,15 +187,19 @@ void TaskGraphExecutor::ExecuteOne(QueueCtx& ctx, TaskStub* task)
         case TaskTypeStub::POST: {
             auto* t = static_cast<TaskStubPost*>(task);
             event.notifyId = t->GetTopicId();
-            notifyState_[t->GetTopicId()] = true;
-            lastPostSeq_[t->GetTopicId()] = event.seq;
+            if (!notifyState_[t->GetTopicId()]) { // 幂等置位：已置位则吸收，保留最老 seq（HB sound）
+                notifyState_[t->GetTopicId()] = true;
+                lastPostSeq_[t->GetTopicId()] = event.seq;
+            }
             break;
         }
         case TaskTypeStub::LOCAL_POST_TO: {
             auto* t = static_cast<TaskStubLocalPostTo*>(task);
             event.notifyId = t->GetTopicId();
-            notifyState_[t->GetTopicId()] = true;
-            lastPostSeq_[t->GetTopicId()] = event.seq;
+            if (!notifyState_[t->GetTopicId()]) { // 幂等置位：已置位则吸收，保留最老 seq（HB sound）
+                notifyState_[t->GetTopicId()] = true;
+                lastPostSeq_[t->GetTopicId()] = event.seq;
+            }
             break;
         }
         case TaskTypeStub::WAIT: {

@@ -443,3 +443,67 @@ TEST_F(TaskGraphExecutorTest, LocalReduceInvalidOpThrows)
     // 抛出后执行器状态已部分推进，用例只断言抛出，不检查后续状态。
     EXPECT_ANY_THROW((void)executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report));
 }
+
+// INT32 大值精确：2^24+1 在 float 不可精确表示（float 路径会回写 16777216）
+TEST_F(TaskGraphExecutorTest, LocalReduceInt32Beyond24BitExact)
+{
+    SimNpu& npu0 = SimWorld::Global()->GetSimNpuByRankId(0);
+    const uint64_t srcAddr = npu0.AllocMemory(BufferType::INPUT, 4);
+    const uint64_t dstAddr = npu0.AllocMemory(BufferType::OUTPUT, 4);
+    auto* src = reinterpret_cast<int32_t*>(Base(0, BufferType::INPUT, 4));
+    auto* dst = reinterpret_cast<int32_t*>(Base(0, BufferType::OUTPUT, 4));
+    src[0] = 16777217; // 2^24 + 1
+    dst[0] = 0;
+
+    DataSlice srcSlice;
+    ASSERT_EQ(npu0.GetSlice(srcAddr, 4, srcSlice), HcclResult::HCCL_SUCCESS);
+    DataSlice dstSlice;
+    ASSERT_EQ(npu0.GetSlice(dstAddr, 4, dstSlice), HcclResult::HCCL_SUCCESS);
+    Append(
+        0, 0,
+        std::make_shared<TaskStubLocalReduce>(
+            srcSlice, dstSlice, HcclDataType::HCCL_DATA_TYPE_INT32, HcclReduceOp::HCCL_REDUCE_SUM));
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    EXPECT_EQ(dst[0], 16777217); // int64 路径精确；float 路径会得 16777216
+}
+
+// 置位吸收：double-post 的 WAIT 由最老 POST 满足（跨队列时最新 POST 不蕴含最老，HB sound 取最老）。
+// 轮询序 ctxs=[rank0主流, rank0从流, rank1主流]：两 POST 须同 sweep 先后执行（第二个落在置位期间被吸收），
+// WAIT 放 rank1 主流 POST 之后（下一 sweep 消费）——否则 rank0 从流的 WAIT 会在 rank1 POST 前消费信号，用例失效。
+TEST_F(TaskGraphExecutorTest, DoublePostAbsorbedKeepsOldestSeq)
+{
+    const uint32_t notifyId = 0x60;
+    Append(0, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));   // 先执行（轮询序 rank0 主流在前）
+    Append(1, 0, std::make_shared<TaskStubLocalPostTo>(notifyId));   // 同 sweep 置位期间 → 被吸收
+    Append(1, 0, std::make_shared<TaskStubLocalWaitFrom>(notifyId)); // 下一 sweep 消费
+
+    TaskGraphExecutor executor;
+    std::string report;
+    ASSERT_EQ(executor.Execute(SimTaskQueue::Global()->GetAllRankTaskQueues(), report), ExecResult::SUCCESS) << report;
+    const auto& log = executor.ExecutionLog();
+    const ExecEvent* firstPost = nullptr;
+    const ExecEvent* secondPost = nullptr;
+    const ExecEvent* wait = nullptr;
+    for (const auto& e : log) {
+        if (e.type == TaskTypeStub::LOCAL_POST_TO && e.notifyId == notifyId) {
+            if (firstPost == nullptr) {
+                firstPost = &e;
+            } else {
+                secondPost = &e;
+            }
+        }
+        if (e.type == TaskTypeStub::LOCAL_WAIT_FROM && e.notifyId == notifyId) {
+            wait = &e;
+        }
+    }
+    ASSERT_NE(firstPost, nullptr);
+    ASSERT_NE(secondPost, nullptr);
+    ASSERT_NE(wait, nullptr);
+    ASSERT_LT(firstPost->seq, secondPost->seq); // 轮询序：rank0 主流在前
+    // 不变量：satisfiedBySeq == 两 POST 中 seq 较小者——最老（首个）POST，非被吸收的第二个；
+    // 覆盖式（吸收前）实现会记录 secondPost->seq，本断言可检出该回归
+    EXPECT_EQ(wait->satisfiedBySeq, firstPost->seq);
+}

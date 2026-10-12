@@ -53,3 +53,33 @@ TEST_F(AicpuStSmokeFixture, ChainSmoke_AllGatherMesh1D_2Rank_Int8)
     scenario.expectedAlgName = "InsAllGatherMesh1D";
     VerifyScenario(scenario);
 }
+
+// 块标签双射性质：不同 (rank, blockIdx) 的标签对必不同——256 对齐块置换可检出
+TEST(AicpuStInputPattern, BlockTagsDistinguishAlignedBlocks)
+{
+    using HcclSim::AicpuSt::AicpuStFixture;
+    for (uint32_t ra = 0; ra < 4; ++ra) {
+        for (uint32_t rb = 0; rb < 4; ++rb) {
+            for (uint64_t ba = 0; ba < 300; ba += 37) {
+                for (uint64_t bb = 0; bb < 300; bb += 41) {
+                    if (ra == rb && ba == bb) {
+                        continue;
+                    }
+                    const uint64_t tagA = (ba << 8) | 0xFEU;
+                    const uint64_t tagB = (bb << 8) | 0xFEU;
+                    const bool loDiffers =
+                        AicpuStFixture::MakeInputByte(ra, tagA) != AicpuStFixture::MakeInputByte(rb, tagB);
+                    const bool hiDiffers =
+                        AicpuStFixture::MakeInputByte(ra, tagA + 1) != AicpuStFixture::MakeInputByte(rb, tagB + 1);
+                    EXPECT_TRUE(loDiffers || hiDiffers)
+                        << "tag collision: (" << ra << "," << ba << ") vs (" << rb << "," << bb << ")";
+                }
+            }
+        }
+    }
+    // 数据字节保留非 256 倍数位移检测力（周期 256，标签位除外）
+    EXPECT_NE(AicpuStFixture::MakeInputByte(0, 3), AicpuStFixture::MakeInputByte(0, 4));
+    EXPECT_EQ(AicpuStFixture::MakeInputByte(0, 3), AicpuStFixture::MakeInputByte(0, 3 + 256));
+    // 相邻 256 块的标签不同（块乱序可检出）
+    EXPECT_NE(AicpuStFixture::MakeInputByte(0, 0xFEU), AicpuStFixture::MakeInputByte(0, 256 + 0xFEU));
+}
