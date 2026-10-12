@@ -35,7 +35,7 @@
 ## 函数原型
 
 ```c
-// 通过引用参数输出结果（占位符形式）
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_half2float(vector_float& dst,
                                            vector_half src,
                                            vector_bool mask,
@@ -46,7 +46,7 @@ __simd_callee__ inline void asc_half2float(vector_float& dst,
                                            vector_bool mask,
                                            std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 
-// 通过函数返回值返回结果（占位符形式）
+// 通过函数返回值返回结果
 __simd_callee__ inline vector_float asc_half2float(vector_half src,
                                                    vector_bool mask,
                                                    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos)
@@ -55,9 +55,6 @@ __simd_callee__ inline vector_float asc_half2float(vector_half src,
                                                    vector_bool mask,
                                                    std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos)
 ```
-
-**占位符说明如下：**
-- `<src_pos>`支持`ASC_POSITION_EVEN`和`ASC_POSITION_ODD`。
 
 ### 函数原型典型示例
 
