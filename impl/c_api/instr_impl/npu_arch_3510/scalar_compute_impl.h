@@ -22,6 +22,7 @@
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_ffs_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_store_dev_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_float2int32_impl.h"
+#include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_float2half_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_sflbits_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_ffz_impl.h"
 #include "impl/c_api/instr_impl/npu_arch_3510/scalar_compute_impl/asc_clear_nthbit_impl.h"
@@ -311,6 +312,8 @@ __aicore__ inline uint64_t asc_atomic_dec(__gm__ uint64_t* address, uint64_t val
     return asc_atomic_dec_impl(address, val);
 }
 } // namespace __asc_aicore
+
+__aicore__ inline half asc_float2half_ro(float value) { return asc_float2half_ro_impl(value); }
 
 #endif
 
