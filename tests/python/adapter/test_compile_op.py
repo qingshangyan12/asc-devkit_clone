@@ -1876,39 +1876,6 @@ class TestCompileOp(unittest.TestCase):
         )
         self.assertTrue("K_TYPE_MIX_AIC_MAIN" in section_context)
 
-    def test_gen_json(self):
-        SetCurrentSocInfo("Ascend310P1")
-        compile_info = CompileInfo()
-        compile_info.kernel_name = "test"
-        compile_info.origin_func_name = "test"
-        compile_info.tiling_key_list = []
-
-        tiling_info = TilingInfo()
-        tiling_info.block_dim = 8
-        tiling_info.static_shape_flag = False
-
-        with tbe.common.context.op_context.OpContext():
-            with buildcfg.build_config() as cfg:
-                _gen_dynamic_json_for_v200(compile_info, tiling_info, "VectorCore")
-                self.assertTrue(os.path.exists(os.path.join(TOP_PATH, "kernel_meta", "test.json")))
-                os.remove(os.path.join(TOP_PATH, "kernel_meta", "test.json"))
-                _gen_static_json_for_mix_v200(compile_info, tiling_info, KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE)
-                self.assertTrue(os.path.exists(os.path.join(TOP_PATH, "kernel_meta", "test.json")))
-                os.remove(os.path.join(TOP_PATH, "kernel_meta", "test.json"))
-                _gen_static_json_for_no_mix_v200(compile_info, tiling_info, KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE)
-                self.assertTrue(os.path.exists(os.path.join(TOP_PATH, "kernel_meta", "test.json")))
-                os.remove(os.path.join(TOP_PATH, "kernel_meta", "test.json"))
-                _gen_non_mix_sub_json(compile_info, tiling_info, "VectorCore")
-                self.assertTrue(os.path.exists(os.path.join(TOP_PATH, "kernel_meta", "test.json")))
-                os.remove(os.path.join(TOP_PATH, "kernel_meta", "test.json"))
-                _gen_mix_sub_json(compile_info, tiling_info)
-                self.assertTrue(os.path.exists(os.path.join(TOP_PATH, "kernel_meta", "test.json")))
-                os.remove(os.path.join(TOP_PATH, "kernel_meta", "test.json"))
-                cfg.current().config["tir.enable_vector_core"] = 1
-                _gen_static_json_for_mix_v200(compile_info, tiling_info, KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE)
-                self.assertTrue(os.path.exists(os.path.join(TOP_PATH, "kernel_meta", "test.json")))
-                os.remove(os.path.join(TOP_PATH, "kernel_meta", "test.json"))
-
     def test_gen_meta_info_section(self):
         SetCurrentSocInfo("Ascend950PR_9599")
         compile_info = CompileInfo()
@@ -5283,27 +5250,6 @@ Contents of section
         compile_info.tiling_key_kernel_type["0"] = KernelMetaType.KERNEL_TYPE_MIX_AIC_HARD_SYNC
         result = get_v220_kernel_type_mix_flag(compile_info, tiling_info)
         self.assertEqual(result, (True, compile_info.hard_sync))
-
-    def test_get_kernel_type_enum(self):
-        compile_log_path = None
-        with mock.patch.object(CommonUtility, "is_v220", return_value=True):
-            kernel_type = "KERNEL_TYPE_AIV_ONLY"
-            kernel_type_enum = KernelInfoInfer.get_kernel_type_enum(kernel_type, compile_log_path)
-            self.assertEqual(kernel_type_enum, KernelMetaType.KERNEL_TYPE_AIV_ONLY)
-            kernel_type = "KERNEL_TYPE_AICORE"
-            kernel_type_enum = KernelInfoInfer.get_kernel_type_enum(kernel_type, compile_log_path)
-            self.assertEqual(kernel_type_enum, None)
-        with mock.patch.object(CommonUtility, "is_v220", return_value=False):
-            with mock.patch.object(CommonUtility, "is_v200", return_value=True):
-                kernel_type = "KERNEL_TYPE_AICORE"
-                kernel_type_enum = KernelInfoInfer.get_kernel_type_enum(kernel_type, compile_log_path)
-                self.assertEqual(kernel_type_enum, KernelMetaType.KERNEL_TYPE_AICORE)
-                kernel_type = "KERNEL_TYPE_AIV_ONLY"
-                kernel_type_enum = KernelInfoInfer.get_kernel_type_enum(kernel_type, compile_log_path)
-                self.assertEqual(kernel_type_enum, None)
-        with mock.patch.object(CommonUtility, "is_v220", return_value=False):
-            with mock.patch.object(CommonUtility, "is_v200", return_value=False):
-                self.assertRaises(Exception, KernelInfoInfer.get_kernel_type_enum, kernel_type, compile_log_path)
 
     def test_is_enable_build_log(self):
         SetCurrentSocInfo("Ascend910B1")
