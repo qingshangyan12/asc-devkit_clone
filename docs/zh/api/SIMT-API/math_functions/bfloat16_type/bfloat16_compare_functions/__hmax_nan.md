@@ -86,3 +86,11 @@ bfloat16_t __hmax_nan(const bfloat16_t x, const bfloat16_t y)
         dst[idx] = __hmax_nan(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.0, 0.5, 2.0, 2.0, nan, 1.0, inf, -inf
+y: 0.5, 0.5, 2.0, 3.0, 1.0, nan, inf, 0.0
+result: 0.5, 0.5, 2.0, 3.0, nan, nan, inf, 0.0
+```
