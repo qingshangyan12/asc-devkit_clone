@@ -276,6 +276,6 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
     TopoMatchMultilevel, InsTempReduceScatterMesh1DZAxisDetour, InsTempReduceScatterNHR);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, InsReduceScatterSequenceMesh1DNhr, AlgEngine::AICPU, "sequence[mesh,nhr]",
-    COND_NONE, FLAG_NONE, 0);
+    COND_NONE, FLAG_MULTI_LEVEL, 0);
 
 } // namespace mc2_ops_hccl
