@@ -54,5 +54,5 @@
 
 ## 其他参考
 
-- [图引擎开发指南](https://www.hiascend.com/document/redirect/CannCommunityGraphguide)。
+- 《[图开发](https://gitcode.com/cann/ge/blob/9.2.0/docs/zh/user_guides/graph_dev/README.md)》。
   - 说明：Ascend Graph图开发的完整指南，适用于算子入图场景。
