@@ -52,9 +52,10 @@ Cache刷新机制示意图如下图所示：
 | [AscendC::GetBlockNum()](../../../../api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockNum.md) | 获取当前任务配置的核数 |
 
 <!-- npu="A3,910b" id1 -->
+
 ## TPipe析构约束
 
-针对Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品，在GE入图及npugraph_ex后端aclnn调用场景，子算子TPipe对象析构（[TPipe::Destroy](../../../../api/SIMD-API/basic_api/resource_management/TPipe/Destroy.md)）接口内部的`AscendC::PipeBarrier<PIPE_ALL>()`指令会被去除，如果算子内部使用了多个TPipe对象或手动调用Destroy函数时开发者需自行保障TPipe对象间流水的同步。
+针对Atlas A2系列产品、Atlas A3系列产品，在GE入图及npugraph_ex后端aclnn调用场景，子算子TPipe对象析构（[TPipe::Destroy](../../../../api/SIMD-API/basic_api/resource_management/TPipe/Destroy.md)）接口内部的`AscendC::PipeBarrier<PIPE_ALL>()`指令会被去除，如果算子内部使用了多个TPipe对象或手动调用Destroy函数时开发者需自行保障TPipe对象间流水的同步。
 
 样例：
 
@@ -136,4 +137,4 @@ Cache刷新机制示意图如下图所示：
 
 ## 核函数（Kernel）直调算子的额外适配
 
-对于使用`<<<>>>`方式开发的Ascend C算子，目前仅支持在npugraph_ex后端融合进SuperKernel。此类算子除需遵循上述通用约束外，还需要在算子kernel入口侧增加SuperKernel入口函数。具体方法请参考[核函数（Kernel）直调算子额外适配说明](kernel_direct_call_adaptation.md)。
+对于使用`<<<>>>`方式开发的Ascend C算子，目前仅支持在npugraph_ex后端融合进SuperKernel。此类算子除需遵循上述通用约束外，还需要在算子核函数（Kernel）入口侧增加SuperKernel入口函数。具体方法请参考[核函数（Kernel）直调算子额外适配说明](kernel_direct_call_adaptation.md)。

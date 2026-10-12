@@ -59,6 +59,8 @@ INPUT_OUTPUT_DTYPE_LEN = {
     "complex64": 8,
     "complex128": 16,
     "uint1": 0.125,
+    "hifloat4": 1,
+    "hifloat4_scale": 4,
 }
 
 InferChannelParamsFromIFile = namedtuple(
@@ -159,13 +161,9 @@ STR_TO_KERNEL_TYPE_V200 = {
     "KERNEL_TYPE_MIX_VECTOR_CORE": KernelMetaType.KERNEL_TYPE_MIX_VECTOR_CORE,
 }
 
-STR_TO_KERNEL_TYPE_L300 = {
-    "KERNEL_TYPE_AICORE": KernelMetaType.KERNEL_TYPE_AICORE,
-}
+STR_TO_KERNEL_TYPE_L300 = {"KERNEL_TYPE_AICORE": KernelMetaType.KERNEL_TYPE_AICORE}
 
-STR_TO_KERNEL_TYPE_L311 = {
-    "KERNEL_TYPE_AICORE": KernelMetaType.KERNEL_TYPE_AICORE,
-}
+STR_TO_KERNEL_TYPE_L311 = {"KERNEL_TYPE_AICORE": KernelMetaType.KERNEL_TYPE_AICORE}
 
 
 KERNEL_TYPE_TO_STR = {

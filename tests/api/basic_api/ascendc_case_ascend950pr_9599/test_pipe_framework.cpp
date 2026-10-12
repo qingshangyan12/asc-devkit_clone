@@ -215,6 +215,42 @@ TEST_F(TEST_TPIPE, TPipeInitBufferWithTBufTest)
     EXPECT_EQ(bufTensor.GetLength(), len);
 }
 
+TEST_F(TEST_TPIPE, TBufGetWithOffsetInt4Test)
+{
+    TBuf<TPosition::A1> buf;
+    TPipe pipe;
+    pipe.InitBuffer(buf, 96);
+
+    auto tensor = buf.GetWithOffset<int4b_t>(128, 32);
+
+    EXPECT_EQ(tensor.address_.bufferAddr, buf.bufStart->address + 32);
+    EXPECT_EQ(tensor.address_.dataLen, 64);
+    EXPECT_EQ(tensor.GetSize(), 128);
+
+    auto int32Tensor = buf.GetWithOffset<int32_t>(8, 64);
+    EXPECT_EQ(int32Tensor.address_.dataLen, 32);
+    EXPECT_EQ(int32Tensor.GetSize(), 8);
+
+    auto traitTensor = buf.GetWithOffset<TensorTrait<int32_t>>(8, 64);
+    EXPECT_EQ(traitTensor.address_.dataLen, 32);
+    EXPECT_EQ(traitTensor.GetSize(), 8);
+}
+
+TEST_F(TEST_TPIPE, TBufGetWithOffsetParamCheckTest)
+{
+    TBuf<TPosition::A1> buf;
+    TPipe pipe;
+    pipe.InitBuffer(buf, 96);
+
+    KernelRaise::GetInstance().SetRaiseMode(false);
+    const uint64_t startRaiseCount = KernelRaise::GetInstance().GetRaiseCount();
+    (void)buf.GetWithOffset<int4b_t>(0, 0);
+    (void)buf.GetWithOffset<int4b_t>(128, 1);
+    (void)buf.GetWithOffset<int4b_t>(128, 64);
+    EXPECT_EQ(KernelRaise::GetInstance().GetRaiseCount() - startRaiseCount, 3);
+    KernelRaise::GetInstance().SetRaiseMode(true);
+}
+
 /* **************************** TPipe InitBuffer With TQue ****************************** */
 TEST_F(TEST_TPIPE, TPipeInitBufferWithTQueTest)
 {
@@ -759,7 +795,7 @@ TEST_F(TEST_TPIPE, testLocalTensorSetBufferLen)
     TQue<TPosition::VECOUT, 4> que;
     int32_t num = 2;
     int32_t len = 1024;
-    int32_t bufLen = 512;
+    int32_t bufLen = 128;
     pipe.InitBuffer(que, num, len);
     LocalTensor<int32_t> tensor1 = que.AllocTensor<int32_t>();
     LocalTensor<int32_t> tensor2 = que.AllocTensor<int32_t>();
@@ -767,9 +803,11 @@ TEST_F(TEST_TPIPE, testLocalTensorSetBufferLen)
     tensor2.SetBufferLen(bufLen);
 
     EXPECT_EQ(tensor1.address_.bufferAddr, 0);
-    EXPECT_EQ(tensor1.address_.dataLen, bufLen);
+    EXPECT_EQ(tensor1.address_.dataLen, bufLen * sizeof(int32_t));
+    EXPECT_EQ(tensor1.GetSize(), bufLen);
     EXPECT_EQ(tensor2.address_.bufferAddr, len);
-    EXPECT_EQ(tensor2.address_.dataLen, bufLen);
+    EXPECT_EQ(tensor2.address_.dataLen, bufLen * sizeof(int32_t));
+    EXPECT_EQ(tensor2.GetSize(), bufLen);
 }
 
 /* **************************** TQue GetBufferPos ****************************** */

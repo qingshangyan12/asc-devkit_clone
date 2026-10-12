@@ -8,7 +8,7 @@
 
 | 产品 | CANN 软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.2.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
 
 ## 目录结构
 
@@ -42,7 +42,7 @@
 | 1 | GM → L1 | `asc_set_gm2l1_nz_para` + `asc_copy_gm2l1_nd2nz` / `asc_copy_gm2l1_dn2nz` | GM上A、B矩阵为ND排列，L1上为Nz排列 |
 | 2 | L1 → L0A / L0B / BT | `asc_copy_l12l0a`、`asc_copy_l12l0b`、`asc_copy_l12bt` | L0A上A矩阵为Nz排列，L0B上B矩阵为Zn排列，Bias为shape为[N]的一维Tensor |
 | 3 | 矩阵乘加 | `asc_mmad` | C矩阵在L0C上为Nz排列，初始值来源于BT |
-| 4 | L0C → GM | `asc_set_l0c2gm_nz2nd` + `asc_copy_l0c2gm` | L0C上C矩阵为Nz排列，GM上为ND排列 |
+| 4 | L0C → GM | `asc_set_l0c_copy_nz_para` + `asc_copy_l0c2gm` | L0C上C矩阵为Nz排列，GM上为ND排列 |
 
 L1、L0A、L0B、L0C上的Buffer大小均按分形对齐要求计算，Mmad计算中包含了补齐的无效数据，通过在`asc_copy_l0c2gm`中设置`m_size = M`、`n_size = N`保证补齐区域的计算结果不会被搬出。另外，`asc_copy_gm2l1_nd2nz` / `asc_copy_gm2l1_dn2nz`只在K方向补零，A、B在M轴、N轴上的对齐补齐行不会被写入，本样例调用`asc_fill_l1`将其显式清零，避免未初始化数据进入Cube参与Mmad。
 
@@ -82,7 +82,7 @@ L1、L0A、L0B、L0C上的Buffer大小均按分形对齐要求计算，Mmad计�
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU 仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU 架构，对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510`（默认） | NPU 架构，对应 Ascend 950PR&950DT系列产品 |
 
 - 执行结果
 

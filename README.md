@@ -30,7 +30,7 @@
 - Ascend 950新特性补充及兼容性样例整改：loopmode数据搬运、interleave矢量计算、datacopy_gm2l1、loadmx（Load2DMX）、mmad_mx、data_copy_pad等（[PR#2336](https://gitcode.com/cann/asc-devkit/pull/2336) [PR#1899](https://gitcode.com/cann/asc-devkit/pull/1899) [PR#2124](https://gitcode.com/cann/asc-devkit/pull/2124)）。
 - RegBase新增基础样例：基础算术、数据类型转换、归约、比较、索引等样例（[PR#1459](https://gitcode.com/cann/asc-devkit/pull/1459) [PR#1575](https://gitcode.com/cann/asc-devkit/pull/1575) [PR#2024](https://gitcode.com/cann/asc-devkit/pull/2024)）。
 - 新增SIMD VF print样例和dump样例（[PR#2558](https://gitcode.com/cann/asc-devkit/pull/2558)）。
-- SIMT新增DCache访问优化样例（[PR#2453](https://gitcode.com/cann/asc-devkit/pull/2453)）、基于transpose的仿存合并和bank冲突样例（[PR#1753](https://gitcode.com/cann/asc-devkit/pull/1753)）、最佳实践样例：通过类型对齐提升搬运效率（[PR#2297](https://gitcode.com/cann/asc-devkit/pull/2297)）。
+- SIMT新增DCache访问优化样例（[PR#2453](https://gitcode.com/cann/asc-devkit/pull/2453)）、基于transpose的访存合并和bank冲突样例（[PR#1753](https://gitcode.com/cann/asc-devkit/pull/1753)）、最佳实践样例：通过类型对齐提升搬运效率（[PR#2297](https://gitcode.com/cann/asc-devkit/pull/2297)）。
 - SIMT新增功能特性样例：pytorch注册自定义算子（[PR#2769](https://gitcode.com/cann/asc-devkit/pull/2769)）、编译相关样例（动态、静态、分离编译等）（[PR#2356](https://gitcode.com/cann/asc-devkit/pull/2356)）、profiling样例（[PR#1989](https://gitcode.com/cann/asc-devkit/pull/1989)）、内存屏障特性样例（[PR#1923](https://gitcode.com/cann/asc-devkit/pull/1923)）、Warp类特性样例（[PR#2876](https://gitcode.com/cann/asc-devkit/pull/2876)）、simulator样例（[PR#2692](https://gitcode.com/cann/asc-devkit/pull/2692)）、kernel log样例（[PR#2131](https://gitcode.com/cann/asc-devkit/pull/2131)）。
 - SIMT入门样例修改为gather（[PR#2405](https://gitcode.com/cann/asc-devkit/pull/2405)）。
 - 新增Tensor API入门及最佳实践样例：Matmul入门、数据搬入搬出、搬出随路量化、MX FP4最佳实践（[PR#2553](https://gitcode.com/cann/asc-devkit/pull/2553)）。
@@ -84,7 +84,7 @@ Ascend C采用分层架构设计，自下而上构建完整的算子开发技术
 
 各层级能力定义与说明如下：
 - **语言扩展层（SIMT API）**：面向多线程并行场景的原生C语言编程接口，支持业界通用的SIMT编程模型，保障跨技术栈开发体验的一致性，支撑离散、不规则计算场景下的高性能算子开发。
-- **语言扩展层（SIMD C API）**：基于SIMD向量化编程模型、面向极致性能调优的C语言级底层编程接口，原生支持数组式内存分配与指针式计算原语，具备指令级零封装开销的硬件访问能力。Ascend 950PR/Ascend 950DT架构新增SIMD/SIMT混合编程模式支持，可覆盖多形态并行计算场景。
+- **语言扩展层（SIMD C API）**：基于SIMD向量化编程模型、面向极致性能调优的C语言级底层编程接口，原生支持数组式内存分配与指针式计算原语，具备指令级零封装开销的硬件访问能力。Ascend 950PR&950DT系列产品架构新增SIMD/SIMT混合编程模式支持，可覆盖多形态并行计算场景。
 - **Tensor API**：面向高性能算子开发的C++ Tensor级核心编程接口。将内存布局（Layout）作为Tensor抽象的一等公民，原生支持携带Layout语义的Tensor对象；内置Layout代数运算能力，可自动化完成内存布局索引推导与布局变换管理，显著降低复杂内存排布场景的开发复杂度，提升代码可维护性与跨架构可移植性。
 - **基础API（Basic API）**：基于单指令抽象的C++类库接口，以无Layout约束的Tensor对象为核心提供基础编程能力；依托TPipe/TQue框架统一托管内存调度与执行同步，屏蔽底层硬件实现细节。
 - **高阶API（Adv API)**：对单核通用计算算法进行标准化抽象封装，提供开箱即用的公共算法实现，屏蔽底层硬件指令细节，支撑算法快速验证与工程原型落地。

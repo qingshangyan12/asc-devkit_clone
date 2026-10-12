@@ -6,13 +6,11 @@ This example demonstrates the complete usage of the Ascend log function in SIMT 
 
 For more log function details, refer to: [Ascend Log Function Reference](https://hiascend.com/document/redirect/CannCommunitylogref)
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -110,32 +108,32 @@ Run the following steps in the root directory of this example to build and execu
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
   ```
 
-  > **Notice:** Before switching build modes, clean the cmake cache by running `rm CMakeCache.txt` in the build directory and then re-run cmake.
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
 
 - Build Options Description
   | Option | Values | Description |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR&950DT products) |
 
 - Execution Result (using non-screen-output mode as an example; for file storage details, refer to [Ascend Log Function Reference](https://hiascend.com/document/redirect/CannCommunitylogref))  
   After execution, the following information is printed:
   ```bash
   [INFO] Input shape: 12288
   [INFO] Launching kernel with assert(total_length < 100)...
-  Ascend Error: <your_path>/09_log/log.asc:88 code=507035 EZ9999: Inner Error!
+  Ascend Error: <your_path>/09_log/log.asc:86 code=507035 EZ9999: Internal error!
   ...
   rtDeviceSynchronize execution failed, reason=vector core exception
   ...
 
-  [ASSERT] <your_path>/09_log/log.asc:47: void add_custom(float *, float *, float *, uint64_t): Assertion `total_length < 100 && "Total length exceeds expected limit!"' failed.
+  [ASSERT] <your_path>/09_log/log.asc:44: void add_custom(float *, float *, float *, uint64_t): Assertion `total_length < 100 && "Total length exceeds expected limit!"' failed.
   [INFO] Execution completed. Check for error messages above.
   ```
 
   > **Note:**
   > - `<your_path>` represents the absolute path of the example code directory, which is replaced with the actual path in the output
   > - Key error message interpretation:
-  >   - `Ascend Error: ... code=507035 EZ9999: Inner Error!` -- Low-level error code returned by the ACL interface
+  >   - `Ascend Error: ... code=507035 EZ9999: Internal error!` -- Low-level error code returned by the ACL interface
   >   - `vector core exception` -- AI Core execution exception, Kernel task failed
   >   - `Assertion 'total_length < 100 ...' failed` -- Specific location and condition of the assertion failure, helping locate the problem code
 

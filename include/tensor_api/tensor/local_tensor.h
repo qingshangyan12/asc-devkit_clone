@@ -16,7 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 #define INCLUDE_TENSOR_API_TENSOR_LOCAL_TENSOR_H
 
-#include "tensor_api/tensor/tensor.h"
+#include "tensor_api/tensor/tensor_interface.h"
 #include "tensor_api/utils/utils.h"
 
 namespace asc {
@@ -29,8 +29,8 @@ struct local_tensor : public base_tensor<EngineT, LayoutT> {
     using data_type = get_attribute_element_type<element_type*>;
     using layoutType = typename tensor_api_base::layout_type;
 
-    __aicore__ inline local_tensor();
-    __aicore__ inline local_tensor(const EngineT& engine, const LayoutT& layout);
+    __aicore__ inline constexpr local_tensor();
+    __aicore__ inline constexpr local_tensor(const EngineT& engine, const LayoutT& layout);
 };
 
 } // namespace te

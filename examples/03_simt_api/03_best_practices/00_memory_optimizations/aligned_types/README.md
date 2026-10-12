@@ -2,13 +2,13 @@
 
 ## 概述
 
-  本样例量化展示**结构体类型对齐对Global Memory访存的影响**：结合Ascend 950PR/Ascend 950DT支持1B、2B、4B、8B、16B位宽的访存指令，构造多个大小不同的结构体做逐元素数据搬运，对比类型对齐带来的搬运效率差异。
+  本样例量化展示**结构体类型对齐对Global Memory访存的影响**：结合Ascend 950PR&950DT系列产品支持1B、2B、4B、8B、16B位宽的访存指令，构造多个大小不同的结构体做逐元素数据搬运，对比类型对齐带来的搬运效率差异。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -156,7 +156,7 @@ __global__ __launch_bounds__(THREAD_COUNT) void aligned_type_kernel(
 
 ## 调优建议
 
-  Ascend 950PR/Ascend 950DT支持1B、2B、4B、8B、16B五种位宽的访存指令，因此建议使用时，在不超过结构体大小的情况下，尽量选择更高的位宽。
+  Ascend 950PR&950DT系列产品支持1B、2B、4B、8B、16B五种位宽的访存指令，因此建议使用时，在不超过结构体大小的情况下，尽量选择更高的位宽。
 
 ## 编译运行
 
@@ -178,11 +178,21 @@ __global__ __launch_bounds__(THREAD_COUNT) void aligned_type_kernel(
   ./demo                                # 执行样例
   ```
 
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
+
+  示例如下：
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU仿真模式
+  ```
+
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
+
 - 编译选项说明
 
   | 选项                      | 可选值     | 说明                                                         |
   | ------------------------- | ---------- | ----------------------------------------------------------- |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT）  |
+  | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU运行、NPU仿真 |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR&950DT系列产品）  |
 
 - 执行结果
 

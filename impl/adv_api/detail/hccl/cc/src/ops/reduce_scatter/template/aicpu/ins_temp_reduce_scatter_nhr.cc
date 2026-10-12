@@ -79,6 +79,14 @@ HcclResult InsTempReduceScatterNHR::KernelRun(
         HCCL_INFO("[InsTempReduceScatterNHR] sliceSize and tailSize are both 0, skip");
         return HCCL_SUCCESS;
     }
+    CHK_PRT_RET(
+        templateResource.channels.empty() || templateResource.threads.size() < GetThreadNum(),
+        HCCL_ERROR("[InsTempReduceScatterNHR] missing channels or threads"), HCCL_E_INTERNAL);
+    for (const auto& peer : templateResource.channels) {
+        CHK_PRT_RET(
+            peer.second.size() < channelsPerRank_,
+            HCCL_ERROR("[InsTempReduceScatterNHR] insufficient channels per peer"), HCCL_E_INTERNAL);
+    }
     tempAlgParams_ = tempAlgParams;
     channels_ = templateResource.channels;
     dataType_ = param.DataDes.dataType;
@@ -183,6 +191,8 @@ HcclResult InsTempReduceScatterNHR::LocalDataCopy(const std::vector<ThreadHandle
             sizeOut = sizeOutTail_;
             elemOffset = elemOffsetTail_;
         }
+        (void)sizeOut;
+        (void)elemOffset;
         for (u64 rpt = 0; rpt < rptNum; ++rpt) {
             const u64 inBaseOff = tempAlgParams_.buffInfo.inBuffBaseOff + rpt * tempAlgParams_.inputRepeatStride;
             const u64 scratchBase = tempAlgParams_.buffInfo.hcclBuffBaseOff + rpt * tempAlgParams_.outputRepeatStride;
@@ -218,6 +228,8 @@ HcclResult InsTempReduceScatterNHR::PostLocalCopy(const std::vector<ThreadHandle
         sizeOut = sizeOut_;
         elemOffset = elemOffset_;
     }
+    (void)sizeOut;
+    (void)elemOffset;
     ThreadHandle q = threads[channelIdx];
 
     const u64 rptNum = std::max<u64>(1, tempAlgParams_.repeatNum);

@@ -3,13 +3,11 @@
 ## Overview
 
 This example uses the Roll operator to demonstrate how to register custom operators using PyTorch's torch.library mechanism.
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Software Version
-
-- \>= CANN 9.1.0
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.1.0 |
 
 ## Directory Structure
 
@@ -132,7 +130,7 @@ This example uses the Roll operator to demonstrate how to register custom operat
 
   | Option       | Values           | Description                                                         |
   | ----------------| -----------------------------| --------------------------------------------------------------------------------------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR&950DT products) |
 
 - Execution Result
 

@@ -27,7 +27,7 @@
 #include "impl/simt_api/device_functions_impl.h"
 #include "impl/simt_api/internal_functions_impl.h"
 
-#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102)
+#if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202) || (__NPU_ARCH__ == 5102)
 
 #define ASCRT_FOUR_BYTE_LEN_U 32U
 constexpr float __internal_subnormal_boundary =
@@ -43,8 +43,16 @@ constexpr float __internal_fp32_subnormal_exponent_fix =
 constexpr float __internal_fp32_log_exponent_scale =
     1.1920928955078125e-07f;                             // 2^-23, converts exponent bits into log2 units.
 constexpr uint32_t __internal_fp32_exponent_shift = 23U; // Bit offset of the fp32 exponent field.
+constexpr int32_t __internal_fp32_exponent_bias = 127;   // IEEE-754 fp32 exponent bias (biased_exp - 127 = true exp).
 constexpr float __internal_fp32_max_exp = 126.0f;        // Largest finite fp32 exponent used by the clamped paths.
 constexpr int32_t __internal_fp32_subnormal_bias = 149;  // Subnormal exponent/reference bias for fp32 reconstruction.
+// Bit-pattern constants used to scale norm inputs into a stable fp32 range.
+constexpr uint32_t __internal_norm_scale_anchor_bits =
+    0x7E800000U; // Anchor used to construct the reciprocal power-of-two scale.
+constexpr uint32_t __internal_norm_exponent_bucket_mask =
+    0xFE000000U; // Retains the exponent bucket used by the scale calculation.
+constexpr uint32_t __internal_norm_restore_mantissa_bit =
+    0x00800000U; // Restores one exponent step after the scaled sqrt path.
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline long int lroundf(float x)
 {
@@ -881,6 +889,108 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float sinf(float x)
     return s;
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
+{
+    // atan2(y, x) is the angle of the point (x, y) over the full circle. The polynomial below only covers
+    // the first octant, so the magnitudes are reduced first and the octant is restored afterwards.
+    float ay = __fabsf(y);
+    float ax = __fabsf(x);
+
+    // Order the magnitudes so the ratio lo / hi never exceeds 1, which is the polynomial's valid range.
+    bool y_gt_x = ay > ax;
+    float hi = y_gt_x ? ay : ax;
+    float lo = y_gt_x ? ax : ay;
+
+    float a = 0.0f;
+    if (hi != 0.0f) {
+        // The ratio lies in [0, 1]. atan is odd, so with z = r^2 the tail is even in r:
+        //   atan(r) = r + r^3 * P(z), P(z) = -0.33333197 + 0.19993925 z - 0.14207722 z^2 + 0.10640416 z^3
+        //             - 0.074792981 z^4 + 0.042200752 z^5 - 0.015681878 z^6 + 0.0027380611 z^7
+        // P is minimax-fitted, not a Taylor truncation (leading term -0.33333197, not -1/3): the error is
+        // flattened across all of [0, 1], so the coefficients cannot be extended by a series rule.
+        float r = lo / hi;
+        float z = r * r;
+        float p = 0.0027380611281841993332f;
+        p = __fma(z, p, -0.015681877732276916504f);
+        p = __fma(z, p, 0.042200751602649688721f);
+        p = __fma(z, p, -0.074792981147766113281f);
+        p = __fma(z, p, 0.10640415549278259277f);
+        p = __fma(z, p, -0.14207722246646881104f);
+        p = __fma(z, p, 0.19993925094604492188f);
+        p = __fma(z, p, -0.33333197236061096191f);
+        // Assemble r + r^3 * P(z). r is the dominant term, so passing it as the fma addend keeps it exact
+        // and confines rounding to the correction.
+        float t = __fma(z * p, r, r);
+
+        // Rebuild the full-circle angle from the octant. |y| == |x| is special-cased so the diagonals come
+        // out as the exactly rounded pi/4 and 3pi/4, and because inf/inf above makes r NaN.
+        if (ay == ax) {
+            a = signbit(x) ? 2.35619449615478515625f : 0.78539818525314331055f;
+        } else if (y_gt_x) {
+            // Steeper than the diagonal: the ratio r = ax/ay is the reciprocal of y/x, so
+            // atan(y/x) = pi/2 - atan(x/y) = pi/2 - t. A negative x lies in the second quadrant, so pi/2 + t.
+            float pio2 = 1.57079637050628662109f;
+            a = signbit(x) ? (pio2 + t) : (pio2 - t);
+        } else {
+            // Shallow angles need no reflection; a negative x mirrors the first octant into the second.
+            a = signbit(x) ? (3.14159274101257324219f - t) : t;
+        }
+    } else {
+        // Both arguments are zero. Sign of x picks pi or 0, matching atan2(+-0, -0) == +-pi.
+        a = signbit(x) ? 3.14159274101257324219f : 0.0f;
+    }
+    float result = signbit(y) ? -a : a;
+    // Summing the magnitudes tests both arguments for NaN at once and propagates it as the result.
+    float sum = ax + ay;
+    if (__isnan(sum)) {
+        result = sum;
+    }
+    // atan2 is odd in y, so the sign of y (including -0.0) is reapplied last.
+    return result;
+}
+
+/**
+ * Computes atan(x) for float inputs.
+ *
+ * The implementation first handles special values with fixed IEEE-style semantics:
+ * NaN propagates, and infinities map to signed pi/2.
+ *
+ * For finite inputs, it uses a reciprocal reduction for |x| > 1:
+ *   atan(x) = sign(x) * (pi/2 - atan(1/|x|))
+ *
+ * The reduced argument is then evaluated with an odd polynomial in x^2.
+ *
+ * @param x The input value.
+ * @return The computed atanf(x) value.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
+{
+    // Use reciprocal reduction for large magnitudes.
+    const float abs_x = fabsf(x);
+    const bool use_reciprocal = abs_x > 1.0f;
+
+    float reduced = use_reciprocal ? (1.0f / abs_x) : abs_x;
+    const float reduced2 = reduced * reduced;
+
+    // Odd polynomial approximation in powers of x^2.
+    float poly = fmaf(reduced2, 0.00245002890005707741f, -0.014396979473531246185f);
+    poly = fmaf(reduced2, poly, 0.039849750697612762451f);
+    poly = fmaf(reduced2, poly, -0.072529748082160949707f);
+    poly = fmaf(reduced2, poly, 0.10518480092287063599f);
+    poly = fmaf(reduced2, poly, -0.14171802997589111328f);
+    poly = fmaf(reduced2, poly, 0.19988775253295898438f);
+    poly = fmaf(reduced2, poly, -0.33332940936088562012f);
+    poly *= reduced2;
+    float result = fmaf(reduced, poly, reduced);
+
+    // Recover the pi/2 complement for the reciprocal branch.
+    if (use_reciprocal) {
+        result = fmaf(0.93318945169448852539f, 1.6832555532455444336f, -result);
+    }
+
+    return __internal_with_sign_bit(result, x);
+}
+
 #define __INTERNAL_SINCOSF(x, s, c)                                              \
     do {                                                                         \
         int quadrant;                                                            \
@@ -997,15 +1107,15 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp)
         const uint32_t r = exp_bits - (q << 2);
         const float scale_q = __uint_as_float(q << 23);        // 23: float32 mantissa width; build 2^q.
         const float scale_qr = __uint_as_float((q + r) << 23); // q + r: first-stage exponent chunk.
-        x *= scale_qr;
-        x *= scale_q;
-        x *= scale_q;
-        x *= scale_q;
-        result = x;
+        float temp_x = x;
+        temp_x *= scale_qr;
+        temp_x *= scale_q;
+        temp_x *= scale_q;
+        temp_x *= scale_q;
+        result = temp_x;
     } else {
         result = x * __uint_as_float(
-                         static_cast<uint32_t>(exp + 127)
-                         << 23); // 23: float32 exponent starts at bit 23; 127: exponent bias.
+                         static_cast<uint32_t>(exp + __internal_fp32_exponent_bias) << __internal_fp32_exponent_shift);
     }
 
     if (exp > 278) { // 278: beyond this positive shift, x * 2^exp overflows to +inf/-inf.
@@ -1022,135 +1132,217 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float ldexpf(float x, int exp)
     return result;
 }
 
+/*
+ * __internal_norm_sqrt - Compute sqrt(x) for the norm-reduction path.
+ *
+ * Mathematical basis:
+ *   sqrt(x) is derived from the hardware reciprocal-square-root estimate
+ *   rsqrtf(x) ≈ 1/sqrt(x) via one Newton-Raphson refinement step.
+ *
+ *   Let y0 = rsqrtf(x)            // initial estimate (~1 ULP accurate)
+ *       p  = x * y0               // p ≈ sqrt(x)
+ *       r  = x - p*p              // residual, measures p's error (FMA: 1 rounding)
+ *   The Newton correction refines the result to full precision:
+ *       sqrt(x) ≈ p + r * (y0 / 2)
+ *   Derivation:  sqrt(p^2 + r) = p*sqrt(1 + r/p^2)
+ *                              ≈ p*(1 + r/(2*p^2))            // 1st-order Taylor
+ *                              = p + r/(2*p) = p + r * y0/2.
+ *   fmaf(r, y0/2, p) evaluates the correction with a single rounding, giving a
+ *   correctly-rounded sqrt for inputs in the stable range.
+ *
+ * Path selection (fast vs. slow) via an unsigned IEEE-754 bit-range test that
+ * avoids any floating-point compare:
+ *       use_slowpath = (x_bits - 0x0D000000) > 0x727FFFFF    (unsigned)
+ *   - Fast path: 0x0D000000 <= x_bits <= 0x7F7FFFFF, i.e. positive finite floats
+ *     in roughly [2^-101, FLT_MAX]. Here rsqrtf + one Newton step is fully
+ *     accurate, so the refinement above is applied directly.
+ *   - Slow path: everything else - zero (incl. signed zero), negatives, NaNs,
+ *     infinities, denormals, and very small sub-2^-101 normals - each handled
+ *     per IEEE-754 sqrt semantics.
+ *
+ * Slow-path special cases:
+ *   - |x| == 0     : return x (preserve signed zero).
+ *   - x < 0        : return the quiet NaN 0x7FFFFFFF.
+ *   - x is NaN     : return x + 1.0f (quiet the NaN, keep propagation).
+ *   - x == +inf    : return +inf.
+ *   - tiny positive: scale x by 2^64 to move it into the stable rsqrt range,
+ *     refine via the same Newton step, then scale back by 2^-32, since
+ *     sqrt(x * 2^64) = sqrt(x) * 2^32.
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_norm_sqrt(float x)
+{
+    // These constants define the unsigned bit-range test that selects the
+    // fast path or the slow path.
+    constexpr uint32_t magnitude_mask = 0x7FFFFFFFU;     // Clears the sign bit and keeps the absolute-value bits.
+    constexpr uint32_t slowpath_subtract = 0x0D000000U;  // Bias used before the unsigned slow-path range check.
+    constexpr uint32_t slowpath_threshold = 0x727FFFFFU; // Upper boundary of the fast-path input bit range.
+    const uint32_t x_bits = __float_as_uint(x);
+    const bool use_slowpath = (x_bits - slowpath_subtract) > slowpath_threshold;
+    float result = x;
+
+    if (!use_slowpath) {
+        // Fast path: rsqrt approximation followed by the same residual
+        // correction sequence used by the reciprocal-square-root refinement.
+        float inverse_sqrt = 1.0f / __sqrtf(x);
+        const float product = x * inverse_sqrt;
+        inverse_sqrt = inverse_sqrt * 0.5f; // Halve the reciprocal square root.
+        const float residual = fmaf(-product, product, x);
+        result = fmaf(residual, inverse_sqrt, product);
+    } else {
+        // Slow path handles zero, negative values, NaN, infinity, and values
+        // that need temporary scaling before reciprocal-square-root refinement.
+        const uint32_t magnitude_bits = x_bits & magnitude_mask;
+        if (magnitude_bits == 0U) { // Zero magnitude, including signed zero.
+            // Preserve the signed zero or zero bit pattern.
+            result = x;
+        } else if (x < 0.0f) { // 0.0f is the non-negative domain boundary.
+            // Return the canonical negative-domain NaN payload.
+            result = __uint_as_float(0x7FFFFFFFU); // Positive quiet-NaN bit pattern.
+        } else if (__isnan(x)) {
+            // 1.0f quiets the NaN through a floating-point addition.
+            // Make the input NaN quiet while preserving its propagation.
+            result = x + 1.0f; // 1.0f is a finite nonzero quieting addend.
+        } else if (x == ASCRT_INF_F) {
+            // sqrt(+inf) is +inf.
+            result = x;
+        } else {
+            // Scale by 2^64 so very small positive values enter a stable
+            // range, then scale sqrt(x * 2^64) back by 2^-32.
+            constexpr float scale_up = 1.84467440737095516160e+19f;  // 2^64, lifts small inputs.
+            constexpr float scale_down = 2.3283064365386962891e-10f; // 2^-32, restores the sqrt scale.
+            const float scaled_x = fmaf(x, scale_up, 0.0f);          // Zero addend keeps the multiply exact.
+            float inverse_sqrt = 1.0f / __sqrtf(scaled_x);
+            const float product = scaled_x * inverse_sqrt;
+            inverse_sqrt = inverse_sqrt * 0.5f; // Halve the reciprocal square root.
+            const float residual = fmaf(product, -product, scaled_x);
+            result = fmaf(residual, inverse_sqrt, product) * scale_down;
+        }
+    }
+    return result;
+}
+
+/*
+ * hypotf - sqrt(x^2 + y^2), avoiding intermediate overflow/underflow.
+ *
+ * Direct squaring of large finite floats (|x| > 2^64) overflows; very small
+ * values underflow to zero.  Both are avoided by scaling all operands by a
+ * power of two derived from the larger magnitude so that max*scale lands in
+ * [0.5, 4.0), keeping every squared term in the safe range [0, 16):
+ *     hypot = sqrt((max*s)^2 + (min*s)^2) / s
+ *
+ * Scale construction via IEEE-754 exponent bit arithmetic (no FP division):
+ *   - 0xFE000000  (__internal_norm_exponent_bucket_mask):
+ *       Retains upper 6 of 8 exponent bits; buckets exponents into groups of
+ *       4 adjacent powers of two so scaled_max always falls in [0.5, 4.0).
+ *   - 0x7E800000  (__internal_norm_scale_anchor_bits):
+ *       Bit pattern of 2^126 (biased exponent 253).  The scale is built by
+ *       unsigned subtraction:  scale_bits = anchor_bits - exponent_bucket,
+ *       yielding 2^(126 - bucket_exp).  Anchor 126 covers the full finite
+ *       range [2^-126, ~2^128].
+ *   - 0x00800000  (__internal_norm_restore_mantissa_bit):
+ *       Exponent LSB (bit 23).  OR-ing it into the bucket adds 1 to the biased
+ *       exponent, compensating for the IEEE-754 bias so restore_scale is the
+ *       exact reciprocal of scale:  scale * restore_scale = 1.0.
+ *
+ * Special cases: both zero -> signed zero preserved; NaN propagates via
+ * max/min bit selection; +Inf in either operand -> +Inf.
+ */
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float hypotf(float x, float y)
 {
-    float abs_x = fabsf(x);
-    float abs_y = fabsf(y);
-    if (isinf(x) || isinf(y)) {
-        return ASCRT_INF_F;
+    // Take absolute values and reinterpret as uint32 for integer comparison.
+    const float abs_x = fabsf(x);
+    const float abs_y = fabsf(y);
+    const uint32_t abs_x_bits = __float_as_uint(abs_x);
+    const uint32_t abs_y_bits = __float_as_uint(abs_y);
+
+    // Identify max/min via unsigned integer comparison.  For non-negative
+    // IEEE-754 floats, larger bit pattern <=> larger value, so this avoids a
+    // float compare and preserves NaN bit patterns for later propagation.
+    const bool x_is_greater = abs_x_bits > abs_y_bits;
+    const uint32_t max_bits = x_is_greater ? abs_x_bits : abs_y_bits;
+    const uint32_t min_bits = x_is_greater ? abs_y_bits : abs_x_bits;
+    const float max_abs = __uint_as_float(max_bits);
+    const float min_abs = __uint_as_float(min_bits);
+
+    // Extract the exponent of max_abs and bucket it (clear lowest 2 exponent
+    // bits) so the scale targets a group of 4 adjacent powers of two.
+    const uint32_t exponent_bucket = max_bits & __internal_norm_exponent_bucket_mask; // 0xFE000000: upper 6 exp bits.
+    // scale = 2^(126 - bucket_exp); brings max_abs into [0.5, 4.0).
+    const float scale = __uint_as_float(__internal_norm_scale_anchor_bits - exponent_bucket); // 0x7E800000 = 2^126.
+    // Scale both operands into the safe range where squaring cannot overflow
+    // (max scaled value < 4.0, so max square < 16.0) or underflow to zero.
+    const float scaled_min = min_abs * scale;
+    const float scaled_max = max_abs * scale;
+
+    // Accumulate scaled squares:  sum = (min*s)^2 + (max*s)^2.
+    // Start with the smaller term (plain mul), then add the larger via fmaf
+    // so each addition incurs only a single rounding error.
+    float square_sum = scaled_min * scaled_min;
+    square_sum = fmaf(scaled_max, scaled_max, square_sum);
+    // Compute sqrt of the scaled sum via the refined rsqrt-based path.
+    const float sqrt_scaled = __internal_norm_sqrt(square_sum);
+
+    // Restore original magnitude: restore_scale = 1/scale, constructed via
+    // an exact bit-pattern trick (OR the exponent LSB to add 1 to the biased
+    // exponent, compensating the bias subtracted in the scale).
+    const uint32_t restore_bits = exponent_bucket | __internal_norm_restore_mantissa_bit;
+    const float restore_scale = __uint_as_float(restore_bits);
+    // If max_abs is nonzero, unscale the sqrt result; otherwise return the
+    // (signed) zero directly — sqrt(0^2 + 0^2) = 0.
+    float result = max_abs != 0.0f ? restore_scale * sqrt_scaled : max_abs;
+
+    // If the smaller magnitude is +Inf, the result is +Inf regardless of the
+    // larger operand (covers hypot(Inf, Inf) and hypot(Inf, finite)).
+    if (min_abs == ASCRT_INF_F) {
+        result = ASCRT_INF_F;
     }
-    if (isnan(abs_x)) {
-        return abs_x;
-    }
-    if (isnan(abs_y)) {
-        return abs_y;
-    }
-    float a = fmaxf(abs_x, abs_y);
-    float b = fminf(abs_x, abs_y);
-    if (b == 0.0f) {
-        return a;
-    }
-    float r = b / a;
-    return a * sqrtf(fmaf(r, r, 1.0f));
+    return result;
 }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c)
-{
-    if (isinf(a) || isinf(b) || isinf(c)) {
-        return ASCRT_INF_F;
-    }
-    if (isnan(a) || isnan(b) || isnan(c)) {
-        return ASCRT_NAN_F;
-    }
-    float m = fmaxf(fabsf(a), fabsf(b));
-    m = fmaxf(m, fabsf(c));
-    if (m == 0.0f) {
-        return 0.0f;
-    }
-    float r = 0.0f;
-    r = fmaf((a / m), (a / m), r);
-    r = fmaf((b / m), (b / m), r);
-    r = fmaf((c / m), (c / m), r);
-    return m * sqrtf(r);
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, float d)
-{
-    if (isinf(a) || isinf(b) || isinf(c) || isinf(d)) {
-        return ASCRT_INF_F;
-    }
-    if (isnan(a) || isnan(b) || isnan(c) || isnan(d)) {
-        return ASCRT_NAN_F;
-    }
-    float m = fmaxf(fabsf(a), fabsf(b));
-    m = fmaxf(m, fabsf(c));
-    m = fmaxf(m, fabsf(d));
-    if (m == 0.0f) {
-        return 0.0f;
-    }
-    float r = 0.0f;
-    r = fmaf((a / m), (a / m), r);
-    r = fmaf((b / m), (b / m), r);
-    r = fmaf((c / m), (c / m), r);
-    r = fmaf((d / m), (d / m), r);
-    return m * sqrtf(r);
-}
-
-#define __INTERNAL_NORMF(n, a)                                                          \
-    do {                                                                                \
-        if ((n) <= 0) {                                                                 \
-            return fabsf((a)[0]);                                                       \
-        }                                                                               \
-        float m = 0;                                                                    \
-        int remainder = (n) & 3;                                                        \
-        int end = (n) - remainder;                                                      \
-        bool has_nan = false;                                                           \
-        if ((n) > 3) {                                                                  \
-            for (int i = 0; i < end; i += 4) {                                          \
-                float a0 = (a)[i];                                                      \
-                float a1 = (a)[i + 1];                                                  \
-                float a2 = (a)[i + 2];                                                  \
-                float a3 = (a)[i + 3];                                                  \
-                if (!isfinite(a0) || !isfinite(a1) || !isfinite(a2) || !isfinite(a3)) { \
-                    if (isinf(a0) || isinf(a1) || isinf(a2) || isinf(a3)) {             \
-                        return ASCRT_INF_F;                                             \
-                    }                                                                   \
-                    has_nan = true;                                                     \
-                }                                                                       \
-                m = __fmaxf(m, fabsf(a0));                                              \
-                m = __fmaxf(m, fabsf(a1));                                              \
-                m = __fmaxf(m, fabsf(a2));                                              \
-                m = __fmaxf(m, fabsf(a3));                                              \
-            }                                                                           \
-        }                                                                               \
-        if (remainder != 0) {                                                           \
-            for (int i = end; i < n; i++) {                                             \
-                float ai = (a)[i];                                                      \
-                if (!isfinite(ai)) {                                                    \
-                    if (isinf(ai)) {                                                    \
-                        return ASCRT_INF_F;                                             \
-                    }                                                                   \
-                    has_nan = true;                                                     \
-                }                                                                       \
-                m = __fmaxf(m, fabsf(ai));                                              \
-            }                                                                           \
-        }                                                                               \
-        if (has_nan) {                                                                  \
-            return ASCRT_NAN_F;                                                         \
-        }                                                                               \
-        if (m == 0.0f) {                                                                \
-            return m;                                                                   \
-        }                                                                               \
-        float sum = 0.0f;                                                               \
-        if ((n) > 3) {                                                                  \
-            for (int i = 0; i < end; i += 4) {                                          \
-                float n0 = (a)[i] / m;                                                  \
-                float n1 = (a)[i + 1] / m;                                              \
-                float n2 = (a)[i + 2] / m;                                              \
-                float n3 = (a)[i + 3] / m;                                              \
-                sum = fmaf(n0, n0, sum);                                                \
-                sum = fmaf(n1, n1, sum);                                                \
-                sum = fmaf(n2, n2, sum);                                                \
-                sum = fmaf(n3, n3, sum);                                                \
-            }                                                                           \
-        }                                                                               \
-        if (remainder != 0) {                                                           \
-            for (int i = end; i < n; i++) {                                             \
-                float ni = (a)[i] / m;                                                  \
-                sum = fmaf(ni, ni, sum);                                                \
-            }                                                                           \
-        }                                                                               \
-        return m * sqrtf(sum);                                                          \
+#define __INTERNAL_NORMF(n, a)                                                                                   \
+    do {                                                                                                         \
+        /* Match normf's first absolute-value load and the n <= 0 behavior. */                                   \
+        const float first_abs = fabsf((a)[0]);                                                                   \
+        if ((n) <= 0) {                                                                                          \
+            return first_abs;                                                                                    \
+        }                                                                                                        \
+        /* Find the largest magnitude before constructing the scale. */                                          \
+        float max_abs = first_abs;                                                                               \
+        if ((n) >= 2) {                                                                                          \
+            /* Keep the first comparison operand order stable. */                                                \
+            max_abs = fmaxf(fabsf((a)[1]), max_abs);                                                             \
+            for (int i = 2; i < (n); ++i) {                                                                      \
+                max_abs = fmaxf(max_abs, fabsf((a)[i]));                                                         \
+            }                                                                                                    \
+        }                                                                                                        \
+        /* Use the largest exponent bucket to keep every squared term finite. */                                 \
+        const uint32_t max_bits = __float_as_uint(max_abs);                                                      \
+        const uint32_t exponent_bucket = max_bits & __internal_norm_exponent_bucket_mask;                        \
+        const float scale = __uint_as_float(__internal_norm_scale_anchor_bits - exponent_bucket);                \
+        const float scaled_max = scale * max_abs;                                                                \
+        /* Accumulate all non-first maxima, then add one maximum below. */                                       \
+        float partial_sum = 0.0f;                                                                                \
+        int accumulated_count = 0;                                                                               \
+        for (int i = 0; i < (n); ++i) {                                                                          \
+            const float scaled_value = scale * fabsf((a)[i]);                                                    \
+            const bool is_not_scaled_max = scaled_value != scaled_max;                                           \
+            /* Skip only the first occurrence of the scaled maximum. */                                          \
+            const bool skip_first_max = !is_not_scaled_max && (i == accumulated_count);                          \
+            if (!skip_first_max) {                                                                               \
+                /* Keep the scaled square accumulation in FMA form. */                                           \
+                partial_sum = fmaf(scaled_value, scaled_value, partial_sum);                                     \
+                ++accumulated_count;                                                                             \
+            }                                                                                                    \
+        }                                                                                                        \
+        /* Add the skipped maximum with one final fused multiply-add. */                                         \
+        const float square_sum = fmaf(scaled_max, scaled_max, partial_sum);                                      \
+        const float sqrt_scaled = __internal_norm_sqrt(square_sum);                                              \
+        /* Restore the original scale only for a nonzero finite remainder. */                                    \
+        if (partial_sum != 0.0f && max_abs != ASCRT_INF_F) {                                                     \
+            const float restore_scale = __uint_as_float(exponent_bucket + __internal_norm_restore_mantissa_bit); \
+            return restore_scale * sqrt_scaled;                                                                  \
+        }                                                                                                        \
+        return max_abs;                                                                                          \
     } while (0)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float normf(int n, float* a) { __INTERNAL_NORMF(n, a); }
@@ -1176,6 +1368,41 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnormf(int n, __gm__ float* a) { ret
 #endif
 #endif
 #endif
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
+{
+    float ax = __fabsf(x);
+    float loga;
+    if (ax < 1.175494350822287508e-38f) {
+        // Subnormal input: the exponent field is 0, so logf(ax) cannot recover the true binary
+        // exponent. Scale by 2^24 to bring it into normal range, then subtract log(2^24).
+        // 16.635532333438686 = 24 * ln2.
+        float scaled = ax * 16777216.0f;
+        loga = __logf(scaled) - 16.635532333438686f;
+    } else {
+        loga = __logf(ax);
+    }
+
+    // First estimate via the logarithm identity: cbrt(ax) = ax^(1/3) = exp(log(ax) / 3).
+    // inv2 = exp(-2/3 * loga) = ax^(-2/3), so y = ax * inv2 = ax^(1/3) is a high-accuracy seed.
+    // Starting from this seed (instead of 1.0) means a single Newton step suffices for 1 ULP.
+    float inv2 = __expf(loga * -0.6666666865348815918f);
+    float y = ax * inv2;
+
+    // One Newton-Raphson step for y^3 = ax:  y_{n+1} = y * (1 + (1 - y^3/ax) / 3).
+    // Here t = inv2 * y = y^2 / ax = y^3 / ax, so 1 - t is the relative residual of y^3/ax.
+    // Scaling by 1/3 gives the Newton correction; fma(y, corr, y) applies it with one rounding.
+    float t = inv2 * y;
+    float corr = __fma(-y, t, 1.0f) * 0.3333333432674407959f;
+    y = __fma(y, corr, y);
+    float result = signbit(x) ? -y : y;
+
+    // cbrt is odd and preserves the sign of zero, so pass through 0, inf, and NaN unchanged.
+    if (x == 0.0f || __isinf(x) || __isnan(x)) {
+        result = x;
+    }
+    return result;
+}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log10f(float x) { return logf(x) / logf(10.0f); }
 
@@ -2683,58 +2910,13 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rcbrtf(float x)
     } while (0)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remquof(float x, float y, int* quo) { __INTERNAL_REMQUOF(x, y, quo); }
+
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x) { return 1.0f - (2.0f / (expf(2.0f * x) + 1.0f)); }
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
-{
-    if (isnan(x)) {
-        return x;
-    }
-    float clip = fminf(x, 10000.0f); // 10000 : MAX_INPUT_VALUE
-    clip = fmaxf(clip, -10000.0f);   // -10000 : MIN_INPUT_VALUE
-    float abs_v = fabsf(clip);
-
-    float dst = 0;
-    float square_v = 0;
-    float tmp = 0;
-    float tmp2 = 0;
-
-    __internal_taylor_expand(dst, abs_v, square_v, 4);            // 4 : Taylor expansion count
-    __internal_atan_expand(tmp, abs_v, tmp2, 0.4142135623730950); // 0.4142135623730950 : TAN_PI_OF_8
-    __internal_taylor_expand(tmp2, tmp, square_v, 4);             // 4 : Taylor expansion count
-
-    tmp2 = tmp2 + ASCRT_PIO8_F;
-    dst = fminf(dst, tmp2);
-
-    tmp2 = abs_v + 1.0f;
-    tmp = abs_v - 1.0f;
-    tmp = tmp / tmp2;
-    tmp = fabsf(tmp);
-
-    __internal_taylor_expand(tmp2, tmp, square_v, 4); // 4 : Taylor expansion count
-    tmp2 = tmp2 + ASCRT_PIO4_F;
-    dst = fminf(dst, tmp2);
-
-    __internal_atan_expand(tmp2, tmp, square_v, 0.4142135623730950); // 0.4142135623730950 : TAN_PI_OF_8
-    __internal_taylor_expand(tmp, tmp2, square_v, 6);                // 6 : Taylor expansion count
-
-    tmp = tmp + ASCRT_PIO8_F;
-    tmp = tmp + ASCRT_PIO4_F;
-    dst = fminf(dst, tmp);
-
-    __internal_sign(tmp, clip, tmp2);
-
-    dst = dst * tmp;
-    return dst;
-}
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanhf(float x) { return logf((1.0f + x) / (1.0f - x)) / 2.0f; }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
 {
-    if (fabsf(x) > 1) {
-        return ASCRT_INF_F / ASCRT_INF_F;
-    }
     float square_v = 0;
     float dst = 0;
     float src = x;
@@ -2752,13 +2934,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinf(float x)
         __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
         return dst;
     } else if (x < -0.7071067811865476f) { // -0.7071067811865476 : SCALAR_ACOS_MIN_LIMIT
-        src = sqrtf(1.0f - x * x);
+        src = __sqrtf(1.0f - x * x);
         __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
         return dst - ASCRT_PIO2_F;
     } else {
-        src = sqrtf(1.0f - x * x);
+        src = __sqrtf(1.0f - x * x);
         __internal_taylor_expand(dst, src, square_v, 7, factor); // 7 : Taylor expansion count
         return ASCRT_PIO2_F - dst;
+    }
+    if (fabsf(x) > 1) {
+        return ASCRT_NAN_F;
     }
 }
 
@@ -2847,16 +3032,23 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
 {
+    float result = logf(x + sqrtf(x * x - 1.0f));
     if (x < 1) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+        result = ASCRT_NAN_F;
     }
-    return logf(x + sqrtf(x * x - 1.0f));
+    return result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
 {
     if (fabsf(x) > 0.1f) {
-        return x > 0 ? logf(x + sqrtf(x * x + 1.0f)) : logf(sqrtf(x * x + 1.0f) - x) * (-1);
+        float result;
+        if (x > 0) {
+            result = __logf(x + __sqrtf(x * x + 1.0f));
+        } else {
+            result = __logf(__sqrtf(x * x + 1.0f) - x) * (-1);
+        }
+        return result;
     } else {
         float square_v = 0;
         float dst = 0;
@@ -2878,97 +3070,10 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x) { return logf(1.0f + x); }
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
-{
-    if (isnan(y)) {
-        return y;
-    } else if (isnan(x)) {
-        return x;
-    }
-
-    int d = (y >= 0) ? 1 : -1;
-    if (y == 0.0f) {
-        if (x > 0.0f) {
-            return y;
-        }
-        uint32_t x_bits = *reinterpret_cast<uint32_t*>(&x);
-        if ((x_bits & ASCRT_NEG_SIGN_BIT_U) != 0) {
-            uint32_t y_bits = *reinterpret_cast<uint32_t*>(&y);
-            int zero_sign = ((y_bits & ASCRT_NEG_SIGN_BIT_U) != 0) ? -1 : 1;
-            return zero_sign * ASCRT_PI_F;
-        }
-        return y;
-    } else if (isinf(y) && isinf(x)) {
-        int s = 1;
-        if (x < 0) {
-            s = 3; // 3 : ATAN2_THREE
-        }
-        return d * ASCRT_PIO4_F * s;
-    } else if (isinf(y)) {
-        return d * ASCRT_PIO2_F;
-    } else if (isinf(x)) {
-        if (x > 0) {
-            d = 0;
-        }
-        return d * ASCRT_PI_F;
-    }
-
-    if (x == 0) {
-        return d * ASCRT_PIO2_F;
-    } else if (x > 0) {
-        d = 0;
-    }
-
-    return atanf(y / x) + d * ASCRT_PI_F;
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
-{
-    uint32_t x_bits = *reinterpret_cast<uint32_t*>(&x);
-    int32_t exp_bits = (x_bits >> 23) & 0xFF;
-    if (x == 0.0f || exp_bits == 0xFF) {
-        return x;
-    }
-
-    // In order for Newtonian iteration method to converge quickly, we need to reduce x to a certain range(0.125, 8).
-    // Depending on the computer's float number storage structure, we can adjust the exponential part of x.
-    // the adjustment factor(k) ensures the exponent of x' is in (-3, 3)
-    int32_t exponent = exp_bits - 127;
-    int32_t k;
-    if (exponent >= 3) {              // 3:ensures the exponent of x' is in (-3, 3)
-        k = ((exponent - 3) / 3) + 1; // 3:ensures the exponent of x' is in (-3, 3)
-    } else if (exponent <= -4) {      //-4:ensures the exponent of x' is in (-3, 3)
-        k = (exponent + 1) / 3;       // 3:ensures the exponent of x' is in (-3, 3)
-    } else {
-        k = 0;
-    }
-
-    // get the adjusted x value
-    int32_t exp_adjusted_bits = exponent - 3 * k + 127;
-    uint32_t x_adjusted_bits = (x_bits & 0x7FFFFF) | (exp_adjusted_bits << 23);
-    float x_adjusted = *reinterpret_cast<float*>(&x_adjusted_bits);
-
-    // Newton's iteration method,f(x) = x^3 - b, x_i+1 = x_i - f(x_i)/f'(x_i) = (2*x_i + b/x_i^2)/3
-    // the initial value of x_i = 1.0
-    float y = 1.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-    y = (2.0f * y + x_adjusted / (y * y)) / 3.0f;
-
-    // adjust the exponent of y by k
-    uint32_t y_bits = *reinterpret_cast<uint32_t*>(&y);
-    int32_t yexp_bits = ((y_bits >> 23) & 0xFF) + k;
-    y_bits = (y_bits & 0x807FFFFF) | ((yexp_bits & 0xFF) << 23) | // 23:the number of bits to shift left
-             (x_bits & 0x80000000);
-    return *reinterpret_cast<float*>(&y_bits);
-}
-
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float coshf(float x)
 {
     float y = fabsf(x);
-    const float tmp = expf(y - ASCRT_SCALAR_LN2_F);
+    const float tmp = __expf(y - ASCRT_SCALAR_LN2_F);
     return tmp + 0.25f / tmp;
 }
 
@@ -3353,6 +3458,48 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tgammaf(float x)
     }
 }
 
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c)
+{
+    if (isinf(a) || isinf(b) || isinf(c)) {
+        return ASCRT_INF_F;
+    }
+    if (isnan(a) || isnan(b) || isnan(c)) {
+        return ASCRT_NAN_F;
+    }
+    float m = fmaxf(fabsf(a), fabsf(b));
+    m = fmaxf(m, fabsf(c));
+    if (m == 0.0f) {
+        return 0.0f;
+    }
+    float r = 0.0f;
+    r = fmaf((a / m), (a / m), r);
+    r = fmaf((b / m), (b / m), r);
+    r = fmaf((c / m), (c / m), r);
+    return m * sqrtf(r);
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, float d)
+{
+    if (isinf(a) || isinf(b) || isinf(c) || isinf(d)) {
+        return ASCRT_INF_F;
+    }
+    if (isnan(a) || isnan(b) || isnan(c) || isnan(d)) {
+        return ASCRT_NAN_F;
+    }
+    float m = fmaxf(fabsf(a), fabsf(b));
+    m = fmaxf(m, fabsf(c));
+    m = fmaxf(m, fabsf(d));
+    if (m == 0.0f) {
+        return 0.0f;
+    }
+    float r = 0.0f;
+    r = fmaf((a / m), (a / m), r);
+    r = fmaf((b / m), (b / m), r);
+    r = fmaf((c / m), (c / m), r);
+    r = fmaf((d / m), (d / m), r);
+    return m * sqrtf(r);
+}
+
 #else
 
 /**
@@ -3561,7 +3708,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ static inline float __asc_make_float_from_mantiss
         } else if (result_exponent < -149) { // -149: exponent of the smallest fp32 subnormal, below it underflows to 0
             result = 0.0f;
         } else if (result_exponent >= -126) { // -126: smallest normal fp32 exponent
-            // Normal result: normalize mantissa and pack signless fp32 bits.
+                                              // Normal result: normalize mantissa and pack signless fp32 bits.
             const uint32_t normalized_mantissa = mantissa << static_cast<uint32_t>(23 - mantissa_log2);
             const uint32_t bits =
                 (static_cast<uint32_t>(result_exponent + 127) << 23U) | (normalized_mantissa & ASCRT_MAN_BIT_FLOAT_U);
@@ -3999,9 +4146,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float remainderf(float x, float y)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rhypotf(float x, float y)
 {
     // Shared scaling constants used to keep the squared sum in range.
-    constexpr uint32_t scale_base = 0x7E800000U;
-    constexpr uint32_t scale_mask = 0xFE000000U;
-
     // Work with absolute values, then pick the smaller and larger magnitudes.
     const float abs_x = fabsf(x);
     const float abs_y = fabsf(y);
@@ -4013,7 +4157,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rhypotf(float x, float y)
     const float max_abs = __uint_as_float(max_bits);
 
     // Build a power-of-two scale from the larger magnitude so the sum of squares remains stable.
-    const float scale = __uint_as_float(scale_base - (max_bits & scale_mask));
+    const float scale =
+        __uint_as_float(__internal_norm_scale_anchor_bits - (max_bits & __internal_norm_exponent_bucket_mask));
     const float scaled_min = min_abs * scale;
     const float scaled_max = max_abs * scale;
     // Evaluate the scaled square sum and take the reciprocal square root.
@@ -4049,9 +4194,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rhypotf(float x, float y)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c)
 {
     // Shared scaling constants used to keep the squared sum numerically safe.
-    constexpr uint32_t scale_base = 0x7E800000U; // fp32 scale anchor used to build a power-of-two rescaling factor.
-    constexpr uint32_t scale_mask = 0xFE000000U; // Mask that keeps the sign/exponent region and clears mantissa bits.
-
     constexpr float rsqrt_subnormal_scale = 4096.0f; // 2^12, compensates the temporary scaling after rsqrt refinement.
 
     // Work with absolute values so the norm depends only on magnitudes.
@@ -4071,7 +4213,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c)
     const float max_abs = fmaxf(abs_c, max_ab);
     const float mid_abs = fminf(abs_c, max_ab);
     const uint32_t max_bits = __float_as_uint(max_abs);
-    const float scale = __uint_as_float(scale_base - (max_bits & scale_mask));
+    const float scale =
+        __uint_as_float(__internal_norm_scale_anchor_bits - (max_bits & __internal_norm_exponent_bucket_mask));
 
     // Accumulate the scaled sum of squares in magnitude order.
     const float scaled_min = min_ab * scale;
@@ -4118,9 +4261,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm3df(float a, float b, float c)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, float d)
 {
     // Shared scaling constants used to keep the squared sum numerically safe.
-    constexpr uint32_t scale_base = 0x7E800000U; // fp32 scale anchor used to build a power-of-two rescaling factor.
-    constexpr uint32_t scale_mask = 0xFE000000U; // Mask that keeps the sign/exponent region and clears mantissa bits.
-
     constexpr float rsqrt_subnormal_scale = 4096.0f; // 2^12, compensates the temporary scaling after rsqrt refinement.
 
     // Work with absolute values so the norm depends only on magnitudes.
@@ -4143,7 +4283,8 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float rnorm4df(float a, float b, float c, 
     const float second_abs = fminf(abs_d, max_abc);
     const float third_abs = fminf(abs_c, max_ab);
     const uint32_t max_bits = __float_as_uint(max_abs);
-    const float scale = __uint_as_float(scale_base - (max_bits & scale_mask));
+    const float scale =
+        __uint_as_float(__internal_norm_scale_anchor_bits - (max_bits & __internal_norm_exponent_bucket_mask));
 
     // Accumulate the scaled sum of squares in magnitude order.
     const float scaled_min = min_ab * scale;
@@ -4559,7 +4700,7 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float __internal_asin_acos_reduced_arg(flo
     float reduced = 0.0f;
     if (abs_x != 1.0f) {
         const float half_one_minus_abs = fmaf(0.5f, -abs_x, 0.5f);
-        const float inv_sqrt = rsqrtf(half_one_minus_abs);
+        const float inv_sqrt = 1.0f / __sqrtf(half_one_minus_abs);
         float sqrt_term = half_one_minus_abs * inv_sqrt;
         const float correction = fmaf(-sqrt_term, inv_sqrt * 0.5f, 0.5f);
         reduced = fmaf(sqrt_term, correction, sqrt_term);
@@ -4609,52 +4750,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float tanhf(float x)
     float yf = ax >= 0.60000002384185791016f ? y_large : y_small;
     return copysignf(yf, x);
     ;
-}
-
-/**
- * Computes atan(x) for float inputs.
- *
- * The implementation first handles special values with fixed IEEE-style semantics:
- * NaN propagates, and infinities map to signed pi/2.
- *
- * For finite inputs, it uses a reciprocal reduction for |x| > 1:
- *   atan(x) = sign(x) * (pi/2 - atan(1/|x|))
- *
- * The reduced argument is then evaluated with an odd polynomial in x^2.
- *
- * @param x The input value.
- * @return The computed atanf(x) value.
- */
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atanf(float x)
-{
-    // Use reciprocal reduction for large magnitudes.
-    const float abs_x = fabsf(x);
-    const bool use_reciprocal = abs_x > 1.0f;
-
-    float reduced = use_reciprocal ? (1.0f / abs_x) : abs_x;
-    const float reduced2 = reduced * reduced;
-
-    // Odd polynomial approximation in powers of x^2.
-    float poly = fmaf(reduced2, 0.00245002890005707741f, -0.014396979473531246185f);
-    poly = fmaf(reduced2, poly, 0.039849750697612762451f);
-    poly = fmaf(reduced2, poly, -0.072529748082160949707f);
-    poly = fmaf(reduced2, poly, 0.10518480092287063599f);
-    poly = fmaf(reduced2, poly, -0.14171802997589111328f);
-    poly = fmaf(reduced2, poly, 0.19988775253295898438f);
-    poly = fmaf(reduced2, poly, -0.33332940936088562012f);
-    poly *= reduced2;
-    float result = fmaf(reduced, poly, reduced);
-
-    // Recover the pi/2 complement for the reciprocal branch.
-    if (use_reciprocal) {
-        result = fmaf(0.93318945169448852539f, 1.6832555532455444336f, -result);
-    }
-
-    if (!(abs_x > ASCRT_INF_F)) {
-        result = __internal_with_sign_bit(result, x);
-    }
-
-    return result;
 }
 
 /**
@@ -4863,18 +4958,18 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float log1pf(float x)
     // Add the separate exponent contribution back as ln(2) * exponent.
     output = fmaf(exponent, 0.69314718246459960938f, output);
 
-    // Positive infinity/NaN and all negative inputs enter the tail correction.
-    if (x_bits >= fp32_positive_inf_bits) {
-        // x is +inf/NaN or x < -1: generate the result via x * +inf + +inf.
-        // x == -1 keeps the -inf produced by the reduction and polynomial path above.
-        if (!(x_bits >= fp32_sign_bit && x_bits < log1p_lower_bound_bits)) {
-            output = fmaf(x, ASCRT_INF_F, ASCRT_INF_F);
-        }
-        // Inputs comparing equal to 0 select -0 so the sign of zero is preserved.
-        if (x == 0.0f) {
-            output = ASCRT_NEG_ZERO_F;
-        }
-    }
+    // Compute the candidate unconditionally; it is only meaningful for special
+    // inputs and discarded by the select on the normal path.
+    const float inf_path = fmaf(x, ASCRT_INF_F, ASCRT_INF_F);
+
+    // Merge the outer and inner conditions: the inf path is taken when both hold.
+    const bool need_inf =
+        (x_bits >= fp32_positive_inf_bits) && !(x_bits >= fp32_sign_bit && x_bits < log1p_lower_bound_bits);
+    // Only x == -0 matches here (the outer condition already excludes +0).
+    const bool need_neg_zero = (x_bits >= fp32_positive_inf_bits) && (x == 0.0f);
+
+    output = need_inf ? inf_path : output;
+    output = need_neg_zero ? ASCRT_NEG_ZERO_F : output;
     return output;
 }
 
@@ -5182,14 +5277,19 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float fmodf(float x, float y)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
 {
-    // acosh(x) = ln(x + sqrt(x^2 - 1)), defined on [1, +inf). Inputs below 1 are out of domain and
-    // return NaN; a NaN input also fails this comparison and falls through to a NaN-producing path.
-    if (x < 1) {
-        return ASCRT_INF_F / ASCRT_INF_F;
+    float t = x - 1.0f;
+    // Mid range: substitute x^2 - 1 = (x - 1)(x + 1) = t * (x + 1) into the defining formula, which
+    // avoids the cancellation of the direct x * x - 1 form while staying exact for the argument here.
+    float result = __logf(1.0f + t + __sqrtf(t * (x + 1.0f)));
+
+    // For large x, sqrt(x^2 - 1) rounds to x in float, so acosh(x) collapses to ln(2x) = ln(x) + ln(2).
+    // The threshold 2^23 + 1 is conservative and also keeps t * (x + 1) below the overflow limit.
+    if (x > 8388609.0f) {
+        result = __logf(x) + 0.69314718246459960938f;
     }
+
     // Work with the offset t = x - 1 throughout. Near x = 1 the term x^2 - 1 cancels catastrophically,
     // so every branch below is expressed in t instead of x^2 - 1.
-    float t = x - 1.0f;
     if (t <= 0.5f) {
         // Near 1, factor out the square-root singularity: acosh(1 + t) = sqrt(2t) * P(t), where P is
         // the Maclaurin series 1 - t/12 + 3t^2/160 - 5t^3/896 + 35t^4/18432 - 63t^5/90112
@@ -5204,16 +5304,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float acoshf(float x)
         factor = __fma(factor, t, 0.018750000745058059692f);
         factor = __fma(factor, t, -0.083333335816860198975f);
         factor = __fma(factor, t, 1.0f);
-        return __sqrtf(2.0f * t) * factor;
+        result = __sqrtf(2.0f * t) * factor;
     }
-    // For large x, sqrt(x^2 - 1) rounds to x in float, so acosh(x) collapses to ln(2x) = ln(x) + ln(2).
-    // The threshold 2^23 + 1 is conservative and also keeps t * (x + 1) below the overflow limit.
-    if (x > 8388609.0f) {
-        return __logf(x) + 0.69314718246459960938f;
+
+    // acosh(x) = ln(x + sqrt(x^2 - 1)), defined on [1, +inf). Inputs below 1 are out of domain and
+    // return NaN; a NaN input also fails this comparison and falls through to a NaN-producing path.
+    if (x < 1) {
+        result = ASCRT_NAN_F;
     }
-    // Mid range: substitute x^2 - 1 = (x - 1)(x + 1) = t * (x + 1) into the defining formula, which
-    // avoids the cancellation of the direct x * x - 1 form while staying exact for the argument here.
-    return __logf(1.0f + t + __sqrtf(t * (x + 1.0f)));
+
+    return result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
@@ -5221,16 +5321,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
     // asinh(x) = ln(x + sqrt(x^2 + 1)) is defined for all finite x and is odd, so the work below is done
     // on |x| and the sign is reapplied at the end.
     float ax = __fabsf(x);
-    // asinh(+-inf) = +-inf, returned directly to keep inf out of the sqrt/log paths.
-    if (ax == ASCRT_INF_F) {
-        return x;
-    }
-    // For tiny inputs the leading correction -x^3/6 sits far below the ulp of x, so asinh(x) rounds to x.
-    // This also returns -0.0 unchanged, which the signbit fixup at the end would otherwise have to handle.
-    if (ax < 1.0e-8f) {
-        return x;
-    }
-
     float y;
     if (ax <= 0.5f) {
         // Small inputs: asinh(ax) = ax + ax^3 * P(ax^2) with P the Maclaurin series
@@ -5258,110 +5348,26 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float asinhf(float x)
         y = __logf(1.0f + u);
     }
     // Restore the sign for the odd extension: asinh(-ax) = -asinh(ax).
-    return signbit(x) ? -y : y;
-}
+    float result = signbit(x) ? -y : y;
 
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float atan2f(float y, float x)
-{
-    // atan2(y, x) is the angle of the point (x, y) over the full circle. The polynomial below only covers
-    // the first octant, so the magnitudes are reduced first and the octant is restored afterwards.
-    float ay = __fabsf(y);
-    float ax = __fabsf(x);
-    // Summing the magnitudes tests both arguments for NaN at once and propagates it as the result.
-    float sum = ax + ay;
-    if (__isnan(sum)) {
-        return sum;
+    // For tiny inputs the leading correction -x^3/6 sits far below the ulp of x, so asinh(x) rounds to x.
+    // This also returns -0.0 unchanged, which the signbit fixup at the end would otherwise have to handle.
+    if (ax < 1.0e-8f) {
+        result = x;
     }
 
-    // Order the magnitudes so the ratio lo / hi never exceeds 1, which is the polynomial's valid range.
-    bool y_gt_x = ay > ax;
-    float hi = y_gt_x ? ay : ax;
-    float lo = y_gt_x ? ax : ay;
-
-    float a = 0.0f;
-    if (hi != 0.0f) {
-        // The ratio lies in [0, 1]. atan is odd, so with z = r^2 the tail is even in r:
-        //   atan(r) = r + r^3 * P(z), P(z) = -0.33333197 + 0.19993925 z - 0.14207722 z^2 + 0.10640416 z^3
-        //             - 0.074792981 z^4 + 0.042200752 z^5 - 0.015681878 z^6 + 0.0027380611 z^7
-        // P is minimax-fitted, not a Taylor truncation (leading term -0.33333197, not -1/3): the error is
-        // flattened across all of [0, 1], so the coefficients cannot be extended by a series rule.
-        float r = lo / hi;
-        float z = r * r;
-        float p = 0.0027380611281841993332f;
-        p = __fma(z, p, -0.015681877732276916504f);
-        p = __fma(z, p, 0.042200751602649688721f);
-        p = __fma(z, p, -0.074792981147766113281f);
-        p = __fma(z, p, 0.10640415549278259277f);
-        p = __fma(z, p, -0.14207722246646881104f);
-        p = __fma(z, p, 0.19993925094604492188f);
-        p = __fma(z, p, -0.33333197236061096191f);
-        // Assemble r + r^3 * P(z). r is the dominant term, so passing it as the fma addend keeps it exact
-        // and confines rounding to the correction.
-        float t = __fma(z * p, r, r);
-
-        // Rebuild the full-circle angle from the octant. |y| == |x| is special-cased so the diagonals come
-        // out as the exactly rounded pi/4 and 3pi/4, and because inf/inf above makes r NaN.
-        if (ay == ax) {
-            a = signbit(x) ? 2.35619449615478515625f : 0.78539818525314331055f;
-        } else if (y_gt_x) {
-            // Steeper than the diagonal: the ratio r = ax/ay is the reciprocal of y/x, so
-            // atan(y/x) = pi/2 - atan(x/y) = pi/2 - t. A negative x lies in the second quadrant, so pi/2 + t.
-            float pio2 = 1.57079637050628662109f;
-            a = signbit(x) ? (pio2 + t) : (pio2 - t);
-        } else {
-            // Shallow angles need no reflection; a negative x mirrors the first octant into the second.
-            a = signbit(x) ? (3.14159274101257324219f - t) : t;
-        }
-    } else {
-        // Both arguments are zero. Sign of x picks pi or 0, matching atan2(+-0, -0) == +-pi.
-        a = signbit(x) ? 3.14159274101257324219f : 0.0f;
+    // asinh(+-inf) = +-inf, returned directly to keep inf out of the sqrt/log paths.
+    if (ax == ASCRT_INF_F) {
+        result = x;
     }
 
-    // atan2 is odd in y, so the sign of y (including -0.0) is reapplied last.
-    return signbit(y) ? -a : a;
-}
-
-__SIMT_DEVICE_FUNCTIONS_DECL__ inline float cbrtf(float x)
-{
-    // cbrt is odd and preserves the sign of zero, so pass through 0, inf, and NaN unchanged.
-    if (x == 0.0f || __isinf(x) || __isnan(x)) {
-        return x;
-    }
-
-    float ax = __fabsf(x);
-    float loga;
-    if (ax < 1.175494350822287508e-38f) {
-        // Subnormal input: the exponent field is 0, so logf(ax) cannot recover the true binary
-        // exponent. Scale by 2^24 to bring it into normal range, then subtract log(2^24).
-        // 16.635532333438686 = 24 * ln2.
-        float scaled = ax * 16777216.0f;
-        loga = __logf(scaled) - 16.635532333438686f;
-    } else {
-        loga = __logf(ax);
-    }
-
-    // First estimate via the logarithm identity: cbrt(ax) = ax^(1/3) = exp(log(ax) / 3).
-    // inv2 = exp(-2/3 * loga) = ax^(-2/3), so y = ax * inv2 = ax^(1/3) is a high-accuracy seed.
-    // Starting from this seed (instead of 1.0) means a single Newton step suffices for 1 ULP.
-    float inv2 = __expf(loga * -0.6666666865348815918f);
-    float y = ax * inv2;
-
-    // One Newton-Raphson step for y^3 = ax:  y_{n+1} = y * (1 + (1 - y^3/ax) / 3).
-    // Here t = inv2 * y = y^2 / ax = y^3 / ax, so 1 - t is the relative residual of y^3/ax.
-    // Scaling by 1/3 gives the Newton correction; fma(y, corr, y) applies it with one rounding.
-    float t = inv2 * y;
-    float corr = __fma(-y, t, 1.0f) * 0.3333333432674407959f;
-    y = __fma(y, corr, y);
-    return signbit(x) ? -y : y;
+    return result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float coshf(float x)
 {
     // cosh is even, so fold sign here and work on ax = |x| throughout. NaN and inf pass through unchanged.
     float ax = __fabsf(x);
-    if (__isnan(ax) || __isinf(ax)) {
-        return ax;
-    }
 
     // Range reduction: x = n * ln2 + r, with n = round(x / ln2). ln2 = 0.6931472... is split into a high
     // and a low part below, so r carries double-precision-grade residual error and stays tiny.
@@ -5387,24 +5393,16 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float coshf(float x)
     // rounding, and keeps inv_term (which can be tiny near overflow) from being lost in the addition.
     float e = scale * __expf(r);
     float inv_term = (1.0f / e) * 0.125f;
-    return __fma(e, 2.0f, inv_term);
+    float result = __fma(e, 2.0f, inv_term);
+
+    if (__isnan(ax) || __isinf(ax)) {
+        result = ax;
+    }
+    return result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cospif(float x)
 {
-    // cos(pi * x). cospi is even and integer-valued at integers (+/-1), zero at half-integers.
-    if (__isnan(x)) {
-        return x;
-    }
-    if (__isinf(x)) {
-        return x * 0.0f;
-    }
-    // When |x| exceeds 2^24 the ulp is larger than 1, so x no longer has a fractional part and
-    // cos(pi * x) is mathematically 1 (x is an exact integer). Return early to skip the reduction.
-    if (__fabsf(x) > 16777216.0f) {
-        return 1.0f;
-    }
-
     // Reduce by half-periods: k = rint(2x), r = x - k/2 lies in [-0.5, 0.5]. pi is never multiplied
     // by x, so the float approximation of pi does not leak into the argument; it enters only via the
     // polynomial coefficients below. k = __cvt_int32_t (round-to-nearest, RS enabled) and kf = rintf(t)
@@ -5434,7 +5432,23 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float cospif(float x)
     // (gives +/-1); when k is odd, x is half-integer => use s (gives 0). q & 2 selects the sign.
     int q = k + 1;
     float y = ((q & 1) != 1) ? s : c;
-    return (q & 2) ? -y : y; // 2: parity mask, second half-period flips the sign
+    float result = (q & 2) ? -y : y; // 2: parity mask, second half-period flips the sign
+
+    // When |x| exceeds 2^24 the ulp is larger than 1, so x no longer has a fractional part and
+    // cos(pi * x) is mathematically 1 (x is an exact integer). Return early to skip the reduction.
+    if (__fabsf(x) > 16777216.0f) {
+        result = 1.0f;
+    }
+
+    if (__isinf(x)) {
+        result = x * 0.0f;
+    }
+
+    // cos(pi * x). cospi is even and integer-valued at integers (+/-1), zero at half-integers.
+    if (__isnan(x)) {
+        result = x;
+    }
+    return result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcf(float x)
@@ -5518,15 +5532,6 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float erfcf(float x)
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x)
 {
-    // 10^x = 2^(x * log2(10)). Split x*log2(10) into an integer k and a small remainder r, then compute
-    // 2^k * 2^r with 2^k constructed exactly from the bit pattern.
-    if (__isnan(x)) {
-        return x;
-    }
-    if (__isinf(x)) {
-        return x > 0.0f ? x : 0.0f;
-    }
-
     // t = x * (log2(10) / 252) + 0.5, a scaled-and-biased form of x * log2(10) used for floor reduction.
     // log2(10) / 252 is precomputed so that floor(t * 252) directly yields the integer index k in the
     // range [0, 252] (covering the full float32 overflow/underflow domain of 10^x).
@@ -5549,25 +5554,22 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float exp10f(float x)
     // drops from ~1e-8 to ~1e-15. r is confined to [-0.5, 0.5], where __powf(2, r) is most accurate.
     float r = __fma(x, 3.3219280242919921875f, -k);
     r = __fma(x, 7.0595369550119357882e-08f, r);
-    return scale * __powf(2.0f, r);
+    float result = scale * __powf(2.0f, r);
+
+    // 10^x = 2^(x * log2(10)). Split x*log2(10) into an integer k and a small remainder r, then compute
+    // 2^k * 2^r with 2^k constructed exactly from the bit pattern.
+    if (__isinf(x)) {
+        result = x > 0.0f ? x : 0.0f;
+    }
+
+    if (__isnan(x)) {
+        result = x;
+    }
+    return result;
 }
 
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x)
 {
-    // expm1f(x) = e^x - 1, computed accurately for small |x| where e^x-1 would otherwise lose
-    // precision to catastrophic cancellation. The approach follows the same range-reduction +
-    // 2^k * 2^r decomposition as expf: split x * log2(e) into integer k and remainder r, build
-    // 2^k exactly from its bit pattern, then reconstruct (2^k * 2^r) - 1 in a cancellation-safe form.
-    if (x == 0.0f) {
-        return x;
-    }
-    if (__isnan(x)) {
-        return x;
-    }
-    if (__isinf(x)) {
-        return x > 0.0f ? x : -1.0f;
-    }
-
     // Clamp |x| to the float32 overflow threshold (log2(e) * 128 ~= 88.72) so the reduction below
     // stays within the representable range; the clamped value still selects the correct overflow path.
     float ax = __fabsf(x);
@@ -5615,6 +5617,18 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x)
     if (large_k) {
         y = y + y;
     }
+
+    // expm1f(x) = e^x - 1, computed accurately for small |x| where e^x-1 would otherwise lose
+    // precision to catastrophic cancellation. The approach follows the same range-reduction +
+    // 2^k * 2^r decomposition as expf: split x * log2(e) into integer k and remainder r, build
+    // 2^k exactly from its bit pattern, then reconstruct (2^k * 2^r) - 1 in a cancellation-safe form.
+    if (__isinf(x)) {
+        y = x > 0.0f ? x : -1.0f;
+    }
+
+    if (__isnan(x) || x == 0.0f) {
+        y = x;
+    }
     return y;
 }
 
@@ -5623,53 +5637,250 @@ __SIMT_DEVICE_FUNCTIONS_DECL__ inline float expm1f(float x)
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t __internal_ilogbf_finite_abs(float ax)
 {
     if (ax >= 1.17549435082228750797e-38f) {
-        // Normal or larger: exponent = (biased exponent field) - 127.
+        // Normal or larger: exponent = (biased exponent field) - bias.
         uint32_t bits = reinterpret_cast<uint32_t&>(ax);
-        return static_cast<int32_t>((bits >> 23) & 0xFFU) - 127; // 23: fp32 exponent field offset
+        // 0xFF: 8-bit exponent field mask.
+        return static_cast<int32_t>((bits >> __internal_fp32_exponent_shift) & 0xFFU) - __internal_fp32_exponent_bias;
     }
 
     // Subnormal: ax has no implicit leading 1, so its true exponent is below -126. Scale by 2^23
     // (8388608) to renormalize into the normal range, then subtract the 23 extra bits we added.
-    float scaled = ax * 8388608.0f;
+    constexpr float subnormal_scale = 8388608.0f; // 2^23, renormalizes subnormals into the normal range.
+    float scaled = ax * subnormal_scale;
     uint32_t bits = reinterpret_cast<uint32_t&>(scaled);
-    return static_cast<int32_t>((bits >> 23) & 0xFFU) - 127 - 23; // 23: fp32 exponent field offset
+    // 0xFF: 8-bit exponent field mask;
+    // __internal_fp32_exponent_shift (subtract): undo the 2^23 renormalization scaling above.
+    return static_cast<int32_t>((bits >> __internal_fp32_exponent_shift) & 0xFFU) - __internal_fp32_exponent_bias -
+           23; // undo the 2^23 renormalization scaling applied above.
 }
 
 // logbf(x) = (float) floor(log2(|x|)) = the unbiased exponent of |x| as a float.
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline float logbf(float x)
 {
-    if (__isnan(x)) {
-        return x; // NaN propagates.
-    }
-
     float ax = __fabsf(x);
-    if (ax == 0.0f) {
-        return -ASCRT_INF_F; // logb(0) = -inf, matching the C standard.
-    }
+    float result = static_cast<float>(__internal_ilogbf_finite_abs(ax));
+
     if (ax == ASCRT_INF_F) {
-        return ASCRT_INF_F; // logb(inf) = +inf.
+        result = ASCRT_INF_F; // logb(inf) = +inf.
     }
 
-    return static_cast<float>(__internal_ilogbf_finite_abs(ax));
+    if (ax == 0.0f) {
+        result = -ASCRT_INF_F; // logb(0) = -inf, matching the C standard.
+    }
+
+    if (__isnan(x)) {
+        result = x; // NaN propagates.
+    }
+    return result;
 }
 
 // ilogbf(x): integer variant of logbf. Returns the unbiased exponent as int32_t, with the IEEE-754
 // special-value encoding: NaN or 0 -> INT_MIN (0x80000000), +inf / -inf -> INT_MAX (0x7FFFFFFF).
 __SIMT_DEVICE_FUNCTIONS_DECL__ inline int32_t ilogbf(float x)
 {
-    if (__isnan(x) || x == 0.0f) {
-        return static_cast<int32_t>(0x80000000U); // INT_MIN: NaN and 0 map to this sentinel.
-    }
-
     float ax = __fabsf(x);
+    int32_t result = __internal_ilogbf_finite_abs(ax);
+
     if (ax == ASCRT_INF_F) {
-        return static_cast<int32_t>(0x7FFFFFFFU); // INT_MAX: infinity maps to this sentinel.
+        result = ASCRT_MAX_VAL_S; // INT_MAX: infinity maps to this sentinel.
+    }
+    if (__isnan(x) || x == 0.0f) {
+        result = ASCRT_MIN_VAL_S; // INT_MIN: NaN and 0 map to this sentinel.
     }
 
-    return __internal_ilogbf_finite_abs(ax);
+    return result;
+}
+
+/*
+ * norm3df - sqrt(a^2 + b^2 + c^2), avoiding intermediate overflow/underflow.
+ *
+ * Same exponent-scaling principle as hypotf: derive a power-of-two scale from
+ * the largest magnitude so all terms land in [0.5, 4.0), accumulate scaled
+ * squares via FMA, then restore the original magnitude.
+ *
+ * Fast path: abs_sum = |a| + |b| + |c| is computed.  If abs_sum == max_abs,
+ * only one term is nonzero (or all zero), so sqrt(x^2) = |x| = abs_sum and
+ * the sqrt can be skipped entirely.  Otherwise the scaled-sqrt path is used.
+ *
+ * See hypotf for the explanation of the bit-pattern constants
+ * (0xFE000000, 0x7E800000, 0x00800000).
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm3df(float a, float b, float c)
+{
+    const float abs_a = fabsf(a);
+    const float abs_b = fabsf(b);
+    const float abs_c = fabsf(c);
+
+    // Decompose into max / middle / min via nested fmaxf/fminf.  The pairing
+    // preserves operand dependency order for stable accumulation.
+    const float max_ab = fmaxf(abs_a, abs_b);
+    const float max_abs = fmaxf(max_ab, abs_c);     // Largest of the three.
+    const float middle_term = fminf(max_ab, abs_c); // Middle value.
+    const float min_ab = fminf(abs_a, abs_b);       // Smallest of the three.
+
+    // Bucket the max exponent (clear lowest 2 bits) and build the scale that
+    // brings all terms into [0.5, 4.0) where squaring is overflow-free.
+    const uint32_t max_abs_bits = __float_as_uint(max_abs);
+    const uint32_t exponent_bucket =
+        max_abs_bits & __internal_norm_exponent_bucket_mask; // 0xFE000000: upper 6 exp bits.
+    const float scale = __uint_as_float(__internal_norm_scale_anchor_bits - exponent_bucket); // 0x7E800000 = 2^126.
+    const float scaled_middle = middle_term * scale;
+    const float scaled_min = min_ab * scale;
+    const float scaled_max = max_abs * scale;
+
+    // Accumulate scaled squares:  sum = mid^2 + min^2 + max^2.
+    // Start with the middle term (plain mul), then add the remaining terms via
+    // fmaf so each addition incurs only a single rounding error.
+    float square_sum = scaled_middle * scaled_middle;
+    square_sum = fmaf(scaled_min, scaled_min, square_sum);
+    square_sum = fmaf(scaled_max, scaled_max, square_sum);
+    const float sqrt_scaled = __internal_norm_sqrt(square_sum);
+
+    // Fast path: if only one term is nonzero, abs_sum == max_abs and
+    // sqrt(x^2) = |x| = abs_sum — no sqrt needed.
+    float abs_sum = abs_a + abs_b + abs_c;
+    float result = abs_sum;
+    if (abs_sum > max_abs) {
+        // restore_scale = 1/scale
+        const float restore_scale = __uint_as_float(exponent_bucket | __internal_norm_restore_mantissa_bit);
+        result = restore_scale * sqrt_scaled;
+    }
+
+    // If the largest magnitude is +Inf, the norm is +Inf.
+    if (max_abs == ASCRT_INF_F) {
+        result = ASCRT_INF_F;
+    }
+    return result;
+}
+
+/*
+ * norm4df - sqrt(a^2 + b^2 + c^2 + d^2), avoiding intermediate overflow/underflow.
+ *
+ * Same exponent-scaling principle as hypotf: derive a power-of-two scale from
+ * the largest magnitude so all terms land in [0.5, 4.0), accumulate scaled
+ * squares via FMA, then restore the original magnitude.
+ *
+ * Fast path: abs_sum = ((|a| + |b|) + |d|) + |c|.  If abs_sum == max_abs,
+ * only one term is nonzero (or all zero), so sqrt(x^2) = |x| = abs_sum and
+ * the sqrt can be skipped entirely.  Otherwise the scaled-sqrt path is used.
+ *
+ * See hypotf for the explanation of the bit-pattern constants
+ * (0xFE000000, 0x7E800000, 0x00800000).
+ */
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline float norm4df(float a, float b, float c, float d)
+{
+    const float abs_a = fabsf(a);
+    const float abs_b = fabsf(b);
+    const float abs_c = fabsf(c);
+    const float abs_d = fabsf(d);
+
+    // Decompose into max + three remaining terms via nested fminf/fmaxf.
+    // The pairing preserves operand dependency order for stable accumulation.
+    const float max_ab = fmaxf(abs_a, abs_b);
+    const float max_abc = fmaxf(max_ab, abs_c);
+    const float max_abs = fmaxf(max_abc, abs_d); // Largest of the four.
+    const float term_3 = fminf(max_abc, abs_d);  // 3rd-largest (or equal).
+    const float term_2 = fminf(max_ab, abs_c);   // 2nd-largest (or equal).
+    const float term_0 = fminf(abs_a, abs_b);    // Smallest (or equal).
+
+    // Bucket the max exponent (clear lowest 2 bits) and build the scale that
+    // brings all terms into [0.5, 4.0) where squaring is overflow-free.
+    const uint32_t max_abs_bits = __float_as_uint(max_abs);
+    const uint32_t exponent_bucket =
+        max_abs_bits & __internal_norm_exponent_bucket_mask; // 0xFE000000: upper 6 exp bits.
+    const float scale = __uint_as_float(__internal_norm_scale_anchor_bits - exponent_bucket); // 0x7E800000 = 2^126.
+    const float scaled_term_3 = term_3 * scale;
+    const float scaled_term_2 = term_2 * scale;
+    const float scaled_term_0 = term_0 * scale;
+    const float scaled_max = max_abs * scale;
+
+    // Accumulate scaled squares:  sum = t3^2 + t2^2 + t0^2 + max^2.
+    // Start with the 3rd term (plain mul), then add the remaining terms via
+    // fmaf so each addition incurs only a single rounding error.
+    float square_sum = scaled_term_3 * scaled_term_3;
+    square_sum = fmaf(scaled_term_2, scaled_term_2, square_sum);
+    square_sum = fmaf(scaled_term_0, scaled_term_0, square_sum);
+    square_sum = fmaf(scaled_max, scaled_max, square_sum);
+    const float sqrt_scaled = __internal_norm_sqrt(square_sum);
+
+    // Fast path: if only one term is nonzero, abs_sum == max_abs and
+    // sqrt(x^2) = |x| = abs_sum — no sqrt needed.
+    float abs_sum = abs_a + abs_b + abs_d + abs_c;
+    float result = abs_sum;
+    if (abs_sum > max_abs) {
+        // restore_scale = 1/scale (exact reciprocal via the +1 exponent LSB).
+        const float restore_scale =
+            __uint_as_float(exponent_bucket | __internal_norm_restore_mantissa_bit); // 0x00800000: sets exp LSB.
+        result = restore_scale * sqrt_scaled;
+    }
+
+    // If the largest magnitude is +Inf, the norm is +Inf.
+    if (max_abs == ASCRT_INF_F) {
+        result = ASCRT_INF_F;
+    }
+    return result;
 }
 
 #endif // ASCENDC_USE_LEGACY_PRECISION
+
+#ifndef __NPU_COMPILER_INTERNAL_PURE_SIMT__
+#ifndef ASCENDC_CPU_DEBUG
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint32_t asc_uintdiv(uint32_t dividend, uint32_t magic, uint32_t shift)
+{
+    uint32_t q = __umulhi(dividend, magic);
+    uint32_t sum = dividend + q;
+    return sum >> shift;
+}
+
+__SIMT_DEVICE_FUNCTIONS_DECL__ inline uint64_t asc_uintdiv(uint64_t dividend, uint64_t magic, uint64_t shift)
+{
+    uint64_t q = __umul64hi(dividend, magic);
+    uint64_t sum = dividend + q;
+    return sum >> shift;
+}
+
+__aicore__ inline uint64_t asc_get_uintdiv_magic_impl(uint64_t dividend, uint64_t divisor)
+{
+    uint64_t quotient = 0;
+    uint64_t remainder = dividend;
+    for (int i = 0; i < 64; ++i) { // 64: process every bit of the uint64_t dividend.
+        quotient <<= 1;
+        const uint64_t borrow = remainder >> 63; // 63: highest bit index of uint64_t.
+        remainder <<= 1;
+        if (borrow != 0) {
+            remainder -= divisor;
+            quotient |= 1; // 1: set the current quotient bit.
+        } else if (remainder >= divisor) {
+            remainder -= divisor;
+            quotient |= 1; // 1: set the current quotient bit.
+        }
+    }
+    return quotient + 1; // 1: round the reciprocal up for exact division.
+}
+
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint32_t* magic, uint32_t* shift, uint32_t divisor)
+{
+    const int64_t pos = 64 - clz(static_cast<uint64_t>(divisor)); // 64: width of the clz input.
+    const int64_t cnt1 = bcnt1(static_cast<uint64_t>(divisor));
+    *shift = cnt1 == 1 ? pos - 1 : pos;
+    *magic = (1ULL << 32) * ((1ULL << *shift) - divisor) / divisor + 1; // 32: uint32_t bit width.
+}
+
+__aicore__ inline void asc_get_uintdiv_magic_and_shift(uint64_t* magic, uint64_t* shift, uint64_t divisor)
+{
+    const int64_t pos = 64 - clz(divisor); // 64: uint64_t bit width.
+    const int64_t cnt1 = bcnt1(divisor);
+    *shift = cnt1 == 1 ? pos - 1 : pos;
+    uint64_t dividend = 0;
+    if (*shift < 64) { // 64: one-past-the-highest valid uint64_t shift.
+        dividend = (1ULL << *shift) - divisor;
+    } else {
+        dividend = UINT64_MAX - divisor + 1; // 1: two's-complement form of 2^64 - divisor.
+    }
+    *magic = asc_get_uintdiv_magic_impl(dividend, divisor);
+}
+#endif
+#endif
 
 #endif
 #endif // IMPL_SIMT_API_MATH_FUNCTIONS_IMPL_H

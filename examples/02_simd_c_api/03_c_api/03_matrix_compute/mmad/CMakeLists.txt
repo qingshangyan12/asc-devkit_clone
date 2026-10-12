@@ -14,15 +14,19 @@ set(CMAKE_ASC_ARCHITECTURES "dav-3510" CACHE STRING "NPU architecture: dav-3510"
 
 find_package(ASC REQUIRED)
 
+if(CMAKE_ASC_RUN_MODE STREQUAL "cpu")
+    include_directories($ENV{ASCEND_HOME_PATH}/tools/cpudebug/include)
+endif()
+
 project(kernel_samples LANGUAGES ASC CXX)
 
 add_executable(demo
     mmad.asc
 )
 
-set(SCENARIO_NUM "1" CACHE STRING "SCENARIO_NUM, e.g. 1 2")
-if(NOT SCENARIO_NUM MATCHES "^[1-2]$")
-    message(FATAL_ERROR "SCENARIO_NUM must be 1 or 2, but got ${SCENARIO_NUM}")
+set(SCENARIO_NUM "1" CACHE STRING "SCENARIO_NUM, e.g. 1 2 3")
+if(NOT SCENARIO_NUM MATCHES "^[1-3]$")
+    message(FATAL_ERROR "SCENARIO_NUM must be 1, 2 or 3, but got ${SCENARIO_NUM}")
 endif()
 
 message(STATUS "[INFO] SCENARIO_NUM is ${SCENARIO_NUM}")

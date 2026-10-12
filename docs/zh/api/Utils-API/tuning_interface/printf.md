@@ -3,29 +3,29 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品AI Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id5 -->
 <!-- npu="910" id6 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id6 -->
 <!-- npu="x90" id7 -->
-- Kirin X90：不支持
+- Kirin X90处理器系列产品：不支持
 <!-- end id7 -->
 <!-- npu="9030" id8 -->
-- Kirin 9030：不支持
+- Kirin 9030处理器系列产品：不支持
 <!-- end id8 -->
 <!-- @ref: asc-devkit/res/docs/zh/api/Utils-API/tuning_interface/printf_res.md#id1 -->
 
@@ -48,7 +48,7 @@ __aicore__ static __attribute__((noinline)) void printf( const __gm__ char* fmt,
 ```
 
 <!-- npu="950" id9 -->
-以下接口为simd\_vf中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
+以下接口为simd\_vf中所使用的printf接口，仅支持Ascend 950PR&950DT系列产品。
 
 ```cpp
 template <class... Args>
@@ -57,7 +57,7 @@ __simd_callee__ inline void printf( const __ubuf__ char* fmt, Args&&... args)
 <!-- end id9 -->
 
 <!-- npu="950" id10 -->
-以下接口为SIMT中所使用的printf接口，仅支持Ascend 950PR/Ascend 950DT。
+以下接口为SIMT中所使用的printf接口，仅支持Ascend 950PR&950DT系列产品。
 
 ```cpp
 template <class... Args>
@@ -81,24 +81,26 @@ static __attribute__((noinline)) void printf(const char* fmt, Args&&... args);
 <!-- npu="950,A3,910b" id14 -->
 -   SIMT场景的支持情况如下：
       <!-- npu="950" id11 -->
-    - Ascend 950PR/Ascend 950DT：支持。
+    - Ascend 950PR&950DT系列产品：支持。
       <!-- end id11 -->
       <!-- npu="A3" id12 -->
-    - Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持。
+    - Atlas A3系列产品：不支持。
       <!-- end id12 -->
       <!-- npu="910b" id13 -->
-    - Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持。
+    - Atlas A2系列产品：不支持。
       <!-- end id13 -->
 <!-- end id14 -->
--   SIMT中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过[aclInit接口](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_0022.html)中的"simt\_printf\_fifo\_size"字段进行配置，配置范围为`[1MB,64MB]`。当打印数据量较大时，建议增加缓存空间。
+-   SIMT中printf功能需要占用额外的Global Memory空间用于数据缓存，缓存空间大小默认为2MB。您可以通过[aclInit接口](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/02_initialization_and_deinitialization.md#aclinit)中的"simt\_printf\_fifo\_size"字段进行配置，配置范围为`[1MB,64MB]`。当打印数据量较大时，建议增加缓存空间。
 -   SIMT中使用printf接口会增加算子运行时间，请控制打印数据量，避免算子超时。建议在代码中判断线程ID，仅在部分线程中打印调试信息，减少重复内容的打印，更有利于调试。
--   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过[aclInit接口](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/API/runtimeapi/aclcppdevg_03_0022.html)中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围为`[1KB,64MB]`。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
+-   SIMD场景下，单次调用本接口打印的数据总量不可超过打印大小限制，默认为30KB。使用时应注意，如果超出这个限制，则数据不会被打印。您可以通过[aclInit接口](https://gitcode.com/cann/runtime/blob/master/docs/zh/api_ref/02_initialization_and_deinitialization.md#aclinit)中的"simd\_printf\_fifo\_size\_per\_core"字段进行配置，配置范围为`[1KB,64MB]`。当打印数据量较大时，建议增加缓存空间。pytorch调用和算子入图场景暂不支持该配置。
 -   如果需要使用"AscendC::printf"形式的打印，则必须额外包含"kernel\_operator.h"头文件，示例如下。
+
     ```cpp
     #include "kernel_operator.h"
 
     AscendC::printf("fmt string %d\n", 0x123);
     ```
+
 -   由于在simd vf中不能直接访问gm地址，因此使用simd vf中的printf时，需要先定义一个ubuf的字符串，该字符串即为原来的fmt变量。
 
     ```cpp
@@ -106,7 +108,7 @@ static __attribute__((noinline)) void printf(const char* fmt, Args&&... args);
     ```
 
 <!-- npu="950" id15 -->
--   SIMD VF场景下，每个AIV核在单次`asc_vf_call`执行期间使用2KB预留UB空间临时保存调测数据。同一次`asc_vf_call`中的`assert`、`ascendc_assert`、`printf`和`asc_dump`共享该空间。该空间中的数据传输完成后会被复用，因此上述接口产生的累计调测数据可以超过2KB。单条调测数据必须能完整保存在该空间中，否则该条数据不会打印。
+-   SIMD VF场景下，每个AIV核在单次`asc_vf_call`执行期间使用2KB预留Unified Buffer（UB）空间临时保存调测数据。同一次`asc_vf_call`中的`assert`、`ascendc_assert`、`printf`和`asc_dump`共享该空间。该空间中的数据传输完成后会被复用，因此上述接口产生的累计调测数据可以超过2KB。单条调测数据必须能完整保存在该空间中，否则该条数据不会打印。
 -   每次调用`simd_vf`的`printf`时，除格式字符串和参数外，还会固定占用32字节；整条打印数据需要按8字节对齐。
 -   SIMD VF场景下，"simd\_printf\_fifo\_size\_per\_core"建议配置为3KB以上。配置过小且打印数据量较大时，部分调测数据不会被打印。
 <!-- end id15 -->

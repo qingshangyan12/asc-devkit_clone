@@ -19,6 +19,7 @@
 #include <functional>
 #include <functional>
 #include <memory>
+#include <type_traits>
 #include "ccu_datatype_v1.h"
 #include "hccl_comm.h"
 #include "hccl_common.h"
@@ -330,6 +331,10 @@ struct CcuKernelArgBase {
     // std::vector<ChannelHandle> channels;
     ChannelHandle channels[CCU_MAX_RANK_SIZE];
     uint32_t channelCount;
+    // Host 编译 CCU 指令时使用；不序列化为设备 XN 参数。
+    // 框架只保留所有权并透传，具体算法在 dispatch 中解释。
+    uint32_t algSubType = 0;
+    std::shared_ptr<void> algArg;
 };
 
 // ccu kernel register所需信息
@@ -402,15 +407,35 @@ static_assert(
 static_assert(
     sizeof(CcuFastLaunchCtx) % alignof(ThreadHandle) == 0, "CcuFastLaunchCtx must preserve ThreadHandle alignment");
 
+struct ParallelChannelPortInfo {
+    bool isValid = false;
+    bool isInterPod = false;
+    uint64_t intraPortGroupSize = 0;
+    uint64_t interPortGroupSize = 0;
+};
+
+static_assert(
+    std::is_trivially_copyable<ParallelChannelPortInfo>::value,
+    "ParallelChannelPortInfo must be trivially copyable for serialization");
+
+// dieSplitRatio ∈ (0,1) 表示有效双 die 切分；1.0/0.0（单 die 或未设置）统一折算为 1000（不切分）。
+// OpResCtx/kernelArg 以千分比整数传递到 AIV/ST，消费侧按 sliceCount*permille/1000 切分。
+inline uint64_t DieSplitRatioToPermille(double ratio)
+{
+    return (ratio > 0.0 && ratio < 1.0) ? static_cast<uint64_t>(ratio * 1000.0 + 0.5) : 1000U;
+}
+
 // A5用了cntNotify
 struct AlgResourceRequest {
     double dieSplitRatio = 0.0;
+    ParallelChannelPortInfo parallelPortInfo;
     u32 notifyNumOnMainThread = 0;
     u32 slaveThreadNum = 0;
     std::vector<u32> notifyNumPerThread;
     std::vector<std::vector<HcclChannelDesc>> channels;
     std::vector<CcuKernelInfo> ccuKernelInfos;
     std::vector<u32> ccuKernelNum;
+    std::vector<ChannelHandle> acquiredChannels;
 };
 
 struct SubCommInfo {
@@ -502,6 +527,7 @@ struct AlgResourceCtxSerializable {
     // ccu的
     std::vector<u32> ccuKernelNum;
     std::vector<CcuKernelHandle> ccuKernels;
+    ParallelChannelPortInfo parallelPortInfo;
     u32 topoInfoSeqSize = 0;
     TopoInfoWithNetLayerDetails topoInfo; // 提取的拓扑信息
     std::vector<uint64_t> kfcServerArgs;  // kfc server算子入参
@@ -533,6 +559,7 @@ struct AlgResourceCtxSerializable {
         binaryStream << ccuKernelNum;
         binaryStream << ccuKernels;
         binaryStream << dieSplitRatio;
+        binaryStream << parallelPortInfo;
         binaryStream << kfcServerArgs;
         binaryStream << kfcServerArgSize;
         std::vector<char> seq = topoInfo.Serialize();
@@ -571,6 +598,7 @@ struct AlgResourceCtxSerializable {
         binaryStream >> ccuKernelNum;
         binaryStream >> ccuKernels;
         binaryStream >> dieSplitRatio;
+        binaryStream >> parallelPortInfo;
         binaryStream >> kfcServerArgs;
         binaryStream >> kfcServerArgSize;
         binaryStream >> topoInfoSeqSize;
@@ -615,6 +643,7 @@ struct OpParam { // 不申请ctx，每个算子单独下发
     void* inputSymWindow = nullptr;
     void* outputSymWindow = nullptr;
     bool supportSymmetricMemory{false};
+    bool symMemChecked{false};
     u64 inputOffset = 0;
     u64 outputOffset = 0;
     HcclMem hcclBuff; // 当前仅快速下发时使用此处的地址

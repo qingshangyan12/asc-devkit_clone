@@ -45,7 +45,7 @@ asc-devkit/
 | `include/adv_api/math/xxx.h` | `impl/adv_api/detail/math/xxx/xxx_common_impl.h` | |
 | `include/adv_api/math/xxx_tiling.h` | `impl/adv_api/tiling/math/xxx_tiling_impl.cpp` | |
 | `include/adv_api/<cat>/xxx.h` | `impl/adv_api/detail/<cat>/xxx/xxx_common_impl.h` | |
-| `include/c_api/<category>/<category>.h` | `impl/c_api/instr_impl/npu_arch_<NNNN>/<category>_impl/asc_<api>_impl.h` | C API使用 `npu_arch_` 前缀目录 |
+| `include/c_api/<category>/<header>.h` | `impl/c_api/memory_base_impl/<header>_intf_impl.h`、`impl/c_api/reg_base_impl/<header>_intf_impl.h` | 公开头沿用现有分类层级，只直接引用同名公共实现头；公共实现头通过架构宏包含`reg_base_impl/npu_arch_3510/`下的3510专用实现，内部公共辅助代码放在各架构组的`utils_impl.h`中 |
 
 ---
 
@@ -91,7 +91,7 @@ exp_check_common.h
 |---------|--------|---------|------|
 | 基础API | `kernel_<name>_intf.h` | 分发层：`kernel_<name>_intf_impl.h`；架构实现：`dav_<arch>/kernel_<name>_impl.h` | `kernel_operator_vec_binary_intf.h` |
 | 高阶API | `<name>.h` | `<name>_common_impl.h` | `axpy.h` / `axpy_common_impl.h` |
-| C API | `<category>.h` | `asc_<api>_impl.h` | `vector_compute.h` / `asc_add_impl.h` |
+| C API | `<header>.h` | `<header>_intf_impl.h` | `scalar_atomic.h` / `scalar_atomic_intf_impl.h` |
 | Tiling | `<name>_tiling.h` | `<name>_tiling_impl.cpp` | `axpy_tiling.h` |
 
 ---
@@ -100,7 +100,7 @@ exp_check_common.h
 
 ### 命名格式
 
-基础API的架构特定实现放在 `impl/basic_api/dav_<code>/` 目录下，格式为 `dav_`+架构代码。高阶API的架构特定实现位于 `impl/adv_api/detail/<category>/<api>/<api>_<arch>_impl.h`，由公开头文件通过 `#if __NPU_ARCH__` 分发。C API使用 `npu_arch_<NNNN>/` 前缀目录，详见上文C API映射表。
+基础API的架构特定实现放在 `impl/basic_api/dav_<code>/` 目录下，格式为 `dav_`+架构代码。高阶API的架构特定实现位于 `impl/adv_api/detail/<category>/<api>/<api>_<arch>_impl.h`，由公开头文件通过 `#if __NPU_ARCH__` 分发。C API的2201实现放在`impl/c_api/memory_base_impl/`，regbase公共实现放在`impl/c_api/reg_base_impl/`，3510独有的实现放在后者的`npu_arch_3510/`目录中，由同名公共实现头按架构包含。
 
 ### 架构代码映射（示例）
 
@@ -108,8 +108,8 @@ exp_check_common.h
 
 | 目录 | `__NPU_ARCH__` 值 | 对应产品 |
 |------|-------------------|---------|
-| `dav_c220` | `2201` | Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品 |
-| `dav_3510` | `3510` | Ascend 950PR/Ascend 950DT |
+| `dav_c220` | `2201` | Atlas A2系列产品、Atlas A3系列产品 |
+| `dav_3510` | `3510` | Ascend 950PR&950DT系列产品 |
 
 > 产品型号与 `__NPU_ARCH__` 的完整对应关系见 [**NPU_ARCH** 文档](../../zh/guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
@@ -234,14 +234,17 @@ impl/adv_api/
 ### C API清单
 
 ```text
-□ include/c_api/<category>/<category>.h或添加函数声明到现有文件
+□ include/c_api/<category>/<header>.h
+    放置接口声明
 
-□ impl/c_api/instr_impl/npu_arch_<NNNN>/<category>_impl/asc_<api>_impl.h
-    架构特定实现
+□ impl/c_api/memory_base_impl/<header>_intf_impl.h
+    放置2201架构的实现
 
-□ impl/c_api/instr_impl/npu_arch_<NNNN>/<category>_impl.h
-    在聚合头中添加#include "<category>_impl/asc_<api>_impl.h"
-    （新增category时还需在include/c_api/asc_simd.h中注册公开头）
+□ impl/c_api/reg_base_impl/<header>_intf_impl.h
+    放置regbase公共实现
+
+□ impl/c_api/reg_base_impl/npu_arch_3510/<header>_intf_impl.h
+    仅放置3510独有的实现
 
 □ tests/api/c_api/npu_arch_<arch>/<category>/test_asc_<api>.cpp
     Mock测试

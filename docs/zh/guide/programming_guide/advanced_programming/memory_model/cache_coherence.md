@@ -1,6 +1,6 @@
 # 缓存一致性
 
-本文介绍NPU编程中常见的缓存一致性问题，说明DCache、ICache、SIMT DCache与GM的数据一致性。芯片的硬件架构参考[NPU架构版本2201](../hardware_implementation/architecture_spec/npu_arch_2201.md)和[NPU架构版本3510](../hardware_implementation/architecture_spec/npu_arch_3510.md)。
+本文介绍NPU编程中常见的缓存一致性问题，说明Data Cache（DCache）、Instruction Cache（ICache）、SIMT DCache与Global Memory（GM）的数据一致性。芯片的硬件架构参考[NPU架构版本2201](../hardware_implementation/architecture_spec/npu_arch_2201.md)和[NPU架构版本3510](../hardware_implementation/architecture_spec/npu_arch_3510.md)。
 
 ## 缓存一致性的基本概念
 
@@ -56,7 +56,7 @@ Data Cache Clean and Invalid（[DCCI](../../../../api/SIMD-API/c_api/cache_ctrl/
 
 实际使用时，可根据一致性目标选择不同DCCI接口：使用[`asc_dcci_single`](../../../../api/SIMD-API/c_api/cache_ctrl/asc_dcci.md)刷新指定地址所在的单个Cache Line；使用[`asc_dcci_entire_out`](../../../../api/SIMD-API/c_api/cache_ctrl/asc_dcci.md)刷新面向GM的一致性目标；原子相关目标按产品支持情况选择[`asc_dcci_entire_atomic`](../../../../api/SIMD-API/c_api/cache_ctrl/asc_dcci.md)等接口。
 
-对于需要等待DCCI触发的写回真正完成的场景，还需要配合Data Sync Barrier（[DSB](../../../../api/SIMD-API/c_api/sync/asc_sync_data_barrier.md)）等待前序内存访问完成，DSB只用于阻塞后续指令执行，直到之前的内存访问指令执行结束，参数可选择`DSB_ALL`、`DSB_DDR`或`DSB_UB`。
+对于需要等待DCCI触发的写回真正完成的场景，还需要配合Data Sync Barrier（[DSB](../../../../api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_data_barrier.md)）等待前序内存访问完成，DSB只用于阻塞后续指令执行，直到之前的内存访问指令执行结束，参数可选择`DSB_ALL`、`DSB_DDR`或`DSB_UB`。
 
 Cache写入策略决定写操作是否会形成Dirty副本，常见策略包括直写和写回：
 
@@ -66,7 +66,7 @@ Cache写入策略决定写操作是否会形成Dirty副本，常见策略包括�
 
 ### 缓存一致性与内存一致性的区别
 
-缓存一致性（cache一致性）关注的是同一地址或同一Cache Line在不同缓存副本之间的值是否一致。例如，某个核的DCache已经把`A`修改为新值，但GM中仍是旧值；或者GM已经被其他路径更新，但当前核DCache仍保留旧副本。此时问题的关键是是否需要写回Dirty副本、失效旧副本，或者绕过Cache访问。
+缓存一致性关注的是同一地址或同一Cache Line在不同缓存副本之间的值是否一致。例如，某个核的DCache已经把`A`修改为新值，但GM中仍是旧值；或者GM已经被其他路径更新，但当前核DCache仍保留旧副本。此时问题的关键是是否需要写回Dirty副本、失效旧副本，或者绕过Cache访问。
 
 内存一致性关注的是不同执行单元、不同线程或不同核之间的读写顺序是否符合程序预期。例如，生产者先写数据再写标志，消费者看到标志后是否一定能按预期读取到数据。同步接口、内存栅栏主要解决执行顺序和访问完成问题；DCCI主要解决Cache副本写回和失效问题。实际编程时，两类问题经常同时出现，但本文重点讨论Cache副本与GM、UB之间的数据一致性。
 
@@ -220,6 +220,7 @@ T6                                                Scalar.LOAD A -> 1
 还有一类问题来自Cache Line粒度。普通Scalar写后续以64B Cache Line为单位写回；多个核即使写的是同一条Cache Line中的不同字段，也可能在各自写回整条Cache Line时覆盖对方结果。此类场景可以通过让不同核操作的地址至少相隔Cache Line大小，或使用ReadGmBypassDCache和WriteGmBypassDCache降低风险。
 
 <!-- npu="950" id3 -->
+
 #### Atomic访问导致的DCache缓存一致性
 
 [NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)支持Scalar原子操作，Scalar原子操作可以看成对某个GM地址执行的读-改-写事件，但是Scalar原子操作会绕过DCache，因此会导致缓存一致性。例如C API [asc_atomic_add](../../../../api/SIMD-API/c_api/atomic/scalar_atomic/asc_atomic_add.md)，该接口在指定GM地址上执行原子加操作。原子操作保证的是这一次读-改-写不会被其他原子更新打断，但它不会自动清理同一地址在DCache中的旧副本或Dirty副本。
@@ -251,6 +252,7 @@ T1        asc_atomic_add(A, 1)
 上面的关键不是`asc_atomic_add`本身不原子，而是原子操作看到的GM值没有包含此前停留在DCache中的普通Scalar写入。
 
 反过来，如果`asc_atomic_add(A, 1)`已经把GM更新为1，而本核DCache里还保留`A == 0`的旧副本，后续普通Scalar读也可能继续读到旧副本。
+
 ```text
 Case 2：Atomic在前，普通Scalar读在后
 初始状态：
@@ -322,7 +324,6 @@ T3        Scalar.DCCI A
 T4        Scalar.LOAD A -> 1
           // 重新从GM获取Atomic更新后的新值
 ```
-
 <!-- end id3 -->
 
 #### 软件维护Scalar访问GM的DCache一致性
@@ -448,6 +449,7 @@ ICache用于缓存Scalar单元最近使用或频繁使用的指令。Scalar读�
 从缓存一致性角度看，ICache缓存的是指令而不是普通数据，并且是只读Cache，因此一般不涉及普通数据路径上的Cache副本不一致问题。
 
 <!-- npu="950" id4 -->
+
 ### SIMT DCache与GM的缓存一致性
 
 #### SIMT DCache访问路径
@@ -608,6 +610,7 @@ C API中提供了[`asc_ub_dcci_single`](../../../../api/SIMD-API/c_api/cache_ctr
 下面按atomic事件发起路径分类说明：<!-- npu="950" id6 -->Scalar原子、<!-- end id6 -->MTE3随路原子、FixPipe随路原子<!-- npu="950" id7 -->和SIMT原子<!-- end id7 -->。本节只说明这些atomic事件放入一致性分析时需要关注的Cache行为，接口细节可参考对应API文档。
 
 <!-- npu="950" id8 -->
+
 ### Scalar原子操作与DCache一致性
 
 [NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)支持Scalar原子操作，Scalar原子操作和普通Scalar读写GM混用时，需要按DCache与GM的一致性来分析，详细处理方式参考[Atomic访问导致的DCache缓存一致性](#atomic访问导致的dcache缓存一致性)。
@@ -635,6 +638,7 @@ FixPipe常用于`L0C Buffer -> GM`或相关矩阵搬出路径。对一致性分�
 - 如果多个流水或多个核都对同一GM地址做随路原子，原子操作只保证每次GM读-改-写不被打断；不同流水、不同核之间的启动顺序仍应由同步或算法协议保证。
 
 <!-- npu="950" id9 -->
+
 ### SIMT原子操作与缓存一致性
 
 [NPU架构版本3510](../../language_extension/simd_builtin_keywords.md)支持SIMT原子操作，SIMT原子操作可能作用于UB，也可能作用于GM；接口例子可参考[asc_atomic_add](../../../../api/SIMT-API/atomic_operations/asc_atomic_add.md)。它保证的是同一地址上这一次读-改-写具有原子性，不保证多个线程之间的执行顺序。

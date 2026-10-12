@@ -5,14 +5,11 @@
 This sample demonstrates the basic usage of the [cooperative groups API](../../../../../../docs/zh/api/SIMT-API/cooperative_groups/cooperative_groups_intro.md) through reduction sum operations, highlighting the code abstraction capabilities provided by cooperative groups.
 
 
-## Supported Products
+## Supported Products and CANN Versions
 
-- Ascend 950PR/Ascend 950DT
-
-## Supported CANN Versions
-
-- \>= CANN 9.2.0
-
+| Products | CANN Versions |
+|---|---|
+| Ascend 950PR&950DT products | \>= CANN 9.2.0 |
 
 ## Directory Structure
 
@@ -209,11 +206,21 @@ Run the following steps in the root directory of this example to build and execu
   ./cooperative_groups 2                                  # Run the warp-internal reduction case
   ```
 
+  When using NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+
+  Example:
+  ```bash
+  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j;   # NPU simulation mode
+  ```
+
+  > **Note:** Clear the cmake cache before switching build modes. Execute `rm CMakeCache.txt` in the build directory, then run cmake again.
+
 - Build Options Description
 
   | Option | Values | Description |
   |---------------------------|------------|---------------------------------------------------|
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR/Ascend 950DT) |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution, NPU simulation |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: this example only supports dav-3510 (Ascend 950PR&950DT products) |
 
 
   The output is as follows, which indicates that the accuracy verification passed.

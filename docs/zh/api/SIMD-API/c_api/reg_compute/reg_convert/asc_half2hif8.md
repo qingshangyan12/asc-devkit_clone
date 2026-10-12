@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -32,26 +32,28 @@
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式](rounding_mode.md)。
 
+本接口为Reg矢量计算接口，仅在AIV上生效。
+
 ## 函数原型
 
 ```c
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_half2hif8<round_mode><sat_mode>(vector_hifloat8_t& dst,
+__simd_callee__ inline void asc_half2hif8_<round_mode><sat_mode>(vector_hifloat8_t& dst,
                                                                 vector_half src,
                                                                 vector_bool mask,
                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-__simd_callee__ inline void asc_half2hif8<round_mode><sat_mode>(vector_hifloat8_t& dst,
+__simd_callee__ inline void asc_half2hif8_<round_mode><sat_mode>(vector_hifloat8_t& dst,
                                                                 vector_half src,
                                                                 vector_bool mask,
                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8<round_mode><sat_mode>(vector_half src,
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_<round_mode><sat_mode>(vector_half src,
                                                                              vector_bool mask,
                                                                              std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
-__simd_callee__ inline vector_hifloat8_t asc_half2hif8<round_mode><sat_mode>(vector_half src,
+__simd_callee__ inline vector_hifloat8_t asc_half2hif8_<round_mode><sat_mode>(vector_half src,
                                                                              vector_bool mask,
                                                                              std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
@@ -95,12 +97,9 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna(vector_half src,
 
 ## 约束说明
 
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。
 - 位置选择标签选择目的操作数的写入地址，其他位置清零。
-- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
-- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
-- 本接口在Vector Function（`__simd_vf__`标记的函数）内调用。
-- mask需通过掩码设置接口预先赋值后再传入，未赋值的掩码寄存器内容不确定，会导致有效元素位置错误。
 - 当数据写入目的操作数索引为奇数的位置，索引为偶数位置的数值置零。反之亦然。
 - 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。
 - `mask`掩码位为0时，`dst`对应元素置0。
@@ -110,12 +109,13 @@ __simd_callee__ inline vector_hifloat8_t asc_half2hif8_rna(vector_half src,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[\_\_NPU\_ARCH\_\_](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main
 ```
 <!-- end id8 -->
+
 ```c
 #include <cstdint>
 #include <iostream>

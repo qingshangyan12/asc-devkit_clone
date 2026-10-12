@@ -12,9 +12,9 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
+| Atlas A3系列产品 | >= CANN 9.0.0 |
+| Atlas A2系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -32,7 +32,7 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
 
 - 样例功能：
 
-  本样例对输入 Tensor 按行做 SoftMax 计算，并使用 AdjustSoftMaxRes 对计算结果做后处理。当输入的 max 中存在指定的值（0xFF7FFFFF，即 float 类型的最大有限值）时，调整输出中对应位置的数据为自定义的值（0.0，即浮点数零）。该机制常用于注意力掩码（attention mask）场景，将无效位置的 softmax 输出置零。
+  本样例对输入 Tensor 按行做 SoftMax 计算，并使用 AdjustSoftMaxRes 对计算结果做后处理。`0xFF7FFFFF`是float类型最小有限值（约为-3.4028235e+38）的IEEE 754位模式。数据生成脚本将输入的第一行设置为该值，使对应的max命中指定值，并将该行的SoftMax输出调整为0.0。该机制常用于注意力掩码（attention mask）场景，将无效位置的SoftMax输出置零。
 
 - 样例规格：
 
@@ -102,7 +102,7 @@ AdjustSoftMaxRes用于对SoftMax计算结果做后处理，当输入的max中存
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式：NPU 运行、CPU调试、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2 训练系列产品/Atlas A2 推理系列产品和 Atlas A3 训练系列产品/Atlas A3 推理系列产品，dav-3510 对应 Ascend 950PR/Ascend 950DT |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201`（默认）、`dav-3510` | NPU 架构：dav-2201 对应 Atlas A2系列产品和 Atlas A3系列产品，dav-3510 对应 Ascend 950PR&950DT系列产品 |
 
 - 执行结果
 

@@ -6,13 +6,11 @@
 
 更多日志功能详情请参考：[Ascend 日志功能参考](https://hiascend.com/document/redirect/CannCommunitylogref)
 
-## 支持的产品
+## 本样例支持的产品及CANN软件版本
 
-- Ascend 950PR/Ascend 950DT
-
-## 支持的CANN软件版本
-
-- \>= CANN 9.1.0
+| 产品 | CANN软件版本 |
+|---|---|
+| Ascend 950PR&950DT系列产品 | \>= CANN 9.1.0 |
 
 ## 目录结构介绍
 
@@ -103,39 +101,39 @@
   ./demo
   ```
 
-  使用 NPU仿真 模式时，添加 `-DCMAKE_ASC_RUN_MODE=sim` 参数即可。
+  使用NPU仿真模式时，添加`-DCMAKE_ASC_RUN_MODE=sim`参数即可。
 
   示例如下：
   ```bash
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU仿真模式
   ```
 
-  > **注意：** 切换编译模式前需清理 cmake 缓存，可在 build 目录下执行 `rm CMakeCache.txt` 后重新 cmake。
+  > **注意：** 切换编译模式前需清理cmake缓存，可在build目录下执行`rm CMakeCache.txt`后重新cmake。
 
 - 编译选项说明
   | 选项 | 可选值 | 说明 |
   |------|--------|------|
   | `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式：NPU 运行、NPU仿真 |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR/Ascend 950DT） |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU 架构：本样例仅支持 dav-3510（Ascend 950PR&950DT系列产品） |
 
 - 执行结果（以非打屏模式下为例，落盘文件详情可参考[Ascend 日志功能参考](https://hiascend.com/document/redirect/CannCommunitylogref)）  
   执行后会打印类似以下信息：
   ```bash
   [INFO] Input shape: 12288
   [INFO] Launching kernel with assert(total_length < 100)...
-  Ascend Error: <your_path>/09_log/log.asc:88 code=507035 EZ9999: Inner Error!
+  Ascend Error: <your_path>/09_log/log.asc:86 code=507035 EZ9999: Internal error!
   ...
   rtDeviceSynchronize execution failed, reason=vector core exception
   ...
 
-  [ASSERT] <your_path>/09_log/log.asc:47: void add_custom(float *, float *, float *, uint64_t): Assertion `total_length < 100 && "Total length exceeds expected limit!"' failed.
+  [ASSERT] <your_path>/09_log/log.asc:44: void add_custom(float *, float *, float *, uint64_t): Assertion `total_length < 100 && "Total length exceeds expected limit!"' failed.
   [INFO] Execution completed. Check for error messages above.
   ```
 
   > **说明：**
   > - `<your_path>` 表示样例代码所在目录的绝对路径，实际输出中会替换为具体路径
   > - 关键错误信息解读：
-  >   - `Ascend Error: ... code=507035 EZ9999: Inner Error!` — ACL接口返回的底层错误码
+  >   - `Ascend Error: ... code=507035 EZ9999: Internal error!` — ACL接口返回的底层错误码
   >   - `vector core exception` — AI Core执行异常，Kernel任务失败
   >   - `Assertion 'total_length < 100 ...' failed` — 断言失败的具体位置和条件，帮助定位问题代码
 
