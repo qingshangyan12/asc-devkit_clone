@@ -79,3 +79,11 @@ int __hadd(int x, int y)
         dst[idx] = __hadd(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -7, 0, 23, -13
+y: 6, 0, 15, -8
+result: -1, 0, 19, -11
+```
