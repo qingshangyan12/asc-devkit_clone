@@ -79,8 +79,15 @@ SIMT编程场景当前不支持使用该接口。
         }
         output[idx] = __half22hif82_rh_sat(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ half* input,  __gm__ uint8_t* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ half* input,  __gm__ hifloat8* output, uint32_t input_total_length)
     {
         asc_vf_call<simt_half22hif82_rh_sat>(dim3(1024), (__gm__ half2*)input, (__gm__ hifloat8x2_t*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (0.0, 1.0), (8.0, 10.0), (128.0, 128.0)
+result: (0, 8), (40, 42), (76, 76)
+```

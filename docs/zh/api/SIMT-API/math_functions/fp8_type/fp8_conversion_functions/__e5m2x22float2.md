@@ -76,8 +76,15 @@ SIMT编程场景当前不支持使用该接口。
         }
         output[idx] = __e5m2x22float2(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ uint8_t* input,  __gm__ float* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ fp8_e5m2_t* input,  __gm__ float* output, uint32_t input_total_length)
     {
         asc_vf_call<simt_e5m2x22float2>(dim3(1024), (__gm__ float8_e5m2x2_t*)input, (__gm__ float2*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (56, 64), (112, 128), (256, 256), (nan, inf)
+result: (56.0, 64.0), (112.0, 128.0), (256.0, 256.0), (nan, inf)
+```
