@@ -99,6 +99,64 @@ __simd_callee__ inline void FusedMulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, Ma
     FusedMulDstAddImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
 }
 #endif
+
+#if __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202
+template <typename T, MaskMergeMode mode, typename U>
+__simd_callee__ inline void MulDstSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    FusedMulDstSubImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+}
+
+template <typename T, MaskMergeMode mode, typename U>
+__simd_callee__ inline void NegMulDstAdd(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    FusedNegMulDstAddImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+}
+
+template <typename T, MaskMergeMode mode, typename U>
+__simd_callee__ inline void NegMulDstSub(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    FusedNegMulDstSubImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+}
+
+template <typename T, MaskMergeMode mode, typename U>
+__simd_callee__ inline void FusedMulSubDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    FusedMulSubDstImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+}
+
+template <typename T, MaskMergeMode mode, typename U>
+__simd_callee__ inline void FusedNegMulAddDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    FusedNegMulAddDstImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+}
+
+template <typename T, MaskMergeMode mode, typename U>
+__simd_callee__ inline void FusedNegMulSubDst(U& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    FusedNegMulSubDstImpl<T, mode, U>(dstReg, srcReg0, srcReg1, mask);
+}
+
+template <typename T, typename U, const CastTrait& trait, typename S, typename V>
+__simd_callee__ inline void ReciprocalCast(S& dstReg, V& srcReg, MaskReg& mask)
+{
+    ReciprocalCastImpl<T, U, trait>(dstReg, srcReg, mask);
+}
+
+#endif
+#if __NPU_ARCH__ == 9202
+template <CMPMODE mode = CMPMODE::GE, typename T, typename U>
+__simd_callee__ inline void MulCompares(MaskReg& dst, T& srcReg0, T& srcReg1, U scalarValue, MaskReg& mask)
+{
+    MulComparesImpl<mode, T, U>(dst, srcReg0, srcReg1, scalarValue, mask);
+}
+template <const CastTrait& trait, typename T, typename U>
+__simd_callee__ inline void MulCast(T& dstReg, U& srcReg0, U& srcReg1, MaskReg& mask)
+{
+    MulCastImpl<trait, T, U>(dstReg, srcReg0, srcReg1, mask);
+}
+#endif
+
 } // namespace Reg
 } // namespace AscendC
 
