@@ -133,12 +133,48 @@ __simd_callee__ inline void asc_neg(vector_float& dst, vector_float src, vector_
 
 __simd_callee__ inline vector_float asc_neg(vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__Rvi8_vi8_vb
+ * @archs 3510
+ * @param [out] dst Destination operand (vector data register).
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline void asc_abs(vector_int8_t& dst, vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__Rvi16_vi16_vb
+ * @archs 3510
+ * @param [out] dst Destination operand (vector data register).
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline void asc_abs(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__Rvi32_vi32_vb
+ * @archs 3510
+ * @param [out] dst Destination operand (vector data register).
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline void asc_abs(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__Rvf16_vf16_vb
+ * @archs 3510
+ * @param [out] dst Destination operand (vector data register).
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline void asc_abs(vector_half& dst, vector_half src, vector_bool mask);
 
 /**
@@ -152,14 +188,54 @@ __simd_callee__ inline void asc_abs(vector_half& dst, vector_half src, vector_bo
  */
 __simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__vi8_vb
+ * @archs 3510
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline vector_int8_t asc_abs(vector_int8_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__vi16_vb
+ * @archs 3510
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline vector_int16_t asc_abs(vector_int16_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__vi32_vb
+ * @archs 3510
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline vector_int32_t asc_abs(vector_int32_t src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__vf16_vb
+ * @archs 3510
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline vector_half asc_abs(vector_half src, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_abs__vf32_vb
+ * @archs 3510
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
+ */
 __simd_callee__ inline vector_float asc_abs(vector_float src, vector_bool mask);
 
 __simd_callee__ inline void asc_mull(
@@ -272,34 +348,10 @@ __simd_callee__ inline void asc_add(
 __simd_callee__ inline void asc_add(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
-/**
- * @ingroup simd_c_api.reg_compute.reg_arith
- * @override_id asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb
- * @archs 3510
- * @param [out] carry Destination operand (mask register). Stores the carry output of the addition.
- * @param [out] dst Destination operand (vector data register).
- * @param [in] src0 Source operand (vector data register).
- * @param [in] src1 Source operand (vector data register).
- * @param [in] carry_src Source operand (mask register). Provides the input carry flags.
- * @param [in] mask Source operand mask (mask register). A value of 1 at the corresponding position selects an element
- * for computation; a value of 0 excludes it. Unselected elements are set to zero in the output.
- */
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
     vector_bool mask);
 
-/**
- * @ingroup simd_c_api.reg_compute.reg_arith
- * @override_id asc_addc__Rvb_Rvi32_vi32_vi32_vb_vb
- * @archs 3510
- * @param [out] carry Destination operand (mask register). Stores the carry output of the addition.
- * @param [out] dst Destination operand (vector data register).
- * @param [in] src0 Source operand (vector data register).
- * @param [in] src1 Source operand (vector data register).
- * @param [in] carry_src Source operand (mask register). Provides the input carry flags.
- * @param [in] mask Source operand mask (mask register). A value of 1 at the corresponding position selects an element
- * for computation; a value of 0 excludes it. Unselected elements are set to zero in the output.
- */
 __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src,
     vector_bool mask);

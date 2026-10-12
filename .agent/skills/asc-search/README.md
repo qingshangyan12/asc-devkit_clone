@@ -99,9 +99,9 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 一句话里可以同时带上阶段、数据类型、版本、产品、行为约束（如非对齐、填充），说得越具体候选越准。
 
-示例：你说"在 A5 上想把两个 uint32_t 向量和输入进位逐元素相加，并输出进位"，AI 会先按 A5 门控准备索引，
-再按"操作=add、类型=uint32"查询，结合带进位语义返回
-`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md` 及一句话用途；如果需求有歧义，它会先反问你。
+示例：你说"在 A5 上想对 float 向量逐元素取绝对值"，AI 会先按 A5 门控准备索引，
+再按"操作=absolute、类型=float"查询，返回
+`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md` 及一句话用途；如果需求有歧义，它会先反问你。
 
 ### 2.3 skill 会做什么
 
@@ -233,11 +233,10 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 ## 3. 三类头的标准格式与真实示例
 
-三类头分别描述 API 的语义、具体重载的结构和源码调用范围。文档头与 include 头以 A5（3510）
-的 `asc_addc` 为例；样例头使用仓库原有的 A5 `abs.asc`。仓库没有原有的 `asc_addc` `.asc`
-样例，因此不为补齐三类头新建源码。真实片段取自 `okf-knowledge-user` 分支；本 README
-在 user、test 两分支保持一致，示范文件的标注范围可以不同。索引如何推导这些字段见
-[索引推导契约](references/索引推导契约.md)。
+三类头分别描述 API 的语义、具体重载的结构和源码调用范围。本章以 A5（3510）的 `asc_abs`
+为贯穿示例，样例源码使用仓库原有的 `abs.asc`，只增加 marker 注释。真实片段取自
+`okf-knowledge-user` 分支；本 README 在 user、test 两分支保持一致，示范文件的标注范围
+可以不同。索引如何推导这些字段见[索引推导契约](references/索引推导契约.md)。
 
 ### 3.1 文档头：Markdown YAML front matter
 
@@ -274,26 +273,23 @@ version: ">=版本号"
 
 **真实示例**
 
-来源：`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md`。
+来源：`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md`。
 
 ```yaml
 ---
 okftype: reference.api
-description: "根据掩码对两个32位整数矢量及输入进位逐元素求和，将低32位结果和每个元素的进位分别写入矢量与掩码寄存器；仅在AIV上生效，支持int32_t和uint32_t。"
+description: "根据mask对源操作数矢量数据寄存器按元素取绝对值，结果写入目的操作数或通过函数返回值返回；输入为有符号整数类型最小负值时结果保留原值不变。"
 tag:
   - roles: [compute]
-  - operations: [add]
-  - traits: [carry_input, elementwise, supports_carry_output]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
+  - operations: [absolute]
+dependencies: []
 version: ">=9.0.0"
 ---
-# asc_addc
+# asc_abs
 ```
 
-该头表达带输入进位的逐元素加法，输出计算结果和进位；`constrained_by` 指向 Reg 矢量计算
-通用约束文档。文档标题和正文原型用于匹配 include 声明。
+该头表达逐元素取绝对值的行为和有符号整数最小负值的处理约束；`dependencies: []`
+表示当前未标注文档依赖。文档标题和正文原型用于匹配 include 声明。
 
 ### 3.2 include 头：Doxygen 与函数声明
 
@@ -323,28 +319,23 @@ Doxygen 块放在每个具体重载声明上方，参数描述使用英文。`ov
 
 **真实示例**
 
-来源：`include/c_api/reg_compute/compute/reg_arith.h`，以下展示 `uint32_t` 重载。
+来源：`include/c_api/reg_compute/compute/reg_arith.h`，以下展示通过引用参数输出结果的 `float` 重载。
 
 ```cpp
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
- * @override_id asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb
+ * @override_id asc_abs__Rvf32_vf32_vb
  * @archs 3510
- * @param [out] carry Destination operand (mask register). Stores the carry output of the addition.
  * @param [out] dst Destination operand (vector data register).
- * @param [in] src0 Source operand (vector data register).
- * @param [in] src1 Source operand (vector data register).
- * @param [in] carry_src Source operand (mask register). Provides the input carry flags.
- * @param [in] mask Source operand mask (mask register). A value of 1 at the corresponding position selects an element
- * for computation; a value of 0 excludes it. Unselected elements are set to zero in the output.
+ * @param [in] src Source operand (vector data register).
+ * @param [in] mask Mask register that controls whether each element participates in the computation.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
  */
-__simd_callee__ inline void asc_addc(
-    vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
-    vector_bool mask);
+__simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask);
 ```
 
-`carry` 和 `dst` 是输出，`src0`、`src1`、`carry_src`、`mask` 是输入；`@archs 3510`
-表示适用 A5。`int32_t` 重载使用独立 ID：`asc_addc__Rvb_Rvi32_vi32_vi32_vb_vb`。
+`dst` 是输出，`src`、`mask` 是输入；`@archs 3510` 表示适用 A5。同名函数的其他
+数据类型和返回方式有独立 ID，例如返回 `float` 矢量的重载使用 `asc_abs__vf32_vb`。
 
 ### 3.3 样例头：成对 override_id marker
 
@@ -382,25 +373,8 @@ for (uint16_t i = 0; i < repeat_time; ++i) {
 ```
 
 本例只有一个重点 `asc_abs` 调用语句，因此 marker 的共同范围只包含该行；循环运行时多次
-调用仍使用同一对 marker。该 ID 只关联 `asc_abs` 的 `float` 重载，不关联 3.2 节的 Addc。
-对应 `include/c_api/reg_compute/compute/reg_arith.h` 中的声明与标注为：
-
-```cpp
-/**
- * @ingroup simd_c_api.reg_compute.reg_arith
- * @override_id asc_abs__Rvf32_vf32_vb
- * @archs 3510
- * @param [out] dst Destination operand (vector data register).
- * @param [in] src Source operand (vector data register).
- * @param [in] mask Mask register that controls whether each element participates in the computation.
- * A value of 1 selects the corresponding element; a value of 0 excludes it. Unselected elements are set to zero.
- */
-__simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_bool mask);
-```
-
-索引再通过 API 名称和原型将该声明匹配到
-`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md`。`asc_addc` 没有已标注的原有
-源码样例时，索引如实返回空样例关联。
+调用仍使用同一对 marker。`asc_abs__Rvf32_vf32_vb` 与 3.2 节引用参数输出的 `float` 重载
+ID 完全一致，索引通过 API 名称和原型将该声明匹配到 3.1 节的 `asc_abs.md` 文档头。
 
 三类头通过“文档的 API 名称与原型 → include 具体声明 → `override_id` → 样例范围”关联。
 `build_index.py` 消费它们生成索引，`ensure_index.py` 检查索引新鲜度，`query.py` 再从索引检索

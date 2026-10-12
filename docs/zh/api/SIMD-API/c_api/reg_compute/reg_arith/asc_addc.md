@@ -1,15 +1,3 @@
----
-okftype: reference.api
-description: "根据掩码对两个32位整数矢量及输入进位逐元素求和，将低32位结果和每个元素的进位分别写入矢量与掩码寄存器；仅在AIV上生效，支持int32_t和uint32_t。"
-tag:
-  - roles: [compute]
-  - operations: [add]
-  - traits: [carry_input, elementwise, supports_carry_output]
-dependencies:
-  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
-    kind: constrained_by
-version: ">=9.0.0"
----
 # asc_addc
 
 ## 产品支持情况
