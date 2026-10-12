@@ -82,6 +82,6 @@ bool __hle(half x, half y)
 
 ```text
 x：-1.25, 0.5, 2.5, nan
-y：-1.25, 0.5, 2.5, nan
-result: true true true false
+y：-0.5, 0.5, 1.25, nan
+result: true true false false
 ```

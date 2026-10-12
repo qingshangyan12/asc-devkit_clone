@@ -98,6 +98,6 @@ inline half __hmax(half x, half y)
 
 ```text
 x：nan, 0.5, 2.5, nan
-y：nan, 0.5, 2.5, nan
-result: nan 0.5 2.5 nan
+y：-1.25, -0.25, 3.25, nan
+result: -1.25 0.5 3.25 nan
 ```
