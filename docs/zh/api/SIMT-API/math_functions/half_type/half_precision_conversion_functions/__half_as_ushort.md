@@ -89,3 +89,10 @@ inline unsigned short int __half_as_ushort(const half x)
         dst[idx] = __half_as_ushort(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.0, -0.0, 5.96046448e-08, 1.0, -1.0, inf, -inf, nan
+result: 0, 32768, 1, 15360, 48128, 31744, 64512, 32256
+```

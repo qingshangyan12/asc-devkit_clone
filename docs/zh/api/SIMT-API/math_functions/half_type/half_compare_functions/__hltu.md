@@ -83,3 +83,11 @@ bool __hltu(half x, half y)
         dst[idx] = __hltu(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, nan, 2.5
+y: 0.75, -0.25, 3.25, nan
+result: true, false, true, true
+```

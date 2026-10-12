@@ -87,3 +87,10 @@ inline half hrsqrt(half x)
         dst[idx] = hrsqrt(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: nan, 1.41406, 0.632324, nan
+```
