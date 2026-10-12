@@ -230,3 +230,162 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 **文档范围内未覆盖：** 对补充提问，无；“9.1.0 当时可用的全部接口”需要另行检索。
 
 </details>
+
+## 3. 三类头的标准格式与真实示例
+
+三类头分别描述 API 的语义、具体重载的结构和源码调用范围。本章以 A5（3510）的 `asc_addc`
+为贯穿示例，真实片段取自 `okf-knowledge-user` 分支的三类头示范；本 README 在 user、test
+两分支保持一致，示范文件的标注范围可以不同。索引如何推导这些字段见
+[索引推导契约](references/索引推导契约.md)。
+
+### 3.1 文档头：Markdown YAML front matter
+
+**标准格式**
+
+文档开头使用 `---` 包住 YAML，固定五个字段并按以下顺序排列。下方模板的占位内容需替换为
+实际摘要、冻结词表值、依赖目标和版本；没有依赖时写 `dependencies: []`。
+
+```yaml
+---
+okftype: reference.api
+description: "接口核心动作、处理对象与关键约束的中文摘要。"
+tag:
+  - roles: [角色标签]
+  - operations: [操作标签]
+  - traits: [特性标签]
+dependencies:
+  - path: docs/zh/api/相关文档.md
+    kind: constrained_by
+version: ">=版本号"
+---
+# API 名称
+```
+
+| 字段 | 标准含义 |
+| --- | --- |
+| `okftype` | 页面种类；本例为接口文档 `reference.api`。 |
+| `description` | 简洁说明核心行为和关键约束。 |
+| `tag` | 只写 `roles`、`operations`、`traits`，值来自冻结词表；不适用的 namespace 省略。 |
+| `dependencies` | 正文有依据的文档关系，包含 `path`、`kind`；条件关系可带 `condition`。 |
+| `version` | CANN 生命周期区间，不表示芯片架构。 |
+
+架构、签名、重载 ID、头文件位置和样例关联由索引推导，不写入这五个字段。
+
+**真实示例**
+
+来源：`docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_addc.md`。
+
+```yaml
+---
+okftype: reference.api
+description: "根据掩码对两个32位整数矢量及输入进位逐元素求和，将低32位结果和每个元素的进位分别写入矢量与掩码寄存器；仅在AIV上生效，支持int32_t和uint32_t。"
+tag:
+  - roles: [compute]
+  - operations: [add]
+  - traits: [carry_input, elementwise, supports_carry_output]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/overview.md
+    kind: constrained_by
+version: ">=9.0.0"
+---
+# asc_addc
+```
+
+该头表达带输入进位的逐元素加法，输出计算结果和进位；`constrained_by` 指向 Reg 矢量计算
+通用约束文档。文档标题和正文原型用于匹配 include 声明。
+
+### 3.2 include 头：Doxygen 与函数声明
+
+**标准格式**
+
+Doxygen 块放在每个具体重载声明上方，参数描述使用英文。`override_id` 按具体签名生成，
+同名函数的不同重载各有独立 ID；参数类型来自紧随注释的声明。
+
+```cpp
+/**
+ * @ingroup simd_c_api.<API category>
+ * @override_id <canonical overload ID>
+ * @archs <NPU architecture numbers>
+ * @param [out] dst Destination operand.
+ * @param [in] src Source operand.
+ * @param [in,out] state Input and output state.
+ */
+// The corresponding concrete function declaration follows here.
+```
+
+| 标注 | 标准含义 |
+| --- | --- |
+| `@ingroup` | API 所属分类。 |
+| `@override_id` | 具体重载的唯一 ID，也是连接样例的键。 |
+| `@archs` | 适用架构号，如 `3510`；多个架构按空格分隔。 |
+| `@param [in/out/in,out]` | 参数名、方向及英文语义描述，需与声明对应。 |
+
+**真实示例**
+
+来源：`include/c_api/reg_compute/compute/reg_arith.h`，以下展示 `uint32_t` 重载。
+
+```cpp
+/**
+ * @ingroup simd_c_api.reg_compute.reg_arith
+ * @override_id asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb
+ * @archs 3510
+ * @param [out] carry Destination operand (mask register). Stores the carry output of the addition.
+ * @param [out] dst Destination operand (vector data register).
+ * @param [in] src0 Source operand (vector data register).
+ * @param [in] src1 Source operand (vector data register).
+ * @param [in] carry_src Source operand (mask register). Provides the input carry flags.
+ * @param [in] mask Source operand mask (mask register). A value of 1 at the corresponding position selects an element
+ * for computation; a value of 0 excludes it. Unselected elements are set to zero in the output.
+ */
+__simd_callee__ inline void asc_addc(
+    vector_bool& carry, vector_uint32_t& dst, vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src,
+    vector_bool mask);
+```
+
+`carry` 和 `dst` 是输出，`src0`、`src1`、`carry_src`、`mask` 是输入；`@archs 3510`
+表示适用 A5。`int32_t` 重载使用独立 ID：`asc_addc__Rvb_Rvi32_vi32_vi32_vb_vb`。
+
+### 3.3 样例头：成对 override_id marker
+
+**标准格式**
+
+每个源文件用一对 marker 包住所有重点 API 的共同展示范围，从首次重点调用所在行到末次
+重点调用结束行，可跨函数。首尾 ID 列表一致，ID 去重，并与 include 中的 `@override_id`
+精确对应。范围是展示片段，不要求独立编译。
+
+```cpp
+//! [id1, id2, ...]
+// Shared source range containing the featured API calls.
+//! [id1, id2, ...]
+```
+
+只有一个重载时仍使用 `//! [override_id]`；同一重载调用多次，在列表中只出现一次。
+
+**真实示例**
+
+来源：`examples/02_simd_c_api/03_c_api/02_reg_vector_compute/addc/addc.asc`，以下为 `addc_vf` 函数内片段。
+
+```cpp
+vector_uint32_t dst_reg;
+vector_uint32_t src0_reg;
+vector_uint32_t src1_reg;
+vector_bool carry;
+uint32_t count = ELEMENT_COUNT;
+vector_bool mask = asc_update_mask_b32(count);
+vector_bool carry_src = mask;
+asc_loadalign(src0_reg, src0);
+asc_loadalign(src1_reg, src1);
+//! [asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb]
+asc_addc(carry, dst_reg, src0_reg, src1_reg, carry_src, mask);
+//! [asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb]
+asc_storealign(dst, dst_reg, mask);
+asc_storealign(carry_out, carry);
+```
+
+本例只有一个重点 `asc_addc` 调用，因此 marker 的共同范围只包含该行。外围加载、掩码和
+存储代码提供调用上下文；marker 中的 `asc_addc__Rvb_Rvu32_vu32_vu32_vb_vb` 与 3.2 节
+无符号整数重载的 ID 完全相同。
+
+三类头通过“文档的 API 名称与原型 → include 具体声明 → `override_id` → 样例范围”关联。
+`build_index.py` 消费它们生成索引，`ensure_index.py` 检查索引新鲜度，`query.py` 再从索引检索
+接口、文档和样例关联。
