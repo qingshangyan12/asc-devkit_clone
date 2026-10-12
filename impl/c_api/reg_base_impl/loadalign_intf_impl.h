@@ -2675,6 +2675,134 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_flo
     }
 }
 
+__simd_callee__ inline c_api::reg_pair<vector_int8_t, vector_int8_t>
+asc_loadalign_deintlv(__ubuf__ int8_t* src)
+{
+    c_api::reg_pair<vector_int8_t, vector_int8_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint8_t, vector_uint8_t>
+asc_loadalign_deintlv(__ubuf__ uint8_t* src)
+{
+    c_api::reg_pair<vector_uint8_t, vector_uint8_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp4x2_e2m1_t, vector_fp4x2_e2m1_t>
+asc_loadalign_deintlv(__ubuf__ fp4x2_e2m1_t* src)
+{
+    c_api::reg_pair<vector_fp4x2_e2m1_t, vector_fp4x2_e2m1_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp4x2_e1m2_t, vector_fp4x2_e1m2_t>
+asc_loadalign_deintlv(__ubuf__ fp4x2_e1m2_t* src)
+{
+    c_api::reg_pair<vector_fp4x2_e1m2_t, vector_fp4x2_e1m2_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int4x2_t, vector_int4x2_t>
+asc_loadalign_deintlv(__ubuf__ int4b_t* src)
+{
+    c_api::reg_pair<vector_int4x2_t, vector_int4x2_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e8m0_t, vector_fp8_e8m0_t>
+asc_loadalign_deintlv(__ubuf__ fp8_e8m0_t* src)
+{
+    c_api::reg_pair<vector_fp8_e8m0_t, vector_fp8_e8m0_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e5m2_t, vector_fp8_e5m2_t>
+asc_loadalign_deintlv(__ubuf__ fp8_e5m2_t* src)
+{
+    c_api::reg_pair<vector_fp8_e5m2_t, vector_fp8_e5m2_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e4m3fn_t, vector_fp8_e4m3fn_t>
+asc_loadalign_deintlv(__ubuf__ fp8_e4m3fn_t* src)
+{
+    c_api::reg_pair<vector_fp8_e4m3fn_t, vector_fp8_e4m3fn_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_hifloat8_t, vector_hifloat8_t>
+asc_loadalign_deintlv(__ubuf__ hifloat8_t* src)
+{
+    c_api::reg_pair<vector_hifloat8_t, vector_hifloat8_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int16_t, vector_int16_t>
+asc_loadalign_deintlv(__ubuf__ int16_t* src)
+{
+    c_api::reg_pair<vector_int16_t, vector_int16_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint16_t, vector_uint16_t>
+asc_loadalign_deintlv(__ubuf__ uint16_t* src)
+{
+    c_api::reg_pair<vector_uint16_t, vector_uint16_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_half, vector_half>
+asc_loadalign_deintlv(__ubuf__ half* src)
+{
+    c_api::reg_pair<vector_half, vector_half> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bfloat16_t, vector_bfloat16_t>
+asc_loadalign_deintlv(__ubuf__ bfloat16_t* src)
+{
+    c_api::reg_pair<vector_bfloat16_t, vector_bfloat16_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_int32_t>
+asc_loadalign_deintlv(__ubuf__ int32_t* src)
+{
+    c_api::reg_pair<vector_int32_t, vector_int32_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_uint32_t>
+asc_loadalign_deintlv(__ubuf__ uint32_t* src)
+{
+    c_api::reg_pair<vector_uint32_t, vector_uint32_t> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_float, vector_float>
+asc_loadalign_deintlv(__ubuf__ float* src)
+{
+    c_api::reg_pair<vector_float, vector_float> result;
+    asc_loadalign_deintlv(result.first, result.second, src);
+    return result;
+}
+
 __simd_callee__ inline void asc_loadalign_deintlv(
     vector_fp4x2_e1m2_t& dst0, vector_fp4x2_e1m2_t& dst1, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset)
 {

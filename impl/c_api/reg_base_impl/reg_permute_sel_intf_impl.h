@@ -705,6 +705,134 @@ __simd_callee__ inline void asc_intlv(
     }
 }
 
+__simd_callee__ inline c_api::reg_pair<vector_uint8_t, vector_uint8_t>
+asc_intlv(vector_uint8_t src0, vector_uint8_t src1)
+{
+    c_api::reg_pair<vector_uint8_t, vector_uint8_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int8_t, vector_int8_t>
+asc_intlv(vector_int8_t src0, vector_int8_t src1)
+{
+    c_api::reg_pair<vector_int8_t, vector_int8_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint16_t, vector_uint16_t>
+asc_intlv(vector_uint16_t src0, vector_uint16_t src1)
+{
+    c_api::reg_pair<vector_uint16_t, vector_uint16_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int16_t, vector_int16_t>
+asc_intlv(vector_int16_t src0, vector_int16_t src1)
+{
+    c_api::reg_pair<vector_int16_t, vector_int16_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_uint32_t>
+asc_intlv(vector_uint32_t src0, vector_uint32_t src1)
+{
+    c_api::reg_pair<vector_uint32_t, vector_uint32_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_int32_t>
+asc_intlv(vector_int32_t src0, vector_int32_t src1)
+{
+    c_api::reg_pair<vector_int32_t, vector_int32_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_half, vector_half>
+asc_intlv(vector_half src0, vector_half src1)
+{
+    c_api::reg_pair<vector_half, vector_half> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_float, vector_float>
+asc_intlv(vector_float src0, vector_float src1)
+{
+    c_api::reg_pair<vector_float, vector_float> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e8m0_t, vector_fp8_e8m0_t>
+asc_intlv(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1)
+{
+    c_api::reg_pair<vector_fp8_e8m0_t, vector_fp8_e8m0_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e5m2_t, vector_fp8_e5m2_t>
+asc_intlv(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1)
+{
+    c_api::reg_pair<vector_fp8_e5m2_t, vector_fp8_e5m2_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e4m3fn_t, vector_fp8_e4m3fn_t>
+asc_intlv(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1)
+{
+    c_api::reg_pair<vector_fp8_e4m3fn_t, vector_fp8_e4m3fn_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_hifloat8_t, vector_hifloat8_t>
+asc_intlv(vector_hifloat8_t src0, vector_hifloat8_t src1)
+{
+    c_api::reg_pair<vector_hifloat8_t, vector_hifloat8_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bfloat16_t, vector_bfloat16_t>
+asc_intlv(vector_bfloat16_t src0, vector_bfloat16_t src1)
+{
+    c_api::reg_pair<vector_bfloat16_t, vector_bfloat16_t> result;
+    asc_intlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bool, vector_bool>
+asc_intlv_b8(vector_bool src0, vector_bool src1)
+{
+    c_api::reg_pair<vector_bool, vector_bool> result;
+    asc_intlv_b8(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bool, vector_bool>
+asc_intlv_b16(vector_bool src0, vector_bool src1)
+{
+    c_api::reg_pair<vector_bool, vector_bool> result;
+    asc_intlv_b16(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bool, vector_bool>
+asc_intlv_b32(vector_bool src0, vector_bool src1)
+{
+    c_api::reg_pair<vector_bool, vector_bool> result;
+    asc_intlv_b32(result.first, result.second, src0, src1);
+    return result;
+}
+
 __simd_callee__ inline vector_uint8_t asc_unsqueeze_u8(vector_bool mask)
 {
     vector_uint8_t dst;
@@ -940,6 +1068,134 @@ __simd_callee__ inline void asc_deintlv_b32(vector_bool& dst0, vector_bool& dst1
     if ASC_IS_AIV {
         pdintlv_b32(dst0, dst1, src0, src1);
     }
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_int32_t>
+asc_deintlv(vector_int32_t src0, vector_int32_t src1)
+{
+    c_api::reg_pair<vector_int32_t, vector_int32_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_uint32_t>
+asc_deintlv(vector_uint32_t src0, vector_uint32_t src1)
+{
+    c_api::reg_pair<vector_uint32_t, vector_uint32_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int16_t, vector_int16_t>
+asc_deintlv(vector_int16_t src0, vector_int16_t src1)
+{
+    c_api::reg_pair<vector_int16_t, vector_int16_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint16_t, vector_uint16_t>
+asc_deintlv(vector_uint16_t src0, vector_uint16_t src1)
+{
+    c_api::reg_pair<vector_uint16_t, vector_uint16_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_int8_t, vector_int8_t>
+asc_deintlv(vector_int8_t src0, vector_int8_t src1)
+{
+    c_api::reg_pair<vector_int8_t, vector_int8_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_uint8_t, vector_uint8_t>
+asc_deintlv(vector_uint8_t src0, vector_uint8_t src1)
+{
+    c_api::reg_pair<vector_uint8_t, vector_uint8_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e4m3fn_t, vector_fp8_e4m3fn_t>
+asc_deintlv(vector_fp8_e4m3fn_t src0, vector_fp8_e4m3fn_t src1)
+{
+    c_api::reg_pair<vector_fp8_e4m3fn_t, vector_fp8_e4m3fn_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_hifloat8_t, vector_hifloat8_t>
+asc_deintlv(vector_hifloat8_t src0, vector_hifloat8_t src1)
+{
+    c_api::reg_pair<vector_hifloat8_t, vector_hifloat8_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e5m2_t, vector_fp8_e5m2_t>
+asc_deintlv(vector_fp8_e5m2_t src0, vector_fp8_e5m2_t src1)
+{
+    c_api::reg_pair<vector_fp8_e5m2_t, vector_fp8_e5m2_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_fp8_e8m0_t, vector_fp8_e8m0_t>
+asc_deintlv(vector_fp8_e8m0_t src0, vector_fp8_e8m0_t src1)
+{
+    c_api::reg_pair<vector_fp8_e8m0_t, vector_fp8_e8m0_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bfloat16_t, vector_bfloat16_t>
+asc_deintlv(vector_bfloat16_t src0, vector_bfloat16_t src1)
+{
+    c_api::reg_pair<vector_bfloat16_t, vector_bfloat16_t> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_float, vector_float>
+asc_deintlv(vector_float src0, vector_float src1)
+{
+    c_api::reg_pair<vector_float, vector_float> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_half, vector_half>
+asc_deintlv(vector_half src0, vector_half src1)
+{
+    c_api::reg_pair<vector_half, vector_half> result;
+    asc_deintlv(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bool, vector_bool>
+asc_deintlv_b8(vector_bool src0, vector_bool src1)
+{
+    c_api::reg_pair<vector_bool, vector_bool> result;
+    asc_deintlv_b8(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bool, vector_bool>
+asc_deintlv_b16(vector_bool src0, vector_bool src1)
+{
+    c_api::reg_pair<vector_bool, vector_bool> result;
+    asc_deintlv_b16(result.first, result.second, src0, src1);
+    return result;
+}
+
+__simd_callee__ inline c_api::reg_pair<vector_bool, vector_bool>
+asc_deintlv_b32(vector_bool src0, vector_bool src1)
+{
+    c_api::reg_pair<vector_bool, vector_bool> result;
+    asc_deintlv_b32(result.first, result.second, src0, src1);
+    return result;
 }
 
 __simd_callee__ inline vector_uint16_t asc_unpack_upper(vector_uint8_t src)
