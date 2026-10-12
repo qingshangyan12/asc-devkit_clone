@@ -155,6 +155,7 @@ add_custom_command(
 )
 
 add_subdirectory(mc2_ccu)
+add_subdirectory(collective_dsl)
 
 # Isolate primitive interception from the existing simulator and production libraries.
 set(MESHCHUNK_TEST_TARGET ascendc_ut_adv_api_hccl_cc_meshchunk)

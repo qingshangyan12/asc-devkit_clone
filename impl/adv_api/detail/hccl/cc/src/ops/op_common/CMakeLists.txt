@@ -12,6 +12,7 @@ add_subdirectory(selector)
 add_subdirectory(template)
 add_subdirectory(topo)
 add_subdirectory(external_alg)
+add_subdirectory(collective_dsl)
 
 set(src_list
     ${CMAKE_CURRENT_SOURCE_DIR}/op_common.cc
