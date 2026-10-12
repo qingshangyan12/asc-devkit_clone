@@ -38,15 +38,13 @@
 
 ```cpp
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_int4x22bfloat16(
-                                                vector_bfloat16_t& dst,
+__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst,
                                                 vector_int4x2_t src,
                                                 vector_bool mask,
                                                 std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16(
-                                                             vector_int4x2_t src,
+__simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16(vector_int4x2_t src,
                                                              vector_bool mask,
                                                              std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
 ```
@@ -68,16 +66,14 @@ enum class asc_position_quarter_mode {
 
 ```cpp
 // 通过引用参数输出结果
-__simd_callee__ inline void asc_int4x22bfloat16(
-                                                vector_bfloat16_t& dst,
+__simd_callee__ inline void asc_int4x22bfloat16(vector_bfloat16_t& dst,
                                                 vector_int4x2_t src,
                                                 vector_bool mask,
                                                 std::integral_constant<asc_position_quarter_mode,
                                                                        asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
 
 // 通过函数返回值返回结果
-__simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16(
-                                                             vector_int4x2_t src,
+__simd_callee__ inline vector_bfloat16_t asc_int4x22bfloat16(vector_int4x2_t src,
                                                              vector_bool mask,
                                                              std::integral_constant<asc_position_quarter_mode,
                                                                                     asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)

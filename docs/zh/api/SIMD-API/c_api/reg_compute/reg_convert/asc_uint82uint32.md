@@ -62,16 +62,14 @@ enum class asc_position_quarter_mode {
 
 ```c
 // 通过引用参数输出结果
-__simd_callee__ inline void asc_uint82uint32(
-                                             vector_uint32_t& dst,
+__simd_callee__ inline void asc_uint82uint32(vector_uint32_t& dst,
                                              vector_uint8_t src,
                                              vector_bool mask,
                                              std::integral_constant<asc_position_quarter_mode,
                                                                     asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
 
 // 通过函数返回值返回结果
-__simd_callee__ inline vector_uint32_t asc_uint82uint32(
-                                                        vector_uint8_t src,
+__simd_callee__ inline vector_uint32_t asc_uint82uint32(vector_uint8_t src,
                                                         vector_bool mask,
                                                         std::integral_constant<asc_position_quarter_mode,
                                                                                asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)

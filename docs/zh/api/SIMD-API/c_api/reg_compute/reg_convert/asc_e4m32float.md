@@ -62,16 +62,14 @@ enum class asc_position_quarter_mode {
 
 ```c
 // 通过引用参数输出结果
-__simd_callee__ inline void asc_e4m32float(
-                                           vector_float& dst,
+__simd_callee__ inline void asc_e4m32float(vector_float& dst,
                                            vector_fp8_e4m3fn_t src,
                                            vector_bool mask,
                                            std::integral_constant<asc_position_quarter_mode,
                                                                   asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
 
 // 通过函数返回值返回结果
-__simd_callee__ inline vector_float asc_e4m32float(
-                                                   vector_fp8_e4m3fn_t src,
+__simd_callee__ inline vector_float asc_e4m32float(vector_fp8_e4m3fn_t src,
                                                    vector_bool mask,
                                                    std::integral_constant<asc_position_quarter_mode,
                                                                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)

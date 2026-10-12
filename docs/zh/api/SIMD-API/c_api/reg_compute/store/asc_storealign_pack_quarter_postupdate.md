@@ -36,8 +36,7 @@
 
 ```c
 // 占位符形式
-__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
-                                                                   __ubuf__ <dtype>*& dst,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ <dtype>*& dst,
                                                                    vector_<dtype> src,
                                                                    int32_t offset,
                                                                    vector_bool mask)
@@ -50,8 +49,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
 ### 函数原型典型示例
 
 ```c
-__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(
-                                                                   __ubuf__ int32_t*& dst,
+__simd_callee__ inline void asc_storealign_pack_quarter_postupdate(__ubuf__ int32_t*& dst,
                                                                    vector_int32_t src,
                                                                    int32_t offset,
                                                                    vector_bool mask)

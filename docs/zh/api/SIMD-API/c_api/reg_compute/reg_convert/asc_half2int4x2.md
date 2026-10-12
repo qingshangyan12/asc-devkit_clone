@@ -40,15 +40,13 @@
 
 ```cpp
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_half2int4x2_<round_mode><sat_mode>(
-                                                                   vector_int4x2_t& dst,
+__simd_callee__ inline void asc_half2int4x2_<round_mode><sat_mode>(vector_int4x2_t& dst,
                                                                    vector_half src,
                                                                    vector_bool mask,
                                                                    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_int4x2_t asc_half2int4x2_<round_mode><sat_mode>(
-                                                                              vector_half src,
+__simd_callee__ inline vector_int4x2_t asc_half2int4x2_<round_mode><sat_mode>(vector_half src,
                                                                               vector_bool mask,
                                                                               std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
@@ -73,16 +71,14 @@ enum class asc_position_quarter_mode {
 
 ```cpp
 // ROUND舍入模式，非饱和模式，通过引用参数输出结果
-__simd_callee__ inline void asc_half2int4x2_rna(
-                                                vector_int4x2_t& dst,
+__simd_callee__ inline void asc_half2int4x2_rna(vector_int4x2_t& dst,
                                                 vector_half src,
                                                 vector_bool mask,
                                                 std::integral_constant<asc_position_quarter_mode,
                                                                        asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 
 // ROUND舍入模式，非饱和模式，通过函数返回值返回结果
-__simd_callee__ inline vector_int4x2_t asc_half2int4x2_rna(
-                                                           vector_half src,
+__simd_callee__ inline vector_int4x2_t asc_half2int4x2_rna(vector_half src,
                                                            vector_bool mask,
                                                            std::integral_constant<asc_position_quarter_mode,
                                                                                   asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
