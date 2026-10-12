@@ -203,7 +203,7 @@ Ascend C资料体系由**五份**核心文档组成，通过交叉链接形成�
 **提示**：VF融合并非范围越大越好。融合粒度过大可能导致寄存器溢出，反而使性能下降。更多优化手段可以参考[VF融合优化](../../../../operator_practice/simd_operator_optimization/vector_compute/vf_optimization/vf_fusion_optimization.md)和[VF循环优化](../../../../operator_practice/simd_operator_optimization/vector_compute/vf_optimization/vf_loop_optimization.md)。
 ```
 
-**L3**：在如下编程指南中提及提及架构版本差异，链接到跨代迁移兼容性指南的对应文档。
+**L3**：在如下编程指南中提及架构版本差异，链接到跨代迁移兼容性指南的对应文档。
 
 ```text
 与NPU架构版本2201相比，NPU架构版本3510的主要差异如下：
@@ -424,7 +424,7 @@ inQueueY.FreeTensor(yLocal);
 |--------|---------|---------|
 | SPMD vs SIMD vs SIMT | SPMD=编程模型、SIMD=指令执行模式、SIMT=线程执行模式 | 层级关系图 |
 | 四步法(Tiling→搬→算→搬) vs TPipe四步(Alloc→EnQue→...) | 编程流程vs流水管理范式 | 对比表 |
-| DMA vs MTE vs DataCopy | 三层名同一件事 | 术语映射表 |
+| DMA vs MTE vs DataCopy | 直接内存访问单元/搬运单元/数据搬运接口 | 术语映射表 |
 | MemBase(基础API) vs RegBase(VF融合API) | 计算位置不同(UB vs寄存器)、Load/Store次数不同 | 对比表+场景推荐 |
 | Block vs CTA | Ascend C编程单元vs CUDA等价概念 | 竞品映射表 |
 | `LocalTensor` vs `GlobalTensor` vs `TBuf` | 计算用/外部用/临时用缓冲区 | 对照表+场景推荐 |
@@ -563,12 +563,12 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     AscendC::LocalTensor<float> xLocal = ubAllocator.Alloc<float, 48>();
     AscendC::LocalTensor<float> yLocal = ubAllocator.Alloc<float, 48>();
     AscendC::LocalTensor<float> zLocal = ubAllocator.Alloc<float, 48>();
-    
+
     AscendC::GlobalTensor<float> xGlobal, yGlobal, zGlobal;
     xGlobal.SetGlobalBuffer((__gm__ float*)x);
     yGlobal.SetGlobalBuffer((__gm__ float*)y);
     zGlobal.SetGlobalBuffer((__gm__ float*)z);
-    
+
     // ...
     // 1. Step 1: Data transfer in, execution pipeline is PIPE_MTE2
     AscendC::Mutex::Lock<PIPE_MTE2>(mutex_id);
@@ -580,7 +580,7 @@ __global__ __vector__ void add_kernel(__gm__ float* x, __gm__ float* y, __gm__ f
     AscendC::Mutex::Lock<PIPE_V>(mutex_id);
     AscendC::Add(zLocal, xLocal, yLocal, 48);
     AscendC::Mutex::Unlock<PIPE_V>(mutex_id);
-    
+
     // 3. Step 3: Data transfer out, execution pipeline is PIPE_MTE3
     AscendC::Mutex::Lock<PIPE_MTE3>(mutex_id);
     AscendC::DataCopy(zGlobal, zLocal, 48);
@@ -880,7 +880,7 @@ int32_t main(int32_t argc, char* argv[])
 
     ```
     ...
-    
+
     target_compile_options(demo PRIVATE
         // 将dav-xxxx更换为对应NPU架构版本号
         $<$<COMPILE_LANGUAGE:ASC>:--npu-arch=dav-xxxx>
