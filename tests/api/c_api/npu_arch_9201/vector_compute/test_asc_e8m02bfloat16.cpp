@@ -50,3 +50,41 @@ TEST(E8m0ToBf16, ReturnAndV2Overloads)
     (void)odd;
     GlobalMockObject::verify();
 }
+
+namespace {
+void AscCastE8m0ToBf16EvenStub(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal part)
+{
+    EXPECT_EQ(part, PART_EVEN);
+}
+
+void AscCastE8m0ToBf16OddStub(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal part)
+{
+    EXPECT_EQ(part, PART_ODD);
+}
+} // namespace
+
+TEST(AscCastE8m0ToBf16, Even)
+{
+    vector_bfloat16_t dst;
+    vector_fp8_e8m0_t src;
+    vector_bool mask;
+    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
+        .times(1)
+        .will(invoke(AscCastE8m0ToBf16EvenStub));
+
+    asc_cast(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+TEST(AscCastE8m0ToBf16, Odd)
+{
+    vector_bfloat16_t dst;
+    vector_fp8_e8m0_t src;
+    vector_bool mask;
+    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
+        .times(1)
+        .will(invoke(AscCastE8m0ToBf16OddStub));
+
+    asc_cast(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
