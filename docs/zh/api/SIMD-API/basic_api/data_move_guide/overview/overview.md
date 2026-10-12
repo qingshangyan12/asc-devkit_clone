@@ -8,7 +8,9 @@
 - **逻辑位置（TPosition）与物理内存的映射：** Ascend C通过TPosition机制隐藏硬件差异，开发者需理解VECIN/VECOUT/A1/B1/CO1等逻辑位置对应的实际物理存储。
 - **搬运功能分类：** 基础数据搬运、高维切分搬运、切片搬运、随路格式转换（ND2NZ/NZ2ND/DN2NZ）、随路量化激活、非对齐搬运、Unified Buffer（UB）内部搬运（Copy）、矩阵分形搬运（LoadData（2D矩阵搬运）/LoadData（卷积数据搬运））、多维数据搬运NDDMA等功能的概念与适用场景。
 - **关键参数概念：** DataBlock、blockLen、blockCount、srcStride/dstStride、repeat等参数的物理含义与配置方式。
-- **通用约束：** 所有数据搬运接口共性的地址对齐要求、数据量约束、同步规则等。
+- **总体约束：** 所有数据搬运接口共性的地址对齐要求、数据量约束、同步规则等。
+
+概览章节包含的具体文档如下：
 
 - **[数据搬运概念](data_move_concept.md)**  
 
