@@ -141,7 +141,7 @@ void AicpuStFixture::RunRankInner(
 
     bool skipGetRes = false;
     if (HandleSingleRankAndCommMode(comm, opParam, skipGetRes) != HCCL_SUCCESS || skipGetRes) {
-        result.error = "HandleSingleRankAndCommMode failed or skipped";
+        result.error = "HandleSingleRankAndCommMode failed or skipped (single-rank scenario not supported in phase 1)";
         (void)HcclCommDestroy(comm);
         return;
     }
@@ -240,10 +240,16 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
         }
     }
 
-    // golden 期望
+    // 集合通信各 rank 必须选同一算法——divergence 即算法缺陷
+    for (uint32_t rank = 1; rank < rankSize; ++rank) {
+        EXPECT_EQ(results[rank].algName, results[0].algName) << "selector divergence across ranks";
+    }
+    const std::string& actualAlgName = results[0].algName;
+
+    // golden 期望：按实际选中算法键控（expectedAlgName 留空模式不影响 golden 选择）
     std::vector<std::vector<uint8_t>> expected(rankSize);
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
-        expected[rank] = BuildExpectedOutput(rankSize, scenario, rank);
+        expected[rank] = BuildExpectedOutput(rankSize, scenario, rank, actualAlgName);
     }
 
     // 任务图真执行 + 死锁定位

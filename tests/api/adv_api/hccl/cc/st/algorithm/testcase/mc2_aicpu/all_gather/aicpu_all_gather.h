@@ -27,7 +27,8 @@ using ExpectationBuilder = std::function<std::vector<uint8_t>(uint32_t, const Ai
 
 class AicpuStAllGather : public AicpuStFixture {
 public:
-    // 按 expectedAlgName 注册变体的 golden 构造器；未注册的算法走默认拼接语义
+    // 按算法名注册变体的 golden 构造器；查找键为 selector 实际选中的算法名（与
+    // scenario.expectedAlgName 解耦——后者仅为断言字段）。未注册的算法走默认拼接语义
     static void RegisterVariant(const std::string& algName, const ExpectationBuilder& builder);
 
     // 拼接语义 golden：output[r] = concat(input[0..N-1])；默认回退与各算法变体共用
@@ -37,7 +38,8 @@ protected:
     void PrepareOpParam(
         OpParam& opParam, uint32_t rankSize, const AicpuStScenario& scenario, const RankMem& mem) override;
 
-    std::vector<uint8_t> BuildExpectedOutput(uint32_t rankSize, const AicpuStScenario& scenario, RankId rank) override;
+    std::vector<uint8_t> BuildExpectedOutput(
+        uint32_t rankSize, const AicpuStScenario& scenario, RankId rank, const std::string& actualAlgName) override;
 
 private:
     static std::map<std::string, ExpectationBuilder>& GetVariantRegistry();

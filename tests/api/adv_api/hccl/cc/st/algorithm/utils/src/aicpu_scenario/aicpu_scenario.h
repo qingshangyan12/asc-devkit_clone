@@ -27,7 +27,7 @@ struct AicpuStScenario {
     HcclDataType dataType = HCCL_DATA_TYPE_FP16;
     HcclCMDType opType = HcclCMDType::HCCL_CMD_ALLGATHER;
 
-    // 期望 selector 选出的算法名（空=跳过断言）
+    // 期望 selector 选出的算法名（空=跳过断言；与 golden 选择解耦，golden 按实际选中算法键控）
     std::string expectedAlgName;
     // 经 tiling.algConfig 强制指定算法（空=自动选择，等价 "default"）
     std::string algConfig;
