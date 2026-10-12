@@ -2493,7 +2493,7 @@ __aicore__ inline void asc_copy_l12ub(
     uint16_t src_gap, uint16_t dst_gap)
 {
     if ASC_IS_AIC {
-        copy_cbuf_to_ubuf(dst_addr, src_addr, static_cast<bool>(sub_blockid), burst_count, burst_len, src_gap, dst_gap);
+        copy_cbuf_to_ubuf(dst_addr, src_addr, sub_blockid, burst_count, burst_len, src_gap, dst_gap);
     }
 }
 
