@@ -53,3 +53,47 @@ TEST_VECTOR_COMPUTE_VCVT_INSTR_2(
 TEST_VECTOR_COMPUTE_VCVT_INSTR_2(
     Half2e5m2_rn_sat_v2, asc_half2e5m2_rn_sat_v2, vcvt, vector_fp8_e5m2_t, vector_half, ROUND_R, RS_ENABLE, PART_ODD,
     MODE_ZEROING, 13);
+
+#define TEST_ASC_CAST_HALF_TO_E5M2(                                                                              \
+    test_name, c_api_name, saturation_mode, dst_pos, expected_sat, expected_part, expected_mode)                 \
+    namespace {                                                                                                  \
+    void test_name##Stub(                                                                                        \
+        vector_fp8_e5m2_t&, vector_half, vector_bool, Literal round, Literal sat, Literal part, Literal mode)    \
+    {                                                                                                            \
+        EXPECT_EQ(round, ROUND_R);                                                                               \
+        EXPECT_EQ(sat, expected_sat);                                                                            \
+        EXPECT_EQ(part, expected_part);                                                                          \
+        EXPECT_EQ(mode, expected_mode);                                                                          \
+    }                                                                                                            \
+    }                                                                                                            \
+                                                                                                                 \
+    TEST(AscCastHalfToE5m2, test_name)                                                                           \
+    {                                                                                                            \
+        vector_fp8_e5m2_t dst;                                                                                   \
+        vector_half src;                                                                                         \
+        vector_bool mask;                                                                                        \
+                                                                                                                 \
+        MOCKER_CPP(vcvt, void(vector_fp8_e5m2_t&, vector_half, vector_bool, Literal, Literal, Literal, Literal)) \
+            .times(1)                                                                                            \
+            .will(invoke(test_name##Stub));                                                                      \
+                                                                                                                 \
+        c_api_name(dst, src, mask, ASC_CAST_RN, saturation_mode, dst_pos);                                       \
+        GlobalMockObject::verify();                                                                              \
+    }
+
+TEST_ASC_CAST_HALF_TO_E5M2(
+    CastNoSatEven, asc_cast, ASC_CAST_NO_SAT, ASC_POSITION_EVEN, RS_DISABLE, PART_EVEN, MODE_ZEROING);
+TEST_ASC_CAST_HALF_TO_E5M2(CastSatEven, asc_cast, ASC_CAST_SAT, ASC_POSITION_EVEN, RS_ENABLE, PART_EVEN, MODE_ZEROING);
+TEST_ASC_CAST_HALF_TO_E5M2(
+    CastNoSatOdd, asc_cast, ASC_CAST_NO_SAT, ASC_POSITION_ODD, RS_DISABLE, PART_ODD, MODE_ZEROING);
+TEST_ASC_CAST_HALF_TO_E5M2(CastSatOdd, asc_cast, ASC_CAST_SAT, ASC_POSITION_ODD, RS_ENABLE, PART_ODD, MODE_ZEROING);
+TEST_ASC_CAST_HALF_TO_E5M2(
+    CastMergeNoSatEven, asc_cast_merge, ASC_CAST_NO_SAT, ASC_POSITION_EVEN, RS_DISABLE, PART_EVEN, MODE_MERGING);
+TEST_ASC_CAST_HALF_TO_E5M2(
+    CastMergeSatEven, asc_cast_merge, ASC_CAST_SAT, ASC_POSITION_EVEN, RS_ENABLE, PART_EVEN, MODE_MERGING);
+TEST_ASC_CAST_HALF_TO_E5M2(
+    CastMergeNoSatOdd, asc_cast_merge, ASC_CAST_NO_SAT, ASC_POSITION_ODD, RS_DISABLE, PART_ODD, MODE_MERGING);
+TEST_ASC_CAST_HALF_TO_E5M2(
+    CastMergeSatOdd, asc_cast_merge, ASC_CAST_SAT, ASC_POSITION_ODD, RS_ENABLE, PART_ODD, MODE_MERGING);
+
+#undef TEST_ASC_CAST_HALF_TO_E5M2
