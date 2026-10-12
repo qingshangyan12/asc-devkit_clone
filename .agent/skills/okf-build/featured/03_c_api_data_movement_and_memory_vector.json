@@ -1,0 +1,214 @@
+{
+  "examples": [
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_gm2l1",
+      "apis": [
+        "asc_copy_gm2l1",
+        "asc_copy_gm2l1_dn2nz",
+        "asc_copy_gm2l1_nd2nz",
+        "asc_copy_l0c2gm",
+        "asc_copy_l12fb",
+        "asc_set_gm2l1_nz_para",
+        "asc_set_l0c_copy_config",
+        "asc_sync_notify",
+        "asc_sync_pipe",
+        "asc_sync_wait"
+      ],
+      "evidence": [
+        "本样例介绍如何使用Ascend C C API将输入数据从GM（Global Memory）搬运到L1（L1 Buffer）",
+        "使用`asc_copy_gm2l1`将Nz格式的输入数据从GM搬运到L1",
+        "使用`asc_set_gm2l1_nz_para`配置ND2NZ参数，再使用`asc_copy_gm2l1_nd2nz`将ND格式的输入数据从GM搬运到L1，并转换为Nz格式"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2gm",
+      "apis": [
+        "asc_copy_l0c2gm",
+        "asc_copy_gm2l1",
+        "asc_copy_l12fb",
+        "asc_set_l0c_copy_config",
+        "asc_set_l0c_copy_prequant",
+        "asc_sync_pipe"
+      ],
+      "evidence": [
+        "本样例演示如何使用Ascend C C API，通过Fixpipe将矩阵乘计算结果从L0C Buffer搬运到GM（Global Memory）",
+        "调用`asc_set_l0c_copy_prequant`配置标量反量化参数，使用`DEQF16`模式",
+        "量化参数先通过`asc_copy_gm2l1`从GM搬运到L1 Buffer，再通过`asc_copy_l12fb`搬运到Fixpipe Buffer"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2l1",
+      "apis": [
+        "asc_copy_l0c2l1",
+        "asc_copy_gm2l1",
+        "asc_copy_l12fb",
+        "asc_copy_l12ub",
+        "asc_set_l0c_copy_config",
+        "asc_set_l0c_copy_prequant",
+        "asc_sync_block_arrive",
+        "asc_sync_pipe"
+      ],
+      "evidence": [
+        "本样例演示如何使用Ascend C C API，通过Fixpipe将矩阵乘计算结果从L0C Buffer搬运到L1（L1 Buffer）",
+        "再通过`asc_copy_l12ub`将L1结果异步搬运到subblock0的UB",
+        "调用`asc_set_l0c_copy_prequant`配置标量反量化参数，使用`DEQF16`模式"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_l0c2ub",
+      "apis": [
+        "asc_copy_l0c2ub",
+        "asc_copy_gm2l1",
+        "asc_copy_l12fb",
+        "asc_set_l0c_copy_config",
+        "asc_set_l0c_copy_prequant",
+        "asc_sync_pipe"
+      ],
+      "evidence": [
+        "本样例演示如何使用Ascend C C API，通过Fixpipe将矩阵乘计算结果从L0C Buffer搬运到UB（Unified Buffer）",
+        "使用`asc_copy_l0c2ub`的`DUAL_DST_SPLIT_M`和`NoQuant`模式，将结果按M维均分至两个AIV的UB，再由两个AIV分别写回对应的GM分片"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/data_copy_ub2l1",
+      "apis": [
+        "asc_copy_gm2ub",
+        "asc_copy_l0c2gm",
+        "asc_copy_l12l0a",
+        "asc_copy_l12l0b_transpose",
+        "asc_copy_l12ub",
+        "asc_copy_ub2gm",
+        "asc_copy_ub2l1",
+        "asc_copy_ub2ub",
+        "asc_get_phy_buf_addr",
+        "asc_mmad",
+        "asc_ndim_copy_gm2ub",
+        "asc_set_l0c_copy_nz_para",
+        "asc_set_ndim_pad_count",
+        "asc_set_ndim_pad_value",
+        "asc_sync",
+        "asc_sync_block_arrive",
+        "asc_sync_block_wait",
+        "asc_sync_intra_arrive",
+        "asc_sync_intra_wait",
+        "asc_sync_notify",
+        "asc_sync_pipe",
+        "asc_sync_wait"
+      ],
+      "evidence": [
+        "本样例使用Ascend C C API将矩阵数据从UB（Unified Buffer）搬运到L1 Buffer",
+        "使用`asc_copy_ub2l1`将补齐后的Nz格式数据连续搬运到L1 Buffer",
+        "两个AIV均调用`asc_sync_block_arrive`参与组内同步"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_gather",
+      "apis": [
+        "asc_gather",
+        "asc_gather_datablock",
+        "asc_loadalign",
+        "asc_storealign",
+        "asc_sync_pipe",
+        "asc_vf_call"
+      ],
+      "evidence": [
+        "本样例使用Ascend C C API的Reg矢量计算接口，将Unified Buffer（UB）中的非连续数据加载到矢量数据寄存器",
+        "使用`asc_gather`按元素索引进行离散搬入，结果满足`dst[i] = src[index[i]]`",
+        "使用`asc_gather_datablock`加载16个DataBlock，并使用`asc_storealign`连续写回256个`half`结果"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align",
+      "apis": [
+        "asc_loadalign",
+        "asc_loadalign_postupdate",
+        "asc_loadalign_brc",
+        "asc_loadalign_upsample",
+        "asc_storealign",
+        "asc_storealign_postupdate",
+        "asc_create_mask_b16",
+        "asc_update_mask_b16",
+        "asc_update_addr_reg_b16",
+        "asc_vf_call",
+        "asc_sync_pipe"
+      ],
+      "evidence": [
+        "本样例展示使用Ascend C C API的Reg矢量计算接口，在Unified Buffer（UB）与矢量数据寄存器之间进行对齐数据读写",
+        "入口函数通过`asc_vf_call`调用SIMD VF函数执行按寄存器位宽分块的加载、加法和存储操作"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_mask",
+      "apis": [
+        "asc_create_mask_b8",
+        "asc_duplicate_scalar",
+        "asc_loadalign",
+        "asc_loadalign_postupdate",
+        "asc_select",
+        "asc_storealign",
+        "asc_storealign_postupdate",
+        "asc_sync_pipe",
+        "asc_vf_call"
+      ],
+      "evidence": [
+        "本样例演示Ascend C C API中掩码寄存器的加载、存储和使用方式",
+        "使用`asc_loadalign`将输入前32B数据加载至掩码寄存器",
+        "使用`asc_select`按掩码寄存器的比特位选择数据"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/01_memory_vector_compute/cast",
+      "apis": [
+        "asc_half2int4_ru",
+        "asc_half2int32_ru",
+        "asc_copy_gm2ub_align",
+        "asc_copy_ub2gm_align"
+      ],
+      "evidence": [
+        "本样例基于C API编程接口实现Cast运算",
+        "`cast_kernel`函数内调用`asc_half2int4_ru`接口，将512个half类型的数据转换为int4b_t类型的数据",
+        "`cast_kernel`函数内调用`asc_half2int32_ru`接口，将512个half类型的数据转换为int32_t类型的数据"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/01_memory_vector_compute/compare",
+      "apis": [
+        "asc_lt",
+        "asc_gt_scalar",
+        "asc_get_cmp_mask",
+        "asc_copy_gm2ub_align",
+        "asc_copy_ub2gm_align"
+      ],
+      "evidence": [
+        "`compare_kernel`函数内调用`asc_lt`接口对两个float类型的向量进行逐元素比较",
+        "`compare_kernel`函数内调用`asc_gt_scalar`接口对float类型的向量和标量进行逐元素比较"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/01_memory_vector_compute/fused_compute",
+      "apis": [
+        "asc_leakyrelu",
+        "asc_copy_gm2ub_align",
+        "asc_copy_ub2gm_align"
+      ],
+      "evidence": [
+        "本样例基于C API编程接口实现复合计算，主要调用[asc_leakyrelu](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_fused/asc_leakyrelu.md)接口实现Leaky ReLU",
+        "`fused_compute_kernel`函数内调用`asc_leakyrelu`接口，对512个half元素进行Leaky ReLU计算"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/01_memory_vector_compute/reduce",
+      "apis": [
+        "asc_repeat_reduce_sum",
+        "asc_datablock_reduce_sum",
+        "asc_copy_gm2ub_align",
+        "asc_copy_ub2gm_align"
+      ],
+      "evidence": [
+        "本样例基于C API编程接口实现Reduce运算，主要调用[asc_repeat_reduce_sum](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_repeat_reduce_sum.md)和[asc_datablock_reduce_sum](../../../../../docs/zh/api/SIMD-API/c_api/vector_compute/vector_reduce/asc_datablock_reduce_sum.md)接口实现求和归约",
+        "`reduce_kernel`函数内调用`asc_repeat_reduce_sum`接口，对一个repeat内的64个float元素求和",
+        "`reduce_kernel`函数内调用`asc_datablock_reduce_sum`接口，分别对8个32BDataBlock内的8个float元素求和"
+      ]
+    }
+  ]
+}
