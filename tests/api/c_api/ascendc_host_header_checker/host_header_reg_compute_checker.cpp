@@ -722,3 +722,35 @@ static void test_host_c_api_reg_compute_20()
     using ::asc_half2int8_rz_merge;
     using ::asc_half2int8_rz_sat_merge;
 }
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+static void test_host_c_api_reg_compute_21()
+{
+    using ::asc_datablock_reduce_max_stride;
+    using ::asc_datablock_reduce_min_stride;
+    using ::asc_datablock_reduce_sum_stride;
+    using ::asc_deintlv_even;
+    using ::asc_deintlv_even_b16;
+    using ::asc_deintlv_even_b32;
+    using ::asc_deintlv_even_b8;
+    using ::asc_deintlv_odd;
+    using ::asc_deintlv_odd_b16;
+    using ::asc_deintlv_odd_b32;
+    using ::asc_deintlv_odd_b8;
+    using ::asc_fms;
+    using ::asc_fnma;
+    using ::asc_fnms;
+    using ::asc_intlv_half_high;
+    using ::asc_intlv_half_high_b16;
+    using ::asc_intlv_half_high_b32;
+    using ::asc_intlv_half_high_b8;
+    using ::asc_intlv_half_low;
+    using ::asc_intlv_half_low_b16;
+    using ::asc_intlv_half_low_b32;
+    using ::asc_intlv_half_low_b8;
+    using ::asc_pair_reduce_sum_stride;
+    using ::asc_reduce_max_last_elem;
+    using ::asc_reduce_min_last_elem;
+    using ::asc_reduce_sum_last_elem;
+}
+#endif
