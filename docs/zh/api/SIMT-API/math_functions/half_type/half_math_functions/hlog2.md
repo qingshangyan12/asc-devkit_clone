@@ -85,3 +85,10 @@ inline half hlog2(half x)
         dst[idx] = hlog2(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: nan, -1, 1.32227, nan
+```

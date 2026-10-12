@@ -89,3 +89,10 @@ inline half2 __half2half2(const half x)
         dst[idx] = __half2half2(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2, -0.5, 0.5, 2, nan
+result: (-2, -2), (-0.5, -0.5), (0.5, 0.5), (2, 2), (nan, nan)
+```
