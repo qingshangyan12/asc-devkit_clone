@@ -91,3 +91,10 @@ inline int __float2int_ru(const float x)
         dst[idx] = __float2int_ru(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -5.5, -0.25, 2.25, 5.5, inf, -inf, nan
+result: -5, 0, 3, 6, 2147483647, -2147483648, 0
+```
