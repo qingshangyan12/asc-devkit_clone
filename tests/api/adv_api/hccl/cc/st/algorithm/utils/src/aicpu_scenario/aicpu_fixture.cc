@@ -264,7 +264,19 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
         ADD_FAILURE() << "DAG conflicts total " << conflicts.size() << ", first " << maxReported << " reported";
     }
 
-    // 逐字节比对（期望为空=零长度场景，跳过）
+    // golden 空守卫：非零场景意外为空则 FAIL（防 adapter bug 假绿；可经 ExpectOutputCheck 豁免）
+    if (layout.outputBytes > 0 && ExpectOutputCheck()) {
+        for (uint32_t rank = 0; rank < rankSize; ++rank) {
+            if (expected[rank].empty()) {
+                ADD_FAILURE() << "rank " << rank
+                              << " golden unexpectedly empty for non-zero scenario (adapter bug? override "
+                                 "ExpectOutputCheck to skip by design)";
+                break; // 只报首个，避免 N rank 刷屏
+            }
+        }
+    }
+
+    // 逐字节比对（期望为空=零长度场景或已豁免场景，跳过）
     for (uint32_t rank = 0; rank < rankSize; ++rank) {
         if (expected[rank].empty()) {
             continue;
