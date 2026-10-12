@@ -54,9 +54,9 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst,
                                       uint16_t dst_gap)
 ```
 
-#### dtype支持的数据类型
+#### dtype支持数据类型
 
-dtype支持的数据类型为`half`、`bfloat16_t`、`int32_t`、`float`。
+`dtype`取值为：`half`、`bfloat16_t`、`int32_t`、`float`。
 
 #### 函数原型典型示例
 
@@ -80,9 +80,9 @@ __aicore__ inline void asc_copy_l12bt(uint64_t dst,
                                       uint32_t size)
 ```
 
-#### dtype支持的数据类型
+#### dtype支持数据类型
 
-dtype支持的数据类型为`half`、`bfloat16_t`、`int32_t`、`float`。
+`dtype`取值为：`half`、`bfloat16_t`、`int32_t`、`float`。
 
 #### 函数原型典型示例
 

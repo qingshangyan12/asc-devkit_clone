@@ -57,7 +57,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ <dtype>*& ds
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t`、`uint64_t`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -79,7 +79,7 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ <dtype>*& ds
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`uint8_t`、`uint16_t`、`uint32_t`。
+`dtype`取值为：`uint8_t`、`uint16_t`、`uint32_t`。
 
 #### 函数原型典型示例
 
@@ -88,7 +88,6 @@ __simd_callee__ inline void asc_storealign_pack_postupdate(__ubuf__ uint8_t*& ds
                                                            vector_bool src,
                                                            int32_t offset)
 ```
-
 
 ## 参数说明
 
