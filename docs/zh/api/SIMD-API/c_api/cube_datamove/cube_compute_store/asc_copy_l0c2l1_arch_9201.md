@@ -160,7 +160,7 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int4b_t* dst,
 | enable_channel_split | 输入 | 是否开启通道拆分的功能。仅在src和dst都为float时才能开启Channel Split，且不能同时开启Channel Split和NZ2ND功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
 | enable_nz2nd | 输入 | 是否开启NZ2ND功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
 | enable_nz2dn | 输入 | 是否开启NZ2DN功能。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
-| enable_clip_relu_pre | 输入 | 是否开启Clip ReLU（标量模式），需搭配`relu_pre_mode`与量化功能一起使用。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&nbsp;&bull; true：开启。 |
+| enable_clip_relu_pre | 输入 | 是否开启Clip ReLU（标量模式），需搭配`relu_pre_mode`与量化功能一起使用。<br>&nbsp;&nbsp;&bull; false：不开启；<br>&nbsp;&bull; true：开启。 |
 
 ## 返回值说明
 
@@ -195,7 +195,7 @@ PIPE_FIX
 
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
-本示例固定`M=N=K=128`，通过MMAD生成L0C Buffer结果，调用本接口搬至L1 Buffer（保持NZ排布），随后经UB回传GM与Host侧Golden结果比较。
+本示例固定`M=N=K=128`，通过MMAD生成L0C Buffer结果，调用本接口转换为ND格式并搬至L1 Buffer，随后经UB回传GM与Host侧Golden结果比较。
 
 <!-- npu="960" id9 -->
 以Ascend 960PR&960DT系列产品（对应NPU架构为`dav-9201`）为例，编译运行命令如下：
@@ -210,166 +210,67 @@ bisheng examples.asc -o main --npu-arch=dav-9201 && ./main
 #include <cstdio>
 #include <vector>
 #include "acl/acl.h"
-#include "kernel_operator.h"
-#include "c_api/cube_datamove/cube_datamove.h"
-using namespace AscendC;
+#include "c_api/asc_simd.h"
 
 namespace {
 constexpr uint32_t M = 128, N = 128, K = 128;
 constexpr uint32_t ELEMENTS = M * N;
+constexpr int64_t READY_FLAG = 11;
 
 __global__ __mix__(1, 2) void CopyL0c2l1Kernel(
     __gm__ int8_t* a, __gm__ int8_t* b, __gm__ int32_t* output)
 {
-    GlobalTensor<int8_t> aGlobal, bGlobal;
-    GlobalTensor<int32_t> cGlobal;
-    aGlobal.SetGlobalBuffer(a, M * K);
-    bGlobal.SetGlobalBuffer(b, K * N);
-    cGlobal.SetGlobalBuffer(output, M * N);
-
-    TPipe pipe;
-    TQue<TPosition::A1, 1> qidA1, qidC1;
-    TQue<TPosition::B1, 1> qidB1;
-    TQue<TPosition::A2, 1> qidA2;
-    TQue<TPosition::B2, 1> qidB2;
-    TQue<TPosition::CO1, 1> qidCO1;
-    TQue<TPosition::VECOUT, 1> qidUB;
-    pipe.InitBuffer(qidA1, 1, M * K * sizeof(int8_t));
-    pipe.InitBuffer(qidB1, 1, K * N * sizeof(int8_t));
-    pipe.InitBuffer(qidA2, 1, M * K * sizeof(int8_t));
-    pipe.InitBuffer(qidB2, 1, K * N * sizeof(int8_t));
-    pipe.InitBuffer(qidCO1, 1, M * N * sizeof(int32_t));
-    pipe.InitBuffer(qidC1, 1, M * N * sizeof(int32_t));
-    pipe.InitBuffer(qidUB, 1, M * N * sizeof(int32_t));
-
-    LocalTensor<int8_t> a_l1 = qidA1.template AllocTensor<int8_t>();
-    LocalTensor<int8_t> b_l1 = qidB1.template AllocTensor<int8_t>();
-    LocalTensor<int8_t> a_l0 = qidA2.template AllocTensor<int8_t>();
-    LocalTensor<int8_t> b_l0 = qidB2.template AllocTensor<int8_t>();
-    LocalTensor<int32_t> c_l0 = qidCO1.template AllocTensor<int32_t>();
-    LocalTensor<int32_t> output_l1 = qidC1.template AllocTensor<int32_t>();
-    LocalTensor<int32_t> output_ub = qidUB.template AllocTensor<int32_t>();
-
-    if ASCEND_IS_AIC {
-        // CopyIn: GM -> L1(A1/B1)，ND转NZ
-        Nd2NzParams nd2nzParams;
-        nd2nzParams.ndNum = 1;
-        nd2nzParams.nValue = M;
-        nd2nzParams.dValue = K;
-        nd2nzParams.srcNdMatrixStride = 0;
-        nd2nzParams.srcDValue = K;
-        nd2nzParams.dstNzC0Stride = M;
-        nd2nzParams.dstNzNStride = 1;
-        nd2nzParams.dstNzMatrixStride = 0;
-        DataCopy(a_l1, aGlobal, nd2nzParams);
-        pipe_barrier(PIPE_ALL);
-
-        nd2nzParams.ndNum = 1;
-        nd2nzParams.nValue = K;
-        nd2nzParams.dValue = N;
-        nd2nzParams.srcNdMatrixStride = 0;
-        nd2nzParams.srcDValue = N;
-        nd2nzParams.dstNzC0Stride = K;
-        nd2nzParams.dstNzNStride = 1;
-        nd2nzParams.dstNzMatrixStride = 0;
-        DataCopy(b_l1, bGlobal, nd2nzParams);
-        pipe_barrier(PIPE_ALL);
-
-        // Split: L1(A1/B1) -> L0A/L0B
-        LoadData2DParamsV2 loadDataParams;
-        loadDataParams.mStartPosition = 0;
-        loadDataParams.kStartPosition = 0;
-        loadDataParams.mStep = DivCeil(M, BLOCK_CUBE);
-        loadDataParams.kStep = DivCeil(K * sizeof(int8_t), 32);
-        loadDataParams.srcStride = DivCeil(M, BLOCK_CUBE);
-        loadDataParams.dstStride = DivCeil(M, BLOCK_CUBE);
-        loadDataParams.sid = 0;
-        loadDataParams.ifTranspose = false;
-        LoadData(a_l0, a_l1, loadDataParams);
-        pipe_barrier(PIPE_ALL);
-
-        uint16_t kAlign = CeilDivision(K, BLOCK_CUBE);
-        uint16_t nAlign = CeilDivision(N * sizeof(int8_t), 32);
-
-        loadDataParams.mStartPosition = 0;
-        loadDataParams.kStartPosition = 0;
-        loadDataParams.mStep = kAlign;
-        loadDataParams.kStep = nAlign;
-        loadDataParams.srcStride = kAlign;
-        // int8_t类型在L0B中按16B对齐存放，dstStride需乘2
-        loadDataParams.dstStride = nAlign * 2;
-
-        loadDataParams.sid = 0;
-        loadDataParams.ifTranspose = true;
-        LoadData(b_l0, b_l1, loadDataParams);
-        pipe_barrier(PIPE_ALL);
-
-        // Compute: Mmad -> L0C(CO1)
-        MmadParams mmadParams;
-        mmadParams.m = M;
-        mmadParams.n = N;
-        mmadParams.k = K;
-        mmadParams.isBias = false;
-        Mmad(c_l0, a_l0, b_l0, mmadParams);
-        pipe_barrier(PIPE_ALL);
-
-        // CopyOut: L0C -> L1 by asc_copy_l0c2l1，随后L1 -> UB
-        // src_stride: L0C中相邻Z分形起始地址的偏移，单位: C0_Size(16 * sizeof(int32_t))
-        uint16_t srcStride = static_cast<uint16_t>(DivCeil(M, BLOCK_CUBE) * BLOCK_CUBE);
-        // dst_stride: L1目的NZ矩阵中相邻Z分形起始地址的偏移，单位: element
-        uint32_t dstStride = static_cast<uint32_t>(M) * BLOCK_CUBE;
-        asc_copy_l0c2l1((__cbuf__ int32_t*)output_l1.GetPhyAddr(), (__cc__ int32_t*)c_l0.GetPhyAddr(),
-            static_cast<uint16_t>(N), static_cast<uint16_t>(M), dstStride, srcStride, asc_unit_flag_mode::DISABLE,
-            asc_quant_mode::NoQuant, asc_relu_pre_mode::NONE, false, false, false, false);
-        pipe_barrier(PIPE_ALL);
-
-        copy_cbuf_to_ubuf((__ubuf__ void*)output_ub.GetPhyAddr(), (__cbuf__ void*)output_l1.GetPhyAddr(), 0, 1,
-            static_cast<uint16_t>(M * N * sizeof(int32_t) / 32), 0, 0);
+    asc_init();
+    __cbuf__ int8_t a_l1[M * K], b_l1[N * K];
+    __cbuf__ int32_t output_l1[ELEMENTS];
+    __ca__ int8_t a_l0[M * K];
+    __cb__ int8_t b_l0[K * N];
+    __cc__ int32_t c_l0[ELEMENTS];
+    __ubuf__ int32_t* output_ub = reinterpret_cast<__ubuf__ int32_t*>(0);
+    if ASC_IS_AIC {
+        asc_set_gm2l1_nz_para(1, 1, M, 0);
+        asc_copy_gm2l1_nd2nz(a_l1, a, K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, M, K, 0, false);
+        asc_set_gm2l1_nz_para(1, 1, K, 0);
+        asc_copy_gm2l1_nd2nz(b_l1, b, K, asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, N, K, 0, false);
+        asc_sync_notify(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE2, PIPE_MTE1, EVENT_ID0);
+        asc_copy_l12l0a(a_l0, a_l1, 0, 0, M / 16, K / 32, M / 16, M / 16);
+        asc_copy_l12l0b(b_l0, b_l1, 0, 0, N / 16, K / 32, N / 16, N / 16);
+        asc_sync_notify(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_sync_wait(PIPE_MTE1, PIPE_M, EVENT_ID0);
+        asc_mmad(c_l0, a_l0, b_l0, M, K, N, asc_unit_flag_mode::DISABLE, true, false, true);
+        asc_sync_notify(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_sync_wait(PIPE_M, PIPE_FIX, EVENT_ID0);
+        asc_set_l0c_copy_nz_para(1, 0, 0);
+        asc_copy_l0c2l1(output_l1, c_l0, N, M, N, M, asc_unit_flag_mode::DISABLE,
+            asc_quant_mode::NoQuant, asc_relu_pre_mode::NONE, false, true, false, false);
+        asc_sync_notify(PIPE_FIX, PIPE_MTE1, EVENT_ID0);
+        asc_sync_wait(PIPE_FIX, PIPE_MTE1, EVENT_ID0);
+        asc_copy_l12ub(output_ub, output_l1, 0, 1, ELEMENTS * sizeof(int32_t) / 32, 0, 0);
+        asc_sync_pipe(PIPE_MTE1);
+        asc_sync_block_arrive(PIPE_MTE1, READY_FLAG);
     }
-    SyncAll<false>();
-    if (GetSubBlockIdx() == 0) {
-        DataCopy(cGlobal, output_ub, M * N);
+    if ASC_IS_AIV {
+        asc_sync_block_wait(PIPE_MTE3, READY_FLAG);
+        if (asc_get_sub_block_id() == 0)
+            asc_copy_ub2gm_align(output, output_ub, ELEMENTS * sizeof(int32_t));
     }
+    asc_sync_pipe(PIPE_ALL);
 }
 } // namespace
 
 int main()
 {
-    std::vector<int8_t> a(M * K), b(K * N);
-    std::vector<int32_t> output(ELEMENTS), golden(ELEMENTS), goldenNz(ELEMENTS);
-    for (uint32_t r = 0; r < M; ++r) {
-        for (uint32_t k = 0; k < K; ++k) {
-            a[r * K + k] = static_cast<int8_t>(static_cast<int32_t>((r + 2 * k) % 5) - 2);
-        }
-    }
-    for (uint32_t c = 0; c < N; ++c) {
-        for (uint32_t k = 0; k < K; ++k) {
-            b[c * K + k] = static_cast<int8_t>(static_cast<int32_t>((3 * c + k) % 5) - 2);
-        }
-    }
-    for (uint32_t r = 0; r < M; ++r) {
-        for (uint32_t c = 0; c < N; ++c) {
-            for (uint32_t k = 0; k < K; ++k) {
-                golden[r * N + c] += a[r * K + k] * b[c * K + k];
-            }
-        }
-    }
-    // L1目的矩阵保持NZ排布: [N/16][M/16][16(m)][16(n)]，按该排布重排Golden
-    for (uint32_t nf = 0; nf < N / 16; ++nf) {
-        for (uint32_t mf = 0; mf < M / 16; ++mf) {
-            for (uint32_t mi = 0; mi < 16; ++mi) {
-                for (uint32_t ni = 0; ni < 16; ++ni) {
-                    goldenNz[((nf * (M / 16) + mf) * 16 + mi) * 16 + ni] =
-                        golden[(mf * 16 + mi) * N + nf * 16 + ni];
-                }
-            }
-        }
-    }
-
-    aclInit(nullptr);
-    aclrtSetDevice(0);
-    int8_t *ad = nullptr, *bd = nullptr;
-    int32_t* od = nullptr;
+    std::vector<int8_t> a(M * K), b(N * K);
+    std::vector<int32_t> output(ELEMENTS), golden(ELEMENTS);
+    for (uint32_t r = 0; r < M; ++r) for (uint32_t k = 0; k < K; ++k)
+        a[r * K + k] = static_cast<int8_t>(static_cast<int32_t>((r + 2 * k) % 5) - 2);
+    for (uint32_t c = 0; c < N; ++c) for (uint32_t k = 0; k < K; ++k)
+        b[c * K + k] = static_cast<int8_t>(static_cast<int32_t>((3 * c + k) % 5) - 2);
+    for (uint32_t r = 0; r < M; ++r) for (uint32_t c = 0; c < N; ++c)
+        for (uint32_t k = 0; k < K; ++k) golden[r * N + c] += a[r * K + k] * b[c * K + k];
+    aclInit(nullptr); aclrtSetDevice(0);
+    int8_t *ad = nullptr, *bd = nullptr; int32_t* od = nullptr;
     aclrtMalloc(reinterpret_cast<void**>(&ad), a.size(), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&bd), b.size(), ACL_MEM_MALLOC_HUGE_FIRST);
     aclrtMalloc(reinterpret_cast<void**>(&od), output.size() * sizeof(int32_t), ACL_MEM_MALLOC_HUGE_FIRST);
@@ -379,13 +280,9 @@ int main()
     const aclError ret = aclrtSynchronizeDevice();
     aclrtMemcpy(output.data(), output.size() * sizeof(int32_t), od,
         output.size() * sizeof(int32_t), ACL_MEMCPY_DEVICE_TO_HOST);
-    const bool passed = ret == ACL_SUCCESS && output == goldenNz;
+    const bool passed = ret == ACL_SUCCESS && output == golden;
     std::printf("M=%u N=%u K=%u asc_copy_l0c2l1=%s\n", M, N, K, passed ? "PASS" : "FAIL");
-    aclrtFree(ad);
-    aclrtFree(bd);
-    aclrtFree(od);
-    aclrtResetDevice(0);
-    aclFinalize();
+    aclrtFree(ad); aclrtFree(bd); aclrtFree(od); aclrtResetDevice(0); aclFinalize();
     return passed ? 0 : 1;
 }
 ```
