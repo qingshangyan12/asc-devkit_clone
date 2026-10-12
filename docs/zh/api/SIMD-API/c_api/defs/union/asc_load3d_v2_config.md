@@ -1,5 +1,7 @@
 # asc_load3d_v2_config
 
+头文件路径为：`"c_api/defs/union.h"`。
+
 asc_load3d_v2_config用于设置Load3Dv2接口的repeat参数。
 
 ## 结构体具体定义
