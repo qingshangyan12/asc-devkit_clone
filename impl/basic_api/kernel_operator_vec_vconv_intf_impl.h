@@ -48,6 +48,8 @@
 #include "dav_l300/kernel_operator_vec_vconv_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_vconv_impl.h"
+#elif (__NPU_ARCH__ == 5101)
+#include "dav_5161/kernel_operator_vec_vconv_impl.h"
 #endif
 
 namespace AscendC {
@@ -657,7 +659,7 @@ __aicore__ inline void SetDeqScale(const LocalTensor<T>& vdeq, const VdeqInfo& v
 }
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101)
 /*
  * @ingroup Truncate Level 2
  * @brief dst[i] = Precision conversion

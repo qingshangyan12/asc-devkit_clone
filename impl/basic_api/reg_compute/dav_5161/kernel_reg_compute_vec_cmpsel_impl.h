@@ -52,27 +52,34 @@ __simd_callee__ inline void CompareImpl(MaskReg& dst, U& srcReg0, U& srcReg1, Ma
     }
 }
 
-template <typename T = DefaultType, CMPMODE mode = CMPMODE::EQ, typename U, typename S>
-__simd_callee__ inline void CompareScalarImpl(MaskReg& dst, U& srcReg, S scalarValue, MaskReg& mask)
+template <typename T = DefaultType, CMPMODE mode = CMPMODE::EQ, typename RegT, typename ScalarT>
+__simd_callee__ inline void CompareScalarImpl(MaskReg& dstMask, RegT& srcReg, ScalarT scalarValue, MaskReg& mask)
 {
-    using ActualT = typename U::ActualT;
+    using ActualT = typename RegT::ActualT;
     static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
     static_assert(
-        SupportType<ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t>(),
+        SupportType<
+            ActualT, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, half, float, bfloat16_t, uint64_t,
+            int64_t>(),
         "current data type is not supported on current device!");
-    static_assert(Std::is_convertible<S, ActualT>(), "scalarValue data type could be converted to RegTensor data type");
-    if constexpr (mode == CMPMODE::EQ) {
-        vcmps_eq(dst, srcReg, scalarValue, mask);
-    } else if constexpr (mode == CMPMODE::NE) {
-        vcmps_ne(dst, srcReg, scalarValue, mask);
-    } else if constexpr (mode == CMPMODE::GT) {
-        vcmps_gt(dst, srcReg, scalarValue, mask);
-    } else if constexpr (mode == CMPMODE::GE) {
-        vcmps_ge(dst, srcReg, scalarValue, mask);
-    } else if constexpr (mode == CMPMODE::LT) {
-        vcmps_lt(dst, srcReg, scalarValue, mask);
-    } else if constexpr (mode == CMPMODE::LE) {
-        vcmps_le(dst, srcReg, scalarValue, mask);
+    if constexpr (sizeof(ActualT) < 8) {
+        if constexpr (mode == CMPMODE::EQ) {
+            vcmps_eq(dstMask, srcReg, scalarValue, mask);
+        } else if constexpr (mode == CMPMODE::NE) {
+            vcmps_ne(dstMask, srcReg, scalarValue, mask);
+        } else if constexpr (mode == CMPMODE::GT) {
+            vcmps_gt(dstMask, srcReg, scalarValue, mask);
+        } else if constexpr (mode == CMPMODE::GE) {
+            vcmps_ge(dstMask, srcReg, scalarValue, mask);
+        } else if constexpr (mode == CMPMODE::LT) {
+            vcmps_lt(dstMask, srcReg, scalarValue, mask);
+        } else if constexpr (mode == CMPMODE::LE) {
+            vcmps_le(dstMask, srcReg, scalarValue, mask);
+        }
+    } else if constexpr (sizeof(ActualT) == 8) {
+        RegT dupReg;
+        Duplicate(dupReg, scalarValue, mask);
+        Compare<T, mode, RegT>(dstMask, srcReg, dupReg, mask);
     }
 }
 
@@ -89,6 +96,13 @@ __simd_callee__ inline void SelectImpl(U& dstReg, U& srcReg0, U& srcReg1, MaskRe
     } else {
         vsel((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg0, (RegTensor<uint32_t>&)srcReg1, mask);
     }
+}
+
+template <typename T>
+__simd_callee__ inline void SlideImpl(
+    RegTensor<T>& dstReg, RegTensor<T>& srcReg0, RegTensor<T>& srcReg1, uint16_t slideAmount)
+{
+    vslide(dstReg, srcReg0, srcReg1, slideAmount);
 }
 } // namespace Reg
 } // namespace AscendC
