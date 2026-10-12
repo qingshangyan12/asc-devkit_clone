@@ -491,7 +491,7 @@ inQueueY.FreeTensor(yLocal);
 - When calling a continuous transfer interface, count \* sizeof\(T\) must be 32-byte aligned. If it is not aligned, the transfer amount is rounded down to a 32-byte-aligned value.
 - If multiple DataCopy instructions must be executed and their destination addresses overlap, insert a synchronization instruction by calling [PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md) to serialize the DataCopy instructions and prevent abnormal data. In the diagram on the left below, two DataCopy instructions are executed and their destination Global Memory addresses overlap. `PipeBarrier<PIPE_MTE3>()` must be called between the two transfer instructions to add synchronization for the MTE3 transfer-out pipeline. As shown in the diagram on the right below, the destination Unified Buffer addresses overlap, so `PipeBarrier<PIPE_MTE2>()` must be called between the two transfer instructions to add synchronization for the MTE2 transfer-in pipeline.
 
-    ![](../../../../figures/datacopy_address_overlap_sync_diagram.png)
+    ![](../zh/api/figures/datacopy_address_overlap_sync_diagram.png)
 
 <!-- npu="910b,A3" id19 -->
 - For the following product models:
@@ -542,7 +542,7 @@ The vector compute unit also supports vector computation with address intervals,
 For continuous computation, set `dataBlockStride` to 1 to process the eight DataBlocks within the same iteration continuously.
 For non-continuous computation, set `dataBlockStride` to a value greater than 1 (for example, 2). When data is read, there is an interval of one DataBlock between different DataBlocks within the same iteration, as shown below.
 
-![dataBlockStride example](../../../../figures/db_stride.png)
+![dataBlockStride example](../zh/guide/figures/db_stride.png)
 ```
 
 [Negative example] A complex parameter is explained only in prose, using more than three sentences.
@@ -731,7 +731,7 @@ None
 - When calling a continuous transfer interface, count \* sizeof\(T\) must be 32-byte aligned. If it is not aligned, the transfer amount is rounded down to a 32-byte-aligned value.
 - If multiple DataCopy instructions must be executed and their destination addresses overlap, insert a synchronization instruction by calling [PipeBarrier(ISASI)](../../sync_control/intra_core_sync/PipeBarrier_ISASI.md) to serialize the DataCopy instructions and prevent abnormal data. In the diagram on the left below, two DataCopy instructions are executed and their destination Global Memory addresses overlap. `PipeBarrier<PIPE_MTE3>()` must be called between the two transfer instructions to add synchronization for the MTE3 transfer-out pipeline. As shown in the diagram on the right below, the destination Unified Buffer addresses overlap, so `PipeBarrier<PIPE_MTE2>()` must be called between the two transfer instructions to add synchronization for the MTE2 transfer-in pipeline.
 
-    ![](../../../../figures/datacopy_address_overlap_sync_diagram.png)
+    ![](../zh/api/figures/datacopy_address_overlap_sync_diagram.png)
 
 <!-- npu="910b,A3" id29 -->
 - For the following product models:
