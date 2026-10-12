@@ -189,14 +189,6 @@ __simd_callee__ inline void FusedNegMulSubDstImpl(RegT& dstReg, RegT& srcReg0, R
     vfnms(dstReg, srcReg0, srcReg1, mask, modeValue);
 }
 
-template <RegLayout layoutMode = RegLayout::ZERO>
-__simd_callee__ inline void FusedReciprocalCastImpl(
-    RegTensor<bfloat16_t>& dstReg, RegTensor<fp8_e6m2_t>& srcReg, MaskReg& mask)
-{
-    constexpr auto partModeValue = std::integral_constant<::Part, static_cast<::Part>(layoutMode)>();
-    vcvt_rcpe6m22bf16(dstReg, srcReg, mask, partModeValue);
-}
-
 template <typename T, typename U, RegLayout layoutMode, MaskMergeMode mode>
 __simd_callee__ inline void ReciprocalCastImpl(RegTensor<T>& dstReg, RegTensor<U>& srcReg, MaskReg& mask)
 {
