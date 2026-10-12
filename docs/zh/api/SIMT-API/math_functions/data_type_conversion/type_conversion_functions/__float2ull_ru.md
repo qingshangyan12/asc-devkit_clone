@@ -85,3 +85,10 @@ inline unsigned long long int __float2ull_ru(const float x)
         dst[idx] = __float2ull_ru(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.5, -0.5, 0.5, 1.5, 2.5, 1.84467441e+19, inf, nan
+result: 0, 0, 1, 2, 3, 18446744073709551615, 18446744073709551615, 0
+```

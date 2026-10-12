@@ -85,3 +85,10 @@ inline unsigned int __float2uint_rna(const float x)
         dst[idx] = __float2uint_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.5, -0.5, 0.5, 1.5, 2.5, 4.2949673e+09, inf, nan
+result: 0, 0, 1, 2, 3, 4294967295, 4294967295, 0
+```

@@ -95,3 +95,10 @@ __simt_vf__ __launch_bounds__(1024) inline void kernel__float2float_rn(__gm__ fl
     dst[idx] = __float2float_rn(x[idx]);
 }
 ```
+
+输入输出示例如下：
+
+```text
+x: -1.5, -0.5, 0.5, 1.5, inf, -inf, nan
+result: -2, 0, 0, 2, inf, -inf, nan
+```
