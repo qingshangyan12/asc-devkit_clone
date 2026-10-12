@@ -79,3 +79,11 @@ unsigned int __umulhi(unsigned int x, unsigned int y)
         dst[idx] = __umulhi(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 65536, 70000, 1, 4294967295
+y: 65536, 70000, 1, 4294967295
+result: 1 1 0 4294967294
+```
