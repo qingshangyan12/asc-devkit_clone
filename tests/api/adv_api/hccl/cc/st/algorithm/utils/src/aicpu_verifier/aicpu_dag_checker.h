@@ -8,6 +8,8 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+// AICPU ST 校验库（本目录 = aicpu_dag_checker）：对执行日志做静态正确性校验，
+// 原语无关。目录结构与角色映射见 aicpu_scenario/aicpu_fixture.h 头部说明。
 #ifndef AICPU_ST_DAG_CHECKER_H
 #define AICPU_ST_DAG_CHECKER_H
 

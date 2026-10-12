@@ -8,6 +8,10 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+// AICPU ST 执行引擎库（本目录 = task_graph_executor + aicpu_float_convert）：
+// 任务图真执行（TaskStub 轮询调度/notify 同步/死锁定位/搬运与归约），
+// 原语无关——任何集合通信算法投递的 TaskStub 均可执行。
+// 目录结构与角色映射见 aicpu_scenario/aicpu_fixture.h 头部说明。
 #ifndef AICPU_ST_TASK_GRAPH_EXECUTOR_H
 #define AICPU_ST_TASK_GRAPH_EXECUTOR_H
 

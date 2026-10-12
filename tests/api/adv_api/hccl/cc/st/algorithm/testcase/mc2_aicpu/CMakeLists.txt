@@ -10,11 +10,14 @@
 
 # ==========================================================================================================
 # Target : AICPU ST（AllGather 首期）
+# 结构：utils 三库（aicpu_scenario=编排 / aicpu_executor=执行引擎 / aicpu_verifier=校验）
+#       + 本目录用例（framework/=框架自测，<原语>/=原语定制，依赖方向 mc2_aicpu → utils 单向）
 # 链路：InitOpParamByTiling → SelectAlgAndPrepareEngine → GetOpParamResCtx → HcclExecOp
 #       → HcclLaunchAicpuKernel → Orchestrate → 模板 KernelRun → Hcomm* stub → TaskStub → SimTaskQueue
 # 校验：静态检查 + 算法选择断言 + golden 逐字节比对 + TaskGraphExecutor 真执行/死锁定位 + DAG 内存冲突
 # ==========================================================================================================
 set(HCCL_AICPU_ST_TARGET ascendc_ut_adv_api_aicpu_st)
+set(HCCL_MC2_AICPU_FRAMEWORK_DIR ${CMAKE_CURRENT_SOURCE_DIR}/framework)
 set(HCCL_MC2_AICPU_ALL_GATHER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_gather)
 set(UTILS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../utils/src)
 set(CC_SRC ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc/src)
@@ -22,14 +25,14 @@ set(CC_SRC ${ASCENDC_DIR}/impl/adv_api/detail/hccl/cc/src)
 add_executable(
     ${HCCL_AICPU_ST_TARGET}
     ${ASCENDC_DIR}/tests/main.cpp
-    aicpu_float_convert_test.cpp
-    sim_backing_test.cpp
-    task_graph_executor_test.cpp
-    aicpu_fixture_test.cpp
-    aicpu_dag_checker_test.cpp
-    ${UTILS_DIR}/aicpu_scenario/task_graph_executor.cc
+    ${HCCL_MC2_AICPU_FRAMEWORK_DIR}/sim_backing_test.cpp
+    ${HCCL_MC2_AICPU_FRAMEWORK_DIR}/task_graph_executor_test.cpp
+    ${HCCL_MC2_AICPU_FRAMEWORK_DIR}/aicpu_float_convert_test.cpp
+    ${HCCL_MC2_AICPU_FRAMEWORK_DIR}/aicpu_dag_checker_test.cpp
+    ${HCCL_MC2_AICPU_FRAMEWORK_DIR}/aicpu_fixture_test.cpp
     ${UTILS_DIR}/aicpu_scenario/aicpu_fixture.cc
-    ${UTILS_DIR}/aicpu_scenario/aicpu_dag_checker.cc
+    ${UTILS_DIR}/aicpu_executor/task_graph_executor.cc
+    ${UTILS_DIR}/aicpu_verifier/aicpu_dag_checker.cc
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/all_gather_testcase.cpp
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/aicpu_all_gather.cc
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}/aicpu_all_gather_mesh1d_adapter.cc
@@ -47,6 +50,8 @@ target_include_directories(
     ${UTILS_DIR}/sim_world
     ${UTILS_DIR}/common/utils
     ${UTILS_DIR}/aicpu_scenario
+    ${UTILS_DIR}/aicpu_executor
+    ${UTILS_DIR}/aicpu_verifier
     ${HCCL_MC2_AICPU_ALL_GATHER_DIR}
     ${CC_SRC}/common
     ${CC_SRC}/ops/op_common

@@ -8,6 +8,19 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+// ═══════════════════════════════════════════════════════════════════════════════════════════════════
+// AICPU ST 目录结构（utils 三库 + 用例层，依赖方向 mc2_aicpu → utils 单向）：
+//   utils/aicpu_scenario/  编排库（本目录）：场景配置 + VerifyScenario 全链装配与四层校验调度
+//                          ↔ CCU 侧 ccu_scenario/
+//   utils/aicpu_executor/  执行引擎库：TaskGraphExecutor（任务图真执行/notify 同步/死锁定位）
+//                          + aicpu_float_convert（数值转换，golden 与执行器共用同一舍入策略）
+//                          ↔ CCU 侧 hccl_proxy/ccu_primitives_stub（录制）+ sim_world/ccu_sim_world（回放）
+//   utils/aicpu_verifier/  校验库：AicpuDagChecker（happens-before + 区间重叠内存冲突检测）
+//                          ↔ CCU 侧 hccl_verifier/ccu_checker*（CCU 塞旧目录，AICPU 独立新目录
+//                            以避免与旧语义校验体系纠缠）
+//   testcase/mc2_aicpu/    用例与定制层：framework/（框架自测，测上述三库）+ <原语>/（原语定制，
+//                          原语级类实现本文件的虚函数契约）——新增算法变体只改用例层，零改 utils
+// ═══════════════════════════════════════════════════════════════════════════════════════════════════
 #ifndef AICPU_ST_FIXTURE_H
 #define AICPU_ST_FIXTURE_H
 
