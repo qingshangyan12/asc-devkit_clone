@@ -55,4 +55,23 @@
         GlobalMockObject::verify();                                                                            \
     }
 
+// Void asc_cast_merge with trailing tag args (round/sat/pos as needed).
+#define TEST_9201_ASC_CAST_MERGE(class_name, dst_data_type, src_data_type, index, ...) \
+                                                                                       \
+    class Test9201AscCastMerge##class_name##_##index : public testing::Test {          \
+    protected:                                                                         \
+        void SetUp() {}                                                                \
+        void TearDown() {}                                                             \
+    };                                                                                 \
+                                                                                       \
+    TEST_F(Test9201AscCastMerge##class_name##_##index, asc_cast_merge_Succ)            \
+    {                                                                                  \
+        dst_data_type dst;                                                             \
+        src_data_type src0;                                                            \
+        vector_bool mask;                                                              \
+                                                                                       \
+        asc_cast_merge(dst, src0, mask, __VA_ARGS__);                                  \
+        GlobalMockObject::verify();                                                    \
+    }
+
 #endif

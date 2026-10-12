@@ -704,6 +704,7 @@ static void test_host_c_api_reg_compute_20()
 
 static void test_host_c_api_reg_compute_21()
 {
+    using ::asc_cast_merge;
     using ::asc_float2bfloat16_rna_merge;
     using ::asc_float2bfloat16_rna_sat_merge;
     using ::asc_float2bfloat16_ru_merge;
