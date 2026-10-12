@@ -43,6 +43,7 @@ namespace te {
     M(int16_t, __VA_ARGS__)                                                                                            \
     M(int32_t, __VA_ARGS__)                                                                                            \
     M(int64_t, __VA_ARGS__)                                                                                            \
+    M(int4b_t, __VA_ARGS__)                                                                                           \
     M(uint8_t, __VA_ARGS__)                                                                                            \
     M(uint16_t, __VA_ARGS__)                                                                                           \
     M(uint32_t, __VA_ARGS__)                                                                                           \
