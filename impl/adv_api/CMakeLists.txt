@@ -73,6 +73,7 @@ if(NOT "${DPRODUCT_SIDE}" STREQUAL "device")
     FILES
       ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/hccl_msg.h
       ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/hccl_tiling_msg.h
+      ${ASCENDC_INCLUDE_DIR}/adv_api/hccl/internal/mc2_algorithm_boundary_sync.h
     DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/adv_api/hccl/internal
     ${INSTALL_OPTIONAL} COMPONENT asc-devkit)
 

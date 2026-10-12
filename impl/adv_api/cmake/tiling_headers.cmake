@@ -337,6 +337,11 @@ file(
   ../../adv_api/hccl/hccl_tiling.h
   ${ASCENDC_INSTALL_BASE_PATH}/asc/include/tiling/hccl/hccl_tiling.h
   SYMBOLIC)
+file(
+  CREATE_LINK
+  ../../adv_api/hccl/internal
+  ${ASCENDC_INSTALL_BASE_PATH}/asc/include/tiling/hccl/internal
+  SYMBOLIC)
 
 # mean
 file(MAKE_DIRECTORY
