@@ -72,6 +72,8 @@ __simd_callee__ inline vector_half asc_float2half_<round_mode><sat_mode>(vector_
                                                                          std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
+**占位符说明如下：**
+
 - `<round_mode>`表示支持的舍入模式，支持`rd`（`FLOOR`）、`rn`（`RINT`）、`rna`（`ROUND`）、`ro`（`ODD`）、`ru`（`CEIL`）和`rz`（`TRUNC`）。
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
