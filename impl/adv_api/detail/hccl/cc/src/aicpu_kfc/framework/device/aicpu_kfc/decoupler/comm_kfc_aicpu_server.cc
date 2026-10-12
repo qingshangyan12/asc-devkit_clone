@@ -63,7 +63,7 @@ HcclResult IsDevice950(bool& isDevice950)
 {
     DevType deviceType = DevType::DEV_TYPE_COUNT;
     CHK_RET(hrtGetDeviceType(deviceType));
-    isDevice950 = (deviceType == DevType::DEV_TYPE_950);
+    isDevice950 = (deviceType == DevType::DEV_TYPE_950 || deviceType == DevType::DEV_TYPE_960);
     return HCCL_SUCCESS;
 }
 
