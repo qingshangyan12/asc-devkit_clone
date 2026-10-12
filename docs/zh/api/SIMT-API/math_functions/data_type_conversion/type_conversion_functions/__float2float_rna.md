@@ -83,3 +83,10 @@ inline float __float2float_rna(const float x)
         dst[idx] = __float2float_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -4.5, -1.25, 1.25, 4.5, inf, -inf, nan
+result: -5.0, -1.0, 1.0, 5.0, inf, -inf, nan
+```
