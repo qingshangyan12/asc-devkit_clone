@@ -113,6 +113,9 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 - 路径: docs/zh/api/SIMD-API/c_api/xxx/yyy.md | API: asc_yyy | 用途: 一句话
 ```
 
+返回多个候选且无法确认已覆盖当前需求的全部适用接口时，会在候选列表后注明：
+“候选仅供参考,不代表全量接口”。
+
 下面四张问答卡片来自实际检索与候选文档核对，按 **CANN 9.2.0 × 3510 × C API** 整理。
 卡片将候选压成表格，点击接口名即可打开对应文档。换版本或架构后，应重新检索，结果可能不同。
 
@@ -213,6 +216,8 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 | [asc_copy_l12l0b_mx](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md) | L1→L0B_MX Buffer，搬运右矩阵量化系数。 |
 | [asc_copy_l12l0b_trans](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md) | L1→L0B，并做二维分形转置。 |
 | [asc_copy_l12ub](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md) | L1→UB。 |
+
+候选仅供参考,不代表全量接口
 
 此处按文档 `version` 区间精确匹配并筛去废弃接口；更早引入或标为 `>=9.2.0` 的接口不在这张表中。
 表中结果反映当前筛选条件下的文档标注，不代表已验证这些 3510 接口能在历史 CANN 9.1.0 环境运行。
