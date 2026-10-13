@@ -291,12 +291,13 @@ class DFXSectionGenerator:
                     f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
                 )
                 section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
-                if CommonUtility.is_920r1() or CommonUtility.is_920r2():
-                    section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
-                        {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 1} };\n"
-                else:
-                    section_var += "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
-                        {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, 2} };\n"
+                aiv_task_ration = 1 if (CommonUtility.is_920r1() or CommonUtility.is_920r2()) else 2
+                section_var += (
+                    "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
+                        {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, "
+                    + str(aiv_task_ration)
+                    + "} };\n"
+                )
             elif compile_info.hard_sync:
                 if compile_info.code_channel in [CORE_TYPE_VEC]:
                     section_var += (
@@ -413,19 +414,18 @@ class DFXSectionGenerator:
             self._generate_binary_for_tiling(tiling_key, tiling_info, compile_info)
 
         section_content = f"// generate dfx section for tiling_key:{tiling_key}"
-        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
-            if CommonUtility.is_v220():
-                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)"
-                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)"
-            elif CommonUtility.is_c310():
-                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)"
-                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 3510)"
-            elif CommonUtility.is_920r1():
-                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 9201)"
-                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 9201)"
-            elif CommonUtility.is_920r2():
-                cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 9202)"
-                vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 9202)"
+        if CommonUtility.is_v220():
+            cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201)"
+            vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 2201)"
+        elif CommonUtility.is_c310():
+            cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 3510)"
+            vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 3510)"
+        elif CommonUtility.is_920r1():
+            cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 9201)"
+            vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 9201)"
+        elif CommonUtility.is_920r2():
+            cube_core_marco = "(defined(__DAV_CUBE__) && __NPU_ARCH__ == 9202)"
+            vec_core_marco = "(defined(__DAV_VEC__) && __NPU_ARCH__ == 9202)"
         else:
             # for v200 cube_core_type is aicore type
             cube_core_marco = "defined(__DAV_M200__)"

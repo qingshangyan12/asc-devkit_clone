@@ -579,19 +579,17 @@ def set_dynamic_sub_func_names_of_super_kernel(tiling_key, compile_info, arch, k
     if compile_info.code_channel == CORE_TYPE_MIX or (
         compile_info.hard_sync and compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE]
     ):
-        kernel_type = (
-            KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1.name
-            if (compile_info.code_channel == CORE_TYPE_MIX and (CommonUtility.is_920r1() or CommonUtility.is_920r2()))
-            else (
-                KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2.name
-                if (compile_info.code_channel == CORE_TYPE_MIX)
-                else (
-                    KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0.name
-                    if compile_info.code_channel == CORE_TYPE_VEC
-                    else KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0.name
-                )
+        if compile_info.code_channel == CORE_TYPE_MIX:
+            # 920r1/920r2 use the 1:1 task ratio, other SoCs keep 1:2
+            kernel_type = (
+                KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1.name
+                if CommonUtility.is_920r1() or CommonUtility.is_920r2()
+                else KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2.name
             )
-        )
+        elif compile_info.code_channel == CORE_TYPE_VEC:
+            kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIV_1_0.name
+        else:
+            kernel_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_0.name
     else:
         kernel_type = (
             KernelMetaType.KERNEL_TYPE_AIC_ONLY.name
