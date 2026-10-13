@@ -804,4 +804,3 @@ static void test_host_c_api_reg_compute_22()
     using ::asc_float2hif8_rna_sat_merge;
 }
 #endif
-
