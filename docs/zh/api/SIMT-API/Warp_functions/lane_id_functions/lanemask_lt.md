@@ -92,3 +92,9 @@ int32_t lanemask_lt()
         dst[idx] = value;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 3, 3, 3, 3, 3, 3, 19, 19
+```
