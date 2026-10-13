@@ -52,10 +52,10 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| gmWorkspace | 输入 | 外部存储核状态的公共缓存，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。 |
-| ubWorkspace | 输入 | 存储当前核状态的公共缓存。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
-| blockIdx | 输入 | 表示等待核的idx号，取值范围：[0,核数-1]。 |
-| eventID | 输入 | 用来控制当前核的set、wait事件。 |
+| gmWorkspace | 输入 | 位于Global Memory、由参与同步的多个AIV核共享，用于存储核间同步标志，类型为GlobalTensor。GlobalTensor数据结构的定义请参考[GlobalTensor](../../data_structures/GlobalTensor/GlobalTensor.md)。 |
+| ubWorkspace | 输入 | 位于当前AIV核的Unified Buffer（UB），用于将同步标志从gmWorkspace搬入、读取并修改，并在需要时将修改结果写回gmWorkspace。<br>类型为[LocalTensor](../../data_structures/LocalTensor/LocalTensor.md)，支持的TPosition为VECIN/VECCALC/VECOUT。 |
+| blockIdx | 输入 | 同步标志对应的逻辑AIV索引，即被等待核（生产者，即调用IBSet的核）的逻辑AIV索引，配对的IBSet和IBWait必须传入相同的blockIdx。<br>合法取值范围由算子调用时设置的逻辑AI Core核数numBlocks和AIV配比共同决定，并不等于本次同步实际参与的核数。例如核函数使用\_\_mix\_\_(1, 2)修饰且numBlocks为4时，逻辑AIV索引范围为[0, 7]。 |
+| eventID | 输入 | 用于软件同步标志寻址的逻辑事件编号，与blockIdx共同区分同一对生产者、消费者之间的不同同步事件。<br>该参数不是SetFlag/WaitFlag使用的硬件事件ID，不受硬件事件ID 0~7的取值限制。请使用非负整数，并建议从0开始连续编号。 |
 
 ## 返回值说明<a name="section640mcpsimp"></a>
 
@@ -80,7 +80,7 @@ __aicore__ inline void IBSet(const GlobalTensor<int32_t>& gmWorkspace, const Loc
 - ubWorkspace申请的空间最少要求为：32Bytes。
 - 使用该接口进行多核控制时，算子调用时指定的逻辑AI Core核数numBlocks必须保证不大于实际运行该算子的AI处理器核数，否则框架进行多轮调度时会插入异常同步，导致核函数（Kernel）“卡死”现象。
 - IBSet和IBWait配对使用时，除了ubWorkspace其余所有参数都必须相同，否则程序会在IBWait处卡死。
-- 分离模式下，使用该接口进行两个核间的同步时，仅对AIV核生效。
+- 分离模式下，该接口的同步逻辑仅在AIV核生效：在AIC核中调用时接口会直接返回，既不设置也不等待同步标志。
 - IBSet接口的gmWorkspace缓存的值需要初始化为0。
 
 ## 调用示例<a name="section177231425115410"></a>
