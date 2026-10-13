@@ -7,6 +7,8 @@ asc_load_l2_cache_mode用于表示数据从GM搬运到Unified Buffer（UB）时�
 
 L2 Cache管理策略的影响可见[L2 Cache Mode最佳实践](../../../../../../../examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode/README.md)。
 
+头文件路径为：`"c_api/defs/enum.h"`。
+
 ## 枚举类具体定义
 
 ```cpp

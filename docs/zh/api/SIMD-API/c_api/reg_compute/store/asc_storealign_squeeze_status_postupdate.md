@@ -26,6 +26,8 @@
 
 ## 功能说明
 
+头文件路径为：`"c_api/reg_compute/store/storealign.h"`。
+
 将[asc_squeeze_and_storeunalign](../reg_permute_sel/asc_squeeze_and_storeunalign.md)操作后保存在AR特殊寄存器中的有效数据长度写入Unified Buffer（UB），并在写入后按字节偏移自动更新目的地址指针。该接口适用于在硬件循环中连续保存squeeze状态的场景。
 
 本接口为Reg矢量搬运接口，仅在AIV上生效。
