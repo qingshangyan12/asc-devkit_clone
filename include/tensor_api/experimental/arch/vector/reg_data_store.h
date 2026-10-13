@@ -74,6 +74,28 @@ __simd_callee__ inline void store(
     Tensor& tensor, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
 /**
+ * @brief Scatters register data from active source lanes to a UB tensor.
+ * @param tensor Destination tensor located in UB.
+ * @param src Source register tensor. Its active-lane mask selects the elements to store.
+ * @param index Register tensor containing the destination offsets.
+ * @note The tensor and source register element types must match.
+ */
+template <typename Tensor, typename T, typename Index>
+__simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index);
+
+/**
+ * @brief Scatters register data from active source lanes to a UB tensor at the specified coordinate.
+ * @param tensor Destination tensor located in UB.
+ * @param coord Coordinate used as the base destination position.
+ * @param src Source register tensor. Its active-lane mask selects the elements to store.
+ * @param index Register tensor containing the destination offsets relative to the base position.
+ * @note The tensor and source register element types must match.
+ */
+template <typename Tensor, typename Coord, typename T, typename Index>
+__simd_callee__ inline void store_scatter(
+    Tensor& tensor, const Coord& coord, const reg_tensor<T>& src, const reg_tensor<Index>& index);
+
+/**
  * @brief Maintains the hardware state for a sequence of unaligned register-to-UB stores.
  * @note Each store writes one full vector register and does not use reg_tensor::mask.
  * Destination addresses must form one contiguous stream. All tensors passed to one
