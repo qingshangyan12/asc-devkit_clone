@@ -101,3 +101,10 @@ inline int32_t asc_any(int32_t predicate)
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 1, 2, 3, 14, 15, 16, 17
+result: 1
+```
