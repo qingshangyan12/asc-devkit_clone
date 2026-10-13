@@ -287,12 +287,16 @@ version: ">=9.0.0"
 
 **标准格式**
 
-Doxygen 块放在每个具体重载声明上方，参数描述使用英文。`override_id` 按具体签名生成，
+Doxygen 块放在每个具体重载声明上方，功能摘要和参数描述使用英文。每个重载用一句 `@brief`
+说明核心动作及结果输出方式，术语参考 `docs/en/`；摘要后用一行空注释结束，再写结构字段。
+`override_id` 按具体签名生成，
 同名函数的不同重载各有独立 ID；参数类型来自紧随注释的声明。
 
 ```cpp
 /**
  * @ingroup simd_c_api.<API category>
+ * @brief <English summary of the concrete overload's behavior and result output>
+ *
  * @override_id <canonical overload ID>
  * @archs <NPU architecture numbers>
  * @param [out] dst Destination operand.
@@ -305,6 +309,7 @@ Doxygen 块放在每个具体重载声明上方，参数描述使用英文。`ov
 | 标注 | 标准含义 |
 | --- | --- |
 | `@ingroup` | API 所属分类。 |
+| `@brief` | 具体重载的一句英文功能摘要，区分输出参数与返回值形式。 |
 | `@override_id` | 具体重载的唯一 ID，也是连接样例的键。 |
 | `@archs` | 适用架构号，如 `3510`；多个架构按空格分隔。 |
 | `@param [in/out/in,out]` | 参数名、方向及英文语义描述，需与声明对应。 |
@@ -316,6 +321,8 @@ Doxygen 块放在每个具体重载声明上方，参数描述使用英文。`ov
 ```cpp
 /**
  * @ingroup simd_c_api.reg_compute.reg_arith
+ * @brief Computes element-wise absolute values of src under mask and stores the results in dst.
+ *
  * @override_id asc_abs__Rvf32_vf32_vb
  * @archs 3510
  * @param [out] dst Destination operand (vector data register).
@@ -328,6 +335,8 @@ __simd_callee__ inline void asc_abs(vector_float& dst, vector_float src, vector_
 
 `dst` 是输出，`src`、`mask` 是输入；`@archs 3510` 表示适用 3510 架构。同名函数的其他
 数据类型和返回方式有独立 ID，例如返回 `float` 矢量的重载使用 `asc_abs__vf32_vb`。
+该返回值形式的摘要为 `@brief Returns element-wise absolute values of src under mask.`。
+`@brief` 供开发者阅读，当前索引仍从文档头获取语义摘要，不额外索引 include 的 brief。
 
 ### 3.3 样例头：成对 override_id marker
 
