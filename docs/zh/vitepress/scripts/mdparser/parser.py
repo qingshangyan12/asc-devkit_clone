@@ -144,6 +144,7 @@ def _escape_lone_tildes(md_text: str) -> str:
     result = []
     in_fence = False
     fence_char = None
+    fence_length = 0
     html_end_pattern = None
     in_html_until_blank = False
     previous_line_blank = True
@@ -153,9 +154,10 @@ def _escape_lone_tildes(md_text: str) -> str:
 
         if in_fence:
             result.append(line)
-            if fence_char and re.match(rf"^{re.escape(fence_char)}{{3,}}[ \t]*$", stripped):
+            if fence_char and re.match(rf"^{re.escape(fence_char)}{{{fence_length},}}[ \t]*$", stripped):
                 in_fence = False
                 fence_char = None
+                fence_length = 0
             previous_line_blank = not stripped
             continue
 
@@ -177,6 +179,7 @@ def _escape_lone_tildes(md_text: str) -> str:
         if fence_match:
             in_fence = True
             fence_char = fence_match.group(1)[0]
+            fence_length = len(fence_match.group(1))
             result.append(line)
             previous_line_blank = False
             continue
@@ -210,15 +213,17 @@ def _split_by_fences(md_text: str):
     current = []
     is_code = False
     fence_char = None
+    fence_length = 0
 
     for line in lines:
         stripped = line.lstrip(" \t")
 
         if is_code:
             current.append(line)
-            if fence_char and re.match(rf"^{re.escape(fence_char)}{{3,}}[ \t]*$", stripped):
+            if fence_char and re.match(rf"^{re.escape(fence_char)}{{{fence_length},}}[ \t]*$", stripped):
                 is_code = False
                 fence_char = None
+                fence_length = 0
                 segments.append((True, "\n".join(current)))
                 current = []
             continue
@@ -230,6 +235,7 @@ def _split_by_fences(md_text: str):
                 current = []
             is_code = True
             fence_char = fence_match.group(1)[0]
+            fence_length = len(fence_match.group(1))
             current.append(line)
             continue
 
