@@ -333,6 +333,23 @@ ResourceStatus ParseResourceId(
     return ResourceStatus::Success;
 }
 
+// New bundles resolve source_file relative to the vendor/built-in root.
+// Legacy bundles keep the sibling kernel/<soc> basename lookup below.
+fs::path InstalledSourceRoot(const std::string& libraryPath)
+{
+    const fs::path directory = fs::path(libraryPath).parent_path();
+    if (directory.filename() == "op_spec") {
+        return directory.parent_path();
+    }
+    const fs::path specRoot = directory.parent_path();
+    const std::string repository = directory.filename().string();
+    if (specRoot.filename() == "op_spec" && specRoot.parent_path().filename() == "built-in" && repository.size() > 4U &&
+        repository.rfind("ops_", 0U) == 0U) {
+        return specRoot.parent_path();
+    }
+    return {};
+}
+
 ResourceStatus ParseSourceFile(
     const Json& document, const LibrarySpec& spec, uint64_t manifestIndex, ManifestOwnership& ownership)
 {
@@ -349,10 +366,11 @@ ResourceStatus ParseSourceFile(
         return ResourceStatus::InvalidResource;
     }
     ownership.sourceFile = document.at("source_file").get<std::string>();
-    if (!IsPlainName(ownership.sourceFile)) {
+    const bool installedLayout = !InstalledSourceRoot(spec.path).empty();
+    if (!(installedLayout ? FileUtils::IsSafeRelativePath(ownership.sourceFile) : IsPlainName(ownership.sourceFile))) {
         ASCENDLOGE(
             "Compile resource manifest has unsafe source file name: resource_id=%s source_type=%s so=%s "
-            "manifest=%" PRIu64 " source_file=%s expected=plain file name",
+            "manifest=%" PRIu64 " source_file=%s expected=safe source path for the selected layout",
             ownership.resourceId.c_str(), SourceTypeName(spec.sourceType), spec.path.c_str(), manifestIndex,
             ownership.sourceFile.c_str());
         return ResourceStatus::InvalidResource;
@@ -590,6 +608,7 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
     AutomaticRoots roots;
     for (const std::string& path : SplitList(std::getenv("ASCEND_CUSTOM_OPP_PATH"), ':')) {
         roots.custom.push_back(FileUtils::JoinPath(path, RELATIVE_JIT_ROOT));
+        roots.custom.push_back(FileUtils::JoinPath(path, "op_spec"));
     }
     const char* environment = std::getenv("ASCEND_OPP_PATH");
     if (environment == nullptr || *environment == '\0') {
@@ -629,8 +648,9 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
             }
             for (const std::string& vendor : SplitList(line.substr(separator + 1U).c_str(), ',')) {
                 if (IsPlainName(vendor)) {
-                    roots.custom.push_back(
-                        FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "vendors/" + vendor), RELATIVE_JIT_ROOT));
+                    const std::string vendorRoot = FileUtils::JoinPath(oppRoot, "vendors/" + vendor);
+                    roots.custom.push_back(FileUtils::JoinPath(vendorRoot, RELATIVE_JIT_ROOT));
+                    roots.custom.push_back(FileUtils::JoinPath(vendorRoot, "op_spec"));
                 } else {
                     ASCENDLOGW(
                         "Ignoring unsafe compile resource vendor name: path=%s vendor=%s expected=plain directory name",
@@ -641,6 +661,7 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
         }
     }
     roots.builtIn.push_back(FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "built-in"), RELATIVE_JIT_ROOT));
+    roots.builtIn.push_back(FileUtils::JoinPath(FileUtils::JoinPath(oppRoot, "built-in"), "op_spec"));
     ASCENDLOGD(
         "Automatic compile resource roots collected: custom_roots=%zu built_in_roots=%zu opp_root=%s",
         roots.custom.size(), roots.builtIn.size(), oppRoot.c_str());
@@ -650,6 +671,9 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
 bool ResourceRegistry::IsLibraryName(const std::string& path)
 {
     const std::string name = FileUtils::FileName(path);
+    if (name == "libcust_compile_db.so" && !InstalledSourceRoot(path).empty()) {
+        return true;
+    }
     return name.size() > std::strlen("lib") + std::strlen(LIBRARY_NAME_SUFFIX) && name.rfind("lib", 0U) == 0U &&
            name.compare(
                name.size() - std::strlen(LIBRARY_NAME_SUFFIX), std::strlen(LIBRARY_NAME_SUFFIX), LIBRARY_NAME_SUFFIX) ==
@@ -881,6 +905,39 @@ ResourceStatus ResourceRegistry::AddSourceMatch(
 ResourceStatus ResourceRegistry::LocateSourceFile(
     const LibrarySpec& spec, const std::string& resourceId, const std::string& sourceFile, std::string& located)
 {
+    const fs::path installedRoot = InstalledSourceRoot(spec.path);
+    if (!installedRoot.empty()) {
+        if (!FileUtils::IsSafeRelativePath(sourceFile)) {
+            return ResourceStatus::InvalidResource;
+        }
+        std::string canonicalRoot;
+        ResourceStatus status = ResolveSourceRoot(installedRoot, resourceId, canonicalRoot);
+        if (status != ResourceStatus::Success) {
+            return status;
+        }
+        fs::path candidate(canonicalRoot);
+        boost::system::error_code error;
+        for (const auto& component : fs::path(sourceFile)) {
+            candidate /= component;
+            const fs::file_status fileStatus = fs::symlink_status(candidate, error);
+            if (error || fs::is_symlink(fileStatus) || !fs::exists(fileStatus)) {
+                ASCENDLOGE(
+                    "Invalid installed compile source: resource_id=%s so=%s source_file=%s path=%s", resourceId.c_str(),
+                    spec.path.c_str(), sourceFile.c_str(), candidate.string().c_str());
+                return ResourceStatus::InvalidResource;
+            }
+        }
+        if (!fs::is_regular_file(candidate, error) || error) {
+            return ResourceStatus::InvalidResource;
+        }
+        const fs::path canonicalSource = fs::canonical(candidate, error);
+        if (error || !FileUtils::IsPathWithin(canonicalSource.string(), canonicalRoot)) {
+            return ResourceStatus::InvalidResource;
+        }
+        // New source placeholders use the installation root, not the source's parent directory.
+        located = canonicalRoot;
+        return ResourceStatus::Success;
+    }
     // Relative path example:
     //   kernel/jit/ascend910b/libfoo_compile_database.so  <- resource SO
     //   kernel/ascend910b/impl/foo.cpp                    <- source file

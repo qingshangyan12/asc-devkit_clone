@@ -13,6 +13,7 @@
 
 import argparse
 import copy
+from dataclasses import dataclass
 import fcntl
 import hashlib
 import json
@@ -24,15 +25,8 @@ import subprocess
 import tempfile
 import sys
 
-MAX_MANIFEST_BYTES = 8 * 1024 * 1024
-MAX_RESOURCE_BYTES = 256 * 1024 * 1024
-MAX_UNIT_BYTES = 512 * 1024 * 1024
-MAX_BUNDLE_BYTES = 1024 * 1024 * 1024
-MAX_MANIFESTS = 4096
-MAX_UNIT_FILES = 65536
-MAX_BUNDLE_FILES = 131072
 SOURCE_MARKER = "${source_file_path}"
-INCLUDE_FLAGS = ("-isystem", "-iquote", "-idirafter", "-I")
+INCLUDE_FLAGS = ("-isystem", "-iquote", "-idirafter", "-include", "-I")
 
 
 class BundleError(RuntimeError):
@@ -104,35 +98,49 @@ def _map_absolute(path, maps):
     return None
 
 
-def _source_index(request, maps):
-    files = set()
-    for directory in request.source_dir:
-        files.update(_files(directory))
-    for value in request.source_file:
-        path = _checked_path(value)
-        if not path.is_file():
-            raise BundleError(f"source file is missing: {path}")
-        files.add(path)
-    installed = {}
-    for path in sorted(files):
-        relative = _map_absolute(path, maps)
-        if relative is None:
-            raise BundleError(f"source file has no source-map: {path}")
-        installed.setdefault(relative, []).append(path)
-    return files, installed
-
-
-def _resolve_source(value, source_files, installed):
+def _resolve_source(value, request, maps, bound_source=None):
+    """Resolve only the referenced source; unrelated files do not need installation maps."""
     relative = _relative(value)
-    if len(relative.parts) == 1:
-        candidates = [p for p in source_files if p.name == value]
+
+    def matches(path):
+        if len(relative.parts) == 1:
+            return path.name == value
+        return _map_absolute(path, maps) == relative.as_posix()
+
+    if bound_source is not None:
+        candidates = {_checked_path(bound_source)}
+        if not matches(next(iter(candidates))):
+            raise BundleError(f"source_file does not match producer source: {value}: {bound_source}")
     else:
-        candidates = installed.get(relative.as_posix(), [])
+        candidates = set()
+        for source_value in request.source_file:
+            path = Path(os.path.abspath(source_value))
+            if matches(path):
+                candidates.add(path)
+        for source_root in request.source_dir:
+            root = _checked_path(source_root)
+            if not root.is_dir():
+                raise BundleError(f"source directory is missing: {root}")
+
+            def walk_error(error):
+                raise error
+
+            # Search names within the allowed roots; inspect contents and paths only for matches.
+            for directory, dirs, files in os.walk(root, onerror=walk_error, followlinks=False):
+                dirs[:] = sorted(name for name in dirs if not (Path(directory) / name).is_symlink())
+                for name in files:
+                    path = Path(directory) / name
+                    if matches(path):
+                        candidates.add(path)
     if len(candidates) != 1:
-        raise BundleError(f"missing or ambiguous source_file {value}: {len(candidates)} candidates")
-    source = candidates[0]
-    package_path = next(key for key, paths in installed.items() if source in paths)
-    return source, package_path
+        raise BundleError(f"missing or ambiguous source_file {relative}: {len(candidates)} candidates")
+    source = _checked_path(candidates.pop())
+    if not source.is_file():
+        raise BundleError(f"source file is missing: {source}")
+    installed = _map_absolute(source, maps)
+    if installed is None:
+        raise BundleError(f"source file has no source-map: {source}")
+    return source, installed
 
 
 def _rewrite_include(path, maps, source_parent):
@@ -186,72 +194,79 @@ def _relocate(manifest, maps, package_source):
     return result
 
 
-def _check_resource_references(value, root, resource_root):
-    if isinstance(value, dict):
-        for item in value.values():
-            _check_resource_references(item, root, resource_root)
-    elif isinstance(value, list):
-        for item in value:
-            _check_resource_references(item, root, resource_root)
-    elif isinstance(value, str) and "${resource}/" in value:
-        relative = value.split("${resource}/", 1)[1]
-        path = _checked_path(root / _relative(relative))
-        if resource_root not in path.parents and path != resource_root:
-            raise BundleError(f"resource reference is outside resource_path: {path}")
-        if not path.exists():
-            raise BundleError(f"missing resource reference: {path}")
+@dataclass
+class ResourceUnit:
+    manifest_path: Path
+    manifest_json: bytes
+    resource_root: Path
+    source_file: Path
+    installed_source: str
+    source_hash: str
+    resource_files: list
+    resource_directories: list
+
+    def delivery_signature(self):
+        # Local build roots are excluded; delivered paths, complete JSON and contents are retained.
+        return {
+            "manifest": self.manifest_json,
+            "installed_source": self.installed_source,
+            "source_hash": self.source_hash,
+            "resource_files": self.resource_files,
+            "resource_directories": self.resource_directories,
+        }
+
+    def cache_input(self):
+        return {
+            "manifest_path": str(self.manifest_path),
+            "manifest_hash": hashlib.sha256(self.manifest_json).hexdigest(),
+            "source_file": str(self.source_file),
+            "source_hash": self.source_hash,
+            "installed_source": self.installed_source,
+            "resource_files": self.resource_files,
+            "resource_directories": self.resource_directories,
+        }
 
 
-def _collect(request, maps, sources, installed):
+def _resource_contents(root):
+    files = [(path.relative_to(root).as_posix(), _hash_file(path)) for path in _files(root)]
+    # Empty include directories are also delivered and can affect compilation.
+    directories = []
+    for directory, dirs, _files_in_directory in os.walk(root):
+        directories.extend((Path(directory) / name).relative_to(root).as_posix() for name in dirs)
+    return sorted(files), sorted(directories)
+
+
+def _collect(request, maps):
     units = {}
     fingerprints = []
+    bindings = getattr(request, "source_bindings", {})
     for directory in sorted(set(request.input_dir)):
         manifests = [p for p in _files(directory) if p.name.endswith("_manifest.json")]
         if not manifests:
             raise BundleError(f"no manifests in input directory: {directory}")
         for path in manifests:
-            if path.stat().st_size > MAX_MANIFEST_BYTES:
-                raise BundleError(f"manifest is too large: {path}")
             manifest = json.loads(path.read_text(encoding="utf-8"))
-            if not isinstance(manifest, dict) or not re.fullmatch(
-                r"[0-9a-f]{64}", str(manifest.get("resource_id", ""))
-            ):
-                raise BundleError(f"invalid resource_id: {path}")
-            if not isinstance(manifest.get("kernels"), list) or not manifest["kernels"]:
-                raise BundleError(f"manifest has no kernels: {path}")
-            source, package_source = _resolve_source(manifest.get("source_file"), sources, installed)
-            resource_root = _checked_path(path.parent / _relative(manifest.get("resource_path")))
-            files = list(_files(resource_root))
-            if len(files) > MAX_UNIT_FILES:
-                raise BundleError(f"too many resource files: {path}")
-            if any(p.stat().st_size > MAX_RESOURCE_BYTES for p in files):
-                raise BundleError(f"resource file is too large: {path}")
-            if sum(p.stat().st_size for p in files) > MAX_UNIT_BYTES:
-                raise BundleError(f"manifest resources are too large: {path}")
-            _check_resource_references(manifest, path.parent, resource_root)
-            relocated = _relocate(manifest, maps, package_source)
-            encoded = json.dumps(relocated, sort_keys=True, separators=(",", ":")).encode()
-            if len(encoded) > MAX_MANIFEST_BYTES:
-                raise BundleError(f"relocated manifest is too large: {path}")
-            fingerprints.append(
-                [
-                    str(path),
-                    _hash_file(path),
-                    str(source),
-                    _hash_file(source),
-                    package_source,
-                    [(str(p.relative_to(path.parent)), _hash_file(p)) for p in files],
-                ]
+            resource_id = manifest.get("resource_id")
+            # An index key is required here; the exporter's full ID format check remains authoritative.
+            if not isinstance(resource_id, str) or not resource_id:
+                raise BundleError(f"missing resource_id for aggregation: {path}")
+            source, package_source = _resolve_source(
+                manifest.get("source_file"), request, maps, bindings.get(str(_checked_path(directory)))
             )
-            units.setdefault(manifest["resource_id"], (path, encoded, files))
-    ordered = sorted(units.items())
-    if len(ordered) > MAX_MANIFESTS:
-        raise BundleError("too many distinct manifests")
-    if sum(len(unit[2]) for _, unit in ordered) > MAX_BUNDLE_FILES:
-        raise BundleError("too many bundle resource files")
-    if sum(len(unit[1]) + sum(p.stat().st_size for p in unit[2]) for _, unit in ordered) > MAX_BUNDLE_BYTES:
-        raise BundleError("bundle payload is too large")
-    return ordered, fingerprints
+            resource_root = _checked_path(path.parent / _relative(manifest.get("resource_path")))
+            files, directories = _resource_contents(resource_root)
+            relocated = _relocate(manifest, maps, package_source)
+            encoded = json.dumps(relocated, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+            unit = ResourceUnit(
+                path, encoded, resource_root, source, package_source, _hash_file(source), files, directories
+            )
+            previous = units.get(resource_id)
+            if previous is not None and previous.delivery_signature() != unit.delivery_signature():
+                raise BundleError(f"conflicting resource_id {resource_id}: {previous.manifest_path} and {path}")
+            if previous is None:
+                units[resource_id] = unit
+            fingerprints.append(unit.cache_input())
+    return sorted(units.items()), fingerprints
 
 
 def _tool(value):
@@ -293,7 +308,7 @@ def _atomic_write(output, write):
 
 
 def build_bundle(request):
-    """Validate inputs, reuse a verified cache or publish a newly exported RUN SO."""
+    """Prepare delivery inputs, reuse a matching cache or publish a newly exported RUN SO."""
     output = _checked_path(request.output)
     if output.suffix != ".so":
         raise BundleError("RUN resource output must have the .so suffix")
@@ -313,8 +328,7 @@ def build_bundle(request):
 
 def _build_locked(request, output, work, lock_key):
     maps = _source_maps(request.source_map)
-    sources, installed = _source_index(request, maps)
-    units, fingerprint = _collect(request, maps, sources, installed)
+    units, fingerprint = _collect(request, maps)
     tools = {name: _tool(getattr(request, name)) for name in ("exporter", "cxx", "make")}
     keep = _keep_temp(request.opc_config)
     if request.jobs < 1:
@@ -338,12 +352,13 @@ def _build_locked(request, output, work, lock_key):
     workspace = Path(tempfile.mkdtemp(prefix=".bundle-", dir=work))
     try:
         collected = workspace / "collected"
-        for resource_id, (path, encoded, _files_to_copy) in units:
-            destination = collected / resource_id
+        for index, (_resource_id, unit) in enumerate(units):
+            # Use private ordinal directories; resource IDs are data, never filesystem paths.
+            destination = collected / str(index)
             destination.mkdir(parents=True)
-            resource_path = json.loads(encoded)["resource_path"]
-            shutil.copytree(path.parent / resource_path, destination / resource_path, symlinks=True)
-            (destination / "resource_manifest.json").write_bytes(encoded)
+            resource_path = unit.resource_root.relative_to(unit.manifest_path.parent)
+            shutil.copytree(unit.resource_root, destination / resource_path, symlinks=True)
+            (destination / "resource_manifest.json").write_bytes(unit.manifest_json)
         staged = workspace / "libcust_compile_db.so"
         argv = [
             str(tools["exporter"]),
@@ -369,9 +384,6 @@ def _build_locked(request, output, work, lock_key):
                 detail = log.read().decode("utf-8", errors="replace")
             raise BundleError(f"exporter failed ({result.returncode}): {detail}")
         with open(_checked_path(staged), "rb") as source:
-            if source.read(4) != b"\x7fELF":
-                raise BundleError("exporter did not produce an ELF resource bundle")
-            source.seek(0)
             _atomic_write(output, lambda stream: shutil.copyfileobj(source, stream))
         stamp_data = json.dumps({"key": key, "output_hash": _hash_file(output)}, sort_keys=True).encode()
         _atomic_write(stamp, lambda stream: stream.write(stamp_data))
@@ -404,6 +416,9 @@ def reset_tasks(request):
             raise ValueError("Invalid producer cleanup directory: " + value)
         if directory.exists():
             shutil.rmtree(directory)
+    # OPC variants share each producer directory. Create it before they run in parallel.
+    for task in tasks:
+        Path(task["directory"]).mkdir(parents=True, exist_ok=True)
     state.write_text(json.dumps(tasks, sort_keys=True), encoding="utf-8")
 
 
@@ -415,6 +430,7 @@ def build_package(request):
     inputs = []
     maps = []
     sources = set()
+    source_bindings = {}
     configs = []
     for context in contexts:
         tasks = json.loads(Path(context["state"]).read_text(encoding="utf-8"))
@@ -435,7 +451,11 @@ def build_package(request):
             if not (copied_root / relative).is_file():
                 raise ValueError("Kernel Spec source is missing from the install input: " + str(source))
             sources.add(str(source))
-            inputs.append(str(directory))
+            input_root = str(_checked_path(directory))
+            if input_root in source_bindings and source_bindings[input_root] != str(source):
+                raise BundleError(f"conflicting producer source for {input_root}")
+            source_bindings[input_root] = str(source)
+            inputs.append(input_root)
     if not configs:
         output.unlink(missing_ok=True)
         for stamp in Path(request.work_dir).glob("*.stamp.json"):
@@ -463,6 +483,7 @@ def build_package(request):
             make=request.make,
             opc_config=str(combined_config),
             jobs=8,
+            source_bindings=source_bindings,
         )
     )
     status.write_text(
@@ -488,7 +509,7 @@ def engineering_main(action, arguments):
             reset_tasks(request)
         else:
             build_package(request)
-    except (BundleError, OSError, ValueError, KeyError, TypeError) as error:
+    except (BundleError, OSError, ValueError, KeyError, TypeError, AttributeError) as error:
         parser.exit(1, f"Kernel Spec build failed: {error}\n")
 
 
@@ -508,7 +529,7 @@ def main():
     args = parser.parse_args()
     try:
         changed = build_bundle(args)
-    except (BundleError, OSError, ValueError, KeyError, TypeError) as error:
+    except (BundleError, OSError, ValueError, KeyError, TypeError, AttributeError) as error:
         parser.exit(1, f"Kernel Spec aggregation failed: {error}\n")
     print("Kernel Spec bundle published" if changed else "Kernel Spec bundle cache hit")
 
