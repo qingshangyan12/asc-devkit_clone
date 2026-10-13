@@ -357,7 +357,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_loadalign_brc_elem2datablock](reg_compute/load/asc_loadalign_brc_elem2datablock.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，将每个元素广播到一个DataBlock中。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_brc_elem2datablock_postupdate](reg_compute/load/asc_loadalign_brc_elem2datablock_postupdate.md)|对齐数据搬运接口，将每个元素广播到一个DataBlock中，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_brc_elem_postupdate](reg_compute/load/asc_loadalign_brc_elem_postupdate.md)|对齐数据搬运接口，搬运一个元素并广播到VL，启用Post Update。|`c_api/reg_compute/load/loadalign.h`|
-|[asc_loadalign_deintlv](reg_compute/load/asc_loadalign_deintlv.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作。|`c_api/reg_compute/load/loadalign.h`|
+|[asc_loadalign_deintlv](reg_compute/load/asc_loadalign_deintlv.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作；无offset重载支持通过函数返回值返回两个矢量数据寄存器，offset重载仍通过引用参数输出。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_deintlv_postupdate](reg_compute/load/asc_loadalign_deintlv_postupdate.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，随路完成deinterleave操作，启用postupdate模式，自动更新UB地址参数。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_downsample](reg_compute/load/asc_loadalign_downsample.md)|对齐数据搬运接口，从UB连续对齐搬入目的操作数，2倍下采样模式。|`c_api/reg_compute/load/loadalign.h`|
 |[asc_loadalign_mask_downsample](reg_compute/load/asc_loadalign_mask_downsample.md)|对齐数据搬运接口，从UB连续对齐搬入掩码数据，2倍下采样模式，通过函数返回值返回掩码寄存器。|`c_api/reg_compute/load/loadalign.h`|
@@ -425,6 +425,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_add](reg_compute/reg_arith/asc_add.md)|按元素执行加法运算。|`c_api/reg_compute/compute/reg_arith.h`|
 |[asc_add_scalar](reg_compute/reg_arith/asc_add_scalar.md)|按元素执行矢量和标量的加法运算。|`c_api/reg_compute/compute/reg_arith.h`|
 |[asc_addc](reg_compute/reg_arith/asc_addc.md)|按元素执行带进位的加法运算。|`c_api/reg_compute/compute/reg_arith.h`|
+|[asc_add_carry](reg_compute/reg_arith/asc_add_carry.md)|按元素执行带进位输出的加法运算，通过函数返回值同时返回加法结果和进位标志。|`c_api/reg_compute/compute/reg_arith.h`|
 |[asc_div](reg_compute/reg_arith/asc_div.md)|按元素执行除法运算。|`c_api/reg_compute/compute/reg_arith.h`|
 |[asc_exp](reg_compute/reg_arith/asc_exp.md)|对源操作数逐元素计算指数。|`c_api/reg_compute/compute/reg_arith.h`|
 |[asc_ln](reg_compute/reg_arith/asc_ln.md)|对源操作数逐元素计算自然对数。|`c_api/reg_compute/compute/reg_arith.h`|
@@ -440,6 +441,7 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_sqrt](reg_compute/reg_arith/asc_sqrt.md)|逐元素计算平方根。|`c_api/reg_compute/compute/reg_arith.h`|
 |[asc_sub](reg_compute/reg_arith/asc_sub.md)|按元素执行减法运算。|`c_api/reg_compute/compute/reg_arith.h`|
 |[asc_subc](reg_compute/reg_arith/asc_subc.md)|按元素执行带借位的减法运算。|`c_api/reg_compute/compute/reg_arith.h`|
+|[asc_sub_carry](reg_compute/reg_arith/asc_sub_carry.md)|按元素执行带借位输出的减法运算，通过函数返回值同时返回减法结果和进位标志。|`c_api/reg_compute/compute/reg_arith.h`|
 
 ### 逻辑计算
 
@@ -519,8 +521,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 
 |API名称|说明|最细粒度公共头文件|
 |---|---|---|
-|[asc_deintlv](reg_compute/reg_permute_sel/asc_deintlv.md)|给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中。|`c_api/reg_compute/compute/reg_permute_sel.h`|
-|[asc_intlv](reg_compute/reg_permute_sel/asc_intlv.md)|将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中。|`c_api/reg_compute/compute/reg_permute_sel.h`|
+|[asc_deintlv](reg_compute/reg_permute_sel/asc_deintlv.md)|给定源操作数src0和src1，将src0和src1中的元素解交织存入结果操作数dst0和dst1中，也支持通过函数返回值返回两个结果。|`c_api/reg_compute/compute/reg_permute_sel.h`|
+|[asc_intlv](reg_compute/reg_permute_sel/asc_intlv.md)|将源操作数src0和src1中的元素交织存入目的操作数dst0和dst1中，也支持通过函数返回值返回两个结果。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_pack_to_high](reg_compute/reg_permute_sel/asc_pack_to_high.md)|将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的高半部分（当数据类型为vector_bool时，每2bit选取其中的低位1bit）。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_pack_to_low](reg_compute/reg_permute_sel/asc_pack_to_low.md)|将源操作数中的元素选取低8位（b16）、低16位（b32）、低32位（b64）写入目的操作数的低半部分（当数据类型为vector_bool时，每2bit选取其中的低位1bit）。|`c_api/reg_compute/compute/reg_permute_sel.h`|
 |[asc_select](reg_compute/reg_permute_sel/asc_select.md)|根据mask的比特位值，从源操作数src0、src1中选择元素，得到目的操作数dst。|`c_api/reg_compute/compute/reg_permute_sel.h`|

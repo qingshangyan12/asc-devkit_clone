@@ -30,7 +30,7 @@
 
 从Unified Buffer（UB）中32字节对齐的起始地址读取2×VL长度数据，将偶数下标元素写入矢量数据寄存器`dst0`，将奇数下标元素写入矢量数据寄存器`dst1`。本接口提供三种功能模式：
 
-- **对齐搬入模式**：将UB源地址的数据解交织后搬入到两个矢量数据寄存器，由用户自行更新源地址。
+- **对齐搬入模式**：将UB源地址的数据解交织后搬入到两个矢量数据寄存器，由用户自行更新源地址。该模式同时提供引用参数版本和函数返回值版本。
 - **立即数偏移搬入模式**：从相对源起始地址偏移指定距离的位置搬入数据。本接口不会自动更新源地址。
 - **地址寄存器偏移搬入模式**：通过地址寄存器指定相对源起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬入场景。需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。
 
@@ -41,27 +41,37 @@
 ### 对齐搬入模式
 
 ```c
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
                                                   vector_<dtype>& dst1,
                                                   __ubuf__ <dtype>* src)
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline asc_loadalign_deintlv_<dtype>_result asc_loadalign_deintlv(__ubuf__ <dtype>* src)
 ```
 
 #### dtype支持数据类型
 
-`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当`dtype`为`int4b_t`时，`dst0`和`dst1`的实际类型均为`vector_int4x2_t`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+
+当`dtype`为`int4b_t`时，`dst0`和`dst1`的实际类型均为`vector_int4x2_t`；通过函数返回值返回结果的函数原型的返回类型为`asc_loadalign_deintlv_int4x2_t_result`，结构体内成员变量`first`和`second`的数据类型均为`vector_int4x2_t`。
 
 #### 函数原型典型示例
 
 ```c
-// 示例：float类型。
+// 通过引用参数输出结果示例：对float数据执行解交织搬入。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
-                                                  vector_float& dst1,
-                                                  __ubuf__ float* src)
+                                                vector_float& dst1,
+                                                __ubuf__ float* src)
+
+// 通过函数返回值返回结果示例：对float数据执行解交织搬入。
+__simd_callee__ inline asc_loadalign_deintlv_float_result asc_loadalign_deintlv(__ubuf__ float* src)
 ```
 
 ### 立即数偏移搬入模式
 
 ```c
+// 通过引用参数输出结果（占位符形式），使用立即数偏移。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
                                                   vector_<dtype>& dst1,
                                                   __ubuf__ <dtype>* src,
@@ -75,7 +85,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
 #### 函数原型典型示例
 
 ```c
-// 示例：float类型。
+// 通过引用参数输出结果示例：对float数据执行带偏移的解交织搬入。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
                                                   vector_float& dst1,
                                                   __ubuf__ float* src,
@@ -85,6 +95,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
 ### 地址寄存器偏移搬入模式
 
 ```c
+// 通过引用参数输出结果（占位符形式），使用地址寄存器偏移。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
                                                   vector_<dtype>& dst1,
                                                   __ubuf__ <dtype>* src,
@@ -98,7 +109,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
 #### 函数原型典型示例
 
 ```c
-// 示例：float类型。
+// 通过引用参数输出结果示例：对float数据执行带偏移的解交织搬入。
 __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
                                                   vector_float& dst1,
                                                   __ubuf__ float* src,
@@ -143,7 +154,8 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值，包含无偏移、立即数偏移和地址寄存器偏移三种模式。
+- 通过函数返回值输出结果的函数原型返回一个具体的结果结构体，使用变量`result`接收函数返回值。返回类型为`asc_loadalign_deintlv_<dtype>_result`，例如，dtype为`float`时，返回类型为`asc_loadalign_deintlv_float_result`，两个成员的类型均为`vector_float`，`result.first`保存源数据中的偶数下标元素；`result.second`保存源数据中的奇数下标元素。
 
 ## 约束说明
 

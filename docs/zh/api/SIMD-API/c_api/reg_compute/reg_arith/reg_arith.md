@@ -4,6 +4,7 @@
 - **[asc_add](asc_add.md)**
 - **[asc_add_scalar](asc_add_scalar.md)**
 - **[asc_addc](asc_addc.md)**
+- **[asc_add_carry](asc_add_carry.md)**
 - **[asc_div](asc_div.md)**
 - **[asc_exp](asc_exp.md)**
 - **[asc_ln](asc_ln.md)**
@@ -19,3 +20,4 @@
 - **[asc_sqrt](asc_sqrt.md)**
 - **[asc_sub](asc_sub.md)**
 - **[asc_subc](asc_subc.md)**
+- **[asc_sub_carry](asc_sub_carry.md)**

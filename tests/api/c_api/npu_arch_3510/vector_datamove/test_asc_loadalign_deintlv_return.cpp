@@ -33,7 +33,7 @@ void ExpectRegisterPattern(const DataType& value, unsigned char pattern)
 } // namespace
 
 #define TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(                                                     \
-    class_name, c_api_name, cce_name, dst_type, src_type, expected_dist)                                      \
+    class_name, c_api_name, cce_name, dst_type, src_type, expected_dist, result_type)                         \
     class TestVectorDatamove##class_name##dst_type##src_type##PairReturnCApi : public testing::Test {            \
     protected:                                                                                                  \
         void SetUp() {}                                                                                         \
@@ -58,7 +58,7 @@ void ExpectRegisterPattern(const DataType& value, unsigned char pattern)
     {                                                                                                           \
         __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                      \
         static_assert(                                                                                          \
-            std::is_same_v<decltype(c_api_name(src)), c_api::reg_pair<dst_type, dst_type>>);                           \
+            std::is_same_v<decltype(c_api_name(src)), result_type>);                                           \
                                                                                                                 \
         MOCKER_CPP(cce_name, void(dst_type&, dst_type&, __ubuf__ src_type*, int32_t, int))                      \
             .times(1)                                                                                           \
@@ -71,7 +71,7 @@ void ExpectRegisterPattern(const DataType& value, unsigned char pattern)
     }
 
 #define TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN_HIF8(                                               \
-    class_name, c_api_name, cce_name, dst_type, src_type, expected_dist)                                      \
+    class_name, c_api_name, cce_name, dst_type, src_type, expected_dist, result_type)                         \
     class TestVectorDatamove##class_name##dst_type##src_type##PairReturnCApi : public testing::Test {            \
     protected:                                                                                                  \
         void SetUp() {}                                                                                         \
@@ -96,7 +96,7 @@ void ExpectRegisterPattern(const DataType& value, unsigned char pattern)
     {                                                                                                           \
         __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                      \
         static_assert(                                                                                          \
-            std::is_same_v<decltype(c_api_name(src)), c_api::reg_pair<dst_type, dst_type>>);                           \
+            std::is_same_v<decltype(c_api_name(src)), result_type>);                                           \
                                                                                                                 \
         MOCKER_CPP(cce_name, void(vector_uint8_t&, vector_uint8_t&, __ubuf__ uint8_t*, int32_t, int))          \
             .times(1)                                                                                           \
@@ -109,7 +109,7 @@ void ExpectRegisterPattern(const DataType& value, unsigned char pattern)
     }
 
 #define TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN_INT4(                                               \
-    class_name, c_api_name, cce_name, dst_type, src_type, expected_dist)                                      \
+    class_name, c_api_name, cce_name, dst_type, src_type, expected_dist, result_type)                         \
     class TestVectorDatamove##class_name##dst_type##src_type##PairReturnCApi : public testing::Test {            \
     protected:                                                                                                  \
         void SetUp() {}                                                                                         \
@@ -135,7 +135,7 @@ void ExpectRegisterPattern(const DataType& value, unsigned char pattern)
     {                                                                                                           \
         __ubuf__ src_type* src = reinterpret_cast<__ubuf__ src_type*>(11);                                      \
         static_assert(                                                                                          \
-            std::is_same_v<decltype(c_api_name(src)), c_api::reg_pair<dst_type, dst_type>>);                           \
+            std::is_same_v<decltype(c_api_name(src)), result_type>);                                           \
                                                                                                                 \
         MOCKER_CPP(                                                                                             \
             cce_name, void(vector_fp4x2_e1m2_t&, vector_fp4x2_e1m2_t&,                                        \
@@ -150,34 +150,50 @@ void ExpectRegisterPattern(const DataType& value, unsigned char pattern)
     }
 
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int8_t, int8_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int8_t, int8_t, DINTLV_B8,
+    asc_loadalign_deintlv_int8_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint8_t, uint8_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint8_t, uint8_t, DINTLV_B8,
+    asc_loadalign_deintlv_uint8_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, DINTLV_B8,
+    asc_loadalign_deintlv_fp4x2_e2m1_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, DINTLV_B8,
+    asc_loadalign_deintlv_fp4x2_e1m2_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, DINTLV_B8,
+    asc_loadalign_deintlv_fp8_e8m0_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, DINTLV_B8,
+    asc_loadalign_deintlv_fp8_e5m2_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, DINTLV_B8,
+    asc_loadalign_deintlv_fp8_e4m3fn_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN_HIF8(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_hifloat8_t, hifloat8_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_hifloat8_t, hifloat8_t, DINTLV_B8,
+    asc_loadalign_deintlv_hifloat8_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int16_t, int16_t, DINTLV_B16);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int16_t, int16_t, DINTLV_B16,
+    asc_loadalign_deintlv_int16_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint16_t, uint16_t, DINTLV_B16);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint16_t, uint16_t, DINTLV_B16,
+    asc_loadalign_deintlv_uint16_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_half, half, DINTLV_B16);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_half, half, DINTLV_B16,
+    asc_loadalign_deintlv_half_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_bfloat16_t, bfloat16_t, DINTLV_B16);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_bfloat16_t, bfloat16_t, DINTLV_B16,
+    asc_loadalign_deintlv_bfloat16_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int32_t, int32_t, DINTLV_B32);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int32_t, int32_t, DINTLV_B32,
+    asc_loadalign_deintlv_int32_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint32_t, uint32_t, DINTLV_B32);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint32_t, uint32_t, DINTLV_B32,
+    asc_loadalign_deintlv_uint32_t_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_float, float, DINTLV_B32);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_float, float, DINTLV_B32,
+    asc_loadalign_deintlv_float_result);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN_INT4(
-    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int4x2_t, int4b_t, DINTLV_B8);
+    LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int4x2_t, int4b_t, DINTLV_B8,
+    asc_loadalign_deintlv_int4x2_t_result);
