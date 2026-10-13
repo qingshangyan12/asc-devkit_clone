@@ -41,7 +41,6 @@ struct hifloat4x2_t {
 using hif4x2_t = hifloat4x2_t;
 
 using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
-
 inline void mad(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k, uint16_t n,
     uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
@@ -188,6 +187,9 @@ inline void mad_mx(
 
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
+
+// The compiler supports this instruction, but it is missing from the CPU debug stub header.
+inline void vcvt_rcpe6m22bf16(vector_bf16& dst, vector_f8e6m2 src, vector_bool mask, Literal part) {}
 
 #ifndef ULL
 #define ULL unsigned long long

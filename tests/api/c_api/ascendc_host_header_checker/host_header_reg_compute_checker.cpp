@@ -192,29 +192,42 @@ static void test_host_c_api_reg_compute_5()
     using ::asc_float2e5m2_rn_v3;
     using ::asc_float2e5m2_rn_v4;
     using ::asc_float2half_rd;
+    using ::asc_float2half_rd_merge;
     using ::asc_float2half_rd_sat;
+    using ::asc_float2half_rd_sat_merge;
     using ::asc_float2half_rd_sat_v2;
     using ::asc_float2half_rd_v2;
     using ::asc_float2half_rn;
+    using ::asc_float2half_rn_merge;
     using ::asc_float2half_rn_sat;
+    using ::asc_float2half_rn_sat_merge;
     using ::asc_float2half_rn_sat_v2;
     using ::asc_float2half_rn_v2;
     using ::asc_float2half_rna;
+    using ::asc_float2half_rna_merge;
     using ::asc_float2half_rna_sat;
+    using ::asc_float2half_rna_sat_merge;
     using ::asc_float2half_rna_sat_v2;
     using ::asc_float2half_rna_v2;
     using ::asc_float2half_ro;
+    using ::asc_float2half_ro_merge;
     using ::asc_float2half_ro_sat;
+    using ::asc_float2half_ro_sat_merge;
     using ::asc_float2half_ro_sat_v2;
     using ::asc_float2half_ro_v2;
     using ::asc_float2half_ru;
+    using ::asc_float2half_ru_merge;
     using ::asc_float2half_ru_sat;
+    using ::asc_float2half_ru_sat_merge;
     using ::asc_float2half_ru_sat_v2;
     using ::asc_float2half_ru_v2;
     using ::asc_float2half_rz;
+    using ::asc_float2half_rz_merge;
     using ::asc_float2half_rz_sat;
+    using ::asc_float2half_rz_sat_merge;
     using ::asc_float2half_rz_sat_v2;
     using ::asc_float2half_rz_v2;
+    using ::asc_rcpe6m22bfloat16;
 }
 
 static void test_host_c_api_reg_compute_6()
