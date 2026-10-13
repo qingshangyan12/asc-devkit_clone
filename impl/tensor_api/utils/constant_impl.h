@@ -138,11 +138,11 @@ constexpr bool is_one_of_attr_v = check_all_same<Target, Candidates...>::value;
 template <typename DataType>
 inline constexpr bool is_data_type =
     is_one_of_attr_v<Std::remove_cvref_t<DataType>, hifloat8_t, bfloat16_t, fp4x2_e1m2_t, fp4x2_e2m1_t, fp8_e5m2_t,
-                     fp8_e4m3fn_t, fp8_e8m0_t>
+                     fp8_e4m3fn_t, fp8_e8m0_t, int4b_t>
     || Std::is_integral_v<Std::remove_cvref_t<DataType>> || Std::is_floating_point_v<Std::remove_cvref_t<DataType>>;
 
 template <typename DataType>
-inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t>;
+inline constexpr bool is_b4_type = is_one_of_attr_v<DataType, fp4x2_e1m2_t, fp4x2_e2m1_t, int4b_t>;
 
 template <typename DataType = Std::ignore_t>
 __aicore__ inline constexpr size_t get_c0_size()

@@ -35,3 +35,15 @@ TEST_F(tensor_api_pointer_offset, test_make_mem_ptr_byte_offset)
     EXPECT_EQ(l1_ptr.get(), reinterpret_cast<__cbuf__ float*>(0 + byte_offset));
     EXPECT_EQ(l0c_ptr.get(), reinterpret_cast<__cc__ float*>(0 + byte_offset));
 }
+
+TEST_F(tensor_api_pointer_offset, test_int4_logical_element_offset)
+{
+    __ubuf__ int4b_t data[128];
+    auto pointer = asc::te::make_mem_ptr<asc::te::location::ub>(data);
+    asc::te::view_engine<decltype(pointer)> engine(pointer);
+
+    EXPECT_EQ((pointer + 2).get(), data + 1);
+    EXPECT_EQ((pointer + 64).get(), data + 32);
+    EXPECT_EQ(&pointer[64], data + 32);
+    EXPECT_EQ((engine + 64).begin().get(), data + 32);
+}

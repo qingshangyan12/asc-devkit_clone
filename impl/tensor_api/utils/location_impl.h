@@ -39,6 +39,7 @@ namespace te {
     Q(_ssbuf__, ssbuf)
 
 #define TENSOR_API_USER_TYPES(M, ...)                                                                                  \
+    M(int4b_t, __VA_ARGS__)                                                                                            \
     M(int8_t, __VA_ARGS__)                                                                                             \
     M(int16_t, __VA_ARGS__)                                                                                            \
     M(int32_t, __VA_ARGS__)                                                                                            \
