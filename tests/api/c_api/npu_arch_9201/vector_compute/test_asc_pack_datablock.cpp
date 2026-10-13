@@ -8,6 +8,7 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
+#include <type_traits>
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
@@ -52,32 +53,28 @@ TEST_PACK_DATABLOCK_RETURN(Float, vector_float);
 TEST_PACK_DATABLOCK_RETURN(UInt64, vector_uint64_t);
 TEST_PACK_DATABLOCK_RETURN(Int64, vector_int64_t);
 
-TEST(PackTo64, SupportsSignedAndUnsignedSources)
-{
-    vector_uint32_t dst;
-    vector_uint64_t u_src;
-    vector_int64_t s_src;
-    MOCKER_CPP(vpack, void(vector_uint32_t&, vector_uint64_t, Literal)).times(4);
-    MOCKER_CPP(vpack, void(vector_uint32_t&, vector_int64_t, Literal)).times(4);
+#define TEST_PACK_TO_64(test_name, src_type, api_name, expected_part)                                        \
+    namespace {                                                                                              \
+    void test_name##Stub(vector_uint32_t&, src_type, Literal part) { EXPECT_EQ(part, expected_part); }       \
+    }                                                                                                        \
+                                                                                                             \
+    TEST(PackTo64, test_name)                                                                                \
+    {                                                                                                        \
+        vector_uint32_t dst;                                                                                 \
+        src_type src;                                                                                        \
+        MOCKER_CPP(vpack, void(vector_uint32_t&, src_type, Literal)).times(2).will(invoke(test_name##Stub)); \
+        api_name(dst, src);                                                                                  \
+        auto result = api_name(src);                                                                         \
+        static_assert(std::is_same<decltype(result), vector_uint32_t>::value);                               \
+        (void)result;                                                                                        \
+        GlobalMockObject::verify();                                                                          \
+    }
 
-    asc_pack_to_low(dst, u_src);
-    asc_pack_to_high(dst, u_src);
-    asc_pack_to_low(dst, s_src);
-    asc_pack_to_high(dst, s_src);
-    auto u_low = asc_pack_to_low(u_src);
-    auto u_high = asc_pack_to_high(u_src);
-    auto s_low = asc_pack_to_low(s_src);
-    auto s_high = asc_pack_to_high(s_src);
-    static_assert(std::is_same<decltype(u_low), vector_uint32_t>::value);
-    static_assert(std::is_same<decltype(u_high), vector_uint32_t>::value);
-    static_assert(std::is_same<decltype(s_low), vector_uint32_t>::value);
-    static_assert(std::is_same<decltype(s_high), vector_uint32_t>::value);
-    (void)u_low;
-    (void)u_high;
-    (void)s_low;
-    (void)s_high;
-    GlobalMockObject::verify();
-}
+TEST_PACK_TO_64(UInt64Low, vector_uint64_t, asc_pack_to_low, LOWER);
+TEST_PACK_TO_64(UInt64High, vector_uint64_t, asc_pack_to_high, HIGHER);
+TEST_PACK_TO_64(Int64Low, vector_int64_t, asc_pack_to_low, LOWER);
+TEST_PACK_TO_64(Int64High, vector_int64_t, asc_pack_to_high, HIGHER);
 
 #undef TEST_PACK_DATABLOCK_RETURN
 #undef TEST_PACK_DATABLOCK
+#undef TEST_PACK_TO_64
