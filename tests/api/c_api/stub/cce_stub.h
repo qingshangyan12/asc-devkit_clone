@@ -40,24 +40,13 @@ inline void vcvt_bf162e8m0(
     vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
 
-// MODE_MERGING / 7-tag overloads missing from current tikicpulib stub_fun.h (host UT).
+// bf16->fp4 MODE_MERGING: stub_fun.h only has 6-arg int32_t overloads; add 7-arg for host UT.
+// Use int32_t (not Literal) so existing mockcpp hooks on int signatures keep working.
 inline void vcvt(
-    vector_f4e1m2x2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+    vector_f4e1m2x2& dst, vector_bf16 src, vector_bool preg, int32_t tag0, int32_t tag1, int32_t tag2, int32_t tag3)
 {}
 inline void vcvt(
-    vector_f4e2m1x2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
-{}
-inline void vcvt(
-    vector_bf16& dst, vector_f32 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
-{}
-inline void vcvt(
-    vector_hif8& dst, vector_f32 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
-{}
-inline void vcvt(
-    vector_f8e4m3& dst, vector_f32 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
-{}
-inline void vcvt(
-    vector_f8e5m2& dst, vector_f32 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
+    vector_f4e2m1x2& dst, vector_bf16 src, vector_bool preg, int32_t tag0, int32_t tag1, int32_t tag2, int32_t tag3)
 {}
 
 struct hifloat4x2_t {
