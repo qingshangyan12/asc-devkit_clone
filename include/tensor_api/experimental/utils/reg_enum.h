@@ -99,6 +99,11 @@ enum class mask_pattern : uint8_t {
     none,
 };
 
+enum class high_low_part : uint8_t {
+    low,
+    high,
+};
+
 enum class reduce_scope : uint8_t { element, datablock, pair };
 
 enum class histogram_half {
@@ -110,6 +115,8 @@ enum class histogram_mode {
     frequency,
     cumulative,
 };
+
+enum class iota_order : uint8_t { increase, decrease };
 
 enum class gather_mode {
     element = 0, // per-element gather

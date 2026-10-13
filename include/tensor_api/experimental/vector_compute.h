@@ -39,9 +39,12 @@
 #include "tensor_api/experimental/arch/vector/histogram_compute.h"
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 #include "tensor_api/experimental/arch/vector/data_reorder.h"
+#include "tensor_api/experimental/arch/vector/reg_compute_sel.h"
 #include "tensor_api/experimental/arch/vector/data_padding.h"
+#include "tensor_api/experimental/arch/vector/reg_index.h"
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_gather.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
 #endif
 #else
@@ -56,9 +59,12 @@
 #include "tensor_api/experimental/arch/vector/histogram_compute.h"
 #include "tensor_api/experimental/arch/vector/mask_reg_compute.h"
 #include "tensor_api/experimental/arch/vector/data_reorder.h"
+#include "tensor_api/experimental/arch/vector/reg_compute_sel.h"
 #include "tensor_api/experimental/arch/vector/data_padding.h"
+#include "tensor_api/experimental/arch/vector/reg_index.h"
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
 #include "tensor_api/experimental/arch/vector/reg_data_load.h"
+#include "tensor_api/experimental/arch/vector/reg_gather.h"
 #include "tensor_api/experimental/arch/vector/reg_data_store.h"
 #endif
 #endif
