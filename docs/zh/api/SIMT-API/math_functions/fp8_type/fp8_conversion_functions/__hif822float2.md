@@ -70,13 +70,20 @@ SIMT编程场景当前不支持使用该接口。
     {
         uint32_t idx = blockIdx.x * blockDim.x + threadIdx.x;
         // 每个线程处理1个hifloat8x2_t类型的数据，即2个hifloat8_t类型的数据，因此idx >= input_total_length / 2的线程不处理数据
-        if (idx > input_total_length /2) {
+        if (idx >= input_total_length / 2) {
             return;
         }
         output[idx] = __hif822float2(input[idx]);
     }
-    __global__ __vector__ void cast_kernel(__gm__ uint8_t* input,  __gm__ float* output, uint32_t input_total_length)
+    __global__ __vector__ void cast_kernel(__gm__ uint8_t* input, __gm__ float* output, uint32_t input_total_length)
     {
         asc_vf_call<simt_hif822float2>(dim3(1024), (__gm__ hifloat8x2_t*)input, (__gm__ float2*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x（hifloat8x2_t）：(0, 1), (0.25, -0.75), (inf, -inf), (nan, 8)
+result：(0.0, 1.0) (0.25, -0.75) (inf, -inf) (nan, 8.0)
+```
