@@ -1135,7 +1135,11 @@ HcclResult HcclGetThread(
         // MC2 and HCCL share the communication-domain unfold thread. Resource preparation is serialized.
         const auto unfoldRet = GetUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread);
         if (unfoldRet == HCCL_E_NOT_FOUND) {
-            CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
+            if (HcommIsSupportHcclDedicatedThreadAcquire()) {
+                CHK_RET(HcclDedicatedThreadAcquire(comm, 0, 0, &resCtxHost->unfoldThread));
+            } else {
+                CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_CPU, 1, 0, &resCtxHost->unfoldThread));
+            }
             CHK_RET(SaveUnfoldThreadInfo(comm, param, resCtxHost->unfoldThread));
         } else {
             CHK_RET(unfoldRet);
