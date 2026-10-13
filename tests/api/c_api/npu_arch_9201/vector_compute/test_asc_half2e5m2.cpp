@@ -8,51 +8,51 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-#include "tests/api/c_api/npu_arch_9201/utils/test_vcvt_instr_utils.h"
+#include "tests/api/c_api/npu_arch_9201/utils/test_half_to_fp8_instr_utils.h"
 
 // ==========asc_half2e5m2==========
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
+TEST_HALF_TO_FP8_VCVT_POS(
     Half2e5m2_rn_even, asc_half2e5m2_rn, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_EVEN, ROUND_R, RS_DISABLE,
-    PART_EVEN, MODE_ZEROING, 0);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
+    PART_EVEN, MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_POS(
     Half2e5m2_rn_odd, asc_half2e5m2_rn, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_ODD, ROUND_R, RS_DISABLE,
-    PART_ODD, MODE_ZEROING, 1);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
+    PART_ODD, MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_POS(
     Half2e5m2_rn_sat_even, asc_half2e5m2_rn_sat, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
-    RS_ENABLE, PART_EVEN, MODE_ZEROING, 2);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
+    RS_ENABLE, PART_EVEN, MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_POS(
     Half2e5m2_rn_sat_odd, asc_half2e5m2_rn_sat, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_ODD, ROUND_R,
-    RS_ENABLE, PART_ODD, MODE_ZEROING, 3);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
+    RS_ENABLE, PART_ODD, MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_POS(
     Half2e5m2_rn_merge_even, asc_half2e5m2_rn_merge, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
-    RS_DISABLE, PART_EVEN, MODE_MERGING, 4);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
+    RS_DISABLE, PART_EVEN, MODE_MERGING);
+TEST_HALF_TO_FP8_VCVT_POS(
     Half2e5m2_rn_merge_odd, asc_half2e5m2_rn_merge, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_ODD, ROUND_R,
-    RS_DISABLE, PART_ODD, MODE_MERGING, 5);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
+    RS_DISABLE, PART_ODD, MODE_MERGING);
+TEST_HALF_TO_FP8_VCVT_POS(
     Half2e5m2_rn_sat_merge_even, asc_half2e5m2_rn_sat_merge, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_EVEN,
-    ROUND_R, RS_ENABLE, PART_EVEN, MODE_MERGING, 6);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
+    ROUND_R, RS_ENABLE, PART_EVEN, MODE_MERGING);
+TEST_HALF_TO_FP8_VCVT_POS(
     Half2e5m2_rn_sat_merge_odd, asc_half2e5m2_rn_sat_merge, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_ODD,
-    ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING, 7);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(
+    ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING);
+TEST_HALF_TO_FP8_VCVT_RETURN_POS(
     Half2e5m2_rn_even, asc_half2e5m2_rn, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_EVEN, ROUND_R, RS_DISABLE,
-    PART_EVEN, MODE_ZEROING, 8);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(
+    PART_EVEN, MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_RETURN_POS(
     Half2e5m2_rn_odd, asc_half2e5m2_rn, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_ODD, ROUND_R, RS_DISABLE,
-    PART_ODD, MODE_ZEROING, 9);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(
+    PART_ODD, MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_RETURN_POS(
     Half2e5m2_rn_sat_even, asc_half2e5m2_rn_sat, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
-    RS_ENABLE, PART_EVEN, MODE_ZEROING, 10);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(
+    RS_ENABLE, PART_EVEN, MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_RETURN_POS(
     Half2e5m2_rn_sat_odd, asc_half2e5m2_rn_sat, vcvt, vector_fp8_e5m2_t, vector_half, ASC_POSITION_ODD, ROUND_R,
-    RS_ENABLE, PART_ODD, MODE_ZEROING, 11);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_2(
+    RS_ENABLE, PART_ODD, MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_V2(
     Half2e5m2_rn_v2, asc_half2e5m2_rn_v2, vcvt, vector_fp8_e5m2_t, vector_half, ROUND_R, RS_DISABLE, PART_ODD,
-    MODE_ZEROING, 12);
-TEST_VECTOR_COMPUTE_VCVT_INSTR_2(
+    MODE_ZEROING);
+TEST_HALF_TO_FP8_VCVT_V2(
     Half2e5m2_rn_sat_v2, asc_half2e5m2_rn_sat_v2, vcvt, vector_fp8_e5m2_t, vector_half, ROUND_R, RS_ENABLE, PART_ODD,
-    MODE_ZEROING, 13);
+    MODE_ZEROING);
 
 #define TEST_ASC_CAST_HALF_TO_E5M2(                                                                              \
     test_name, c_api_name, saturation_mode, dst_pos, expected_sat, expected_part, expected_mode)                 \

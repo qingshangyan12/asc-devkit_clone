@@ -768,8 +768,13 @@ static void test_host_c_api_reg_compute_21()
 }
 #endif
 
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
 static void test_host_c_api_reg_compute_22()
 {
+    using ::asc_e6m22bfloat16;
+    using ::asc_e6m22bfloat16_v2;
+    using ::asc_e8m02bfloat16;
+    using ::asc_e8m02bfloat16_v2;
     using ::asc_half2e4m3_rn;
     using ::asc_half2e4m3_rn_merge;
     using ::asc_half2e4m3_rn_sat;
@@ -786,3 +791,4 @@ static void test_host_c_api_reg_compute_22()
     using ::asc_pack_to_high;
     using ::asc_pack_to_low;
 }
+#endif

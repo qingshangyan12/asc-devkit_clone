@@ -321,10 +321,6 @@ inline void vpackv2(vector_f32& dst, vector_f32 src) {}
 inline void vpackv2(vector_u64& dst, vector_u64 src) {}
 inline void vpackv2(vector_s64& dst, vector_s64 src) {}
 
-inline void vgather2(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u16 index, vector_bool mask) {}
-inline void vgatherb(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u32 index, vector_bool mask) {}
-inline void vgatherb(vector_f8e6m2& dst, __ubuf__ fp8_e6m2_t* src, vector_u32 index) {}
-
 void vcgadd(vector_u32& dst, vector_u16 src, vector_bool pg, int32_t mode);
 void vcgadd(vector_s32& dst, vector_s16 src, vector_bool pg, int32_t mode);
 
