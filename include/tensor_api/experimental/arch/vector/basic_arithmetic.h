@@ -16,7 +16,7 @@
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 
-#include "tensor_api/tensor/tensor.h"
+#include "tensor_api/tensor/tensor_interface.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
@@ -27,6 +27,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src);
 
 template <typename T>
+__simd_callee__ inline reg_tensor<T> ln(const reg_tensor<T>& src);
+
+template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
@@ -34,6 +37,9 @@ __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> neg(const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -83,53 +89,37 @@ __simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src);
 template <typename T>
 __simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src, const reg_tensor<T>& slope);
 
-template <typename T, typename ScalarType>
-__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const ScalarType& slope);
+template <typename T>
+__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const T& slope);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_tensor<T> add_c(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
-    const reg_tensor<bool>& carry_src);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> sub(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> sub_c(
-    reg_tensor<bool>& carry, const reg_tensor<T>& src0, const reg_tensor<T>& src1,
-    const reg_tensor<bool>& carry_src);
-
-template <typename T>
-__simd_callee__ inline reg_pair<T, bool> addc(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
-
-template <typename T>
-__simd_callee__ inline reg_pair<T, bool> addc(
+__simd_callee__ inline reg_pair<T, bool> add_carry(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src);
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> subc(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+__simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
-__simd_callee__ inline reg_pair<T, bool> subc(
+__simd_callee__ inline reg_pair<T, bool> sub_carry(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src);
-
-template <typename T>
-__simd_callee__ inline reg_tensor<T> mull(
-    reg_tensor<T>& high, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
 __simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) operator/(const T& a, const U& b);
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
-template <typename T, typename U>
-__simd_callee__ inline decltype(auto) min(const T& a, const U& b);
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src, const T& scalar);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const T& scalar, const reg_tensor<T>& src);
 
 } // namespace experimental
 } // namespace te

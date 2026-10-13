@@ -117,6 +117,11 @@ enum class histogram_mode {
 };
 
 enum class iota_order : uint8_t { increase, decrease };
+
+enum class gather_mode {
+    element = 0, // per-element gather
+    data_block,  // datablock-width gather
+};
 } // namespace experimental
 } // namespace te
 } // namespace asc
