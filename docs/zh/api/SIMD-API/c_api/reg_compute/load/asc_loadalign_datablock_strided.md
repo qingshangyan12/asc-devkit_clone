@@ -45,7 +45,7 @@ __simd_callee__ inline vector_<dtype> asc_loadalign_datablock_strided(__ubuf__ <
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当dtype为`int4b_t`时，返回值的实际类型为`vector_int4x2_t`。
+`dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。当`dtype`为`int4b_t`时，返回值的实际类型为`vector_int4x2_t`。
 
 ### 函数原型典型示例
 

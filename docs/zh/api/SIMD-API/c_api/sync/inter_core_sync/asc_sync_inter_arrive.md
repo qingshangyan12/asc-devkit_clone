@@ -73,7 +73,7 @@ PIPE_S
     <!-- npu="950" id9 -->
     - 针对[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
 
-        **表2**  NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
+        **表2** NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
 
         | 核类型 | 支持的pipe取值 |
         | :--- | :--- |
@@ -84,7 +84,7 @@ PIPE_S
     <!-- npu="A3,910b" id10 -->
     - 针对[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，AIC和AIV支持的`pipe`取值如[表3](#aic_aiv_supported_pipe_2201)所示。
 
-        **表3**  NPU架构2201中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_2201"></a>
+        **表3** NPU架构2201中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_2201"></a>
 
         | 核类型 | 支持的pipe取值 |
         | :--- | :--- |

@@ -16,3 +16,19 @@ This directory contains samples that directly include `tensor_api/tensor.h` and 
 | [mmad_tensor_api](./mmad_tensor_api) | Implements dynamic-shape matrix multiplication and in-path quantization using the Tensor API | Ascend 950PR&950DT products |
 | [matmul_mxfp4_tensor_api_high_performance](./matmul_mxfp4_tensor_api_high_performance) | High-performance MxFP4 Matmul Tensor API sample based on the static Tensor programming model | Ascend 950PR&950DT products |
 | [custom_op_tensor_api](./custom_op_tensor_api) | Implements batched-input flattening and shared-weight QKV projection with a custom Tensor API Copy Operation | Ascend 950PR&950DT products |
+| [bank_conflict](./custom_op_tensor_api) | Introduces bank conflicts and mitigation methods based on the Tensor API | Ascend 950PR&950DT products |
+| [matmul_split_k](./matmul_split_k) | Implements multi-core matrix multiplication with K-axis splitting using the Tensor API | Ascend 950PR&950DT products |
+| [matmul_bias_fusion](./matmul_bias_fusion) | Implements Cube-Vector (CV) fusion computation with Bias using the Tensor API | Ascend 950PR&950DT products |
+| [abs_diff](./experimental/reg_vector_compute/abs_diff) | Computes the element-wise absolute difference of two float Tensors using the Tensor API | Ascend 950PR&950DT products |
+| [add](./experimental/reg_vector_compute/add) | Implements element-wise addition of two float Tensors using the Tensor API | Ascend 950PR&950DT products |
+| [cast](./experimental/reg_vector_compute/cast) | Implements element-wise data type conversion in multiple scenarios using the Tensor API | Ascend 950PR&950DT products |
+| [compare](./experimental/reg_vector_compute/compare) | Implements multi-scenario data comparison using the Tensor API operator> | Ascend 950PR&950DT products |
+| [copy_vector](./experimental/reg_vector_compute/copy_vector) | Implements GM-to-UB, UB-to-GM, and UB-to-UB data movement in multiple layout scenarios on the AIV using the Tensor API | Ascend 950PR&950DT products |
+| [data_reorder](./experimental/reg_vector_compute/data_reorder) | Implements data reordering using the Tensor API deinterleave | Ascend 950PR&950DT products |
+| [fill](./experimental/reg_vector_compute/fill) | Implements the fill operation in scalar-filling mode using the Tensor API | Ascend 950PR&950DT products |
+| [fma](./experimental/reg_vector_compute/fma) | Implements element-wise fused multiply-add on three float Tensors using the Tensor API | Ascend 950PR&950DT products |
+| [histograms](./experimental/reg_vector_compute/histograms) | Implements cumulative histogram statistics over the upper half region using the Tensor API | Ascend 950PR&950DT products |
+| [mull](./experimental/reg_vector_compute/mull) | Implements element-wise multiplication that outputs the high and low 32 bits of each product using the Tensor API | Ascend 950PR&950DT products |
+| [reduction_compute](./experimental/reg_vector_compute/reduction_compute) | Implements reduce_sum/reduce_max/reduce_min reduction computations using the Tensor API | Ascend 950PR&950DT products |
+| [shift_left](./experimental/reg_vector_compute/shift_left) | Implements element-wise left shift with a Tensor of shift amounts using the Tensor API | Ascend 950PR&950DT products |
+| [trunc](./experimental/reg_vector_compute/trunc) | Implements element-wise truncation toward zero on floating-point inputs using the Tensor API | Ascend 950PR&950DT products |

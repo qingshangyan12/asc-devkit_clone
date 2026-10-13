@@ -91,3 +91,10 @@ inline bfloat16_t __habs(bfloat16_t x)
         dst[idx] = __habs(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, -0.5, -0.0, 0.0, inf, -inf, nan, 1.5
+result: 0.5, 0.5, 0.0, 0.0, inf, inf, nan, 1.5
+```

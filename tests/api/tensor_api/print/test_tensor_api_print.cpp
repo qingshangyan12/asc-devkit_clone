@@ -14,6 +14,7 @@
 
 #include "tensor_api/stub/cce_stub.h"
 #include "tensor_api/tensor.h"
+#include "tensor_api/utils/print.h"
 
 namespace {
 
@@ -21,6 +22,14 @@ using tensor_api_print_test::format;
 using tensor_api_print_test::output;
 using tensor_api_print_test::records;
 using tensor_api_print_test::reset_records;
+
+template <typename T>
+void print_value(const T& value)
+{
+    asc::te::detail::print_session session;
+    asc::te::detail::emit_value(session, value);
+    asc::te::detail::print_fragment(session, (__gm__ const char*)"\n");
+}
 
 class TensorApiPrintTest : public testing::Test {
 protected:
@@ -49,17 +58,17 @@ TEST_F(TensorApiPrintTest, FormatOverloadsForwardOnePrintRecord)
 
 TEST_F(TensorApiPrintTest, ScalarValuesUseExpectedFormatsAndEndWithNewline)
 {
-    asc::te::print(-7);
+    print_value(-7);
     EXPECT_EQ(output(), "[AIC Block 0/1] -7\n");
     expect_single_head();
 
     reset_records();
-    asc::te::print(uint64_t{42});
+    print_value(uint64_t{42});
     EXPECT_EQ(output(), "[AIC Block 0/1] 42\n");
     expect_single_head();
 
     reset_records();
-    asc::te::print(1.5F);
+    print_value(1.5F);
     EXPECT_EQ(output(), "[AIC Block 0/1] 1.500000\n");
     expect_single_head();
 }
@@ -68,7 +77,7 @@ TEST_F(TensorApiPrintTest, NestedTuplePreservesStructureAndUsesOneHead)
 {
     using namespace asc::te;
 
-    print(make_coord(2, make_coord(3, 4)));
+    print_value(make_coord(2, make_coord(3, 4)));
 
     EXPECT_EQ(output(), "[AIC Block 0/1] (2, (3, 4))\n");
     expect_single_head();
@@ -78,7 +87,7 @@ TEST_F(TensorApiPrintTest, NonRankTwoLayoutUsesCompactRepresentation)
 {
     using namespace asc::te;
 
-    print(make_layout(make_shape(2, 3, 4)));
+    print_value(make_layout(make_shape(2, 3, 4)));
 
     EXPECT_EQ(output(), "[AIC Block 0/1] layout(shape=(2, 3, 4), stride=(12, 4, 1))\n");
     expect_single_head();
@@ -89,7 +98,7 @@ TEST_F(TensorApiPrintTest, PrintLayoutSeparatesDescriptionFromIndexTable)
     using namespace asc::te;
 
     auto layout = make_layout(make_shape(2, 3));
-    print(layout);
+    print_value(layout);
     EXPECT_EQ(output(), "[AIC Block 0/1] layout(shape=(2, 3), stride=(3, 1))\n");
     expect_single_head();
 
@@ -112,7 +121,7 @@ TEST_F(TensorApiPrintTest, PrintTensorDescriptionIncludesPointerAndElementBits)
 
     __gm__ int32_t data[4] = {1, 2, 3, 4};
     auto tensor = make_tensor(make_mem_ptr(data), make_layout(make_shape(2, 2)));
-    print(tensor);
+    print_value(tensor);
 
     std::string expected =
         "[AIC Block 0/1] ptr[32b](" + format("%p", data) + ") o layout(shape=(2, 2), stride=(2, 1))\n";
@@ -122,7 +131,7 @@ TEST_F(TensorApiPrintTest, PrintTensorDescriptionIncludesPointerAndElementBits)
     reset_records();
     __gm__ fp4x2_e1m2_t b4_data[1] = {};
     auto b4_tensor = make_tensor(make_mem_ptr(b4_data), make_layout(make_shape(1)));
-    print(b4_tensor);
+    print_value(b4_tensor);
     expected = "[AIC Block 0/1] ptr[4b](" + format("%p", b4_data) + ") o layout(shape=(1), stride=(1))\n";
     EXPECT_EQ(output(), expected);
     expect_single_head();

@@ -75,7 +75,8 @@ struct CommonPrepareParamCcu {
     HcclReduceOp op;
     uint64_t strideCount;
     uint8_t repeat = 1U;
-    uint8_t reservedPartA[7];
+    uint8_t skipLocalRankCopy = 0U;
+    uint8_t reservedPartA[6];
     AlltoAllVParamExt paramExt;       // only used by AlltoAllV
     AlltoAllvWriteParamExt wParamExt; // only used by AlltoAllvWrite
     uint8_t reservedPartB[8];

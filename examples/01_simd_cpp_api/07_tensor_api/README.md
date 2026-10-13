@@ -16,3 +16,19 @@
 | [mmad_tensor_api](./mmad_tensor_api) | 基于Tensor API实现动态Shape矩阵乘法和随路量化计算 | Ascend 950PR&950DT系列产品 |
 | [matmul_mxfp4_tensor_api_high_performance](./matmul_mxfp4_tensor_api_high_performance) | MxFP4 Matmul Tensor API高性能样例，展示基于静态Tensor编程的高性能实现路径 | Ascend 950PR&950DT系列产品 |
 | [custom_op_tensor_api](./custom_op_tensor_api) | 基于自定义Tensor API Copy Operation实现batch输入展平和共享权重QKV投影 | Ascend 950PR&950DT系列产品 |
+| [bank_conflict](./custom_op_tensor_api) | 基于Tensor API介绍bank冲突及规避方式 | Ascend 950PR&950DT系列产品 |
+| [matmul_split_k](./matmul_split_k) | 基于Tensor API实现多核K轴切分矩阵乘计算 | Ascend 950PR&950DT系列产品 |
+| [matmul_bias_fusion](./matmul_bias_fusion) | 基于Tensor API实现Cube和Vector的CV融合计算 | Ascend 950PR&950DT系列产品 |
+| [abs_diff](./experimental/reg_vector_compute/abs_diff) | 基于Tensor API对两组float Tensor逐元素计算差的绝对值 | Ascend 950PR&950DT系列产品 |
+| [add](./experimental/reg_vector_compute/add) | 基于Tensor API对两组float Tensor执行逐元素加法 | Ascend 950PR&950DT系列产品 |
+| [cast](./experimental/reg_vector_compute/cast) | 基于Tensor API实现多场景逐元素数据类型转换 | Ascend 950PR&950DT系列产品 |
+| [compare](./experimental/reg_vector_compute/compare) | 基于Tensor API的operator>实现多场景数据比较 | Ascend 950PR&950DT系列产品 |
+| [copy_vector](./experimental/reg_vector_compute/copy_vector) | 基于Tensor API实现AIV侧GM->UB、UB->GM和UB->UB搬运及多种分形场景 | Ascend 950PR&950DT系列产品 |
+| [data_reorder](./experimental/reg_vector_compute/data_reorder) | 基于Tensor API的deinterleave实现数据重排 | Ascend 950PR&950DT系列产品 |
+| [fill](./experimental/reg_vector_compute/fill) | 基于Tensor API实现fill标量填充运算 | Ascend 950PR&950DT系列产品 |
+| [fma](./experimental/reg_vector_compute/fma) | 基于Tensor API对三组float Tensor执行逐元素融合乘加计算 | Ascend 950PR&950DT系列产品 |
+| [histograms](./experimental/reg_vector_compute/histograms) | 基于Tensor API实现高半区累计直方图统计 | Ascend 950PR&950DT系列产品 |
+| [mull](./experimental/reg_vector_compute/mull) | 基于Tensor API实现逐元素乘法并输出乘积的高32位和低32位 | Ascend 950PR&950DT系列产品 |
+| [reduction_compute](./experimental/reg_vector_compute/reduction_compute) | 基于Tensor API实现reduce_sum/reduce_max/reduce_min归约计算 | Ascend 950PR&950DT系列产品 |
+| [shift_left](./experimental/reg_vector_compute/shift_left) | 基于Tensor API按照Tensor移位量执行逐元素左移 | Ascend 950PR&950DT系列产品 |
+| [trunc](./experimental/reg_vector_compute/trunc) | 基于Tensor API对浮点输入执行逐元素向零取整 | Ascend 950PR&950DT系列产品 |

@@ -97,3 +97,10 @@ inline half hsqrt(half x)
         asc_vf_call<kernel_sqrt>(dim3(1024), dst, x, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: nan, 0.707031, 1.58105, nan
+```

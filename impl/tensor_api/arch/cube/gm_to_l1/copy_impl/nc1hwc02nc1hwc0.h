@@ -58,7 +58,8 @@ public:
                 block_len = block_len >> 1;
             }
             copy_gm_to_l1_align_v2_instr::data_copy(
-                dst.data().get(), src.data().get(), c1, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+                dst.data().get(), src.data().get(), c1, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+                trait.pre_allocation);
         } else {
             // W not fully loaded (sliced src): per-H loop, C1 bursts of W*C0 each.
             uint32_t h = get<2>(dst_layout.shape());
@@ -70,7 +71,8 @@ public:
                 auto src_h = src(make_coord(0, 0, i, 0, 0));
                 auto dst_h = dst(make_coord(0, 0, i, 0, 0));
                 copy_gm_to_l1_align_v2_instr::data_copy(
-                    dst_h.data().get(), src_h.data().get(), c1, block_len, 0, 0, cache_mode, src_stride, dst_stride);
+                    dst_h.data().get(), src_h.data().get(), c1, block_len, 0, 0, cache_mode, src_stride, dst_stride,
+                    trait.pre_allocation);
             }
         }
     }
@@ -102,7 +104,8 @@ public:
             }
             copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
                 dst, src, dst_offset, src_offset, c1, block_len, 0, 0,
-                static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride);
+                static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride,
+                trait.pre_allocation);
         } else {
             uint32_t block_len = row_elems * sizeof(type);
             if constexpr (is_b4_type<type>) {
@@ -113,7 +116,8 @@ public:
                 auto row_offset = src_offset + i * get<2>(src.layout().stride());
                 copy_gm_to_l1_align_v2_instr::data_copy_with_offset(
                     dst_h, src, dst_offset, row_offset, c1, block_len, 0, 0,
-                    static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride);
+                    static_cast<asc_load_l2_cache_mode>(src.engine().get_cache_mode()), src_stride, dst_stride,
+                    trait.pre_allocation);
             }
         }
     }
