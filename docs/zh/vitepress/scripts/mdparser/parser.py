@@ -251,15 +251,15 @@ def _make_code_stasher():
     return _stash, spans
 
 
-def _make_math_stasher(blocks):
+def _make_math_stasher(blocks, placeholder_fmt=_MATH_PLACEHOLDER_FMT):
     def _stash(m):
         blocks.append(m.group(0))
-        return _MATH_PLACEHOLDER_FMT.format(n=len(blocks) - 1)
+        return placeholder_fmt.format(n=len(blocks) - 1)
 
     return _stash
 
 
-def _extract_math_blocks(md_text: str) -> tuple:
+def _extract_math_blocks(md_text: str, placeholder_fmt=_MATH_PLACEHOLDER_FMT) -> tuple:
     segments = _split_by_fences(md_text)
     blocks = []
     result = []
@@ -271,7 +271,7 @@ def _extract_math_blocks(md_text: str) -> tuple:
         stash_code, code_spans = _make_code_stasher()
         text = _INLINE_CODE_SPAN_RE.sub(stash_code, content)
 
-        stash_math = _make_math_stasher(blocks)
+        stash_math = _make_math_stasher(blocks, placeholder_fmt)
         text = _MATH_BLOCK_RE.sub(stash_math, text)
         text = _MATH_INLINE_RE.sub(stash_math, text)
 
@@ -283,9 +283,9 @@ def _extract_math_blocks(md_text: str) -> tuple:
     return "\n".join(result), blocks
 
 
-def _restore_math_blocks(html: str, blocks: list) -> str:
+def _restore_math_blocks(html: str, blocks: list, placeholder_fmt=_MATH_PLACEHOLDER_FMT) -> str:
     for i, block in enumerate(blocks):
-        placeholder = _MATH_PLACEHOLDER_FMT.format(n=i)
+        placeholder = placeholder_fmt.format(n=i)
         encoded = block.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
         html = html.replace(placeholder, encoded)
     return html
@@ -675,12 +675,16 @@ def _highlight_code(html: str) -> str:
 def parse_string(text: str, gfm: bool = True, source_path=None) -> str:
     text = _convert_cann_filter(text)
     text = _escape_lone_tildes(text)
-    text, math_blocks = _extract_math_blocks(text)
+    placeholder_fmt = _MATH_PLACEHOLDER_FMT
+    collision_text = html_mod.unescape(text.replace(r"\@", "@"))
+    while placeholder_fmt.split("{n}", 1)[0] in collision_text:
+        placeholder_fmt = "@" + placeholder_fmt
+    text, math_blocks = _extract_math_blocks(text, placeholder_fmt)
     if gfm:
         html = gfm_to_html(text)
     else:
         html = markdown_to_html(text)
-    html = _restore_math_blocks(html, math_blocks)
+    html = _restore_math_blocks(html, math_blocks, placeholder_fmt)
     html = _fix_links(html, source_path=source_path)
     html = _fix_callouts(html)
     html = _highlight_code(html)
