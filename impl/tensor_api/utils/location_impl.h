@@ -38,6 +38,15 @@ namespace te {
     Q(_fbuf__, fixbuf)               \
     Q(_ssbuf__, ssbuf)
 
+// hifloat4x2_t and hif4_scale are specific to arch 9201 and are not generated on other arches.
+#if defined(__NPU_ARCH__) && __NPU_ARCH__ == 9201
+#define TENSOR_API_ARCH_SPECIFIC_TYPES(M, ...) \
+    M(hifloat4x2_t, __VA_ARGS__)               \
+    M(hif4_scale, __VA_ARGS__)
+#else
+#define TENSOR_API_ARCH_SPECIFIC_TYPES(M, ...)
+#endif
+
 #define TENSOR_API_USER_TYPES(M, ...) \
     M(int8_t, __VA_ARGS__)            \
     M(int16_t, __VA_ARGS__)           \
@@ -57,8 +66,7 @@ namespace te {
     M(fp8_e4m3fn_t, __VA_ARGS__)      \
     M(fp8_e8m0_t, __VA_ARGS__)        \
     M(int4b_t, __VA_ARGS__)           \
-    M(hifloat4x2_t, __VA_ARGS__)      \
-    M(hif4_scale, __VA_ARGS__)
+    TENSOR_API_ARCH_SPECIFIC_TYPES(M, __VA_ARGS__)
 
 #define TENSOR_API_TYPE_ALIAS(qual, type) qual##_##type
 
