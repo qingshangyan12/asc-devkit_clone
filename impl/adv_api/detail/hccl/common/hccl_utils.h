@@ -31,6 +31,24 @@ __aicore__ inline void FlushDataCache(__gm__ void* gmAddr)
     FlushDataCache(globalHcclMsgArea, gmAddr);
 }
 
+// 连续多行 DCCI 刷新（性能优化(B)）：N 行共享单组 Barrier/DSB，省 N-1 组重屏障；
+// 行距由调用方传入（KFC xnData 帧行距 = MAX_DCCI_CNT=64B），单行粒度与 FlushDataCache 一致
+__aicore__ inline void FlushDataCacheLines(__gm__ void* gmAddr, uint32_t lineCount, uint64_t lineStride)
+{
+    if (lineCount == 0U) {
+        return;
+    }
+    GlobalTensor<int64_t> globalHcclMsgArea;
+    AscendC::Barrier();
+    __asm__("NOP");
+    for (uint32_t i = 0; i < lineCount; ++i) {
+        globalHcclMsgArea.SetGlobalBuffer(reinterpret_cast<__gm__ int64_t*>(
+            reinterpret_cast<__gm__ uint8_t*>(gmAddr) + lineStride * i));
+        DataCacheCleanAndInvalid<int64_t, CacheLine::SINGLE_CACHE_LINE, DcciDst::CACHELINE_OUT>(globalHcclMsgArea);
+    }
+    DataSyncBarrier<MemDsbT::ALL>();
+}
+
 __aicore__ inline void FlushDataCacheAicpu(GlobalTensor<int64_t>& globalHcclMsgArea, __gm__ void* gmAddr)
 {
     AscendC::Barrier();
@@ -89,6 +107,21 @@ __aicore__ inline void WriteHBMData(__gm__ T* addr, T value)
         WriteGmBypassDCache(reinterpret_cast<__gm__ uint8_t*>(addr), (uint8_t)value);
     }
 
+    DataSyncBarrier<MemDsbT::ALL>();
+}
+
+// 多地址 bypass 写合并（性能优化(C)）：N 笔独立地址写共享单组 Barrier/DSB，省 N-1 组重屏障；
+// 语义等价 N 次 WriteHBMData（地址互不依赖，DSB 统一兜底完成）
+__aicore__ inline void WriteHBMDataMulti(const uint64_t* addrs, uint64_t value, uint32_t count)
+{
+    if (count == 0U) {
+        return;
+    }
+    Barrier();
+    Nop();
+    for (uint32_t i = 0; i < count; ++i) {
+        WriteGmBypassDCache(reinterpret_cast<__gm__ uint64_t*>(addrs[i]), value);
+    }
     DataSyncBarrier<MemDsbT::ALL>();
 }
 

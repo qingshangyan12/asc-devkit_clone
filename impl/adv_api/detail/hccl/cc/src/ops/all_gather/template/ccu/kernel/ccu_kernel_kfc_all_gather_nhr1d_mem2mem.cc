@@ -310,10 +310,10 @@ CcuResult DoRepeatAllGatherNHRSingleStep(KfcAllGatherNhr1DContext& ctx, const Kf
         }
     }
 
-    if (!isLastStep) {
-        CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-        CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
-    }
+    // D3：末步也做步间同步——turn-end 提前到 PostSync 前的前置条件（末步接收分片的到达
+    // 保证由此承担，与 hccl 仅末步跳过同步不同）；record 先于 wait 且不阻塞，无死锁。
+    CCU_CHK_RET(ccu::NotifyRecord(sendChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
+    CCU_CHK_RET(ccu::NotifyWait(recvChannel, AG_NHR_CKE_IDX, AG_NHR_STEP_POST_SYNC_BIT));
 
     return CCU_SUCCESS;
 }
@@ -364,7 +364,7 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable die1Size, ccu::Variable outputSliceStride, ccu::Variable goSize0, ccu::Variable goSize1,
     ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
     uint32_t rankSize, uint32_t rankId, uint32_t axisId, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx)
+    const std::map<uint32_t, uint32_t>& rank2ChannelIdx, ccu::Variable turnEndAddr)
 {
     KfcAllGatherNhr1DContext ctx;
     ctx.channels = channels;
@@ -383,6 +383,12 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     CCU_CHK_RET(PreSync(ctx));
 
     CCU_CHK_RET(DoRepeatAllGatherNHR(ctx));
+
+    // D3：末步同步完成后本 mission 半区输出已完整（各步接收分片到达 + GroupCopy 阻塞落位 +
+    // 本 rank 写 EventWait；双 die 两 mission 数据不相交，AIV 等齐两个 turn-end 即全量完整），
+    // 在 PostSync 前写 turn-end，AIV 提前返回；PostSync 仍在 server 指令流中先于下一轮
+    // PreSync 执行，跨轮 XN 保护不变。
+    CCU_CHK_RET(ccu::Store(turnEndAddr, ctx.constVar1));
 
     CCU_CHK_RET(PostSync(ctx));
 

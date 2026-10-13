@@ -25,12 +25,16 @@ namespace mc2_ops_hccl {
 // 前者由 LoadNhr1DArgs 内联（sole executor 恒定），后者经 goSize 全零表达（in-place 时
 // AIV 按 0 字节计算 goSize，GroupCopy 内部 CCU_IF 块均不触发）；goSize0-3 已由 dispatch
 // 按 axisId 选档（D0/D1 组），die1Size 仅 axis1 用于基偏移。
+// D3 turn-end 提前：turnEndAddr 为本轮完成信号（WAIT 槽 CKE）的 HBM 地址，由 server 按
+// 队列游标传入（双 mission 各传各的 recordAddr）；kernel 在末步同步后、PostSync 前提前
+// 写入，AIV 提前返回，server 侧相应跳过本轮 SetTurnEndSig（PostSync 仍在 server 指令流中
+// 先于下一轮 PreSync 执行，跨轮 XN 保护不变）。
 CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     ccu::Variable inputAddr, ccu::Variable outputAddr, ccu::Variable tokenInfo, ccu::Variable die0Size,
     ccu::Variable die1Size, ccu::Variable outputSliceStride, ccu::Variable goSize0, ccu::Variable goSize1,
     ccu::Variable goSize2, ccu::Variable goSize3, const ChannelHandle channels[], uint32_t channelCount,
     uint32_t rankSize, uint32_t rankId, uint32_t axisId, const std::vector<KfcNhrStepInfo>& stepInfoVector,
-    const std::map<uint32_t, uint32_t>& rank2ChannelIdx);
+    const std::map<uint32_t, uint32_t>& rank2ChannelIdx, ccu::Variable turnEndAddr);
 
 } // namespace mc2_ops_hccl
 
