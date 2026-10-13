@@ -230,7 +230,7 @@ constexpr const char* Ascend_035B = "Ascend035B";
 constexpr const char* Ascend5162A = "Ascend5162A";
 constexpr const char* KirinX90 = "KirinX90";
 constexpr const char* Kirin9030 = "Kirin9030";
-constexpr const char* KirinDev0000 = "KirinDev0000";
+constexpr const char* Kirin9050 = "Kirin9050";
 constexpr const char* KirinDev0001 = "KirinDev0001";
 constexpr const char* KirinDev0002 = "KirinDev0002";
 constexpr const char* KirinDev0003 = "KirinDev0003";
@@ -683,7 +683,7 @@ private:
                                            Ascend950DT_9572,   Ascend950DT_9573,   Ascend950DT_9574,  Ascend950DT_9575,
                                            Ascend950DT_9576,   Ascend950DT_9577,   Ascend950DT_9578,  MC32DM11AA,
                                            MC32DM11AB,         MC32DM11AC,         Ascend350_354f,    Ascend350_355e,
-                                           KirinDev0000,       KirinDev0001,       KirinDev0002,      KirinDev0003,
+                                           Kirin9050,       KirinDev0001,       KirinDev0002,      KirinDev0003,
                                            Ascend960DT_969B5,  Ascend960DT_968B7,  Ascend960DT_966B7, Ascend960DT_969B6,
                                            Ascend960DT_966B8,  Ascend960DT_966B8Z, Ascend960DT_961BZ, Ascend960DT_961BY,
                                            Ascend960PR,        Ascend960PR_969A1,  Ascend960_9689,    Ascend960PR_964A1,

@@ -656,7 +656,7 @@ class CommonUtility:
             res: True means l311
         """
         short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
-        if short_soc_version in ["KirinDev0000"]:
+        if short_soc_version in ["Kirin9050"]:
             return True
         return False
 

@@ -508,7 +508,7 @@ bool CceConfBase::SetOptionalCoreType(const std::string& key)
             MC62DM23AB,        MC62CM12AA,        MC62DM22AA,        MC62CM12AC,        MC62DM22AC,
             MC62CM12AD,        MC62DM22AD,        MC62CM12AE,        MC62DM22AE,        MC62CM12AF,
             MC62DM22AF,        MC62CM12AB,        MC62DM22AB,        KirinX90,          Kirin9030,
-            KirinDev0000,      KirinDev0001,      KirinDev0002,      KirinDev0003,      MC32DM11AA,
+            Kirin9050,      KirinDev0001,      KirinDev0002,      KirinDev0003,      MC32DM11AA,
             MC32DM11AB,        MC32DM11AC,        Ascend350_354f,    Ascend350_355e,    Ascend960DT_969B5,
             Ascend960DT_968B7, Ascend960DT_966B7, Ascend960DT_969B6, Ascend960DT_966B8, Ascend960DT_966B8Z,
             Ascend960DT_961BZ, Ascend960DT_961BY, Ascend960PR,       Ascend960PR_969A1, Ascend960_9689,
