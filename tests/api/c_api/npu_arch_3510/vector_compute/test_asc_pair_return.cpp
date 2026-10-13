@@ -22,16 +22,64 @@ void FillRegister(DataType& value, unsigned char pattern)
     std::memset(&value, pattern, sizeof(DataType));
 }
 
-template <typename FirstType, typename SecondType>
+template <typename ResultType, typename FirstType, typename SecondType>
 void ExpectPairRegisters(
-    const c_api::reg_pair<FirstType, SecondType>& result, const FirstType& expected_first, const SecondType& expected_second)
+    const ResultType& result, const FirstType& expected_first, const SecondType& expected_second)
 {
     EXPECT_EQ(0, std::memcmp(&result.first, &expected_first, sizeof(FirstType)));
     EXPECT_EQ(0, std::memcmp(&result.second, &expected_second, sizeof(SecondType)));
 }
 } // namespace
 
-#define TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(class_name, c_api_name, cce_name, data_type)                    \
+class TestVectorComputeMullPairReturnCApi : public testing::Test {};
+
+namespace {
+template <typename DataType>
+void MullPairStub(DataType& dst0, DataType& dst1, DataType src0, DataType src1, vector_bool mask)
+{
+    vector_bool expected_mask{};
+    FillRegister(expected_mask, 0x33);
+    EXPECT_EQ(0, std::memcmp(&mask, &expected_mask, sizeof(mask)));
+    dst0 = src0;
+    dst1 = src1;
+}
+} // namespace
+
+TEST_F(TestVectorComputeMullPairReturnCApi, Int32PairReturn)
+{
+    vector_int32_t src0{};
+    vector_int32_t src1{};
+    vector_bool mask{};
+    FillRegister(src0, 0x11);
+    FillRegister(src1, 0x22);
+    FillRegister(mask, 0x33);
+    static_assert(std::is_same_v<decltype(asc_mull(src0, src1, mask)), asc_mull_int32_t_result>);
+    MOCKER_CPP(vmull, void(vector_int32_t&, vector_int32_t&, vector_int32_t, vector_int32_t, vector_bool))
+        .times(1)
+        .will(invoke(MullPairStub<vector_int32_t>));
+    auto result = asc_mull(src0, src1, mask);
+    ExpectPairRegisters(result, src0, src1);
+    GlobalMockObject::verify();
+}
+
+TEST_F(TestVectorComputeMullPairReturnCApi, Uint32PairReturn)
+{
+    vector_uint32_t src0{};
+    vector_uint32_t src1{};
+    vector_bool mask{};
+    FillRegister(src0, 0x11);
+    FillRegister(src1, 0x22);
+    FillRegister(mask, 0x33);
+    static_assert(std::is_same_v<decltype(asc_mull(src0, src1, mask)), asc_mull_uint32_t_result>);
+    MOCKER_CPP(vmull, void(vector_uint32_t&, vector_uint32_t&, vector_uint32_t, vector_uint32_t, vector_bool))
+        .times(1)
+        .will(invoke(MullPairStub<vector_uint32_t>));
+    auto result = asc_mull(src0, src1, mask);
+    ExpectPairRegisters(result, src0, src1);
+    GlobalMockObject::verify();
+}
+
+#define TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(class_name, c_api_name, cce_name, data_type, result_type)       \
     class TestVectorCompute##class_name##data_type##PairReturnCApi : public testing::Test {                   \
     protected:                                                                                                \
         void SetUp() {}                                                                                       \
@@ -58,7 +106,7 @@ void ExpectPairRegisters(
         FillRegister(src0, 0x11);                                                                              \
         FillRegister(src1, 0x22);                                                                              \
         FillRegister(mask, 0x33);                                                                              \
-        static_assert(std::is_same_v<decltype(c_api_name(src0, src1, mask)), c_api::reg_pair<data_type, vector_bool>>); \
+        static_assert(std::is_same_v<decltype(c_api_name(src0, src1, mask)), result_type>);                    \
                                                                                                               \
         MOCKER_CPP(cce_name, void(vector_bool&, data_type&, data_type, data_type, vector_bool))               \
             .times(1)                                                                                         \
@@ -69,7 +117,7 @@ void ExpectPairRegisters(
         GlobalMockObject::verify();                                                                           \
     }
 
-#define TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(class_name, c_api_name, cce_name, data_type)               \
+#define TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(class_name, c_api_name, cce_name, data_type, result_type)  \
     class TestVectorCompute##class_name##data_type##PairReturnCApi : public testing::Test {                   \
     protected:                                                                                                \
         void SetUp() {}                                                                                       \
@@ -102,7 +150,7 @@ void ExpectPairRegisters(
         FillRegister(mask, 0x44);                                                                              \
         static_assert(                                                                                        \
             std::is_same_v<decltype(c_api_name(src0, src1, carry_src, mask)),                                \
-                c_api::reg_pair<data_type, vector_bool>>);                                                          \
+                result_type>);                                                                                 \
                                                                                                               \
         MOCKER_CPP(cce_name, void(vector_bool&, data_type&, data_type, data_type, vector_bool, vector_bool))  \
             .times(1)                                                                                         \
@@ -113,16 +161,24 @@ void ExpectPairRegisters(
         GlobalMockObject::verify();                                                                           \
     }
 
-TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(AddCarry, asc_add_carry, vaddc, vector_uint32_t);
-TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(AddCarry, asc_add_carry, vaddc, vector_int32_t);
-TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(AddCarrySrc, asc_add_carry, vaddcs, vector_uint32_t);
-TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(AddCarrySrc, asc_add_carry, vaddcs, vector_int32_t);
-TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(SubCarry, asc_sub_carry, vsubc, vector_uint32_t);
-TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(SubCarry, asc_sub_carry, vsubc, vector_int32_t);
-TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(SubCarrySrc, asc_sub_carry, vsubcs, vector_uint32_t);
-TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(SubCarrySrc, asc_sub_carry, vsubcs, vector_int32_t);
+TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(
+    AddCarry, asc_add_carry, vaddc, vector_uint32_t, asc_add_carry_uint32_t_result);
+TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(
+    AddCarry, asc_add_carry, vaddc, vector_int32_t, asc_add_carry_int32_t_result);
+TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
+    AddCarrySrc, asc_add_carry, vaddcs, vector_uint32_t, asc_add_carry_uint32_t_result);
+TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
+    AddCarrySrc, asc_add_carry, vaddcs, vector_int32_t, asc_add_carry_int32_t_result);
+TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(
+    SubCarry, asc_sub_carry, vsubc, vector_uint32_t, asc_sub_carry_uint32_t_result);
+TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(
+    SubCarry, asc_sub_carry, vsubc, vector_int32_t, asc_sub_carry_int32_t_result);
+TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
+    SubCarrySrc, asc_sub_carry, vsubcs, vector_uint32_t, asc_sub_carry_uint32_t_result);
+TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
+    SubCarrySrc, asc_sub_carry, vsubcs, vector_int32_t, asc_sub_carry_int32_t_result);
 
-#define TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(class_name, c_api_name, cce_name, data_type)                    \
+#define TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(class_name, c_api_name, cce_name, data_type, result_type)       \
     class TestVectorCompute##class_name##data_type##PairReturnCApi : public testing::Test {                   \
     protected:                                                                                                \
         void SetUp() {}                                                                                       \
@@ -146,7 +202,7 @@ TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(SubCarrySrc, asc_sub_carry, vsubcs, ve
         data_type src1{};                                                                                     \
         FillRegister(src0, 0x11);                                                                              \
         FillRegister(src1, 0x22);                                                                              \
-        static_assert(std::is_same_v<decltype(c_api_name(src0, src1)), c_api::reg_pair<data_type, data_type>>);      \
+        static_assert(std::is_same_v<decltype(c_api_name(src0, src1)), result_type>);                         \
                                                                                                               \
         MOCKER_CPP(cce_name, void(data_type&, data_type&, data_type, data_type))                             \
             .times(1)                                                                                         \
@@ -157,7 +213,7 @@ TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(SubCarrySrc, asc_sub_carry, vsubcs, ve
         GlobalMockObject::verify();                                                                           \
     }
 
-#define TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN_HIF8(class_name, c_api_name, cce_name)                       \
+#define TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN_HIF8(class_name, c_api_name, cce_name, result_type)          \
     class TestVectorCompute##class_name##vector_hifloat8_t##PairReturnCApi : public testing::Test {          \
     protected:                                                                                                \
         void SetUp() {}                                                                                       \
@@ -183,7 +239,7 @@ TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(SubCarrySrc, asc_sub_carry, vsubcs, ve
         FillRegister(src1, 0x22);                                                                              \
         static_assert(                                                                                        \
             std::is_same_v<decltype(c_api_name(src0, src1)),                                                 \
-                c_api::reg_pair<vector_hifloat8_t, vector_hifloat8_t>>);                                            \
+                result_type>);                                                                                 \
                                                                                                               \
         MOCKER_CPP(cce_name, void(vector_uint8_t&, vector_uint8_t&, vector_uint8_t, vector_uint8_t))         \
             .times(1)                                                                                         \
@@ -194,35 +250,61 @@ TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(SubCarrySrc, asc_sub_carry, vsubcs, ve
         GlobalMockObject::verify();                                                                           \
     }
 
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_uint8_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_int8_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_uint16_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_int16_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_uint32_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_int32_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_half);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_float);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_fp8_e8m0_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_fp8_e5m2_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_fp8_e4m3fn_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Intlv, asc_intlv, vintlv, vector_bfloat16_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN_HIF8(Intlv, asc_intlv, vintlv);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_uint8_t, asc_intlv_uint8_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_int8_t, asc_intlv_int8_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_uint16_t, asc_intlv_uint16_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_int16_t, asc_intlv_int16_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_uint32_t, asc_intlv_uint32_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_int32_t, asc_intlv_int32_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_half, asc_intlv_half_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_float, asc_intlv_float_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_fp8_e8m0_t, asc_intlv_fp8_e8m0_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_fp8_e5m2_t, asc_intlv_fp8_e5m2_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_fp8_e4m3fn_t, asc_intlv_fp8_e4m3fn_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv, vintlv, vector_bfloat16_t, asc_intlv_bfloat16_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN_HIF8(
+    Intlv, asc_intlv, vintlv, asc_intlv_hifloat8_t_result);
 
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_int32_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_uint32_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_int16_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_uint16_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_int8_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_uint8_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_fp8_e4m3fn_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN_HIF8(Deintlv, asc_deintlv, vdintlv);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_fp8_e5m2_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_fp8_e8m0_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_bfloat16_t);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_float);
-TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_half);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_int32_t, asc_deintlv_int32_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_uint32_t, asc_deintlv_uint32_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_int16_t, asc_deintlv_int16_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_uint16_t, asc_deintlv_uint16_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_int8_t, asc_deintlv_int8_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_uint8_t, asc_deintlv_uint8_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_fp8_e4m3fn_t, asc_deintlv_fp8_e4m3fn_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN_HIF8(
+    Deintlv, asc_deintlv, vdintlv, asc_deintlv_hifloat8_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_fp8_e5m2_t, asc_deintlv_fp8_e5m2_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_fp8_e8m0_t, asc_deintlv_fp8_e8m0_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_bfloat16_t, asc_deintlv_bfloat16_t_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_float, asc_deintlv_float_result);
+TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv, vdintlv, vector_half, asc_deintlv_half_result);
 
-#define TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(class_name, c_api_name, cce_name)                         \
+#define TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(class_name, c_api_name, cce_name, result_type)            \
     class TestVectorCompute##class_name##c_api_name##MaskPairReturnCApi : public testing::Test {             \
     protected:                                                                                                \
         void SetUp() {}                                                                                       \
@@ -244,7 +326,7 @@ TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_ha
         vector_bool src1{};                                                                                   \
         FillRegister(src0, 0x11);                                                                              \
         FillRegister(src1, 0x22);                                                                              \
-        static_assert(std::is_same_v<decltype(c_api_name(src0, src1)), c_api::reg_pair<vector_bool, vector_bool>>);  \
+        static_assert(std::is_same_v<decltype(c_api_name(src0, src1)), result_type>);                         \
                                                                                                               \
         MOCKER_CPP(cce_name, void(vector_bool&, vector_bool&, vector_bool, vector_bool))                      \
             .times(1)                                                                                         \
@@ -255,9 +337,15 @@ TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(Deintlv, asc_deintlv, vdintlv, vector_ha
         GlobalMockObject::verify();                                                                           \
     }
 
-TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(Intlv, asc_intlv_b8, pintlv_b8);
-TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(Intlv, asc_intlv_b16, pintlv_b16);
-TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(Intlv, asc_intlv_b32, pintlv_b32);
-TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(Deintlv, asc_deintlv_b8, pdintlv_b8);
-TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(Deintlv, asc_deintlv_b16, pdintlv_b16);
-TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(Deintlv, asc_deintlv_b32, pdintlv_b32);
+TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv_b8, pintlv_b8, asc_intlv_b8_result);
+TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv_b16, pintlv_b16, asc_intlv_b16_result);
+TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
+    Intlv, asc_intlv_b32, pintlv_b32, asc_intlv_b32_result);
+TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv_b8, pdintlv_b8, asc_deintlv_b8_result);
+TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv_b16, pdintlv_b16, asc_deintlv_b16_result);
+TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
+    Deintlv, asc_deintlv_b32, pdintlv_b32, asc_deintlv_b32_result);

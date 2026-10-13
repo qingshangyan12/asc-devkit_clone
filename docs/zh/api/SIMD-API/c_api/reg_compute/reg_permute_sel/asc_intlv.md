@@ -44,11 +44,15 @@
 ### 矢量数据寄存器交织模式
 
 ```c
-// 占位符形式
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_intlv(vector_<dtype>& dst0,
-                                      vector_<dtype>& dst1,
-                                      vector_<dtype> src0,
-                                      vector_<dtype> src1)
+                                    vector_<dtype>& dst1,
+                                    vector_<dtype> src0,
+                                    vector_<dtype> src1)
+
+// 通过函数返回值返回结果（占位符形式）
+__simd_callee__ inline asc_intlv_<dtype>_result asc_intlv(vector_<dtype> src0,
+                                                       vector_<dtype> src1)
 ```
 
 #### dtype支持数据类型
@@ -58,15 +62,21 @@ __simd_callee__ inline void asc_intlv(vector_<dtype>& dst0,
 #### 函数原型典型示例
 
 ```c
+// 通过引用参数输出结果示例：对int8_t矢量数据寄存器执行交织。
 __simd_callee__ inline void asc_intlv(vector_int8_t& dst0,
                                       vector_int8_t& dst1,
                                       vector_int8_t src0,
                                       vector_int8_t src1)
+
+// 通过函数返回值返回结果示例：对int8_t矢量数据寄存器执行交织。
+__simd_callee__ inline asc_intlv_int8_t_result asc_intlv(vector_int8_t src0,
+                                                         vector_int8_t src1)
 ```
 
 ### 掩码寄存器交织模式
 
 ```c
+// 通过引用参数输出结果
 __simd_callee__ inline void asc_intlv_b8(vector_bool& dst0,
                                          vector_bool& dst1,
                                          vector_bool src0,
@@ -79,6 +89,14 @@ __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0,
                                           vector_bool& dst1,
                                           vector_bool src0,
                                           vector_bool src1)
+
+// 通过函数返回值返回结果
+__simd_callee__ inline asc_intlv_b8_result asc_intlv_b8(vector_bool src0,
+                                                        vector_bool src1)
+__simd_callee__ inline asc_intlv_b16_result asc_intlv_b16(vector_bool src0,
+                                                          vector_bool src1)
+__simd_callee__ inline asc_intlv_b32_result asc_intlv_b32(vector_bool src0,
+                                                          vector_bool src1)
 ```
 
 ## 参数说明
@@ -91,8 +109,8 @@ __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0,
 |---|---|---|
 | dst0 | 输出 | 目的操作数（矢量数据寄存器），用于保存交织后的低半部分数据。数据类型须与`src0`、`src1`一致。 |
 | dst1 | 输出 | 目的操作数（矢量数据寄存器），用于保存交织后的高半部分数据。数据类型须与`src0`、`src1`一致。 |
-| src0 | 输入 | 源操作数（矢量数据寄存器）。 |
-| src1 | 输入 | 源操作数（矢量数据寄存器）。数据类型须与`src0`一致。 |
+| src0 | 输入 | 源矢量数据寄存器，参与交织的操作数。前半部分元素与`src1`前半部分元素交替写入`dst0`，后半部分元素与`src1`后半部分元素交替写入`dst1`，每对元素中`src0`的元素在前。 |
+| src1 | 输入 | 源矢量数据寄存器，参与交织的操作数。数据类型须与`src0`一致，每对元素中`src1`的元素在后。 |
 
 ### 掩码寄存器交织模式
 
@@ -109,7 +127,10 @@ __simd_callee__ inline void asc_intlv_b32(vector_bool& dst0,
 
 ## 返回值说明
 
-无
+- 通过引用参数输出结果的函数原型无返回值。
+- 通过函数返回值输出结果的函数原型返回一个具体的结果结构体，使用变量`result`接收函数返回值。
+    - 操作数为矢量数据寄存器时，返回类型为`asc_intlv_<dtype>_result`。例如，输入为`vector_half`时，`asc_deintlv`函数的返回值类型为`asc_intlv_half_result`，两个成员的类型均为`vector_half`。`result.first`对应引用参数版本的`dst0`，保存解交织后的偶数索引元素集合；`result.second`对应引用参数版本的`dst1`，保存解交织后的奇数索引元素集合。
+    - 操作数为掩码寄存器时，返回类型为`asc_intlv_b8_result`、`asc_intlv_b16_result`或`asc_intlv_b32_result`。`result.first`和`result.second`的类型均为`vector_bool`，分别对应引用参数版本的`dst0`和`dst1`，保存对应粒度下解交织后的偶数索引位集合和奇数索引位集合。
 
 ## 约束说明
 

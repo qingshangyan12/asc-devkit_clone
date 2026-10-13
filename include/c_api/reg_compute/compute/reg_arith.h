@@ -76,16 +76,16 @@ __simd_callee__ inline void asc_subc(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src,
     vector_bool mask);
 
-__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_bool>
+__simd_callee__ inline asc_sub_carry_uint32_t_result
 asc_sub_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
-__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_bool>
+__simd_callee__ inline asc_sub_carry_int32_t_result
 asc_sub_carry(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
-__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_bool>
+__simd_callee__ inline asc_sub_carry_uint32_t_result
 asc_sub_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask);
 
-__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_bool>
+__simd_callee__ inline asc_sub_carry_int32_t_result
 asc_sub_carry(vector_int32_t src0, vector_int32_t src1, vector_bool carry_src, vector_bool mask);
 
 __simd_callee__ inline vector_int8_t asc_min(vector_int8_t src0, vector_int8_t src1, vector_bool mask);
@@ -170,6 +170,12 @@ __simd_callee__ inline void asc_mull(
 
 __simd_callee__ inline void asc_mull(
     vector_int32_t& dst0, vector_int32_t& dst1, vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+
+__simd_callee__ inline asc_mull_int32_t_result
+asc_mull(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
+
+__simd_callee__ inline asc_mull_uint32_t_result
+asc_mull(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
 __simd_callee__ inline vector_half asc_sqrt(vector_half src, vector_bool mask);
 
@@ -283,16 +289,16 @@ __simd_callee__ inline void asc_addc(
     vector_bool& carry, vector_int32_t& dst, vector_int32_t src0, vector_int32_t src1, vector_bool carry_src,
     vector_bool mask);
 
-__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_bool>
+__simd_callee__ inline asc_add_carry_uint32_t_result
 asc_add_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask);
 
-__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_bool>
+__simd_callee__ inline asc_add_carry_int32_t_result
 asc_add_carry(vector_int32_t src0, vector_int32_t src1, vector_bool mask);
 
-__simd_callee__ inline c_api::reg_pair<vector_uint32_t, vector_bool>
+__simd_callee__ inline asc_add_carry_uint32_t_result
 asc_add_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask);
 
-__simd_callee__ inline c_api::reg_pair<vector_int32_t, vector_bool>
+__simd_callee__ inline asc_add_carry_int32_t_result
 asc_add_carry(vector_int32_t src0, vector_int32_t src1, vector_bool carry_src, vector_bool mask);
 
 __simd_callee__ inline vector_uint8_t asc_max(vector_uint8_t src0, vector_uint8_t src1, vector_bool mask);
