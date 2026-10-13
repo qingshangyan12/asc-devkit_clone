@@ -147,8 +147,8 @@ bool ResourceManifestValidator::ValidateManifestFields()
         }
         sourceFile = manifest_.at("source_file").get_ref<const std::string&>();
         if (!CheckAndLog(
-                FileUtils::IsSafeRelativePath(sourceFile) && FileUtils::FileName(sourceFile) == sourceFile, __LINE__,
-                "invalid source_file: expected a plain file name")) {
+                FileUtils::IsSafeRelativePath(sourceFile), __LINE__,
+                "invalid source_file: expected a safe relative POSIX path")) {
             return false;
         }
         hasSourceFile_ = true;

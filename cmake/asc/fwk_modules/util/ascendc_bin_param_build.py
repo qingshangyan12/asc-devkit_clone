@@ -684,7 +684,9 @@ def gen_option_config(debug_config, super_config, op_debug_config):
                 debug_config[_op_type].add(_option)
 
 
-def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str, opc_config_file: str = "", ops: list = None):
+def gen_bin_param_file(
+    cfgfile: str, out_dir: str, soc: str, opc_config_file: str = "", ops: list = None, kernel_spec_task: str = None
+):
     if not os.path.exists(cfgfile):
         print(f"INFO: {cfgfile} does not exists in this project, skip generating compile commands.")
         return
@@ -707,7 +709,7 @@ def gen_bin_param_file(cfgfile: str, out_dir: str, soc: str, opc_config_file: st
     for op_desc in op_descs:
         op_desc.set_soc_version(soc)
         op_desc.set_out_path(out_dir)
-        op_desc.kernel_spec_options = shell_options(opc_config_file, op_desc.op_type, soc)
+        op_desc.kernel_spec_options = shell_options(opc_config_file, op_desc.op_type, soc, kernel_spec_task)
         if op_desc.op_type in debug_config:
             op_desc.set_op_debug_config(debug_config[op_desc.op_type])
         if all_soc_key in debug_config:
