@@ -611,7 +611,10 @@ function(_ascendc_remove_kernel_spec_install package_name resource_dir)
     if(NOT IS_ABSOLUTE \"\${spec_cleanup_destination}\")
       set(spec_cleanup_destination \"\${CMAKE_INSTALL_PREFIX}/\${spec_cleanup_destination}\")
     endif()
-    file(REMOVE \"\$ENV{DESTDIR}\${spec_cleanup_destination}/libcust_compile_db.so\")
+    # Active resource targets perform their own status check before changing installed files.
+    if(NOT $<TARGET_EXISTS:${package_name}_kernel_spec>)
+      file(REMOVE \"\$ENV{DESTDIR}\${spec_cleanup_destination}/libcust_compile_db.so\")
+    endif()
   ")
 endfunction()
 

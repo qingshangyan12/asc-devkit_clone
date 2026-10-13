@@ -129,6 +129,22 @@ if [ $? -ne 0 ];then
     exit 1
 fi
 
+# Resource SOs are a separate delivery directory from kernel binaries.
+log "[INFO] upgrade kernel spec resources"
+if [ -f "${sourcedir}/${vendordir}/op_spec/libcust_compile_db.so" ]; then
+    upgrade op_spec
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+elif [ -f "${targetdir}/${vendordir}/op_spec/libcust_compile_db.so" ]; then
+    # A package without exported resources must not keep the previous resource database.
+    rm -f "${targetdir}/${vendordir}/op_spec/libcust_compile_db.so"
+    if [ $? -ne 0 ]; then
+        log "[ERROR] remove stale kernel spec resource SO failed"
+        exit 1
+    fi
+fi
+
 log "[INFO] upgrade op api"
 upgrade op_api
 if [ $? -ne 0 ];then
