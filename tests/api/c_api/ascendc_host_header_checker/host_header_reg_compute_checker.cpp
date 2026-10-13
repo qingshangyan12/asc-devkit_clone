@@ -758,7 +758,7 @@ static void test_host_c_api_reg_compute_21()
 #endif
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90200000)
-static void test_host_c_api_reg_compute_22)
+static void test_host_c_api_reg_compute_22()
 {
     using ::asc_float2half_rd_merge;
     using ::asc_float2half_rd_sat_merge;
@@ -809,4 +809,3 @@ static void test_host_c_api_reg_compute_24()
     using ::asc_pack_to_low;
 }
 #endif
-
