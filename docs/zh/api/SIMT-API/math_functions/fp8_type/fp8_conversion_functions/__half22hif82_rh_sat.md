@@ -68,6 +68,7 @@ SIMT编程场景当前不支持使用该接口。
 
     ```cpp
     #include "simt_api/asc_fp8.h"
+    #include "basic_api/kernel_operator_common_intf.h"
 
     // 使用短向量可提升数据搬运效率
     __simt_vf__ __launch_bounds__(1024) inline void simt_half22hif82_rh_sat(__gm__ half2* input, __gm__ hifloat8x2_t* output, uint32_t input_total_length)
@@ -81,6 +82,14 @@ SIMT编程场景当前不支持使用该接口。
     }
     __global__ __vector__ void cast_kernel(__gm__ half* input,  __gm__ uint8_t* output, uint32_t input_total_length)
     {
+        AscendC::SetCtrlSpr<60, 60>(0);
         asc_vf_call<simt_half22hif82_rh_sat>(dim3(1024), (__gm__ half2*)input, (__gm__ hifloat8x2_t*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x：(0.0, 1.0), (0.25, -0.75), (inf, -inf), (nan, 8.0)
+result（hifloat8x2_t）：(0, 1) (0.25, -0.75) (32768, -32768) (0, 8)
+```
