@@ -22,16 +22,12 @@ using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
 using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
 using vector_fp8_e6m2_t = vector_f8e6m2;
 
-// CPU stub scalar type for hif4x2 (used by mad / datamove UT).
 struct hifloat4x2_t {
     uint8_t val = 0;
 };
 using hif4x2_t = hifloat4x2_t;
 
-// Temporary CPU stub: tikicpulib may lack vector_hif4x2; keep type.h alias compiling.
-#if !defined(ASCENDC_HAS_VECTOR_HIF4X2)
 using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
-#endif
 
 inline void vcvt(
     vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
