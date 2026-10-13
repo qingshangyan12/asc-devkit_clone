@@ -1893,7 +1893,6 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
-
 // ==========9201 PR merging conversion + asc_cast_merge (A6 float/bf16/fp4/hif8)==========
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask,

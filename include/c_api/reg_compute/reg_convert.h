@@ -6877,7 +6877,6 @@ __simd_callee__ inline void asc_half2int4x2_rz_sat_merge(
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
         dst_quarter_pos);
 
-
 // ==========9201 merging conversion interfaces (*_merge / *_sat_merge)==========
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
     vector_fp4x2_e1m2_t& dst, vector_bfloat16_t src, vector_bool mask,
