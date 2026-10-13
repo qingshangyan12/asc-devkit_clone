@@ -53,6 +53,8 @@ struct reg_tensor {
      * @archs 3510
      * @brief Constructs a register tensor with the specified active-lane mask.
      * @param [in] maskValue Raw vector predicate used as the active-lane mask.
+     * @note A mask value of 1 enables the corresponding element; a value of 0 disables it.
+     * Setting the mask does not modify the underlying register data.
      */
     __simd_callee__ reg_tensor(const vector_bool& maskValue) : mask(maskValue) {}
 
@@ -63,6 +65,8 @@ struct reg_tensor {
      * @brief Sets the active-lane mask from a Boolean register tensor.
      * @return A reference to this register tensor.
      * @param [in] maskReg Register tensor whose register value supplies the mask.
+     * @note A mask value of 1 enables the corresponding element; a value of 0 disables it.
+     * Setting the mask does not modify the underlying register data.
      */
     __simd_callee__ inline reg_tensor& with_mask(const reg_tensor<bool>& maskReg);
 

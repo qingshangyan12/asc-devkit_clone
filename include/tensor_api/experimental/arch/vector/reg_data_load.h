@@ -84,6 +84,11 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
  * @param [in] coord Coordinate used as the base source position.
  * @param [in] index Register tensor containing the source offsets relative to the base position.
  * @param [in] gather_mask Register mask that selects the values to gather.
+ * @note The active-lane mask is taken from gather_mask.reg.
+ * In element mode, a value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero in element mode.
+ * In datablock mode, mask bits 0, 4, 8, 12, 16, 20, 24, and 28 select the eight data blocks.
+ * The result preserves gather_mask.reg as its active-lane mask.
  */
 template <gather_mode mode = gather_mode::element, typename Tensor, typename Coord, typename Index>
 __simd_callee__ inline decltype(auto) load_gather(
@@ -99,6 +104,11 @@ __simd_callee__ inline decltype(auto) load_gather(
  * @param [in] tensor Source tensor located in UB.
  * @param [in] index Register tensor containing the source offsets.
  * @param [in] gather_mask Register mask that selects the values to gather.
+ * @note The active-lane mask is taken from gather_mask.reg.
+ * In element mode, a value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero in element mode.
+ * In datablock mode, mask bits 0, 4, 8, 12, 16, 20, 24, and 28 select the eight data blocks.
+ * The result preserves gather_mask.reg as its active-lane mask.
  */
 template <gather_mode mode = gather_mode::element, typename Tensor, typename Index>
 __simd_callee__ inline decltype(auto) load_gather(

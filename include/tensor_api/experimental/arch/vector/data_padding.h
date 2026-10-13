@@ -34,6 +34,9 @@ namespace experimental {
  * @return A register tensor containing the filled elements and the input mask.
  * @param [in] value Scalar value copied to each enabled element.
  * @param [in] mask Mask that specifies the elements to fill.
+ * @note The active-lane mask is taken from mask.reg.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <size_t N = 1, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>& mask = all_mask<T>());
@@ -48,6 +51,9 @@ __simd_callee__ inline reg_tensor<T> fill(const T& value, const reg_tensor<bool>
  * @return A register tensor containing the copied elements and the input mask.
  * @param [in] src Source register tensor.
  * @param [in] mask Mask that specifies the elements to copy.
+ * @note The active-lane mask is taken from mask.reg.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <size_t N = 1, typename T>
 __simd_callee__ inline reg_tensor<T> fill(const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());

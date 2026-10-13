@@ -246,6 +246,9 @@ __simd_callee__ inline reg_tensor<bool> operator>=(const T& src0, const reg_tens
  * @param [in] condition Per-element selection condition.
  * @param [in] src0 Source tensor selected when the corresponding condition is true.
  * @param [in] src1 Source tensor selected when the corresponding condition is false.
+ * @note A condition value of 1 selects the corresponding element from src0;
+ * a value of 0 selects it from src1. This condition does not zero unselected elements.
+ * The result preserves src0.mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> select(

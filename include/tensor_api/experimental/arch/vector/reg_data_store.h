@@ -99,6 +99,9 @@ __simd_callee__ inline void store(
  * @param [out] tensor Destination tensor located in UB.
  * @param [in] src Source register tensor. Its active-lane mask selects the elements to store.
  * @param [in] index Register tensor containing the destination offsets.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding source element for storage; a value of 0 excludes it.
+ * Unselected elements are not written; the corresponding destination memory is unchanged.
  */
 template <typename Tensor, typename T, typename Index>
 __simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index);
@@ -114,6 +117,9 @@ __simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& s
  * @param [in] coord Coordinate used as the base destination position.
  * @param [in] src Source register tensor. Its active-lane mask selects the elements to store.
  * @param [in] index Register tensor containing the destination offsets relative to the base position.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding source element for storage; a value of 0 excludes it.
+ * Unselected elements are not written; the corresponding destination memory is unchanged.
  */
 template <typename Tensor, typename Coord, typename T, typename Index>
 __simd_callee__ inline void store_scatter(

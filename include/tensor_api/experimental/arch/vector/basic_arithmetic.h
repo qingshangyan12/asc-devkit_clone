@@ -28,6 +28,9 @@ namespace experimental {
  * @override_id te_experimental_log__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src);
@@ -37,6 +40,9 @@ __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src);
  * @override_id te_experimental_ln__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> ln(const reg_tensor<T>& src);
@@ -47,6 +53,9 @@ __simd_callee__ inline reg_tensor<T> ln(const reg_tensor<T>& src);
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -57,6 +66,9 @@ __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const 
  * @archs 3510
  * @param [in] src Source operand.
  * @param [in] scalar Scalar operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T& scalar);
@@ -67,6 +79,9 @@ __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T
  * @archs 3510
  * @param [in] scalar Scalar operand.
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
@@ -76,6 +91,9 @@ __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor
  * @override_id te_experimental_neg__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> neg(const reg_tensor<T>& src);
@@ -86,6 +104,9 @@ __simd_callee__ inline reg_tensor<T> neg(const reg_tensor<T>& src);
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -96,6 +117,9 @@ __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const 
  * @archs 3510
  * @param [in] src Source operand.
  * @param [in] scalar Scalar operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src, const T& scalar);
@@ -106,6 +130,9 @@ __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src, const T
  * @archs 3510
  * @param [in] scalar Scalar operand.
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator-(const T& scalar, const reg_tensor<T>& src);
@@ -116,6 +143,9 @@ __simd_callee__ inline reg_tensor<T> operator-(const T& scalar, const reg_tensor
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -126,6 +156,9 @@ __simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src0, const 
  * @archs 3510
  * @param [in] src Source operand.
  * @param [in] scalar Scalar operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src, const T& scalar);
@@ -136,6 +169,9 @@ __simd_callee__ inline reg_tensor<T> operator*(const reg_tensor<T>& src, const T
  * @archs 3510
  * @param [in] scalar Scalar operand.
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor<T>& src);
@@ -146,6 +182,9 @@ __simd_callee__ inline reg_tensor<T> operator*(const T& scalar, const reg_tensor
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -156,6 +195,9 @@ __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src0, const reg_te
  * @archs 3510
  * @param [in] src Source operand.
  * @param [in] scalar Scalar operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scalar);
@@ -166,6 +208,9 @@ __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scal
  * @archs 3510
  * @param [in] scalar Scalar operand.
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src);
@@ -175,6 +220,9 @@ __simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& s
  * @override_id te_experimental_abs__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src);
@@ -184,6 +232,9 @@ __simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src);
  * @override_id te_experimental_exp__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src);
@@ -193,6 +244,9 @@ __simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src);
  * @override_id te_experimental_sqrt__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src);
@@ -202,6 +256,9 @@ __simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src);
  * @override_id te_experimental_log2__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src);
@@ -211,6 +268,9 @@ __simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src);
  * @override_id te_experimental_log10__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src);
@@ -220,6 +280,9 @@ __simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src);
  * @override_id te_experimental_relu__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src);
@@ -230,6 +293,9 @@ __simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src);
  * @archs 3510
  * @param [in] src Source operand.
  * @param [in] slope Slope operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src, const reg_tensor<T>& slope);
@@ -240,6 +306,9 @@ __simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src, const reg_t
  * @archs 3510
  * @param [in] src Source operand.
  * @param [in] slope Slope operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const T& slope);
@@ -250,6 +319,8 @@ __simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const 
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
  */
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -261,6 +332,8 @@ __simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, co
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
  * @param [in] carry_src Input carry register tensor.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
  */
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> add_carry(
@@ -272,6 +345,8 @@ __simd_callee__ inline reg_pair<T, bool> add_carry(
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
  */
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -283,6 +358,8 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, co
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
  * @param [in] borrow_src Input borrow register tensor.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
  */
 template <typename T>
 __simd_callee__ inline reg_pair<T, bool> sub_carry(
@@ -294,6 +371,8 @@ __simd_callee__ inline reg_pair<T, bool> sub_carry(
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
  */
 template <typename T>
 __simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -304,6 +383,9 @@ __simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_ten
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -314,6 +396,9 @@ __simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const 
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
+ * @note The active-lane mask is taken from src0.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -324,6 +409,9 @@ __simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src0, const reg_te
  * @archs 3510
  * @param [in] src Source operand.
  * @param [in] scalar Scalar operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src, const T& scalar);
@@ -334,6 +422,9 @@ __simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src, const T& scal
  * @archs 3510
  * @param [in] scalar Scalar operand.
  * @param [in] src Source operand.
+ * @note The active-lane mask is taken from src.mask.
+ * A value of 1 selects the corresponding element; a value of 0 excludes it.
+ * Unselected elements are set to zero. The result preserves the active-lane mask.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> min(const T& scalar, const reg_tensor<T>& src);
