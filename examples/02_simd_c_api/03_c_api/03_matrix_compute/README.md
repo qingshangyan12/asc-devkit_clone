@@ -15,6 +15,6 @@
 | [asc_copy_l0c2gm](./asc_copy_l0c2gm) | 使用`asc_copy_l0c2gm`演示NZ/ND/DN输出、量化、ReLU和Channel Split。 | Ascend 950PR&950DT系列产品 |
 | [asc_copy_l0c2l1](./asc_copy_l0c2l1) | 使用`asc_copy_l0c2l1`演示L0C到L1的NZ搬运及量化、ReLU。 | Ascend 950PR&950DT系列产品 |
 | [asc_copy_l0c2ub](./asc_copy_l0c2ub) | 使用`asc_copy_l0c2ub`演示单目标和按M/N维双目标搬运。 | Ascend 950PR&950DT系列产品 |
-| [mmad](./mmad) |  本样例以 int8_t 和 bfloat16 两种输入数据类型为例，演示如何通过C API实现矩阵乘法（C = A × B + Bias） | Ascend 950PR&950DT系列产品 |
+| [mmad](./mmad) |  本样例以int8_t、bfloat16和float三种输入数据类型为例，演示如何通过C API实现矩阵乘法（C = A × B + Bias） | Ascend 950PR&950DT系列产品 |
 | [mmad_mx](./mmad_mx) | 本样例演示如何通过C API实现带量化功能的MX矩阵乘法。A、B矩阵使用FP4或FP8数据类型，ScaleA、ScaleB使用fp8_e8m0_t数据类型；包含C矩阵初始化为0、从BiasTable Buffer初始化以及从L0C累加三种场景，并介绍K轴对齐和FP8尾部清零 | Ascend 950PR&950DT系列产品 |
 | [matmul](./matmul) | 本样例以 float 输入数据类型为例，演示如何通过C API实现矩阵乘法（C = A × B + Bias），A、B矩阵均不转置 | Ascend 950PR&950DT系列产品 |
