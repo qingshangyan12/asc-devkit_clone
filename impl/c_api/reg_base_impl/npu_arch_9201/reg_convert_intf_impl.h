@@ -2410,12 +2410,6 @@ __simd_callee__ inline vector_bfloat16_t asc_rcpe6m22bfloat16(
     return dst;
 }
 
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
-
 // ==========9201 PR merging conversion (A6 float/bf16/fp4/hif8)==========
 // ---------- asc_bfloat162e1m2x2 *_merge ----------
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
@@ -5167,6 +5161,4 @@ __simd_callee__ inline void asc_cast_merge(
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
 #undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC
-#endif
-
 #endif

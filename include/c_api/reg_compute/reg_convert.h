@@ -8542,12 +8542,6 @@ __simd_callee__ inline void asc_float2e5m2_rn_sat_v4(vector_fp8_e5m2_t& dst, vec
 ASC_DEPRECATED(9.2.0, "2027/09/07", asc_half2float)
 __simd_callee__ inline void asc_half2float_v2(vector_float& dst, vector_half src, vector_bool mask);
 
-#endif
-
-#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_REG_CONVERT_H)
-#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_REG_CONVERT_H
-
 // ==========9201 PR merging conversion interfaces (*_merge)==========
 // ---------- asc_bfloat162e1m2x2 *_merge ----------
 __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
@@ -9915,10 +9909,8 @@ __simd_callee__ inline void asc_cast_merge(
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER> dst_pos);
 #endif
 
-// ==========Deprecated conversion interfaces==========
-
-// Legacy overloads without explicit position arguments.
-ASC_DEPRECATED(
-    9.2.0, "2027/09/07", asc_float2half_rd(vector_half& dst, vector_float src, vector_bool mask, ASC_POSITION_EVEN))
+#if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_REG_CONVERT_H)
+#undef ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS
+#undef UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_REG_COMPUTE_REG_CONVERT_H
 
 #endif
