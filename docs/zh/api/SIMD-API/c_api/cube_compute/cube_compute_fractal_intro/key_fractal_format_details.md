@@ -81,7 +81,7 @@
 
     通过公式表达转换过程如下：
 
-    ```py
+    ```text
     (…, B, M, K)->pad->(…, B, M1 * M0, K1 * K0)->reshape->(…, B, M1, M0, K1, K0)->transpose->(…, B, M1, K1, M0, K0)
     ```
 
@@ -111,7 +111,7 @@
 
     通过公式表达转换过程如下：
 
-    ```py
+    ```text
     (…, B, K, N)->pad->(…, B, K1 * K0, N1 * N0)->reshape->(…, B, K1, K0, N1, N0)->transpose->(…, B, K1, N1, N0, K0)
     ```
 

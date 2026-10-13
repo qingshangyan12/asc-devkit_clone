@@ -57,7 +57,7 @@ This example performs reduction on the input vector. The details are as follows:
 
 **Scenario 2: DataBlock Reduction**
 
-- Example functionality: Separately sums the eight float values in each of eight 32-byte DataBlocks.
+- Example functionality: Separately sums the eight float values in each of eight 32byte DataBlocks.
 - Example specifications:
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="3" align="center">AIV Example</td></tr>
@@ -69,9 +69,9 @@ This example performs reduction on the input vector. The details are as follows:
   </table>
 
 - Example implementation:
-  The `reduce_kernel` function calls `asc_datablock_reduce_sum` to separately sum the eight float values in each of eight 32-byte DataBlocks. The process is as follows:
+  The `reduce_kernel` function calls `asc_datablock_reduce_sum` to separately sum the eight float values in each of eight 32byte DataBlocks. The process is as follows:
   - Load: Calls `asc_copy_gm2ub_align` to load 64 float values from GM to UB.
-  - Compute: Calls `asc_datablock_reduce_sum` to sum the eight float values in each 32-byte DataBlock.
+  - Compute: Calls `asc_datablock_reduce_sum` to sum the eight float values in each 32byte DataBlock.
   - Store: Calls `asc_copy_ub2gm_align` to store the result from UB to GM.
   - Invocation implementation: Uses the kernel invocation syntax `<<<>>>` to call the kernel function.
 
