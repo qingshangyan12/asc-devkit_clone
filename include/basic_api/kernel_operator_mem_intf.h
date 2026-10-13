@@ -72,7 +72,7 @@ __BLOCK_LOCAL__ __inline__ int32_t g_ubMaxAddr; // Set the maximum value for eac
 } // namespace AscendC
 
 #if ((__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)) && !defined(ASCENDC_CPU_DEBUG)
-#include "dav_9201/kernel_operator_mem_impl.h"
+#include "../../impl/basic_api/dav_9201/kernel_operator_mem_impl.h"
 #endif
 
 #endif // ASCENDC_MODULE_INNER_OPERATOR_ATOMIC_INTERFACE_H
