@@ -1893,6 +1893,523 @@ __simd_callee__ inline void asc_cast(
     }
 }
 
+// ================asc_float2half_*_merge================
+__simd_callee__ inline void asc_float2half_rd_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rd_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rd_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_F, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rd_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_F, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rn_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rn_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rn_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rn_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rna_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rna_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rna_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_A, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rna_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_A, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_ro_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_O, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_ro_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_O, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_ro_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_O, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_ro_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_O, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_ru_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_ru_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_ru_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_C, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_ru_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_C, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rz_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rz_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rz_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_Z, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_float2half_rz_sat_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_Z, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+// ================asc_cast_merge for float2half================
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RN> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_A, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RNA> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_A, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_F, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RD> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_F, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_C, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RU> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_C, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_Z, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RZ> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_Z, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RO> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_O, RS_DISABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RO> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::NO_SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_O, RS_DISABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RO> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_O, RS_ENABLE, PART_EVEN, MODE_MERGING);
+    }
+}
+
+__simd_callee__ inline void asc_cast_merge(
+    vector_half& dst, vector_float src, vector_bool mask,
+    std::integral_constant<asc_cast_round_mode, asc_cast_round_mode::RO> round_mode,
+    std::integral_constant<asc_cast_saturation_mode, asc_cast_saturation_mode::SAT> saturation_mode,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt(dst, src, mask, ROUND_O, RS_ENABLE, PART_ODD, MODE_MERGING);
+    }
+}
+
+// ================asc_rcpe6m22bfloat16================
+__simd_callee__ inline void asc_rcpe6m22bfloat16(
+    vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt_rcpe6m22bf16(dst, src, mask, PART_EVEN);
+    }
+}
+
+__simd_callee__ inline void asc_rcpe6m22bfloat16(
+    vector_bfloat16_t& dst, vector_fp8_e6m2_t src, vector_bool mask,
+    std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    if ASC_IS_AIV {
+        vcvt_rcpe6m22bf16(dst, src, mask, PART_ODD);
+    }
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_rcpe6m22bfloat16(
+    vector_fp8_e6m2_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+{
+    vector_bfloat16_t dst;
+    asc_rcpe6m22bfloat16(dst, src, mask, dst_pos);
+    return dst;
+}
+
+__simd_callee__ inline vector_bfloat16_t asc_rcpe6m22bfloat16(
+    vector_fp8_e6m2_t src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+{
+    vector_bfloat16_t dst;
+    asc_rcpe6m22bfloat16(dst, src, mask, dst_pos);
+    return dst;
+}
+
 #endif
 
 #if defined(UNDEF_ASCENDC_C_API_INCLUDE_COMPILER_INTERNAL_HEADERS_ASCENDC)
