@@ -34,18 +34,18 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 
   A C0 block contains 16 half elements, that is, one 32-byte DataBlock. Each row of a `144 x 128` tile contains eight C0 blocks. The Vector write stage writes these eight DataBlocks to the corresponding eight C0 columns in the NZ region.
 
-  - `x`: input matrix, logical shape `[M, N]`, half, ND layout
-  - `z`: output matrix, logical shape `[M, N]`, half, NZ layout
+  - `x`: input matrix, logical shape `[m, n]`, half, ND layout
+  - `z`: output matrix, logical shape `[m, n]`, half, NZ layout
 
 - Example specifications:
 
-  The example uses `M=8192` and `N=8192` and launches 64 Vector blocks. Each block processes a row split and a column split using `144 x 128` tiles. The valid height of the final row tile is passed through `actualTileH`.
+  The example uses `m=8192` and `n=8192` and launches 64 Vector blocks. Each block processes a row split and a column split using `144 x 128` tiles. The valid height of the final row tile is passed through `actual_tile_h`.
 
   <table>
   <tr><td rowspan="1" align="center">Example Type (OpType)</td><td colspan="4" align="center">ND2NZ</td></tr>
   <tr><td rowspan="2" align="center">Example Input</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">NZ</td></tr>
+  <tr><td align="center">x</td><td align="center">[m, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">Example Output</td><td align="center">z</td><td align="center">[m, n]</td><td align="center">float16</td><td align="center">NZ</td></tr>
   <tr><td rowspan="1" align="center">Kernel Function Name</td><td colspan="4" align="center">bank_conflict_kernel</td></tr>
   </table>
 
@@ -53,17 +53,17 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 
   | Parameter | Value | Description |
   | :--- | :---: | :--- |
-  | `TOTAL_M` | 8192 | Number of rows in the input matrix |
-  | `TOTAL_N` | 8192 | Number of columns in the input matrix |
-  | `ROW_SPLITS` | 8 | Number of row splits |
-  | `COL_SPLITS` | 8 | Number of column splits |
-  | `TOTAL_BLOCKS` | 64 | Number of launched blocks |
-  | `TILE_H` | 144 | Maximum number of rows in a tile |
-  | `TILE_W` | 128 | Number of columns in a tile |
-  | `C0_ELEMS` | 16 | Number of half elements in one C0 block |
-  | `TILE_C0_COLS` | 8 | Number of C0 columns in one tile |
+  | `total_m` | 8192 | Number of rows in the input matrix |
+  | `total_n` | 8192 | Number of columns in the input matrix |
+  | `row_splits` | 8 | Number of row splits |
+  | `col_splits` | 8 | Number of column splits |
+  | `total_blocks` | 64 | Number of launched blocks |
+  | `tile_h` | 144 | Maximum number of rows in a tile |
+  | `tile_w` | 128 | Number of columns in a tile |
+  | `c0_elems` | 16 | Number of half elements in one C0 block |
+  | `tile_c0_cols` | 8 | Number of C0 columns in one tile |
   | `SCENARIO_NUM` | 1, 2 | Bank-conflict comparison scenario |
-  | `dstNzC0Stride` | S1=144, S2=145 | Distance between adjacent C0-column start positions, in DataBlocks |
+  | `dst_nz_c0_stride` | S1=144, S2=145 | Distance between adjacent C0-column start positions, in DataBlocks |
 
   > **Terminology:** A DataBlock is the data unit processed by a Vector instruction and is 32 bytes in size. One DataBlock contains 16 half elements.
 
@@ -81,7 +81,7 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
     <tr><td align="left">2</td><td align="left">make_tensor + layout</td><td align="left">Create GM, UB source, and UB destination Tensor views</td><td align="left">GM uses ND; NZ write strides are expressed by the Vector interface and the MTE3 layout respectively</td></tr>
     <tr><td align="left">3</td><td align="left">copy(copy_gm_to_ub)</td><td align="left">Move the valid-height ND tile from GM to UB</td><td align="left">ND to ND</td></tr>
     <tr><td align="left">4</td><td align="left">slice + asc_loadalign</td><td align="left">Slice by row and read 128 half elements from the UB ND tile</td><td align="left">Vector</td></tr>
-    <tr><td align="left">5</td><td align="left">asc_storealign</td><td align="left">Write eight DataBlocks to the UB NZ region with `dstNzC0Stride`</td><td align="left">Vector, ND to NZ rearrangement</td></tr>
+    <tr><td align="left">5</td><td align="left">asc_storealign</td><td align="left">Write eight DataBlocks to the UB NZ region with `dst_nz_c0_stride`</td><td align="left">Vector, ND to NZ rearrangement</td></tr>
     <tr><td align="left">6</td><td align="left">copy(copy_ub_to_gm)</td><td align="left">Write the NZ tile back to the compact NZ layout in GM, skipping the padding used by S2</td><td align="left">NZ to NZ</td></tr>
     </table>
 
@@ -99,16 +99,16 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 
   - Core ND-to-NZ implementation:
 
-    `srcTensor` and `dstTensor` are first constructed with the Tensor API. `slice` only obtains the starting address of each row; the non-contiguous destinations of the eight DataBlocks are specified by the `dstNzC0Stride` argument of `asc_storealign`.
+    `src_tensor` and `dst_tensor` are first constructed with the Tensor API. `slice` only obtains the starting address of each row; the non-contiguous destinations of the eight DataBlocks are specified by the `dst_nz_c0_stride` argument of `asc_storealign`.
 
     ```cpp
-    template <uint32_t dstNzC0Stride>
-    __simd_vf__ inline void NdToNz(__ubuf__ half* dst, __ubuf__ half* src)
+    template <uint32_t dst_nz_c0_stride>
+    __simd_vf__ inline void nd_to_nz(__ubuf__ half* dst, __ubuf__ half* src)
     {
         vector_bool mask = asc_create_mask_b16(PAT_ALL);
         vector_half value;
         asc_loadalign(value, src);
-        asc_storealign(dst, value, dstNzC0Stride, 0, mask);
+        asc_storealign(dst, value, dst_nz_c0_stride, 0, mask);
     }
     ```
 
@@ -116,9 +116,9 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 
     ```cpp
     if constexpr (SCENARIO_NUM == 1) {
-        NdToNz<TILE_H>(dstRow.data().get(), srcRow.data().get());
+        nd_to_nz<tile_h>(dst_row.data().get(), src_row.data().get());
     } else {
-        NdToNz<TILE_H + BANK_CONFLICT_OFFSET>(dstRow.data().get(), srcRow.data().get());
+        nd_to_nz<tile_h + bank_conflict_offset>(dst_row.data().get(), src_row.data().get());
     }
     ```
 
@@ -130,7 +130,7 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 
     The Unified Buffer of Ascend 950PR&950DT products is divided into 16 physical banks and organized into eight bank groups. Banks `i` and `i+8` belong to the same bank group, so `bank group = bank % 8`. UB addresses use low-order interleaving: for every 32-byte DataBlock traversed by a consecutive address, the physical bank number increases by one modulo 16.
 
-    This example focuses on write-write conflicts when one `asc_storealign` writes eight DataBlocks. The distance between adjacent destinations is controlled by `dstNzC0Stride`; when multiple destinations fall into the same bank group, the writes must be serialized.
+    This example focuses on write-write conflicts when one `asc_storealign` writes eight DataBlocks. The distance between adjacent destinations is controlled by `dst_nz_c0_stride`; when multiple destinations fall into the same bank group, the writes must be serialized.
 
     **Figure: UB bank structure of Ascend 950PR&950DT products**
 
@@ -142,7 +142,7 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 
     **Scenario 1: Compact placement**
 
-    Build with `SCENARIO_NUM=1`. In this scenario, `dstNzC0Stride=144`, which is `16 x 9` DataBlocks. For one row, the physical bank number of all eight write destinations remains unchanged, so the eight accesses use the same bank and bank group, causing write-write conflicts.
+    Build with `SCENARIO_NUM=1`. In this scenario, `dst_nz_c0_stride=144`, which is `16 x 9` DataBlocks. For one row, the physical bank number of all eight write destinations remains unchanged, so the eight accesses use the same bank and bank group, causing write-write conflicts.
 
     **Figure: ND-to-NZ layout with compact placement in Scenario 1**
 
@@ -156,9 +156,9 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 
     **Scenario 2: Increased stride and shifted NZ buffer base**
 
-    Build with `SCENARIO_NUM=2`. In this scenario, `dstNzC0Stride=145`, which is `16 x 9 + 1` DataBlocks. The physical bank number increases by one at every jump, so the eight write destinations enter eight different bank groups.
+    Build with `SCENARIO_NUM=2`. In this scenario, `dst_nz_c0_stride=145`, which is `16 x 9 + 1` DataBlocks. The physical bank number increases by one at every jump, so the eight write destinations enter eight different bank groups.
 
-    The code also shifts the initial `nzPtr` address by eight DataBlocks (`NZ_BASE_SHIFT_DATA_BLOCKS=8`). For the first row, `asc_loadalign` reads banks 0-7 and `asc_storealign` writes banks 8-15, separating the physical banks used by the initial read and write and reducing same-cycle bank overlap. The additional stride is only used to change UB destinations; the UB-to-GM transfer uses the NZ Tensor layout to skip the padding, so the output remains in compact NZ format.
+    The code also shifts the initial `nz_ptr` address by eight DataBlocks (`nz_base_shift_data_blocks=8`). For the first row, `asc_loadalign` reads banks 0-7 and `asc_storealign` writes banks 8-15, separating the physical banks used by the initial read and write and reducing same-cycle bank overlap. The additional stride is only used to change UB destinations; the UB-to-GM transfer uses the NZ Tensor layout to skip the padding, so the output remains in compact NZ format.
 
     **Figure: ND-to-NZ layout with increased stride in Scenario 2**
 
@@ -176,16 +176,16 @@ Data movement between GM and UB uses the Tensor API `copy` interface. Register a
 | Tensor slicing | Use `slice` to obtain each tile and row start address |
 | Data movement | Use `copy` for GM-to-UB and UB-to-GM transfers |
 | ND-to-NZ rearrangement | Use `asc_loadalign` and `asc_storealign` for Vector register movement |
-| Bank-conflict comparison | Compare compact and distributed placement with `dstNzC0Stride=144/145` |
+| Bank-conflict comparison | Compare compact and distributed placement with `dst_nz_c0_stride=144/145` |
 | Address offset | Scenario 2 shifts the NZ base by eight DataBlocks to separate the physical banks used by the initial ND read and NZ write |
 | Double buffering | Use ping-pong UB buffers to process tiles alternately |
-| Tail-tile handling | Use `actualTileH` to limit the valid rows in the final tile |
+| Tail-tile handling | Use `actual_tile_h` to limit the valid rows in the final tile |
 
 ## Performance Data
 
 The following data was measured on Ascend 950PR&950DT products with `144 x 128` tiles and 64 launched blocks.
 
-| Scenario | `dstNzC0Stride` | Task Duration (us) | `aiv_time` (us) | `aiv_total_cycles` | `aiv_vec_time` (us) | `aiv_vec_ratio` | `aiv_scalar_time` (us) | `aiv_scalar_ratio` | `aiv_mte2_time` (us) | `aiv_mte2_ratio` | `aiv_mte3_time` (us) | `aiv_mte3_ratio` | `icache_miss_rate` |
+| Scenario | `dst_nz_c0_stride` | Task Duration (us) | `aiv_time` (us) | `aiv_total_cycles` | `aiv_vec_time` (us) | `aiv_vec_ratio` | `aiv_scalar_time` (us) | `aiv_scalar_ratio` | `aiv_mte2_time` (us) | `aiv_mte2_ratio` | `aiv_mte3_time` (us) | `aiv_mte3_ratio` | `icache_miss_rate` |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | S1 | 144 | 262.628 | 261.96 | 14112428 | **254.637** | 0.972 | 3.851 | 0.015 | 93.445 | 0.357 | 47.817 | 0.183 | 0.006 |
 | S2 | 145 | 222.964 | 222.18 | 12052109 | **214.199** | 0.964 | 3.823 | 0.017 | 111.712 | 0.503 | 41.139 | 0.185 | 0.009 |
