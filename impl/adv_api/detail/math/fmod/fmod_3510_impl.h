@@ -361,6 +361,49 @@ __aicore__ inline void FmodComputeIteration(
     FmodComputeIterationF32<iterationNum>(dst, src0, src1, mainRepeatTimes, mainBlockLen, tailRepeatTimes, tailCount);
 }
 
+// The iteration compensation is implemented in fp32. half inputs are upcast into a fp32 staging area
+// in sharedTmpBuffer (src0 | src1 | dst), processed by the fp32 iteration, then downcast back to half.
+// The staging area needs 3 * sizeof(float) bytes per element; when the buffer is smaller, the tensor is
+// processed in chunks.
+template <int32_t iterationNum>
+__aicore__ inline void FmodComputeIteration(
+    const LocalTensor<half>& dstTensor, const LocalTensor<half>& src0Tensor, const LocalTensor<half>& src1Tensor,
+    const LocalTensor<uint8_t>& sharedTmpBuffer, const uint32_t count)
+{
+    constexpr uint32_t floatTensorNum = 3; // src0, src1, dst in fp32
+    uint32_t bufferSize = sharedTmpBuffer.GetSize();
+    uint32_t stackSize = bufferSize / (floatTensorNum * sizeof(float)) / ONE_BLK_SIZE * ONE_BLK_SIZE;
+    CheckTmpBufferSize(stackSize, 0, bufferSize);
+    stackSize = stackSize > src0Tensor.GetSize() ? src0Tensor.GetSize() : stackSize;
+
+    LocalTensor<float> floatTmpTensor = sharedTmpBuffer.ReinterpretCast<float>();
+    LocalTensor<float> tmpSrc0 = floatTmpTensor;
+    LocalTensor<float> tmpSrc1 = floatTmpTensor[stackSize];
+    LocalTensor<float> tmpDst = floatTmpTensor[2 * stackSize];
+
+    const uint32_t round = count / stackSize;
+    const uint32_t tail = count % stackSize;
+
+    for (uint32_t i = 0; i < round; ++i) {
+        Cast<float, half>(tmpSrc0, src0Tensor[i * stackSize], RoundMode::CAST_NONE, stackSize);
+        Cast<float, half>(tmpSrc1, src1Tensor[i * stackSize], RoundMode::CAST_NONE, stackSize);
+        PipeBarrier<PIPE_V>();
+        FmodComputeIteration<iterationNum>(tmpDst, tmpSrc0, tmpSrc1, sharedTmpBuffer, stackSize);
+        PipeBarrier<PIPE_V>();
+        Cast<half, float>(dstTensor[i * stackSize], tmpDst, RoundMode::CAST_NONE, stackSize);
+        PipeBarrier<PIPE_V>();
+    }
+    if (tail > 0) {
+        Cast<float, half>(tmpSrc0, src0Tensor[round * stackSize], RoundMode::CAST_NONE, tail);
+        Cast<float, half>(tmpSrc1, src1Tensor[round * stackSize], RoundMode::CAST_NONE, tail);
+        PipeBarrier<PIPE_V>();
+        FmodComputeIteration<iterationNum>(tmpDst, tmpSrc0, tmpSrc1, sharedTmpBuffer, tail);
+        PipeBarrier<PIPE_V>();
+        Cast<half, float>(dstTensor[round * stackSize], tmpDst, RoundMode::CAST_NONE, tail);
+        PipeBarrier<PIPE_V>();
+    }
+}
+
 template <typename T>
 __simd_vf__ inline void FmodComputeVF(
     __ubuf__ T* dstTensor, __ubuf__ T* src0Tensor, __ubuf__ T* src1Tensor, const uint16_t repeatTimes, uint32_t count)
@@ -438,7 +481,7 @@ __aicore__ inline void FmodImpl(
         static_assert(
             config.iterationNum >= 1 && config.iterationNum <= FMOD_ITERATION_NUM_MAX,
             "Iteration number must be in the range [1, 11].");
-        static_assert(SupportType<T, float>(), "current data type is not supported on current device!");
+        static_assert(SupportType<T, half, float>(), "current data type is not supported on current device!");
         FmodComputeIteration<config.iterationNum>(dstTensor, src0Tensor, src1Tensor, sharedTmpBuffer, calCount);
     } else {
         static_assert(SupportType<T, half, float>(), "current data type is not supported on current device!");
