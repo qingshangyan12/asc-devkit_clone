@@ -1,8 +1,5 @@
 # OKF Search README
 
-这是用户侧 skill `asc-search` 的全貌说明。看这一篇就能知道：它是干什么的、怎么让 AI 用它、
-每个文件是干什么的、索引和配置里每个字段是什么意思。
-
 ## 快速开始
 
 先克隆完整的 asc-devkit 仓库，在仓库根目录执行（Linux/macOS，Python 3.10+）：
