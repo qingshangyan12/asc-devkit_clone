@@ -192,7 +192,9 @@ HcclResult InitOpParamByTiling(
 HcclResult PrepareTopoInfoForOp(
     HcclComm comm, OpParam& opParam, std::unique_ptr<TopoInfoWithNetLayerDetails>& topoInfo);
 
-HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName);
+HcclResult PrepareEngineForAlg(HcclComm comm, OpParam& opParam, const std::string& algName);
+
+HcclResult SetMultipleDimensionSplitRatio(HcclComm comm, OpParam& param);
 
 std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, const std::string& algName);
 

@@ -17,7 +17,12 @@ bool InsTempAllGatherMesh1D1DZAxisDetour::isNew;
 InsTempAllGatherMesh1D1DZAxisDetour::InsTempAllGatherMesh1D1DZAxisDetour(
     const OpParam& param, const u32 rankId, const std::vector<std::vector<u32>>& subCommRanks)
     : InsTempAllGatherMesh1D(param, rankId, subCommRanks)
-{}
+{
+    if (param.opConfig.multipleDimensionSplitRatioSource != MultipleDimensionSplitRatioSource::BUILTIN_FORMULA) {
+        configSplitRatio_ = param.opConfig.multipleDimensionSplitRatio;
+        configSplitRatioSet_ = true;
+    }
+}
 InsTempAllGatherMesh1D1DZAxisDetour::~InsTempAllGatherMesh1D1DZAxisDetour() {}
 
 HcclResult InsTempAllGatherMesh1D1DZAxisDetour::CalcRes(
@@ -85,7 +90,17 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::SetchannelsPerRank(
     if (channelsPerRank_ > 1) {
         level0ChannelNumPerRank_ = MESH_CHANNELS_NUM;
         level1ChannelNumPerRank_ = channelsPerRank_ - level0ChannelNumPerRank_;
-        level0DataRatio_ = 0.5f;
+        level0DataRatio_ = (templateRankSize_ == 2) ? 0.25f : 0.5f;
+        if (configSplitRatioSet_) {
+            if (configSplitRatio_ >= 0.0 && configSplitRatio_ <= 1.0) {
+                level0DataRatio_ = static_cast<float>(configSplitRatio_);
+            } else {
+                HCCL_WARNING(
+                    "[InsTempAllGatherMesh1D1DZAxisDetour][SetchannelsPerRank] configured ratio[%f] is out of "
+                    "range[0, 1], use built-in ratio[%.2f].",
+                    configSplitRatio_, level0DataRatio_);
+            }
+        }
     }
     HCCL_INFO(
         "[InsTempAllGatherMesh1D1DZAxisDetour][SetchannelsPerRank], channelsPerRank_[%u], "
@@ -149,6 +164,7 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::LocalDataCopy(const std::vector<
         sliceSize = tempAlgParams_.tailSize;
     }
     u64 sliceCount = sliceSize / dataTypeSize;
+    const u32 subThreadNum = static_cast<u32>(threads.size()) - 1;
     for (u32 rpt = 0; rpt < tempAlgParams_.repeatNum; ++rpt) {
         const u64 inBaseOff = tempAlgParams_.buffInfo.inBuffBaseOff + rpt * tempAlgParams_.inputRepeatStride;
         const u64 outBaseOff = tempAlgParams_.buffInfo.outBuffBaseOff + rpt * tempAlgParams_.outputRepeatStride;
@@ -159,6 +175,7 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::LocalDataCopy(const std::vector<
         bool skipOutCopy = (tempAlgParams_.buffInfo.inputPtr == tempAlgParams_.buffInfo.outputPtr && inOff == outOff);
         if (!skipOutCopy) {
             DataSlice dstSlice(tempAlgParams_.buffInfo.outputPtr, outOff, sliceSize, sliceCount);
+            const u32 copyThreadIdx = (subThreadNum > 0) ? (1 + rpt % subThreadNum) : 0;
             HCCL_DEBUG(
                 "[InsTempAllGatherMesh1D1DZAxisDetour][LocalDataCopy] RankID [%d] AlgRank [%d] srcSlice: "
                 "inBaseOff[%llu] inOff[%llu] "
@@ -167,9 +184,9 @@ HcclResult InsTempAllGatherMesh1D1DZAxisDetour::LocalDataCopy(const std::vector<
             HCCL_DEBUG(
                 "[InsTempAllGatherMesh1D1DZAxisDetour][LocalDataCopy] RankID [%d] AlgRank [%d] dstSlice: "
                 "outBaseoff[%llu] "
-                "outOff[%llu] sliceSize[%llu] count[%llu].",
-                myRank_, myAlgRank, outBaseOff, outOff, sliceSize, sliceCount);
-            LocalCopy(threads[0], srcSlice, dstSlice);
+                "outOff[%llu] sliceSize[%llu] count[%llu] copyThreadIdx[%u].",
+                myRank_, myAlgRank, outBaseOff, outOff, sliceSize, sliceCount, copyThreadIdx);
+            LocalCopy(threads[copyThreadIdx], srcSlice, dstSlice);
         }
     }
     return HcclResult::HCCL_SUCCESS;

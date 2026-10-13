@@ -627,7 +627,7 @@ HcclResult PrepareTopoInfoForOp(HcclComm comm, OpParam& opParam, std::unique_ptr
     return HCCL_SUCCESS;
 }
 
-HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName)
+HcclResult PrepareEngineForAlg(HcclComm comm, OpParam& opParam, const std::string& algName)
 {
     CHK_RET(SetCommEngine(opParam));
     if (GetExternalInputHcclAivOnlyMode() && opParam.engine != COMM_ENGINE_AIV) {
@@ -641,6 +641,7 @@ HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName)
         CHK_RET(LoadAICPUKernel());
     }
     CHK_RET(SetOpParamAlgTag(opParam, algName));
+    CHK_RET(SetMultipleDimensionSplitRatio(comm, opParam));
     CHK_RET(FillOpParamAlgName(opParam, algName));
     return HCCL_SUCCESS;
 }
@@ -774,7 +775,7 @@ static HcclResult TryForcedAlgAndPrepareEngine(
         return HCCL_SUCCESS;
     }
 
-    HcclResult ret = PrepareEngineForAlg(opParam, forcedAlgName);
+    HcclResult ret = PrepareEngineForAlg(comm, opParam, forcedAlgName);
     if (ret != HCCL_SUCCESS) {
         opParam = opParamBackup;
         HCCL_ERROR(
@@ -826,7 +827,7 @@ HcclResult SelectAlgAndPrepareEngine(
         return HCCL_E_PTR;
     }
 
-    CHK_RET(PrepareEngineForAlg(opParam, algName));
+    CHK_RET(PrepareEngineForAlg(comm, opParam, algName));
     return HCCL_SUCCESS;
 }
 
@@ -1140,7 +1141,7 @@ HcclResult SelectCcuAlgorithm(
     }
 
     if (forcedAccepted) {
-        CHK_RET(PrepareEngineForAlg(opParam, algName));
+        CHK_RET(PrepareEngineForAlg(comm, opParam, algName));
         HCCL_INFO("[CcuSelectAlg] use configured algorithm[%s] for ccTiling[%u].", algName.c_str(), tilingIndex);
     } else {
         CHK_RET(SelectAlgAndPrepareEngine(comm, opParam, algName, topoInfo));

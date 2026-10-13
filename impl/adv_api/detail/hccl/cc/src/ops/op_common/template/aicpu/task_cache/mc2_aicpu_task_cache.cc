@@ -172,7 +172,7 @@ bool IsSupportedProtocol(CommProtocol protocol)
 void SetBypass(Mc2AicpuTaskCachePlan& plan, const char* reason)
 {
     plan.enabled = false;
-    HCCL_DEBUG("[MC2_TASK_CACHE][Bypass] reason[%s].", reason);
+    HCCL_INFO("[MC2_TASK_CACHE][Bypass] reason[%s].", reason);
 }
 
 bool GetAllToAllVSpans(
@@ -517,6 +517,9 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
             }
             hasValidChannel = true;
             if (!IsSupportedProtocol(channel.protocol)) {
+                HCCL_INFO(
+                    "[MC2_TASK_CACHE][Bypass] unsupported channel protocol[%u], remoteRank[%u], levelSize[%zu].",
+                    static_cast<uint32_t>(channel.protocol), channel.remoteRank, level.size());
                 return false;
             }
             resource.AddU32(channel.remoteRank);
