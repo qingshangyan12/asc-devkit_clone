@@ -86,3 +86,10 @@ inline int __float_as_int(const float x)
         dst[idx] = __float_as_int(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.0, -0.0, 1.0, -1.0, inf, -inf, nan
+result: 0, -2147483648, 1065353216, -1082130432, 2139095040, -8388608, 2143289344
+```
