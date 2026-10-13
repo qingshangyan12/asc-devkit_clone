@@ -99,3 +99,10 @@ inline unsigned int __half2uint_rn(const half x)
         asc_vf_call<kernel__half2uint_rn>(dim3(1024), dst, x, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
+result: 0, 0, 0, 2, 2, 4294967295, 0, 0
+```

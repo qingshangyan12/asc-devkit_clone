@@ -61,7 +61,7 @@
 
 | 接口     | 硬件支持的模板参数枚举值 | 软件支持的模板参数枚举值 |
 | :------- | :----------------------- | :----------------------- |
-| Cast     | MaskMergeMode::ZEROING   | 无                       |
+| Cast     | MaskMergeMode::ZEROING   | MaskMergeMode::MERGING   |
 | Truncate | MaskMergeMode::ZEROING   | 无                       |
 
 **表6**  归约计算接口MergeMode支持情况
@@ -77,4 +77,3 @@
 | 接口      | 硬件支持的模板参数枚举值                       | 软件支持的模板参数枚举值 |
 | :-------- | :--------------------------------------------- | :----------------------- |
 | Duplicate | MaskMergeMode::ZEROING、MaskMergeMode::MERGING | 无                       |
-

@@ -21,7 +21,7 @@
 #define INCLUDE_C_API_REG_COMPUTE_COMPUTE_REG_REDUCE_H
 #include "c_api/defs/defs.h"
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
 #include "impl/c_api/reg_base_impl/reg_reduce_intf_impl.h"
 #endif
 
@@ -176,6 +176,165 @@ __simd_callee__ inline vector_int32_t asc_reduce_sum_datablock(vector_int16_t sr
 __simd_callee__ inline vector_uint32_t asc_reduce_sum_datablock(vector_uint32_t src, vector_bool mask);
 
 __simd_callee__ inline vector_int32_t asc_reduce_sum_datablock(vector_int32_t src, vector_bool mask);
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+//=================asc_datablock_reduce_max_stride==================
+__simd_callee__ inline void asc_datablock_reduce_max_stride(vector_half& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_max_stride(vector_float& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_max_stride(
+    vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_max_stride(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_max_stride(
+    vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_max_stride(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_datablock_reduce_max_stride(vector_half src, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_datablock_reduce_max_stride(vector_float src, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_datablock_reduce_max_stride(vector_uint16_t src, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_datablock_reduce_max_stride(vector_int16_t src, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_datablock_reduce_max_stride(vector_uint32_t src, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_datablock_reduce_max_stride(vector_int32_t src, vector_bool mask);
+
+//=================asc_datablock_reduce_min_stride==================
+__simd_callee__ inline void asc_datablock_reduce_min_stride(vector_half& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_min_stride(vector_float& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_min_stride(
+    vector_uint16_t& dst, vector_uint16_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_min_stride(vector_int16_t& dst, vector_int16_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_min_stride(
+    vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_min_stride(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_datablock_reduce_min_stride(vector_half src, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_datablock_reduce_min_stride(vector_float src, vector_bool mask);
+
+__simd_callee__ inline vector_uint16_t asc_datablock_reduce_min_stride(vector_uint16_t src, vector_bool mask);
+
+__simd_callee__ inline vector_int16_t asc_datablock_reduce_min_stride(vector_int16_t src, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_datablock_reduce_min_stride(vector_uint32_t src, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_datablock_reduce_min_stride(vector_int32_t src, vector_bool mask);
+
+//=================asc_datablock_reduce_sum_stride==================
+__simd_callee__ inline void asc_datablock_reduce_sum_stride(vector_half& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_sum_stride(vector_float& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_sum_stride(
+    vector_uint32_t& dst, vector_uint16_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_sum_stride(vector_int32_t& dst, vector_int16_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_sum_stride(
+    vector_uint32_t& dst, vector_uint32_t src, vector_bool mask);
+
+__simd_callee__ inline void asc_datablock_reduce_sum_stride(vector_int32_t& dst, vector_int32_t src, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_datablock_reduce_sum_stride(vector_half src, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_datablock_reduce_sum_stride(vector_float src, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_datablock_reduce_sum_stride(vector_uint16_t src, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_datablock_reduce_sum_stride(vector_int16_t src, vector_bool mask);
+
+__simd_callee__ inline vector_uint32_t asc_datablock_reduce_sum_stride(vector_uint32_t src, vector_bool mask);
+
+__simd_callee__ inline vector_int32_t asc_datablock_reduce_sum_stride(vector_int32_t src, vector_bool mask);
+
+//=================asc_pair_reduce_sum_stride==================
+__simd_callee__ inline void asc_pair_reduce_sum_stride(vector_half& dst, vector_half src, vector_bool mask);
+
+__simd_callee__ inline void asc_pair_reduce_sum_stride(vector_float& dst, vector_float src, vector_bool mask);
+
+__simd_callee__ inline vector_half asc_pair_reduce_sum_stride(vector_half src, vector_bool mask);
+
+__simd_callee__ inline vector_float asc_pair_reduce_sum_stride(vector_float src, vector_bool mask);
+
+//=================asc_reduce_max_last_elem==================
+__simd_callee__ inline void asc_reduce_max_last_elem(vector_half& dst, vector_half src);
+
+__simd_callee__ inline void asc_reduce_max_last_elem(vector_float& dst, vector_float src);
+
+__simd_callee__ inline void asc_reduce_max_last_elem(vector_uint16_t& dst, vector_uint16_t src);
+
+__simd_callee__ inline void asc_reduce_max_last_elem(vector_int16_t& dst, vector_int16_t src);
+
+__simd_callee__ inline void asc_reduce_max_last_elem(vector_uint32_t& dst, vector_uint32_t src);
+
+__simd_callee__ inline void asc_reduce_max_last_elem(vector_int32_t& dst, vector_int32_t src);
+
+__simd_callee__ inline vector_half asc_reduce_max_last_elem(vector_half src);
+
+__simd_callee__ inline vector_float asc_reduce_max_last_elem(vector_float src);
+
+__simd_callee__ inline vector_uint16_t asc_reduce_max_last_elem(vector_uint16_t src);
+
+__simd_callee__ inline vector_int16_t asc_reduce_max_last_elem(vector_int16_t src);
+
+__simd_callee__ inline vector_uint32_t asc_reduce_max_last_elem(vector_uint32_t src);
+
+__simd_callee__ inline vector_int32_t asc_reduce_max_last_elem(vector_int32_t src);
+
+//=================asc_reduce_min_last_elem==================
+__simd_callee__ inline void asc_reduce_min_last_elem(vector_half& dst, vector_half src);
+
+__simd_callee__ inline void asc_reduce_min_last_elem(vector_float& dst, vector_float src);
+
+__simd_callee__ inline void asc_reduce_min_last_elem(vector_uint16_t& dst, vector_uint16_t src);
+
+__simd_callee__ inline void asc_reduce_min_last_elem(vector_int16_t& dst, vector_int16_t src);
+
+__simd_callee__ inline void asc_reduce_min_last_elem(vector_uint32_t& dst, vector_uint32_t src);
+
+__simd_callee__ inline void asc_reduce_min_last_elem(vector_int32_t& dst, vector_int32_t src);
+
+__simd_callee__ inline vector_half asc_reduce_min_last_elem(vector_half src);
+
+__simd_callee__ inline vector_float asc_reduce_min_last_elem(vector_float src);
+
+__simd_callee__ inline vector_uint16_t asc_reduce_min_last_elem(vector_uint16_t src);
+
+__simd_callee__ inline vector_int16_t asc_reduce_min_last_elem(vector_int16_t src);
+
+__simd_callee__ inline vector_uint32_t asc_reduce_min_last_elem(vector_uint32_t src);
+
+__simd_callee__ inline vector_int32_t asc_reduce_min_last_elem(vector_int32_t src);
+
+//=================asc_reduce_sum_last_elem==================
+__simd_callee__ inline void asc_reduce_sum_last_elem(vector_int32_t& dst, vector_int32_t src);
+
+__simd_callee__ inline void asc_reduce_sum_last_elem(vector_uint32_t& dst, vector_uint32_t src);
+
+__simd_callee__ inline void asc_reduce_sum_last_elem(vector_half& dst, vector_half src);
+
+__simd_callee__ inline void asc_reduce_sum_last_elem(vector_float& dst, vector_float src);
+
+__simd_callee__ inline vector_int32_t asc_reduce_sum_last_elem(vector_int32_t src);
+
+__simd_callee__ inline vector_uint32_t asc_reduce_sum_last_elem(vector_uint32_t src);
+
+__simd_callee__ inline vector_half asc_reduce_sum_last_elem(vector_half src);
+
+__simd_callee__ inline vector_float asc_reduce_sum_last_elem(vector_float src);
+#endif
 
 #endif
 

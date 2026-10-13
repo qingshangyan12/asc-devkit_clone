@@ -93,6 +93,6 @@ inline long int lroundf(float x)
 输入输出示例如下：
 
 ```
-x：0.25, 0.75, 1.25, 1.75
-result: 0 1 1 2
+x: 0.25, 0.75, 1.25, 1.75
+result: 0, 1, 1, 2
 ```

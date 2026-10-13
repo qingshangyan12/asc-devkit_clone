@@ -91,3 +91,10 @@ inline long long int __half2ll_rna(const half x)
         dst[idx] = __half2ll_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
+result: -3, -2, 1, 2, 3, 9223372036854775807, -9223372036854775808, 0
+```

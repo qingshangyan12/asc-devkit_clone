@@ -94,3 +94,10 @@ inline float __half2float(const half x)
         asc_vf_call<kernel__half2float>(dim3(1024), dst, x, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2, -0.5, 0.5, 2, inf, -inf, nan
+result: -2, -0.5, 0.5, 2, inf, -inf, nan
+```

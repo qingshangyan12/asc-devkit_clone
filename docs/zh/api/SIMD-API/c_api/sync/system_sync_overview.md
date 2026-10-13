@@ -4,7 +4,7 @@
 
 AI Core的同步，总共分成2类：[核内同步](intra_core_sync/intra_core_sync_overview.md)、[核间同步](inter_core_sync/inter_core_sync_overview.md)。各类同步对应的接口如下。
 
-**表1**  核内同步接口
+**表1** 核内同步接口
 
 | 接口名称 | 功能简述 |
 | --- | --- |
@@ -27,7 +27,7 @@ AI Core的同步，总共分成2类：[核内同步](intra_core_sync/intra_core_
 **图1**  四种核间同步控制模式示意图<a id="fig_sync_control_mode"></a>    
 ![](../../../figures/3510_sync_control_mode_diagram.png)
 
-**表2**  核间同步接口
+**表2** 核间同步接口
 
 | 接口名称 | 同步范围 | 对应模式 | 功能简述 |
 | --- | --- | --- | --- |

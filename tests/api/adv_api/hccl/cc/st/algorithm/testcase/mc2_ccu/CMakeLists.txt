@@ -119,6 +119,7 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mj_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/reduce_scatter_testcase.cpp
+    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/peer_only_local_copy_testcase.cpp
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_nhr_multilink_adapter.cc

@@ -88,3 +88,11 @@ bool __hlt(half x, half y)
         asc_vf_call<kernel_hlt>(dim3(1024), dst, x, y, total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, nan
+y: -0.5, 0.5, 1.25, nan
+result: true, false, false, false
+```

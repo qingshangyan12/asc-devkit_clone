@@ -82,3 +82,10 @@ inline bfloat16_t __uint2bfloat16_rna(const unsigned int x)
         dst[idx] = __uint2bfloat16_rna(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 129, 257, 258, 259, 100000, 1000000, 4294967295, 0
+result: 129.0, 258.0, 258.0, 260.0, 99840.0, 999424.0, 4294967296.0, 0.0
+```

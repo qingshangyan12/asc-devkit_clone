@@ -85,3 +85,10 @@ inline long long int __float2ll_rd(const float x)
         dst[idx] = __float2ll_rd(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2.5, -1.5, 0.5, 1.5, inf, -inf, nan
+result: -3, -2, 0, 1, 9223372036854775807, -9223372036854775808, 0
+```

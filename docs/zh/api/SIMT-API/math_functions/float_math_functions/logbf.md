@@ -98,6 +98,6 @@ inline float logbf(float x)
 输入输出示例如下：
 
 ```
-x：1, 2, 3, 4
-result: 0 1 1 2
+x: 1, 2, 3, 4
+result: 0, 1, 1, 2
 ```

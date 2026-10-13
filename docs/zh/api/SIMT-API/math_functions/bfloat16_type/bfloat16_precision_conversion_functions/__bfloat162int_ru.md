@@ -85,3 +85,10 @@ inline int __bfloat162int_ru(const bfloat16_t x)
         dst[idx] = __bfloat162int_ru(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, 1.5, 2.5, -1.5, -2.5, 127.5, -127.5, inf
+result: 1, 2, 3, -1, -2, 128, -127, 2147483647
+```
