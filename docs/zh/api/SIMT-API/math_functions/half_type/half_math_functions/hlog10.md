@@ -86,3 +86,10 @@ inline half hlog10(half x)
         dst[idx] = hlog10(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, 0.5, 2.5, -3.75
+result: nan, -0.301025, 0.397949, nan
+```

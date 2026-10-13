@@ -9,7 +9,7 @@
 # -----------------------------------------------------------------------------------------------------------
 
 # 后续如果更新asc-comm代码需要同步更新至devkit run包需要更新change id
-set(ASC_COMM_TAG_ID 140efa94dc4090ddc84f7b34e6b56ea0c1b313d0)
+set(ASC_COMM_TAG_ID e6910865c219886ba962748119bc1fd2d2f710f6)
 
 # asc-comm 与 asc-devkit 按同级目录放置。路径以本文件所在目录(<devkit>/cmake/third_party)为锚，
 # 对于CI环境已经存在asc-comm代码, 不去拉取代码否则使用submodule方式拉取asc-comm仓代码
@@ -120,7 +120,7 @@ if(EXISTS "${ASC_COMM_CCU_CMAKE_DIR}/CMakeLists.txt")
             LIBRARY DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/lib64 ${INSTALL_OPTIONAL}
             COMPONENT asc-devkit)
         install(DIRECTORY ${ASC_COMM_SOURCE_PATH}/include/ccu/hcomm/
-            DESTINATION ${CMAKE_SYSTEM_PROCESSOR}-linux/include/ccu/hcomm
+            DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/comm_api/ccu/hcomm
             COMPONENT asc-devkit
             FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
     endif()

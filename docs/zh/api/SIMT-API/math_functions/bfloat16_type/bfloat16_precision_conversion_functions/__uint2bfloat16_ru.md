@@ -85,3 +85,10 @@ inline bfloat16_t __uint2bfloat16_ru(const unsigned int x)
         dst[idx] = __uint2bfloat16_ru(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 129, 257, 258, 259, 100000, 1000000, 4294967295, 0
+result: 129.0, 258.0, 258.0, 260.0, 100352.0, 1003520.0, 4294967296.0, 0.0
+```

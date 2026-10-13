@@ -227,6 +227,6 @@ REGISTER_EXECUTOR_BY_TWO_TEMPS(
     HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMeshNhrDPU, InsV2AllGatherSequenceExecutor, TopoMatchMultilevel,
     InsTempAllGatherMesh1D, InsTempAllGatherNHRDPU);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMeshNhrDPU, AlgEngine::DPU, "sequence[mesh,nhr]", COND_NONE, FLAG_NONE,
-    0);
+    HcclCMDType::HCCL_CMD_ALLGATHER, InsAllGatherMeshNhrDPU, AlgEngine::DPU, "sequence[mesh,nhr]", COND_NONE,
+    FLAG_MULTI_LEVEL, 0);
 } // namespace mc2_ops_hccl

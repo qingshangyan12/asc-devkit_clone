@@ -71,7 +71,7 @@
 </tr>
 <tr id="row6977143384316"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p193897255119"><a name="p193897255119"></a><a name="p193897255119"></a>BiasTable Buffer</p>
 </td>
-<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p16363828195111"><a name="p16363828195111"></a><a name="p16363828195111"></a>偏置存储，AI Core内部物理存储单元，通常用于存储矩阵计算所需的Bias（偏置）数据，与逻辑内存AscendC::TPosition::C2相对应。</p>
+<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p16363828195111"><a name="p16363828195111"></a><a name="p16363828195111"></a>偏置存储，AI Core内部物理存储单元，通常用于存储矩阵计算所需的Bias（偏置）数据。</p>
 </td>
 </tr>
 <tr id="row21839410462"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p17392132125120"><a name="p17392132125120"></a><a name="p17392132125120"></a>Broadcast</p>
@@ -193,7 +193,7 @@
 </tr>
 <tr id="row1939121952620"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p1439018219518"><a name="p1439018219518"></a><a name="p1439018219518"></a>Fixpipe Buffer</p>
 </td>
-<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p1236412285516"><a name="p1236412285516"></a><a name="p1236412285516"></a>AI Core内部物理存储单元，通常用于存储Fixpipe搬运过程中所需的量化参数等数据，与逻辑内存AscendC::TPosition::C2PIPE2GM相对应。</p>
+<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p1236412285516"><a name="p1236412285516"></a><a name="p1236412285516"></a>AI Core内部物理存储单元，通常用于存储Fixpipe搬运过程中所需的量化参数等数据。</p>
 </td>
 </tr>
 <tr id="row1548192912206"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p1439018225112"><a name="p1439018225112"></a><a name="p1439018225112"></a>Global Memory/GM</p>
@@ -237,22 +237,22 @@
 </tr>
 <tr id="row8135612193319"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p9390122165118"><a name="p9390122165118"></a><a name="p9390122165118"></a>L0A Buffer</p>
 </td>
-<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p1136472835113"><a name="p1136472835113"></a><a name="p1136472835113"></a>AI Core内部物理存储单元，通常用于存储矩阵计算的左矩阵，与逻辑内存AscendC::TPosition::A2相对应。</p>
+<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p1136472835113"><a name="p1136472835113"></a><a name="p1136472835113"></a>AI Core内部物理存储单元，通常用于存储矩阵计算的左矩阵。</p>
 </td>
 </tr>
 <tr id="row7277111220337"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p15390127512"><a name="p15390127512"></a><a name="p15390127512"></a>L0B Buffer</p>
 </td>
-<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p18364328105110"><a name="p18364328105110"></a><a name="p18364328105110"></a>AI Core内部物理存储单元，通常用于存储矩阵计算的右矩阵，与逻辑内存AscendC::TPosition::B2相对应。</p>
+<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p18364328105110"><a name="p18364328105110"></a><a name="p18364328105110"></a>AI Core内部物理存储单元，通常用于存储矩阵计算的右矩阵。</p>
 </td>
 </tr>
 <tr id="row1642151219334"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p1439092115117"><a name="p1439092115117"></a><a name="p1439092115117"></a>L0C Buffer</p>
 </td>
-<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p83644289519"><a name="p83644289519"></a><a name="p83644289519"></a>AI Core内部物理存储单元，通常用于存储矩阵计算的结果，与逻辑内存AscendC::TPosition::CO1相对应。</p>
+<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p83644289519"><a name="p83644289519"></a><a name="p83644289519"></a>AI Core内部物理存储单元，通常用于存储矩阵计算的结果。</p>
 </td>
 </tr>
 <tr id="row20555141263319"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p133905218518"><a name="p133905218518"></a><a name="p133905218518"></a>L1 Buffer</p>
 </td>
-<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p1836472812518"><a name="p1836472812518"></a><a name="p1836472812518"></a>AI Core内部物理存储单元，空间相对较大，通常用于缓存矩阵计算的输入数据。矩阵计算的输入一般需要从GM搬运到L1 Buffer，然后分别搬运到L0A Buffer和L0B Buffer。L1 Buffer与逻辑内存AscendC::TPosition::A1、AscendC::TPosition::B1相对应。</p>
+<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p1836472812518"><a name="p1836472812518"></a><a name="p1836472812518"></a>AI Core内部物理存储单元，空间相对较大，通常用于缓存矩阵计算的输入数据。矩阵计算的输入一般需要从GM搬运到L1 Buffer，然后分别搬运到L0A Buffer和L0B Buffer。</p>
 </td>
 </tr>
 <tr id="row6690141203319"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p039012215517"><a name="p039012215517"></a><a name="p039012215517"></a>L2 Cache</p>
@@ -467,7 +467,7 @@
 </tr>
 <tr id="row13357140113713"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p17392122195118"><a name="p17392122195118"></a><a name="p17392122195118"></a>Unified Buffer/UB</p>
 </td>
-<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p936692819517"><a name="p936692819517"></a><a name="p936692819517"></a>AI Core内部存储单元，主要用于矢量计算，与逻辑内存AscendC::TPosition::VECIN、AscendC::TPosition::VECOUT、AscendC::TPosition::VECCALC相对应。</p>
+<td class="cellrowborder" valign="top" width="77.02117702117702%" headers="mcps1.2.3.1.2 "><p id="p936692819517"><a name="p936692819517"></a><a name="p936692819517"></a>AI Core内部物理存储单元，主要用于矢量计算，也可用于存储矢量计算过程中的输入、输出和临时数据。</p>
 </td>
 </tr>
 <tr id="row354602815226"><td class="cellrowborder" valign="top" width="22.978822978822976%" headers="mcps1.2.3.1.1 "><p id="p23927295115"><a name="p23927295115"></a><a name="p23927295115"></a>VECCALC</p>

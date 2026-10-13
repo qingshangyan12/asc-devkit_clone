@@ -3,3 +3,5 @@
 - **[load](load.md)**
 
 - **[load_broadcast](load_broadcast.md)**
+
+- **[load_gather](load_gather.md)**

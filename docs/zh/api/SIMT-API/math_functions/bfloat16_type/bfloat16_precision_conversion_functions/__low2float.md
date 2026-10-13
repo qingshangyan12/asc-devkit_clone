@@ -103,3 +103,10 @@ inline float __low2float(const bfloat16x2_t x)
         asc_vf_call<simt_low2float>(dim3(1024), (__gm__ bfloat16x2_t*)input, output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (0.5, -1.0), (1.0, 2.0), (3.0, 4.0), (0.0, 3.0), (nan, 1.0), (1.0, 2.0), (inf, -inf), (nan, nan)
+result: 0.5, 1.0, 3.0, 0.0, nan, 1.0, inf, nan
+```

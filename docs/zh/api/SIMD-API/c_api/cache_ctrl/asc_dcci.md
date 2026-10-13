@@ -50,6 +50,7 @@ asc_dcci接口用于解决上述一致性问题，其功能可以拆解为两部
 - 用户通过Scalar单元写GM的数据，希望立刻写出，也需要使用asc_dcci接口。
 
 > [!NOTE]说明
+>
 > - Scalar单元读写GM时，若调用的是[asc_load_dev](../scalar_compute/scalar_load/asc_load_dev.md)和[asc_store_dev](../scalar_compute/scalar_store/asc_store_dev.md)这一对接口，则读写数据不经过DCache，无需调用asc_dcci接口。
 > - Scalar单元读写UB时是否经过DCache，由[asc_set_ctrl](../spr/asc_set_ctrl.md)接口配置的CTRL[49]位控制，该bit位默认值为1'b0，即默认不经过DCache。CTRL[49]的详细说明请参考[asc_set_ctrl](../spr/asc_set_ctrl.md#ctrl_bit_desc)的常用CTRL寄存器比特位说明。
 
@@ -95,10 +96,7 @@ PIPE_S
 
 ## 约束说明
 
-<!-- npu="950" id8 -->
-- 针对Ascend 950PR&950DT系列产品，不支持asc_dcci_entire_ub接口。
-<!-- end id8 -->
-- `dst`为`__ubuf__ void*`类型的函数原型仅支持在AIV中调用。
+`dst`为`__ubuf__ void*`类型的函数原型仅支持在AIV中调用。
 
 ## 调用示例
 

@@ -8,7 +8,7 @@
 
 标量原子操作接口如表1所示，各接口支持的数据类型如表2所示。其中`old_value`为`address`指向的GM地址上的旧值，`new_value`为写回该地址的新值，表1中的原子计算接口均返回`old_value`。
 
-**表1**  标量原子操作接口
+**表1** 标量原子操作接口
 
 | 对应接口 | 接口功能描述 | 计算公式 |
 | --- | --- | --- |
@@ -32,7 +32,7 @@
 - [asc_set_store_atomic_config_v1](asc_set_store_atomic_config_v1.md)：仅Atlas A2系列产品、Atlas A3系列产品支持，Ascend 950PR&950DT系列产品不支持，在Ascend 950PR&950DT系列产品可使用[asc_atomic_add](asc_atomic_add.md)实现原子累加。
 - [asc_get_store_atomic_config](asc_get_store_atomic_config.md)：Atlas A2系列产品、Atlas A3系列产品、Ascend 950PR&950DT系列产品均支持，但在Ascend 950PR&950DT系列产品上已废弃，该系列产品可直接使用[asc_atomic_add](asc_atomic_add.md)实现原子累加。
 
-**表2**  标量原子操作接口支持的数据类型
+**表2** 标量原子操作接口支持的数据类型
 
 | 对应接口 | `dtype`支持的数据类型 |
 | --- | --- |

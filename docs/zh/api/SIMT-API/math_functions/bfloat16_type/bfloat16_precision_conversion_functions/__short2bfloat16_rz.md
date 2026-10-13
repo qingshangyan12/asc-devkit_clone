@@ -90,3 +90,10 @@ inline bfloat16_t __short2bfloat16_rz(const short int x)
         dst[idx] = __short2bfloat16_rz(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -129, -258, 258, 259, -32768, 32767, 0, 1
+result: -129.0, -258.0, 258.0, 258.0, -32768.0, 32640.0, 0.0, 1.0
+```

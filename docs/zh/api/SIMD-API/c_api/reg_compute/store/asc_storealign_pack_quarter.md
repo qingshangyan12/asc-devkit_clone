@@ -51,7 +51,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -73,7 +73,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -96,7 +96,7 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ <dtype>* dst,
 
 #### dtype支持数据类型
 
-`dtype`支持的数据类型为`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
+`dtype`取值为：`int32_t`、`uint32_t`、`float`。对应矢量寄存器类型为`vector_<dtype>`。
 
 #### 函数原型典型示例
 
@@ -106,7 +106,6 @@ __simd_callee__ inline void asc_storealign_pack_quarter(__ubuf__ int32_t* dst,
                                                         addr_reg offset,
                                                         vector_bool mask)
 ```
-
 
 ## 参数说明
 

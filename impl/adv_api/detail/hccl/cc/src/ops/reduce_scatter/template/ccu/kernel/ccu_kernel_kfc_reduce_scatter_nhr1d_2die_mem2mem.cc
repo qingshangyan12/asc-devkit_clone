@@ -21,6 +21,9 @@ constexpr uint16_t STEP_POST_SYNC_ID = 5;
 
 constexpr uint16_t CKE_IDX_0 = 0;
 
+// 步内流水的在途操作数（slice 数）超出单 event 16 位预算时回退逐 slice 串行等待（MultiLink 同款）。
+constexpr uint32_t RS_NHR_2DIE_EVENT_BIT_BUDGET = 16U;
+
 struct KfcReduceScatterNhr2DieContext : CcuKernelCtxBase {
     const ChannelHandle* channels = nullptr;
     uint32_t channelCount = 0;
@@ -157,6 +160,21 @@ CcuResult DoRepeatWriteReduceSlices(
     return CCU_SUCCESS;
 }
 
+// 只发射单个 slice 的 WriteReduce/占位 EventRecord，不等待；事件位 = 1 << sliceSeq。
+// 流水路径由调用方在步末统一 EventWait；串行路径不经过此函数。
+CcuResult IssueReduceSlice2Die(
+    KfcReduceScatterNhr2DieContext& ctx, const ChannelHandle& sendChannel, ccu::LocalAddr& src, ccu::RemoteAddr& dst,
+    ccu::Variable& sliceSize, uint32_t sliceSeq)
+{
+    CCU_IF(sliceSize != 0)
+    {
+        CCU_CHK_RET(
+            ccu::WriteReduce(sendChannel, dst, src, sliceSize, ctx.dataType, ctx.reduceOp, ctx.event, 1U << sliceSeq));
+    }
+    CCU_IF(sliceSize == 0) { CCU_CHK_RET(ccu::EventRecord(ctx.event, 1U << sliceSeq)); }
+    return CCU_SUCCESS;
+}
+
 CcuResult DoRepeatReduceScatterNHRSingleStep(
     KfcReduceScatterNhr2DieContext& ctx, const KfcNhrStepInfo& nhrStepInfo,
     const std::vector<ccu::Variable>& inputSliceOffset)
@@ -177,27 +195,64 @@ CcuResult DoRepeatReduceScatterNHRSingleStep(
 
     ChannelHandle sendChannel = ctx.channels[toRankIdx];
     ChannelHandle recvChannel = ctx.channels[fromRankIdx];
-    const std::vector<u32>& sendSliceIdxList = nhrStepInfo.txSliceIdxs;
     const uint32_t localIdx = ctx.channelCount;
     ctx.remoteDst_.token = ctx.token[toRankIdx];
     ctx.localSrc_.token = ctx.token[localIdx];
 
     bool islastSlice = false;
 
-    // 通知fromRank，可以写入
-    CCU_CHK_RET(ccu::NotifyRecord(recvChannel, CKE_IDX_0, 1 << STEP_PRE_SYNC_ID));
+    // step 非 0 时先做步间就绪同步，保证对端上一轮读取已完成；step 0 的 PreSync 基址交换
+    // 刚做过全屏障，跳过（MultiLink kernel 同款先例）
+    if (nhrStepInfo.step != 0U) {
+        CCU_CHK_RET(ccu::NotifyRecord(recvChannel, CKE_IDX_0, 1 << STEP_PRE_SYNC_ID));
+        CCU_CHK_RET(ccu::NotifyWait(sendChannel, CKE_IDX_0, 1 << STEP_PRE_SYNC_ID));
+    }
+    // 发射期分流（宿主期值必须用普通 if，只发射命中分支）：slice 数不超单 event 16 位预算时
+    // 走步内流水——本轮所有 slice 先全部发射（各占独立事件位；各 slice 的 src/dst 分片互不相交，
+    // 无数据依赖），步末一次 EventWait 批量等完成，消除"发一个等一个"的完成等待空转。
+    const uint32_t sliceNum = static_cast<uint32_t>(nhrStepInfo.txSliceIdxs.size());
+    if (sliceNum != 0U && sliceNum <= RS_NHR_2DIE_EVENT_BIT_BUDGET) {
+        const uint16_t waitMask = static_cast<uint16_t>((1U << sliceNum) - 1U);
+        // die1 段起始偏移一次性折叠进 turnOffset（axisId 是 emission 期 kernelArg 常量，普通 if）
+        ccu::Variable turnOffset;
+        ccu::Variable repeatNumAdd;
+        turnOffset = 0;
+        repeatNumAdd = 1;
+        if (ctx.axisId == 1) {
+            turnOffset += ctx.die0Size;
+        }
+        ctx.repeatNumVarTemp = ctx.repeatNumVar;
+        CCU_WHILE(ctx.repeatNumVarTemp != UINT64_MAX)
+        {
+            ctx.repeatNumVarTemp += repeatNumAdd;
+            for (uint32_t sliceSeq = 0; sliceSeq < sliceNum; ++sliceSeq) {
+                const uint32_t sendSliceIdx = nhrStepInfo.txSliceIdxs[sliceSeq];
+                ctx.remoteDst_.addr = ctx.input[toRankIdx];
+                ctx.remoteDst_.addr += inputSliceOffset[sendSliceIdx];
+                ctx.remoteDst_.addr += turnOffset;
+                ctx.localSrc_.addr = ctx.input[localIdx];
+                ctx.localSrc_.addr += inputSliceOffset[sendSliceIdx];
+                ctx.localSrc_.addr += turnOffset;
+                islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
+                ccu::Variable& sliceSizeVar = (ctx.axisId == 0) ? (islastSlice ? ctx.die0LastSliceSize : ctx.die0Size) :
+                                                                  (islastSlice ? ctx.die1LastSliceSize : ctx.die1Size);
+                CCU_CHK_RET(
+                    IssueReduceSlice2Die(ctx, sendChannel, ctx.localSrc_, ctx.remoteDst_, sliceSizeVar, sliceSeq));
+            }
+            CCU_CHK_RET(ccu::EventWait(ctx.event, waitMask));
+            turnOffset += ctx.inputRepeatStride;
+        }
+    } else {
+        // 串行回退（slice 超 16 位预算或空步）：保持原"发一个等一个"结构。
+        for (const u32& sendSliceIdx : nhrStepInfo.txSliceIdxs) {
+            ctx.remoteDst_.addr = ctx.input[toRankIdx];
+            ctx.remoteDst_.addr += inputSliceOffset[sendSliceIdx];
+            ctx.localSrc_.addr = ctx.input[localIdx];
+            ctx.localSrc_.addr += inputSliceOffset[sendSliceIdx];
 
-    // 等待toRank通知其可以写入
-    CCU_CHK_RET(ccu::NotifyWait(sendChannel, CKE_IDX_0, 1 << STEP_PRE_SYNC_ID));
-
-    for (const u32& sendSliceIdx : sendSliceIdxList) {
-        ctx.remoteDst_.addr = ctx.input[toRankIdx];
-        ctx.remoteDst_.addr += inputSliceOffset[sendSliceIdx];
-        ctx.localSrc_.addr = ctx.input[localIdx];
-        ctx.localSrc_.addr += inputSliceOffset[sendSliceIdx];
-
-        islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
-        CCU_CHK_RET(DoRepeatWriteReduceSlices(ctx, nhrStepInfo.toRank, ctx.localSrc_, ctx.remoteDst_, islastSlice));
+            islastSlice = (sendSliceIdx + 1 == ctx.rankSize);
+            CCU_CHK_RET(DoRepeatWriteReduceSlices(ctx, nhrStepInfo.toRank, ctx.localSrc_, ctx.remoteDst_, islastSlice));
+        }
     }
 
     // 通知toRank数据写入完毕
@@ -237,6 +292,7 @@ CcuResult DoRepeatReduceScatterNHR(KfcReduceScatterNhr2DieContext& ctx)
     ccu::Variable repeatNumAdd2;
     bool islastSlice = (ctx.rankId + 1 == ctx.rankSize);
     repeatNumAdd2 = 1;
+    ctx.isRepeatIter = 0;
     CCU_WHILE(ctx.repeatNumVar != UINT64_MAX)
     {
         ctx.repeatNumVar += repeatNumAdd2;

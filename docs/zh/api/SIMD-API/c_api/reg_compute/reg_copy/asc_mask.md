@@ -45,7 +45,7 @@
 
 ```c
 __simd_callee__ inline vector_<dtype> asc_mask(vector_<dtype> src,
-                                                vector_bool mask)
+                                               vector_bool mask)
 ```
 
 #### dtype支持数据类型
