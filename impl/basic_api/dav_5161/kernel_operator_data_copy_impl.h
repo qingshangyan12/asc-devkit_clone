@@ -163,7 +163,7 @@ __aicore__ inline void CopyCbufToGmAlignV2(
         uint16_t loop2Size = burstLength / sizeof(T);
         // ISA/API: unit of element
         uint32_t loop3Size = blockCount;
-        // ISA: loop2SrcStride = 1, and does not to be set by programmer.
+        // ISA: loop2SrcStride = 1, and does not to be set by programmer.  // 测试
         constexpr uint64_t loop2SrcStride = 1;
         // ISA: unit of C0_size(32B)
         uint64_t loop3SrcStride = DivCeil(actSrcStride, BYTE_32_ALIGN);
