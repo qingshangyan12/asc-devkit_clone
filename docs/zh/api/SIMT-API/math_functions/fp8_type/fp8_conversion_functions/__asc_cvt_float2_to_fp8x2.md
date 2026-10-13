@@ -97,3 +97,10 @@ SIMT编程场景当前不支持使用该接口。
         asc_vf_call<simt_asc_cvt_float2_to_fp8x2>(dim3(1024), (__gm__ float2*)input, output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x(float2)：(-1.5, 0.5), (17.25, -17.25), (600.0, -600.0), (nan, inf)
+result(float8_e4m3x2_t)：(-1.5, 0.5), (18, -18), (nan, nan), (nan, nan)
+```
