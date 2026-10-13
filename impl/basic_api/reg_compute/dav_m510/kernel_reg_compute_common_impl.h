@@ -434,6 +434,13 @@ __simd_callee__ inline void CopyMergingImpl(RegT& dstReg, RegT& srcReg, MaskReg&
         }
     } else if constexpr (sizeof(ActualT) == 8) {
         if constexpr (CheckRegTrait<RegT, RegTraitNumOne>()) {
+            // since vmov only supports b32, interleave the mask for the b32 view
+            MaskReg tmpMask;
+            MaskReg dumpMask;
+            ppack(
+                tmpMask, adjustedMask,
+                std::integral_constant<::HiloPart, static_cast<::HiloPart>(HighLowPart::LOWEST)>());
+            pintlv_b32(adjustedMask, dumpMask, tmpMask, tmpMask);
             vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, adjustedMask, modeValue);
         } else if constexpr (CheckRegTrait<RegT, RegTraitNumTwo>()) {
             vmov((RegTensor<uint32_t>&)dstReg.reg[0], (RegTensor<uint32_t>&)srcReg.reg[0], mask, modeValue);
