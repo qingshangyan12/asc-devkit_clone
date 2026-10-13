@@ -21,21 +21,18 @@ namespace te {
 namespace experimental {
 namespace detail {
 template <typename T>
-inline constexpr bool is_move_support_type = Std::is_one_of_v<
-    T, bool, uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t,
-    float>;
+inline constexpr bool is_move_support_type =
+    Std::is_one_of_v<T, bool, uint8_t, int8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t, int32_t, float>;
 } // namespace detail
 
 template <int16_t Offset, typename T>
 __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src)
 {
     static_assert(
-        AscendC::Std::is_one_of_v<T, uint16_t, uint32_t>,
-        "move_mask only supports uint16_t and uint32_t data types");
+        AscendC::Std::is_one_of_v<T, uint16_t, uint32_t>, "move_mask only supports uint16_t and uint32_t data types");
     static_assert(
-        Offset >= 0 &&
-            ((AscendC::Std::is_same_v<T, uint16_t> && Offset < 16) ||
-             (AscendC::Std::is_same_v<T, uint32_t> && Offset < 32)),
+        Offset >= 0 && ((AscendC::Std::is_same_v<T, uint16_t> && Offset < 16) ||
+                        (AscendC::Std::is_same_v<T, uint32_t> && Offset < 32)),
         "move_mask offset is out of range");
     reg_tensor<bool> dst;
     dst.reg = asc_extract_mask(src.reg, Offset);
@@ -44,13 +41,11 @@ __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src)
 }
 
 template <typename T>
-__simd_callee__ inline void move(reg_tensor<T>& dst, const reg_tensor<T>& src,
-    const reg_tensor<bool>& mask)
+__simd_callee__ inline void move(reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask)
 {
     static_assert(
-        detail::is_move_support_type<T>,
-        "move only supports bool uint8_t, int8_t, uint16_t,"
-        "int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
+        detail::is_move_support_type<T>, "move only supports bool uint8_t, int8_t, uint16_t,"
+                                         "int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     asc_copy(dst.reg, src.reg, mask.reg);
 }
 } // namespace experimental

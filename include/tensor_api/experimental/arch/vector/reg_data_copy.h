@@ -45,8 +45,8 @@ __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src);
  * @param mask Active lanes to copy. Defaults to all lanes for T.
  */
 template <typename T>
-__simd_callee__ inline void move(reg_tensor<T>& dst, const reg_tensor<T>& src,
-    const reg_tensor<bool>& mask = all_mask<T>());
+__simd_callee__ inline void move(
+    reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
 } // namespace experimental
 } // namespace te
 } // namespace asc

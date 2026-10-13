@@ -34,11 +34,11 @@ __aicore__ inline void TestMoveMask()
     EXPECT_EQ(dst.mask, asc::te::experimental::all_mask<uint8_t>().reg);
 }
 
-#define REG_DATA_MOVE_TEST(DataType)                         \
-    TEST_F(TensorApiVectorRegDataCopy3510, Move_##DataType)  \
-    {                                                        \
-        TestMove<DataType>();                                \
-        SUCCEED();                                           \
+#define REG_DATA_MOVE_TEST(DataType)                        \
+    TEST_F(TensorApiVectorRegDataCopy3510, Move_##DataType) \
+    {                                                       \
+        TestMove<DataType>();                               \
+        SUCCEED();                                          \
     }
 
 REG_DATA_MOVE_TEST(bool)
