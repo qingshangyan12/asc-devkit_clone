@@ -96,3 +96,9 @@ inline uint32_t asc_activemask()
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+result(uint32_t): 4294967295
+```
