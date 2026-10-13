@@ -1,4 +1,4 @@
-"""索引门控：CANN 版本检测、架构映射与版本区间判定。
+"""索引筛选条件：CANN 版本检测、架构映射与版本区间判定。
 
 检测链（references/索引推导契约.md 第 4 节）：--cann-version 显式参数 > $ASCEND_HOME_PATH
 安装目录版本 > 仓 version.cmake。架构标签经 product-map.yaml 映射架构号。
@@ -26,10 +26,12 @@ def load_product_map(path: Path) -> dict[str, Any]:
 
 
 def arch_label_to_number(label: str, product_map: dict[str, Any]) -> str:
+    if label in product_map["archs"]:
+        return label
     for arch, info in product_map["archs"].items():
         if label in info.get("labels", []):
             return str(arch)
-    raise ValueError(f"unknown arch label: {label!r}; known: {[i.get('labels') for i in product_map['archs'].values()]}")
+    raise ValueError(f"unknown arch label: {label!r}; known architecture numbers: {list(product_map['archs'])}")
 
 
 def npu_to_arch(marker: str, product_map: dict[str, Any]) -> str | None:

@@ -1,38 +1,38 @@
-# asc-search dryrun 查询清单（c_api 全量 × A5/A3 × CANN 9.2.0）。
+# asc-search dryrun 查询清单（c_api 全量 × 3510/A3 × CANN 9.2.0）。
 # 每条用例验证一个能力面；前 19 条为试点基线，后 10 条为全量轮新增
 # （reg_compute/sync/atomic/deprecated/defs 维度）。
-# args 键与 query.py 参数一一对应；arch 选构建实例（a5=默认提交实例）。
+# args 键与 query.py 参数一一对应；arch 选构建实例（arch3510=默认提交实例）。
 
 cases:
-  - name: A5 搬入阶段
+  - name: 3510 搬入阶段
     args: {stage: in}
     min: 3
     contains: [asc_copy_gm2ub]
 
-  - name: A5 搬出阶段
+  - name: 3510 搬出阶段
     args: {stage: out}
     min: 2
     contains: [asc_copy_ub2gm]
 
-  - name: A5 非对齐搬运
+  - name: 3510 非对齐搬运
     args: {kw: 非对齐}
     min: 2
     contains: [asc_copy_gm2ub_align]
 
-  - name: A5 对齐搬运 trait
+  - name: 3510 对齐搬运 trait
     args: {operation: copy, kw: 对齐}
     min: 2
 
-  - name: A5 api_class 分类
+  - name: 3510 api_class 分类
     args: {api_class: vector_datamove}
     min: 10
 
-  - name: A5 参数反查（枚举类型形参）
+  - name: 3510 参数反查（枚举类型形参）
     args: {param: asc_load_l2_cache_mode}
     min: 2
     contains: [asc_copy_gm2ub_align, asc_ndim_copy_gm2ub]
 
-  - name: A5 参数反查（参数名）
+  - name: 3510 参数反查（参数名）
     args: {param: pad_value}
     min: 2
     contains: [asc_set_copy_pad_val, asc_set_ndim_pad_value]
@@ -42,26 +42,26 @@ cases:
     min: 1
     contains: [enum.h, NORMAL_PERSISTENT]
 
-  - name: A5 反向配置依赖
+  - name: 3510 反向配置依赖
     args: {deps_of: asc_copy_gm2ub_align, kind: configures, reverse: true}
     min: 1
     contains: [asc_set_copy_pad_val]
 
-  - name: A5 家族卡
+  - name: 3510 家族卡
     args: {api: asc_copy_gm2ub}
     min: 2
     contains: [asc_copy_gm2ub_arch_3510]
 
-  - name: A5 dtype 过滤
+  - name: 3510 dtype 过滤
     args: {dtype: half, stage: in}
     min: 1
 
-  - name: A5 版本视图
+  - name: 3510 版本视图
     args: {version: ">=9.1.0"}
     min: 2
     contains: [asc_set_copy_pad_val]
 
-  - name: A5 产品视图
+  - name: 3510 产品视图
     args: {product: "950", stage: in}
     min: 3
 

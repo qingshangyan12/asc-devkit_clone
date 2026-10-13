@@ -1,4 +1,4 @@
-"""asc-search 推导引擎、门控与查询测试（不写入已提交索引，用临时目录构建）。"""
+"""asc-search 推导引擎、筛选条件与查询测试（不写入已提交索引，用临时目录构建）。"""
 
 from __future__ import annotations
 
@@ -31,7 +31,8 @@ class GateTests(unittest.TestCase):
 
     def test_arch_label_mapping(self) -> None:
         pm = gate.load_product_map(REPO_ROOT / ".agent/skills/asc-search/config/product-map.yaml")
-        self.assertEqual(gate.arch_label_to_number("A5", pm), "3510")
+        self.assertEqual(gate.arch_label_to_number("3510", pm), "3510")
+        self.assertEqual(gate.arch_label_to_number("2201", pm), "2201")
         self.assertEqual(gate.arch_label_to_number("A3", pm), "2201")
         self.assertEqual(gate.npu_to_arch("950", pm), "3510")
         self.assertEqual(gate.npu_to_arch("910b", pm), "2201")
@@ -110,16 +111,16 @@ class DeriveTests(unittest.TestCase):
 
 
 class BuildTests(unittest.TestCase):
-    """真实构建（临时目录）：门控、推导与确定性。"""
+    """真实构建（临时目录）：筛选条件、推导与确定性。"""
 
     @classmethod
     def setUpClass(cls) -> None:
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name)
         scope = build_index.SCOPES["c_api"]
-        build_index.build(REPO_ROOT, scope, cls.out / "a5", "9.2.0", "A5")
+        build_index.build(REPO_ROOT, scope, cls.out / "arch3510", "9.2.0", "3510")
         build_index.build(REPO_ROOT, scope, cls.out / "a3", "9.2.0", "A3")
-        cls.a5 = json.loads((cls.out / "a5" / "index.json").read_text(encoding="utf-8"))
+        cls.arch3510 = json.loads((cls.out / "arch3510" / "index.json").read_text(encoding="utf-8"))
         cls.a3 = json.loads((cls.out / "a3" / "index.json").read_text(encoding="utf-8"))
 
     @classmethod
@@ -127,46 +128,46 @@ class BuildTests(unittest.TestCase):
         cls.tmp.cleanup()
 
     def test_gate_arch(self) -> None:
-        self.assertEqual(self.a5["meta"]["arch"], "3510")
+        self.assertEqual(self.arch3510["meta"]["arch"], "3510")
         self.assertEqual(self.a3["meta"]["arch"], "2201")
-        for path in self.a5["documents"]:
+        for path in self.arch3510["documents"]:
             if "_arch_2201" in path:
-                self.fail(f"2201 变体页进入 A5 索引: {path}")
+                self.fail(f"2201 变体页进入 3510 索引: {path}")
         for path in self.a3["documents"]:
             if "_arch_3510" in path:
                 self.fail(f"3510 变体页进入 A3 索引: {path}")
-        # 全量轮：A5 文档多于 A3（新架构 API 更多 + 废弃双架构文档保留）
-        self.assertGreater(len(self.a5["documents"]), len(self.a3["documents"]))
+        # 全量轮：3510 文档多于 A3（新架构 API 更多 + 废弃双架构文档保留）
+        self.assertGreater(len(self.arch3510["documents"]), len(self.a3["documents"]))
 
     def test_gate_version(self) -> None:
         # 全量轮：3 篇废弃接口 version 闭区间止于 9.1.0，不覆盖本地 9.2.0
-        self.assertEqual(self.a5["meta"]["filtered_by_version"], 3)
+        self.assertEqual(self.arch3510["meta"]["filtered_by_version"], 3)
 
     def test_arch_page_signatures(self) -> None:
-        doc = self.a5["documents"]["docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"]
+        doc = self.arch3510["documents"]["docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"]
         for signature in doc["signatures"]:
             self.assertIn("3510", signature["archs"])
 
     def test_views(self) -> None:
         for view in ("by_stage", "by_role", "by_operation", "by_dtype", "by_param", "by_enum", "by_feature"):
-            self.assertIn(view, self.a5["views"])
-        self.assertGreater(len(self.a5["views"]["by_param"]), 10)
-        self.assertIn("asc_load_l2_cache_mode", self.a5["views"]["by_enum"])
+            self.assertIn(view, self.arch3510["views"])
+        self.assertGreater(len(self.arch3510["views"]["by_param"]), 10)
+        self.assertIn("asc_load_l2_cache_mode", self.arch3510["views"]["by_enum"])
         self.assertGreater(len(self.a3["views"]["by_dtype_pair"]), 0)
         self.assertIn("low_precision", self.a3["views"]["by_feature"])
 
     def test_enum_reverse_lookup(self) -> None:
-        users = self.a5["views"]["by_enum"]["asc_load_l2_cache_mode"]
+        users = self.arch3510["views"]["by_enum"]["asc_load_l2_cache_mode"]
         self.assertTrue(users)
-        enum = self.a5["defs"]["enums"]["asc_load_l2_cache_mode"]
+        enum = self.arch3510["defs"]["enums"]["asc_load_l2_cache_mode"]
         self.assertIn("NORMAL_PERSISTENT", enum["values"])
 
     def test_deterministic_rebuild(self) -> None:
         scope = build_index.SCOPES["c_api"]
-        build_index.build(REPO_ROOT, scope, self.out / "a5-again", "9.2.0", "A5")
-        first = build_index.strip_informational(self.a5)
+        build_index.build(REPO_ROOT, scope, self.out / "arch3510-again", "9.2.0", "3510")
+        first = build_index.strip_informational(self.arch3510)
         second = build_index.strip_informational(
-            json.loads((self.out / "a5-again" / "index.json").read_text(encoding="utf-8"))
+            json.loads((self.out / "arch3510-again" / "index.json").read_text(encoding="utf-8"))
         )
         self.assertEqual(first, second)
 
@@ -189,7 +190,7 @@ class DryrunTests(unittest.TestCase):
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name)
         scope = build_index.SCOPES["c_api"]
-        build_index.build(REPO_ROOT, scope, cls.out / "a5", "9.2.0", "A5")
+        build_index.build(REPO_ROOT, scope, cls.out / "arch3510", "9.2.0", "3510")
         build_index.build(REPO_ROOT, scope, cls.out / "a3", "9.2.0", "A3")
         cls.cases = yaml.safe_load(
             (Path(__file__).parent / "dryrun.yaml").read_text(encoding="utf-8")
@@ -214,8 +215,8 @@ class DryrunTests(unittest.TestCase):
 
     def test_reverse_deps_by_family(self) -> None:
         # 族名与成员全路径应得到同一组反向入边
-        by_family = self._run("a5", {"deps_of": "asc_copy_gm2ub", "reverse": True})
-        by_path = self._run("a5", {
+        by_family = self._run("arch3510", {"deps_of": "asc_copy_gm2ub", "reverse": True})
+        by_path = self._run("arch3510", {
             "deps_of": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
             "reverse": True,
         })
@@ -223,14 +224,14 @@ class DryrunTests(unittest.TestCase):
         self.assertEqual({r["path"] for r in by_family}, {r["path"] for r in by_path})
 
     def test_unknown_named_query_returns_empty(self) -> None:
-        self.assertEqual(self._run("a5", {"api": "asc_no_such_api"}), [])
-        self.assertEqual(self._run("a5", {"deps_of": "asc_no_such_api"}), [])
-        self.assertEqual(self._run("a5", {"operation": "no_such_operation"}), [])
+        self.assertEqual(self._run("arch3510", {"api": "asc_no_such_api"}), [])
+        self.assertEqual(self._run("arch3510", {"deps_of": "asc_no_such_api"}), [])
+        self.assertEqual(self._run("arch3510", {"operation": "no_such_operation"}), [])
 
     def test_dryrun_cases(self) -> None:
         for case in self.cases["cases"]:
             with self.subTest(case=case["name"]):
-                arch = case.get("arch", "a5")
+                arch = case.get("arch", "arch3510")
                 results = self._run(arch, case["args"])
                 self.assertGreaterEqual(
                     len(results), case.get("min", 1),
@@ -243,7 +244,7 @@ class DryrunTests(unittest.TestCase):
 
 
 class EnsureTests(unittest.TestCase):
-    """ensure_index 前置检测：门控匹配、指纹漂移与原地重建决策。"""
+    """ensure_index 前置检测：筛选条件匹配、指纹漂移与原地重建决策。"""
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -251,7 +252,7 @@ class EnsureTests(unittest.TestCase):
         cls.ensure_mod = ensure_index
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name)
-        build_index.build(REPO_ROOT, build_index.SCOPES["c_api"], cls.out / "inst", "9.2.0", "A5")
+        build_index.build(REPO_ROOT, build_index.SCOPES["c_api"], cls.out / "inst", "9.2.0", "3510")
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -269,12 +270,12 @@ class EnsureTests(unittest.TestCase):
         )
 
     def test_gate_reasons(self) -> None:
-        ok = {"surface": "c_api", "cann_version": "9.2.0", "arch_label": "A5"}
-        self.assertEqual(self.ensure_mod.gate_reasons(ok, "c_api", "9.2.0", "A5"), [])
+        ok = {"surface": "c_api", "cann_version": "9.2.0", "arch_label": "3510"}
+        self.assertEqual(self.ensure_mod.gate_reasons(ok, "c_api", "9.2.0", "3510"), [])
         reasons = self.ensure_mod.gate_reasons(
-            {"surface": "c_api", "cann_version": "9.1.0", "arch_label": "A3"}, "c_api", "9.2.0", "A5"
+            {"surface": "c_api", "cann_version": "9.1.0", "arch_label": "A3"}, "c_api", "9.2.0", "3510"
         )
-        self.assertEqual(reasons, ["cann 9.1.0 != 9.2.0", "arch A3 != A5"])
+        self.assertEqual(reasons, ["cann 9.1.0 != 9.2.0", "arch A3 != 3510"])
 
     def test_light_fresh_ok(self) -> None:
         ok, reasons = self.ensure_mod.light_fresh(self.out / "inst", REPO_ROOT, build_index.SCOPES["c_api"])
@@ -302,9 +303,9 @@ class EnsureTests(unittest.TestCase):
         self.assertTrue(any(r.startswith("scope document count") for r in reasons), reasons)
 
     def test_committed_instance_ready_noop(self) -> None:
-        """committed c_api 实例与 9.2.0×A5 匹配且新鲜：ensure 零动作。"""
+        """committed c_api 实例与 9.2.0×3510 匹配且新鲜：ensure 零动作。"""
         with self._patch_build_forbidden():
-            result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A5")
+            result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "3510")
         self.assertEqual(result["status"], "ready")
         self.assertEqual(result["actions"], [])
         # 全量轮：15 个分类全部入索引（含 defs/deprecated_interface/experimental）
@@ -319,7 +320,7 @@ class EnsureTests(unittest.TestCase):
         (inst / "build-meta.json").write_text(json.dumps(meta), encoding="utf-8")
         with self._patch_build_forbidden():
             result = self.ensure_mod.ensure(
-                REPO_ROOT, "c_api", "9.2.0", "A5", skip_drift=True, index_root=inst.parent
+                REPO_ROOT, "c_api", "9.2.0", "3510", skip_drift=True, index_root=inst.parent
             )
         self.assertEqual(result["actions"], [])
 
@@ -328,7 +329,7 @@ class EnsureTests(unittest.TestCase):
         meta = json.loads((inst / "build-meta.json").read_text(encoding="utf-8"))
         meta["product_map_sha256"] = "0" * 64
         (inst / "build-meta.json").write_text(json.dumps(meta), encoding="utf-8")
-        result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A5", index_root=inst.parent)
+        result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "3510", index_root=inst.parent)
         self.assertEqual(len(result["actions"]), 1)
         self.assertIn("product_map_sha256 drift", result["actions"][0])
 
@@ -336,7 +337,7 @@ class EnsureTests(unittest.TestCase):
         inst = self._copy_instance("rebuild-a3")
         result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A3", index_root=inst.parent)
         self.assertEqual(len(result["actions"]), 1)
-        self.assertIn("arch A5 != A3", result["actions"][0])
+        self.assertIn("arch 3510 != A3", result["actions"][0])
         self.assertEqual(result["arch"], "2201")
 
     def test_ensure_builds_missing_instance(self) -> None:

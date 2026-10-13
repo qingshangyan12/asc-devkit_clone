@@ -3,14 +3,14 @@
 把已打标文档构建为持久索引，支撑检索流程（[retrieve.md](retrieve.md)）。索引是三类头的
 **纯派生数据**：文档 slim 头（语义）+ include Doxygen/声明（结构）+ examples marker（关联），
 推导规则以 [索引推导契约.md](索引推导契约.md) 为唯一契约。
-当前实例为 c_api 全量（838 篇 slim 头，SCOPES categories=None；592 篇过 A5 门控）。
+当前构建范围为 c_api（SCOPES categories=None），默认架构为 3510；索引文档数随已标注范围和筛选条件变化，以 `ensure_index.py` 输出的 `doc_count` 为准。
 
 ## 资产结构
 
 ```
 asc-search/
-  scripts/build_index.py        # 构建 + 校验 + 漂移检测（--check）；--arch/--cann-version 门控
-  scripts/ensure_index.py       # 前置保障（检索步骤 0）：门控匹配 + 指纹新鲜 → 按需原地重建
+  scripts/build_index.py        # 构建 + 校验 + 漂移检测（--check）；--arch/--cann-version 筛选条件
+  scripts/ensure_index.py       # 前置保障（检索步骤 0）：筛选条件匹配 + 指纹新鲜 → 按需原地重建
   scripts/query.py              # 查询 CLI（唯一检索入口）
   scripts/derive/               # 推导引擎：include_db / docparse / examples_db / gate / overrides / slim_header
   config/tag-taxonomy.json      # 随包分发的冻结词表（tag 合法值校验）
@@ -20,18 +20,18 @@ asc-search/
   index/c_api/build-meta.json   # 源 commit、文档 sha256、词表/映射指纹
   index/c_api/gaps.json         # 缺口登记（可选、人工维护；缺失视为空台账，随实例落盘快照）
   index/c_api/概览.md            # 人读概览（构建产物）
-  tests/test_index.py           # 门控 + 推导正确性 + 确定性 + ensure 决策 + dryrun 回归
-  tests/dryrun.yaml             # 查询清单（A5/A3 双实例）
+  tests/test_index.py           # 筛选条件 + 推导正确性 + 确定性 + ensure 决策 + dryrun 回归
+  tests/dryrun.yaml             # 查询清单（3510/A3 双实例）
 ```
 
-## 构建门控与流程
+## 构建筛选条件与流程
 
 ```bash
-python3 scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] [--check]
+python3 scripts/build_index.py --scope c_api [--arch 3510] [--cann-version 9.2.0] [--check]
 ```
 
 1. **CANN 版本检测链**：`--cann-version` > `$ASCEND_HOME_PATH` 安装目录 > 仓 `version.cmake`。
-2. **架构映射**：`--arch`（默认 A5）经本 skill `config/product-map.yaml` 映射架构号（A5→3510）。
+2. **架构映射**：`--arch`（默认 3510）由本 skill `config/product-map.yaml` 校验，其他标签映射为架构号。
 3. 只索引同时满足三条件的 API：头内 `version` 区间覆盖本地 CANN 版本 ∧ 推导 archs 含目标架构
    ∧ 属于目标层级；被过滤 API 计入 `meta.filtered_by_version/arch`。
 4. 推导（脚本为主）：
@@ -75,13 +75,13 @@ python3 scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] 
 ## 前置保障（检索步骤 0）
 
 ```bash
-python3 scripts/ensure_index.py [--arch A5] [--cann-version X] [--skip-drift] [--strict] [--json]
+python3 scripts/ensure_index.py [--arch 3510] [--cann-version X] [--skip-drift] [--strict] [--json]
 ```
 
-检测链与构建同构（surface 默认 c_api）。committed 实例门控匹配且指纹新鲜 → 零动作；
-缺失、门控不符或漂移 → 原地重建。指纹默认轻量档（build-meta `document_sha256` 逐文件 +
+检测链与构建同构（surface 默认 c_api）。committed 实例筛选条件匹配且指纹新鲜 → 零动作；
+缺失、筛选条件不符或漂移 → 原地重建。指纹默认轻量档（build-meta `document_sha256` 逐文件 +
 scope 文档数 + 词表/映射/gaps 哈希，毫秒级），`--strict` 走全量重建比对；`--skip-drift`
-只查门控。输出 JSON（`cann_version/arch_label/categories/doc_count/actions`）即检索
+只查筛选条件。输出 JSON（`cann_version/arch_label/categories/doc_count/actions`）即检索
 上下文；失败时退出码 1，由检索侧如实转告。
 
 ## 维护边界

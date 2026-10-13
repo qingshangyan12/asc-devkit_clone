@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""OKF 索引构建：slim 头 + include 头 + examples 头 → 门控化持久索引。
+"""OKF 索引构建：slim 头 + include 头 + examples 头 → 按适用条件筛选的持久索引。
 
 管线：解析文档头 → 三源推导（include 声明/Doxygen、examples marker、正文）→
-门控（CANN 版本 × 架构 × 层级）→ 视图 → 依赖图 → 落盘。
+筛选条件（CANN 版本 × 架构 × 层级）→ 视图 → 依赖图 → 落盘。
 构建以脚本为主，残留进 unresolved.json，由 derive-overrides 裁决后确定性消费；
 同输入两次构建字节一致（meta 中的信息性字段除外）。
 """
@@ -212,7 +212,7 @@ def derive_signatures(
     }
     if mode == "none":
         unresolved.append({"document": rel, "field": "signatures", "issue": "no declaration found in include/c_api"})
-        # 无声明也继续：archs 交给正文 npu 标记兜底（保守保留改为按证据门控）。
+        # 无声明也继续：archs 交给正文 npu 标记兜底（保守保留改为按证据筛选）。
     silent = 0
     for declaration in declarations:
         raw_archs = list(declaration.archs)
@@ -256,7 +256,7 @@ def derive_signatures(
     derived["archs"] = sorted(set(derived["archs"]))
     if page_arch and derived["signatures"]:
         # 架构变体页只呈现本架构视图：声明 @archs 含多架构（如废弃接口 2201+3510）
-        # 时也按页面架构门控，防止变体页漏入其他架构索引。
+        # 时也按页面架构筛选，防止变体页漏入其他架构索引。
         derived["archs"] = [page_arch]
     derived["headers"] = sorted(set(derived["headers"]))
     derived["params"] = list({
@@ -462,7 +462,7 @@ def overview(index: dict[str, Any], enums: dict[str, Any]) -> str:
     meta = index["meta"]
     lines = [
         "# OKF 索引概览（构建副产物，勿手改）", "",
-        f"- 门控：CANN {meta['cann_version']} × 架构 {meta['arch_label']}（{meta['arch']}）× 层级 {meta['surface']}",
+        f"- 筛选条件：CANN {meta['cann_version']} × 架构 {meta['arch_label']}（{meta['arch']}）× 层级 {meta['surface']}",
         f"- 索引文档：{meta['doc_count']}（主文档 {meta['primary_count']}、导航页 {meta['nav_page_count']}）",
         f"- 版本过滤：{meta['filtered_by_version']} 篇；架构过滤：{meta['filtered_by_arch']} 篇",
         f"- 范围内无 slim 头的文档：{meta['pending_no_okf']} 篇",
@@ -681,7 +681,7 @@ def main() -> int:
     parser.add_argument("--scope", default="c_api", choices=sorted(SCOPES))
     parser.add_argument("--out", type=Path, default=None)
     parser.add_argument("--cann-version", default=None, help="默认自动检测（$ASCEND_HOME_PATH > version.cmake）")
-    parser.add_argument("--arch", default="A5", help="检索代际标签（默认 A5，经 product-map 映射架构号）")
+    parser.add_argument("--arch", default="3510", help="架构号或检索标签（默认 3510，经 product-map 校验）")
     parser.add_argument("--check", action="store_true", help="校验已提交索引与重建结果一致")
     args = parser.parse_args()
     scope = SCOPES[args.scope]

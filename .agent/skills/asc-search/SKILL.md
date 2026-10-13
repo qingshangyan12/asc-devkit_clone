@@ -1,6 +1,6 @@
 ---
 name: asc-search
-description: OKF 用户侧入口：把 Ascend C API 文档的三类头建立为门控化持久索引，并按算子需求检索候选接口文档。用户需要建索引/检查索引新鲜度、询问“用哪个接口/怎么找 API/某接口配什么用/哪个版本可用”时使用；写头、改词表、标注文档请用 asc-knowledge-create。
+description: OKF 用户侧入口：把 Ascend C API 文档的三类头建立为按适用条件筛选的持久索引，并按算子需求检索候选接口文档。用户需要建索引/检查索引新鲜度、询问“用哪个接口/怎么找 API/某接口配什么用/哪个版本可用”时使用；写头、改词表、标注文档请用 asc-knowledge-create。
 ---
 
 # OKF 索引与检索（asc-search）
@@ -15,26 +15,28 @@ examples marker）的纯派生数据，查询统一走本 skill 的 `scripts/que
 对应的 asc-devkit 仓库根目录，并从该目录执行以下命令和读取候选文档。用户当前目录
 可以位于其他项目；检索始终使用安装入口指向的 devkit 仓库。
 
+目标架构统一使用 NPU 架构号表述，默认使用 `3510`。
+
 ## 建立索引
 
 ```bash
-python3 .agent/skills/asc-search/scripts/build_index.py --scope c_api [--arch A5] [--cann-version 9.2.0] [--check]
+python3 .agent/skills/asc-search/scripts/build_index.py --scope c_api [--arch 3510] [--cann-version 9.2.0] [--check]
 ```
 
-构建按「CANN 版本 × 架构 × 层级」门控，只索引同时满足 version 覆盖、archs 命中、层级命中的 API；
+构建按 CANN 版本、架构和 API 层级筛选，只索引同时满足 version 覆盖、archs 命中、层级命中的 API；
 校验不过不出索引，同输入两次构建字节一致。`--check` 做文档漂移检测。
 
 ## 使用索引
 
 ### 步骤 0：索引前置保障
 
-任何检索开始前先运行（用户显式指定架构/版本时透传参数，否则默认 A5 + 本地自动检测）：
+任何检索开始前先运行（用户显式指定架构/版本时透传参数，否则默认使用 3510 架构并自动检测本地 CANN 版本）：
 
 ```bash
 python3 .agent/skills/asc-search/scripts/ensure_index.py --json [--arch A3] [--cann-version 9.2.0]
 ```
 
-门控匹配且指纹新鲜 → 零动作；缺失、门控不符或漂移 → 原地重建（本地 diff，不主动提交）。
+筛选条件匹配且指纹新鲜 → 零动作；缺失、筛选条件不符或漂移 → 原地重建（本地 diff，不主动提交）。
 成功后以输出 JSON（`cann_version/arch_label/categories`）作为本次检索的**文档范围**；
 `actions` 含 `rebuilt` 时向用户说明一句。失败时如实报告并停止，不得绕过索引猜测文档。
 
@@ -49,20 +51,20 @@ python3 .agent/skills/asc-search/scripts/ensure_index.py --json [--arch A3] [--c
    `--gap` 确认范围外；仍无则如实说明。
 4. **配套展开**：`--deps-of`（含 `--reverse`）、`--enum`/`--param` 反查，保留家族变体。
 5. **收敛与把关**：意图要素全部有候选或确认范围外、依赖闭合后按固定格式作答；
-   脚本只给候选，输出前由你复核相关性与适用条件（门控/condition/deprecated），
+   脚本只给候选，输出前由你复核相关性与适用条件（筛选条件/condition/deprecated），
    不相关的不展示；按需只读候选文档支撑推荐所需的章节，禁止全量精读。
 
 完整维度映射表、降级链与策略要点见 [references/retrieve.md](references/retrieve.md)；
 查询 CLI 全部参数见 [references/index.md](references/index.md)。
 
-### 输出格式（不落盘、不增删章节）
+### 输出格式（不落盘）
 
 ```text
 ## 候选
 - 路径: docs/zh/api/SIMD-API/c_api/xxx/yyy.md 或 include/... | API: asc_yyy | 用途: 一句话
-## 文档范围内未覆盖
-- 能力描述（及源码或范围外线索，若有）
 ```
+
+未检索到候选时直接说明结果；适用条件和待确认事项随候选说明，不单设未覆盖章节。
 
 ## 边界
 

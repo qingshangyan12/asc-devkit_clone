@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """OKF 索引查询 CLI。
 
-索引实例按 surface 隔离（默认 c_api），构建时已按 CANN 版本 × 架构门控。
+索引实例按 surface 隔离（默认 c_api），构建时已按 CANN 版本 × 架构筛选条件。
 过滤查询各维度 AND、逗号值内 OR；独立查询（--api/--deps-of/--enum/--gap）返回结构化卡片。
 """
 
@@ -300,7 +300,7 @@ def render(index: dict[str, Any], results: list[dict[str, Any]]) -> str:
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--surface", default="c_api", choices=sorted(SCOPES),
-                   help="API surface 索引实例（默认 c_api）；索引构建时已按 CANN×架构门控")
+                   help="API surface 索引实例（默认 c_api）；索引构建时已按 CANN×架构筛选条件")
     p.add_argument("--index-dir", type=Path, default=None, help="显式索引目录（默认 index/<surface>）")
     p.add_argument("--json", action="store_true", help="机器可读输出")
     p.add_argument("--stage", help="逗号列表: in,out,compute")

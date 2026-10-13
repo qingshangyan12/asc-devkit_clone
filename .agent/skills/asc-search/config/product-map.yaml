@@ -1,6 +1,6 @@
 # 产品映射（唯一事实源，机器可读）。
 #
-# 用途：asc-search 门控（--arch 检索标签 -> 架构号）与产品支持推导
+# 用途：asc-search 筛选条件（--arch 架构号或检索标签 -> 架构号）与产品支持推导
 #（文档正文 <!-- npu="X" --> 标记 -> 架构号 -> 产品代际）。
 # 本文件为唯一事实源；新增产品时直接维护本文件。
 
@@ -9,7 +9,7 @@ schema_version: 1
 # NPU_ARCH 架构号 -> 信息表
 archs:
   "3510":
-    labels: [A5]
+    labels: []
     soc_versions: [Ascend950]
     npu_markers: ["950"]
     products:

@@ -2,7 +2,7 @@
 """OKF 索引前置保障：检索前确保存在与「本地 CANN × 架构 × 层级」匹配且新鲜的索引。
 
 检索流程（references/retrieve.md）的步骤 0。检测链与 build_index 一致（--cann-version > $ASCEND_HOME_PATH >
-version.cmake；--arch 默认 A5 经 product-map 校验）。committed `index/<surface>` 门控
+version.cmake；--arch 默认 3510 经 product-map 校验）。committed `index/<surface>` 筛选条件
 匹配且指纹新鲜时零动作；否则原地重建（产生本地 diff，是否提交由维护流程决定）。
 指纹默认轻量档（build-meta 哈希 + scope 文档数），--strict 走全量重建比对。
 """
@@ -101,7 +101,7 @@ def light_fresh(instance: Path, root: Path, scope: build_index.Scope) -> tuple[b
 def strict_fresh(
     instance: Path, root: Path, scope: build_index.Scope, cann_version: str, arch_label: str,
 ) -> tuple[bool, list[str]]:
-    """全量重建比对（与 build_index --check 同语义，按目标门控参数化）。"""
+    """全量重建比对（与 build_index --check 同语义，按目标筛选条件参数化）。"""
     with tempfile.TemporaryDirectory() as tmp:
         for target in build_index.build(root, scope, Path(tmp), cann_version, arch_label):
             if target.name.endswith(".json"):
@@ -162,8 +162,8 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=REPO_ROOT)
     parser.add_argument("--surface", default="c_api", choices=sorted(build_index.SCOPES))
     parser.add_argument("--cann-version", default=None, help="默认自动检测（$ASCEND_HOME_PATH > version.cmake）")
-    parser.add_argument("--arch", default="A5", help="检索代际标签（默认 A5，经 product-map 映射架构号）")
-    parser.add_argument("--skip-drift", action="store_true", help="只校验门控匹配，跳过指纹漂移校验")
+    parser.add_argument("--arch", default="3510", help="架构号或检索标签（默认 3510，经 product-map 校验）")
+    parser.add_argument("--skip-drift", action="store_true", help="只校验筛选条件匹配，跳过指纹漂移校验")
     parser.add_argument("--strict", action="store_true", help="全量重建比对（比轻量指纹精确，更慢）")
     parser.add_argument("--json", action="store_true", help="机器可读输出")
     args = parser.parse_args()
