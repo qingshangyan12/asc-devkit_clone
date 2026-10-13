@@ -89,8 +89,6 @@ dst[i] = src[index[i]], 0 <= i < 128
 
   在支持的 NPU 环境运行时，可省略 `-DCMAKE_ASC_RUN_MODE=sim`，默认运行模式为 `npu`。使用仿真模式时，在上述 CMake 命令中添加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式或芯片型号时，建议先清除 `build` 目录中的 CMake 缓存。
 
-  CMake 优先使用本仓库的 Tensor API 头文件与实现，避免误用已安装版本。
-
 - 编译选项说明
 
   | 选项 | 说明 |
@@ -112,19 +110,3 @@ dst[i] = src[index[i]], 0 <= i < 128
   ```bash
   python3 ../scripts/verify_result.py
   ```
-
-## 精度用例
-
-默认 `random` 用例与原样例保持一致，并固定随机种子保证复现，显式包含边界索引 0 和 127。
-额外提供 `identity`（顺序）、`reverse`（逆序）和 `repeated`（全部读取索引 127）用例。在 `build` 目录下执行以下命令验证全部用例：
-
-```bash
-for case in random identity reverse repeated; do
-  python3 ../scripts/gen_data.py --case "$case" && \
-    ./demo && python3 ../scripts/verify_result.py || exit 1
-done
-```
-
-Golden 由 NumPy 的 `source[indexes]` 生成。Gather 不涉及算术误差，因此 C++ 主程序与 Python
-校验脚本均按 `uint16_t` 原始位模式逐元素比较；128/128 元素必须完全一致。
-文件尺寸错误、非法索引、ACL 调用失败或精度不一致均返回非零退出码。
