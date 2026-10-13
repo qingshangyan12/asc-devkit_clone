@@ -1543,6 +1543,48 @@ inline void load_cbuf_to_cb_transpose_s4(
     uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride)
 {}
 
+// ==========scatter_ubuf_to_gm===========
+inline void scatter_ubuf_to_gm(
+    __gm__ uint8_t* dst, __ubuf__ uint8_t* dataSrc, uint8_t sid, uint8_t offset_type, __ubuf__ void* offsetSrc,
+    uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
+{}
+
+inline void scatter_ubuf_to_gm(
+    __gm__ uint16_t* dst, __ubuf__ uint16_t* dataSrc, uint8_t sid, uint8_t offset_type, __ubuf__ void* offsetSrc,
+    uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
+{}
+
+inline void scatter_ubuf_to_gm(
+    __gm__ uint32_t* dst, __ubuf__ uint32_t* dataSrc, uint8_t sid, uint8_t offset_type, __ubuf__ void* offsetSrc,
+    uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
+{}
+
+inline void scatter_ubuf_to_gm(
+    __gm__ uint64_t* dst, __ubuf__ uint64_t* dataSrc, uint8_t sid, uint8_t offset_type, __ubuf__ void* offsetSrc,
+    uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
+{}
+
+// ==========gather_gm_to_ubuf===========
+inline void gather_gm_to_ubuf(
+    __ubuf__ uint8_t* dst, __gm__ uint8_t* baseSrc, uint8_t sid, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ void* offsetSrc, uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t dst_stride, uint32_t offset_num)
+{}
+
+inline void gather_gm_to_ubuf(
+    __ubuf__ uint16_t* dst, __gm__ uint16_t* baseSrc, uint8_t sid, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ void* offsetSrc, uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t dst_stride, uint32_t offset_num)
+{}
+
+inline void gather_gm_to_ubuf(
+    __ubuf__ uint32_t* dst, __gm__ uint32_t* baseSrc, uint8_t sid, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ void* offsetSrc, uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t dst_stride, uint32_t offset_num)
+{}
+
+inline void gather_gm_to_ubuf(
+    __ubuf__ uint64_t* dst, __gm__ uint64_t* baseSrc, uint8_t sid, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ void* offsetSrc, uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t dst_stride, uint32_t offset_num)
+{}
+
 #if defined(__DAV_CUBE__)
 inline int32_t g_coreType = 1;
 #else
