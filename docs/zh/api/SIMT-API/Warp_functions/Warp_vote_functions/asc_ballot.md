@@ -103,3 +103,12 @@ inline uint32_t asc_ballot(int32_t predicate)
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+input: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31 
+threshold: 3.5
+total_length: 32
+selected_mask: 0xFFFFFFF0
+```
