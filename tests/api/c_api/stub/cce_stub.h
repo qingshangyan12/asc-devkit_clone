@@ -1297,10 +1297,7 @@ struct CopyGmToUbufAlignV2StubState {
 
 inline CopyGmToUbufAlignV2StubState g_copy_gm_to_ubuf_align_v2_stub_state;
 
-inline void reset_copy_gm_to_ubuf_align_v2_stub_state()
-{
-    g_copy_gm_to_ubuf_align_v2_stub_state = {};
-}
+inline void reset_copy_gm_to_ubuf_align_v2_stub_state() { g_copy_gm_to_ubuf_align_v2_stub_state = {}; }
 
 inline void record_copy_gm_to_ubuf_align_v2(
     bool pre_allocation, uint8_t l2_cache_mode, uint64_t src_stride, uint32_t dst_stride, bool non_eod_ctrl)
@@ -1326,10 +1323,7 @@ struct CopyUbufToGmAlignV2StubState {
 
 inline CopyUbufToGmAlignV2StubState g_copy_ubuf_to_gm_align_v2_stub_state;
 
-inline void reset_copy_ubuf_to_gm_align_v2_stub_state()
-{
-    g_copy_ubuf_to_gm_align_v2_stub_state = {};
-}
+inline void reset_copy_ubuf_to_gm_align_v2_stub_state() { g_copy_ubuf_to_gm_align_v2_stub_state = {}; }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201))
 inline void wait_intra_block(pipe_t pipe, int flag_id) {}
