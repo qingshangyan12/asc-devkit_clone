@@ -100,6 +100,8 @@ def _copy_static_files(common_root, out_dir, md_files):
         if rel in md_set:
             continue
         dst = out_dir / rel
+        if entry.resolve() == dst.resolve():
+            continue
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(entry, dst)
         logger.info("  %s -> %s", entry, dst)
