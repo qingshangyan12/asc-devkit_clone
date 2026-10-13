@@ -34,9 +34,10 @@ constexpr cast_options default_cast_ops = {cast_layout::zero, cast_round_mode::r
 
 /**
  * @ingroup tensor_api.experimental.reg_compute.reg_cast
+ * @brief Converts the active elements of a register tensor to another element type.
+ *
  * @override_id te_experimental_cast__const_reg_tensor_SrcType_R__template_DstType_opt_SrcType
  * @archs 3510
- * @brief Converts the active elements of a register tensor to another element type.
  * @return The converted register tensor with the source mask preserved.
  * @note Source and destination element types must differ. Supported option combinations are architecture-dependent.
  * @param [in] src Source register tensor.
@@ -46,9 +47,10 @@ __simd_callee__ inline reg_tensor<DstType> cast(const reg_tensor<SrcType>& src);
 
 /**
  * @ingroup tensor_api.experimental.reg_compute.reg_cast
+ * @brief Truncates the fractional part of each active register element.
+ *
  * @override_id te_experimental_trunc__const_reg_tensor_T_R__template_T
  * @archs 3510
- * @brief Truncates the fractional part of each active register element.
  * @return The truncated register tensor with the source mask preserved.
  * @note Supported element types are half, bfloat16_t, and float.
  * @param [in] src Source register tensor.

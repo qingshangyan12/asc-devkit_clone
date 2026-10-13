@@ -22,10 +22,11 @@ namespace asc {
 namespace te {
 namespace experimental {
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_reorder
+ * @ingroup simd_api.tensor_api.reg_vector_compute.data_reorder
+ * @brief Interleaves elements from two register tensors.
+ *
  * @override_id te_experimental_interleave__reg_tensor_T_reg_tensor_T__template_T
  * @archs 3510
- * @brief Interleaves elements from two register tensors.
  * @tparam T Element type of the register tensors.
  * @return A pair of register tensors containing the interleaved elements. Both result tensors use a full mask.
  * @param [in] src0 First source register tensor.
@@ -35,10 +36,11 @@ template <typename T>
 __simd_callee__ inline reg_pair<T> interleave(reg_tensor<T> src0, reg_tensor<T> src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_reorder
+ * @ingroup simd_api.tensor_api.reg_vector_compute.data_reorder
+ * @brief Deinterleaves elements from two register tensors.
+ *
  * @override_id te_experimental_deinterleave__reg_tensor_T_reg_tensor_T__template_T
  * @archs 3510
- * @brief Deinterleaves elements from two register tensors.
  * @tparam T Element type of the register tensors.
  * @return A pair of register tensors containing the deinterleaved elements. Both result tensors use a full mask.
  * @param [in] src0 First source register tensor.

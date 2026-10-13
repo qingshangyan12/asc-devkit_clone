@@ -24,7 +24,9 @@ namespace te {
 namespace experimental {
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_logic
+ * @ingroup simd_api.tensor_api.reg_vector_compute.logical_compute
+ * @brief Returns the element-wise bitwise complement of the source register under src.mask.
+ *
  * @override_id te_experimental_operator_logical_not__const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src Source operand.
@@ -33,7 +35,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> operator!(const reg_tensor<T>& src);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_logic
+ * @ingroup simd_api.tensor_api.reg_vector_compute.logical_compute
+ * @brief Returns element-wise bitwise AND results of the operands.
+ *
  * @override_id te_experimental_operator_and__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src0 First source operand.
@@ -43,7 +47,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> operator&(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_logic
+ * @ingroup simd_api.tensor_api.reg_vector_compute.logical_compute
+ * @brief Returns element-wise bitwise OR results of the operands.
+ *
  * @override_id te_experimental_operator_or__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src0 First source operand.
@@ -53,7 +59,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> operator|(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_logic
+ * @ingroup simd_api.tensor_api.reg_vector_compute.logical_compute
+ * @brief Returns element-wise bitwise XOR results of the operands.
+ *
  * @override_id te_experimental_operator_xor__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src0 First source operand.

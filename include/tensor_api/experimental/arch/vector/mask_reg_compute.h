@@ -28,10 +28,11 @@ namespace te {
 namespace experimental {
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_mask
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @brief Creates a register mask with the specified pattern for an element type.
+ *
  * @override_id te_experimental_make_mask__void__template_Pattern_DataType
  * @archs 3510
- * @brief Creates a register mask with the specified pattern for an element type.
  * @return A register mask containing the selected pattern.
  * @note Supported element widths are b8, b16 and b32.
  */
@@ -39,10 +40,11 @@ template <mask_pattern Pattern = mask_pattern::all, typename DataType>
 __simd_callee__ inline reg_tensor<bool> make_mask();
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_mask
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @brief Creates a register mask with all lanes enabled for an element type.
+ *
  * @override_id te_experimental_all_mask__void__template_DataType
  * @archs 3510
- * @brief Creates a register mask with all lanes enabled for an element type.
  * @return A register mask with all lanes enabled.
  * @note Supported element widths are b8, b16 and b32.
  */
@@ -50,10 +52,11 @@ template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> all_mask();
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_mask
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @brief Creates a register mask with all lanes disabled for an element type.
+ *
  * @override_id te_experimental_none_mask__void__template_DataType
  * @archs 3510
- * @brief Creates a register mask with all lanes disabled for an element type.
  * @return A register mask with all lanes disabled.
  * @note Supported element widths are b8, b16 and b32.
  */
@@ -61,10 +64,11 @@ template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> none_mask();
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_mask
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @brief Creates a mask for a vector iteration and updates the remaining element count.
+ *
  * @override_id te_experimental_update_mask__uint32_t_R__template_DataType
  * @archs 3510
- * @brief Creates a mask for a vector iteration and updates the remaining element count.
  * @return A register mask enabling the elements processed by the current iteration.
  * @note Supported element widths are b8, b16 and b32.
  * @param [in,out] remain Element count used to create the mask and updated for the subsequent call.
@@ -73,13 +77,14 @@ template <typename DataType>
 __simd_callee__ inline reg_tensor<bool> update_mask(uint32_t& remain);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_mask
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @brief Interleaves the lanes of two register masks for the specified element type.
+ *
  * @override_id te_experimental_interleave__reg_tensor_bool_reg_tensor_bool__template_DataType
  * @archs 3510
- * @brief Interleaves the lanes of two register masks for the specified element type.
  * @tparam DataType Element type whose width determines the mask lane granularity.
- * @return A register-mask pair containing the interleaved sequence. The first and second halves of the sequence
- * are stored in the first and second members, respectively.
+ * @return A register-mask pair containing the interleaved sequence. The first and second halves of the sequence are
+ * stored in the first and second members, respectively.
  * @note Supported element widths are b8, b16 and b32.
  * @param [in] src0 First source register mask.
  * @param [in] src1 Second source register mask.
@@ -88,13 +93,14 @@ template <typename DataType>
 __simd_callee__ inline reg_pair<bool> interleave(reg_tensor<bool> src0, reg_tensor<bool> src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_mask
+ * @ingroup simd_api.tensor_api.reg_vector_compute.mask_reg_compute
+ * @brief Deinterleaves the lanes of two register masks for the specified element type.
+ *
  * @override_id te_experimental_deinterleave__reg_tensor_bool_reg_tensor_bool__template_DataType
  * @archs 3510
- * @brief Deinterleaves the lanes of two register masks for the specified element type.
  * @tparam DataType Element type whose width determines the mask lane granularity.
- * @return A register-mask pair containing the deinterleaved sequence. The first member contains the even lanes,
- * and the second member contains the odd lanes.
+ * @return A register-mask pair containing the deinterleaved sequence. The first member contains the even lanes, and the
+ * second member contains the odd lanes.
  * @note Supported element widths are b8, b16 and b32.
  * @param [in] src0 First half of the interleaved register-mask sequence.
  * @param [in] src1 Second half of the interleaved register-mask sequence.

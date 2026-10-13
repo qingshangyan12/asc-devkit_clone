@@ -24,10 +24,12 @@ namespace te {
 namespace experimental {
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_composite
+ * @ingroup simd_api.tensor_api.reg_vector_compute.composite_compute
+ * @brief Updates dst with scalar times src plus dst under dst.mask and returns the updated register tensor.
+ *
  * @override_id te_experimental_axpy__reg_tensor_T_R_const_reg_tensor_T_R_const_T_R__template_T
  * @archs 3510
- * @param [out] dst Destination tensor.
+ * @param [in,out] dst Destination tensor.
  * @param [in] src Source operand.
  * @param [in] scalar Scalar operand.
  */
@@ -35,7 +37,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> axpy(reg_tensor<T>& dst, const reg_tensor<T>& src, const T& scalar);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_composite
+ * @ingroup simd_api.tensor_api.reg_vector_compute.composite_compute
+ * @brief Returns element-wise absolute differences between src0 and src1 under src0.mask.
+ *
  * @override_id te_experimental_abs_diff__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src0 First source operand.
@@ -45,7 +49,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> abs_diff(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_composite
+ * @ingroup simd_api.tensor_api.reg_vector_compute.composite_compute
+ * @brief Returns element-wise exponentials of the differences between src0 and src1.
+ *
  * @override_id te_experimental_exp_diff__const_reg_tensor_U_R_const_reg_tensor_U_R__template_T_U
  * @archs 3510
  * @param [in] src0 First source operand.
@@ -55,7 +61,9 @@ template <typename T, typename U>
 __simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const reg_tensor<U>& src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_composite
+ * @ingroup simd_api.tensor_api.reg_vector_compute.composite_compute
+ * @brief Returns element-wise exponentials of the differences between src0 and src1.
+ *
  * @override_id
  * te_experimental_exp_diff__const_reg_tensor_U_R_const_reg_tensor_U_R_PositionType__template_T_U_PositionType
  * @archs 3510
@@ -68,10 +76,12 @@ __simd_callee__ inline reg_tensor<T> exp_diff(
     const reg_tensor<U>& src0, const reg_tensor<U>& src1, PositionType src_pos);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_composite
+ * @ingroup simd_api.tensor_api.reg_vector_compute.composite_compute
+ * @brief Updates dst with dst times src0 plus src1 under dst.mask and returns the updated register tensor.
+ *
  * @override_id te_experimental_madd__reg_tensor_T_R_const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
  * @archs 3510
- * @param [out] dst Destination tensor.
+ * @param [in,out] dst Destination tensor.
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
  */
@@ -79,10 +89,12 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> madd(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_composite
+ * @ingroup simd_api.tensor_api.reg_vector_compute.composite_compute
+ * @brief Adds src0 times src1 to dst element-wise under dst.mask and returns the updated register tensor.
+ *
  * @override_id te_experimental_mula__reg_tensor_T_R_const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
  * @archs 3510
- * @param [out] dst Destination tensor.
+ * @param [in,out] dst Destination tensor.
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
  */
@@ -90,7 +102,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> mula(reg_tensor<T>& dst, const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_composite
+ * @ingroup simd_api.tensor_api.reg_vector_compute.composite_compute
+ * @brief Returns element-wise fused multiply-add results of the three source operands.
+ *
  * @override_id te_experimental_fma__const_reg_tensor_T_R_const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
  * @archs 3510
  * @param [in] src0 First source operand.
@@ -102,7 +116,9 @@ __simd_callee__ inline reg_tensor<T> fma(
     const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<T>& src2);
 
 /**
- * @ingroup tensor_api.experimental.reg_compute.reg_composite
+ * @ingroup simd_api.tensor_api.reg_vector_compute.composite_compute
+ * @brief Returns register values multiplied by scalar and converted to the destination element type.
+ *
  * @override_id te_experimental_muls_cast__const_reg_tensor_U_R_const_U_R__template_Layout_T_U
  * @archs 3510
  * @param [in] src Source operand.

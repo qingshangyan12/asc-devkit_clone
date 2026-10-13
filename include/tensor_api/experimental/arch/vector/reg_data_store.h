@@ -28,11 +28,12 @@ namespace te {
 namespace experimental {
 
 /**
- * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
+ * @brief Stores register data to a UB tensor at the specified coordinate.
+ *
  * @override_id
  * te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
  * @archs 3510
- * @brief Stores register data to a UB tensor at the specified coordinate.
  * @note The tensor and register element types must match.
  * @param [out] tensor Destination tensor located in UB.
  * @param [in] coord Coordinate of the first destination element.
@@ -44,11 +45,12 @@ template <
 __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src);
 
 /**
- * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
+ * @brief Stores register data at the beginning of a UB tensor.
+ *
  * @override_id
  * te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
  * @archs 3510
- * @brief Stores register data at the beginning of a UB tensor.
  * @note The tensor and register element types must match.
  * @param [out] tensor Destination tensor located in UB.
  * @param [in] src Source register tensor.
@@ -57,11 +59,12 @@ template <store_sideband_mode sideband_mode = store_sideband_mode::direct, typen
 __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>& src);
 
 /**
- * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
+ * @brief Interleaves two register tensors and stores the result at the specified coordinate of a UB tensor.
+ *
  * @override_id
  * te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
  * @archs 3510
- * @brief Interleaves two register tensors and stores the result at the specified coordinate of a UB tensor.
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
  * @param [out] tensor Destination tensor located in UB.
  * @param [in] coord Coordinate of the first destination element.
@@ -75,11 +78,12 @@ __simd_callee__ inline void store(
     Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
+ * @brief Interleaves two register tensors and stores the result at the beginning of a UB tensor.
+ *
  * @override_id
  * te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
  * @archs 3510
- * @brief Interleaves two register tensors and stores the result at the beginning of a UB tensor.
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
  * @param [out] tensor Destination tensor located in UB.
  * @param [in] src0 First source register tensor.
@@ -90,36 +94,36 @@ __simd_callee__ inline void store(
     Tensor& tensor, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
 /**
- * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
+ * @brief Scatters register data from active source lanes to a UB tensor.
+ *
  * @override_id
  * te_experimental_store_scatter__Tensor_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_T_Index
  * @archs 3510
- * @brief Scatters register data from active source lanes to a UB tensor.
  * @note The tensor and source register element types must match.
  * @param [out] tensor Destination tensor located in UB.
  * @param [in] src Source register tensor. Its active-lane mask selects the elements to store.
  * @param [in] index Register tensor containing the destination offsets.
- * @note The active-lane mask is taken from src.mask.
- * A value of 1 selects the corresponding source element for storage; a value of 0 excludes it.
- * Unselected elements are not written; the corresponding destination memory is unchanged.
+ * @note The active-lane mask is taken from src.mask. A value of 1 selects the corresponding source element for storage;
+ * a value of 0 excludes it. Unselected elements are not written; the corresponding destination memory is unchanged.
  */
 template <typename Tensor, typename T, typename Index>
 __simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index);
 
 /**
- * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @ingroup simd_api.tensor_api.reg_vector_compute.reg_data_store
+ * @brief Scatters register data from active source lanes to a UB tensor at the specified coordinate.
+ *
  * @override_id
  * te_experimental_store_scatter__Tensor_R_const_Coord_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_Coord_T_Index
  * @archs 3510
- * @brief Scatters register data from active source lanes to a UB tensor at the specified coordinate.
  * @note The tensor and source register element types must match.
  * @param [out] tensor Destination tensor located in UB.
  * @param [in] coord Coordinate used as the base destination position.
  * @param [in] src Source register tensor. Its active-lane mask selects the elements to store.
  * @param [in] index Register tensor containing the destination offsets relative to the base position.
- * @note The active-lane mask is taken from src.mask.
- * A value of 1 selects the corresponding source element for storage; a value of 0 excludes it.
- * Unselected elements are not written; the corresponding destination memory is unchanged.
+ * @note The active-lane mask is taken from src.mask. A value of 1 selects the corresponding source element for storage;
+ * a value of 0 excludes it. Unselected elements are not written; the corresponding destination memory is unchanged.
  */
 template <typename Tensor, typename Coord, typename T, typename Index>
 __simd_callee__ inline void store_scatter(
