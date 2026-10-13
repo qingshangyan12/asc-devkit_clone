@@ -31,9 +31,15 @@ __aicore__ inline void asc_copy_gm2ub(
     uint16_t dst_stride)
 {
     if ASC_IS_AIV {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+        copy_gm_to_ubuf_align_v2(
+            (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, burst_count, burst_len, 0, 0, false, false, 0,
+            src_stride, dst_stride, false);
+#else
         copy_gm_to_ubuf_align_v2(
             (__ubuf__ uint8_t*)dst, (__gm__ uint8_t*)src, 0, burst_count, burst_len, 0, 0, false, 0, src_stride,
             dst_stride);
+#endif
     }
 }
 
@@ -47,7 +53,12 @@ __aicore__ inline void asc_copy_ub2gm(
     uint16_t src_stride)
 {
     if ASC_IS_AIV {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+        copy_ubuf_to_gm_align_v2(
+            dst, src, 0, burst_count, burst_len, false, false, 0, 0, dst_stride, src_stride, false);
+#else
         copy_ubuf_to_gm_align_v2(dst, src, 0, burst_count, burst_len, 0, dst_stride, src_stride);
+#endif
     }
 }
 
