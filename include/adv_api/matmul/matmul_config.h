@@ -202,7 +202,7 @@ struct MatmulConfig {
     BatchOutMode bmmOutMode = BatchOutMode::SINGLE_BATCH;  // BMM output mode
     bool enableL1BankConflictOptimise = false;             // Whether to enable L1BankConflictOptimise
     PreallocationMode preAllocationMode = PreallocationMode::PREALLOCATION_ENABLE_ALL; // for mte2 preallocation
-    bool enableRelu = false;                               // Whether to enable Relu
+    bool enableRelu = false;                                                           // Whether to enable Relu
     DecompressionMode decompMode = DecompressionMode::DECOMP_NONE;
 };
 
