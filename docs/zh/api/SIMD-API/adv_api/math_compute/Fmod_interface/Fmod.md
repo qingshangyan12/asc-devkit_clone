@@ -85,7 +85,7 @@ Fmod\(-3.0, 1.1\) = -0.8
 | --- | --- |
 | T | 操作数的数据类型。支持的数据类型为：half、float。 |
 | isReuseSource | 是否允许修改源操作数。该参数预留，传入默认值false即可。 |
-| config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR&950DT系列产品。<br><br><!-- end id9 -->Fmod计算的相关配置。此参数可选配，FmodConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：指定Fmod的算法。该参数支持的取值如下：NORMAL：algo的默认值，使用模拟的普通模式，支持的数据类型为：half、float。ITERATION_COMPENSATION：迭代补偿的高精度模式，支持的数据类型为：float。<br><br>iterationNum：迭代补偿的高精度模式下的迭代补偿轮次，该参数仅在algo为ITERATION_COMPENSATION模式下生效，轮次范围1至11，默认值为11次。迭代轮次越多，结果精度越高，但性能会相应降低。使用时，可根据两个浮点数的指数位差异来选择迭代轮次，float类型共有8位指数位，src0Tensor和src1Tensor之间的指数位差异不应超过24*iterationNum。 |
+| config | <!-- npu="950" id9 -->该参数仅支持Ascend 950PR&950DT系列产品。<br><br><!-- end id9 -->Fmod计算的相关配置。此参数可选配，FmodConfig类型，具体定义如下方代码所示，其中参数的含义为：<br>algo：指定Fmod的算法。该参数支持的取值如下：NORMAL：algo的默认值，使用模拟的普通模式，支持的数据类型为：half、float。ITERATION_COMPENSATION：迭代补偿的高精度模式，支持的数据类型为：half、float。<br><br>iterationNum：迭代补偿的高精度模式下的迭代补偿轮次，该参数仅在algo为ITERATION_COMPENSATION模式下生效，轮次范围1至11，默认值为11次。迭代轮次越多，结果精度越高，但性能会相应降低。使用时，可根据两个浮点数的指数位差异来选择迭代轮次，src0Tensor和src1Tensor之间的指数位差异不应超过24*iterationNum。float类型共有8位指数位，一般取3至11；half类型共有5位指数位，指数位差异不超过40，取2即可覆盖全部half输入。 |
 
 ```
 constexpr uint32_t FMOD_ITERATION_NUM_MAX = 11;
@@ -121,7 +121,7 @@ struct FmodConfig {
 -   **不支持源操作数与目的操作数地址重叠。**
 -   不支持sharedTmpBuffer与源操作数和目的操作数地址重叠。
 <!-- npu="950" id10 -->
--   对于Ascend 950PR&950DT系列产品，模板参数config中的algo为ITERATION\_COMPENSATION迭代补偿模式下，操作数的数据类型仅支持float。
+-   对于Ascend 950PR&950DT系列产品，模板参数config中的algo为ITERATION\_COMPENSATION迭代补偿模式下，操作数的数据类型支持half、float。half场景下迭代补偿在float精度上完成，需要额外预留3倍输入元素个数的float临时空间（大小可通过[GetFmodMaxMinTmpSize](GetFmodMaxMinTmpSize.md)获取），推荐iterationNum取2。
 <!-- end id10 -->
 -   操作数地址对齐要求请参见[通用地址对齐约束](../../../general_description_and_constraints.md#section796754519912)。
 
@@ -159,6 +159,17 @@ __aicore__ constexpr AscendC::FmodConfig GetConfig()
 }
 static constexpr AscendC::FmodConfig config = GetConfig();
 AscendC::Fmod<float, false, config>(dstLocal, src0Local, src1Local, sharedTmpBuffer, 512);
+```
+
+half场景下迭代轮次取2即可覆盖全部输入（指数位差异不超过40）：
+
+```
+__aicore__ constexpr AscendC::FmodConfig GetHalfConfig()
+{
+    return {.algo = AscendC::FmodAlgo::ITERATION_COMPENSATION, .iterationNum = 2};
+}
+static constexpr AscendC::FmodConfig halfConfig = GetHalfConfig();
+AscendC::Fmod<half, false, halfConfig>(dstLocal, src0Local, src1Local, sharedTmpBuffer, 512);
 ```
 
 结果示例如下：

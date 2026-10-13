@@ -101,3 +101,79 @@ VEC_FMOD_LEVEL2_TESTCASE(half, NORMAL_MODE, 256);
 VEC_FMOD_LEVEL2_TESTCASE(half, CAL_MODE, 256);
 VEC_FMOD_LEVEL2_TESTCASE(half, BUF_MODE, 256);
 VEC_FMOD_LEVEL2_TESTCASE(half, BUF_CAL_MODE, 256);
+
+#if defined(__NPU_ARCH__) &&                                                                         \
+    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162 || \
+     __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113)
+constexpr AscendC::FmodConfig FMOD_ITER_NUM2_CONFIG = {AscendC::FmodAlgo::ITERATION_COMPENSATION, 2};
+
+template <typename T, const AscendC::FmodConfig& config>
+void MainVecFmodIterDemo(
+    __gm__ uint8_t* dstGm, __gm__ uint8_t* src0Gm, __gm__ uint8_t* src1Gm, uint32_t dataSize, uint32_t tmpBytes)
+{
+    TPipe tpipe;
+    GlobalTensor<T> input0Global;
+    GlobalTensor<T> input1Global;
+    GlobalTensor<T> outputGlobal;
+    input0Global.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(src0Gm), dataSize);
+    input1Global.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(src1Gm), dataSize);
+    outputGlobal.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(dstGm), dataSize);
+
+    TBuf<TPosition::VECCALC> tbuf1;
+    tpipe.InitBuffer(tbuf1, dataSize * sizeof(T));
+    LocalTensor<T> input0Local = tbuf1.Get<T>();
+
+    TBuf<TPosition::VECCALC> tbuf2;
+    tpipe.InitBuffer(tbuf2, dataSize * sizeof(T));
+    LocalTensor<T> input1Local = tbuf2.Get<T>();
+
+    TBuf<TPosition::VECCALC> tbuf3;
+    tpipe.InitBuffer(tbuf3, dataSize * sizeof(T));
+    LocalTensor<T> outputLocal = tbuf3.Get<T>();
+
+    TBuf<TPosition::VECCALC> tbuf4;
+    tpipe.InitBuffer(tbuf4, tmpBytes);
+    LocalTensor<uint8_t> tmpLocal = tbuf4.Get<uint8_t>();
+
+    DataCopy(input0Local, input0Global, dataSize);
+    DataCopy(input1Local, input1Global, dataSize);
+
+    SetFlag<HardEvent::MTE2_V>(EVENT_ID0);
+    WaitFlag<HardEvent::MTE2_V>(EVENT_ID0);
+
+    Fmod<T, false, config>(outputLocal, input0Local, input1Local, tmpLocal, dataSize);
+
+    SetFlag<HardEvent::V_MTE3>(EVENT_ID0);
+    WaitFlag<HardEvent::V_MTE3>(EVENT_ID0);
+
+    DataCopy(outputGlobal, outputLocal, dataSize);
+
+    PipeBarrier<PIPE_ALL>();
+}
+
+// half iteration compensation: src0 = 0xfbff(-65504), src1 = 0x32bc(0.21044921875) -> 0xb2a4(-0.20751953).
+// tmpBytes = 2048 is GetFmodMaxMinTmpSize's minValue for half, so the staging area is smaller than
+// dataSize * 3 * sizeof(float): the chunked path (multiple chunks plus a tail) is exercised.
+TEST_F(TEST_FMOD, FmodHalfIterCompensationChunkCase)
+{
+    constexpr uint32_t dataSize = 1024;
+    uint8_t input0Gm[dataSize * sizeof(half)] = {0};
+    uint8_t input1Gm[dataSize * sizeof(half)] = {0};
+    uint8_t outputGm[dataSize * sizeof(half)] = {0};
+
+    for (uint32_t i = 0; i < dataSize; i++) {
+        input0Gm[2 * i] = 0xff;     // 0xfbff little endian
+        input0Gm[2 * i + 1] = 0xfb;
+        input1Gm[2 * i] = 0xbc;     // 0x32bc little endian
+        input1Gm[2 * i + 1] = 0x32;
+    }
+
+    MainVecFmodIterDemo<half, FMOD_ITER_NUM2_CONFIG>(outputGm, input0Gm, input1Gm, dataSize, 2048);
+
+    for (uint32_t i = 0; i < dataSize; i++) {
+        uint16_t got = static_cast<uint16_t>(outputGm[2 * i]) | (static_cast<uint16_t>(outputGm[2 * i + 1]) << 8);
+        EXPECT_EQ(got, 0xb2a4) << "index " << i;
+    }
+}
+#endif
+
