@@ -109,7 +109,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <text class="label" xml:space="preserve" x="960" y="59" font-size="42" fill="#132b57" font-weight="700" text-anchor="middle">asc-search：三类知识标注与检索工具链</text>
 <text class="label" xml:space="preserve" x="960" y="98" font-size="25" fill="#53657c" font-weight="500" text-anchor="middle">以 3510 架构的 asc_abs 为真实示例</text>
 <path d="M 330,154 L 1590,154" fill="none" stroke="#7041c9" stroke-width="3" stroke-dasharray="10 8"/>
-<path d="M 330,154 L 330,193 M 960,154 L 960,193 M 1590,154 L 1590,193" fill="none" stroke="#7041c9" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#relation)"/>
+<path d="M 330,154 L 330,193" fill="none" stroke="#7041c9" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#relation)"/>
+<path d="M 960,154 L 960,193" fill="none" stroke="#7041c9" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#relation)"/>
+<path d="M 1590,154 L 1590,193" fill="none" stroke="#7041c9" stroke-width="3" stroke-dasharray="10 8" marker-end="url(#relation)"/>
 <text class="label" xml:space="preserve" x="645" y="137" font-size="21" fill="#7041c9" font-weight="600" text-anchor="middle">API 名称、分类与原型匹配</text>
 <text class="label" xml:space="preserve" x="1275" y="137" font-size="21" fill="#7041c9" font-weight="600" text-anchor="middle">@override_id 关联样例范围</text>
 <rect x="30" y="210" width="600" height="645" rx="16" fill="#f0faf4" stroke="#16824b" stroke-width="2"/>
