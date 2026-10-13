@@ -143,6 +143,8 @@ ZN Layout将逻辑二维Shape拆分为`((C0, ceil_div(M, C0)), (16, ceil_div(N, 
 
 ## 调用示例
 
+以下示例在UB内完成数据搬运：源与目的张量位于同一UB地址空间，搬运参数（blockCount、blockLen、srcGap、dstGap）由layout的shape与stride自动推导，无需显式配置。完整Tensor搬运形式如下：
+
 ```cpp
 #include "tensor_api/tensor.h"
 

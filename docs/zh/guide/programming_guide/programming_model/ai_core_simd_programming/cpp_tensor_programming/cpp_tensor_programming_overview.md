@@ -344,6 +344,11 @@ Cube矩阵计算主要涵盖矩阵乘计算与卷积计算，其数据主要来�
 ![矩阵乘示意图](../../../../figures/matmul.png)
 
 ```cpp
+// Tile sizes of one base matrix multiplication: M=128, K=64, N=256 (aligned to the 16x16 fractal granularity)
+constexpr uint32_t BLOCK_M = 128;
+constexpr uint32_t BLOCK_K = 64;
+constexpr uint32_t BLOCK_N = 256;
+
 // Define Cube matrix operator, marked with __cube__ to execute on Device Cube core, suitable for operators with only Cube computation
 __global__ __cube__ void matmul_kernel(__gm__ float* x, __gm__ float* y, __gm__ float* z)
 {

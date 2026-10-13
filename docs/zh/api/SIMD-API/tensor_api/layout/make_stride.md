@@ -49,8 +49,8 @@ __aicore__ inline constexpr stride<FirstStride, Strides...> make_stride(
 
 | 参数名 | 输入/输出 | 描述 |
 |--------|-----------|------|
-| first_stride | 输入 | 第一个维度的步长或子结构。 |
-| strides... | 输入 | 其余维度的步长或子结构。 |
+| first_stride | 输入 | 第一个维度的步长或子结构。步长单位为元素个数。 |
+| strides... | 输入 | 其余维度的步长或子结构。步长单位为元素个数。 |
 
 ## 返回值说明
 
