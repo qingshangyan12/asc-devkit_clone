@@ -2908,7 +2908,8 @@ private:
 #endif
         LocalTensor<SrcScaleAT> leftMatrix;
         leftMatrix.SetAddr(tbufOutTmp);
-        LocalTensor<SrcScaleAT> srcTensor = GetVecTensor<SrcScaleAT>(aScaleAddr_, sizeScaleAmatrix_ / sizeof(SrcScaleAT));
+        LocalTensor<SrcScaleAT> srcTensor =
+            GetVecTensor<SrcScaleAT>(aScaleAddr_, sizeScaleAmatrix_ / sizeof(SrcScaleAT));
         if constexpr (PhyMxScalePosIsUB<A_TYPE>()) {
             if constexpr (A_TYPE::scaleFormat == CubeFormat::NZ) {
                 if (isTrans) {
@@ -2982,7 +2983,8 @@ private:
 #endif
         LocalTensor<SrcScaleBT> rightMatrix;
         rightMatrix.SetAddr(tbufOutTmp);
-        LocalTensor<SrcScaleBT> srcTensor = GetVecTensor<SrcScaleBT>(bScaleAddr_, sizeScaleBmatrix_ / sizeof(SrcScaleBT));
+        LocalTensor<SrcScaleBT> srcTensor =
+            GetVecTensor<SrcScaleBT>(bScaleAddr_, sizeScaleBmatrix_ / sizeof(SrcScaleBT));
         if constexpr (PhyMxScalePosIsUB<B_TYPE>()) {
             if constexpr (B_TYPE::scaleFormat == CubeFormat::NZ) {
                 if (isBTrans) {
