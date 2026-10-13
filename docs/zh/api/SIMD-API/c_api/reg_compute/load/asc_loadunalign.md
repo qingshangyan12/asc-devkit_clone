@@ -74,7 +74,7 @@ __simd_callee__ inline void asc_loadunalign(vector_int8_t& dst,
 - Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - `src1`起始地址必须按dtype对齐，且实际访问范围必须在UB地址空间内，否则会报错。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，必须插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 - 每次搬入前必须调用[asc_loadunalign_pre](asc_loadunalign_pre.md)中的源地址预处理模式进行初始化，且初始化接口和本接口必须使用相同的`src1`。
 
 ## 调用示例
