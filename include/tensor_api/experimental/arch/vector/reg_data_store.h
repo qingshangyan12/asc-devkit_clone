@@ -28,11 +28,14 @@ namespace te {
 namespace experimental {
 
 /**
+ * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @override_id te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
+ * @archs 3510
  * @brief Stores register data to a UB tensor at the specified coordinate.
- * @param tensor Destination tensor located in UB.
- * @param coord Coordinate of the first destination element.
- * @param src Source register tensor.
  * @note The tensor and register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] coord Coordinate of the first destination element.
+ * @param [in] src Source register tensor.
  */
 template <
     store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Tensor, typename Coord,
@@ -40,21 +43,27 @@ template <
 __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src);
 
 /**
+ * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @override_id te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
+ * @archs 3510
  * @brief Stores register data at the beginning of a UB tensor.
- * @param tensor Destination tensor located in UB.
- * @param src Source register tensor.
  * @note The tensor and register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] src Source register tensor.
  */
 template <store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Tensor, typename RegDataType>
 __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>& src);
 
 /**
+ * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @override_id te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
+ * @archs 3510
  * @brief Interleaves two register tensors and stores the result at the specified coordinate of a UB tensor.
- * @param tensor Destination tensor located in UB.
- * @param coord Coordinate of the first destination element.
- * @param src0 First source register tensor.
- * @param src1 Second source register tensor.
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] coord Coordinate of the first destination element.
+ * @param [in] src0 First source register tensor.
+ * @param [in] src1 Second source register tensor.
  */
 template <
     store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename Coord,
@@ -63,33 +72,42 @@ __simd_callee__ inline void store(
     Tensor& tensor, const Coord& coord, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @override_id te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
+ * @archs 3510
  * @brief Interleaves two register tensors and stores the result at the beginning of a UB tensor.
- * @param tensor Destination tensor located in UB.
- * @param src0 First source register tensor.
- * @param src1 Second source register tensor.
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] src0 First source register tensor.
+ * @param [in] src1 Second source register tensor.
  */
 template <store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename RegDataType>
 __simd_callee__ inline void store(
     Tensor& tensor, const reg_tensor<RegDataType>& src0, const reg_tensor<RegDataType>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @override_id te_experimental_store_scatter__Tensor_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_T_Index
+ * @archs 3510
  * @brief Scatters register data from active source lanes to a UB tensor.
- * @param tensor Destination tensor located in UB.
- * @param src Source register tensor. Its active-lane mask selects the elements to store.
- * @param index Register tensor containing the destination offsets.
  * @note The tensor and source register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] src Source register tensor. Its active-lane mask selects the elements to store.
+ * @param [in] index Register tensor containing the destination offsets.
  */
 template <typename Tensor, typename T, typename Index>
 __simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& src, const reg_tensor<Index>& index);
 
 /**
+ * @ingroup tensor_api.experimental.reg_load_store.reg_store
+ * @override_id te_experimental_store_scatter__Tensor_R_const_Coord_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_Coord_T_Index
+ * @archs 3510
  * @brief Scatters register data from active source lanes to a UB tensor at the specified coordinate.
- * @param tensor Destination tensor located in UB.
- * @param coord Coordinate used as the base destination position.
- * @param src Source register tensor. Its active-lane mask selects the elements to store.
- * @param index Register tensor containing the destination offsets relative to the base position.
  * @note The tensor and source register element types must match.
+ * @param [out] tensor Destination tensor located in UB.
+ * @param [in] coord Coordinate used as the base destination position.
+ * @param [in] src Source register tensor. Its active-lane mask selects the elements to store.
+ * @param [in] index Register tensor containing the destination offsets relative to the base position.
  */
 template <typename Tensor, typename Coord, typename T, typename Index>
 __simd_callee__ inline void store_scatter(

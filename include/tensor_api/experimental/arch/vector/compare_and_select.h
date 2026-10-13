@@ -22,173 +22,230 @@ namespace asc {
 namespace te {
 namespace experimental {
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_eq__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares two register tensors for element-wise equality.
- * @param src0 First source tensor.
- * @param src1 Second source tensor.
  * @return A boolean register tensor containing the equality results.
+ * @param [in] src0 First source tensor.
+ * @param [in] src1 Second source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator==(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_eq__const_reg_tensor_T_R_const_T_R__template_T
+ * @archs 3510
  * @brief Compares register tensor elements with a scalar for equality.
- * @param src0 Source tensor.
- * @param src1 Scalar value to compare with each tensor element.
  * @return A boolean register tensor containing the equality results.
+ * @param [in] src0 Source tensor.
+ * @param [in] src1 Scalar value to compare with each tensor element.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator==(const reg_tensor<T>& src0, const T& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_eq__const_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares a scalar with register tensor elements for equality.
- * @param src0 Scalar value to compare with each tensor element.
- * @param src1 Source tensor.
  * @return A boolean register tensor containing the equality results.
+ * @param [in] src0 Scalar value to compare with each tensor element.
+ * @param [in] src1 Source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator==(const T& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_ne__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares two register tensors for element-wise inequality.
- * @param src0 First source tensor.
- * @param src1 Second source tensor.
  * @return A boolean register tensor containing the inequality results.
+ * @param [in] src0 First source tensor.
+ * @param [in] src1 Second source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator!=(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_ne__const_reg_tensor_T_R_const_T_R__template_T
+ * @archs 3510
  * @brief Compares register tensor elements with a scalar for inequality.
- * @param src0 Source tensor.
- * @param src1 Scalar value to compare with each tensor element.
  * @return A boolean register tensor containing the inequality results.
+ * @param [in] src0 Source tensor.
+ * @param [in] src1 Scalar value to compare with each tensor element.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator!=(const reg_tensor<T>& src0, const T& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_ne__const_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares a scalar with register tensor elements for inequality.
- * @param src0 Scalar value to compare with each tensor element.
- * @param src1 Source tensor.
  * @return A boolean register tensor containing the inequality results.
+ * @param [in] src0 Scalar value to compare with each tensor element.
+ * @param [in] src1 Source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator!=(const T& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_lt__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares whether elements in one register tensor are less than those in another.
- * @param src0 First source tensor.
- * @param src1 Second source tensor.
  * @return A boolean register tensor containing the less-than results.
+ * @param [in] src0 First source tensor.
+ * @param [in] src1 Second source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator<(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_lt__const_reg_tensor_T_R_const_T_R__template_T
+ * @archs 3510
  * @brief Compares whether register tensor elements are less than a scalar.
- * @param src0 Source tensor.
- * @param src1 Scalar value to compare with each tensor element.
  * @return A boolean register tensor containing the less-than results.
+ * @param [in] src0 Source tensor.
+ * @param [in] src1 Scalar value to compare with each tensor element.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator<(const reg_tensor<T>& src0, const T& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_lt__const_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares whether a scalar is less than register tensor elements.
- * @param src0 Scalar value to compare with each tensor element.
- * @param src1 Source tensor.
  * @return A boolean register tensor containing the less-than results.
+ * @param [in] src0 Scalar value to compare with each tensor element.
+ * @param [in] src1 Source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator<(const T& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_le__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares whether elements in one register tensor are less than or equal to those in another.
- * @param src0 First source tensor.
- * @param src1 Second source tensor.
  * @return A boolean register tensor containing the less-than-or-equal results.
+ * @param [in] src0 First source tensor.
+ * @param [in] src1 Second source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator<=(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_le__const_reg_tensor_T_R_const_T_R__template_T
+ * @archs 3510
  * @brief Compares whether register tensor elements are less than or equal to a scalar.
- * @param src0 Source tensor.
- * @param src1 Scalar value to compare with each tensor element.
  * @return A boolean register tensor containing the less-than-or-equal results.
+ * @param [in] src0 Source tensor.
+ * @param [in] src1 Scalar value to compare with each tensor element.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator<=(const reg_tensor<T>& src0, const T& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_le__const_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares whether a scalar is less than or equal to register tensor elements.
- * @param src0 Scalar value to compare with each tensor element.
- * @param src1 Source tensor.
  * @return A boolean register tensor containing the less-than-or-equal results.
+ * @param [in] src0 Scalar value to compare with each tensor element.
+ * @param [in] src1 Source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator<=(const T& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_gt__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares whether elements in one register tensor are greater than those in another.
- * @param src0 First source tensor.
- * @param src1 Second source tensor.
  * @return A boolean register tensor containing the greater-than results.
+ * @param [in] src0 First source tensor.
+ * @param [in] src1 Second source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator>(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_gt__const_reg_tensor_T_R_const_T_R__template_T
+ * @archs 3510
  * @brief Compares whether register tensor elements are greater than a scalar.
- * @param src0 Source tensor.
- * @param src1 Scalar value to compare with each tensor element.
  * @return A boolean register tensor containing the greater-than results.
+ * @param [in] src0 Source tensor.
+ * @param [in] src1 Scalar value to compare with each tensor element.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator>(const reg_tensor<T>& src0, const T& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_gt__const_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares whether a scalar is greater than register tensor elements.
- * @param src0 Scalar value to compare with each tensor element.
- * @param src1 Source tensor.
  * @return A boolean register tensor containing the greater-than results.
+ * @param [in] src0 Scalar value to compare with each tensor element.
+ * @param [in] src1 Source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator>(const T& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_ge__const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares whether elements in one register tensor are greater than or equal to those in another.
- * @param src0 First source tensor.
- * @param src1 Second source tensor.
  * @return A boolean register tensor containing the greater-than-or-equal results.
+ * @param [in] src0 First source tensor.
+ * @param [in] src1 Second source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator>=(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_ge__const_reg_tensor_T_R_const_T_R__template_T
+ * @archs 3510
  * @brief Compares whether register tensor elements are greater than or equal to a scalar.
- * @param src0 Source tensor.
- * @param src1 Scalar value to compare with each tensor element.
  * @return A boolean register tensor containing the greater-than-or-equal results.
+ * @param [in] src0 Source tensor.
+ * @param [in] src1 Scalar value to compare with each tensor element.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator>=(const reg_tensor<T>& src0, const T& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_operator_ge__const_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Compares whether a scalar is greater than or equal to register tensor elements.
- * @param src0 Scalar value to compare with each tensor element.
- * @param src1 Source tensor.
  * @return A boolean register tensor containing the greater-than-or-equal results.
+ * @param [in] src0 Scalar value to compare with each tensor element.
+ * @param [in] src1 Source tensor.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<bool> operator>=(const T& src0, const reg_tensor<T>& src1);
 
 /**
+ * @ingroup tensor_api.experimental.reg_compute.reg_compare
+ * @override_id te_experimental_select__const_reg_tensor_bool_R_const_reg_tensor_T_R_const_reg_tensor_T_R__template_T
+ * @archs 3510
  * @brief Selects elements from two register tensors according to a condition tensor.
- * @param condition Per-element selection condition.
- * @param src0 Source tensor selected when the corresponding condition is true.
- * @param src1 Source tensor selected when the corresponding condition is false.
  * @return A register tensor containing the selected elements.
+ * @param [in] condition Per-element selection condition.
+ * @param [in] src0 Source tensor selected when the corresponding condition is true.
+ * @param [in] src1 Source tensor selected when the corresponding condition is false.
  */
 template <typename T>
 __simd_callee__ inline reg_tensor<T> select(

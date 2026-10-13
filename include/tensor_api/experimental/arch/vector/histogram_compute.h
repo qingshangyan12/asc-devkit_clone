@@ -30,6 +30,13 @@ struct histogram_options {
 
 inline constexpr histogram_options default_histogram_options{};
 
+/**
+ * @ingroup tensor_api.experimental.reg_compute.reg_histogram
+ * @override_id te_experimental_histograms__const_reg_tensor_T_R_const_reg_tensor_U_R__template_options_T_U
+ * @archs 3510
+ * @param [out] dst Destination tensor.
+ * @param [in] src Source operand.
+ */
 template <const histogram_options& options = default_histogram_options, typename T, typename U>
 __simd_callee__ inline reg_tensor<T> histograms(const reg_tensor<T>& dst, const reg_tensor<U>& src);
 
