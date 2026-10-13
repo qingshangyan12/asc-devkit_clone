@@ -11,40 +11,40 @@
 #include "tests/api/c_api/npu_arch_9201/utils/test_vcvt_instr_utils.h"
 
 // ==========asc_half2e4m3==========
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
     Half2e4m3_rn_even, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R, RS_DISABLE,
     PART_EVEN, MODE_ZEROING, 0);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
     Half2e4m3_rn_odd, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R, RS_DISABLE,
     PART_ODD, MODE_ZEROING, 1);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
     Half2e4m3_rn_sat_even, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
     RS_ENABLE, PART_EVEN, MODE_ZEROING, 2);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
     Half2e4m3_rn_sat_odd, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R,
     RS_ENABLE, PART_ODD, MODE_ZEROING, 3);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
     Half2e4m3_rn_merge_even, asc_half2e4m3_rn_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
     RS_DISABLE, PART_EVEN, MODE_MERGING, 4);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
     Half2e4m3_rn_merge_odd, asc_half2e4m3_rn_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R,
     RS_DISABLE, PART_ODD, MODE_MERGING, 5);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
     Half2e4m3_rn_sat_merge_even, asc_half2e4m3_rn_sat_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN,
     ROUND_R, RS_ENABLE, PART_EVEN, MODE_MERGING, 6);
-TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(
     Half2e4m3_rn_sat_merge_odd, asc_half2e4m3_rn_sat_merge, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD,
     ROUND_R, RS_ENABLE, PART_ODD, MODE_MERGING, 7);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(
     Half2e4m3_rn_even, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R, RS_DISABLE,
     PART_EVEN, MODE_ZEROING, 8);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(
     Half2e4m3_rn_odd, asc_half2e4m3_rn, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R, RS_DISABLE,
     PART_ODD, MODE_ZEROING, 9);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(
     Half2e4m3_rn_sat_even, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_EVEN, ROUND_R,
     RS_ENABLE, PART_EVEN, MODE_ZEROING, 10);
-TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(
+TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(
     Half2e4m3_rn_sat_odd, asc_half2e4m3_rn_sat, vcvt, vector_fp8_e4m3fn_t, vector_half, ASC_POSITION_ODD, ROUND_R,
     RS_ENABLE, PART_ODD, MODE_ZEROING, 11);
 TEST_VECTOR_COMPUTE_VCVT_INSTR_2(
