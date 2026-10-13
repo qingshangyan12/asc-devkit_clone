@@ -312,7 +312,7 @@ REGISTER_EXEC_V2(
     TopoMatch1D, CcuTempKfcReduceScatterNHR1DMultiJettyMem2Mem);
 REGISTER_ALG_META(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHRMultiLink, AlgEngine::CCU,
-    "sole[nhr.multi_channel]", COND_NONE, FLAG_NONE, 0);
+    "sole[nhr.multi_channel]", COND_NONE, FLAG_UBX, 0);
 REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CcuSchedReduceScatterSoleNHR, InsV2ReduceScatterSoleExecutor, TopoMatch1D,
     CcuTempKfcReduceScatterNHR1D2DieMem2Mem);

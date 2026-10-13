@@ -44,23 +44,21 @@
 
 ## 函数原型
 
-### 模板原型
-
 ```cpp
 // 占位符形式
 __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ <dtype>* dst,
                                             __gm__ <dtype>* src,
-                                             uint64_t src_d_value,
-                                             asc_load_l2_cache_mode l2_cache_mode,
+                                            uint64_t src_d_value,
+                                            asc_load_l2_cache_mode l2_cache_mode,
                                             uint16_t n_value,
                                             uint32_t d_value,
-                                             uint64_t src_nd_matrix_stride,
-                                             bool enable_small_c0)
+                                            uint64_t src_nd_matrix_stride,
+                                            bool enable_small_c0)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
@@ -68,12 +66,12 @@ dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`�
 // 示例：half类型的DN到Nz格式搬运。
 __aicore__ inline void asc_copy_gm2l1_dn2nz(__cbuf__ half* dst,
                                             __gm__ half* src,
-                                             uint64_t src_d_value,
-                                             asc_load_l2_cache_mode l2_cache_mode,
+                                            uint64_t src_d_value,
+                                            asc_load_l2_cache_mode l2_cache_mode,
                                             uint16_t n_value,
                                             uint32_t d_value,
-                                             uint64_t src_nd_matrix_stride,
-                                             bool enable_small_c0)
+                                            uint64_t src_nd_matrix_stride,
+                                            bool enable_small_c0)
 ```
 
 ## 参数说明

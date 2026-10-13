@@ -45,9 +45,9 @@
 
 ```c
 __simd_callee__ inline vector_bool asc_extract_mask(vector_uint16_t src,
-                                                     int16_t part)
+                                                    int16_t part)
 __simd_callee__ inline vector_bool asc_extract_mask(vector_uint32_t src,
-                                                     int16_t part)
+                                                    int16_t part)
 ```
 
 ## 参数说明

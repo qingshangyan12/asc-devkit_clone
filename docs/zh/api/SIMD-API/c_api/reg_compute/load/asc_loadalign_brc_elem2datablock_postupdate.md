@@ -42,7 +42,7 @@ __simd_callee__ inline void asc_loadalign_brc_elem2datablock_postupdate(vector_<
 
 ### dtype支持数据类型
 
-dtype支持的数据类型为`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 函数原型典型示例
 

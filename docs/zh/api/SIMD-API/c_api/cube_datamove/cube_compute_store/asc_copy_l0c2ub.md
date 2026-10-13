@@ -80,8 +80,6 @@
 
 ## 函数原型
 
-### 模板原型
-
 ```cpp
 // 占位符形式
 __aicore__ inline void asc_copy_l0c2ub(__ubuf__ <dst_dtype>* dst,
@@ -101,7 +99,7 @@ __aicore__ inline void asc_copy_l0c2ub(__ubuf__ <dst_dtype>* dst,
                                        bool enable_clip_relu_pre)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
 src dtype与dst dtype支持以下组合：
 

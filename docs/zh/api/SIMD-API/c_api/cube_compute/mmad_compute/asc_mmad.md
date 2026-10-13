@@ -98,7 +98,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
                                 bool disable_gemv)
 ```
 
-**dtype支持的数据类型：**
+#### dtype支持数据类型
 
 `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
@@ -116,7 +116,7 @@ __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
 | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
 | `float` | `float` | `float` | `float` |
 
-**典型示例：**
+#### 函数原型典型示例
 
 ```c
 // 不显式传入Bias起始地址
@@ -151,25 +151,60 @@ __aicore__ inline void asc_mmad(__cc__ float* c_matrix,
 
   ```c
   // 占位符形式
-  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix, __ca__ <a_dtype>* a_matrix, __cb__ <b_dtype>* b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad(__cc__ <c_dtype>* c_matrix,
+                                  __ca__ <a_dtype>* a_matrix,
+                                  __cb__ <b_dtype>* b_matrix,
+                                  uint16_t m,
+                                  uint16_t k,
+                                  uint16_t n,
+                                  asc_unit_flag_mode unit_flag_mode,
+                                  bool k_direction_align,
+                                  bool c_matrix_source,
+                                  bool c_matrix_init_val)
   ```
 
-  `c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
+#### dtype支持数据类型
 
-  **表** 支持的数据类型组合（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+`c_dtype`、`a_dtype`、`b_dtype`的取值组合见下表：
 
-  | a_dtype | b_dtype | c_dtype | Bias数据类型 |
-  | --- | --- | --- | --- |
-  | `int8_t` | `int8_t` | `int32_t` | `int32_t` |
-  | `half` | `half` | `float` | `float` |
-  | `bfloat16_t` | `bfloat16_t` | `float` | `float` |
-  | `float` | `float` | `float` | `float` |
+**表** 支持的数据类型组合（[NPU架构版本2201](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)）
+
+| a_dtype | b_dtype | c_dtype | Bias数据类型 |
+| --- | --- | --- | --- |
+| `int8_t` | `int8_t` | `int32_t` | `int32_t` |
+| `half` | `half` | `float` | `float` |
+| `bfloat16_t` | `bfloat16_t` | `float` | `float` |
+| `float` | `float` | `float` | `float` |
 
 - asc_mmad_s4接口，当输入矩阵数据类型为`int4b_t`时调用此类接口：
 
   ```c
-  __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix, __ca__ int4b_t* a_matrix, __cb__ int4b_t* b_matrix, uint16_t m, uint16_t k, uint16_t n, asc_unit_flag_mode unit_flag_mode, bool k_direction_align, bool c_matrix_source, bool c_matrix_init_val)
+  __aicore__ inline void asc_mmad_s4(__cc__ int32_t* c_matrix,
+                                     __ca__ int4b_t* a_matrix,
+                                     __cb__ int4b_t* b_matrix,
+                                     uint16_t m,
+                                     uint16_t k,
+                                     uint16_t n,
+                                     asc_unit_flag_mode unit_flag_mode,
+                                     bool k_direction_align,
+                                     bool c_matrix_source,
+                                     bool c_matrix_init_val)
   ```
+
+#### 函数原型典型示例
+
+```c
+__aicore__ inline void asc_mmad(__cc__ float* c_matrix,
+                                __ca__ bfloat16_t* a_matrix,
+                                __cb__ bfloat16_t* b_matrix,
+                                uint16_t m,
+                                uint16_t k,
+                                uint16_t n,
+                                asc_unit_flag_mode unit_flag_mode,
+                                bool k_direction_align,
+                                bool c_matrix_source,
+                                bool c_matrix_init_val)
+```
 <!-- end id13 -->
 
 ## 参数说明

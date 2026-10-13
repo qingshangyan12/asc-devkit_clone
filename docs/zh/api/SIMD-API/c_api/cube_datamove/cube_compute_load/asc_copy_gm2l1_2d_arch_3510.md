@@ -36,8 +36,6 @@
 
 ## 函数原型
 
-### 模板原型
-
 ```cpp
 // 占位符形式
 __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
@@ -45,14 +43,14 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ <dtype>* dst,
                                       uint32_t m_start_position,
                                       uint32_t k_start_position,
                                       uint16_t dst_stride,
-                                       uint16_t m_step,
-                                       uint16_t k_step,
-                                       asc_load_l2_cache_mode l2_cache_mode)
+                                      uint16_t m_step,
+                                      uint16_t k_step,
+                                      asc_load_l2_cache_mode l2_cache_mode)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
+`dtype`取值为：`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`void`。
 
 ### 函数原型典型示例
 
@@ -63,9 +61,9 @@ __aicore__ inline void asc_copy_gm2l1(__cbuf__ bfloat16_t* dst,
                                       uint32_t m_start_position,
                                       uint32_t k_start_position,
                                       uint16_t dst_stride,
-                                       uint16_t m_step,
-                                       uint16_t k_step,
-                                       asc_load_l2_cache_mode l2_cache_mode)
+                                      uint16_t m_step,
+                                      uint16_t k_step,
+                                      asc_load_l2_cache_mode l2_cache_mode)
 ```
 
 ## 参数说明

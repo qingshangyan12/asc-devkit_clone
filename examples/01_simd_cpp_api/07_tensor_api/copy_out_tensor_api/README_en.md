@@ -31,7 +31,7 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 
   1. Dynamic Matmul Functionality
 
-  This example implements multi-core Matmul functionality. Shape parameters (M, N, K, singleCoreM, singleCoreN, singleCoreK) are dynamically passed to the kernel at runtime through the `MatmulTiling` structure. `BASE_M`, `BASE_N`, `BASE_K` and `STEP_M`, `STEP_N`, `STEP_K` serve as compile-time template parameters, determining the allocation size of L0/L1 level buffers.
+  This example implements multi-core Matmul functionality. Shape parameters (m, n, k, single_core_m, single_core_n, single_core_k) are dynamically passed to the kernel at runtime through the `MatmulTiling` structure. `base_m`, `base_n`, `base_k` and `step_m`, `step_n`, `step_k` serve as compile-time template parameters, determining the allocation size of L0/L1 level buffers.
 
   2. Bias Functionality
 
@@ -60,14 +60,14 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
       int32_t m;            // Number of rows of matrix A
       int32_t n;            // Number of columns of matrix B
       int32_t k;            // Number of columns of matrix A / number of rows of matrix B
-      int32_t singleCoreM;  // M dimension size processed per core
-      int32_t singleCoreN;  // N dimension size processed per core
-      int32_t singleCoreK;  // K dimension size processed per core
+      int32_t single_core_m;  // M dimension size processed per core
+      int32_t single_core_n;  // N dimension size processed per core
+      int32_t single_core_k;  // K dimension size processed per core
   };
   ```
 
 - Example specifications:
-  In the kernel function direct invocation example, the default supported shape is: M = 1024, N = 1024, K = 256.
+  In the kernel function direct invocation example, the default supported shape is: m = 1024, n = 1024, k = 256.
 
   **Scenario 0: Normal mode, L0C -> GM**
 
@@ -75,11 +75,11 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
   <caption>Table 1: Scenario 0 Specifications</caption>
   <tr><td rowspan="1" align="left">Example Type (OpType)</td><td colspan="4" align="left">Matmul with Bias</td></tr>
   <tr><td rowspan="5" align="left">Example Input</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x (Matrix A)</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">y (Matrix B)</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">x (Matrix A)</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">y (Matrix B)</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling structure</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">Example Output</td><td align="left">z (Matrix C)</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">Example Output</td><td align="left">z (Matrix C)</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">Kernel Function Name</td><td colspan="4" align="left">copy_out_tensor_api</td></tr>
   </table>
 
@@ -89,11 +89,11 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
   <caption>Table 2: Scenario 1 Specifications</caption>
   <tr><td rowspan="1" align="left">Example Type (OpType)</td><td colspan="4" align="left">Matmul with Bias</td></tr>
   <tr><td rowspan="5" align="left">Example Input</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x (Matrix A)</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">y (Matrix B)</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">x (Matrix A)</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">y (Matrix B)</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling structure</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">Example Output</td><td align="left">z (Matrix C)</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">Example Output</td><td align="left">z (Matrix C)</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">Kernel Function Name</td><td colspan="4" align="left">copy_out_tensor_api</td></tr>
   </table>
 
@@ -103,11 +103,11 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
   <caption>Table 3: Scenario 2 Specifications</caption>
   <tr><td rowspan="1" align="left">Example Type (OpType)</td><td colspan="4" align="left">Matmul with Bias</td></tr>
   <tr><td rowspan="5" align="left">Example Input</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x (Matrix A)</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">y (Matrix B)</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">x (Matrix A)</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">y (Matrix B)</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling structure</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">Example Output</td><td align="left">z (Matrix C)</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">Example Output</td><td align="left">z (Matrix C)</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">Kernel Function Name</td><td colspan="4" align="left">copy_out_tensor_api</td></tr>
   </table>
 
@@ -117,11 +117,11 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
   <caption>Table 4: Scenario 3 Specifications</caption>
   <tr><td rowspan="1" align="left">Example Type (OpType)</td><td colspan="4" align="left">Matmul with Bias</td></tr>
   <tr><td rowspan="5" align="left">Example Input</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">x (Matrix A)</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">y (Matrix B)</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">x (Matrix A)</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">y (Matrix B)</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling structure</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">Example Output</td><td align="left">z (Matrix C)</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">Example Output</td><td align="left">z (Matrix C)</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">Kernel Function Name</td><td colspan="4" align="left">copy_out_tensor_api</td></tr>
   </table>
 
@@ -129,12 +129,12 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
 
   | Parameter | Default | Description |
   | :------ | :----- | :----------------------- |
-  | BASE_M  | 128    | M dimension base block size |
-  | BASE_N  | 128    | N dimension base block size |
-  | BASE_K  | 64     | K dimension base block size |
-  | STEP_M  | 1      | M dimension L1 cache step |
-  | STEP_N  | 1      | N dimension L1 cache step |
-  | STEP_K  | 4      | K dimension L1 cache step |
+  | base_m  | 128    | M dimension base block size |
+  | base_n  | 128    | N dimension base block size |
+  | base_k  | 64     | K dimension base block size |
+  | step_m  | 1      | M dimension L1 cache step |
+  | step_n  | 1      | N dimension L1 cache step |
+  | step_k  | 4      | K dimension L1 cache step |
 
   Runtime dynamic parameter default values:
 
@@ -143,9 +143,9 @@ This example implements dynamic Shape matrix multiplication with Bias based on t
   | m            | 1024   | Number of rows of matrix A |
   | n            | 1024   | Number of columns of matrix B |
   | k            | 256    | Number of columns of matrix A / number of rows of matrix B |
-  | singleCoreM  | 256    | Per-core M dimension size |
-  | singleCoreN  | 128    | Per-core N dimension size |
-  | singleCoreK  | 256    | Per-core K dimension size |
+  | single_core_m  | 256    | Per-core M dimension size |
+  | single_core_n  | 128    | Per-core N dimension size |
+  | single_core_k  | 256    | Per-core K dimension size |
 
 ## Build and Run
 

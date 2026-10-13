@@ -38,7 +38,7 @@ $$
 C = (\text{ScaleA} \otimes A) \times (\text{ScaleB} \otimes B)
 $$
 
-在MxMatmul中，K 方向每 32 个元素共享一个 scale。也就是说，scale 的数量远少于矩阵元素数量，但它会沿 K 方向广播到对应的一组 MxFP4 数据上，如图所示：
+在MxMatmul中，k 方向每 32 个元素共享一个 scale。也就是说，scale 的数量远少于矩阵元素数量，但它会沿 k 方向广播到对应的一组 MxFP4 数据上，如图所示：
 
   <img src="figures/MxMatmul.png"  width="80%">
 
@@ -50,21 +50,21 @@ $$
 
 | 输入/输出 | 逻辑形状 | 数据类型 | 数据排布类型 | 说明 |
 |------|------|----------|------|------|
-| A | `[M, K]` | `fp4x2_e1m2_t` | ND | 左矩阵，每个字节打包 2 个 fp4 元素 |
-| ScaleA | `[M, scaleK]` | `fp8_e8m0_t` | ND | A 矩阵的缩放因子，A矩阵在K 方向每 32 个元素共享一个 scale |
-| B | `[N, K]` | `fp4x2_e1m2_t` | DN | 右矩阵，按 `[N, K]` 形式输入 kernel |
-| ScaleB | `[N, scaleK]` | `fp8_e8m0_t` | DN | B 矩阵的缩放因子，B矩阵在K 方向每 32 个元素共享一个 scale |
-| C | `[M, N]` | `bfloat16_t` | ND | 输出矩阵 |
+| A | `[m, k]` | `fp4x2_e1m2_t` | ND | 左矩阵，每个字节打包 2 个 fp4 元素 |
+| ScaleA | `[m, scale_k]` | `fp8_e8m0_t` | ND | A 矩阵的缩放因子，A矩阵在k 方向每 32 个元素共享一个 scale |
+| B | `[n, k]` | `fp4x2_e1m2_t` | DN | 右矩阵，按 `[n, k]` 形式输入 kernel |
+| ScaleB | `[n, scale_k]` | `fp8_e8m0_t` | DN | B 矩阵的缩放因子，B矩阵在k 方向每 32 个元素共享一个 scale |
+| C | `[m, n]` | `bfloat16_t` | ND | 输出矩阵 |
 
 其中：
 
-- 两个`fp4x2_e1m2_t`打包存储在一个字节中，因此当数据类型为`fp4`时，K 需要为偶数
-- `scaleK = align_even(ceil(K / 32))`，表示先向上整除再对齐到 2 的倍数。由于硬件约束要求 scale 数据在 K 方向满足 2Byte 连续对齐，因此 scaleK 必须为偶数
-- 由于硬件约束，当 ScaleB 矩阵为 `[scaleK, N]` 输入时，需要 K 方向 2 Byte连续，因此推荐 ScaleB 采用`[N, scaleK]`输入
+- 两个`fp4x2_e1m2_t`打包存储在一个字节中，因此当数据类型为`fp4`时，k 需要为偶数
+- `scale_k = align_even(ceil(k / 32))`，表示先向上整除再对齐到 2 的倍数。由于硬件约束要求 scale 数据在 k 方向满足 2Byte 连续对齐，因此 scale_k 必须为偶数
+- 由于硬件约束，当 ScaleB 矩阵为 `[scale_k, n]` 输入时，需要 k 方向 2 Byte连续，因此推荐 ScaleB 采用`[n, scale_k]`输入
 
 #### 四路输入说明
 
-与普通 Matmul 相比，MxMatmul 在 kernel 中多了 scale 的搬运、加载和参与计算路径。A/B 与 ScaleA/ScaleB 必须按相同的 K block 节奏进入计算流水，否则 Cube 侧拿不到匹配的缩放信息。
+与普通 Matmul 相比，MxMatmul 在 kernel 中多了 scale 的搬运、加载和参与计算路径。A/B 与 ScaleA/ScaleB 必须按相同的 k block 节奏进入计算流水，否则 Cube 侧拿不到匹配的缩放信息。
 
 - 四路输入的数据排布格式如下图所示：
 
@@ -78,24 +78,24 @@ $$
 
 | 参数 | 值 | 说明 |
 |------|----|------|
-| `M` | `8192` | 矩阵 M 维度规模 |
-| `N` | `8192` | 矩阵 N 维度规模 |
-| `K` | `8192` | 矩阵 K 维度规模 |
-| `baseM` | `256` | Cube 计算基本块 M 维度大小 |
-| `baseK` | `256` | Cube 计算基本块 K 维度大小 |
-| `baseN` | `256` | Cube 计算基本块 N 维度大小 |
-| `singleCoreM` | `2048` | 单核 M 方向计算范围 |
-| `singleCoreN` | `1024` | 单核 N 方向计算范围 |
-| `singleCoreK` | `8192` | 单核 K 方向计算范围 |
-| `stepK` | `2` | GM->L1搬运中，A/B 在 K 方向的大包搬运步长 |
-| `scaleFactorK` | `4` | GM->L1搬运中，ScaleA/ScaleB 相对 A/B 的 K 方向搬运比例 |
+| `m` | `8192` | 矩阵 m 维度规模 |
+| `n` | `8192` | 矩阵 n 维度规模 |
+| `k` | `8192` | 矩阵 k 维度规模 |
+| `base_m` | `256` | Cube 计算基本块 m 维度大小 |
+| `base_k` | `256` | Cube 计算基本块 k 维度大小 |
+| `base_n` | `256` | Cube 计算基本块 n 维度大小 |
+| `single_core_m` | `2048` | 单核 m 方向计算范围 |
+| `single_core_n` | `1024` | 单核 n 方向计算范围 |
+| `single_core_k` | `8192` | 单核 k 方向计算范围 |
+| `step_k` | `2` | GM->L1搬运中，A/B 在 k 方向的大包搬运步长 |
+| `scale_factor_k` | `4` | GM->L1搬运中，ScaleA/ScaleB 相对 A/B 的 k 方向搬运比例 |
 | `Block Num` | `32` | 使用核数 |
 
-> **约束说明**：本样例暂时不支持 K 方向存在尾块的场景，即要求 `K` 能被 `baseK` 整除。
+> **约束说明**：本样例暂时不支持 k 方向存在尾块的场景，即要求 `k` 能被 `base_k` 整除。
 
 ## 样例实现
 
-整个 kernel 的过程为：多核切分后，每个核负责一个 singleCoreM * singleCoreN 子矩阵，在 M/N 方向上循环，将 A/B 与 ScaleA/ScaleB 搬入 L1，再在K方向循环，加载到 L0A/L0B 和 L0ScaleA/L0ScaleB，完成 Cube 累加计算，最后把结果写回 GM。
+整个 kernel 的过程为：多核切分后，每个核负责一个 single_core_m * single_core_n 子矩阵，在 m/n 方向上循环，将 A/B 与 ScaleA/ScaleB 搬入 L1，再在k方向循环，加载到 L0A/L0B 和 L0ScaleA/L0ScaleB，完成 Cube 累加计算，最后把结果写回 GM。
 
 ### 数据流路径
 
@@ -113,7 +113,7 @@ $$
   v
   L0A / L0B / L0ScaleA / L0ScaleB
   |
-  |  mmad                              M
+  |  mmad                              m
   v
   L0C
   |
@@ -124,23 +124,23 @@ $$
 
 #### 1. 多核切分：把大矩阵拆成 32 个子任务
 
-样例使用 32 核并行。`M=8192` 按 `singleCoreM=2048` 切成 4 份，`N=8192` 按 `singleCoreN=1024` 切成 8 份，正好形成 `4 x 8 = 32` 个子矩阵。
+样例使用 32 核并行。`m=8192` 按 `single_core_m=2048` 切成 4 份，`n=8192` 按 `single_core_n=1024` 切成 8 份，正好形成 `4 x 8 = 32` 个子矩阵。
 
 ```text
-M direction: 8192 / 2048 = 4 blocks
-N direction: 8192 / 1024 = 8 blocks
+m direction: 8192 / 2048 = 4 blocks
+n direction: 8192 / 1024 = 8 blocks
 
 Total blocks = 4 * 8 = 32
 ```
 
-每个核只处理自己负责的 `2048 x 1024` 输出区域。核内按 `baseK=256` 分块在 K 方向循环完成累加。
+每个核只处理自己负责的 `2048 x 1024` 输出区域。核内按 `base_k=256` 分块在 k 方向循环完成累加。
 
 对应的核索引计算如下：
 
 ```cpp
-constexpr uint32_t mIter = AscendC::Std::ceil_div(M, singleCoreM);
-uint32_t mIterIdx = block_idx % mIter;
-uint32_t nIterIdx = block_idx / mIter;
+constexpr uint32_t m_iter = AscendC::Std::ceil_div(m, single_core_m);
+uint32_t m_iter_idx = block_idx % m_iter;
+uint32_t n_iter_idx = block_idx / m_iter;
 ```
 
 #### 2. GM 到 L1：矩阵和 scale 一起进流水
@@ -149,25 +149,25 @@ MxMatmul 的输入不是两路，而是四路：A、B、ScaleA、ScaleB。因此
 
 | 数据 | 搬运函数 | GM 数据shape | L1 数据shape |
 |------|----------|-----------|---------|
-| A | `copy` | `[singleCoreM, singleCoreK]` | `[baseM, stepK * baseK]` |
-| B | `copy` | `[singleCoreN, singleCoreK]` | `[baseN, stepK * baseK]` |
-| ScaleA | `copy` | `[singleCoreM, singleCoreSK]` | `[baseM, scaleFactorK * stepK * baseSK]` |
-| ScaleB | `copy` | `[singleCoreN, singleCoreSK]` | `[baseN, scaleFactorK * stepK * baseSK]` |
+| A | `copy` | `[single_core_m, single_core_k]` | `[base_m, step_k * base_k]` |
+| B | `copy` | `[single_core_n, single_core_k]` | `[base_n, step_k * base_k]` |
+| ScaleA | `copy` | `[single_core_m, singleCoreSK]` | `[base_m, scale_factor_k * step_k * baseSK]` |
+| ScaleB | `copy` | `[single_core_n, singleCoreSK]` | `[base_n, scale_factor_k * step_k * baseSK]` |
 
-通过 `stepK=2` 一次搬入 `stepK * baseM * baseK` 的 A 矩阵数据 和 `stepK * baseN * baseK` 的 B 矩阵数据，减少搬运指令数量，提高 GM 到 L1 的搬运效率。
+通过 `step_k=2` 一次搬入 `step_k * base_m * base_k` 的 A 矩阵数据 和 `step_k * base_n * base_k` 的 B 矩阵数据，减少搬运指令数量，提高 GM 到 L1 的搬运效率。
 
-scale 的搬运粒度由 `scaleFactorK=4` 控制，一次搬入 `scaleFactorK * stepK * baseM * baseSK` 的 ScaleA 矩阵数据 和 `scaleFactorK * stepK * baseN * baseSK` 的 ScaleB 矩阵数据，其中`baseSK = baseK / 32`。它的作用是让 ScaleA/ScaleB 在 K 方向相比于 A/B 一次覆盖更大的范围，减少 scale 反复搬运带来的 MTE2 压力。
+scale 的搬运粒度由 `scale_factor_k=4` 控制，一次搬入 `scale_factor_k * step_k * base_m * baseSK` 的 ScaleA 矩阵数据 和 `scale_factor_k * step_k * base_n * baseSK` 的 ScaleB 矩阵数据，其中`baseSK = base_k / 32`。它的作用是让 ScaleA/ScaleB 在 k 方向相比于 A/B 一次覆盖更大的范围，减少 scale 反复搬运带来的 MTE2 压力。
 
-以 A 矩阵数据搬运为例，`copy` 一次搬入 `stepK` 个 K 方向 base 块，每个base块为 `baseM * baseK`：
+以 A 矩阵数据搬运为例，`copy` 一次搬入 `step_k` 个 k 方向 base 块，每个base块为 `base_m * base_k`：
 
 ```cpp
-asc::te::copy(gm2L1Atom, l1TensorAPing, a.slice(asc::te::make_coord(mBlockIdx * baseM, dataNextKChunkIdx * baseK), asc::te::make_shape(curM, stepCurK)));
+asc::te::copy(gm2l1_atom, l1_tensor_a_ping, a.slice(asc::te::make_coord(m_block_idx * base_m, data_next_k_chunk_idx * base_k), asc::te::make_shape(cur_m, step_cur_k)));
 ```
 
-以 ScaleA 矩阵数据搬运为例。`copy` 一次搬入 `scaleFactorK * stepK` 个 K 方向 base 块，每个base块为 `baseM * baseSK`（其中 `baseSK = align_even(ceil(baseK / 32))`）：
+以 ScaleA 矩阵数据搬运为例。`copy` 一次搬入 `scale_factor_k * step_k` 个 k 方向 base 块，每个base块为 `base_m * baseSK`（其中 `baseSK = align_even(ceil(base_k / 32))`）：
 
 ```cpp
-asc::te::copy(gm2L1Atom, l1TensorAsPing, as.slice(asc::te::make_coord(mBlockIdx * baseM, scaleNextKChunkIdx * baseScaleK), asc::te::make_shape(curM, stepCurScaleK)));
+asc::te::copy(gm2l1_atom, l1_tensor_as_ping, as.slice(asc::te::make_coord(m_block_idx * base_m, scale_next_k_chunk_idx * base_scale_k), asc::te::make_shape(cur_m, step_cur_scale_k)));
 ```
 
 #### 3. L1 到 L0 进入 MX 计算路径
@@ -176,16 +176,16 @@ asc::te::copy(gm2L1Atom, l1TensorAsPing, as.slice(asc::te::make_coord(mBlockIdx 
 
 当 A/B 和 ScaleA/ScaleB 进入 L0 后，Cube 计算单元就可以按照 MX 语义完成带缩放的矩阵乘累加。
 
-以 A 矩阵数据搬运为例，`copy` 一次搬入 1 个`baseM * baseK` 大小的 base 块：
+以 A 矩阵数据搬运为例，`copy` 一次搬入 1 个`base_m * base_k` 大小的 base 块：
 
 ```cpp
-asc::te::copy(l12l0AAtom, l0TensorA, l1ReadBufA.slice(asc::te::make_coord(0, kOffsetInDataChunk * baseK), asc::te::make_shape(curM, curK)));
+asc::te::copy(l12l0a_atom, l0_tensor_a, l1_read_buf_a.slice(asc::te::make_coord(0, k_offset_in_data_chunk * base_k), asc::te::make_shape(cur_m, cur_k)));
 ```
 
-以 ScaleA 矩阵数据搬运为例，`copy` 一次搬入 1 个`baseM * baseSK` 大小的 base 块：
+以 ScaleA 矩阵数据搬运为例，`copy` 一次搬入 1 个`base_m * baseSK` 大小的 base 块：
 
 ```cpp
-asc::te::copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.slice(asc::te::make_coord(0, kOffsetInScaleChunk * baseScaleK), asc::te::make_shape(curM, curScaleK)));
+asc::te::copy(l12l0scalea_atom, l0_tensor_as, l1_read_buf_as.slice(asc::te::make_coord(0, k_offset_in_scale_chunk * base_scale_k), asc::te::make_shape(cur_m, cur_scale_k)));
 ```
 
 #### 4. L0 双缓冲：让加载和计算交叠
@@ -200,8 +200,8 @@ asc::te::copy(l12l0ScaleAAtom, l0TensorAs, l1ReadBufAs.slice(asc::te::make_coord
 | L1 | `B Ping/Pong` | B 的大包数据 | 存放 GM->L1 的 B 数据 |
 | L1 | `ScaleA Ping/Pong` | A 对应的 scale 数据 | 存放 A 侧 MXScale  |
 | L1 | `ScaleB Ping/Pong` | B 对应的 scale 数据 | 存放 B 侧 MXScale  |
-| L0A | `A Ping/Pong` | 当前 K block 的 A 数据 | Cube `mmad` 左操作数 |
-| L0B | `B Ping/Pong` | 当前 K block 的 B 数据 | Cube `mmad` 右操作数 |
+| L0A | `A Ping/Pong` | 当前 k block 的 A 数据 | Cube `mmad` 左操作数 |
+| L0B | `B Ping/Pong` | 当前 k block 的 B 数据 | Cube `mmad` 右操作数 |
 | L0C | `C` | float 累加结果 | `mmad` 输出，供写回GM |
 
 一个简化的流水节奏如下：
@@ -217,32 +217,32 @@ L0C->GM                                                           | copy L0C to 
 
 图中横线长度只用于表达不同阶段耗时可能不同，并不代表实测比例；真实耗时需要以 `msopprof` 采集结果为准。
 
-在 K 循环中，当前 K block 进入 Cube 计算时，下一批 A/B/ScaleA/ScaleB 可以提前发起搬运。Ping 和 Pong 交替使用，生产者和消费者通过事件同步确认缓冲区是否可写、数据是否可读。
+在 k 循环中，当前 k block 进入 Cube 计算时，下一批 A/B/ScaleA/ScaleB 可以提前发起搬运。Ping 和 Pong 交替使用，生产者和消费者通过事件同步确认缓冲区是否可写、数据是否可读。
 
-#### 5. Cube 计算：按 K block 累加
+#### 5. Cube 计算：按 k block 累加
 
-每个输出子矩阵会在最内层先沿 K 方向循环。每一轮处理一个 `baseK=256` 的 K block，再沿M/N方向循环：
+每个输出子矩阵会在最内层先沿 k 方向循环。每一轮处理一个 `base_k=256` 的 k block，再沿m/n方向循环：
 
 ```text
-for nBlock in N blocks:
-  for mBlock in M blocks:
-    for kBlock in K blocks:
+for nBlock in n blocks:
+  for mBlock in m blocks:
+    for kBlock in k blocks:
         copy(A block, ScaleA block)
         copy(B block, ScaleB block)
         mmad accumulate
 ```
 
-`mmad` 的输入来自 L0A/L0B，输出累加到 L0C。第一轮 K block 初始化累加结果，后续 K block 持续累加，直到完整 K 方向计算完成。
+`mmad` 的输入来自 L0A/L0B，输出累加到 L0C。第一轮 k block 初始化累加结果，后续 k block 持续累加，直到完整 k 方向计算完成。
 
 计算阶段的关键参数包括 `m/n/k` 尺寸、是否初始化 C 矩阵：
 
 ```cpp
-asc::te::mmad_params mmadParams{curM, curN, curK, asc::te::unit_flag_mode::disable, true};
-mmadParams.init_with_zero = (kBlockIdx == 0);
-asc::te::mmad(mmadAtom.with(mmadParams), l0TensorC, l0TensorA, l0TensorB);
+asc::te::mmad_params mmad_params{cur_m, cur_n, cur_k, asc::te::unit_flag_mode::disable, true};
+mmad_params.init_with_zero = (k_block_idx == 0);
+asc::te::mmad(mmad_atom.with(mmad_params), l0_tensor_c, l0_tensor_a, l0_tensor_b);
 ```
 
-其中 `init_with_zero` 用于控制第一轮 K block 初始化累加结果，后续 K block 在已有 L0C 数据上继续累加。
+其中 `init_with_zero` 用于控制第一轮 k block 初始化累加结果，后续 k block 在已有 L0C 数据上继续累加。
 
 #### 6. L0C 写回 GM：从 float 转换到 bfloat16 输出
 
@@ -253,12 +253,12 @@ L0C float result
       |
       | copy, F32 -> BF16
       v
-GM C [M, N]
+GM C [m, n]
 ```
 
 ```cpp
-asc::te::l0c_to_gm_params fixpipeParams;
-asc::te::copy(l0c2GmAtom.with(fixpipeParams), c.slice(asc::te::make_coord(mBlockIdx * baseM, nBlockIdx * baseN), asc::te::make_shape(curM, curN)), l0TensorC);
+asc::te::l0c_to_gm_params fixpipe_params;
+asc::te::copy(l0c2gm_atom.with(fixpipe_params), c.slice(asc::te::make_coord(m_block_idx * base_m, n_block_idx * base_n), asc::te::make_shape(cur_m, cur_n)), l0_tensor_c);
 ```
 
 ### 流水同步
@@ -277,17 +277,17 @@ A/B Data的生命周期一致，因此按Ping/Pong相位绑定到同一组slot�
 大包粒度的同步只在大包首元素锁定待读Buffer，在大包末元素释放Buffer：
 
 ```cpp
-if (kOffsetInDataChunk == 0) {
-    asc_lock(PIPE_MTE1, GetDataSlot(dataReadIdx));
+if (k_offset_in_data_chunk == 0) {
+    asc_lock(PIPE_MTE1, get_data_slot(data_read_idx));
 }
-if (((kOffsetInDataChunk + 1) == dataChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, GetDataSlot(dataReadIdx));
+if (((k_offset_in_data_chunk + 1) == data_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
+    asc_unlock(PIPE_MTE1, get_data_slot(data_read_idx));
 }
-if (kOffsetInScaleChunk == 0) {
-    asc_lock(PIPE_MTE1, GetScaleSlot(scaleReadIdx));
+if (k_offset_in_scale_chunk == 0) {
+    asc_lock(PIPE_MTE1, get_scale_slot(scale_read_idx));
 }
-if (((kOffsetInScaleChunk + 1) == scaleChunkStep) || (kBlockIdx + 1 == kLoopCount)) {
-    asc_unlock(PIPE_MTE1, GetScaleSlot(scaleReadIdx));
+if (((k_offset_in_scale_chunk + 1) == scale_chunk_step) || (k_block_idx + 1 == kLoopCount)) {
+    asc_unlock(PIPE_MTE1, get_scale_slot(scale_read_idx));
 }
 ```
 
@@ -316,7 +316,7 @@ next LoadData
 本样例的性能优化围绕三件事展开：
 
 - **多核切分**：把 `8192 x 8192` 输出矩阵拆到 32 核并行计算。
-- **大包搬运**：A/B 按多个 K block 搬运，ScaleA/ScaleB 按更大的 K 覆盖范围搬运，降低 MTE2 指令和数据搬运压力。
+- **大包搬运**：A/B 按多个 k block 搬运，ScaleA/ScaleB 按更大的 k 覆盖范围搬运，降低 MTE2 指令和数据搬运压力。
 - **双缓冲流水**：L1 和 L0 都采用 Ping-Pong，让 MTE2、MTE1、CUBE、FIXPIPE 流水尽量交叠执行。
 
 ## 理论性能对比
@@ -353,7 +353,7 @@ Ascend 950PR 芯片性能数据如下：
 
 Cube 理论运算时间 $T_{cube}$ 为：
 
-$$T_{cube} = \frac{M \times N \times K}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{核数}} = \frac{8192 \times 8192 \times 8192}{16384 \times 1.65 \times 10^9 \times 32} = 635.5 μs$$
+$$T_{cube} = \frac{m \times n \times k}{16 \times 64 \times 16 \times 1.65 \times 10^9 \times \text{核数}} = \frac{8192 \times 8192 \times 8192}{16384 \times 1.65 \times 10^9 \times 32} = 635.5 μs$$
 
 从表中可以看出 `aic_mac_time` 为 `640.591 μs`，相对理论值 `635.5 μs`，误差 $E_{cube}$ 为：
 
@@ -365,13 +365,13 @@ $$E_{cube} = \frac{T_{actual} - T_{cube}}{T_{cube}} = \frac{640.591 - 635.5}{635
 
 矩阵乘法中，输出矩阵 C 的每个元素 $C_{i,j}$ 需要 A 的第 i 行和 B 的第 j 列参与计算。分块计算时，同一输入数据块会被多个输出块复用：
 
-- A 矩阵按 M 方向切成 `M/baseM` 个行块，每个 A 行块参与 N 方向 `N/baseN` 个输出块的计算
-- B 矩阵按 N 方向切成 `N/baseN` 个列块，每个 B 列块参与 M 方向 `M/baseM` 个输出块的计算
+- A 矩阵按 m 方向切成 `m/base_m` 个行块，每个 A 行块参与 n 方向 `n/base_n` 个输出块的计算
+- B 矩阵按 n 方向切成 `n/base_n` 个列块，每个 B 列块参与 m 方向 `m/base_m` 个输出块的计算
 
-MxFP4 Matmul 还包含两路 ScaleA/ScaleB 输入，K 方向每 32 个元素共享一个 scale，因此 `scaleK = K/32`：
+MxFP4 Matmul 还包含两路 ScaleA/ScaleB 输入，k 方向每 32 个元素共享一个 scale，因此 `scale_k = k/32`：
 
-- ScaleA 形状 `[M, scaleK]`，按 M 方向切成 `M/baseM` 个行块，每个 ScaleA 行块参与 N 方向 `N/baseN` 个输出块的计算
-- ScaleB 形状 `[N, scaleK]`，按 N 方向切成 `N/baseN` 个列块，每个 ScaleB 列块参与 M 方向 `M/baseM` 个输出块的计算
+- ScaleA 形状 `[m, scale_k]`，按 m 方向切成 `m/base_m` 个行块，每个 ScaleA 行块参与 n 方向 `n/base_n` 个输出块的计算
+- ScaleB 形状 `[n, scale_k]`，按 n 方向切成 `n/base_n` 个列块，每个 ScaleB 列块参与 m 方向 `m/base_m` 个输出块的计算
 
 由于 L1/L2Cache 容量有限，无法缓存所有输入数据，同一数据块会被多次从 HBM 搬运到 L2Cache/L1，导致数据重复搬运。
 
@@ -379,11 +379,11 @@ MxFP4 Matmul 还包含两路 ScaleA/ScaleB 输入，K 方向每 32 个元素共�
 
 MxFP4 Matmul 的输入包含四路数据：A、B、ScaleA、ScaleB。A/B 矩阵使用 `fp4x2_e1m2_t`，每 2 个 fp4 元素打包成 1 byte，单元素 `sizeof = 0.5B`；ScaleA/ScaleB 使用 `fp8_e8m0_t`，单元素 `sizeof = 1B`。
 
-本样例参数 `M=N=K=8192`，`scaleK=256`，分块参数 `baseM=baseN=256`。
+本样例参数 `m=n=k=8192`，`scale_k=256`，分块参数 `base_m=base_n=256`。
 
 读入数据总量 $D_{total}$ 为：
 
-$$D_{total} = \frac{N}{baseN} \times M \times K \times 0.5B + \frac{M}{baseM} \times K \times N \times 0.5B + \frac{N}{baseN} \times M \times scaleK \times 1B + \frac{M}{baseM} \times scaleK \times N \times 1B$$
+$$D_{total} = \frac{n}{base_n} \times m \times k \times 0.5B + \frac{m}{base_m} \times k \times n \times 0.5B + \frac{n}{base_n} \times m \times scale_k \times 1B + \frac{m}{base_m} \times scale_k \times n \times 1B$$
 
 $$= (32 \times 8192 \times 8192 \times 0.5 + 32 \times 8192 \times 8192 \times 0.5 + 32 \times 8192 \times 256 \times 1 + 32 \times 256 \times 8192 \times 1) B$$
 
@@ -397,7 +397,7 @@ Ascend 950PR 芯片：L2Cache 峰值带宽约 5TB/s，HBM（对应 GM）带宽�
 
 首次从 HBM 读入的数据总量 $D_{HBM}$ 为：
 
-$$D_{HBM} = M \times K \times 0.5B + K \times N \times 0.5B + M \times scaleK \times 1B + N \times scaleK \times 1B = 32MB + 32MB + 2MB + 2MB = 68MB$$
+$$D_{HBM} = m \times k \times 0.5B + k \times n \times 0.5B + m \times scale_k \times 1B + n \times scale_k \times 1B = 32MB + 32MB + 2MB + 2MB = 68MB$$
 
 从 L2Cache 读入的数据总量 $D_{L2Cache}$ 为：
 

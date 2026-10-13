@@ -91,3 +91,10 @@ inline signed char __half2char_rz(const half x)
         dst[idx] = __half2char_rz(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.5, -0.5, 0.5, 1.5, 127.5, inf, nan
+result: -1, 0, 0, 1, 127, 127, 0
+```

@@ -64,12 +64,12 @@ __simd_callee__ inline void asc_uint322int16<sat_mode>(vector_int16_t& dst,
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_int16_t asc_uint322int16<sat_mode>(vector_uint32_t src,
-                                                       vector_bool mask,
-                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
 __simd_callee__ inline vector_int16_t asc_uint322int16<sat_mode>(vector_uint32_t src,
-                                                       vector_bool mask,
-                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
 **占位符说明如下：**

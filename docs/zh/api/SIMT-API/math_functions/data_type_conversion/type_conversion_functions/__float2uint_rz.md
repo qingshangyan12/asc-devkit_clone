@@ -86,3 +86,10 @@ inline unsigned int __float2uint_rz(const float x)
         dst[idx] = __float2uint_rz(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -6.5, -1.75, 1.75, 6.5, 4294967296.0, inf, nan
+result: 0, 0, 1, 6, 4294967295, 4294967295, 0
+```

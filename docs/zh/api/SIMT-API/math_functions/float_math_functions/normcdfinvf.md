@@ -98,6 +98,6 @@ inline float normcdfinvf(float x)
 输入输出示例如下：
 
 ```
-x：-0.75, -0.25, 0.25, 0.75
-result: nan nan -0.6744897 0.6744897
+x: -0.75, -0.25, 0.25, 0.75
+result: nan, nan, -0.6744897, 0.6744897
 ```

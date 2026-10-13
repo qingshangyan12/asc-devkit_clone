@@ -79,3 +79,10 @@ inline bool __hisnan(bfloat16_t x)
         dst[idx] = __hisnan(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, -0.5, -0.0, 0.0, inf, -inf, nan, 1.5
+result: false, false, false, false, false, false, true, false
+```

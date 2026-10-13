@@ -24,7 +24,6 @@
 - Atlas训练系列产品：不支持
 <!-- end id7 -->
 
-
 ## 功能说明
 
 根据`mask`将`src`中参与计算的`uint32_t`类型元素转换为`uint8_t`类型，结果写入`dst`。由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组，参数`dst_quarter_pos`从`dst`中离散选取每隔4个元素的索引位置写入转换结果，具体为索引0、4、8、…，索引1、5、9、…，索引2、6、10、…或索引3、7、11、…，其他位置置零。
@@ -38,37 +37,45 @@
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_uint322uint8<sat_mode>(vector_uint8_t& dst,
-                                     vector_uint32_t src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                       vector_uint32_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_uint8_t asc_uint322uint8<sat_mode>(vector_uint32_t src,
-                                     vector_bool mask,
-                                     std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
+                                                                 vector_bool mask,
+                                                                 std::integral_constant<asc_position_quarter_mode, <quarter_pos>> dst_quarter_pos)
 ```
 
 **占位符说明如下：**
 - `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
-- `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+
+`<quarter_pos>`支持`asc_position_quarter_mode`枚举类的四个取值：
+
+```c
+enum class asc_position_quarter_mode {
+    DISPERSE_FIRST_QUARTER = 0,
+    DISPERSE_SECOND_QUARTER,
+    DISPERSE_THIRD_QUARTER,
+    DISPERSE_FOURTH_QUARTER
+};
+```
 
 ### 函数原型典型示例
 
 ```c
 // 非饱和模式，通过引用参数输出结果
-__simd_callee__ inline void asc_uint322uint8(
-    vector_uint8_t& dst,
-    vector_uint32_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+__simd_callee__ inline void asc_uint322uint8(vector_uint8_t& dst,
+                                             vector_uint32_t src,
+                                             vector_bool mask,
+                                             std::integral_constant<asc_position_quarter_mode,
+                                                                    asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 
 // 非饱和模式，通过函数返回值返回结果
-__simd_callee__ inline vector_uint8_t asc_uint322uint8(
-    vector_uint32_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
+__simd_callee__ inline vector_uint8_t asc_uint322uint8(vector_uint32_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_quarter_mode,
+                                                                              asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> dst_quarter_pos)
 ```
 
 ## 参数说明
@@ -80,7 +87,7 @@ __simd_callee__ inline vector_uint8_t asc_uint322uint8(
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| dst_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。 |
+| dst_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 
