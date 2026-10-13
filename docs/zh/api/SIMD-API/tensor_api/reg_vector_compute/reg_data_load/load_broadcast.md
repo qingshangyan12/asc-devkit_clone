@@ -83,14 +83,14 @@
 
 | `brc_mode` | 支持的数据类型 |
 | --- | --- |
-| `elem`、`datablock` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
+| `elem`、`datablock` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
 | `elem2datablock` | `int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float` |
 
-未列出的类型或模式组合会产生编译期错误。
+Tensor元素类型为`int4b_t`时，对应的reg_tensor为`reg_tensor<int4x2_t>`。
 
 ## 返回值说明
 
-返回`reg_tensor<typename Tensor::data_type>`，其`reg`成员保存广播结果。
+通常返回`reg_tensor<typename Tensor::data_type>`；当源Tensor元素类型为`int4b_t`时，返回`reg_tensor<int4x2_t>`。其`reg`成员保存广播结果。
 
 ## 约束说明
 

@@ -97,7 +97,7 @@
 | `sideband_mode` | 搬出模式，类型为`store_sideband_mode`。单源操作数重载的默认值为`store_sideband_mode::direct`；双源操作数重载的默认值为`store_sideband_mode::intlv`。具体取值请参考[表3](#表3-store_sideband_mode参数说明)。 |
 | `Tensor` | 目的Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
 | `Coord` | 目的Tensor的坐标类型，由函数实参自动推导。 |
-| `RegDataType` | 源寄存器元素类型，由函数实参自动推导，必须与目的Tensor的元素类型一致。 |
+| `RegDataType` | 源寄存器元素类型，由函数实参自动推导。除INT4外，必须与目的Tensor的元素类型一致；目的Tensor为`int4b_t`时必须为`int4x2_t`。 |
 
 **表2** 参数说明
 
@@ -123,12 +123,12 @@
 
 ## 数据类型
 
-目的Tensor元素类型与源寄存器元素类型必须一致。不同模式支持的数据类型如下，未列出的类型或模式组合会产生编译期错误。
+除INT4外，目的Tensor元素类型与源寄存器元素类型必须一致。INT4目的Tensor使用`int4b_t`，源寄存器使用`reg_tensor<int4x2_t>`。下表列出目的Tensor的元素类型。不同模式支持的数据类型如下，未列出的类型或模式组合会产生编译期错误。
 
 | `sideband_mode` | 支持的数据类型 |
 | --- | --- |
-| `direct`、`store_1st` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
-| `intlv` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4x2_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
+| `direct`、`store_1st` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
+| `intlv` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
 | `pack` | `int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`int64_t`、`half`、`bfloat16_t`、`float` |
 | `pack_quarter` | `int32_t`、`uint32_t`、`float` |
 
@@ -139,9 +139,10 @@
 ## 约束说明
 
 - 仅支持位于UB的Tensor。
-- 目的Tensor元素类型必须与源`reg_tensor`元素类型一致。
+- 除INT4外，目的Tensor元素类型必须与源`reg_tensor`元素类型一致；`int4b_t`目的Tensor要求源寄存器元素类型为`int4x2_t`。双源`intlv`重载的两个源寄存器都必须满足该要求。
 - 搬出起始地址必须满足[表3](#表3-store_sideband_mode参数说明)中的对齐约束。
 - 传入`coord`时，坐标维数必须与Tensor布局匹配，且坐标不能越界。
+- 对于`int4b_t` Tensor，shape、stride和coord对应的布局偏移以逻辑INT4元素计数，公共Tensor指针将偏移除以2后寻址打包字节。起始逻辑偏移必须为偶数，换算后的字节地址仍需满足该模式的对齐约束；调用方不要再次将布局偏移除以2。
 - 单源操作数重载不支持`store_sideband_mode::intlv`；双源操作数重载仅支持`store_sideband_mode::intlv`。
 - 使用`direct`、`pack`或`pack_quarter`模式前，必须保证`src.reg`和`src.mask`均已初始化。使用`store_1st`或`intlv`模式时，仅要求参与搬出的`reg`成员已初始化。
 - 正常模式下，如果目的UB的剩余空间不足一个VL，必须通过`src.mask`关闭越界位置，并保证目的UB至少剩余一个DataBlock（32B）空间。
