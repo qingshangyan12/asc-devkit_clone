@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/vector_datamove/vector_datamove.h"`。
 
-将数据从Unified Buffer（UB）搬运到Global Memory (GM)，支持8位/16位/32位分块拷贝操作。
+将数据从Unified Buffer（UB）搬运到Global Memory（GM），支持搬运数据长度不是32字节整数倍的数据，并支持8位/16位/32位数据类型搬运。搬运数据长度仍需满足对应数据类型的字节对齐要求；源、目的起始地址的对齐要求请参见[参数说明](#参数说明)。
 
 本接口支持以下两种数据搬运方式，均不支持设置填充值：
 

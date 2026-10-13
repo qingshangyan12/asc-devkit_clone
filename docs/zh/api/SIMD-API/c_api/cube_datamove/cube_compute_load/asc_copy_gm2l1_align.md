@@ -28,7 +28,7 @@
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
-将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力，搬运过程中对支持对数据进行padding。
+将数据从Global Memory（GM）搬运到L1 Buffer，支持搬运数据长度不是32字节整数倍的数据，并支持在搬运过程中对数据进行Padding。搬运数据长度仍需满足对应数据类型的字节对齐要求；源、目的起始地址的对齐要求请参见[参数说明](#参数说明)。
 
 若搬运数据长度非32字节对齐，会将搬运数据补齐至32字节对齐。可通过配置参数`dst_stride`选择Normal模式或Compact模式。非32字节对齐场景支持以下两种填充方式：
 
