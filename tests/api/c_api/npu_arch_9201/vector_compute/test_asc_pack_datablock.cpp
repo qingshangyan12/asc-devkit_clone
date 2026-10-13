@@ -53,24 +53,19 @@ TEST_PACK_DATABLOCK_RETURN(Float, vector_float);
 TEST_PACK_DATABLOCK_RETURN(UInt64, vector_uint64_t);
 TEST_PACK_DATABLOCK_RETURN(Int64, vector_int64_t);
 
-#define TEST_PACK_TO_64(test_name, src_type, api_name, expected_part)                                      \
+#define TEST_PACK_TO_64(test_name, src_type, api_name, expected_part)                                        \
     namespace {                                                                                              \
-    void test_name##Stub(vector_uint32_t&, src_type, Literal part)                                          \
-    {                                                                                                        \
-        EXPECT_EQ(part, expected_part);                                                                      \
-    }                                                                                                        \
+    void test_name##Stub(vector_uint32_t&, src_type, Literal part) { EXPECT_EQ(part, expected_part); }       \
     }                                                                                                        \
                                                                                                              \
     TEST(PackTo64, test_name)                                                                                \
     {                                                                                                        \
         vector_uint32_t dst;                                                                                 \
         src_type src;                                                                                        \
-        MOCKER_CPP(vpack, void(vector_uint32_t&, src_type, Literal))                                        \
-            .times(2)                                                                                        \
-            .will(invoke(test_name##Stub));                                                                 \
+        MOCKER_CPP(vpack, void(vector_uint32_t&, src_type, Literal)).times(2).will(invoke(test_name##Stub)); \
         api_name(dst, src);                                                                                  \
         auto result = api_name(src);                                                                         \
-        static_assert(std::is_same<decltype(result), vector_uint32_t>::value);                              \
+        static_assert(std::is_same<decltype(result), vector_uint32_t>::value);                               \
         (void)result;                                                                                        \
         GlobalMockObject::verify();                                                                          \
     }

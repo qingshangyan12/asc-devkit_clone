@@ -11,6 +11,7 @@
 #ifndef TESTS_API_C_API_NPU_ARCH_9201_UTILS_TEST_VCVT_INSTR_UTILS_H
 #define TESTS_API_C_API_NPU_ARCH_9201_UTILS_TEST_VCVT_INSTR_UTILS_H
 
+#include <cstring>
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
