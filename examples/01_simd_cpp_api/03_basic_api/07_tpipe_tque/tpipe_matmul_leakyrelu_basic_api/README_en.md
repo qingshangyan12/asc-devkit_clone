@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example implements fused Matmul and LeakyRelu using the TPipe-TQue programming model, with TPipe managing local resources and TQue managing data synchronization and buffer reuse. Double Buffer is enabled to demonstrate cooperative computation between the Cube and Vector units. Cube cores perform matrix multiplication, and Vector cores apply LeakyRelu.
+This example implements fused Matmul and LeakyRelu using the [TPipe and TQue programming paradigm](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_paradigm.md), with TPipe managing local resources and TQue managing data synchronization and buffer reuse. [Double Buffer](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md) is enabled to demonstrate cooperative computation between the Cube and Vector units. Cube cores perform matrix multiplication, and Vector cores apply LeakyRelu.
 
 In this example, the A1 (physically in L1 Buffer), A2 (L0A Buffer), CO1 (L0C Buffer), VECIN (UB) and VECOUT (UB) queues enable Double Buffer so that transfers and computation for different tiles can overlap. The right-hand matrix B is reused across M tiles, loaded only once and retained in L0B Buffer.
 
@@ -10,9 +10,9 @@ In this example, the A1 (physically in L1 Buffer), A2 (L0A Buffer), CO1 (L0C Buf
 
 | Product | CANN Version |
 |---------|--------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 Training Series Products/Atlas A3 Inference Series Products | >= CANN 9.0.0 |
-| Atlas A2 Training Series Products/Atlas A2 Inference Series Products | >= CANN 9.0.0 |
+| Ascend 950PR&950DT Series Products | >= CANN 9.1.0 |
+| Atlas A3 Series Products | >= CANN 9.0.0 |
+| Atlas A2 Series Products | >= CANN 9.0.0 |
 
 ## Directory Structure
 
@@ -135,6 +135,8 @@ tpipe_matmul_leakyrelu_basic_api/
 
   `GlobalTensor<half>` offsets are measured in elements, not bytes. Cube A/C base addresses advance by `GetBlockIdx()*singleCoreM*K` and `GetBlockIdx()*singleCoreM*N`. On the Vector side, `GetBlockIdx()/2` maps to the paired Cube core. Both Cube cores load the complete B matrix without an M-dependent offset.
 
+  A single TPipe instance is created at the Kernel entry and passed to the operator through `Init(..., &pipe)`; the class stores only its pointer. This follows [Avoid Creating and Initializing TPipe Inside an Object](../../../../../docs/zh/guide/operator_practice/simd_operator_optimization/overhead_optimization/avoid_tpipe_init_in_object.md) and the [Reduce example](../../01_memory_vector_compute/reduce/reduce.asc), allowing constant folding and propagation of Scalar variables in the operator class.
+
   The queue members and shared constants match the source. Tile dimensions in these excerpts are supplied by the nine template parameters of KernelMatmul. Comments are omitted from the code excerpts; the complete template is in the [source](tpipe_matmul_leakyrelu_basic_api.asc).
 
 ```cpp
@@ -142,7 +144,7 @@ constexpr uint32_t CUBE_BLOCK = 16;
 constexpr uint32_t BUFFER_NUM = 2;
 constexpr uint16_t READY_FLAG = 8;
 constexpr uint16_t FREE_FLAG = 10;
-AscendC::TPipe pipe;
+AscendC::TPipe* pipe;
 AscendC::TQue<AscendC::TPosition::A1, BUFFER_NUM> a1Queue;
 AscendC::TQue<AscendC::TPosition::B1, 1> b1Queue;
 AscendC::TQue<AscendC::TPosition::A2, 1> a2Queue;
@@ -155,11 +157,13 @@ AscendC::TQue<AscendC::TPosition::VECOUT, 1> vecOutQueue;
   The following is the template class's Init method:
 
 ```cpp
-__aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
+__aicore__ inline void Init(
+    __gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix, AscendC::TPipe* pipeIn)
 {
+    pipe = pipeIn;
     static_assert(M % singleCoreM == 0 && singleCoreM % baseM == 0, "M must be divisible by tiles");
-    static_assert(singleCoreK == K && baseK == K && singleCoreN == N && baseN == N,
-        "This sample only partitions M");
+    static_assert(
+        singleCoreK == K && baseK == K && singleCoreN == N && baseN == N, "This sample only partitions M");
     static_assert(baseM == 32 || baseM == 64 || baseM == 128, "Supported baseM: 32, 64, 128");
     static_assert(K == 128 && N == 128, "This sample requires K=N=128");
     static_assert(singleCoreM / baseM >= BUFFER_NUM, "At least two tiles are required for double buffer");
@@ -169,16 +173,16 @@ __aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __
     if ASCEND_IS_AIC {
         aGM = aGM[AscendC::GetBlockIdx() * singleCoreM * K];
         cGM = cGM[AscendC::GetBlockIdx() * singleCoreM * N];
-        pipe.InitBuffer(a1Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
-        pipe.InitBuffer(a2Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
-        pipe.InitBuffer(cQueue, BUFFER_NUM, baseM * baseN * sizeof(float));
-        pipe.InitBuffer(b1Queue, 1, baseK * baseN * sizeof(half));
-        pipe.InitBuffer(b2Queue, 1, baseK * baseN * sizeof(half));
+        pipe->InitBuffer(a1Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
+        pipe->InitBuffer(a2Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
+        pipe->InitBuffer(cQueue, BUFFER_NUM, baseM * baseN * sizeof(float));
+        pipe->InitBuffer(b1Queue, 1, baseK * baseN * sizeof(half));
+        pipe->InitBuffer(b2Queue, 1, baseK * baseN * sizeof(half));
     }
     if ASCEND_IS_AIV {
         cGM = cGM[AscendC::GetBlockIdx() / 2 * singleCoreM * N];
-        pipe.InitBuffer(vecInQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
-        pipe.InitBuffer(vecOutQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
+        pipe->InitBuffer(vecInQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
+        pipe->InitBuffer(vecOutQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
     }
 }
 ```
@@ -195,95 +199,110 @@ __aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __
 
 ```cpp
 __aicore__ inline void Process()
-    {
-        constexpr uint32_t mLoops = singleCoreM / baseM;
-        if ASCEND_IS_AIC {
-            AscendC::LocalTensor<half> b1Local = b1Queue.AllocTensor<half>();
-            AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
-            b1Queue.EnQue(b1Local);
-            for (uint32_t mIndex = 0; mIndex < BUFFER_NUM; ++mIndex) {
-                CopyInA(mIndex);
-            }
-            LoadB();
-            AscendC::LocalTensor<half> b2Local = b2Queue.DeQue<half>();
-            for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
-                AscendC::LocalTensor<half> a1Local = a1Queue.DeQue<half>();
-                AscendC::LocalTensor<half> a2Local = a2Queue.AllocTensor<half>();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-                for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
-                    AscendC::LoadData(
-                        a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
-                        AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0});
-                }
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-                AscendC::LoadData(
-                    a2Local, a1Local,
-                    AscendC::LoadData2DParamsV2{
-                        0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
-#endif
-                a2Queue.EnQue(a2Local);
-                a1Queue.FreeTensor(a1Local);
-                if (mIndex + BUFFER_NUM < mLoops) {
-                    CopyInA(mIndex + BUFFER_NUM);
-                }
-                a2Local = a2Queue.DeQue<half>();
-                AscendC::LocalTensor<float> cLocal = cQueue.AllocTensor<float>();
-                AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
-                cQueue.EnQue(cLocal);
-                a2Queue.FreeTensor(a2Local);
-                cLocal = cQueue.DeQue<float>();
-                uint32_t slot = mIndex % BUFFER_NUM;
-                if (mIndex >= BUFFER_NUM) {
-                    AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + slot);
-                }
-                AscendC::Fixpipe(
-                    cGM[mIndex * baseM * N], cLocal,
-                    AscendC::FixpipeParamsV220{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0});
-                AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + slot);
-                cQueue.FreeTensor(cLocal);
-            }
-            for (uint32_t slot = 0; slot < BUFFER_NUM; ++slot) {
-                AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + slot);
-            }
-            b2Queue.FreeTensor(b2Local);
+{
+    constexpr uint32_t mLoops = singleCoreM / baseM;
+    if ASCEND_IS_AIC {
+        AscendC::LocalTensor<half> b1Local = b1Queue.AllocTensor<half>();
+        AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
+        b1Queue.EnQue(b1Local);
+        for (uint32_t mIndex = 0; mIndex < BUFFER_NUM; ++mIndex) {
+            CopyInA(mIndex);
         }
+        LoadB();
+        AscendC::LocalTensor<half> b2Local = b2Queue.DeQue<half>();
+        for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
+            AscendC::LocalTensor<half> a1Local = a1Queue.DeQue<half>();
+            AscendC::LocalTensor<half> a2Local = a2Queue.AllocTensor<half>();
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+            for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
+                AscendC::LoadData(
+                    a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
+                    AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0});
+            }
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+            AscendC::LoadData(
+                a2Local, a1Local,
+                AscendC::LoadData2DParamsV2{
+                    0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false,
+                    0});
+#endif
+            a2Queue.EnQue(a2Local);
+            a1Queue.FreeTensor(a1Local);
+            if (mIndex + BUFFER_NUM < mLoops) {
+                CopyInA(mIndex + BUFFER_NUM);
+            }
+            a2Local = a2Queue.DeQue<half>();
+            AscendC::LocalTensor<float> cLocal = cQueue.AllocTensor<float>();
+            AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
+            cQueue.EnQue(cLocal);
+            a2Queue.FreeTensor(a2Local);
+            cLocal = cQueue.DeQue<float>();
+            uint32_t flagOffset = mIndex % BUFFER_NUM;
+            if (mIndex >= BUFFER_NUM) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                AscendC::CrossCoreWaitFlag<0x2, PIPE_FIX>(FREE_FLAG + flagOffset);
+#else
+                AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + flagOffset);
+#endif
+            }
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+            AscendC::FixpipeParamsV220 fixpipeParams{baseN, baseM, baseM, N, false, QuantMode_t::F322F16,
+                                                     0,     1,     0,     0, 0};
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+            AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams{baseN, baseM, baseM, N};
+            fixpipeParams.quantPre = QuantMode_t::F322F16;
+            fixpipeParams.reluEn = false;
+            fixpipeParams.params = {1, 0, 0};
+#endif
+            AscendC::Fixpipe<half, float, AscendC::CFG_ROW_MAJOR>(cGM[mIndex * baseM * N], cLocal, fixpipeParams);
+            AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + flagOffset);
+            cQueue.FreeTensor(cLocal);
+        }
+        for (uint32_t flagOffset = 0; flagOffset < BUFFER_NUM; ++flagOffset) {
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+            AscendC::CrossCoreWaitFlag<0x2, PIPE_FIX>(FREE_FLAG + flagOffset);
+#else
+            AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + flagOffset);
+#endif
+        }
+        b2Queue.FreeTensor(b2Local);
     }
+}
 ```
 
   Private helpers handle A prefetch and architecture-specific B loading:
 
 ```cpp
 __aicore__ inline void CopyInA(uint32_t mIndex)
-    {
-        AscendC::LocalTensor<half> a1Local = a1Queue.AllocTensor<half>();
-        AscendC::DataCopy(
-            a1Local, aGM[mIndex * baseM * K], AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
-        a1Queue.EnQue(a1Local);
-    }
-    __aicore__ inline void LoadB()
-    {
-        AscendC::LocalTensor<half> b1Local = b1Queue.DeQue<half>();
-        AscendC::LocalTensor<half> b2Local = b2Queue.AllocTensor<half>();
+{
+    AscendC::LocalTensor<half> a1Local = a1Queue.AllocTensor<half>();
+    AscendC::DataCopy(a1Local, aGM[mIndex * baseM * K], AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
+    a1Queue.EnQue(a1Local);
+}
+__aicore__ inline void LoadB()
+{
+    AscendC::LocalTensor<half> b1Local = b1Queue.DeQue<half>();
+    AscendC::LocalTensor<half> b2Local = b2Queue.AllocTensor<half>();
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-        for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
-            AscendC::LoadData(
-                b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
-                AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
-        }
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
         AscendC::LoadData(
-            b2Local, b1Local,
-            AscendC::LoadData2DParamsV2{
-                0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
-#endif
-        b2Queue.EnQue(b2Local);
-        b1Queue.FreeTensor(b1Local);
+            b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
+            AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
     }
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    AscendC::LoadData(
+        b2Local, b1Local,
+        AscendC::LoadData2DParamsV2{
+            0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
+#endif
+    b2Queue.EnQue(b2Local);
+    b1Queue.FreeTensor(b1Local);
+}
 ```
 
   **Vector computation**
 
-  - **Cross-core synchronization:** Wait for READY for the current tile. After reading, publish FREE from MTE2; the Cube core waits for both paired AIVs before reusing that notification slot.
+  - **Cross-core synchronization:** Wait for READY for the current tile. After reading, publish FREE from MTE2; the Cube core waits for both paired AIVs before reusing that flagId.
   - **LocalTensor allocation:** Separate VECIN and VECOUT queues each have two physical buffers.
   - **GM → UB:** DataCopyPad reads `baseM/2` rows of `baseN` half elements.
   - **UB computation:** LeakyRelu writes a separate output tensor and applies the FP16 negative slope.
@@ -303,14 +322,18 @@ __aicore__ inline void LeakyReluCompute(uint32_t mIndex, uint32_t nIndex, uint32
     uint32_t blockLen = baseN * sizeof(half);
     uint32_t srcStride = (N - baseN) * sizeof(half);
     uint32_t gmOffset = (mIndex * baseM * N + nIndex * baseN) + AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
-    uint32_t slot = mIndex % BUFFER_NUM;
+    uint32_t flagOffset = mIndex % BUFFER_NUM;
     AscendC::LocalTensor<half> vecInLocal = vecInQueue.AllocTensor<half>();
-    AscendC::CrossCoreWaitFlag<0x2>(READY_FLAG + slot);
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+    AscendC::CrossCoreWaitFlag<0x2, PIPE_MTE2>(READY_FLAG + flagOffset);
+#else
+    AscendC::CrossCoreWaitFlag<0x2>(READY_FLAG + flagOffset);
+#endif
     AscendC::DataCopyPad<half>(
         vecInLocal, cGM[gmOffset],
         AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, srcStride, 0, 0},
         AscendC::DataCopyPadExtParams<half>{true, 0, 0, 0});
-    AscendC::CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG + slot);
+    AscendC::CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG + flagOffset);
     vecInQueue.EnQue(vecInLocal);
     vecInLocal = vecInQueue.DeQue<half>();
     AscendC::LocalTensor<half> vecOutLocal = vecOutQueue.AllocTensor<half>();
@@ -338,7 +361,7 @@ __aicore__ inline void LeakyReluCompute(uint32_t mIndex, uint32_t nIndex, uint32
 
   **Kernel invocation**
 
-  `__global__` declares the device entry point. `__mix__(1, 2)` specifies one Cube core and two paired Vector cores per logical block. The wrapper matches the original sample:
+  `__global__` declares the device entry point. `__mix__(1, 2)` specifies one Cube core and two paired Vector cores per logical block. The Kernel entry creates the TPipe instance and passes its pointer to the operator:
 
 ```cpp
 template <
@@ -347,8 +370,9 @@ template <
 __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
 {
     AscendC::InitSocState();
+    AscendC::TPipe pipe;
     KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, baseN> op;
-    op.Init(xMatrix, yMatrix, zMatrix);
+    op.Init(xMatrix, yMatrix, zMatrix, &pipe);
     op.Process();
     AscendC::PipeBarrier<PIPE_ALL>();
 }
@@ -356,7 +380,7 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
 
 - **API parameters**
 
-  The tables below follow the constructor argument order used by the brace-initialized calls. That order may differ from member declaration order. Some field types vary by architecture, so these are semantic descriptions rather than complete struct declarations. Consult the linked repository documentation for target-specific ranges. The links use the repository's Chinese API references.
+  The tables below describe constructor arguments in brace-initialized calls and explicitly assigned member fields. That order may differ from member declaration order. Some field types vary by architecture, so these are semantic descriptions rather than complete struct declarations. Consult the linked repository documentation for target-specific ranges. The links use the repository's Chinese API references.
 
   **TPipe and TQue**
 
@@ -428,7 +452,7 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
 
   The call is `{baseM, baseN, baseK, 0, false, true}`. M tiles cover different output rows, not successive segments of a K reduction.
 
-  **[FixpipeParamsV220](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)** — L0C-to-GM transfer and conversion:
+  **[FixpipeParamsV220](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)** — L0C-to-GM transfer and conversion for Atlas A2 Series Products and Atlas A3 Series Products:
 
   | Constructor parameter | Value and meaning |
   |-----------------------|-------------------|
@@ -444,7 +468,24 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
   | dstNdStride | Distance between destination ND matrix starts, in elements; 0 for one matrix |
   | unitFlag | 0, consistent with Mmad |
 
-  The call is `{baseN,baseM,baseM,N,false,QuantMode_t::F322F16,0,1,0,0,0}` and writes to `cGM[mIndex*baseM*N]`. The 3510 branch also uses this interface form; the V220 name does not mean only the 2201 branch executes it.
+  The call is `{baseN,baseM,baseM,N,false,QuantMode_t::F322F16,0,1,0,0,0}` and writes to `cGM[mIndex*baseM*N]`.
+
+  **[FixpipeParamsArch3510](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)** — used for Ascend 950PR&950DT Series Products:
+
+  `FixpipeParamsArch3510<CO2Layout::ROW_MAJOR>` and `Fixpipe<half, float, CFG_ROW_MAJOR>` convert NZ to ND and FP32 to FP16, then transfer the result to GM.
+
+  | Parameter | Configuration and meaning in this example |
+  |-----------|-------------------------------------------|
+  | `nSize`, `mSize` | First two constructor arguments: baseN and baseM, the output tile's columns and rows |
+  | `srcStride` | Third argument: baseM, the offset between adjacent Z layouts in the source NZ matrix, in C0_SIZE units; C0_SIZE is 64 bytes for float |
+  | `dstStride` | Fourth argument: N, the offset between destination ND row starts, in elements |
+  | `quantPre` | Explicitly set to `QuantMode_t::F322F16` |
+  | `reluEn` | Explicitly false to preserve negative values for LeakyRelu |
+  | `params` | `Nz2NdParams{1, 0, 0}`: ndNum, srcNdStride and dstNdStride; the matrix strides are unused for a single matrix |
+  | `unitFlag` | Default value 0, consistent with Mmad |
+  | `preReluMode`, `preClipReluMode` | Defaults `NO_RELU` and `NOCLIP_RELU`; no activation before conversion |
+
+  Unlike FixpipeParamsV220, the 3510 structure stores NZ2ND parameters in its `params` member. srcNdStride is measured in C0_SIZE units and dstNdStride in elements. This example requires no quantization scale and does not set deqScalar.
 
   **[DataCopyExtParams](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB.md)** — GM/UB transfers:
 
@@ -475,7 +516,11 @@ __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ ui
 
   `LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, tileLen)` receives the output tensor, input tensor, negative slope and number of elements. `tileLen=8192`, not bytes.
 
-  `CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG+slot)` publishes readiness after FIX completes. `CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG+slot)` acknowledges a completed AIV read. `slot=mIndex%2`; READY uses 8/9 and FREE uses 10/11. The AIC waits for both AIV acknowledgements. The default waiting-pipeline semantics differ between 2201 and 3510; this code retains `CrossCoreWaitFlag<0x2>` without an explicit pipeline argument.
+  `CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG+flagOffset)` sends READY after FIX completes. `CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG+flagOffset)` sends FREE after the AIV finishes reading. READY_FLAG=8 and FREE_FLAG=10 are the starting flagId values defined by this example. With `flagOffset=mIndex%BUFFER_NUM`, READY uses 8/9 and FREE uses 10/11. One mode-2 wait on the AIC requires both paired AIVs to complete synchronization.
+
+  On Ascend 950PR&950DT Series Products, the `pipe` template argument takes effect; omitting it blocks only the default `PIPE_S`. The AIV uses `CrossCoreWaitFlag<0x2, PIPE_MTE2>` for READY so GM-to-UB reads follow Fixpipe completion. The AIC uses `CrossCoreWaitFlag<0x2, PIPE_FIX>` for FREE to wait for both AIV reads before reusing the flagId, ordering subsequent Fixpipe operations and READY events. The final FREE waits also use `PIPE_FIX`; the Kernel's final `PipeBarrier<PIPE_ALL>()` ensures completion.
+
+  On Atlas A2 Series Products and Atlas A3 Series Products, `pipe` does not affect the hardware instruction: the wait blocks all pipelines. This branch retains `CrossCoreWaitFlag<0x2>` as recommended by the repository API documentation. Both architecture branches use mode 2 to match the corresponding Set calls.
 
 ## Compilation and Execution
 
@@ -516,7 +561,7 @@ Execute the following steps in the root directory of this example to compile and
   | Option | Possible Values | Description |
   | -------| ----------------| --------------------------------------------------------------------------------------|
   | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |
-  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 products and Atlas A3 products, dav-3510 corresponds to Ascend 950PR&950DT products |
+  | `CMAKE_ASC_ARCHITECTURES` | `dav-2201` (default), `dav-3510` | NPU architecture: dav-2201 corresponds to Atlas A2 Series Products and Atlas A3 Series Products, dav-3510 corresponds to Ascend 950PR&950DT Series Products |
 
 - Execution Result
 
@@ -540,7 +585,7 @@ The following tables break down the Cube and Vector operations in execution orde
 | Matrix compute | Dequeue A2, allocate CO1, Mmad, enqueue CO1, release A2 | Independent full-K computation for each M tile |
 | Local synchronization | Queue operations manage producer/consumer and reuse dependencies | MTE2→MTE1, MTE1→M, M→FIX and reverse reuse protection |
 | L0C → GM | Dequeue CO1, Fixpipe, release CO1 | Allow different tiles' M/FIX work to overlap |
-| Cross-core completion | Publish READY, consume FREE before slot reuse and at the end, release B2 | Bound outstanding notifications and complete the B lifecycle |
+| Cross-core completion | Send READY, wait for FREE before reusing flagId and at the end, release B2 | Complete paired synchronization events and release the B2 buffer |
 
 ### Vector Core Flow
 
@@ -564,7 +609,7 @@ The following tables break down the Cube and Vector operations in execution orde
 
 Stages within one tile still obey their dependencies. Different physical buffers allow MTE1 to load while Mmad reads another tile, Mmad to write while FIX reads another result, and Vector transfers to overlap work on another half tile. FreeTensor does not immediately destroy physical local memory; subsequent reuse remains synchronized. Double buffering offers overlap, not a guaranteed 2× speedup.
 
-With two tiles per core, the AIC publishes READY8/READY9 and consumes FREE10/FREE11 at the end. With baseM=64 and four tiles, tile2 reuses slot0 only after both AIVs acknowledge tile0 via FREE10; tile3 similarly waits for tile1's FREE11. Final acknowledgements are then consumed for tile2/tile3.
+With two tiles per core, the AIC sends READY with flagId 8/9 and waits for FREE with flagId 10/11 at the end. With baseM=64 and four tiles, tile 2 reuses flagId 8 only after FREE for tile 0 (flagId 10); tile 3 similarly waits for FREE for tile 1 (flagId 11) before reusing flagId 9. The final waits complete FREE synchronization for tiles 2 and 3.
 
 FREE indicates that the corresponding GM read is complete, not that activation and final output are complete. Tiles occupy distinct GM regions, so a later Cube tile does not overwrite an earlier Vector output. Queue dependencies and the final PipeBarrier complete the writes. No extra GM workspace is used.
 

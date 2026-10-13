@@ -2,7 +2,7 @@
 
 ## 算子概述
 
-本样例基于TPipe-TQue编程模式（由TPipe统一管理片上资源、由TQue管理数据同步和缓冲复用的编程方式）实现Matmul和LeakyRelu融合计算并开启Double Buffer能力，展示Cube单元和Vector单元协同计算的编程模式。Cube核完成矩阵乘计算，Vector核完成LeakyRelu激活计算。
+本样例基于[TPipe和TQue编程范式](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/tpipe_tque_programming/tpipe_tque_paradigm.md)（由TPipe统一管理片上资源、由TQue管理数据同步和缓冲复用的编程方式）实现Matmul和LeakyRelu融合计算并开启[Double Buffer](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)，展示Cube单元和Vector单元协同计算的编程模式。Cube核完成矩阵乘计算，Vector核完成LeakyRelu激活计算。
 
 在本样例中，A1（物理位置为L1 Buffer）、A2（物理位置为L0A Buffer）、CO1（物理位置为L0C Buffer）、VECIN（物理位置为UB）和VECOUT（物理位置为UB）队列启用Double Buffer，使不同tile的搬运和计算具备重叠执行的条件；右矩阵B在各M tile间复用，仅搬运一次并驻留L0B Buffer。
 
@@ -10,9 +10,9 @@
 
 | 产品 | CANN软件版本 |
 |------|-------------|
-| Ascend 950PR/Ascend 950DT | >= CANN 9.1.0 |
-| Atlas A3 训练系列产品/Atlas A3 推理系列产品 | >= CANN 9.0.0 |
-| Atlas A2 训练系列产品/Atlas A2 推理系列产品 | >= CANN 9.0.0 |
+| Ascend 950PR&950DT系列产品 | >= CANN 9.1.0 |
+| Atlas A3系列产品 | >= CANN 9.0.0 |
+| Atlas A2系列产品 | >= CANN 9.0.0 |
 
 ## 目录结构介绍
 
@@ -64,7 +64,7 @@
 
   **分核逻辑**：
 
-  输出矩阵C按M方向（shape第一维，行方向）分为2个分块，N方向（shape第二维，列方向）不分块，使用2个Cube核完成Matmul计算；每个Cube核对应2个Vector核，因此使用4个Vector核完成LeakyRelu计算。每个Cube核负责singleCoreM=256行，按baseM=128拆为两个baseM×baseN结果块；每个tile由配对的2个Vector核各处理baseM/2×baseN=64×128个元素。baseK=K=128、baseN=N=128，K/N方向不分块。
+  输出矩阵C按M方向（shape第一维，行方向）分为2个分块，N方向（shape第二维，列方向）不分块，使用2个Cube核完成Matmul计算；每个Cube核对应2个Vector核，因此使用4个Vector核完成LeakyRelu计算。每个Cube核负责singleCoreM=256行，按baseM=128拆为两个baseM×baseN结果块；每个分块（tile）由配对的2个Vector核各处理baseM/2×baseN=64×128个元素。baseK=K=128、baseN=N=128，K/N方向不分块。
 
   **M/N/K参数图解**：
 
@@ -109,7 +109,7 @@
       > 数据需在搬运过程中进行格式转换（ND→Nz/Zn），因为Cube计算单元要求特定的分形（Fractal）排布格式，而非ND排布。
       >
       > 同步机制说明：
-      > - **核内同步**：使用[TPipe](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/TPipe.md)和[TQue](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TQue/TQue.md)管理资源；EnQue/DeQue建立生产者到消费者的依赖，FreeTensor/AllocTensor保护缓冲复用，无需手动设置HardEvent同步事件。
+      > - **核内同步**：使用[TPipe](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/TPipe.md)和[TQue](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TQue/TQue.md)管理资源；EnQue/DeQue建立写后读数据依赖，FreeTensor/AllocTensor解决读后写内存复用冲突，无需手动设置HardEvent同步事件。
       > - **核间同步**：[CrossCoreSetFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreSetFlag_ISASI.md)/[CrossCoreWaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md)用于不同核之间的依赖同步，如Cube核完成计算后通知Vector核可以开始读取数据
 
       **1）数据流路径**
@@ -133,8 +133,8 @@
       ```
 
       > **注意**：L0A Buffer上的分形在不同产品上有差异：
-      > - Ascend 950PR/Ascend 950DT产品：L0A的分形为Nz
-      > - Atlas A2/A3系列产品：L0A的分形为Zz
+      > - Ascend 950PR&950DT系列产品：L0A的分形为Nz
+      > - Atlas A2系列产品和Atlas A3系列产品：L0A的分形为Zz
 
       核间同步与Vector侧数据流（1个Cube核的结果由2个Vector核处理）：
 
@@ -146,7 +146,7 @@
       Vector核:     GM(C:ND,half) -> UB(VECIN,half) -> UB(VECOUT,half) -> GM(C:ND,half)
                                   │                 │                   │
                             DataCopyPad          LeakyRelu          DataCopyPad
-                      MTE2搬运（baseM/2×baseN）    VEC计算            MTE3写出
+                      MTE2搬运（baseM/2×baseN）    Vector计算            MTE3写出
       ```
 
       **2）流程详解**：
@@ -155,7 +155,9 @@
 
           **GlobalTensor定义与分核偏移**：使用[GlobalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/GlobalTensor/GlobalTensor_intro.md)（全局内存张量）访问芯片外部全局内存中的输入/输出数据，并通过[GetBlockIdx](../../../../../docs/zh/api/SIMD-API/basic_api/tool_interface/system_resources_and_variables/GetBlockIdx.md)（获取当前核的逻辑编号）计算分核偏移：
 
-          队列成员和公共常量与源码一致，片段中的模板尺寸来自KernelMatmul的九个模板参数：
+          TPipe实例在Kernel入口创建，通过`Init(..., &pipe)`传入算子对象，类内仅保存指针。该写法参考仓内[避免TPipe在对象内创建和初始化](../../../../../docs/zh/guide/operator_practice/simd_operator_optimization/overhead_optimization/avoid_tpipe_init_in_object.md)有利于编译器对类内Scalar变量进行常量折叠和常量传播。
+
+          队列成员和公共常量如下，片段中的模板尺寸来自KernelMatmul的九个模板参数：
 
           ```cpp
           constexpr uint32_t CUBE_BLOCK = 16;
@@ -164,8 +166,8 @@
           constexpr uint16_t FREE_FLAG = 10;
 
           // 以下成员位于KernelMatmul类的private区域。
-          AscendC::TPipe pipe;
-          // A1预取两个tile，队列深度为2；其余队列最多一个待出队tensor，深度为1。
+          AscendC::TPipe* pipe;
+          // A1预取两个tile，队列深度为2；其余队列深度为1。
           // 队列深度与物理缓冲数不同，双缓冲通过InitBuffer的BUFFER_NUM参数开启。
           AscendC::TQue<AscendC::TPosition::A1, BUFFER_NUM> a1Queue;
           AscendC::TQue<AscendC::TPosition::B1, 1> b1Queue;
@@ -179,12 +181,14 @@
           以下为模板类中的Init方法；完整类模板见源码。
 
           ```cpp
-          __aicore__ inline void Init(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
+          __aicore__ inline void Init(
+              __gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix, AscendC::TPipe* pipeIn)
           {
+              pipe = pipeIn;
               // 本样例仅沿M方向分核和分tile，K/N方向整块计算，不处理尾块。
               static_assert(M % singleCoreM == 0 && singleCoreM % baseM == 0, "M must be divisible by tiles");
-              static_assert(singleCoreK == K && baseK == K && singleCoreN == N && baseN == N,
-                  "This sample only partitions M");
+              static_assert(
+                  singleCoreK == K && baseK == K && singleCoreN == N && baseN == N, "This sample only partitions M");
               static_assert(baseM == 32 || baseM == 64 || baseM == 128, "Supported baseM: 32, 64, 128");
               static_assert(K == 128 && N == 128, "This sample requires K=N=128");
               static_assert(singleCoreM / baseM >= BUFFER_NUM, "At least two tiles are required for double buffer");
@@ -196,19 +200,19 @@
                   aGM = aGM[AscendC::GetBlockIdx() * singleCoreM * K];
                   cGM = cGM[AscendC::GetBlockIdx() * singleCoreM * N];
                   // A1/A2/CO1使用双缓冲，内存分配和核内流水同步均由TPipe-TQue管理。
-                  pipe.InitBuffer(a1Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
-                  pipe.InitBuffer(a2Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
-                  pipe.InitBuffer(cQueue, BUFFER_NUM, baseM * baseN * sizeof(float));
+                  pipe->InitBuffer(a1Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
+                  pipe->InitBuffer(a2Queue, BUFFER_NUM, baseM * baseK * sizeof(half));
+                  pipe->InitBuffer(cQueue, BUFFER_NUM, baseM * baseN * sizeof(float));
                   // B在不同M tile间保持不变，只搬运一次并驻留L0B，无需重复搬运或双缓冲。
-                  pipe.InitBuffer(b1Queue, 1, baseK * baseN * sizeof(half));
-                  pipe.InitBuffer(b2Queue, 1, baseK * baseN * sizeof(half));
+                  pipe->InitBuffer(b1Queue, 1, baseK * baseN * sizeof(half));
+                  pipe->InitBuffer(b2Queue, 1, baseK * baseN * sizeof(half));
               }
               if ASCEND_IS_AIV {
                   // Vector核数是Cube核数的2倍，1个Cube核的计算结果由2个Vector核继续完成LeakyRelu。
                   // 因此这里用GetBlockIdx() / 2映射回对应的Cube核输出块起始地址。
                   cGM = cGM[AscendC::GetBlockIdx() / 2 * singleCoreM * N];
-                  pipe.InitBuffer(vecInQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
-                  pipe.InitBuffer(vecOutQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
+                  pipe->InitBuffer(vecInQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
+                  pipe->InitBuffer(vecOutQueue, BUFFER_NUM, baseM / 2 * baseN * sizeof(half));
               }
           }
           ```
@@ -220,123 +224,136 @@
           - **LocalTensor创建**：在Init中用TPipe::InitBuffer初始化队列，运行时用AllocTensor申请LocalTensor；写入后EnQue，消费前DeQue，读取提交后FreeTensor。A1/A2/CO1使用两个物理缓冲，B1/B2各一个。
           - **GM → L1**：使用[DataCopy](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)将B搬入L1一次，并预取两个A tile，完成ND到Nz格式转换（Cube计算单元要求Nz分形排布，因此需在搬运时将ND格式转为Nz格式）
           - **L1 → L0A/L0B**：使用[LoadData](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md)将A tile搬运到L0A，将B一次性转置加载到L0B（Nz→Zn）并持有到全部M tile计算结束
-          - **L0A/L0B → L0C**：使用[Mmad](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md)（矩阵乘累加指令）执行每个M tile的完整K归约；每次均初始化累加器，不进行跨tile的K累加
+          - **L0A/L0B → L0C**：使用[Mmad](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md)（矩阵乘累加指令）执行每个M tile的完整K维度的矩阵乘计算；每次均初始化累加器，不进行跨tile的K累加
           - **L0C → GM**：使用[Fixpipe](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)将结果搬出到GM，完成Nz到ND格式转换和float32到half类型转换
 
           代码示例如下（类内片段，完整定义见[tpipe_matmul_leakyrelu_basic_api.asc](tpipe_matmul_leakyrelu_basic_api.asc)）：
 
           ```cpp
-              __aicore__ inline void Process()
-              {
-                  constexpr uint32_t mLoops = singleCoreM / baseM;
-                  if ASCEND_IS_AIC {
-                      // B矩阵GM->L1调用DataCopy接口 + Nd2NzParams结构体参数：
-                      // {ndNum, nValue, dValue, srcNdMatrixStride, srcDValue, dstNzC0Stride, dstNzNStride, dstNzMatrixStride}
-                      AscendC::LocalTensor<half> b1Local = b1Queue.AllocTensor<half>();
-                      AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
-                      b1Queue.EnQue(b1Local);
-                      // 预取两个A tile，使后续tile的搬入可以与当前tile的计算重叠。
-                      for (uint32_t mIndex = 0; mIndex < BUFFER_NUM; ++mIndex) {
-                          CopyInA(mIndex);
-                      }
-                      LoadB();
-                      AscendC::LocalTensor<half> b2Local = b2Queue.DeQue<half>();
-                      for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
-                          // A1出队保证MTE2->MTE1依赖，A2入队/出队保证MTE1->M依赖。
-                          AscendC::LocalTensor<half> a1Local = a1Queue.DeQue<half>();
-                          AscendC::LocalTensor<half> a2Local = a2Queue.AllocTensor<half>();
-          #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-                          // Nz->Zz, L0A上的排布格式为Zz。
-                          // LoadData2DParams: {startIndex, repeatTimes, srcStride, sid, dstGap, ifTranspose, addrMode}
-                          for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
-                              AscendC::LoadData(
-                                  a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
-                                  AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0});
-                          }
-          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-                          // Nz->Nz, L0A上的排布格式为Nz。
-                          // LoadData2DParamsV2: {mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, ifTranspose, sid}
-                          AscendC::LoadData(
-                              a2Local, a1Local,
-                              AscendC::LoadData2DParamsV2{
-                                  0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0});
-          #endif
-                          a2Queue.EnQue(a2Local);
-                          a1Queue.FreeTensor(a1Local);
-                          // 已用A1缓冲由队列安全回收，继续预取后续tile。
-                          if (mIndex + BUFFER_NUM < mLoops) {
-                              CopyInA(mIndex + BUFFER_NUM);
-                          }
-                          a2Local = a2Queue.DeQue<half>();
-                          AscendC::LocalTensor<float> cLocal = cQueue.AllocTensor<float>();
-                          // MmadParams: {m, n, k, unitFlag, cmatrixSource, cmatrixInitVal}
-                          // 每个M tile独立计算完整K，cmatrixInitVal=true，不跨tile累加。
-                          AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
-                          cQueue.EnQue(cLocal);
-                          a2Queue.FreeTensor(a2Local);
-
-                          // CO1队列保证M->FIX依赖以及L0C双缓冲复用时的FIX->M依赖。
-                          cLocal = cQueue.DeQue<float>();
-                          uint32_t slot = mIndex % BUFFER_NUM;
-                          if (mIndex >= BUFFER_NUM) {
-                              // 复用通知槽前，等待两个Vector核读完该槽上一次对应的tile，限制未消费通知数量。
-                              AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + slot);
-                          }
-                          // FixpipeParamsV220: {nSize, mSize, srcStride, dstStride, reluEn, quantPre,
-                          // deqScalar, ndNum, srcNdStride, dstNdStride, unitFlag}
-                          // 先将FP32矩阵乘结果转为FP16，再进行LeakyRelu。
-                          AscendC::Fixpipe(
-                              cGM[mIndex * baseM * N], cLocal,
-                              AscendC::FixpipeParamsV220{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0});
-                          AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + slot);
-                          cQueue.FreeTensor(cLocal);
-                      }
-                      // 收回最后两个tile的确认，避免核函数结束时遗留核间通知。
-                      for (uint32_t slot = 0; slot < BUFFER_NUM; ++slot) {
-                          AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + slot);
-                      }
-                      b2Queue.FreeTensor(b2Local);
+          __aicore__ inline void Process()
+          {
+              constexpr uint32_t mLoops = singleCoreM / baseM;
+              if ASCEND_IS_AIC {
+                  // B矩阵GM->L1调用DataCopy接口 + Nd2NzParams结构体参数：
+                  // {ndNum, nValue, dValue, srcNdMatrixStride, srcDValue, dstNzC0Stride, dstNzNStride, dstNzMatrixStride}
+                  AscendC::LocalTensor<half> b1Local = b1Queue.AllocTensor<half>();
+                  AscendC::DataCopy(b1Local, bGM, AscendC::Nd2NzParams{1, baseK, baseN, 0, N, baseK, 1, 0});
+                  b1Queue.EnQue(b1Local);
+                  // 预取两个A tile，使后续tile的搬入可以与当前tile的计算重叠。
+                  for (uint32_t mIndex = 0; mIndex < BUFFER_NUM; ++mIndex) {
+                      CopyInA(mIndex);
                   }
-                  // Vector分支见下方。
+                  LoadB();
+                  AscendC::LocalTensor<half> b2Local = b2Queue.DeQue<half>();
+                  for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
+                      // A1出队保证MTE2->MTE1依赖，A2入队/出队保证MTE1->M依赖。
+                      AscendC::LocalTensor<half> a1Local = a1Queue.DeQue<half>();
+                      AscendC::LocalTensor<half> a2Local = a2Queue.AllocTensor<half>();
+          #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+                      // Nz->Zz, L0A上的排布格式为Zz。
+                      // LoadData2DParams: {startIndex, repeatTimes, srcStride, sid, dstGap, ifTranspose, addrMode}
+                      for (int i = 0; i < baseM / CUBE_BLOCK; ++i) {
+                          AscendC::LoadData(
+                              a2Local[i * baseK * CUBE_BLOCK], a1Local[i * 512 / sizeof(half)],
+                              AscendC::LoadData2DParams{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0});
+                      }
+          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                      // Nz->Nz, L0A上的排布格式为Nz。
+                      // LoadData2DParamsV2: {mStartPosition, kStartPosition, mStep, kStep, srcStride, dstStride, ifTranspose,
+                      // sid}
+                      AscendC::LoadData(
+                          a2Local, a1Local,
+                          AscendC::LoadData2DParamsV2{
+                              0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false,
+                              0});
+          #endif
+                      a2Queue.EnQue(a2Local);
+                      a1Queue.FreeTensor(a1Local);
+                      // 已用A1缓冲由队列安全回收，继续预取后续tile。
+                      if (mIndex + BUFFER_NUM < mLoops) {
+                          CopyInA(mIndex + BUFFER_NUM);
+                      }
+                      a2Local = a2Queue.DeQue<half>();
+                      AscendC::LocalTensor<float> cLocal = cQueue.AllocTensor<float>();
+                      // MmadParams: {m, n, k, unitFlag, cmatrixSource, cmatrixInitVal}
+                      // 每个M tile独立计算完整K，cmatrixInitVal=true，不跨tile累加。
+                      AscendC::Mmad(cLocal, a2Local, b2Local, AscendC::MmadParams{baseM, baseN, baseK, 0, false, true});
+                      cQueue.EnQue(cLocal);
+                      a2Queue.FreeTensor(a2Local);
+
+                      // CO1队列保证M->FIX依赖以及L0C双缓冲复用时的FIX->M依赖。
+                      cLocal = cQueue.DeQue<float>();
+                      uint32_t flagOffset = mIndex % BUFFER_NUM;
+                      if (mIndex >= BUFFER_NUM) {
+                          // 复用flagId前，等待两个Vector核完成上一次对应分块的读取。
+          #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                          AscendC::CrossCoreWaitFlag<0x2, PIPE_FIX>(FREE_FLAG + flagOffset);
+          #else
+                          AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + flagOffset);
+          #endif
+                      }
+                      // 先将FP32矩阵乘结果转为FP16，再进行LeakyRelu。
+          #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+                      AscendC::FixpipeParamsV220 fixpipeParams{baseN, baseM, baseM, N, false, QuantMode_t::F322F16,
+                                                               0,     1,     0,     0, 0};
+          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                      AscendC::FixpipeParamsArch3510<AscendC::CO2Layout::ROW_MAJOR> fixpipeParams{baseN, baseM, baseM, N};
+                      fixpipeParams.quantPre = QuantMode_t::F322F16;
+                      fixpipeParams.reluEn = false;
+                      fixpipeParams.params = {1, 0, 0};
+          #endif
+                      AscendC::Fixpipe<half, float, AscendC::CFG_ROW_MAJOR>(cGM[mIndex * baseM * N], cLocal, fixpipeParams);
+                      AscendC::CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + flagOffset);
+                      cQueue.FreeTensor(cLocal);
+                  }
+                  // 等待最后两个分块的FREE同步完成，避免核函数结束时遗留同步事件。
+                  for (uint32_t flagOffset = 0; flagOffset < BUFFER_NUM; ++flagOffset) {
+          #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+                      AscendC::CrossCoreWaitFlag<0x2, PIPE_FIX>(FREE_FLAG + flagOffset);
+          #else
+                      AscendC::CrossCoreWaitFlag<0x2>(FREE_FLAG + flagOffset);
+          #endif
+                  }
+                  b2Queue.FreeTensor(b2Local);
               }
+          }
           ```
 
           CopyInA和LoadB作为私有辅助函数，分别完成A tile搬入和B的架构相关加载：
 
           ```cpp
-              __aicore__ inline void CopyInA(uint32_t mIndex)
-              {
-                  AscendC::LocalTensor<half> a1Local = a1Queue.AllocTensor<half>();
-                  AscendC::DataCopy(
-                      a1Local, aGM[mIndex * baseM * K], AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
-                  a1Queue.EnQue(a1Local);
-              }
+          __aicore__ inline void CopyInA(uint32_t mIndex)
+          {
+              AscendC::LocalTensor<half> a1Local = a1Queue.AllocTensor<half>();
+              AscendC::DataCopy(a1Local, aGM[mIndex * baseM * K], AscendC::Nd2NzParams{1, baseM, baseK, 0, K, baseM, 1, 0});
+              a1Queue.EnQue(a1Local);
+          }
 
-              __aicore__ inline void LoadB()
-              {
-                  AscendC::LocalTensor<half> b1Local = b1Queue.DeQue<half>();
-                  AscendC::LocalTensor<half> b2Local = b2Queue.AllocTensor<half>();
+          __aicore__ inline void LoadB()
+          {
+              AscendC::LocalTensor<half> b1Local = b1Queue.DeQue<half>();
+              AscendC::LocalTensor<half> b2Local = b2Queue.AllocTensor<half>();
           #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
-                  // B矩阵L1->L0B（Nz->Zn）。
-                  for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
-                      AscendC::LoadData(
-                          b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
-                          AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
-                  }
-          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
-                  // B矩阵L1->L0B（Nz->Zn），一次LoadData完成整块加载。
+              // B矩阵L1->L0B（Nz->Zn）。
+              for (int i = 0; i < baseK / CUBE_BLOCK; ++i) {
                   AscendC::LoadData(
-                      b2Local, b1Local,
-                      AscendC::LoadData2DParamsV2{
-                          0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
-          #endif
-                  b2Queue.EnQue(b2Local);
-                  b1Queue.FreeTensor(b1Local);
+                      b2Local[i * baseN * CUBE_BLOCK], b1Local[i * 512 / sizeof(half)],
+                      AscendC::LoadData2DParams{0, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, 0, 0, true, 0});
               }
+          #elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+              // B矩阵L1->L0B（Nz->Zn），一次LoadData完成整块加载。
+              AscendC::LoadData(
+                  b2Local, b1Local,
+                  AscendC::LoadData2DParamsV2{
+                      0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0});
+          #endif
+              b2Queue.EnQue(b2Local);
+              b1Queue.FreeTensor(b1Local);
+          }
           ```
 
       2. **Vector核计算阶段**：
-          - **核间同步**：Vector核通过[CrossCoreWaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md)等待当前tile的READY通知；读完后通过MTE2发送FREE确认，AIC复用通知槽前等待两个配对AIV的确认
+          - **核间同步**：Vector核通过[CrossCoreWaitFlag](../../../../../docs/zh/api/SIMD-API/basic_api/sync_control/inter_core_sync/CrossCoreWaitFlag_ISASI.md)等待当前tile的READY同步事件；读取完成后通过MTE2发送FREE同步事件，AIC复用flagId前等待两个配对AIV完成同步
           - **LocalTensor创建**：使用VECIN和VECOUT双缓冲队列分配输入、输出[LocalTensor](../../../../../docs/zh/api/SIMD-API/basic_api/data_structures/LocalTensor/LocalTensor_intro.md)，用于承载当前Vector核处理的半块结果
           - **GM → UB**：使用[DataCopyPad](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB.md)（带Padding的GM与UB之间数据搬运）将Matmul结果搬运到UB，每个Vector核处理baseM/2×baseN的数据
           - **UB计算**：使用[LeakyRelu](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/basic_arithmetic/LeakyRelu.md)（LeakyReLU激活函数，负值部分乘以negativeSlope）执行激活计算，负值部分乘以0.001
@@ -345,9 +362,9 @@
           代码实例如下：
 
           ```cpp
-          // Process中的Vector分支，每次处理当前tile的一半。
           if ASCEND_IS_AIV {
               for (uint32_t mIndex = 0; mIndex < mLoops; ++mIndex) {
+                  // Cube:Vector=1:2，每个Vector核处理当前tile的baseM / 2 * baseN个元素。
                   LeakyReluCompute(mIndex, 0, baseM / 2 * baseN);
               }
           }
@@ -360,16 +377,20 @@
               uint32_t srcStride = (N - baseN) * sizeof(half);
               // 两个Vector核分别处理当前Cube tile的上、下半块。
               uint32_t gmOffset = (mIndex * baseM * N + nIndex * baseN) + AscendC::GetBlockIdx() % 2 * (baseM / 2 * N);
-              uint32_t slot = mIndex % BUFFER_NUM;
+              uint32_t flagOffset = mIndex % BUFFER_NUM;
               AscendC::LocalTensor<half> vecInLocal = vecInQueue.AllocTensor<half>();
-              AscendC::CrossCoreWaitFlag<0x2>(READY_FLAG + slot);
+          #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+              AscendC::CrossCoreWaitFlag<0x2, PIPE_MTE2>(READY_FLAG + flagOffset);
+          #else
+              AscendC::CrossCoreWaitFlag<0x2>(READY_FLAG + flagOffset);
+          #endif
               // GM->UB调用DataCopyPad。
               AscendC::DataCopyPad<half>(
                   vecInLocal, cGM[gmOffset],
                   AscendC::DataCopyExtParams{static_cast<uint16_t>(baseM / 2), blockLen, srcStride, 0, 0},
                   AscendC::DataCopyPadExtParams<half>{true, 0, 0, 0});
-              // 读完后确认该次通知已消费；每个tile在GM中有独立区域，不会被后续Cube tile覆盖。
-              AscendC::CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG + slot);
+              // 读取完成后发送FREE同步事件；每个分块在GM中有独立区域，不会被后续Cube分块覆盖。
+              AscendC::CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG + flagOffset);
               vecInQueue.EnQue(vecInLocal);
 
               // 输入队列保证MTE2->V依赖，输出队列保证V->MTE3依赖。
@@ -394,45 +415,43 @@
     2. baseM可取32、64或128，默认128；baseM/baseK/baseN满足16对齐。
     3. M能被singleCoreM整除，singleCoreM能被baseM整除，不支持尾块。
     4. singleCoreM/baseM至少为BUFFER_NUM=2，保证初始双tile预取有效。
-    5. Vector核数是Cube核数的2倍；更改配比需同时修改半块划分和核间同步协议。
+    5. Vector核数是Cube核数的2倍；更改配比需同时修改半块划分和核间同步逻辑。
     6. 输入输出为连续ND的half矩阵，生成脚本固定M/K/N=512/128/128；模板形式不代表任意形状均支持。
 
   - **调用实现**：
-    核调用符`__mix__(1, 2)`实现Cube和Vector核的协同调用，其中参数`(1, 2)`表示每个逻辑核由1个AIC（Cube核）和2个AIV（Vector核）组成，Cube:Vector核数比例为1:2。
+    函数执行空间限定符`__mix__(1, 2)`实现Cube和Vector核的协同调用，其中参数`(1, 2)`表示每个逻辑核由1个AIC（Cube核）和2个AIV（Vector核）组成，Cube:Vector核数比例为1:2。
 
     ```cpp
     template <
         uint32_t M, uint32_t K, uint32_t N, uint32_t singleCoreM, uint32_t singleCoreK, uint32_t singleCoreN,
         uint32_t baseM, uint32_t baseK, uint32_t baseN>
-    // __global__: 核函数声明修饰符
-    // __mix__(1,2): 混合核函数，1个AIC(Cube) + 2个AIV(Vector)组成一个逻辑核
     __global__ __mix__(1, 2) void mmad_vec_custom(__gm__ uint8_t* xMatrix, __gm__ uint8_t* yMatrix, __gm__ uint8_t* zMatrix)
     {
-        AscendC::InitSocState();  // 初始化硬件状态
-        KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN,
-                     baseM, baseK, baseN> op;
-        op.Init(xMatrix, yMatrix, zMatrix);   // GlobalTensor分核偏移及TPipe队列初始化
-        op.Process();        // AIC侧执行Matmul，AIV侧执行LeakyRelu
-        AscendC::PipeBarrier<PIPE_ALL>();  // 等待所有流水阶段完成
+        AscendC::InitSocState();
+        AscendC::TPipe pipe;
+        KernelMatmul<M, K, N, singleCoreM, singleCoreK, singleCoreN, baseM, baseK, baseN> op;
+        op.Init(xMatrix, yMatrix, zMatrix, &pipe);
+        op.Process();
+        AscendC::PipeBarrier<PIPE_ALL>();
     }
     ```
 
 - **接口参数说明**
 
-  以下按源码中花括号`{}`调用的构造参数顺序说明各字段。构造参数顺序不一定等于成员声明顺序，且部分字段类型随架构变化，所以下表说明调用语义，不作为完整struct定义；产品取值范围以链接中的仓库API文档为准。
+  以下分别说明源码中花括号`{}`调用的构造参数和显式赋值的成员字段。构造参数顺序不一定等于成员声明顺序，且部分字段类型随架构变化，所以下表说明调用语义，不作为完整struct定义；产品取值范围以链接中的仓库API文档为准。
 
   **TPipe和TQue资源管理接口** — 在Init中分配缓冲，在各阶段传递Tensor：
 
   | 接口 | 本样例含义 |
   |------|------------|
   | `TQue<TPosition, depth>` | position指定逻辑位置，depth是最大待出队Tensor数；A1深度为2，其余为1 |
-  | `pipe.InitBuffer(queue, num, len)` | num是物理缓冲数，len是单缓冲字节数；双缓冲num=2 |
+  | `pipe->InitBuffer(queue, num, len)` | num是物理缓冲数，len是单缓冲字节数；双缓冲num=2 |
   | `AllocTensor<T>()` | 获取可写的片上Tensor，类型必须与容量和计算匹配 |
   | `EnQue(tensor)` | 发布生产任务及数据依赖 |
   | `DeQue<T>()` | 按队列顺序取得Tensor，建立消费前的依赖 |
   | `FreeTensor(tensor)` | 归还缓冲使用权，后续AllocTensor复用时保护未完成的读取 |
 
-  例如`pipe.InitBuffer(a2Queue, 2, baseM * baseK * sizeof(half))`分配两个32 KiB的L0A缓冲。a2Queue的模板深度为1，并不意味着只有一个物理缓冲。相关说明见[TPipe](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/TPipe.md)和[TQue](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TQue/TQue.md)。
+  例如`pipe->InitBuffer(a2Queue, 2, baseM * baseK * sizeof(half))`分配两个32 KiB的L0A缓冲。a2Queue的模板深度为1，并不意味着只有一个物理缓冲。相关说明见[TPipe](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TPipe/TPipe.md)和[TQue](../../../../../docs/zh/api/SIMD-API/basic_api/resource_management/TQue/TQue.md)。
 
   **[AscendC::Nd2NzParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/DataCopy_GMToL1_ND2NZ.md)** — `DataCopy`接口使用，描述ND→Nz格式转换参数：
 
@@ -449,7 +468,7 @@
 
   例如搬运A矩阵时`{1, baseM, baseK, 0, K, baseM, 1, 0}`，将baseM×baseK的ND数据转为Nz格式。
 
-  **[AscendC::LoadData2DParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md)** — `LoadData`接口使用，描述Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品中A矩阵L1到L0A和B矩阵L1到L0B的数据搬运参数：
+  **[AscendC::LoadData2DParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D.md)** — `LoadData`接口使用，描述Atlas A2系列产品、Atlas A3系列产品中A矩阵L1到L0A和B矩阵L1到L0B的数据搬运参数：
 
   | 构造参数 | 含义 |
   |----------|------|
@@ -461,10 +480,10 @@
   | `ifTranspose` | 是否转置每个分形，默认false |
   | `addrMode` | 地址更新方式，本样例为0（递增） |
 
-  例如：Atlas A2 训练系列产品/Atlas A2 推理系列产品、Atlas A3 训练系列产品/Atlas A3 推理系列产品中，L0A上的排布格式为Zz，搬运A矩阵时`{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`；<br>
+  例如：Atlas A2系列产品、Atlas A3系列产品中，L0A上的排布格式为Zz，搬运A矩阵时`{0, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, 0, 0, false, 0}`；<br>
   搬运B矩阵时`ifTranspose=true`，完成Nz到Zn的转置搬运。
 
-  **[AscendC::LoadData2DParamsV2](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D_V2.md)** — `LoadData`接口使用，描述Ascend 950PR/Ascend 950DT产品中A矩阵L1到L0A和B矩阵L1到L0B的数据搬运参数：
+  **[AscendC::LoadData2DParamsV2](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_load/LoadData_2D_V2.md)** — `LoadData`接口使用，描述Ascend 950PR&950DT系列产品中A矩阵L1到L0A和B矩阵L1到L0B的数据搬运参数：
 
   | 构造参数 | 含义 |
   |----------|------|
@@ -477,7 +496,7 @@
   | `ifTranspose` | 是否转置每个分形，默认false |
   | `sid` | 预留，配置为0 |
 
-  Ascend 950PR/Ascend 950DT产品中，L0A上的排布格式为Nz，搬运A矩阵时使用`{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0}`，一次完成A矩阵Nz到Nz搬运；搬运B矩阵时使用`{0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0}`，一次完成B矩阵Nz到Zn搬运。
+  Ascend 950PR&950DT系列产品中，L0A上的排布格式为Nz，搬运A矩阵时使用`{0, 0, baseM / CUBE_BLOCK, baseK / CUBE_BLOCK, baseM / CUBE_BLOCK, baseM / CUBE_BLOCK, false, 0}`，一次完成A矩阵Nz到Nz搬运；搬运B矩阵时使用`{0, 0, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, baseK / CUBE_BLOCK, baseN / CUBE_BLOCK, true, 0}`，一次完成B矩阵Nz到Zn搬运。
 
   **[AscendC::MmadParams](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/mmad_compute/Mmad.md)** — `Mmad`接口使用，描述矩阵乘参数：
 
@@ -492,7 +511,7 @@
 
   例如`{baseM, baseN, baseK, 0, false, true}`，计算baseM×baseN输出块并在K方向累加baseK长度。
 
-  **[AscendC::FixpipeParamsV220](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)** — `Fixpipe`接口使用，描述L0C到GM的数据搬运和精度转换参数：
+  **[AscendC::FixpipeParamsV220](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)** — Atlas A2系列产品和Atlas A3系列产品使用，描述L0C到GM的数据搬运和精度转换参数：
 
   | 构造参数 | 含义 |
   |----------|------|
@@ -508,7 +527,24 @@
   | `dstNdStride` | 目的相邻ND矩阵偏移，单位：element；本例ndNum=1时设0 |
   | `unitFlag` | Mmad与Fixpipe并行控制 |
 
-  例如`{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0}`，将L0C中的baseM×baseN float32结果转为half并写回`cGM[mIndex * baseM * N]`。srcStride的C0_SIZE对float源为16×4=64B；当前3510分支也使用源码中的FixpipeParamsV220接口形式。
+  例如`{baseN, baseM, baseM, N, false, QuantMode_t::F322F16, 0, 1, 0, 0, 0}`，将L0C中的baseM×baseN float32结果转为half并写回`cGM[mIndex * baseM * N]`。srcStride的C0_SIZE对float源为16×4=64B。
+
+  **[AscendC::FixpipeParamsArch3510](../../../../../docs/zh/api/SIMD-API/basic_api/cube_compute_ISASI/cube_compute_store/Fixpipe_L0CToGM.md)** — Ascend 950PR&950DT系列产品使用：
+
+  使用`FixpipeParamsArch3510<CO2Layout::ROW_MAJOR>`与`Fixpipe<half, float, CFG_ROW_MAJOR>`，完成NZ2ND格式转换，将FP32结果转为FP16并搬出至GM。
+
+  | 参数 | 本样例配置及含义 |
+  |------|------------------|
+  | `nSize`、`mSize` | 构造参数前两项为baseN、baseM，即输出分块的列数和行数 |
+  | `srcStride` | 第三项为baseM，源NZ相邻Z排布的起始偏移，单位为C0_SIZE；float源的C0_SIZE为64B |
+  | `dstStride` | 第四项为N，目的ND相邻行起始偏移，单位为元素 |
+  | `quantPre` | 显式配置为`QuantMode_t::F322F16` |
+  | `reluEn` | 显式配置为false，保留负值供LeakyRelu处理 |
+  | `params` | `Nz2NdParams{1, 0, 0}`，依次为ndNum、srcNdStride、dstNdStride；单矩阵搬运不使用两个矩阵间隔 |
+  | `unitFlag` | 保持默认值0，与Mmad一致 |
+  | `preReluMode`、`preClipReluMode` | 保持默认值`NO_RELU`、`NOCLIP_RELU`，不使能前置激活 |
+
+  与FixpipeParamsV220不同，3510的NZ2ND参数位于`params`成员中；其中srcNdStride的单位为C0_SIZE，dstNdStride的单位为元素。本样例未使用随路量化scale，不设置deqScalar。
 
   **[AscendC::DataCopyExtParams](../../../../../docs/zh/api/SIMD-API/basic_api/memory_vector_compute/data_move/DataCopyPad_GMToUB.md)** — `DataCopyPad`接口使用，描述GM与UB之间按块搬运的参数：
 
@@ -536,8 +572,10 @@
   **LeakyRelu和核间同步参数**：
 
   - `LeakyRelu(vecOutLocal, vecInLocal, (half)0.001, tileLen)`依次传入输出、输入、负半轴斜率及元素数；tileLen=8192，不是字节数。
-  - `CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + slot)`在FIX完成后通知两个配对AIV；`CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG + slot)`在AIV读取完成后确认。
-  - READY_FLAG=8、FREE_FLAG=10、slot=mIndex%2。AIC等待FREE时需两个AIV均完成确认；默认参数的等待流水语义依架构而异，代码保持`CrossCoreWaitFlag<0x2>`用法。
+  - `CrossCoreSetFlag<0x2, PIPE_FIX>(READY_FLAG + flagOffset)`在FIX完成后通知两个配对AIV；`CrossCoreSetFlag<0x2, PIPE_MTE2>(FREE_FLAG + flagOffset)`在AIV读取完成后确认。
+  - READY_FLAG=8、FREE_FLAG=10是本样例定义的flagId起始值；`flagOffset=mIndex%BUFFER_NUM`，READY使用8/9，FREE使用10/11。AIC的一次模式2等待要求两个配对AIV均完成同步。
+  - Ascend 950PR&950DT系列产品的`pipe`模板参数生效，省略时仅阻塞默认的`PIPE_S`。本样例在AIV侧使用`CrossCoreWaitFlag<0x2, PIPE_MTE2>`等待READY，保证GM→UB搬运在Fixpipe完成后执行；AIC侧使用`CrossCoreWaitFlag<0x2, PIPE_FIX>`等待FREE，保证复用flagId前两个AIV均完成读取，并约束后续Fixpipe与READY发送的顺序。末尾的FREE等待同样使用`PIPE_FIX`，由核函数末尾的`PipeBarrier<PIPE_ALL>()`保证完成。
+  - Atlas A2系列产品和Atlas A3系列产品的`pipe`参数不影响硬件指令功能，等待会阻塞全部流水，按仓内接口建议保留`CrossCoreWaitFlag<0x2>`。两个架构分支均与Set端的模式2匹配。
 
 ## 编译运行
 
@@ -599,10 +637,10 @@
 | GM → L1 | B搬入一次，A预取两个tile，DataCopy完成ND→Nz | 提前提交独立搬运 |
 | L1 → L0B | B1出队、LoadB、B2入队/出队 | B在不同M tile中不变，驻留复用 |
 | L1 → L0A | A1出队、LoadData、A2入队，释放A1 | 根据架构完成Nz→Zz/Nz，并在需要时预取后续A tile |
-| L0A/L0B → L0C | A2出队、分配CO1、Mmad、CO1入队、释放A2 | 每个M tile独立完成完整K归约 |
+| L0A/L0B → L0C | A2出队、分配CO1、Mmad、CO1入队、释放A2 | 每个M tile独立完成完整K维度的矩阵乘计算 |
 | 核内同步 | 队列入队/出队管理生产消费依赖，释放/分配管理复用冲突 | 覆盖MTE2→MTE1、MTE1→M、M→FIX等依赖 |
 | L0C → GM | CO1出队、Fixpipe转half并写当前tile、释放CO1 | 双缓冲允许不同tile的M/FIX重叠 |
-| 核间同步及收尾 | FIX发布READY，复用通知槽前等待FREE；结束时收回最后两次FREE并释放B2 | 限制未消费通知，完整结束B生命周期 |
+| 核间同步及收尾 | FIX发送READY，复用flagId前等待FREE；结束时等待最后两个分块的FREE并释放B2 | 保证核间同步事件成对完成，并释放B2缓冲 |
 
 ### Vector核流程
 
@@ -626,9 +664,9 @@
 
 同一tile内部仍按依赖执行；不同tile可利用不同物理缓冲使MTE1加载与Mmad、Mmad与Fixpipe、Vector搬运与计算重叠。TQue的FreeTensor并非立即销毁底层片上内存，后续复用仍受队列依赖保护。双缓冲提供重叠机会，不保证性能翻倍。
 
-默认每核两个tile，AIC发布READY8/READY9后，在末尾收回FREE10/FREE11。如果baseM=64，每核四个tile，tile2复用槽0前需收回tile0的FREE10，tile3复用槽1前需收回tile1的FREE11，然后末尾再收回最后两次确认。
+默认每核两个分块，AIC发送flagId为8/9的READY同步事件，在末尾等待flagId为10/11的FREE同步事件。如果baseM=64，每核四个分块，分块2复用flagId=8前等待分块0的FREE（flagId=10），分块3复用flagId=9前等待分块1的FREE（flagId=11），然后在末尾等待最后两个分块的FREE。
 
-FREE表示对应tile的GM读取已完成，不代表激活和最终写回完成。每个tile的GM区域独立，后续Cube tile不会覆盖前一个Vector输出；最终写回由队列和核函数末尾PipeBarrier保证收尾，无额外GM workspace。
+FREE表示对应tile的GM读取已完成，不代表激活和最终写回完成。每个tile的GM区域独立，后续Cube tile不会覆盖前一个Vector输出；最终写回由队列和核函数末尾PipeBarrier保证完成，无额外GM workspace。
 
 ## 功能调试
 
