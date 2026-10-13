@@ -224,6 +224,11 @@ function(simple_kernel_compile)
   if (NOT DEFINED BINCMP_OUT_DIR)
     set(BINCMP_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/binary)
   endif()
+  get_property(kernel_spec_task_id GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_${BINCMP_TARGET_NAME}_KERNEL_SPEC_TASK)
+  set(kernel_spec_task_option)
+  if(kernel_spec_task_id)
+    set(kernel_spec_task_option "--kernel-spec-task=${kernel_spec_task_id}")
+  endif()
   set(BINCMP_TILING_LIB_TMP ${BINCMP_TILING_LIB})
   set(BINCMP_TILING_LIB $<TARGET_FILE:${BINCMP_PACKAGE_NAME}_ascendc_${BINCMP_TILING_LIB}>)
   # add Environment Variable Configurations of ccache
@@ -261,6 +266,7 @@ function(simple_kernel_compile)
             --json-file=${BINCMP_JSON_FILE} \
             --target-name=${BINCMP_TARGET_NAME} \
             --auto-gen-path=${auto_gen_path} \
+            ${kernel_spec_task_option} \
             --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1; echo $? > ${BINCMP_COMPILE_FAIL_FLAG}"
       )
 
@@ -299,6 +305,7 @@ function(simple_kernel_compile)
                       --json-file=${BINCMP_JSON_FILE}
                       --target-name=${BINCMP_TARGET_NAME}
                       --auto-gen-path=${auto_gen_path}
+                      ${kernel_spec_task_option}
                       --build-tool=$(MAKE))
     endif()
     add_dependencies(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT} ${BINCMP_PACKAGE_NAME}_ascendc_${BINCMP_TILING_LIB_TMP})
@@ -322,6 +329,7 @@ function(simple_kernel_compile)
             --json-file=${BINCMP_JSON_FILE} \
             --target-name=${BINCMP_TARGET_NAME} \
             --auto-gen-path=${auto_gen_path} \
+            ${kernel_spec_task_option} \
             --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1; echo $? > ${BINCMP_COMPILE_FAIL_FLAG}"
       )
 
@@ -360,6 +368,7 @@ function(simple_kernel_compile)
                       --json-file=${BINCMP_JSON_FILE}
                       --target-name=${BINCMP_TARGET_NAME}
                       --auto-gen-path=${auto_gen_path}
+                      ${kernel_spec_task_option}
                       --build-tool=$(MAKE))
     endif()
   endif()
@@ -461,6 +470,151 @@ function(npu_op_kernel_library target_name)
   set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_${target_name}_TILING_LIBRARY ${KERNEL_TILING_LIBRARY})
 endfunction()
 
+# This target graph deliberately matches the existing always-run kernel producers.
+# A full reset is followed by every producer; bundle content caching remains independent.
+
+# Quote paths for the package's internal JSON registration (CMake 3.16 compatible).
+function(_ascendc_kernel_spec_json_string output_var value)
+  string(REPLACE "\\" "\\\\" value "${value}")
+  string(REPLACE "\"" "\\\"" value "${value}")
+  string(REPLACE "\n" "\\n" value "${value}")
+  string(REPLACE "\r" "\\r" value "${value}")
+  string(REPLACE "\t" "\\t" value "${value}")
+  set(${output_var} "\"${value}\"" PARENT_SCOPE)
+endfunction()
+
+function(_ascendc_add_kernel_spec_target package_name kernel_target)
+  set(spec_target "${package_name}_kernel_spec")
+  set(reset_target "${package_name}_${kernel_target}_kernel_spec_reset")
+  get_property(spec_work GLOBAL PROPERTY _ASC_PKG_${package_name}_KERNEL_SPEC_BUILD_DIR)
+  set(spec_output "${spec_work}/op_spec/libcust_compile_db.so")
+  set(spec_status "${spec_work}/install_status.cmake")
+  set(spec_state "${spec_work}/${kernel_spec_task_id}.tasks.json")
+  set(package_state "${spec_work}/kernels.json")
+  set(spec_script "${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_build_kernel_spec.py")
+  set(spec_common --state "${spec_state}" --install-status "${spec_status}"
+    --opc-config "${auto_gen_path}/custom_opc_options.ini" --task-id "${kernel_spec_task_id}")
+  # A new configure must not install the previous configuration's result.
+  file(MAKE_DIRECTORY "${spec_work}")
+  file(REMOVE "${spec_status}")
+
+  add_custom_target(${reset_target}
+    COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${spec_script}" reset ${spec_common} ${kernel_spec_tasks}
+    COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_copy_kernel_src.py"
+      "--auto-gen-path=${auto_gen_path}" "--target-name=${kernel_target}"
+      "--kernel-base-dir=${KERNEL_SRC_BASE}" "--copy-dst-dir=${KERNEL_DYNAMIC_PATH}"
+    VERBATIM)
+  # Serialize against the legacy timestamp-based copy, then refresh this batch's sources and headers.
+  add_dependencies(${reset_target} ${kernel_target}_copy_kernel_srcs)
+  foreach(producer IN LISTS KERNEL_COMPILE_TARGETS)
+    add_dependencies(${producer} ${reset_target})
+  endforeach()
+
+  if(NOT TARGET ${spec_target})
+    file(WRITE "${package_state}" "[]")
+    set_property(GLOBAL PROPERTY _ASC_PKG_${package_name}_KERNEL_SPEC_RESOURCE_DIR "${kernel_spec_install_dir}")
+    # exporter and make run on the build host; the SO compiler targets the package consumer.
+    # Tools are required only when final scopes contain an effective export task.
+    find_program(_ASC_KERNEL_SPEC_EXPORTER asc_compile_exporter
+      HINTS "${ASCEND_CANN_PACKAGE_PATH}/tools/asc_compile_exporter" "${ASCEND_CANN_PACKAGE_PATH}/bin"
+      NO_CMAKE_FIND_ROOT_PATH)
+    if(CMAKE_CXX_COMPILER)
+      set(_ASC_KERNEL_SPEC_CXX "${CMAKE_CXX_COMPILER}")
+    else()
+      find_program(_ASC_KERNEL_SPEC_CXX NAMES c++ g++ clang++ NO_CMAKE_FIND_ROOT_PATH)
+    endif()
+    find_program(_ASC_KERNEL_SPEC_MAKE NAMES make gmake NO_CMAKE_FIND_ROOT_PATH)
+
+    add_custom_target(${spec_target}
+      COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${spec_script}" bundle
+        --package-state "${package_state}" --install-status "${spec_status}"
+        --output "${spec_output}" --work-dir "${spec_work}/cache"
+        --exporter "${_ASC_KERNEL_SPEC_EXPORTER}" --cxx "${_ASC_KERNEL_SPEC_CXX}" --make "${_ASC_KERNEL_SPEC_MAKE}"
+      BYPRODUCTS "${spec_output}" "${spec_status}"
+      VERBATIM)
+    add_dependencies(binary ${spec_target})
+    # Installation consumes a successful result of this build, including an explicit empty result.
+    # Reset removes this receipt before producers run, so a failed build cannot install an old SO.
+    adapt_install_path(INPUT_PATH "${kernel_spec_install_dir}" INPUT_TARGET ${package_name} OUTPUT_PATH spec_install)
+    install(CODE "
+      if(NOT EXISTS \"${spec_status}\")
+        message(FATAL_ERROR \"Kernel Spec resources have not been successfully built for ${package_name}\")
+      endif()
+      unset(ASCENDC_KERNEL_SPEC_READY)
+      unset(ASCENDC_KERNEL_SPEC_HAS_RESOURCES)
+      include(\"${spec_status}\")
+      if(NOT ASCENDC_KERNEL_SPEC_READY)
+        message(FATAL_ERROR \"Kernel Spec build result is unavailable for ${package_name}\")
+      endif()
+      set(spec_destination \"${spec_install}\")
+      if(NOT IS_ABSOLUTE \"\${spec_destination}\")
+        set(spec_destination \"\${CMAKE_INSTALL_PREFIX}/\${spec_destination}\")
+      endif()
+      if(ASCENDC_KERNEL_SPEC_HAS_RESOURCES)
+        file(INSTALL DESTINATION \"\${spec_destination}\" TYPE FILE FILES \"${spec_output}\")
+      else()
+        file(REMOVE \"\$ENV{DESTDIR}\${spec_destination}/libcust_compile_db.so\")
+      endif()
+    ")
+  else()
+    get_property(resource_dir GLOBAL PROPERTY _ASC_PKG_${package_name}_KERNEL_SPEC_RESOURCE_DIR)
+    if(NOT resource_dir STREQUAL kernel_spec_install_dir)
+      message(FATAL_ERROR "Kernel Spec resources in one package must share the same vendor or built-in source root")
+    endif()
+  endif()
+
+  # CMake owns the engineering registration; no Python process is needed at configure time.
+  foreach(field IN ITEMS spec_state KERNEL_SRC_BASE KERNEL_DYNAMIC_PATH kernel_spec_source_destination)
+    _ascendc_kernel_spec_json_string(${field}_json "${${field}}")
+  endforeach()
+  _ascendc_kernel_spec_json_string(opc_config_json "${auto_gen_path}/custom_opc_options.ini")
+  string(CONCAT kernel_context
+    "{\"state\":${spec_state_json},\"opc_config\":${opc_config_json},"
+    "\"source_root\":${KERNEL_SRC_BASE_json},\"copied_source_root\":${KERNEL_DYNAMIC_PATH_json},"
+    "\"source_destination\":${kernel_spec_source_destination_json}}")
+  file(READ "${package_state}" kernel_contexts)
+  string(REGEX REPLACE "\\]$" "" kernel_contexts "${kernel_contexts}")
+  if(NOT kernel_contexts STREQUAL "[")
+    string(APPEND kernel_contexts ",")
+  endif()
+  file(WRITE "${package_state}" "${kernel_contexts}${kernel_context}]")
+  add_dependencies(${spec_target} ${reset_target})
+  foreach(soc IN LISTS ASCEND_COMPUTE_UNIT)
+    add_dependencies(${spec_target} ${kernel_target}_ascendc_bin_${soc}_gen_ops_config)
+  endforeach()
+endfunction()
+
+
+# Derive source_file and ${source_file_path} from the source installation already selected by the package.
+function(_ascendc_kernel_spec_layout package_name source_path)
+  file(TO_CMAKE_PATH "${source_path}" source_path)
+  if(IS_ABSOLUTE "${source_path}" OR source_path MATCHES "(^|/)\\.\\.(/|$)")
+    message(FATAL_ERROR "Kernel Spec source installation must be a relative path inside vendor or built-in")
+  endif()
+  if(source_path MATCHES "^packages/vendors/([^/]+)/(.+)$")
+    set(source_destination "${CMAKE_MATCH_2}")
+    set(install_dir "packages/vendors/${CMAKE_MATCH_1}/op_spec")
+  elseif(source_path MATCHES "^opp/built-in/(.+)$")
+    set(source_destination "${CMAKE_MATCH_1}")
+    set(install_dir "opp/built-in/op_spec/ops_${package_name}")
+  else()
+    message(FATAL_ERROR "Kernel Spec source installation must be inside packages/vendors/<vendor> or opp/built-in")
+  endif()
+  set(kernel_spec_source_destination "${source_destination}" PARENT_SCOPE)
+  set(kernel_spec_install_dir "${install_dir}" PARENT_SCOPE)
+endfunction()
+
+function(_ascendc_remove_kernel_spec_install package_name resource_dir)
+  adapt_install_path(INPUT_PATH "${resource_dir}" INPUT_TARGET ${package_name} OUTPUT_PATH cleanup_path)
+  install(CODE "
+    set(spec_cleanup_destination \"${cleanup_path}\")
+    if(NOT IS_ABSOLUTE \"\${spec_cleanup_destination}\")
+      set(spec_cleanup_destination \"\${CMAKE_INSTALL_PREFIX}/\${spec_cleanup_destination}\")
+    endif()
+    file(REMOVE \"\$ENV{DESTDIR}\${spec_cleanup_destination}/libcust_compile_db.so\")
+  ")
+endfunction()
+
 function(npu_op_package target_package_name)
   cmake_parse_arguments(PACKAGE "" "TYPE" "CONFIG" ${ARGN})
   if(NOT DEFINED PACKAGE_TYPE)
@@ -478,6 +632,8 @@ function(npu_op_package target_package_name)
     message(STATUS "package config is empty")
   endif()
 
+  set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_KERNEL_SPEC_BUILD_DIR
+    "${CMAKE_CURRENT_BINARY_DIR}/${target_package_name}/kernel_spec_bundle")
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_KERNEL_SPEC_MODE None)
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_SOURCE_PACKAGE ${ENABLE_SOURCE_PACKAGE})
   set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_BINARY_PACKAGE ${ENABLE_BINARY_PACKAGE})
@@ -567,6 +723,8 @@ function(npu_op_package target_package_name)
     )
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/version.info
             DESTINATION ${install_path})
+
+    _ascendc_remove_kernel_spec_install("${target_package_name}" "packages/vendors/${target_vendor_name}/op_spec")
 
     get_property(enable_cpack GLOBAL PROPERTY _ASC_PKG_${target_package_name}_ENABLE_CPACK)
     if (${enable_cpack})
@@ -1053,6 +1211,7 @@ function(get_current_pack_target sub_target output_var)
 endfunction()
 
 function(npu_op_package_add target_package_name)
+  set(kernel_spec_task_id)
   cmake_parse_arguments(ADD_TARGET "" "PACKAGE_PATH" "TYPE;LIBRARY;FILES" ${ARGN})
   if(DEFINED ADD_TARGET_LIBRARY AND DEFINED ADD_TARGET_FILES)
     message(FATAL_ERROR
@@ -1179,11 +1338,14 @@ function(npu_op_package_add target_package_name)
       if(NOT spec_sources OR NOT spec_binaries)
         message(FATAL_ERROR "KERNEL_SPEC_MODE requires source and binary packaging enabled")
       endif()
+      string(SHA256 kernel_spec_task_id "${target_package_name}/${_ascendc_kernel_target}")
+      set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_${_ascendc_kernel_target}_KERNEL_SPEC_TASK "${kernel_spec_task_id}")
       set(kernel_spec_root "${KERNEL_BINARY_PATH}/kernel_spec")
       npu_op_kernel_options(${_ascendc_kernel_target} ALL OPTIONS
         "--kernel-spec=${kernel_spec_mode}" "--kernel-spec-dir=${kernel_spec_root}")
     endif()
 
+    set(kernel_spec_tasks)
     set(KERNEL_COMPILE_TARGETS "")
     set(KERNEL_COMPILE_TARGET_COUNT 0)
 
@@ -1222,6 +1384,7 @@ function(npu_op_package_add target_package_name)
                                 PACKAGE_NAME ${target_package_name}
                                 OUT_DIR ${KERNEL_BINARY_PATH}/binary/)
 
+          list(APPEND kernel_spec_tasks --task "${op_type}" "${compute_unit}")
           list(APPEND KERNEL_COMPILE_TARGETS ${op_type}_${compute_unit})
           math(EXPR KERNEL_COMPILE_TARGET_COUNT "${KERNEL_COMPILE_TARGET_COUNT} + 1")
         endif()
@@ -1627,7 +1790,10 @@ endif()
     endif()
     foreach(compute_unit ${ASCEND_COMPUTE_UNIT})
       if (${kernel_enable_binary_package} OR ${kernel_enable_source_package})
-        if (${kernel_enable_binary_package})
+        get_property(spec_chip_producers GLOBAL PROPERTY ${_ascendc_kernel_target}_ASCENDC_KERNEL_TARGETS_${compute_unit})
+        if(kernel_spec_task_id AND NOT spec_chip_producers)
+          add_custom_target(${_ascendc_kernel_target}_ascendc_bin_${compute_unit}_gen_ops_config)
+        elseif (${kernel_enable_binary_package})
           # gen binary_info_config.json and <file_name>.json
           if (${ASCEND_SKIP_FAILED_COMPUTE_UNIT})
             set(COMPILE_LOG "${CMAKE_CURRENT_BINARY_DIR}/compile.log")
@@ -1681,6 +1847,13 @@ endif()
       endif()
       # set(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_TILING_PATH
       get_property(kernel_package_path GLOBAL PROPERTY _ASC_PKG_${target_package_name}_KERNEL_PATH)
+
+      if(kernel_spec_task_id)
+        _ascendc_kernel_spec_layout("${target_package_name}" "${kernel_package_path}")
+        _ascendc_add_kernel_spec_target("${target_package_name}" "${_ascendc_kernel_target}")
+      elseif(kernel_package_path MATCHES "^opp/built-in/")
+        _ascendc_remove_kernel_spec_install("${target_package_name}" "opp/built-in/op_spec/ops_${target_package_name}")
+      endif()
 
       if (${kernel_enable_source_package})
         adapt_install_path(

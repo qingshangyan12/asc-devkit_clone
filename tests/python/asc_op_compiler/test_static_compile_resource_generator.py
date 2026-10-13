@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import importlib.util
 import os
 from dataclasses import dataclass
 from enum import Enum
@@ -882,6 +883,30 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                 self.generate(request)
 
         self.assertEqual(Path(marker).read_text(encoding="utf-8"), "previous\n")
+
+
+def _load_adapter_generator():
+    # Exercise the adapter implementation using the standalone host dependencies.
+    name = "asc_op_compile_base.asc_op_compiler._adapter_generator_test"
+    source = Path(FRAMEWORK_PATH) / "asc_op_compile_base/adapter/static_compile_resource_generator.py"
+    spec = importlib.util.spec_from_file_location(name, source)
+    module = importlib.util.module_from_spec(spec)
+    dependencies = {
+        name: module,
+        "tbe.common": SimpleNamespace(context=generator.context_module),
+        "tbe.tvm": SimpleNamespace(error_mgr=generator.error_mgr),
+    }
+    with mock.patch.dict(sys.modules, dependencies):
+        spec.loader.exec_module(module)
+    return module
+
+
+class TestAdapterStaticCompileResourceGenerator(TestStaticCompileResourceGenerator):
+    def setUp(self):
+        original = generator
+        globals()["generator"] = _load_adapter_generator()
+        self.addCleanup(globals().__setitem__, "generator", original)
+        super().setUp()
 
 
 if __name__ == "__main__":
