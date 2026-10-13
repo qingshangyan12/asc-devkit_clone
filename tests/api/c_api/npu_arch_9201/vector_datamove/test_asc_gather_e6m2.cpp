@@ -15,9 +15,9 @@
 #include "include/c_api/asc_simd.h"
 
 namespace {
-void Gather2Stub(vector_fp8_e6m2_t&, __ubuf__ fp8_e6m2_t*, vector_uint16_t, vector_bool) {}
-void GatherbMaskStub(vector_fp8_e6m2_t&, __ubuf__ fp8_e6m2_t*, vector_uint32_t, vector_bool) {}
-void GatherbStub(vector_fp8_e6m2_t&, __ubuf__ fp8_e6m2_t*, vector_uint32_t) {}
+void Gather2Stub(vector_fp8_e5m2_t&, __ubuf__ fp8_e5m2_t*, vector_uint16_t, vector_bool) {}
+void GatherbMaskStub(vector_fp8_e5m2_t&, __ubuf__ fp8_e5m2_t*, vector_uint32_t, vector_bool) {}
+void GatherbStub(vector_fp8_e5m2_t&, __ubuf__ fp8_e5m2_t*, vector_uint32_t) {}
 } // namespace
 
 TEST(GatherE6m2, Gather2RefAndReturn)
@@ -26,7 +26,7 @@ TEST(GatherE6m2, Gather2RefAndReturn)
     vector_uint16_t index;
     vector_bool mask;
     auto* src = reinterpret_cast<__ubuf__ fp8_e6m2_t*>(0);
-    MOCKER_CPP(vgather2, void(vector_fp8_e6m2_t&, __ubuf__ fp8_e6m2_t*, vector_uint16_t, vector_bool))
+    MOCKER_CPP(vgather2, void(vector_fp8_e5m2_t&, __ubuf__ fp8_e5m2_t*, vector_uint16_t, vector_bool))
         .times(2)
         .will(invoke(Gather2Stub));
 
@@ -43,10 +43,10 @@ TEST(GatherE6m2, GatherbRefAndReturn)
     vector_uint32_t index;
     vector_bool mask;
     auto* src = reinterpret_cast<__ubuf__ fp8_e6m2_t*>(0);
-    MOCKER_CPP(vgatherb, void(vector_fp8_e6m2_t&, __ubuf__ fp8_e6m2_t*, vector_uint32_t, vector_bool))
+    MOCKER_CPP(vgatherb, void(vector_fp8_e5m2_t&, __ubuf__ fp8_e5m2_t*, vector_uint32_t, vector_bool))
         .times(2)
         .will(invoke(GatherbMaskStub));
-    MOCKER_CPP(vgatherb, void(vector_fp8_e6m2_t&, __ubuf__ fp8_e6m2_t*, vector_uint32_t))
+    MOCKER_CPP(vgatherb, void(vector_fp8_e5m2_t&, __ubuf__ fp8_e5m2_t*, vector_uint32_t))
         .times(2)
         .will(invoke(GatherbStub));
 
