@@ -102,7 +102,7 @@ def _match_compute_units(compute_units, current_soc):
     return current_soc in normalized_units, True
 
 
-def shell_options(config_file, current_op_type, soc):
+def shell_options(config_file, current_op_type, soc, task_id=None):
     """Resolve the most specific op and SoC scope and return shell-ready OPC options."""
     if not config_file or not Path(config_file).is_file():
         return ""
@@ -135,4 +135,15 @@ def shell_options(config_file, current_op_type, soc):
         return ""
 
     output_dir = os.path.join(selected_options["--kernel-spec-dir"], current_soc)
+    if task_id:
+        # Each CMake producer owns a separate subtree; the public option root is unchanged.
+        output_dir = os.path.join(output_dir, ".ascendc-" + task_id, soc.lower(), current_op_type)
     return " " + shlex.join(["--kernel-spec=" + selected_options["--kernel-spec"], "--kernel-spec-dir=" + output_dir])
+
+
+def task_directory(config_file, current_op_type, soc, task_id):
+    """Return the same private producer directory used by command generation."""
+    for option in shlex.split(shell_options(config_file, current_op_type, soc, task_id)):
+        if option.startswith("--kernel-spec-dir="):
+            return Path(option.partition("=")[2])
+    return None
