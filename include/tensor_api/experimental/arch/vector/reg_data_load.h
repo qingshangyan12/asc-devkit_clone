@@ -75,7 +75,8 @@ __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
 /**
  * @ingroup tensor_api.experimental.reg_load_store.reg_load
- * @override_id te_experimental_load_gather__const_Tensor_R_const_Coord_R_const_reg_tensor_Index_const_reg_tensor_bool_R__template_mode_Tensor_Coord_Index
+ * @override_id
+ * te_experimental_load_gather__const_Tensor_R_const_Coord_R_const_reg_tensor_Index_const_reg_tensor_bool_R__template_mode_Tensor_Coord_Index
  * @archs 3510
  * @brief Gathers elements or data blocks from a UB tensor at the specified coordinate.
  * @return A register tensor containing the gathered data.
@@ -90,7 +91,8 @@ __simd_callee__ inline decltype(auto) load_gather(
 
 /**
  * @ingroup tensor_api.experimental.reg_load_store.reg_load
- * @override_id te_experimental_load_gather__const_Tensor_R_const_reg_tensor_Index_const_reg_tensor_bool_R__template_mode_Tensor_Index
+ * @override_id
+ * te_experimental_load_gather__const_Tensor_R_const_reg_tensor_Index_const_reg_tensor_bool_R__template_mode_Tensor_Index
  * @archs 3510
  * @brief Gathers elements or data blocks from the beginning of a UB tensor.
  * @return A register tensor containing the gathered data.

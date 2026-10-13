@@ -29,7 +29,8 @@ namespace experimental {
 
 /**
  * @ingroup tensor_api.experimental.reg_load_store.reg_store
- * @override_id te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
+ * @override_id
+ * te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
  * @archs 3510
  * @brief Stores register data to a UB tensor at the specified coordinate.
  * @note The tensor and register element types must match.
@@ -44,7 +45,8 @@ __simd_callee__ inline void store(Tensor& tensor, const Coord& coord, const reg_
 
 /**
  * @ingroup tensor_api.experimental.reg_load_store.reg_store
- * @override_id te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
+ * @override_id
+ * te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
  * @archs 3510
  * @brief Stores register data at the beginning of a UB tensor.
  * @note The tensor and register element types must match.
@@ -56,7 +58,8 @@ __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>&
 
 /**
  * @ingroup tensor_api.experimental.reg_load_store.reg_store
- * @override_id te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
+ * @override_id
+ * te_experimental_store__Tensor_R_const_Coord_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_Coord_RegDataType
  * @archs 3510
  * @brief Interleaves two register tensors and stores the result at the specified coordinate of a UB tensor.
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
@@ -73,7 +76,8 @@ __simd_callee__ inline void store(
 
 /**
  * @ingroup tensor_api.experimental.reg_load_store.reg_store
- * @override_id te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
+ * @override_id
+ * te_experimental_store__Tensor_R_const_reg_tensor_RegDataType_R_const_reg_tensor_RegDataType_R__template_sideband_mode_Tensor_RegDataType
  * @archs 3510
  * @brief Interleaves two register tensors and stores the result at the beginning of a UB tensor.
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
@@ -87,7 +91,8 @@ __simd_callee__ inline void store(
 
 /**
  * @ingroup tensor_api.experimental.reg_load_store.reg_store
- * @override_id te_experimental_store_scatter__Tensor_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_T_Index
+ * @override_id
+ * te_experimental_store_scatter__Tensor_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_T_Index
  * @archs 3510
  * @brief Scatters register data from active source lanes to a UB tensor.
  * @note The tensor and source register element types must match.
@@ -100,7 +105,8 @@ __simd_callee__ inline void store_scatter(Tensor& tensor, const reg_tensor<T>& s
 
 /**
  * @ingroup tensor_api.experimental.reg_load_store.reg_store
- * @override_id te_experimental_store_scatter__Tensor_R_const_Coord_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_Coord_T_Index
+ * @override_id
+ * te_experimental_store_scatter__Tensor_R_const_Coord_R_const_reg_tensor_T_R_const_reg_tensor_Index_R__template_Tensor_Coord_T_Index
  * @archs 3510
  * @brief Scatters register data from active source lanes to a UB tensor at the specified coordinate.
  * @note The tensor and source register element types must match.

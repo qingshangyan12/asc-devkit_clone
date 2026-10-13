@@ -56,7 +56,8 @@ __simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const r
 
 /**
  * @ingroup tensor_api.experimental.reg_compute.reg_composite
- * @override_id te_experimental_exp_diff__const_reg_tensor_U_R_const_reg_tensor_U_R_PositionType__template_T_U_PositionType
+ * @override_id
+ * te_experimental_exp_diff__const_reg_tensor_U_R_const_reg_tensor_U_R_PositionType__template_T_U_PositionType
  * @archs 3510
  * @param [in] src0 First source operand.
  * @param [in] src1 Second source operand.
