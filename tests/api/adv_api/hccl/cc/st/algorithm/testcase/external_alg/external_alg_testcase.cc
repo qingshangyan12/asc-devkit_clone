@@ -550,7 +550,7 @@ TEST(ExtAlgResolver, VariantPairDisambiguation)
     big.DataDes.dataType = HCCL_DATA_TYPE_FP32;
     big.DataDes.count = 24U * 1024 * 1024 + 1U; // 96MB+4B，x16 rank > 1536MB
     EXPECT_EQ(ResolveExternalAlg(big, &twoLevel, spec, algName, errMsg), ResolveStatus::RESOLVED);
-    EXPECT_EQ(algName, "InsReduceScatterMesh1DZAxisDetour");
+    EXPECT_EQ(algName, "AicpuReduceScatterSoleMeshConcur");
 
     OpParam small = big;
     small.DataDes.count = 1024U;
@@ -662,8 +662,8 @@ TEST(ExtAlgResolver, SpecificityOrdering)
         EXPECT_LE(specificity, lastSpecificity); // 降序
         lastSpecificity = specificity;
     }
-    EXPECT_EQ(cands[0].registeredName, "CcuSchedReduceScatterSoleMeshPeerOnly"); // 特化字典序在前
-    EXPECT_EQ(cands[1].registeredName, "InsReduceScatterMesh1DZAxisDetour");
+    EXPECT_EQ(cands[0].registeredName, "AicpuReduceScatterSoleMeshConcur"); // 特化字典序在前
+    EXPECT_EQ(cands[1].registeredName, "CcuSchedReduceScatterSoleMeshPeerOnly");
     EXPECT_EQ(cands[2].registeredName, "CcuSchedReduceScatterSoleMesh"); // 裸名字典序
     EXPECT_EQ(cands[3].registeredName, "InsReduceScatterMesh1D");
 }
@@ -778,6 +778,7 @@ TEST(ExtAlgWhitelist, IsAlgAllowedMatchesNameList)
              "InsAllGatherParallelMesh1DNHR",
              "InsAllGatherParallelMesh1DNHRUBX",
              "InsReduceScatterMesh1DZAxisDetour",
+             "AicpuReduceScatterSoleMeshConcur",
              "CcuSchedReduceScatterSoleMeshPeerOnly",
              "InsReduceScatterAicpuReduceNHR",
              "InsReduceScatterSequenceMesh1DNhr",

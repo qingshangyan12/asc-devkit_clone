@@ -340,9 +340,15 @@ SelectorStatus ReduceScatterAutoSelector::SelectMeshAlgoAicpuForMesh1D(
     if (Is64BitDataType(opParam.DataDes.dataType) || opParam.reduceType == HcclReduceOp::HCCL_REDUCE_PROD) {
         selectAlgName = "InsReduceScatterMesh1D";
     } else {
-        if (IsTwoLevelNetLayer(topoInfo)) {
-            if (dataSize * topoInfo->userRankSize > RS_AICPU_1D_TWO_LEVER_DATA_SIZE_THRESHOLD) {
-                selectAlgName = "InsReduceScatterMesh1DZAxisDetour";
+        bool hostDPUOnly = false;
+        const bool isHostDPUOnly = CheckHostDPUOnly(topoInfo, opParam, hostDPUOnly) == HCCL_SUCCESS && hostDPUOnly;
+        if (!isHostDPUOnly && IsTwoLevelNetLayer(topoInfo)) {
+            constexpr u64 RS_2P_DETOUR_DATA_SIZE = 4ULL * 1024 * 1024;
+            if (topoInfo->userRankSize == 2 && dataSize >= RS_2P_DETOUR_DATA_SIZE) {
+                selectAlgName = "AicpuReduceScatterSoleMeshConcur";
+            } else if (topoInfo->userRankSize != 0 &&
+                       dataSize > RS_AICPU_1D_TWO_LEVER_DATA_SIZE_THRESHOLD / topoInfo->userRankSize) {
+                selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else if (dataSize * ratio > RS_AICPU_1D_MAX_DATA_SIZE) {
                 selectAlgName = "AicpuReduceScatterSoleMeshChunk";
             } else {
