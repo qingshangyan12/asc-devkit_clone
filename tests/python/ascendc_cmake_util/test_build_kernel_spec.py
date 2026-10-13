@@ -1,0 +1,401 @@
+# ----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# ----------------------------------------------------------------------------------------------------------
+
+import argparse
+import ctypes
+import json
+import os
+from pathlib import Path
+import sys
+import subprocess
+import tempfile
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "cmake/asc/fwk_modules/util"))
+import ascendc_build_kernel_spec as bundle
+
+
+@pytest.fixture
+def bundle_request(tmp_path):
+    source = tmp_path / "src"
+    source.mkdir()
+    (source / "add.cpp").write_text("void add() {}\n")
+    exporter = tmp_path / "exporter"
+    exporter.write_text(
+        "#!/usr/bin/env python3\n"
+        "import json,sys,pathlib\n"
+        "args=sys.argv[1:]\n"
+        "root=pathlib.Path(args[args.index('--input-dir')+1])\n"
+        "out=pathlib.Path(args[args.index('--output')+1])\n"
+        "data=[json.loads(p.read_text()) for p in sorted(root.rglob('*_manifest.json'))]\n"
+        "out.write_bytes(b'\\x7fELF'+json.dumps(data,sort_keys=True).encode())\n"
+    )
+    exporter.chmod(0o755)
+    inp = tmp_path / "input"
+    inp.mkdir()
+    _unit(inp / "910b", "a" * 64)
+    return argparse.Namespace(
+        input_dir=[str(inp)],
+        source_dir=[str(source)],
+        source_file=[],
+        source_map=[[str(source), "op_impl/dynamic"]],
+        output=str(tmp_path / "output/libcust_compile_db.so"),
+        work_dir=str(tmp_path / "work"),
+        exporter=str(exporter),
+        cxx="c++",
+        make="make",
+        opc_config=None,
+        jobs=2,
+    )
+
+
+def _unit(root, resource_id):
+    resources = root / "resources"
+    resources.mkdir(parents=True)
+    (resources / "wrapper.cpp").write_text('#include "add.cpp"\n')
+    manifest = {
+        "resource_id": resource_id,
+        "soc_version": "Ascend910B1",
+        "source_file": "add.cpp",
+        "resource_path": "resources",
+        "options": {"common_compile": ["-I${source_file_path}"]},
+        "kernels": [
+            {
+                "kernel_name": "add",
+                "objects": [
+                    {
+                        "object_name": "basic",
+                        "object_type": "basic",
+                        "commands": [
+                            {
+                                "type": "compile",
+                                "cmd": [
+                                    "c++",
+                                    "${options:common_compile}",
+                                    "${resource}/resources/wrapper.cpp",
+                                    "-o",
+                                    "${output}/add.o",
+                                ],
+                            }
+                        ],
+                        "outputs": ["${output}/add.o"],
+                    }
+                ],
+            }
+        ],
+    }
+    path = root / "add_manifest.json"
+    path.write_text(json.dumps(manifest))
+    return path
+
+
+def _published(bundle_request):
+    return json.loads(Path(bundle_request.output).read_bytes()[4:])
+
+
+def test_collects_sorted_unique_ids_and_preserves_input(bundle_request):
+    root = Path(bundle_request.input_dir[0])
+    original = (root / "910b/add_manifest.json").read_bytes()
+    _unit(root / "950", "a" * 64)
+    _unit(root / "other", "b" * 64)
+    assert bundle.build_bundle(bundle_request) is True
+    data = _published(bundle_request)
+    assert [m["resource_id"] for m in data] == ["a" * 64, "b" * 64]
+    assert data[0]["source_file"] == "op_impl/dynamic/add.cpp"
+    assert data[0]["options"]["common_compile"] == ["-I${source_file_path}/op_impl/dynamic"]
+    assert (root / "910b/add_manifest.json").read_bytes() == original
+
+
+def test_include_mapping_uses_longest_prefix_and_preserves_order(bundle_request):
+    root = Path(bundle_request.source_dir[0])
+    bundle_request.source_map.append([str(root / "nested"), "extra"])
+    path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
+    manifest = json.loads(path.read_text())
+    manifest["options"]["common_compile"] = [
+        "-I",
+        str(root),
+        "-isystem" + str(root / "nested/include"),
+        "-iquote",
+        str(root / "not_created"),
+        "-idirafter" + str(root),
+        "-I/untouched",
+    ]
+    path.write_text(json.dumps(manifest))
+    bundle.build_bundle(bundle_request)
+    assert _published(bundle_request)[0]["options"]["common_compile"] == [
+        "-I",
+        "${source_file_path}/op_impl/dynamic",
+        "-isystem${source_file_path}/extra/include",
+        "-iquote",
+        "${source_file_path}/op_impl/dynamic/not_created",
+        "-idirafter${source_file_path}/op_impl/dynamic",
+        "-I/untouched",
+    ]
+
+
+def test_cache_reuses_output_and_checks_ambiguity_before_hit(bundle_request):
+    assert bundle.build_bundle(bundle_request) is True
+    before = Path(bundle_request.output).stat().st_mtime_ns
+    assert bundle.build_bundle(bundle_request) is False
+    assert Path(bundle_request.output).stat().st_mtime_ns == before
+    duplicate = Path(bundle_request.source_dir[0]) / "nested/add.cpp"
+    duplicate.parent.mkdir()
+    duplicate.write_text("different")
+    with pytest.raises(bundle.BundleError, match="ambiguous"):
+        bundle.build_bundle(bundle_request)
+
+
+def test_cache_invalidates_on_resource_tool_map_and_output_changes(bundle_request):
+    bundle.build_bundle(bundle_request)
+    (Path(bundle_request.input_dir[0]) / "910b/resources/wrapper.cpp").write_text("changed")
+    assert bundle.build_bundle(bundle_request) is True
+    bundle_request.source_map[0][1] = "new_layout"
+    assert bundle.build_bundle(bundle_request) is True
+    Path(bundle_request.exporter).write_text(Path(bundle_request.exporter).read_text() + "# tool changed\n")
+    assert bundle.build_bundle(bundle_request) is True
+    Path(bundle_request.output).write_bytes(b"corrupt")
+    assert bundle.build_bundle(bundle_request) is True
+
+
+def test_exporter_failure_preserves_output_and_cleans_workspace(bundle_request):
+    bundle.build_bundle(bundle_request)
+    before = Path(bundle_request.output).read_bytes()
+    Path(bundle_request.exporter).write_text("#!/bin/sh\necho failed\nexit 1\n")
+    with pytest.raises(bundle.BundleError, match="exporter"):
+        bundle.build_bundle(bundle_request)
+    assert Path(bundle_request.output).read_bytes() == before
+    assert not list(Path(bundle_request.work_dir).glob(".bundle-*"))
+
+
+@pytest.mark.parametrize(
+    "case", ["empty", "missing", "invalid_id", "resource_escape", "source_escape", "symlink", "missing_ref"]
+)
+def test_rejects_invalid_inputs(bundle_request, case, tmp_path):
+    path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
+    manifest = json.loads(path.read_text())
+    if case == "empty":
+        bundle_request.input_dir.append(str(tmp_path / "empty"))
+        (tmp_path / "empty").mkdir()
+    elif case == "missing":
+        bundle_request.input_dir.append(str(tmp_path / "missing"))
+    elif case == "invalid_id":
+        manifest["resource_id"] = "invalid"
+    elif case == "resource_escape":
+        manifest["resource_path"] = "../resources"
+    elif case == "source_escape":
+        manifest["source_file"] = "../add.cpp"
+    elif case == "symlink":
+        (path.parent / "resources/link").symlink_to(Path(bundle_request.source_dir[0]) / "add.cpp")
+    elif case == "missing_ref":
+        (path.parent / "resources/wrapper.cpp").unlink()
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(bundle.BundleError):
+        bundle.build_bundle(bundle_request)
+    assert not Path(bundle_request.output).exists()
+
+
+def test_publish_failure_keeps_previous_output(bundle_request, monkeypatch):
+    bundle.build_bundle(bundle_request)
+    before = Path(bundle_request.output).read_bytes()
+    (Path(bundle_request.input_dir[0]) / "910b/resources/wrapper.cpp").write_text("changed")
+    original = os.replace
+
+    def fail_output(source, dest):
+        if Path(dest) == Path(bundle_request.output):
+            raise OSError("publish failed")
+        return original(source, dest)
+
+    monkeypatch.setattr(bundle.os, "replace", fail_output)
+    with pytest.raises(OSError, match="publish failed"):
+        bundle.build_bundle(bundle_request)
+    assert Path(bundle_request.output).read_bytes() == before
+
+
+def test_stamp_failure_does_not_make_corrupt_cache_hit(bundle_request, monkeypatch):
+    original = os.replace
+
+    def fail_stamp(source, dest):
+        if str(dest).endswith(".stamp.json"):
+            raise OSError("stamp failed")
+        return original(source, dest)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(bundle.os, "replace", fail_stamp)
+        with pytest.raises(OSError, match="stamp failed"):
+            bundle.build_bundle(bundle_request)
+    assert Path(bundle_request.output).is_file()
+    assert bundle.build_bundle(bundle_request) is True
+
+
+def test_opc_dump_cce_preserves_exporter_diagnostics(bundle_request, tmp_path):
+    config = tmp_path / "custom_opc_options.ini"
+    config.write_text("ALL@@--op_debug_config=dump_cce\n")
+    bundle_request.opc_config = str(config)
+    bundle.build_bundle(bundle_request)
+    folders = list(Path(bundle_request.work_dir).glob(".bundle-*"))
+    assert len(folders) == 1
+    assert (folders[0] / "build.log").is_file()
+    assert (folders[0] / "collected").is_dir()
+
+
+def test_package_relative_source_and_explicit_file(bundle_request):
+    path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
+    manifest = json.loads(path.read_text())
+    manifest["source_file"] = "op_impl/dynamic/add.cpp"
+    path.write_text(json.dumps(manifest))
+    bundle_request.source_file = [str(Path(bundle_request.source_dir[0]) / "add.cpp")]
+    bundle_request.source_dir = []
+    bundle.build_bundle(bundle_request)
+    assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
+
+
+def test_resource_reference_outside_resource_path_is_rejected(bundle_request):
+    path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
+    (path.parent / "outside.h").write_text("outside")
+    manifest = json.loads(path.read_text())
+    manifest["options"]["common_compile"] = ["-include", "${resource}/outside.h"]
+    path.write_text(json.dumps(manifest))
+    with pytest.raises(bundle.BundleError, match="resource_path"):
+        bundle.build_bundle(bundle_request)
+
+
+def test_work_directory_cannot_contaminate_manifest_inputs(bundle_request):
+    bundle_request.work_dir = str(Path(bundle_request.input_dir[0]) / "work")
+    with pytest.raises(bundle.BundleError, match="overlap"):
+        bundle.build_bundle(bundle_request)
+
+
+def test_source_change_and_invalid_stamp_force_rebuild(bundle_request):
+    bundle.build_bundle(bundle_request)
+    (Path(bundle_request.source_dir[0]) / "add.cpp").write_text("changed source")
+    assert bundle.build_bundle(bundle_request) is True
+    for content in ("invalid", "[]"):
+        next(Path(bundle_request.work_dir).glob("*.stamp.json")).write_text(content)
+        assert bundle.build_bundle(bundle_request) is True
+
+
+def test_unmapped_source_and_bad_package_map_fail(bundle_request):
+    bundle_request.source_map = []
+    with pytest.raises(bundle.BundleError, match="source-map"):
+        bundle.build_bundle(bundle_request)
+    bundle_request.source_map = [[bundle_request.source_dir[0], "../escape"]]
+    with pytest.raises(bundle.BundleError, match="root"):
+        bundle.build_bundle(bundle_request)
+
+
+def test_cli_handles_paths_with_spaces_and_reports_cache_hit(bundle_request, tmp_path):
+    bundle_request.output = str(tmp_path / "with spaces/libcust_compile_db.so")
+    script = Path(bundle.__file__)
+    arguments = [sys.executable, str(script)]
+    for name in ("input_dir", "source_dir", "source_file"):
+        for value in getattr(bundle_request, name):
+            arguments.extend(["--" + name.replace("_", "-"), value])
+    for mapping in bundle_request.source_map:
+        arguments.extend(["--source-map", *mapping])
+    for name in ("output", "work_dir", "exporter", "cxx", "make"):
+        arguments.extend(["--" + name.replace("_", "-"), getattr(bundle_request, name)])
+    first = subprocess.run(arguments, capture_output=True, text=True, check=False)
+    assert first.returncode == 0, first.stderr
+    second = subprocess.run(arguments, capture_output=True, text=True, check=False)
+    assert second.returncode == 0, second.stderr
+    assert "cache hit" in second.stdout
+
+
+def test_publishes_across_filesystems(bundle_request):
+    if (
+        not Path("/dev/shm").is_dir()
+        or Path("/dev/shm").stat().st_dev == Path(bundle_request.work_dir).parent.stat().st_dev
+    ):
+        pytest.skip("requires writable separate /dev/shm filesystem")
+    with tempfile.TemporaryDirectory(prefix="kernel-spec-stage2-", dir="/dev/shm") as output_dir:
+        bundle_request.output = str(Path(output_dir) / "libcust_compile_db.so")
+        assert bundle.build_bundle(bundle_request) is True
+        assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
+
+
+def test_successful_exporter_with_invalid_output_is_rejected(bundle_request):
+    bundle.build_bundle(bundle_request)
+    old = Path(bundle_request.output).read_bytes()
+    Path(bundle_request.exporter).write_text("#!/bin/sh\nexit 0\n")
+    with pytest.raises(OSError):
+        bundle.build_bundle(bundle_request)
+    assert Path(bundle_request.output).read_bytes() == old
+
+
+@pytest.mark.parametrize("limit", ["MAX_RESOURCE_BYTES", "MAX_UNIT_BYTES", "MAX_BUNDLE_BYTES", "MAX_UNIT_FILES"])
+def test_resource_budgets_fail_before_export(bundle_request, monkeypatch, limit):
+    monkeypatch.setattr(bundle, limit, 0)
+    with pytest.raises(bundle.BundleError):
+        bundle.build_bundle(bundle_request)
+    assert not Path(bundle_request.output).exists()
+
+
+def test_preserves_empty_include_directories_in_resource_copy(bundle_request, tmp_path):
+    path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
+    (path.parent / "resources/empty_include").mkdir()
+    manifest = json.loads(path.read_text())
+    manifest["options"]["common_compile"].append("-I${resource}/resources/empty_include")
+    path.write_text(json.dumps(manifest))
+    config = tmp_path / "custom_opc_options.ini"
+    config.write_text("ALL@@--op_debug_config=dump_cce\n")
+    bundle_request.opc_config = str(config)
+    bundle.build_bundle(bundle_request)
+    workspace = next(Path(bundle_request.work_dir).glob(".bundle-*"))
+    assert (workspace / "collected" / ("a" * 64) / "resources/empty_include").is_dir()
+
+
+@pytest.mark.skipif(not os.environ.get("ASCEND_TEST_COMPILE_EXPORTER"), reason="requires built asc_compile_exporter")
+def test_real_exporter_builds_loadable_bundle_with_large_resource(bundle_request):
+    bundle_request.exporter = os.environ["ASCEND_TEST_COMPILE_EXPORTER"]
+    large = Path(bundle_request.input_dir[0]) / "910b/resources/large.h"
+    large.write_bytes(b"x" * (1024 * 1024 + 1))
+    bundle.build_bundle(bundle_request)
+
+    class String(ctypes.Structure):
+        _fields_ = [("data", ctypes.c_void_p), ("size", ctypes.c_uint64)]
+
+    class File(ctypes.Structure):
+        _fields_ = [("name", String), ("path", String), ("data", ctypes.c_void_p), ("size", ctypes.c_uint64)]
+
+    class Manifest(ctypes.Structure):
+        _fields_ = [("json", String), ("files", ctypes.POINTER(File)), ("count", ctypes.c_uint64)]
+
+    class Header(ctypes.Structure):
+        _fields_ = [
+            ("magic", ctypes.c_uint32),
+            ("version", ctypes.c_uint32),
+            ("size", ctypes.c_uint32),
+            ("flags", ctypes.c_uint32),
+        ]
+
+    class Bundle(ctypes.Structure):
+        _fields_ = [
+            ("header", Header),
+            ("manifests", ctypes.POINTER(Manifest)),
+            ("count", ctypes.c_uint64),
+            ("extensions", ctypes.c_void_p),
+            ("extension_count", ctypes.c_uint64),
+        ]
+
+    library = ctypes.CDLL(bundle_request.output)
+    library.AscendcGetCompileResourceBundle.restype = ctypes.POINTER(Bundle)
+    exported = library.AscendcGetCompileResourceBundle().contents
+    assert exported.header.magic == 0x41435253
+    assert exported.header.version == 1
+    assert exported.count == 1
+    manifest = exported.manifests[0]
+    data = json.loads(ctypes.string_at(manifest.json.data, manifest.json.size))
+    assert data["source_file"] == "op_impl/dynamic/add.cpp"
+    assert data["options"]["common_compile"] == ["-I${source_file_path}/op_impl/dynamic"]
+    resources = {ctypes.string_at(f.path.data, f.path.size).decode(): f for f in manifest.files[: manifest.count]}
+    assert resources["resources/large.h"].size == 1024 * 1024 + 1
+    assert ctypes.string_at(resources["resources/large.h"].data, 1) == b"x"
+    assert bundle.build_bundle(bundle_request) is False

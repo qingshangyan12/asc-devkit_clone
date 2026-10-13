@@ -19,12 +19,14 @@ import const_var
 import ascendc_impl_build
 import ascendc_bin_param_build
 import ascendc_op_info
+from kernel_spec_options import task_directory
 from opdesc_parser import _trans_soc_ver_to_short
 
 
 class CompileKernel:
     def __init__(self: any, args: any):
         self.op_type = args.op_type
+        self.kernel_spec_task = getattr(args, "kernel_spec_task", None)
         self.op_cpp_file = os.path.realpath(args.src_file)
         self.impl_path = os.path.dirname(self.op_cpp_file)
         self.op_soc_ver = args.compute_unit
@@ -126,8 +128,9 @@ class CompileKernel:
         os.makedirs(bin_param_path)
         base_dir = os.path.dirname(self.op_cfg_ini)
         opc_config_file = os.path.join(base_dir, "custom_opc_options.ini")
+        task_options = {"kernel_spec_task": self.kernel_spec_task} if self.kernel_spec_task else {}
         ascendc_bin_param_build.gen_bin_param_file(
-            self.op_cfg_ini, bin_param_path, self.op_soc_ver, opc_config_file, [self.op_type]
+            self.op_cfg_ini, bin_param_path, self.op_soc_ver, opc_config_file, [self.op_type], **task_options
         )
         (tiling_key_info, op_debug_config, kernel_json_file, _, kernel_template_input_info, _) = (
             ascendc_bin_param_build.parse_op_debug_config(opc_config_file, self.op_soc_ver)
@@ -197,6 +200,16 @@ class CompileKernel:
                 "Kernel Compilation Error: OpType {} Kernel File {}!".format(self.op_type, self.op_cpp_file)
             )
 
+    def record_kernel_spec_success(self):
+        """Tell the package build that this producer completed, including its source selection."""
+        if not self.kernel_spec_task:
+            return
+        config_file = os.path.join(os.path.dirname(self.op_cfg_ini), "custom_opc_options.ini")
+        directory = task_directory(config_file, self.op_type, self.op_soc_ver, self.kernel_spec_task)
+        if directory is not None:
+            directory.mkdir(parents=True, exist_ok=True)
+            (directory / ".producer-success").write_text(self.op_cpp_file, encoding="utf-8")
+
 
 def args_parse():
     parser = argparse.ArgumentParser()
@@ -219,6 +232,7 @@ def args_parse():
     parser.add_argument("-b", "--build-tool", nargs="?", default=None, help="build tool must be make.")
     parser.add_argument("-tn", "--target-name", nargs="?", default=None, help="kernel target name.")
     parser.add_argument("-a", "--auto-gen-path", nargs="?", default=None, help="auto gen file path.")
+    parser.add_argument("--kernel-spec-task", default=None, help="Internal CMake producer namespace.")
     return parser.parse_args()
 
 
@@ -236,3 +250,5 @@ if __name__ == "__main__":
         kernel_builder.ascendc_put_tiling()
         kernel_builder.ascendc_build()
         kernel_builder.clean()
+        if args.kernel_spec_task:
+            kernel_builder.record_kernel_spec_success()

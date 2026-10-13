@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 
 #include <string>
+#include <fstream>
 #include <vector>
 
 #include <sys/stat.h>
@@ -200,6 +201,34 @@ TEST_F(ModuleTest, RepositoryReportsDirectoryOpenFailure)
 {
     std::vector<ManifestUnit> units;
     EXPECT_FALSE(CollectedManifestRepository("/dev/null").Load(units));
+}
+
+TEST_F(ModuleTest, RepositoryAcceptsResourceAboveLegacyOneMiBLimit)
+{
+    const std::string unit = FileUtils::JoinPath(root_, "large/Unit");
+    WriteTestFile(FileUtils::JoinPath(unit, "resources/large.h"), std::string(1024U * 1024U + 1U, 'x'));
+    CreateManifest(unit, "Unit");
+    std::vector<ManifestUnit> units;
+    ASSERT_TRUE(CollectedManifestRepository(FileUtils::JoinPath(root_, "large")).Load(units));
+    ASSERT_EQ(units.size(), 1U);
+    ASSERT_EQ(units[0].files.size(), 1U);
+    EXPECT_EQ(units[0].files[0].data.size(), 1024U * 1024U + 1U);
+}
+
+TEST_F(ModuleTest, RepositoryRejectsResourceAboveConsumerFileLimit)
+{
+    const std::string unit = FileUtils::JoinPath(root_, "oversized/Unit");
+    ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::JoinPath(unit, "resources")));
+    {
+        std::ofstream resource(FileUtils::JoinPath(unit, "resources/large.h"), std::ios::binary);
+        ASSERT_TRUE(resource.is_open());
+        resource.seekp(256U * 1024U * 1024U);
+        resource.put('x');
+        ASSERT_TRUE(resource.good());
+    }
+    CreateManifest(unit, "Unit");
+    std::vector<ManifestUnit> units;
+    EXPECT_FALSE(CollectedManifestRepository(FileUtils::JoinPath(root_, "oversized")).Load(units));
 }
 
 } // namespace
