@@ -48,16 +48,16 @@ $$
 K_{\text{effective}} = dilation \times (K_h - 1) + 1 = 2 \times (3 - 1) + 1 = 5
 $$
 
-The output H/W is calculated as:
+The output h/w is calculated as:
 
 $$
 \begin{aligned}
-H_{out} &= \frac{H + pad_{top} + pad_{bottom} - K_{\text{effective}}}{stride_h} + 1 = \frac{9 + 2 + 2 - 5}{2} + 1 = 5 \\
-W_{out} &= \frac{W + pad_{left} + pad_{right} - K_{\text{effective}}}{stride_w} + 1 = \frac{9 + 2 + 2 - 5}{2} + 1 = 5
+H_{out} &= \frac{h + pad_{top} + pad_{bottom} - K_{\text{effective}}}{stride_h} + 1 = \frac{9 + 2 + 2 - 5}{2} + 1 = 5 \\
+W_{out} &= \frac{w + pad_{left} + pad_{right} - K_{\text{effective}}}{stride_w} + 1 = \frac{9 + 2 + 2 - 5}{2} + 1 = 5
 \end{aligned}
 $$
 
-The matrix multiplication specification is `M = HOut * WOut = 25`, `K = C * Kh * Kw = 288`, `N = Cout = 16`.
+The matrix multiplication specification is `m = HOut * WOut = 25`, `k = C * Kh * Kw = 288`, `n = Cout = 16`.
 
 ## Scenario Details
 
@@ -68,9 +68,9 @@ This sample selects different Global Memory data formats via the compile paramet
 <caption style="font-weight: normal;">
     <span style="font-weight: bold; font-size: 1.2em;">📌 Table 2: Meanings of SCENARIO_NUM Values</span></caption>
 <tr><td rowspan="1" align="center">SCENARIO_NUM</td><td align="center">FeatureMap Input Layout</td><td align="center">Output Layout</td><td align="center">Global Memory → L1 Buffer Conversion</td><td align="center">L0C Buffer → Global Memory Conversion</td></tr>
-<tr><td align="center">0</td><td align="center">NC1HWC0 [1, C1, H, W, C0]</td><td align="center">NC1HWC0 [1, Cout_C1, HOut, WOut, C0]</td><td align="center">NC1HWC0 direct copy</td><td align="center">NC1HWC0 direct copy</td></tr>
-<tr><td align="center">1</td><td align="center">NCHW [1, C, H, W]</td><td align="center">NCHW [1, Cout, HOut, WOut]</td><td align="center">NCHW → NC1HWC0 (dn2nz)</td><td align="center">NC1HWC0 → NCHW (nz2dn)</td></tr>
-<tr><td align="center">2</td><td align="center">NHWC [1, H, W, C]</td><td align="center">NHWC [1, HOut, WOut, Cout]</td><td align="center">NHWC → NC1HWC0 (nd2nz)</td><td align="center">NC1HWC0 → NHWC (nz2nd)</td></tr>
+<tr><td align="center">0</td><td align="center">NC1HWC0 [1, c1, h, w, c0]</td><td align="center">NC1HWC0 [1, Cout_C1, HOut, WOut, c0]</td><td align="center">NC1HWC0 direct copy</td><td align="center">NC1HWC0 direct copy</td></tr>
+<tr><td align="center">1</td><td align="center">NCHW [1, C, h, w]</td><td align="center">NCHW [1, Cout, HOut, WOut]</td><td align="center">NCHW → NC1HWC0 (dn2nz)</td><td align="center">NC1HWC0 → NCHW (nz2dn)</td></tr>
+<tr><td align="center">2</td><td align="center">NHWC [1, h, w, C]</td><td align="center">NHWC [1, HOut, WOut, Cout]</td><td align="center">NHWC → NC1HWC0 (nd2nz)</td><td align="center">NC1HWC0 → NHWC (nz2nd)</td></tr>
 </table>
 
 **Scenario 0: NC1HWC0 Input/Output**
