@@ -103,3 +103,11 @@ inline uint32_t asc_ballot(int32_t predicate)
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 1, 2, 3, 14, 15, 16, 17
+threshold(float): 3.5
+result(uint32_t): 4294967280
+```
