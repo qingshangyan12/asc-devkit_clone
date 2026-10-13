@@ -86,3 +86,10 @@ inline unsigned long long int __bfloat162ull_ru(const bfloat16_t x)
         dst[idx] = __bfloat162ull_ru(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0.5, 1.5, 2.5, 63.5, 64.5, 16777216.0, 4294967296.0, inf
+result: 1, 2, 3, 64, 65, 16777216, 4294967296, 18446744073709551615
+```

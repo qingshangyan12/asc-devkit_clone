@@ -77,3 +77,11 @@ bool __hgt(half x, half y)
         dst[idx] = __hgt(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 2.5, 0.5, 1.0, nan
+y: 1.0, 0.5, 2.5, nan
+result: true, false, false, false
+```

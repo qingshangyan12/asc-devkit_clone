@@ -22,6 +22,8 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/vector_datamove_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/vector_datamove_intf_impl.h"
 #endif
 
 __aicore__ inline void asc_copy_gm2ub(
@@ -59,7 +61,7 @@ __aicore__ inline void asc_copy_ub2l1(
     uint16_t dst_gap)
 {
     if ASC_IS_AIV {
-        copy_ubuf_to_cbuf(dst, src, static_cast<uint8_t>(0), burst_count, burst_len, src_gap, dst_gap);
+        copy_ubuf_to_cbuf(dst, src, 0, burst_count, burst_len, src_gap, dst_gap);
     }
 }
 

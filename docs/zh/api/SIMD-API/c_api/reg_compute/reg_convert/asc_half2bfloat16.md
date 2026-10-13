@@ -37,12 +37,12 @@
 ```c
 // 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_half2bfloat16_<round_mode>(vector_bfloat16_t& dst,
-                                                          vector_half src,
-                                                          vector_bool mask)
+                                                           vector_half src,
+                                                           vector_bool mask)
 
 // 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_bfloat16_t asc_half2bfloat16_<round_mode>(vector_half src,
-                                                                       vector_bool mask)
+                                                                        vector_bool mask)
 ```
 
 **占位符说明如下：**`<round_mode>`支持`rd`（FLOOR）、`rn`（RINT）、`rna`（ROUND）、`ru`（CEIL）和`rz`（TRUNC）。

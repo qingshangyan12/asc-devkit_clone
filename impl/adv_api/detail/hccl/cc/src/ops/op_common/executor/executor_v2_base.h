@@ -36,9 +36,6 @@ public:
     virtual void* CalcCostCoeffAbiPlaceholder(void*, void*, const char*) { return nullptr; }
     virtual void* GetAlgNetMetaAbiPlaceholder(void*) const { return nullptr; }
 
-    virtual HcclResult CalcAlgHierarchyInfo(
-        HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) = 0;
-
     virtual HcclResult CalcAlgHierarchyInfoV2(
         TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo, const AlgAttrs& algAttrs);
 
@@ -52,6 +49,11 @@ public:
     virtual HcclResult FastLaunch(const OpParam& param, const CcuFastLaunchCtx* resCtx);
 
     virtual AlgAttrs GetAlgoMeta(const std::string& algName) const;
+
+    // HCCL #3525 删除 V1 槽位；bridge 使用的虚函数前缀必须与新 HCCL 保持一致。
+    // V1 仅供 MC2 本地 executor 使用，放在前缀末尾，不能用于调用 CANN executor。
+    virtual HcclResult CalcAlgHierarchyInfo(
+        HcclComm comm, TopoInfoWithNetLayerDetails* topoInfo, AlgHierarchyInfoForAllLevel& algHierarchyInfo) = 0;
 
     HcclResult SetTempFastLaunchAddr(
         TemplateFastLaunchCtx& tempFastLaunchCtx, void* inputPtr, void* outputPtr, const HcclMem& hcclBuff) const;

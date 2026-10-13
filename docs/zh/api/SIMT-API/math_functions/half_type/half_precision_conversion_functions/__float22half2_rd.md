@@ -105,3 +105,10 @@ inline half2 __float22half2_rd(const float2 x)
         asc_vf_call<simt_float22half2_rd>(dim3(1024), (__gm__ float2*)input, (__gm__ half2*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (128, 128.0625), (128.1875, -128.1875), (inf, -inf), (nan, 65536)
+result: (128, 128), (128.125, -128.25), (inf, -inf), (nan, inf)
+```

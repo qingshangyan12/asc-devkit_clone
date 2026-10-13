@@ -38,39 +38,45 @@
 
 ```cpp
 // 通过引用参数输出结果（占位符形式）
-__simd_callee__ inline void asc_int4x22int16(
-    vector_int16_t& dst,
-    vector_int4x2_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
+__simd_callee__ inline void asc_int4x22int16(vector_int16_t& dst,
+                                             vector_int4x2_t src,
+                                             vector_bool mask,
+                                             std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline vector_int16_t asc_int4x22int16(
-    vector_int4x2_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
+__simd_callee__ inline vector_int16_t asc_int4x22int16(vector_int4x2_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_quarter_mode, <quarter_pos>> src_quarter_pos)
 ```
 
 **占位符说明如下：**
-- `<quarter_pos>`支持`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+
+`<quarter_pos>`支持`asc_position_quarter_mode`枚举类的四个取值：
+
+```c
+enum class asc_position_quarter_mode {
+    DISPERSE_FIRST_QUARTER = 0,
+    DISPERSE_SECOND_QUARTER,
+    DISPERSE_THIRD_QUARTER,
+    DISPERSE_FOURTH_QUARTER
+};
+```
 
 ### 函数原型典型示例
 
 ```cpp
 // 通过引用参数输出结果
-__simd_callee__ inline void asc_int4x22int16(
-    vector_int16_t& dst,
-    vector_int4x2_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
+__simd_callee__ inline void asc_int4x22int16(vector_int16_t& dst,
+                                             vector_int4x2_t src,
+                                             vector_bool mask,
+                                             std::integral_constant<asc_position_quarter_mode,
+                                                                    asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
 
 // 通过函数返回值返回结果
-__simd_callee__ inline vector_int16_t asc_int4x22int16(
-    vector_int4x2_t src,
-    vector_bool mask,
-    std::integral_constant<asc_position_quarter_mode,
-                           asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
+__simd_callee__ inline vector_int16_t asc_int4x22int16(vector_int4x2_t src,
+                                                       vector_bool mask,
+                                                       std::integral_constant<asc_position_quarter_mode,
+                                                                              asc_position_quarter_mode::DISPERSE_FIRST_QUARTER> src_quarter_pos)
 ```
 
 ## 参数说明
@@ -82,7 +88,7 @@ __simd_callee__ inline vector_int16_t asc_int4x22int16(
 | dst | 输出 | 目的操作数（矢量数据寄存器）。 |
 | src | 输入 | 源操作数（矢量数据寄存器）。 |
 | mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
-| src_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择源操作数的读取位置。 |
+| src_quarter_pos | 输入 | 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择源操作数的读取位置。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
 

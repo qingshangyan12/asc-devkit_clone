@@ -140,3 +140,11 @@ bool __hblex2(bfloat16x2_t x, bfloat16x2_t y)
         asc_vf_call<simt_hblex2>(dim3(1024), (__gm__ bfloat16x2_t*)x, (__gm__ bfloat16x2_t*)y, dst, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1.0, 0.0), (1.0, -1.0), (inf, -inf), (nan, 0.5)
+y: (1.0, 0.0), (1.0, -2.0), (inf, inf), (0.5, nan)
+result: true, false, true, false
+```

@@ -15,7 +15,7 @@ set(ascend950_list   ascend950pr_9599 ascend950pr_958a ascend950pr_9589 ascend95
     ascend950pr_950z ascend950dt_950x ascend950dt_950y ascend950dt_95a1 ascend950dt_95a2 ascend950dt_9591 ascend950dt_9592  ascend950dt_9595 ascend950dt_9596
     ascend950dt_9581 ascend950dt_9582 ascend950dt_9583 ascend950dt_9584 ascend950dt_9585 ascend950dt_9586 ascend950dt_9587 ascend950dt_9588 ascend950dt_9571
     ascend950dt_9572 ascend950dt_9573 ascend950dt_9574 ascend950dt_9575 ascend950dt_9576 ascend950dt_9577 ascend950dt_9578 ascend350_354f   ascend350_355e)
-set(ascend960_list ascend960dt_969b5 ascend960dt_969b6 ascend960dt_968b7 ascend960dt_966b7 ascend960dt_966b8 ascend960dt_966b8z ascend960dt_961by ascend960dt_961bz)
+set(ascend960_list ascend960dt_969b5 ascend960dt_969b6 ascend960dt_968b7 ascend960dt_966b7 ascend960dt_966b8 ascend960dt_966b8z ascend960dt_961by ascend960dt_961bz ascend960pr_963a1 ascend960pr_969a1 ascend960pr_964a1)
 set(kirinx90_list kirinx90)
 set(kirin9030_list kirin9030)
 set(ascend5162a_list ascend5162a)

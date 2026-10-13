@@ -6,7 +6,7 @@
 
 ![](../../../figures/atomic_operation_pipelined_data_movement_effect.png "数据搬运随路原子累加效果")
 
-**表1**  数据搬运随路原子操作接口<a id="datamove_atomic_operation_interface"></a>
+**表1** 数据搬运随路原子操作接口<a id="datamove_atomic_operation_interface"></a>
 
 | 对应接口 | 接口功能描述 |
 | --- | --- |
@@ -28,7 +28,7 @@ Scalar原子操作接口，能够在指定GM地址上进行单点原子计算操
 
 ![](../../../figures/scalar_atomic_operation_diagram.png "标量原子累加效果")
 
-**表2**  Scalar原子操作接口<a id="scalar_atomic_operation_interface"></a>
+**表2** Scalar原子操作接口<a id="scalar_atomic_operation_interface"></a>
 
 | 对应接口 | 接口功能描述 |
 | --- | --- |

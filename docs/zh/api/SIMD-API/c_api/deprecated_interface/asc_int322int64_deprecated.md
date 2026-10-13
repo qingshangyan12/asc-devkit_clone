@@ -61,8 +61,6 @@ def asc_int322int64_v2(dst, src, mask):
 
 ## 函数原型
 
-### 模板原型
-
 ```c
 // 占位符形式
 __simd_callee__ inline void asc_int322int64<position_mode>(vector_int64_t& dst,

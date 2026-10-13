@@ -34,18 +34,18 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 
   NZ布局的小分形为16 × C0，小分形中的一个C0块包含16个half，即一个32B DataBlock。每个`144 × 128` tile的一行包含8个C0块，向量写阶段将这8个DataBlock写入NZ区域中对应的8个C0列。
 
-  - `x`：输入，逻辑shape为`[M, N]`，half，ND布局
-  - `z`：输出，逻辑shape为`[M, N]`，half，NZ布局
+  - `x`：输入，逻辑shape为`[m, n]`，half，ND布局
+  - `z`：输出，逻辑shape为`[m, n]`，half，NZ布局
 
 - 样例规格：
 
-  本样例固定`M=8192`、`N=8192`，启动64个Vector block。每个block负责一个行切分和列切分区域，内部按`144 × 128` tile处理；最后一个行tile的有效高度通过`actualTileH`传入。
+  本样例固定`m=8192`、`n=8192`，启动64个Vector block。每个block负责一个行切分和列切分区域，内部按`144 × 128` tile处理；最后一个行tile的有效高度通过`actual_tile_h`传入。
 
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">ND2NZ</td></tr>
   <tr><td rowspan="2" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">x</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">NZ</td></tr>
+  <tr><td align="center">x</td><td align="center">[m, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">z</td><td align="center">[m, n]</td><td align="center">float16</td><td align="center">NZ</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">bank_conflict_kernel</td></tr>
   </table>
 
@@ -53,17 +53,17 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 
   | 参数 | 值 | 说明 |
   | :--- | :---: | :--- |
-  | `TOTAL_M` | 8192 | 输入矩阵行数 |
-  | `TOTAL_N` | 8192 | 输入矩阵列数 |
-  | `ROW_SPLITS` | 8 | 行方向切分数 |
-  | `COL_SPLITS` | 8 | 列方向切分数 |
-  | `TOTAL_BLOCKS` | 64 | 启动block数 |
-  | `TILE_H` | 144 | tile最大行数 |
-  | `TILE_W` | 128 | tile列数 |
-  | `C0_ELEMS` | 16 | 一个C0块中的half元素数 |
-  | `TILE_C0_COLS` | 8 | 一个tile中的C0列数 |
+  | `total_m` | 8192 | 输入矩阵行数 |
+  | `total_n` | 8192 | 输入矩阵列数 |
+  | `row_splits` | 8 | 行方向切分数 |
+  | `col_splits` | 8 | 列方向切分数 |
+  | `total_blocks` | 64 | 启动block数 |
+  | `tile_h` | 144 | tile最大行数 |
+  | `tile_w` | 128 | tile列数 |
+  | `c0_elems` | 16 | 一个C0块中的half元素数 |
+  | `tile_c0_cols` | 8 | 一个tile中的C0列数 |
   | `SCENARIO_NUM` | 1、2 | bank冲突对照场景 |
-  | `dstNzC0Stride` | S1=144、S2=145 | 相邻C0列起始位置的间距，单位为DataBlock |
+  | `dst_nz_c0_stride` | S1=144、S2=145 | 相邻C0列起始位置的间距，单位为DataBlock |
 
   > **术语说明：** DataBlock是向量指令处理的数据单元，大小为32B；half类型下1个DataBlock包含16个half。
 
@@ -81,7 +81,7 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
     <tr><td align="left">2</td><td align="left">make_tensor + layout</td><td align="left">创建GM、UB源和UB目标Tensor视图</td><td align="left">GM为ND；NZ写入步长由Vector接口和MTE3 layout分别表达</td></tr>
     <tr><td align="left">3</td><td align="left">copy(copy_gm_to_ub)</td><td align="left">将当前有效高度的ND tile从GM搬到UB</td><td align="left">ND到ND</td></tr>
     <tr><td align="left">4</td><td align="left">slice + asc_loadalign</td><td align="left">按行切片，从UB ND tile读取128个half</td><td align="left">Vector</td></tr>
-    <tr><td align="left">5</td><td align="left">asc_storealign</td><td align="left">将8个DataBlock按`dstNzC0Stride`写入UB NZ区域</td><td align="left">Vector，ND到NZ重排</td></tr>
+    <tr><td align="left">5</td><td align="left">asc_storealign</td><td align="left">将8个DataBlock按`dst_nz_c0_stride`写入UB NZ区域</td><td align="left">Vector，ND到NZ重排</td></tr>
     <tr><td align="left">6</td><td align="left">copy(copy_ub_to_gm)</td><td align="left">将NZ tile写回GM的紧凑NZ布局，跳过S2的填充空间</td><td align="left">NZ到NZ</td></tr>
     </table>
 
@@ -99,16 +99,16 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 
   - ND到NZ核心实现：
 
-    `srcTensor`和`dstTensor`先通过Tensor API创建，`slice`只负责取得当前行的起始地址；8个DataBlock的非连续落点由`asc_storealign`的`dstNzC0Stride`参数表达。
+    `src_tensor`和`dst_tensor`先通过Tensor API创建，`slice`只负责取得当前行的起始地址；8个DataBlock的非连续落点由`asc_storealign`的`dst_nz_c0_stride`参数表达。
 
     ```cpp
-    template <uint32_t dstNzC0Stride>
-    __simd_vf__ inline void NdToNz(__ubuf__ half* dst, __ubuf__ half* src)
+    template <uint32_t dst_nz_c0_stride>
+    __simd_vf__ inline void nd_to_nz(__ubuf__ half* dst, __ubuf__ half* src)
     {
         vector_bool mask = asc_create_mask_b16(PAT_ALL);
         vector_half value;
         asc_loadalign(value, src);
-        asc_storealign(dst, value, dstNzC0Stride, 0, mask);
+        asc_storealign(dst, value, dst_nz_c0_stride, 0, mask);
     }
     ```
 
@@ -116,9 +116,9 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 
     ```cpp
     if constexpr (SCENARIO_NUM == 1) {
-        NdToNz<TILE_H>(dstRow.data().get(), srcRow.data().get());
+        nd_to_nz<tile_h>(dst_row.data().get(), src_row.data().get());
     } else {
-        NdToNz<TILE_H + BANK_CONFLICT_OFFSET>(dstRow.data().get(), srcRow.data().get());
+        nd_to_nz<tile_h + bank_conflict_offset>(dst_row.data().get(), src_row.data().get());
     }
     ```
 
@@ -130,7 +130,7 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 
     Ascend 950PR&950DT系列产品的Unified Buffer划分为16个物理bank，并组织为8个bank group。bank `i`和bank `i+8`属于同一个bank group，关系为`bank group = bank % 8`。UB地址采用低位交织，连续地址每经过一个32B DataBlock，物理bank编号加1并按16取模。
 
-    本样例关注`asc_storealign`一次写入8个DataBlock时的写写冲突。相邻落点之间的间距由`dstNzC0Stride`决定；当多个落点落入同一个bank group时，写入需要串行处理。
+    本样例关注`asc_storealign`一次写入8个DataBlock时的写写冲突。相邻落点之间的间距由`dst_nz_c0_stride`决定；当多个落点落入同一个bank group时，写入需要串行处理。
 
     **图：Ascend 950PR&950DT系列产品 UB Bank结构示意图**
 
@@ -142,7 +142,7 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 
     **场景1：紧凑排放**
 
-    编译时设置`SCENARIO_NUM=1`。此时`dstNzC0Stride=144`，即`16 × 9`个DataBlock。对同一行而言，8个写落点的物理bank编号保持不变，因此8个写访问同一个bank和bank group，形成写写冲突。
+    编译时设置`SCENARIO_NUM=1`。此时`dst_nz_c0_stride=144`，即`16 × 9`个DataBlock。对同一行而言，8个写落点的物理bank编号保持不变，因此8个写访问同一个bank和bank group，形成写写冲突。
 
     **图：场景1紧凑排放下ND到NZ示意图**
 
@@ -156,9 +156,9 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 
     **场景2：增加stride并偏移NZ buffer起点**
 
-    编译时设置`SCENARIO_NUM=2`。此时`dstNzC0Stride=145`，即`16 × 9 + 1`个DataBlock。每次跳转后物理bank编号加1，8个写落点依次进入8个不同的bank group。
+    编译时设置`SCENARIO_NUM=2`。此时`dst_nz_c0_stride=145`，即`16 × 9 + 1`个DataBlock。每次跳转后物理bank编号加1，8个写落点依次进入8个不同的bank group。
 
-    代码同时将`nzPtr`的起始地址额外偏移8个DataBlock（`NZ_BASE_SHIFT_DATA_BLOCKS=8`）。因此以第一行为例，`asc_loadalign`从ND buffer读取bank 0~7，`asc_storealign`向NZ buffer写入bank 8~15，错开首行读写使用的物理bank，降低同拍物理bank重叠。增加的stride空间只用于改变UB落点，UB到GM搬运通过NZ Tensor的layout跳过填充位置，输出仍是紧凑NZ布局。
+    代码同时将`nz_ptr`的起始地址额外偏移8个DataBlock（`nz_base_shift_data_blocks=8`）。因此以第一行为例，`asc_loadalign`从ND buffer读取bank 0~7，`asc_storealign`向NZ buffer写入bank 8~15，错开首行读写使用的物理bank，降低同拍物理bank重叠。增加的stride空间只用于改变UB落点，UB到GM搬运通过NZ Tensor的layout跳过填充位置，输出仍是紧凑NZ布局。
 
     **图：场景2增加stride后的ND到NZ示意图**
 
@@ -176,16 +176,16 @@ GM和UB之间的数据搬运使用Tensor API的`copy`接口，ND到NZ重排的�
 | 张量切片 | 使用`slice`取得每个tile和每行的起始地址 |
 | 数据搬运 | 使用`copy`完成GM到UB、UB到GM搬运 |
 | ND到NZ重排 | 使用`asc_loadalign`和`asc_storealign`完成向量寄存器搬运 |
-| Bank冲突对比 | 通过`dstNzC0Stride=144/145`对比紧凑排放和bank分散排放 |
+| Bank冲突对比 | 通过`dst_nz_c0_stride=144/145`对比紧凑排放和bank分散排放 |
 | 地址偏移 | 场景2通过8个DataBlock的NZ起始偏移，在起始位置错开ND读取和NZ写入的物理bank |
 | 双缓冲 | 使用ping-pong UB buffer交替处理tile |
-| 尾块处理 | 使用`actualTileH`限制最后一个tile的有效行数 |
+| 尾块处理 | 使用`actual_tile_h`限制最后一个tile的有效行数 |
 
 ## 性能数据
 
 以下数据为Ascend 950PR&950DT系列产品在`144 × 128` tile、64个block配置下的实测结果。
 
-| 场景 | `dstNzC0Stride` | Task Duration(μs) | `aiv_time`(μs) | `aiv_total_cycles` | `aiv_vec_time`(μs) | `aiv_vec_ratio` | `aiv_scalar_time`(μs) | `aiv_scalar_ratio` | `aiv_mte2_time`(μs) | `aiv_mte2_ratio` | `aiv_mte3_time`(μs) | `aiv_mte3_ratio` | `icache_miss_rate` |
+| 场景 | `dst_nz_c0_stride` | Task Duration(μs) | `aiv_time`(μs) | `aiv_total_cycles` | `aiv_vec_time`(μs) | `aiv_vec_ratio` | `aiv_scalar_time`(μs) | `aiv_scalar_ratio` | `aiv_mte2_time`(μs) | `aiv_mte2_ratio` | `aiv_mte3_time`(μs) | `aiv_mte3_ratio` | `icache_miss_rate` |
 | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | S1 | 144 | 262.628 | 261.96 | 14112428 | **254.637** | 0.972 | 3.851 | 0.015 | 93.445 | 0.357 | 47.817 | 0.183 | 0.006 |
 | S2 | 145 | 222.964 | 222.18 | 12052109 | **214.199** | 0.964 | 3.823 | 0.017 | 111.712 | 0.503 | 41.139 | 0.185 | 0.009 |

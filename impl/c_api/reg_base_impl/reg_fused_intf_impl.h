@@ -22,6 +22,8 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/reg_fused_intf_impl.h"
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
+#include "impl/c_api/reg_base_impl/npu_arch_9201/reg_fused_intf_impl.h"
 #endif
 
 __simd_callee__ inline void asc_relu(vector_half& dst, vector_half src, vector_bool mask)
@@ -328,31 +330,6 @@ __simd_callee__ inline void asc_mula(vector_float& dst, vector_float src0, vecto
     if ASC_IS_AIV {
         vmula(dst, src0, src1, mask, MODE_ZEROING);
     }
-}
-
-__simd_callee__ inline vector_half asc_fma(vector_half src0, vector_half src1, vector_half src2, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(src2, src0, src1, mask, MODE_ZEROING);
-    }
-    return src2;
-}
-
-__simd_callee__ inline vector_bfloat16_t asc_fma(
-    vector_bfloat16_t src0, vector_bfloat16_t src1, vector_bfloat16_t src2, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(src2, src0, src1, mask, MODE_ZEROING);
-    }
-    return src2;
-}
-
-__simd_callee__ inline vector_float asc_fma(vector_float src0, vector_float src1, vector_float src2, vector_bool mask)
-{
-    if ASC_IS_AIV {
-        vmula(src2, src0, src1, mask, MODE_ZEROING);
-    }
-    return src2;
 }
 
 #endif
