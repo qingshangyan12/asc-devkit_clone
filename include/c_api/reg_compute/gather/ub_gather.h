@@ -25,10 +25,6 @@
 #include "impl/c_api/reg_base_impl/ub_gather_intf_impl.h"
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-#include "impl/c_api/reg_base_impl/npu_arch_9201/ub_gather_intf_impl.h"
-#endif
-
 __simd_callee__ inline vector_int8_t asc_gather(__ubuf__ int8_t* src, vector_uint16_t index, vector_bool mask);
 
 __simd_callee__ inline vector_uint8_t asc_gather(__ubuf__ uint8_t* src, vector_uint16_t index, vector_bool mask);
