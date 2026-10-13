@@ -70,11 +70,10 @@ Warp内所有活跃线程输入val的最小值。
     ```cpp
     #include "simt_api/device_warp_functions.h"
 
-    __global__ __launch_bounds__(1024) void KernelReduceMin(int32_t* dst)
+    __global__ __launch_bounds__(1024) void KernelReduceMin(int32_t* dst, const int32_t* src)
     {
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        int32_t laneId = idx % 32;
-        int32_t result = asc_reduce_min(laneId); // 返回值为0
+        int32_t result = asc_reduce_min(src[idx]);
         dst[idx] = result;
     }
     ```
@@ -84,12 +83,18 @@ Warp内所有活跃线程输入val的最小值。
     ```cpp
     #include "simt_api/device_warp_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void KernelReduceMin(__gm__ int32_t* dst)
+    __simt_vf__ __launch_bounds__(1024) inline void KernelReduceMin(__gm__ int32_t* dst, __gm__ const int32_t* src)
     {
         // asc_vf_call参数：dim3{1024, 1, 1}
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
-        int32_t laneId = idx % 32;
-        int32_t result = asc_reduce_min(laneId); // 返回值为0
+        int32_t result = asc_reduce_min(src[idx]);
         dst[idx] = result;
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 17, -8, 42, 3, -25, 60, 11, -37, 24, 5, -14, 73, 8, -2, 39, 19, -31, 54, 7, 12, -18, 28, 66, -9, 33, 1, -45, 22, 48, -5, 36, 15
+result: -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45, -45
+```
