@@ -57,8 +57,6 @@ int32_t lanemask_ge()
 
 ## 调用示例
 
-下面示例使用`lanemask_ge()`统计当前Lane及其之后的线程数，并据此判断当前线程位于Warp的上半区还是下半区，再通过`asc_shfl()`分别广播上下半Warp中指定Lane的数据。示例中使用[asc_shfl](../Warp_shfl_functions/asc_shfl.md)，需另外包含`simt_api/device_warp_functions.h`头文件，其中`srcLane`的取值范围为[0, 15]。
-
 -   SIMT编程场景：
 
     ```cpp
@@ -92,3 +90,11 @@ int32_t lanemask_ge()
         dst[idx] = value;
     }
     ```
+
+输入输出示例如下：
+
+```text
+src: 14, 87, 32, 6, 71, 19, 54, 95, 27, 60, 8, 43, 78, 11, 66, 35, 90, 22, 49, 3, 82, 38, 57, 15, 74, 29, 92, 5, 68, 41, 86, 24
+srcLane: 3
+dst: 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3
+```

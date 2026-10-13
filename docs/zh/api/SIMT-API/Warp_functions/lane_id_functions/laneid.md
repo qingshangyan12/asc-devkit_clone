@@ -49,8 +49,6 @@ int32_t laneid()
 
 ## 调用示例
 
-下面示例使用`laneid()`计算全部输入数据的和，并把结果赋值到输出数据的第0位置上，示例中使用[asc_reduce_add](../Warp_reduce_functions/asc_reduce_add.md)，需另外包含`simt_api/device_warp_functions.h`头文件，使用[asc_atomic_add](../../atomic_operations/asc_atomic_add.md)，需另外包含`simt_api/device_atomic_functions.h`头文件。
-
 - SIMT编程场景：
 
     ```cpp
@@ -90,3 +88,10 @@ int32_t laneid()
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+src: 17, -8, 42, 3, -25, 60, 11, -37, 24, 5, -14, 73, 8, -2, 39, 19, -31, 54, 7, 12, -18, 28, 66, -9, 33, 1, -45, 22, 48, -5, 36, 15
+dst: 429
+```
