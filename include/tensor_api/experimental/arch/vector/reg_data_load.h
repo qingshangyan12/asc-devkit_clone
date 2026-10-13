@@ -32,8 +32,6 @@ namespace experimental {
  * @param tensor Source tensor located in UB.
  * @param coord Coordinate of the first source element.
  * @return A register pair for deintlv mode; otherwise, a register tensor.
- * @note For int4b_t tensors, the layout offset counts individual INT4 values and
- * is shifted right by one to address packed bytes. The offset must be even.
  */
 template <load_sideband_mode sideband_mode = load_sideband_mode::direct, typename Tensor, typename Coord>
 __simd_callee__ inline decltype(auto) load(const Tensor& tensor, const Coord& coord);
@@ -51,8 +49,6 @@ __simd_callee__ inline decltype(auto) load(const Tensor& tensor);
  * @param tensor Source tensor located in UB.
  * @param coord Coordinate of the first source element.
  * @return A register tensor populated according to the selected broadcast mode.
- * @note For int4b_t tensors, the layout offset counts individual INT4 values and
- * is shifted right by one to address packed bytes. The offset must be even.
  */
 template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor, typename Coord>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor, const Coord& coord);

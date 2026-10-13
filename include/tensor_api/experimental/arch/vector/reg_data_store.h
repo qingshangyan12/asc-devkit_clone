@@ -33,8 +33,6 @@ namespace experimental {
  * @param coord Coordinate of the first destination element.
  * @param src Source register tensor.
  * @note The tensor and register element types must match.
- * @note int4b_t tensors require int4x2_t registers. Their layout offset counts
- * individual INT4 values and is shifted right by one; the offset must be even.
  */
 template <
     store_sideband_mode sideband_mode = store_sideband_mode::direct, typename Tensor, typename Coord,
@@ -57,8 +55,6 @@ __simd_callee__ inline void store(Tensor& tensor, const reg_tensor<RegDataType>&
  * @param src0 First source register tensor.
  * @param src1 Second source register tensor.
  * @note This overload supports only store_sideband_mode::intlv. The tensor and register element types must match.
- * @note int4b_t tensors require int4x2_t registers. Their layout offset counts
- * individual INT4 values and is shifted right by one; the offset must be even.
  */
 template <
     store_sideband_mode sideband_mode = store_sideband_mode::intlv, typename Tensor, typename Coord,

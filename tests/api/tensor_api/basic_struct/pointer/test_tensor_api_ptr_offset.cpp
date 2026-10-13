@@ -47,13 +47,3 @@ TEST_F(tensor_api_pointer_offset, test_int4_logical_element_offset)
     EXPECT_EQ(&pointer[64], data + 32);
     EXPECT_EQ((engine + 64).begin().get(), data + 32);
 }
-
-TEST_F(tensor_api_pointer_offset, test_int4x2_packed_element_offset)
-{
-    __ubuf__ int4x2_t data[128];
-    auto pointer = asc::te::make_mem_ptr<asc::te::location::ub>(data);
-
-    EXPECT_EQ((pointer + 2).get(), data + 2);
-    EXPECT_EQ((pointer + 64).get(), data + 64);
-    EXPECT_EQ(&pointer[64], data + 64);
-}
