@@ -58,6 +58,7 @@ def _handle_single(path, args):
 
 
 def _handle_batch(md_files, args):
+    md_files = [str(Path(src).resolve()) for src in md_files]
     out_dir = Path(args.output) if args.output else Path.cwd()
     out_dir.mkdir(parents=True, exist_ok=True)
     common_root = _find_common_root(md_files)
