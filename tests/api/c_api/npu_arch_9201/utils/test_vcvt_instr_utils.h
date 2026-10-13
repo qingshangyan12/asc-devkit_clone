@@ -11,6 +11,7 @@
 #ifndef TESTS_API_C_API_NPU_ARCH_9201_UTILS_TEST_VCVT_INSTR_UTILS_H
 #define TESTS_API_C_API_NPU_ARCH_9201_UTILS_TEST_VCVT_INSTR_UTILS_H
 
+#include <cstring>
 #include <gtest/gtest.h>
 #include <mockcpp/mockcpp.hpp>
 #include "tests/api/c_api/stub/cce_stub.h"
@@ -79,132 +80,6 @@
     }
 
 #define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_2(                                                                      \
-    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                                    \
-                                                                                                                   \
-    class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_2 : public testing::Test {      \
-    protected:                                                                                                     \
-        void SetUp() {}                                                                                            \
-        void TearDown() {}                                                                                         \
-    };                                                                                                             \
-                                                                                                                   \
-    namespace {                                                                                                    \
-    void cce_name##_##dst_data_type##_##src_data_type##_Stub_##index(                                              \
-        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal sat, Literal part,          \
-        Literal mode)                                                                                              \
-    {}                                                                                                             \
-    }                                                                                                              \
-                                                                                                                   \
-    TEST_F(                                                                                                        \
-        TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_2,                                \
-        c_api_name##_##dst_data_type##_##src_data_type##_Succ)                                                     \
-    {                                                                                                              \
-        dst_data_type dst;                                                                                         \
-        src_data_type src0;                                                                                        \
-        vector_bool mask;                                                                                          \
-                                                                                                                   \
-        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal, Literal)) \
-            .times(1)                                                                                              \
-            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Stub_##index));                            \
-                                                                                                                   \
-        c_api_name(dst, src0, mask, pos);                                                                          \
-        GlobalMockObject::verify();                                                                                \
-    }
-
-#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(                                                                \
-    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                                     \
-                                                                                                                    \
-    class TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_2 : public testing::Test { \
-    protected:                                                                                                      \
-        void SetUp() {}                                                                                             \
-        void TearDown() {}                                                                                          \
-    };                                                                                                              \
-                                                                                                                    \
-    namespace {                                                                                                     \
-    void cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_##index(                                        \
-        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal sat, Literal part,           \
-        Literal mode)                                                                                               \
-    {}                                                                                                              \
-    }                                                                                                               \
-                                                                                                                    \
-    TEST_F(                                                                                                         \
-        TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_2,                           \
-        c_api_name##_return_##dst_data_type##_##src_data_type##_Succ)                                               \
-    {                                                                                                               \
-        src_data_type src0;                                                                                         \
-        vector_bool mask;                                                                                           \
-                                                                                                                    \
-        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal, Literal))  \
-            .times(1)                                                                                               \
-            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_##index));                      \
-                                                                                                                    \
-        dst_data_type dst = c_api_name(src0, mask, pos);                                                            \
-        (void)dst;                                                                                                  \
-        GlobalMockObject::verify();                                                                                 \
-    }
-
-#define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_3(                                                                 \
-    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                               \
-                                                                                                              \
-    class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_3 : public testing::Test { \
-    protected:                                                                                                \
-        void SetUp() {}                                                                                       \
-        void TearDown() {}                                                                                    \
-    };                                                                                                        \
-                                                                                                              \
-    namespace {                                                                                               \
-    void cce_name##_##dst_data_type##_##src_data_type##_Stub_##index(                                         \
-        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal part, Literal mode)    \
-    {}                                                                                                        \
-    }                                                                                                         \
-                                                                                                              \
-    TEST_F(                                                                                                   \
-        TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_3,                           \
-        c_api_name##_##dst_data_type##_##src_data_type##_Succ)                                                \
-    {                                                                                                         \
-        dst_data_type dst;                                                                                    \
-        src_data_type src0;                                                                                   \
-        vector_bool mask;                                                                                     \
-                                                                                                              \
-        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal))     \
-            .times(1)                                                                                         \
-            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Stub_##index));                       \
-                                                                                                              \
-        c_api_name(dst, src0, mask, pos);                                                                     \
-        GlobalMockObject::verify();                                                                           \
-    }
-
-#define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_4(                                                                 \
-    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                               \
-                                                                                                              \
-    class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_1 : public testing::Test { \
-    protected:                                                                                                \
-        void SetUp() {}                                                                                       \
-        void TearDown() {}                                                                                    \
-    };                                                                                                        \
-                                                                                                              \
-    namespace {                                                                                               \
-    void cce_name##_##dst_data_type##_##src_data_type##_Stub_##index(                                         \
-        dst_data_type& dst, src_data_type src0, vector_bool mask, int rnd, int sat, int part, int mode)       \
-    {}                                                                                                        \
-    }                                                                                                         \
-                                                                                                              \
-    TEST_F(                                                                                                   \
-        TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_1,                           \
-        c_api_name##_##dst_data_type##_##src_data_type##_Succ)                                                \
-    {                                                                                                         \
-        dst_data_type dst;                                                                                    \
-        src_data_type src0;                                                                                   \
-        vector_bool mask;                                                                                     \
-                                                                                                              \
-        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, int, int, int, int))            \
-            .times(1)                                                                                         \
-            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Stub_##index));                       \
-                                                                                                              \
-        c_api_name(dst, src0, mask, pos);                                                                     \
-        GlobalMockObject::verify();                                                                           \
-    }
-
-#define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(                                                                      \
     class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, round, sat, part, mode, index)            \
                                                                                                                    \
     class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_2 : public testing::Test {      \
@@ -249,100 +124,7 @@
         GlobalMockObject::verify();                                                                                \
     }
 
-#define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_6(                                                                 \
-    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                               \
-                                                                                                              \
-    class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_3 : public testing::Test { \
-    protected:                                                                                                \
-        void SetUp() {}                                                                                       \
-        void TearDown() {}                                                                                    \
-    };                                                                                                        \
-                                                                                                              \
-    namespace {                                                                                               \
-    void cce_name##_##dst_data_type##_##src_data_type##_Stub_##index(                                         \
-        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal part, Literal mode)    \
-    {}                                                                                                        \
-    }                                                                                                         \
-                                                                                                              \
-    TEST_F(                                                                                                   \
-        TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_3,                           \
-        c_api_name##_##dst_data_type##_##src_data_type##_Succ)                                                \
-    {                                                                                                         \
-        dst_data_type dst;                                                                                    \
-        src_data_type src0;                                                                                   \
-        vector_bool mask;                                                                                     \
-                                                                                                              \
-        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal))     \
-            .times(1)                                                                                         \
-            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Stub_##index));                       \
-                                                                                                              \
-        c_api_name(dst, src0, mask, pos);                                                                     \
-        GlobalMockObject::verify();                                                                           \
-    }
-
-#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_3(                                                                \
-    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                                     \
-                                                                                                                    \
-    class TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_3 : public testing::Test { \
-    protected:                                                                                                      \
-        void SetUp() {}                                                                                             \
-        void TearDown() {}                                                                                          \
-    };                                                                                                              \
-                                                                                                                    \
-    namespace {                                                                                                     \
-    void cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_##index(                                        \
-        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal part, Literal mode)          \
-    {}                                                                                                              \
-    }                                                                                                               \
-                                                                                                                    \
-    TEST_F(                                                                                                         \
-        TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_3,                           \
-        c_api_name##_return_##dst_data_type##_##src_data_type##_Succ)                                               \
-    {                                                                                                               \
-        src_data_type src0;                                                                                         \
-        vector_bool mask;                                                                                           \
-                                                                                                                    \
-        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal))           \
-            .times(1)                                                                                               \
-            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_##index));                      \
-                                                                                                                    \
-        dst_data_type dst = c_api_name(src0, mask, pos);                                                            \
-        (void)dst;                                                                                                  \
-        GlobalMockObject::verify();                                                                                 \
-    }
-
-#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_4(                                                                \
-    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                                     \
-                                                                                                                    \
-    class TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_1 : public testing::Test { \
-    protected:                                                                                                      \
-        void SetUp() {}                                                                                             \
-        void TearDown() {}                                                                                          \
-    };                                                                                                              \
-                                                                                                                    \
-    namespace {                                                                                                     \
-    void cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_##index(                                        \
-        dst_data_type& dst, src_data_type src0, vector_bool mask, int rnd, int sat, int part, int mode)             \
-    {}                                                                                                              \
-    }                                                                                                               \
-                                                                                                                    \
-    TEST_F(                                                                                                         \
-        TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_1,                           \
-        c_api_name##_return_##dst_data_type##_##src_data_type##_Succ)                                               \
-    {                                                                                                               \
-        src_data_type src0;                                                                                         \
-        vector_bool mask;                                                                                           \
-                                                                                                                    \
-        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, int, int, int, int))                  \
-            .times(1)                                                                                               \
-            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_##index));                      \
-                                                                                                                    \
-        dst_data_type dst = c_api_name(src0, mask, pos);                                                            \
-        (void)dst;                                                                                                  \
-        GlobalMockObject::verify();                                                                                 \
-    }
-
-#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(                                                                \
+#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_2(                                                                \
     class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, round, sat, part, mode, index)             \
                                                                                                                     \
     class TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_2 : public testing::Test { \
@@ -387,7 +169,145 @@
         GlobalMockObject::verify();                                                                                 \
     }
 
-#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_6(                                                                \
+#define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_3(                                                                 \
+    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                               \
+                                                                                                              \
+    class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_3 : public testing::Test { \
+    protected:                                                                                                \
+        void SetUp() {}                                                                                       \
+        void TearDown() {}                                                                                    \
+    };                                                                                                        \
+                                                                                                              \
+    namespace {                                                                                               \
+    void cce_name##_##dst_data_type##_##src_data_type##_Stub_##index(                                         \
+        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal part, Literal mode)    \
+    {}                                                                                                        \
+    }                                                                                                         \
+                                                                                                              \
+    TEST_F(                                                                                                   \
+        TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_3,                           \
+        c_api_name##_##dst_data_type##_##src_data_type##_Succ)                                                \
+    {                                                                                                         \
+        dst_data_type dst;                                                                                    \
+        src_data_type src0;                                                                                   \
+        vector_bool mask;                                                                                     \
+                                                                                                              \
+        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal))     \
+            .times(1)                                                                                         \
+            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Stub_##index));                       \
+                                                                                                              \
+        c_api_name(dst, src0, mask, pos);                                                                     \
+        GlobalMockObject::verify();                                                                           \
+    }
+
+#define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_4(                                                                 \
+    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                               \
+                                                                                                              \
+    class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_4 : public testing::Test { \
+    protected:                                                                                                \
+        void SetUp() {}                                                                                       \
+        void TearDown() {}                                                                                    \
+    };                                                                                                        \
+                                                                                                              \
+    namespace {                                                                                               \
+    void cce_name##_##dst_data_type##_##src_data_type##_Stub_4_##index(                                       \
+        dst_data_type& dst, src_data_type src0, vector_bool mask, int rnd, int sat, int part, int mode)       \
+    {}                                                                                                        \
+    }                                                                                                         \
+                                                                                                              \
+    TEST_F(                                                                                                   \
+        TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_4,                           \
+        c_api_name##_##dst_data_type##_##src_data_type##_Succ)                                                \
+    {                                                                                                         \
+        dst_data_type dst;                                                                                    \
+        src_data_type src0;                                                                                   \
+        vector_bool mask;                                                                                     \
+                                                                                                              \
+        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, int, int, int, int))            \
+            .times(1)                                                                                         \
+            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Stub_4_##index));                     \
+                                                                                                              \
+        c_api_name(dst, src0, mask, pos);                                                                     \
+        GlobalMockObject::verify();                                                                           \
+    }
+
+#define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_5(                                                                      \
+    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, round, sat, part, mode, index)            \
+                                                                                                                   \
+    class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_5 : public testing::Test {      \
+    protected:                                                                                                     \
+        void SetUp() {}                                                                                            \
+        void TearDown() {}                                                                                         \
+    };                                                                                                             \
+                                                                                                                   \
+    namespace {                                                                                                    \
+    void cce_name##_##dst_data_type##_##src_data_type##_Stub_5_##index(                                            \
+        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal sat, Literal part,          \
+        Literal mode)                                                                                              \
+    {}                                                                                                             \
+    }                                                                                                              \
+                                                                                                                   \
+    TEST_F(                                                                                                        \
+        TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_5,                                \
+        c_api_name##_##dst_data_type##_##src_data_type##_Succ)                                                     \
+    {                                                                                                              \
+        dst_data_type dst;                                                                                         \
+        src_data_type src0;                                                                                        \
+        vector_bool mask;                                                                                          \
+        Literal expected_round = round;                                                                            \
+        Literal expected_sat = sat;                                                                                \
+        Literal expected_part = part;                                                                              \
+        Literal expected_mode = mode;                                                                              \
+        Literal actual_round{};                                                                                    \
+        Literal actual_sat{};                                                                                      \
+        Literal actual_part{};                                                                                     \
+        Literal actual_mode{};                                                                                     \
+                                                                                                                   \
+        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal, Literal)) \
+            .times(1)                                                                                              \
+            .with(any(), any(), any(), spy(actual_round), spy(actual_sat), spy(actual_part), spy(actual_mode))     \
+            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Stub_5_##index));                          \
+                                                                                                                   \
+        c_api_name(dst, src0, mask, pos);                                                                          \
+        EXPECT_EQ(0, std::memcmp(&expected_round, &actual_round, sizeof(Literal)));                                \
+        EXPECT_EQ(0, std::memcmp(&expected_sat, &actual_sat, sizeof(Literal)));                                    \
+        EXPECT_EQ(0, std::memcmp(&expected_part, &actual_part, sizeof(Literal)));                                  \
+        EXPECT_EQ(0, std::memcmp(&expected_mode, &actual_mode, sizeof(Literal)));                                  \
+        GlobalMockObject::verify();                                                                                \
+    }
+
+#define TEST_VECTOR_COMPUTE_VCVT_POS_INSTR_6(                                                                 \
+    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                               \
+                                                                                                              \
+    class TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_6 : public testing::Test { \
+    protected:                                                                                                \
+        void SetUp() {}                                                                                       \
+        void TearDown() {}                                                                                    \
+    };                                                                                                        \
+                                                                                                              \
+    namespace {                                                                                               \
+    void cce_name##_##dst_data_type##_##src_data_type##_Stub_6_##index(                                       \
+        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal part, Literal mode)    \
+    {}                                                                                                        \
+    }                                                                                                         \
+                                                                                                              \
+    TEST_F(                                                                                                   \
+        TestVectorCompute##class_name##_##dst_data_type##_##src_data_type##_CApi_6,                           \
+        c_api_name##_##dst_data_type##_##src_data_type##_Succ)                                                \
+    {                                                                                                         \
+        dst_data_type dst;                                                                                    \
+        src_data_type src0;                                                                                   \
+        vector_bool mask;                                                                                     \
+                                                                                                              \
+        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal))     \
+            .times(1)                                                                                         \
+            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Stub_6_##index));                     \
+                                                                                                              \
+        c_api_name(dst, src0, mask, pos);                                                                     \
+        GlobalMockObject::verify();                                                                           \
+    }
+
+#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_3(                                                                \
     class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                                     \
                                                                                                                     \
     class TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_3 : public testing::Test { \
@@ -412,6 +332,113 @@
         MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal))           \
             .times(1)                                                                                               \
             .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_##index));                      \
+                                                                                                                    \
+        dst_data_type dst = c_api_name(src0, mask, pos);                                                            \
+        (void)dst;                                                                                                  \
+        GlobalMockObject::verify();                                                                                 \
+    }
+
+#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_4(                                                                \
+    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                                     \
+                                                                                                                    \
+    class TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_4 : public testing::Test { \
+    protected:                                                                                                      \
+        void SetUp() {}                                                                                             \
+        void TearDown() {}                                                                                          \
+    };                                                                                                              \
+                                                                                                                    \
+    namespace {                                                                                                     \
+    void cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_4_##index(                                      \
+        dst_data_type& dst, src_data_type src0, vector_bool mask, int rnd, int sat, int part, int mode)             \
+    {}                                                                                                              \
+    }                                                                                                               \
+                                                                                                                    \
+    TEST_F(                                                                                                         \
+        TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_4,                           \
+        c_api_name##_return_##dst_data_type##_##src_data_type##_Succ)                                               \
+    {                                                                                                               \
+        src_data_type src0;                                                                                         \
+        vector_bool mask;                                                                                           \
+                                                                                                                    \
+        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, int, int, int, int))                  \
+            .times(1)                                                                                               \
+            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_4_##index));                    \
+                                                                                                                    \
+        dst_data_type dst = c_api_name(src0, mask, pos);                                                            \
+        (void)dst;                                                                                                  \
+        GlobalMockObject::verify();                                                                                 \
+    }
+
+#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_5(                                                                \
+    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, round, sat, part, mode, index)             \
+                                                                                                                    \
+    class TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_5 : public testing::Test { \
+    protected:                                                                                                      \
+        void SetUp() {}                                                                                             \
+        void TearDown() {}                                                                                          \
+    };                                                                                                              \
+                                                                                                                    \
+    namespace {                                                                                                     \
+    void cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_5_##index(                                      \
+        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal sat, Literal part,           \
+        Literal mode)                                                                                               \
+    {}                                                                                                              \
+    }                                                                                                               \
+                                                                                                                    \
+    TEST_F(                                                                                                         \
+        TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_5,                           \
+        c_api_name##_return_##dst_data_type##_##src_data_type##_Succ)                                               \
+    {                                                                                                               \
+        src_data_type src0;                                                                                         \
+        vector_bool mask;                                                                                           \
+        Literal expected_round = round;                                                                             \
+        Literal expected_sat = sat;                                                                                 \
+        Literal expected_part = part;                                                                               \
+        Literal expected_mode = mode;                                                                               \
+        Literal actual_round{};                                                                                     \
+        Literal actual_sat{};                                                                                       \
+        Literal actual_part{};                                                                                      \
+        Literal actual_mode{};                                                                                      \
+                                                                                                                    \
+        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal, Literal))  \
+            .times(1)                                                                                               \
+            .with(any(), any(), any(), spy(actual_round), spy(actual_sat), spy(actual_part), spy(actual_mode))      \
+            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_5_##index));                    \
+                                                                                                                    \
+        dst_data_type dst = c_api_name(src0, mask, pos);                                                            \
+        (void)dst;                                                                                                  \
+        EXPECT_EQ(0, std::memcmp(&expected_round, &actual_round, sizeof(Literal)));                                 \
+        EXPECT_EQ(0, std::memcmp(&expected_sat, &actual_sat, sizeof(Literal)));                                     \
+        EXPECT_EQ(0, std::memcmp(&expected_part, &actual_part, sizeof(Literal)));                                   \
+        EXPECT_EQ(0, std::memcmp(&expected_mode, &actual_mode, sizeof(Literal)));                                   \
+        GlobalMockObject::verify();                                                                                 \
+    }
+
+#define TEST_VECTOR_COMPUTE_VCVT_RETURN_POS_INSTR_6(                                                                \
+    class_name, c_api_name, cce_name, dst_data_type, src_data_type, pos, index)                                     \
+                                                                                                                    \
+    class TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_6 : public testing::Test { \
+    protected:                                                                                                      \
+        void SetUp() {}                                                                                             \
+        void TearDown() {}                                                                                          \
+    };                                                                                                              \
+                                                                                                                    \
+    namespace {                                                                                                     \
+    void cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_6_##index(                                      \
+        dst_data_type& dst, src_data_type src0, vector_bool mask, Literal rnd, Literal part, Literal mode)          \
+    {}                                                                                                              \
+    }                                                                                                               \
+                                                                                                                    \
+    TEST_F(                                                                                                         \
+        TestVectorComputeReturn##class_name##_##dst_data_type##_##src_data_type##_CApi_6,                           \
+        c_api_name##_return_##dst_data_type##_##src_data_type##_Succ)                                               \
+    {                                                                                                               \
+        src_data_type src0;                                                                                         \
+        vector_bool mask;                                                                                           \
+                                                                                                                    \
+        MOCKER_CPP(cce_name, void(dst_data_type&, src_data_type, vector_bool, Literal, Literal, Literal))           \
+            .times(1)                                                                                               \
+            .will(invoke(cce_name##_##dst_data_type##_##src_data_type##_Return_Stub_6_##index));                    \
                                                                                                                     \
         dst_data_type dst = c_api_name(src0, mask, pos);                                                            \
         (void)dst;                                                                                                  \
@@ -556,6 +583,5 @@
         EXPECT_EQ(0, std::memcmp(&expected_mode, &actual_mode, sizeof(Literal)));                                  \
         GlobalMockObject::verify();                                                                                \
     }
-
 
 #endif
