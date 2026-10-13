@@ -31,6 +31,7 @@ from .ascendc_constants import (
     KernelMetaType,
     MIX_CORE_MACRO,
     TILING_KEY_MACRO,
+    KERNEL_TYPE_TO_STR,
 )
 
 
