@@ -62,6 +62,29 @@ template <broadcast_mode brc_mode = broadcast_mode::elem, typename Tensor>
 __simd_callee__ inline decltype(auto) load_broadcast(const Tensor& tensor);
 
 /**
+ * @brief Gathers elements or data blocks from a UB tensor at the specified coordinate.
+ * @param tensor Source tensor located in UB.
+ * @param coord Coordinate used as the base source position.
+ * @param index Register tensor containing the source offsets relative to the base position.
+ * @param gather_mask Register mask that selects the values to gather.
+ * @return A register tensor containing the gathered data.
+ */
+template <gather_mode mode = gather_mode::element, typename Tensor, typename Coord, typename Index>
+__simd_callee__ inline decltype(auto) load_gather(
+    const Tensor& tensor, const Coord& coord, const reg_tensor<Index> index, const reg_tensor<bool>& gather_mask);
+
+/**
+ * @brief Gathers elements or data blocks from the beginning of a UB tensor.
+ * @param tensor Source tensor located in UB.
+ * @param index Register tensor containing the source offsets.
+ * @param gather_mask Register mask that selects the values to gather.
+ * @return A register tensor containing the gathered data.
+ */
+template <gather_mode mode = gather_mode::element, typename Tensor, typename Index>
+__simd_callee__ inline decltype(auto) load_gather(
+    const Tensor& tensor, const reg_tensor<Index> index, const reg_tensor<bool>& gather_mask);
+
+/**
  * @brief Maintains the hardware state for an unaligned UB-to-register load.
  * @note load() does not advance the prepared state. Call prepare() for each new
  * source address, using a tensor whose beginning matches the load address.
