@@ -419,7 +419,7 @@ __global__ __aicore__ void MainReduceSumNormalMode(
     SetFlag<HardEvent::MTE3_V>(eventIdMte3ToV);
     WaitFlag<HardEvent::MTE3_V>(eventIdMte3ToV);
 
-    uint64_t maskArr[] = {0xffffffffffffffff, 0xffffffffffffffff};
+    uint64_t maskArr[] = {0xffffffffffffffff, sizeof(PrimT<T>) == sizeof(half) ? 0xffffffffffffffffULL : 0ULL};
     ReduceSum<T>(outputLocal, inputLocal, workLocal, maskArr, repeatTime, srcRepStride);
 
     event_t secondEventIdVToMte3 = static_cast<event_t>(GetTPipePtr()->FetchEventID(HardEvent::V_MTE3));
