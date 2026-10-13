@@ -15,53 +15,80 @@
 #include "include/c_api/asc_simd.h"
 
 namespace {
-void E8m0ToBf16Stub(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal) {}
-} // namespace
-
-TEST(E8m0ToBf16, PositionOverloads)
-{
-    vector_bfloat16_t dst;
-    vector_fp8_e8m0_t src;
-    vector_bool mask;
-    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
-        .times(2)
-        .will(invoke(E8m0ToBf16Stub));
-
-    asc_e8m02bfloat16(dst, src, mask, ASC_POSITION_EVEN);
-    asc_e8m02bfloat16(dst, src, mask, ASC_POSITION_ODD);
-    GlobalMockObject::verify();
-}
-
-TEST(E8m0ToBf16, ReturnAndV2Overloads)
-{
-    vector_fp8_e8m0_t src;
-    vector_bool mask;
-    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
-        .times(3)
-        .will(invoke(E8m0ToBf16Stub));
-
-    auto even = asc_e8m02bfloat16(src, mask, ASC_POSITION_EVEN);
-    auto odd = asc_e8m02bfloat16(src, mask, ASC_POSITION_ODD);
-    vector_bfloat16_t dst;
-    asc_e8m02bfloat16_v2(dst, src, mask);
-    static_assert(std::is_same<decltype(even), vector_bfloat16_t>::value);
-    static_assert(std::is_same<decltype(odd), vector_bfloat16_t>::value);
-    (void)even;
-    (void)odd;
-    GlobalMockObject::verify();
-}
-
-namespace {
-void AscCastE8m0ToBf16EvenStub(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal part)
+void E8m0ToBf16EvenStub(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal part)
 {
     EXPECT_EQ(part, PART_EVEN);
 }
 
-void AscCastE8m0ToBf16OddStub(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal part)
-{
-    EXPECT_EQ(part, PART_ODD);
-}
+void E8m0ToBf16OddStub(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal part) { EXPECT_EQ(part, PART_ODD); }
 } // namespace
+
+TEST(E8m0ToBf16, PositionEven)
+{
+    vector_bfloat16_t dst;
+    vector_fp8_e8m0_t src;
+    vector_bool mask;
+    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
+        .times(1)
+        .will(invoke(E8m0ToBf16EvenStub));
+
+    asc_e8m02bfloat16(dst, src, mask, ASC_POSITION_EVEN);
+    GlobalMockObject::verify();
+}
+
+TEST(E8m0ToBf16, PositionOdd)
+{
+    vector_bfloat16_t dst;
+    vector_fp8_e8m0_t src;
+    vector_bool mask;
+    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
+        .times(1)
+        .will(invoke(E8m0ToBf16OddStub));
+
+    asc_e8m02bfloat16(dst, src, mask, ASC_POSITION_ODD);
+    GlobalMockObject::verify();
+}
+
+TEST(E8m0ToBf16, ReturnEven)
+{
+    vector_fp8_e8m0_t src;
+    vector_bool mask;
+    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
+        .times(1)
+        .will(invoke(E8m0ToBf16EvenStub));
+
+    auto dst = asc_e8m02bfloat16(src, mask, ASC_POSITION_EVEN);
+    static_assert(std::is_same<decltype(dst), vector_bfloat16_t>::value);
+    (void)dst;
+    GlobalMockObject::verify();
+}
+
+TEST(E8m0ToBf16, ReturnOdd)
+{
+    vector_fp8_e8m0_t src;
+    vector_bool mask;
+    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
+        .times(1)
+        .will(invoke(E8m0ToBf16OddStub));
+
+    auto dst = asc_e8m02bfloat16(src, mask, ASC_POSITION_ODD);
+    static_assert(std::is_same<decltype(dst), vector_bfloat16_t>::value);
+    (void)dst;
+    GlobalMockObject::verify();
+}
+
+TEST(E8m0ToBf16, V2)
+{
+    vector_fp8_e8m0_t src;
+    vector_bool mask;
+    vector_bfloat16_t dst;
+    MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
+        .times(1)
+        .will(invoke(E8m0ToBf16OddStub));
+
+    asc_e8m02bfloat16_v2(dst, src, mask);
+    GlobalMockObject::verify();
+}
 
 TEST(AscCastE8m0ToBf16, Even)
 {
@@ -70,7 +97,7 @@ TEST(AscCastE8m0ToBf16, Even)
     vector_bool mask;
     MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(AscCastE8m0ToBf16EvenStub));
+        .will(invoke(E8m0ToBf16EvenStub));
 
     asc_cast(dst, src, mask, ASC_POSITION_EVEN);
     GlobalMockObject::verify();
@@ -83,7 +110,7 @@ TEST(AscCastE8m0ToBf16, Odd)
     vector_bool mask;
     MOCKER_CPP(vcvt_e8m02bf16, void(vector_bfloat16_t&, vector_fp8_e8m0_t, vector_bool, Literal))
         .times(1)
-        .will(invoke(AscCastE8m0ToBf16OddStub));
+        .will(invoke(E8m0ToBf16OddStub));
 
     asc_cast(dst, src, mask, ASC_POSITION_ODD);
     GlobalMockObject::verify();
