@@ -101,7 +101,6 @@ static void test_host_c_api_reg_compute_2()
     using ::asc_bfloat162int32_rz_sat;
     using ::asc_bfloat162int32_rz_sat_v2;
     using ::asc_bfloat162int32_rz_v2;
-    using ::asc_cast_merge;
     using ::asc_ceil;
     using ::asc_clear_ar_spr;
     using ::asc_copy;
