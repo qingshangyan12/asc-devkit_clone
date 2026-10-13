@@ -26,10 +26,6 @@
 #include "impl/c_api/reg_base_impl/npu_arch_9201/reg_convert_intf_impl.h"
 #endif
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-#include "impl/c_api/reg_base_impl/npu_arch_9201/reg_convert_intf_impl.h"
-#endif
-
 __simd_callee__ inline void asc_float2half_rd(
     vector_half& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
