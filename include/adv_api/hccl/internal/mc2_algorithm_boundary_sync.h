@@ -70,8 +70,27 @@ struct TurnPolicy {
     bool enabled = false;
     bool skipEntry = false;
     uint32_t exitNotify = 0U;
+    uint32_t communicationThreads = 0U;
+    uint32_t activeThreads = 0U;
     // Diagnostic only; not part of the wire format or task-cache identity.
     const char* fallbackReason = "disabled";
 };
+
+// Preserve the executor's existing channel-selection rule, including legacy SoleNHR.
+inline bool ConfigureAllGatherChannels(bool aicpu, bool isPod, const char* algorithm)
+{
+    return aicpu && (isPod || std::strcmp(algorithm, "AicpuAllGatherSoleNHR") != 0);
+}
+
+inline bool NotifyBudget(uint32_t base, uint32_t threads, uint32_t turns, uint32_t& required)
+{
+    required = base;
+    if (threads < 2U || base >= NOTIFY_LIMIT || turns == 0U ||
+        threads - 1U > (NOTIFY_LIMIT - base) / turns) {
+        return false;
+    }
+    required = base + turns * (threads - 1U);
+    return true;
+}
 }
 #endif

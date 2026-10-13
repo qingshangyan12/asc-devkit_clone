@@ -1135,9 +1135,10 @@ HcclResult HcclGetThread(
         std::vector<ThreadHandle> threads(threadNum);
         // maxNotifyNum需要再增加一个用于host-device同步
         uint32_t allocatedNotify = maxNotifyNum + 1U;
-        if (boundaryTurns > 1U && allocatedNotify < mc2_boundary::NOTIFY_LIMIT &&
-            boundaryTurns <= mc2_boundary::NOTIFY_LIMIT - allocatedNotify) {
-            allocatedNotify += boundaryTurns;
+        uint32_t requiredNotify = allocatedNotify;
+        if (boundaryTurns > 1U && mc2_boundary::NotifyBudget(
+            allocatedNotify, threadNum, boundaryTurns, requiredNotify)) {
+            allocatedNotify = requiredNotify;
         }
         CHK_RET(HcclThreadAcquire(comm, COMM_ENGINE_AICPU_TS, threadNum, allocatedNotify, threads.data()));
         CHK_RET(SaveMainThreadInfo(comm, param, threads[0], maxNotifyNum + 1));

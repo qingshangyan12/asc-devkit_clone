@@ -264,7 +264,7 @@ HcclResult AllocOpParamMemory(
     std::string tagParam = ctxTag + "_" + std::to_string(index);
     if (extensionSize != 0U) {
         mc2_boundary::Encode(serializedOpParam.data() + baseSize, boundary);
-        tagParam += ":mb1:" + std::to_string(boundary.mode) + ":" +
+        tagParam += ":mb2:" + std::to_string(boundary.mode) + ":" +
                     std::to_string(boundary.groupId) + ":" + std::to_string(boundary.totalTurns);
     }
     void* opParamPtr = nullptr;
@@ -1081,7 +1081,7 @@ HcclResult GetOpParam(
         HCCL_ERROR("Invalid MC2 boundary tiling extension."), HCCL_E_PARA);
     std::string resourceTag = tag;
     if (boundary.mode != 0U) {
-        resourceTag += ":mb1:" + std::to_string(boundary.mode) + ":" +
+        resourceTag += ":mb2:" + std::to_string(boundary.mode) + ":" +
                        std::to_string(boundary.groupId) + ":" + std::to_string(boundary.totalTurns);
     }
     CHK_RET(InitOpParamByTiling(comm, stream, resourceTag, ccTiling, opParam));

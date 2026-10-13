@@ -13,9 +13,11 @@
 #include <deque>
 #include <map>
 #include <numeric>
+#include <set>
 #include <tuple>
 #include <vector>
 #include "gtest/gtest.h"
+#include "gtest/gtest-spi.h"
 #include "alg_data_trans_wrapper.h"
 #include "ins_temp_all_gather_nhr.h"
 #include "mc2_boundary_group_state.h"
@@ -42,11 +44,13 @@ std::map<ThreadHandle, std::deque<Task>> queues;
 uint32_t entryRecords = 0;
 uint32_t internalRecords = 0;
 uint32_t payloads = 0;
-constexpr uint32_t RANKS = 8;
+constexpr uint32_t RANKS = 16;
 constexpr uint32_t TURNS = 3;
 constexpr uint32_t COUNT = 144;
 constexpr uint32_t STRIDE = 148;
 bool batchSupported = false;
+uint32_t allocatedThreads = 2U;
+uint32_t activeChannels = 1U;
 uint32_t batchCalls = 0;
 using Queues = std::map<ThreadHandle, std::deque<Task>>;
 std::map<std::string, Queues> cachedQueues;
@@ -119,9 +123,10 @@ void ExpectSameQueues(const Queues& expected)
 }
 uint64_t ChannelMailbox(ChannelHandle c, bool remote)
 {
-    const uint64_t from = (c - 1U) / RANKS;
+    const uint64_t channel = (c - 1U) / (RANKS * RANKS);
+    const uint64_t from = ((c - 1U) / RANKS) % RANKS;
     const uint64_t to = (c - 1U) % RANKS;
-    return 1000U + (remote ? to * RANKS + from : from * RANKS + to);
+    return 100000U + channel * RANKS * RANKS + (remote ? to * RANKS + from : from * RANKS + to);
 }
 void Copy(ThreadHandle t, void* dst, const void* src, uint64_t bytes)
 {
@@ -135,10 +140,10 @@ bool Execute(bool slaveFirst)
         bool progress = false;
         bool empty = true;
         // Drain each runnable stream, intentionally producing extreme main/slave skew.
-        for (uint32_t index = 0; index < RANKS * 2; ++index) {
-            const uint32_t rank = index / 2;
-            const bool slave = (index % 2 == 0) == slaveFirst;
-            auto& q = queues[rank * 2U + (slave ? 2U : 1U)];
+        for (uint32_t index = 0; index < RANKS * allocatedThreads; ++index) {
+            const uint32_t rank = index / allocatedThreads;
+            const uint32_t lane = (index % allocatedThreads + (slaveFirst ? 1U : 0U)) % allocatedThreads;
+            auto& q = queues[rank * allocatedThreads + lane + 1U];
             while (!q.empty()) {
                 empty = false;
                 const Task t = q.front();
@@ -164,6 +169,10 @@ bool Execute(bool slaveFirst)
                 }
                 q.pop_front();
                 progress = true;
+                if (slaveFirst && lane >= activeChannels) {
+                    // Slow post-copy lanes while communication lanes drain fully.
+                    break;
+                }
             }
         }
         if (empty) {
@@ -181,8 +190,9 @@ bool Execute(bool slaveFirst)
 extern "C" int32_t __wrap_HcommThreadNotifyRecordOnThread(ThreadHandle t, ThreadHandle dst, uint32_t n)
 {
     queues[t].push_back({Kind::RECORD, dst, n});
-    entryRecords += n == 0U && t % 2U == 1U;
-    internalRecords += n == 1U;
+    entryRecords += n == 0U && (t - 1U) % allocatedThreads == 0U;
+    internalRecords += n == 1U && (t - 1U) % allocatedThreads < activeChannels &&
+        (dst - 1U) % allocatedThreads >= activeChannels;
     return HCCL_SUCCESS;
 }
 extern "C" int32_t __wrap_HcommThreadNotifyWaitOnThread(ThreadHandle t, uint32_t n, uint32_t)
@@ -299,12 +309,15 @@ TEST(Mc2Boundary, FailedSubmissionCannotFinalize)
     EXPECT_FALSE(group.Begin(config, 1));
 }
 
-static void RunNhrCase(uint32_t loops, bool batch, HcclDataType dtype, uint32_t elementSize)
+static void RunNhrCase(uint32_t loops, bool batch, HcclDataType dtype, uint32_t elementSize,
+    uint32_t channels = 1U, uint32_t allocation = 2U)
 {
+    allocatedThreads = allocation;
+    activeChannels = channels;
     for (const bool enabled : {false, true}) {
         for (const bool slaveFirst : {false, true}) {
             CacheHooks hooks;
-            Mc2AicpuTaskCacheManager cache(128U, 4096U);
+            Mc2AicpuTaskCacheManager cache(128U, 65536U);
             Mc2AicpuTaskCacheManager fullCache(1U, 4096U);
             ASSERT_EQ(fullCache.TryReserve(reinterpret_cast<void*>(1U), "occupied"),
                 Mc2TaskCacheReserveResult::RESERVED);
@@ -350,27 +363,32 @@ static void RunNhrCase(uint32_t loops, bool batch, HcclDataType dtype, uint32_t 
                     AlgResourceCtxSerializable resource{};
                     resource.topoInfo.userRank = rank;
                     resource.topoInfo.userRankSize = RANKS;
+                    resource.topoInfo.isPod = channels > 1U;
                     resource.algHierarchyInfo.infos = {{ranks}};
                     resource.cclMem.addr = scratch[rank].data();
                     resource.cclMem.size = RANKS * (loops == 1U ? 256U : 128U);
-                    resource.notifyNumOnMainThread = 1U;
-                    resource.notifyNumPerThread = {2U};
+                    resource.notifyNumOnMainThread = allocation - 1U;
+                    resource.notifyNumPerThread.assign(allocation - 1U, 2U);
                     resource.channels.resize(1);
-                    resource.threads = {rank * 2U + 1U, rank * 2U + 2U};
+                    for (uint32_t t = 0; t < allocation; ++t) {
+                        resource.threads.push_back(rank * allocation + t + 1U);
+                    }
                     for (uint32_t peer = 0; peer < RANKS; ++peer) {
                         if (peer == rank) {
                             continue;
                         }
-                        ChannelInfo channel{};
-                        channel.isValid = true;
-                        channel.remoteRank = peer;
-                        channel.handle = rank * RANKS + peer + 1U;
-                        channel.protocol = COMM_PROTOCOL_UBC_CTP;
-                        channel.remoteCclMem.addr = scratch[peer].data();
-                        channel.remoteCclMem.size = scratch[peer].size();
-                        resource.channels[0].push_back(channel);
+                        for (uint32_t c = 0; c < allocation / 2U; ++c) {
+                            ChannelInfo channel{};
+                            channel.isValid = true;
+                            channel.remoteRank = peer;
+                            channel.handle = c * RANKS * RANKS + rank * RANKS + peer + 1U;
+                            channel.portGroupSize = c == 0U ? 3U : 1U;
+                            channel.protocol = COMM_PROTOCOL_UBC_CTP;
+                            channel.remoteCclMem.addr = scratch[peer].data();
+                            channel.remoteCclMem.size = scratch[peer].size();
+                            resource.channels[0].push_back(channel);
+                        }
                     }
-                    InsV2AllGatherSoleExecutor<TopoMatch1D, InsTempAllGatherNHR> executor;
                     mc2_boundary::Config config;
                     config.mode = enabled ? 1U : 0U;
                     config.totalTurns = TURNS;
@@ -382,10 +400,14 @@ static void RunNhrCase(uint32_t loops, bool batch, HcclDataType dtype, uint32_t 
                     uint32_t executions = 0U;
                     auto execute = [&]() {
                         ++executions;
+                        // Match LaunchOpenOpParamDataImpl: a fresh executor for each
+                        // expansion, not an accumulated RestoreChannelMap instance.
+                        InsV2AllGatherSoleExecutor<TopoMatch1D, InsTempAllGatherNHR> executor;
                         return executor.OrchestrateBoundary(param, resource, policy);
                     };
-                    const auto tag = enabled ? ":mb1:" + std::to_string(policy.skipEntry) + ":" +
-                        std::to_string(policy.exitNotify) : std::string();
+                    const auto tag = enabled ? ":mb2:" + std::to_string(policy.skipEntry) + ":" +
+                        std::to_string(policy.exitNotify) + ":" + std::to_string(policy.communicationThreads) +
+                        ":" + std::to_string(policy.activeThreads) : std::string();
                     // Clear each case so the first call must capture even when disabled
                     // turns share a shape; relocation belongs to HCOMM's separate tests.
                     cachedQueues.clear();
@@ -410,8 +432,9 @@ static void RunNhrCase(uint32_t loops, bool batch, HcclDataType dtype, uint32_t 
                         {Kind::CHECK, 0, 0, param.outputPtr, expected[turn].data(), RANKS * STRIDE});
                 }
             }
-            EXPECT_EQ(entryRecords, RANKS * (enabled ? 1U + TURNS * (loops - 1U) : TURNS * loops));
-            EXPECT_EQ(internalRecords, RANKS * TURNS * loops);
+            EXPECT_EQ(entryRecords, RANKS * (TURNS * loops * (2U * channels - 1U) -
+                (enabled ? (TURNS - 1U) * channels : 0U)));
+            EXPECT_EQ(internalRecords, RANKS * TURNS * loops * channels);
             ASSERT_GT(payloads, 0U);
             EXPECT_EQ(batchCalls > 0U, batch);
             ASSERT_TRUE(Execute(slaveFirst));
@@ -441,6 +464,9 @@ TEST(Mc2Boundary, CapturedNhrQueuesPreserveDataWithFastAndSlowCopyThreads)
             (dtype == HCCL_DATA_TYPE_FP32 ? 4U : 2U);
         RunNhrCase(1U, batch, dtype, elementSize);
         RunNhrCase(2U, batch, dtype, elementSize);
+        RunNhrCase(1U, batch, dtype, elementSize, 1U, 4U);
+        RunNhrCase(1U, batch, dtype, elementSize, 2U, 4U);
+        RunNhrCase(2U, batch, dtype, elementSize, 2U, 4U);
     }
 }
 
@@ -462,6 +488,12 @@ TEST(Mc2Boundary, RuntimeFallbackReasonsAndPolicyReset)
     res.cclMem.addr = scratch.data();
     res.cclMem.size = scratch.size();
     res.notifyNumOnMainThread = 2U;
+    ChannelInfo channel{};
+    channel.isValid = true;
+    channel.remoteRank = 1U;
+    channel.handle = 1U;
+    channel.protocol = COMM_PROTOCOL_UBC_CTP;
+    res.channels = {{channel}};
     mc2_boundary::Config config;
     config.mode = 1U;
     config.totalTurns = 3U;
@@ -496,4 +528,82 @@ TEST(Mc2Boundary, RuntimeFallbackReasonsAndPolicyReset)
     std::strcpy(param.algName, "AicpuAllGatherSoleNHRMultiLink");
     EXPECT_FALSE(prepare());
     EXPECT_STREQ(policy.fallbackReason, "unsupported_algorithm_or_mode");
+}
+
+TEST(Mc2Boundary, EffectiveLayoutAndNotifyMatrix)
+{
+    AlgResourceCtxSerializable res{};
+    res.threads = {1U, 2U, 3U, 4U};
+    res.channels.resize(1);
+    for (uint32_t peer = 1U; peer < 4U; ++peer) {
+        for (uint32_t c = 0U; c < 2U; ++c) {
+            ChannelInfo channel{};
+            channel.remoteRank = peer;
+            channel.handle = peer * 2U + c;
+            channel.isValid = true;
+            channel.protocol = COMM_PROTOCOL_UBC_CTP;
+            channel.portGroupSize = c + 1U;
+            res.channels[0].push_back(channel);
+        }
+    }
+    mc2_boundary::TurnPolicy policy;
+    ASSERT_TRUE(PrepareOpenBoundaryLayout(res, policy));
+    EXPECT_EQ(policy.communicationThreads, 1U);
+    EXPECT_EQ(policy.activeThreads, 2U);
+    res.topoInfo.isPod = true;
+    ASSERT_TRUE(PrepareOpenBoundaryLayout(res, policy));
+    EXPECT_EQ(policy.communicationThreads, 2U);
+    EXPECT_EQ(policy.activeThreads, 4U);
+    uint32_t required = 0U;
+    EXPECT_TRUE(mc2_boundary::NotifyBudget(4U, 4U, 4U, required));
+    EXPECT_EQ(required, 16U);
+    EXPECT_TRUE(mc2_boundary::NotifyBudget(4U, 4U, 20U, required));
+    EXPECT_EQ(required, 64U);
+    EXPECT_FALSE(mc2_boundary::NotifyBudget(4U, 4U, 21U, required));
+    EXPECT_FALSE(mc2_boundary::NotifyBudget(4U, UINT32_MAX, UINT32_MAX, required));
+    std::set<uint32_t> slots;
+    for (uint32_t turn = 0; turn < 4U; ++turn) {
+        for (uint32_t slave = 0; slave < 3U; ++slave) {
+            EXPECT_TRUE(slots.insert(4U + turn * 3U + slave).second);
+        }
+    }
+    res.threads[3] = res.threads[1];
+    EXPECT_FALSE(PrepareOpenBoundaryLayout(res, policy));
+    EXPECT_STREQ(policy.fallbackReason, "thread_layout");
+    res.threads[3] = 4U;
+    res.channels[0].back().portGroupSize = 9U;
+    EXPECT_FALSE(PrepareOpenBoundaryLayout(res, policy));
+    EXPECT_STREQ(policy.fallbackReason, "channel_protocol_or_partition");
+    res.channels[0].pop_back();
+    EXPECT_FALSE(PrepareOpenBoundaryLayout(res, policy));
+    EXPECT_STREQ(policy.fallbackReason, "uneven_channel_layout");
+}
+
+TEST(Mc2Boundary, CommunicationEntryProtectsSlowPostCopyScratch)
+{
+    allocatedThreads = 4U;
+    activeChannels = 2U;
+    for (const bool retainEntry : {false, true}) {
+        queues.clear();
+        uint32_t scratch = 7U;
+        uint32_t output = 0U;
+        const uint32_t expected = 7U;
+        const uint32_t nextInput = 9U;
+        // Previous full exit is on main, not on the producer T1.
+        queues[1].push_back({Kind::WAIT, 1U, 6U});
+        if (retainEntry) {
+            queues[1].push_back({Kind::RECORD, 2U, 0U});
+            queues[2].push_back({Kind::WAIT, 2U, 0U});
+        }
+        queues[1].push_back({Kind::CHECK, 0U, 0U, &output, &expected, sizeof(output)});
+        queues[2].push_back({Kind::COPY, 0U, 0U, &scratch, &nextInput, sizeof(scratch)});
+        queues[4].push_back({Kind::COPY, 0U, 0U, &output, &scratch, sizeof(output)});
+        queues[4].push_back({Kind::RECORD, 1U, 6U});
+        if (retainEntry) {
+            EXPECT_TRUE(Execute(false));
+            EXPECT_EQ(output, expected);
+        } else {
+            EXPECT_NONFATAL_FAILURE(EXPECT_FALSE(Execute(false)), "Per-turn completion preceded output readiness");
+        }
+    }
 }

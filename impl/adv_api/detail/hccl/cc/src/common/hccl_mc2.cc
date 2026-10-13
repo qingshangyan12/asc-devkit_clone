@@ -416,7 +416,7 @@ HcclResult BuildTagsAndValidate(
                       std::to_string(ccTiling->commEngine);
         }
         if (boundary.mode != 0U) {
-            ctxTag += ":mb1:" + std::to_string(boundary.mode) + ":" +
+            ctxTag += ":mb2:" + std::to_string(boundary.mode) + ":" +
                       std::to_string(boundary.groupId) + ":" + std::to_string(boundary.totalTurns);
         }
     }

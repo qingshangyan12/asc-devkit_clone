@@ -35,6 +35,8 @@ HcclResult LaunchOpenOpParamData(
 bool PrepareOpenBoundaryPolicy(
     const std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
     const mc2_boundary::Config& config, uint32_t turn, mc2_boundary::TurnPolicy& policy);
+bool PrepareOpenBoundaryLayout(
+    const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, mc2_boundary::TurnPolicy& policy);
 HcclResult LoadFromKey(uint64_t opParamKey);
 
 #endif

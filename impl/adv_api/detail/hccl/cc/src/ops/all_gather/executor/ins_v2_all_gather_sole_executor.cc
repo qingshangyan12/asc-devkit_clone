@@ -177,8 +177,8 @@ HcclResult InsV2AllGatherSoleExecutor<AlgTopoMatch, InsAlgTemplate>::Orchestrate
         templateAlgRes.channels.size(), templateAlgRes.threads.size());
     // 构建template
     InsAlgTemplate algTemplate(param, resCtx.topoInfo.userRank, resCtx.algHierarchyInfo.infos[0]);
-    if (param.engine == COMM_ENGINE_AICPU_TS &&
-        (resCtx.topoInfo.isPod || std::string(param.algName) != "AicpuAllGatherSoleNHR")) {
+    if (mc2_boundary::ConfigureAllGatherChannels(
+        param.engine == COMM_ENGINE_AICPU_TS, resCtx.topoInfo.isPod, param.algName)) {
         CHK_RET(SetChannelsPerRankIfSupported(algTemplate, templateAlgRes.channels));
     }
     u32 templateScratchMultiplier =

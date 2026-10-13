@@ -9,6 +9,8 @@
  */
 #include <cstddef>
 #include <limits>
+#include <map>
+#include <set>
 #include "comm_kfc_open_kernel_adapter.h"
 #include "ins_v2_all_gather_sole_executor.h"
 #include "ins_temp_all_gather_nhr.h"
@@ -140,6 +142,67 @@ bool DisjointBuffers(const void* a, uint64_t aSize, const void* b, uint64_t bSiz
 }
 } // namespace
 
+bool PrepareOpenBoundaryLayout(
+    const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, mc2_boundary::TurnPolicy& policy)
+{
+    policy.fallbackReason = "channel_layout";
+    policy.communicationThreads = 0U;
+    policy.activeThreads = 0U;
+    if (resCtx.channels.size() != 1U || resCtx.channels[0].empty()) {
+        return false;
+    }
+    std::map<uint32_t, std::vector<const mc2_ops_hccl::ChannelInfo*>> peers;
+    for (const auto& channel : resCtx.channels[0]) {
+        peers[channel.remoteRank].push_back(&channel);
+    }
+    // This helper is only used for the exact SoleNHR whitelist. Non-POD SoleNHR
+    // intentionally retains the template's one-channel defaults.
+    const uint32_t channels = resCtx.topoInfo.isPod ? peers.begin()->second.size() : 1U;
+    if (channels == 0U || channels > 2U) {
+        policy.fallbackReason = "unsupported_channel_count";
+        return false;
+    }
+    uint64_t portCount = 0U;
+    for (uint32_t c = 0U; c < channels; ++c) {
+        portCount += peers.begin()->second[c]->portGroupSize;
+    }
+    if (portCount > UINT32_MAX) {
+        policy.fallbackReason = "channel_partition_overflow";
+        return false;
+    }
+    std::set<uint64_t> handles;
+    for (const auto& peer : peers) {
+        if (peer.second.size() < channels || (resCtx.topoInfo.isPod && peer.second.size() != channels)) {
+            policy.fallbackReason = "uneven_channel_layout";
+            return false;
+        }
+        for (uint32_t c = 0; c < channels; ++c) {
+            const auto& channel = *peer.second[c];
+            if (!channel.isValid || channel.handle == 0U || !handles.insert(channel.handle).second ||
+                channel.protocol != COMM_PROTOCOL_UBC_CTP ||
+                channel.portGroupSize != peers.begin()->second[c]->portGroupSize ||
+                (channels > 1U && channel.portGroupSize == 0U)) {
+                policy.fallbackReason = "channel_protocol_or_partition";
+                return false;
+            }
+        }
+    }
+    policy.communicationThreads = channels;
+    policy.activeThreads = channels * 2U;
+    policy.fallbackReason = "thread_layout";
+    if (resCtx.threads.size() < policy.activeThreads || resCtx.threads.size() > mc2_boundary::NOTIFY_LIMIT) {
+        return false;
+    }
+    handles.clear();
+    for (uint32_t t = 0; t < policy.activeThreads; ++t) {
+        if (resCtx.threads[t] == 0U || !handles.insert(resCtx.threads[t]).second) {
+            return false;
+        }
+    }
+    policy.fallbackReason = "none";
+    return true;
+}
+
 bool PrepareOpenBoundaryPolicy(
     const std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
     const mc2_boundary::Config& config, uint32_t turn, mc2_boundary::TurnPolicy& policy)
@@ -147,7 +210,7 @@ bool PrepareOpenBoundaryPolicy(
     policy = mc2_boundary::TurnPolicy{};
     policy.fallbackReason = "invalid_policy_or_thread_layout";
     if (opParam.size() < sizeof(mc2_ops_hccl::OpParam) || config.mode != 1U ||
-        config.totalTurns <= 1U || turn >= config.totalTurns || resCtx.threads.size() != 2U) {
+        config.totalTurns <= 1U || turn >= config.totalTurns) {
         return false;
     }
     const auto& param = *reinterpret_cast<const mc2_ops_hccl::OpParam*>(opParam.data());
@@ -155,6 +218,9 @@ bool PrepareOpenBoundaryPolicy(
     if (param.opType != HCCL_CMD_ALLGATHER || param.engine != COMM_ENGINE_AICPU_TS ||
         std::string(param.algName) != "AicpuAllGatherSoleNHR" || param.supportSymmetricMemory ||
         param.opMode != mc2_ops_hccl::OpMode::OPBASE) {
+        return false;
+    }
+    if (!PrepareOpenBoundaryLayout(resCtx, policy)) {
         return false;
     }
     const uint64_t element = GetDataTypeSize(param.DataDes.dataType);
@@ -179,16 +245,16 @@ bool PrepareOpenBoundaryPolicy(
         base = std::max(base, value);
     }
     policy.fallbackReason = "notify_budget";
-    if (base >= mc2_boundary::NOTIFY_LIMIT - 1U ||
-        config.totalTurns > mc2_boundary::NOTIFY_LIMIT - base - 1U) {
+    uint32_t required = 0U;
+    if (base >= mc2_boundary::NOTIFY_LIMIT - 1U || !mc2_boundary::NotifyBudget(
+        base + 1U, resCtx.threads.size(), config.totalTurns, required)) {
         return false;
     }
-    // The only slave is a post-copy thread: its existing POST_COPY_NOTIFY_IDX wait
-    // follows the main-thread producer. Retained per-turn exits protect scratch reuse.
-    // No communication primitive can execute on this slave before that internal wait.
+    // Only post-copy entries are elided. Communication slaves retain their entry
+    // waits, so no producer can recycle scratch before the previous full exit.
     policy.enabled = true;
     policy.skipEntry = turn != 0U;
-    policy.exitNotify = base + 1U + turn;
+    policy.exitNotify = base + 1U + turn * (policy.activeThreads - 1U);
     policy.fallbackReason = "none";
     return true;
 }
@@ -277,8 +343,9 @@ HcclResult LaunchOpenOpParamDataImpl(
             mc2_ops_hccl::TopoMatch1D, mc2_ops_hccl::InsTempAllGatherNHR>;
         NhrExecutor nhrExecutor;
         CHK_RET(mc2_ops_hccl::InitHcommBatchTransferOnThreadSupported(resCtx.isHcommBatchTransferOnThreadSupported));
-        const std::string boundaryTag = ":mb1:" + std::to_string(policy.skipEntry) + ":" +
-                                        std::to_string(policy.exitNotify);
+        const std::string boundaryTag = ":mb2:" + std::to_string(policy.skipEntry) + ":" +
+            std::to_string(policy.exitNotify) + ":" + std::to_string(policy.communicationThreads) + ":" +
+            std::to_string(policy.activeThreads);
         return mc2_ops_hccl::RunWithMc2TaskCache(
             *param, resCtx, [&]() { return nhrExecutor.OrchestrateBoundary(*param, resCtx, policy); },
             mc2_ops_hccl::Mc2AicpuTaskCacheManager::Instance(), boundaryTag);

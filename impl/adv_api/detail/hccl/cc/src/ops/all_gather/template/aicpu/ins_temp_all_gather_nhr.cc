@@ -170,8 +170,11 @@ HcclResult InsTempAllGatherNHR::KernelRunBoundary(
     enableRemoteMemAccess_ = tempAlgParams.enableRemoteMemAccess;
     threadNum_ = GetThreadNum();
     CHK_RET(ValidateKernelRunParams(templateResource));
-    CHK_PRT_RET((policy.enabled || policy.skipEntry) && (channelsPerRank_ != 1U || threadNum_ != 2U),
-        HCCL_ERROR("Boundary policy requires one communication thread and one copy thread."), HCCL_E_PARA);
+    CHK_PRT_RET((policy.enabled || policy.skipEntry) &&
+        (channelsPerRank_ != maxChannelsPerRank_ || channelsPerRank_ != policy.communicationThreads ||
+         threadNum_ != policy.activeThreads || policy.exitNotify >= mc2_boundary::NOTIFY_LIMIT ||
+         threadNum_ - 1U > mc2_boundary::NOTIFY_LIMIT - policy.exitNotify),
+        HCCL_ERROR("Boundary policy does not match the active NHR thread layout or notify budget."), HCCL_E_PARA);
 
     isDmaRead_ = IsPcieProtocol(templateResource.channels);
     HCCL_DEBUG("[InsTempAllGatherNHR] Use Dma Read[%d]", isDmaRead_);
@@ -186,7 +189,13 @@ HcclResult InsTempAllGatherNHR::KernelRunBoundary(
         std::vector<ThreadHandle> subThreads(
             templateResource.threads.begin() + 1, templateResource.threads.begin() + threadNum_);
         GetNotifyIdxMainToSub(notifyIdxMainToSub_);
-        if (!policy.skipEntry) {
+        if (policy.skipEntry) {
+            // Keep communication-slave entries: the previous main-thread join
+            // protects their scratch from the slower post-copy threads.
+            subThreads.resize(channelsPerRank_ - 1U);
+            notifyIdxMainToSub_.resize(channelsPerRank_ - 1U);
+        }
+        if (!subThreads.empty()) {
             CHK_RET(PreSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxMainToSub_));
         }
     }
@@ -207,7 +216,9 @@ HcclResult InsTempAllGatherNHR::KernelRunBoundary(
             templateResource.threads.begin() + 1, templateResource.threads.begin() + threadNum_);
         GetNotifyIdxSubToMain(notifyIdxSubToMain_);
         if (policy.enabled) {
-            notifyIdxSubToMain_.assign(1U, policy.exitNotify);
+            for (u32 index = 0; index < notifyIdxSubToMain_.size(); ++index) {
+                notifyIdxSubToMain_[index] = policy.exitNotify + index;
+            }
         }
         CHK_RET(PostSyncInterThreads(templateResource.threads[0], subThreads, notifyIdxSubToMain_));
     }

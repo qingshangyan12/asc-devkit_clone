@@ -3,7 +3,7 @@
 ## 支持范围
 
 本版本只裁剪 A5 本地 `AicpuAllGatherSoleNHR` 的安全入口：
-实际只有一条通信 Thread 和一条后拷贝 Thread、同组 Thread 映射及 Notify 布局一致、
+支持有效 K 条通信 Thread 和 K 条后拷贝 Thread、同组 Thread 映射及 Notify 布局一致、
 输入/输出/scratch 无别名，且额外 Notify 容量足够。
 
 RS SoleNHR 按当前实施范围排除，等待后续多 Channel 支持。其他 RS、本地 AllReduce、
@@ -38,7 +38,10 @@ API 不推断业务算子，不放宽每轮结果完成语义。默认 DISABLED�
 没有独立后拷贝时，slave 除了边界通知没有数据访问。
 每轮最终 PostSync 始终保留，使 main 在进入下一轮 LocalDataCopy 前已收齐上一轮 slave。
 因此 main 的 FIFO 和保留的内部等待共同保护跨轮 scratch 复用。
-这项证明不适用于多个通信 Thread，也不直接推广到其他模板。
+多个通信 Thread 时，非主通信 Thread 的入口仍保留：main 收齐上一轮全部后拷贝完成后，
+才放行下一轮通信和 scratch 写入。只有后拷贝 Thread 的外层入口可以省略，
+其内部 copy-ready 等待保留。因此不会发生快通信 Thread 覆盖慢后拷贝 Thread 正在读取的 scratch。
+这不是删除所有 slave 的入口，也不推广到其他模板。
 
 只省第 2～N 轮 executor 的首次入口；内部 payload loop 和 NHR step 均不改。
 每轮最终出口改用独立槽位；中间 payload loop 继续用原索引。
@@ -47,15 +50,17 @@ API 不推断业务算子，不放宽每轮结果完成语义。默认 DISABLED�
 
 - tiling reserved2 前 20 字节放置 magic/version/size 扩展；结构大小不变。
 - OpParam 有效数据后附加私有扩展，加载后剥离；不修改 OpParam 或资源序列化布局。
-- 参数及资源 tag 纳入配置；开启功能要求匹配的新 client/server。
-- Notify 基址为算法最大 Notify 数 + 原 Host/Device 槽位；单 slave 每轮占一个额外槽位。
+- 参数及资源 tag 使用 `mb2` 纳入配置；开启功能要求匹配的新 client/server。
+- Notify 基址 B 为算法最大 Notify 数 + 原 Host/Device 槽位。
+  Host 按申请 Thread 数 A 保守预留 `N*(A-1)` 个额外槽位；
+  Device 对有效 T 条 Thread 使用 `B+turn*(T-1)+slaveIndex` 的独立出口槽位。
 - 上限 64；容量不足整组保持原同步。原同步 Notify 索引不变。
 - task-cache 标识纳入首次入口是否省略、实际出口槽位；miss/hit/bypass 使用相同策略。
 - 轮次槽位会增加缓存任务图数量，需同时验收命中率、展开耗时和通信耗时。
 
 ## 回退和失败
 
-未知路径、多 Channel、Thread 映射不一致、容量不足或动态地址别名均保留入口。
+未知路径、不均匀 Channel、Thread 映射不一致、容量不足或动态地址别名均保留入口。
 本版本不省出口，因此不存在需要延后补齐的出口。
 分组配置不一致、重复组、轮数越界、提交失败及不完整 Finalize 返回错误。
 已提交任务不重试、不重新展开。资源申请失败不以策略回退掩盖。
@@ -75,9 +80,13 @@ API 不推断业务算子，不放宽每轮结果完成语义。默认 DISABLED�
 
 ## 当前主线适配与回退诊断
 
-本功能仍只支持单 Channel、两个 Thread 的 `AicpuAllGatherSoleNHR`。
+本功能按实际执行布局支持 `AicpuAllGatherSoleNHR`，不按申请资源数组大小猜测执行线程数。
+保留现有 isPod 条件：非 POD 的普通 SoleNHR 仍使用模板单 Channel 默认值，
+即使申请4条 Thread，也可能只有前2条参与执行；不会为启用优化而改变 Channel 选择。
+POD 分支要求所有 peer 的有效 Channel 数相同、分区权重一致且为 UB 协议，K=M，T=2K。
+本次只开放 K=1/2；更多 Channel 保守回退，不把双 Channel 验证外推。
 主线的 `AicpuAllGatherSoleNHRMultiLink` 即使复用同一 NHR 模板也不在白名单中；
-多 Channel 的 scratch 所有权及出口 Notify 分配需要独立设计，不能仅放宽算法名称匹配。
+不会仅放宽算法名称匹配来启用 MultiLink。
 CCU、其他 AllGather、ReduceScatter 和 CANN bridge AllReduce 均保持原任务图。
 
 DEBUG 级别可检索 `[MC2_BOUNDARY_SYNC][BEGIN]`、`[FALLBACK]` 和 `[SUMMARY]`。
@@ -88,15 +97,19 @@ DEBUG 级别可检索 `[MC2_BOUNDARY_SYNC][BEGIN]`、`[FALLBACK]` 和 `[SUMMARY]
 | --- | --- |
 | `unsupported_mode` / `single_turn` | 未接入的模式或只有一轮 |
 | `unsupported_algorithm` | 整组包含不支持的引擎或算法，包括 MultiLink |
-| `multi_channel` / `thread_layout` | 多 Channel 或线程数量、句柄、映射不符合单 Channel 约束 |
+| `channel_layout` / `uneven_channel_layout` | 空资源或各 peer Channel 数不一致 |
+| `channel_protocol_or_partition` | 无效/重复 Channel、非 UB 或各 peer 分区权重不一致 |
+| `unsupported_channel_count` / `channel_partition_overflow` | 超过两条有效 Channel 或权重求和溢出 |
+| `thread_layout` | 有效线程不足、句柄为空/重复或组内映射不同 |
 | `notify_budget_or_layout` / `notify_budget` | Notify 资源不足或组内布局不一致 |
 | `zero_count` / `invalid_range_or_stride` | 当前轮无数据或地址范围计算不满足条件 |
 | `buffer_alias_or_invalid_span` | 用户 buffer 与彼此或 scratch 重叠，或范围无效 |
 | `unsupported_algorithm_or_mode` | 本轮参数属于未接入的算法、对称内存或非 OPBASE 模式 |
 
 配置默认关闭。benchmark 的 `-n` 不等于同一 Kernel 的 `totalTurns`；
-须先构造同一 Kernel 的多轮 Prepare/repeat，并确认 SUMMARY 的 `removed_entry` 大于零。
-对当前一个从线程的布局，N 轮理想减少 `2 × (N − 1)` 个入口 Notify 任务；
+须先构造同一 Kernel 的多轮 Prepare/repeat，并确认 BEGIN 的 `active_threads`、
+`communication_threads` 和 SUMMARY 的 `removed_entry_pairs`、`removed_notify_tasks`。
+对 K 条后拷贝线程，N 轮理想减少 `2 × K × (N − 1)` 个入口 Notify 任务；
 内部后拷贝通知、Channel 握手、payload-loop 同步和每轮出口均不减少。
 每轮出口槽位对应不同缓存任务图，需同时记录首次捕获、缓存命中率与占用，不能承诺固定微秒收益。
 
@@ -107,3 +120,8 @@ DEBUG 级别可检索 `[MC2_BOUNDARY_SYNC][BEGIN]`、`[FALLBACK]` 和 `[SUMMARY]
 地址、长度、Notify 槽位及每线程顺序逐项比较，再执行快慢线程模拟验证结果。
 BatchTransfer 能力在进程内不可改变，因此开关覆盖使用两个独立测试进程；不修改生产能力缓存。
 这些仍是 Host 队列模拟，不等于真实 HCOMM SQE/WQE 地址重定位或 NPU 验收。
+
+扩展测试采用16逻辑rank，覆盖申请4条但执行2条、真正双Channel/4条执行线程、
+非等量3:1分区、尾loop、四类dtype，以及保留通信slave入口后的快慢后拷贝调度。
+例如 B=4、4 turn、4 Thread 需要16个Notify，而不是旧实现的8个。
+超过64槽位时整组回退；未改变 tiling wire、OpParam 或资源序列化布局。

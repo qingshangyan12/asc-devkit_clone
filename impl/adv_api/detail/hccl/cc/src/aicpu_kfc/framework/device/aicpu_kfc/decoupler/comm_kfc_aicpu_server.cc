@@ -644,14 +644,9 @@ HcclResult CommKfcAicpuServer::CheckBoundaryGroup(
         for (const auto count : res.notifyNumPerThread) {
             notifyBase = std::max(notifyBase, count);
         }
-        // Do not restore/change the NHR multi-channel configuration in this feature.
-        bool singleChannel = res.channels.size() == 1U && !res.channels[0].empty();
-        std::set<uint32_t> peers;
-        for (const auto& level : res.channels) {
-            for (const auto& channel : level) {
-                singleChannel = peers.insert(channel.remoteRank).second && singleChannel;
-            }
-        }
+        mc2_boundary::TurnPolicy layout;
+        mc2_boundary::TurnPolicy currentLayout;
+        uint32_t required = 0U;
         if (!eligible) {
             continue;
         }
@@ -659,13 +654,16 @@ HcclResult CommKfcAicpuServer::CheckBoundaryGroup(
             param->opType != HCCL_CMD_ALLGATHER || param->engine != COMM_ENGINE_AICPU_TS ||
             std::string(param->algName) != "AicpuAllGatherSoleNHR") {
             reason = "unsupported_algorithm";
-        } else if (!singleChannel) {
-            reason = "multi_channel";
-        } else if (res.threads.size() != 2U || res.threads[0] == 0U || res.threads[1] == 0U ||
-                   res.threads[0] == res.threads[1] || res.threads != current.resCtxHolder->threads) {
+        } else if (!PrepareOpenBoundaryLayout(res, layout)) {
+            reason = layout.fallbackReason;
+        } else if (!PrepareOpenBoundaryLayout(*current.resCtxHolder, currentLayout) ||
+                   layout.activeThreads != currentLayout.activeThreads ||
+                   res.threads != current.resCtxHolder->threads ||
+                   res.algHierarchyInfo.infos != current.resCtxHolder->algHierarchyInfo.infos) {
             reason = "thread_layout";
         } else if (notifyBase != currentBase || notifyBase >= mc2_boundary::NOTIFY_LIMIT - 1U ||
-                   current.boundary.totalTurns > mc2_boundary::NOTIFY_LIMIT - notifyBase - 1U) {
+                   !mc2_boundary::NotifyBudget(notifyBase + 1U, res.threads.size(),
+                       current.boundary.totalTurns, required)) {
             reason = "notify_budget_or_layout";
         } else {
             continue;
@@ -803,9 +801,12 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         if (execCtx->boundary.mode != 0U && boundaryGroup_.Turn() == 0U) {
             HCCL_DEBUG(
                 "[MC2_BOUNDARY_SYNC][BEGIN] group[%u] turns[%u] mode[%u] eligible[%d] effective[%d] "
-                "fallback_reason[%s].",
+                "allocated_threads[%zu] active_threads[%u] communication_threads[%u] "
+                "copy_threads[%u] fallback_reason[%s].",
                 execCtx->boundary.groupId, execCtx->boundary.totalTurns, execCtx->boundary.mode,
-                boundaryEligible, boundaryPolicy.enabled,
+                boundaryEligible, boundaryPolicy.enabled, execCtx->resCtxHolder->threads.size(),
+                boundaryPolicy.activeThreads, boundaryPolicy.communicationThreads,
+                boundaryPolicy.communicationThreads,
                 boundaryPolicy.fallbackReason);
 
         }
@@ -879,16 +880,16 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         }
 
         if (execCtx->boundary.mode != 0U) {
-            boundaryRemovedEntry_ += boundaryPolicy.skipEntry ? 1U : 0U;
+            boundaryRemovedEntry_ += boundaryPolicy.skipEntry ? boundaryPolicy.communicationThreads : 0U;
             boundaryFallbackTurns_ += boundaryPolicy.enabled ? 0U : 1U;
         }
         boundaryGroup_.CommitTurn();
         if (execCtx->boundary.mode != 0U && boundaryGroup_.Complete()) {
             HCCL_DEBUG(
-                "[MC2_BOUNDARY_SYNC][SUMMARY] group[%u] total_turns[%u] removed_entry[%u] "
-                "removed_exit[0] fallback_turns[%u].",
+                "[MC2_BOUNDARY_SYNC][SUMMARY] group[%u] total_turns[%u] removed_entry_pairs[%u] "
+                "removed_notify_tasks[%u] removed_exit[0] fallback_turns[%u].",
                 execCtx->boundary.groupId, execCtx->boundary.totalTurns,
-                boundaryRemovedEntry_, boundaryFallbackTurns_);
+                boundaryRemovedEntry_, boundaryRemovedEntry_ * 2U, boundaryFallbackTurns_);
         }
         UpdateProgress("LoopEnd", msgPos, i, turnIdx, opParamKey, waitAddr, recordAddr);
         LogAicpuOrderDfxCounter(
