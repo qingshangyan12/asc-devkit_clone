@@ -286,32 +286,37 @@ TEST_F(ResourceRegistryTest, AutomaticSearchRootsParsesCustomVendorAndBuiltInPat
 
     const AutomaticRoots roots = ResourceRegistry::AutomaticSearchRoots();
     const fs::path canonicalOpp = fs::canonical(opp);
-    ASSERT_EQ(roots.custom.size(), 4U);
+    ASSERT_EQ(roots.custom.size(), 8U);
     EXPECT_EQ(roots.custom[0], "/custom/one/op_impl/ai_core/tbe/kernel/jit");
-    EXPECT_EQ(roots.custom[1], "/custom/two/op_impl/ai_core/tbe/kernel/jit");
-    EXPECT_EQ(roots.custom[2], (canonicalOpp / "vendors/vendor_a/op_impl/ai_core/tbe/kernel/jit").string());
-    EXPECT_EQ(roots.custom[3], (canonicalOpp / "vendors/vendor_b/op_impl/ai_core/tbe/kernel/jit").string());
-    ASSERT_EQ(roots.builtIn.size(), 1U);
+    EXPECT_EQ(roots.custom[1], "/custom/one/op_spec");
+    EXPECT_EQ(roots.custom[2], "/custom/two/op_impl/ai_core/tbe/kernel/jit");
+    EXPECT_EQ(roots.custom[3], "/custom/two/op_spec");
+    EXPECT_EQ(roots.custom[4], (canonicalOpp / "vendors/vendor_a/op_impl/ai_core/tbe/kernel/jit").string());
+    EXPECT_EQ(roots.custom[5], (canonicalOpp / "vendors/vendor_a/op_spec").string());
+    EXPECT_EQ(roots.custom[6], (canonicalOpp / "vendors/vendor_b/op_impl/ai_core/tbe/kernel/jit").string());
+    EXPECT_EQ(roots.custom[7], (canonicalOpp / "vendors/vendor_b/op_spec").string());
+    ASSERT_EQ(roots.builtIn.size(), 2U);
     EXPECT_EQ(roots.builtIn[0], (canonicalOpp / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
+    EXPECT_EQ(roots.builtIn[1], (canonicalOpp / "built-in/op_spec").string());
 
     SetEnvironment("ASCEND_OPP_PATH", Path("missing-opp").string());
     const AutomaticRoots missingOpp = ResourceRegistry::AutomaticSearchRoots();
-    EXPECT_EQ(missingOpp.custom.size(), 2U);
+    EXPECT_EQ(missingOpp.custom.size(), 4U);
     EXPECT_TRUE(missingOpp.builtIn.empty());
 
     const fs::path oppWithoutVendorConfig = Path("opp-without-vendor-config");
     MakeDirectory(oppWithoutVendorConfig);
     SetEnvironment("ASCEND_OPP_PATH", oppWithoutVendorConfig.string());
     const AutomaticRoots missingVendorConfig = ResourceRegistry::AutomaticSearchRoots();
-    EXPECT_EQ(missingVendorConfig.custom.size(), 2U);
-    ASSERT_EQ(missingVendorConfig.builtIn.size(), 1U);
+    EXPECT_EQ(missingVendorConfig.custom.size(), 4U);
+    ASSERT_EQ(missingVendorConfig.builtIn.size(), 2U);
     EXPECT_EQ(
         missingVendorConfig.builtIn[0],
         (fs::canonical(oppWithoutVendorConfig) / "built-in/op_impl/ai_core/tbe/kernel/jit").string());
 
     UnsetEnvironment("ASCEND_OPP_PATH");
     const AutomaticRoots noOpp = ResourceRegistry::AutomaticSearchRoots();
-    EXPECT_EQ(noOpp.custom.size(), 2U);
+    EXPECT_EQ(noOpp.custom.size(), 4U);
     EXPECT_TRUE(noOpp.builtIn.empty());
 }
 
@@ -1347,6 +1352,81 @@ TEST_F(ResourceRegistryTest, LoadAutomaticCachesFirstStatus)
 TEST_F(ResourceRegistryTest, InstanceReturnsStableSingleton)
 {
     EXPECT_EQ(&ResourceRegistry::Instance(), &ResourceRegistry::Instance());
+}
+
+} // namespace
+} // namespace specialization_compile
+} // namespace ascendc
+
+namespace ascendc {
+namespace specialization_compile {
+namespace {
+
+TEST_F(ResourceRegistryTest, OpSpecUsesExactSourcePathAndInstallationRoot)
+{
+    for (const std::string& relativeLibrary :
+         {std::string("vendors/custom/op_spec/libcust_compile_db.so"),
+          std::string("built-in/op_spec/ops_demo/libcust_compile_db.so")}) {
+        const fs::path library = Path(relativeLibrary);
+        const fs::path root = relativeLibrary.rfind("vendors/", 0U) == 0U ? Path("vendors/custom") : Path("built-in");
+        WriteFile(library);
+        WriteFile(root / "op_impl/first/source.cpp", "selected");
+        WriteFile(root / "op_impl/second/source.cpp", "other same-name source");
+        const LibrarySpec spec{library.string(), ResourceSourceType::External};
+        EXPECT_TRUE(ResourceRegistry::IsLibraryName(library.string()));
+        std::string located;
+        EXPECT_EQ(
+            ResourceRegistry::LocateSourceFile(spec, "resource", "op_impl/first/source.cpp", located),
+            ResourceStatus::Success);
+        EXPECT_EQ(located, fs::canonical(root).string());
+        EXPECT_EQ(
+            ResourceRegistry::LocateSourceFile(spec, "resource", "op_impl/missing/source.cpp", located),
+            ResourceStatus::InvalidResource);
+        EXPECT_EQ(
+            ResourceRegistry::LocateSourceFile(spec, "resource", "../source.cpp", located),
+            ResourceStatus::InvalidResource);
+        const std::string text = R"({"resource_id":"installed","source_file":"op_impl/first/source.cpp"})";
+        AcCompileResourceManifest unit{StringView(text), nullptr, 0U};
+        StageState stage;
+        EXPECT_EQ(ResourceRegistry::LoadManifest(unit, spec, 0U, stage), ResourceStatus::Success);
+        ASSERT_EQ(stage.external.resources.size(), 1U);
+        EXPECT_EQ(stage.external.resources.at("installed")->data.sourceFilePath, fs::canonical(root).string());
+    }
+}
+
+TEST_F(ResourceRegistryTest, OpSpecRejectsSourceSymlinksAndMisplacedLibrary)
+{
+    const fs::path root = Path("vendor");
+    const fs::path library = root / "op_spec/libcust_compile_db.so";
+    WriteFile(library);
+    WriteFile(Path("outside/source.cpp"), "outside");
+    fs::create_directory_symlink(Path("outside"), root / "redirect");
+    const LibrarySpec spec{library.string(), ResourceSourceType::External};
+    std::string located;
+    EXPECT_EQ(
+        ResourceRegistry::LocateSourceFile(spec, "resource", "redirect/source.cpp", located),
+        ResourceStatus::InvalidResource);
+    EXPECT_FALSE(ResourceRegistry::IsLibraryName(Path("libcust_compile_db.so").string()));
+    EXPECT_FALSE(ResourceRegistry::IsLibraryName(Path("built-in/op_spec/unknown/libcust_compile_db.so").string()));
+}
+
+TEST_F(ResourceRegistryTest, AutomaticDiscoveryFindsNewCustomAndBuiltInBundles)
+{
+    const fs::path custom = Path("custom");
+    const fs::path opp = Path("opp");
+    const fs::path customLibrary = custom / "op_spec/libcust_compile_db.so";
+    const fs::path builtinLibrary = opp / "built-in/op_spec/ops_demo/libcust_compile_db.so";
+    WriteFile(customLibrary);
+    WriteFile(builtinLibrary);
+    SetEnvironment("ASCEND_CUSTOM_OPP_PATH", custom.string());
+    SetEnvironment("ASCEND_OPP_PATH", opp.string());
+    std::vector<LibrarySpec> libraries;
+    EXPECT_EQ(ResourceRegistry::DiscoverLibraries(nullptr, libraries), ResourceStatus::Success);
+    ASSERT_EQ(libraries.size(), 2U);
+    EXPECT_EQ(libraries[0].path, fs::canonical(customLibrary).string());
+    EXPECT_EQ(libraries[0].sourceType, ResourceSourceType::Custom);
+    EXPECT_EQ(libraries[1].path, fs::canonical(builtinLibrary).string());
+    EXPECT_EQ(libraries[1].sourceType, ResourceSourceType::BuiltIn);
 }
 
 } // namespace

@@ -175,9 +175,7 @@ def test_exporter_failure_preserves_output_and_cleans_workspace(bundle_request):
     assert not list(Path(bundle_request.work_dir).glob(".bundle-*"))
 
 
-@pytest.mark.parametrize(
-    "case", ["empty", "missing", "invalid_id", "resource_escape", "source_escape", "symlink", "missing_ref"]
-)
+@pytest.mark.parametrize("case", ["empty", "missing", "resource_escape", "source_escape", "symlink"])
 def test_rejects_invalid_inputs(bundle_request, case, tmp_path):
     path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
     manifest = json.loads(path.read_text())
@@ -186,16 +184,12 @@ def test_rejects_invalid_inputs(bundle_request, case, tmp_path):
         (tmp_path / "empty").mkdir()
     elif case == "missing":
         bundle_request.input_dir.append(str(tmp_path / "missing"))
-    elif case == "invalid_id":
-        manifest["resource_id"] = "invalid"
     elif case == "resource_escape":
         manifest["resource_path"] = "../resources"
     elif case == "source_escape":
         manifest["source_file"] = "../add.cpp"
     elif case == "symlink":
         (path.parent / "resources/link").symlink_to(Path(bundle_request.source_dir[0]) / "add.cpp")
-    elif case == "missing_ref":
-        (path.parent / "resources/wrapper.cpp").unlink()
     path.write_text(json.dumps(manifest))
     with pytest.raises(bundle.BundleError):
         bundle.build_bundle(bundle_request)
@@ -257,13 +251,15 @@ def test_package_relative_source_and_explicit_file(bundle_request):
     assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
 
 
-def test_resource_reference_outside_resource_path_is_rejected(bundle_request):
+def test_resource_reference_validation_is_delegated_to_exporter(bundle_request):
     path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
     (path.parent / "outside.h").write_text("outside")
     manifest = json.loads(path.read_text())
     manifest["options"]["common_compile"] = ["-include", "${resource}/outside.h"]
     path.write_text(json.dumps(manifest))
-    with pytest.raises(bundle.BundleError, match="resource_path"):
+    # The exporter owns reference validation; aggregation propagates its diagnostic.
+    Path(bundle_request.exporter).write_text("#!/bin/sh\necho 'outside resource_path'\nexit 1\n")
+    with pytest.raises(bundle.BundleError, match="exporter.*resource_path"):
         bundle.build_bundle(bundle_request)
 
 
@@ -330,10 +326,12 @@ def test_successful_exporter_with_invalid_output_is_rejected(bundle_request):
     assert Path(bundle_request.output).read_bytes() == old
 
 
-@pytest.mark.parametrize("limit", ["MAX_RESOURCE_BYTES", "MAX_UNIT_BYTES", "MAX_BUNDLE_BYTES", "MAX_UNIT_FILES"])
-def test_resource_budgets_fail_before_export(bundle_request, monkeypatch, limit):
-    monkeypatch.setattr(bundle, limit, 0)
-    with pytest.raises(bundle.BundleError):
+@pytest.mark.parametrize(
+    "diagnostic", ["resource file too large", "unit too large", "bundle too large", "too many files"]
+)
+def test_exporter_budget_failure_is_propagated(bundle_request, diagnostic):
+    Path(bundle_request.exporter).write_text(f"#!/bin/sh\necho '{diagnostic}'\nexit 1\n")
+    with pytest.raises(bundle.BundleError, match="exporter.*" + diagnostic):
         bundle.build_bundle(bundle_request)
     assert not Path(bundle_request.output).exists()
 
@@ -349,7 +347,7 @@ def test_preserves_empty_include_directories_in_resource_copy(bundle_request, tm
     bundle_request.opc_config = str(config)
     bundle.build_bundle(bundle_request)
     workspace = next(Path(bundle_request.work_dir).glob(".bundle-*"))
-    assert (workspace / "collected" / ("a" * 64) / "resources/empty_include").is_dir()
+    assert (workspace / "collected" / "0" / "resources/empty_include").is_dir()
 
 
 @pytest.mark.skipif(not os.environ.get("ASCEND_TEST_COMPILE_EXPORTER"), reason="requires built asc_compile_exporter")
@@ -399,3 +397,67 @@ def test_real_exporter_builds_loadable_bundle_with_large_resource(bundle_request
     assert resources["resources/large.h"].size == 1024 * 1024 + 1
     assert ctypes.string_at(resources["resources/large.h"].data, 1) == b"x"
     assert bundle.build_bundle(bundle_request) is False
+
+
+@pytest.mark.parametrize("difference", ["manifest", "resource", "source", "installed_path", "empty_directory"])
+def test_same_id_conflict_preserves_published_bundle(bundle_request, tmp_path, difference):
+    bundle.build_bundle(bundle_request)
+    published = Path(bundle_request.output).read_bytes()
+    root = Path(bundle_request.input_dir[0])
+    path = _unit(root / "duplicate", "a" * 64)
+    manifest = json.loads(path.read_text())
+    if difference == "manifest":
+        manifest["soc_version"] = "Ascend950"
+        path.write_text(json.dumps(manifest))
+    elif difference == "resource":
+        (path.parent / "resources/wrapper.cpp").write_text("different wrapper")
+    elif difference == "empty_directory":
+        (path.parent / "resources/include").mkdir()
+    else:
+        source = tmp_path / "other_source/add.cpp"
+        source.parent.mkdir()
+        source.write_text("different source" if difference == "source" else "void add() {}\n")
+        bundle_request.source_map.append(
+            [str(source.parent), "op_impl/dynamic" if difference == "source" else "other_layout"]
+        )
+        bundle_request.source_bindings = {
+            str(root / "910b"): str(Path(bundle_request.source_dir[0]) / "add.cpp"),
+            str(root / "duplicate"): str(source),
+        }
+        bundle_request.input_dir = list(bundle_request.source_bindings)
+    with pytest.raises(bundle.BundleError, match="conflicting resource_id") as error:
+        bundle.build_bundle(bundle_request)
+    assert str(path) in str(error.value)
+    assert str(root / "910b/add_manifest.json") in str(error.value)
+    assert Path(bundle_request.output).read_bytes() == published
+
+
+def test_equivalent_id_ignores_json_key_order_and_formatting(bundle_request):
+    root = Path(bundle_request.input_dir[0])
+    path = _unit(root / "duplicate", "a" * 64)
+    manifest = json.loads(path.read_text())
+    path.write_text(json.dumps(dict(reversed(list(manifest.items()))), indent=4))
+    bundle.build_bundle(bundle_request)
+    assert len(_published(bundle_request)) == 1
+
+
+def test_unreferenced_source_does_not_require_install_mapping(bundle_request, tmp_path):
+    unrelated = tmp_path / "unmapped"
+    unrelated.mkdir()
+    (unrelated / "unused.cpp").write_text("unrelated")
+    bundle_request.source_dir.append(str(unrelated))
+    assert bundle.build_bundle(bundle_request) is True
+    (unrelated / "unused.cpp").write_text("changed unrelated source")
+    assert bundle.build_bundle(bundle_request) is False
+
+
+def test_producer_binding_selects_actual_source_among_same_names(bundle_request, tmp_path):
+    other = tmp_path / "other/add.cpp"
+    other.parent.mkdir()
+    other.write_text("other source")
+    bundle_request.source_file.append(str(other))
+    bundle_request.source_bindings = {
+        str(Path(bundle_request.input_dir[0])): str(Path(bundle_request.source_dir[0]) / "add.cpp")
+    }
+    assert bundle.build_bundle(bundle_request) is True
+    assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
