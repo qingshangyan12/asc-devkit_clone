@@ -151,49 +151,49 @@ void ExpectRegisterPattern(const DataType& value, unsigned char pattern)
 
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int8_t, int8_t, DINTLV_B8,
-    asc_loadalign_deintlv_int8_t_result);
+    asc_int8_t_int8_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint8_t, uint8_t, DINTLV_B8,
-    asc_loadalign_deintlv_uint8_t_result);
+    asc_uint8_t_uint8_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp4x2_e2m1_t, fp4x2_e2m1_t, DINTLV_B8,
-    asc_loadalign_deintlv_fp4x2_e2m1_t_result);
+    asc_fp4x2_e2m1_t_fp4x2_e2m1_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp4x2_e1m2_t, fp4x2_e1m2_t, DINTLV_B8,
-    asc_loadalign_deintlv_fp4x2_e1m2_t_result);
+    asc_fp4x2_e1m2_t_fp4x2_e1m2_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e8m0_t, fp8_e8m0_t, DINTLV_B8,
-    asc_loadalign_deintlv_fp8_e8m0_t_result);
+    asc_fp8_e8m0_t_fp8_e8m0_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e5m2_t, fp8_e5m2_t, DINTLV_B8,
-    asc_loadalign_deintlv_fp8_e5m2_t_result);
+    asc_fp8_e5m2_t_fp8_e5m2_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_fp8_e4m3fn_t, fp8_e4m3fn_t, DINTLV_B8,
-    asc_loadalign_deintlv_fp8_e4m3fn_t_result);
+    asc_fp8_e4m3fn_t_fp8_e4m3fn_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN_HIF8(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_hifloat8_t, hifloat8_t, DINTLV_B8,
-    asc_loadalign_deintlv_hifloat8_t_result);
+    asc_hifloat8_t_hifloat8_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int16_t, int16_t, DINTLV_B16,
-    asc_loadalign_deintlv_int16_t_result);
+    asc_int16_t_int16_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint16_t, uint16_t, DINTLV_B16,
-    asc_loadalign_deintlv_uint16_t_result);
+    asc_uint16_t_uint16_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_half, half, DINTLV_B16,
-    asc_loadalign_deintlv_half_result);
+    asc_half_half_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_bfloat16_t, bfloat16_t, DINTLV_B16,
-    asc_loadalign_deintlv_bfloat16_t_result);
+    asc_bfloat16_t_bfloat16_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int32_t, int32_t, DINTLV_B32,
-    asc_loadalign_deintlv_int32_t_result);
+    asc_int32_t_int32_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_uint32_t, uint32_t, DINTLV_B32,
-    asc_loadalign_deintlv_uint32_t_result);
+    asc_uint32_t_uint32_t_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_float, float, DINTLV_B32,
-    asc_loadalign_deintlv_float_result);
+    asc_float_float_pair);
 TEST_VECTOR_DATAMOVE_LOADALIGN_DEINTLV_PAIR_RETURN_INT4(
     LoadAlignDeintlvPair, asc_loadalign_deintlv, vlds, vector_int4x2_t, int4b_t, DINTLV_B8,
-    asc_loadalign_deintlv_int4x2_t_result);
+    asc_int4x2_t_int4x2_t_pair);

@@ -57,7 +57,7 @@ __simd_callee__ inline void asc_mull(vector_<dtype>& dst0,
                                      vector_bool mask)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline asc_mull_<dtype>_result asc_mull(vector_<dtype> src0,
+__simd_callee__ inline asc_<dtype>_<dtype>_pair asc_mull(vector_<dtype> src0,
                                                         vector_<dtype> src1,
                                                         vector_bool mask)
 ```
@@ -77,7 +77,7 @@ __simd_callee__ inline void asc_mull(vector_uint32_t& dst0,
                                      vector_bool mask)
 
 // 通过函数返回值返回结果示例：uint32_t类型乘法。
-__simd_callee__ inline asc_mull_uint32_t_result asc_mull(vector_uint32_t src0,
+__simd_callee__ inline asc_uint32_t_uint32_t_pair asc_mull(vector_uint32_t src0,
                                                          vector_uint32_t src1,
                                                          vector_bool mask)
 ```
@@ -99,7 +99,7 @@ __simd_callee__ inline asc_mull_uint32_t_result asc_mull(vector_uint32_t src0,
 ## 返回值说明
 
 - 通过引用参数输出结果的函数原型无返回值。
-- 通过函数返回值返回结果的函数原型返回`asc_mull_int32_t_result`或`asc_mull_uint32_t_result`，使用变量`result`接收函数返回值。两个成员的数据类型均与输入矢量数据寄存器一致。`result.first`对应引用参数版本的`dst0`，保存64位乘积的低32位；`result.second`对应`dst1`，保存64位乘积的高32位。`dst0`和`dst1`仅用于引用参数版本，函数返回值版本无需传入目的寄存器。
+- 通过函数返回值返回结果的函数原型返回`asc_int32_t_int32_t_pair`或`asc_uint32_t_uint32_t_pair`，使用变量`result`接收函数返回值。两个成员的数据类型均与输入矢量数据寄存器一致。`result.first`对应引用参数版本的`dst0`，保存64位乘积的低32位；`result.second`对应`dst1`，保存64位乘积的高32位。`dst0`和`dst1`仅用于引用参数版本，函数返回值版本无需传入目的寄存器。
 
 ## 约束说明
 

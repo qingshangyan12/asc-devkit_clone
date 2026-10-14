@@ -817,34 +817,34 @@ __simd_callee__ inline void asc_addc(
     }
 }
 
-__simd_callee__ inline asc_add_carry_uint32_t_result
+__simd_callee__ inline asc_uint32_t_bool_pair
 asc_add_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
-    asc_add_carry_uint32_t_result result;
+    asc_uint32_t_bool_pair result;
     asc_add(result.second, result.first, src0, src1, mask);
     return result;
 }
 
-__simd_callee__ inline asc_add_carry_int32_t_result
+__simd_callee__ inline asc_int32_t_bool_pair
 asc_add_carry(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
-    asc_add_carry_int32_t_result result;
+    asc_int32_t_bool_pair result;
     asc_add(result.second, result.first, src0, src1, mask);
     return result;
 }
 
-__simd_callee__ inline asc_add_carry_uint32_t_result
+__simd_callee__ inline asc_uint32_t_bool_pair
 asc_add_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask)
 {
-    asc_add_carry_uint32_t_result result;
+    asc_uint32_t_bool_pair result;
     asc_addc(result.second, result.first, src0, src1, carry_src, mask);
     return result;
 }
 
-__simd_callee__ inline asc_add_carry_int32_t_result
+__simd_callee__ inline asc_int32_t_bool_pair
 asc_add_carry(vector_int32_t src0, vector_int32_t src1, vector_bool carry_src, vector_bool mask)
 {
-    asc_add_carry_int32_t_result result;
+    asc_int32_t_bool_pair result;
     asc_addc(result.second, result.first, src0, src1, carry_src, mask);
     return result;
 }
@@ -930,34 +930,34 @@ __simd_callee__ inline void asc_subc(
     }
 }
 
-__simd_callee__ inline asc_sub_carry_uint32_t_result
+__simd_callee__ inline asc_uint32_t_bool_pair
 asc_sub_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
-    asc_sub_carry_uint32_t_result result;
+    asc_uint32_t_bool_pair result;
     asc_sub(result.second, result.first, src0, src1, mask);
     return result;
 }
 
-__simd_callee__ inline asc_sub_carry_int32_t_result
+__simd_callee__ inline asc_int32_t_bool_pair
 asc_sub_carry(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
-    asc_sub_carry_int32_t_result result;
+    asc_int32_t_bool_pair result;
     asc_sub(result.second, result.first, src0, src1, mask);
     return result;
 }
 
-__simd_callee__ inline asc_sub_carry_uint32_t_result
+__simd_callee__ inline asc_uint32_t_bool_pair
 asc_sub_carry(vector_uint32_t src0, vector_uint32_t src1, vector_bool carry_src, vector_bool mask)
 {
-    asc_sub_carry_uint32_t_result result;
+    asc_uint32_t_bool_pair result;
     asc_subc(result.second, result.first, src0, src1, carry_src, mask);
     return result;
 }
 
-__simd_callee__ inline asc_sub_carry_int32_t_result
+__simd_callee__ inline asc_int32_t_bool_pair
 asc_sub_carry(vector_int32_t src0, vector_int32_t src1, vector_bool carry_src, vector_bool mask)
 {
-    asc_sub_carry_int32_t_result result;
+    asc_int32_t_bool_pair result;
     asc_subc(result.second, result.first, src0, src1, carry_src, mask);
     return result;
 }
@@ -1552,18 +1552,18 @@ __simd_callee__ inline void asc_mull(
     }
 }
 
-__simd_callee__ inline asc_mull_int32_t_result
+__simd_callee__ inline asc_int32_t_int32_t_pair
 asc_mull(vector_int32_t src0, vector_int32_t src1, vector_bool mask)
 {
-    asc_mull_int32_t_result result;
+    asc_int32_t_int32_t_pair result;
     asc_mull(result.first, result.second, src0, src1, mask);
     return result;
 }
 
-__simd_callee__ inline asc_mull_uint32_t_result
+__simd_callee__ inline asc_uint32_t_uint32_t_pair
 asc_mull(vector_uint32_t src0, vector_uint32_t src1, vector_bool mask)
 {
-    asc_mull_uint32_t_result result;
+    asc_uint32_t_uint32_t_pair result;
     asc_mull(result.first, result.second, src0, src1, mask);
     return result;
 }
