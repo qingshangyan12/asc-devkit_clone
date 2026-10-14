@@ -576,10 +576,8 @@ static void test_host_c_api_reg_compute_16()
     using ::asc_lt_scalar;
     using ::asc_madd;
     using ::asc_max;
-    using ::asc_max_merge;
     using ::asc_max_scalar;
     using ::asc_min;
-    using ::asc_min_merge;
     using ::asc_min_scalar;
     using ::asc_mul;
     using ::asc_mul_scalar;
