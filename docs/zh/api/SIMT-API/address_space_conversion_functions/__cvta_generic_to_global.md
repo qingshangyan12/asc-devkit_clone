@@ -68,6 +68,16 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_global(uint32_t*
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     size_t addr_val = __cvta_generic_to_global(src + idx);
-    printf("GM(src)的偏移量为：%lu\n", addr_val);
+    printf("GM(src)的偏移量为：%X\n", addr_val);
 }
+```
+
+输入输出示例如下：
+
+```text
+src: 11, 22, 33, 44
+GM(src)的偏移量为：19791209394176
+GM(src)的偏移量为：19791209394180
+GM(src)的偏移量为：19791209394184
+GM(src)的偏移量为：19791209394188
 ```
