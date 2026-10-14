@@ -24,8 +24,6 @@ inline void vcvt_bf162e8m0(
     vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
 
-
-
 // bf16->fp4 MODE_MERGING: stub_fun.h only has 6-arg int32_t overloads; add 7-arg for host UT.
 // Use int32_t (not Literal) so existing mockcpp hooks on int signatures keep working.
 inline void vcvt(
