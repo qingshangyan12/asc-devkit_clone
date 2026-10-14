@@ -70,10 +70,15 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_local(uint32_t* 
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     uint32_t local_data[2] = {src[idx], src[idx]};
     size_t addr_val = __cvta_generic_to_local(local_data);
-    if (addr_val > 1152) {  // 1152:SIMT栈空间大小
-        printf("栈(local_data)溢出，偏移量为：%lu\n", addr_val);
-    } else {
-        printf("栈(local_data)的偏移量为：%lu\n", addr_val);
-    }
+    printf("栈(local_data)的栈空间地址值为：0x%lx\n", addr_val);
 }
+```
+
+输入输出示例如下：
+
+```text
+栈(local_data)的栈空间地址值为：0x478
+栈(local_data)的栈空间地址值为：0x478
+栈(local_data)的栈空间地址值为：0x478
+栈(local_data)的栈空间地址值为：0x478
 ```
