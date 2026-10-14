@@ -106,16 +106,16 @@ unsigned long long __mul_i32toi64(unsigned int x, unsigned int y)
 
 - 当输入数据类型为`int`时：
 
-```text
-x: -12, 23, -7, 6
-y: 6, 3, 4, 15
-result: -72, 69, -28, 90
-```
+    ```text
+    x: -12, 23, -7, 6
+    y: 6, 3, 4, 15
+    result: -72, 69, -28, 90
+    ```
 
 - 当输入数据类型为`unsigned int`时：
 
-```text
-x: 0, 12, 23, 70
-y: 6, 15, 3, 4
-result: 0, 180, 69, 280
-```
+    ```text
+    x: 0, 12, 23, 70
+    y: 6, 15, 3, 4
+    result: 0, 180, 69, 280
+    ```
