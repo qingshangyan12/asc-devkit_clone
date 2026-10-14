@@ -81,9 +81,9 @@ unsigned int __usad(unsigned int x, unsigned int y, unsigned int z)
 
 输入输出示例如下：
 
-```text
-x: 0, 12, 23, 70
-y: 5, 0, 15, 7
-z: 0, 5, 9, 3
-result: 5, 17, 17, 66
-```
+    ```text
+    x: 0, 12, 23, 70
+    y: 5, 0, 15, 7
+    z: 0, 5, 9, 3
+    result: 5, 17, 17, 66
+    ```

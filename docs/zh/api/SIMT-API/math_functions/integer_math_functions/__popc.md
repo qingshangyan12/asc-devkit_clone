@@ -109,14 +109,14 @@ int __popc(unsigned long x)
 
 - 当输入数据类型为`unsigned int`时：
 
-```text
-x: 0, 1, 2, 8, 15
-result: 0, 1, 1, 1, 4
-```
+    ```text
+    x: 0, 1, 2, 8, 15
+    result: 0, 1, 1, 1, 4
+    ```
 
 - 当输入数据类型为`unsigned long long`时：
 
-```text
-x: 0, 1, 2, 8, 15
-result: 0, 1, 1, 1, 4
-```
+    ```text
+    x: 0, 1, 2, 8, 15
+    result: 0, 1, 1, 1, 4
+    ```

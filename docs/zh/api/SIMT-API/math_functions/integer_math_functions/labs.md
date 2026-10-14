@@ -79,7 +79,7 @@ inline long int labs(long int x)
 
 输入输出示例如下：
 
-```text
-x: -12, 0, 23, -7
-result: 12, 0, 23, 7
-```
+    ```text
+    x: -12, 0, 23, -7
+    result: 12, 0, 23, 7
+    ```
