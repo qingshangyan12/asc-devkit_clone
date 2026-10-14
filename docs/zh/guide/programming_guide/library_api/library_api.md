@@ -1,3 +1,17 @@
 # 类库API
 
-本文件为文档发布时所需的索引文件。
+- [编程接口概述](./programming_interface_overview.md)
+- [基础API](./basic_api/basic_api.md)
+  - [概述](./basic_api/overview.md)
+  - [接口分类说明](./basic_api/interface_classification/interface_classification.md)
+    - [连续计算API](./basic_api/interface_classification/continuous_compute_api.md)
+    - [高维切分API](./basic_api/interface_classification/high_dim_split_api.md)
+  - [常用操作速查指导](./basic_api/quick_reference/quick_reference.md)
+    - [如何使用掩码操作API](./basic_api/quick_reference/how_to_use_mask_api.md)
+    - [如何使用归约计算API](./basic_api/quick_reference/how_to_use_reduction_api.md)
+- [高阶API](./advanced_api/advanced_api.md)
+  - [概述](./advanced_api/overview.md)
+  - [常用操作速查指导](./advanced_api/quick_reference/quick_reference.md)
+    - [如何使用Tiling依赖的头文件](./advanced_api/quick_reference/how_to_use_tiling_headers.md)
+    - [如何使用核函数（Kernel）侧临时空间](./advanced_api/quick_reference/how_to_use_kernel_temp_space.md)
+- [Utils API](./utils_api.md)

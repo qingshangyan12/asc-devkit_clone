@@ -1,3 +1,21 @@
 # 优秀实践
 
-本文件为文档发布时所需的索引文件。
+- [FlashAttention算子性能调优案例](./flash_attention_tuning.md)
+- [GroupedMatmul算子性能调优案例](./grouped_matmul_tuning.md)
+- [MC²算子性能调优案例](./mc_operator_tuning.md)
+- [Matmul性能调优案例](./matmul_tuning_cases/matmul_tuning_cases.md)
+  - [Matmul性能优化策略总览](./matmul_tuning_cases/matmul_optimization_overview.md)
+  - [Matmul算子优化Tiling策略](./matmul_tuning_cases/matmul_tiling_strategy.md)
+  - [Matmul高阶API开启纯Cube模式](./matmul_tuning_cases/matmul_pure_cube.md)
+  - [Matmul高阶API开启MDL模板](./matmul_tuning_cases/matmul_mdl_template.md)
+  - [Matmul高阶API开启UnitFlag](./matmul_tuning_cases/matmul_unit_flag.md)
+  - [Matmul高阶API开启Tiling全量常量化](./matmul_tuning_cases/matmul_tiling_constant.md)
+  - [Matmul高阶API开启L2 Cache切分](./matmul_tuning_cases/matmul_l2_cache_split.md)
+  - [Matmul高阶API开启多核切K](./matmul_tuning_cases/matmul_multi_core_split_k.md)
+  - [Matmul高阶API开启多核K轴错峰访问内存](./matmul_tuning_cases/matmul_multi_core_k_stagger.md)
+  - [Matmul高阶API开启NBuffer33模板](./matmul_tuning_cases/matmul_nbuffer33.md)
+  - [Matmul高阶API开启IBShare模板共享B矩阵数据](./matmul_tuning_cases/matmul_ibshare_b.md)
+  - [Matmul高阶API开启IBShare模板共享A和B矩阵数据](./matmul_tuning_cases/matmul_ibshare_ab.md)
+  - [AIV核上的ND2NZ格式转换](./matmul_tuning_cases/aiv_nd2nz_conversion.md)
+  - [Matmul高阶API开启MTE2 Preload](./matmul_tuning_cases/matmul_mte2_preload.md)
+- [SIMT实现InsertHashTable算子案例](./simt_insert_hash_table.md)
