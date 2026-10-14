@@ -1,5 +1,7 @@
 # asc_l13d_fmatrix_config
 
+头文件路径为：`"c_api/defs/union.h"`。
+
 asc_l13d_fmatrix_config用于设置[asc_copy_l12l0a](../../cube_datamove/cube_compute_load/asc_copy_l12l0a.md)/[asc_copy_l12l0b](../../cube_datamove/cube_compute_load/asc_copy_l12l0b.md)的3D格式搬运接口的Feature map属性参数。
 
 ## 结构体具体定义
