@@ -70,3 +70,11 @@ __global__ __launch_bounds__(1024) void kernel__cvta_ubuf_to_generic(uint32_t* d
     dst[idx] = ptr[0];
 }
 ```
+
+输入输出示例如下：
+
+```text
+x: 11, 22, 33, 44
+addr: 0, 4, 8, 12
+result: 11, 22, 33, 44
+```
