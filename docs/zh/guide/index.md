@@ -409,5 +409,5 @@
             -   [C++17语言特性](./technical_appendix/cpp_standard_support/cpp_language_feature/cpp17_language_feature.md)
             -   [Lambda表达式](./technical_appendix/cpp_standard_support/cpp_language_feature/lambda_expressions.md)
         -   [C/C++语法限制](./technical_appendix/cpp_standard_support/cpp_language_restrictions/cpp_language_restrictions.md)
-            -   [不支持的特性](./technical_appendix/cpp_standard_support/cpp_language_restrictions/unsupport_features.md)
-            -   [函数](./technical_appendix/cpp_standard_support/cpp_language_restrictions/functions.md)
+            -   [通用语法限制](./technical_appendix/cpp_standard_support/cpp_language_restrictions/general_restrictions.md)
+            -   [C++11标准语法限制](./technical_appendix/cpp_standard_support/cpp_language_restrictions/cpp11_restrictions.md)

@@ -2,7 +2,7 @@
 
 本文介绍Lambda表达式在Ascend C中的使用方式。SIMT Device侧支持C++11 Lambda表达式的完整形态——值捕获、引用捕获、mutable、嵌套、立即调用（IIFE）、无捕获lambda转函数指针、捕获this、作为函数模板实参等均可直接使用；C++14泛型lambda与init-capture、C++17 constexpr lambda与`[*this]`按值捕获同样可用（见各标准章节）。
 
-Ascend C的Lambda是**Device侧局部闭包**：核函数（Kernel）参数仅支持基础类型、POD结构体与指针（见[核函数（Kernel）参数列表限制](../cpp_language_restrictions/functions.md#section_kernel_function_argument_list_constraint)），不存在"Host侧lambda传入核函数"的用法（即无`--extended-lambda`机制的等价物，试图传递会报`lambda type cannot be used as template argument for kernel function`），因此也没有跨执行空间的Lambda限制与闭包类型traits。需要按参数定制计算时，将标量参数直接传入核函数，在核函数内定义Lambda消费参数。
+Ascend C的Lambda是**Device侧局部闭包**：核函数（Kernel）参数仅支持基础类型、POD结构体与指针（见[核函数（Kernel）参数列表限制](../cpp_language_restrictions/general_restrictions.md#section_kernel_function_argument_list_constraint)），不存在"Host侧lambda传入核函数"的用法（即无`--extended-lambda`机制的等价物，试图传递会报`lambda type cannot be used as template argument for kernel function`），因此也没有跨执行空间的Lambda限制与闭包类型traits。需要按参数定制计算时，将标量参数直接传入核函数，在核函数内定义Lambda消费参数。
 
 SIMT编程与SIMD与SIMT混合编程场景场景下Lambda的使用约束略有不同。下文将会展开说明。
 
