@@ -13,30 +13,11 @@
 #include "stub_fun.h"
 #include "c_api/defs/enum.h"
 
-namespace float8_e6m2 {
-struct Fp8e6m2T {
-    uint8_t val;
-};
-} // namespace float8_e6m2
-using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
-using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
-using vector_fp8_e6m2_t = vector_f8e6m2;
-
-struct hifloat4x2_t {
-    uint8_t val = 0;
-};
-using hif4x2_t = hifloat4x2_t;
-
-using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
-
 inline void vcvt(
     vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
 inline void vcvt(
     vector_f8e5m2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
-{}
-inline void vcvt_bf162e6m2(
-    vector_f8e6m2& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2)
 {}
 inline void vcvt_bf162e8m0(
     vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
@@ -148,18 +129,6 @@ inline void mad_mx(
 {}
 
 inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ hif4x2_t* a_matrix, uint64_t scale_a_addr, __cb__ hif4x2_t* b_matrix,
-    uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
-    bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ hif4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
     __cc__ float* c_matrix, uint64_t bias, __ca__ fp8_e4m3fn_t* a_matrix, uint64_t scale_a_addr,
     __cb__ fp4x2_e2m1_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
     bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
@@ -172,20 +141,8 @@ inline void mad_mx(
 {}
 
 inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ half* a_matrix, uint64_t scale_a_addr, __cb__ hif4x2_t* b_matrix,
-    uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag, bool disable_gemv,
-    bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
     __cc__ float* c_matrix, uint64_t bias, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_addr,
     __cb__ fp4x2_e2m1_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
-    bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
-{}
-
-inline void mad_mx(
-    __cc__ float* c_matrix, uint64_t bias, __ca__ bfloat16_t* a_matrix, uint64_t scale_a_addr,
-    __cb__ hif4x2_t* b_matrix, uint64_t scale_b_addr, uint16_t m, uint16_t k, uint16_t n, uint8_t unit_flag,
     bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
 {}
 
@@ -197,9 +154,6 @@ inline void mad_mx(
 
 // The compiler supports this overload, but it is missing from the CPU debug stub header.
 inline void vmadd(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, vector_bool mask, Literal mode) {}
-
-// The compiler supports this instruction, but it is missing from the CPU debug stub header.
-inline void vcvt_rcpe6m22bf16(vector_bf16& dst, vector_f8e6m2 src, vector_bool mask, Literal part) {}
 
 #ifndef ULL
 #define ULL unsigned long long
@@ -310,7 +264,6 @@ using float8_e5m2_t = fp8_e5m2_t;
 using float4_e1m2x2_t = fp4x2_e1m2_t;
 using float4_e2m1x2_t = fp4x2_e2m1_t;
 
-inline void vcvt_e6m22bf16(vector_bf16& dst, vector_f8e6m2 src, vector_bool mask, Literal part) {}
 inline void vcvt_e8m02bf16(vector_bf16& dst, vector_f8e8m0 src, vector_bool mask, Literal part) {}
 
 inline void vcvt(
@@ -1709,7 +1662,6 @@ inline void vintlvv2(vector_f8e4m3& dst, vector_f8e4m3 src0, vector_f8e4m3 src1,
 inline void vintlvv2(vector_f8e5m2& dst, vector_f8e5m2 src0, vector_f8e5m2 src1, Literal pos) {}
 inline void vintlvv2(vector_f8e8m0& dst, vector_f8e8m0 src0, vector_f8e8m0 src1, Literal pos) {}
 inline void vintlvv2(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, Literal pos) {}
-inline void vintlvv2(vector_f8e6m2& dst, vector_f8e6m2 src0, vector_f8e6m2 src1, Literal pos) {}
 inline void vdintlvv2(vector_u8& dst, vector_u8 src0, vector_u8 src1, Literal pos) {}
 inline void vdintlvv2(vector_s8& dst, vector_s8 src0, vector_s8 src1, Literal pos) {}
 inline void vdintlvv2(vector_u16& dst, vector_u16 src0, vector_u16 src1, Literal pos) {}
@@ -1722,7 +1674,6 @@ inline void vdintlvv2(vector_f8e4m3& dst, vector_f8e4m3 src0, vector_f8e4m3 src1
 inline void vdintlvv2(vector_f8e5m2& dst, vector_f8e5m2 src0, vector_f8e5m2 src1, Literal pos) {}
 inline void vdintlvv2(vector_f8e8m0& dst, vector_f8e8m0 src0, vector_f8e8m0 src1, Literal pos) {}
 inline void vdintlvv2(vector_bf16& dst, vector_bf16 src0, vector_bf16 src1, Literal pos) {}
-inline void vdintlvv2(vector_f8e6m2& dst, vector_f8e6m2 src0, vector_f8e6m2 src1, Literal pos) {}
 inline void pintlvv2_b8(vector_bool& dst, vector_bool src0, vector_bool src1, Literal pos) {}
 inline void pintlvv2_b16(vector_bool& dst, vector_bool src0, vector_bool src1, Literal pos) {}
 inline void pintlvv2_b32(vector_bool& dst, vector_bool src0, vector_bool src1, Literal pos) {}

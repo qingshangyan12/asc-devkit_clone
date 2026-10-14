@@ -42,14 +42,6 @@ TEST_VECTOR_COMPUTE_VCVT_ROUND_SAT_POS_INSTR_2(
     Cast_rn_sat_odd, asc_cast, vcvt, vector_fp8_e5m2_t, vector_bfloat16_t, ASC_CAST_RN, ASC_CAST_SAT, ASC_POSITION_ODD,
     7);
 
-// ==========asc_cast bfloat16 to e6m2==========
-
-// ==========rn==========
-TEST_VECTOR_COMPUTE_VCVT_ROUND_POS_INSTR_3(
-    Cast_rn_even, asc_cast, vcvt_bf162e6m2, vector_fp8_e6m2_t, vector_bfloat16_t, ASC_CAST_RN, ASC_POSITION_EVEN, 8);
-TEST_VECTOR_COMPUTE_VCVT_ROUND_POS_INSTR_3(
-    Cast_rn_odd, asc_cast, vcvt_bf162e6m2, vector_fp8_e6m2_t, vector_bfloat16_t, ASC_CAST_RN, ASC_POSITION_ODD, 9);
-
 // ==========asc_cast bfloat16 to e8m0==========
 
 // ==========ru==========
