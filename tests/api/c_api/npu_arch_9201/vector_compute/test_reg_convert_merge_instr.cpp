@@ -67,7 +67,8 @@ TEST_9201_REG_CONVERT_POS(
     ASC_POSITION_EVEN, 13);
 
 TEST_9201_REG_CONVERT_POS(
-    Mergingfloat2bfloat16rnamerge, asc_float2bfloat16_rna_merge, vector_bfloat16_t, vector_float, ASC_POSITION_EVEN, 14);
+    Mergingfloat2bfloat16rnamerge, asc_float2bfloat16_rna_merge, vector_bfloat16_t, vector_float, ASC_POSITION_EVEN,
+    14);
 
 TEST_9201_REG_CONVERT_POS(
     Mergingfloat2bfloat16rnasatmerge, asc_float2bfloat16_rna_sat_merge, vector_bfloat16_t, vector_float,
@@ -88,7 +89,8 @@ TEST_9201_REG_CONVERT_POS(
     ASC_POSITION_EVEN, 19);
 
 TEST_9201_REG_CONVERT_POS(
-    Mergingfloat2e4m3rnmerge, asc_float2e4m3_rn_merge, vector_fp8_e4m3fn_t, vector_float, ASC_DISPERSE_FIRST_QUARTER, 20);
+    Mergingfloat2e4m3rnmerge, asc_float2e4m3_rn_merge, vector_fp8_e4m3fn_t, vector_float, ASC_DISPERSE_FIRST_QUARTER,
+    20);
 
 TEST_9201_REG_CONVERT_POS(
     Mergingfloat2e4m3rnsatmerge, asc_float2e4m3_rn_sat_merge, vector_fp8_e4m3fn_t, vector_float,
@@ -105,10 +107,12 @@ TEST_9201_REG_CONVERT_POS(
     Mergingfloat2hif8rhm, asc_float2hif8_rh_merge, vector_hifloat8_t, vector_float, ASC_DISPERSE_FIRST_QUARTER, 24);
 
 TEST_9201_REG_CONVERT_POS(
-    Mergingfloat2hif8rhsatm, asc_float2hif8_rh_sat_merge, vector_hifloat8_t, vector_float, ASC_DISPERSE_FIRST_QUARTER, 25);
+    Mergingfloat2hif8rhsatm, asc_float2hif8_rh_sat_merge, vector_hifloat8_t, vector_float, ASC_DISPERSE_FIRST_QUARTER,
+    25);
 
 TEST_9201_REG_CONVERT_POS(
-    Mergingfloat2hif8rnamerge, asc_float2hif8_rna_merge, vector_hifloat8_t, vector_float, ASC_DISPERSE_FIRST_QUARTER, 26);
+    Mergingfloat2hif8rnamerge, asc_float2hif8_rna_merge, vector_hifloat8_t, vector_float, ASC_DISPERSE_FIRST_QUARTER,
+    26);
 
 TEST_9201_REG_CONVERT_POS(
     Mergingfloat2hif8rnasatmerge, asc_float2hif8_rna_sat_merge, vector_hifloat8_t, vector_float,
