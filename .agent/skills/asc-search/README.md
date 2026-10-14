@@ -373,10 +373,6 @@ for (uint16_t i = 0; i < repeat_time; ++i) {
 }
 ```
 
-本例只有一个重点 `asc_abs` 调用语句，因此 marker 的共同范围只包含该行；循环运行时多次
-调用仍使用同一对 marker。`asc_abs__Rvf32_vf32_vb` 与 3.2 节引用参数输出的 `float` 重载
-ID 完全一致，索引通过 API 名称和原型将该声明匹配到 3.1 节的 `asc_abs.md` 文档头。
-
 三类头通过“文档的 API 名称与原型 → include 具体声明 → `override_id` → 样例范围”关联。
 `build_index.py` 消费它们生成索引，`ensure_index.py` 检查索引新鲜度，`query.py` 再从索引检索
 接口、文档和样例关联。
