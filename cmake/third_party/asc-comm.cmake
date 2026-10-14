@@ -104,7 +104,6 @@ install(CODE "file(CREATE_LINK ../../adv_api/hcomm \$ENV{DESTDIR}\${CMAKE_INSTAL
 install(CODE "file(CREATE_LINK ../../adv_api/detail/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/aicore/hcomm SYMBOLIC)" COMPONENT asc-devkit)
 
 # AICPU 公共 API 头由 asc-devkit 直接交付；运行期库仍由 runtime 包提供。
-# 与 CCU 一样使用显式规则，避免被上方通用 hcomm 排除规则过滤。
 set(ASC_COMM_AICPU_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm)
 if(EXISTS "${ASC_COMM_AICPU_HEADER_DIR}")
     install(DIRECTORY ${ASC_COMM_AICPU_HEADER_DIR}/
