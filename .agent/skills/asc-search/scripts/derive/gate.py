@@ -1,3 +1,13 @@
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """索引筛选条件：CANN 版本检测、架构映射与版本区间判定。
 
 检测链（references/索引推导契约.md 第 4 节）：--cann-version 显式参数 > $ASCEND_HOME_PATH
@@ -13,9 +23,7 @@ from typing import Any
 
 import yaml
 
-VERSION_RANGE_RE = re.compile(
-    r"^>=(?P<floor>\d+\.\d+(?:\.\d+)?)(?:,<=(?P<ceil>\d+\.\d+(?:\.\d+)?))?$"
-)
+VERSION_RANGE_RE = re.compile(r"^>=(?P<floor>\d+\.\d+(?:\.\d+)?)(?:,<=(?P<ceil>\d+\.\d+(?:\.\d+)?))?$")
 
 
 def load_product_map(path: Path) -> dict[str, Any]:

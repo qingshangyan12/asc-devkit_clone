@@ -17,7 +17,7 @@ python3 .agent/skills/asc-search/scripts/install.py
 | Claude Code | `~/.claude/skills/asc-search` |
 | OpenCode | `~/.config/opencode/skills/asc-search`（设置 `XDG_CONFIG_HOME` 时使用对应配置目录） |
 
-安装路径依据 [Codex](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills)、
+安装路径依据 [Codex 官方文档入口](https://github.com/openai/codex/blob/main/docs/skills.md)、
 [Claude Code](https://code.claude.com/docs/en/skills#choose-where-skills-load) 和
 [OpenCode](https://opencode.ai/docs/skills/#place-files) 的官方发现规则。
 
@@ -63,7 +63,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 `asc-search` 把三类头推导成一份持久索引，查询时只查索引、按需打开候选文档，不需要现场全文搜索。
 
-![asc-search：三类知识标注与检索工具链](references/asc-search三类知识标注与检索工具链.svg)
+![asc-search：三类知识标注与检索工具链](references/asc-search-knowledge-toolchain.svg)
 
 ### 1.3 两个工作流
 

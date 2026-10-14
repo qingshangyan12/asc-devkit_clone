@@ -1,3 +1,13 @@
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """derive-overrides 兜底机制（references/索引推导契约.md 第 3 节）。
 
 脚本推导不了的残留进 unresolved.json；单轮 LLM/人工裁决后固化为
@@ -46,7 +56,9 @@ def load_overrides(path: Path) -> dict[str, list[dict[str, Any]]]:
     return grouped
 
 
-def apply_overrides(document: str, derived: dict[str, Any], overrides: dict[str, list[dict[str, Any]]]) -> list[dict[str, Any]]:
+def apply_overrides(
+    document: str, derived: dict[str, Any], overrides: dict[str, list[dict[str, Any]]]
+) -> list[dict[str, Any]]:
     """将裁决覆盖应用到单文档推导结果；返回应用的裁决（供审计输出）。"""
     applied = []
     for entry in overrides.get(document, []):

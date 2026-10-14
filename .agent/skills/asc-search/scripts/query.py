@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """OKF 索引查询 CLI。
 
 索引实例按 surface 隔离（默认 c_api），构建时已按 CANN 版本 × 架构筛选条件。
@@ -109,9 +119,15 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
     # 维度值不合法时不报错：视作空结果，交由 Agent 走降级链并用同义词重试
     candidates: set[str] | None = None
     for key, view_name in (
-        ("stage", "by_stage"), ("operation", "by_operation"), ("category", "by_category"),
-        ("api_class", "by_api_class"), ("dtype", "by_dtype"), ("pair", "by_dtype_pair"),
-        ("feature", "by_feature"), ("version", "by_version"), ("product", "by_product"),
+        ("stage", "by_stage"),
+        ("operation", "by_operation"),
+        ("category", "by_category"),
+        ("api_class", "by_api_class"),
+        ("dtype", "by_dtype"),
+        ("pair", "by_dtype_pair"),
+        ("feature", "by_feature"),
+        ("version", "by_version"),
+        ("product", "by_product"),
     ):
         values = dims[key]
         if not values:
@@ -122,15 +138,15 @@ def filter_query(index: dict[str, Any], args: argparse.Namespace) -> list[dict[s
         candidates = matched if candidates is None else candidates & matched
     if dims["kw"]:
         matched = {
-            path for path in (candidates if candidates is not None else index["documents"])
-            if any(kw.lower() in f"{index['documents'][path]['title']} {index['documents'][path]['description']}".lower()
-                   for kw in dims["kw"])
+            path
+            for path in (candidates if candidates is not None else index["documents"])
+            if any(
+                kw.lower() in f"{index['documents'][path]['title']} {index['documents'][path]['description']}".lower()
+                for kw in dims["kw"]
+            )
         }
         candidates = matched
-    return [
-        {"path": path, "why": why_tags(index, path, dims)}
-        for path in sorted(candidates or set())
-    ]
+    return [{"path": path, "why": why_tags(index, path, dims)} for path in sorted(candidates or set())]
 
 
 def api_card(index: dict[str, Any], name: str) -> list[dict[str, Any]]:
@@ -159,16 +175,26 @@ def deps_query(index: dict[str, Any], target: str, kind: str | None, reverse: bo
         family_paths.add(path)
         for edge in index["graph"]["edges"]:
             if edge["to"] in family_paths and (not kind or edge["kind"] == kind):
-                results.append({"path": edge["from"], "why": [f"reverse:{edge['kind']}"],
-                                "condition": edge["condition"], "out_of_scope": edge["from"] not in index["documents"]})
+                results.append(
+                    {
+                        "path": edge["from"],
+                        "why": [f"reverse:{edge['kind']}"],
+                        "condition": edge["condition"],
+                        "out_of_scope": edge["from"] not in index["documents"],
+                    }
+                )
     else:
         for dep in doc["dependencies"]:
             if kind and dep["kind"] != kind:
                 continue
-            results.append({
-                "path": dep["path"], "why": [f"dep:{dep['kind']}"],
-                "condition": dep["condition"], "out_of_scope": dep["path"] not in index["documents"],
-            })
+            results.append(
+                {
+                    "path": dep["path"],
+                    "why": [f"dep:{dep['kind']}"],
+                    "condition": dep["condition"],
+                    "out_of_scope": dep["path"] not in index["documents"],
+                }
+            )
     return results
 
 
@@ -190,10 +216,13 @@ def param_query(index: dict[str, Any], token: str) -> list[dict[str, Any]]:
             results.append({"path": path, "why": reasons})
     if not results and token in index.get("defs", {}).get("enums", {}):
         enum = index["defs"]["enums"][token]
-        results.append({
-            "path": enum["header"], "why": [f"enum:{token}"],
-            "enum": {"values": enum["values"][:20], "header": enum["header"], "total_values": len(enum["values"])},
-        })
+        results.append(
+            {
+                "path": enum["header"],
+                "why": [f"enum:{token}"],
+                "enum": {"values": enum["values"][:20], "header": enum["header"], "total_values": len(enum["values"])},
+            }
+        )
     return results
 
 
@@ -205,10 +234,13 @@ def enum_query(index: dict[str, Any], token: str) -> list[dict[str, Any]]:
     if token in enums:
         users = index["views"].get("by_enum", {}).get(token, [])
         enum = enums[token]
-        results.append({
-            "path": f"include/{enum['header']}", "why": [f"enum:{token}"],
-            "enum": {"values": enum["values"], "used_by": users},
-        })
+        results.append(
+            {
+                "path": f"include/{enum['header']}",
+                "why": [f"enum:{token}"],
+                "enum": {"values": enum["values"], "used_by": users},
+            }
+        )
     value_owner = None
     for name, enum in enums.items():
         if token in enum["values"]:
@@ -216,8 +248,7 @@ def enum_query(index: dict[str, Any], token: str) -> list[dict[str, Any]]:
             break
     if value_owner is None and token in constants:
         value_owner = next(
-            (e for e, info in enums.items()
-             if any(c["name"] == token for c in constants.values() if True) and False),
+            (e for e, info in enums.items() if any(c["name"] == token for c in constants.values() if True) and False),
             None,
         )
         # 常量名 ASC_CAST_RN → 归属枚举（defs 常量与枚举同名族）
@@ -228,11 +259,13 @@ def enum_query(index: dict[str, Any], token: str) -> list[dict[str, Any]]:
                 break
     if value_owner:
         users = index["views"].get("by_enum", {}).get(value_owner, [])
-        results.append({
-            "path": f"include/{enums[value_owner]['header']}",
-            "why": [f"enum-value:{token}", f"enum:{value_owner}"],
-            "enum": {"value": token, "used_by": users},
-        })
+        results.append(
+            {
+                "path": f"include/{enums[value_owner]['header']}",
+                "why": [f"enum-value:{token}", f"enum:{value_owner}"],
+                "enum": {"value": token, "used_by": users},
+            }
+        )
     if not results:
         raise ValueError(f"unknown enum or value: {token}")
     return results
@@ -254,8 +287,13 @@ def gap_query(gaps: dict[str, Any], keyword: str) -> list[dict[str, Any]]:
     for gap in gaps["relation_gaps"]:
         haystack = f"{gap['from']} {gap['note']}"
         if hit(haystack):
-            results.append({"gap_id": f"relation:{Path(gap['from']).stem}", "conclusion": gap["note"],
-                            "hints": [{"path": gap["from"], "note": "范围内部文档"}]})
+            results.append(
+                {
+                    "gap_id": f"relation:{Path(gap['from']).stem}",
+                    "conclusion": gap["note"],
+                    "hints": [{"path": gap["from"], "note": "范围内部文档"}],
+                }
+            )
     return results
 
 
@@ -299,8 +337,12 @@ def render(index: dict[str, Any], results: list[dict[str, Any]]) -> str:
 
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--surface", default="c_api", choices=sorted(SCOPES),
-                   help="API surface 索引实例（默认 c_api）；索引构建时已按 CANN×架构筛选条件")
+    p.add_argument(
+        "--surface",
+        default="c_api",
+        choices=sorted(SCOPES),
+        help="API surface 索引实例（默认 c_api）；索引构建时已按 CANN×架构筛选条件",
+    )
     p.add_argument("--index-dir", type=Path, default=None, help="显式索引目录（默认 index/<surface>）")
     p.add_argument("--json", action="store_true", help="机器可读输出")
     p.add_argument("--stage", help="逗号列表: in,out,compute")

@@ -1,4 +1,14 @@
 #!/usr/bin/env python3
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """OKF 索引前置保障：检索前确保存在与「本地 CANN × 架构 × 层级」匹配且新鲜的索引。
 
 检索流程（references/retrieve.md）的步骤 0。检测链与 build_index 一致（--cann-version > $ASCEND_HOME_PATH >
@@ -52,9 +62,7 @@ def scope_documents(root: Path, scope: build_index.Scope) -> list[str]:
     for path in sorted((root / scope.root).rglob("*.md")):
         rel = path.relative_to(root).as_posix()
         parts = PurePosixPath(rel).parts
-        if scope.categories is not None and (
-            len(parts) <= base or parts[base] not in scope.categories
-        ):
+        if scope.categories is not None and (len(parts) <= base or parts[base] not in scope.categories):
             continue
         out.append(rel)
     return out
@@ -89,8 +97,10 @@ def light_fresh(instance: Path, root: Path, scope: build_index.Scope) -> tuple[b
             reasons.append(f"document changed: {rel}")
     index_meta = json.loads((instance / "index.json").read_text(encoding="utf-8"))["meta"]
     expected_count = (
-        index_meta["doc_count"] + index_meta["pending_no_okf"]
-        + index_meta["filtered_by_version"] + index_meta["filtered_by_arch"]
+        index_meta["doc_count"]
+        + index_meta["pending_no_okf"]
+        + index_meta["filtered_by_version"]
+        + index_meta["filtered_by_arch"]
     )
     actual = len(scope_documents(root, scope))
     if actual != expected_count:
@@ -99,7 +109,7 @@ def light_fresh(instance: Path, root: Path, scope: build_index.Scope) -> tuple[b
 
 
 def strict_fresh(
-    instance: Path, root: Path, scope: build_index.Scope, cann_version: str, arch_label: str,
+    instance: Path, root: Path, scope: build_index.Scope, cann_version: str, arch_label: str
 ) -> tuple[bool, list[str]]:
     """全量重建比对（与 build_index --check 同语义，按目标筛选条件参数化）。"""
     with tempfile.TemporaryDirectory() as tmp:
@@ -118,8 +128,14 @@ def strict_fresh(
 
 
 def ensure(
-    root: Path, surface: str, cann_version: str, arch_label: str,
-    *, skip_drift: bool = False, strict: bool = False, index_root: Path | None = None,
+    root: Path,
+    surface: str,
+    cann_version: str,
+    arch_label: str,
+    *,
+    skip_drift: bool = False,
+    strict: bool = False,
+    index_root: Path | None = None,
 ) -> dict[str, Any]:
     actions: list[str] = []
     scope = build_index.SCOPES[surface]
@@ -170,8 +186,7 @@ def main() -> int:
     try:
         cann_version = gate.detect_cann_version(args.cann_version, args.root)
         result = ensure(
-            args.root, args.surface, cann_version, args.arch,
-            skip_drift=args.skip_drift, strict=args.strict,
+            args.root, args.surface, cann_version, args.arch, skip_drift=args.skip_drift, strict=args.strict
         )
     except (build_index.BuildError, ValueError, OSError, KeyError, subprocess.CalledProcessError) as exc:
         print(f"error: {exc}", file=sys.stderr)

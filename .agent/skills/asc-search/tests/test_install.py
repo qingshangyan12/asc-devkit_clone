@@ -1,3 +1,13 @@
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """Installation behavior with isolated destinations, never real user directories."""
 
 from __future__ import annotations
@@ -77,11 +87,14 @@ class InstallTests(unittest.TestCase):
         with mock.patch.object(Path, "home", return_value=user_home), mock.patch.dict(
             os.environ, {"XDG_CONFIG_HOME": str(config_home)}
         ):
-            self.assertEqual(install.target_directories(self.root, "user"), {
-                "codex": user_home / ".agents/skills",
-                "claude": user_home / ".claude/skills",
-                "opencode": config_home / "opencode/skills",
-            })
+            self.assertEqual(
+                install.target_directories(self.root, "user"),
+                {
+                    "codex": user_home / ".agents/skills",
+                    "claude": user_home / ".claude/skills",
+                    "opencode": config_home / "opencode/skills",
+                },
+            )
         self.assertEqual(install.target_directories(self.root, "project")["codex"], self.root / ".agents/skills")
 
     def test_cli_from_outside_checkout_and_installed_link(self) -> None:
@@ -98,8 +111,7 @@ class InstallTests(unittest.TestCase):
             self.assertEqual((directory / "asc-search").resolve(), self.source)
         linked_script = repo / ".agents/skills/asc-search/scripts/install.py"
         second = subprocess.run(
-            [sys.executable, str(linked_script), "--scope", "project"],
-            cwd=self.root, capture_output=True, text=True,
+            [sys.executable, str(linked_script), "--scope", "project"], cwd=self.root, capture_output=True, text=True
         )
         self.assertEqual(second.returncode, 0, second.stderr)
         self.assertIn(f"Devkit checkout: {repo}", second.stdout)

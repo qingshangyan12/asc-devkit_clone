@@ -1,3 +1,13 @@
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """asc-search 推导引擎、筛选条件与查询测试（不写入已提交索引，用临时目录构建）。"""
 
 from __future__ import annotations
@@ -63,8 +73,7 @@ class DeriveTests(unittest.TestCase):
         enum = self.include_db["enums"]["asc_cast_round_mode"]
         self.assertIn("RN", enum["values"])
         self.assertTrue(
-            any(c["name"] == "ASC_CAST_RN" for c in self.include_db["constants"]),
-            "ASC_CAST_RN 常量应入 defs 目录",
+            any(c["name"] == "ASC_CAST_RN" for c in self.include_db["constants"]), "ASC_CAST_RN 常量应入 defs 目录"
         )
 
     def test_mask_derivation(self) -> None:
@@ -104,7 +113,9 @@ class DeriveTests(unittest.TestCase):
                 build_examples_db(root)
 
     def test_product_support_parse(self) -> None:
-        body = (REPO_ROOT / "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md").read_text(encoding="utf-8")
+        body = (
+            REPO_ROOT / "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"
+        ).read_text(encoding="utf-8")
         support = doc_product_support(body.split("---\n", 2)[-1])
         self.assertEqual(support["950"]["support"], "支持")
         self.assertEqual(support["A3"]["support"], "不支持")
@@ -144,7 +155,9 @@ class BuildTests(unittest.TestCase):
         self.assertEqual(self.arch3510["meta"]["filtered_by_version"], 3)
 
     def test_arch_page_signatures(self) -> None:
-        doc = self.arch3510["documents"]["docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"]
+        doc = self.arch3510["documents"][
+            "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md"
+        ]
         for signature in doc["signatures"]:
             self.assertIn("3510", signature["archs"])
 
@@ -187,14 +200,13 @@ class DryrunTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         import yaml
+
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name)
         scope = build_index.SCOPES["c_api"]
         build_index.build(REPO_ROOT, scope, cls.out / "arch3510", "9.2.0", "3510")
         build_index.build(REPO_ROOT, scope, cls.out / "a3", "9.2.0", "A3")
-        cls.cases = yaml.safe_load(
-            (Path(__file__).parent / "dryrun.yaml").read_text(encoding="utf-8")
-        )
+        cls.cases = yaml.safe_load((Path(__file__).parent / "dryrun.yaml").read_text(encoding="utf-8"))
 
     @classmethod
     def tearDownClass(cls) -> None:
@@ -203,12 +215,26 @@ class DryrunTests(unittest.TestCase):
     def _run(self, arch: str, args: dict) -> list[dict]:
         sys.path.insert(0, str(SCRIPTS))
         import query as query_mod
+
         index, gaps = query_mod.load(self.out / arch)
         defaults = {
-            "stage": None, "operation": None, "category": None, "api_class": None,
-            "dtype": None, "kw": None, "convert": None, "feature": None, "version": None,
-            "product": None, "api": None, "deps_of": None, "kind": None, "reverse": False,
-            "param": None, "enum": None, "gap": None,
+            "stage": None,
+            "operation": None,
+            "category": None,
+            "api_class": None,
+            "dtype": None,
+            "kw": None,
+            "convert": None,
+            "feature": None,
+            "version": None,
+            "product": None,
+            "api": None,
+            "deps_of": None,
+            "kind": None,
+            "reverse": False,
+            "param": None,
+            "enum": None,
+            "gap": None,
         }
         namespace = type("Args", (), {**defaults, **args, "json": True, "surface": "c_api", "index_dir": None})()
         return query_mod.run_query(namespace, index, gaps)
@@ -216,10 +242,13 @@ class DryrunTests(unittest.TestCase):
     def test_reverse_deps_by_family(self) -> None:
         # 族名与成员全路径应得到同一组反向入边
         by_family = self._run("arch3510", {"deps_of": "asc_copy_gm2ub", "reverse": True})
-        by_path = self._run("arch3510", {
-            "deps_of": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
-            "reverse": True,
-        })
+        by_path = self._run(
+            "arch3510",
+            {
+                "deps_of": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+                "reverse": True,
+            },
+        )
         self.assertGreaterEqual(len(by_family), 1)
         self.assertEqual({r["path"] for r in by_family}, {r["path"] for r in by_path})
 
@@ -234,8 +263,7 @@ class DryrunTests(unittest.TestCase):
                 arch = case.get("arch", "arch3510")
                 results = self._run(arch, case["args"])
                 self.assertGreaterEqual(
-                    len(results), case.get("min", 1),
-                    f"{case['name']}: 期望 ≥{case.get('min', 1)}，实际 {len(results)}",
+                    len(results), case.get("min", 1), f"{case['name']}: 期望 ≥{case.get('min', 1)}，实际 {len(results)}"
                 )
                 if "contains" in case:
                     joined = json.dumps(results, ensure_ascii=False)
@@ -249,6 +277,7 @@ class EnsureTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         import ensure_index
+
         cls.ensure_mod = ensure_index
         cls.tmp = tempfile.TemporaryDirectory()
         cls.out = Path(cls.tmp.name)
@@ -265,8 +294,7 @@ class EnsureTests(unittest.TestCase):
 
     def _patch_build_forbidden(self):
         return mock.patch.object(
-            self.ensure_mod.build_index, "build",
-            side_effect=AssertionError("ensure must not rebuild"),
+            self.ensure_mod.build_index, "build", side_effect=AssertionError("ensure must not rebuild")
         )
 
     def test_gate_reasons(self) -> None:
@@ -341,9 +369,7 @@ class EnsureTests(unittest.TestCase):
         self.assertEqual(result["arch"], "2201")
 
     def test_ensure_builds_missing_instance(self) -> None:
-        result = self.ensure_mod.ensure(
-            REPO_ROOT, "c_api", "9.2.0", "A3", index_root=self.out / "empty"
-        )
+        result = self.ensure_mod.ensure(REPO_ROOT, "c_api", "9.2.0", "A3", index_root=self.out / "empty")
         self.assertEqual(result["status"], "ready")
         self.assertEqual(result["actions"], ["rebuilt: index.json missing"])
         self.assertGreater(result["doc_count"], 0)

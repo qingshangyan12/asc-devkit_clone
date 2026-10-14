@@ -1,3 +1,13 @@
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """slim 头（5 字段）解析与冻结词表加载（asc-search 自含工具）。
 
 不依赖其他 skill：词表为本 skill 配置 `config/tag-taxonomy.json`（随包分发的冻结词表）；
@@ -31,7 +41,7 @@ def split_front_matter(text: str) -> tuple[dict[str, Any], str, str]:
     data = yaml.safe_load(raw) or {}
     if not isinstance(data, dict):
         raise ValidationError("front matter must be a mapping")
-    return data, raw, text[end + len("\n---\n"):]
+    return data, raw, text[end + len("\n---\n") :]
 
 
 def taxonomy(path: Path = TAXONOMY_PATH) -> tuple[tuple[str, ...], dict[str, set[str]]]:

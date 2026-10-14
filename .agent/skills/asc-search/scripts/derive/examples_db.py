@@ -1,3 +1,13 @@
+# -----------------------------------------------------------------------------------------------------------
+# Copyright (c) 2026 Huawei Technologies Co., Ltd.
+# This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+# CANN Open Software License Agreement Version 2.0 (the "License").
+# Please refer to the License for details. You may not use this file except in compliance with the License.
+# THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+# See LICENSE in the root of the software repository for the full text of the License.
+# -----------------------------------------------------------------------------------------------------------
+
 """样例目录解析：单 ID 或集中 ID 列表的成对 marker → 样例文件映射。"""
 
 from __future__ import annotations
@@ -6,8 +16,7 @@ import re
 from pathlib import Path
 
 MARKER_RE = re.compile(
-    r"^[ \t]*//![ \t]*\[(?P<ids>[A-Za-z0-9_.:-]+(?:[ \t]*,[ \t]*[A-Za-z0-9_.:-]+)*)\][ \t]*$",
-    re.MULTILINE,
+    r"^[ \t]*//![ \t]*\[(?P<ids>[A-Za-z0-9_.:-]+(?:[ \t]*,[ \t]*[A-Za-z0-9_.:-]+)*)\][ \t]*$", re.MULTILINE
 )
 
 
