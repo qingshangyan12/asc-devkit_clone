@@ -90,19 +90,6 @@ file(GLOB ASCENDC_UT_ascend960dt_AIV_CASE_SRC
     npu_arch_9201/vector_datamove/*.cpp
 )
 
-# New-format tests require the CPU package types supplied by toolkit-dev PR 173.
-get_target_property(ASCENDC_CPU_INCLUDE_DIRS tikicpulib_ascend910 INTERFACE_INCLUDE_DIRECTORIES)
-set(ASCENDC_CPU_HAS_9201_TYPES FALSE)
-foreach(include_dir IN LISTS ASCENDC_CPU_INCLUDE_DIRS)
-    if(EXISTS "${include_dir}/kernel_fp8_e6m2.h" AND EXISTS "${include_dir}/kernel_hif4.h")
-        set(ASCENDC_CPU_HAS_9201_TYPES TRUE)
-        break()
-    endif()
-endforeach()
-if(NOT ASCENDC_CPU_HAS_9201_TYPES)
-    list(FILTER ASCENDC_UT_ascend960dt_AIV_CASE_SRC EXCLUDE REGEX "/(test_asc_bfloat162e6m2|test_asc_rcpe6m22bfloat16)\\.cpp$")
-endif()
-
 foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
     add_executable(ascendc_ut_c_api_${product_type}
         ${ASCENDC_DIR}/tests/main.cpp
