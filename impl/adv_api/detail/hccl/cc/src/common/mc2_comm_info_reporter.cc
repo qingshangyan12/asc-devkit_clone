@@ -199,7 +199,7 @@ void SaveMc2CommInfoForProfiling(
 {
     try {
 #ifdef MACRO_DEV_TYPE_NEW
-        if (param.deviceType != DevType::DEV_TYPE_950) {
+        if (param.deviceType != DevType::DEV_TYPE_950 && param.deviceType != DevType::DEV_TYPE_960) {
 #else
         if (param.deviceType != DevType::DEV_TYPE_910_95) {
 #endif
