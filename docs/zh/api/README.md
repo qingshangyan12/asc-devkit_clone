@@ -1604,7 +1604,6 @@
             -   [asc_copy_gm2l1_nd2nz（废弃）](SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_nd2nz_deprecated.md)
             -   [asc_copy_gm2l1_arch_3510（高维切分数据搬运）（废弃）](SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_highdim_deprecated.md)
             -   [asc_copy_gm2l1_arch_3510（2D矩阵搬运模式）（废弃）](SIMD-API/c_api/deprecated_interface/asc_copy_gm2l1_2d_deprecated.md)
-            -   [asc_copy_l12ub_sync（废弃）](SIMD-API/c_api/deprecated_interface/asc_copy_l12ub_sync_deprecated.md)
             -   [asc_copy_l0c2gm（废弃）](SIMD-API/c_api/deprecated_interface/asc_copy_l0c2gm_deprecated.md)
             -   [asc_copy_l0c2l1（废弃）](SIMD-API/c_api/deprecated_interface/asc_copy_l0c2l1_deprecated.md)
             -   [asc_copy_l0c2ub（废弃）](SIMD-API/c_api/deprecated_interface/asc_copy_l0c2ub_deprecated.md)
@@ -2453,6 +2452,13 @@
 
         -   [随机函数](SIMD-API/adv_api/random_functions/random_functions.md)
             -   [PhiloxRandom](SIMD-API/adv_api/random_functions/PhiloxRandom.md)
+        -   [试验接口](SIMD-API/adv_api/experimental/experimental.md)
+            -   [BesselI0接口](SIMD-API/adv_api/experimental/BesselI0_interface/BesselI0_interface.md)
+                -   [BesselI0](SIMD-API/adv_api/experimental/BesselI0_interface/BesselI0.md)
+                -   [GetBesselI0MaxMinTmpSize](SIMD-API/adv_api/experimental/BesselI0_interface/GetBesselI0MaxMinTmpSize.md)
+                -   [GetBesselI0TmpBufferFactorSize](SIMD-API/adv_api/experimental/BesselI0_interface/GetBesselI0TmpBufferFactorSize.md)
+            -   [Ndtri接口](SIMD-API/adv_api/experimental/Ndtri_interface/Ndtri_interface.md)
+                -   [Ndtri](SIMD-API/adv_api/experimental/Ndtri_interface/Ndtri.md)
 
 -   [SIMT API<a npu_parse_enabled="true"></a>](SIMT-API/SIMT-API.md)
     -   [概述](SIMT-API/overview.md)
