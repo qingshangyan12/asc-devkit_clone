@@ -74,6 +74,17 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* s
     }
     ubuf_data[threadIdx.x] = src[idx];
     size_t addr_val = __cvta_generic_to_ubuf(ubuf_data + threadIdx.x);
-    printf("UB(ubuf_data)的地址值为：%lu\n", addr_val);
+    if (threadIdx.x == 0 && blockIdx.x < 4) {
+        printf("blockId(%u)的ubuf_data[%u]的UB地址值为：0x%lx\n", blockIdx.x, threadIdx.x, addr_val);
+    }
 }
+```
+
+输入输出示例如下：
+
+```text
+blockId(0)的ubuf_data[0]的UB地址值为：0x0
+blockId(0)的ubuf_data[1]的UB地址值为：0x4
+blockId(0)的ubuf_data[2]的UB地址值为：0x8
+blockId(0)的ubuf_data[3]的UB地址值为：0xc
 ```
