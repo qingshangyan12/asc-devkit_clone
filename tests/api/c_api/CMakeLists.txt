@@ -19,9 +19,11 @@ set(ASCENDC_UT_PRODUCT_TYPE_LIST
     ascend910B1_AIV
     ascend950pr_9599_AIC
     ascend950pr_9599_AIV
-    ascend960dt_AIC
-    ascend960dt_AIV
 )
+
+if(CANN_CHIP_EXT STREQUAL "ascend960")
+    list(APPEND ASCENDC_UT_PRODUCT_TYPE_LIST ascend960dt_AIC ascend960dt_AIV)
+endif()
 
 set(ASCENDC_UT_HEADER
     ${CMAKE_CURRENT_LIST_DIR}/..
@@ -100,6 +102,7 @@ foreach(product_type ${ASCENDC_UT_PRODUCT_TYPE_LIST})
 
     target_compile_definitions(ascendc_ut_c_api_${product_type} PRIVATE
         UT_TEST
+        $<$<STREQUAL:${CANN_CHIP_EXT},ascend960>:CANN_CHIP_EXT=ascend960>
         ASCENDC_OOM=1
         ASCENDC_DUMP=0
         $<$<STREQUAL:${product_type},ascend910B1_AIC>:__NPU_ARCH__=2201;__DAV_C220__;__DAV_C220_CUBE__;__DAV_CUBE__>
