@@ -22,6 +22,13 @@ using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
 using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
 using vector_fp8_e6m2_t = vector_f8e6m2;
 
+struct hifloat4x2_t {
+    uint8_t val = 0;
+};
+using hif4x2_t = hifloat4x2_t;
+
+using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
+
 inline void vcvt(
     vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
@@ -35,12 +42,15 @@ inline void vcvt_bf162e8m0(
     vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
 
-struct hifloat4x2_t {
-    uint8_t val = 0;
-};
-using hif4x2_t = hifloat4x2_t;
+// bf16->fp4 MODE_MERGING: stub_fun.h only has 6-arg int32_t overloads; add 7-arg for host UT.
+// Use int32_t (not Literal) so existing mockcpp hooks on int signatures keep working.
+inline void vcvt(
+    vector_f4e1m2x2& dst, vector_bf16 src, vector_bool preg, int32_t tag0, int32_t tag1, int32_t tag2, int32_t tag3)
+{}
+inline void vcvt(
+    vector_f4e2m1x2& dst, vector_bf16 src, vector_bool preg, int32_t tag0, int32_t tag1, int32_t tag2, int32_t tag3)
+{}
 
-using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
 inline void mad(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k, uint16_t n,
     uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
