@@ -309,6 +309,28 @@ using float8_e4m3_t = fp8_e4m3fn_t;
 using float8_e5m2_t = fp8_e5m2_t;
 using float4_e1m2x2_t = fp4x2_e1m2_t;
 using float4_e2m1x2_t = fp4x2_e2m1_t;
+
+inline void vcvt_e6m22bf16(vector_bf16& dst, vector_f8e6m2 src, vector_bool mask, Literal part) {}
+inline void vcvt_e8m02bf16(vector_bf16& dst, vector_f8e8m0 src, vector_bool mask, Literal part) {}
+
+inline void vcvt(
+    vector_f8e4m3& dst, vector_f16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+inline void vcvt(
+    vector_f8e5m2& dst, vector_f16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+
+inline void vpack(vector_u32& dst, vector_u64 src, Literal part) {}
+inline void vpack(vector_u32& dst, vector_s64 src, Literal part) {}
+inline void vpackv2(vector_u16& dst, vector_u16 src) {}
+inline void vpackv2(vector_s16& dst, vector_s16 src) {}
+inline void vpackv2(vector_f16& dst, vector_f16 src) {}
+inline void vpackv2(vector_u32& dst, vector_u32 src) {}
+inline void vpackv2(vector_s32& dst, vector_s32 src) {}
+inline void vpackv2(vector_f32& dst, vector_f32 src) {}
+inline void vpackv2(vector_u64& dst, vector_u64 src) {}
+inline void vpackv2(vector_s64& dst, vector_s64 src) {}
+
 void vcgadd(vector_u32& dst, vector_u16 src, vector_bool pg, int32_t mode);
 void vcgadd(vector_s32& dst, vector_s16 src, vector_bool pg, int32_t mode);
 
