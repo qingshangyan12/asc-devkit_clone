@@ -2,7 +2,7 @@
 
 本文介绍Lambda表达式在Ascend C中的使用方式。SIMT Device侧支持C++11 Lambda表达式的完整形态——值捕获、引用捕获、mutable、嵌套、立即调用（IIFE）、无捕获lambda转函数指针、捕获this、作为函数模板实参等均可直接使用；C++14泛型lambda与init-capture、C++17 constexpr lambda与`[*this]`按值捕获同样可用（见各标准章节）。
 
-Ascend C的Lambda是**Device侧局部闭包**：核函数（Kernel）参数仅支持基础类型、POD结构体与指针（见[核函数（Kernel）参数列表限制](../cpp_language_restrictions/functions.md#section_kernel_function_argument_list_constraint)），不存在"Host侧lambda传入核函数"的用法（即无`--extended-lambda`机制的等价物，试图传递会报`lambda type cannot be used as template argument for kernel function`），因此也没有跨执行空间的Lambda限制与闭包类型traits。需要按参数定制计算时，将标量参数直接传入核函数，在核函数内定义Lambda消费参数。
+Ascend C的Lambda是**Device侧局部闭包**：核函数（Kernel）参数仅支持基础类型、POD结构体与指针（见[核函数（Kernel）参数列表限制](../cpp_language_restrictions/general_restrictions.md#section_kernel_function_argument_list_constraint)），不存在"Host侧lambda传入核函数"的用法（即无`--extended-lambda`机制的等价物，试图传递会报`lambda type cannot be used as template argument for kernel function`），因此也没有跨执行空间的Lambda限制与闭包类型traits。需要按参数定制计算时，将标量参数直接传入核函数，在核函数内定义Lambda消费参数。
 
 SIMT编程与SIMD与SIMT混合编程场景场景下Lambda的使用约束略有不同。下文将会展开说明。
 
@@ -29,7 +29,7 @@ __global__ __launch_bounds__(THREAD_COUNT) void kernel(float* output)
 
 SIMT场景的限制如下：
 - lambda体内不可使用try/throw、动态分配、TLS等Device侧不支持的能力；
-- namespace-scope的lambda对象受全局变量规则约束（非constexpr闭包报`global variable is not allowed in aicore function`，constexpr闭包可用）。
+- namespace-scope的lambda对象受全局变量规则约束：不支持非constexpr闭包，constexpr闭包可用。
 
 Lambda捕获在实际算子开发中的用法请参考[Lambda捕获实战样例](../../../../../../examples/03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)。
 
@@ -105,12 +105,11 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 | constexpr lambda（C++17） | ⚠️ | `static_assert`与结果落`constexpr`变量后使用均可用；**不要**在VF内直接运行期调用constexpr闭包（实测个别版本结果错误，见下文注意事项）。 |
 | SIMD VF内调用矢量intrinsics | ✅ | `__simd_callee__` lambda体内可使用`asc_duplicate_scalar`/`asc_mul_scalar`/`asc_storealign`等并写UB。 |
 | 无参数列表形式 | ⚠️ | `[v] __simt_callee__ { ... }`可编译但触发C++2b扩展告警；C++17下应写显式`()`。 |
-| callee标记lambda转函数指针 | ❌ | 标记使闭包类型失去向函数指针的转换，报`no viable conversion`；需要函数指针形态时改用普通callee函数。 |
-| namespace-scope lambda对象 | ❌ | 闭包对象是全局变量，报`global variable ... is not allowed in aicore function`；`constexpr`闭包可用。 |
+| callee标记lambda转函数指针 | ❌ | 标记使闭包类型失去向函数指针的转换，需要函数指针形态时改用普通callee函数。 |
+| namespace-scope lambda对象 | ❌ | 不支持非`constexpr`的闭包对象；`constexpr`闭包可用。 |
 
 ### 使用约束<a name="section_lambda_constraints"></a>
 
 -   **constexpr lambda先落constexpr变量**：在VF函数内使用constexpr lambda时，将结果先赋给`constexpr`局部变量（`constexpr int32_t r64 = sq(8);`）再参与计算；不要在运行期路径直接调用constexpr闭包。
--   **lambda的类型不可跨执行空间使用**：标记callee的Lambda只能在对应VF函数及其callee链内定义和使用；纯SIMT核函数内直接编写的Lambda无需（也不能）携带callee标记。
--   **泛型Lambda与init-capture为C++14特性**：C++11语法范围内的Lambda（本节所述形态）在Device侧完整支持；`auto`参数与初始化捕获等C++14扩展见[C++14语言特性](./cpp14_language_feature.md)。
--   **Lambda与AscendC::Std**：混合编程场景下，Lambda可正常操作`AscendC::Std`标准库设施（如tuple，可在lambda体内`make_tuple`/`get`），但注意tuple模板实参不能携带UB地址空间限定类型，需先取值为普通标量局部变量再聚合，详见[混合编程Lambda捕获实战样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)说明。
+-   **lambda的类型不可跨执行空间使用**：标记callee的Lambda只能在对应VF函数及其callee链内定义和使用；
+-   **Lambda与AscendC::Std**：混合编程场景下，Lambda可正常操作`AscendC::Std`标准库设施，比如可在lambda体内使用tuple的`make_tuple`/`get`等，但注意tuple模板实参不能携带UB地址空间限定类型，需先取值为普通标量局部变量再聚合，详见[混合编程Lambda捕获实战样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)说明。
