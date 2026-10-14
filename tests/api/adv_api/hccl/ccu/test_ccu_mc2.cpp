@@ -65,6 +65,7 @@ REGISTER_ALG_META(
 
 // hccl_mc2.cc 的 CheckCcuAlgorithmsRegistered（非 static 自由函数，须在全局作用域声明）
 bool CheckCcuAlgorithmsRegistered(const void* ccTilingList[], uint32_t tilingNum);
+HcclResult CheckMc2CcDeviceType(const char* apiName);
 
 namespace {
 
@@ -1753,6 +1754,15 @@ TEST_F(CcuMc2TestSuite, Mc2AcquireCcResCtx_PropagatesOpResCtxCopyFailure)
     EXPECT_EQ(ccResCtx, nullptr);
     EXPECT_EQ(ccResCtxSize, 0U);
     EXPECT_EQ(Mc2FreeCcArgs(ccArgs), HCCL_SUCCESS);
+}
+
+TEST_F(CcuMc2TestSuite, CheckMc2CcDeviceType_Supports950And960)
+{
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_950;
+    EXPECT_EQ(CheckMc2CcDeviceType(__func__), HCCL_SUCCESS);
+
+    mc2_ops_hccl::g_stubDeviceType = DevType::DEV_TYPE_960;
+    EXPECT_EQ(CheckMc2CcDeviceType(__func__), HCCL_SUCCESS);
 }
 
 TEST_F(CcuMc2TestSuite, Mc2CcKernelLaunch_NullContext)
