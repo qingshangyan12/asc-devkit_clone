@@ -88,8 +88,8 @@ inline constexpr bool is_unpack_support_type_v = !AscendC::Std::is_same_v<unpack
 
 template <typename T>
 inline constexpr bool is_compress_support_type_v = AscendC::Std::is_one_of_v<
-    T, uint8_t, int8_t, fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, hifloat8_t, uint16_t, int16_t, half, bfloat16_t,
-    uint32_t, int32_t, float>;
+    T, uint8_t, int8_t, fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, hifloat8_t, uint16_t, int16_t, half, bfloat16_t, uint32_t,
+    int32_t, float>;
 
 template <typename T>
 struct expand_index_type {
@@ -130,19 +130,20 @@ template <typename T>
 using expand_index_t = typename expand_index_type<T>::type;
 
 template <typename T>
-inline constexpr bool is_expand_support_type_v = AscendC::Std::is_one_of_v<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t>;
+inline constexpr bool is_expand_support_type_v =
+    AscendC::Std::is_one_of_v<T, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t>;
 
 } // namespace detail
 
 template <high_low_part part, typename T>
 __simd_callee__ inline decltype(auto) pack(reg_tensor<T> src)
 {
-    static_assert(part == high_low_part::low || part == high_low_part::high,
+    static_assert(
+        part == high_low_part::low || part == high_low_part::high,
         "pack only supports high_low_part::low and high_low_part::high");
     static_assert(
-        detail::is_pack_support_type_v<T>,
-        "pack with reg_tensor<T> only supports "
-        "bool, uint16_t and uint32_t.");
+        detail::is_pack_support_type_v<T>, "pack with reg_tensor<T> only supports "
+                                           "bool, uint16_t and uint32_t.");
 
     using dst_type = detail::pack_dst_t<T>;
     reg_tensor<dst_type> dst;
@@ -158,12 +159,12 @@ __simd_callee__ inline decltype(auto) pack(reg_tensor<T> src)
 template <high_low_part part, typename T>
 __simd_callee__ inline decltype(auto) unpack(reg_tensor<T> src)
 {
-    static_assert(part == high_low_part::low || part == high_low_part::high,
+    static_assert(
+        part == high_low_part::low || part == high_low_part::high,
         "unpack only supports high_low_part::low and high_low_part::high");
     static_assert(
-        detail::is_unpack_support_type_v<T>,
-        "unpack with reg_tensor<T> only supports "
-        "bool, uint8_t, int8_t, uint16_t and int16_t.");
+        detail::is_unpack_support_type_v<T>, "unpack with reg_tensor<T> only supports "
+                                             "bool, uint8_t, int8_t, uint16_t and int16_t.");
 
     using dst_type = detail::unpack_dst_t<T>;
     reg_tensor<dst_type> dst;
@@ -194,9 +195,8 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> expand(reg_tensor<bool> mask)
 {
     static_assert(
-        detail::is_expand_support_type_v<T>,
-        "expand with reg_tensor<T> only supports "
-        "int8_t, uint8_t, int16_t, uint16_t, int32_t and uint32_t.");
+        detail::is_expand_support_type_v<T>, "expand with reg_tensor<T> only supports "
+                                             "int8_t, uint8_t, int16_t, uint16_t, int32_t and uint32_t.");
 
     reg_tensor<T> dst;
     asc_unsqueeze(dst.reg, mask.reg);

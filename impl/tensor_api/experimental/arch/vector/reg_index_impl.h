@@ -26,7 +26,8 @@ template <iota_order order, typename T>
 __simd_callee__ inline reg_tensor<Std::remove_cvref_t<T>> iota(const T& start)
 {
     using data_type = Std::remove_cvref_t<T>;
-    static_assert(AscendC::Std::is_one_of_v<data_type, int8_t, int16_t, int32_t, half, float>,
+    static_assert(
+        AscendC::Std::is_one_of_v<data_type, int8_t, int16_t, int32_t, half, float>,
         "iota only supports int8_t, int16_t, int32_t, half, and float");
     static_assert(
         order == iota_order::increase || order == iota_order::decrease,

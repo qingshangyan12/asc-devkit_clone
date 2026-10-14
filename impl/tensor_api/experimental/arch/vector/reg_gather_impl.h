@@ -27,17 +27,14 @@ namespace detail {
 template <typename DataType, typename IndexType>
 inline constexpr bool is_gather_reg_support_type_v =
     (Std::is_same_v<IndexType, uint8_t> &&
-        AscendC::Std::is_one_of_v<
-            DataType, int8_t, uint8_t, fp8_e4m3fn_t, hifloat8_t, fp8_e5m2_t, fp8_e8m0_t>) ||
-    (Std::is_same_v<IndexType, uint16_t> &&
-        AscendC::Std::is_one_of_v<DataType, int16_t, uint16_t, half, bfloat16_t>) ||
+     AscendC::Std::is_one_of_v<DataType, int8_t, uint8_t, fp8_e4m3fn_t, hifloat8_t, fp8_e5m2_t, fp8_e8m0_t>) ||
+    (Std::is_same_v<IndexType, uint16_t> && AscendC::Std::is_one_of_v<DataType, int16_t, uint16_t, half, bfloat16_t>) ||
     (Std::is_same_v<IndexType, uint32_t> && AscendC::Std::is_one_of_v<DataType, int32_t, uint32_t>);
 
 } // namespace detail
 
 template <typename DataType, typename IndexType>
-__simd_callee__ inline reg_tensor<DataType> gather(
-    const reg_tensor<DataType>& src, const reg_tensor<IndexType>& index)
+__simd_callee__ inline reg_tensor<DataType> gather(const reg_tensor<DataType>& src, const reg_tensor<IndexType>& index)
 {
     static_assert(
         detail::is_gather_reg_support_type_v<DataType, IndexType>,

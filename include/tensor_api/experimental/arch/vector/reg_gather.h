@@ -32,8 +32,7 @@ namespace experimental {
  * @return A register tensor containing the gathered data. The result mask is inherited from index.
  */
 template <typename DataType, typename IndexType>
-__simd_callee__ inline reg_tensor<DataType> gather(
-    const reg_tensor<DataType>& src, const reg_tensor<IndexType>& index);
+__simd_callee__ inline reg_tensor<DataType> gather(const reg_tensor<DataType>& src, const reg_tensor<IndexType>& index);
 
 } // namespace experimental
 } // namespace te

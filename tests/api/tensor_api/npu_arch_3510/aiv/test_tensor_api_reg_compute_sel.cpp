@@ -1,7 +1,7 @@
-/*
+/**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This file is a part of the CANN Open Software.
- * Licensed under CANN Open Software License Agreement Version 2.0 (the "License").
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
@@ -18,7 +18,7 @@ namespace {
 template <typename SrcType, typename PackedType>
 __simd_vf__ inline void compile_reg_data_pack_unpack(vector_bool mask)
 {
-    asc::te::experimental::reg_tensor<SrcType> src {mask};
+    asc::te::experimental::reg_tensor<SrcType> src{mask};
     auto packed_default = asc::te::experimental::pack(src);
     auto packed_low = asc::te::experimental::pack<asc::te::experimental::high_low_part::low>(src);
     auto packed_high = asc::te::experimental::pack<asc::te::experimental::high_low_part::high>(src);
@@ -37,7 +37,7 @@ __simd_vf__ inline void compile_reg_data_pack_unpack(vector_bool mask)
 template <typename SrcType, typename UnpackedType>
 __simd_vf__ inline void compile_reg_data_unpack(vector_bool mask)
 {
-    asc::te::experimental::reg_tensor<SrcType> src {mask};
+    asc::te::experimental::reg_tensor<SrcType> src{mask};
     auto unpacked_low = asc::te::experimental::unpack<asc::te::experimental::high_low_part::low>(src);
     auto unpacked_high = asc::te::experimental::unpack<asc::te::experimental::high_low_part::high>(src);
     static_assert(AscendC::Std::is_same_v<decltype(unpacked_low), asc::te::experimental::reg_tensor<UnpackedType>>);
@@ -46,7 +46,7 @@ __simd_vf__ inline void compile_reg_data_unpack(vector_bool mask)
 
 __simd_vf__ inline void compile_reg_mask_pack_unpack(vector_bool mask)
 {
-    asc::te::experimental::reg_tensor<bool> src {mask};
+    asc::te::experimental::reg_tensor<bool> src{mask};
     auto packed_default = asc::te::experimental::pack(src);
     auto packed_low = asc::te::experimental::pack<asc::te::experimental::high_low_part::low>(src);
     auto packed_high = asc::te::experimental::pack<asc::te::experimental::high_low_part::high>(src);
@@ -64,8 +64,8 @@ __simd_vf__ inline void compile_reg_mask_pack_unpack(vector_bool mask)
 template <typename T>
 __simd_vf__ inline void compile_reg_compress(vector_bool mask)
 {
-    asc::te::experimental::reg_tensor<T> src {mask};
-    asc::te::experimental::reg_tensor<bool> select_mask {mask};
+    asc::te::experimental::reg_tensor<T> src{mask};
+    asc::te::experimental::reg_tensor<bool> select_mask{mask};
     auto compressed = asc::te::experimental::compress(src, select_mask);
     static_assert(AscendC::Std::is_same_v<decltype(compressed), asc::te::experimental::reg_tensor<T>>);
 }
@@ -73,7 +73,7 @@ __simd_vf__ inline void compile_reg_compress(vector_bool mask)
 template <typename T>
 __simd_vf__ inline void compile_reg_expand(vector_bool mask)
 {
-    asc::te::experimental::reg_tensor<bool> select_mask {mask};
+    asc::te::experimental::reg_tensor<bool> select_mask{mask};
     auto expanded = asc::te::experimental::expand<T>(select_mask);
     static_assert(AscendC::Std::is_same_v<decltype(expanded), asc::te::experimental::reg_tensor<T>>);
 }

@@ -121,8 +121,8 @@ __simd_vf__ inline void compile_reg_local_tensor_broadcast(__ubuf__ float* src)
 template <typename DataType, typename IndexDataType>
 __simd_vf__ inline void compile_reg_register_gather(vector_bool mask)
 {
-    asc::te::experimental::reg_tensor<DataType> src {mask};
-    asc::te::experimental::reg_tensor<IndexDataType> index {mask};
+    asc::te::experimental::reg_tensor<DataType> src{mask};
+    asc::te::experimental::reg_tensor<IndexDataType> index{mask};
     auto value = asc::te::experimental::gather(src, index);
     static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<DataType>>);
 }
