@@ -38,16 +38,16 @@ TEST(AicpuStFloatConvert, HalfRoundTripAllBitPatterns)
 // RNE：中点入偶（normal / 次正规 / 溢出边界）
 TEST(AicpuStFloatConvert, FloatToHalfRoundsMidpointToEven)
 {
-    EXPECT_EQ(FloatToHalf(1.0f + 0.5f * 0x1p-10f), 0x3C00); // 1.0 与 1.0+2^-10 中点 → 入偶 0x3C00
-    EXPECT_EQ(FloatToHalf(1.0f + 1.5f * 0x1p-10f), 0x3C02); // 0x3C01 与 0x3C02 中点 → 入偶 0x3C02
-    EXPECT_EQ(FloatToHalf(1.5f * 0x1p-24f), 0x0002);        // 次正规 0x0001/0x0002 中点 → 入偶
-    EXPECT_EQ(FloatToHalf(65520.0f), 0x7C00);               // 65504/Inf 中点 → 入偶 Inf
-    EXPECT_EQ(FloatToHalf(65519.9f), 0x7BFF);               // 中点以下保持最大有限
+    EXPECT_EQ(FloatToHalf(1.0f + 0.5f * (1.0f / 1024.0f)), 0x3C00); // 1.0 与 1.0+2^-10 中点 → 入偶 0x3C00
+    EXPECT_EQ(FloatToHalf(1.0f + 1.5f * (1.0f / 1024.0f)), 0x3C02); // 0x3C01 与 0x3C02 中点 → 入偶 0x3C02
+    EXPECT_EQ(FloatToHalf(1.5f * (1.0f / 16777216.0f)), 0x0002);    // 次正规 0x0001/0x0002 中点 → 入偶
+    EXPECT_EQ(FloatToHalf(65520.0f), 0x7C00);                       // 65504/Inf 中点 → 入偶 Inf
+    EXPECT_EQ(FloatToHalf(65519.9f), 0x7BFF);                       // 中点以下保持最大有限
     // 常规 RNE（最近值舍入）：2.9f = 2.900000095367431640625，最近 half 为 0x41CD(2.900390625)，
     // 距离 0.00039 < 半 ULP(2^-10)；0x4200(3.0) 距离 0.1——RNE 舍到最近值而非 3.0，
     // 舍到 3.0 需值不小于 2.9990234375（0x41FF/0x4200 中点）。原断言 0x4200 与 IEEE RNE 不符，已修正
     EXPECT_EQ(FloatToHalf(2.9f), 0x41CD);
-    EXPECT_EQ(FloatToHalf(0x1p-24f), 0x0001); // 最小次正规
+    EXPECT_EQ(FloatToHalf(1.0f / 16777216.0f), 0x0001); // 最小次正规
 }
 
 // 饱和转换
@@ -83,7 +83,9 @@ TEST(AicpuStFloatConvert, Bfp16RoundTripAllBitPatterns)
         EXPECT_EQ(FloatToBfp16(Bfp16ToFloat(bits)), bits) << "roundtrip mismatch at 0x" << std::hex << v;
     }
     // 截断锚点：BFP16 尾数 7 位，[1,2) 区间 ULP=2^-7、半 ULP=2^-8
-    EXPECT_EQ(FloatToBfp16(1.0f + 0x1p-9f), 0x3F80);           // 1/4 ULP：半 ULP 以下截断 → 1.0
-    EXPECT_EQ(FloatToBfp16(1.0f + 0x1p-8f + 0x1p-9f), 0x3F80); // 3/4 ULP：超半 ULP 仍截断 → 1.0（RNE 会入到 0x3F81）
-    EXPECT_EQ(FloatToBfp16(1.0f + 0x1p-7f + 0x1p-8f), 0x3F81); // 1.5 ULP：超 1 ULP 截断进位 → 1 + 2^-7
+    EXPECT_EQ(FloatToBfp16(1.0f + (1.0f / 512.0f)), 0x3F80); // 1/4 ULP：半 ULP 以下截断 → 1.0
+    EXPECT_EQ(
+        FloatToBfp16(1.0f + (1.0f / 256.0f) + (1.0f / 512.0f)),
+        0x3F80); // 3/4 ULP：超半 ULP 仍截断 → 1.0（RNE 会入到 0x3F81）
+    EXPECT_EQ(FloatToBfp16(1.0f + (1.0f / 128.0f) + (1.0f / 256.0f)), 0x3F81); // 1.5 ULP：超 1 ULP 截断进位 → 1 + 2^-7
 }
