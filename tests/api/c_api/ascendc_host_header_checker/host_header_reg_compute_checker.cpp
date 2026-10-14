@@ -813,7 +813,7 @@ static void test_host_c_api_reg_compute_23()
 #endif
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90200000)
-static void test_host_c_api_reg_compute_23()
+static void test_host_c_api_reg_compute_24()
 {
     using ::asc_add_merge;
     using ::asc_max_merge;
@@ -822,7 +822,7 @@ static void test_host_c_api_reg_compute_23()
 #endif
 
 #if (ASC_DEVKIT_VERSION_NUM >= 90200000)
-static void test_host_c_api_reg_compute_24()
+static void test_host_c_api_reg_compute_25()
 {
     using ::asc_e6m22bfloat16;
     using ::asc_e6m22bfloat16_v2;
