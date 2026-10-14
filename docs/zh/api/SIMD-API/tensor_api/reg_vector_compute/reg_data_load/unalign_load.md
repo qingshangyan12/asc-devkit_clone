@@ -56,16 +56,16 @@ struct unalign_load {
 
 | 参数名 | 描述 |
 | --- | --- |
-| `Tensor` | 源Tensor类型，由函数实参自动推导，必须位于UB。 |
-| `Coord` | 源Tensor坐标类型，由函数实参自动推导，仅用于指定坐标的`load`重载。 |
+| Tensor | 源Tensor类型，由函数实参自动推导，必须位于UB。 |
+| Coord | 源Tensor坐标类型，由函数实参自动推导，仅用于指定坐标的`load`重载。 |
 
 **表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `src_base` | 输入 | `prepare`使用的源Tensor，其起始地址必须与本次连续搬入序列中首次`load`的实际搬入地址相同。 |
-| `src_tile` | 输入 | `load`使用的源Tensor。不传入`coord`时，从`src_tile.engine().begin().get()`搬入。 |
-| `coord` | 输入 | 搬入起始元素在`src_tile`逻辑布局中的坐标，实际搬入地址为`(src_tile.data() + src_tile.layout()(coord)).get()`。 |
+| src_base | 输入 | `prepare`使用的源Tensor，其起始地址必须与本次连续搬入序列中首次`load`的实际搬入地址相同。 |
+| src_tile | 输入 | `load`使用的源Tensor。不传入`coord`时，从`src_tile.engine().begin().get()`搬入。 |
+| coord | 输入 | 搬入起始元素在`src_tile`逻辑布局中的坐标，实际搬入地址为`(src_tile.data() + src_tile.layout()(coord)).get()`。 |
 
 ## 数据类型
 

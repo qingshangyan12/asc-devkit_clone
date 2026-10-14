@@ -61,20 +61,20 @@ struct unalign_store {
 
 | 参数名 | 描述 |
 | --- | --- |
-| `Tensor` | 目的Tensor类型，由函数实参自动推导，必须位于UB。 |
-| `Coord` | `store`的目的Tensor坐标类型，由函数实参自动推导。 |
-| `RegDataType` | 源寄存器元素类型，由函数实参自动推导。除`int4b_t`映射为`int4x2_t`外，必须与目的Tensor元素类型一致。 |
+| Tensor | 目的Tensor类型，由函数实参自动推导，必须位于UB。 |
+| Coord | `store`的目的Tensor坐标类型，由函数实参自动推导。 |
+| RegDataType | 源寄存器元素类型，由函数实参自动推导。除`int4b_t`映射为`int4x2_t`外，必须与目的Tensor元素类型一致。 |
 
 **表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `dst_tile` | 输出 | 本次搬出的目的Tensor。不传入坐标时，写入地址为`dst_tile.engine().begin().get()`。Tensor视图按值传入，不会修改调用者的视图，但会写入其指向的UB。 |
-| `coord`（`store`） | 输入 | 本次搬出起始元素在`dst_tile`逻辑布局中的坐标，实际写入地址为`(dst_tile.data() + dst_tile.layout()(coord)).get()`。 |
-| `src` | 输入 | 源`reg_tensor`，`reg`必须初始化，`mask`不参与搬出。 |
-| `count` | 输入 | 本次搬出的元素个数，类型为`uint32_t`，不超过单个矢量寄存器可容纳的元素个数。 |
-| `dst_base` | 输出 | 收尾使用的目的Tensor，其起始地址为本次连续搬出序列第一次`store`的实际写入地址。 |
-| `coord`（`flush`） | 输入 | 类型为`int32_t`，传给底层收尾接口的元素偏移量，应为本次连续搬出序列各次`count`之和。它不是`make_coord`生成的逻辑坐标，也不是字节偏移。 |
+| dst_tile | 输出 | 本次搬出的目的Tensor。不传入坐标时，写入地址为`dst_tile.engine().begin().get()`。Tensor视图按值传入，不会修改调用者的视图，但会写入其指向的UB。 |
+| coord（store） | 输入 | 本次搬出起始元素在`dst_tile`逻辑布局中的坐标，实际写入地址为`(dst_tile.data() + dst_tile.layout()(coord)).get()`。 |
+| src | 输入 | 源`reg_tensor`，`reg`必须初始化，`mask`不参与搬出。 |
+| count | 输入 | 本次搬出的元素个数，类型为`uint32_t`，不超过单个矢量寄存器可容纳的元素个数。 |
+| dst_base | 输出 | 收尾使用的目的Tensor，其起始地址为本次连续搬出序列第一次`store`的实际写入地址。 |
+| coord（flush） | 输入 | 类型为`int32_t`，传给底层收尾接口的元素偏移量，应为本次连续搬出序列各次`count`之和。它不是`make_coord`生成的逻辑坐标，也不是字节偏移。 |
 
 `flush`使用的收尾地址由`dst_base.engine().begin().get()`和元素偏移`coord`确定。若第一次`store`指定了非零坐标，应将该坐标对应的Tensor视图作为`dst_base`，不能直接用未偏移的原Tensor配合本序列元素总数进行收尾。
 

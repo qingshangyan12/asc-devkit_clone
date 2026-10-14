@@ -59,6 +59,7 @@ TYPED_TEST(tensor_api_reg_data_unalign_3510, full_register_sessions)
     constexpr uint32_t capacity = 2 * asc_get_vf_len() / sizeof(TypeParam) + 32;
     alignas(32) TypeParam src[capacity]{};
     alignas(32) TypeParam dst[capacity]{};
+    run_unalign_load_store(dst, src);
     run_unalign_load_store(dst + 2, src + 1);
 }
 
@@ -67,6 +68,7 @@ TEST(tensor_api_reg_data_unalign_3510_int4, full_register_session)
     constexpr uint32_t capacity = 2 * asc_get_vf_len() / sizeof(int4x2_t) + 32;
     alignas(32) int4b_t src[capacity]{};
     alignas(32) int4b_t dst[capacity]{};
+    run_unalign_load_store<int4b_t, int4x2_t>(dst, src);
     run_unalign_load_store<int4b_t, int4x2_t>(dst + 2, src + 2);
 }
 
@@ -97,6 +99,36 @@ TYPED_TEST(tensor_api_reg_data_unalign_3510, partial_stores_from_nonzero_coordin
     }
     EXPECT_EQ(src_tensor.engine().begin().get(), src);
     EXPECT_EQ(dst_tensor.engine().begin().get(), dst);
+}
+
+TYPED_TEST(tensor_api_reg_data_unalign_3510, continuous_partial_stores)
+{
+    constexpr uint32_t packing_factor = asc::te::is_b4_type<TypeParam> ? 2 : 1;
+    constexpr uint32_t elements_per_register = packing_factor * asc_get_vf_len() / sizeof(TypeParam);
+    constexpr uint32_t first_count = elements_per_register - 2 * packing_factor;
+    constexpr uint32_t last_count = packing_factor;
+    constexpr uint32_t total_count = first_count + last_count;
+    constexpr uint32_t capacity = 2 * asc_get_vf_len() / sizeof(TypeParam) + 32;
+    alignas(32) TypeParam src[capacity]{};
+    alignas(32) TypeParam dst[capacity]{};
+    auto layout = asc::te::make_layout(asc::te::make_shape(2 * elements_per_register));
+    auto src_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(src + 1), layout);
+    auto dst_tensor = asc::te::make_tensor(asc::te::make_mem_ptr<asc::te::location::ub>(dst + 2), layout);
+    auto tail_coord = asc::te::make_coord(first_count);
+    auto dst_tail = dst_tensor.slice(tail_coord, asc::te::make_shape(last_count));
+    EXPECT_EQ(dst_tail.engine().begin().get(), dst + 2 + first_count / packing_factor);
+
+    asc::te::experimental::unalign_load loader;
+    asc::te::experimental::unalign_store storer;
+    loader.prepare(src_tensor);
+    auto first = loader.load(src_tensor);
+    auto last = loader.load(src_tensor, asc::te::make_coord(elements_per_register));
+    storer.store(dst_tensor, first, first_count);
+    storer.store(dst_tensor, tail_coord, last, last_count);
+    storer.flush(dst_tensor, static_cast<int32_t>(total_count));
+
+    EXPECT_EQ(src_tensor.engine().begin().get(), src + 1);
+    EXPECT_EQ(dst_tensor.engine().begin().get(), dst + 2);
 }
 
 } // namespace
