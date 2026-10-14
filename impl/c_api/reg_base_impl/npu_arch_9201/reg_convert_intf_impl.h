@@ -2418,7 +2418,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_F, PART_P0, MODE_MERGING);
     }
 }
 
@@ -2428,7 +2428,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_F, PART_P1, MODE_MERGING);
     }
 }
 
@@ -2438,7 +2438,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_F, PART_P2, MODE_MERGING);
     }
 }
 
@@ -2448,7 +2448,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rd_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_F, PART_P3, MODE_MERGING);
     }
 }
 
@@ -2498,7 +2498,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rn_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_R, PART_P0, MODE_MERGING);
     }
 }
 
@@ -2508,7 +2508,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rn_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_R, PART_P1, MODE_MERGING);
     }
 }
 
@@ -2518,7 +2518,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rn_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_R, PART_P2, MODE_MERGING);
     }
 }
 
@@ -2528,7 +2528,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rn_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_R, PART_P3, MODE_MERGING);
     }
 }
 
@@ -2578,7 +2578,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rna_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_A, PART_P0, MODE_MERGING);
     }
 }
 
@@ -2588,7 +2588,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rna_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_A, PART_P1, MODE_MERGING);
     }
 }
 
@@ -2598,7 +2598,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rna_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_A, PART_P2, MODE_MERGING);
     }
 }
 
@@ -2608,7 +2608,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rna_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_A, PART_P3, MODE_MERGING);
     }
 }
 
@@ -2658,7 +2658,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_ru_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_C, PART_P0, MODE_MERGING);
     }
 }
 
@@ -2668,7 +2668,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_ru_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_C, PART_P1, MODE_MERGING);
     }
 }
 
@@ -2678,7 +2678,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_ru_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_C, PART_P2, MODE_MERGING);
     }
 }
 
@@ -2688,7 +2688,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_ru_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_C, PART_P3, MODE_MERGING);
     }
 }
 
@@ -2738,7 +2738,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rz_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_Z, PART_P0, MODE_MERGING);
     }
 }
 
@@ -2748,7 +2748,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rz_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_Z, PART_P1, MODE_MERGING);
     }
 }
 
@@ -2758,7 +2758,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rz_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_Z, PART_P2, MODE_MERGING);
     }
 }
 
@@ -2768,7 +2768,7 @@ __simd_callee__ inline void asc_bfloat162e1m2x2_rz_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_Z, PART_P3, MODE_MERGING);
     }
 }
 
@@ -2819,7 +2819,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rd_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_F, PART_P0, MODE_MERGING);
     }
 }
 
@@ -2829,7 +2829,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rd_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_F, PART_P1, MODE_MERGING);
     }
 }
 
@@ -2839,7 +2839,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rd_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_F, PART_P2, MODE_MERGING);
     }
 }
 
@@ -2849,7 +2849,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rd_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_F, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_F, PART_P3, MODE_MERGING);
     }
 }
 
@@ -2899,7 +2899,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rn_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_R, PART_P0, MODE_MERGING);
     }
 }
 
@@ -2909,7 +2909,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rn_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_R, PART_P1, MODE_MERGING);
     }
 }
 
@@ -2919,7 +2919,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rn_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_R, PART_P2, MODE_MERGING);
     }
 }
 
@@ -2929,7 +2929,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rn_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_R, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_R, PART_P3, MODE_MERGING);
     }
 }
 
@@ -2979,7 +2979,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rna_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_A, PART_P0, MODE_MERGING);
     }
 }
 
@@ -2989,7 +2989,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rna_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_A, PART_P1, MODE_MERGING);
     }
 }
 
@@ -2999,7 +2999,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rna_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_A, PART_P2, MODE_MERGING);
     }
 }
 
@@ -3009,7 +3009,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rna_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_A, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_A, PART_P3, MODE_MERGING);
     }
 }
 
@@ -3059,7 +3059,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_ru_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_C, PART_P0, MODE_MERGING);
     }
 }
 
@@ -3069,7 +3069,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_ru_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_C, PART_P1, MODE_MERGING);
     }
 }
 
@@ -3079,7 +3079,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_ru_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_C, PART_P2, MODE_MERGING);
     }
 }
 
@@ -3089,7 +3089,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_ru_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_C, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_C, PART_P3, MODE_MERGING);
     }
 }
 
@@ -3139,7 +3139,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rz_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P0, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_Z, PART_P0, MODE_MERGING);
     }
 }
 
@@ -3149,7 +3149,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rz_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P1, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_Z, PART_P1, MODE_MERGING);
     }
 }
 
@@ -3159,7 +3159,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rz_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P2, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_Z, PART_P2, MODE_MERGING);
     }
 }
 
@@ -3169,7 +3169,7 @@ __simd_callee__ inline void asc_bfloat162e2m1x2_rz_merge(
         dst_quarter_pos)
 {
     if ASC_IS_AIV {
-        vcvt(dst, src, mask, ROUND_Z, RS_DISABLE, PART_P3, MODE_MERGING);
+        vcvt(dst, src, mask, ROUND_Z, PART_P3, MODE_MERGING);
     }
 }
 
