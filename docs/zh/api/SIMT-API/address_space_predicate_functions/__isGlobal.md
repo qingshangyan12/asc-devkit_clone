@@ -77,3 +77,10 @@ __global__ __launch_bounds__(1024) void kernel_isGlobal(uint32_t* dst, uint32_t*
     dst[idx] = __isGlobal(src + idx);
 }
 ```
+
+输入输出示例如下：
+
+```text
+src: 11, 22, 33, 44
+result: 1, 1, 1, 1
+```
