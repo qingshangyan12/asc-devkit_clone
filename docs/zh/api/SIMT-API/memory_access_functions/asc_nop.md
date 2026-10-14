@@ -65,7 +65,7 @@ inline void asc_nop()
         uint32_t x = *data; // 读取数据
         ...
     }
-    ```
+```
 
 -   SIMD与SIMT混合编程场景：
 
@@ -81,13 +81,11 @@ inline void asc_nop()
         uint32_t x = *data; // 读取数据
         ...
     }
-    ```
+```
 
 输入输出示例如下：
 
-- 调用示例1：
-
-    ```text
-    x: 11
-    result: 12
-    ```
+```text
+x: 11
+result: 12
+```

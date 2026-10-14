@@ -96,7 +96,7 @@ inline void asc_syncthreads()
              }
          }
     }
-    ```
+```
 
 - SIMD与SIMT混合编程场景：
 
@@ -122,12 +122,10 @@ inline void asc_syncthreads()
              }
          }
     }
-    ```
+```
 
 输入输出示例如下：
 
-- 调用示例1：
-
-    ```text
-    result: 3, 1, 1, 1
-    ```
+```text
+result: 3, 1, 1, 1
+```

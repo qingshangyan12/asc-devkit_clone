@@ -207,7 +207,7 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = asc_ldcg(src + idx);
     }
-    ```
+```
 
 -   SIMD与SIMT混合编程场景：
 
@@ -221,13 +221,11 @@ L2 Cache中的缓存数据或输入的Global Memory地址上的数据。
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = asc_ldcg(src + idx);
     }
-    ```
+```
 
 输入输出示例如下：
 
-- 调用示例1：
-
-    ```text
-    x: -12.5, 0, 23.5, -7.25
-    result: -12.5, 0, 23.5, -7.25
-    ```
+```text
+x: -12.5, 0, 23.5, -7.25
+result: -12.5, 0, 23.5, -7.25
+```
