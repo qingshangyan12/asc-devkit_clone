@@ -2675,130 +2675,130 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_flo
     }
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_int8_t_result
+__simd_callee__ inline asc_int8_t_int8_t_pair
 asc_loadalign_deintlv(__ubuf__ int8_t* src)
 {
-    asc_loadalign_deintlv_int8_t_result result;
+    asc_int8_t_int8_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_uint8_t_result
+__simd_callee__ inline asc_uint8_t_uint8_t_pair
 asc_loadalign_deintlv(__ubuf__ uint8_t* src)
 {
-    asc_loadalign_deintlv_uint8_t_result result;
+    asc_uint8_t_uint8_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_fp4x2_e2m1_t_result
+__simd_callee__ inline asc_fp4x2_e2m1_t_fp4x2_e2m1_t_pair
 asc_loadalign_deintlv(__ubuf__ fp4x2_e2m1_t* src)
 {
-    asc_loadalign_deintlv_fp4x2_e2m1_t_result result;
+    asc_fp4x2_e2m1_t_fp4x2_e2m1_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_fp4x2_e1m2_t_result
+__simd_callee__ inline asc_fp4x2_e1m2_t_fp4x2_e1m2_t_pair
 asc_loadalign_deintlv(__ubuf__ fp4x2_e1m2_t* src)
 {
-    asc_loadalign_deintlv_fp4x2_e1m2_t_result result;
+    asc_fp4x2_e1m2_t_fp4x2_e1m2_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_int4x2_t_result
+__simd_callee__ inline asc_int4x2_t_int4x2_t_pair
 asc_loadalign_deintlv(__ubuf__ int4b_t* src)
 {
-    asc_loadalign_deintlv_int4x2_t_result result;
+    asc_int4x2_t_int4x2_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_fp8_e8m0_t_result
+__simd_callee__ inline asc_fp8_e8m0_t_fp8_e8m0_t_pair
 asc_loadalign_deintlv(__ubuf__ fp8_e8m0_t* src)
 {
-    asc_loadalign_deintlv_fp8_e8m0_t_result result;
+    asc_fp8_e8m0_t_fp8_e8m0_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_fp8_e5m2_t_result
+__simd_callee__ inline asc_fp8_e5m2_t_fp8_e5m2_t_pair
 asc_loadalign_deintlv(__ubuf__ fp8_e5m2_t* src)
 {
-    asc_loadalign_deintlv_fp8_e5m2_t_result result;
+    asc_fp8_e5m2_t_fp8_e5m2_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_fp8_e4m3fn_t_result
+__simd_callee__ inline asc_fp8_e4m3fn_t_fp8_e4m3fn_t_pair
 asc_loadalign_deintlv(__ubuf__ fp8_e4m3fn_t* src)
 {
-    asc_loadalign_deintlv_fp8_e4m3fn_t_result result;
+    asc_fp8_e4m3fn_t_fp8_e4m3fn_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_hifloat8_t_result
+__simd_callee__ inline asc_hifloat8_t_hifloat8_t_pair
 asc_loadalign_deintlv(__ubuf__ hifloat8_t* src)
 {
-    asc_loadalign_deintlv_hifloat8_t_result result;
+    asc_hifloat8_t_hifloat8_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_int16_t_result
+__simd_callee__ inline asc_int16_t_int16_t_pair
 asc_loadalign_deintlv(__ubuf__ int16_t* src)
 {
-    asc_loadalign_deintlv_int16_t_result result;
+    asc_int16_t_int16_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_uint16_t_result
+__simd_callee__ inline asc_uint16_t_uint16_t_pair
 asc_loadalign_deintlv(__ubuf__ uint16_t* src)
 {
-    asc_loadalign_deintlv_uint16_t_result result;
+    asc_uint16_t_uint16_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_half_result
+__simd_callee__ inline asc_half_half_pair
 asc_loadalign_deintlv(__ubuf__ half* src)
 {
-    asc_loadalign_deintlv_half_result result;
+    asc_half_half_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_bfloat16_t_result
+__simd_callee__ inline asc_bfloat16_t_bfloat16_t_pair
 asc_loadalign_deintlv(__ubuf__ bfloat16_t* src)
 {
-    asc_loadalign_deintlv_bfloat16_t_result result;
+    asc_bfloat16_t_bfloat16_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_int32_t_result
+__simd_callee__ inline asc_int32_t_int32_t_pair
 asc_loadalign_deintlv(__ubuf__ int32_t* src)
 {
-    asc_loadalign_deintlv_int32_t_result result;
+    asc_int32_t_int32_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_uint32_t_result
+__simd_callee__ inline asc_uint32_t_uint32_t_pair
 asc_loadalign_deintlv(__ubuf__ uint32_t* src)
 {
-    asc_loadalign_deintlv_uint32_t_result result;
+    asc_uint32_t_uint32_t_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }
 
-__simd_callee__ inline asc_loadalign_deintlv_float_result
+__simd_callee__ inline asc_float_float_pair
 asc_loadalign_deintlv(__ubuf__ float* src)
 {
-    asc_loadalign_deintlv_float_result result;
+    asc_float_float_pair result;
     asc_loadalign_deintlv(result.first, result.second, src);
     return result;
 }

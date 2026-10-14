@@ -53,7 +53,7 @@ TEST_F(TestVectorComputeMullPairReturnCApi, Int32PairReturn)
     FillRegister(src0, 0x11);
     FillRegister(src1, 0x22);
     FillRegister(mask, 0x33);
-    static_assert(std::is_same_v<decltype(asc_mull(src0, src1, mask)), asc_mull_int32_t_result>);
+    static_assert(std::is_same_v<decltype(asc_mull(src0, src1, mask)), asc_int32_t_int32_t_pair>);
     MOCKER_CPP(vmull, void(vector_int32_t&, vector_int32_t&, vector_int32_t, vector_int32_t, vector_bool))
         .times(1)
         .will(invoke(MullPairStub<vector_int32_t>));
@@ -70,7 +70,7 @@ TEST_F(TestVectorComputeMullPairReturnCApi, Uint32PairReturn)
     FillRegister(src0, 0x11);
     FillRegister(src1, 0x22);
     FillRegister(mask, 0x33);
-    static_assert(std::is_same_v<decltype(asc_mull(src0, src1, mask)), asc_mull_uint32_t_result>);
+    static_assert(std::is_same_v<decltype(asc_mull(src0, src1, mask)), asc_uint32_t_uint32_t_pair>);
     MOCKER_CPP(vmull, void(vector_uint32_t&, vector_uint32_t&, vector_uint32_t, vector_uint32_t, vector_bool))
         .times(1)
         .will(invoke(MullPairStub<vector_uint32_t>));
@@ -162,21 +162,21 @@ TEST_F(TestVectorComputeMullPairReturnCApi, Uint32PairReturn)
     }
 
 TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(
-    AddCarry, asc_add_carry, vaddc, vector_uint32_t, asc_add_carry_uint32_t_result);
+    AddCarry, asc_add_carry, vaddc, vector_uint32_t, asc_uint32_t_bool_pair);
 TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(
-    AddCarry, asc_add_carry, vaddc, vector_int32_t, asc_add_carry_int32_t_result);
+    AddCarry, asc_add_carry, vaddc, vector_int32_t, asc_int32_t_bool_pair);
 TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
-    AddCarrySrc, asc_add_carry, vaddcs, vector_uint32_t, asc_add_carry_uint32_t_result);
+    AddCarrySrc, asc_add_carry, vaddcs, vector_uint32_t, asc_uint32_t_bool_pair);
 TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
-    AddCarrySrc, asc_add_carry, vaddcs, vector_int32_t, asc_add_carry_int32_t_result);
+    AddCarrySrc, asc_add_carry, vaddcs, vector_int32_t, asc_int32_t_bool_pair);
 TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(
-    SubCarry, asc_sub_carry, vsubc, vector_uint32_t, asc_sub_carry_uint32_t_result);
+    SubCarry, asc_sub_carry, vsubc, vector_uint32_t, asc_uint32_t_bool_pair);
 TEST_VECTOR_COMPUTE_CARRY_PAIR_RETURN(
-    SubCarry, asc_sub_carry, vsubc, vector_int32_t, asc_sub_carry_int32_t_result);
+    SubCarry, asc_sub_carry, vsubc, vector_int32_t, asc_int32_t_bool_pair);
 TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
-    SubCarrySrc, asc_sub_carry, vsubcs, vector_uint32_t, asc_sub_carry_uint32_t_result);
+    SubCarrySrc, asc_sub_carry, vsubcs, vector_uint32_t, asc_uint32_t_bool_pair);
 TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
-    SubCarrySrc, asc_sub_carry, vsubcs, vector_int32_t, asc_sub_carry_int32_t_result);
+    SubCarrySrc, asc_sub_carry, vsubcs, vector_int32_t, asc_int32_t_bool_pair);
 
 #define TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(class_name, c_api_name, cce_name, data_type, result_type)       \
     class TestVectorCompute##class_name##data_type##PairReturnCApi : public testing::Test {                   \
@@ -251,58 +251,58 @@ TEST_VECTOR_COMPUTE_CARRY_SRC_PAIR_RETURN(
     }
 
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_uint8_t, asc_intlv_uint8_t_result);
+    Intlv, asc_intlv, vintlv, vector_uint8_t, asc_uint8_t_uint8_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_int8_t, asc_intlv_int8_t_result);
+    Intlv, asc_intlv, vintlv, vector_int8_t, asc_int8_t_int8_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_uint16_t, asc_intlv_uint16_t_result);
+    Intlv, asc_intlv, vintlv, vector_uint16_t, asc_uint16_t_uint16_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_int16_t, asc_intlv_int16_t_result);
+    Intlv, asc_intlv, vintlv, vector_int16_t, asc_int16_t_int16_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_uint32_t, asc_intlv_uint32_t_result);
+    Intlv, asc_intlv, vintlv, vector_uint32_t, asc_uint32_t_uint32_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_int32_t, asc_intlv_int32_t_result);
+    Intlv, asc_intlv, vintlv, vector_int32_t, asc_int32_t_int32_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_half, asc_intlv_half_result);
+    Intlv, asc_intlv, vintlv, vector_half, asc_half_half_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_float, asc_intlv_float_result);
+    Intlv, asc_intlv, vintlv, vector_float, asc_float_float_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_fp8_e8m0_t, asc_intlv_fp8_e8m0_t_result);
+    Intlv, asc_intlv, vintlv, vector_fp8_e8m0_t, asc_fp8_e8m0_t_fp8_e8m0_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_fp8_e5m2_t, asc_intlv_fp8_e5m2_t_result);
+    Intlv, asc_intlv, vintlv, vector_fp8_e5m2_t, asc_fp8_e5m2_t_fp8_e5m2_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_fp8_e4m3fn_t, asc_intlv_fp8_e4m3fn_t_result);
+    Intlv, asc_intlv, vintlv, vector_fp8_e4m3fn_t, asc_fp8_e4m3fn_t_fp8_e4m3fn_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv, vintlv, vector_bfloat16_t, asc_intlv_bfloat16_t_result);
+    Intlv, asc_intlv, vintlv, vector_bfloat16_t, asc_bfloat16_t_bfloat16_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN_HIF8(
-    Intlv, asc_intlv, vintlv, asc_intlv_hifloat8_t_result);
+    Intlv, asc_intlv, vintlv, asc_hifloat8_t_hifloat8_t_pair);
 
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_int32_t, asc_deintlv_int32_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_int32_t, asc_int32_t_int32_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_uint32_t, asc_deintlv_uint32_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_uint32_t, asc_uint32_t_uint32_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_int16_t, asc_deintlv_int16_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_int16_t, asc_int16_t_int16_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_uint16_t, asc_deintlv_uint16_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_uint16_t, asc_uint16_t_uint16_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_int8_t, asc_deintlv_int8_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_int8_t, asc_int8_t_int8_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_uint8_t, asc_deintlv_uint8_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_uint8_t, asc_uint8_t_uint8_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_fp8_e4m3fn_t, asc_deintlv_fp8_e4m3fn_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_fp8_e4m3fn_t, asc_fp8_e4m3fn_t_fp8_e4m3fn_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN_HIF8(
-    Deintlv, asc_deintlv, vdintlv, asc_deintlv_hifloat8_t_result);
+    Deintlv, asc_deintlv, vdintlv, asc_hifloat8_t_hifloat8_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_fp8_e5m2_t, asc_deintlv_fp8_e5m2_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_fp8_e5m2_t, asc_fp8_e5m2_t_fp8_e5m2_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_fp8_e8m0_t, asc_deintlv_fp8_e8m0_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_fp8_e8m0_t, asc_fp8_e8m0_t_fp8_e8m0_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_bfloat16_t, asc_deintlv_bfloat16_t_result);
+    Deintlv, asc_deintlv, vdintlv, vector_bfloat16_t, asc_bfloat16_t_bfloat16_t_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_float, asc_deintlv_float_result);
+    Deintlv, asc_deintlv, vdintlv, vector_float, asc_float_float_pair);
 TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv, vdintlv, vector_half, asc_deintlv_half_result);
+    Deintlv, asc_deintlv, vdintlv, vector_half, asc_half_half_pair);
 
 #define TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(class_name, c_api_name, cce_name, result_type)            \
     class TestVectorCompute##class_name##c_api_name##MaskPairReturnCApi : public testing::Test {             \
@@ -338,14 +338,14 @@ TEST_VECTOR_COMPUTE_REORDER_PAIR_RETURN(
     }
 
 TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv_b8, pintlv_b8, asc_intlv_b8_result);
+    Intlv, asc_intlv_b8, pintlv_b8, asc_bool_bool_pair);
 TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv_b16, pintlv_b16, asc_intlv_b16_result);
+    Intlv, asc_intlv_b16, pintlv_b16, asc_bool_bool_pair);
 TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
-    Intlv, asc_intlv_b32, pintlv_b32, asc_intlv_b32_result);
+    Intlv, asc_intlv_b32, pintlv_b32, asc_bool_bool_pair);
 TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv_b8, pdintlv_b8, asc_deintlv_b8_result);
+    Deintlv, asc_deintlv_b8, pdintlv_b8, asc_bool_bool_pair);
 TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv_b16, pdintlv_b16, asc_deintlv_b16_result);
+    Deintlv, asc_deintlv_b16, pdintlv_b16, asc_bool_bool_pair);
 TEST_VECTOR_COMPUTE_MASK_REORDER_PAIR_RETURN(
-    Deintlv, asc_deintlv_b32, pdintlv_b32, asc_deintlv_b32_result);
+    Deintlv, asc_deintlv_b32, pdintlv_b32, asc_bool_bool_pair);

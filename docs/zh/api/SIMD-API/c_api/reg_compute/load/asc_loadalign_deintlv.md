@@ -47,14 +47,14 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_<dtype>& dst0,
                                                   __ubuf__ <dtype>* src)
 
 // 通过函数返回值返回结果（占位符形式）
-__simd_callee__ inline asc_loadalign_deintlv_<dtype>_result asc_loadalign_deintlv(__ubuf__ <dtype>* src)
+__simd_callee__ inline asc_<dtype>_<dtype>_pair asc_loadalign_deintlv(__ubuf__ <dtype>* src)
 ```
 
 #### dtype支持数据类型
 
 `dtype`取值为：`int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
-当`dtype`为`int4b_t`时，`dst0`和`dst1`的实际类型均为`vector_int4x2_t`；通过函数返回值返回结果的函数原型的返回类型为`asc_loadalign_deintlv_int4x2_t_result`，结构体内成员变量`first`和`second`的数据类型均为`vector_int4x2_t`。
+当`dtype`为`int4b_t`时，`dst0`和`dst1`的实际类型均为`vector_int4x2_t`；通过函数返回值返回结果的函数原型的返回类型为`asc_int4x2_t_int4x2_t_pair`，结构体内成员变量`first`和`second`的数据类型均为`vector_int4x2_t`。
 
 #### 函数原型典型示例
 
@@ -65,7 +65,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
                                                 __ubuf__ float* src)
 
 // 通过函数返回值返回结果示例：对float数据执行解交织搬入。
-__simd_callee__ inline asc_loadalign_deintlv_float_result asc_loadalign_deintlv(__ubuf__ float* src)
+__simd_callee__ inline asc_float_float_pair asc_loadalign_deintlv(__ubuf__ float* src)
 ```
 
 ### 立即数偏移搬入模式
@@ -155,7 +155,7 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0,
 ## 返回值说明
 
 - 通过引用参数输出结果的函数原型无返回值，包含无偏移、立即数偏移和地址寄存器偏移三种模式。
-- 通过函数返回值输出结果的函数原型返回一个具体的结果结构体，使用变量`result`接收函数返回值。返回类型为`asc_loadalign_deintlv_<dtype>_result`，例如，dtype为`float`时，返回类型为`asc_loadalign_deintlv_float_result`，两个成员的类型均为`vector_float`，`result.first`保存源数据中的偶数下标元素；`result.second`保存源数据中的奇数下标元素。
+- 通过函数返回值输出结果的函数原型返回一个具体的结果结构体，使用变量`result`接收函数返回值。返回类型为`asc_<dtype>_<dtype>_pair`，例如，dtype为`float`时，返回类型为`asc_float_float_pair`，两个成员的类型均为`vector_float`，`result.first`保存源数据中的偶数下标元素；`result.second`保存源数据中的奇数下标元素。
 
 ## 约束说明
 

@@ -50,12 +50,12 @@ $$
 
 ```cpp
 // 通过函数返回值返回结果（占位符形式），不带输入进位。
-__simd_callee__ inline asc_sub_carry_<dtype>_result asc_sub_carry(vector_<dtype> src0,
+__simd_callee__ inline asc_<dtype>_bool_pair asc_sub_carry(vector_<dtype> src0,
                                                               vector_<dtype> src1,
                                                               vector_bool mask)
 
 // 通过函数返回值返回结果（占位符形式），带输入进位。
-__simd_callee__ inline asc_sub_carry_<dtype>_result asc_sub_carry(vector_<dtype> src0,
+__simd_callee__ inline asc_<dtype>_bool_pair asc_sub_carry(vector_<dtype> src0,
                                                               vector_<dtype> src1,
                                                               vector_bool carry_src,
                                                               vector_bool mask)
@@ -69,12 +69,12 @@ __simd_callee__ inline asc_sub_carry_<dtype>_result asc_sub_carry(vector_<dtype>
 
 ```cpp
 // 通过函数返回值返回结果示例：不带输入进位的uint32_t类型减法。
-__simd_callee__ inline asc_sub_carry_uint32_t_result asc_sub_carry(vector_uint32_t src0,
+__simd_callee__ inline asc_uint32_t_bool_pair asc_sub_carry(vector_uint32_t src0,
                                                                vector_uint32_t src1,
                                                                vector_bool mask)
 
 // 通过函数返回值返回结果示例：带输入进位的uint32_t类型减法。
-__simd_callee__ inline asc_sub_carry_uint32_t_result asc_sub_carry(vector_uint32_t src0,
+__simd_callee__ inline asc_uint32_t_bool_pair asc_sub_carry(vector_uint32_t src0,
                                                                vector_uint32_t src1,
                                                                vector_bool carry_src,
                                                                vector_bool mask)
@@ -103,7 +103,7 @@ __simd_callee__ inline asc_sub_carry_uint32_t_result asc_sub_carry(vector_uint32
 
 ## 返回值说明
 
-通过函数返回值输出结果的函数原型返回一个具体的结果结构体，返回类型为`asc_sub_carry_<dtype>_result`，使用变量`result`接收函数返回值。`result.first`保存计算结果的低32位，数据类型与输入矢量数据寄存器一致，为`vector_int32_t`或`vector_uint32_t`；`result.second`数据类型为`vector_bool`，保存补码加法产生的进位标志，为1表示无借位，为0表示有借位。
+通过函数返回值输出结果的函数原型返回公共结果结构体，返回类型为`asc_<dtype>_bool_pair`，使用变量`result`接收函数返回值。`result.first`保存计算结果的低32位，数据类型与输入矢量数据寄存器一致，为`vector_int32_t`或`vector_uint32_t`；`result.second`数据类型为`vector_bool`，保存补码加法产生的进位标志，为1表示无借位，为0表示有借位。相同dtype的加法和减法进位接口共用该结构体类型。
 
 ## 约束说明
 
