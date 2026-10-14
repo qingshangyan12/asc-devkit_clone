@@ -1,17 +1,6 @@
 # C++ 11语法约束限制<a name="section_auto_restrictions"></a>
 
-本文介绍C++ 11语法特性在Ascend C Device侧的限制与正确用法。各项约束均以可复现用例为依据，取证用例位于`simt_rdv/testcase`（`13_auto_restrictions`为auto约束、`14_alias_template_restrictions`为别名模板约束，均通过`SCENARIO_NUM`编译选项选择场景）。
-
-## 约束一览
-
-**表1**  C++ 11语法约束一览
-
-| 约束 | 表现 | 触发场景 |
-| --- | --- | --- |
-| [auto推导的设备指针不支持隐式转换后传入核函数](#auto推导的设备指针不支持隐式转换后传入核函数) | 编译通过，运行期核函数未获得有效Device地址，输出与期望不符 | Host侧以`auto dev = nullptr;`声明设备指针 |
-| 多声明符auto要求各声明符推导类型一致 | 推导类型不一致时编译报错 | 一条语句声明多个初始化表达式类型不同的auto变量 |
-| auto不可再作为存储类说明符 | 编译报错 | `auto int32_t idx = ...;`旧写法（C++11已移除该含义） |
-| [核函数模板不支持以依赖模板参数的别名模板作形参](#核函数模板不支持以依赖模板参数的别名模板作形参) | 混合编程模式下编译报错，形参地址空间限定符不被识别 | 核函数为函数模板，形参写`inputT<T>`（`using inputT = __gm__ T*;`） |
+本文介绍C++ 11语法特性在Ascend C Device侧的限制与正确用法。
 
 ## auto推导的设备指针不支持隐式转换后传入核函数
 
@@ -84,51 +73,3 @@ auto int32_t idx = threadIdx.x * blockDim.x + blockIdx.x;
 int32_t idx = threadIdx.x * blockDim.x + blockIdx.x;   // 显式类型
 auto idx2 = threadIdx.x * blockDim.x + blockIdx.x;     // auto推导（单个声明符）
 ```
-
-## 核函数模板不支持以依赖模板参数的别名模板作形参
-
-混合编程模式下，当核函数为函数模板、且形参通过别名模板（alias template）引用核函数自身的模板参数时，编译报错——别名模板展开后的地址空间限定符（`__gm__`）不被核函数参数机制识别：
-
-```cpp
-template <typename T>
-using inputT = __gm__ T*;
-
-template <typename T>
-__global__ __aicore__ void kernel_func(inputT<T> output, inputT<T> base)   // 编译报错
-{
-    output[threadIdx.x] = static_cast<T>(threadIdx.x) + base[threadIdx.x];
-}
-```
-
-典型报错（CANN 9.3.0实测）：
-
-```text
-error: expecting parameter output to have memory qualifier __gm__
-error: expecting parameter base to have memory qualifier __gm__
-```
-
-**正确写法**：形参直接书写显式类型，地址空间限定符写在指针声明处：
-
-```cpp
-template <typename T>
-__global__ __aicore__ void kernel_func(__gm__ T* output, __gm__ T* base)
-{
-    output[threadIdx.x] = static_cast<T>(threadIdx.x) + base[threadIdx.x];
-}
-```
-
-### 实测边界（CANN 9.3.0）
-
-别名模板与核函数/SIMT VF函数的组合行为按"别名是否依赖函数模板自身的模板参数"区分：
-
-**表2**  别名模板在核函数与SIMT VF函数中的实测行为
-
-| 场景 | 模式 | 实测结果 |
-| --- | --- | --- |
-| 核函数为**函数模板**，形参为依赖模板参数的别名（`inputT<T>`） | 混合编程 | ❌ 编译报错`expecting parameter ... to have memory qualifier __gm__` |
-| 非模板核函数，形参为已实例化别名（`inputT<float>`） | 混合编程 | ⚠️ 编译通过且运行正确（依赖编译器实现行为，不保证跨版本兼容，建议避免） |
-| SIMT VF为函数模板，形参为依赖模板参数的`__ubuf__`/`__gm__`别名 | 混合编程 | ⚠️ 经`asc_vf_call`调用编译通过且运行正确（同为实现行为，建议避免） |
-| 核函数形参为普通别名（`T*`，无地址空间限定） | 纯SIMT | ✅ 编译通过且运行正确（纯SIMT核函数指针形参无地址空间限定要求） |
-
-> [!NOTE]说明
-> 约束的根因在核函数参数机制的地址空间校验：混合编程核函数形参要求指针显式携带`__gm__`限定，该校验在模板两阶段检查中无法穿透别名模板的依赖类型展开。非依赖路径（已实例化别名）可绕过该校验属编译器实现行为，跨CANN版本不保证兼容，因此**核函数与SIMT VF函数的形参一律直接书写显式类型**。
