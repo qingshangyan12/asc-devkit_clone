@@ -144,7 +144,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 <text class="code" xml:space="preserve" x="69" y="682" font-size="19" fill="#162a46" font-weight="400" text-anchor="start">  - roles: [compute]</text>
 <text class="code" xml:space="preserve" x="69" y="703" font-size="19" fill="#162a46" font-weight="400" text-anchor="start">  - operations: [absolute]</text>
 <text class="code" xml:space="preserve" x="69" y="724" font-size="19" fill="#162a46" font-weight="400" text-anchor="start">dependencies: []</text>
-<text class="code" xml:space="preserve" x="69" y="745" font-size="19" fill="#162a46" font-weight="400" text-anchor="start">version: &quot;&gt;=9.0.0&quot;</text>
+<text class="code" xml:space="preserve" x="69" y="745" font-size="19" fill="#162a46" font-weight="400" text-anchor="start">version: &quot;&gt;=9.2.0&quot;</text>
 <text class="code" xml:space="preserve" x="69" y="766" font-size="19" fill="#162a46" font-weight="400" text-anchor="start">---</text>
 <text class="code" xml:space="preserve" x="69" y="787" font-size="19" fill="#162a46" font-weight="400" text-anchor="start"># asc_abs</text>
 <text class="code" xml:space="preserve" x="69" y="808" font-size="19" fill="#162a46" font-weight="400" text-anchor="start">.....</text>
