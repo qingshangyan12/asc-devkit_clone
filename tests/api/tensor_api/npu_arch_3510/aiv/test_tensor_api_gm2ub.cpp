@@ -122,8 +122,10 @@ TEST_F(tensor_api_vector_copy_3510, copy_gm_to_ub_int4_logical_elements)
     auto gm_tensor = make_tensor_at<location::gm>(src, layout);
     auto ub_tensor = make_tensor_at<location::ub>(dst, layout);
 
-    MOCKER_CPP(copy_gm_to_ubuf_align_v2, void(__ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t,
-                                              uint8_t, uint8_t, bool, uint8_t, uint64_t, uint32_t))
+    MOCKER_CPP(
+        copy_gm_to_ubuf_align_v2, void(
+                                      __ubuf__ uint8_t*, __gm__ uint8_t*, uint8_t, uint32_t, uint32_t, uint8_t, uint8_t,
+                                      bool, uint8_t, uint64_t, uint32_t))
         .times(1)
         .will(invoke(copy_gm_to_ub_stub));
 
