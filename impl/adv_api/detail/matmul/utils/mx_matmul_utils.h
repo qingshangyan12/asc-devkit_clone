@@ -77,10 +77,12 @@ struct GetMmDstType<fp4x2_e1m2_t> {
     using Type = float;
 };
 
+#if __NPU_ARCH__ == 9201
 template <>
 struct GetMmDstType<hifloat4x2_t> {
     using Type = float;
 };
+#endif
 
 template <>
 struct GetL0DataType<fp8_e5m2_t, true> {
@@ -112,7 +114,12 @@ __aicore__ inline constexpr static int32_t AuxGetC0Size()
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
     else if (IsTypeOneOfV<SrcT, uint8_t, int8_t, hifloat8_t, fp8_e4m3fn_t, fp8_e5m2_t, fp8_e8m0_t>) {
         return Impl::B8_C0SIZE;
-    } else if (IsTypeOneOfV<SrcT, int4b_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat4x2_t>) {
+    }
+#if __NPU_ARCH__ == 9201
+    else if (IsTypeOneOfV<SrcT, int4b_t, fp4x2_e1m2_t, fp4x2_e2m1_t, hifloat4x2_t>) {
+#else
+    else if (IsTypeOneOfV<SrcT, int4b_t, fp4x2_e1m2_t, fp4x2_e2m1_t>) {
+#endif
         return Impl::B4_C0SIZE;
     }
 #else
@@ -236,7 +243,11 @@ __aicore__ constexpr int32_t GetBitSize()
     if constexpr (IsTypeOneOfV<T, fp8_e8m0_t, hifloat8_t, fp8_e4m3fn_t, fp8_e5m2_t>) {
         return ONE_BYTE_BIT_SIZE;
     }
+#if __NPU_ARCH__ == 9201
     if constexpr (IsTypeOneOfV<T, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>) {
+#else
+    if constexpr (IsTypeOneOfV<T, fp4x2_e2m1_t, fp4x2_e1m2_t>) {
+#endif
         return ONE_BYTE_BIT_SIZE / 2;
     }
 #endif
@@ -348,7 +359,10 @@ __aicore__ inline constexpr bool InputPhyPosIsUB()
     }
 }
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
+template <typename T>
+constexpr bool SupportMXFP8 = IsTypeOneOfV<T, fp8_e4m3fn_t, fp8_e5m2_t, fp4x2_e2m1_t, fp4x2_e1m2_t>;
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
 template <typename T>
 constexpr bool SupportMXFP8 = IsTypeOneOfV<T, fp8_e4m3fn_t, fp8_e5m2_t, fp4x2_e2m1_t, fp4x2_e1m2_t, hifloat4x2_t>;
 #else
