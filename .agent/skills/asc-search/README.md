@@ -17,10 +17,6 @@ python3 .agent/skills/asc-search/scripts/install.py
 | Claude Code | `~/.claude/skills/asc-search` |
 | OpenCode | `~/.config/opencode/skills/asc-search`（设置 `XDG_CONFIG_HOME` 时使用对应配置目录） |
 
-安装路径依据 [Codex 官方文档入口](https://github.com/openai/codex/blob/main/docs/skills.md)、
-[Claude Code](https://code.claude.com/docs/en/skills#choose-where-skills-load) 和
-[OpenCode](https://opencode.ai/docs/skills/#place-files) 的官方发现规则。
-
 只安装到一个智能体或仅在本项目启用时，可选择：
 
 ```bash
