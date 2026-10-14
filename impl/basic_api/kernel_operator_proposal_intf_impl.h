@@ -379,8 +379,31 @@ __aicore__ inline void Extract(
     ExtractImpl(
         (__ubuf__ PrimType*)dstValue.GetPhyAddr(), (__ubuf__ uint32_t*)dstIndex.GetPhyAddr(),
         (__ubuf__ PrimType*)sorted.GetPhyAddr(), repeatTime);
+#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3103)
+    uint64_t rsvdCnt;
+    if constexpr (Std::is_same<PrimType, half>::value) {
+        constexpr uint8_t gatherMaskPattern3 = 3;
+        constexpr uint8_t gatherMaskPattern2 = 2;
+        GatherMaskCal(
+            (__ubuf__ PrimType*)dstValue.GetPhyAddr(), (__ubuf__ PrimType*)sorted.GetPhyAddr(), gatherMaskPattern3,
+            false, static_cast<uint32_t>(0), {1, static_cast<uint16_t>(repeatTime * 2), 4, 0}, rsvdCnt);
+        PipeBarrier<PIPE_V>();
+        GatherMaskCal(
+            (__ubuf__ uint32_t*)dstIndex.GetPhyAddr(), (__ubuf__ uint32_t*)sorted.GetPhyAddr(), gatherMaskPattern2,
+            false, static_cast<uint32_t>(0), {1, static_cast<uint16_t>(repeatTime * 2), 4, 0}, rsvdCnt);
+    } else {
+        constexpr uint8_t gatherMaskPattern1 = 1;
+        constexpr uint8_t gatherMaskPattern2 = 2;
+        GatherMaskCal(
+            (__ubuf__ PrimType*)dstValue.GetPhyAddr(), (__ubuf__ PrimType*)sorted.GetPhyAddr(), gatherMaskPattern1,
+            false, static_cast<uint32_t>(0), {1, static_cast<uint16_t>(repeatTime * 2), 4, 0}, rsvdCnt);
+        PipeBarrier<PIPE_V>();
+        GatherMaskCal(
+            (__ubuf__ uint32_t*)dstIndex.GetPhyAddr(), (__ubuf__ uint32_t*)sorted.GetPhyAddr(), gatherMaskPattern2,
+            false, static_cast<uint32_t>(0), {1, static_cast<uint16_t>(repeatTime), 4, 0}, rsvdCnt);
+    }
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 2201) || (__NPU_ARCH__ == 3002) || (__NPU_ARCH__ == 3102) || \
-                                (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3103) || (__NPU_ARCH__ == 3113))
+                                (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113))
     uint64_t rsvdCnt;
     if constexpr (Std::is_same<PrimType, half>::value) {
         constexpr uint8_t gatherMaskPattern3 = 3;
