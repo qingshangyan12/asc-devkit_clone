@@ -14,12 +14,15 @@ import numpy as np
 
 
 def verify_result():
+    output_dir = Path("output")
+    output_path = output_dir / "output.bin"
+    golden_path = output_dir / "golden.bin"
     expected_size = 128 * np.dtype(np.uint16).itemsize
-    for filename in ["output/output.bin", "output/golden.bin"]:
-        if Path(filename).stat().st_size != expected_size:
+    for filename in [output_path, golden_path]:
+        if filename.stat().st_size != expected_size:
             raise ValueError(f"{filename}: expected {expected_size} bytes")
-    actual = np.fromfile("output/output.bin", dtype=np.uint16)
-    expected = np.fromfile("output/golden.bin", dtype=np.uint16)
+    actual = np.fromfile(output_path, dtype=np.uint16)
+    expected = np.fromfile(golden_path, dtype=np.uint16)
     mismatches = np.flatnonzero(actual != expected)
     if mismatches.size:
         print(f"FAIL: {mismatches.size}/128 mismatches; first index {mismatches[0]}")

@@ -27,11 +27,13 @@ def gen_golden_data_gather(case):
         indexes = np.arange(total_length - 1, -1, -1, dtype=np.uint16)
     else:
         indexes = np.full(total_length, total_length - 1, dtype=np.uint16)
-    Path("input").mkdir(exist_ok=True)
-    Path("output").mkdir(exist_ok=True)
-    source.tofile("input/input_x.bin")
-    indexes.tofile("input/input_y.bin")
-    source[indexes].tofile("output/golden.bin")
+    input_dir = Path("input")
+    output_dir = Path("output")
+    input_dir.mkdir(exist_ok=True)
+    output_dir.mkdir(exist_ok=True)
+    source.tofile(input_dir / "input_x.bin")
+    indexes.tofile(input_dir / "input_y.bin")
+    source[indexes].tofile(output_dir / "golden.bin")
     print(f"Generated {case}: half/uint16, {total_length} elements")
 
 
