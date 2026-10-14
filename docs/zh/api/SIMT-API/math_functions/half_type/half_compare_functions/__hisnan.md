@@ -76,3 +76,10 @@ inline bool __hisnan(half x)
         dst[idx] = __hisnan(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -1.25, nan, inf, -inf
+result: false, true, false, false
+```

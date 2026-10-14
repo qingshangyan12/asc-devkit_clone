@@ -269,6 +269,10 @@ function stripSidebarNumber(text) {
   return String(text || '').replace(/^\d+(?:\.\d+)*\.\s*/, '')
 }
 
+function stripHtmlTags(text) {
+  return String(text || '').replace(/<[^>]+>/g, '')
+}
+
 function buildBreadcrumbMap() {
   const roots = {
     '/api/': { text: 'Ascend C API', link: '/api/api_list' },
@@ -282,7 +286,7 @@ function buildBreadcrumbMap() {
       const isRootItem = link && link === rootLink
       const nextTrail = isRootItem
         ? trail
-        : [...trail, { text: stripSidebarNumber(item.text), ...(item.link ? { link: item.link } : {}) }]
+        : [...trail, { text: stripHtmlTags(stripSidebarNumber(item.text)), ...(item.link ? { link: item.link } : {}) }]
       if (link) breadcrumbs.set(link, nextTrail)
       if (item.items?.length) visit(item.items, nextTrail, rootLink)
     }

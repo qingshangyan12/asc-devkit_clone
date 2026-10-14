@@ -5,6 +5,8 @@ asc_store_l2_cache_mode用于表示数据从Unified Buffer（UB）搬运到GM时
 - 向量搬运接口，例如[asc_copy_ub2gm_align](../../vector_datamove/asc_copy_ub2gm_align/asc_copy_ub2gm_align_arch_3510.md)。
 - 标量访存路径的store策略配置与查询，例如[asc_set_scalar_cache_mode](../../cache_ctrl/asc_set_scalar_cache_mode.md)和[asc_get_scalar_store_cache_mode](../../cache_ctrl/asc_get_scalar_store_cache_mode.md)。
 
+头文件路径为：`"c_api/defs/enum.h"`。
+
 ## 枚举类具体定义
 
 ```cpp

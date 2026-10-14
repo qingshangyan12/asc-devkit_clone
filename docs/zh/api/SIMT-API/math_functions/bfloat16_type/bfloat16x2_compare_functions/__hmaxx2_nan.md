@@ -146,3 +146,11 @@ bfloat16x2_t __hmaxx2_nan(const bfloat16x2_t x, const bfloat16x2_t y)
         asc_vf_call<simt_hmaxx2_nan>(dim3(1024), (__gm__ bfloat16x2_t*)x, (__gm__ bfloat16x2_t*)y, (__gm__ bfloat16x2_t*)dst, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-1.25, 0.5), (2.5, -3.75), (nan, 1.25), (0.75, nan)
+y: (0.5, -2.0), (1.25, 3.0), (-2.0, nan), (nan, -0.25)
+result: (0.5, 0.5), (2.5, 3), (nan, nan), (nan, nan)
+```

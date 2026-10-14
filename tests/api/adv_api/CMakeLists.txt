@@ -323,6 +323,7 @@ set(ASCENDC_TEST_Kirin9030_AIV_CASE_SRC_FILES
 
 # ascend950pr_9599 test cases
 file(GLOB ASCENDC_TEST_ascend950pr_9599_AIC_CASE_SRC_FILES
+    hccl/test_hccl_ccu_prepare_950.cpp
     matmul/resource/cube_out_buffer/test_cube_out_buffer_co1_shared.cpp
     matmul/param/test_matmul_cross_core_sync.cpp
     matmul/kfc/test_matmul_server_c310.cpp

@@ -104,3 +104,10 @@ inline half2 __lowhigh2highlow(const half2 x)
         asc_vf_call<simt_lowhigh2highlow>(dim3(1024), (__gm__ half2*)input, (__gm__ half2*)output, input_total_length);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: (-2.5, -1.5), (-0.5, 0.5), (1.5, 2.5), (inf, nan)
+result: (-1.5, -2.5), (0.5, -0.5), (2.5, 1.5), (nan, inf)
+```

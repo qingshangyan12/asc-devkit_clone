@@ -205,16 +205,16 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 | [asc_copy_ub2gm](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md) | UB→GM。 |
 | [asc_copy_ub2l1](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md) | UB→L1。 |
 | [asc_copy_ub2ub](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md) | UB 内部搬运。 |
-| [asc_copy_gm2l1_align](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_align.md) | GM→L1，支持非对齐搬运与填充。 |
-| [asc_copy_gm2l1_dn2nz](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_dn2nz.md) | GM→L1，并做 DN→Nz 格式转换。 |
-| [asc_copy_gm2l1_nd2nz](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_gm2l1_nd2nz/asc_copy_gm2l1_nd2nz_arch_3510.md) | GM→L1，并做 ND→Nz 格式转换。 |
-| [asc_copy_l0c2gm](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2gm/asc_copy_l0c2gm_arch_3510.md) | L0C→GM，可组合随路量化、激活与格式转换。 |
-| [asc_copy_l0c2ub](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l0c2ub.md) | L0C→UB，可组合随路量化、激活与格式转换。 |
-| [asc_copy_l12bt](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12bt/asc_copy_l12bt_arch_3510.md) | L1→BiasTable Buffer。 |
-| [asc_copy_l12fb](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12fb/asc_copy_l12fb_arch_3510.md) | L1→Fixpipe Buffer，搬运量化或激活参数。 |
-| [asc_copy_l12l0b_mx](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_mx.md) | L1→L0B_MX Buffer，搬运右矩阵量化系数。 |
-| [asc_copy_l12l0b_trans](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12l0b_trans/asc_copy_l12l0b_trans_arch_3510.md) | L1→L0B，并做二维分形转置。 |
-| [asc_copy_l12ub](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/asc_copy_l12ub.md) | L1→UB。 |
+| [asc_copy_gm2l1_align](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md) | GM→L1，支持非对齐搬运与填充。 |
+| [asc_copy_gm2l1_dn2nz](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md) | GM→L1，并做 DN→Nz 格式转换。 |
+| [asc_copy_gm2l1_nd2nz](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz_arch_3510.md) | GM→L1，并做 ND→Nz 格式转换。 |
+| [asc_copy_l0c2gm](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md) | L0C→GM，可组合随路量化、激活与格式转换。 |
+| [asc_copy_l0c2ub](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2ub.md) | L0C→UB，可组合随路量化、激活与格式转换。 |
+| [asc_copy_l12bt](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12bt_arch_3510.md) | L1→BiasTable Buffer。 |
+| [asc_copy_l12fb](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12fb_arch_3510.md) | L1→Fixpipe Buffer，搬运量化或激活参数。 |
+| [asc_copy_l12l0b_mx](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_mx.md) | L1→L0B_MX Buffer，搬运右矩阵量化系数。 |
+| [asc_copy_l12l0b_trans](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_trans_arch_3510.md) | L1→L0B，并做二维分形转置。 |
+| [asc_copy_l12ub](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l12ub.md) | L1→UB。 |
 
 候选仅供参考，不代表全量接口。
 

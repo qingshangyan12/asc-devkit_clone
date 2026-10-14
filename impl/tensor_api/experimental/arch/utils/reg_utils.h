@@ -66,10 +66,16 @@ __simd_callee__ inline reg_tensor<T> make_reg_operand(const U& value, const vect
 }
 
 template <typename T>
+using get_reg_data_type = AscendC::Std::conditional_t<AscendC::Std::is_same_v<T, int4b_t>, int4x2_t, T>;
+
+template <typename T>
 inline constexpr bool supports_float_math_v = ::AscendC::Std::is_one_of_v<T, half, float>;
 
 template <typename T>
 inline constexpr bool supports_abs_v = ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
+
+template <typename T>
+inline constexpr bool supports_neg_v = ::AscendC::Std::is_one_of_v<T, int8_t, int16_t, half, int32_t, float>;
 
 template <typename T>
 inline constexpr bool supports_relu_v = ::AscendC::Std::is_one_of_v<T, half, int32_t, float>;

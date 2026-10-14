@@ -92,3 +92,10 @@ inline unsigned int __half2uint_rz(const half x)
         dst[idx] = __half2uint_rz(x[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -2.5, -1.5, 0.5, 1.5, 2.5, inf, -inf, nan
+result: 0, 0, 0, 1, 2, 4294967295, 0, 0
+```

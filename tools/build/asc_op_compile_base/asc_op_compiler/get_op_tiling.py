@@ -1335,9 +1335,8 @@ def get_tiling_data_func_head():
 def get_tiling_data_func():
     class_body = "{\n"
     class_body += "    constexpr uint64_t all_bytes = sizeof(T);\n"
-    class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && __NPU_ARCH__ == 2201) || (defined \
-        (__DAV_CUBE__) && __NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || \
-        (__NPU_ARCH__ == 9202) || defined(__GET_CODE_CHANNEL__)\n"
+    class_body += "#if defined(ASCENDC_CPU_DEBUG) || (defined(__DAV_CUBE__) && (__NPU_ARCH__ == 2201 || \
+        __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)) || defined(__GET_CODE_CHANNEL__)\n"
     class_body += "#if defined(__DAV_C100__) || defined(ASCENDC_CPU_DEBUG)\n"
     class_body += get_dynamic_assign_tiling_data_by_size(
         "all_bytes",
@@ -1370,7 +1369,7 @@ p_tilingdata",
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, false, 0, 0, 0, false);\n"
     class_body += get_tilingdata_preload()
     class_body += "#elif __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-__NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163\n"
+__NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162\n"
     class_body += "    copy_gm_to_ubuf_align_v2((__ubuf__ uint8_t *)tilingdata_in_ub, \
 (__gm__ uint8_t *)p_tilingdata, 0, 1, len_burst * 32, 0, 0, false, 0, 0);\n"
     class_body += "#elif __NPU_ARCH__ != 3102\n"

@@ -131,6 +131,10 @@ TEST_F(TestDMAOom, TestOOMStorageShapeTensorListDescriptor)
     uint8_t* tensor1 = static_cast<uint8_t*>(AscendC::GmAlloc(128));
     auto dynamicPtr = reinterpret_cast<uint64_t*>(tensorList);
     dynamicPtr[0] = 40;
+    dynamicPtr[1] = 1;
+    dynamicPtr[2] = 8;
+    dynamicPtr[3] = 1;
+    dynamicPtr[4] = 6;
     dynamicPtr[5] = reinterpret_cast<uint64_t>(tensor0);
     dynamicPtr[6] = reinterpret_cast<uint64_t>(tensor1);
 
@@ -148,18 +152,39 @@ TEST_F(TestDMAOom, TestOOMStorageShapeTensorListDescriptor)
     OOMInit();
     EXPECT_TRUE(OOMTryRegisterTensorListWithStorageShape(cursor, tensorList, 4));
     EXPECT_EQ(cursor, metadata + 30);
-    EXPECT_EQ(g_oomAddrArange.count, 2);
-    EXPECT_EQ(g_oomAddrArange.len[0], 64);
-    EXPECT_EQ(g_oomAddrArange.len[1], 48);
+    EXPECT_EQ(g_oomAddrArange.count, 1);
+    EXPECT_EQ(g_oomAddrArange.isLevelOnePointer[0], 0);
+    uintptr_t matchedAddr = 0;
+    uint64_t matchedLen = 0;
+    EXPECT_TRUE(OOMCheckAddrInTensorList(0, reinterpret_cast<uintptr_t>(tensor0 + 63), matchedAddr, matchedLen));
+    EXPECT_EQ(matchedAddr, reinterpret_cast<uintptr_t>(tensor0));
+    EXPECT_EQ(matchedLen, 64);
+    EXPECT_TRUE(OOMCheckAddrInTensorList(0, reinterpret_cast<uintptr_t>(tensor1 + 47), matchedAddr, matchedLen));
+    EXPECT_EQ(matchedAddr, reinterpret_cast<uintptr_t>(tensor1));
+    EXPECT_EQ(matchedLen, 48);
+    EXPECT_EQ(g_oomAddrArange.addr[0], reinterpret_cast<uintptr_t>(tensorList));
+    EXPECT_EQ(g_oomAddrArange.len[0], 4);
+    EXPECT_FALSE(AscendCUtils::OOMCheckAddrIsOverflow(reinterpret_cast<uintptr_t>(tensor1 + 47), 1));
+    EXPECT_TRUE(AscendCUtils::OOMCheckAddrIsOverflow(reinterpret_cast<uintptr_t>(tensor1 + 47), 2));
 
     OOMInit();
     cursor = metadata;
     WritePacked<uint8_t>(cursor + 9, 1); // F mode
     EXPECT_TRUE(OOMTryRegisterTensorListWithStorageShape(cursor, tensorList, 4));
     EXPECT_EQ(cursor, metadata + 30);
-    EXPECT_EQ(g_oomAddrArange.count, 2);
-    EXPECT_EQ(g_oomAddrArange.len[0], 64);
-    EXPECT_EQ(g_oomAddrArange.len[1], 48);
+    EXPECT_EQ(g_oomAddrArange.count, 1);
+    EXPECT_TRUE(OOMCheckAddrInTensorList(0, reinterpret_cast<uintptr_t>(tensor1 + 47), matchedAddr, matchedLen));
+    EXPECT_EQ(matchedLen, 48);
+
+    OOMInit();
+    g_oomAddrArange.count = g_oomAddrRangeMaxSize - 1;
+    cursor = metadata;
+    EXPECT_TRUE(OOMTryRegisterTensorListWithStorageShape(cursor, tensorList, 4));
+    EXPECT_EQ(g_oomAddrArange.count, g_oomAddrRangeMaxSize);
+    EXPECT_TRUE(OOMCheckAddrInTensorList(
+        g_oomAddrRangeMaxSize - 1, reinterpret_cast<uintptr_t>(tensor1 + 47), matchedAddr, matchedLen));
+    EXPECT_EQ(matchedLen, 48);
+    OOMInit();
 
     AscendC::GmFree(metadata);
     AscendC::GmFree(tensorList);

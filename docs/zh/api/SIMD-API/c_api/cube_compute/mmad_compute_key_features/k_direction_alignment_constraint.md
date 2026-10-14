@@ -7,7 +7,7 @@ Atlas A2系列产品/Atlas A3系列产品，asc_mmad接口支持开启此特性�
 <!-- end id1 -->
 
 <!-- npu="950" id2 -->
-Ascend 950PR&950DT系列产品产品上L0A Buffer为Nz排布，非Zz排布，A矩阵转置非对齐float数据类型场景，L0A Buffer在K方向8对齐，无需开启此特性去确保计算正确性。
+Ascend 950PR&950DT系列产品上L0A Buffer为Nz排布，非Zz排布，A矩阵转置非对齐float数据类型场景，L0A Buffer在K方向8对齐，无需开启此特性去确保计算正确性。
 <!-- end id2 -->
 
 <!-- npu="910b,A3" id3 -->
@@ -34,6 +34,10 @@ K方向对齐的核心功能是通过k_direction_align参数控制在使用float
 当输入需要进行转置操作时，例如原始矩阵A的维度为K×M，在搬入L1 Buffer后，其存储形式会变为Nz排布（本质上仍为K×M）。此时应调用具备转置能力的矩阵搬入接口。该接口的内部实现如下图所示：在K方向上会进行16的对齐处理（如左图所示）。完成转置后，数据将呈现出如右图所示的Zz分形形式，存储在L0A Buffer中。为了避免读入无效数据，可以通过开启k_direction_align参数，仅读取有效分形的数据。
 
 ![K方向对齐转置示意图](../../../../figures/kdirectionalign_demo.png)
+
+<!-- npu="A3,910b" id4 -->
+该参数在[asc_mmad](../mmad_compute/asc_mmad.md)的Atlas A3系列产品和Atlas A2系列产品对应重载中提供；A、B矩阵的分形排布可参见[关键分形格式详解](../cube_compute_fractal_intro/key_fractal_format_details.md)，转置搬入可参见[asc_copy_l12l0a_trans](../../cube_datamove/cube_compute_load/asc_copy_l12l0a_trans.md)。
+<!-- end id4 -->
 
 **使用示例：**
 

@@ -26,13 +26,13 @@
 
 ## 功能说明
 
-**`asc_copy_gm2l1_dn2nz`的旧常规重载和`asc_copy_gm2l1_dn2nz_sync`接口已废弃。请使用带`asc_load_l2_cache_mode l2_cache_mode`参数的[asc_copy_gm2l1_dn2nz](../cube_datamove/asc_copy_gm2l1_dn2nz.md)接口；同步场景请额外调用`asc_sync`。**
+**`asc_copy_gm2l1_dn2nz`的旧常规重载和`asc_copy_gm2l1_dn2nz_sync`接口已废弃。请使用带`asc_load_l2_cache_mode l2_cache_mode`参数的[asc_copy_gm2l1_dn2nz](../cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md)接口；同步场景请额外调用`asc_sync`。**
 
 头文件路径为：`"c_api/cube_datamove/cube_datamove.h"`。
 
 将数据从Global Memory搬运到L1 Buffer，并在搬运过程中进行DN到Nz格式的转换，使其满足后续矩阵计算对分形列连续性的要求。
 
-进行DN2Nz格式搬运前，需先通过[asc_set_gm2l1_nz_para](../cube_datamove/asc_set_gm2l1_nz_para.md)接口配置DN2Nz搬运的目的Nz矩阵步长与DN矩阵搬运个数。
+进行DN2Nz格式搬运前，需先通过[asc_set_gm2l1_nz_para](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_nz_para.md)接口配置DN2Nz搬运的目的Nz矩阵步长与DN矩阵搬运个数。
 
 本接口仅在AIC上执行有效。
 
@@ -43,8 +43,6 @@
 ![](../../../figures/gm2l1_dn2nz_concept.png)
 
 ## 函数原型
-
-### 模板原型
 
 ```cpp
 // 占位符形式
@@ -66,9 +64,9 @@ __aicore__ inline void asc_copy_gm2l1_dn2nz_sync(__cbuf__ <dtype>* dst,
                                                  bool smallc0_en)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
-dtype支持的数据类型为`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ### 典型示例
 
@@ -128,7 +126,7 @@ PIPE_MTE2
 
 ### DN2Nz约束
 
-- 调用本接口前，需要先调用[asc_set_gm2l1_nz_para](../cube_datamove/asc_set_gm2l1_nz_para.md)接口配置DN2Nz搬运的目的Nz矩阵步长与DN矩阵搬运个数。
+- 调用本接口前，需要先调用[asc_set_gm2l1_nz_para](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_nz_para.md)接口配置DN2Nz搬运的目的Nz矩阵步长与DN矩阵搬运个数。
 - `loop1_src_stride`、`n_value`、`d_value`、`loop4_src_stride`取值需确保在取值范围内，超出取值范围的值会被截断，导致搬运结果不符合预期。
 - `smallc0_en`设置为`true`时，$d\_value \le 4$，否则导致搬运异常。
 
@@ -137,7 +135,7 @@ PIPE_MTE2
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR&950DT系列产品产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng examples.asc -o main --npu-arch=dav-3510 && ./main
