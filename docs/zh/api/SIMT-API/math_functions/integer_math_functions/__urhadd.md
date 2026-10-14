@@ -82,8 +82,8 @@ unsigned int __urhadd(unsigned int x, unsigned int y)
 
 输入输出示例如下：
 
-    ```text
-    x: 0, 12, 23, 70
-    y: 6, 0, 15, 7
-    result: 3, 6, 19, 39
-    ```
+```text
+x: 0, 12, 23, 70
+y: 6, 0, 15, 7
+result: 3, 6, 19, 39
+```

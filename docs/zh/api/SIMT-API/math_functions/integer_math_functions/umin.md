@@ -82,8 +82,8 @@ inline unsigned int umin(const unsigned int x, const unsigned int y)
 
 输入输出示例如下：
 
-    ```text
-    x: 0, 12, 23, 70
-    y: 5, 0, 15, 7
-    result: 0, 0, 15, 7
-    ```
+```text
+x: 0, 12, 23, 70
+y: 5, 0, 15, 7
+result: 0, 0, 15, 7
+```

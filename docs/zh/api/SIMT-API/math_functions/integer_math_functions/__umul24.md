@@ -80,8 +80,8 @@ unsigned int __umul24(unsigned int x, unsigned int y)
 
 输入输出示例如下：
 
-    ```text
-    x: 0, 12, 23, 70
-    y: 6, 15, 3, 4
-    result: 0, 180, 69, 280
-    ```
+```text
+x: 0, 12, 23, 70
+y: 6, 15, 3, 4
+result: 0, 180, 69, 280
+```
