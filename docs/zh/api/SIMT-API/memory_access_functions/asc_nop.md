@@ -82,3 +82,11 @@ inline void asc_nop()
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+data: 11
+flag: 1
+result: 11
+```
