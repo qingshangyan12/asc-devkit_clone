@@ -168,7 +168,7 @@ template <typename T>
 __simd_vf__ inline void AddVF(__ubuf__ T* dstAddr, __ubuf__ T* src0Addr, __ubuf__ T* src1Addr, uint32_t count,  uint32_t oneRepeatSize, uint16_t repeatTimes) 
 {     
     AscendC::Reg::RegTensor<T> srcReg0;
-    AscendC::Reg::RegTensor<T> srcReg0;
+    AscendC::Reg::RegTensor<T> srcReg1;
     AscendC::Reg::RegTensor<T> dstReg;
     AscendC::Reg::MaskReg mask;
     for (uint16_t i = 0; i < repeatTimes; ++i) {
