@@ -215,7 +215,7 @@ inline void asc_stcg(half2* address, half2 val)
         }
         asc_stcg(dst + idx, val[idx]);
     }
-    ```
+```
 
 -   SIMD与SIMT混合编程场景：
 
@@ -232,4 +232,11 @@ inline void asc_stcg(half2* address, half2 val)
         }
         asc_stcg(dst + idx, val[idx]);
     }
-    ```
+```
+
+输入输出示例如下：
+
+```text
+x: -12.5, 0, 23.5, -7.25
+result: -12.5, 0, 23.5, -7.25
+```

@@ -222,7 +222,7 @@ inline half2 asc_ldca(half2* address)
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = asc_ldca(src + idx);
     }
-    ```
+```
 
 -   SIMD与SIMT混合编程场景：
 
@@ -236,4 +236,11 @@ inline half2 asc_ldca(half2* address)
         int idx = threadIdx.x + blockIdx.x * blockDim.x;
         dst[idx] = asc_ldca(src + idx);
     }
-    ```
+```
+
+输入输出示例如下：
+
+```text
+x: -12.5, 0, 23.5, -7.25
+result: -12.5, 0, 23.5, -7.25
+```

@@ -95,7 +95,7 @@ inline void asc_threadfence()
             result[0] = data[0];
         }
     }
-    ```
+```
 
 -   SIMD与SIMT混合编程场景：
 
@@ -118,4 +118,11 @@ inline void asc_threadfence()
             result[0] = data[0];
         }
     }
-    ```
+```
+
+输入输出示例如下：
+
+```text
+x: 0
+result: 100
+```
