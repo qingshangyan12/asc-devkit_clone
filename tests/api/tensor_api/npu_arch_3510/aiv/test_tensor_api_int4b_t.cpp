@@ -53,8 +53,7 @@ void load_packed_stub(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int3
 }
 
 void load_interleaved_stub(
-    vector_fp4x2_e1m2_t& first, vector_fp4x2_e1m2_t& second, __ubuf__ fp4x2_e1m2_t* src, int32_t offset,
-    int32_t mode)
+    vector_fp4x2_e1m2_t& first, vector_fp4x2_e1m2_t& second, __ubuf__ fp4x2_e1m2_t* src, int32_t offset, int32_t mode)
 {
     EXPECT_EQ(mode, DINTLV_B8);
     EXPECT_EQ(offset, 0);
@@ -89,8 +88,8 @@ void store_packed_stub(
 }
 
 void store_interleaved_stub(
-    vector_fp4x2_e1m2_t first, vector_fp4x2_e1m2_t second, __ubuf__ fp4x2_e1m2_t* dst, int32_t offset,
-    int32_t mode, vector_bool)
+    vector_fp4x2_e1m2_t first, vector_fp4x2_e1m2_t second, __ubuf__ fp4x2_e1m2_t* dst, int32_t offset, int32_t mode,
+    vector_bool)
 {
     EXPECT_EQ(mode, INTLV_B8);
     EXPECT_EQ(offset, 0);
@@ -199,16 +198,17 @@ protected:
         MOCKER(static_cast<void (*)(vector_fp4x2_e1m2_t&, __ubuf__ fp4x2_e1m2_t*, int32_t, Literal)>(vlds))
             .stubs()
             .will(invoke(load_packed_stub));
-        MOCKER(static_cast<void (*)(
-            vector_fp4x2_e1m2_t&, vector_fp4x2_e1m2_t&, __ubuf__ fp4x2_e1m2_t*, int32_t, int32_t)>(vlds))
+        MOCKER(
+            static_cast<void (*)(vector_fp4x2_e1m2_t&, vector_fp4x2_e1m2_t&, __ubuf__ fp4x2_e1m2_t*, int32_t, int32_t)>(
+                vlds))
             .stubs()
             .will(invoke(load_interleaved_stub));
-        MOCKER(static_cast<void (*)(
-            vector_fp4x2_e1m2_t, __ubuf__ fp4x2_e1m2_t*, int32_t, Literal, vector_bool)>(vsts))
+        MOCKER(static_cast<void (*)(vector_fp4x2_e1m2_t, __ubuf__ fp4x2_e1m2_t*, int32_t, Literal, vector_bool)>(vsts))
             .stubs()
             .will(invoke(store_packed_stub));
-        MOCKER(static_cast<void (*)(
-            vector_fp4x2_e1m2_t, vector_fp4x2_e1m2_t, __ubuf__ fp4x2_e1m2_t*, int32_t, int32_t, vector_bool)>(vsts))
+        MOCKER(
+            static_cast<void (*)(
+                vector_fp4x2_e1m2_t, vector_fp4x2_e1m2_t, __ubuf__ fp4x2_e1m2_t*, int32_t, int32_t, vector_bool)>(vsts))
             .stubs()
             .will(invoke(store_interleaved_stub));
         for (size_t index = 0; index < source.size(); ++index) {
@@ -273,8 +273,7 @@ protected:
     alignas(32) std::array<uint8_t, 2048> destination{};
 };
 
-class TensorApiRegInt4MaskedStore : public TensorApiRegInt4Runtime,
-                                  public testing::WithParamInterface<uint8_t> {};
+class TensorApiRegInt4MaskedStore : public TensorApiRegInt4Runtime, public testing::WithParamInterface<uint8_t> {};
 
 TEST_P(TensorApiRegInt4MaskedStore, PreservesMaskedBytes)
 {
@@ -360,30 +359,15 @@ TEST_F(TensorApiRegInt4Runtime, InterleaveStoreIgnoresSourceMasks)
     EXPECT_EQ(store_call_count, 2);
 }
 
-TEST_F(TensorApiRegInt4Runtime, DirectLoad)
-{
-    check_load<asc::te::experimental::load_sideband_mode::direct>();
-}
+TEST_F(TensorApiRegInt4Runtime, DirectLoad) { check_load<asc::te::experimental::load_sideband_mode::direct>(); }
 
-TEST_F(TensorApiRegInt4Runtime, DownsampleLoad)
-{
-    check_load<asc::te::experimental::load_sideband_mode::downsample>();
-}
+TEST_F(TensorApiRegInt4Runtime, DownsampleLoad) { check_load<asc::te::experimental::load_sideband_mode::downsample>(); }
 
-TEST_F(TensorApiRegInt4Runtime, UnpackLoad)
-{
-    check_load<asc::te::experimental::load_sideband_mode::unpack>();
-}
+TEST_F(TensorApiRegInt4Runtime, UnpackLoad) { check_load<asc::te::experimental::load_sideband_mode::unpack>(); }
 
-TEST_F(TensorApiRegInt4Runtime, Unpack4Load)
-{
-    check_load<asc::te::experimental::load_sideband_mode::unpack4>();
-}
+TEST_F(TensorApiRegInt4Runtime, Unpack4Load) { check_load<asc::te::experimental::load_sideband_mode::unpack4>(); }
 
-TEST_F(TensorApiRegInt4Runtime, UpsampleLoad)
-{
-    check_load<asc::te::experimental::load_sideband_mode::upsample>();
-}
+TEST_F(TensorApiRegInt4Runtime, UpsampleLoad) { check_load<asc::te::experimental::load_sideband_mode::upsample>(); }
 
 TEST_F(TensorApiRegInt4Runtime, DeinterleaveLoadAndInterleaveStore)
 {
