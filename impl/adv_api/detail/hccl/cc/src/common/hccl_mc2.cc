@@ -120,9 +120,9 @@ HcclResult CheckMc2CcDeviceType(const char* apiName)
         HCCL_ERROR("[%s] failed to get device type, ret[%d].", apiName, ret);
         return ret;
     }
-    if (deviceType != DevType::DEV_TYPE_950) {
+    if (deviceType != DevType::DEV_TYPE_950 && deviceType != DevType::DEV_TYPE_960) {
         HCCL_ERROR(
-            "[%s] unsupported device type[%u], MC2 CCU / AICPU path only supports device type 950.", apiName,
+            "[%s] unsupported device type[%u], MC2 CCU / AICPU path only supports device types 950 and 960.", apiName,
             static_cast<uint32_t>(deviceType));
         return HCCL_E_NOT_SUPPORT;
     }
