@@ -22,8 +22,6 @@
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510)
 #include "impl/c_api/reg_base_impl/npu_arch_3510/reg_convert_intf_impl.h"
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-#include "impl/c_api/reg_base_impl/npu_arch_9201/reg_convert_intf_impl.h"
 #endif
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
