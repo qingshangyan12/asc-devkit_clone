@@ -77,3 +77,10 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_local(uint32_t* 
     }
 }
 ```
+
+输入输出示例如下：
+
+```text
+x: 11, 22, 33, 44
+result: 1144, 1144, 1144, 1144
+```

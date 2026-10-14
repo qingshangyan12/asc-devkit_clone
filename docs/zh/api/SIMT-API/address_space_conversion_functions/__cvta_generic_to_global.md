@@ -71,3 +71,10 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_global(uint32_t*
     printf("GM(src)的偏移量为：%lu\n", addr_val);
 }
 ```
+
+输入输出示例如下：
+
+```text
+x: 11, 22, 33, 44
+result: 94208, 94212, 94216, 94220
+```
