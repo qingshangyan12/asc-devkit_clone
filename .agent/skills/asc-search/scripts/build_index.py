@@ -182,7 +182,9 @@ def load_documents(root: Path, scope: Scope, errors: list[str]) -> tuple[dict[st
         allowed = {"okftype", "description", "tag", "dependencies", "version"}
         extra = sorted(set(fm) - allowed)
         if extra:
-            errors.append(f"{rel}: fields outside slim header (violates references/索引推导契约.md): {extra}")
+            errors.append(
+                f"{rel}: fields outside slim header (violates references/index_derivation_contract.md): {extra}"
+            )
             continue
         tags: dict[str, list[str]] = {}
         for item in fm.get("tag") or []:

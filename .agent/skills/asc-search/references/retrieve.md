@@ -2,7 +2,7 @@
 
 打通「算子需求 → 意图分析 → 索引查询 → 分阶段候选文档」链路。检索入口是本 skill 的
 `scripts/query.py`，本工作流只定义检索流程与输出规范，不新建索引数据、不改写索引。
-推导规则见 [索引推导契约.md](索引推导契约.md)；建索引细节见 [index.md](index.md)。
+推导规则见 [index_derivation_contract.md](index_derivation_contract.md)；建索引细节见 [index.md](index.md)。
 命令均从仓库根目录执行。
 
 ## 步骤 0：索引前置保障

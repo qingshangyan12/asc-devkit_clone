@@ -2,7 +2,7 @@
 
 把已打标文档构建为持久索引，支撑检索流程（[retrieve.md](retrieve.md)）。索引是三类头的
 **纯派生数据**：文档 slim 头（语义）+ include Doxygen/声明（结构）+ examples marker（关联），
-推导规则以 [索引推导契约.md](索引推导契约.md) 为唯一契约。
+推导规则以 [index_derivation_contract.md](index_derivation_contract.md) 为唯一契约。
 当前构建范围为 c_api（SCOPES categories=None），默认架构为 3510；索引文档数随已标注范围和筛选条件变化，以 `ensure_index.py` 输出的 `doc_count` 为准。
 
 ## 资产结构

@@ -229,7 +229,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 三类头分别描述 API 的语义、具体重载的结构和源码调用范围。本章以 3510 架构的 `asc_abs`
 为贯穿示例，样例源码使用仓库原有的 `abs.asc`，只增加 marker 注释。真实片段取自
 `okf-knowledge-user` 分支；本 README 在 user、test 两分支保持一致，示范文件的标注范围
-可以不同。索引如何推导这些字段见[索引推导契约](references/索引推导契约.md)。
+可以不同。索引如何推导这些字段见[索引推导契约](references/index_derivation_contract.md)。
 
 ### 3.1 文档头：Markdown YAML front matter
 

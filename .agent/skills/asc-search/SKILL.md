@@ -7,7 +7,7 @@ description: OKF 用户侧入口：把 Ascend C API 文档的三类头建立为�
 
 本 Skill 覆盖「建立索引 → 使用索引」全流程：索引是三类头（文档 slim 头、include Doxygen、
 examples marker）的纯派生数据，查询统一走本 skill 的 `scripts/query.py`。推导规则唯一事实源是
-[references/索引推导契约.md](references/索引推导契约.md)；
+[references/index_derivation_contract.md](references/index_derivation_contract.md)；
 建索引细节见 [references/index.md](references/index.md)，检索流程细节见
 [references/retrieve.md](references/retrieve.md)。命令均从仓库根目录执行。
 

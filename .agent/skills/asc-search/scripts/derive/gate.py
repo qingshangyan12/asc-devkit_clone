@@ -10,7 +10,7 @@
 
 """索引筛选条件：CANN 版本检测、架构映射与版本区间判定。
 
-检测链（references/索引推导契约.md 第 4 节）：--cann-version 显式参数 > $ASCEND_HOME_PATH
+检测链（references/index_derivation_contract.md 第 4 节）：--cann-version 显式参数 > $ASCEND_HOME_PATH
 安装目录版本 > 仓 version.cmake。架构标签经 product-map.yaml 映射架构号。
 """
 

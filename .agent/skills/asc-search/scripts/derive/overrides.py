@@ -8,7 +8,7 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # -----------------------------------------------------------------------------------------------------------
 
-"""derive-overrides 兜底机制（references/索引推导契约.md 第 3 节）。
+"""derive-overrides 兜底机制（references/index_derivation_contract.md 第 3 节）。
 
 脚本推导不了的残留进 unresolved.json；单轮 LLM/人工裁决后固化为
 derive-overrides/<surface>.json（落盘、可审查、可回放）；构建确定性消费。
