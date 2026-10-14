@@ -12,6 +12,7 @@
  * \file kernel_utils_struct_dma_params.h
  * \brief
  */
+#include <cstdint>
 #if !defined(__ASCENDC_INCLUDE_INTERNAL_HEADERS__)
 #pragma message( \
     "impl/basic_api/utils/kernel_utils_struct_dma_params.h is an internal header file and must not be used directly. Functions or variables defined in this file may be removed in the future. Please use \"#include \"basic_api/kernel_operator_intf.h\"\" and use public functions or variables defined in interface headers files.")
@@ -24,6 +25,19 @@
 
 namespace AscendC {
 
+enum class eltwise_antiq_t {
+    S8ANTIQ_Scalar = 0,
+    S8ANTIQ_Vector,
+    S4ANTIQ_Scalar,
+    S4ANTIQ_Vector,
+    U8ANTIQ_Scalar,
+    U8ANTIQ_Vector,
+    S16ANTIQ_Scalar,
+    S16ANTIQ_Vector,
+    S32ANTIQ_PreRow_Quant,
+    NO_ANTIQ
+};
+
 struct QuantParams {
     __aicore__ QuantParams() {}
     __aicore__ QuantParams(const QuantMode_t quantPreIn) : quantPre(quantPreIn) {}
@@ -35,7 +49,7 @@ struct QuantParams {
 };
 
 struct Nz2NdParams {
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162))
     __aicore__ Nz2NdParams() {}
 
     __aicore__ Nz2NdParams(const uint16_t ndNumIn, const uint16_t srcNdStrideIn, const uint32_t dstNdStrideIn)
@@ -126,6 +140,132 @@ struct FixpipeParams {
     bool reluEn = false;
     Nz2NdParams nz2ndParams;
     uint8_t unitFlag = 0;
+};
+
+template <typename T = int16_t>
+struct FixPipePreQuantParams {
+    __aicore__ FixPipePreQuantParams() {}
+
+    __aicore__ FixPipePreQuantParams(
+        const int8_t shiftScaleIn, const int8_t mulScaleIn, const int32_t offset0In, const int8_t offset1In,
+        const int16_t offset2In, const T clipMaxValPreIn)
+        : shiftScale(shiftScaleIn),
+          mulScale(mulScaleIn),
+          offset0(offset0In),
+          offset1(offset1In),
+          offset2(offset2In),
+          clipMaxValPre(clipMaxValPreIn)
+    {
+        isSft = true;
+    }
+
+    __aicore__ FixPipePreQuantParams(
+        const float scalarValueIn, const int32_t offset0In, const int8_t offset1In, const int16_t offset2In,
+        const T clipMaxValPreIn)
+        : scalarValue(scalarValueIn),
+          offset0(offset0In),
+          offset1(offset1In),
+          offset2(offset2In),
+          clipMaxValPre(clipMaxValPreIn)
+    {
+        isSft = false;
+    }
+
+    int8_t shiftScale = 0;
+    float scalarValue = 0.0f;
+    int8_t mulScale = 0;
+    int32_t offset0 = 0;
+    int8_t offset1 = 0;
+    int16_t offset2 = 0;
+    bool isSft = false;
+    bool isSigned = false;
+    T clipMaxValPre = static_cast<T>(0);
+};
+
+struct FixPipePostQuantParams {
+    __aicore__ FixPipePostQuantParams() {}
+
+    __aicore__ FixPipePostQuantParams(
+        const int8_t shiftScaleIn, const float scalarValueIn, const int8_t offset0In, const int16_t offset1In,
+        const int32_t offset2In)
+        : shiftScale(shiftScaleIn),
+          scalarValue(scalarValueIn),
+          offset0(offset0In),
+          offset1(offset1In),
+          offset2(offset2In)
+    {}
+
+    int8_t shiftScale = 0;
+    float scalarValue = 0.0f;
+    int8_t offset0 = 0;
+    int16_t offset1 = 0;
+    int32_t offset2 = 0;
+    bool isSigned = false;
+};
+
+template <typename T = int8_t>
+struct FixPipeEltAntiqParams {
+    __aicore__ FixPipeEltAntiqParams() {}
+
+    __aicore__ FixPipeEltAntiqParams(
+        const int8_t shiftScaleIn, const int8_t mulScaleIn, const int8_t s4OffsetIn, const T b8OffsetIn,
+        const int16_t s16OffsetIn, const T clipMaxValPreIn, const eltwise_antiq_t eltAntiqCfgIn)
+        : shiftScale(shiftScaleIn),
+          mulScale(mulScaleIn),
+          s4Offset(s4OffsetIn),
+          b8Offset(b8OffsetIn),
+          s16Offset(s16OffsetIn),
+          eltAntiqCfg(eltAntiqCfgIn)
+    {
+        isSft = true;
+    }
+
+    __aicore__ FixPipeEltAntiqParams(
+        const half scalarValueIn, const int8_t s4OffsetIn, const T b8OffsetIn, const int16_t s16OffsetIn,
+        const T clipMaxValPreIn, const eltwise_antiq_t eltAntiqCfgIn)
+        : scalarValue(scalarValueIn),
+          s4Offset(s4OffsetIn),
+          b8Offset(b8OffsetIn),
+          s16Offset(s16OffsetIn),
+          eltAntiqCfg(eltAntiqCfgIn)
+    {
+        isSft = false;
+    }
+
+    int8_t shiftScale = 0;
+    int8_t mulScale = 0;
+    half scalarValue = 0.0f;
+    int8_t s4Offset = 0;
+    T b8Offset = static_cast<T>(0);
+    int16_t s16Offset = 0;
+    bool isSft = false;
+    eltwise_antiq_t eltAntiqCfg = eltwise_antiq_t::S8ANTIQ_Scalar;
+};
+
+struct FixpipeEltwiseAddrParams {
+    __aicore__ FixpipeEltwiseAddrParams() {}
+
+    __aicore__ FixpipeEltwiseAddrParams(
+        const bool c0IndicatorIn, const uint32_t eltSrcAddrIn, const uint32_t srcStride1In, const uint32_t srcStride2In)
+        : c0Indicator(c0IndicatorIn), eltSrcAddr(eltSrcAddrIn), srcStride1(srcStride1In), srcStride2(srcStride2In)
+    {}
+
+    bool c0Indicator = false;
+    uint32_t eltSrcAddr = 0;
+    uint32_t srcStride1 = 0;
+    uint32_t srcStride2 = 0;
+};
+
+template <typename T1, typename T2>
+struct FixpipeClipReluParams {
+    __aicore__ FixpipeClipReluParams() {}
+
+    __aicore__ FixpipeClipReluParams(const T1 preValueIn, const T2 postValueIn)
+        : preValue(preValueIn), postValue(postValueIn)
+    {}
+
+    T1 preValue = 0;
+    T2 postValue = 0;
 };
 
 } // namespace AscendC
