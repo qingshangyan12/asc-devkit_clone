@@ -105,3 +105,10 @@ inline void asc_dcci_entire(void *dst)
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 0
+result: 10
+```
