@@ -60,20 +60,21 @@ inline void asc_dcci_single(void *dst)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __global__ __launch_bounds__(1024) void kernelDcci_single(uint32_t* data, uint32_t* output) {
+    __global__ __launch_bounds__(1024) void kernelDcci_single(uint32_t* data, uint32_t* flag, uint32_t* output) {
         // 线程块0的线程0进行数据写操作
         if (blockIdx.x == 0 && threadIdx.x == 0) {
-            data[1] = 10;      // 写入数据
+            data[0] = 10;      // 写入数据
             asc_threadfence(); // 确保数据写入完成
-            data[0] = 1;       // 标志位，数据已就绪
+            flag[0] = 1;       // 标志位，数据已就绪
         }
 
         // 线程块1的线程0进行数据读操作
         if (blockIdx.x == 1 && threadIdx.x == 0) {
-            while (data[0] != 1) {
-                asc_dcci_single((void*)(data)); // 从Global Memory读标志位
+            while (*(volatile uint32_t *)flag != 1) {
+                asc_nop(); // 15个cycle后再发送下一个load指令
             }
-            output[0] = data[1]; // 数据就绪，获取数据
+            asc_dcci_single((void*)(data)); // 刷新指定地址所在的Cache Line
+            output[0] = data[0]; // 数据就绪，获取数据
         }
     }
     ```
@@ -83,21 +84,30 @@ inline void asc_dcci_single(void *dst)
     ```cpp
     #include "simt_api/device_functions.h"
 
-    __simt_vf__ __launch_bounds__(1024) inline void kernelDcci_single(__gm__ uint32_t* data, __gm__ uint32_t* output)
+    __simt_vf__ __launch_bounds__(1024) inline void kernelDcci_single(__gm__ uint32_t* data, __gm__ uint32_t* flag, __gm__ uint32_t* output)
     {
         // 线程块0的线程0进行数据写操作
         if (blockIdx.x == 0 && threadIdx.x == 0) {
-            data[1] = 10;      // 写入数据
+            data[0] = 10;      // 写入数据
             asc_threadfence(); // 确保数据写入完成
-            data[0] = 1;       // 标志位，数据已就绪
+            flag[0] = 1;       // 标志位，数据已就绪
         }
 
         // 线程块1的线程0进行数据读操作
         if (blockIdx.x == 1 && threadIdx.x == 0) {
-            while (data[0] != 1) {
-                asc_dcci_single((__gm__ void*)(data)); // 从Global Memory读标志位
+            while (*(volatile uint32_t *)flag != 1) {
+                asc_nop(); // 15个cycle后再发送下一个load指令
             }
-            output[0] = data[1]; // 数据就绪，获取数据
+            asc_dcci_single((__gm__ void*)(data)); // 刷新指定地址所在的Cache Line
+            output[0] = data[0]; // 数据就绪，获取数据
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+data: 0
+flag: 0
+output: 10
+```
