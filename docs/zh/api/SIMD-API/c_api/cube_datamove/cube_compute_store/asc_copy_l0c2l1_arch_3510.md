@@ -40,8 +40,8 @@
 
 - Nz2ND格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2nd`使用；
 - Nz2DN格式转换场景下，需通过[asc_set_l0c_copy_nz_para](../cube_store_aux_config/asc_set_l0c_copy_nz_para.md)、[asc_set_l0c_copy_channel_para](../cube_store_aux_config/asc_set_l0c_copy_channel_para.md)预先配置格式转换参数，并且需要搭配本接口`enable_nz2dn`使用；
-- 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用;
-- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用;
+- 随路scalar量化模式下，需通过[asc_set_l0c_copy_prequant](../cube_store_aux_config/asc_set_l0c_copy_prequant.md)设置随路scalar量化参数，并且需要搭配本接口`quant_pre_mode`使用；
+- 随路tensor量化模式下，需通过[asc_set_l0c_copy_config](../cube_store_aux_config/asc_set_l0c_copy_config.md)设置随路tensor量化使用tensor的起始地址，其中量化tensor的每个元素都代表一个量化参数，并且需要搭配本接口`quant_pre_mode`使用；
 - 随路激活模式下，需通过[asc_set_l0c_copy_relu_alpha](../cube_store_aux_config/asc_set_l0c_copy_relu_alpha.md)、[asc_set_l0c_copy_lrelu_alpha](../cube_store_aux_config/asc_set_l0c_copy_lrelu_alpha.md)预先配置ReLU/Leaky ReLU激活参数，并且需要搭配本接口`enable_clip_relu_pre`与`relu_pre_mode`使用。
 
 quant_pre_mode量化模式参数支持的枚举值如下：
@@ -132,8 +132,8 @@ __aicore__ inline void asc_copy_l0c2l1(__cbuf__ int8_t* dst,
 | dst | 输出 | 目的操作数，存储位置为L1 Buffer。数据格式为Nz、ND或DN格式，起始地址需32字节对齐。 |
 | src | 输入 | 源操作数，存储位置为L0C Buffer。数据格式为Nz格式，起始地址需64字节对齐。 |
 | n_size | 输入 | 源Nz矩阵在N方向上的大小，取值范围：[1, 4095]。<br>对于Nz输出场景：<br>&nbsp;&nbsp;&bull; 若`enable_channel_split`设置为`true`开启Channel Split功能，`n_size`必须为8的倍数。<br>&nbsp;&nbsp;&bull; 若不开启Channel Split功能，`n_size`必须为16的倍数。<br>对于ND输出场景：<br>&nbsp;&nbsp;&bull; $n\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`n_size`必须为64的倍数。<br> |
-| m_size | 输入 | 源Nz矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；<br>&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。<br>&nbsp;&nbsp;&bull;对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。<br>  |
-| dst_stride | 输入 | &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br>&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element对于不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。<br> |
+| m_size | 输入 | 源Nz矩阵在M方向上的大小。<br>&nbsp;&nbsp;&bull; 不开启Nz2ND功能，取值范围：[1, 65535]；<br>&nbsp;&nbsp;&bull; 开启Nz2ND功能，取值范围：[1, 8192]。<br>&nbsp;&nbsp;&bull; 对于DN输出场景：$m\_size\times\operatorname{sizeof}(dst\_dtype)$必须为32的倍数；若`dst_dtype`设置为`int4b_t`，`m_size`必须为64的倍数。<br>  |
+| dst_stride | 输入 | &nbsp;&nbsp;&bull; 若不开启Nz2ND功能，dst_stride表示目的Nz矩阵中相邻Z排布的起始地址偏移，取值不为0，单位：element。<br>&nbsp;&nbsp;&bull; 若开启Nz2ND/Nz2DN功能，dst_stride表示目的ND矩阵每一行中的元素个数，取值不为0，单位：element。不同`dst_dtype`的对齐约束如下：`int4b_t`输出需为64的倍数，8位输出需为32的倍数，16位输出需为16的倍数，32位输出需为8的倍数。<br> |
 | src_stride | 输入 | 源Nz矩阵中相邻Z排布的起始地址偏移，取值范围：[0, 65535]，单位为64字节，即$16\times\operatorname{sizeof}(src\_dtype)$。 |
 | unit_flag_mode | 输入 | unit_flag是mmad类指令和矩阵搬出类指令细粒度的并行功能，开启该功能后，硬件每计算完一个分形，计算结果就会被搬出。取值说明如下：<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::DISABLE`：不开启unit_flag；<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_KEEP`：开启unit_flag，硬件执行完指令之后，不复位单元标记位；<br>&nbsp;&nbsp;&bull; `asc_unit_flag_mode::ENABLE_UPDATE`：开启unitFlag，硬件执行完指令之后，复位单元标记位。<br>开启该功能时，须将mmad类指令和矩阵搬出类指令的unit_flag值设置为`asc_unit_flag_mode::ENABLE_KEEP`或`asc_unit_flag_mode::ENABLE_UPDATE`。<br>与计算指令的配合方式见[UnitFlag](../../cube_compute/mmad_compute_key_features/UnitFlag.md)。 |
 | quant_pre_mode | 输入 | 预处理阶段量化参数。取值见[功能说明](#功能说明)。<br>系数含义及配置步骤见[随路量化](../cube_store_key_features/accompanying_quantization.md)。 |
