@@ -68,6 +68,15 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_global(uint32_t*
 {
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     size_t addr_val = __cvta_generic_to_global(src + idx);
-    printf("GM(src)的偏移量为：%lu\n", addr_val);
+    printf("blockId(%u)的src[%u]的GM内存空间的地址值为：0x%lx\n", blockIdx.x, idx, addr_val);
 }
+```
+
+输入输出示例如下：
+
+```text
+blockId(0)的src[0]的GM内存空间的地址值为：0x120000017000
+blockId(0)的src[1]的GM内存空间的地址值为：0x120000017004
+blockId(0)的src[2]的GM内存空间的地址值为：0x120000017008
+blockId(0)的src[3]的GM内存空间的地址值为：0x12000001700c
 ```
