@@ -73,9 +73,11 @@
 
 **表3** `broadcast_mode`参数说明
 
+表中的VL表示一个矢量数据寄存器的长度，单位为Byte。`int4b_t`类型的数据在寄存器中以`int4x2_t`形式存储，与`fp4x2_e2m1_t`和`fp4x2_e1m2_t`均以包含两个4bit值的8bit打包单元进行搬运。因此，对于这三种类型，下表所述的“元素”是指打包后的8bit搬运单元，而不是单个4bit值；补零、重复、采样和交织等操作均以该打包单元为粒度。
+
 | 取值 | 含义 | 搬入起始地址对齐约束（Byte） |
 | --- | --- | --- |
-| `broadcast_mode::elem` | 从UB读取一个元素，并将该元素广播到目的寄存器的所有元素位置。 | `sizeof(Tensor::data_type)` |
+| `broadcast_mode::elem` | 从UB读取一个元素，并将该元素广播到目的寄存器的所有元素位置。 | 元素的大小 |
 | `broadcast_mode::datablock` | 从UB读取一个DataBlock（32B），并将该DataBlock重复广播到整个目的寄存器。 | 32 |
 | `broadcast_mode::elem2datablock` | 依次读取VL/32B个元素，并将每个元素分别广播到目的寄存器的一个DataBlock内。 | 16bit类型为VL/16；32bit类型为VL/8 |
 
@@ -85,8 +87,6 @@
 | --- | --- |
 | `elem`、`datablock` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
 | `elem2datablock` | `int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float` |
-
-Tensor元素类型为`int4b_t`时，对应的reg_tensor为`reg_tensor<int4x2_t>`。
 
 ## 返回值说明
 

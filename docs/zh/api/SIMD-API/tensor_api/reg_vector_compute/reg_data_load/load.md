@@ -75,13 +75,15 @@
 
 **表3** `load_sideband_mode`参数说明
 
+表中的VL表示一个矢量数据寄存器的长度，单位为Byte。`int4b_t`类型的数据在寄存器中以`int4x2_t`形式存储，与`fp4x2_e2m1_t`和`fp4x2_e1m2_t`均以包含两个4bit值的8bit打包单元进行搬运。因此，对于这三种类型，下表所述的“元素”是指打包后的8bit搬运单元，而不是单个4bit值；补零、重复、采样和交织等操作均以该打包单元为粒度。
+
 | 取值 | 含义 | 搬入起始地址对齐约束（Byte） |
 | --- | --- | --- |
 | `load_sideband_mode::direct` | 正常模式，从UB连续读取VL数据量并搬入一个`reg_tensor`。 | 32 |
 | `load_sideband_mode::deintlv` | 解交织模式，从UB连续读取2\*VL数据量，将偶数索引和奇数索引的元素分别搬入返回值的`first`和`second`成员。 | 32 |
 | `load_sideband_mode::downsample` | 2倍下采样模式，从UB读取2\*VL数据量，每隔一个元素保留一个元素，得到VL数据量。 | 32 |
-| `load_sideband_mode::unpack` | 2倍展开模式，从UB读取VL/2数据量，在每个源元素后补一个0，展开为VL数据量。 | min(32, VL/2) |
-| `load_sideband_mode::unpack4` | 4倍展开模式，从UB读取VL/4数据量，在每个源元素后补三个0，展开为VL数据量。 | min(32, VL/4) |
+| `load_sideband_mode::unpack` | 2倍展开模式，从UB读取VL/2数据量，在每个源元素后补一个0元素，展开为VL数据量。 | min(32, VL/2) |
+| `load_sideband_mode::unpack4` | 4倍展开模式，从UB读取VL/4数据量，在每个源元素后补三个0元素，展开为VL数据量。 | min(32, VL/4) |
 | `load_sideband_mode::upsample` | 2倍上采样模式，从UB读取VL/2数据量，每个源元素在目的寄存器中重复两次。 | min(32, VL/2) |
 
 ## 数据类型
@@ -98,8 +100,8 @@
 
 ## 返回值说明
 
-- `deintlv`模式返回`reg_pair<typename Tensor::data_type>`，其`first.reg`和`second.reg`分别保存偶数索引和奇数索引元素的搬入结果。
-- 其他模式返回`reg_tensor<typename Tensor::data_type>`，其`reg`成员保存搬入结果。
+- 对于非`int4b_t`类型，`deintlv`模式返回`reg_pair<typename Tensor::data_type>`，其`first.reg`和`second.reg`分别保存偶数索引和奇数索引搬运单元的搬入结果。
+- 对于非`int4b_t`类型，其他模式返回`reg_tensor<typename Tensor::data_type>`，其`reg`成员保存搬入结果。
 - 当源Tensor元素类型为`int4b_t`时，`deintlv`模式返回`reg_pair<int4x2_t>`，其他模式返回`reg_tensor<int4x2_t>`。
 
 ## 约束说明
@@ -140,6 +142,6 @@ __simd_vf__ inline void LoadDeinterleaved(const SrcTensor& src)
     auto mask = asc::te::experimental::all_mask<T>();
     value.first.with_mask(mask);
     value.second.with_mask(mask);
-    // value.first和value.second分别保存偶数索引和奇数索引的元素。
+    // value.first和value.second分别保存偶数索引和奇数索引的搬运单元。
 }
 ```
