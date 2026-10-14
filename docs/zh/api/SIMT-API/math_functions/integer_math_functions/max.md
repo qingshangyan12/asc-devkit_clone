@@ -143,3 +143,11 @@ unsigned long long int max(unsigned long long int x, long long int y)
         dst[idx] = max(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: -12, 0, 23, -7
+y: -20, 0, 15, 7
+result: -12, 0, 23, 7
+```

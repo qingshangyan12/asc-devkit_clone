@@ -79,3 +79,11 @@ unsigned int __urhadd(unsigned int x, unsigned int y)
         dst[idx] = __urhadd(x[idx], y[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 12, 23, 70
+y: 6, 0, 15, 7
+result: 3, 6, 19, 39
+```
