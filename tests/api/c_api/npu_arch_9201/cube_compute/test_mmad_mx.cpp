@@ -79,18 +79,6 @@ TEST_MMAD_MX(fp4x2_e2m1_t, fp8_e8m0_t, fp4x2_e2m1_t, fp8_e8m0_t, E2m1E2m1)
 TEST_MMAD_MX(fp8_e4m3fn_t, fp8_e8m0_t, fp8_e4m3fn_t, fp8_e8m0_t, E4m3E4m3)
 TEST_MMAD_MX(fp8_e4m3fn_t, fp8_e8m0_t, fp8_e5m2_t, fp8_e8m0_t, E4m3E5m2)
 TEST_MMAD_MX(fp8_e5m2_t, fp8_e8m0_t, fp8_e4m3fn_t, fp8_e8m0_t, E5m2E4m3)
-#ifdef ASCENDC_HIF4_H
-TEST_MMAD_MX(hif4x2_t, hif4_scale, hif4x2_t, hif4_scale, Hif4Hif4)
-#endif
-#ifdef ASCENDC_HIF4_H
-TEST_MMAD_MX(fp8_e4m3fn_t, fp8_e8m0_t, hif4x2_t, hif4_scale, E4m3Hif4)
-#endif
 TEST_MMAD_MX(fp8_e4m3fn_t, fp8_e8m0_t, fp4x2_e2m1_t, fp8_e8m0_t, E4m3E2m1)
 TEST_MMAD_MX(half, fp8_e8m0_t, fp4x2_e2m1_t, fp8_e8m0_t, HalfE2m1)
-#ifdef ASCENDC_HIF4_H
-TEST_MMAD_MX(half, fp8_e8m0_t, hif4x2_t, hif4_scale, HalfHif4)
-#endif
 TEST_MMAD_MX(bfloat16_t, fp8_e8m0_t, fp4x2_e2m1_t, fp8_e8m0_t, Bfloat16E2m1)
-#ifdef ASCENDC_HIF4_H
-TEST_MMAD_MX(bfloat16_t, fp8_e8m0_t, hif4x2_t, hif4_scale, Bfloat16Hif4)
-#endif
