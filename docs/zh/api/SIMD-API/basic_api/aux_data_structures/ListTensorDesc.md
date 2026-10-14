@@ -66,9 +66,27 @@ class ListTensorDesc {
 | ListTensorDesc | - | 默认构造函数，需配合Init函数使用。 |
 | ListTensorDesc | data：待解析数据的首地址<br>length：待解析内存的长度<br>shapeSize：数据指针的个数<br>length和shapeSize仅用于校验，不填写时不进行校验 | ListTensorDesc类的构造函数，用于解析对应的内存排布。 |
 | Init | data：待解析数据的首地址<br>length：待解析内存的长度<br>shapeSize：数据指针的个数<br>length和shapeSize仅用于校验，不填写时不进行校验 | 初始化函数，用于解析对应的内存排布。 |
-| GetDesc | desc：出参，解析后的Tensor描述信息<br>index：索引值 | 根据index获得功能说明图中对应的TensorDesc信息。<br>使用GetDesc前需要先调用TensorDesc.SetShapeAddr为desc指定用于储存shape信息的地址，调用GetDesc后会将shape信息写入该地址。<br>Atlas推理系列产品AI Core支持该功能<br>Atlas训练系列产品不支持该功能<br>Atlas A2系列产品支持该功能<br>Atlas A3系列产品支持该功能<br>Atlas 200I/500 A2推理产品不支持该功能 |
+| GetDesc | desc：出参，解析后的Tensor描述信息<br>index：索引值 | 根据index获得功能说明图中对应的TensorDesc信息。<br>使用GetDesc前需要先调用TensorDesc.SetShapeAddr为desc指定用于储存shape信息的地址，调用GetDesc后会将shape信息写入该地址。 |
 | GetDataPtr | index：索引值 | 根据index获取储存对应数据的地址。 |
 | GetSize | - | 获取ListTensor中包含的数据指针的个数。 |
+
+GetDesc的产品支持情况如下：
+
+<!-- npu="310p" id8 -->
+- Atlas推理系列产品AI Core：支持
+<!-- end id8 -->
+<!-- npu="910" id9 -->
+- Atlas训练系列产品：不支持
+<!-- end id9 -->
+<!-- npu="910b" id10 -->
+- Atlas A2系列产品：支持
+<!-- end id10 -->
+<!-- npu="A3" id11 -->
+- Atlas A3系列产品：支持
+<!-- end id11 -->
+<!-- npu="310b" id12 -->
+- Atlas 200I/500 A2推理产品：不支持
+<!-- end id12 -->
 
 ## 调用示例<a name="section1742652412511"></a>
 
