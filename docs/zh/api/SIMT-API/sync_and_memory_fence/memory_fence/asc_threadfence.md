@@ -119,3 +119,11 @@ inline void asc_threadfence()
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+data: 0
+flag: 0
+result: 100
+```
