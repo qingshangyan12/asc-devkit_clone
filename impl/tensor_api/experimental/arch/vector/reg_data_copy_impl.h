@@ -44,9 +44,10 @@ template <typename T>
 __simd_callee__ inline void move(reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask)
 {
     static_assert(
-        detail::is_move_support_type<T>, "move only supports bool uint8_t, int8_t, uint16_t,"
+        detail::is_move_support_type<T>, "move only supports bool, uint8_t, int8_t, uint16_t,"
                                          "int16_t, half, bfloat16_t, uint32_t, int32_t and float.");
     asc_copy(dst.reg, src.reg, mask.reg);
+    dst.mask = mask.reg;
 }
 } // namespace experimental
 } // namespace te

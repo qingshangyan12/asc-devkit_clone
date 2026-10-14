@@ -20,9 +20,16 @@ __aicore__ inline void TestMove()
 {
     asc::te::experimental::reg_tensor<T> dst{};
     asc::te::experimental::reg_tensor<T> src{};
-    auto mask = asc::te::experimental::all_mask<T>();
+    auto allMask = asc::te::experimental::all_mask<T>();
+    auto noneMask = asc::te::experimental::none_mask<T>();
+    dst.mask = noneMask.reg;
+
     asc::te::experimental::move(dst, src);
-    asc::te::experimental::move(dst, src, mask);
+    EXPECT_EQ(dst.mask, allMask.reg);
+
+    dst.mask = allMask.reg;
+    asc::te::experimental::move(dst, src, noneMask);
+    EXPECT_EQ(dst.mask, noneMask.reg);
 }
 
 template <int16_t Offset, typename T>

@@ -40,7 +40,7 @@ __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src);
 /**
  * @brief Copies register data under the specified mask.
  * @tparam T Register element type.
- * @param dst Destination register tensor.
+ * @param dst Destination register tensor. Its mask is updated from mask.
  * @param src Source register tensor.
  * @param mask Active lanes to copy. Defaults to all lanes for T.
  */
