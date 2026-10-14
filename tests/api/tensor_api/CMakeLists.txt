@@ -14,21 +14,6 @@ find_package(tikicpulib REQUIRED)
 
 add_subdirectory(ascendc_tensor_api_header_checker)
 
-# These CPU tests share C API types introduced by toolkit-dev PR 173.
-# Keep host header checks available while CI still uses the older CPU package.
-get_target_property(ASCENDC_CPU_INCLUDE_DIRS tikicpulib_ascend910 INTERFACE_INCLUDE_DIRECTORIES)
-set(ASCENDC_CPU_HAS_9201_TYPES FALSE)
-foreach(include_dir IN LISTS ASCENDC_CPU_INCLUDE_DIRS)
-    if(EXISTS "${include_dir}/kernel_fp8_e6m2.h" AND EXISTS "${include_dir}/kernel_hif4.h")
-        set(ASCENDC_CPU_HAS_9201_TYPES TRUE)
-        break()
-    endif()
-endforeach()
-if(NOT ASCENDC_CPU_HAS_9201_TYPES)
-    message(STATUS "Omit tensor_api CPU UT: the CPU package does not provide toolkit-dev PR 173 types")
-    return()
-endif()
-
 set(ASCENDC_UT_PRODUCT_TYPE_LIST
     NPU_ARCH_3510_AIC
     NPU_ARCH_3510_AIV

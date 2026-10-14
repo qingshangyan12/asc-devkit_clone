@@ -45,10 +45,14 @@ TEST_VECTOR_COMPUTE_VCVT_ROUND_SAT_POS_INSTR_2(
 // ==========asc_cast bfloat16 to e6m2==========
 
 // ==========rn==========
+#ifdef ASCENDC_FP8_E6M2_H
 TEST_VECTOR_COMPUTE_VCVT_ROUND_POS_INSTR_3(
     Cast_rn_even, asc_cast, vcvt_bf162e6m2, vector_fp8_e6m2_t, vector_bfloat16_t, ASC_CAST_RN, ASC_POSITION_EVEN, 8);
+#endif
+#ifdef ASCENDC_FP8_E6M2_H
 TEST_VECTOR_COMPUTE_VCVT_ROUND_POS_INSTR_3(
     Cast_rn_odd, asc_cast, vcvt_bf162e6m2, vector_fp8_e6m2_t, vector_bfloat16_t, ASC_CAST_RN, ASC_POSITION_ODD, 9);
+#endif
 
 // ==========asc_cast bfloat16 to e8m0==========
 
