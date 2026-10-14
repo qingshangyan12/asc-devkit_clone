@@ -2,7 +2,7 @@
 
 ## Overview
 
-This example introduces the usage of the asc_dump series APIs on the simd_vf side. In vector functions, APIs such as `asc_dump_ubuf`, `asc_dump_reg`, and `asc_dump` enable visual printing of UB and register data. On the host side, `ReadFile` and `WriteFile` read and write binary data. The kernel reads input data from GM, performs Adds computation, and writes the result back to GM. The result is then verified by comparing the output against the ground truth.
+This example uses `asc_dump_ubuf`, `asc_dump_reg`, and `asc_dump` to print UB and register data from vector functions. The host generates input and expected values in the same `.asc` file; the kernel reads from GM, performs C API addition, and writes back to GM. The host checks the result.
 
 ## Supported Products and CANN Software Versions
 
@@ -14,12 +14,8 @@ This example introduces the usage of the asc_dump series APIs on the simd_vf sid
 
 ```
 ├── simd_vf_dump
-│   ├── scripts
-│   │   ├── gen_data.py         // Script for generating input data and ground truth data
-│   │   └── verify_result.py    // Script for verifying output data against ground truth data
 │   ├── CMakeLists.txt          // Build project file
-│   ├── data_utils.h            // Data read/write functions
-│   ├── simd_vf_dump.asc        // Ascend C example implementation & invocation example
+│   ├── simd_vf_dump.asc        // Kernel, host invocation, and result verification
 │   └── README.md               // Example description document
 ```
 
@@ -27,7 +23,7 @@ This example introduces the usage of the asc_dump series APIs on the simd_vf sid
 
 - Example features:
 
-  Using the vector programming mode, this example demonstrates the basic usage of the asc_dump series APIs on the simd_vf side. The kernel function reads binary input data through `ReadFile`, uses `asc_vf_call` to invoke simd_vf functions for dump printing, performs Adds computation, writes binary output data through `WriteFile`, and finally compares the output against ground truth through a verification script.
+  In vector programming mode, the host generates input, and the kernel uses `asc_vf_call` to print the original and modified data and C API calls for addition. The host compares the output with the expected values.
 
   1. `asc_dump_ubuf<T>` - Print UB data
   2. `asc_dump_reg<T>` - Print register data
@@ -49,7 +45,7 @@ This example introduces the usage of the asc_dump series APIs on the simd_vf sid
 
 - Invocation implementation
 
-  Use `asc_vf_call` inside the `__global__ __vector__` kernel to print the original UB and register data. After computing `x + 1.0f`, dump the modified UB, then write the result to GM. `asc_dump` is a debugging utility shared by the C and C++ API examples; its template parameter specifies the printed data type. The host reads and writes binary data through `ReadFile`/`WriteFile`.
+  Use `asc_vf_call` inside the `__global__ __vector__` kernel to print the original UB and register data. Compute `x + 1.0f` with the C API `asc_add_scalar` in the VF, then dump the modified UB and write the result to GM. `asc_dump` is a debugging utility shared by the C and C++ API examples; its template parameter specifies the printed data type. The host generates input and verifies output directly.
 
 ## Build and Run
 
@@ -67,11 +63,9 @@ Run the following steps in the root directory of this example to build and run t
 
   Run the following commands in the example directory.
   ```bash
-  mkdir -p build && cd build;                                               # Create and enter the build directory
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # Build the project
-  python3 ../scripts/gen_data.py                                            # Generate test input data
-  ./demo                                                                    # Run the compiled executable to execute the example
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # Verify the output result to confirm algorithm correctness
+  cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510
+  cmake --build build -j
+  ./build/demo
   ```
 
 - Build options

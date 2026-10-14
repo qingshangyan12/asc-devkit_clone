@@ -3,7 +3,7 @@
 
 ## 概述
 
-本样例介绍simd_vf侧asc_dump系列接口使用方法，在vector函数中通过`asc_dump_ubuf`、`asc_dump_reg`、`asc_dump`等接口实现UB和寄存器数据的可视化打印。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写，核函数从GM读取输入数据，执行Adds计算后将结果写回GM，通过比较输出与真值进行校验。
+本样例介绍simd_vf侧asc_dump系列接口使用方法，在vector函数中通过`asc_dump_ubuf`、`asc_dump_reg`、`asc_dump`等接口实现UB和寄存器数据的可视化打印。Host侧在同一个`.asc`文件中生成输入与真值，核函数从GM读取输入、执行C API加法并写回GM，最后在Host侧比较结果。
 
 ## 本样例支持的产品及CANN软件版本
 
@@ -15,12 +15,8 @@
 
 ```
 ├── simd_vf_dump
-│   ├── scripts
-│   │   ├── gen_data.py         // 输入数据和真值数据生成脚本
-│   │   └── verify_result.py    // 验证输出数据和真值数据是否一致
 │   ├── CMakeLists.txt          // 编译工程文件
-│   ├── data_utils.h            // 数据读入写出函数
-│   ├── simd_vf_dump.asc        // Ascend C样例实现&调用样例
+│   ├── simd_vf_dump.asc        // 内核、Host调用及结果校验
 │   └── README.md               // 样例说明文档
 ```
 
@@ -28,7 +24,7 @@
 
 - 样例功能：
 
-  使用vector编程模式，展示simd_vf侧asc_dump系列接口的基本使用方法。核函数通过`ReadFile`读取二进制输入数据，使用`asc_vf_call`调用simd_vf函数进行dump打印，执行Adds计算后通过`WriteFile`写出二进制输出数据，最终通过校验脚本比对输出与真值。
+  使用vector编程模式，展示simd_vf侧asc_dump系列接口的基本使用方法。Host侧生成输入，核函数通过`asc_vf_call`打印原始与修改后的数据，并使用C API执行加法；Host侧将输出与真值比较。
 
   1. `asc_dump_ubuf<T>`-打印UB数据
   2. `asc_dump_reg<T>`-打印寄存器数据
@@ -50,7 +46,7 @@
 
 - 调用实现
 
-  在`__global__ __vector__`核函数内使用`asc_vf_call`依次打印原始UB和寄存器数据，执行`x + 1.0f`后再打印修改后的UB，最后将结果写回GM。`asc_dump`属于C/C++ API共用的调试接口，模板参数仅用于指定打印数据类型。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写。
+  在`__global__ __vector__`核函数内使用`asc_vf_call`依次打印原始UB和寄存器数据，通过VF中的C API `asc_add_scalar`执行`x + 1.0f`后再打印修改后的UB，最后将结果写回GM。`asc_dump`属于C/C++ API共用的调试接口，模板参数仅用于指定打印数据类型。Host侧直接生成输入并校验输出。
 
 ## 编译运行
 
@@ -68,11 +64,9 @@
 
   在本样例目录下执行如下命令。
   ```bash
-  mkdir -p build && cd build;                                               # 创建并进入build目录
-  cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j;                      # 编译工程
-  python3 ../scripts/gen_data.py                                            # 生成测试输入数据
-  ./demo                                                                    # 执行编译生成的可执行程序，执行样例
-  python3 ../scripts/verify_result.py output/output.bin output/golden.bin   # 验证输出结果是否正确，确认算法逻辑正确
+  cmake -S . -B build -DCMAKE_ASC_ARCHITECTURES=dav-3510
+  cmake --build build -j
+  ./build/demo
   ```
 
 - 编译选项说明
