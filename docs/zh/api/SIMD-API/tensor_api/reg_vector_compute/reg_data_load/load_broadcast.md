@@ -58,16 +58,16 @@
 
 | 参数名 | 描述 |
 | --- | --- |
-| `brc_mode` | 广播模式，类型为`broadcast_mode`，默认值为`broadcast_mode::elem`。具体取值请参考[表3](#表3-broadcast_mode参数说明)。 |
-| `Tensor` | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
-| `Coord` | 源Tensor的坐标类型，由函数实参自动推导。 |
+| brc_mode | 广播模式，类型为`broadcast_mode`，默认值为`broadcast_mode::elem`。具体取值请参考[表3](#表3-broadcast_mode参数说明)。 |
+| Tensor | 源Tensor类型，由函数实参自动推导。Tensor必须位于UB。 |
+| Coord | 源Tensor的坐标类型，由函数实参自动推导。 |
 
 **表2** 参数说明
 
 | 参数名 | 输入/输出 | 描述 |
 | --- | --- | --- |
-| `tensor` | 输入 | 源Tensor，必须位于UB。 |
-| `coord` | 输入 | 搬入起始元素在`tensor`逻辑布局中的坐标。 |
+| tensor | 输入 | 源Tensor，必须位于UB。 |
+| coord | 输入 | 搬入起始元素在`tensor`逻辑布局中的坐标。 |
 
 <a id="表3-broadcast_mode参数说明"></a>
 
@@ -77,16 +77,16 @@
 
 | 取值 | 含义 | 搬入起始地址对齐约束（Byte） |
 | --- | --- | --- |
-| `broadcast_mode::elem` | 从UB读取一个元素，并将该元素广播到目的寄存器的所有元素位置。 | 元素的大小 |
-| `broadcast_mode::datablock` | 从UB读取一个DataBlock（32B），并将该DataBlock重复广播到整个目的寄存器。 | 32 |
-| `broadcast_mode::elem2datablock` | 依次读取VL/32B个元素，并将每个元素分别广播到目的寄存器的一个DataBlock内。 | 16bit类型为VL/16；32bit类型为VL/8 |
+| broadcast_mode::elem | 从UB读取一个元素，并将该元素广播到目的寄存器的所有元素位置。 | 元素的大小 |
+| broadcast_mode::datablock | 从UB读取一个DataBlock（32B），并将该DataBlock重复广播到整个目的寄存器。 | 32 |
+| broadcast_mode::elem2datablock | 依次读取VL/32B个元素，并将每个元素分别广播到目的寄存器的一个DataBlock内。 | 16bit类型为VL/16；32bit类型为VL/8 |
 
 ## 数据类型
 
-| `brc_mode` | 支持的数据类型 |
+| brc_mode | 支持的数据类型 |
 | --- | --- |
-| `elem`、`datablock` | `int8_t`、`uint8_t`、`int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float`、`hifloat8_t`、`fp8_e4m3fn_t`、`fp8_e5m2_t`、`fp8_e8m0_t`、`int4b_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t` |
-| `elem2datablock` | `int16_t`、`uint16_t`、`int32_t`、`uint32_t`、`half`、`bfloat16_t`、`float` |
+| elem、datablock | `int4b_t`、`int8_t`、`uint8_t`、`fp4x2_e2m1_t`、`fp4x2_e1m2_t`、`hifloat8_t`、`fp8_e8m0_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` |
+| elem2datablock | `int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float` |
 
 ## 返回值说明
 
