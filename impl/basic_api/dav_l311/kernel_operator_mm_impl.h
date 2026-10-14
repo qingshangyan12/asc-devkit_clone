@@ -487,19 +487,15 @@ __aicore__ inline void MmadCal(
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(__cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, const MmadBitModeParams& mmadParams)
 {
-    if ASCEND_IS_AIC {
-        mad(c, a, b, mmadParams.GetConfig0());
-    }
+    mad(c, a, b, mmadParams.GetConfig0());
 }
 
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void MmadCal(
     __cc__ DstT* c, __ca__ Src0T* a, __cb__ Src1T* b, uint64_t bias, MmadBitModeParams& mmadParams)
 {
-    if ASCEND_IS_AIC {
-        mmadParams.SetCmatrixInitVal(false);
-        mad(c, a, b, bias, mmadParams.GetConfig0());
-    }
+    mmadParams.SetCmatrixInitVal(false);
+    mad(c, a, b, bias, mmadParams.GetConfig0());
 }
 
 /* **************************************************************************************************

@@ -118,6 +118,7 @@ constexpr uint32_t INT3_BIT_NUM = 3;
 // int2b_t param
 constexpr uint32_t INT2_FOUR = 4;
 constexpr uint32_t INT2_BIT_NUM = 2;
+constexpr uint32_t INT1_BIT_NUM = 1;
 #endif
 
 namespace ConstantsInternal {
@@ -708,7 +709,7 @@ struct IntegerSubType {
 
 using int4b_t = integer_sub_type<INT4_BIT_NUM, true>;
 
-#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 using int2b_t = IntegerSubType<INT2_BIT_NUM, true>;
 using int1b_t = IntegerSubType<INT1_BIT_NUM, true>;
 using uint1b_t = IntegerSubType<INT1_BIT_NUM, false>;
@@ -795,7 +796,7 @@ struct SizeOfBits<int4b_t> {
     static int const value = INT4_BIT_NUM;
 };
 
-#if (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
+#if (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162)
 template <>
 struct SizeOfBits<int2b_t> {
     static constexpr uint32_t value = INT2_BIT_NUM;
