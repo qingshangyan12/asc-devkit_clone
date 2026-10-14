@@ -74,7 +74,7 @@ inline void asc_dcci_entire(void *dst)
 
         // 线程块1的线程0进行数据读操作
         if (blockIdx.x == 1 && threadIdx.x == 0) {
-            while (data[0] != 1) {
+            while (*(volatile uint32_t *)data != 1) {
                 asc_dcci_entire((void*)(data)); // 从Global Memory读标志位
             }
             output[0] = data[1]; // 数据就绪，获取数据
@@ -98,10 +98,17 @@ inline void asc_dcci_entire(void *dst)
 
         // 线程块1的线程0进行数据读操作
         if (blockIdx.x == 1 && threadIdx.x == 0) {
-            while (data[0] != 1) {
+            while (*(volatile uint32_t *)data != 1) {
                 asc_dcci_entire((__gm__ void*)(data)); // 从Global Memory读标志位
             }
             output[0] = data[1]; // 数据就绪，获取数据
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 0
+result: 10
+```
