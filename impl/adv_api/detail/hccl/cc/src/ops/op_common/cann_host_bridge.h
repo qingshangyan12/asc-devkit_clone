@@ -22,8 +22,13 @@ class InsCollAlgBase;
 struct AlgResourceCtxSerializable;
 
 // 判断该 op 是否需要走 CANN 桥接路径(选路/取执行器/资源准备)。
-// ALLTOALL/ALLTOALLV/ALLREDUCE 已切回本地路径, 当前恒返回 false。
+// allreduce-test: 仅 ALLREDUCE(AICPU/AICPU_TS) 走 CANN 桥接；ALLTOALL/ALLTOALLV 本地。
 bool UseCannBridge(const OpParam& param);
+
+// allreduce-test: 判断 algName 是否 devkit 本地注册——forced-alg 场景的归属分流，
+// 本地注册的算法名（即使 opType 在桥接列表中）仍走本地路径，避免被拦进 CANN 查表而
+// 触发 fallback / CANN 侧查无此名导致执行失败。
+bool IsLocalRegisteredAlg(HcclCMDType opType, const std::string& algName);
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName);
 

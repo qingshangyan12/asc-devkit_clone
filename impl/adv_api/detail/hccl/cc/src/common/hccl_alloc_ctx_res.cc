@@ -647,10 +647,15 @@ HcclResult PrepareEngineForAlg(OpParam& opParam, const std::string& algName)
 
 std::unique_ptr<InsCollAlgBase> GetAlgExecutorForOp(const OpParam& opParam, const std::string& algName)
 {
+    // allreduce-test: forced-alg 先查本地注册表——本地注册名走本地执行器，
+    // 避免 devkit 算法名被 ALLREDUCE 桥接拦进 CANN 查表而 fallback。
+    if (IsLocalRegisteredAlg(opParam.opType, algName)) {
+        return CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
+    }
     if (UseCannBridge(opParam)) {
         return GetAlgExecViaCann(opParam.opType, algName);
     }
-    return CollAlgExecRegistryV2::Instance().GetAlgExec(opParam.opType, algName);
+    return nullptr;
 }
 
 HcclResult CheckForcedAlgResource(
