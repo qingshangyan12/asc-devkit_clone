@@ -72,15 +72,21 @@ SIMT编程场景：
 ```cpp
 #include "simt_api/device_functions.h"
 
-__global__ __launch_bounds__(1024) void kernel__isUbuf(uint32_t* dst,
-uint32_t* src)
+__global__ __launch_bounds__(1024) void kernel__isUbuf(uint32_t* result, uint32_t* src)
 {
     __ubuf__ uint32_t ptr[10];
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
     if(__isUbuf(ptr) == 1) {
-       dst[idx] = 1;
+        result[idx] = 1;
     } else {
-      dst[idx] = 0;
+        result[idx] = 0;
     }
 }
+```
+
+输入输出示例如下：
+
+```text
+src: 11, 22, 33, 44
+result: 1, 1, 1, 1
 ```
