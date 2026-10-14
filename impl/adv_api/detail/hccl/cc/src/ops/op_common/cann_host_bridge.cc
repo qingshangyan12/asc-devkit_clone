@@ -17,6 +17,7 @@
 #include "log.h"
 #include "executor_v2_base.h"
 #include "selector/execute_selector.h"
+#include "coll_alg_v2_exec_registry.h"
 
 namespace mc2_ops_hccl {
 namespace cann_abi {
@@ -145,6 +146,11 @@ bool UseCannBridge(const OpParam& param)
     // ALLTOALL/ALLTOALLV 维持本地路径。
     return (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
            (param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+}
+
+bool IsLocalRegisteredAlg(HcclCMDType opType, const std::string& algName)
+{
+    return CollAlgExecRegistryV2::Instance().IsRegistered(opType, algName);
 }
 
 HcclResult SelectViaCann(OpParam& ascParam, TopoInfoWithNetLayerDetails* ascTopo, std::string& algName)

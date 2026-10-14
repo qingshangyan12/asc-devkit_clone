@@ -879,10 +879,12 @@ HcclResult HcclGetAlgRes(
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] before CalcAlgHierarchyInfo, opType[%d], algTag[%s].", param.opType,
         param.algTag);
-    // allreduce-test: 与 UseCannBridge 同步，ALLREDUCE 走 CANN 桥接
+    // allreduce-test: 与 UseCannBridge 同步，ALLREDUCE 走 CANN 桥接；
+    // forced 指定的本地注册算法名仍走本地（资源计算用本地 executor/CalcAlgHierarchyInfo）
     const bool useCannBridge =
         (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
-        (param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
+        (param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE) &&
+        !IsLocalRegisteredAlg(param.opType, std::string(param.algName));
     if (useCannBridge) {
         AlgAttrs algAttrs = executor->GetAlgoMeta(std::string(param.algName));
         HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);

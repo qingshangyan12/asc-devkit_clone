@@ -178,8 +178,10 @@ HcclResult LaunchOpenOpParamDataImpl(
 
     CHK_RET(RestoreVarDataIfNeeded(*param, resCtx));
 
-    // allreduce-test: 与 Host 侧 UseCannBridge 同步，ALLREDUCE 的 AICPU 执行走 CANN 桥接
-    const bool useCannBridge = (param->opType == HCCL_CMD_ALLREDUCE);
+    // allreduce-test: 与 Host 侧 UseCannBridge 同步，ALLREDUCE 的 AICPU 执行走 CANN 桥接；
+    // forced 指定的本地注册算法名仍走本地（AICPU 侧注册表与 Host 同源序列化）
+    const bool useCannBridge = (param->opType == HCCL_CMD_ALLREDUCE) &&
+        !mc2_ops_hccl::CollAlgExecRegistryV2::Instance().IsRegistered(param->opType, std::string(param->algName));
     if (useCannBridge) {
         HcclResult cannRet = mc2_ops_hccl::RunWithMc2TaskCache(
             *param, resCtx, [&]() -> HcclResult { return mc2_ops_hccl::LaunchViaCann(*param, resCtx); });
