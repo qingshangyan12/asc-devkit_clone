@@ -98,11 +98,6 @@ inline void asc_syncthreads()
     }
     ```
 
-    ```text
-    输出结果:
-    [1023, 1, 1, 1 …]
-    ```
-
 - SIMD与SIMT混合编程场景：
 
     ```cpp
@@ -129,7 +124,10 @@ inline void asc_syncthreads()
     }
     ```
 
+输入输出示例如下：
+
+- 调用示例1：
+
     ```text
-    输出结果:
-    [1023, 1, 1, 1 …]
+    result: 3, 1, 1, 1
     ```
