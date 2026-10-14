@@ -178,6 +178,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
     if (workingFlag_) {
         WriteHBMData(finishCntGM_, uint64_t(0));
     }
+    // 性能优化：context 常量缓存（通信域生命周期内不变，InitCcuParam 每轮复用免 GM 读）
+    if (newCcuFlag_) {
+        cachedRankNum_ = hcclNewContext_->rankSize;
+        cachedRankId_ = hcclNewContext_->rankId;
+        cachedScratchAddr_ = hcclNewContext_->res[0];
+        cachedDieSplitRatioPermille_ = hcclNewContext_->res[1];
+    }
     curVersion_ = version;
     curHandleId_ = 0;
     finishNum_ = 0;
@@ -402,11 +409,13 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::I
         }
     }
 
-    ccuParam_.rankNum = newCcuFlag_ ? hcclNewContext_->rankSize : hcclContext_->rankNum;
-    ccuParam_.rankId = newCcuFlag_ ? hcclNewContext_->rankId : hcclContext_->rankId;
-    ccuParam_.scratchAddr = newCcuFlag_ ? hcclNewContext_->res[0] : hcclContext_->windowsOut[0];
+    // 性能优化：context 常量缓存（InitInner 一次性读入，通信域生命周期内不变；
+    // 免 InitCcuParam 每轮 4 次 hcclNewContext_ GM 读）
+    ccuParam_.rankNum = newCcuFlag_ ? cachedRankNum_ : hcclContext_->rankNum;
+    ccuParam_.rankId = newCcuFlag_ ? cachedRankId_ : hcclContext_->rankId;
+    ccuParam_.scratchAddr = newCcuFlag_ ? cachedScratchAddr_ : hcclContext_->windowsOut[0];
     // res[1]=die 切分千分比（1000/0=不切分），host 侧 GetCcuOpParamResCtx 写入
-    ccuParam_.dieSplitRatioPermille = newCcuFlag_ ? hcclNewContext_->res[1] : 1000U;
+    ccuParam_.dieSplitRatioPermille = newCcuFlag_ ? cachedDieSplitRatioPermille_ : 1000U;
 }
 
 template <const auto& config>
@@ -520,14 +529,19 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
         resourceId);
     GM_ADDR xnAddr = newCcuFlag_ ? reinterpret_cast<GM_ADDR>(hcclNewContext_->xnAddr) : hcclContext_->xnOffset;
     ccuMsg_.xnAddr = xnAddr + static_cast<uint64_t>(resourceId) * CCU_MSG_XN_NUM * CCU_XN_DATA_SIZE;
+    // 性能优化(W1v2)：xnData 绕 cache posted 直写 HBM（WriteGmBypassDCache，无逐笔屏障），
+    // 末尾单次 DataSyncBarrier 保证全部全局可见后再写 commit CKE（WriteHBMData 内含
+    // Barrier 前缀，时序正确：xnData 全局可见 → commit CKE 可见 → server 检测）。
+    // 对比原路径（13 笔缓存写 + 2 行 FlushDataCache 各带 Barrier+DCCI+DSB 重屏障组），
+    // 省去 DCCI 刷新及重复屏障（~1-1.5us）。
+    // 与已回退 W1 的区别：W1 逐笔调 WriteHBMData（每笔 Barrier+NOP+写+DSB）导致劣化；
+    // 此处 posted bypass 写仅末尾 1 次 DSB。
+    // 消费方仅 CCU server 的 ccu::Load（直读 HBM，不经 AIV cache），语义等价。
+    // reinterpret_cast 模式与上方已删的缓存写（原行 524）完全一致，编译兼容。
     for (int i = 0; i < ccuUsedXnNum_; i++) {
-        *(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i)) = xnData_[i];
+        WriteGmBypassDCache(reinterpret_cast<__gm__ uint64_t*>(ccuMsg_.xnAddr + CCU_XN_DATA_SIZE * i), xnData_[i]);
     }
-
-    // 循环刷新xn, ccuUsedXnNum_ + 7) / 8 向上取整
-    for (int i = 0; i < ((ccuUsedXnNum_ + 7) / 8); i++) {
-        FlushDataCache(ccuMsg_.xnAddr + MAX_DCCI_CNT * i);
-    }
+    DataSyncBarrier<MemDsbT::ALL>();
 
     // 性能优化：原 26 参日志的参数表达式（26 次 __gm__ 读）在日志级别过滤前
     // 无条件求值，每轮必付 26 次 GM 读；降为 0 GM 读的单行摘要。

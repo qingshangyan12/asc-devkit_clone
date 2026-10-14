@@ -194,6 +194,13 @@ private:
 
     uint8_t ccuUsedXnNum_ = 0;
 
+    // 性能优化：context 常量缓存（InitInner 一次性读入，通信域生命周期内不变；
+    // InitCcuParam 每轮复用，免 hcclNewContext_ GM 重复读）
+    uint64_t cachedRankNum_ = 0;
+    uint64_t cachedRankId_ = 0;
+    uint64_t cachedScratchAddr_ = 0;
+    uint64_t cachedDieSplitRatioPermille_ = 1000U;
+
     bool msgQueueIsAvailable_[CCU_MAX_MSG_NUM];
     uint64_t xnData_[CCU_USED_XN_NUM];
 };
