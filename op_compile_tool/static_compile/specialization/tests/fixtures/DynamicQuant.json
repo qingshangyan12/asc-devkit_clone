@@ -1,0 +1,205 @@
+{
+  "metadata": {
+    "binFileName": "DynamicQuant_jit_compact",
+    "binFileSuffix": ".o",
+    "blockDim": -1,
+    "coreType": "VectorCore",
+    "core_type": "AIV",
+    "intercoreSync": 0,
+    "kernelName": "DynamicQuant_jit_compact",
+    "magic": "RT_DEV_BINARY_MAGIC_ELF_AIVEC",
+    "memoryStamping": [],
+    "opParaSize": 248,
+    "parameters": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "sha256": "509f7a6a66308686b104bc90ff14f71250df0bc889383f9a478481188f9cafeb",
+    "workspace": {
+      "num": 1,
+      "size": [
+        -1
+      ],
+      "type": [
+        0
+      ]
+    },
+    "kernelList": [
+      {
+        "kernelName": "DynamicQuant_jit_compact_10"
+      }
+    ],
+    "supportSuperKernel": 1,
+    "platformInfo": {
+      "deterministicLevel": 0
+    },
+    "compileInfo": {},
+    "supportInfo": {
+      "implMode": "high_performance",
+      "int64Mode": false,
+      "staticKey": "c12a3f973973b9e55b9e284d7c3ace2b715a1d6e07090683c13fa293922576a3",
+      "inputs": [
+        {
+          "name": "x",
+          "index": 0,
+          "dtype": "bfloat16",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "smooth_scales",
+          "index": 1,
+          "dtype": "bfloat16",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ]
+        },
+        null
+      ],
+      "outputs": [
+        {
+          "name": "y",
+          "index": 0,
+          "dtype": "int8",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ]
+        },
+        {
+          "name": "scale",
+          "index": 1,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ]
+        }
+      ],
+      "attrs": [
+        {
+          "name": "dst_type",
+          "dtype": "int",
+          "value": 2
+        }
+      ],
+      "opMode": "dynamic",
+      "tilingKey": [
+        "10"
+      ],
+      "deterministic": "ignore"
+    }
+  },
+  "shape": {
+    "attrs": [
+      {
+        "dtype": "int",
+        "index": 0,
+        "name": "dst_type",
+        "value": 2
+      }
+    ],
+    "deterministic": "false",
+    "deterministic_level": 0,
+    "impl_mode": "high_performance",
+    "inputs": [
+      {
+        "dtype": "bfloat16",
+        "format": "ND",
+        "index": 0,
+        "is_view": true,
+        "name": "x",
+        "offset": 0,
+        "origin_format": "ND",
+        "origin_shape": [
+          864,
+          1024
+        ],
+        "param_type": "required",
+        "shape": [
+          864,
+          1024
+        ],
+        "stride": [],
+        "value_depend": false
+      },
+      {
+        "dtype": "bfloat16",
+        "format": "ND",
+        "index": 1,
+        "is_view": true,
+        "name": "smooth_scales",
+        "offset": 0,
+        "origin_format": "ND",
+        "origin_shape": [
+          1024
+        ],
+        "param_type": "optional",
+        "shape": [
+          1024
+        ],
+        "stride": [],
+        "value_depend": false
+      },
+      null
+    ],
+    "op_type": "DynamicQuant",
+    "outputs": [
+      {
+        "dtype": "int8",
+        "format": "ND",
+        "index": 0,
+        "is_view": true,
+        "name": "y",
+        "offset": 0,
+        "origin_format": "ND",
+        "origin_shape": [
+          864,
+          1024
+        ],
+        "param_type": "required",
+        "shape": [
+          864,
+          1024
+        ],
+        "stride": [],
+        "value_depend": false
+      },
+      {
+        "dtype": "float",
+        "format": "ND",
+        "index": 1,
+        "is_view": true,
+        "name": "scale",
+        "offset": 0,
+        "origin_format": "ND",
+        "origin_shape": [
+          864
+        ],
+        "param_type": "required",
+        "shape": [
+          864
+        ],
+        "stride": [],
+        "value_depend": false
+      }
+    ],
+    "platform_info": {
+      "cube_core_cnt": 20,
+      "pcie_through_flag": false,
+      "vector_core_cnt": 40
+    },
+    "tune_mode": "all"
+  }
+}
