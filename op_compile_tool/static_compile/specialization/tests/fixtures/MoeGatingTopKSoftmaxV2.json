@@ -1,0 +1,248 @@
+{
+  "metadata": {
+    "binFileName": "MoeGatingTopKSoftmaxV2_jit_compact",
+    "binFileSuffix": ".o",
+    "blockDim": -1,
+    "coreType": "MIX",
+    "intercoreSync": 1,
+    "kernelName": "MoeGatingTopKSoftmaxV2_jit_compact",
+    "magic": "RT_DEV_BINARY_MAGIC_ELF",
+    "memoryStamping": [],
+    "opParaSize": 600,
+    "parameters": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "sha256": "4ce5831b636306c1df4ec02a89e6ea8b251ee1c97c8d9d90ca82fcdb3f8b1161",
+    "workspace": {
+      "num": 1,
+      "size": [
+        -1
+      ],
+      "type": [
+        0
+      ]
+    },
+    "kernelList": [
+      {
+        "tilingKey": 101031,
+        "kernelType": "MIX_AIC",
+        "crossCoreSync": 1,
+        "taskRation": "0:1",
+        "kernelName": "MoeGatingTopKSoftmaxV2_jit_compact_101031"
+      }
+    ],
+    "taskRation": "tilingKey",
+    "supportSuperKernel": 1,
+    "platformInfo": {
+      "deterministicLevel": 0
+    },
+    "compileInfo": {},
+    "supportInfo": {
+      "implMode": "",
+      "int64Mode": false,
+      "staticKey": "84154d3d0a78e6142057023bb8ed32888e558630eefe60e29139d06fec75ac60",
+      "inputs": [
+        {
+          "name": "x",
+          "index": 0,
+          "dtype": "bfloat16",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        null
+      ],
+      "outputs": [
+        {
+          "name": "y",
+          "index": 0,
+          "dtype": "bfloat16",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "expert_idx",
+          "index": 1,
+          "dtype": "int32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "softmax_result",
+          "index": 2,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "optional",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        }
+      ],
+      "attrs": [
+        {
+          "name": "k",
+          "dtype": "int",
+          "value": 1024
+        },
+        {
+          "name": "renorm",
+          "dtype": "int",
+          "value": 0
+        },
+        {
+          "name": "output_softmax_result_flag",
+          "dtype": "bool",
+          "value": false
+        }
+      ],
+      "opMode": "dynamic",
+      "tilingKey": [
+        "101031"
+      ],
+      "deterministic": "ignore"
+    }
+  },
+  "shape": {
+    "attrs": [
+      {
+        "dtype": "int",
+        "index": 0,
+        "name": "k",
+        "value": 1024
+      },
+      {
+        "dtype": "int",
+        "index": 1,
+        "name": "renorm",
+        "value": 0
+      },
+      {
+        "dtype": "bool",
+        "index": 2,
+        "name": "output_softmax_result_flag",
+        "value": false
+      }
+    ],
+    "deterministic": "false",
+    "deterministic_level": 0,
+    "impl_mode": "",
+    "inputs": [
+      {
+        "dtype": "bfloat16",
+        "format": "ND",
+        "index": 0,
+        "is_view": true,
+        "name": "x",
+        "offset": 0,
+        "origin_format": "ND",
+        "origin_shape": [
+          864,
+          2048
+        ],
+        "param_type": "required",
+        "shape": [
+          864,
+          2048
+        ],
+        "stride": [
+          2048,
+          1
+        ],
+        "value_depend": false
+      },
+      null
+    ],
+    "op_type": "MoeGatingTopKSoftmaxV2",
+    "outputs": [
+      {
+        "dtype": "bfloat16",
+        "format": "ND",
+        "index": 0,
+        "is_view": true,
+        "name": "y",
+        "offset": 0,
+        "origin_format": "ND",
+        "origin_shape": [
+          864,
+          1024
+        ],
+        "param_type": "required",
+        "shape": [
+          864,
+          1024
+        ],
+        "stride": [
+          1024,
+          1
+        ],
+        "value_depend": false
+      },
+      {
+        "dtype": "int32",
+        "format": "ND",
+        "index": 1,
+        "is_view": true,
+        "name": "expert_idx",
+        "offset": 0,
+        "origin_format": "ND",
+        "origin_shape": [
+          864,
+          1024
+        ],
+        "param_type": "required",
+        "shape": [
+          864,
+          1024
+        ],
+        "stride": [
+          1024,
+          1
+        ],
+        "value_depend": false
+      },
+      {
+        "dtype": "float",
+        "format": "ND",
+        "index": 2,
+        "is_view": true,
+        "name": "softmax_result",
+        "offset": 0,
+        "origin_format": "ND",
+        "origin_shape": [
+          0
+        ],
+        "param_type": "optional",
+        "shape": [
+          0
+        ],
+        "stride": [
+          1
+        ],
+        "value_depend": false
+      }
+    ],
+    "platform_info": {
+      "cube_core_cnt": 20,
+      "pcie_through_flag": false,
+      "vector_core_cnt": 40
+    },
+    "tune_mode": "all"
+  }
+}
