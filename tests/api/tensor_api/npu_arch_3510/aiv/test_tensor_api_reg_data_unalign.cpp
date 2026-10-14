@@ -1,11 +1,11 @@
-/*
+/**
  * Copyright (c) 2026 Huawei Technologies Co., Ltd.
- * This file is a part of the CANN Open Software.
- * Licensed under CANN Open Software License Agreement Version 2.0 (the "License").
+ * This program is free software, you can redistribute it and/or modify it under the terms and conditions of
+ * CANN Open Software License Agreement Version 2.0 (the "License").
  * Please refer to the License for details. You may not use this file except in compliance with the License.
  * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
- * See LICENSE in the root of the software repository for the full text of the LICENSE file.
+ * See LICENSE in the root of the software repository for the full text of the License.
  */
 #include <gtest/gtest.h>
 
@@ -28,11 +28,10 @@ __simd_vf__ inline void compile_unalign_load_store(__ubuf__ T* dst, __ubuf__ T* 
     asc::te::experimental::unalign_store storer;
     loader.prepare(src_tensor);
 
-    auto first_src =
-        src_tensor.slice(asc::te::make_coord(0), asc::te::make_shape(elements_per_register));
+    auto first_src = src_tensor.slice(asc::te::make_coord(0), asc::te::make_shape(elements_per_register));
     auto first = loader.load(first_src);
-    auto second_src = src_tensor.slice(
-        asc::te::make_coord(elements_per_register), asc::te::make_shape(elements_per_register));
+    auto second_src =
+        src_tensor.slice(asc::te::make_coord(elements_per_register), asc::te::make_shape(elements_per_register));
     loader.prepare(second_src);
     auto second = loader.load(second_src, asc::te::make_coord(0));
     static_assert(AscendC::Std::is_same_v<decltype(first), asc::te::experimental::reg_tensor<RegDataType>>);
@@ -41,8 +40,7 @@ __simd_vf__ inline void compile_unalign_load_store(__ubuf__ T* dst, __ubuf__ T* 
     storer.store(
         dst_tensor.slice(asc::te::make_coord(0), asc::te::make_shape(elements_per_register)), first,
         elements_per_register);
-    storer.store(
-        dst_tensor, asc::te::make_coord(elements_per_register), second, elements_per_register);
+    storer.store(dst_tensor, asc::te::make_coord(elements_per_register), second, elements_per_register);
     constexpr int32_t total_elements = static_cast<int32_t>(elements_per_register * 2);
     static_assert(AscendC::Std::is_same_v<decltype(storer.flush(dst_tensor, total_elements)), void>);
     storer.flush(dst_tensor, total_elements);
