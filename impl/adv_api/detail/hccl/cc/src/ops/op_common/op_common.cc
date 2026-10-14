@@ -879,7 +879,10 @@ HcclResult HcclGetAlgRes(
     HCCL_INFO(
         "[asc][AlgoResource][HcclGetAlgRes] before CalcAlgHierarchyInfo, opType[%d], algTag[%s].", param.opType,
         param.algTag);
-    const bool useCannBridge = false;
+    // allreduce-test: 与 UseCannBridge 同步，ALLREDUCE 走 CANN 桥接
+    const bool useCannBridge =
+        (param.engine == COMM_ENGINE_AICPU_TS || param.engine == COMM_ENGINE_AICPU) &&
+        (param.opType == HcclCMDType::HCCL_CMD_ALLREDUCE);
     if (useCannBridge) {
         AlgAttrs algAttrs = executor->GetAlgoMeta(std::string(param.algName));
         HcclResult calcHierarchyRet = executor->CalcAlgHierarchyInfoV2(topoInfo, algHierarchyInfo, algAttrs);
