@@ -63,7 +63,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 `asc-search` 把三类头推导成一份持久索引，查询时只查索引、按需打开候选文档，不需要现场全文搜索。
 
-![asc-search：三类知识标注与检索工具链](references/asc-search-knowledge-toolchain.svg)
+![asc-search：三类知识标注与检索工具链](references/asc-search-knowledge-toolchain-9.2.0.svg)
 
 ### 1.3 两个工作流
 
