@@ -341,12 +341,25 @@ __aicore__ inline void HcclImpl<HcclServerType::HCCL_SERVER_TYPE_CCU, config>::C
     const bool isInputOutputEqual = (inputBase == outputBase + outputSliceStride * ccuParam_.rankId);
     const uint64_t die0CopySize = isInputOutputEqual ? 0U : die0Size;
     const uint64_t die1CopySize = isInputOutputEqual ? 0U : die1Size;
+    // GO_SIZE 调参(N4)：loopCount 从 CCU_LOOP_COUNT_M2M_AG(8) 降至 2，loopSize 从
+    // 256KB 降至 64KB——4M/16rank 双 die 下每 die ~100-160KB，原 loopSize 256KB 导致
+    // m=0（主块跳过，全走 secondary 慢路径）；调参后 m=1-2 走主块快路径。
+    // CCU 侧 moConfig 由 kernel 内 AllocGoResource(2, 8) 同步设置（见 kernel .cc）。
+    // loopSize = 2 × (CCU_MEMSLICE_SIZE × 8) = 64KB
     CalcGoSize(
-        die0CopySize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_D0_SIZE_0],
+        die0CopySize, 2U, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_D0_SIZE_0],
         ccuProtocolVersion_);
     CalcGoSize(
-        die1CopySize, CCU_LOOP_COUNT_M2M_AG, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_D1_SIZE_0],
+        die1CopySize, 2U, CCU_MEMSLICE_SIZE * 8U, &xnData_[KFC_AG_SOLE_NHR_GO_D1_SIZE_0],
         ccuProtocolVersion_);
+    KERNEL_LOG(
+        KERNEL_INFO,
+        "AG sole-NHR GO_SIZE: die0(copy=0x%llx, addr=0x%llx, m=%llu, para=0x%llx, p=0x%llu), "
+        "die1(copy=0x%llx, addr=0x%llx, m=%llu, para=0x%llx, p=0x%llu)\n",
+        die0CopySize, xnData_[KFC_AG_SOLE_NHR_GO_D0_SIZE_0], xnData_[KFC_AG_SOLE_NHR_GO_D0_SIZE_1],
+        xnData_[KFC_AG_SOLE_NHR_GO_D0_SIZE_2], xnData_[KFC_AG_SOLE_NHR_GO_D0_SIZE_3],
+        die1CopySize, xnData_[KFC_AG_SOLE_NHR_GO_D1_SIZE_0], xnData_[KFC_AG_SOLE_NHR_GO_D1_SIZE_1],
+        xnData_[KFC_AG_SOLE_NHR_GO_D1_SIZE_2], xnData_[KFC_AG_SOLE_NHR_GO_D1_SIZE_3]);
     KERNEL_LOG(
         KERNEL_INFO,
         "AG sole-NHR prepare: slice=0x%llx, die0=0x%llx, die1=0x%llx, outStride=0x%llx, "

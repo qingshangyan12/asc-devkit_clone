@@ -376,6 +376,14 @@ CcuResult CcuKernelKfcAllGatherNHR1DMem2MemKernel(
     InitCcuKernelCtxBase(ctx);
     CCU_CHK_RET(InitResource(ctx));
 
+    // GO_SIZE 调参(N4)：覆盖 GroupCopy 引擎配置，使 CCU 侧 moConfig 与 AIV 侧
+    // CalcGoSize 参数一致（loopCount=2, memSlice=8×4KB=32KB, loopSize=64KB）。
+    // 默认 AllocGoResource(parallelDim=128, msPerLoop=1) 设 loopSize=512KB，
+    // 与 AIV 侧 256KB 不匹配（当前 m=0 主块跳过故无影响；调参后 m≥1 必须匹配，
+    // 否则主块地址越界）。先于此处调用后，GroupCopyV1 内 AllocGoResource 检测
+    // allocated=true 跳过重分配，moConfig 保持本值。
+    CCU_CHK_RET(AllocGoResource(ctx.moConfig, ctx.moRes, ctx.resourceAllocated, 2U, 8U));
+
     LoadNhr1DArgs(
         ctx, inputAddr, outputAddr, tokenInfo, die0Size, die1Size, outputSliceStride, goSize0, goSize1, goSize2,
         goSize3, axisId);
