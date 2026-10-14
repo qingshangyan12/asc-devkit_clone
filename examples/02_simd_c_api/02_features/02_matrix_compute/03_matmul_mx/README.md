@@ -2,13 +2,15 @@
 
 ## 概述
 
-本样例介绍如何基于C API，通过 L1/L0 双缓冲机制、大包搬运、细粒度流水同步等多种优化手段，实现一个高性能的 MxFP8 Matmul kernel。
+本样例介绍如何基于 C API，通过 L1/L0 [双缓冲（Double Buffer）](../../../../../docs/zh/guide/technical_appendix/concepts_and_terms/performance_optimization/double_buffer.md)、大包搬运、流水同步等优化手段，实现高性能的 MXFP8 Matmul 核函数。矩阵计算的基本流程参见[Cube矩阵计算编程](../../../../../docs/zh/guide/programming_guide/programming_model/ai_core_simd_programming/c_pointer_programming/cube_matrix_computation.md)。
 
 ## 本样例支持的产品及 CANN 软件版本
 
 | 产品 | CANN软件版本 |
 |------|-------------|
 | Ascend 950PR&950DT系列产品 | >= CANN 9.2.0 |
+
+本样例固定启动 32 个 Cube block，目标架构为 `dav-3510`。仅支持 NPU 上板运行，不支持 CPU 调试。接口及实现以本代码仓为准；CMake 优先引用仓内头文件，避免使用旧 CANN 包中的接口。
 
 ## 目录结构
 
@@ -26,23 +28,25 @@
 
 ## MX Matmul 介绍
 
+带有量化系数的矩阵乘加计算及其数据格式参见 [asc_mmad_mx](../../../../../docs/zh/api/SIMD-API/c_api/cube_compute/mmad_compute/asc_mmad_mx.md)。
+
 普通 Matmul 只有两路矩阵输入：
 
 $$
 C = A * B
 $$
 
-MxMatmul 在此基础上额外引入两路 scale 输入。A、B 为 MxFP8 低比特数据，scaleA、scaleB 为缩放因子。计算时，矩阵数据与对应 scale 共同参与运算：
+MX Matmul 在此基础上额外引入两路 scale 输入。A、B 为 MXFP8 低比特数据，scaleA、scaleB 为量化系数。计算时，矩阵数据与对应 scale 共同参与运算：
 
 $$
 C = (\text{scaleA} \otimes A) \times (\text{scaleB} \otimes B)
 $$
 
-在MxMatmul中，K 方向每 32 个元素共享一个 scale，计算时沿 K 方向广播到对应的一组 MxFP8 数据上。
+在MX Matmul中，K 方向每 32 个元素共享一个 scale，计算时沿 K 方向广播到对应的一组 MXFP8 数据上。
 
 ## 样例规格
 
-本样例实现固定 shape 为 `8192 x 8192 x 8192` 的 MxFP8 Matmul，输出数据类型为 `half`。
+本样例实现固定 shape 为 `8192 x 8192 x 8192` 的 MXFP8 Matmul，输出数据类型为 `half`。
 
 ### 输入输出
 
@@ -54,20 +58,22 @@ $$
 | scale_b | [8192, 256] | fp8_e8m0_t | ND |
 | C | [8192, 8192] | half | ND |
 
+A 和 B 在 GM 中分别按 `[M, K]`、`[N, K]` 行主序存储，B 是公式中逻辑右矩阵的转置；scale_a 和 scale_b 分别按 `[M, K/32]`、`[N, K/32]` 存储。每个 FP8 元素及量化系数占 1 字节。L0C 使用 float 累加，最后转换为 half 输出，首轮累加初始化为零。
+
 ### 关键参数
 
 | 代码参数 | 值 | 说明 |
 | --- | --- | --- |
-| matrix_m / matrix_n / matrix_k | 8192 / 8192 / 8192 | 完整逻辑 shape |
+| matrix_m / matrix_n / matrix_k | 8192 / 8192 / 8192 | 完整矩阵形状 |
 | tile_m / tile_n / tile_k | 256 / 256 / 128 | 一次 Cube 计算的 M/N/K 范围 |
 | core_m / core_n | 2048 / 1024 | 每个 block 的输出区域 |
 | num_blocks | 32 | 固定启动的 Cube block 数 |
-| k_rounds | 64 | 每个输出 tile 的 K 累加轮数 |
+| k_rounds | 64 | 每个输出分块 的 K 累加轮数 |
 | data_step | 2 | 一个 A/B 大包包含的基础 K 块数 |
 | data_k | 256 | 数据大包的逻辑 K 长度 |
 | scale_step | 8 | 一个 scale 大包覆盖的基础 K 块数 |
 | scale_chunk | 32 | 每行 scale 大包的字节数，对应逻辑 K=1024 |
-| l0_buffer_bytes | 32768 | L0A/B 单个 ping/pong slot 的字节数 |
+| l0_buffer_bytes | 32768 | L0A/B 单个 Ping/Pong 缓冲区 的字节数 |
 
 > **约束说明**：本样例未提供任意 shape 或尾块处理。
 
@@ -83,7 +89,7 @@ $$
 | load_to_l0 | 矩阵数据与 scale 数据从 L1 加载到 L0 |
 | compute_tile | 当前 K 块的 MX 矩阵乘累加 |
 | copy_result_to_gm | 计算结果搬出写回 GM |
-| process_tile | 组织首包、K 循环、预取和输出 |
+| process_tile | 组织首个大包、K 循环、预取和输出 |
 | matmul_mx | 分配片上存储，执行固定 32 核分工 |
 
 ### 数据流路径
@@ -95,7 +101,7 @@ $$
   |  copy_scale_to_l1            MTE2
   v
   L1
-  |                              
+  |
   |  load_to_l0                  MTE1
   v
   L0A / L0B / L0A_MX / L0B_MX
@@ -118,11 +124,11 @@ uint32_t m_start = block_idx % (matrix_m / core_m) * core_m;
 uint32_t n_start = block_idx / (matrix_m / core_m) * core_n;
 ```
 
-每核先遍历 N、再遍历 M，输出区域包含 `8×4=32` 个 256×256 tile。每个 tile 沿 K 执行 64 轮乘累加。32 个 block 恰好覆盖完整输出。
+每核先遍历 N、再遍历 M，输出区域包含 `8×4=32` 个 256×256 分块。每个分块 沿 K 执行 64 轮乘累加。32 个 block 恰好覆盖完整输出。
 
 #### 2. GM 到 L1：矩阵和 scale 按大包搬运
 
-`copy_data_to_l1` 对 A/B 分别执行 `asc_copy_gm2l1_nd2nz`。GM 行步长为 8192 字节，大包宽度为 256 个 FP8 元素，K 方向源偏移为 `k_idx*tile_k` 字节；A/B 目的 C0 stride 分别为 tile_m、tile_n。
+`copy_data_to_l1` 对 A/B 分别执行 [`asc_copy_gm2l1_nd2nz`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz.md)。GM 行步长为 8192 字节，大包宽度为 256 个 FP8 元素，K 方向源偏移为 `k_idx*tile_k` 字节；A/B 目的 C0 stride 分别为 tile_m、tile_n。
 
 ```cpp
 set_nz_config(tile_m);
@@ -131,7 +137,7 @@ asc_copy_gm2l1_nd2nz((__cbuf__ uint8_t*)a_l1,
     asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, tile_m, data_k, 0, false);
 ```
 
-`copy_scale_to_l1` 将两个相邻 E8M0 字节视为一个 b16 元素，使用 Dn2Nz 保证 MX 所需的排列格式：
+`copy_scale_to_l1` 将两个相邻 E8M0 字节视为一个 b16 元素，使用 [Dn2Nz](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md) 保证 MX 所需的排列格式：
 
 ```cpp
 set_nz_config(scale_chunk / 2);
@@ -140,15 +146,17 @@ asc_copy_gm2l1_dn2nz((__cbuf__ half*)scale_a_l1,
     asc_load_l2_cache_mode::NORMAL_FIRST_VICTIM, scale_chunk / 2, tile_m, 0, false);
 ```
 
-half 指针只是 16 位搬运视图，不进行数值转换；GM 行步长参数仍为字节数 `scale_k=256`，不能因为指针类型变化再除以 2。
+half 指针用于按 16 位数据搬运，不进行数值转换；GM 行步长参数仍为字节数 `scale_k=256`，不能因为指针类型变化再除以 2。
 
 #### 3. L1 到 L0：加载 FP8 数据及 MX scale
+
+量化系数加载的地址映射和参数单位参见 [asc_copy_l12l0a_mx](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0a_mx.md)。
 
 `load_to_l0` 通过 `asc_copy_l12l0a/b` 加载矩阵数据，通过 `asc_copy_l12l0a_mx/b_mx` 加载对应 scale。
 
 - FP8 数据分形的 K 长度为 32 元素，数据 `k_step=tile_k/32=4`。
 - MX scale 分形覆盖逻辑 K=64，scale `y_step=tile_k/64=2`，不能照搬数据的步长。
-- 数据在大包内偏移为 `data_offset*tile_k*tile_m/n` 字节。
+- 数据在大包内偏移为 A 的 `data_offset*tile_k*tile_m` 或 B 的 `data_offset*tile_k*tile_n` 字节。
 - scale 在大包内偏移为 `scale_offset_idx*(tile_k/32)*16` 字节；源 stride 为 `scale_chunk/2=16`，目的 stride 为 `tile_k/64=2`。
 - MX 目的地址为对应 L0A/B 数据地址除以 16。
 
@@ -173,17 +181,17 @@ asc_copy_l12l0b_mx((uint64_t)b_dst / 16, scale_b_l1 + scale_offset,
 
 | 层级 | 缓冲区 | 内容 | 作用 |
 |------|--------|------|------|
-| L1 | `A1 Ping/Pong` | A 的大包数据 | 存放 GM->L1 的 A 数据 |
-| L1 | `B1 Ping/Pong` | B 的大包数据 | 存放 GM->L1 的 B 数据 |
-| L1 | `scaleA1 Ping/Pong` | A 对应的 scale 数据 | 存放 A 侧 MXScale  |
-| L1 | `scaleB1 Ping/Pong` | B 对应的 scale 数据 | 存放 B 侧 MXScale  |
-| L0A | `A2 Ping/Pong` | 当前 K block 的 A 数据 | Cube 计算左操作数 |
-| L0B | `B2 Ping/Pong` | 当前 K block 的 B 数据 | Cube 计算右操作数 |
-| L0C | `cLocal` | float 累加结果 | 存放计算结果，供搬出指令写回 GM |
+| L1 | `a_l1 Ping/Pong` | A 的大包数据 | 存放 GM->L1 的 A 数据 |
+| L1 | `b_l1 Ping/Pong` | B 的大包数据 | 存放 GM->L1 的 B 数据 |
+| L1 | `scalea_l1 Ping/Pong` | A 对应的 scale 数据 | 存放 A 侧 量化系数  |
+| L1 | `scaleb_l1 Ping/Pong` | B 对应的 scale 数据 | 存放 B 侧 量化系数  |
+| L0A | `a_l0 Ping/Pong` | 当前 K 分块 的 A 数据 | Cube 计算左操作数 |
+| L0B | `b_l0 Ping/Pong` | 当前 K 分块 的 B 数据 | Cube 计算右操作数 |
+| L0C | `c_l0` | float 累加结果 | 存放计算结果，供搬出指令写回 GM |
 
-在 K 循环中，当前 K block 进入 Cube 计算时，下一批 A/B/scaleA/scaleB 可以提前发起搬运。Ping 和 Pong 交替使用，生产者和消费者通过事件同步确认缓冲区是否可写、数据是否可读。
+在 K 循环中，当前 K 分块 进入 Cube 计算时，下一批 A/B/scaleA/scaleB 可以提前发起搬运。Ping 和 Pong 交替使用，生产者和消费者通过事件同步确认缓冲区是否可写、数据是否可读。
 
-#### 5. Cube 计算：按 K block 累加
+#### 5. Cube 计算：按 K 分块 累加
 
 `compute_tile` 等待 L0 数据就绪，执行一次 256×128×256 的 MX 矩阵乘累加。第一轮初始化 C，后续轮继续累加：
 
@@ -192,11 +200,11 @@ asc_mmad_mx(c_l0, a_dst, b_dst, tile_m, tile_k, tile_n,
     asc_unit_flag_mode::DISABLE, false, false, k_idx == 0);
 ```
 
-每个输出 tile 共执行 64 次 MMAD；每轮计算后发出 M→MTE1 事件，允许后续复用该 L0 slot。
+每个输出分块 共执行 64 次 MMAD；每轮计算后发出 M→MTE1 事件，允许后续复用该 L0 缓冲区。
 
 #### 6. Fixpipe 写回：从 float 转换到 half 输出
 
-`copy_result_to_gm` 等待 Cube 完成，将 L0C 的 NZ 格式转换成行优先 ND，使用 `F322F16` 输出 half：
+`copy_result_to_gm` 等待 Cube 完成，将 L0C 的 NZ 格式转换成行优先 ND，使用 [`F322F16`](../../../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm.md) 输出 half：
 
 ```cpp
 asc_set_l0c_copy_nz_para(1, 0, 0);
@@ -207,9 +215,11 @@ asc_copy_l0c2gm(dst, c_l0, tile_n, tile_m, matrix_n, tile_m,
 
 目的行步长为 8192 个 half 元素，源 NZ stride 为 tile_m=256，输出地址为 `c+m*matrix_n+n`。
 
-写回后发出 FIX→M 事件，将等待推迟到下一 tile 的第一条 MMAD 前，让其 L1/L0 搬运可先发起，同时防止在 FIX 读取结束前覆盖 L0C。
+写回后发出 FIX→M 事件，将等待推迟到下一分块 的第一条 MMAD 前，让其 L1/L0 搬运可先发起，同时防止在 FIX 读取结束前覆盖 L0C。
 
 ### 事件同步：把流水并行起来
+
+使用 [asc_sync_notify / asc_sync_wait](../../../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md) 实现核内不同流水之间的同步控制。
 
 | 方向 | event ID | 含义 |
 | --- | --- | --- |
@@ -219,8 +229,8 @@ asc_copy_l0c2gm(dst, c_l0, tile_n, tile_m, matrix_n, tile_m,
 | MTE1→MTE2 | 2/3 | scale ping/pong 可覆盖 |
 | MTE1→M | 0/1 | L0 ping/pong 数据及 scale 就绪 |
 | M→MTE1 | 0/1 | Cube 已消费 L0 ping/pong |
-| M→FIX | 0 | 完整输出 tile 累加完成 |
-| FIX→M | 0 | L0C 可供下一输出 tile 复用 |
+| M→FIX | 0 | 完整输出分块 累加完成 |
+| FIX→M | 0 | L0C 可供下一输出分块 复用 |
 
 事件按流水方向独立使用。入口预置 MTE1→MTE2 的 0～3、M→MTE1 的 0/1 和 FIX→M 的 0，使首次写入不等待未发生的消费者。出口消费所有剩余反向事件，并执行 `asc_sync_pipe(PIPE_ALL)`。
 
@@ -230,8 +240,8 @@ asc_copy_l0c2gm(dst, c_l0, tile_n, tile_m, matrix_n, tile_m,
 
 - 固定 32 核、4×8 网格切分，每核计算完整 K，避免跨核归约。
 - A/B 数据按两个基础 K 块搬运，scale 按八个基础 K 块搬运，减少 MTE2 指令数。
-- 保持 256×256 输出 tile 提高输入复用；基础 K=128 使 FP8 适配 L0 双缓冲容量。
-- L1 数据、L1 scale、L0 各自使用 ping/pong 和明确的生命周期事件，交叠搬运和计算。
+- 保持 256×256 输出分块 提高输入复用；基础 K=128 使 FP8 适配 L0 双缓冲容量。
+- L1 数据、L1 scale、L0 各自使用 ping/pong 和明确的同步事件，交叠搬运和计算。
 - 推迟 L0C 复用等待，使下一输出块的输入预加载可与前一块写回交叠。
 
 ## 理论性能对比
@@ -274,7 +284,7 @@ $$E_{cube}=\frac{T_{mac,actual}-T_{cube}}{T_{cube}}\times100\%$$
 
 ### MTE2 带宽分析
 
-每个 A 行块参与 `N/tile_n=32` 个输出 tile，每个 B 行块参与 `M/tile_m=32` 个输出 tile，scale 具有相同复用次数。FP8 每元素为 1 字节，因此 GM→L1 总逻辑搬运量为：
+每个 A 行块参与 `N/tile_n=32` 个输出分块，每个 B 行块参与 `M/tile_m=32` 个输出分块，scale 具有相同复用次数。FP8 每元素为 1 字节，因此 GM→L1 总逻辑搬运量为：
 
 $$D_{total}=\frac{N}{tile_n}MK+\frac{M}{tile_m}NK+
 \frac{N}{tile_n}M\cdot scale_k+\frac{M}{tile_m}N\cdot scale_k$$
@@ -285,22 +295,20 @@ $$=2\ GiB+2\ GiB+64\ MiB+64\ MiB=4.125\ GiB=4,429,185,024\ B$$
 
 $$D_{input}=MK+NK+M\cdot scale_k+N\cdot scale_k=132\ MiB=138,412,032\ B$$
 
-若每个输入字节仅首次从 HBM 读取、后续全部命中 L2，则后续访问量为 `D_total-D_input=4,290,772,992 B`。沿用原样例的带宽假设——HBM 1.6 TB/s、L2 5 TB/s——可作理想化串行服务时间估算：
+若每个输入字节仅首次从 HBM 读取、后续全部命中 L2，则后续访问量为 `D_total-D_input=4,290,772,992 B`。沿用原样例的带宽假设——HBM 1.6 TB/s、L2 5 TB/s——可作理想情况下的搬运时间估算：
 
 $$T_{MTE2,model}=\frac{138,412,032}{1.6\times10^{12}}+
 \frac{4,290,772,992}{5\times10^{12}}\approx944.662\ \mu s$$
 
-容量采用二进制 MiB/GiB，带宽采用十进制 TB/s。带宽为模型假设，不能替代目标设备实测；HBM/L2 服务存在交叠，模型也未计入格式转换、指令和缓存冲突。4.125 GiB 是逻辑搬运量，不等于实际 HBM 流量。若按原样例假设的 128 MiB L2 容量，132 MiB 输入无法全部常驻；加上输出和其他流量，实际命中率需要由 profiler 验证。
+容量采用二进制 MiB/GiB，带宽采用十进制 TB/s。带宽为模型假设，不能替代目标设备实测；HBM 和 L2 数据传输可以交叠，模型也未计入格式转换、指令和缓存冲突。4.125 GiB 是逻辑搬运量，不等于实际 HBM 流量。若按原样例假设的 128 MiB L2 容量，132 MiB 输入无法全部常驻；加上输出和其他流量，实际命中率需要由 profiler 验证。
 
 实测 MTE2 数据暂留空，可在采集后与模型对照，并分析缓存复用与 ND/DN→NZ 转换开销。
 
 ## 编译运行
 
-### 样例执行
-
 在本样例根目录下执行如下步骤，编译并执行样例。
 
-> **注意事项**：本样例使用的 `ml_dtypes` 库需要版本 `0.2.0`，安装命令为
+> **注意事项**：本样例使用的 `ml_dtypes` 库需要版本 `0.2.0`，安装命令为：
 
 ```bash
 python3 -m pip install ml_dtypes==0.2.0

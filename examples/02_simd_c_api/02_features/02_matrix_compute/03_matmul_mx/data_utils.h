@@ -8,7 +8,6 @@
  * See LICENSE in the root of the software repository for the full text of the License.
  */
 
-
 #ifndef MATMUL_MX_DATA_UTILS_H
 #define MATMUL_MX_DATA_UTILS_H
 
