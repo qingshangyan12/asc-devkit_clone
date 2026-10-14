@@ -78,3 +78,12 @@ unsigned int __usad(unsigned int x, unsigned int y, unsigned int z)
         dst[idx] = __usad(x[idx], y[idx], z[idx]);
     }
     ```
+
+输入输出示例如下：
+
+```text
+x: 0, 12, 23, 70
+y: 5, 0, 15, 7
+z: 0, 5, 9, 3
+result: 5, 17, 17, 66
+```
