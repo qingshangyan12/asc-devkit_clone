@@ -107,7 +107,8 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 ```
 
 返回多个候选且无法确认已覆盖当前需求的全部适用接口时，会在候选列表后注明：
-“候选仅供参考，不代表全量接口。”
+
+> **候选仅供参考，不代表全量接口。**
 
 下面四张问答卡片来自实际检索与候选文档核对，按 **CANN 9.2.0 × 3510 × C API** 整理。
 卡片将候选压成表格，点击接口名即可打开对应文档。换版本或架构后，应重新检索，结果可能不同。
@@ -117,20 +118,18 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 **回答来源：** cannbot glm5.3（独立检索后经候选文档核对、整理）。
 
-**答：** 先看 `asc_copy_gm2ub`；需要非对齐填充或多维搬运时，再看对应候选。
+**答：** 先看 `asc_copy_gm2ub`；搬运长度不是 32 字节整数倍，或需要填充、多维搬运时，再看对应候选。
 
 **候选**
 
 | 接口与文档 | 用途与选择条件 |
 | --- | --- |
 | [asc_copy_gm2ub](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md) | GM→UB，支持连续搬运和高维切分搬运；目的 UB 地址须 32 字节对齐，长度非 32 字节整数倍时需要为 UB 侧补齐写入预留空间。 |
-| [asc_copy_gm2ub_align](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md) | 数据非对齐 GM→UB 搬运，可按原型与参数选择填充方式；手动填充、循环搬运等场景有配套配置接口。 |
+| [asc_copy_gm2ub_align](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md) | GM→UB，支持搬运长度不是 32 字节整数倍的数据，并补齐至 32 字节对齐；长度仍需满足数据类型的字节对齐要求，起始地址要求见参数说明。填充方式和循环搬运配置按所选原型与参数确定。 |
 | [asc_ndim_copy_gm2ub](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_gm2ub.md) | 最多 5 维、各维独立步长的 GM→UB 搬运，支持随路 Padding。 |
 
 以上接口仅在 AIV 上生效。具体选择还需确认数据类型、搬运维度、对齐和填充要求。
-与其他指令存在 UB 地址重叠时，要配合
-[asc_sync_notify](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md)、
-[asc_sync_wait](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md) 同步。
+如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../../docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
 
 </details>
 
@@ -150,12 +149,15 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 | [asc_float2e4m3_rn / asc_float2e4m3_rn_sat](../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md) | 将 float 转为 `fp8_e4m3fn_t`，分别对应非饱和与饱和形式。 |
 | [asc_float2e5m2_rn / asc_float2e5m2_rn_sat](../../../docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e5m2.md) | 将 float 转为 `fp8_e5m2_t`，分别对应非饱和与饱和形式。 |
 
-待确认目标 fp8 格式、饱和策略和结果布局。这些接口按位置标签选取源或目的元素，
-不能直接假定组合调用后得到连续打包的 fp8 数据；饱和配置使用按功能划分的
-[asc_set_saturation_strategy](../../../docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md) 和
-[asc_set_saturation_flag](../../../docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md)。
-按文档开启 `FLOAT8` 饱和前，需使用 `USE_GLOBAL` 策略并先开启 `FLOAT` 饱和；
-具体饱和或非饱和行为还需结合所选转换接口核对。
+分步转换前，需要确定目标 fp8 类型、是否采用饱和模式，以及结果的数据布局。
+`asc_half2float` 按位置标签读取源寄存器中的偶数或奇数位置，float→fp8 接口则按位置标签将结果写入目的寄存器中每隔 4 个元素的位置。
+因此，两步转换不会自动得到连续排列的 fp8 数据，需要根据目标布局处理位置选择和结果重排。
+
+如需配置全局饱和模式，使用
+[asc_set_saturation_strategy](../../../docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md) 选择策略，使用
+[asc_set_saturation_flag](../../../docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md) 设置对应模式的开关。
+开启 `FLOAT8` 饱和时，应先将策略设为 `USE_GLOBAL`，再依次开启 `FLOAT` 和 `FLOAT8` 饱和。
+转换时还需根据所选接口的文档，确认其饱和或非饱和形式与全局配置的生效条件。
 
 </details>
 
@@ -169,6 +171,8 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 
 **补充提问示例：** “asc_ndim_copy_gm2ub 要搭配什么接口一起用？”
 
+如果本指令与其他指令存在数据依赖，需要插入[同步指令](../../../docs/zh/api/SIMD-API/c_api/sync/system_sync_overview.md)，保证多个指令串行化，防止出现异常数据。
+
 **候选**
 
 | 配套接口与文档 | 何时使用 |
@@ -177,7 +181,8 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 | [asc_set_ndim_pad_count](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_count.md) | 配置 loop1 至 loop4 的左右填充数；loop0 填充数由搬运接口参数设置。 |
 | [asc_set_ndim_pad_value](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ndim_pad_value.md) | `padding_mode=true` 时，搬运前配置与数据类型一致的常数填充值。 |
 | [asc_ndim_copy_dci](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_ndim_copy_dci.md) | 多核可能读取同一 GM 地址，且数据可能被其他核更新时，搬运前刷新 NDDMA DataCache。 |
-| [asc_sync_notify](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md)、[asc_sync_wait](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md) | 与其他指令存在 UB 地址重叠时，配对同步以保证相关读写串行化。 |
+| [asc_lock](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_lock.md)、[asc_unlock](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_unlock.md) | 核内不同流水存在数据依赖时，3510 架构优先使用这组接口。每组调用须使用相同的 `pipe`、`mutex_id` 和 `mode`，先 lock 后 unlock，且相同 `mutex_id` 的组合不得嵌套。 |
+| [asc_sync_notify](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md)、[asc_sync_wait](../../../docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md) | 通过事件实现核内不同流水之间的同步时，配对发送和等待同一事件。 |
 
 配套关系有各自的触发条件，并非每次搬运都需要调用表中的全部接口。
 
@@ -201,7 +206,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 | [asc_copy_ub2gm](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md) | UB→GM。 |
 | [asc_copy_ub2l1](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2l1.md) | UB→L1。 |
 | [asc_copy_ub2ub](../../../docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2ub.md) | UB 内部搬运。 |
-| [asc_copy_gm2l1_align](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md) | GM→L1，支持非对齐搬运与填充。 |
+| [asc_copy_gm2l1_align](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md) | GM→L1，支持搬运长度不是 32 字节整数倍的数据，并补齐至 32 字节对齐；长度仍需满足数据类型的字节对齐要求，起始地址要求见参数说明。 |
 | [asc_copy_gm2l1_dn2nz](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_dn2nz.md) | GM→L1，并做 DN→Nz 格式转换。 |
 | [asc_copy_gm2l1_nd2nz](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_gm2l1_nd2nz_arch_3510.md) | GM→L1，并做 ND→Nz 格式转换。 |
 | [asc_copy_l0c2gm](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l0c2gm_arch_3510.md) | L0C→GM，可组合随路量化、激活与格式转换。 |
@@ -212,7 +217,7 @@ skill 会从安装软链定位原始 devkit 仓库，检查索引后返回候选
 | [asc_copy_l12l0b_trans](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_load/asc_copy_l12l0b_trans_arch_3510.md) | L1→L0B，并做二维分形转置。 |
 | [asc_copy_l12ub](../../../docs/zh/api/SIMD-API/c_api/cube_datamove/cube_compute_store/asc_copy_l12ub.md) | L1→UB。 |
 
-候选仅供参考，不代表全量接口。
+> **候选仅供参考，不代表全量接口。**
 
 此处按文档 `version` 区间精确匹配并筛去废弃接口；更早引入或标为 `>=9.2.0` 的接口不在这张表中。
 表中结果反映当前筛选条件下的文档标注，不代表已验证这些 3510 接口能在历史 CANN 9.1.0 环境运行。
