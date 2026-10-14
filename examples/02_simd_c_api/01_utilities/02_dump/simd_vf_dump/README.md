@@ -50,7 +50,7 @@
 
 - 调用实现
 
-  在`__global__ __vector__`核函数内使用`asc_vf_call<FuncName>()`调用simd_vf函数完成dump打印，随后通过`asc_add_scalar`执行计算并将结果写回GM。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写。
+  在`__global__ __vector__`核函数内使用`asc_vf_call`依次打印原始UB和寄存器数据，执行`x + 1.0f`后再打印修改后的UB，最后将结果写回GM。`asc_dump`属于C/C++ API共用的调试接口，模板参数仅用于指定打印数据类型。Host侧通过`ReadFile`/`WriteFile`完成二进制数据的读写。
 
 ## 编译运行
 

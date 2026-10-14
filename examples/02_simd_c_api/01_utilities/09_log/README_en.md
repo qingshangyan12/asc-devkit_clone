@@ -105,11 +105,10 @@ Run the following steps in the root directory of this example to build and execu
   ./demo
   ```
 
-  When using CPU debugging or NPU simulation mode, add the `-DCMAKE_ASC_RUN_MODE=cpu` or `-DCMAKE_ASC_RUN_MODE=sim` parameter.
+  For NPU simulation, add the `-DCMAKE_ASC_RUN_MODE=sim` parameter.
 
   Example:
   ```bash
-  cmake -DCMAKE_ASC_RUN_MODE=cpu -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # CPU debugging mode
   cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..;make -j; # NPU simulation mode
   ```
 
@@ -119,7 +118,7 @@ Run the following steps in the root directory of this example to build and execu
 
   | Option | Values | Description |
   |------|--------|------|
-  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `cpu`, `sim` | Run mode: NPU execution, CPU debugging, NPU simulation |
+  | `CMAKE_ASC_RUN_MODE` | `npu` (default), `sim` | Run mode: NPU execution or NPU simulation |
   | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU architecture: Ascend 950PR&950DT products |
 
 - Execution Result (NPU mode, using non-screen-output mode as an example; for file storage details, refer to [Ascend Log Function Reference](https://hiascend.com/document/redirect/CannCommunitylogref))

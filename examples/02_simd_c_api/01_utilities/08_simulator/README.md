@@ -72,11 +72,11 @@
 
   在本样例目录下执行如下命令。
   ```bash
-  mkdir -p build && cd build
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j
-  python3 ../scripts/gen_data.py
-  msopprof simulator --soc-version=<soc_version> ./demo
-  python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin
+  cmake -S . -B build -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510
+  cmake --build build -j
+  python3 scripts/gen_data.py
+  msopprof simulator --soc-version=<soc_version> ./build/demo
+  python3 scripts/verify_result.py ./output/output.bin ./output/golden.bin
   ```
 
   本迁移样例仅以`dav-3510`为目标；运行仿真时需将`<soc_version>`替换为实际设备的型号。
@@ -94,10 +94,10 @@
 
 ## 仿真调优
 
-基于`./demo`可通过`msopprof simulator`进行仿真性能分析，生成可视化的指令流水图等信息，指令如下：
+基于`./build/demo`可通过`msopprof simulator`进行仿真性能分析，生成可视化的指令流水图等信息，指令如下：
 
 ```bash
-msopprof simulator --soc-version=<soc_version> ./demo
+msopprof simulator --soc-version=<soc_version> ./build/demo
 ```
 
 > AI处理器的型号`<soc_version>`请通过如下方式获取：

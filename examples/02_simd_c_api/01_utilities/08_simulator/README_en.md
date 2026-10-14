@@ -71,11 +71,11 @@ Perform the following steps in the root directory of this sample to compile and 
 
   Execute the following command in this sample directory.
   ```bash
-  mkdir -p build && cd build
-  cmake -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510 ..; make -j
-  python3 ../scripts/gen_data.py
-  msopprof simulator --soc-version=<soc_version> ./demo
-  python3 ../scripts/verify_result.py ./output/output.bin ./output/golden.bin
+  cmake -S . -B build -DCMAKE_ASC_RUN_MODE=sim -DCMAKE_ASC_ARCHITECTURES=dav-3510
+  cmake --build build -j
+  python3 scripts/gen_data.py
+  msopprof simulator --soc-version=<soc_version> ./build/demo
+  python3 scripts/verify_result.py ./output/output.bin ./output/golden.bin
   ```
 
   This port targets only `dav-3510`. Replace `<soc_version>` with the actual device model when running the simulator.
@@ -93,10 +93,10 @@ Perform the following steps in the root directory of this sample to compile and 
 
 ## Simulation tuning
 
-Based on `./demo`, simulation performance analysis can be performed through `msopprof simulator` to generate visual instruction flow chart and other information. The instructions are as follows:
+Based on `./build/demo`, simulation performance analysis can be performed through `msopprof simulator` to generate visual instruction flow chart and other information. The instructions are as follows:
 
 ```bash
-msopprof simulator --soc-version=<soc_version> ./demo
+msopprof simulator --soc-version=<soc_version> ./build/demo
 ```
 
 > Please obtain the AI ​​processor model `<soc_version>` through the following methods:

@@ -49,7 +49,7 @@ This example introduces the usage of the asc_dump series APIs on the simd_vf sid
 
 - Invocation implementation
 
-  Use `asc_vf_call<FuncName>()` inside the `__global__ __vector__` kernel function to call simd_vf functions for dump printing, then perform computation through `asc_add_scalar` and write results back to GM. The host side reads and writes binary data through `ReadFile`/`WriteFile`.
+  Use `asc_vf_call` inside the `__global__ __vector__` kernel to print the original UB and register data. After computing `x + 1.0f`, dump the modified UB, then write the result to GM. `asc_dump` is a debugging utility shared by the C and C++ API examples; its template parameter specifies the printed data type. The host reads and writes binary data through `ReadFile`/`WriteFile`.
 
 ## Build and Run
 
