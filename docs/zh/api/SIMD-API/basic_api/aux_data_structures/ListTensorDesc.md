@@ -70,24 +70,6 @@ class ListTensorDesc {
 | GetDataPtr | index：索引值 | 根据index获取储存对应数据的地址。 |
 | GetSize | - | 获取ListTensor中包含的数据指针的个数。 |
 
-GetDesc的产品支持情况如下：
-
-<!-- npu="310p" id8 -->
-- Atlas推理系列产品AI Core：支持
-<!-- end id8 -->
-<!-- npu="910" id9 -->
-- Atlas训练系列产品：不支持
-<!-- end id9 -->
-<!-- npu="910b" id10 -->
-- Atlas A2系列产品：支持
-<!-- end id10 -->
-<!-- npu="A3" id11 -->
-- Atlas A3系列产品：支持
-<!-- end id11 -->
-<!-- npu="310b" id12 -->
-- Atlas 200I/500 A2推理产品：不支持
-<!-- end id12 -->
-
 ## 调用示例<a name="section1742652412511"></a>
 
 示例中待解析的srcGm内存排布如下图所示：
