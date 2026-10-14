@@ -118,6 +118,15 @@ __simd_vf__ inline void compile_reg_local_tensor_broadcast(__ubuf__ float* src)
     value.with_mask(asc::te::experimental::all_mask<float>());
 }
 
+template <typename DataType, typename IndexDataType>
+__simd_vf__ inline void compile_reg_register_gather(vector_bool mask)
+{
+    asc::te::experimental::reg_tensor<DataType> src {mask};
+    asc::te::experimental::reg_tensor<IndexDataType> index {mask};
+    auto value = asc::te::experimental::gather(src, index);
+    static_assert(AscendC::Std::is_same_v<decltype(value), asc::te::experimental::reg_tensor<DataType>>);
+}
+
 template <asc::te::experimental::store_sideband_mode sideband_mode>
 __simd_vf__ inline void compile_reg_local_tensor_store_mode(__ubuf__ uint32_t* dst, vector_bool mask)
 {
@@ -303,6 +312,13 @@ TEST(tensor_api_reg_tensor_3510, holds_register_and_mask)
     (void)compile_broadcast_elem;
     (void)compile_broadcast_datablock;
     (void)compile_broadcast_elem2datablock;
+
+    auto compile_gather_reg_b8 = &compile_reg_register_gather<int8_t, uint8_t>;
+    auto compile_gather_reg_b16 = &compile_reg_register_gather<half, uint16_t>;
+    auto compile_gather_reg_b32 = &compile_reg_register_gather<uint32_t, uint32_t>;
+    (void)compile_gather_reg_b8;
+    (void)compile_gather_reg_b16;
+    (void)compile_gather_reg_b32;
 
     auto compile_store_direct =
         &compile_reg_local_tensor_store_mode<asc::te::experimental::store_sideband_mode::direct>;
