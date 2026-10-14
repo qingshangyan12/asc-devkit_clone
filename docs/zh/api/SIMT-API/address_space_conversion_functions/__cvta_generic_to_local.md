@@ -77,3 +77,13 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_local(uint32_t* 
     }
 }
 ```
+
+输入输出示例如下：
+
+```text
+src: 11, 22, 33, 44
+栈(local_data)的偏移量为：1144
+栈(local_data)的偏移量为：1144
+栈(local_data)的偏移量为：1144
+栈(local_data)的偏移量为：1144
+```

@@ -73,3 +73,10 @@ __global__ __launch_bounds__(1024) void kernel__cvta_local_to_generic(uint32_t* 
     dst[idx] = ptr[0];
 }
 ```
+
+输入输出示例如下：
+
+```text
+addr_val: 1144(指向数据11), 1144(指向数据22), 1144(指向数据33), 1144(指向数据44)
+result: 11, 22, 33, 44
+```

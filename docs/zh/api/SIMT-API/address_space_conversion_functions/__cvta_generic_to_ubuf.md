@@ -77,3 +77,13 @@ __global__ __launch_bounds__(1024) void kernel__cvta_generic_to_ubuf(uint32_t* s
     printf("UB(ubuf_data)的地址值为：%lu\n", addr_val);
 }
 ```
+
+输入输出示例如下：
+
+```text
+src: 11, 22, 33, 44
+UB(ubuf_data)的地址值为：0
+UB(ubuf_data)的地址值为：4
+UB(ubuf_data)的地址值为：8
+UB(ubuf_data)的地址值为：12
+```
