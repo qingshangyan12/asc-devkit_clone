@@ -1,3 +1,3 @@
 # 核间通信
 
-本文件为文档发布时所需的索引文件。
+- [使用SSBuffer实现核间通信](./ssbuffer_inter_core_memory_feature.md)
