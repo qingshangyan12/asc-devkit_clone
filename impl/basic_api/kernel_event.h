@@ -690,7 +690,7 @@ __aicore__ constexpr HardEvent GetQueEvt(
         ASSERT(dst == Hardware::GM || dst == Hardware::UB);
 #elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3102))
         ASSERT(dst == Hardware::GM || dst == Hardware::UB);
-#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113))
+#elif defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101))
         ASSERT(dst == Hardware::GM || dst == Hardware::UB || dst == Hardware::L1);
 #endif
         return fwdDirect ? HardEvent::M_FIX : HardEvent::FIX_M;

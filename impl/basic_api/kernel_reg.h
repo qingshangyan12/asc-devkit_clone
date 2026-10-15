@@ -148,7 +148,7 @@ __aicore__ inline void DcciGMImpl(__gm__ T* dst)
 
 __aicore__ inline void SetMaskCountImpl()
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101))
     constexpr uint32_t CTRL_COUNTER = 56;
     set_ctrl(sbitset1(get_ctrl(), CTRL_COUNTER));
 #else
@@ -158,7 +158,7 @@ __aicore__ inline void SetMaskCountImpl()
 
 __aicore__ inline void SetMaskNormImpl()
 {
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3113)
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101))
     constexpr uint32_t CTRL_COUNTER = 56;
     set_ctrl(sbitset0(get_ctrl(), CTRL_COUNTER));
 #else
