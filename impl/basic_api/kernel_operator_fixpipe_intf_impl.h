@@ -88,9 +88,9 @@ __aicore__ inline void SetFixPipeConfig(const LocalTensor<T>& preData, bool isUn
     SetFixPipeConfigImpl<T, setRelu>(preData, isUnitFlag);
 }
 
-#if defined(__NPU_ARCH__) &&                                                                         \
-    (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || \
-     __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || __NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5101 || \
+                              __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163 || \
+                              __NPU_ARCH__ == 5162 || __NPU_ARCH__ == 9201 || __NPU_ARCH__ == 9202)
 __aicore__ inline void SetFixpipeNz2ndFlag(uint16_t ndNum, uint16_t srcNdStride, uint32_t dstNdStride)
 {
     SetFixpipeNz2ndFlagImpl(ndNum, srcNdStride, dstNdStride);
