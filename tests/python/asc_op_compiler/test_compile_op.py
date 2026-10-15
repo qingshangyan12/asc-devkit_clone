@@ -20,6 +20,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import struct
 from collections import namedtuple
 from contextlib import ExitStack
 
@@ -2372,6 +2373,83 @@ class TestCompileOp(unittest.TestCase):
             with buildcfg.build_config() as cfg:
                 cfg.current()["tir.op_debug_config"] = ["oom"]
                 _gen_compile_cmd(src_file, dst_file, compile_option_tuple, tiling_file)
+
+    def test_runtime_parameter_metadata_matches_kernel_signature(self):
+        # Runtime reads little-endian type 16/17 TLVs from the function section.
+        for soc, is_mix, static_shape, expected_count in (
+            ("Ascend910B", False, False, 6),
+            ("Ascend910B", True, False, 7),
+            ("Ascend910B", False, True, 5),
+            ("Ascend310P", False, False, 7),
+            ("Ascend950", True, False, 6),
+            ("Ascend960DT", True, False, 6),
+            ("Ascend960PR", True, False, 6),
+        ):
+            with self.subTest(soc=soc, mix=is_mix, static=static_shape):
+                global_var_storage.set_variable("ascendc_short_soc_version", soc)
+                global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+                global_var_storage.set_variable("ascendc_tiling_no_register", True)
+                op_info = OpInfo(
+                    kernel_name="TestKernel",
+                    op_type="TestOp",
+                    inputs=[None, {"param_name": "x"}],
+                    outputs=[{"param_name": "y"}],
+                    origin_inputs=[],
+                    mc2_ctx=["ctx"],
+                    param_type_list=["optional", "required", "required"],
+                    output_shape_depend_on_compute=[0],
+                )
+                tiling_info = TilingInfo()
+                tiling_info.static_shape_flag = static_shape
+                tiling_info.static_workspace_size = -1
+                generator = DFXSectionGenerator()
+                generator.dfx_info_reset(op_info)
+                declaration, _, _, _ = _gen_kernel_func_declare_head(is_mix, False, op_info, tiling_info)
+                self.assertEqual(declaration.count("GM_ADDR"), expected_count)
+                for dfx_supported in (True, False):
+                    generator.is_support = dfx_supported
+                    source = generator.generate_dfx_section("0", tiling_info, "TestKernel", CompileInfo())
+                    match = re.search(r"TestKernel_param_section[^=]*=\s*\{([^}]+)\}", source)
+                    self.assertIsNotNone(match, source)
+                    data = bytes(int(value.strip()) for value in match.group(1).split(",") if value.strip())
+                    self.assertEqual(struct.unpack_from("<HHIQ", data), (16, 12, expected_count, expected_count * 8))
+                    self.assertEqual(len(data), 16 + expected_count * 40)
+                    for index in range(expected_count):
+                        info = struct.unpack_from("<HHIIIIHHIIII", data, 16 + index * 40)
+                        self.assertEqual(info, (17, 36, index, index, index * 8, 8, 8, 2, 0, 0, 0, 0))
+
+    def test_runtime_parameter_metadata_group_keys_and_reset(self):
+        global_var_storage.set_variable("ascendc_short_soc_version", "Ascend910B")
+        global_var_storage.set_variable("ascendc_enable_super_kernel", False)
+        global_var_storage.set_variable("ascendc_tiling_no_register", True)
+        op_info = OpInfo(
+            kernel_name="TestKernel",
+            op_type="TestOp",
+            inputs=[],
+            outputs=[],
+            origin_inputs=[],
+            mc2_ctx=[],
+            param_type_list=[],
+        )
+        tiling_info = TilingInfo()
+        tiling_info.static_shape_flag = True
+        generator = DFXSectionGenerator()
+        generator.dfx_info_reset(op_info)
+        _gen_kernel_func_declare_head(False, False, op_info, tiling_info)
+        compile_info = CompileInfo()
+        compile_info.kernel_name = "TestKernel"
+        compile_info.tiling_key_group_map = {"0": ["1"]}
+        compile_info.tiling_key_kernel_type = {"1": KernelMetaType.KERNEL_TYPE_AIV_ONLY}
+        source = generator.generate_dfx_section("0", tiling_info, "TestKernel_0", compile_info)
+        for key in ("0", "1"):
+            self.assertEqual(source.count(f"TestKernel_{key}_param_section[]"), 1)
+            self.assertIn(f'section(".ascend.meta.TestKernel_{key}")', source)
+        generator.dfx_info_reset(op_info)
+        self.assertEqual(generator.generate_param_section("TestKernel"), "")
+        global_var_storage.set_variable("ascendc_enable_super_kernel", True)
+        with mock.patch.object(compile_op_module, "get_context", return_value=None):
+            _gen_kernel_func_declare_head(False, False, op_info, tiling_info)
+        self.assertEqual(generator.generate_param_section("TestKernel"), "")
 
     def test_gen_kernel_func_declare_head(self):
         kernel_func_desc = ""
