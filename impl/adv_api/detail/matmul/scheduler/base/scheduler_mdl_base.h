@@ -353,7 +353,7 @@ protected:
         }
     }
 
-    __aicore__ inline constexpr bool IsMDLKFullLoad()
+    __aicore__ inline bool IsMDLKFullLoad()
     {
         if constexpr (IsStaticTilingEnable(MM_CFG)) {
             const auto& tiling = MATMUL_MODULE(MatmulShapeTiling)->GetTiling();
