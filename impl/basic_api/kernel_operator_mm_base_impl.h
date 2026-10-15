@@ -266,7 +266,8 @@ __aicore__ inline void LoadDataImpl(
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <
     typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
     typename std::enable_if<IsSameType<PrimT<T>, U>::value, bool>::type = true>
@@ -366,7 +367,8 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadDataImpl(
 }
 #endif
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <TPosition Dst, TPosition Src, typename T>
 __aicore__ inline void LoadDataImpl(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const Load3DBitModeParam& loadDataParams)
@@ -837,7 +839,8 @@ __aicore__ inline void SetFmatrixImpl(
     }
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline void SetFmatrixImpl(const SetFMatrixBitModeParams& param, const FmatrixMode& fmatrixMode)
 {
     if (fmatrixMode == FmatrixMode::FMATRIX_LEFT) {
@@ -866,7 +869,8 @@ __aicore__ inline void SetLoadDataRepeatImpl(const LoadDataRepeatParam& repeatPa
     SetLoadDataRepeatCal(repeatParams);
 }
 
-#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || \
+                              (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 __aicore__ inline void SetLoadDataRepeatWithStrideImpl(const LoadDataRepeatParamWithStride& repeatParams)
 {
     SetLoadDataRepeatWithStrideCal(repeatParams);
