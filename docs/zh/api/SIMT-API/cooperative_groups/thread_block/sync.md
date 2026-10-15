@@ -78,3 +78,9 @@ static void sync()
         ...
     }
     ```
+
+输入输出示例如下：<a name="io-example"></a>
+
+```text
+无
+```
