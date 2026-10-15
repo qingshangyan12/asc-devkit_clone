@@ -118,3 +118,9 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3
+```
