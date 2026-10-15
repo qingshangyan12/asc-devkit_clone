@@ -452,6 +452,22 @@ __aicore__ inline void SetLoadDataBoundaryCal(uint32_t boundaryValue)
 {
     ASCENDC_ASSERT(false, { KERNEL_LOG(KERNEL_ERROR, "unsupported SetLoadDataBoundary!"); });
 }
+
+template <typename T>
+__aicore__ inline void Load3DSetPaddingCal(const T padValue)
+{
+    uint16_t paddingValue = 0;
+    uint16_t padValueShiftBit = 8;
+
+    if constexpr (sizeof(T) == B16_BYTE_SIZE) {
+        paddingValue = (uint16_t)GetScalarBitcodeValue((T)padValue);
+    } else if constexpr (sizeof(T) == B32_BYTE_SIZE) {
+        paddingValue = (uint32_t)GetScalarBitcodeValue((T)padValue);
+    } else {
+        paddingValue = (((uint16_t)padValue) << padValueShiftBit) | (uint16_t)padValue;
+    }
+    set_padding(paddingValue);
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_MM_IMPL_H__)

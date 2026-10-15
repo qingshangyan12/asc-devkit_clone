@@ -220,6 +220,156 @@ __aicore__ inline void AxpyImpl(__ubuf__ T* dst, __ubuf__ U* src, const U& scala
         Internal::VecAxpyLevel2ImplTemplate<func, T>(dst, src, scalarValue, calCount);
     }
 }
+
+namespace Internal {
+template <auto func, typename T, typename U, typename RegT, typename RegU>
+__simd_vf__ inline void VecAxpyLevel2VFImpl(__ubuf__ T* dst, __ubuf__ U* src, U scalarValue, const uint32_t calCount)
+{
+    RegU srcReg;
+    RegT dstReg;
+    uint32_t count = static_cast<uint32_t>(calCount);
+    Reg::MaskReg mask;
+    constexpr uint32_t repeatStride = static_cast<uint32_t>(GetVecLen() / sizeof(T) * RegT::trait.REG_NUM);
+    uint16_t repeatTime = static_cast<uint16_t>(CeilDivision(calCount, repeatStride));
+    for (uint16_t i = 0; i < repeatTime; ++i) {
+        mask = Reg::UpdateMask<T, RegT::trait>(count);
+        Reg::LoadAlign(srcReg, src + i * repeatStride);
+        Reg::LoadAlign(dstReg, dst + i * repeatStride);
+        func(dstReg, srcReg, scalarValue, mask);
+        Reg::StoreAlign(dst + i * repeatStride, dstReg, mask);
+    }
+}
+
+template <auto func, typename T, typename U>
+__aicore__ inline void VecAxpyLevel2ImplTemplate(
+    __ubuf__ T* dst, __ubuf__ U* src, U scalarValue, const uint32_t calCount)
+{
+    if constexpr (SupportBytes<T, 8>()) {
+        VecAxpyLevel2VFImpl<func, T, U, Reg::RegTensor<T, Reg::RegTraitNumTwo>, Reg::RegTensor<U, Reg::RegTraitNumTwo>>(
+            dst, src, scalarValue, calCount);
+    } else {
+        VecAxpyLevel2VFImpl<func, T, U, Reg::RegTensor<T>, Reg::RegTensor<U>>(dst, src, scalarValue, calCount);
+    }
+}
+
+/*
+ * T: data type
+ * func: Reg input/output function
+ * isSetMask: basic api whether to set mask
+ * isNormalMode: true: NormalMode, false: CounterMode
+ * isMaskBitMode: true: mask bit mode, false: mask count mode
+ */
+template <auto func, bool isSetMask, bool isMaskBitMode, bool isNormalMode, typename T, typename U>
+__simd_vf__ inline void VecAxpyVFImpl(
+    __ubuf__ T* dst, __ubuf__ U* src, U scalarValue, const BasicAPIMaskStruct maskArrayStruct, const uint64_t maskCount,
+    const uint8_t repeatTime, const UnaryRepeatParams repeatParams, __ubuf__ uint64_t* maskBuf)
+{
+    uint32_t count =
+        VecMicroGetCount<isSetMask, isNormalMode, isMaskBitMode>(maskArrayStruct.maskArray, maskCount, maskBuf);
+    uint16_t newRepeatTimes = 0;
+    constexpr bool TUCompare = sizeof(T) > sizeof(U);
+    using TT = typename Conditional<TUCompare, T, U>::type;
+    newRepeatTimes = VecMicroGetRepeatTimes<TT, isNormalMode>(count, repeatTime);
+    Reg::MaskReg maskReg;
+    Reg::MaskReg maskRegDst;
+    Reg::MaskReg maskRegSrc;
+    if constexpr (isNormalMode) {
+        maskReg = VecMicroGetMaskReg<TT, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
+        maskRegSrc = maskReg;
+        maskRegDst = maskReg;
+        if constexpr (sizeof(U) == 2 * sizeof(T)) {
+            Reg::MaskPack(maskRegDst, maskReg);
+        } else if constexpr (sizeof(T) == 2 * sizeof(U)) {
+            Reg::MaskPack(maskRegSrc, maskReg);
+        }
+    }
+    constexpr uint8_t ElePerBlkT = GetDataBlockSizeInBytes() / sizeof(T);
+    constexpr uint8_t ElePerBlkU = GetDataBlockSizeInBytes() / sizeof(U);
+    for (uint16_t index = 0; index < newRepeatTimes; ++index) {
+        if constexpr (!isNormalMode) {
+            maskReg = VecMicroGetMaskReg<TT, isSetMask, isNormalMode, isMaskBitMode>(maskBuf, count);
+            maskRegSrc = maskReg;
+            maskRegDst = maskReg;
+            if constexpr (sizeof(U) == 2 * sizeof(T)) {
+                Reg::MaskPack(maskRegDst, maskReg);
+            } else if constexpr (sizeof(T) == 2 * sizeof(U)) {
+                Reg::MaskPack(maskRegSrc, maskReg);
+            }
+        }
+        Reg::RegTensor<T> dstVreg;
+        Reg::RegTensor<U> srcVreg;
+#ifndef NO_OVERLAP_IN_MULTI_REPEAT
+        Reg::LocalMemBar<Reg::MemType::VEC_STORE, Reg::MemType::VEC_LOAD>();
+#endif
+        Reg::LoadAlign<U, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            srcVreg, src + index * repeatParams.srcRepStride * ElePerBlkU, repeatParams.srcBlkStride, maskRegSrc);
+
+        Reg::LoadAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            dstVreg, dst + index * repeatParams.dstRepStride * ElePerBlkT, repeatParams.dstBlkStride, maskRegDst);
+        func(dstVreg, srcVreg, scalarValue, maskReg);
+        Reg::StoreAlign<T, Reg::DataCopyMode::DATA_BLOCK_COPY>(
+            dst + index * repeatParams.dstRepStride * ElePerBlkT, dstVreg, repeatParams.dstBlkStride, maskRegDst);
+    }
+}
+
+template <auto func, bool isSetMask, bool isMaskBitMode, typename T, typename U>
+__aicore__ inline void VecAxpyImplTemplate(
+    __ubuf__ T* dst, __ubuf__ U* src, U scalarValue, const uint64_t maskArray[], const uint64_t maskCount,
+    const uint8_t repeatTime, const UnaryRepeatParams& repeatParams)
+{
+    constexpr bool TUCompare = sizeof(T) > sizeof(U);
+    using TT = typename Conditional<TUCompare, T, U>::type;
+    BasicAPIMaskStruct maskArrayStruct;
+    if constexpr (isMaskBitMode) {
+        ASCENDC_ASSERT(maskCount == 0, "maskCount must be 0 when isMaskBitMode is true.");
+        maskArrayStruct = *(reinterpret_cast<const BasicAPIMaskStruct*>(maskArray));
+    } else {
+        ASCENDC_ASSERT(maskArray == nullptr, "maskArray must be nullptr when isMaskBitMode is false.");
+    }
+    __ubuf__ uint64_t* maskBuf = nullptr;
+
+    if (Internal::IsCounterMode()) {
+        if constexpr (!isSetMask) {
+            maskBuf =
+                AscendCUtils::GetTemporaryBufferAddr<uint64_t>(GetRuntimeUBSize(), 2); // maskReg 256bit PK-> 128bit
+        }
+        VecAxpyVFImpl<func, isSetMask, isMaskBitMode, false, T, U>(
+            dst, src, scalarValue, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
+        if constexpr (!isSetMask) {
+            AscendCUtils::FreeTemporaryBuffer<uint64_t>(maskBuf);
+        }
+    } else {
+        if constexpr (isMaskBitMode && isSetMask) {
+            SetVectorMask<TT>(maskArray[1], maskArray[0]); // set mask to SPR.MASK, movp in VF
+        }
+        VecAxpyVFImpl<func, isSetMask, isMaskBitMode, true, T, U>(
+            dst, src, scalarValue, maskArrayStruct, maskCount, repeatTime, repeatParams, maskBuf);
+    }
+}
+} // namespace Internal
+namespace RegAxpy {
+namespace CastParam {
+constexpr Reg::CastTrait half2floatTrait = {
+    Reg::RegLayout::ZERO, Reg::SatMode::UNKNOWN, Reg::MaskMergeMode::ZEROING, RoundMode::UNKNOWN};
+}
+template <typename T, typename U, typename RegT, typename RegU>
+__simd_callee__ inline void Axpy(RegT& dstReg, RegU& srcReg, U scalarValue, Reg::MaskReg& mask)
+{
+    if constexpr (SupportType<
+                      Tuple<T, U>, Tuple<half, half>, Tuple<float, float>, Tuple<uint64_t, uint64_t>,
+                      Tuple<int64_t, int64_t>>()) {
+        Reg::Axpy(dstReg, srcReg, scalarValue, mask);
+    } else if constexpr (SupportType<Tuple<T, U>, Tuple<float, half>>()) {
+        RegU tmpReg;
+        RegT cvtReg;
+        Reg::UnPack<uint32_t, uint16_t, AscendC::Reg::HighLowPart::LOWEST>(
+            (Reg::RegTensor<uint32_t>&)tmpReg, (Reg::RegTensor<uint16_t>&)srcReg);
+        Reg::Cast<float, half, CastParam::half2floatTrait>(cvtReg, tmpReg, mask);
+        Reg::Muls(cvtReg, cvtReg, static_cast<T>(scalarValue), mask);
+        Reg::Add(dstReg, cvtReg, dstReg, mask);
+    }
+}
+} // namespace RegAxpy
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_VEC_TERNARY_SCALAR_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_VEC_TERNARY_SCALAR_IMPL_H__)
