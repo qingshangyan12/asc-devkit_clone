@@ -55,13 +55,12 @@ unsigned int meta_group_rank() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(unsigned int* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         unsigned int group_rank = tile4.meta_group_rank();
-        ...
+        result[threadIdx.x] = group_rank;
     }
     ```
 
@@ -71,12 +70,17 @@ unsigned int meta_group_rank() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ unsigned int* result)
     {
-        ...
         thread_block block = this_thread_block();
         auto tile4 = tiled_partition<4>(block);
         unsigned int group_rank = tile4.meta_group_rank();
-        ...
+        result[threadIdx.x] = group_rank;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7
+```
