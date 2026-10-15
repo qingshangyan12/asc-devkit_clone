@@ -93,6 +93,7 @@ SOC_TO_SHORT_SOC_MAP = {
     "ascend960pr_963a1": "ascend960PR",
     "ascend960pr_969a1": "ascend960PR",
     "ascend960pr_964a1": "ascend960PR",
+    "ascend310n": "ascend310n",
 }
 CONFLICT_KEYWORDS = {
     "and",
