@@ -77,4 +77,12 @@ static dim3 group_dim()
         dim3 block_dim = g.group_dim();
         ...
     }
+
+返回的dim3按(x, y, z)格式显示。
+
+输入输出示例如下：
+
+```text
+result: (1, 1, 1)
+```
     ```
