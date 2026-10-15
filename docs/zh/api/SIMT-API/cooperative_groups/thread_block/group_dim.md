@@ -77,4 +77,10 @@ static dim3 group_dim()
         dim3 block_dim = g.group_dim();
         ...
     }
+
+输入输出示例如下：
+
+```text
+result: dim3(1,1,1)
+```
     ```
