@@ -395,6 +395,7 @@ REGISTER_TILING_DEFAULT"
             and not CommonUtility.is_l311()
             and not CommonUtility.is_l510()
             and not CommonUtility.is_l516()
+            and not CommonUtility.is_516r2()
         )
         tiling_no_register_flag = False
         try:

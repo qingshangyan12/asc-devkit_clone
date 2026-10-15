@@ -41,7 +41,7 @@
 #elif __NPU_ARCH__ == 3003
 #include "dav_l300/kernel_operator_vec_bilinearinterpolation_impl.h"
 #elif (__NPU_ARCH__ == 5162)
-#include "dav_v516/kernel_operator_vec_bilinearinterpolation_impl.h"
+#include "dav_5162/kernel_operator_vec_bilinearinterpolation_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_bilinearinterpolation_impl.h"
 #endif

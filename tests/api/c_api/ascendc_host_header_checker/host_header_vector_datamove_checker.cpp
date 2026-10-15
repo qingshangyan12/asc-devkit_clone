@@ -25,10 +25,8 @@ static void test_host_c_api_vector_datamove_0()
     using ::asc_copy_ub2l1_sync;
     using ::asc_copy_ub2ub;
     using ::asc_copy_ub2ub_sync;
-    using ::asc_gather_gm2ub;
     using ::asc_ndim_copy_dci;
     using ::asc_ndim_copy_gm2ub;
-    using ::asc_scatter_ub2gm;
     using ::asc_set_copy_pad_val;
     using ::asc_set_gm2ub_loop1_stride;
     using ::asc_set_gm2ub_loop2_stride;
@@ -45,3 +43,11 @@ static void test_host_c_api_vector_datamove_0()
     using ::asc_set_ub2gm_loop2_stride;
     using ::asc_set_ub2gm_loop_size;
 }
+
+#if (ASC_DEVKIT_VERSION_NUM >= 90200000)
+static void test_host_c_api_vector_datamove_1()
+{
+    using ::asc_gather_gm2ub;
+    using ::asc_scatter_ub2gm;
+}
+#endif

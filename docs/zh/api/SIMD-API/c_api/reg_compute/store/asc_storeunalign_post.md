@@ -115,7 +115,7 @@ __simd_callee__ inline void asc_storeunalign_post(__ubuf__ uint8_t* dst,
 - 需要保证目的操作数的地址加上`offset`对应的偏移地址，访问范围须位于实际可用UB范围内。
 - 该接口中的目的地址不需要32B对齐，但数据类型为`dtype`的`dst`需要`sizeof(dtype)`字节对齐。
 - UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址不可超过实际可用容量，否则会报错。
-- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在数据依赖，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。
 
 ### 立即数偏移搬出模式
 

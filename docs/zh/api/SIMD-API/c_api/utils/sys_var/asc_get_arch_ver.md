@@ -65,7 +65,7 @@ PIPE_S
 
 ## 约束说明
 
-在调用asc_get_arch_ver接口前，需先定义core_version,调用asc_get_arch_ver接口后core_version会变成相对应架构版本号的值。
+在调用asc_get_arch_ver接口前，需先定义core_version，调用asc_get_arch_ver接口后core_version会变成相对应架构版本号的值。
 
 ## 调用示例
 
