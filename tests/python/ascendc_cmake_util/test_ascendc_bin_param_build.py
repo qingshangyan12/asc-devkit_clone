@@ -11,6 +11,7 @@
 # ----------------------------------------------------------------------------------------------------------
 
 import json
+import shlex
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -145,3 +146,27 @@ def test_kernel_json_without_simplified_key_keeps_legacy_behavior(tmp_path, monk
     assert len(build_commands) == 1
     split_json = json.loads(Path(build_commands[0][0]).read_text(encoding="utf-8"))
     assert "_ascendc_custom_binary_json" not in split_json
+
+
+def test_bin_param_receives_kernel_spec_directly(tmp_path, monkeypatch):
+    cfg_file = tmp_path / "op_info.ini"
+    cfg_file.write_text("")
+    opc_file = tmp_path / "custom_opc_options.ini"
+    opc_file.write_text("ALL@@--kernel-json-file=/op.json\n")
+    op_desc = _FakeOpDesc()
+    monkeypatch.setattr(ascendc_bin_param_build.opdesc_parser, "get_op_desc", lambda *_args, **_kwargs: [op_desc])
+    task_id = "a" * 64
+    ascendc_bin_param_build.gen_bin_param_file(
+        str(cfg_file),
+        str(tmp_path),
+        "ascend910b",
+        str(opc_file),
+        kernel_spec_mode="SK",
+        kernel_spec_dir=str(tmp_path / "resources"),
+        kernel_spec_task=task_id,
+    )
+    assert shlex.split(op_desc.kernel_spec_options) == [
+        "--kernel-spec=SK",
+        f"--kernel-spec-dir={tmp_path}/resources/ascend910b/.ascendc-{task_id}/ascend910b/AddCustomTemplate",
+    ]
+    assert "kernel-spec" not in opc_file.read_text()

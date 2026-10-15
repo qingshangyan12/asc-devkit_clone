@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
+#include <unordered_map>
 #include <utility>
 
 #include <boost/filesystem.hpp>
@@ -201,7 +202,7 @@ bool LoadResourceFile(
 
 bool LoadResourceFiles(
     const std::string& directory, const std::string& manifestRoot, const std::string& manifestPath,
-    ResourceBudget& budget, ManifestUnit& unit)
+    ResourceBudget& budget, ManifestUnit& unit, std::vector<std::string>& resourceLayout)
 {
     boost::system::error_code error;
     fs::recursive_directory_iterator iterator(fs::path(directory), fs::directory_options::none, error);
@@ -231,7 +232,16 @@ bool LoadResourceFiles(
         } else if (!fs::is_regular_file(status)) {
             ASCENDLOGE("Manifest resource_path contains a non-regular file: %s", source.c_str());
             return false;
-        } else if (!LoadResourceFile(source, manifestRoot, manifestPath, budget, manifestResourceBytes, unit)) {
+        }
+        const fs::path relative = fs::relative(source, fs::path(manifestRoot), error);
+        if (error || relative.empty()) {
+            ASCENDLOGE("Failed to inspect resource layout: %s", source.c_str());
+            return false;
+        }
+        // Retain empty files and directories for equality checks, even when no payload is exported.
+        resourceLayout.push_back(relative.generic_string() + (fs::is_directory(status) ? "/" : ""));
+        if (fs::is_regular_file(status) &&
+            !LoadResourceFile(source, manifestRoot, manifestPath, budget, manifestResourceBytes, unit)) {
             return false;
         }
         if (!AdvanceIterator(iterator, directory)) {
@@ -241,7 +251,9 @@ bool LoadResourceFiles(
     return true;
 }
 
-bool LoadUnit(const std::string& manifestPath, ResourceBudget& budget, ManifestUnit& unit)
+bool LoadUnit(
+    const std::string& manifestPath, ResourceBudget& budget, ManifestUnit& unit,
+    std::vector<std::string>& resourceLayout)
 {
     ASCENDLOGD("Loading manifest %s", manifestPath.c_str());
     std::vector<uint8_t> manifestBytes;
@@ -273,15 +285,38 @@ bool LoadUnit(const std::string& manifestPath, ResourceBudget& budget, ManifestU
             resourceInput.c_str());
         return false;
     }
-    if (!LoadResourceFiles(resourceRoot, manifestRoot, manifestPath, budget, unit)) {
+    if (!LoadResourceFiles(resourceRoot, manifestRoot, manifestPath, budget, unit, resourceLayout)) {
         return false;
     }
     std::sort(unit.files.begin(), unit.files.end(), [](const ResourceFile& left, const ResourceFile& right) {
         return left.filePath < right.filePath;
     });
+    std::sort(resourceLayout.begin(), resourceLayout.end());
     ASCENDLOGD("Loaded manifest %s with %zu resource file(s)", manifestPath.c_str(), unit.files.size());
     return true;
 }
+
+bool HaveSameContents(const ManifestUnit& left, const ManifestUnit& right)
+{
+    // LoadUnit canonicalizes JSON and sorts files, so comparison ignores discovery order and formatting.
+    if (left.json != right.json || left.files.size() != right.files.size()) {
+        return false;
+    }
+    for (size_t index = 0U; index < left.files.size(); ++index) {
+        const ResourceFile& first = left.files[index];
+        const ResourceFile& second = right.files[index];
+        if (first.fileName != second.fileName || first.filePath != second.filePath || first.data != second.data) {
+            return false;
+        }
+    }
+    return true;
+}
+
+struct ResourceOrigin {
+    size_t unitIndex;
+    std::string manifestPath;
+    std::vector<std::string> resourceLayout;
+};
 
 } // namespace
 
@@ -300,11 +335,27 @@ bool CollectedManifestRepository::Load(std::vector<ManifestUnit>& units) const
     ASCENDLOGI("Discovered %zu manifest(s)", manifests.size());
     units.clear();
     units.reserve(manifests.size());
+    std::unordered_map<std::string, ResourceOrigin> resources;
     for (const std::string& manifest : manifests) {
         ManifestUnit unit;
-        if (!LoadUnit(manifest, budget, unit)) {
+        std::vector<std::string> resourceLayout;
+        if (!LoadUnit(manifest, budget, unit, resourceLayout)) {
             return false;
         }
+        const std::string resourceId = Json::parse(unit.json).at("resource_id").get<std::string>();
+        const auto previous = resources.find(resourceId);
+        if (previous != resources.end()) {
+            const ResourceOrigin& origin = previous->second;
+            if (origin.resourceLayout != resourceLayout || !HaveSameContents(units[origin.unitIndex], unit)) {
+                ASCENDLOGE(
+                    "conflicting resource_id %s: %s and %s", resourceId.c_str(), origin.manifestPath.c_str(),
+                    manifest.c_str());
+                return false;
+            }
+            ASCENDLOGD("Deduplicated resource_id %s from %s", resourceId.c_str(), manifest.c_str());
+            continue;
+        }
+        resources.emplace(resourceId, ResourceOrigin{units.size(), manifest, std::move(resourceLayout)});
         units.push_back(std::move(unit));
     }
     return true;

@@ -151,8 +151,12 @@ def _rewrite_include(path, maps, source_parent):
         return SOURCE_MARKER + "/" + str(PurePosixPath(source_parent) / suffix)
     if not os.path.isabs(path):
         return path
-    mapped = _map_absolute(_checked_path(path), maps)
-    return SOURCE_MARKER + "/" + mapped if mapped is not None else path
+    mapped = _map_absolute(Path(os.path.abspath(path)), maps)
+    if mapped is None:
+        # External dependencies are supplied by the consumer and keep their original paths.
+        return path
+    _checked_path(path)
+    return SOURCE_MARKER + "/" + mapped
 
 
 def _rewrite_tokens(tokens, maps, source_parent):
@@ -205,15 +209,9 @@ class ResourceUnit:
     resource_files: list
     resource_directories: list
 
-    def delivery_signature(self):
-        # Local build roots are excluded; delivered paths, complete JSON and contents are retained.
-        return {
-            "manifest": self.manifest_json,
-            "installed_source": self.installed_source,
-            "source_hash": self.source_hash,
-            "resource_files": self.resource_files,
-            "resource_directories": self.resource_directories,
-        }
+    def source_delivery_signature(self):
+        # Exporter sees packaged resources, but cannot inspect the separately installed main source.
+        return self.installed_source, self.source_hash
 
     def cache_input(self):
         return {
@@ -237,7 +235,8 @@ def _resource_contents(root):
 
 
 def _collect(request, maps):
-    units = {}
+    units = []
+    sources_by_id = {}
     fingerprints = []
     bindings = getattr(request, "source_bindings", {})
     for directory in sorted(set(request.input_dir)):
@@ -247,7 +246,7 @@ def _collect(request, maps):
         for path in manifests:
             manifest = json.loads(path.read_text(encoding="utf-8"))
             resource_id = manifest.get("resource_id")
-            # An index key is required here; the exporter's full ID format check remains authoritative.
+            # Source consistency requires a key; exporter validates the complete manifest.
             if not isinstance(resource_id, str) or not resource_id:
                 raise BundleError(f"missing resource_id for aggregation: {path}")
             source, package_source = _resolve_source(
@@ -260,13 +259,15 @@ def _collect(request, maps):
             unit = ResourceUnit(
                 path, encoded, resource_root, source, package_source, _hash_file(source), files, directories
             )
-            previous = units.get(resource_id)
-            if previous is not None and previous.delivery_signature() != unit.delivery_signature():
+            previous = sources_by_id.get(resource_id)
+            if previous is not None and previous.source_delivery_signature() != unit.source_delivery_signature():
                 raise BundleError(f"conflicting resource_id {resource_id}: {previous.manifest_path} and {path}")
             if previous is None:
-                units[resource_id] = unit
+                sources_by_id[resource_id] = unit
+            # Forward every candidate so exporter owns resource comparison and deduplication.
+            units.append((resource_id, unit))
             fingerprints.append(unit.cache_input())
-    return sorted(units.items()), fingerprints
+    return sorted(units, key=lambda item: (item[0], str(item[1].manifest_path))), fingerprints
 
 
 def _tool(value):
@@ -359,7 +360,7 @@ def _build_locked(request, output, work, lock_key):
             resource_path = unit.resource_root.relative_to(unit.manifest_path.parent)
             shutil.copytree(unit.resource_root, destination / resource_path, symlinks=True)
             (destination / "resource_manifest.json").write_bytes(unit.manifest_json)
-        staged = workspace / "libcust_compile_db.so"
+        staged = workspace / "libcust_compile_resource.so"
         argv = [
             str(tools["exporter"]),
             "--input-dir",
@@ -404,8 +405,8 @@ def reset_tasks(request):
     previous = json.loads(state.read_text(encoding="utf-8")) if state.is_file() else []
     tasks = []
     for op_type, soc in request.task:
-        directory = task_directory(request.opc_config, op_type, soc, request.task_id)
-        if directory is not None:
+        if request.kernel_spec_mode != "None":
+            directory = task_directory(request.kernel_spec_dir, op_type, soc, request.task_id)
             tasks.append({"op_type": op_type, "soc": soc, "directory": str(directory)})
     # All producer targets run on every build. Clear only this package/kernel's namespaces.
     for value in {task["directory"] for task in previous + tasks}:
@@ -425,7 +426,7 @@ def reset_tasks(request):
 def build_package(request):
     status = Path(request.install_status)
     status.unlink(missing_ok=True)
-    contexts = json.loads(Path(request.package_state).read_text(encoding="utf-8"))
+    contexts = json.loads(Path(request.build_config).read_text(encoding="utf-8"))
     output = Path(request.output)
     inputs = []
     maps = []
@@ -466,7 +467,7 @@ def build_package(request):
         return
 
     # Retain temporary resources if any contributing kernel enables the existing debug setting.
-    combined_config = Path(request.package_state).with_name("bundle_options.ini")
+    combined_config = Path(request.build_config).with_name("bundle_options.ini")
     combined_config.write_text(
         "\n".join(Path(config).read_text(encoding="utf-8") for config in sorted(set(configs))), encoding="utf-8"
     )
@@ -495,11 +496,12 @@ def engineering_main(action, arguments):
     """Internal CMake entry points; direct aggregation keeps its existing CLI."""
     parser = argparse.ArgumentParser(description=__doc__)
     if action == "reset":
-        for name in ("state", "install-status", "opc-config", "task-id"):
+        for name in ("state", "install-status", "kernel-spec-dir", "task-id"):
             parser.add_argument("--" + name, required=True)
+        parser.add_argument("--kernel-spec-mode", choices=("None", "Normal", "SK"), required=True)
         parser.add_argument("--task", nargs=2, action="append", default=[], metavar=("OP", "SOC"))
     else:
-        for name in ("package-state", "install-status", "output", "work-dir", "exporter", "cxx", "make"):
+        for name in ("build-config", "install-status", "output", "work-dir", "exporter", "cxx", "make"):
             parser.add_argument("--" + name, required=True)
     request = parser.parse_args(arguments)
     if action == "reset" and not re.fullmatch(r"[0-9a-f]{64}", request.task_id):

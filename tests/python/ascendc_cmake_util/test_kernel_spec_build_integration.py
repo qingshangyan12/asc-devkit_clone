@@ -32,7 +32,7 @@ def test_run_scripts_deliver_and_remove_stale_resource_so(tmp_path, script):
     (target / vendor).mkdir(parents=True)
     (target / "vendors/config.ini").write_text("load_priority=customize\n")
     payload = tmp_path / "packages" / vendor
-    resource = payload / "op_spec/libcust_compile_db.so"
+    resource = payload / "op_spec/libcust_compile_resource.so"
     resource.parent.mkdir(parents=True)
     (payload / "version.info").write_text("version=1\n")
     command = ["bash", str(tmp_path / script)]
@@ -54,7 +54,7 @@ def test_run_scripts_deliver_and_remove_stale_resource_so(tmp_path, script):
             timeout=30,
         )
         assert result.returncode == 0, result.stdout + result.stderr
-        installed = target / vendor / "op_spec/libcust_compile_db.so"
+        installed = target / vendor / "op_spec/libcust_compile_resource.so"
         assert installed.exists() == (content is not None)
         if content is not None:
             assert installed.read_bytes() == content
@@ -79,14 +79,11 @@ function(add_kernel kernel)
   set(KERNEL_DYNAMIC_PATH "${KERNEL_BINARY_PATH}/binary/dynamic")
   file(MAKE_DIRECTORY "${auto_gen_path}")
   string(SHA256 kernel_spec_task_id "demo/${kernel}")
-  if(SPEC_MODE STREQUAL "None")
-    file(WRITE "${auto_gen_path}/custom_opc_options.ini" "")
-  else()
-    file(WRITE "${auto_gen_path}/custom_opc_options.ini"
-      "ALL@@--kernel-spec=Normal@--kernel-spec-dir=${KERNEL_BINARY_PATH}/kernel_spec\n")
-    if(DISABLE_SCOPES)
-      file(APPEND "${auto_gen_path}/custom_opc_options.ini" "Add@@--kernel-spec=None\n")
-    endif()
+  file(WRITE "${auto_gen_path}/custom_opc_options.ini" "")
+  set(kernel_spec_mode "${SPEC_MODE}")
+  set(kernel_spec_root "${KERNEL_BINARY_PATH}/kernel_spec")
+  if(DISABLE_EXPORT)
+    set(kernel_spec_mode None)
   endif()
   add_custom_target(${kernel}_copy_kernel_srcs)
   set(KERNEL_COMPILE_TARGETS)
@@ -94,7 +91,7 @@ function(add_kernel kernel)
   foreach(soc IN LISTS ASCEND_COMPUTE_UNIT)
     add_custom_target(${kernel}_${soc}
       COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/producer.py" "${ASCENDC_CMAKE_SCRIPTS_PATH}/util"
-        "${auto_gen_path}/custom_opc_options.ini" Add "${soc}" "${kernel_spec_task_id}"
+        "${kernel_spec_mode}" "${kernel_spec_root}" Add "${soc}" "${kernel_spec_task_id}"
         "${KERNEL_SRC_BASE}/add.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/fail"
       VERBATIM)
     list(APPEND KERNEL_COMPILE_TARGETS ${kernel}_${soc})
@@ -123,9 +120,9 @@ import sys
 from pathlib import Path
 sys.path.insert(0, sys.argv[1])
 from kernel_spec_options import task_directory
-config, op, soc, task_id, source, fail = sys.argv[2:]
-directory = task_directory(config, op, soc, task_id)
-if directory is not None:
+mode, root, op, soc, task_id, source, fail = sys.argv[2:]
+if mode != "None":
+    directory = task_directory(root, op, soc, task_id)
     assert directory.is_dir(), 'reset must create the directory before parallel OPC variants'
     resources = directory / 'resources'
     resources.mkdir()
@@ -191,10 +188,11 @@ def test_package_build_cache_and_install_with_same_named_sources(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
-    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_db.so"
-    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_db.so"
+    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_resource.so"
+    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     data = json.loads(installed.read_bytes()[4:])
     assert len(data) == 4
+    assert all("kernel-spec" not in path.read_text() for path in build.glob("*/autogen/custom_opc_options.ini"))
     assert {manifest["source_file"] for manifest in data} == {
         "op_impl/dynamic/kernel_a/add.cpp",
         "op_impl/dynamic/kernel_b/add.cpp",
@@ -212,7 +210,7 @@ def test_failed_producer_and_reconfigure_cannot_install_old_result(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
-    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_db.so"
+    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     previous = installed.read_bytes()
     (source / "fail").touch()
     result = _build(build, success=False)
@@ -227,18 +225,18 @@ def test_failed_producer_and_reconfigure_cannot_install_old_result(project):
     assert installed.read_bytes() == previous
 
 
-def test_disabled_scopes_and_none_remove_stale_delivery(project):
+def test_global_none_and_package_none_remove_stale_delivery(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
-    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_db.so"
-    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_db.so"
-    _configure(source, build, "-DDISABLE_SCOPES=ON", "-D_ASC_KERNEL_SPEC_EXPORTER=missing-exporter")
+    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_resource.so"
+    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
+    _configure(source, build, "-DDISABLE_EXPORT=ON", "-D_ASC_KERNEL_SPEC_EXPORTER=missing-exporter")
     _build(build)
     _install(build, prefix)
     assert not output.exists()
     assert not installed.exists()
-    _configure(source, build, "-DDISABLE_SCOPES=OFF")
+    _configure(source, build, "-DDISABLE_EXPORT=OFF")
     _build(build, success=False)
     _configure(source, build, "-DSPEC_MODE=None")
     _build(build)

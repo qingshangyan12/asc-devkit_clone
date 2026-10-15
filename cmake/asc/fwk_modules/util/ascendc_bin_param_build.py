@@ -417,8 +417,23 @@ class BinParamBuilder(opdesc_parser.OpDesc):
         with os.fdopen(os.open(param_file, const_var.WFLAGS, const_var.WMODES), "w") as fd:
             json.dump(param, fd, indent="  ")
 
-    def _generate_check_result(self: any, enable_tiling_keys: bool, bin_file: str):
+    def _generate_check_result(self: any, enable_tiling_keys: bool, bin_file: str, kernel_spec_enabled=False):
         check_result = ""
+        if kernel_spec_enabled:
+            # Capture OPC status before echo or stale output checks can overwrite it.
+            check_result += "opc_status=$?\n"
+            check_result += 'echo "${res}"\n'
+            check_result += 'if [ "${opc_status}" -ne 0 ]; then\n'
+            if enable_tiling_keys:
+                check_result += '    if [ "${opc_status}" -eq 1 ] && echo "${res}" | '
+                check_result += 'grep -q "None of the given tiling keys are in the supported list"; then\n'
+                check_result += "        exit 0\n"
+                check_result += "    fi\n"
+            check_result += '    exit "${opc_status}"\n'
+            check_result += "fi\n"
+            check_result += const_var.CHK_CMD.format(res_file=bin_file + ".json")
+            check_result += const_var.CHK_CMD.format(res_file=bin_file + ".o")
+            return check_result
         if enable_tiling_keys is False:
             check_result += 'echo "${res}"\n'
             check_result += const_var.CHK_CMD.format(res_file=bin_file + ".json")
@@ -498,7 +513,9 @@ grep -q "None of the given tiling keys are in the supported list"; then\n'
         build_cmd_var += ")\n"
         build_cmd_var += "\n"
 
-        check_result = self._generate_check_result(enable_tiling_keys, bin_file)
+        check_result = self._generate_check_result(
+            enable_tiling_keys, bin_file, kernel_spec_enabled=bool(self.kernel_spec_options) and not super_mode
+        )
         build_cmd_var += check_result
         build_cmd_var += f'echo "[{self.soc}] Generating {bin_file} Done"\n'
 
@@ -685,7 +702,14 @@ def gen_option_config(debug_config, super_config, op_debug_config):
 
 
 def gen_bin_param_file(
-    cfgfile: str, out_dir: str, soc: str, opc_config_file: str = "", ops: list = None, kernel_spec_task: str = None
+    cfgfile: str,
+    out_dir: str,
+    soc: str,
+    opc_config_file: str = "",
+    ops: list = None,
+    kernel_spec_task: str = None,
+    kernel_spec_mode: str = "None",
+    kernel_spec_dir: str = None,
 ):
     if not os.path.exists(cfgfile):
         print(f"INFO: {cfgfile} does not exists in this project, skip generating compile commands.")
@@ -709,7 +733,9 @@ def gen_bin_param_file(
     for op_desc in op_descs:
         op_desc.set_soc_version(soc)
         op_desc.set_out_path(out_dir)
-        op_desc.kernel_spec_options = shell_options(opc_config_file, op_desc.op_type, soc, kernel_spec_task)
+        op_desc.kernel_spec_options = shell_options(
+            kernel_spec_mode, kernel_spec_dir, op_desc.op_type, soc, kernel_spec_task
+        )
         if op_desc.op_type in debug_config:
             op_desc.set_op_debug_config(debug_config[op_desc.op_type])
         if all_soc_key in debug_config:
