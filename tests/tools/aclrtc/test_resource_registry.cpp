@@ -1365,8 +1365,8 @@ namespace {
 TEST_F(ResourceRegistryTest, OpSpecUsesExactSourcePathAndInstallationRoot)
 {
     for (const std::string& relativeLibrary :
-         {std::string("vendors/custom/op_spec/libcust_compile_db.so"),
-          std::string("built-in/op_spec/ops_demo/libcust_compile_db.so")}) {
+         {std::string("vendors/custom/op_spec/libcust_compile_resource.so"),
+          std::string("built-in/op_spec/ops_demo/libcust_compile_resource.so")}) {
         const fs::path library = Path(relativeLibrary);
         const fs::path root = relativeLibrary.rfind("vendors/", 0U) == 0U ? Path("vendors/custom") : Path("built-in");
         WriteFile(library);
@@ -1397,7 +1397,7 @@ TEST_F(ResourceRegistryTest, OpSpecUsesExactSourcePathAndInstallationRoot)
 TEST_F(ResourceRegistryTest, OpSpecRejectsSourceSymlinksAndMisplacedLibrary)
 {
     const fs::path root = Path("vendor");
-    const fs::path library = root / "op_spec/libcust_compile_db.so";
+    const fs::path library = root / "op_spec/libcust_compile_resource.so";
     WriteFile(library);
     WriteFile(Path("outside/source.cpp"), "outside");
     fs::create_directory_symlink(Path("outside"), root / "redirect");
@@ -1406,16 +1406,17 @@ TEST_F(ResourceRegistryTest, OpSpecRejectsSourceSymlinksAndMisplacedLibrary)
     EXPECT_EQ(
         ResourceRegistry::LocateSourceFile(spec, "resource", "redirect/source.cpp", located),
         ResourceStatus::InvalidResource);
-    EXPECT_FALSE(ResourceRegistry::IsLibraryName(Path("libcust_compile_db.so").string()));
-    EXPECT_FALSE(ResourceRegistry::IsLibraryName(Path("built-in/op_spec/unknown/libcust_compile_db.so").string()));
+    EXPECT_FALSE(ResourceRegistry::IsLibraryName(Path("libcust_compile_resource.so").string()));
+    EXPECT_FALSE(
+        ResourceRegistry::IsLibraryName(Path("built-in/op_spec/unknown/libcust_compile_resource.so").string()));
 }
 
 TEST_F(ResourceRegistryTest, AutomaticDiscoveryFindsNewCustomAndBuiltInBundles)
 {
     const fs::path custom = Path("custom");
     const fs::path opp = Path("opp");
-    const fs::path customLibrary = custom / "op_spec/libcust_compile_db.so";
-    const fs::path builtinLibrary = opp / "built-in/op_spec/ops_demo/libcust_compile_db.so";
+    const fs::path customLibrary = custom / "op_spec/libcust_compile_resource.so";
+    const fs::path builtinLibrary = opp / "built-in/op_spec/ops_demo/libcust_compile_resource.so";
     WriteFile(customLibrary);
     WriteFile(builtinLibrary);
     SetEnvironment("ASCEND_CUSTOM_OPP_PATH", custom.string());

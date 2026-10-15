@@ -671,7 +671,7 @@ AutomaticRoots ResourceRegistry::AutomaticSearchRoots()
 bool ResourceRegistry::IsLibraryName(const std::string& path)
 {
     const std::string name = FileUtils::FileName(path);
-    if (name == "libcust_compile_db.so" && !InstalledSourceRoot(path).empty()) {
+    if (name == "libcust_compile_resource.so" && !InstalledSourceRoot(path).empty()) {
         return true;
     }
     return name.size() > std::strlen("lib") + std::strlen(LIBRARY_NAME_SUFFIX) && name.rfind("lib", 0U) == 0U &&

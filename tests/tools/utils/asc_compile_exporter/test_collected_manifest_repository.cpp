@@ -73,6 +73,61 @@ TEST_F(ModuleTest, RepositoryAddsSchemaVersionToManifestJson)
     EXPECT_EQ(manifest.at("schema_version"), "1.0");
 }
 
+TEST_F(ModuleTest, RepositoryDeduplicatesEquivalentResourceIds)
+{
+    const std::string collection = FileUtils::JoinPath(root_, "duplicates");
+    const std::string first = FileUtils::JoinPath(collection, "a");
+    const std::string second = FileUtils::JoinPath(collection, "b");
+    // Different creation order and JSON formatting do not change the resource.
+    WriteTestFile(FileUtils::JoinPath(first, "resources/z.h"), "z");
+    WriteTestFile(FileUtils::JoinPath(first, "resources/a.h"), "a");
+    WriteTestFile(FileUtils::JoinPath(second, "resources/a.h"), "a");
+    WriteTestFile(FileUtils::JoinPath(second, "resources/z.h"), "z");
+    CreateManifest(first, "Same");
+    CreateManifest(second, "Same");
+    const std::string path = FileUtils::JoinPath(second, "Same_manifest.json");
+    WriteTestFile(path, Json::parse(ReadTestFile(path)).dump(4));
+
+    std::vector<ManifestUnit> units;
+    ASSERT_TRUE(CollectedManifestRepository(collection).Load(units));
+    ASSERT_EQ(units.size(), 1U);
+    EXPECT_EQ(units[0].files.size(), 2U);
+}
+
+TEST_F(ModuleTest, RepositoryRejectsConflictingResourceIds)
+{
+    for (const std::string difference : {"manifest", "bytes", "path", "empty-directory", "empty-file"}) {
+        SCOPED_TRACE(difference);
+        const std::string collection = FileUtils::JoinPath(root_, difference);
+        const std::string first = FileUtils::JoinPath(collection, "a");
+        const std::string second = FileUtils::JoinPath(collection, "b");
+        WriteTestFile(FileUtils::JoinPath(first, "resources/kernel.cpp"), "source");
+        WriteTestFile(FileUtils::JoinPath(second, "resources/kernel.cpp"), "source");
+        CreateManifest(first, "Same");
+        CreateManifest(second, "Same");
+        if (difference == "manifest") {
+            const std::string path = FileUtils::JoinPath(second, "Same_manifest.json");
+            Json manifest = Json::parse(ReadTestFile(path));
+            manifest["soc_version"] = "different";
+            WriteTestFile(path, manifest.dump());
+        } else if (difference == "bytes") {
+            WriteTestFile(FileUtils::JoinPath(second, "resources/kernel.cpp"), "changed");
+        } else if (difference == "path") {
+            ASSERT_EQ(
+                rename(
+                    FileUtils::JoinPath(second, "resources/kernel.cpp").c_str(),
+                    FileUtils::JoinPath(second, "resources/renamed.cpp").c_str()),
+                0);
+        } else if (difference == "empty-directory") {
+            ASSERT_TRUE(FileUtils::CreateDirectories(FileUtils::JoinPath(second, "resources/include")));
+        } else {
+            WriteTestFile(FileUtils::JoinPath(second, "resources/empty.h"), "");
+        }
+        std::vector<ManifestUnit> units;
+        EXPECT_FALSE(CollectedManifestRepository(collection).Load(units));
+    }
+}
+
 TEST_F(ModuleTest, RepositoryRejectsManifestWithSchemaVersion)
 {
     const std::string collection = FileUtils::JoinPath(root_, "collection-existing-schema-version");
