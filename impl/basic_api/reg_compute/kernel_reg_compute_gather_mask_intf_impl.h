@@ -33,7 +33,7 @@
 #elif __NPU_ARCH__ == 5102
 #include "../../basic_api/reg_compute/dav_m510/kernel_reg_compute_gather_mask_impl.h"
 #elif __NPU_ARCH__ == 5162
-#include "../../basic_api/reg_compute/dav_v516/kernel_reg_compute_gather_mask_impl.h"
+#include "../../basic_api/reg_compute/dav_5162/kernel_reg_compute_gather_mask_impl.h"
 #else
 #include "../../basic_api/reg_compute/dav_3510/kernel_reg_compute_gather_mask_impl.h"
 #endif
@@ -86,8 +86,8 @@ __simd_callee__ inline void Gather(S& dstReg, S& srcReg, V& indexReg)
 }
 #endif
 
-#if defined(__NPU_ARCH__) &&                                                                                      \
-        ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || (__NPU_ARCH__ == 3113)) || \
+#if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 3003) || \
+                              (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5162)) ||                          \
     defined(__ASC_NPU_HOST__)
 template <typename T = DefaultType, GatherMaskMode store = GatherMaskMode::NO_STORE_REG, typename U>
 __simd_callee__ inline void GatherMask(U& dstReg, U& srcReg, MaskReg& mask)
