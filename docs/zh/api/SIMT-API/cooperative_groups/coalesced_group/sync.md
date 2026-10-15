@@ -55,14 +55,12 @@ void sync() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
-        ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
             active.sync();
         }
-        ...
     }
     ```
 
@@ -74,11 +72,15 @@ void sync() const
     using namespace cooperative_groups;
     __simt_vf__ inline void simt_kernel(...)
     {
-        ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
             active.sync();
         }
-        ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+无
+```
