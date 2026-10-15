@@ -284,14 +284,14 @@ class DFXSectionGenerator:
 
     def generate_kernel_type_section(self, compile_info: CompileInfo, kernel_name: str):
         section_var = ""
-        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
+        if CommonUtility.is_split_core_arch():
             short_soc_version = global_var_storage.get_variable("ascendc_short_soc_version")
             if compile_info.code_channel == CORE_TYPE_MIX:
                 section_var += (
                     f"static const struct FunLevelMixCoreType {kernel_name}_kernel_type_section __attribute__ "
                 )
                 section_var += f'((used, section (".ascend.meta.{kernel_name}"))) = '
-                aiv_task_ration = 1 if (CommonUtility.is_920r1() or CommonUtility.is_920r2()) else 2
+                aiv_task_ration = 1 if (CommonUtility.is_default_vec_cube_ratio_1_to_1()) else 2
                 section_var += (
                     "{ {{F_TYPE_KTYPE, sizeof(unsigned int)}, K_TYPE_MIX_AIC_MAIN},\
                         {{F_TYPE_MIX_TASK_RATION, sizeof(unsigned int)}, 1, "

@@ -506,14 +506,12 @@ def gen_compile_cmd_for_meta_info(src_file: str, dst_file: str, compile_option_t
 
 
 def get_v220_kernel_type_mix_flag(compile_info: CompileInfo, tiling_info: TilingInfo):
-    is_v220_flag = (
-        CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2()
-    )
+    is_split_core_flag = CommonUtility.is_split_core_arch()
     kernel_type_res = 0
     is_single_and_using_hard_sync = (
-        is_v220_flag and compile_info.hard_sync and compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE]
+        is_split_core_flag and compile_info.hard_sync and compile_info.code_channel in [CORE_TYPE_VEC, CORE_TYPE_CUBE]
     )
-    if is_v220_flag is False:
+    if is_split_core_flag is False:
         return False, is_single_and_using_hard_sync
 
     is_mix = compile_info.code_channel == CORE_TYPE_MIX
@@ -580,7 +578,7 @@ def set_dynamic_sub_func_names_of_super_kernel(tiling_key, compile_info, arch, k
             # 920r1/920r2 use the 1:1 task ratio, other SoCs keep 1:2
             kernel_type = (
                 KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1.name
-                if CommonUtility.is_920r1() or CommonUtility.is_920r2()
+                if CommonUtility.is_default_vec_cube_ratio_1_to_1()
                 else KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2.name
             )
         elif compile_info.code_channel == CORE_TYPE_VEC:
@@ -658,7 +656,7 @@ def gen_current_kernel_name(compile_info: CompileInfo, sub_arch: str, code_chann
         # if code_mix, do not add __kernel0 when compile
         current_kernel_name = compile_info.kernel_name
         if code_channel == CORE_TYPE_MIX:
-            if CommonUtility.is_920r1() or CommonUtility.is_920r2():
+            if CommonUtility.is_default_vec_cube_ratio_1_to_1():
                 kernel_meta_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_1.name
             else:
                 kernel_meta_type = KernelMetaType.KERNEL_TYPE_MIX_AIC_1_2.name
