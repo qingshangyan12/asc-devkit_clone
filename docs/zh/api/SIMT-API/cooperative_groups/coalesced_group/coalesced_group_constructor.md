@@ -80,3 +80,9 @@ coalesced_group coalesced_threads()
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+无
+```

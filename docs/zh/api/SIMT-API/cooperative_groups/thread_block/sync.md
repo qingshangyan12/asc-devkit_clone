@@ -55,12 +55,10 @@ static void sync()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
-        ...
         thread_block g = this_thread_block();
         g.sync(); // 同步线程块内所有线程
-        ...
     }
     ```
 
@@ -70,11 +68,15 @@ static void sync()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel()
     {
-        ...
         thread_block g = this_thread_block();
         g.sync(); // 同步线程块内所有线程
-        ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+无
+```
