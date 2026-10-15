@@ -8,7 +8,7 @@ $$
 Y = A \times B + Bias + Residual
 $$
 
-The example uses one `__mix__(1, 2)` kernel to start one AIC and two AIVs. Cube transfers the L0C result to two Vector sub-blocks along the M dimension by using `dual_dst_mode::split_m` of `copy_l0c_to_ub`. Each Vector sub-block adds its corresponding Residual data and writes the result back to Global Memory. This demonstrates CV data exchange and pipeline coordination in one kernel.
+The example uses one `__mix__(1, 2)` kernel to start one AIC and two AIVs. Cube transfers the L0C result to two Vector sub-blocks along the m dimension by using `dual_dst_mode::split_m` of `copy_l0c_to_ub`. Each Vector sub-block adds its corresponding Residual data and writes the result back to Global Memory. This demonstrates CV data exchange and pipeline coordination in one kernel.
 
 ## Supported Products and CANN Software Versions
 
@@ -37,15 +37,15 @@ The example uses one `__mix__(1, 2)` kernel to start one AIC and two AIVs. Cube 
 
   1. **Cube-side Matmul and Bias fusion**
 
-     The Cube side transfers A and B from Global Memory to L1, and then to L0A/L0B, before using `mmad` for matrix multiplication. Bias is transferred from Global Memory through L1 and the Bias table to L0Bias. It is passed to only the first `mmad` of each output tile; subsequent K iterations accumulate the matrix multiplication result without adding Bias again.
+     The Cube side transfers A and B from Global Memory to L1, and then to L0A/L0B, before using `mmad` for matrix multiplication. Bias is transferred from Global Memory through L1 and the Bias table to L0Bias. It is passed to only the first `mmad` of each output tile; subsequent k iterations accumulate the matrix multiplication result without adding Bias again.
 
   2. **Vector-side Residual addition**
 
-     Cube transfers the `float` result in L0C to UB. `dual_dst_mode::split_m` divides one tile evenly along the M dimension and sends the two halves to the two AIVs. Each AIV reads its half of the Cube result and the corresponding Residual data from Global Memory, calls `ComputeAdd` for element-wise addition, and writes the result back to Global Memory.
+     Cube transfers the `float` result in L0C to UB. `dual_dst_mode::split_m` divides one tile evenly along the m dimension and sends the two halves to the two AIVs. Each AIV reads its half of the Cube result and the corresponding Residual data from Global Memory, calls `compute_add` for element-wise addition, and writes the result back to Global Memory.
 
   3. **CV pipeline coordination**
 
-     Two UB slots (`PIPE_DEPTH=2`) are reused alternately for output tiles. Before reusing a slot, AIC waits for both AIVs to finish consuming the previous tile. After the L0C-to-UB transfer, AIC notifies the AIVs. After both AIVs finish the addition and UB-to-Global Memory transfer, they notify AIC. `asc_sync_block_wait` and `asc_sync_block_arrive` implement the AIC/AIV synchronization, so the Vector path does not require a separate kernel.
+     Two UB slots (`pipe_depth=2`) are reused alternately for output tiles. Before reusing a slot, AIC waits for both AIVs to finish consuming the previous tile. After the L0C-to-UB transfer, AIC notifies the AIVs. After both AIVs finish the addition and UB-to-Global Memory transfer, they notify AIC. `asc_sync_block_wait` and `asc_sync_block_arrive` implement the AIC/AIV synchronization, so the Vector path does not require a separate kernel.
 
   4. **Computation formula**
 
@@ -58,13 +58,13 @@ The example uses one `__mix__(1, 2)` kernel to start one AIC and two AIVs. Cube 
      Y_{m,n}=T_{m,n}+Residual_{m,n}
      $$
 
-- `ComputeAdd` implementation:
+- `compute_add` implementation:
 
-  `ComputeAdd` is a Vector function marked with `__simd_vf__`. Both its inputs and output are one-dimensional UB Tensors. The function first creates a valid-element mask with `update_mask<float>(length)`, then performs masked `load` operations on the two input Tensors, computes `lhs + rhs`, and finally writes the result with `store`. `length` is the number of valid elements in the current tail block, so padding elements in a tile are not accessed.
+  `compute_add` is a Vector function marked with `__simd_vf__`. Both its inputs and output are one-dimensional UB Tensors. The function first creates a valid-element mask with `update_mask<float>(length)`, then performs masked `load` operations on the two input Tensors, computes `lhs + rhs`, and finally writes the result with `store`. `length` is the number of valid elements in the current tail block, so padding elements in a tile are not accessed.
 
   ```cpp
   template <typename Src0Tensor, typename Src1Tensor, typename DstTensor>
-  __simd_vf__ inline void ComputeAdd(Src0Tensor src0, Src1Tensor src1,
+  __simd_vf__ inline void compute_add(Src0Tensor src0, Src1Tensor src1,
       DstTensor dst, uint32_t length)
   {
       const auto coord = asc::te::make_coord(0);
@@ -77,18 +77,18 @@ The example uses one `__mix__(1, 2)` kernel to start one AIC and two AIVs. Cube 
 
 - Example specifications:
 
-  The default shape is `M=1024`, `N=1024`, and `K=256`. Each Cube block processes an output region of `singleCoreM=256` by `singleCoreN=128`, and 32 mixed blocks are launched.
+  The default shape is `m=1024`, `n=1024`, and `k=256`. Each Cube block processes an output region of `single_core_m=256` by `single_core_n=128`, and 32 mixed blocks are launched.
 
   <table border="2">
   <caption>Example Specifications</caption>
   <tr><td rowspan="1" align="left">Example Type (OpType)</td><td colspan="4" align="left">Matmul with Bias and Residual</td></tr>
   <tr><td rowspan="6" align="left">Example Input</td><td align="left">name</td><td align="left">shape</td><td align="left">data type</td><td align="left">format</td></tr>
-  <tr><td align="left">A (Matrix A)</td><td align="left">[M, K]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">B (Matrix B)</td><td align="left">[K, N]</td><td align="left">half</td><td align="left">ND</td></tr>
-  <tr><td align="left">Bias</td><td align="left">[N]</td><td align="left">float</td><td align="left">ND</td></tr>
-  <tr><td align="left">Residual</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">A (Matrix A)</td><td align="left">[m, k]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">B (Matrix B)</td><td align="left">[k, n]</td><td align="left">half</td><td align="left">ND</td></tr>
+  <tr><td align="left">Bias</td><td align="left">[n]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td align="left">Residual</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td align="left">tiling</td><td align="left">MatmulTiling structure</td><td align="left">int32_t</td><td align="left">ND</td></tr>
-  <tr><td rowspan="1" align="left">Example Output</td><td align="left">Y (Output matrix)</td><td align="left">[M, N]</td><td align="left">float</td><td align="left">ND</td></tr>
+  <tr><td rowspan="1" align="left">Example Output</td><td align="left">Y (Output matrix)</td><td align="left">[m, n]</td><td align="left">float</td><td align="left">ND</td></tr>
   <tr><td rowspan="1" align="left">Kernel Function Name</td><td colspan="4" align="left">matmul_bias_fusion</td></tr>
   </table>
 
@@ -96,14 +96,14 @@ The example uses one `__mix__(1, 2)` kernel to start one AIC and two AIVs. Cube 
 
   | Parameter | Default | Description |
   | :--- | :---: | :--- |
-  | `BASE_M` | 128 | M dimension of a Cube output tile |
-  | `BASE_N` | 128 | N dimension of a Cube output tile |
-  | `BASE_K` | 64 | Basic block size of the Cube K dimension |
-  | `STEP_M` | 1 | L1 M dimension step |
-  | `STEP_N` | 1 | L1 N dimension step |
-  | `STEP_K` | 4 | L1 K dimension step |
-  | `VECTOR_LEN` | 64 | Maximum number of elements in one Vector addition |
-  | `PIPE_DEPTH` | 2 | Number of UB slots |
+  | `base_m` | 128 | M dimension of a Cube output tile |
+  | `base_n` | 128 | N dimension of a Cube output tile |
+  | `base_k` | 64 | Basic block size of the Cube K dimension |
+  | `step_m` | 1 | L1 M dimension step |
+  | `step_n` | 1 | L1 N dimension step |
+  | `step_k` | 4 | L1 K dimension step |
+  | `vector_len` | 64 | Maximum number of elements in one Vector addition |
+  | `pipe_depth` | 2 | Number of UB slots |
 
   The default runtime tiling parameter values are as follows:
 
@@ -112,9 +112,9 @@ The example uses one `__mix__(1, 2)` kernel to start one AIC and two AIVs. Cube 
   | `m` | 1024 | Number of rows of matrix A |
   | `n` | 1024 | Number of columns of matrix B |
   | `k` | 256 | Number of columns of matrix A / number of rows of matrix B |
-  | `singleCoreM` | 256 | M dimension processed by one Cube block |
-  | `singleCoreN` | 128 | N dimension processed by one Cube block |
-  | `singleCoreK` | 256 | K dimension processed by one Cube block |
+  | `single_core_m` | 256 | M dimension processed by one Cube block |
+  | `single_core_n` | 128 | N dimension processed by one Cube block |
+  | `single_core_k` | 256 | K dimension processed by one Cube block |
 
 ## Example Implementation
 
@@ -141,16 +141,16 @@ The example uses one `__mix__(1, 2)` kernel to start one AIC and two AIVs. Cube 
 | 5 | `copy(copy_l0c_to_ub)` | Split the L0C tile into two M halves with `dual_dst_mode::split_m` | Transfer the L0C result to the UB of the two AIVs |
 | 6 | `asc_sync_block_wait/arrive` | Pass ready and consumed events for each slot between AIC and the two AIVs | CV synchronization |
 | 7 | `copy(copy_ub_to_ub)`, `copy(copy_gm_to_ub)` | Read the Cube half-tile and Residual into temporary Vector UB buffers | AIV/Vector |
-| 8 | `ComputeAdd` | Perform masked load, element-wise addition, and store for valid elements | AIV/Vector |
+| 8 | `compute_add` | Perform masked load, element-wise addition, and store for valid elements | AIV/Vector |
 | 9 | `copy(copy_ub_to_gm)` | Write the addition result to the corresponding Global Memory region of Y | AIV to Global Memory |
 
 ### Cube-side Matmul Flow
 
-Each AIC block uses `block_idx` to locate a `singleCoreM` by `singleCoreN` region and divides that region into output tiles using `BASE_M` and `BASE_N`. For each tile, A and B are transferred along the K dimension in `BASE_K` blocks and passed to `mmad`. The first call sets `init_with_zero=true` and passes L0Bias; subsequent calls set `init_with_zero=false` and accumulate the matrix multiplication result. The resulting L0C tile is therefore `A x B + Bias`.
+Each AIC block uses `block_idx` to locate a `single_core_m` by `single_core_n` region and divides that region into output tiles using `base_m` and `base_n`. For each tile, A and B are transferred along the K dimension in `base_k` blocks and passed to `mmad`. The first call sets `init_with_zero=true` and passes L0Bias; subsequent calls set `init_with_zero=false` and accumulate the matrix multiplication result. The resulting L0C tile is therefore `A x B + Bias`.
 
 ### Vector-side Addition Flow
 
-Each AIV uses `asc_get_sub_block_id()` to determine its M half. After receiving the notification for the corresponding AIC slot, it processes each row and each `VECTOR_LEN`-element column block. It first copies the Cube result from UB to a Vector temporary Tensor, then transfers Residual from Global Memory to UB, calls `ComputeAdd`, and finally copies the output Tensor to the corresponding Y slice in Global Memory. The two AIVs process non-overlapping row ranges.
+Each AIV uses `asc_get_sub_block_id()` to determine its M half. After receiving the notification for the corresponding AIC slot, it processes each row and each `vector_len`-element column block. It first copies the Cube result from UB to a Vector temporary Tensor, then transfers Residual from Global Memory to UB, calls `compute_add`, and finally copies the output Tensor to the corresponding Y slice in Global Memory. The two AIVs process non-overlapping row ranges.
 
 ### Dual-destination L0C-to-UB Transfer and Synchronization
 
@@ -161,7 +161,7 @@ Each AIV uses `asc_get_sub_block_id()` to determine its M half. After receiving 
   asc::te::dual_dst_mode::split_m }
 ```
 
-For each output tile, AIC writes the first M half to sub-block 0 and the second M half to sub-block 1. Two slot groups are reused according to `sequence % PIPE_DEPTH`. The AIC-to-AIV flags are 8 and 9, and the AIV-to-AIC flags are 10 and 11. Before reusing a slot, AIC waits on `PIPE_MTE2` for both AIVs to finish. After the transfer, AIC notifies the AIVs on `PIPE_FIX`. Each AIV waits for data on `PIPE_S` and notifies AIC on `PIPE_MTE3` after writing the result back. This prevents UB from being overwritten before Vector consumption and establishes the complete CV pipeline dependency.
+For each output tile, AIC writes the first M half to sub-block 0 and the second M half to sub-block 1. Two slot groups are reused according to `sequence % pipe_depth`. The AIC-to-AIV flags are 8 and 9, and the AIV-to-AIC flags are 10 and 11. Before reusing a slot, AIC waits on `PIPE_MTE2` for both AIVs to finish. After the transfer, AIC notifies the AIVs on `PIPE_FIX`. Each AIV waits for data on `PIPE_S` and notifies AIC on `PIPE_MTE3` after writing the result back. This prevents UB from being overwritten before Vector consumption and establishes the complete CV pipeline dependency.
 
 ## Tensor API Implementation Features
 
@@ -171,9 +171,9 @@ For each output tile, AIC writes the first M half to sub-block 0 and the second 
 | Matrix computation | Use `mmad` for Cube-side matrix multiply-accumulate; inject Bias only in the first K iteration |
 | CV fusion | Use one `__mix__(1, 2)` kernel to connect one AIC and two AIVs |
 | Dual-destination transfer | Use `dual_dst_mode::split_m` of `copy_l0c_to_ub` to split along M |
-| Vector computation | Use the `__simd_vf__` function `ComputeAdd` for addition |
+| Vector computation | Use the `__simd_vf__` function `compute_add` for addition |
 | Data synchronization | Use fixed flags with `asc_sync_block_wait/arrive` for slot-level handoff |
-| Tail-block handling | Limit the valid region with `curM`, `curN`, and `length` to avoid reading padding |
+| Tail-block handling | Limit the valid region with `cur_m`, `cur_n`, and `length` to avoid reading padding |
 
 ## Build and Run
 

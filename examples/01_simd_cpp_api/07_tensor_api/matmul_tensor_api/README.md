@@ -31,13 +31,13 @@
   C = A * B
   $$
 - 样例规格：
-  本样例参数M = 512, N = 1024, K = 512，调用16个核完成计算，输入输出规格如下表所示：
+  本样例参数m = 512, n = 1024, k = 512，调用16个核完成计算，输入输出规格如下表所示：
   <table>
   <tr><td rowspan="1" align="center">样例类型(OpType)</td><td colspan="4" align="center">Matmul</td></tr>
   <tr><td rowspan="3" align="center">样例输入</td><td align="center">name</td><td align="center">shape</td><td align="center">data type</td><td align="center">format</td></tr>
-  <tr><td align="center">A</td><td align="center">[M, K]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td align="center">B</td><td align="center">[K, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
-  <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[M, N]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">A</td><td align="center">[m, k]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td align="center">B</td><td align="center">[k, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
+  <tr><td rowspan="1" align="center">样例输出</td><td align="center">C</td><td align="center">[m, n]</td><td align="center">float16</td><td align="center">ND</td></tr>
   <tr><td rowspan="1" align="center">核函数名</td><td colspan="4" align="center">matmul_custom</td></tr>
   </table>
 
@@ -68,7 +68,7 @@
 
     4. **切片接口**：使用slice + make_coord + make_shape获取张量的子区域
        - 实现分核逻辑：每个核处理不同的数据块
-       - 实现分块逻辑：baseM/baseK/baseN的基础块切分
+       - 实现分块逻辑：base_m/base_k/base_n的基础块切分
 
   - 调用实现
     使用内核调用符<<<>>>调用核函数。

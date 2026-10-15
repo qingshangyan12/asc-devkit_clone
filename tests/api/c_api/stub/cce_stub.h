@@ -22,6 +22,13 @@ using fp8_e6m2_t = float8_e6m2::Fp8e6m2T;
 using vector_f8e6m2 = std::array<fp8_e6m2_t, ConstantsInternal::b8EleSize>;
 using vector_fp8_e6m2_t = vector_f8e6m2;
 
+struct hifloat4x2_t {
+    uint8_t val = 0;
+};
+using hif4x2_t = hifloat4x2_t;
+
+using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
+
 inline void vcvt(
     vector_f8e4m3& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
@@ -35,12 +42,15 @@ inline void vcvt_bf162e8m0(
     vector_f8e8m0& dst, vector_bf16 src, vector_bool preg, Literal tag0, Literal tag1, Literal tag2, Literal tag3)
 {}
 
-struct hifloat4x2_t {
-    uint8_t val = 0;
-};
-using hif4x2_t = hifloat4x2_t;
+// bf16->fp4 MODE_MERGING: stub_fun.h only has 6-arg int32_t overloads; add 7-arg for host UT.
+// Use int32_t (not Literal) so existing mockcpp hooks on int signatures keep working.
+inline void vcvt(
+    vector_f4e1m2x2& dst, vector_bf16 src, vector_bool preg, int32_t tag0, int32_t tag1, int32_t tag2, int32_t tag3)
+{}
+inline void vcvt(
+    vector_f4e2m1x2& dst, vector_bf16 src, vector_bool preg, int32_t tag0, int32_t tag1, int32_t tag2, int32_t tag3)
+{}
 
-using vector_hif4x2 = std::array<hifloat4x2_t, ConstantsInternal::b8EleSize>;
 inline void mad(
     __cc__ float* c_matrix, __ca__ half* a_matrix, __cb__ fp8_e4m3fn_t* b_matrix, uint16_t m, uint16_t k, uint16_t n,
     uint8_t unit_flag, bool disable_gemv, bool c_matrix_source, bool c_matrix_init_val)
@@ -299,6 +309,28 @@ using float8_e4m3_t = fp8_e4m3fn_t;
 using float8_e5m2_t = fp8_e5m2_t;
 using float4_e1m2x2_t = fp4x2_e1m2_t;
 using float4_e2m1x2_t = fp4x2_e2m1_t;
+
+inline void vcvt_e6m22bf16(vector_bf16& dst, vector_f8e6m2 src, vector_bool mask, Literal part) {}
+inline void vcvt_e8m02bf16(vector_bf16& dst, vector_f8e8m0 src, vector_bool mask, Literal part) {}
+
+inline void vcvt(
+    vector_f8e4m3& dst, vector_f16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+inline void vcvt(
+    vector_f8e5m2& dst, vector_f16 src, vector_bool mask, Literal round, Literal sat, Literal part, Literal mode)
+{}
+
+inline void vpack(vector_u32& dst, vector_u64 src, Literal part) {}
+inline void vpack(vector_u32& dst, vector_s64 src, Literal part) {}
+inline void vpackv2(vector_u16& dst, vector_u16 src) {}
+inline void vpackv2(vector_s16& dst, vector_s16 src) {}
+inline void vpackv2(vector_f16& dst, vector_f16 src) {}
+inline void vpackv2(vector_u32& dst, vector_u32 src) {}
+inline void vpackv2(vector_s32& dst, vector_s32 src) {}
+inline void vpackv2(vector_f32& dst, vector_f32 src) {}
+inline void vpackv2(vector_u64& dst, vector_u64 src) {}
+inline void vpackv2(vector_s64& dst, vector_s64 src) {}
+
 void vcgadd(vector_u32& dst, vector_u16 src, vector_bool pg, int32_t mode);
 void vcgadd(vector_s32& dst, vector_s16 src, vector_bool pg, int32_t mode);
 
@@ -1541,6 +1573,48 @@ inline void load_cbuf_to_cb_transpose_s4(
 inline void load_cbuf_to_cb_transpose_s4(
     float4_e2m1x2_t* dst, __cbuf__ float4_e2m1x2_t* src, uint16_t index_id, uint8_t repeat, uint16_t src_stride,
     uint16_t dst_stride, bool addrmode, uint16_t dst_frac_stride, uint16_t src_frac_stride)
+{}
+
+// ==========scatter_ubuf_to_gm===========
+inline void scatter_ubuf_to_gm(
+    __gm__ uint8_t* dst, __ubuf__ uint8_t* dataSrc, uint8_t sid, uint8_t offset_type, __ubuf__ void* offsetSrc,
+    uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
+{}
+
+inline void scatter_ubuf_to_gm(
+    __gm__ uint16_t* dst, __ubuf__ uint16_t* dataSrc, uint8_t sid, uint8_t offset_type, __ubuf__ void* offsetSrc,
+    uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
+{}
+
+inline void scatter_ubuf_to_gm(
+    __gm__ uint32_t* dst, __ubuf__ uint32_t* dataSrc, uint8_t sid, uint8_t offset_type, __ubuf__ void* offsetSrc,
+    uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
+{}
+
+inline void scatter_ubuf_to_gm(
+    __gm__ uint64_t* dst, __ubuf__ uint64_t* dataSrc, uint8_t sid, uint8_t offset_type, __ubuf__ void* offsetSrc,
+    uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t src_stride, uint32_t offset_num)
+{}
+
+// ==========gather_gm_to_ubuf===========
+inline void gather_gm_to_ubuf(
+    __ubuf__ uint8_t* dst, __gm__ uint8_t* baseSrc, uint8_t sid, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ void* offsetSrc, uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t dst_stride, uint32_t offset_num)
+{}
+
+inline void gather_gm_to_ubuf(
+    __ubuf__ uint16_t* dst, __gm__ uint16_t* baseSrc, uint8_t sid, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ void* offsetSrc, uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t dst_stride, uint32_t offset_num)
+{}
+
+inline void gather_gm_to_ubuf(
+    __ubuf__ uint32_t* dst, __gm__ uint32_t* baseSrc, uint8_t sid, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ void* offsetSrc, uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t dst_stride, uint32_t offset_num)
+{}
+
+inline void gather_gm_to_ubuf(
+    __ubuf__ uint64_t* dst, __gm__ uint64_t* baseSrc, uint8_t sid, uint8_t offset_type, bool constant_padding_ctl,
+    __ubuf__ void* offsetSrc, uint8_t l2_cache_ctl, uint32_t burst_len, uint32_t dst_stride, uint32_t offset_num)
 {}
 
 #if defined(__DAV_CUBE__)

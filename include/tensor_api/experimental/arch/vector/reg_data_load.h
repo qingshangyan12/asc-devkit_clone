@@ -84,6 +84,44 @@ template <gather_mode mode = gather_mode::element, typename Tensor, typename Ind
 __simd_callee__ inline decltype(auto) load_gather(
     const Tensor& tensor, const reg_tensor<Index> index, const reg_tensor<bool>& gather_mask);
 
+/**
+ * @brief Maintains the hardware state for an unaligned UB-to-register load.
+ * @note load() does not advance the prepared state. Call prepare() for each new
+ * source address, using a tensor whose beginning matches the load address.
+ */
+struct unalign_load {
+    __simd_callee__ unalign_load() = default;
+
+    /**
+     * @brief Prepares an unaligned load stream at the beginning of a UB tensor.
+     * @param src_base Tensor whose beginning is the first address of the stream.
+     */
+    template <typename Tensor>
+    __simd_callee__ inline void prepare(const Tensor& src_base);
+
+    /**
+     * @brief Loads one full vector register from the prepared source address.
+     * @param src_tile Tensor whose beginning is the source address for this load.
+     * @return One register tensor containing the loaded data. An int4b_t source
+     * returns reg_tensor<int4x2_t>.
+     */
+    template <typename Tensor>
+    __simd_callee__ inline auto load(const Tensor& src_tile);
+
+    /**
+     * @brief Loads one full vector register from a UB tensor at the specified coordinate.
+     * @param src_tile Source tensor in the prepared unaligned stream.
+     * @param coord Coordinate of the first source element.
+     * @return One register tensor containing the loaded data. An int4b_t source
+     * returns reg_tensor<int4x2_t>.
+     */
+    template <typename Tensor, typename Coord>
+    __simd_callee__ inline auto load(const Tensor& src_tile, const Coord& coord);
+
+private:
+    vector_load_unalign ureg;
+};
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

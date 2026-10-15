@@ -188,6 +188,68 @@ __simd_callee__ inline void store_scatter(
     asc_scatter(dst_engine.begin().get(), src.reg, index.reg, src.mask);
 }
 
+template <typename Tensor, typename RegDataType>
+__simd_callee__ inline void unalign_store::store(Tensor dst_tile, const reg_tensor<RegDataType>& src, uint32_t count)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<reg_data_type, RegDataType>,
+        "unalign_store requires matching tensor and register element types");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_store supports b4, b8, b16, b32, and b64 element types only");
+
+    asc_storeunalign(dst_tile.engine().begin().get(), ureg, src.reg, count);
+}
+
+template <typename Tensor, typename Coord, typename RegDataType>
+__simd_callee__ inline void unalign_store::store(
+    Tensor dst_tile, const Coord& coord, const reg_tensor<RegDataType>& src, uint32_t count)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store only supports tensors located in UB");
+    static_assert(
+        Std::is_same_v<reg_data_type, RegDataType>,
+        "unalign_store requires matching tensor and register element types");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_store supports b4, b8, b16, b32, and b64 element types only");
+    TENSOR_API_DEBUG_CHECK(debug_check_coord, dst_tile.layout(), coord, "unalign_store::store");
+
+    asc_storeunalign((dst_tile.data() + dst_tile.layout()(coord)).get(), ureg, src.reg, count);
+}
+
+template <typename Tensor>
+__simd_callee__ inline void unalign_store::flush(Tensor dst_base, int32_t coord)
+{
+    using engine_type = typename Tensor::engine_type;
+    using data_type = typename Tensor::data_type;
+    using reg_data_type = detail::get_reg_data_type<data_type>;
+    static_assert(
+        Std::is_same_v<get_mem_location<engine_type>, location::ub>,
+        "unalign_store only supports tensors located in UB");
+    static_assert(
+        detail::is_b4_type_v<reg_data_type> || detail::is_b8_type_v<reg_data_type> ||
+            detail::is_b16_type_v<reg_data_type> || detail::is_b32_type_v<reg_data_type> ||
+            detail::is_b64_type_v<reg_data_type>,
+        "unalign_store supports b4, b8, b16, b32, and b64 element types only");
+
+    asc_storeunalign_post(dst_base.engine().begin().get(), ureg, coord);
+}
+
 } // namespace experimental
 } // namespace te
 } // namespace asc

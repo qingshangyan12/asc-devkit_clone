@@ -63,6 +63,7 @@ TEST_F(TestMatmulClient, test_mx_matmul_client_fp8)
 
     TilingParamsMx tilingParamsMx = {1, 64, 64, 64, 64, 64, 64, 32, 32, 32, 2, 2, 1, 1, 2, 2, 1, 1, 0};
     tilingParamsMx.GetTiling(tiling);
+    mm0.InitStatic(&tiling);
 
     using MX_T = fp8_e8m0_t;
 
@@ -113,6 +114,7 @@ TEST_F(TestMatmulClient, test_mx_matmul_client_fp8_ab)
 
     TilingParamsMx tilingParamsMx = {1, 64, 64, 64, 64, 64, 64, 32, 32, 32, 2, 2, 1, 1, 2, 2, 1, 1, 0};
     tilingParamsMx.GetTiling(tiling);
+    mm0.InitStatic(&tiling);
 
     const int32_t left_data_size = tiling.M * tiling.Ka * sizeof(fp8_e4m3fn_t);
     const int32_t right_data_size = tiling.N * tiling.Kb * sizeof(fp8_e4m3fn_t);
@@ -158,6 +160,7 @@ TEST_F(TestMatmulClient, test_mx_matmul_client_fp4)
 
     TilingParamsMx tilingParamsMx = {1, 64, 64, 64, 64, 64, 64, 32, 32, 32, 2, 2, 1, 1, 2, 2, 1, 1, 0};
     tilingParamsMx.GetTiling(tiling);
+    mm1.InitStatic(&tiling);
 
     using MX_T = fp8_e8m0_t;
 

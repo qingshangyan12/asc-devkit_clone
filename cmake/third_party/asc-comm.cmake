@@ -103,6 +103,15 @@ install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTA
 install(CODE "file(CREATE_LINK ../../adv_api/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/include/comm_api/aicore/hcomm SYMBOLIC)" COMPONENT asc-devkit)
 install(CODE "file(CREATE_LINK ../../adv_api/detail/hcomm \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_LIBRARY_DIR}/asc/impl/comm_api/aicore/hcomm SYMBOLIC)" COMPONENT asc-devkit)
 
+# AICPU 公共 API 头由 asc-devkit 直接交付；运行期库仍由 runtime 包提供。
+set(ASC_COMM_AICPU_HEADER_DIR ${ASC_COMM_SOURCE_PATH}/include/aicpu/hcomm)
+if(EXISTS "${ASC_COMM_AICPU_HEADER_DIR}")
+    install(DIRECTORY ${ASC_COMM_AICPU_HEADER_DIR}/
+        DESTINATION ${INSTALL_LIBRARY_DIR}/asc/include/comm_api/aicpu/hcomm
+        COMPONENT asc-devkit
+        FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+endif()
+
 # 构建 asc-comm CCU 动态库（数据面实现 + host-launch 兼容 wrapper），
 # 并将库与公开 DSL 头文件交付到 asc-devkit run 包。
 # CCU 源码归属 asc-comm，跨 SO 依赖通过已安装 CANN pkg_inc 和 POD ABI 解决。
