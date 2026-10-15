@@ -55,11 +55,16 @@ static dim3 group_dim()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(dim3* result)
     {
-        ...
         grid_group g = this_grid();
         dim3 grid_dim = g.group_dim();
-        ...
+        result[threadIdx.x] = grid_dim;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: dim3(1, 1, 1), dim3(1, 1, 1), dim3(1, 1, 1), dim3(1, 1, 1)
+```
