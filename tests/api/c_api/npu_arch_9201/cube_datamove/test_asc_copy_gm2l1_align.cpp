@@ -13,7 +13,7 @@
 #include "c_api/stub/cce_stub.h"
 #include "c_api/asc_simd.h"
 
-template <typename DTYPE>
+template <typename DTYPE, bool expect_pre_load>
 __aicore__ inline void copy_gm_to_cbuf_align_v2_stub(
     __cbuf__ DTYPE* dst, __gm__ DTYPE* src, uint8_t sid, uint32_t n_burst, uint32_t len_burst,
     uint8_t left_padding_count, uint8_t right_padding_count, bool data_select_bit, bool enable_pre_load_ignore_sync,
@@ -27,7 +27,7 @@ __aicore__ inline void copy_gm_to_cbuf_align_v2_stub(
     EXPECT_EQ(left_padding_count, static_cast<uint8_t>(55));
     EXPECT_EQ(right_padding_count, static_cast<uint8_t>(66));
     EXPECT_EQ(data_select_bit, static_cast<bool>(false));
-    EXPECT_TRUE(enable_pre_load_ignore_sync);
+    EXPECT_EQ(enable_pre_load_ignore_sync, expect_pre_load);
     EXPECT_EQ(l2_cache_ctl, static_cast<uint8_t>(4));
     EXPECT_EQ(burst_src_stride, static_cast<uint64_t>(88));
     EXPECT_EQ(burst_dst_stride, static_cast<uint32_t>(99));
@@ -60,12 +60,41 @@ protected:
                                           __cbuf__ dtype*, __gm__ dtype*, uint8_t, uint32_t, uint32_t, uint8_t, \
                                           uint8_t, bool, bool, uint8_t, uint64_t, uint32_t))                    \
             .times(1)                                                                                           \
-            .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype>));                                                \
+            .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype, true>));                                          \
                                                                                                                 \
         asc_copy_gm2l1_align(                                                                                   \
             dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, true,       \
             l2_cache_mode, burst_src_stride, burst_dst_stride);                                                 \
         GlobalMockObject::verify();                                                                             \
+    }
+
+#define TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(dtype)                                                           \
+                                                                                                                   \
+    TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_##dtype##_Short)                                     \
+    {                                                                                                              \
+        __cbuf__ dtype* dst = reinterpret_cast<__cbuf__ dtype*>(11);                                               \
+        __gm__ dtype* src = reinterpret_cast<__gm__ dtype*>(22);                                                   \
+                                                                                                                   \
+        uint32_t n_burst = 33;                                                                                     \
+        uint32_t len_burst = 44;                                                                                   \
+        uint8_t left_padding_count = 55;                                                                           \
+        uint8_t right_padding_count = 66;                                                                          \
+        bool data_select_bit = false;                                                                              \
+        asc_load_l2_cache_mode l2_cache_mode = asc_load_l2_cache_mode::NOTALLOC_KEEP;                              \
+        uint64_t burst_src_stride = 88;                                                                            \
+        uint32_t burst_dst_stride = 99;                                                                            \
+                                                                                                                   \
+        MOCKER_CPP(                                                                                                \
+            copy_gm_to_cbuf_align_v2, void(                                                                        \
+                                          __cbuf__ dtype*, __gm__ dtype*, uint8_t, uint32_t, uint32_t, uint8_t,    \
+                                          uint8_t, bool, bool, uint8_t, uint64_t, uint32_t))                       \
+            .times(1)                                                                                              \
+            .will(invoke(copy_gm_to_cbuf_align_v2_stub<dtype, false>));                                            \
+                                                                                                                   \
+        asc_copy_gm2l1_align(                                                                                      \
+            dst, src, n_burst, len_burst, left_padding_count, right_padding_count, data_select_bit, l2_cache_mode, \
+            burst_src_stride, burst_dst_stride);                                                                   \
+        GlobalMockObject::verify();                                                                                \
     }
 
 TEST_F(TEST_COPY_GM_TO_L1_ALIGN, TEST_COPY_GM_TO_L1_ALIGN_AIV_NOOP)
@@ -94,3 +123,14 @@ TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(int8_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint16_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint32_t);
 TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN(uint8_t);
+
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(bfloat16_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(half);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(float);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(hifloat8_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(int16_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(int32_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(int8_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(uint16_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(uint32_t);
+TEST_CUBE_DATAMOVE_COPY_GM2L1_ALIGN_SHORT(uint8_t);
