@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<!--
+----------------------------------------------------------------------------------------------------------
+Copyright (c) 2026 Huawei Technologies Co., Ltd.
+This program is free software: you can redistribute it and/or modify it under the terms and conditions of
+CANN Open Software License Agreement Version 2.0 (the "License").
+Please refer to the License for details. You may not use this file except in compliance with the License.
+THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
+See LICENSE in the root of the software repository for the full text of the License.
+----------------------------------------------------------------------------------------------------------
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CANN 业务仓 URL 合规整改建议报告</title>
+<style>
+    body {
+        font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 32px;
+        color: #1f2329;
+        background: #f7f8fa;
+        line-height: 1.6;
+    }
+    header {
+        background: linear-gradient(135deg, #002fa7, #005cd6);
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 24px 32px;
+        margin-bottom: 24px;
+    }
+    header h1 { margin: 0 0 8px 0; font-size: 24px; }
+    header p { margin: 2px 0; font-size: 13px; opacity: .92; }
+    h2 {
+        font-size: 18px;
+        border-left: 4px solid #005cd6;
+        padding-left: 10px;
+        margin: 32px 0 12px 0;
+    }
+    h3 { font-size: 15px; margin: 20px 0 8px 0; }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #ffffff;
+        font-size: 13px;
+        margin: 12px 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    th, td {
+        border: 1px solid #e0e3e8;
+        padding: 8px 10px;
+        text-align: left;
+        vertical-align: top;
+        word-break: break-all;
+    }
+    th { background: #eef2f8; font-weight: 600; white-space: nowrap; }
+    tr:nth-child(even) td { background: #fafbfc; }
+    code {
+        background: #f0f2f5;
+        border-radius: 3px;
+        padding: 1px 5px;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 12px;
+        color: #c7254e;
+    }
+    .p0 { color: #d93026; font-weight: 600; }
+    .p1 { color: #e8710a; font-weight: 600; }
+    .p2 { color: #1a73e8; font-weight: 600; }
+    .stats { display: flex; gap: 16px; flex-wrap: wrap; margin: 16px 0; }
+    .stat-card {
+        flex: 1 1 180px;
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 16px;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    }
+    .stat-card .num { font-size: 28px; font-weight: 700; }
+    .stat-card .label { font-size: 12px; color: #646a73; }
+    .stat-card.red .num { color: #d93026; }
+    .stat-card.orange .num { color: #e8710a; }
+    .stat-card.blue .num { color: #1a73e8; }
+    .stat-card.green .num { color: #0f9d58; }
+    ol, ul { padding-left: 24px; }
+    li { margin: 4px 0; }
+    footer {
+        margin-top: 32px;
+        padding-top: 12px;
+        border-top: 1px solid #e0e3e8;
+        font-size: 12px;
+        color: #646a73;
+    }
+    .tag {
+        display: inline-block;
+        border-radius: 10px;
+        padding: 0 8px;
+        font-size: 12px;
+        color: #ffffff;
+        margin-right: 4px;
+    }
+    .tag.p0 { background: #d93026; }
+    .tag.p1 { background: #e8710a; }
+    .tag.p2 { background: #1a73e8; }
+    .note {
+        background: #fff8e1;
+        border-left: 4px solid #f9ab00;
+        padding: 10px 14px;
+        border-radius: 4px;
+        font-size: 13px;
+        margin: 12px 0;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>CANN 业务仓 URL 合规整改建议报告</h1>
+    <p>分析对象：sbom/oss_dep_security_gate_master.json（商业发布代码仓 URL 安全门禁基线）</p>
+    <p>覆盖范围：runtime / asc-devkit / hccl / hcomm / hixl / oam-tools / ge / metadef / amct / opbase / ops-cv / ops-nn / ops-transformer / ops-math / pto-as / asc-tools / atvc / graph-autofusion / pto-isa / pypto-vscode</p>
+    <p>报告日期：2026-10-15</p>
+</header>
+
+<section id="overview">
+    <h2>总体数据</h2>
+    <div class="stats">
+        <div class="stat-card blue"><div class="num">20</div><div class="label">业务仓</div></div>
+        <div class="stat-card blue"><div class="num">~1600</div><div class="label">扫描 URL 总数</div></div>
+        <div class="stat-card red"><div class="num">~60</div><div class="label">P0 必清零项（发布阻断）</div></div>
+        <div class="stat-card orange"><div class="num">~300</div><div class="label">P1 供应链收敛项</div></div>
+        <div class="stat-card green"><div class="num">3</div><div class="label">P2 长效治理规则</div></div>
+    </div>
+    <div class="note">
+        <strong>核心结论：</strong>各业务仓普遍存在内网地址泄漏、AI 工具链配置误提交、CI 产物桶依赖、破损模板字符串、制品源多版本分裂五类问题。需按 P0（本版本清零）→ P1（下版本收敛）→ P2（白名单机制常态化）三批次整改。
+    </div>
+</section>
+
+<section id="baseline">
+    <h2>一、业界规范基线（对标 openEuler / OpenHarmony / 国内商业组织）</h2>
+    <table>
+        <tr><th>社区 / 组织</th><th>核心实践</th><th>对 CANN 的启示</th></tr>
+        <tr>
+            <td>openEuler</td>
+            <td>三方件全部收入 <code>src-openeuler/&lt;pkg&gt;</code> 仓托管，spec 描述构建来源，<strong>禁止构建期直连上游</strong>，版本固定 tag + 校验</td>
+            <td>收敛到单一制品源（<code>cann-src-third-party</code> 或 <code>cann-3rd.obs</code> 二选一），禁止 GitHub / 上游直链</td>
+        </tr>
+        <tr>
+            <td>OpenHarmony</td>
+            <td>三方源码 vendoring 进 <code>third_party/</code>，npm/pip 走统一镜像 + lock 文件，社区门禁拦截未审批 URL</td>
+            <td>语言生态依赖由 lock 文件解析，URL 白名单改为<strong>域名级</strong>而非 URL 枚举</td>
+        </tr>
+        <tr>
+            <td>商业组织（字节 / 阿里）</td>
+            <td>内网 Artifactory 代理 + 构建机不出公网 + SBOM（SPDX）出证</td>
+            <td>开源仓中<strong>内网地址零容忍</strong>；发布仓与 CI 仓隔离（dev → release 桶晋升）</td>
+        </tr>
+        <tr>
+            <td>SLSA / Linux 基金会</td>
+            <td>来源固定（commit/tag）、完整性校验（SHA256）、可追溯（provenance）</td>
+            <td>禁用 <code>latest</code> / <code>Daily</code> / <code>newest</code> 可变路径，全部版本化 + 哈希</td>
+        </tr>
+    </table>
+</section>
+
+<section id="rules">
+    <h2>二、通用整改规则（全仓适用）</h2>
+
+    <h3><span class="tag p0">R1</span>必清零（P0，发布阻断项）</h3>
+    <ol>
+        <li><strong>内网 / 私有泄漏</strong>：<code>10.0.0.x</code>、<code>127.0.0.1</code>、<code>*.devcloud.huaweicloud.com</code>、<code>codehub-y.huawei.com</code>、<code>mirrors.tools.huawei.com</code>、<code>km.sankuai.com</code>（外部公司内网！）、<code>superkernel.local</code>、<code>openlibing.com</code>（若为内部流水线）</li>
+        <li><strong>AI 工具链配置</strong>：<code>obra/superpowers</code>、<code>opencode.ai/config.json</code>、<code>cann-agent/skills.git</code>（产品仓与 AI 辅助配置分离）</li>
+        <li><strong>破损 / 残缺字符串</strong>（扫描器抓到的源码脏数据）：<code>${obs_path</code>、<code>http://x</code>、<code>https://[^</code>、<code>https://）不检查</code>、中文混入 URL（<code>...pull/1437，发现问题后...</code>）、<code>access_token=${TOKEN}</code> 模板、<code>.insteadOf=</code> 误抓 —— 这些同时说明<strong>源码注释 / 文档质量缺陷</strong></li>
+        <li><strong>个人 / 临时仓</strong>：<code>funna2000/kirin_cann_test</code>、<code>zhupc158/CheckerL2</code>、<code>zhangstevenunity/*</code>、<code>obs-9be7</code>、<code>GitHub_Trending/*</code>（来源不明镜像）</li>
+        <li><strong>第三方代理</strong>：<code>ghfast.top</code>（GitHub 加速代理，供应链劫持高危）、<code>hf-mirror.com</code>（非官方 HF 镜像，模型许可合规风险）</li>
+    </ol>
+
+    <h3><span class="tag p1">R2</span>供应链收敛（P1）</h3>
+    <ol>
+        <li><strong>制品源统一</strong>：同一组件（gtest / json / makeself / mockcpp）现存 2 个托管源 + 多版本分裂（json 3.11.3 / 3.12.0 并存、mockcpp h1~h5 五种变体、makeself 两种打包），应统一版本并只保留 <code>cann-src-third-party</code> releases 或 <code>cann-3rd.obs</code> 之一</li>
+        <li><strong>CI 桶与发布桶隔离</strong>：<code>ascend-ci</code>（无 SLA）、<code>msprof_daily</code>、<code>pta/Daily</code>、<code>20260729_newest</code> 等每日构建产物不得出现在商业仓引用中；统一为版本化制品 + SHA256</li>
+        <li><strong>禁止 <code>curl | sh</code> 模式</strong>：<code>cargo-binstall</code>、<code>deb.nodesource.com</code>、<code>micro.mamba.pm/.../latest</code></li>
+        <li><strong>上游直链迁移</strong>（<code>github.com/google/googletest/...</code>、<code>cmake.org</code>、<code>ccache</code> releases 等）至 <code>cann-src-third-party</code> 托管</li>
+    </ol>
+
+    <h3><span class="tag p2">R3</span>白名单制（P2，长效机制）</h3>
+    <ol>
+        <li>URL 门禁由“精确 URL 枚举”升级为 5 类域名规则：①构建制品源 ②官方文档（hiascend / pytorch.org / gcc.gnu.org / tensorflow.org）③许可证（apache.org / opensource.org）④论文引用（arxiv.org / doi.org）⑤语言包 registry（pypi / npm 镜像域名，lock 文件解析，不枚举 tgz 直链）</li>
+        <li>XML 命名空间（<code>w3.org/2000/svg</code>、<code>json-schema.org</code>）属协议标识，从 URL 扫描中排除</li>
+        <li><code>github.com/sponsors/*</code>、<code>opencollective.com/*</code>（lock 解析产物噪音）按域名整体豁免</li>
+    </ol>
+</section>
+
+<section id="repos">
+    <h2>三、逐仓整改要点</h2>
+    <table>
+        <tr>
+            <th style="width:9%">业务仓</th>
+            <th style="width:33%"><span class="p0">必清零（P0）</span></th>
+            <th style="width:33%"><span class="p1">收敛（P1）</span></th>
+            <th style="width:25%"><span class="p2">规范化（P2）</span></th>
+        </tr>
+        <tr><td><strong>runtime</strong></td>
+            <td>superpowers、opencode.ai、<code>${obs_path</code></td>
+            <td><code>latest</code> 路径、rttest_data / acl-compat 无哈希</td>
+            <td>tldp.org 深链换官方文档</td></tr>
+        <tr><td><strong>asc-devkit</strong></td>
+            <td>codehub-y.huawei.com（内网）、<code>${GENERAL_MIRROR</code>、<code>https://ccache</code> / <code>https://code</code> / <code>https://docs</code> 破损串</td>
+            <td>cargo-binstall 脚本、json 3.11.3（与主仓 3.12.0 分裂）、lychee 版本变量</td>
+            <td>ohmyzsh / zsh 系列剥离至 devcontainer</td></tr>
+        <tr><td><strong>hccl</strong></td>
+            <td><code>http://x</code>、example.invalid、tester / someone 示例仓、<code>{}/{}</code> 模板</td>
+            <td>mpich / open-mpi 上游直链迁入托管源</td>
+            <td>openlibing 内部平台确认归属</td></tr>
+        <tr><td><strong>hcomm</strong></td>
+            <td><code>127.0.0.1:8000</code>、破损串</td>
+            <td><code>20260729_newest</code> 日期桶、npm 125 条 tgz 直链 → lock + registry 域名、src-openeuler 与 cann-src 双轨统一</td>
+            <td>sponsor / opencollective 域名豁免</td></tr>
+        <tr><td><strong>hixl</strong></td>
+            <td><code>access_token=${TOKEN}</code>、api v8 带 token 模板、<code>${owner}/${repo}</code> 模板、regex 破损</td>
+            <td>api v5 / v8 统一</td>
+            <td>token 全部改环境变量注入</td></tr>
+        <tr><td><strong>oam-tools</strong></td>
+            <td>中文混入 URL、jq 命令串</td>
+            <td>msprof_daily、devcloud artifactory</td>
+            <td>HiAgent / compliance 用途确认</td></tr>
+        <tr><td><strong>ge</strong></td>
+            <td><strong>10.0.0.193 内网 IP</strong>、<code>${ip</code>、example.com、superpowers、opencode.ai</td>
+            <td>devcloud 镜像源、cmake.org / ccup / lcov GitHub 直链、obs-9be7 个人桶</td>
+            <td>stackoverflow 引用替换为官方文档</td></tr>
+        <tr><td><strong>metadef</strong></td>
+            <td><code>${repo_name</code></td>
+            <td>devcloud、cmake-053 版本统一</td>
+            <td>本仓最接近达标</td></tr>
+        <tr><td><strong>amct</strong></td>
+            <td>superpowers、opencode.ai、<code>）不检查</code>、jq 命令串、中文混入</td>
+            <td>hf-mirror.com、<code>20260902_newest</code>、gh_mirrors/pr 双源</td>
+            <td>FlatQuant 个人学术仓评估后归档说明</td></tr>
+        <tr><td><strong>opbase</strong></td>
+            <td>—（干净）</td>
+            <td>cann-3rd 与 cann-src 双源、github pre-commit 直链</td>
+            <td>版本与主仓对齐</td></tr>
+        <tr><td><strong>ops-cv</strong></td>
+            <td>funna2000 个人仓</td>
+            <td>cmake-044 老版本、googletest 1.11 GitHub 直链与 cann-src 1.14 双版本</td>
+            <td>—</td></tr>
+        <tr><td><strong>ops-nn</strong></td>
+            <td><code>https://...</code>、<code>https://[^</code> 破损</td>
+            <td>googletest 1.11 直链、GTEST_VERSION 变量固化</td>
+            <td>asc.gitcode.com 内部文档外迁</td></tr>
+        <tr><td><strong>ops-transformer</strong></td>
+            <td><code>${obs_path</code>、<strong>km.sankuai.com ×4（外部公司内网）</strong></td>
+            <td>atomgit / gitcode 双托管平台统一、ascend-ci 910b 包</td>
+            <td>—</td></tr>
+        <tr><td><strong>ops-math</strong></td>
+            <td><code>${obs_key</code></td>
+            <td><strong>GitHub_Trending/sp/spack 来源可疑</strong>、cann-spark 制品源确认</td>
+            <td>netlib 注释可留</td></tr>
+        <tr><td><strong>pto-as</strong></td>
+            <td>example.invalid ×8、<strong>ghfast.top</strong>、<code>${REPO}</code> 模板 ×5、github.example、mirrors.tools.huawei.com、hw-native-sys（内部组织暴露于 GitHub）</td>
+            <td>api.github.com、micro.mamba <code>latest</code></td>
+            <td>个人 fork 清理</td></tr>
+        <tr><td><strong>asc-tools</strong></td>
+            <td><code>${GENERAL_MIRROR</code></td>
+            <td>torch / torch_npu 8 条 whl 直链（与 asc-devkit 重复，收敛为 requirements + 镜像）、ccache 直链、cmake-003 老版本</td>
+            <td>ohmyzsh / zsh 剥离</td></tr>
+        <tr><td><strong>atvc</strong></td>
+            <td>—</td>
+            <td>—</td>
+            <td><strong>仅 3 条 URL，全仓标杆样板</strong></td></tr>
+        <tr><td><strong>graph-autofusion</strong></td>
+            <td>superkernel.local、<code>http://</code> 破损</td>
+            <td>pytorch-package <code>Daily</code> 桶、pyenv 双源、tfa 旧版 whl</td>
+            <td>—</td></tr>
+        <tr><td><strong>pto-isa</strong></td>
+            <td>container-obsfs <strong>明文 http</strong></td>
+            <td>googletest zip 直链双源</td>
+            <td>80RC3 老版本文档链接更新</td></tr>
+        <tr><td><strong>pypto-vscode</strong></td>
+            <td><code>${host</code> / <code>${port</code></td>
+            <td>877 条中 739 npm + 87 github 均为 lock 解析产物：<strong>改 registry 域名白名单制</strong>，不逐条枚举；npmjs / npmmirror 双源统一</td>
+            <td>deb.nodesource 脚本</td></tr>
+    </table>
+</section>
+
+<section id="mechanism">
+    <h2>四、落地机制建议</h2>
+    <ol>
+        <li><strong>单一事实源</strong>：各仓删除自带的 <code>cann-src-third-party</code> 硬编码 URL，统一通过 <code>CANN_CMAKE_TAG</code> + <code>add_cann_third_party()</code> 引用 cmake 仓（asc-devkit <code>scripts/download_third_party_offline.sh</code> 固化整改方向，向 ops-* / ge / metadef 推广）</li>
+        <li><strong>门禁升级</strong>：SBOM 扫描（oss_dep_security_gate_master.json 即产物）从 URL 精确匹配改为域名规则匹配 + P0 黑名单（内网段、<code>.local</code>、代理域名、明文 http），新增 URL 需 PR 审批</li>
+        <li><strong>分批出仓</strong>：P0 项（约 60 条）本版本清零 → P1 制品源收敛（约 300 条）下版本 → P2 白名单机制常态化</li>
+        <li><strong>发布验收</strong>：对齐 openEuler 出包标准 —— 全部构建制品有 SHA256、SBOM 出证、离线构建可复现</li>
+    </ol>
+</section>
+
+<footer>
+    <p>数据来源：sbom/oss_dep_security_gate_master.json（master 分支基线扫描） · 生成于 2026-10-15 · 仅供内部整改参考</p>
+</footer>
+
+</body>
+</html>
