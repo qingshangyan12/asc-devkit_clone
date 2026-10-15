@@ -118,3 +118,9 @@ coalesced_group tiled_partition(const coalesced_group& parent, unsigned int tile
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3
+```
