@@ -512,7 +512,7 @@ bool CceConfBase::SetOptionalCoreType(const std::string& key)
             MC32DM11AB,        MC32DM11AC,        Ascend350_354f,    Ascend350_355e,    Ascend960DT_969B5,
             Ascend960DT_968B7, Ascend960DT_966B7, Ascend960DT_969B6, Ascend960DT_966B8, Ascend960DT_966B8Z,
             Ascend960DT_961BZ, Ascend960DT_961BY, Ascend960PR,       Ascend960PR_969A1, Ascend960PR_963A1,
-            Ascend960PR_964A1,
+            Ascend960PR_964A1, Ascend_310N,
         };
         if (soc_vector_core.find(this->target_opti_compilation_infos_.GetSocVersion()) == soc_vector_core.end()) {
             return false;
