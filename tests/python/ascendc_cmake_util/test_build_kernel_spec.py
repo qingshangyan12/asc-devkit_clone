@@ -47,7 +47,7 @@ def bundle_request(tmp_path):
         source_dir=[str(source)],
         source_file=[],
         source_map=[[str(source), "op_impl/dynamic"]],
-        output=str(tmp_path / "output/libcust_compile_db.so"),
+        output=str(tmp_path / "output/libcust_compile_resource.so"),
         work_dir=str(tmp_path / "work"),
         exporter=str(exporter),
         cxx="c++",
@@ -288,7 +288,7 @@ def test_unmapped_source_and_bad_package_map_fail(bundle_request):
 
 
 def test_cli_handles_paths_with_spaces_and_reports_cache_hit(bundle_request, tmp_path):
-    bundle_request.output = str(tmp_path / "with spaces/libcust_compile_db.so")
+    bundle_request.output = str(tmp_path / "with spaces/libcust_compile_resource.so")
     script = Path(bundle.__file__)
     arguments = [sys.executable, str(script)]
     for name in ("input_dir", "source_dir", "source_file"):
@@ -312,7 +312,7 @@ def test_publishes_across_filesystems(bundle_request):
     ):
         pytest.skip("requires writable separate /dev/shm filesystem")
     with tempfile.TemporaryDirectory(prefix="kernel-spec-stage2-", dir="/dev/shm") as output_dir:
-        bundle_request.output = str(Path(output_dir) / "libcust_compile_db.so")
+        bundle_request.output = str(Path(output_dir) / "libcust_compile_resource.so")
         assert bundle.build_bundle(bundle_request) is True
         assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
 

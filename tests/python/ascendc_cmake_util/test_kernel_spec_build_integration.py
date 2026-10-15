@@ -32,7 +32,7 @@ def test_run_scripts_deliver_and_remove_stale_resource_so(tmp_path, script):
     (target / vendor).mkdir(parents=True)
     (target / "vendors/config.ini").write_text("load_priority=customize\n")
     payload = tmp_path / "packages" / vendor
-    resource = payload / "op_spec/libcust_compile_db.so"
+    resource = payload / "op_spec/libcust_compile_resource.so"
     resource.parent.mkdir(parents=True)
     (payload / "version.info").write_text("version=1\n")
     command = ["bash", str(tmp_path / script)]
@@ -54,7 +54,7 @@ def test_run_scripts_deliver_and_remove_stale_resource_so(tmp_path, script):
             timeout=30,
         )
         assert result.returncode == 0, result.stdout + result.stderr
-        installed = target / vendor / "op_spec/libcust_compile_db.so"
+        installed = target / vendor / "op_spec/libcust_compile_resource.so"
         assert installed.exists() == (content is not None)
         if content is not None:
             assert installed.read_bytes() == content
@@ -191,8 +191,8 @@ def test_package_build_cache_and_install_with_same_named_sources(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
-    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_db.so"
-    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_db.so"
+    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_resource.so"
+    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     data = json.loads(installed.read_bytes()[4:])
     assert len(data) == 4
     assert {manifest["source_file"] for manifest in data} == {
@@ -212,7 +212,7 @@ def test_failed_producer_and_reconfigure_cannot_install_old_result(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
-    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_db.so"
+    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     previous = installed.read_bytes()
     (source / "fail").touch()
     result = _build(build, success=False)
@@ -231,8 +231,8 @@ def test_disabled_scopes_and_none_remove_stale_delivery(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
-    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_db.so"
-    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_db.so"
+    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_resource.so"
+    installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     _configure(source, build, "-DDISABLE_SCOPES=ON", "-D_ASC_KERNEL_SPEC_EXPORTER=missing-exporter")
     _build(build)
     _install(build, prefix)

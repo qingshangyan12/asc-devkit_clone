@@ -151,8 +151,12 @@ def _rewrite_include(path, maps, source_parent):
         return SOURCE_MARKER + "/" + str(PurePosixPath(source_parent) / suffix)
     if not os.path.isabs(path):
         return path
-    mapped = _map_absolute(_checked_path(path), maps)
-    return SOURCE_MARKER + "/" + mapped if mapped is not None else path
+    mapped = _map_absolute(Path(os.path.abspath(path)), maps)
+    if mapped is None:
+        # External dependencies are supplied by the consumer and keep their original paths.
+        return path
+    _checked_path(path)
+    return SOURCE_MARKER + "/" + mapped
 
 
 def _rewrite_tokens(tokens, maps, source_parent):
@@ -359,7 +363,7 @@ def _build_locked(request, output, work, lock_key):
             resource_path = unit.resource_root.relative_to(unit.manifest_path.parent)
             shutil.copytree(unit.resource_root, destination / resource_path, symlinks=True)
             (destination / "resource_manifest.json").write_bytes(unit.manifest_json)
-        staged = workspace / "libcust_compile_db.so"
+        staged = workspace / "libcust_compile_resource.so"
         argv = [
             str(tools["exporter"]),
             "--input-dir",
@@ -425,7 +429,7 @@ def reset_tasks(request):
 def build_package(request):
     status = Path(request.install_status)
     status.unlink(missing_ok=True)
-    contexts = json.loads(Path(request.package_state).read_text(encoding="utf-8"))
+    contexts = json.loads(Path(request.build_config).read_text(encoding="utf-8"))
     output = Path(request.output)
     inputs = []
     maps = []
@@ -466,7 +470,7 @@ def build_package(request):
         return
 
     # Retain temporary resources if any contributing kernel enables the existing debug setting.
-    combined_config = Path(request.package_state).with_name("bundle_options.ini")
+    combined_config = Path(request.build_config).with_name("bundle_options.ini")
     combined_config.write_text(
         "\n".join(Path(config).read_text(encoding="utf-8") for config in sorted(set(configs))), encoding="utf-8"
     )
@@ -499,7 +503,7 @@ def engineering_main(action, arguments):
             parser.add_argument("--" + name, required=True)
         parser.add_argument("--task", nargs=2, action="append", default=[], metavar=("OP", "SOC"))
     else:
-        for name in ("package-state", "install-status", "output", "work-dir", "exporter", "cxx", "make"):
+        for name in ("build-config", "install-status", "output", "work-dir", "exporter", "cxx", "make"):
             parser.add_argument("--" + name, required=True)
     request = parser.parse_args(arguments)
     if action == "reset" and not re.fullmatch(r"[0-9a-f]{64}", request.task_id):
