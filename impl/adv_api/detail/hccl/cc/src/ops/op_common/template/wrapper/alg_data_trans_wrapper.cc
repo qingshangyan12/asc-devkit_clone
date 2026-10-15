@@ -982,7 +982,7 @@ uint16_t Fp32DenormToFp16(uint32_t sign, uint32_t mantissa, int32_t fp16Exp)
 uint16_t Fp32ToFp16(float value)
 {
     uint32_t fp32Bits;
-    std::memcpy(&f, &result, sizeof(f));
+    std::memcpy(&fp32Bits, &value, sizeof(fp32Bits));
     uint32_t sign = (fp32Bits >> 31) & 0x1;
     uint32_t exponent = (fp32Bits >> 23) & 0xFF;
     uint32_t mantissa = fp32Bits & 0x7FFFFF;
