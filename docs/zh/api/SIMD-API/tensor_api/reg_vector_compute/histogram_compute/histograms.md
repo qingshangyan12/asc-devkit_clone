@@ -117,7 +117,7 @@ __simd_callee__ inline reg_tensor<T> histograms(const reg_tensor<T>& dst, const 
 
 ```cpp
 #include "c_api/asc_simd.h"
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 constexpr uint16_t initial_value = 3;
 constexpr asc::te::experimental::histogram_options histogram_config {

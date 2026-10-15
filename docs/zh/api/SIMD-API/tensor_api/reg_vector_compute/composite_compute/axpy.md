@@ -78,7 +78,7 @@ __simd_callee__ inline reg_tensor<T> axpy(reg_tensor<T>& dst, const reg_tensor<T
 ## 调用示例
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename DstTensor, typename SrcTensor>
 __simd_vf__ inline void axpy_vf(

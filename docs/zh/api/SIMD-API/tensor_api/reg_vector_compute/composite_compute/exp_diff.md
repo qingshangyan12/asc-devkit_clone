@@ -96,7 +96,7 @@ __simd_callee__ inline reg_tensor<T> exp_diff(const reg_tensor<U>& src0, const r
 以下示例展示`half`输入的典型调用方式。
 
 ```cpp
-#include "tensor_api/experimental/vector_compute.h"
+#include "tensor_api/experimental/vector_ops.h"
 
 template <typename Src0Tensor, typename Src1Tensor, typename DstTensor>
 __simd_vf__ inline void exp_diff_vf(
