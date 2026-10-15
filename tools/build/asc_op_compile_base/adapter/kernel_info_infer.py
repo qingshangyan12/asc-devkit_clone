@@ -152,7 +152,7 @@ processed as numeric variables in the precompilation phase. please use numeric c
 
     @staticmethod
     def get_kernel_type_enum(kernel_type, compile_log_path):
-        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
+        if CommonUtility.is_split_core_arch():
             if kernel_type in STR_TO_KERNEL_TYPE_V220.keys():
                 return STR_TO_KERNEL_TYPE_V220[kernel_type]
             else:
@@ -180,7 +180,7 @@ processed as numeric variables in the precompilation phase. please use numeric c
 
     @staticmethod
     def get_kernel_type_enum_for_group(kernel_type):
-        if any((CommonUtility.is_v220(), CommonUtility.is_c310(), CommonUtility.is_920r1(), CommonUtility.is_920r2())):
+        if CommonUtility.is_split_core_arch():
             if kernel_type in STR_TO_KERNEL_TYPE_V220.keys():
                 return STR_TO_KERNEL_TYPE_V220[kernel_type]
             elif kernel_type in STR_TO_KERNEL_TYPE_V200.keys():
@@ -361,9 +361,7 @@ REGISTER_TILING_DEFAULT"
         tiling_struct_expr_map = {}
         register_tiling_struct = set()
         tpl_tiling_struct = set()
-        if not (
-            CommonUtility.is_v220() or CommonUtility.is_c310() or CommonUtility.is_920r1() or CommonUtility.is_920r2()
-        ):
+        if not CommonUtility.is_split_core_arch():
             code_channel = CORE_TYPE_MIX
         if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
             check_exist_instrinsic_when_super_kernel(dst_i_file)
