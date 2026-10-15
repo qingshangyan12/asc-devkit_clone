@@ -77,4 +77,12 @@ static dim3 group_index()
         dim3 block_idx = g.group_index();
         ...
     }
+
+返回的dim3按dim3(x,y,z)格式显示。
+
+输入输出示例如下：
+
+```text
+result:dim3(0,0,0)
+```
     ```
