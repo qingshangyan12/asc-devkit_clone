@@ -14,6 +14,7 @@ ascendc compile dfx
 """
 
 import enum
+import struct
 from functools import reduce
 from .ascendc_common_utility import CommonUtility, CompileInfo, get_kernel_fun_name_with_tiling_key_and_kernel_type
 from .get_op_tiling import OpInfo, TilingInfo
@@ -79,6 +80,8 @@ class FuncMetaType(enum.Enum):
     F_TYPE_L0_EXCEPTION_DFX = 4  # DFX tlv for header
     F_TYPE_L0_EXCEPTION_DFX_ARGSINFO = 5  # DFX tlv for args info
     F_TYPE_L0_EXCEPTION_DFX_IS_TIK = 6  # DFX tlv mark for TIK
+    F_TYPE_PARAM_SUMMARY = 16
+    F_TYPE_PARAM_INFO = 17
     F_TYPE_MAX = -1
 
 
@@ -107,6 +110,7 @@ class DFXSectionGenerator:
         self.gen_dfx_struct_flag: bool = False
         self.is_support: bool = False
         self.param_placeholder_num = 0
+        self.kernel_param_count = None
         self.is_support = self.is_support_dfx(op_info)
 
     @staticmethod
@@ -362,10 +366,48 @@ class DFXSectionGenerator:
 
         return section_var
 
+    def generate_param_section(self, kernel_name: str):
+        if self.kernel_param_count is None:
+            return ""
+        # The ACLNN wrapper signature consists entirely of 64-bit GM_ADDR slots.
+        # Serialize explicitly: native C struct padding must not split the TLVs.
+        pointer_size = 8
+        data = struct.pack(
+            "<HHIQ",
+            FuncMetaType.F_TYPE_PARAM_SUMMARY.value,
+            12,
+            self.kernel_param_count,
+            self.kernel_param_count * pointer_size,
+        )
+        for index in range(self.kernel_param_count):
+            # index, ordinal, offset, size, alignment, pointer type, address-space fields, reserved.
+            data += struct.pack(
+                "<HHIIIIHHIIII",
+                FuncMetaType.F_TYPE_PARAM_INFO.value,
+                36,
+                index,
+                index,
+                index * pointer_size,
+                pointer_size,
+                pointer_size,
+                2,
+                0,
+                0,
+                0,
+                0,
+            )
+        values = ", ".join(str(value) for value in data)
+        return (
+            f"static const unsigned char {kernel_name}_param_section[] __attribute__ "
+            f'((used, aligned(4), section(".ascend.meta.{kernel_name}"))) = {{{values}}};\n'
+        )
+
     def generate_dfx_section_for_one_tiling_key(
         self, tiling_key: str, kernel_name: str, compile_info: CompileInfo, kernel_type_section: bool = False
     ):
-        section_content = ""
+        section_content = self.generate_param_section(kernel_name)
+        if not self.is_support:
+            return section_content
         # generate kernel type tlv section
         if kernel_type_section:
             section_content += self.generate_kernel_type_section(compile_info, kernel_name)
@@ -406,10 +448,14 @@ class DFXSectionGenerator:
         compile_info: CompileInfo,
         kernel_type_section: bool = False,
     ):
-        if self.is_support is False:
+        if not self.is_support and self.kernel_param_count is None:
             return ""
 
-        if not tiling_info.static_shape_flag and not global_var_storage.get_variable("ascendc_tiling_no_register"):
+        if (
+            self.is_support
+            and not tiling_info.static_shape_flag
+            and not global_var_storage.get_variable("ascendc_tiling_no_register")
+        ):
             self._generate_binary_for_tiling(tiling_key, tiling_info, compile_info)
 
         section_content = f"// generate dfx section for tiling_key:{tiling_key}"
@@ -436,7 +482,7 @@ class DFXSectionGenerator:
         )
 
         # generate struct for dfx section
-        if self.gen_dfx_struct_flag == False:
+        if self.is_support and self.gen_dfx_struct_flag == False:
             if not global_var_storage.get_variable("ascendc_tiling_no_register"):
                 section_content += self._generate_dfx_info_struct()
 

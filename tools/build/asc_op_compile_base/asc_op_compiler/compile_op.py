@@ -229,6 +229,11 @@ def _gen_kernel_func_declare_head(
     super_kernel_params, func_params = _gen_kernel_func_declare_head_with_workspace(
         tiling_info, super_kernel_params, func_params
     )
+    # Capture the actual wrapper ABI, including overflowStatus and static workspace.
+    # DFX parameters describe pointees and can omit these argument slots.
+    dfx_generator.kernel_param_count = (
+        None if global_var_storage.get_variable("ascendc_enable_super_kernel") is True else len(func_params)
+    )
     if global_var_storage.get_variable("ascendc_enable_super_kernel") is True:
         global_var_storage.set_variable("ascendc_sub_super_kernel_params", super_kernel_params)
         context = get_context()
