@@ -82,6 +82,12 @@ HcclResult AicpuReduce(
     const ThreadHandle& thread, const DataSlice& srcSlice, const DataSlice& dstSlice, const HcclDataType dataType,
     const HcclReduceOp reduceOp);
 
+float Fp16ToFp32(uint16_t fp16Bits);
+
+uint16_t Fp32ToFp16(float value);
+
+HcclResult AicpuReduceFp16(u8* dst, u8* src, u64 size, const HcclReduceOp reduceOp);
+
 template <typename T>
 HcclResult AicpuReduceTemplate(T* dst, u64 dstSize, T* src, u64 srcSize, const HcclReduceOp reduceOp);
 } // namespace mc2_ops_hccl
