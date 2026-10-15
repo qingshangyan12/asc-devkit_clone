@@ -50,6 +50,8 @@
 #include "dav_l300/kernel_operator_vec_mulcast_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_vec_mulcast_impl.h"
+#elif __NPU_ARCH__ == 5101
+#include "dav_5161/kernel_operator_vec_mulcast_impl.h"
 #endif
 
 #pragma begin_pipe(V)
