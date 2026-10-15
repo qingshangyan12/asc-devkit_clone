@@ -436,6 +436,8 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, "InsAllGatherMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllGatherSoleNHR"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllGatherSoleNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsAllGatherParallelMesh1DNHRMultiJetty"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
@@ -626,8 +628,9 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
             }
         }
     }
-    // 覆盖数锚（限 5 个集合通信 CMD）：31 个 (op,外部名) 键（51 行归并）；
-    // 41 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
+    // 覆盖数锚（限 5 个集合通信 CMD）：32 个 (op,外部名) 键（52 行归并；MultiLink
+    // 外部名修正为 sole[nhr.multi_channel] 后自 AG sole[nhr] 键分立，新增该键）；
+    // 42 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
     // 限定 COLL_CMDS 范围使锚不受测试内注册行（如 KFC cmd 的宏验证行）影响。
     const std::set<HcclCMDType> collCmds(std::begin(COLL_CMDS), std::end(COLL_CMDS));
     size_t keyCount = 0;
@@ -645,8 +648,8 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
         }
         comboCount += engines.size();
     }
-    EXPECT_EQ(keyCount, 31U);
-    EXPECT_EQ(comboCount, 41U);
+    EXPECT_EQ(keyCount, 32U);
+    EXPECT_EQ(comboCount, 42U);
 }
 
 TEST(ExtAlgResolver, SpecificityOrdering)

@@ -229,8 +229,8 @@ REGISTER_EXEC_V2(
     HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHRMultiLink, InsV2AllGatherSoleExecutor, TopoMatch1D,
     InsTempAllGatherNHR);
 REGISTER_ALG_META(
-    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHRMultiLink, AlgEngine::AICPU, "sole[nhr]", COND_NONE,
-    FLAG_NONE, 0);
+    HcclCMDType::HCCL_CMD_ALLGATHER, AicpuAllGatherSoleNHRMultiLink, AlgEngine::AICPU, "sole[nhr.multi_channel]",
+    COND_NONE, FLAG_NONE, 0);
 
 #if !defined(AICPU_COMPILE) && MC2_CLIENT_ENABLE_CCU
 
