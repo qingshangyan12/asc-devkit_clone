@@ -63,3 +63,9 @@ static dim3 dim_blocks()
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: dim3(32, 1, 1)
+```
