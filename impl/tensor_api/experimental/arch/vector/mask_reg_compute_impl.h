@@ -9,6 +9,8 @@
  */
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
+#warning \
+    "impl/tensor_api/experimental/arch/vector/mask_reg_compute_impl.h is an internal header file and must not be used directly. Include the corresponding header under include/tensor_api/experimental instead."
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
 #define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_MASK_REG_COMPUTE_IMPL_H
 #endif
