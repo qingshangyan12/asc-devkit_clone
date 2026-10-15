@@ -752,11 +752,10 @@ static HcclResult TryForcedAlgAndPrepareEngine(
 {
     forcedAlgAccepted = false;
     std::string forcedAlgName;
-    std::string bareName;
     ExternalAlgSpec extSpec;
     std::string classifyErrMsg;
-    const ForcedAlgKind kind = ClassifyForcedAlgConfig(
-        algConfig == nullptr ? std::string() : std::string(algConfig), bareName, extSpec, classifyErrMsg);
+    const ForcedAlgKind kind =
+        ClassifyForcedAlgConfig(algConfig == nullptr ? std::string() : std::string(algConfig), extSpec, classifyErrMsg);
 
     OpParam opParamBackup = opParam; // topo 准备会改写 opParam，失败恢复以入口现场为基线
     if (kind == ForcedAlgKind::EXTERNAL) {
@@ -764,9 +763,6 @@ static HcclResult TryForcedAlgAndPrepareEngine(
         if (!ResolveExternalAlgName(comm, algConfig, opParam, topoInfo, forcedAlgName)) {
             return HCCL_SUCCESS;
         }
-    } else if (kind == ForcedAlgKind::BARE_NAME) {
-        forcedAlgName = bareName;
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
     } else {
         if (kind == ForcedAlgKind::LEGACY) {
             HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", algConfig);
@@ -977,10 +973,8 @@ static HcclResult PrepareAlltoAllSendCounts(HcclComm comm, OpParam& opParam, std
     if (opParam.opType != HcclCMDType::HCCL_CMD_ALLTOALL) {
         return HCCL_SUCCESS;
     }
-    constexpr uint64_t ALLTOALL_DEFAULT_SEND_COUNTS = 200ULL * 1024 * 1024;
     uint32_t userRankSize = 0;
     CHK_RET(HcclGetRankSize(comm, &userRankSize));
-    sendCounts.assign(userRankSize, ALLTOALL_DEFAULT_SEND_COUNTS);
     opParam.all2AllVDataDes.sendCounts = reinterpret_cast<void*>(sendCounts.data());
     return HCCL_SUCCESS;
 }
@@ -1121,20 +1115,15 @@ HcclResult SelectCcuAlgorithm(
     }
 
     // 外部名需 topo 参与消歧，单独定名
-    std::string bareName;
     ExternalAlgSpec extSpec;
     std::string classifyErrMsg;
     const char* forcedConfig = ccTiling == nullptr ? nullptr : ccTiling->algConfig;
     const ForcedAlgKind kind = ClassifyForcedAlgConfig(
-        forcedConfig == nullptr ? std::string() : std::string(forcedConfig), bareName, extSpec, classifyErrMsg);
+        forcedConfig == nullptr ? std::string() : std::string(forcedConfig), extSpec, classifyErrMsg);
 
     bool forcedAccepted = false;
     if (kind == ForcedAlgKind::EXTERNAL) {
         forcedAccepted = ResolveExternalAlgName(comm, forcedConfig, opParam, topoInfo, algName);
-    } else if (kind == ForcedAlgKind::BARE_NAME) {
-        algName = bareName;
-        CHK_RET(PrepareTopoInfoForOp(comm, opParam, topoInfo));
-        forcedAccepted = true;
     } else if (kind == ForcedAlgKind::LEGACY) {
         HCCL_INFO("[MC2_FORCE_ALG] legacy algConfig[%s], use default selector.", forcedConfig);
     }
