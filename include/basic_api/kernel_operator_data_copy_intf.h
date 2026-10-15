@@ -130,7 +130,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const bool enablePreReadIgnoreSync);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, bool enableSmallC0 = false>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopy(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const Dn2NzParams& intriParams);
@@ -491,7 +492,8 @@ __aicore__ inline void DataCopyPad(
 
 // override DataCopyPad, use new param DataCopyExtParams
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const DataCopyExtParams& dataCopyParams,
@@ -525,7 +527,8 @@ __aicore__ inline __inout_pipe__(MTE2) void DataCopyPad(
     const DataCopyPadExtParams<U>& padParams);
 
 #if (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
-    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
+    (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 9201) || \
+    (__NPU_ARCH__ == 9202)
 template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline __inout_pipe__(MTE3) void DataCopyPad(
     const GlobalTensor<T>& dst, const LocalTensor<T>& src, const DataCopyExtParams& dataCopyParams);
