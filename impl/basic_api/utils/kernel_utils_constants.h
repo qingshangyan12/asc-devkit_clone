@@ -95,6 +95,12 @@ constexpr uint32_t POWER_INT32_BITS = 32;
 constexpr uint32_t INT4_TWO = 2;
 constexpr uint32_t INT4_BIT_NUM = 4;
 
+#if (__NPU_ARCH__ == 3113)
+// int2b_t param
+constexpr uint32_t INT1_EIGHT = 8;
+constexpr uint32_t INT1_BIT_NUM = 1;
+#endif
+
 #if (__NPU_ARCH__ == 5102)
 // int2b_t param
 constexpr uint32_t INT2_FOUR = 4;

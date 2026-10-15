@@ -229,7 +229,6 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
             float, int32_t, uint32_t>(),
         "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
-    if ASCEND_IS_AIC {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         if (loadDataParam.GetIfTranspose()) {
             load_cbuf_to_ca(
@@ -259,7 +258,6 @@ __aicore__ inline void LoadData2DL12L0ACal(__ca__ T* dst, __cbuf__ T* src, const
             }
         }
 #endif
-    }
 }
 
 template <typename T>
@@ -271,7 +269,6 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
             float, int32_t, uint32_t>(),
         "LoadData 2dv2 only support fp4x2_e2m1_t, fp4x2_e1m2_t, uint8_t, int8_t, hifloat8_t, fp8_e5m2_t, fp8_e4m3fn_t, \
          half, bfloat16_t, float, int32_t, uint32_t on current device!");
-    if ASCEND_IS_AIC {
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
         if (loadDataParam.GetIfTranspose()) {
             load_cbuf_to_cb(
@@ -301,7 +298,6 @@ __aicore__ inline void LoadData2DL12L0BCal(__cb__ T* dst, __cbuf__ T* src, const
             }
         }
 #endif
-    }
 }
 
 /* **************************************************************************************************
