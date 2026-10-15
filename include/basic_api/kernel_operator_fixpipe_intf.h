@@ -93,7 +93,7 @@ template <typename T>
 __aicore__ inline void SetFixPipeAddr(const LocalTensor<T>& eleWiseData, uint16_t c0ChStride);
 
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201 || __NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || \
-                              __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
+                              __NPU_ARCH__ == 5101 || __NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102)
 // L0C->L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(

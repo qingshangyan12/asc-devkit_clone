@@ -53,7 +53,7 @@ __simd_callee__ inline void Move(U& dstReg, U& srcReg)
 
 #if !(                       \
     defined(__NPU_ARCH__) && \
-    (__NPU_ARCH__ == 5101 || __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
+    (__NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163))
 // Kirin v516 平台不支持如下历史接口
 template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::MERGING, typename U>
 __simd_callee__ inline void Copy(U& dstReg, U& srcReg, MaskReg mask)

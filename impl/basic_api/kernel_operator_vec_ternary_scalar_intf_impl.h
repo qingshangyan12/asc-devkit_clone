@@ -45,6 +45,8 @@
 #include "dav_l300/kernel_operator_vec_ternary_scalar_impl.h"
 #elif (__NPU_ARCH__ == 3113)
 #include "dav_l311/kernel_operator_vec_ternary_scalar_impl.h"
+#elif (__NPU_ARCH__ == 5101)
+#include "dav_5161/kernel_operator_vec_ternary_scalar_impl.h"
 #endif
 #include "kernel_check.h"
 

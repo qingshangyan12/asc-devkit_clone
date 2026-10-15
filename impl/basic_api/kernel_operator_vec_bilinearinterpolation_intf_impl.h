@@ -44,6 +44,8 @@
 #include "dav_5162/kernel_operator_vec_bilinearinterpolation_impl.h"
 #elif __NPU_ARCH__ == 3113
 #include "dav_l311/kernel_operator_vec_bilinearinterpolation_impl.h"
+#elif (__NPU_ARCH__ == 5101)
+#include "dav_5161/kernel_operator_vec_bilinearinterpolation_impl.h"
 #endif
 
 #pragma begin_pipe(V)
@@ -58,7 +60,7 @@ __aicore__ inline void BilinearInterpolationCheck(
 #if __NPU_ARCH__ == 2201
     uint32_t expectedTmpBufferSize = (src0.GetSize() + src1.GetSize()) * 32;
 #elif (__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5162) || (__NPU_ARCH__ == 3003) || \
-    (__NPU_ARCH__ == 3113)
+    (__NPU_ARCH__ == 3113) || (__NPU_ARCH__ == 5101)
     uint32_t expectedTmpBufferSize = 0;
 #else
     uint32_t expectedTmpBufferSize = src0Offset.GetSize() * sizeof(uint32_t);
