@@ -225,9 +225,16 @@ function(simple_kernel_compile)
     set(BINCMP_OUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/binary)
   endif()
   get_property(kernel_spec_task_id GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_${BINCMP_TARGET_NAME}_KERNEL_SPEC_TASK)
-  set(kernel_spec_task_option)
+  set(kernel_spec_options)
+  set(kernel_spec_shell_options)
   if(kernel_spec_task_id)
-    set(kernel_spec_task_option "--kernel-spec-task=${kernel_spec_task_id}")
+    get_property(kernel_spec_mode GLOBAL PROPERTY _ASC_PKG_${BINCMP_PACKAGE_NAME}_KERNEL_SPEC_MODE)
+    get_property(kernel_binary_path GLOBAL PROPERTY _ASC_TGT_KERNEL_${BINCMP_TARGET_NAME}_BINARY_DIR)
+    set(kernel_spec_root "${kernel_binary_path}/kernel_spec")
+    set(kernel_spec_options "--kernel-spec-mode=${kernel_spec_mode}"
+      "--kernel-spec-dir=${kernel_spec_root}" "--kernel-spec-task=${kernel_spec_task_id}")
+    string(REPLACE "'" "'\\''" kernel_spec_root_shell "${kernel_spec_root}")
+    set(kernel_spec_shell_options "--kernel-spec-mode=${kernel_spec_mode} --kernel-spec-dir='${kernel_spec_root_shell}' --kernel-spec-task=${kernel_spec_task_id}")
   endif()
   set(BINCMP_TILING_LIB_TMP ${BINCMP_TILING_LIB})
   set(BINCMP_TILING_LIB $<TARGET_FILE:${BINCMP_PACKAGE_NAME}_ascendc_${BINCMP_TILING_LIB}>)
@@ -266,7 +273,7 @@ function(simple_kernel_compile)
             --json-file=${BINCMP_JSON_FILE} \
             --target-name=${BINCMP_TARGET_NAME} \
             --auto-gen-path=${auto_gen_path} \
-            ${kernel_spec_task_option} \
+            ${kernel_spec_shell_options} \
             --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1; echo $? > ${BINCMP_COMPILE_FAIL_FLAG}"
       )
 
@@ -305,7 +312,7 @@ function(simple_kernel_compile)
                       --json-file=${BINCMP_JSON_FILE}
                       --target-name=${BINCMP_TARGET_NAME}
                       --auto-gen-path=${auto_gen_path}
-                      ${kernel_spec_task_option}
+                      ${kernel_spec_options}
                       --build-tool=$(MAKE))
     endif()
     add_dependencies(${BINCMP_OP_TYPE}_${BINCMP_COMPUTE_UNIT} ${BINCMP_PACKAGE_NAME}_ascendc_${BINCMP_TILING_LIB_TMP})
@@ -329,7 +336,7 @@ function(simple_kernel_compile)
             --json-file=${BINCMP_JSON_FILE} \
             --target-name=${BINCMP_TARGET_NAME} \
             --auto-gen-path=${auto_gen_path} \
-            ${kernel_spec_task_option} \
+            ${kernel_spec_shell_options} \
             --build-tool=$(MAKE) > ${BINCMP_COMPILE_LOG} 2>&1; echo $? > ${BINCMP_COMPILE_FAIL_FLAG}"
       )
 
@@ -368,7 +375,7 @@ function(simple_kernel_compile)
                       --json-file=${BINCMP_JSON_FILE}
                       --target-name=${BINCMP_TARGET_NAME}
                       --auto-gen-path=${auto_gen_path}
-                      ${kernel_spec_task_option}
+                      ${kernel_spec_options}
                       --build-tool=$(MAKE))
     endif()
   endif()
@@ -487,13 +494,13 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
   set(spec_target "${package_name}_kernel_spec")
   set(reset_target "${package_name}_${kernel_target}_kernel_spec_reset")
   get_property(spec_work GLOBAL PROPERTY _ASC_PKG_${package_name}_KERNEL_SPEC_BUILD_DIR)
-  set(spec_output "${spec_work}/op_spec/libcust_compile_db.so")
+  set(spec_output "${spec_work}/op_spec/libcust_compile_resource.so")
   set(spec_status "${spec_work}/install_status.cmake")
   set(spec_state "${spec_work}/${kernel_spec_task_id}.tasks.json")
-  set(package_state "${spec_work}/kernels.json")
+  set(spec_build_config "${spec_work}/kernel_spec_build_config.json")
   set(spec_script "${ASCENDC_CMAKE_SCRIPTS_PATH}/util/ascendc_build_kernel_spec.py")
   set(spec_common --state "${spec_state}" --install-status "${spec_status}"
-    --opc-config "${auto_gen_path}/custom_opc_options.ini" --task-id "${kernel_spec_task_id}")
+    --kernel-spec-mode "${kernel_spec_mode}" --kernel-spec-dir "${kernel_spec_root}" --task-id "${kernel_spec_task_id}")
   # A new configure must not install the previous configuration's result.
   file(MAKE_DIRECTORY "${spec_work}")
   file(REMOVE "${spec_status}")
@@ -511,7 +518,7 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
   endforeach()
 
   if(NOT TARGET ${spec_target})
-    file(WRITE "${package_state}" "[]")
+    file(WRITE "${spec_build_config}" "[]")
     set_property(GLOBAL PROPERTY _ASC_PKG_${package_name}_KERNEL_SPEC_RESOURCE_DIR "${kernel_spec_install_dir}")
     # exporter and make run on the build host; the SO compiler targets the package consumer.
     # Tools are required only when final scopes contain an effective export task.
@@ -527,7 +534,7 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
 
     add_custom_target(${spec_target}
       COMMAND "${ASCEND_PYTHON_EXECUTABLE}" "${spec_script}" bundle
-        --package-state "${package_state}" --install-status "${spec_status}"
+        --build-config "${spec_build_config}" --install-status "${spec_status}"
         --output "${spec_output}" --work-dir "${spec_work}/cache"
         --exporter "${_ASC_KERNEL_SPEC_EXPORTER}" --cxx "${_ASC_KERNEL_SPEC_CXX}" --make "${_ASC_KERNEL_SPEC_MAKE}"
       BYPRODUCTS "${spec_output}" "${spec_status}"
@@ -553,7 +560,7 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
       if(ASCENDC_KERNEL_SPEC_HAS_RESOURCES)
         file(INSTALL DESTINATION \"\${spec_destination}\" TYPE FILE FILES \"${spec_output}\")
       else()
-        file(REMOVE \"\$ENV{DESTDIR}\${spec_destination}/libcust_compile_db.so\")
+        file(REMOVE \"\$ENV{DESTDIR}\${spec_destination}/libcust_compile_resource.so\")
       endif()
     ")
   else()
@@ -572,12 +579,12 @@ function(_ascendc_add_kernel_spec_target package_name kernel_target)
     "{\"state\":${spec_state_json},\"opc_config\":${opc_config_json},"
     "\"source_root\":${KERNEL_SRC_BASE_json},\"copied_source_root\":${KERNEL_DYNAMIC_PATH_json},"
     "\"source_destination\":${kernel_spec_source_destination_json}}")
-  file(READ "${package_state}" kernel_contexts)
+  file(READ "${spec_build_config}" kernel_contexts)
   string(REGEX REPLACE "\\]$" "" kernel_contexts "${kernel_contexts}")
   if(NOT kernel_contexts STREQUAL "[")
     string(APPEND kernel_contexts ",")
   endif()
-  file(WRITE "${package_state}" "${kernel_contexts}${kernel_context}]")
+  file(WRITE "${spec_build_config}" "${kernel_contexts}${kernel_context}]")
   add_dependencies(${spec_target} ${reset_target})
   foreach(soc IN LISTS ASCEND_COMPUTE_UNIT)
     add_dependencies(${spec_target} ${kernel_target}_ascendc_bin_${soc}_gen_ops_config)
@@ -613,7 +620,7 @@ function(_ascendc_remove_kernel_spec_install package_name resource_dir)
     endif()
     # Active resource targets perform their own status check before changing installed files.
     if(NOT $<TARGET_EXISTS:${package_name}_kernel_spec>)
-      file(REMOVE \"\$ENV{DESTDIR}\${spec_cleanup_destination}/libcust_compile_db.so\")
+      file(REMOVE \"\$ENV{DESTDIR}\${spec_cleanup_destination}/libcust_compile_resource.so\")
     endif()
   ")
 endfunction()
@@ -1344,8 +1351,6 @@ function(npu_op_package_add target_package_name)
       string(SHA256 kernel_spec_task_id "${target_package_name}/${_ascendc_kernel_target}")
       set_property(GLOBAL PROPERTY _ASC_PKG_${target_package_name}_${_ascendc_kernel_target}_KERNEL_SPEC_TASK "${kernel_spec_task_id}")
       set(kernel_spec_root "${KERNEL_BINARY_PATH}/kernel_spec")
-      npu_op_kernel_options(${_ascendc_kernel_target} ALL OPTIONS
-        "--kernel-spec=${kernel_spec_mode}" "--kernel-spec-dir=${kernel_spec_root}")
     endif()
 
     set(kernel_spec_tasks)

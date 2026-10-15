@@ -26,111 +26,50 @@ import kernel_spec_options
 import ascendc_gen_options
 
 
-def test_split_writes_global_kernel_spec_and_preserves_other_options(tmp_path):
-    config_file = tmp_path / "custom_opc_options.ini"
-
-    remaining = kernel_spec_options.split_and_write_options(
-        ["--kernel-spec=Normal", f"--kernel-spec-dir={tmp_path}/kernel_spec", "-O2"], str(config_file), "ALL", ""
-    )
-
-    assert remaining == ["-O2"]
-    assert config_file.read_text(encoding="utf-8") == (
-        f"ALL@@--kernel-spec=Normal@--kernel-spec-dir={tmp_path}/kernel_spec\n"
-    )
+@pytest.mark.parametrize("mode", ["Normal", "SK"])
+def test_direct_options_and_task_directory_agree(tmp_path, mode):
+    root = tmp_path / "resources with spaces"
+    task_id = "1" * 64
+    directory = kernel_spec_options.task_directory(str(root), "AddCustom", "Ascend910B1", task_id)
+    assert directory == root / "ascend910b" / (".ascendc-" + task_id) / "ascend910b1" / "AddCustom"
+    options = shlex.split(kernel_spec_options.shell_options(mode, str(root), "AddCustom", "Ascend910B1", task_id))
+    assert options == [f"--kernel-spec={mode}", "--kernel-spec-dir=" + str(directory)]
 
 
-def test_shell_options_reads_global_rule_and_adds_soc_directory(tmp_path):
-    config_file = tmp_path / "custom_opc_options.ini"
-    config_file.write_text(f"ALL@@--kernel-spec=Normal@--kernel-spec-dir={tmp_path}/kernel_spec\n", encoding="utf-8")
+def test_direct_options_without_task_keep_chip_directory(tmp_path):
+    options = shlex.split(kernel_spec_options.shell_options("Normal", str(tmp_path), "OtherOp", "ascend950"))
+    assert options == ["--kernel-spec=Normal", f"--kernel-spec-dir={tmp_path}/ascend950"]
 
-    options = kernel_spec_options.shell_options(str(config_file), "AddCustom", "Ascend910B1")
 
-    assert shlex.split(options) == ["--kernel-spec=Normal", f"--kernel-spec-dir={tmp_path}/kernel_spec/ascend910b"]
+def test_none_does_not_require_resource_directory():
+    assert kernel_spec_options.shell_options("None", None, "AddCustom", "ascend910b") == ""
 
 
 @pytest.mark.parametrize(
-    ("op_type", "soc", "expected_mode", "expected_root"),
-    [
-        ("AddCustom", "Ascend910B1", "Normal", "op_soc"),
-        ("AddCustom", "Ascend910C1", "SK", "op_all_soc"),
-        ("OtherOp", "Ascend910B1", "SK", "all_op_soc"),
-        ("OtherOp", "Ascend910C1", "Normal", "global"),
-    ],
+    "mode,root,message",
+    [("Invalid", "/tmp/resources", "None, Normal or SK"), ("Normal", None, "absolute"), ("SK", "relative", "absolute")],
 )
-def test_shell_options_selects_most_specific_scope(tmp_path, op_type, soc, expected_mode, expected_root):
-    config_file = tmp_path / "custom_opc_options.ini"
-    config_file.write_text(
-        f"ALL@@--kernel-spec=Normal@--kernel-spec-dir={tmp_path}/global\n"
-        f"ALL@ascend910b@--kernel-spec=SK@--kernel-spec-dir={tmp_path}/all_op_soc\n"
-        f"AddCustom@@--kernel-spec=SK@--kernel-spec-dir={tmp_path}/op_all_soc\n"
-        f"AddCustom@ascend910b@--kernel-spec=Normal@--kernel-spec-dir={tmp_path}/op_soc\n",
-        encoding="utf-8",
-    )
-
-    options = shlex.split(kernel_spec_options.shell_options(str(config_file), op_type, soc))
-
-    assert options == [
-        f"--kernel-spec={expected_mode}",
-        f"--kernel-spec-dir={tmp_path}/{expected_root}/{kernel_spec_options._normalize_soc(soc)}",
-    ]
+def test_direct_options_validate_mode_and_root(mode, root, message):
+    with pytest.raises(ValueError, match=message):
+        kernel_spec_options.shell_options(mode, root, "AddCustom", "ascend910b")
 
 
-def test_shell_options_allows_exact_op_to_disable_global_mode(tmp_path):
-    config_file = tmp_path / "custom_opc_options.ini"
-    config_file.write_text(
-        f"ALL@@--kernel-spec=Normal@--kernel-spec-dir={tmp_path}/global\nAddCustom@@--kernel-spec=None\n",
-        encoding="utf-8",
-    )
-
-    assert kernel_spec_options.shell_options(str(config_file), "AddCustom", "Ascend910B1") == ""
-
-
-def test_shell_options_prefers_exact_op_over_exact_soc(tmp_path):
-    config_file = tmp_path / "custom_opc_options.ini"
-    config_file.write_text(
-        f"ALL@ascend910b@--kernel-spec=Normal@--kernel-spec-dir={tmp_path}/all_op_soc\n"
-        f"AddCustom@ALL@--kernel-spec=SK@--kernel-spec-dir={tmp_path}/op_all_soc\n",
-        encoding="utf-8",
-    )
-
-    options = shlex.split(kernel_spec_options.shell_options(str(config_file), "AddCustom", "Ascend910B1"))
-
-    assert options == ["--kernel-spec=SK", f"--kernel-spec-dir={tmp_path}/op_all_soc/ascend910b"]
+@pytest.mark.parametrize("op_type,chip", [("ALL", ""), ("AddCustom", "ascend910b")])
+def test_kernel_options_entry_rejects_kernel_spec_flags(tmp_path, op_type, chip):
+    config_file = tmp_path / "custom_compile_options.ini"
+    with pytest.raises(RuntimeError, match="KERNEL_SPEC_MODE"):
+        ascendc_gen_options.gen_compile_options(
+            str(config_file), op_type, chip, ["--kernel-spec=Normal", f"--kernel-spec-dir={tmp_path}/resources"]
+        )
+    assert not config_file.exists()
+    assert not (tmp_path / "custom_opc_options.ini").exists()
 
 
-def test_shell_options_rejects_conflicting_rules_at_same_scope(tmp_path):
-    config_file = tmp_path / "custom_opc_options.ini"
-    config_file.write_text(
-        f"AddCustom@@--kernel-spec=Normal@--kernel-spec-dir={tmp_path}/normal\n"
-        f"AddCustom@@--kernel-spec=SK@--kernel-spec-dir={tmp_path}/sk\n",
-        encoding="utf-8",
-    )
-
-    with pytest.raises(ValueError, match="Conflicting kernel specialization scope"):
-        kernel_spec_options.shell_options(str(config_file), "AddCustom", "Ascend910B1")
-
-
-def test_shell_options_does_not_borrow_directory_from_lower_scope(tmp_path):
-    config_file = tmp_path / "custom_opc_options.ini"
-    config_file.write_text(
-        f"ALL@@--kernel-spec=Normal@--kernel-spec-dir={tmp_path}/global\nAddCustom@@--kernel-spec=SK\n",
-        encoding="utf-8",
-    )
-
-    with pytest.raises(ValueError, match="kernel-spec-dir is required"):
-        kernel_spec_options.shell_options(str(config_file), "AddCustom", "Ascend910B1")
-
-
-def test_gen_compile_options_keeps_device_options_separate(tmp_path):
-    compile_file = tmp_path / "custom_compile_options.ini"
-
-    ascendc_gen_options.gen_compile_options(
-        str(compile_file), "ALL", "", ["--kernel-spec=Normal", f"--kernel-spec-dir={tmp_path}/kernel_spec", "-O2"]
-    )
-
-    assert "-O2" in compile_file.read_text(encoding="utf-8")
-    assert "kernel-spec" not in compile_file.read_text(encoding="utf-8")
-    assert "--kernel-spec=Normal" in (tmp_path / "custom_opc_options.ini").read_text(encoding="utf-8")
+def test_scoped_ordinary_device_options_are_unchanged(tmp_path):
+    config_file = tmp_path / "custom_compile_options.ini"
+    ascendc_gen_options.gen_compile_options(str(config_file), "AddCustom", "ascend910b", ["-O2", "--save-temp-files"])
+    assert config_file.read_text() == "AddCustom,ascend910b,-O2\n"
+    assert (tmp_path / "custom_opc_options.ini").read_text() == "AddCustom@ascend910b@--op_debug_config=dump_cce\n"
 
 
 def test_cmake_package_rejects_invalid_kernel_spec_mode(tmp_path):
