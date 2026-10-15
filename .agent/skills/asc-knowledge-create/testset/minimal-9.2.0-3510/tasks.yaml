@@ -1,0 +1,183 @@
+tasks:
+  - id: Q01
+    prompt: >
+      CANN 9.2.0、3510 架构，在 AIV 上需要把一段连续数据从 GM 搬入 UB，
+      并支持按多个数据块及源、目的步长搬运。应该查哪些 C API 文档？
+
+  - id: Q02
+    prompt: >
+      CANN 9.2.0、3510 架构，需要将 GM 中的数据搬到 UB，单块有效长度不是 32 字节的整数倍，
+      还希望在数据块两侧使用指定常量填充。应该查哪些搬运和配置接口？
+
+  - id: Q03
+    prompt: >
+      CANN 9.2.0、3510 架构，需要把 UB 中的数据写回 GM，既有连续搬出，也有高维切分搬出。
+      请找出相关 C API 文档，并核对长度不是 32 字节整数倍时的缓冲区约束。
+
+  - id: Q04
+    prompt: >
+      CANN 9.2.0、3510 架构，我想为后续 GM 到 UB 的常量填充搬运设置填充值。
+      应该使用什么配置接口，它与搬运接口之间是什么关系？
+
+  - id: Q05
+    prompt: >
+      CANN 9.2.0、3510 架构，Vector Function 内需要把 32 字节对齐的 UB 数据读入矢量寄存器，
+      希望同时查看返回值形式和输出参数形式。应该查哪篇 C API 文档？
+
+  - id: Q06
+    prompt: >
+      CANN 9.2.0、3510 架构，需要按掩码把矢量寄存器中的 float 数据对齐写入 UB，
+      未选中的 UB 元素应保留原值。应该查哪个接口？
+
+  - id: Q07
+    prompt: >
+      CANN 9.2.0、3510 架构，Vector Function 循环需要根据剩余元素个数生成本轮掩码，
+      并自动更新剩余计数，数据位宽可能是 8、16 或 32 bit。应该查哪个接口族？
+
+  - id: Q08
+    prompt: >
+      CANN 9.2.0、3510 架构，需要对 float 矢量寄存器按元素取绝对值，支持掩码控制。
+      请找出相关 C API 文档和仓内已有调用样例。
+
+  - id: Q09
+    prompt: >
+      CANN 9.2.0、3510 架构，需要对两个 float 矢量寄存器按掩码逐元素求商，
+      并查看引用参数输出和函数返回值两种形式。应该查哪个 C API？
+
+  - id: Q10
+    prompt: >
+      CANN 9.2.0、3510 架构，需要将 half 矢量寄存器转换为 float，
+      并分别选择源寄存器的偶数位置和奇数位置。应该查哪个接口及其位置参数说明？
+
+  - id: Q11
+    prompt: >
+      CANN 9.2.0、3510 架构，需要把 float 矢量寄存器转换为 FP8 E4M3，
+      比较饱和与非饱和形式，并了解四分之一位置标签对结果布局的影响。应该查哪些文档？
+
+  - id: Q12
+    prompt: >
+      CANN 9.2.0、3510 架构，需要在按 API 配置饱和和使用全局饱和配置之间切换。
+      应该查哪个接口，相关策略枚举在哪里说明？
+
+  - id: Q13
+    prompt: >
+      CANN 9.2.0、3510 架构，需要分别配置 FLOAT、FLOAT8、INT 和 CAST 的饱和开关。
+      请找出设置接口及其前置配置依赖，尤其是开启 FLOAT8 和 CAST 时的条件。
+
+  - id: Q14
+    prompt: >
+      CANN 9.2.0、3510 架构，需要在 MTE2 的前序数据读写完成后发出事件通知，
+      让 Vector 流水后续消费数据。应该查哪个通知接口及其配套接口？
+
+  - id: Q15
+    prompt: >
+      CANN 9.2.0、3510 架构，需要让目的流水等待指定事件，事件就绪后再执行后续指令。
+      应该查哪个等待接口，如何查找与它配对的通知接口？
+
+  - id: Q16
+    prompt: >
+      CANN 9.2.0、3510 架构，要检索实现 y = abs(x) 所需的 C API 文档：
+      float 输入来自 GM，经 UB 搬入寄存器，按剩余元素掩码计算后写回 UB 和 GM。
+      请覆盖数据搬运、寄存器读写、掩码、计算及流水同步。
+
+  - id: Q17
+    prompt: >
+      CANN 9.2.0、3510 架构，要检索实现 z = x / y 所需的 C API 文档，
+      两个输入和输出都是 GM 中的 float 数组，计算放在 Vector Function 的寄存器上。
+      请找出计算、搬入搬出及同步所需接口。
+
+  - id: Q18
+    prompt: >
+      CANN 9.2.0、3510 架构，我知道 GM 到 UB 搬运中有 asc_load_l2_cache_mode 参数，
+      想按这个枚举类型反查当前已标注文档里的使用接口。请给出候选文档。
+
+  - id: Q19
+    prompt: >
+      CANN 9.2.0、3510 架构，想直接用 Reg 版 asc_abs 对 double 矢量取绝对值。
+      能否找到满足该数据类型要求的重载文档？
+
+  - id: Q20
+    prompt: >
+      CANN 9.2.0、Atlas A3 产品上，我想使用 reg_compute 下的 asc_abs，
+      在 Vector Function 中对 float 寄存器求绝对值。这一产品是否适用该接口？
+
+  - id: Q21
+    prompt: >
+      我的环境是 CANN 9.1.0、3510 架构，希望调用 asc_set_saturation_flag 和
+      asc_set_saturation_strategy 管理饱和状态。能否直接推荐这两个接口？
+
+  - id: Q22
+    prompt: >
+      CANN 9.2.0、3510 架构，希望用 asc_loadalign 直接从 GM 地址读取数据到矢量寄存器，
+      跳过 UB。该接口能满足这一需求吗？
+
+  - id: Q23
+    prompt: >
+      CANN 9.2.0、3510 架构，希望用 asc_storealign 直接把矢量寄存器写回 GM，
+      不经过 UB。有没有符合这个要求的 asc_storealign 重载？
+
+  - id: Q24
+    prompt: >
+      CANN 9.2.0、3510 架构，我的 UB 起始地址没有按 32 字节对齐，
+      但想直接调用 asc_loadalign 读取 float 数据。这个接口是否适用？
+
+  - id: Q25
+    prompt: >
+      CANN 9.2.0、3510 架构，用 asc_copy_gm2ub 连续搬入 48 字节，
+      目的 UB 只分配 48 字节，后面没有可写空间。能否直接使用该接口？
+
+  - id: Q26
+    prompt: >
+      CANN 9.2.0、3510 架构，用 asc_abs 处理有符号 int32_t 的最小负值时，
+      我要求结果饱和成 int32_t 最大正值。该接口是否符合这个要求？
+
+  - id: Q27
+    prompt: >
+      CANN 9.2.0、3510 架构，要求 Reg 版 asc_abs 在 mask 为 0 的位置保留 dst 原来的值。
+      请查找是否存在满足这个行为的已标注重载。
+
+  - id: Q28
+    prompt: >
+      CANN 9.2.0、3510 架构，需要 float 矢量除法对所有输入都与标准 IEEE 754 结果逐位一致，
+      不允许任何 ULP 偏差。Reg 版 asc_div 是否满足这一要求？
+
+  - id: Q29
+    prompt: >
+      CANN 9.2.0、3510 架构，想在运行时根据普通整数变量切换 asc_half2float 的
+      src_pos 参数，而不使用编译期位置标签。现有接口是否支持这种调用？
+
+  - id: Q30
+    prompt: >
+      CANN 9.2.0、3510 架构，需要一个直接将 half 矢量寄存器转成 FP8 E4M3 的单步接口。
+      请只在这次已标注的 15 篇 API 文档中查找，有没有符合要求的接口？
+
+  - id: Q31
+    prompt: >
+      CANN 9.2.0、3510 架构，想调用一次 asc_float2e4m3_rn 就获得从下标 0 开始连续排列的
+      FP8 结果，不做位置选择或重排。这个接口是否能直接满足要求？
+
+  - id: Q32
+    prompt: >
+      CANN 9.2.0、3510 架构，只调用 asc_set_copy_pad_val 设置填充值，
+      不再调用任何搬运接口。它是否会立即在 UB 中写入填充数据？
+
+  - id: Q33
+    prompt: >
+      CANN 9.2.0、3510 架构，当前饱和策略保持 USE_API，只调用
+      asc_set_saturation_flag(CAST, true)，能否让全局 CAST 饱和配置生效？
+
+  - id: Q34
+    prompt: >
+      CANN 9.2.0、3510 架构，FLOAT 饱和仍关闭时，只对 FLOAT8 调用
+      asc_set_saturation_flag 开启饱和，能否满足 FP8 全局饱和的前置条件？
+
+  - id: Q35
+    prompt: >
+      CANN 9.2.0、3510 架构，用 asc_sync_notify(PIPE_MTE2, PIPE_V, EVENT_ID0)
+      发出通知，再用 asc_sync_wait(PIPE_MTE2, PIPE_V, EVENT_ID1) 等待。
+      这两次调用能否构成有效的同步配对？
+
+  - id: Q36
+    prompt: >
+      CANN 9.2.0、3510 架构，想用 asc_sync_notify 和 asc_sync_wait
+      在两个不同 AI Core 之间传递完成事件。应该推荐这对接口吗？
