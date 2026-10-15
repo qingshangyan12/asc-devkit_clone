@@ -114,6 +114,10 @@ __aicore__ inline void SetMatrixMxPara(const MatrixMxParaBitModeParams& params) 
 
 __aicore__ inline void SetMatrixMxPara(const MatrixMxParaParams& params) { SetMatrixMxParaImpl(params); }
 
+__aicore__ inline void PostProc(const PostProcBitModeParams& params) { PostProcImpl(params); }
+
+__aicore__ inline void PostProc(const PostProcParams& params) { PostProcImpl(params); }
+
 template <typename T, typename U, typename S>
 __aicore__ inline void ConvFix(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter,

@@ -172,6 +172,14 @@ __aicore__ inline void SetMatrixMxPara(const MatrixMxParaParams& params);
 
 /*
  * @ingroup MacroCube
+ * @brief setting the register
+ * @param [in] params register
+ */
+__aicore__ inline void PostProc(const PostProcBitModeParams& params);
+__aicore__ inline void PostProc(const PostProcParams& params);
+
+/*
+ * @ingroup MacroCube
  * @brief performs normal convolution
  * @param [out] dst
  * @param [in] fm

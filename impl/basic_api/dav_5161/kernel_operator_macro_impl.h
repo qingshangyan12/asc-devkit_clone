@@ -307,6 +307,38 @@ __aicore__ inline void SetMatrixMxParaCal(const MatrixMxParaParams& params)
     set_mx_buf_addr(mxPara);
 }
 
+__aicore__ inline void PostProcCal(const PostProcBitModeParams& params) { postproc(params.GetConfig0()); }
+
+__aicore__ inline void PostProcCal(const PostProcParams& params)
+{
+    constexpr uint8_t POS_PRE_QUANT_MODE = 2;
+    constexpr uint8_t POS_ACT_PRE_MODE = 7;
+    constexpr uint8_t POS_POST_QUANT_MODE = 10;
+    constexpr uint8_t POS_PRE_CLIP_RELU_MODE = 18;
+    constexpr uint8_t POS_ELTWISE_OP = 20;
+    constexpr uint8_t POS_ELTWISE_ANTIQ_EN = 23;
+    constexpr uint8_t POS_ELTWISE_BROADCAST_EN = 24;
+    constexpr uint8_t POS_LSB_MASK = 28;
+    constexpr uint8_t POS_DEPEND_EN = 36;
+    constexpr uint8_t POS_INSTR_ID = 37;
+    constexpr uint8_t POS_N = 48;
+
+    uint64_t postProc = 0;
+    postProc |= (uint64_t)static_cast<uint8_t>(params.preQuantMode) << POS_PRE_QUANT_MODE;
+    postProc |= (uint64_t)(params.actPreMode) << POS_ACT_PRE_MODE;
+    postProc |= (uint64_t)static_cast<uint8_t>(params.postQuantMode) << POS_POST_QUANT_MODE;
+    postProc |= (uint64_t)(params.preClipReluMode) << POS_PRE_CLIP_RELU_MODE;
+    postProc |= (uint64_t)static_cast<uint8_t>(params.eltwiseOp) << POS_ELTWISE_OP;
+    postProc |= (uint64_t)(params.eltwiseAntiqEnable ? 1 : 0) << POS_ELTWISE_ANTIQ_EN;
+    postProc |= (uint64_t)(params.eltwiseBroadcastEnable ? 1 : 0) << POS_ELTWISE_BROADCAST_EN;
+    postProc |= (uint64_t)static_cast<uint8_t>(params.lsbMask) << POS_LSB_MASK;
+    postProc |= (uint64_t)(params.dependEnable ? 1 : 0) << POS_DEPEND_EN;
+    postProc |= (uint64_t)static_cast<uint8_t>(params.instrId) << POS_INSTR_ID;
+    postProc |= (uint64_t)(params.n) << POS_N;
+
+    postproc(postProc);
+}
+
 template <typename DstT, typename Src0T, typename Src1T>
 __aicore__ inline void ConvFixCal(
     __cbuf__ DstT* dst, __cbuf__ Src0T* fm, __cb__ Src1T* filter, const ConvFixBitModeParams& convFixParams)
