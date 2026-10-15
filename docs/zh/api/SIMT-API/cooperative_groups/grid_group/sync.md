@@ -58,24 +58,30 @@ void sync() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(uint64_t* output)
+    __global__ void simt_kernel(uint64_t* result)
     {
         grid_group g = this_grid(); // 获取grid_group对象
         unsigned int block = static_cast<unsigned int>(g.block_rank());
 
         if (threadIdx.x == 0) {
-            output[block] = block + 1;
+            result[block] = block + 1;
         }
 
         g.sync(); // 同步Grid内所有线程
 
-        if (threadIdx.x == 0) {
+        if (blockIdx.x == 0 && threadIdx.x == 0) {
             uint64_t sum = 0;
-            asc_dcci_entire(output); // 刷新Cache
+            asc_dcci_entire(result); // 刷新Cache
             for (unsigned int i = 0; i < g.num_blocks(); ++i) {
-                sum += output[i];
+                sum += result[i];
             }
-            output[g.num_blocks() + block] = sum;
+            result[g.num_blocks()] = sum;
         }
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 528
+```
