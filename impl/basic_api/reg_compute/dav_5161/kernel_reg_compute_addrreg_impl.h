@@ -104,6 +104,79 @@ __simd_callee__ inline AddrReg CreateAddrRegImpl(
     }
 }
 } // namespace Reg
+
+namespace Reg {
+template <typename T>
+__simd_callee__ inline AddrReg CreateAddrRegImpl(uint16_t index0, uint32_t stride0)
+{
+    static_assert(
+        sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4,
+        "CreateAddrReg only support type b8/b16/b32 on current device");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    return VagCpuSim(sizeof(T), index0, stride0);
+#endif
+    if constexpr (sizeof(T) == 1) {
+        return vag_b8(stride0);
+    } else if constexpr (sizeof(T) == 2) {
+        return vag_b16(stride0);
+    }
+    return vag_b32(stride0);
+}
+
+template <typename T>
+__simd_callee__ inline AddrReg CreateAddrRegImpl(uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1)
+{
+    static_assert(
+        sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4,
+        "CreateAddrReg only support type b8/b16/b32 on current device");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    return VagCpuSim(sizeof(T), index0, stride0, index1, stride1);
+#endif
+    if constexpr (sizeof(T) == 1) {
+        return vag_b8(stride0, stride1);
+    } else if constexpr (sizeof(T) == 2) {
+        return vag_b16(stride0, stride1);
+    }
+    return vag_b32(stride0, stride1);
+}
+
+template <typename T>
+__simd_callee__ inline AddrReg CreateAddrRegImpl(
+    uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2)
+{
+    static_assert(
+        sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4,
+        "CreateAddrReg only support type b8/b16/b32 on current device");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    return VagCpuSim(sizeof(T), index0, stride0, index1, stride1, index2, stride2);
+#endif
+    if constexpr (sizeof(T) == 1) {
+        return vag_b8(stride0, stride1, stride2);
+    } else if constexpr (sizeof(T) == 2) {
+        return vag_b16(stride0, stride1, stride2);
+    }
+    return vag_b32(stride0, stride1, stride2);
+}
+
+template <typename T>
+__simd_callee__ inline AddrReg CreateAddrRegImpl(
+    uint16_t index0, uint32_t stride0, uint16_t index1, uint32_t stride1, uint16_t index2, uint32_t stride2,
+    uint16_t index3, uint32_t stride3)
+{
+    static_assert(
+        sizeof(T) == 1 || sizeof(T) == 2 || sizeof(T) == 4,
+        "CreateAddrReg only support type b8/b16/b32 on current device");
+#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
+    return VagCpuSim(sizeof(T), index0, stride0, index1, stride1, index2, stride2, index3, stride3);
+#endif
+    if constexpr (sizeof(T) == 1) {
+        return vag_b8(stride0, stride1, stride2, stride3);
+    } else if constexpr (sizeof(T) == 2) {
+        return vag_b16(stride0, stride1, stride2, stride3);
+    }
+    return vag_b32(stride0, stride1, stride2, stride3);
+}
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_ADDRREG_IMPL_H
 

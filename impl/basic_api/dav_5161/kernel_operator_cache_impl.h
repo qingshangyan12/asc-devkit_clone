@@ -44,6 +44,8 @@ __aicore__ inline void PreLoad(const int64_t preFetchLen)
     ASCENDC_ASSERT((false), "ICachePreLoad is not supported on this device!");
 }
 
+
+__aicore__ inline void PreLoadImpl(void* pc, const int64_t preFetchLen) { preload(pc, preFetchLen); }
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_CACHE_IMPL_H
 

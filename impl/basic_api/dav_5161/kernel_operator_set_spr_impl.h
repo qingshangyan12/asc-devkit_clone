@@ -23,7 +23,13 @@
 
 #ifndef ASCENDC_MODULE_OPERATOR_SET_SPR_IMPL_H
 #define ASCENDC_MODULE_OPERATOR_SET_SPR_IMPL_H
-namespace AscendC {} // namespace AscendC
+
+namespace AscendC {
+__aicore__ inline void SetQuantPreImpl(uint64_t config) { set_quant_pre(config); }
+__aicore__ inline void SetLoop3ParaImpl(uint64_t config) { set_loop3_para(config); }
+__aicore__ inline void SetNdParaImpl(uint64_t config) {}
+__aicore__ inline void SetFpcImpl(uint64_t config) { set_fpc(config); }
+} // namespace AscendC
 #endif               // ASCENDC_MODULE_OPERATOR_SET_SPR_IMPL_H
 
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_SET_SPR_IMPL_H__)
