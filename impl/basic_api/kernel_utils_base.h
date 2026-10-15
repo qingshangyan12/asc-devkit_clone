@@ -80,6 +80,7 @@ public:
 
     __aicore__ static inline void InitSocStateImpl()
     {
+#if !defined(__BISHENG_ENABLE_ASC_INIT)
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113 || __NPU_ARCH__ == 5101 || \
                               __NPU_ARCH__ == 5161 || __NPU_ARCH__ == 5165 || __NPU_ARCH__ == 5163)
 #else
@@ -106,6 +107,7 @@ public:
 #endif
 #elif __NPU_ARCH__ == 3002
         set_padding(static_cast<uint64_t>(0));
+#endif
 #endif
     }
 
