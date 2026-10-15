@@ -47,7 +47,7 @@ def bundle_request(tmp_path):
         source_dir=[str(source)],
         source_file=[],
         source_map=[[str(source), "op_impl/dynamic"]],
-        output=str(tmp_path / "output/libcust_compile_db.so"),
+        output=str(tmp_path / "output/libcust_compile_resource.so"),
         work_dir=str(tmp_path / "work"),
         exporter=str(exporter),
         cxx="c++",
@@ -101,14 +101,14 @@ def _published(bundle_request):
     return json.loads(Path(bundle_request.output).read_bytes()[4:])
 
 
-def test_collects_sorted_unique_ids_and_preserves_input(bundle_request):
+def test_passes_sorted_duplicate_ids_to_exporter_and_preserves_input(bundle_request):
     root = Path(bundle_request.input_dir[0])
     original = (root / "910b/add_manifest.json").read_bytes()
     _unit(root / "950", "a" * 64)
     _unit(root / "other", "b" * 64)
     assert bundle.build_bundle(bundle_request) is True
     data = _published(bundle_request)
-    assert [m["resource_id"] for m in data] == ["a" * 64, "b" * 64]
+    assert [m["resource_id"] for m in data] == ["a" * 64, "a" * 64, "b" * 64]
     assert data[0]["source_file"] == "op_impl/dynamic/add.cpp"
     assert data[0]["options"]["common_compile"] == ["-I${source_file_path}/op_impl/dynamic"]
     assert (root / "910b/add_manifest.json").read_bytes() == original
@@ -288,7 +288,7 @@ def test_unmapped_source_and_bad_package_map_fail(bundle_request):
 
 
 def test_cli_handles_paths_with_spaces_and_reports_cache_hit(bundle_request, tmp_path):
-    bundle_request.output = str(tmp_path / "with spaces/libcust_compile_db.so")
+    bundle_request.output = str(tmp_path / "with spaces/libcust_compile_resource.so")
     script = Path(bundle.__file__)
     arguments = [sys.executable, str(script)]
     for name in ("input_dir", "source_dir", "source_file"):
@@ -312,7 +312,7 @@ def test_publishes_across_filesystems(bundle_request):
     ):
         pytest.skip("requires writable separate /dev/shm filesystem")
     with tempfile.TemporaryDirectory(prefix="kernel-spec-stage2-", dir="/dev/shm") as output_dir:
-        bundle_request.output = str(Path(output_dir) / "libcust_compile_db.so")
+        bundle_request.output = str(Path(output_dir) / "libcust_compile_resource.so")
         assert bundle.build_bundle(bundle_request) is True
         assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
 
@@ -399,32 +399,23 @@ def test_real_exporter_builds_loadable_bundle_with_large_resource(bundle_request
     assert bundle.build_bundle(bundle_request) is False
 
 
-@pytest.mark.parametrize("difference", ["manifest", "resource", "source", "installed_path", "empty_directory"])
-def test_same_id_conflict_preserves_published_bundle(bundle_request, tmp_path, difference):
+@pytest.mark.parametrize("difference", ["source", "installed_path"])
+def test_same_id_source_conflict_preserves_published_bundle(bundle_request, tmp_path, difference):
     bundle.build_bundle(bundle_request)
     published = Path(bundle_request.output).read_bytes()
     root = Path(bundle_request.input_dir[0])
     path = _unit(root / "duplicate", "a" * 64)
-    manifest = json.loads(path.read_text())
-    if difference == "manifest":
-        manifest["soc_version"] = "Ascend950"
-        path.write_text(json.dumps(manifest))
-    elif difference == "resource":
-        (path.parent / "resources/wrapper.cpp").write_text("different wrapper")
-    elif difference == "empty_directory":
-        (path.parent / "resources/include").mkdir()
-    else:
-        source = tmp_path / "other_source/add.cpp"
-        source.parent.mkdir()
-        source.write_text("different source" if difference == "source" else "void add() {}\n")
-        bundle_request.source_map.append(
-            [str(source.parent), "op_impl/dynamic" if difference == "source" else "other_layout"]
-        )
-        bundle_request.source_bindings = {
-            str(root / "910b"): str(Path(bundle_request.source_dir[0]) / "add.cpp"),
-            str(root / "duplicate"): str(source),
-        }
-        bundle_request.input_dir = list(bundle_request.source_bindings)
+    source = tmp_path / "other_source/add.cpp"
+    source.parent.mkdir()
+    source.write_text("different source" if difference == "source" else "void add() {}\n")
+    bundle_request.source_map.append(
+        [str(source.parent), "op_impl/dynamic" if difference == "source" else "other_layout"]
+    )
+    bundle_request.source_bindings = {
+        str(root / "910b"): str(Path(bundle_request.source_dir[0]) / "add.cpp"),
+        str(root / "duplicate"): str(source),
+    }
+    bundle_request.input_dir = list(bundle_request.source_bindings)
     with pytest.raises(bundle.BundleError, match="conflicting resource_id") as error:
         bundle.build_bundle(bundle_request)
     assert str(path) in str(error.value)
@@ -432,13 +423,73 @@ def test_same_id_conflict_preserves_published_bundle(bundle_request, tmp_path, d
     assert Path(bundle_request.output).read_bytes() == published
 
 
-def test_equivalent_id_ignores_json_key_order_and_formatting(bundle_request):
+def test_equivalent_id_is_forwarded_despite_json_formatting(bundle_request):
     root = Path(bundle_request.input_dir[0])
     path = _unit(root / "duplicate", "a" * 64)
     manifest = json.loads(path.read_text())
     path.write_text(json.dumps(dict(reversed(list(manifest.items()))), indent=4))
     bundle.build_bundle(bundle_request)
-    assert len(_published(bundle_request)) == 1
+    assert len(_published(bundle_request)) == 2
+
+
+@pytest.mark.parametrize("difference", ["manifest", "resource", "empty_directory"])
+def test_resource_conflict_is_delegated_to_exporter(bundle_request, difference):
+    root = Path(bundle_request.input_dir[0])
+    path = _unit(root / "duplicate", "a" * 64)
+    if difference == "manifest":
+        manifest = json.loads(path.read_text())
+        manifest["soc_version"] = "Ascend950"
+        path.write_text(json.dumps(manifest))
+    elif difference == "resource":
+        (path.parent / "resources/wrapper.cpp").write_text("different wrapper")
+    else:
+        (path.parent / "resources/include").mkdir()
+    assert bundle.build_bundle(bundle_request) is True
+    # The fixture exporter deliberately serializes every input, without validating duplicates.
+    assert len(_published(bundle_request)) == 2
+
+
+@pytest.mark.skipif(not os.environ.get("ASCEND_TEST_COMPILE_EXPORTER"), reason="requires built asc_compile_exporter")
+@pytest.mark.parametrize("difference", ["equivalent", "manifest", "resource", "empty_directory", "empty_file"])
+def test_real_exporter_owns_id_deduplication_and_preserves_output_on_conflict(bundle_request, difference):
+    bundle_request.exporter = os.environ["ASCEND_TEST_COMPILE_EXPORTER"]
+    bundle.build_bundle(bundle_request)
+    published = Path(bundle_request.output).read_bytes()
+    path = _unit(Path(bundle_request.input_dir[0]) / "duplicate", "a" * 64)
+    if difference == "manifest":
+        manifest = json.loads(path.read_text())
+        manifest["soc_version"] = "Ascend950"
+        path.write_text(json.dumps(manifest))
+    elif difference == "resource":
+        (path.parent / "resources/wrapper.cpp").write_text("different wrapper")
+    elif difference == "empty_directory":
+        (path.parent / "resources/include").mkdir()
+    elif difference == "empty_file":
+        (path.parent / "resources/empty.h").write_text("")
+    if difference != "equivalent":
+        with pytest.raises(bundle.BundleError, match="exporter failed"):
+            bundle.build_bundle(bundle_request)
+        assert Path(bundle_request.output).read_bytes() == published
+        return
+    manifest = json.loads(path.read_text())
+    path.write_text(json.dumps(dict(reversed(list(manifest.items()))), indent=4))
+    assert bundle.build_bundle(bundle_request) is True
+
+    class Header(ctypes.Structure):
+        _fields_ = [
+            ("magic", ctypes.c_uint32),
+            ("version", ctypes.c_uint32),
+            ("size", ctypes.c_uint32),
+            ("flags", ctypes.c_uint32),
+        ]
+
+    class Bundle(ctypes.Structure):
+        _fields_ = [("header", Header), ("manifests", ctypes.c_void_p), ("count", ctypes.c_uint64)]
+
+    library = ctypes.CDLL(bundle_request.output)
+    library.AscendcGetCompileResourceBundle.restype = ctypes.POINTER(Bundle)
+    assert library.AscendcGetCompileResourceBundle().contents.count == 1
+    assert bundle.build_bundle(bundle_request) is False
 
 
 def test_unreferenced_source_does_not_require_install_mapping(bundle_request, tmp_path):

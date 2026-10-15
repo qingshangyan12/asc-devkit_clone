@@ -348,19 +348,19 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         source_argument = self.wrapper_path
         missing_include = os.path.join(self.input_root, "missing")
         cases = (
-            ("split", ["-I", self.input_root]),
-            ("joined", ["-I" + self.input_root]),
-            ("missing split", ["-I", missing_include]),
-            ("missing joined", ["-I" + missing_include]),
+            ("split", ["-I", self.input_root], []),
+            ("joined", ["-I" + self.input_root], []),
+            ("missing split", ["-I", missing_include], ["-I", missing_include]),
+            ("missing joined", ["-I" + missing_include], ["-I" + missing_include]),
         )
-        for name, include_options in cases:
+        for name, include_options, preserved in cases:
             with self.subTest(name=name):
                 argv = [self.bisheng, *include_options, source_argument]
                 self.assertEqual(
                     generator._normalize_source_include_options(
                         argv, self.source_path, replacement, insertion_before=source_argument
                     ),
-                    [self.bisheng, "-I", replacement, source_argument],
+                    [self.bisheng, *preserved, "-I", replacement, source_argument],
                 )
 
     def test_manifest_package_writer_writes_snapshot(self):
@@ -436,7 +436,9 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertNotIn("intermediates", serialized)
         for old_name in ("static_inputs", "token", "obj_name", "obj_type", "option", "link_option"):
             self.assertNotIn(f'"{old_name}"', serialized)
-        self.assertNotIn(self.root, serialized)
+        self.assertNotIn(self.source_path, serialized)
+        self.assertNotIn(self.wrapper_path, serialized)
+        self.assertNotIn(self.tiling_path, serialized)
         resource_root = os.path.join(self.output_dir, "resources")
         self.assertEqual(
             {os.path.relpath(path, resource_root) for path in Path(resource_root).rglob("*") if path.is_file()},
@@ -464,7 +466,8 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
                     index for index, value in enumerate(expanded_cmd) if value.startswith("${resource}/resources/src/")
                 ),
             )
-            self.assertFalse(any("missing_joined" in value or "missing_split" in value for value in expanded_cmd))
+            self.assertIn("-I" + os.path.join(self.input_root, "missing_joined"), expanded_cmd)
+            self.assertIn(os.path.join(self.input_root, "missing_split"), expanded_cmd)
             include_index = expanded_cmd.index("-include")
             self.assertEqual(expanded_cmd[include_index + 1], constant_info["file"])
 
@@ -850,7 +853,10 @@ class TestStaticCompileResourceGenerator(unittest.TestCase):
         self.assertEqual(sk_object["commands"][2]["cmd"][0], "${env:ASCEND_HOME_PATH}/bin/llvm-objcopy")
         bind_compile = sk_object["commands"][1]["cmd"]
         self.assertNotIn("${source_file_path}", bind_compile)
-        self.assertNotIn(self.input_root, json.dumps(bind_compile))
+        self.assertNotIn(self.input_root, bind_compile)
+        self.assertNotIn("-I" + self.input_root, bind_compile)
+        self.assertIn("-I" + os.path.join(self.input_root, "missing_joined"), bind_compile)
+        self.assertIn(os.path.join(self.input_root, "missing_split"), bind_compile)
         bind_reference = next(
             value for value in sk_object["commands"][1]["cmd"] if value.startswith("${resource}/resources/src/sk_bind_")
         )
@@ -899,6 +905,100 @@ def _load_adapter_generator():
     with mock.patch.dict(sys.modules, dependencies):
         spec.loader.exec_module(module)
     return module
+
+
+class TestManifestPublication(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name)
+
+        def fail(_code, message):
+            raise RuntimeError(message)
+
+        patch = mock.patch.object(generator.utility_module.CommonUtility, "ascendc_raise_python_err", side_effect=fail)
+        patch.start()
+        self.addCleanup(patch.stop)
+
+    def compilation(self, mode="Normal"):
+        compilation = generator.KernelSpecCompilation.__new__(generator.KernelSpecCompilation)
+        compilation.enabled = mode != "None"
+        compilation._kernel_spec_mode = mode
+        compilation.kernel_spec_dir = str(self.root)
+        compilation.compile_info = SimpleNamespace(kernel_name="AddTest")
+        compilation.basic_compile_info = compilation.compile_info
+        compilation.sk_compile_info = None
+        compilation.resource_id = "a" * 64
+        compilation.record_sk_commands = False
+        compilation._manifest_path = None
+        return compilation
+
+    def test_success_without_publication_fails_for_each_export_mode(self):
+        for mode in ("Normal", "SK"):
+            with self.subTest(mode=mode):
+                with self.assertRaisesRegex(RuntimeError, "kernel=AddTest.*mode=" + mode + ".*not generated"):
+                    with self.compilation(mode):
+                        pass
+
+    def test_missing_or_empty_publication_fails_even_with_another_valid_manifest(self):
+        (self.root / "other_manifest.json").write_text("{}")
+        published = self.root / "requested_manifest.json"
+        for empty in (False, True):
+            if empty:
+                published.touch()
+            with mock.patch.object(generator, "ManifestPackageWriter") as writer:
+                writer.return_value.write.return_value = str(published)
+                with self.assertRaisesRegex(RuntimeError, "manifest (was not generated|is empty)"):
+                    with self.compilation() as compilation:
+                        compilation.publish_manifest(None, 4)
+
+    def test_publication_io_error_reports_task_context(self):
+        with mock.patch.object(generator, "ManifestPackageWriter") as writer:
+            writer.return_value.write.side_effect = OSError("disk full")
+            with self.assertRaisesRegex(RuntimeError, "kernel=AddTest.*mode=Normal.*output_dir=.*disk full"):
+                with self.compilation() as compilation:
+                    compilation.publish_manifest(None, 4)
+
+    def test_valid_publication_and_non_export_tasks_succeed(self):
+        published = self.root / "requested_manifest.json"
+        published.write_text("{}")
+        with mock.patch.object(generator, "ManifestPackageWriter") as writer:
+            writer.return_value.write.return_value = str(published)
+            with self.compilation() as compilation:
+                compilation.publish_manifest(None, 4)
+        with self.compilation("None"):
+            pass
+        compilation = self.compilation()
+        compilation.enabled = False
+        with compilation:
+            pass
+
+    def test_compilation_error_is_preserved(self):
+        original = ValueError("device compile failed")
+        with self.assertRaises(ValueError) as raised:
+            with self.compilation():
+                raise original
+        self.assertIs(raised.exception, original)
+
+    def test_missing_publication_still_cleans_up_and_restores_sk_state(self):
+        compilation = self.compilation("SK")
+        compilation.record_sk_commands = True
+        compilation._global_state = {"ascendc_enable_super_kernel": False}
+        compilation.cleanup = mock.Mock()
+        with mock.patch.object(generator.storage_module.global_var_storage, "set_variable") as restore:
+            with self.assertRaisesRegex(RuntimeError, "not generated"):
+                with compilation:
+                    pass
+            compilation.cleanup.assert_called_once()
+            restore.assert_called_once_with("ascendc_enable_super_kernel", False)
+
+
+class TestAdapterManifestPublication(TestManifestPublication):
+    def setUp(self):
+        original = generator
+        globals()["generator"] = _load_adapter_generator()
+        self.addCleanup(globals().__setitem__, "generator", original)
+        super().setUp()
 
 
 class TestAdapterStaticCompileResourceGenerator(TestStaticCompileResourceGenerator):

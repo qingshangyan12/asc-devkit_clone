@@ -14,6 +14,8 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 FWK_MODULES_DIR = REPO_ROOT / "cmake/asc/fwk_modules"
 
@@ -132,8 +134,7 @@ npu_op_code_gen(SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/kernel.cpp" PACKAGE demo OUT_
 set(ASCEND_PYTHON_EXECUTABLE "python3")
 if(KERNEL_SPEC_MODE STREQUAL "Normal" OR KERNEL_SPEC_MODE STREQUAL "SK")
   npu_op_kernel_options(kernel ALL OPTIONS
-    "--kernel-spec=${{KERNEL_SPEC_MODE}}"
-    "--kernel-spec-dir=${{CMAKE_BINARY_DIR}}/kernel_spec")
+    "--kernel-json-file=${{CMAKE_BINARY_DIR}}/${{KERNEL_SPEC_MODE}}.json")
 endif()
 {second_codegen}
 ''',
@@ -141,7 +142,7 @@ endif()
     )
 
 
-def test_custom_codegen_options_are_reset_when_kernel_spec_is_disabled(tmp_path):
+def test_custom_codegen_options_are_reset_when_options_are_removed(tmp_path):
     source_dir = tmp_path / "source"
     build_dir = tmp_path / "build"
     _write_codegen_option_project(source_dir)
@@ -152,7 +153,7 @@ def test_custom_codegen_options_are_reset_when_kernel_spec_is_disabled(tmp_path)
     assert (build_dir / "custom_autogen/custom_opc_options.ini").read_text(encoding="utf-8") == ""
 
 
-def test_custom_codegen_options_replace_previous_kernel_spec_mode(tmp_path):
+def test_custom_codegen_options_replace_previous_options(tmp_path):
     source_dir = tmp_path / "source"
     build_dir = tmp_path / "build"
     _write_codegen_option_project(source_dir)
@@ -161,9 +162,7 @@ def test_custom_codegen_options_replace_previous_kernel_spec_mode(tmp_path):
     _configure_kernel_spec_mode(source_dir, build_dir, "SK")
 
     config_file = build_dir / "custom_autogen/custom_opc_options.ini"
-    assert config_file.read_text(encoding="utf-8") == (
-        f"ALL@@--kernel-spec=SK@--kernel-spec-dir={build_dir}/kernel_spec\n"
-    )
+    assert config_file.read_text(encoding="utf-8") == (f"ALL@@--kernel-json-file={build_dir}/SK.json\n")
 
 
 def test_codegen_options_are_initialized_once_per_configure(tmp_path):
@@ -174,6 +173,48 @@ def test_codegen_options_are_initialized_once_per_configure(tmp_path):
     _configure_kernel_spec_mode(source_dir, build_dir, "Normal")
 
     config_file = build_dir / "custom_autogen/custom_opc_options.ini"
-    assert config_file.read_text(encoding="utf-8") == (
-        f"ALL@@--kernel-spec=Normal@--kernel-spec-dir={build_dir}/kernel_spec\n"
+    assert config_file.read_text(encoding="utf-8") == (f"ALL@@--kernel-json-file={build_dir}/Normal.json\n")
+
+
+@pytest.mark.parametrize("cross_compile,skip_failed", [(False, False), (False, True), (True, False), (True, True)])
+def test_kernel_spec_parameters_reach_compile_command_directly(tmp_path, cross_compile, skip_failed):
+    scripts = tmp_path / "scripts"
+    (scripts / "util").mkdir(parents=True)
+    (scripts / "util/ascendc_compile_kernel.py").write_text(
+        "import json,sys\nfrom pathlib import Path\n"
+        "Path(__file__).with_name('arguments.json').write_text(json.dumps(sys.argv[1:]))\n"
     )
+    root = tmp_path / "resource root"
+    (tmp_path / "stub.cpp").write_text("int stub() { return 0; }\n")
+    (tmp_path / "CMakeLists.txt").write_text(
+        f'''cmake_minimum_required(VERSION 3.16)
+project(direct_spec_options CXX)
+include("{FWK_MODULES_DIR / "func.cmake"}")
+set(ASCENDC_CMAKE_SCRIPTS_PATH "{scripts}")
+set(ASCEND_PYTHON_EXECUTABLE python3)
+set(ENABLE_CROSS_COMPILE {"ON" if cross_compile else "OFF"})
+set(ASCEND_SKIP_FAILED_COMPUTE_UNIT {"ON" if skip_failed else "OFF"})
+set(HOST_NATIVE_TILING_LIB "${{CMAKE_BINARY_DIR}}/unused.so")
+set_property(GLOBAL PROPERTY _ASC_PKG_ERROR_FILE "${{CMAKE_BINARY_DIR}}/compile_error.log")
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_KERNEL_SPEC_MODE SK)
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_kernel_KERNEL_SPEC_TASK "{"a" * 64}")
+set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_kernel_BINARY_DIR "{root}")
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_CODE_GEN_DIRS "${{CMAKE_BINARY_DIR}}/autogen")
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_ENABLE_BINARY_PACKAGE ON)
+add_library(demo_ascendc_tiling SHARED stub.cpp)
+add_custom_target(kernel_ops_info_gen_ascend910b)
+simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.cpp"
+    COMPUTE_UNIT ascend910b TARGET_NAME kernel PACKAGE_NAME demo TILING_LIB tiling)
+'''
+    )
+    build = tmp_path / "build"
+    for command in [
+        ["cmake", "-S", str(tmp_path), "-B", str(build)],
+        ["cmake", "--build", str(build), "--target", "AddCustom_ascend910b"],
+    ]:
+        result = subprocess.run(command, text=True, capture_output=True)
+        assert result.returncode == 0, result.stdout + result.stderr
+    arguments = json.loads((scripts / "util/arguments.json").read_text())
+    assert "--kernel-spec-mode=SK" in arguments
+    assert f"--kernel-spec-dir={root}/kernel_spec" in arguments
+    assert "--kernel-spec-task=" + "a" * 64 in arguments
