@@ -1,0 +1,4 @@
+interface:
+  display_name: "ASC Knowledge Create"
+  short_description: "建设侧：tag 词表调研、三类头标注写入、新范围接入编排与检索评测"
+  default_prompt: "使用 $asc-knowledge-create 对指定 C API 范围执行词表调研、prepare→标注→validate→write 打标写入，或按 references/maintain.md 编排新范围接入。"

@@ -1,0 +1,42 @@
+{
+  "examples": [
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/abs",
+      "apis": [
+        "asc_abs"
+      ],
+      "evidence": [
+        "abs_vf函数内调用asc_abs接口进行计算，结果写回UB"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/02_reg_vector_compute/div",
+      "apis": [
+        "asc_div"
+      ],
+      "evidence": [
+        "使用asc_div接口执行除法运算"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/02_features/00_data_movement/00_set_l2_cache_mode",
+      "apis": [
+        "asc_copy_gm2ub_align"
+      ],
+      "evidence": [
+        "MTE2将数据从Global Memory（GM）搬运到Unified Buffer（UB）时，可通过`asc_copy_gm2ub_align`接口的`l2_cache_mode`参数",
+        "本样例说明**复用数据**和**流式数据**两大类场景下，如何选择合适的L2 Cache模式来优化MTE2搬运性能"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/00_data_movement/reg_load_store_align",
+      "apis": [
+        "asc_loadalign",
+        "asc_storealign"
+      ],
+      "evidence": [
+        "本样例展示使用Ascend C C API的Reg矢量计算接口，在Unified Buffer（UB）与矢量数据寄存器之间进行对齐数据读写，并通过多个场景演示不同的寻址和数据分布方式。"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,622 @@
+{
+  "schema_version": 1,
+  "purpose": "okf_semantic_annotations",
+  "annotations": [
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+      "document_sha256": "daa821c364ca36b54ea07bf52941c58d438b3e0c4a539ee8c075782469fb5233",
+      "description": {
+        "value": "将GM数据连续或按高维切分搬入UB；有效长度非32字节对齐时在UB侧补齐写入，需为实际写入范围预留空间。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+            "excerpt": "将数据从Global Memory（GM）搬运到Unified Buffer（UB）。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "copy"
+        ],
+        "traits": [
+          "high_dimensional",
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将数据从Global Memory（GM）搬运到Unified Buffer（UB）。",
+        "operations:copy": "将数据从Global Memory（GM）搬运到Unified Buffer（UB）。",
+        "traits:high_dimensional": "本接口支持连续数据搬运和高维切分数据搬运。连续数据搬运按`size`指定的字节数从源GM连续搬运到目的UB，如图1所示；高维切分数据搬运按`burst_count`指定搬运的数据块个数，每个数据块按`burst_len`指定的字节数搬运，并通过`src_stride`和`dst_stride`指定源操作数和目的操作数相邻数据块首地址间隔，如图2所示。",
+        "traits:padding": "有效长度非32字节对齐时，硬件会在UB一侧补齐写入dummy假数据至32字节边界。连续搬运仅在整体末尾补齐；高维切分搬运中，`dst_stride`等于`burst_len`时仅在所有数据块的整体末尾补齐，否则每个数据块分别补齐。目的UB必须为实际补齐写入范围预留空间。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+      "document_sha256": "cddee034e056bb30cd9422e6405dca029628e034718b65943436c0e77652eed7",
+      "description": {
+        "value": "将GM数据非对齐搬入UB，支持连续及高维切分搬运、Normal和Compact模式，以及按条件配置常量填充。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+            "excerpt": "提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "copy"
+        ],
+        "traits": [
+          "unaligned_transfer",
+          "high_dimensional",
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。",
+        "operations:copy": "提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。",
+        "traits:unaligned_transfer": "提供数据非对齐搬运的功能，将数据从Global Memory (GM)搬运到Unified Buffer（UB），并支持8位/16位/32位数据类型搬运。",
+        "traits:high_dimensional": "- 高维切分数据搬运",
+        "traits:padding": "- 手动填充：搬运前调用`asc_set_copy_pad_val`设置填充值，并将`enable_constant_pad`设置为`true`。\n    - 自动填充：将`enable_constant_pad`设置为`false`，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+          "kind": "requires",
+          "condition": "高维切分使用常量填充，或Normal模式左右Padding非0时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+            "excerpt": "- 手动填充：搬运前调用`asc_set_copy_pad_val`设置填充值，并将`enable_constant_pad`设置为`true`。\n    - 自动填充：将`enable_constant_pad`设置为`false`，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md",
+          "kind": "requires",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+            "excerpt": "使用循环搬运模式时，可通过[asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md)设置两层循环迭代次数，通过[asc_set_gm2ub_loop1_stride](../asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](../asc_set_gm2ub_loop2_stride.md)分别设置内层循环`loop1`、外层循环`loop2`中相邻两次迭代的源操作数和目的操作数数据块起始地址偏移量。相关接口的产品支持情况以各接口文档为准。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md",
+          "kind": "requires",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+            "excerpt": "使用循环搬运模式时，可通过[asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md)设置两层循环迭代次数，通过[asc_set_gm2ub_loop1_stride](../asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](../asc_set_gm2ub_loop2_stride.md)分别设置内层循环`loop1`、外层循环`loop2`中相邻两次迭代的源操作数和目的操作数数据块起始地址偏移量。相关接口的产品支持情况以各接口文档为准。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md",
+          "kind": "requires",
+          "condition": "使用循环搬运模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+            "excerpt": "使用循环搬运模式时，可通过[asc_set_gm2ub_loop_size](../asc_set_gm2ub_loop_size.md)设置两层循环迭代次数，通过[asc_set_gm2ub_loop1_stride](../asc_set_gm2ub_loop1_stride.md)和[asc_set_gm2ub_loop2_stride](../asc_set_gm2ub_loop2_stride.md)分别设置内层循环`loop1`、外层循环`loop2`中相邻两次迭代的源操作数和目的操作数数据块起始地址偏移量。相关接口的产品支持情况以各接口文档为准。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+      "document_sha256": "b229baebe69572b2985ab4baaf8b3ff2333ef8685680c07ecc176c7ea49245fd",
+      "description": {
+        "value": "将UB数据连续或按高维切分搬出至GM；非32字节对齐时补齐读取UB，但仅将有效数据写入GM。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+            "excerpt": "将数据从Unified Buffer（UB）搬运到Global Memory（GM）。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "copy"
+        ],
+        "traits": [
+          "high_dimensional"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将数据从Unified Buffer（UB）搬运到Global Memory（GM）。",
+        "operations:copy": "将数据从Unified Buffer（UB）搬运到Global Memory（GM）。",
+        "traits:high_dimensional": "本接口支持连续数据搬运和高维切分数据搬运。连续数据搬运按`size`指定的字节数从源UB连续搬运到目的GM，如图1所示；高维切分数据搬运按`burst_count`指定搬运的数据块个数，每个数据块按`burst_len`指定的字节数搬运，并通过`src_stride`和`dst_stride`指定源操作数和目的操作数相邻数据块首地址间隔，如图2所示。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md",
+          "kind": "requires",
+          "condition": "通过loop功能实现Broadcast时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+            "excerpt": "使用高维切分搬运接口时，不建议通过将`src_stride`设置为0实现Broadcast。可通过loop功能实现Broadcast，将`burst_count`设置为1，并通过[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../asc_set_ub2gm_loop2_stride.md)配置循环搬运："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md",
+          "kind": "requires",
+          "condition": "通过loop功能实现Broadcast时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+            "excerpt": "使用高维切分搬运接口时，不建议通过将`src_stride`设置为0实现Broadcast。可通过loop功能实现Broadcast，将`burst_count`设置为1，并通过[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../asc_set_ub2gm_loop2_stride.md)配置循环搬运："
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md",
+          "kind": "requires",
+          "condition": "通过loop功能实现Broadcast时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+            "excerpt": "使用高维切分搬运接口时，不建议通过将`src_stride`设置为0实现Broadcast。可通过loop功能实现Broadcast，将`burst_count`设置为1，并通过[asc_set_ub2gm_loop_size](../asc_set_ub2gm_loop_size.md)、[asc_set_ub2gm_loop1_stride](../asc_set_ub2gm_loop1_stride.md)和[asc_set_ub2gm_loop2_stride](../asc_set_ub2gm_loop2_stride.md)配置循环搬运："
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+      "document_sha256": "993851e97c510831d74dbf0d8d0fa1011a038311c3f017918042fc0d0ce5225a",
+      "description": {
+        "value": "为后续GM到UB搬运配置填充值；3510上用于asc_copy_gm2ub_align，是否取用配置由搬运模式和填充参数决定。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+            "excerpt": "该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement_configuration"
+        ],
+        "traits": [
+          "padding"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement_configuration": "该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。",
+        "traits:padding": "该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+          "kind": "configures",
+          "condition": "3510上搬运采用常量填充值时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+            "excerpt": "该接口与[asc_copy_gm2ub_align](./asc_copy_gm2ub_align/asc_copy_gm2ub_align.md)配合使用，用于设置连续搬运数据块左右两侧的填充值。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+      "document_sha256": "974cfcac9e4d6ea832fd8be15cc686bbaf98753306e95da132af310b797be96e",
+      "description": {
+        "value": "从32字节对齐的UB地址搬入矢量或掩码寄存器，支持返回值、输出参数及多种偏移寻址方式，保持数据格式和内容。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+            "excerpt": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。本接口提供四种功能模式："
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "load"
+        ],
+        "traits": [
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。本接口提供四种功能模式：",
+        "operations:load": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。本接口提供四种功能模式：",
+        "traits:aligned_transfer": "从Unified Buffer（UB）中32字节对齐的起始地址读取数据，并通过函数返回值返回或写入目的矢量数据寄存器或掩码寄存器，搬运过程中数据格式和内容保持不变。本接口提供四种功能模式："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+          "kind": "requires",
+          "condition": "地址寄存器偏移模式",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+            "excerpt": "- **连续对齐搬入模式**：将UB源地址的数据搬入到矢量数据寄存器或掩码寄存器，由用户自行更新源地址。\n- **立即数偏移搬入模式**：从相对源起始地址偏移指定距离的位置搬入数据。本接口不会自动更新源地址。\n- **地址寄存器偏移搬入模式**：通过地址寄存器指定相对源起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬入场景。需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。\n- **非连续对齐搬入模式**：单条指令非连续搬入8个`DataBlock`，每个`DataBlock`的数据量为32字节。支持配置数据块之间的地址步长和起始读取位置。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+          "kind": "requires",
+          "condition": "与其他指令存在UB地址重叠时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+            "excerpt": "- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。\n- 各功能模式下的实际读取地址必须按32字节对齐，且实际读取范围必须在UB地址空间内且不越界，否则会报错。非连续对齐搬入模式中，当某个`DataBlock`的`mask`包含的元素全部无效时，该`DataBlock`即使越界也不会报错。\n- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈 + 2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB～128KB作Data Cache，可用容量进一步减少）。UB地址偏移后不可超过实际可用容量，否则会报错。\n- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md",
+          "kind": "requires",
+          "condition": "int64_t搬入使用b64掩码时，先创建b32掩码",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+            "excerpt": "- 该模式不支持目的操作数为掩码寄存器。\n- 当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_mask/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。展开后的掩码以连续8个bit为一组，仅每组最低位的bit有效，用于控制对应的一个b64元素。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md",
+          "kind": "requires",
+          "condition": "int64_t搬入使用b64掩码时，将b32掩码展开",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+            "excerpt": "- 该模式不支持目的操作数为掩码寄存器。\n- 当dtype为`int64_t`时，由于掩码创建接口不支持b64模式，需要先通过[asc_create_mask_b32](../reg_mask/asc_create_mask.md)生成b32掩码，再通过[asc_unpack_lower](../reg_permute_sel/asc_unpack.md)将其展开为适用于b64数据的掩码后传入本接口。展开后的掩码以连续8个bit为一组，仅每组最低位的bit有效，用于控制对应的一个b64元素。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+      "document_sha256": "e807eac8f12ab5903920b4a446fbcf13713dc2b932db98c414f6f6c9d2f81b8f",
+      "description": {
+        "value": "将矢量或掩码寄存器数据对齐搬出至UB，支持连续及偏移寻址；矢量搬出时掩码未选中位置保留UB原值。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+            "excerpt": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节），支持配置掩码用于指示参与搬出的元素，掩码为1的元素写入目的地址，掩码为0的元素保留目的地址原数据。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），将掩码寄存器中的数据直接搬出，不支持配置掩码。搬运过程中数据格式与内容保持不变。目的操作数为UB地址。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "data_movement"
+        ],
+        "operations": [
+          "store"
+        ],
+        "traits": [
+          "aligned_transfer"
+        ]
+      },
+      "tag_evidence": {
+        "roles:data_movement": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节），支持配置掩码用于指示参与搬出的元素，掩码为1的元素写入目的地址，掩码为0的元素保留目的地址原数据。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），将掩码寄存器中的数据直接搬出，不支持配置掩码。搬运过程中数据格式与内容保持不变。目的操作数为UB地址。",
+        "operations:store": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节），支持配置掩码用于指示参与搬出的元素，掩码为1的元素写入目的地址，掩码为0的元素保留目的地址原数据。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），将掩码寄存器中的数据直接搬出，不支持配置掩码。搬运过程中数据格式与内容保持不变。目的操作数为UB地址。",
+        "traits:aligned_transfer": "将矢量数据寄存器或掩码寄存器中的数据以对齐的方式搬出到Unified Buffer（UB）。当源操作数为矢量数据寄存器时，单次搬出量为VL（256字节），支持配置掩码用于指示参与搬出的元素，掩码为1的元素写入目的地址，掩码为0的元素保留目的地址原数据。当源操作数为掩码寄存器时，单次搬出量为掩码寄存器长度（32字节），将掩码寄存器中的数据直接搬出，不支持配置掩码。搬运过程中数据格式与内容保持不变。目的操作数为UB地址。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md",
+          "kind": "requires",
+          "condition": "地址寄存器偏移模式",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+            "excerpt": "- **连续对齐搬出模式**：将矢量数据寄存器中的数据搬出到UB目的地址，由用户自行更新目的地址。\n- **立即数偏移搬出模式**：通过立即数指定相对目的起始地址的偏移，单位为元素，用户可选择更新偏移或更新目的地址。\n- **地址寄存器偏移搬出模式**：通过地址寄存器指定相对目的起始地址的偏移，常用于Hardware Loop内偏移随循环计数变化的对齐搬出场景。需要与[asc_update_addr_reg](../reg_addr_reg/asc_update_addr_reg.md)配合使用。\n- **非连续对齐搬出模式**：单条指令搬运8个DataBlock，一个DataBlock数据量为32字节。通过参数配置相邻DataBlock的步长和相对目的起始地址的偏移。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md",
+          "kind": "requires",
+          "condition": "与其他指令存在UB地址重叠时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+            "excerpt": "- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。\n- dst起始地址需32字节对齐，否则会报错。\n- UB容量上限为256KB，用户可用容量随编译选项与编程场景变化（默认预留6KB SIMD VF栈+2KB Ascend C预留，可用248KB；SIMD+SIMT混编时再划分32KB~128KB作Data Cache，可用容量进一步减少）。目的操作数地址偏移后不可超过实际可用容量，否则会报错。\n- 如果本指令与其他指令存在UB地址重叠，需要插入同步指令[asc_mem_bar](../reg_sync/asc_mem_bar.md)，保证多个指令串行化，防止出现异常数据。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md",
+      "document_sha256": "d1bf17db85f514edc43b0d687c07d0cedcc9507b97d486d4002d02b6deb1384a",
+      "description": {
+        "value": "按剩余元素个数生成掩码并递减计数，支持b8、b16和b32位宽，用于Vector Function分块处理数据。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md",
+            "excerpt": "根据元素个数value生成mask，并自动将value减去当前向量处理单元的元素个数。支持b8、b16、b32三种位宽模式，由于VL=256B，各模式的向量处理单元元素个数为："
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "根据元素个数value生成mask，并自动将value减去当前向量处理单元的元素个数。支持b8、b16、b32三种位宽模式，由于VL=256B，各模式的向量处理单元元素个数为："
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md",
+      "document_sha256": "ec4ea09cb9553367938e049f4c8118d8900c02287d8d148a236b67b749458a95",
+      "description": {
+        "value": "按掩码逐元素求寄存器数据的绝对值，支持输出参数及返回值形式；有符号整数最小负值保持不变。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md",
+            "excerpt": "根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下："
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "absolute"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：",
+        "operations:absolute": "根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下：",
+        "traits:elementwise": "根据`mask`对源操作数`src`按元素取绝对值，得到计算结果。计算公式如下："
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md",
+      "document_sha256": "044296563d3d183b99013de35192a70062fb6734a75a91449e23ff2ee580bc45",
+      "description": {
+        "value": "按掩码对两个源矢量寄存器逐元素求商，支持输出参数和返回值形式；浮点结果可能存在1 ULP精度差异。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md",
+            "excerpt": "该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "divide"
+        ],
+        "traits": [
+          "elementwise"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。",
+        "operations:divide": "该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。",
+        "traits:elementwise": "该接口根据mask，对源操作数src0、src1进行按元素求商操作，将结果写入目的操作数dst。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md",
+      "document_sha256": "b50f2adb5003f58719ef28eb20ee7a9924fd688ed52883e80aa524717488a29c",
+      "description": {
+        "value": "按掩码将half寄存器元素转换为float，通过编译期位置标签选择源寄存器的偶数或奇数位置。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md",
+            "excerpt": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`float`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "conversion"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`float`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。",
+        "operations:conversion": "根据`mask`将`src`中的每个参与计算的`half`类型元素转换为`float`类型，结果写入`dst`。由于源操作数与目的操作数类型位宽比为1:2，读取数据时需要将一个`VL`大小的数据分为两部分，根据参数`src_pos`选择读取`src`索引为偶数的位置或奇数的位置。"
+      },
+      "dependencies": []
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+      "document_sha256": "bdb4606888b1aa587fef93cc1088e856185b462d9526c0776c70815c7dd165ff",
+      "description": {
+        "value": "按掩码将float转换为FP8 E4M3，支持饱和及非饱和形式；四分之一位置标签决定离散写入位置，其余位置置零。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+            "excerpt": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e4m3fn_t`类型，结果写入`dst`。由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组，参数`dst_quarter_pos`从`dst`中离散选取每隔4个元素的索引位置写入转换结果，具体为索引0、4、8、…，索引1、5、9、…，索引2、6、10、…或索引3、7、11、…，其他位置置零。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "compute"
+        ],
+        "operations": [
+          "conversion"
+        ],
+        "traits": [
+          "rounding_mode",
+          "saturation_mode"
+        ]
+      },
+      "tag_evidence": {
+        "roles:compute": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e4m3fn_t`类型，结果写入`dst`。由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组，参数`dst_quarter_pos`从`dst`中离散选取每隔4个元素的索引位置写入转换结果，具体为索引0、4、8、…，索引1、5、9、…，索引2、6、10、…或索引3、7、11、…，其他位置置零。",
+        "operations:conversion": "根据`mask`将`src`中参与计算的`float`类型元素转换为`fp8_e4m3fn_t`类型，结果写入`dst`。由于源操作数与目的操作数的类型位宽比为4:1，`dst`中的元素按索引分为四组，参数`dst_quarter_pos`从`dst`中离散选取每隔4个元素的索引位置写入转换结果，具体为索引0、4、8、…，索引1、5、9、…，索引2、6、10、…或索引3、7、11、…，其他位置置零。",
+        "traits:rounding_mode": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。",
+        "traits:saturation_mode": "**占位符说明如下：**\n- `<sat_mode>`表示饱和/非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md",
+          "kind": "requires",
+          "condition": "配置饱和或非饱和模式时",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+            "excerpt": "- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。\n- 位置选择标签参数仅能使用编译期常量，编译器据此在编译期分发至对应的重载。\n- 位置选择标签选择目的操作数的写入地址，其他位置清零。\n- `mask`掩码位为0时，`dst`对应元素置0。\n- 使用饱和或非饱和模式时，需要配置`ctrl`寄存器，详细说明请参见[asc_set_ctrl](../../spr/asc_set_ctrl.md)。"
+          }
+        },
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md",
+          "kind": "constrained_by",
+          "condition": "舍入与饱和模式规则",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+            "excerpt": "关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+      "document_sha256": "b0c03b1c47f9fe3c658c30b35ada7dd66eeead6b22194084697cc3038d0bf3be",
+      "description": {
+        "value": "选择按API或全局配置的饱和策略；全局CAST饱和开关仅在USE_GLOBAL策略下生效，切换策略不改变各模式开关。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "设置饱和控制策略，默认为开启全局饱和配置："
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ],
+        "traits": [
+          "saturation_mode"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "设置饱和控制策略，默认为开启全局饱和配置：",
+        "traits:saturation_mode": "设置饱和控制策略，默认为开启全局饱和配置："
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+          "kind": "configures",
+          "condition": "全局CAST饱和开关仅在USE_GLOBAL下生效",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+            "excerpt": "该策略尤其影响CAST类饱和：只有在`USE_GLOBAL`时，通过[asc_set_saturation_flag](asc_set_saturation_flag.md)配置的`asc_saturation_mode::CAST`才会生效。枚举含义详见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+      "document_sha256": "40ff06b10e502871fb590ea7f89aa87b7e21c388ae28d47fcb8cd6721be3af35",
+      "description": {
+        "value": "按FLOAT、FLOAT8、INT或CAST模式设置饱和开关，各模式的关闭语义和前置配置不同；FLOAT8开启还依赖FLOAT饱和。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "configuration"
+        ],
+        "traits": [
+          "saturation_mode"
+        ]
+      },
+      "tag_evidence": {
+        "roles:configuration": "按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。",
+        "traits:saturation_mode": "按饱和模式类型设置对应饱和开关。`enable_sat`表示API语义上的“是否开启饱和”，接口内部会按模式处理不同语义。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+          "kind": "requires",
+          "condition": "开启FLOAT或CAST全局饱和前须选择USE_GLOBAL；FLOAT8还须先开启FLOAT",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md",
+            "excerpt": "- `enable_sat`是API语义参数：同一布尔值在不同模式下的关闭语义不同（INT为截断，FLOAT/FLOAT8/CAST为非饱和或截断），请以表1为准。\n- 当对`FLOAT`开启饱和模式前，需要通过[asc_set_saturation_strategy](asc_set_saturation_strategy.md)开启全局饱和配置方可生效；当`saturation_mode`为`FLOAT8`时，还需要先对`FLOAT`开启饱和模式才能生效。\n- 当`saturation_mode`为`CAST`时，还需将饱和策略设置为`asc_override_strategy::USE_GLOBAL`，CAST才会生效。可通过[asc_set_saturation_strategy](asc_set_saturation_strategy.md)配置。\n- 本接口仅修改对应模式的饱和配置，不影响其他模式。"
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+      "document_sha256": "0fc8e9105157cb644569910b3217503ae3fce10827a8523e1ad040abf54b4574",
+      "description": {
+        "value": "在源流水前序读写完成后设置同步事件标志，不阻塞源流水后续指令；需与相同流水和事件ID的wait配对。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+            "excerpt": "- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。\n- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "control"
+        ],
+        "operations": [
+          "synchronization"
+        ]
+      },
+      "tag_evidence": {
+        "roles:control": "- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。\n- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。",
+        "operations:synchronization": "- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。\n- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+          "kind": "related",
+          "condition": "配对调用的源流水、目标流水和事件ID必须一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+            "excerpt": "如图1所示，与[asc_sync_wait](asc_sync_wait.md)配对使用，用于实现AI Core内部不同流水之间的同步控制，`asc_sync_notify`和`asc_sync_wait`各自的功能如下："
+          }
+        }
+      ]
+    },
+    {
+      "document_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+      "document_sha256": "887e61d3efd22efa1bd5db989614aec617d4dd70e5a1cc738ebba83b3c9c20b9",
+      "description": {
+        "value": "等待目标流水的同步事件标志，未就绪时阻塞后续指令，就绪后清除标志并继续；需与notify配对使用。",
+        "evidence": [
+          {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+            "excerpt": "- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。\n- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。"
+          }
+        ]
+      },
+      "tag": {
+        "roles": [
+          "control"
+        ],
+        "operations": [
+          "synchronization"
+        ]
+      },
+      "tag_evidence": {
+        "roles:control": "- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。\n- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。",
+        "operations:synchronization": "- `asc_sync_notify`：当源流水的前序指令的所有读写操作都完成之后，当前指令开始执行，并将硬件中的对应标志位设置为1。`asc_sync_notify`只是设置硬件中的对应标志位，并不会阻塞源流水中的下一个指令。\n- `asc_sync_wait`：当目的流水执行到该指令时，如果发现硬件中对应标志位为0，目的流水的后续指令将一直被阻塞；如果发现硬件中对应标志位为1，则将硬件中对应标志位设置为0，同时目的流水的后续指令开始执行。"
+      },
+      "dependencies": [
+        {
+          "path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+          "kind": "related",
+          "condition": "配对调用的源流水、目标流水和事件ID必须一致",
+          "evidence": {
+            "source_path": "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+            "excerpt": "如图1所示，与[asc_sync_notify](asc_sync_notify.md)配对使用，用于实现AI Core内部不同流水之间的同步控制，`asc_sync_notify`和`asc_sync_wait`各自的功能如下："
+          }
+        }
+      ]
+    }
+  ]
+}

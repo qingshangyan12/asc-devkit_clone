@@ -1,3 +1,13 @@
+---
+okftype: reference.api
+description: "按掩码对两个源矢量寄存器逐元素求商，支持输出参数和返回值形式；浮点结果可能存在1 ULP精度差异。"
+tag:
+  - roles: [compute]
+  - operations: [divide]
+  - traits: [elementwise]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_div
 
 ## 产品支持情况

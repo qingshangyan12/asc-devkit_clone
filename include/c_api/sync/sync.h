@@ -27,8 +27,28 @@
 #include "impl/c_api/reg_base_impl/sync_intf_impl.h"
 #endif
 
+/**
+ * @ingroup simd_c_api.sync.intra_core_sync
+ * @brief Sets a synchronization event after preceding source-pipeline accesses complete without blocking subsequent source instructions.
+ *
+ * @override_id asc_sync_notify__pipe_pipe_event
+ * @archs 2201 3510
+ * @param [in] pipe 源流水类型，即“等待哪条流水的前序指令完成”。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
+ * @param [in] tpipe 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。
+ * @param [in] id 同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。
+ */
 __aicore__ inline void asc_sync_notify(pipe_t pipe, pipe_t tpipe, event_t id);
 
+/**
+ * @ingroup simd_c_api.sync.intra_core_sync
+ * @brief Waits for a matching synchronization event and clears it before allowing subsequent destination-pipeline instructions.
+ *
+ * @override_id asc_sync_wait__pipe_pipe_event
+ * @archs 2201 3510
+ * @param [in] pipe 源流水类型，即“等待哪条流水的前序指令完成”。 参数的类型是`pipe_t`枚举，各个枚举取值的含义请参考[硬件流水类型](intra_core_sync_overview.md#硬件流水类型)。
+ * @param [in] tpipe 目标流水类型，即“解除哪条流水的`asc_sync_wait`阻塞”。取值范围与`pipe`相同，为`pipe_t`枚举。
+ * @param [in] id 同步事件ID，每对`pipe`与`tpipe`组合各自拥有8个独立的同步事件ID。取值范围为`event_t`枚举类型。
+ */
 __aicore__ inline void asc_sync_wait(pipe_t pipe, pipe_t tpipe, event_t id);
 
 __aicore__ inline void asc_sync_pipe(pipe_t pipe);

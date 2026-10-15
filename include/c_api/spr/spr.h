@@ -33,8 +33,25 @@ __aicore__ inline void asc_set_ctrl(uint64_t config);
 
 __aicore__ inline int64_t asc_get_squeeze_status();
 
+/**
+ * @ingroup simd_c_api.spr
+ * @brief Enables or disables saturation for the selected saturation mode without changing other modes.
+ *
+ * @override_id asc_set_saturation_flag__saturation_b
+ * @archs 3510
+ * @param [in] saturation_mode 饱和模式类型，取值见[asc_saturation_mode](../defs/enum/asc_saturation_mode.md)。
+ * @param [in] enable_sat 是否开启饱和。`true`表示开启饱和，`false`表示关闭饱和（对INT为截断；对FLOAT/FLOAT8/CAST为非饱和或截断，见上表）。
+ */
 __aicore__ inline void asc_set_saturation_flag(asc_saturation_mode saturation_mode, bool enable_sat);
 __aicore__ inline bool asc_get_saturation_flag(asc_saturation_mode saturation_mode);
+/**
+ * @ingroup simd_c_api.spr
+ * @brief Selects per-API or global saturation control without changing the saturation flags.
+ *
+ * @override_id asc_set_saturation_strategy__strategy
+ * @archs 3510
+ * @param [in] strategy 饱和控制策略，取值见[asc_override_strategy](../defs/enum/asc_override_strategy.md)。
+ */
 __aicore__ inline void asc_set_saturation_strategy(asc_override_strategy strategy);
 __aicore__ inline asc_override_strategy asc_get_saturation_strategy();
 

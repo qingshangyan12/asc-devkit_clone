@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "按FLOAT、FLOAT8、INT或CAST模式设置饱和开关，各模式的关闭语义和前置配置不同；FLOAT8开启还依赖FLOAT饱和。"
+tag:
+  - roles: [configuration]
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md
+    kind: requires
+    condition: "开启FLOAT或CAST全局饱和前须选择USE_GLOBAL；FLOAT8还须先开启FLOAT"
+version: ">=9.2.0"
+---
 # asc_set_saturation_flag
 
 ## 产品支持情况

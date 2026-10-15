@@ -1,3 +1,11 @@
+---
+okftype: reference.api
+description: "按剩余元素个数生成掩码并递减计数，支持b8、b16和b32位宽，用于Vector Function分块处理数据。"
+tag:
+  - roles: [configuration]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_update_mask
 
 ## 产品支持情况

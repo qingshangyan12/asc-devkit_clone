@@ -1,0 +1,15 @@
+# version 推导人工裁决覆盖（derive_version.py 消费）。
+#
+# 仅登记脚本规则无法裁决、经人工核对 Release Notes 原文确认的版本修正；
+# 每条必须给出依据摘录。新增条目须附核对说明。
+
+schema_version: 1
+floors:
+  asc_set_saturation_strategy:
+    floor: 9.2.0
+    reason: CANN_9_2_0.md「新增特性」在同一条目的第二组接口中引入饱和策略配置；条目解析器只识别第一个冒号前的接口名，遗漏本接口。9.0.0和9.1.0 Release Notes 均未列出该接口。
+    evidence: "[asc_set_saturation_strategy](../../SIMD-API/c_api/spr/asc_set_saturation_strategy.md)和[asc_get_saturation_strategy](../../SIMD-API/c_api/spr/asc_get_saturation_strategy.md)支持通过[asc_override_strategy](../../SIMD-API/c_api/defs/enum/asc_override_strategy.md)在单指令/API路径配置与全局饱和配置之间切换和查询。"
+  asc_fma:
+    floor: 9.1.0
+    reason: CANN_9_2_0.md「新增特性」自述 asc_fma 在 CANN 9.1.0 仅有 Memory 矢量计算接口、9.2.0 新增的是 Reg 接口；Memory 版文档 floor 应为 9.1.0。9.1.0 Release Notes 未逐名列出该接口，规则正则无法识别。
+    evidence: "`asc_fma`在CANN 9.1.0中仅有Memory矢量计算接口，本版本新增的是Reg接口"

@@ -1,3 +1,25 @@
+---
+okftype: reference.api
+description: "从32字节对齐的UB地址搬入矢量或掩码寄存器，支持返回值、输出参数及多种偏移寻址方式，保持数据格式和内容。"
+tag:
+  - roles: [data_movement]
+  - operations: [load]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_create_mask.md
+    kind: requires
+    condition: "int64_t搬入使用b64掩码时，先创建b32掩码"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_permute_sel/asc_unpack.md
+    kind: requires
+    condition: "int64_t搬入使用b64掩码时，将b32掩码展开"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_loadalign
 
 ## 产品支持情况

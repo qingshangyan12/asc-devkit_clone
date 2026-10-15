@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "在源流水前序读写完成后设置同步事件标志，不阻塞源流水后续指令；需与相同流水和事件ID的wait配对。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md
+    kind: related
+    condition: "配对调用的源流水、目标流水和事件ID必须一致"
+version: ">=9.0.0"
+---
 # asc_sync_notify
 
 ## 产品支持情况

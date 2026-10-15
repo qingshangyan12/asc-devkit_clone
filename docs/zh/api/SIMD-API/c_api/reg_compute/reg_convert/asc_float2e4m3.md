@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "按掩码将float转换为FP8 E4M3，支持饱和及非饱和形式；四分之一位置标签决定离散写入位置，其余位置置零。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+  - traits: [rounding_mode, saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/rounding_mode.md
+    kind: constrained_by
+    condition: "舍入与饱和模式规则"
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_ctrl.md
+    kind: requires
+    condition: "配置饱和或非饱和模式时"
+version: ">=9.0.0"
+---
 # asc_float2e4m3
 
 ## 产品支持情况

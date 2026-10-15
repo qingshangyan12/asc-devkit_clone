@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "为后续GM到UB搬运配置填充值；3510上用于asc_copy_gm2ub_align，是否取用配置由搬运模式和填充参数决定。"
+tag:
+  - roles: [data_movement_configuration]
+  - traits: [padding]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md
+    kind: configures
+    condition: "3510上搬运采用常量填充值时"
+version: ">=9.1.0"
+---
 # asc_set_copy_pad_val
 
 ## 产品支持情况

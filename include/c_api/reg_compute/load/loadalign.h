@@ -28,36 +28,164 @@
 // ========== return-value load APIs ==========
 // ========== return vector data register APIs ==========
 // ========== asc_loadalign ==========
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUi4x2
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_int4x2_t asc_loadalign(__ubuf__ int4b_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUi8
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_int8_t asc_loadalign(__ubuf__ int8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUu8
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_uint8_t asc_loadalign(__ubuf__ uint8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUf4e2m1x2
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_fp4x2_e2m1_t asc_loadalign(__ubuf__ fp4x2_e2m1_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUf4e1m2x2
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_fp4x2_e1m2_t asc_loadalign(__ubuf__ fp4x2_e1m2_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUhf8
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_hifloat8_t asc_loadalign(__ubuf__ hifloat8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUf8e8m0
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_fp8_e8m0_t asc_loadalign(__ubuf__ fp8_e8m0_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUf8e5m2
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_fp8_e5m2_t asc_loadalign(__ubuf__ fp8_e5m2_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUf8e4m3
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_loadalign(__ubuf__ fp8_e4m3fn_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUi16
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_int16_t asc_loadalign(__ubuf__ int16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUu16
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_uint16_t asc_loadalign(__ubuf__ uint16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUf16
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_half asc_loadalign(__ubuf__ half* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUbf16
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_bfloat16_t asc_loadalign(__ubuf__ bfloat16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUi32
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_int32_t asc_loadalign(__ubuf__ int32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUu32
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_uint32_t asc_loadalign(__ubuf__ uint32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Returns a vector loaded from a 32-byte-aligned UB address without changing its data format.
+ *
+ * @override_id asc_loadalign__PUf32
+ * @archs 3510
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline vector_float asc_loadalign(__ubuf__ float* src);
 
 // ========== asc_loadalign_brc_datablock ==========
@@ -303,40 +431,202 @@ __simd_callee__ inline vector_bool asc_loadalign_mask_downsample(__ubuf__ uint32
 
 __simd_callee__ inline vector_bool asc_loadalign_mask_upsample(__ubuf__ uint32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi8_PUi8
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu8_PUu8
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf4e2m1x2_PUf4e2m1x2
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf4e1m2x2_PUf4e1m2x2
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi4x2_PUi4x2
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e8m0_PUf8e8m0
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e5m2_PUf8e5m2
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e4m3_PUf8e4m3
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvhf8_PUhf8
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi16_PUi16
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int16_t& dst, __ubuf__ int16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu16_PUu16
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint16_t& dst, __ubuf__ uint16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf16_PUf16
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_half& dst, __ubuf__ half* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvbf16_PUbf16
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi32_PUi32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int32_t& dst, __ubuf__ int32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu32_PUu32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint32_t& dst, __ubuf__ uint32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf32_PUf32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_float& dst, __ubuf__ float* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi64_PUi64
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int64_t& dst, __ubuf__ int64_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu64_PUu64
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint64_t& dst, __ubuf__ uint64_t* src);
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_t* src);
@@ -494,40 +784,220 @@ __simd_callee__ inline void asc_loadalign_deintlv(vector_uint32_t& dst0, vector_
 
 __simd_callee__ inline void asc_loadalign_deintlv(vector_float& dst0, vector_float& dst1, __ubuf__ float* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi8_PUi8_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu8_PUu8_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf4e2m1x2_PUf4e2m1x2_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf4e1m2x2_PUf4e1m2x2_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi4x2_PUi4x2_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e8m0_PUf8e8m0_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e5m2_PUf8e5m2_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e4m3_PUf8e4m3_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvhf8_PUhf8_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi16_PUi16_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int16_t& dst, __ubuf__ int16_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu16_PUu16_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint16_t& dst, __ubuf__ uint16_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf16_PUf16_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_half& dst, __ubuf__ half* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvbf16_PUbf16_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi32_PUi32_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int32_t& dst, __ubuf__ int32_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu32_PUu32_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint32_t& dst, __ubuf__ uint32_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf32_PUf32_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_float& dst, __ubuf__ float* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi64_PUi64_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int64_t& dst, __ubuf__ int64_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu64_PUu64_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint64_t& dst, __ubuf__ uint64_t* src, int32_t offset);
 
 __simd_callee__ inline void asc_loadalign_brc(vector_int8_t& dst, __ubuf__ int8_t* src, int32_t offset);
@@ -947,57 +1417,261 @@ __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
 __simd_callee__ inline void asc_loadalign_deintlv_postupdate(
     vector_float& dst0, vector_float& dst1, __ubuf__ float*& src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi8_PUi8_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_int8_t& dst, __ubuf__ int8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu8_PUu8_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_uint8_t& dst, __ubuf__ uint8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi16_PUi16_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_int16_t& dst, __ubuf__ int16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu16_PUu16_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_uint16_t& dst, __ubuf__ uint16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi32_PUi32_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_int32_t& dst, __ubuf__ int32_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu32_PUu32_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_uint32_t& dst, __ubuf__ uint32_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi64_PUi64_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_int64_t& dst, __ubuf__ int64_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvbf16_PUbf16_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e4m3_PUf8e4m3_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvhf8_PUhf8_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e5m2_PUf8e5m2_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e8m0_PUf8e8m0_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf4e1m2x2_PUf4e1m2x2_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf4e2m1x2_PUf4e2m1x2_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, uint16_t block_stride, uint16_t repeat_stride,
     vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi4x2_PUi4x2_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_int4x2_t& dst, __ubuf__ int4b_t* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf16_PUf16_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_half& dst, __ubuf__ half* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using a non-contiguous DataBlock stride without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf32_PUf32_u16_u16_vb
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器。dtype必须与`src`一致，搬入VL长度数据。本模式不支持`vector_bool`目的寄存器。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] block_stride 源操作数相邻`DataBlock`之间起始地址的步长，单位为32字节。
+ * @param [in] repeat_stride 本次搬入的起始读取地址相对`src`的偏移，单位为32字节。实际起始读取地址为`src`偏移`repeat_stride × 32`字节。
+ * @param [in] mask 掩码寄存器，用于指示在计算过程中哪些元素参与计算。该接口以`DataBlock`为数据搬运单元。 &bull; 当`DataBlock`中的任意一个元素被`mask`筛选成有效元素时，该`DataBlock`中所有数据都会搬入至矢量数据寄存器。 &bull; 当`DataBlock`中所有元素都被`mask`筛选成无效元素时，该`DataBlock`中的数据不会搬入到矢量数据寄存器，对应位置的元素设置为0，即使UB越界也不会报错。
+ */
 __simd_callee__ inline void asc_loadalign(
     vector_float& dst, __ubuf__ float* src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
@@ -1055,40 +1729,220 @@ __simd_callee__ inline void asc_loadalign_postupdate(
 __simd_callee__ inline void asc_loadalign_postupdate(
     vector_float& dst, __ubuf__ float*& src, uint16_t block_stride, uint16_t repeat_stride, vector_bool mask);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf4e1m2x2_PUf4e1m2x2_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf4e2m1x2_PUf4e2m1x2_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp4x2_e2m1_t& dst, __ubuf__ fp4x2_e2m1_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi4x2_PUi4x2_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int4x2_t& dst, __ubuf__ int4b_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu8_PUu8_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint8_t& dst, __ubuf__ uint8_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi8_PUi8_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int8_t& dst, __ubuf__ int8_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e4m3_PUf8e4m3_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e4m3fn_t& dst, __ubuf__ fp8_e4m3fn_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvhf8_PUhf8_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_hifloat8_t& dst, __ubuf__ hifloat8_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e5m2_PUf8e5m2_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e5m2_t& dst, __ubuf__ fp8_e5m2_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf8e8m0_PUf8e8m0_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_fp8_e8m0_t& dst, __ubuf__ fp8_e8m0_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu16_PUu16_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint16_t& dst, __ubuf__ uint16_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi16_PUi16_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int16_t& dst, __ubuf__ int16_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvbf16_PUbf16_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_bfloat16_t& dst, __ubuf__ bfloat16_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu32_PUu32_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint32_t& dst, __ubuf__ uint32_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi32_PUi32_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int32_t& dst, __ubuf__ int32_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvi64_PUi64_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_int64_t& dst, __ubuf__ int64_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvu64_PUu64_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_uint64_t& dst, __ubuf__ uint64_t* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf16_PUf16_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_half& dst, __ubuf__ half* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvf32_PUf32_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_float& dst, __ubuf__ float* src, addr_reg offset);
 
 __simd_callee__ inline void asc_loadalign_brc(vector_fp4x2_e1m2_t& dst, __ubuf__ fp4x2_e1m2_t* src, addr_reg offset);
@@ -1261,10 +2115,39 @@ __simd_callee__ inline void asc_loadalign_unpack(vector_int32_t& dst, __ubuf__ i
 
 __simd_callee__ inline void asc_loadalign_unpack(vector_float& dst, __ubuf__ float* src, addr_reg offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst in contiguous order without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvb_PUu32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器，仅无返回值类型接口包含该参数。 &bull; 当`dst`为矢量数据寄存器，`dtype`必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ */
 __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvb_PUu32_i32
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, int32_t offset);
 
+/**
+ * @ingroup simd_c_api.reg_compute.load
+ * @brief Loads data from aligned UB storage into dst using an immediate offset without changing its data format.
+ *
+ * @override_id asc_loadalign__Rvb_PUu32_ar
+ * @archs 3510
+ * @param [out] dst 目的矢量数据寄存器或掩码寄存器。 &bull; 当`dst`为矢量数据寄存器，dtype必须与`src`一致，搬入VL长度数据。 &bull; 当`dst`为掩码寄存器，搬入VL/8长度数据。
+ * @param [in] src 源UB地址，实际读取地址必须按32字节对齐。
+ * @param [in] offset 相对`src`起始地址的偏移。 &bull; 当`dst`为矢量数据寄存器，单位为元素个数。 &bull; 当`dst`为掩码寄存器，单位为字节。
+ */
 __simd_callee__ inline void asc_loadalign(vector_bool& dst, __ubuf__ uint32_t* src, addr_reg offset);
 
 __simd_callee__ inline void asc_loadalign_upsample(vector_bool& dst, __ubuf__ uint32_t* src);

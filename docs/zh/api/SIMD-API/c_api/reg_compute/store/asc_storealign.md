@@ -1,3 +1,19 @@
+---
+okftype: reference.api
+description: "将矢量或掩码寄存器数据对齐搬出至UB，支持连续及偏移寻址；矢量搬出时掩码未选中位置保留UB原值。"
+tag:
+  - roles: [data_movement]
+  - operations: [store]
+  - traits: [aligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_addr_reg/asc_update_addr_reg.md
+    kind: requires
+    condition: "地址寄存器偏移模式"
+  - path: docs/zh/api/SIMD-API/c_api/reg_compute/reg_sync/asc_mem_bar.md
+    kind: requires
+    condition: "与其他指令存在UB地址重叠时"
+version: ">=9.0.0"
+---
 # asc_storealign
 
 ## 产品支持情况

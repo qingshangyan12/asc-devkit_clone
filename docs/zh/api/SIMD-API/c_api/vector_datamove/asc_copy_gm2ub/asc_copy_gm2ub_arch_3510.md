@@ -1,3 +1,13 @@
+---
+okftype: reference.api
+description: "将GM数据连续或按高维切分搬入UB；有效长度非32字节对齐时在UB侧补齐写入，需为实际写入范围预留空间。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [high_dimensional, padding]
+dependencies: []
+version: ">=9.1.0"
+---
 # asc_copy_gm2ub
 
 ## 产品支持情况

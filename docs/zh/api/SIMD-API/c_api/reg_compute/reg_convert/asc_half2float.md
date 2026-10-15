@@ -1,3 +1,12 @@
+---
+okftype: reference.api
+description: "按掩码将half寄存器元素转换为float，通过编译期位置标签选择源寄存器的偶数或奇数位置。"
+tag:
+  - roles: [compute]
+  - operations: [conversion]
+dependencies: []
+version: ">=9.0.0"
+---
 # asc_half2float
 
 ## 产品支持情况

@@ -1,0 +1,24 @@
+{
+ "schema": "okf-index-meta/2",
+ "source_commit": "20f4f71417fd28e5476a60ec86197493ec267cc1",
+ "taxonomy_sha256": "79fd49bb303aa3f4402c0763fbb63a58e92a176ca626e0db64bbd4c82ef571b5",
+ "product_map_sha256": "5b732d1ee11991711801843502963a26d99085075908ae93aa3fb957ee6a8e3e",
+ "gaps_sha256": "d597c91cfa099937b2704a6591da4ae2cb40cf3134d648565a5b4344aacaddd1",
+ "document_sha256": {
+  "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md": "974cfcac9e4d6ea832fd8be15cc686bbaf98753306e95da132af310b797be96e",
+  "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md": "ec4ea09cb9553367938e049f4c8118d8900c02287d8d148a236b67b749458a95",
+  "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md": "044296563d3d183b99013de35192a70062fb6734a75a91449e23ff2ee580bc45",
+  "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md": "bdb4606888b1aa587fef93cc1088e856185b462d9526c0776c70815c7dd165ff",
+  "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md": "b50f2adb5003f58719ef28eb20ee7a9924fd688ed52883e80aa524717488a29c",
+  "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md": "d1bf17db85f514edc43b0d687c07d0cedcc9507b97d486d4002d02b6deb1384a",
+  "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md": "e807eac8f12ab5903920b4a446fbcf13713dc2b932db98c414f6f6c9d2f81b8f",
+  "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md": "40ff06b10e502871fb590ea7f89aa87b7e21c388ae28d47fcb8cd6721be3af35",
+  "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md": "cb6b0af83b302d67f9fb39a0c532c86b9947f23a11f5aabd4e2624698d49fabb",
+  "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md": "0fc8e9105157cb644569910b3217503ae3fce10827a8523e1ad040abf54b4574",
+  "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md": "887e61d3efd22efa1bd5db989614aec617d4dd70e5a1cc738ebba83b3c9c20b9",
+  "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md": "daa821c364ca36b54ea07bf52941c58d438b3e0c4a539ee8c075782469fb5233",
+  "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md": "cddee034e056bb30cd9422e6405dca029628e034718b65943436c0e77652eed7",
+  "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md": "b229baebe69572b2985ab4baaf8b3ff2333ef8685680c07ecc176c7ea49245fd",
+  "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md": "993851e97c510831d74dbf0d8d0fa1011a038311c3f017918042fc0d0ce5225a"
+ }
+}

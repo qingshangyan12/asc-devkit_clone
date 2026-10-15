@@ -1,0 +1,8 @@
+[
+  {"name": "absolute", "args": ["--operation", "absolute"], "contains": ["asc_abs"]},
+  {"name": "GM to UB", "args": ["--operation", "copy", "--stage", "in"], "contains": ["asc_copy_gm2ub"]},
+  {"name": "half to float", "args": ["--convert", "half", "float"], "contains": ["asc_half2float"]},
+  {"name": "synchronization", "args": ["--operation", "synchronization"], "contains": ["asc_sync_notify", "asc_sync_wait"]},
+  {"name": "padding dependency", "args": ["--deps-of", "asc_copy_gm2ub_align_arch_3510"], "contains": ["asc_set_copy_pad_val"]},
+  {"name": "3510-only version view", "args": ["--version", ">=9.2.0"], "contains": ["asc_set_saturation_flag", "asc_set_saturation_strategy"]}
+]

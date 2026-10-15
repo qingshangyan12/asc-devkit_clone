@@ -26,41 +26,121 @@
 #endif
 
 // ASC_RETURN_VALUE_VCONV_API
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns non-saturating FP8 E4M3 conversions of src under mask in the first quarter positions, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn__vf32_vb_icposqfirst
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns non-saturating FP8 E4M3 conversions of src under mask in the second quarter positions, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn__vf32_vb_icposqsecond
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns non-saturating FP8 E4M3 conversions of src under mask in the third quarter positions, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn__vf32_vb_icposqthird
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns non-saturating FP8 E4M3 conversions of src under mask in the fourth quarter positions, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn__vf32_vb_icposqfourth
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns saturating FP8 E4M3 conversions of src under mask in the first quarter positions, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn_sat__vf32_vb_icposqfirst
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn_sat(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns saturating FP8 E4M3 conversions of src under mask in the second quarter positions, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn_sat__vf32_vb_icposqsecond
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn_sat(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns saturating FP8 E4M3 conversions of src under mask in the third quarter positions, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn_sat__vf32_vb_icposqthird
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn_sat(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns saturating FP8 E4M3 conversions of src under mask in the fourth quarter positions, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn_sat__vf32_vb_icposqfourth
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline vector_fp8_e4m3fn_t asc_float2e4m3_rn_sat(
     vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
@@ -3634,41 +3714,129 @@ __simd_callee__ inline void asc_trunc(vector_bfloat16_t& dst, vector_bfloat16_t 
 __simd_callee__ inline void asc_trunc(vector_float& dst, vector_float src, vector_bool mask);
 
 // ==========Position-aware conversion overloads==========
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts src to non-saturating FP8 E4M3 under mask in the first quarter positions of dst, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn__Rvf8e4m3_vf32_vb_icposqfirst
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline void asc_float2e4m3_rn(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts src to non-saturating FP8 E4M3 under mask in the second quarter positions of dst, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn__Rvf8e4m3_vf32_vb_icposqsecond
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline void asc_float2e4m3_rn(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts src to non-saturating FP8 E4M3 under mask in the third quarter positions of dst, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn__Rvf8e4m3_vf32_vb_icposqthird
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline void asc_float2e4m3_rn(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts src to non-saturating FP8 E4M3 under mask in the fourth quarter positions of dst, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn__Rvf8e4m3_vf32_vb_icposqfourth
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline void asc_float2e4m3_rn(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts src to saturating FP8 E4M3 under mask in the first quarter positions of dst, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn_sat__Rvf8e4m3_vf32_vb_icposqfirst
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline void asc_float2e4m3_rn_sat(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FIRST_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts src to saturating FP8 E4M3 under mask in the second quarter positions of dst, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn_sat__Rvf8e4m3_vf32_vb_icposqsecond
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline void asc_float2e4m3_rn_sat(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_SECOND_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts src to saturating FP8 E4M3 under mask in the third quarter positions of dst, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn_sat__Rvf8e4m3_vf32_vb_icposqthird
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline void asc_float2e4m3_rn_sat(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_THIRD_QUARTER>
         dst_quarter_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts src to saturating FP8 E4M3 under mask in the fourth quarter positions of dst, zeroing other positions.
+ *
+ * @override_id asc_float2e4m3_rn_sat__Rvf8e4m3_vf32_vb_icposqfourth
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] dst_quarter_pos 四分之一位置选择标签（编译期标签分发，通过编译期重载选择对应实现），用于选择目的操作数的写入地址，其他位置清零。可传入对应的编译期标签：`ASC_DISPERSE_FIRST_QUARTER`、`ASC_DISPERSE_SECOND_QUARTER`、`ASC_DISPERSE_THIRD_QUARTER`和`ASC_DISPERSE_FOURTH_QUARTER`。
+ */
 __simd_callee__ inline void asc_float2e4m3_rn_sat(
     vector_fp8_e4m3fn_t& dst, vector_float src, vector_bool mask,
     std::integral_constant<asc_position_quarter_mode, asc_position_quarter_mode::DISPERSE_FOURTH_QUARTER>
@@ -3926,16 +4094,58 @@ __simd_callee__ inline void asc_int162float(
     vector_float& dst, vector_int16_t src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns float values converted from the even half lanes of src under mask.
+ *
+ * @override_id asc_half2float__vf16_vb_icposeven
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] src_pos 位置选择标签（编译期标签分发，通过编译期重载选择对应实现），类型为std::integral_constant<asc_position_mode, asc_position_mode::EVEN>或std::integral_constant<asc_position_mode, asc_position_mode::ODD>。取`ASC_POSITION_EVEN`时选择读取源数据索引为偶数的位置；取`ASC_POSITION_ODD`时选择读取源数据索引为奇数的位置。
+ */
 __simd_callee__ inline vector_float asc_half2float(
     vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Returns float values converted from the odd half lanes of src under mask.
+ *
+ * @override_id asc_half2float__vf16_vb_icposodd
+ * @archs 3510
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] src_pos 位置选择标签（编译期标签分发，通过编译期重载选择对应实现），类型为std::integral_constant<asc_position_mode, asc_position_mode::EVEN>或std::integral_constant<asc_position_mode, asc_position_mode::ODD>。取`ASC_POSITION_EVEN`时选择读取源数据索引为偶数的位置；取`ASC_POSITION_ODD`时选择读取源数据索引为奇数的位置。
+ */
 __simd_callee__ inline vector_float asc_half2float(
     vector_half src, vector_bool mask, std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts the even half lanes of src to float under mask and stores the results in dst.
+ *
+ * @override_id asc_half2float__Rvf32_vf16_vb_icposeven
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] src_pos 位置选择标签（编译期标签分发，通过编译期重载选择对应实现），类型为std::integral_constant<asc_position_mode, asc_position_mode::EVEN>或std::integral_constant<asc_position_mode, asc_position_mode::ODD>。取`ASC_POSITION_EVEN`时选择读取源数据索引为偶数的位置；取`ASC_POSITION_ODD`时选择读取源数据索引为奇数的位置。
+ */
 __simd_callee__ inline void asc_half2float(
     vector_float& dst, vector_half src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::EVEN> src_pos);
 
+/**
+ * @ingroup simd_c_api.reg_compute.reg_convert
+ * @brief Converts the odd half lanes of src to float under mask and stores the results in dst.
+ *
+ * @override_id asc_half2float__Rvf32_vf16_vb_icposodd
+ * @archs 3510
+ * @param [out] dst 目的操作数（矢量数据寄存器）。
+ * @param [in] src 源操作数（矢量数据寄存器）。
+ * @param [in] mask 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。
+ * @param [in] src_pos 位置选择标签（编译期标签分发，通过编译期重载选择对应实现），类型为std::integral_constant<asc_position_mode, asc_position_mode::EVEN>或std::integral_constant<asc_position_mode, asc_position_mode::ODD>。取`ASC_POSITION_EVEN`时选择读取源数据索引为偶数的位置；取`ASC_POSITION_ODD`时选择读取源数据索引为奇数的位置。
+ */
 __simd_callee__ inline void asc_half2float(
     vector_float& dst, vector_half src, vector_bool mask,
     std::integral_constant<asc_position_mode, asc_position_mode::ODD> src_pos);

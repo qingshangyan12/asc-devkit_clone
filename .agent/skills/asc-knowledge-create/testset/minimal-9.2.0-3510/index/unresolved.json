@@ -1,0 +1,31 @@
+{
+  "purpose": "okf_derive_unresolved",
+  "records": [
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+      "field": "signatures",
+      "issue": "24 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+      "field": "signatures",
+      "issue": "21 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    },
+    {
+      "document": "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+      "field": "signatures",
+      "issue": "1 declaration(s) without @override_id (no example link; dtypes/params still derived)"
+    }
+  ],
+  "schema_version": 1
+}

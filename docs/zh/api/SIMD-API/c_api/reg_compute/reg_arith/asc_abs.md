@@ -1,11 +1,12 @@
 ---
 okftype: reference.api
-description: "根据mask对源操作数矢量数据寄存器按元素取绝对值，结果写入目的操作数或通过函数返回值返回；输入为有符号整数类型最小负值时结果保留原值不变。"
+description: "按掩码逐元素求寄存器数据的绝对值，支持输出参数及返回值形式；有符号整数最小负值保持不变。"
 tag:
   - roles: [compute]
   - operations: [absolute]
+  - traits: [elementwise]
 dependencies: []
-version: ">=9.2.0"
+version: ">=9.0.0"
 ---
 # asc_abs
 

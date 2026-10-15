@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "cann_version": "9.2.0",
+  "arch": "3510",
+  "surface": "c_api",
+  "skill_source_commit": "35af37f58ea9a8613557b03dc24f83a80ccf7f6e",
+  "documents": [
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub/asc_copy_gm2ub_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_gm2ub_align/asc_copy_gm2ub_align_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_copy_ub2gm/asc_copy_ub2gm_arch_3510.md",
+    "docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/load/asc_loadalign.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/store/asc_storealign.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_mask/asc_update_mask.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_abs.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_arith/asc_div.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_half2float.md",
+    "docs/zh/api/SIMD-API/c_api/reg_compute/reg_convert/asc_float2e4m3.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md",
+    "docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_wait.md",
+    "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_strategy.md",
+    "docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md"
+  ]
+}

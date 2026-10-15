@@ -1,0 +1,121 @@
+{
+  "examples": [
+    {
+      "example": "examples/02_simd_c_api/03_c_api/03_matrix_compute/asc_copy_l0c2gm",
+      "apis": [
+        "asc_copy_l0c2gm",
+        "asc_set_l0c_copy_nz_para",
+        "asc_set_l0c_copy_channel_para",
+        "asc_set_l0c_copy_prequant",
+        "asc_set_l0c_copy_config",
+        "asc_copy_gm2l1",
+        "asc_copy_l12fb"
+      ],
+      "evidence": [
+        "本样例介绍如何使用SIMD C API `asc_copy_l0c2gm`将矩阵乘的结果从L0C Buffer搬出到GM",
+        "先调用`asc_set_l0c_copy_nz_para(1, 0, 0)`配置单矩阵搬出，再调用`asc_copy_l0c2gm`并设置`enable_nz2nd = true`"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/03_matrix_compute/asc_copy_l0c2l1",
+      "apis": [
+        "asc_copy_l0c2l1",
+        "asc_set_l0c_copy_prequant",
+        "asc_set_l0c_copy_config",
+        "asc_copy_gm2l1",
+        "asc_copy_l12fb",
+        "asc_copy_l0c2gm"
+      ],
+      "evidence": [
+        "本样例介绍如何使用SIMD C API `asc_copy_l0c2l1`将矩阵乘的结果从L0C Buffer搬出到L1 Buffer",
+        "调用`asc_set_l0c_copy_prequant(2.0F, 0, true)`配置Scalar量化参数，再以`asc_quant_mode::QF322B8_PRE`调用`asc_copy_l0c2l1`"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/03_matrix_compute/asc_copy_l0c2ub",
+      "apis": [
+        "asc_copy_l0c2ub",
+        "asc_set_l0c_copy_nz_para"
+      ],
+      "evidence": [
+        "本样例介绍如何使用SIMD C API `asc_copy_l0c2ub`将矩阵乘的结果从L0C Buffer搬出到UB（Unified Buffer）",
+        "调用`asc_set_l0c_copy_nz_para(1, 0, 0)`，再调用`asc_copy_l0c2ub`并设置`enable_nz2nd = true`、`dual_dst_mode = DUAL_DST_DISABLE`"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/03_matrix_compute/load_data_l12l0_950",
+      "apis": [
+        "asc_copy_l12l0a",
+        "asc_copy_l12l0b",
+        "asc_copy_l12l0a_transpose",
+        "asc_copy_l12l0b_transpose",
+        "asc_set_gm2l1_nz_para",
+        "asc_copy_gm2l1_nd2nz",
+        "asc_mmad",
+        "asc_set_l0c_copy_nz_para",
+        "asc_copy_l0c2gm"
+      ],
+      "evidence": [
+        "本样例展示如何调用`asc_copy_l12l0a` / `asc_copy_l12l0b`及其`_transpose`接口，将A / B矩阵从L1搬运到L0A / L0B Buffer。",
+        "使用`asc_set_gm2l1_nz_para`配置Nz排布参数，使用`asc_copy_gm2l1_nd2nz`实现ND到Nz格式转换。"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/03_matrix_compute/matmul",
+      "apis": [
+        "asc_set_gm2l1_nz_para",
+        "asc_copy_gm2l1_nd2nz",
+        "asc_copy_gm2l1_dn2nz",
+        "asc_copy_l12l0a",
+        "asc_copy_l12l0b",
+        "asc_copy_l12bt",
+        "asc_mmad",
+        "asc_set_l0c_copy_nz_para",
+        "asc_copy_l0c2gm",
+        "asc_fill_l1"
+      ],
+      "evidence": [
+        "本样例以 float 输入数据类型为例，演示如何通过C API实现矩阵乘法（C = A × B + Bias）。",
+        "本样例调用`asc_fill_l1`将其显式清零"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad",
+      "apis": [
+        "asc_copy_gm2l1_nd2nz",
+        "asc_set_gm2l1_nz_para",
+        "asc_copy_l12l0a",
+        "asc_copy_l12l0b_trans",
+        "asc_copy_l12bt",
+        "asc_mmad",
+        "asc_copy_l0c2gm",
+        "asc_set_l0c_copy_nz_para",
+        "asc_copy_l12l0b",
+        "asc_copy_l12l0a_transpose"
+      ],
+      "evidence": [
+        "本样例以 int8_t、bfloat16 和 float 三种输入数据类型为例，演示如何通过 C API 实现矩阵乘法（C = A × B + Bias）。",
+        "`asc_copy_l12l0b_trans`：B 从 L1 Buffer转置搬运至 L0B Buffer"
+      ]
+    },
+    {
+      "example": "examples/02_simd_c_api/03_c_api/03_matrix_compute/mmad_mx",
+      "apis": [
+        "asc_copy_gm2l1_nd2nz",
+        "asc_copy_gm2l1_dn2nz",
+        "asc_fill_l1",
+        "asc_copy_l12l0a",
+        "asc_copy_l12l0a_mx",
+        "asc_copy_l12l0b",
+        "asc_copy_l12l0b_mx",
+        "asc_copy_l12bt",
+        "asc_mmad_mx",
+        "asc_copy_l0c2gm"
+      ],
+      "evidence": [
+        "本样例演示如何使用C API实现带量化功能的MX矩阵乘法。",
+        "使用`asc_copy_l12l0a`和`asc_copy_l12l0a_mx`将A、ScaleA搬运到L0A和L0AMX；"
+      ]
+    }
+  ]
+}

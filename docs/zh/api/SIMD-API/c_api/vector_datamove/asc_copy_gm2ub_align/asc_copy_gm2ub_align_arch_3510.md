@@ -1,3 +1,25 @@
+---
+okftype: reference.api
+description: "将GM数据非对齐搬入UB，支持连续及高维切分搬运、Normal和Compact模式，以及按条件配置常量填充。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [high_dimensional, padding, unaligned_transfer]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_copy_pad_val.md
+    kind: requires
+    condition: "高维切分使用常量填充，或Normal模式左右Padding非0时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop1_stride.md
+    kind: requires
+    condition: "使用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop2_stride.md
+    kind: requires
+    condition: "使用循环搬运模式时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_gm2ub_loop_size.md
+    kind: requires
+    condition: "使用循环搬运模式时"
+version: ">=9.0.0"
+---
 # asc_copy_gm2ub_align
 
 ## 产品支持情况

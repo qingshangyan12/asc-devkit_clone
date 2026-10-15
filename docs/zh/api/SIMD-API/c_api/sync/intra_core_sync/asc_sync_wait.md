@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "等待目标流水的同步事件标志，未就绪时阻塞后续指令，就绪后清除标志并继续；需与notify配对使用。"
+tag:
+  - roles: [control]
+  - operations: [synchronization]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/sync/intra_core_sync/asc_sync_notify.md
+    kind: related
+    condition: "配对调用的源流水、目标流水和事件ID必须一致"
+version: ">=9.0.0"
+---
 # asc_sync_wait
 
 ## 产品支持情况

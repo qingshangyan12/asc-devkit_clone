@@ -1,3 +1,22 @@
+---
+okftype: reference.api
+description: "将UB数据连续或按高维切分搬出至GM；非32字节对齐时补齐读取UB，但仅将有效数据写入GM。"
+tag:
+  - roles: [data_movement]
+  - operations: [copy]
+  - traits: [high_dimensional]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop1_stride.md
+    kind: requires
+    condition: "通过loop功能实现Broadcast时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop2_stride.md
+    kind: requires
+    condition: "通过loop功能实现Broadcast时"
+  - path: docs/zh/api/SIMD-API/c_api/vector_datamove/asc_set_ub2gm_loop_size.md
+    kind: requires
+    condition: "通过loop功能实现Broadcast时"
+version: ">=9.1.0"
+---
 # asc_copy_ub2gm
 
 ## 产品支持情况

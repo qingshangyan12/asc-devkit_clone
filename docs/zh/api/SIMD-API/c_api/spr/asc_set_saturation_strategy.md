@@ -1,3 +1,15 @@
+---
+okftype: reference.api
+description: "选择按API或全局配置的饱和策略；全局CAST饱和开关仅在USE_GLOBAL策略下生效，切换策略不改变各模式开关。"
+tag:
+  - roles: [configuration]
+  - traits: [saturation_mode]
+dependencies:
+  - path: docs/zh/api/SIMD-API/c_api/spr/asc_set_saturation_flag.md
+    kind: configures
+    condition: "全局CAST饱和开关仅在USE_GLOBAL下生效"
+version: ">=9.2.0"
+---
 # asc_set_saturation_strategy
 
 ## 产品支持情况
