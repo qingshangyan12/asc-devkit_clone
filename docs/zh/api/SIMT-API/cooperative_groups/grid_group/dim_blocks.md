@@ -55,11 +55,16 @@ static dim3 dim_blocks()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(dim3* result)
     {
-        ...
         grid_group g = this_grid();
-        dim3 grid_dim = g.dim_blocks();
-        ...
+        dim3 dim_blocks = g.dim_blocks();
+        result[g.block_rank()] = dim_blocks;
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: dim3(32, 1, 1)
+```
