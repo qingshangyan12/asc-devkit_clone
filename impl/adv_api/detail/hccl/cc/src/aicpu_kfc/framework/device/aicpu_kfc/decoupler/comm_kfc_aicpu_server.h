@@ -42,6 +42,10 @@ struct ServerExecCtx {
     ThreadHandle mainThread{0};
     mc2_open::OpenResCtxHolder resCtxHolder{};
     mc2_boundary::Config boundary{};
+    OpenBoundaryStaticContext boundaryStatic{};
+    bool boundaryEligible{false};
+    const char* boundaryReason{"disabled"};
+    HcclResult boundaryCheckResult{HCCL_SUCCESS};
 };
 
 struct ServerProgress {

@@ -395,7 +395,15 @@ static void RunNhrCase(uint32_t loops, bool batch, HcclDataType dtype, uint32_t 
                     std::vector<uint8_t> bytes(sizeof(param));
                     std::memcpy(bytes.data(), &param, sizeof(param));
                     mc2_boundary::TurnPolicy policy;
-                    ASSERT_EQ(PrepareOpenBoundaryPolicy(bytes, resource, config, turn, policy), enabled);
+                    OpenBoundaryStaticContext staticContext;
+                    PrepareOpenBoundaryStaticContext(resource, config, staticContext);
+                    mc2_boundary::TurnPolicy referencePolicy;
+                    ASSERT_EQ(PrepareOpenBoundaryPolicy(bytes, resource, config, turn, referencePolicy), enabled);
+                    ASSERT_EQ(PrepareOpenBoundaryPolicy(
+                        bytes, resource, config, turn, staticContext, policy), enabled);
+                    EXPECT_EQ(policy.skipEntry, referencePolicy.skipEntry);
+                    EXPECT_EQ(policy.exitNotify, referencePolicy.exitNotify);
+                    EXPECT_EQ(policy.activeThreads, referencePolicy.activeThreads);
                     const auto before = queues;
                     uint32_t executions = 0U;
                     auto execute = [&]() {
@@ -498,10 +506,19 @@ TEST(Mc2Boundary, RuntimeFallbackReasonsAndPolicyReset)
     config.mode = 1U;
     config.totalTurns = 3U;
     mc2_boundary::TurnPolicy policy;
+    OpenBoundaryStaticContext staticContext;
+    PrepareOpenBoundaryStaticContext(res, config, staticContext);
     auto prepare = [&]() {
         std::vector<uint8_t> bytes(sizeof(param));
         std::memcpy(bytes.data(), &param, sizeof(param));
-        return PrepareOpenBoundaryPolicy(bytes, res, config, 1U, policy);
+        mc2_boundary::TurnPolicy uncached;
+        const bool expected = PrepareOpenBoundaryPolicy(bytes, res, config, 1U, uncached);
+        const bool actual = PrepareOpenBoundaryPolicy(bytes, res, config, 1U, staticContext, policy);
+        EXPECT_EQ(actual, expected);
+        EXPECT_EQ(policy.skipEntry, uncached.skipEntry);
+        EXPECT_EQ(policy.exitNotify, uncached.exitNotify);
+        EXPECT_STREQ(policy.fallbackReason, uncached.fallbackReason);
+        return actual;
     };
     ASSERT_TRUE(prepare());
     EXPECT_TRUE(policy.skipEntry);
@@ -522,12 +539,34 @@ TEST(Mc2Boundary, RuntimeFallbackReasonsAndPolicyReset)
     EXPECT_STREQ(policy.fallbackReason, "invalid_range_or_stride");
     param.DataDes.strideCount = 0U;
     res.notifyNumOnMainThread = 62U;
+    PrepareOpenBoundaryStaticContext(res, config, staticContext);
     EXPECT_FALSE(prepare());
     EXPECT_STREQ(policy.fallbackReason, "notify_budget");
     res.notifyNumOnMainThread = 2U;
+    PrepareOpenBoundaryStaticContext(res, config, staticContext);
     std::strcpy(param.algName, "AicpuAllGatherSoleNHRMultiLink");
     EXPECT_FALSE(prepare());
     EXPECT_STREQ(policy.fallbackReason, "unsupported_algorithm_or_mode");
+    std::strcpy(param.algName, "AicpuAllGatherSoleNHR");
+    ASSERT_TRUE(prepare());
+    std::vector<uint8_t> bytes(sizeof(param));
+    std::memcpy(bytes.data(), &param, sizeof(param));
+    for (uint32_t turn = 0; turn < config.totalTurns; ++turn) {
+        ASSERT_TRUE(PrepareOpenBoundaryPolicy(bytes, res, config, turn, staticContext, policy));
+        EXPECT_EQ(policy.skipEntry, turn != 0U);
+        EXPECT_EQ(policy.exitNotify, 3U + turn);
+    }
+    EXPECT_FALSE(PrepareOpenBoundaryPolicy(bytes, res, config, config.totalTurns, staticContext, policy));
+    EXPECT_FALSE(policy.skipEntry);
+    AlgResourceCtxSerializable replacement = res;
+    EXPECT_FALSE(PrepareOpenBoundaryPolicy(bytes, replacement, config, 1U, staticContext, policy));
+    EXPECT_STREQ(policy.fallbackReason, "stale_static_context");
+    auto otherConfig = config;
+    ++otherConfig.totalTurns;
+    EXPECT_FALSE(PrepareOpenBoundaryPolicy(bytes, res, otherConfig, 1U, staticContext, policy));
+    EXPECT_STREQ(policy.fallbackReason, "stale_static_context");
+    PrepareOpenBoundaryStaticContext(replacement, otherConfig, staticContext);
+    ASSERT_TRUE(PrepareOpenBoundaryPolicy(bytes, replacement, otherConfig, 1U, staticContext, policy));
 }
 
 TEST(Mc2Boundary, EffectiveLayoutAndNotifyMatrix)

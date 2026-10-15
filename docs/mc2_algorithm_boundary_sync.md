@@ -125,3 +125,20 @@ BatchTransfer 能力在进程内不可改变，因此开关覆盖使用两个独
 非等量3:1分区、尾loop、四类dtype，以及保留通信slave入口后的快慢后拷贝调度。
 例如 B=4、4 turn、4 Thread 需要16个Notify，而不是旧实现的8个。
 超过64槽位时整组回退；未改变 tiling wire、OpParam 或资源序列化布局。
+
+## 静态校验缓存与每轮检查
+
+每个 ServerExecCtx 在 AddOpContext 恢复只读资源后保存有效 Thread/Channel 布局、
+Notify 基址和容量校验结果。所有已登记成员的组配置、Thread 映射及层级一致性，
+在 AddOpContext 结束时重新校验并缓存，包括不兼容结果和错误码。
+新增成员会重新校验已有成员，不能沿用新增前的成功结论。
+缓存仅属于当前 server，随其销毁；不跨 Kernel 保存裸资源指针，不修改公开 ABI。
+资源 holder 为 shared_ptr<const ...>，在上下文生命周期内不可原地变更；
+资源替换必须重建上下文，静态缓存同时重建。
+
+每个 Prepare/repeat turn 仍验证运行算法/引擎、模式、count、dtype、stride、
+地址范围和输入/输出/scratch 别名，并检查资源身份、配置和 turn 范围。
+GroupState 的轮次、失败及 Finalize 完整性检查不变。
+本轮动态校验失败只影响本轮，不污染缓存；下一轮换成合法地址可以恢复优化。
+task-cache 标识和 Notify 任务图不变，本改动只避免逐轮构造 map/vector/set
+和重复比较静态资源；初始化工作仍存在，不承诺固定微秒收益。

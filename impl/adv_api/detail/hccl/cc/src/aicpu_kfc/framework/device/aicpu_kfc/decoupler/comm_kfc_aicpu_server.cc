@@ -388,6 +388,9 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
             execCtx.mainStream = &commAicpu->GetMainStream();
 #endif
         }
+        if (boundary.mode != 0U) {
+            PrepareOpenBoundaryStaticContext(*execCtx.resCtxHolder, boundary, execCtx.boundaryStatic);
+        }
         execCtxList_.push_back(execCtx);
         HCCL_INFO(
             "Group %u: add exec ctx for opParamKey %#llx, commName[%s], resource type %u, "
@@ -404,6 +407,15 @@ HcclResult CommKfcAicpuServer::AddOpContext(const HcclApi::OpResCtx* ctx)
 
     CHK_PRT_RET(execCtxList_.empty(), HCCL_ERROR("Group %u: no exec ctx is added.", groupIdx_), HCCL_E_PARA);
     syncExecCtx_ = &execCtxList_.front();
+    // Dispatcher finishes registering contexts before running messages. Refresh
+    // every member after registration, including cached failures: a later member
+    // can make a previously valid group incompatible. No task is submitted here.
+    for (auto& member : execCtxList_) {
+        if (member.boundary.mode != 0U) {
+            member.boundaryCheckResult = CheckBoundaryGroup(
+                member, member.boundaryEligible, member.boundaryReason);
+        }
+    }
     return HCCL_SUCCESS;
 }
 
@@ -626,10 +638,7 @@ HcclResult CommKfcAicpuServer::CheckBoundaryGroup(
 {
     eligible = current.boundary.mode == 1U && current.boundary.totalTurns > 1U;
     reason = current.boundary.mode != 1U ? "unsupported_mode" : "single_turn";
-    uint32_t currentBase = current.resCtxHolder->notifyNumOnMainThread;
-    for (const auto count : current.resCtxHolder->notifyNumPerThread) {
-        currentBase = std::max(currentBase, count);
-    }
+    const uint32_t currentBase = current.boundaryStatic.notifyBase;
     for (const auto& member : execCtxList_) {
         if (member.boundary.mode == 0U || member.boundary.groupId != current.boundary.groupId) {
             continue;
@@ -640,13 +649,8 @@ HcclResult CommKfcAicpuServer::CheckBoundaryGroup(
             HCCL_ERROR("[MC2_BOUNDARY_SYNC] inconsistent group configuration."), HCCL_E_PARA);
         const auto* param = reinterpret_cast<const mc2_ops_hccl::OpParam*>(member.baseOpParam.data());
         const auto& res = *member.resCtxHolder;
-        uint32_t notifyBase = res.notifyNumOnMainThread;
-        for (const auto count : res.notifyNumPerThread) {
-            notifyBase = std::max(notifyBase, count);
-        }
-        mc2_boundary::TurnPolicy layout;
-        mc2_boundary::TurnPolicy currentLayout;
-        uint32_t required = 0U;
+        const auto& layout = member.boundaryStatic.layout;
+        const auto& currentLayout = current.boundaryStatic.layout;
         if (!eligible) {
             continue;
         }
@@ -654,16 +658,14 @@ HcclResult CommKfcAicpuServer::CheckBoundaryGroup(
             param->opType != HCCL_CMD_ALLGATHER || param->engine != COMM_ENGINE_AICPU_TS ||
             std::string(param->algName) != "AicpuAllGatherSoleNHR") {
             reason = "unsupported_algorithm";
-        } else if (!PrepareOpenBoundaryLayout(res, layout)) {
+        } else if (!member.boundaryStatic.valid) {
             reason = layout.fallbackReason;
-        } else if (!PrepareOpenBoundaryLayout(*current.resCtxHolder, currentLayout) ||
+        } else if (!current.boundaryStatic.valid ||
                    layout.activeThreads != currentLayout.activeThreads ||
                    res.threads != current.resCtxHolder->threads ||
                    res.algHierarchyInfo.infos != current.resCtxHolder->algHierarchyInfo.infos) {
             reason = "thread_layout";
-        } else if (notifyBase != currentBase || notifyBase >= mc2_boundary::NOTIFY_LIMIT - 1U ||
-                   !mc2_boundary::NotifyBudget(notifyBase + 1U, res.threads.size(),
-                       current.boundary.totalTurns, required)) {
+        } else if (member.boundaryStatic.notifyBase != currentBase) {
             reason = "notify_budget_or_layout";
         } else {
             continue;
@@ -699,7 +701,9 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
     bool boundaryEligible = false;
     const char* boundaryReason = "disabled";
     if (execCtx->boundary.mode != 0U) {
-        CHK_RET(CheckBoundaryGroup(*execCtx, boundaryEligible, boundaryReason));
+        CHK_RET(execCtx->boundaryCheckResult);
+        boundaryEligible = execCtx->boundaryEligible;
+        boundaryReason = execCtx->boundaryReason;
     }
     CHK_PRT_RET(!boundaryGroup_.Begin(execCtx->boundary, repeatCnt),
         HCCL_ERROR("[MC2_BOUNDARY_SYNC] invalid group order/count, group[%u].", execCtx->boundary.groupId),
@@ -794,7 +798,8 @@ HcclResult CommKfcAicpuServer::Orchestrate(const HcclMsg& msg, HcclMsgExt& extMs
         boundaryPolicy.fallbackReason = boundaryReason;
         if (boundaryEligible) {
             PrepareOpenBoundaryPolicy(
-                runParam, *execCtx->resCtxHolder, execCtx->boundary, boundaryGroup_.Turn(), boundaryPolicy);
+                runParam, *execCtx->resCtxHolder, execCtx->boundary, boundaryGroup_.Turn(),
+                execCtx->boundaryStatic, boundaryPolicy);
         }
         CHK_PRT_RET(!boundaryGroup_.StartTurn(),
             HCCL_ERROR("[MC2_BOUNDARY_SYNC] previous submission failed."), HCCL_E_INTERNAL);

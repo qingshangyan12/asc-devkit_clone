@@ -203,9 +203,45 @@ bool PrepareOpenBoundaryLayout(
     return true;
 }
 
+void PrepareOpenBoundaryStaticContext(
+    const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, const mc2_boundary::Config& config,
+    OpenBoundaryStaticContext& context)
+{
+    context = OpenBoundaryStaticContext{};
+    context.resource = &resCtx;
+    context.mode = config.mode;
+    context.totalTurns = config.totalTurns;
+    if (!PrepareOpenBoundaryLayout(resCtx, context.layout)) {
+        return;
+    }
+    uint32_t base = resCtx.notifyNumOnMainThread;
+    for (const auto value : resCtx.notifyNumPerThread) {
+        base = std::max(base, value);
+    }
+    uint32_t required = 0U;
+    context.layout.fallbackReason = "notify_budget";
+    if (base >= mc2_boundary::NOTIFY_LIMIT - 1U || !mc2_boundary::NotifyBudget(
+        base + 1U, resCtx.threads.size(), config.totalTurns, required)) {
+        return;
+    }
+    context.notifyBase = base + 1U;
+    context.valid = true;
+    context.layout.fallbackReason = "none";
+}
+
 bool PrepareOpenBoundaryPolicy(
     const std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
     const mc2_boundary::Config& config, uint32_t turn, mc2_boundary::TurnPolicy& policy)
+{
+    OpenBoundaryStaticContext context;
+    PrepareOpenBoundaryStaticContext(resCtx, config, context);
+    return PrepareOpenBoundaryPolicy(opParam, resCtx, config, turn, context, policy);
+}
+
+bool PrepareOpenBoundaryPolicy(
+    const std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::Config& config, uint32_t turn, const OpenBoundaryStaticContext& context,
+    mc2_boundary::TurnPolicy& policy)
 {
     policy = mc2_boundary::TurnPolicy{};
     policy.fallbackReason = "invalid_policy_or_thread_layout";
@@ -220,7 +256,12 @@ bool PrepareOpenBoundaryPolicy(
         param.opMode != mc2_ops_hccl::OpMode::OPBASE) {
         return false;
     }
-    if (!PrepareOpenBoundaryLayout(resCtx, policy)) {
+    policy.fallbackReason = "stale_static_context";
+    if (context.resource != &resCtx || context.mode != config.mode || context.totalTurns != config.totalTurns) {
+        return false;
+    }
+    policy = context.layout;
+    if (!context.valid) {
         return false;
     }
     const uint64_t element = GetDataTypeSize(param.DataDes.dataType);
@@ -240,21 +281,11 @@ bool PrepareOpenBoundaryPolicy(
         !DisjointBuffers(param.outputPtr, outputSize, resCtx.cclMem.addr, resCtx.cclMem.size)) {
         return false;
     }
-    uint32_t base = resCtx.notifyNumOnMainThread;
-    for (const auto value : resCtx.notifyNumPerThread) {
-        base = std::max(base, value);
-    }
-    policy.fallbackReason = "notify_budget";
-    uint32_t required = 0U;
-    if (base >= mc2_boundary::NOTIFY_LIMIT - 1U || !mc2_boundary::NotifyBudget(
-        base + 1U, resCtx.threads.size(), config.totalTurns, required)) {
-        return false;
-    }
     // Only post-copy entries are elided. Communication slaves retain their entry
     // waits, so no producer can recycle scratch before the previous full exit.
     policy.enabled = true;
     policy.skipEntry = turn != 0U;
-    policy.exitNotify = base + 1U + turn * (policy.activeThreads - 1U);
+    policy.exitNotify = context.notifyBase + turn * (policy.activeThreads - 1U);
     policy.fallbackReason = "none";
     return true;
 }

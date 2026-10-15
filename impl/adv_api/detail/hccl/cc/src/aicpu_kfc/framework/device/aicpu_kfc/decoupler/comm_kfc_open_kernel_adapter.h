@@ -37,6 +37,23 @@ bool PrepareOpenBoundaryPolicy(
     const mc2_boundary::Config& config, uint32_t turn, mc2_boundary::TurnPolicy& policy);
 bool PrepareOpenBoundaryLayout(
     const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, mc2_boundary::TurnPolicy& policy);
+// Owned by one ServerExecCtx, alongside its immutable resource holder. Never
+// reuse across resource replacement or a different tiling configuration.
+struct OpenBoundaryStaticContext {
+    mc2_boundary::TurnPolicy layout{};
+    const mc2_ops_hccl::AlgResourceCtxSerializable* resource{nullptr};
+    uint32_t mode{0U};
+    uint32_t totalTurns{0U};
+    uint32_t notifyBase{0U};
+    bool valid{false};
+};
+void PrepareOpenBoundaryStaticContext(
+    const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, const mc2_boundary::Config& config,
+    OpenBoundaryStaticContext& context);
+bool PrepareOpenBoundaryPolicy(
+    const std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::Config& config, uint32_t turn, const OpenBoundaryStaticContext& context,
+    mc2_boundary::TurnPolicy& policy);
 HcclResult LoadFromKey(uint64_t opParamKey);
 
 #endif
