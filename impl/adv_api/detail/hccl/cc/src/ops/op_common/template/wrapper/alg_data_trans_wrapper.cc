@@ -12,6 +12,8 @@
 
 #include <atomic>
 #include <cstring>
+#include <cstdint>
+#include <type_traits>
 
 namespace mc2_ops_hccl {
 
