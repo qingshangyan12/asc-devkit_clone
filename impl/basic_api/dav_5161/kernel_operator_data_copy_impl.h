@@ -324,45 +324,43 @@ template <typename T, bool enableSmallC0 = false>
 __aicore__ inline void DataCopyGM2L1ND2NZImplBase(
     __cbuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
 {
-    if ASCEND_IS_AIC {
-        SmallC0Checker(enableSmallC0, intriParams.dValue);
+    SmallC0Checker(enableSmallC0, intriParams.dValue);
 
-        if constexpr (g_gm_overflow_check) {
-            __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
-            AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
-        }
+    if constexpr (g_gm_overflow_check) {
+        __gm__ uint8_t* workSpace = GetSysWorkSpacePtr();
+        AscendCUtils::CheckGmMemOverflowNd2Nz(src, workSpace, true, intriParams);
+    }
 
-        uint16_t loop2DstStride = intriParams.dstNzNStride;  // loop2DstStride = dst_nz_n_stride
-        uint16_t loop3DstStride = intriParams.dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
-        // loop4DstStride: dst_nz_matrix_stride * size_of_dst_type / C0_size
-        uint16_t loop4DstStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride * sizeof(T) / ONE_BLK_SIZE);
+    uint16_t loop2DstStride = intriParams.dstNzNStride;  // loop2DstStride = dst_nz_n_stride
+    uint16_t loop3DstStride = intriParams.dstNzC0Stride; // loop3_dst_stride = dst_nz_c0_Stride
+    // loop4DstStride: dst_nz_matrix_stride * size_of_dst_type / C0_size
+    uint16_t loop4DstStride = static_cast<uint16_t>(intriParams.dstNzMatrixStride * sizeof(T) / ONE_BLK_SIZE);
 
-        uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
-        mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
-        mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
-        mte2NzPara |= static_cast<uint64_t>(intriParams.ndNum);            // MTE2_NZ_PARA[15:0]
-        set_mte2_nz_para(mte2NzPara); // CCE: store parameters for ND2NZ DMA instructions
+    uint64_t mte2NzPara = static_cast<uint64_t>(loop4DstStride) << 48; // MTE2_NZ_PARA[63:48]
+    mte2NzPara |= static_cast<uint64_t>(loop3DstStride) << 32;         // MTE2_NZ_PARA[47:32]
+    mte2NzPara |= static_cast<uint64_t>(loop2DstStride) << 16;         // MTE2_NZ_PARA[31:16]
+    mte2NzPara |= static_cast<uint64_t>(intriParams.ndNum);            // MTE2_NZ_PARA[15:0]
+    set_mte2_nz_para(mte2NzPara); // CCE: store parameters for ND2NZ DMA instructions
 
-        // input params: srcDValue, srcNdMatrixStride                        unit of element nums
-        // expected params for ISA: loop1_src_stride, loop4SrcStride       uint of bytes
-        // loop1SrcStride = srcD * sizeof(srcType)     loop4SrcStride = srcNdMatrixStride * sizeof(srcType)
-        uint64_t loop1SrcStride = intriParams.srcDValue * sizeof(T);
-        uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
-        if constexpr (sizeof(T) == B8_BYTE_SIZE) {
-            copy_gm_to_cbuf_multi_nd2nz(
-                (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, intriParams.sid, loop1SrcStride, cacheMode,
-                intriParams.nValue, intriParams.dValue, loop4SrcStride, enableSmallC0);
-        }
-        if constexpr (sizeof(T) == B16_BYTE_SIZE) {
-            copy_gm_to_cbuf_multi_nd2nz(
-                (__cbuf__ half*)dst, (__gm__ half*)src, intriParams.sid, loop1SrcStride, cacheMode, intriParams.nValue,
-                intriParams.dValue, loop4SrcStride, enableSmallC0);
-        }
-        if constexpr (sizeof(T) == B32_BYTE_SIZE) {
-            copy_gm_to_cbuf_multi_nd2nz(
-                (__cbuf__ float*)dst, (__gm__ float*)src, intriParams.sid, loop1SrcStride, cacheMode,
-                intriParams.nValue, intriParams.dValue, loop4SrcStride, enableSmallC0);
-        }
+    // input params: srcDValue, srcNdMatrixStride                        unit of element nums
+    // expected params for ISA: loop1_src_stride, loop4SrcStride       uint of bytes
+    // loop1SrcStride = srcD * sizeof(srcType)     loop4SrcStride = srcNdMatrixStride * sizeof(srcType)
+    uint64_t loop1SrcStride = intriParams.srcDValue * sizeof(T);
+    uint64_t loop4SrcStride = intriParams.srcNdMatrixStride * sizeof(T);
+    if constexpr (sizeof(T) == B8_BYTE_SIZE) {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ int8_t*)dst, (__gm__ int8_t*)src, intriParams.sid, loop1SrcStride, cacheMode, intriParams.nValue,
+            intriParams.dValue, loop4SrcStride, enableSmallC0);
+    }
+    if constexpr (sizeof(T) == B16_BYTE_SIZE) {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ half*)dst, (__gm__ half*)src, intriParams.sid, loop1SrcStride, cacheMode, intriParams.nValue,
+            intriParams.dValue, loop4SrcStride, enableSmallC0);
+    }
+    if constexpr (sizeof(T) == B32_BYTE_SIZE) {
+        copy_gm_to_cbuf_multi_nd2nz(
+            (__cbuf__ float*)dst, (__gm__ float*)src, intriParams.sid, loop1SrcStride, cacheMode, intriParams.nValue,
+            intriParams.dValue, loop4SrcStride, enableSmallC0);
     }
 }
 
@@ -378,7 +376,8 @@ __aicore__ inline void DataCopyGM2L1ND2NZImpl(
 }
 
 template <typename T>
-__aicore__ inline void DataCopyGM2UBND2NZImpl(__ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams)
+__aicore__ inline void DataCopyGM2UBND2NZImpl(
+    __ubuf__ T* dst, __gm__ T* src, const Nd2NzParams& intriParams, const uint8_t cacheMode = 0)
 {
     ASSERT(false && "unsupported data copy GM to UB ND2NZ on current device");
 }
@@ -797,9 +796,6 @@ template <typename T, PaddingMode mode = PaddingMode::Normal>
 __aicore__ inline void DataCopyPadGm2UBImpl(
     __ubuf__ T* dst, __gm__ T* src, const DataCopyParams& intriParams, const DataCopyPadParams& padParams)
 {
-    if ASCEND_IS_AIC {
-        return;
-    }
     if (padParams.isPad == true) {
         set_pad_val_outtoub(padParams.paddingValue);
     }
