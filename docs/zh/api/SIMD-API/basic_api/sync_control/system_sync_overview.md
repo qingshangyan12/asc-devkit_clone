@@ -7,7 +7,7 @@ AI Core的同步，总共分成3类：核内同步、核间同步、任务间同
 以下内容展示三类同步的使用场景。
 
 <!-- npu="950" id1 -->
-**图1**  [NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)架构图
+**图1**  [NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)架构图   
 ![](../../../figures/npu_3510_hw_arch_sync.png)
 
 <!-- end id1 -->

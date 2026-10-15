@@ -7,7 +7,7 @@ AI Core的同步，总共分成2类：[核内同步](intra_core_sync/intra_core_
 以下内容展示两类同步的使用场景。
 
 <!-- npu="950" id1 -->
-**图1**  [NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)架构图
+**图1**  [NPU架构3510](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)架构图    
 ![](../../../figures/npu_3510_hw_arch_sync.png)
 
 <!-- end id1 -->
