@@ -95,3 +95,9 @@ void sync(const GroupType& g)
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+无
+```
