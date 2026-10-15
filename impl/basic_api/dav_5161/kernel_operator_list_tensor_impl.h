@@ -236,6 +236,139 @@ __aicore__ inline uint32_t ListTensorDescImpl<Sequential>::GetSize()
     return count_;
 }
 
+
+template <class T>
+__aicore__ inline TensorDescImpl<T>::TensorDescImpl()
+{
+    dim_ = 0;
+    offset_ = 0;
+    shape_ = nullptr;
+    ptr_ = nullptr;
+}
+template <class T>
+__aicore__ inline void TensorDescImpl<T>::SetDim(uint32_t dim)
+{
+    this->dim_ = dim;
+}
+template <class T>
+__aicore__ inline uint64_t TensorDescImpl<T>::GetDim()
+{
+    return dim_;
+}
+template <class T>
+__aicore__ inline void TensorDescImpl<T>::SetIndex(uint32_t offset)
+{
+    this->offset_ = offset;
+}
+template <class T>
+__aicore__ inline uint64_t TensorDescImpl<T>::GetIndex()
+{
+    return offset_;
+}
+template <class T>
+__aicore__ inline void TensorDescImpl<T>::SetShapeAddr(uint64_t* shapePtr)
+{
+    ASSERT(shapePtr != nullptr);
+    this->shape_ = shapePtr;
+}
+template <class T>
+__aicore__ inline uint64_t* TensorDescImpl<T>::GetShapeAddr()
+{
+    return shape_;
+}
+template <class T>
+__aicore__ inline uint64_t TensorDescImpl<T>::GetShape(uint32_t offset)
+{
+    ASSERT(offset < dim_);
+    return shape_[offset];
+}
+template <class T>
+__aicore__ inline void TensorDescImpl<T>::SetDataPtr(__gm__ T* dataPtr)
+{
+    ASSERT(dataPtr != nullptr);
+    this->ptr_ = dataPtr;
+}
+template <class T>
+__aicore__ inline __gm__ T* TensorDescImpl<T>::GetDataPtr()
+{
+    return ptr_;
+}
+template <class T>
+__aicore__ inline GlobalTensor<T> TensorDescImpl<T>::GetDataObj()
+{
+    GlobalTensor<T> obj;
+    uint32_t size = sizeof(T);
+    for (uint32_t i = 0; i < dim_; i++) {
+        size *= shape_[i];
+    }
+    obj.SetGlobalBuffer(reinterpret_cast<__gm__ T*>(ptr_), size);
+    return obj;
+}
+template <bool Sequential>
+__aicore__ inline void ListTensorDescImpl<Sequential>::ListTensorDecode(
+    __gm__ void* data, uint32_t length, uint32_t shapeSize)
+{
+    ASSERT(data != nullptr);
+    __gm__ uint64_t* dataAddr = reinterpret_cast<__gm__ uint64_t*>(data);
+    uint64_t dataPtrOffset = *dataAddr; // The offset between head address and data pointer address.
+
+    shapeStart_ = dataAddr + 1; // Point to the address of first shape info address.
+    dataPtr_ = dataAddr + dataPtrOffset / sizeof(uint64_t);
+
+    dim_ = *shapeStart_ & 0xffffffff;     // 0xffffffff means get the low 32 bits.
+    uint32_t offset = *shapeStart_ >> 32; // Shift right 32 means get the high 32 bits.
+
+    // dim_ = 0 means the ListTensor only has data pointer inside, then shape info should be filled in 0xffffffff
+    // which means descStructSize_ is 2.
+    descStructSize_ = (dim_ == 0) ? 2 : 1 + dim_;
+    // Shift right 32 means get the high 32bits.
+    count_ = (offset != 0) ? offset : (*(dataPtr_ - descStructSize_) >> 32) + 1;
+    // If the ListTensor only has data pointer inside, the offset between head address and data pointer address
+    // should be a constant value, which is (2 + 1) * sizeof(uint64_t) = 24.
+    ASSERT(
+        ((dim_ != 0) && (count_ == ((dataPtrOffset - sizeof(uint64_t)) / (descStructSize_ * sizeof(uint64_t))))) ||
+        ((dim_ == 0) && (*(shapeStart_ + 1) == 0xffffffff) && (dataPtrOffset == 24)));
+
+    if ((length != 0xffffffff) && (shapeSize != 0xffffffff)) {
+        ASSERT(count_ == shapeSize);
+        ASSERT(length == (dataPtrOffset + count_ * sizeof(uint64_t)));
+    }
+    preloadOffset_ = INIT_PRELOAD_OFFSET;
+}
+template <bool Sequential>
+template <class T>
+__aicore__ inline void ListTensorDescImpl<Sequential>::GetDesc(TensorDescImpl<T>* desc, uint32_t index)
+{
+    ASSERT((index < count_) && (desc != nullptr) && (dim_ != 0));
+    desc->SetDim(dim_);
+    desc->SetDataPtr(reinterpret_cast<__gm__ T*>(*(dataPtr_ + index)));
+    desc->SetIndex(index);
+    int64_t curloadOffset = index * descStructSize_ * sizeof(uint64_t);
+    // check the whole struct has benn loaded in cache
+    if (curloadOffset + descStructSize_ * sizeof(uint64_t) > preloadOffset_ + PRELOAD_OFFSET) {
+#ifndef ASCENDC_CPU_DEBUG
+        dc_preload(shapeStart_, curloadOffset); // Preload 256Bytes from the cache miss offset.
+#endif
+        preloadOffset_ = curloadOffset;
+    }
+    __gm__ uint64_t* curShapePtr = shapeStart_ + index * descStructSize_;
+    GetShape(desc->GetShapeAddr(), curShapePtr);
+}
+template <bool Sequential>
+template <class T>
+__aicore__ inline __gm__ T* ListTensorDescImpl<Sequential>::GetDataPtr(uint32_t index)
+{
+    ASSERT(index < count_);
+    return reinterpret_cast<__gm__ T*>(*(dataPtr_ + index));
+}
+template <bool Sequential>
+__aicore__ inline void ListTensorDescImpl<Sequential>::GetShape(uint64_t* shapeInfo, __gm__ uint64_t* target)
+{
+    auto targetShape = reinterpret_cast<__gm__ uint64_t*>(target + 1);
+    for (uint32_t i = 0; i < dim_; i++) {
+        *(shapeInfo++) = *(targetShape++);
+    }
+}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_LIST_TENSOR_IMPL_H
 

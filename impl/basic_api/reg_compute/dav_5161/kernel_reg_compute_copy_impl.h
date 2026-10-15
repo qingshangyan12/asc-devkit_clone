@@ -46,6 +46,26 @@ __simd_callee__ inline void CopyImpl(U& dstReg, U& srcReg, MaskReg mask)
     }
 }
 } // namespace Reg
+
+namespace Reg {
+template <typename T = DefaultType, MaskMergeMode mode = MaskMergeMode::ZEROING, typename RegT>
+__simd_callee__ inline void CopyImpl(RegT& dstReg, RegT& srcReg, MaskReg mask)
+{
+    using ActualT = typename RegT::ActualT;
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    static_assert(SupportEnum<mode, MaskMergeMode::MERGING>(), "current Move api only supported MaskMergeMode MERGING");
+    constexpr auto modeValue = GetMaskMergeMode<mode>();
+    vmov(dstReg, srcReg, mask, modeValue);
+}
+
+template <typename T = DefaultType, typename RegT>
+__simd_callee__ inline void CopyImpl(RegT& dstReg, RegT& srcReg)
+{
+    using ActualT = typename RegT::ActualT;
+    static_assert(Std::is_same_v<T, DefaultType> || Std::is_same_v<T, ActualT>, "T type is not correct!");
+    vmov(dstReg, srcReg);
+}
+} // namespace Reg
 } // namespace AscendC
 #endif // ASCENDC_MODULE_REG_COMPUTE_COPY_IMPL_H
 
