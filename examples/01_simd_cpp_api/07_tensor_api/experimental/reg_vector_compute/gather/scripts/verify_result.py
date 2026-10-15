@@ -14,9 +14,8 @@ import numpy as np
 
 
 def verify_result():
-    output_dir = Path("output")
-    output_path = output_dir / "output.bin"
-    golden_path = output_dir / "golden.bin"
+    output_path = Path("./output/output.bin")
+    golden_path = Path("./output/golden.bin")
     expected_size = 128 * np.dtype(np.uint16).itemsize
     for filename in [output_path, golden_path]:
         if filename.stat().st_size != expected_size:
