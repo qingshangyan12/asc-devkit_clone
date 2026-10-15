@@ -64,9 +64,8 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 
     using namespace cooperative_groups;
     constexpr int THREAD_NUM = 1024;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
-        ...
         // 创建Size<=32的thread_block_tile
         thread_block block = this_thread_block();
         thread_block_tile<32> tile32 = tiled_partition<32>(block);              // 按照32个线程为一组划分thread_block
@@ -77,14 +76,11 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
         __ubuf__ block_tile_memory<THREAD_NUM> scratch;
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);                   // 按照64个线程为一组划分thread_block
-        ...
     }
 
     int main()
     {
-        ...
-        simt_kernel<<<dim3(1), dim3(THREAD_NUM), 0, stream>>>(...);             // 线程块中创建的线程数必须小于等于`block_tile_memory`的模板参数
-        ...
+        simt_kernel<<<dim3(1), dim3(THREAD_NUM), 0, stream>>>();             // 线程块中创建的线程数必须小于等于`block_tile_memory`的模板参数
     }
     ```
 
@@ -95,9 +91,8 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
 
     constexpr int THREAD_NUM = 1024;
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel()
     {
-        ...
         // 创建Size<=32的thread_block_tile
         thread_block block = this_thread_block();
         thread_block_tile<32> tile32 = tiled_partition<32>(block);              // 按照32个线程为一组划分thread_block
@@ -108,13 +103,10 @@ thread_block_tile<Size, ParentT> tiled_partition(const ParentT& g)
         __ubuf__ block_tile_memory<THREAD_NUM> scratch = {};                    // 混合编程场景下需使用此方式在UB创建对象
         thread_block block_with_memory = this_thread_block(scratch);
         auto tile64 = tiled_partition<64>(block_with_memory);                   // 使用UB临时存储划分thread_block
-        ...
     }
 
-    __global__ __vector__ void global_kernel(...)
+    __global__ __vector__ void global_kernel()
     {
-        ...
-        asc_vf_call<simt_kernel>(dim3(THREAD_NUM), ...);                        // 拉起SIMT VF时配置的线程数必须小于等于 block_tile_memory 的模板参数
-        ...
+        asc_vf_call<simt_kernel>(dim3(THREAD_NUM));                        // 拉起SIMT VF时配置的线程数必须小于等于 block_tile_memory 的模板参数
     }
     ```

@@ -55,13 +55,11 @@ bool is_valid() const
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
-        ...
         grid_group g = this_grid();
         if (g.is_valid()) {
             g.sync();
         }
-        ...
     }
     ```

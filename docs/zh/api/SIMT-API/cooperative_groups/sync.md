@@ -69,15 +69,13 @@ void sync(const GroupType& g)
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel()
     {
-        ...
         thread_block block = this_thread_block();
         sync(block); // 等价于block.sync()
 
         grid_group grid = this_grid();
         sync(grid); // 等价于grid.sync()
-        ...
     }
     ```
 
@@ -87,11 +85,9 @@ void sync(const GroupType& g)
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel()
     {
-        ...
         thread_block block = this_thread_block();
         sync(block); // 等价于block.sync()
-        ...
     }
     ```
