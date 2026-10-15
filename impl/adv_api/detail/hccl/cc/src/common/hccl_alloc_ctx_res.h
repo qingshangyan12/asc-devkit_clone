@@ -214,7 +214,7 @@ HcclResult HandleSingleRankAndCommMode(HcclComm comm, OpParam& opParam, bool& sk
 
 HcclResult GetOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,
-    void** resCtxOut);
+    void** resCtxOut, uint32_t boundaryTurns = 0U);
 
 HcclResult GetCcuOpParamResCtx(
     HcclComm comm, const std::string& algName, OpParam& opParam, TopoInfoWithNetLayerDetails* topoInfo,

@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "mc2_algorithm_boundary_sync.h"
 
 #include "hccl_msg.h"
 #include <hccl/hccl_types.h>
@@ -22,11 +23,37 @@ struct AlgResourceCtxSerializable;
 }
 
 HcclResult LoadOpenOpParamData(
-    uint64_t opParamKey, uint64_t opParamSize, std::string& commName, std::vector<uint8_t>& opParam);
+    uint64_t opParamKey, uint64_t opParamSize, std::string& commName, std::vector<uint8_t>& opParam,
+    mc2_boundary::Config* boundary = nullptr);
 HcclResult FormatOpenOpParamDataFromMsg(
     const std::vector<uint8_t>& baseOpParam, const HcclApi::HcclMsg& msg, HcclApi::HcclMsgExt& extMsg, uint32_t rankNum,
     uint32_t repeatIdx, void* stream, std::vector<uint8_t>& runOpParam);
 HcclResult LaunchOpenOpParamData(std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx);
+HcclResult LaunchOpenOpParamData(
+    std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::TurnPolicy& policy);
+bool PrepareOpenBoundaryPolicy(
+    const std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::Config& config, uint32_t turn, mc2_boundary::TurnPolicy& policy);
+bool PrepareOpenBoundaryLayout(
+    const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, mc2_boundary::TurnPolicy& policy);
+// Owned by one ServerExecCtx, alongside its immutable resource holder. Never
+// reuse across resource replacement or a different tiling configuration.
+struct OpenBoundaryStaticContext {
+    mc2_boundary::TurnPolicy layout{};
+    const mc2_ops_hccl::AlgResourceCtxSerializable* resource{nullptr};
+    uint32_t mode{0U};
+    uint32_t totalTurns{0U};
+    uint32_t notifyBase{0U};
+    bool valid{false};
+};
+void PrepareOpenBoundaryStaticContext(
+    const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx, const mc2_boundary::Config& config,
+    OpenBoundaryStaticContext& context);
+bool PrepareOpenBoundaryPolicy(
+    const std::vector<uint8_t>& opParam, const mc2_ops_hccl::AlgResourceCtxSerializable& resCtx,
+    const mc2_boundary::Config& config, uint32_t turn, const OpenBoundaryStaticContext& context,
+    mc2_boundary::TurnPolicy& policy);
 HcclResult LoadFromKey(uint64_t opParamKey);
 
 #endif

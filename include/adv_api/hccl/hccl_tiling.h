@@ -16,6 +16,7 @@
 #define LIB_HCCL_HCCL_TILING_H
 
 #include "hccl_tilingdata.h"
+#include "internal/mc2_algorithm_boundary_sync.h"
 #include "kernel_tiling/kernel_tiling.h"
 #include "../../../impl/adv_api/tiling/hccl/hccl_tiling_impl_def.h"
 
@@ -44,6 +45,8 @@ public:
     uint32_t SetQueueNum(uint16_t num);
     uint32_t SetCommBlockNum(uint16_t num);
     uint32_t SetCommEngine(uint8_t commEngine);
+    uint32_t SetAlgorithmBoundarySync(
+        Mc2AlgorithmBoundarySyncMode mode, uint32_t groupId, uint32_t totalTurns);
 
 private:
     HcclTilingImpl impl_;

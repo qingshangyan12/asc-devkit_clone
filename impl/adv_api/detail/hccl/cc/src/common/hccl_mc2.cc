@@ -14,6 +14,7 @@
 #include "hccl_inner.h"
 #include "param_check.h"
 #include "hccl_alloc_ctx_res.h"
+#include "mc2_algorithm_boundary_sync.h"
 #include "external_alg_resolver.h"
 #include "op_common.h"
 #include "ccu_assist_pub.h"
@@ -399,6 +400,9 @@ HcclResult BuildTagsAndValidate(
         const Mc2CcTilingInner* ccTiling = static_cast<const Mc2CcTilingInner*>(ccTilingList[i]);
         topoTag[i] = std::to_string(ccTiling->opType) + "_" + std::to_string(ccTiling->srcDataType) + "_" +
                      std::string(commName) + versionTag;
+        mc2_boundary::Config boundary;
+        CHK_PRT_RET(!mc2_boundary::Decode(ccTiling->reserved2, sizeof(ccTiling->reserved2), boundary),
+            HCCL_ERROR("Invalid MC2 boundary tiling extension."), HCCL_E_PARA);
         CHK_RET(HcclCheckTag(topoTag[i].c_str()));
         bool isReduce;
         CHK_RET(CheckIsReduce(ccTiling, &isReduce));
@@ -410,6 +414,10 @@ HcclResult BuildTagsAndValidate(
         } else {
             ctxTag += "_" + std::to_string(ccTiling->opType) + "_" + std::string(ccTiling->algConfig) + "_" +
                       std::to_string(ccTiling->commEngine);
+        }
+        if (boundary.mode != 0U) {
+            ctxTag += ":mb2:" + std::to_string(boundary.mode) + ":" +
+                      std::to_string(boundary.groupId) + ":" + std::to_string(boundary.totalTurns);
         }
     }
     ctxTag += versionTag;

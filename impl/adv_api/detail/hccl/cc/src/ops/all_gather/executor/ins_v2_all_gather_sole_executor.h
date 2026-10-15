@@ -11,6 +11,7 @@
 #define HCCLV2_INS_V2_ALL_GATHER_SOLE_EXECUTOR_H
 
 #include "executor_common_ops.h"
+#include "mc2_algorithm_boundary_sync.h"
 
 namespace mc2_ops_hccl {
 template <typename AlgTopoMatch, typename InsAlgTemplate>
@@ -20,6 +21,9 @@ public:
     ~InsV2AllGatherSoleExecutor() override = default;
 
     HcclResult Orchestrate(const OpParam& param, const AlgResourceCtxSerializable& resCtx) override;
+    HcclResult OrchestrateBoundary(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx,
+        const mc2_boundary::TurnPolicy& policy);
 
     /* *************** 资源计算 *************** */
     HcclResult CalcRes(
@@ -31,7 +35,12 @@ public:
 
 protected:
     /* *************** 算法编排 *************** */
-    HcclResult OrchestrateLoop(const OpParam& param, const AlgResourceCtxSerializable& resCtx);
+    HcclResult OrchestrateImpl(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx,
+        const mc2_boundary::TurnPolicy& policy);
+    HcclResult OrchestrateLoop(
+        const OpParam& param, const AlgResourceCtxSerializable& resCtx,
+        const mc2_boundary::TurnPolicy& policy);
     std::vector<std::map<u32, std::vector<ChannelInfo>>> remoteRankToChannelInfo_;
     std::vector<ThreadHandle> threads_;
 };

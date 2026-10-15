@@ -13,6 +13,7 @@
 #include "sim_communicator.h"
 #include "sim_world.h"
 #include "hccl_alloc_ctx_res.h"
+#include "mc2_algorithm_boundary_sync.h"
 #include "op_common.h"
 #include "coll_alg_v2_exec_registry.h"
 
@@ -146,6 +147,58 @@ TEST_F(AicpuAllocCtxResTest, CaptureSafeCopyCoversOpParamAndOpResCtx)
 
     const auto* copiedOpParam = reinterpret_cast<const OpParam*>(opResCtx->algInfo[0].opParam);
     EXPECT_EQ(copiedOpParam->opType, HcclCMDType::HCCL_CMD_ALLGATHER);
+}
+
+TEST_F(AicpuAllocCtxResTest, TilingAllocationPreservesBoundaryExtension)
+{
+    Mc2InitTilingInner initTiling{};
+    Mc2CcTilingInner ccTiling{};
+    ccTiling.commEngine = static_cast<uint8_t>(OpExecuteConfig::AICPU_TS);
+    mc2_boundary::Config boundary;
+    boundary.mode = 1U;
+    boundary.groupId = 7U;
+    boundary.totalTurns = 3U;
+    mc2_boundary::Encode(ccTiling.reserved2, boundary);
+    const void* ccTilingList[MAX_CC_TILING_NUM] = {&ccTiling};
+    OpParam param{};
+    param.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
+    param.varMemSize = 16U;
+    void* ctx = nullptr;
+    ASSERT_EQ(HcclAllocOpResCtx(comm_, "boundary_copy", std::vector<OpParam>{param},
+        &initTiling, ccTilingList, &ctx), HCCL_SUCCESS);
+    ASSERT_NE(ctx, nullptr);
+    const auto* res = static_cast<const OpResCtx*>(ctx);
+    const size_t baseSize = sizeof(OpParam) + param.varMemSize;
+    ASSERT_EQ(res->opParamSize[0], baseSize + sizeof(boundary));
+    mc2_boundary::Config copied;
+    ASSERT_TRUE(mc2_boundary::Decode(
+        reinterpret_cast<const uint8_t*>(res->algInfo[0].opParam) + baseSize,
+        sizeof(copied), copied, true));
+    EXPECT_EQ(copied.mode, boundary.mode);
+    EXPECT_EQ(copied.groupId, boundary.groupId);
+    EXPECT_EQ(copied.totalTurns, boundary.totalTurns);
+
+    // The new non-tiling overload must not inherit the previous tiling policy.
+    void* plainCtx = nullptr;
+    ASSERT_EQ(HcclAllocOpResCtx(comm_, "boundary_copy", param, COMM_ENGINE_AICPU_TS, &plainCtx), HCCL_SUCCESS);
+    ASSERT_NE(plainCtx, nullptr);
+    const auto* plain = static_cast<const OpResCtx*>(plainCtx);
+    EXPECT_EQ(plain->opParamSize[0], baseSize);
+}
+
+TEST_F(AicpuAllocCtxResTest, TilingAllocationRejectsMalformedBoundary)
+{
+    Mc2InitTilingInner initTiling{};
+    Mc2CcTilingInner ccTiling{};
+    mc2_boundary::Config boundary;
+    boundary.mode = 1U;
+    boundary.totalTurns = 0U;
+    mc2_boundary::Encode(ccTiling.reserved2, boundary);
+    const void* ccTilingList[MAX_CC_TILING_NUM] = {&ccTiling};
+    void* ctx = nullptr;
+    ASSERT_EQ(HcclAllocOpResCtx(comm_, "invalid_boundary", std::vector<OpParam>{OpParam{}},
+        &initTiling, ccTilingList, &ctx), HCCL_E_PARA);
+    EXPECT_EQ(g_hcclEngineCtxCopyCallCount, 0U);
 }
 
 } // namespace
