@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 
 
-def gen_golden_data_gather(case):
+def gen_golden_data_gather(case, source_path, index_path, golden_path):
     rng = np.random.default_rng(2026)
     total_length = 128
     source = rng.uniform(0, 1, total_length).astype(np.float16)
@@ -27,17 +27,19 @@ def gen_golden_data_gather(case):
         indexes = np.arange(total_length - 1, -1, -1, dtype=np.uint16)
     else:
         indexes = np.full(total_length, total_length - 1, dtype=np.uint16)
-    input_dir = Path("input")
-    output_dir = Path("output")
-    input_dir.mkdir(exist_ok=True)
-    output_dir.mkdir(exist_ok=True)
-    source.tofile("./input/input_x.bin")
-    indexes.tofile("./input/input_y.bin")
-    source[indexes].tofile("./output/golden.bin")
+    for path in (source_path, index_path, golden_path):
+        path.parent.mkdir(parents=True, exist_ok=True)
+    source.tofile(source_path)
+    indexes.tofile(index_path)
+    source[indexes].tofile(golden_path)
     print(f"Generated {case}: half/uint16, {total_length} elements")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--case", choices=["random", "identity", "reverse", "repeated"], default="random")
-    gen_golden_data_gather(parser.parse_args().case)
+    parser.add_argument("--source", type=Path, required=True, help="Source data output path")
+    parser.add_argument("--indexes", type=Path, required=True, help="Index data output path")
+    parser.add_argument("--golden", type=Path, required=True, help="Golden data output path")
+    args = parser.parse_args()
+    gen_golden_data_gather(args.case, args.source, args.indexes, args.golden)

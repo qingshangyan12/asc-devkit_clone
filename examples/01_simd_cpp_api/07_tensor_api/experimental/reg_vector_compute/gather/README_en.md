@@ -83,9 +83,12 @@ Perform the following steps from the sample root directory to build and run the 
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py
+  python3 ../scripts/gen_data.py \
+    --source input/input_x.bin --indexes input/input_y.bin --golden output/golden.bin
   ./demo
   ```
+
+  The data generation script requires explicit paths for the source, indexes, and golden data; it does not embed file names. The optional `--case` accepts `random`, `identity`, `reverse`, or `repeated` and defaults to `random`. The host program uses a fixed sample directory layout, so use the paths above when running `./demo`.
 
   When running in a supported NPU environment, `-DCMAKE_ASC_RUN_MODE=sim` can be omitted; the default run mode is `npu`. For simulation mode, add `-DCMAKE_ASC_RUN_MODE=sim` to the CMake command above. When switching run modes or chip models, it is recommended to clear the CMake cache in the `build` directory first.
 
@@ -108,5 +111,5 @@ Perform the following steps from the sample root directory to build and run the 
   The host program already includes accuracy verification. You can also run the following command from the `build` directory to independently verify the output file using the Python script:
 
   ```bash
-  python3 ../scripts/verify_result.py
+  python3 ../scripts/verify_result.py --output output/output.bin --golden output/golden.bin
   ```

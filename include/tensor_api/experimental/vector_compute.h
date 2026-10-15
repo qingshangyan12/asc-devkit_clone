@@ -39,9 +39,9 @@
 #include "tensor_api/experimental/arch/vector/data_reorder.h"
 #include "tensor_api/experimental/arch/vector/reg_compute_sel.h"
 #include "tensor_api/experimental/arch/vector/data_padding.h"
-#include "tensor_api/experimental/arch/vector/reg_index.h"
+#include "tensor_api/experimental/arch/vector/reg_index_compute.h"
 #include "tensor_api/experimental/arch/vector/compare_and_select.h"
-#include "tensor_api/experimental/arch/vector/reg_gather.h"
+#include "tensor_api/experimental/arch/vector/gather_compute.h"
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_VECTOR_COMPUTE_H
 

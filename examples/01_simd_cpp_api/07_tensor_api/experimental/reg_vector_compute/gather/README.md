@@ -83,9 +83,12 @@ dst[i] = src[index[i]], 0 <= i < 128
   mkdir -p build && cd build
   cmake -DCMAKE_ASC_ARCHITECTURES=dav-3510 -DCANN_ASC_USE_EXPERIMENTAL=ON ..
   make -j
-  python3 ../scripts/gen_data.py
+  python3 ../scripts/gen_data.py \
+    --source input/input_x.bin --indexes input/input_y.bin --golden output/golden.bin
   ./demo
   ```
+
+  数据生成脚本通过必填参数指定源数据、索引和真值文件路径，不内置文件名。`--case` 可选 `random`、`identity`、`reverse`、`repeated`，默认 `random`。Host 程序使用固定的样例目录布局，因此运行 `./demo` 时请使用上述路径。
 
   在支持的 NPU 环境运行时，可省略 `-DCMAKE_ASC_RUN_MODE=sim`，默认运行模式为 `npu`。使用仿真模式时，在上述 CMake 命令中添加 `-DCMAKE_ASC_RUN_MODE=sim`。切换运行模式或芯片型号时，建议先清除 `build` 目录中的 CMake 缓存。
 
@@ -108,5 +111,5 @@ dst[i] = src[index[i]], 0 <= i < 128
   Host 程序已包含精度校验，也可以在 `build` 目录下执行以下命令，使用 Python 脚本独立校验输出文件：
 
   ```bash
-  python3 ../scripts/verify_result.py
+  python3 ../scripts/verify_result.py --output output/output.bin --golden output/golden.bin
   ```
