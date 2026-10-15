@@ -103,6 +103,8 @@ constexpr cast_options default_cast_ops = {
 | `half → int4x2_t` | `zero`、`one`、`two`、`three` | `rint`、`round`、`floor`、`ceil`、`trunc` | `not_sat`、`sat` |
 | `half → hifloat8_t` | `zero`、`one` | `round` | `not_sat`、`sat` |
 
+`cast`支持的类型为寄存器元素类型，对于`int4x2_t`相关的转换，可以通过从UB中的元素类型为`int4b_t`的Tensor搬入后，使用返回的`reg_tensor<int4x2_t>`参与转换；`cast<int4x2_t>`的结果可通过`store`写入`int4b_t` Tensor。
+
 ## 关键特性说明
 
 ### 饱和与非饱和模式<a name="饱和与非饱和模式"></a>
@@ -142,7 +144,7 @@ constexpr cast_options default_cast_ops = {
 
 对于尾块，建议按照源、目的类型中位宽较大的类型计算单寄存器逻辑元素数，并用相同类型调用`update_mask`。这样可使搬入/搬出sideband模式、`layout`和mask对应同一组逻辑元素。
 
-`int4x2_t`、`fp4x2_e2m1_t`和`fp4x2_e1m2_t`每个存储单元包含两个4 bit元素。它们与16 bit类型转换时，指令按两个元素一组读写；从16 bit类型转换到4 bit打包类型时，每组mask以偶数位为有效控制位。
+int4b_t在寄存器上以两个逻辑元素打包为一个字节，内存Tensor使用`int4b_t`，寄存器使用`int4x2_t`。`int4x2_t`、`fp4x2_e2m1_t`和`fp4x2_e1m2_t`每个存储单元包含两个4 bit元素。它们与16 bit类型转换时，指令按两个元素一组读写；从16 bit类型转换到4 bit打包类型时，每组mask以偶数位为有效控制位。
 
 ## 返回值说明
 
