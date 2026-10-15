@@ -71,7 +71,7 @@ T shfl_up(T var, unsigned int delta) const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl_up(threadIdx.x + 100, 2);
+            uint32_t result = active.shfl_up(active.thread_rank() + 100, 2);
         }
         ...
     }
@@ -88,8 +88,14 @@ T shfl_up(T var, unsigned int delta) const
         ...
         if (threadIdx.x % 2 == 0) {
             coalesced_group active = coalesced_threads();
-            uint32_t result = active.shfl_up(threadIdx.x + 100, 2);
+            uint32_t result = active.shfl_up(active.thread_rank() + 100, 2);
         }
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 100, 0, 101, 0, 100, 0, 101, 0, 102, 0, 103, 0, 104, 0, 105, 0, 106, 0, 107, 0, 108, 0, 109, 0, 110, 0, 111, 0, 112, 0, 113, 0
+```
