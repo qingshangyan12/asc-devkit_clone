@@ -131,7 +131,7 @@ asc::te::copy(atom, dst, src);
 `enable_constant_pad`设置为`true`时，必须在搬运前调用[asc_set_copy_pad_val](../../../c_api/vector_datamove/asc_set_copy_pad_val.md)设置填充值。例如，以下代码将非32字节对齐场景下的补齐值设置为`0`：
 
 ```cpp
-#include "c_api/vector_datamove/vector_datamove.h"
+#include "tensor_api/tensor.h"
 
 asc_set_copy_pad_val(static_cast<half>(0));
 asc::te::gm_to_ub_params params{0, 0, true};
@@ -157,7 +157,7 @@ asc::te::copy(atom, dst, src);
 
 | 源/目的Layout | 支持的数据类型 |
 | :--- | :--- |
-| ND、DN、NZ、ZN | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
+| ND、DN、NZ、ZN | `int4b_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
 
 ## 返回值说明
 
