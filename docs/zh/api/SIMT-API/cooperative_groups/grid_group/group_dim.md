@@ -63,3 +63,10 @@ static dim3 group_dim()
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: dim3(32,1,1)
+```
+```
