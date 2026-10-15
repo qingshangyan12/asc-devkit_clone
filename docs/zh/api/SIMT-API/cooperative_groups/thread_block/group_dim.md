@@ -55,12 +55,15 @@ static dim3 group_dim()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __global__ void simt_kernel(...)
+    __global__ void simt_kernel(dim3* result)
     {
-        ...
         thread_block g = this_thread_block();
         dim3 block_dim = g.group_dim();
-        ...
+        if (threadIdx.x == 0) {
+            result[blockIdx.x].x = block_dim.x;
+            result[blockIdx.x].y = block_dim.y;
+            result[blockIdx.x].z = block_dim.z;
+        }
     }
     ```
 
@@ -70,11 +73,20 @@ static dim3 group_dim()
     #include "simt_api/cooperative_groups.h"
 
     using namespace cooperative_groups;
-    __simt_vf__ inline void simt_kernel(...)
+    __simt_vf__ inline void simt_kernel(__gm__ dim3* result)
     {
-        ...
         thread_block g = this_thread_block();
         dim3 block_dim = g.group_dim();
-        ...
+        if (threadIdx.x == 0) {
+            result[blockIdx.x].x = block_dim.x;
+            result[blockIdx.x].y = block_dim.y;
+            result[blockIdx.x].z = block_dim.z;
+        }
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: (32, 1, 1, (32, 1, 1, (32, 1, 1, (32, 1, 1
+```
