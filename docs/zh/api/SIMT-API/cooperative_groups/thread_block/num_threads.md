@@ -77,4 +77,10 @@ static unsigned int num_threads()
         unsigned int thread_num = g.num_threads();
         ...
     }
+
+输入输出示例如下：
+
+```text
+result: 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32
+```
     ```

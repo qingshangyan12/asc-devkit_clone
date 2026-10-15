@@ -78,3 +78,9 @@ static dim3 dim_threads()
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: dim3(1,1,1)
+```
