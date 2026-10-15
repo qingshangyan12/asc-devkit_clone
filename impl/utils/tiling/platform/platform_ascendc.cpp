@@ -51,6 +51,7 @@ static const std::map<std::string, SocVersion> convertMap{
     {"Ascend910_93", SocVersion::ASCEND910B},
     {"Ascend310B", SocVersion::ASCEND310B},
     {"Ascend950", SocVersion::ASCEND950},
+    {"Ascend310N", SocVersion::ASCEND310N},
     {"Ascend350", SocVersion::ASCEND350},
     {"Ascend960DT", SocVersion::ASCEND960DT},
     {"Ascend960PR", SocVersion::ASCEND960PR},
@@ -340,6 +341,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
     {"Ascend910PremiumA", "Ascend910"},
     {"Ascend310P1", "Ascend310P"}, // ascend310p_list
     {"Ascend310P3", "Ascend310P"},
+    {"Ascend310N", "Ascend310N"},
     {"Ascend310B1", "Ascend310B"}, // ascend310b_list
     {"Ascend310B2", "Ascend310B"},
     {"Ascend310B3", "Ascend310B"},
@@ -424,6 +426,7 @@ const static std::map<std::string, std::string> convertMapInAicpu = {
 
 const static std::map<std::string, std::string> AICPUshortVersionToNpuArchMap = {
     {"Ascend910B", "2201"}, // ascend910b_list
+    {"Ascend310N", "3510"},
     {"Ascend910", "1001"},    {"Ascend310P", "2002"},   {"Ascend310B", "3002"},  {"Ascend950", "3510"},
     {"Ascend350", "3510"},    {"Ascend960DT", "9201"},  {"Ascend960PR", "9202"}, {"MC62", "5102"},
     {"KirinX90", "3003"},     {"Kirin9030", "3113"},    {"MC32DM11A", "5102"},   {"KirinDev0000", "5101"},
