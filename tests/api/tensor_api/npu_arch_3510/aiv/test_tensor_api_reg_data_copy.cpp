@@ -23,12 +23,14 @@ __aicore__ inline void TestMove()
     auto allMask = asc::te::experimental::all_mask<T>();
     auto noneMask = asc::te::experimental::none_mask<T>();
     dst.mask = noneMask.reg;
+    src.mask = allMask.reg;
 
     asc::te::experimental::move(dst, src);
     EXPECT_EQ(dst.mask, allMask.reg);
 
     dst.mask = allMask.reg;
-    asc::te::experimental::move(dst, src, noneMask);
+    src.mask = noneMask.reg;
+    asc::te::experimental::move(dst, src);
     EXPECT_EQ(dst.mask, noneMask.reg);
 }
 

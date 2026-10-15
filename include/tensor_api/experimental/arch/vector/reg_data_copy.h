@@ -38,15 +38,13 @@ template <int16_t Offset, typename T>
 __simd_callee__ inline reg_tensor<bool> move_mask(const reg_tensor<T>& src);
 
 /**
- * @brief Copies register data under the specified mask.
+ * @brief Copies register data under the source register tensor's mask.
  * @tparam T Register element type.
- * @param dst Destination register tensor. Its mask is updated from mask.
- * @param src Source register tensor.
- * @param mask Active lanes to copy. Defaults to all lanes for T.
+ * @param dst Destination register tensor. Its mask is updated from src.mask.
+ * @param src Source register tensor. Its mask selects the active lanes to copy.
  */
 template <typename T>
-__simd_callee__ inline void move(
-    reg_tensor<T>& dst, const reg_tensor<T>& src, const reg_tensor<bool>& mask = all_mask<T>());
+__simd_callee__ inline void move(reg_tensor<T>& dst, const reg_tensor<T>& src);
 } // namespace experimental
 } // namespace te
 } // namespace asc

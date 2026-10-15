@@ -96,7 +96,8 @@ __simd_vf__ inline void MoveMaskData(SrcTensor src, DstTensor dst,
         auto src_reg = asc::te::experimental::load(src, coord);
         auto dst_reg = asc::te::experimental::load(dst, coord);
         auto mask = asc::te::experimental::move_mask<0>(src_reg);
-        asc::te::experimental::move(dst_reg, src_reg, mask);
+        src_reg.with_mask(mask);
+        asc::te::experimental::move(dst_reg, src_reg);
         asc::te::experimental::store(dst, coord, dst_reg);
     }
 }
