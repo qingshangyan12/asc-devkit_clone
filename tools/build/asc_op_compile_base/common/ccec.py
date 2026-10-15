@@ -104,6 +104,7 @@ def check_is_regbase_v2():
     from .platform.platform_info import BS9SX2A
     from .platform.platform_info import MC61AM21A
     from .platform.platform_info import ASCEND_950
+    from .platform.platform_info import ASCEND_310N
     from .platform.platform_info import ASCEND_960DT
     from .platform.platform_info import ASCEND_960PR
     from .platform.platform_info import ASCEND_5162
@@ -122,6 +123,7 @@ def check_is_regbase_v2():
         MC61AM21A,
         AS31XM1,
         ASCEND_950,
+        ASCEND_310N,
         ASCEND_960DT,
         ASCEND_960PR,
         KIRIN_X90,
@@ -189,6 +191,7 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
     from .platform.platform_info import BS9SX2A
     from .platform.platform_info import MC61AM21A
     from .platform.platform_info import ASCEND_950
+    from .platform.platform_info import ASCEND_310N
     from .platform.platform_info import ASCEND_960DT
     from .platform.platform_info import ASCEND_960PR
     from .platform.platform_info import COMPILER_ARCH
@@ -237,7 +240,7 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
         if (
             is_c220
             or is_enable_vector_core
-            or get_soc_spec("SHORT_SOC_VERSION") in (ASCEND_950, ASCEND_960DT, ASCEND_960PR)
+            or get_soc_spec("SHORT_SOC_VERSION") in (ASCEND_950, ASCEND_310N, ASCEND_960DT, ASCEND_960PR)
         ):
             aicore_type = get_soc_spec("AICORE_TYPE")
             from asc_op_compile_base.common.buildcfg.buildcfg_mapping import enforce_mix_mode
@@ -307,9 +310,14 @@ def _build_aicore_compile_cmd(src_file, dst_file, name="", is_ffts_needed=False,
             cce_runtime.CceFlag.BatchBindOnly = False
     short_soc_version = get_soc_spec("SHORT_SOC_VERSION")
     if short_soc_version != ASCEND_610LITE and short_soc_version != BS9SX2A:
-        if short_soc_version != MC61AM21A and short_soc_version not in (ASCEND_950, ASCEND_960DT, ASCEND_960PR):
+        if short_soc_version != MC61AM21A and short_soc_version not in (
+            ASCEND_950,
+            ASCEND_310N,
+            ASCEND_960DT,
+            ASCEND_960PR,
+        ):
             cmd += ["--cce-auto-sync=off"]
-    if short_soc_version in (ASCEND_950, ASCEND_960DT, ASCEND_960PR):
+    if short_soc_version in (ASCEND_950, ASCEND_310N, ASCEND_960DT, ASCEND_960PR):
         cmd += ["--cce-long-scbz=true"]
         cmd += ["--cce-simd-vf-fusion=false"]
     if current_build_config().get(enable_cce_licm_safe_hoist):
