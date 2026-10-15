@@ -14,7 +14,6 @@
 
 #include "alg_meta_registry.h"
 #include "alg_param.h"
-#include "alg_whitelist.h"
 #include "auto_selector_base.h"
 #include "coll_alg_v2_exec_registry.h"
 #include "external_alg_parser.h"
@@ -23,12 +22,6 @@
 #include "gtest/gtest.h"
 
 using namespace mc2_ops_hccl;
-
-// 须在首次候选表构建前生效
-const bool g_disableAlgWhitelist = [] {
-    SetAlgWhitelistEnabled(false);
-    return true;
-}();
 
 namespace {
 // 合法外部名样本（30 个规范名的代表集 + 空格/保序变体）
@@ -436,6 +429,8 @@ TEST(ExtAlgResolver, GoldenAllEngines)
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, "InsAllGatherMesh1D"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuAllGatherSoleNHR"},
+        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
+         "AicpuAllGatherSoleNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
          "InsAllGatherParallelMesh1DNHRMultiJetty"},
         {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
@@ -473,6 +468,9 @@ TEST(ExtAlgResolver, GoldenAllEngines)
          "CcuSchedAllGatherConcurMeshNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
          "CcuSchedReduceScatterSoleNHRMultiLink"},
+        // CCU·RS·sole[nhr]：唯一候选带 FLAG_MULTI_LEVEL，多层网命中
+        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &multi, CommEngine::COMM_ENGINE_CCU,
+         "CcuSchedReduceScatterSoleNHR"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
          "AicpuReduceScatterSoleNHRMultiLink"},
         {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
@@ -602,6 +600,13 @@ TEST(ExtAlgResolver, ErrorCasesCarryThreeElements)
     ASSERT_TRUE(ParseExternalAlg("parallel[mesh,nhr]", spec, errMsg));
     EXPECT_EQ(ResolveExternalAlg(op, &flat, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
     EXPECT_NE(errMsg.find("parallel[mesh,nhr]"), std::string::npos);
+
+    // 规则全灭（RS sole[nhr]·CCU：唯一 CCU 候选 CcuSchedReduceScatterSoleNHR 带
+    // FLAG_MULTI_LEVEL，单层 flat 拓扑不命中，无裸名兜底 -> 整键全灭回退）
+    OpParam opRsCcu = MakeResolveParam(HcclCMDType::HCCL_CMD_REDUCE_SCATTER, CommEngine::COMM_ENGINE_CCU);
+    ASSERT_TRUE(ParseExternalAlg("sole[nhr]", spec, errMsg));
+    EXPECT_EQ(ResolveExternalAlg(opRsCcu, &flat, spec, algName, errMsg), ResolveStatus::ERROR_INVALID);
+    EXPECT_NE(errMsg.find("sole[nhr]"), std::string::npos);
 }
 
 TEST(ExtAlgResolver, CandidateTableIsDeterministic)
@@ -626,8 +631,9 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
             }
         }
     }
-    // 覆盖数锚（限 5 个集合通信 CMD）：31 个 (op,外部名) 键（51 行归并）；
-    // 41 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
+    // 覆盖数锚（限 5 个集合通信 CMD）：32 个 (op,外部名) 键（52 行归并；MultiLink
+    // 外部名修正为 sole[nhr.multi_channel] 后自 AG sole[nhr] 键分立，新增该键）；
+    // 42 个 (引擎,op,外部名) 组合（键内引擎去重求和）。
     // 限定 COLL_CMDS 范围使锚不受测试内注册行（如 KFC cmd 的宏验证行）影响。
     const std::set<HcclCMDType> collCmds(std::begin(COLL_CMDS), std::end(COLL_CMDS));
     size_t keyCount = 0;
@@ -645,8 +651,8 @@ TEST(ExtAlgResolver, CandidateTableIsDeterministic)
         }
         comboCount += engines.size();
     }
-    EXPECT_EQ(keyCount, 31U);
-    EXPECT_EQ(comboCount, 41U);
+    EXPECT_EQ(keyCount, 32U);
+    EXPECT_EQ(comboCount, 42U);
 }
 
 TEST(ExtAlgResolver, SpecificityOrdering)
@@ -725,224 +731,4 @@ TEST(ExtAlgResolver, RuleTableBinding)
     EXPECT_STREQ(VariantCondName(COND_Z_AXIS), "COND_Z_AXIS");
     EXPECT_STREQ(MachineFlagName(FLAG_FLAT_1D), "FLAG_FLAT_1D");
     EXPECT_STREQ(VariantCondName(-1), "n/a");
-}
-
-TEST(ExtAlgWhitelist, IsAlgAllowedMatchesNameList)
-{
-    for (const char* name : {
-             "InsAllGatherMesh1D",
-             "AicpuAllGatherSoleNHR",
-             "AicpuAllGatherSoleNHRMultiLink",
-             "CcuSchedAllGatherSoleMesh",
-             "AicpuAllGatherConcurMeshNHR",
-             "CcuSchedAllGatherConcurMeshNHRMultiLink",
-             "InsAllGatherParallelMesh1DNHRMultiJetty",
-             "InsAllGatherParallelMesh1DNHRPcie",
-             "CcuSchedAllGatherParallelMeshNHRMultiLink",
-             "AicpuAllGatherPipeLinePcie",
-             "InsReduceScatterMesh1D",
-             "AicpuReduceScatterSoleMeshChunk",
-             "InsReduceScatterNHR",
-             "AicpuReduceScatterSoleNHRMultiLink",
-             "InsReduceScatterParallelMesh1DNHRPcie",
-             "AicpuReduceScatterParallelMeshNHRUBX",
-             "AicpuReduceScatterConcurMeshNHR",
-             "CcuSchedReduceScatterSoleMesh",
-             // 补齐此前其他commit添加白名单项时遗漏的成员检查
-             "CcuSchedReduceScatterSoleNHR",
-             "CcuSchedReduceScatterSoleNHRMultiLink",
-             "CcuSchedReduceScatterConcurMeshNHRMultiLink",
-             "AicpuReduceScatterPipeLinePcie",
-             "AicpuAllReduceSoleNHR",
-             "AicpuAllReduceSoleMeshOneShot",
-             "AicpuAllReduceSoleMeshTwoShot",
-             "AicpuAllReduceSoleMeshChunkTwoShot",
-             "AicpuAllReduceParallelMeshNHR",
-             "AicpuAllReducePipeLinePcie",
-             "CcuSchedAllReduceSoleMesh",
-             "AicpuAllToAllSoleMesh",
-             "AicpuAllToAllSoleMeshSingleChannel",
-             "AicpuAllToAllSoleMeshUBX",
-             "CcuSchedAllToAllSoleMesh",
-             "CcuSchedAllToAllMesh1DMultiJetty",
-             "AicpuAllToAllSoleMeshConcurrent",
-             "AicpuAllToAllVSoleMesh",
-             "AicpuAllToAllVSoleMeshConcurrent",
-             "CcuSchedAllToAllSoleMeshConcurrent",
-             "CcuSchedAllToAllVSoleMesh",
-         }) {
-        EXPECT_TRUE(IsAlgAllowed(name)) << name;
-    }
-    for (const char* name : {
-             "InsAllGatherMeshNhrDPU",
-             "InsAllGatherParallelMesh1DNHR",
-             "InsAllGatherParallelMesh1DNHRUBX",
-             "InsReduceScatterMesh1DZAxisDetour",
-             "CcuSchedReduceScatterSoleMeshPeerOnly",
-             "InsReduceScatterAicpuReduceNHR",
-             "InsReduceScatterSequenceMesh1DNhr",
-             "InsReduceScatterSequenceMeshMeshDPU",
-             "InsReduceScatterParallelMesh1DNHR",
-             "AicpuAllReduceSoleNHRAicpuReduce",
-             "AicpuAllreduceParallelMeshNHRPcie",
-         }) {
-        EXPECT_FALSE(IsAlgAllowed(name)) << name;
-    }
-    EXPECT_FALSE(IsAlgAllowed("NotAnAlgorithm"));
-    EXPECT_EQ(ALG_WHITELIST.size(), 39U);
-}
-
-// 改名漏改防线：白名单出现死名即红
-TEST(ExtAlgWhitelist, WhitelistNamesAreRegistered)
-{
-    const auto& rows = AlgMetaRegistry::Instance().GetAll();
-    for (const char* allowed : ALG_WHITELIST) {
-        bool found = false;
-        for (const AlgMetaRow& row : rows) {
-            if (row.registeredName == allowed) {
-                found = true;
-                break;
-            }
-        }
-        EXPECT_TRUE(found) << allowed << " 不在注册表中";
-    }
-}
-
-// 生产口径映射：全量注册经 IsAlgAllowed 过滤后的计数/死键/定名期望
-TEST(ExtAlgWhitelist, DifferentialProductionView)
-{
-    std::vector<AlgMetaRow> kept;
-    for (const AlgMetaRow& row : AlgMetaRegistry::Instance().GetAll()) {
-        if (IsAlgAllowed(row.registeredName)) {
-            kept.push_back(row);
-        }
-    }
-    EXPECT_EQ(kept.size(), 39U);
-    const auto prodTable = BuildCandidateTable(kept);
-
-    const std::pair<HcclCMDType, const char*> deadKeys[] = {
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "sequence[mesh,nhr]"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sequence[mesh,nhr]"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sequence[mesh,mesh]"},
-    };
-    for (const auto& dead : deadKeys) {
-        EXPECT_EQ(prodTable.count(std::make_pair(dead.first, std::string(dead.second))), 0U) << dead.second;
-    }
-
-    struct Case {
-        HcclCMDType cmd;
-        const char* extName;
-        const TopoInfoWithNetLayerDetails* topo;
-        CommEngine engine;
-        HcclDataType dtype;
-        u64 count;
-        const char* expected; // nullptr = 全灭回退 selector
-    };
-    TopoInfoWithNetLayerDetails flat = MakeFlatMesh1DTopo();
-    TopoInfoWithNetLayerDetails ubx = MakeUbxTopo();
-    TopoInfoWithNetLayerDetails pcie = MakePcieMixTopo();
-    TopoInfoWithNetLayerDetails multi = MakeMultiLevelTopo();
-    TopoInfoWithNetLayerDetails twoLevel = MakeTwoLevelNetLayerTopo();
-
-    const Case cases[] = {
-        // AllGather
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, HCCL_DATA_TYPE_FP32,
-         1U, "InsAllGatherMesh1D"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
-         "CcuSchedAllGatherSoleMesh"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, HCCL_DATA_TYPE_FP32, 1U,
-         "AicpuAllGatherSoleNHR"},
-        // parallel[mesh,nhr] 仅剩 Pcie 候选
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "InsAllGatherParallelMesh1DNHRPcie"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, nullptr},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "InsAllGatherParallelMesh1DNHRMultiJetty"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "parallel[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
-         HCCL_DATA_TYPE_FP32, 1U, "CcuSchedAllGatherParallelMeshNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuAllGatherConcurMeshNHR"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "concur[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
-         HCCL_DATA_TYPE_FP32, 1U, "CcuSchedAllGatherConcurMeshNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_ALLGATHER, "pipeline[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuAllGatherPipeLinePcie"},
-        // ReduceScatter
-        // ZAxis 档被滤：两层网大数据仍落裸名
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]", &twoLevel, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 100U * 1024 * 1024, "InsReduceScatterMesh1D"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32,
-         1U, "CcuSchedReduceScatterSoleMesh"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[mesh.chunk]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterSoleMeshChunk"},
-        // SPECIAL_DT 变体被滤：64bit 也落裸名
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP64, 1U, "InsReduceScatterNHR"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
-         HCCL_DATA_TYPE_FP32, 1U, "CcuSchedReduceScatterSoleNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr.multi_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterSoleNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &multi, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32,
-         1U, "CcuSchedReduceScatterSoleNHR"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "sole[nhr]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
-         nullptr},
-        // MULTI_LEVEL 被滤：多层网全灭
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterParallelMeshNHRUBX"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "InsReduceScatterParallelMesh1DNHRPcie"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "parallel[mesh,nhr]", &multi, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, nullptr},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterConcurMeshNHR"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "concur[mesh,nhr.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
-         HCCL_DATA_TYPE_FP32, 1U, "CcuSchedReduceScatterConcurMeshNHRMultiLink"},
-        {HcclCMDType::HCCL_CMD_REDUCE_SCATTER, "pipeline[mesh,nhr]", &pcie, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuReduceScatterPipeLinePcie"},
-        // AllReduce
-        {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
-         "CcuSchedAllReduceSoleMesh"},
-        {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh.one_shot]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuAllReduceSoleMeshOneShot"},
-        {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh.two_shot]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuAllReduceSoleMeshTwoShot"},
-        {HcclCMDType::HCCL_CMD_ALLREDUCE, "sole[mesh.two_shot.chunk]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuAllReduceSoleMeshChunkTwoShot"},
-        // AllToAll
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, HCCL_DATA_TYPE_FP32, 1U,
-         "AicpuAllToAllSoleMesh"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS, HCCL_DATA_TYPE_FP32, 1U,
-         "AicpuAllToAllSoleMeshUBX"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
-         "CcuSchedAllToAllSoleMesh"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh.single_channel]", &flat, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuAllToAllSoleMeshSingleChannel"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "sole[mesh.multi_channel]", &ubx, CommEngine::COMM_ENGINE_CCU,
-         HCCL_DATA_TYPE_FP32, 1U, "CcuSchedAllToAllMesh1DMultiJetty"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "concur[mesh,mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuAllToAllSoleMeshConcurrent"},
-        {HcclCMDType::HCCL_CMD_ALLTOALL, "concur[mesh,mesh]", &ubx, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32,
-         1U, "CcuSchedAllToAllSoleMeshConcurrent"},
-        // AllToAllV
-        {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_AICPU_TS, HCCL_DATA_TYPE_FP32,
-         1U, "AicpuAllToAllVSoleMesh"},
-        {HcclCMDType::HCCL_CMD_ALLTOALLV, "sole[mesh]", &flat, CommEngine::COMM_ENGINE_CCU, HCCL_DATA_TYPE_FP32, 1U,
-         "CcuSchedAllToAllVSoleMesh"},
-        {HcclCMDType::HCCL_CMD_ALLTOALLV, "concur[mesh,mesh]", &ubx, CommEngine::COMM_ENGINE_AICPU_TS,
-         HCCL_DATA_TYPE_FP32, 1U, "AicpuAllToAllVSoleMeshConcurrent"},
-    };
-    for (const Case& c : cases) {
-        const auto it = prodTable.find(std::make_pair(c.cmd, std::string(c.extName)));
-        ASSERT_NE(it, prodTable.end()) << c.extName;
-        OpParam op = MakeResolveParam(c.cmd, c.engine);
-        op.DataDes.dataType = c.dtype;
-        op.DataDes.count = c.count;
-        const AlgCandidate* selected = SelectCandidate(it->second, op, c.topo);
-        if (c.expected == nullptr) {
-            EXPECT_EQ(selected, nullptr) << c.extName;
-        } else {
-            ASSERT_NE(selected, nullptr) << c.extName;
-            EXPECT_STREQ(selected->registeredName.c_str(), c.expected) << c.extName;
-        }
-    }
 }
