@@ -82,3 +82,9 @@ unsigned int meta_group_size() const
         ...
     }
     ```
+
+输入输出示例如下：
+
+```text
+result: 256, 256, 256, 256
+```

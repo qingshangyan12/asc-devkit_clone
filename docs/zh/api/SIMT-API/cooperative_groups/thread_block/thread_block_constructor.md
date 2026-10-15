@@ -82,3 +82,7 @@ struct block_tile_memory
 ## 调用示例
 
 参考[调用示例](sync.md#调用示例)
+
+输入输出示例如下：
+
+参考[输入输出示例](sync.md#io-example)
