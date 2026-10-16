@@ -456,7 +456,7 @@ friend声明的访问权限与C++保持一致，但friend成员函数同样需�
 
 ### 成员函数指针
 
-成员函数指针在Device侧实测可用（指向的成员函数需标记`__aicore__`）：
+成员函数指针在Device侧可用，指向的成员函数需标记`__aicore__`：
 
 ```cpp
 struct Holder {
@@ -468,7 +468,7 @@ __global__ __launch_bounds__(128) void probe(float* output, uint32_t count)
 {
     Holder h;
     float (Holder::*mp)() const = &Holder::twice;   // 成员函数指针：可用
-    output[threadIdx.x] = (h.*mp)();                // 实测返回6
+    output[threadIdx.x] = (h.*mp)();
 }
 ```
 
