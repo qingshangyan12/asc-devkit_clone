@@ -126,6 +126,30 @@ template <
 __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace,
     const FixpipeParamsV220& intriParams);
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] Fixpipe V220 pointer paths (GM cacheMode=0) */
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__ubuf__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __cbuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __ubuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace, const FixpipeParamsV220& intriParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #endif
 
 #if defined(__NPU_ARCH__) && __NPU_ARCH__ == 3002
@@ -197,11 +221,40 @@ template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsArch3510<config.format>& intriParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__gm__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 // L0C->GM deq tensor quant
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(
     const GlobalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<uint64_t>& cbufWorkspace,
     const FixpipeParamsArch3510<config.format>& intriParams);
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] Fixpipe Arch3510 L0C->L1/UB (+ws); GM+ws (bare GM uses cacheMode=0) */
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__cbuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(__ubuf__ T* dst, __cc__ U* src, const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __cbuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __ubuf__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams);
+
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(
+    __gm__ T* dst, __cc__ U* src, __cbuf__ uint64_t* cbufWorkspace,
+    const FixpipeParamsArch3510<config.format>& intriParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #elif (__NPU_ARCH__ == 5162)
 // L1->UB,L1
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>

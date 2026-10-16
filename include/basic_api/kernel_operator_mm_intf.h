@@ -68,6 +68,15 @@ template <typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] LoadData 2D L1(__cbuf__) -> L0A/L0B */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParams& loadDataParams);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams);
@@ -102,6 +111,24 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParamsV2& loadDataParams,
     const bool enablePreReadIgnoreSync);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] LoadData 2DV2 GM(__gm__) -> L0A/L0B/L1 ; cacheMode=0 */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cbuf__ T* dst, __gm__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData2DParamsV2& loadDataParams);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #if defined(__NPU_ARCH__) &&                                                                                 \
     ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || (__NPU_ARCH__ == 5161) || \
      (__NPU_ARCH__ == 5165) || (__NPU_ARCH__ == 5163) || (__NPU_ARCH__ == 5162))
@@ -151,6 +178,127 @@ template <
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV1<U>& loadDataParams);
+
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-BGROUP] LoadData 3DV1 pointer paths (caller ensures reset via defaultConfig) */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV1<U>& loadDataParams);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-BGROUP] LoadData 3DV2 pointer paths */
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void LoadDataWithStride(
+    __ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2<U>& loadDataParams);
+
+/* [CUBE-PTR-BGROUP] LoadData 3DV2Pro pointer paths */
+template <typename T>
+__aicore__ inline void LoadData(__ca__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__cb__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadData(__ubuf__ T* dst, __cbuf__ T* src, const LoadData3DParamsV2Pro& loadDataParams);
+
+/* [CUBE-PTR-BGROUP] MmadMx pointer paths */
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+
+template <typename T, typename U, typename S>
+__aicore__ inline void MmadMx(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, const MmadParams& mmadParams,
+    bool cmatrixSource = false);
+
+/* [CUBE-PTR-BGROUP] BroadCastVecToMM / Fill / InitConstValue / LoadDataUnzip */
+template <typename T, typename U>
+__aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(
+    __cc__ T* dst, __ubuf__ U* src, const int32_t blockCount, const uint8_t blockLen, const uint8_t srcGap,
+    const uint8_t dstGap);
+
+template <
+    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <
+    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <
+    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void Fill(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <
+    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__ca__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <
+    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cb__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <
+    typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
+__aicore__ inline void InitConstValue(__cbuf__ T* dst, const InitConstValueParams<U>& initConstValueParams);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cbuf__ T* dst, __gm__ T* src);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__ca__ T* dst, __gm__ T* src);
+
+template <typename T>
+__aicore__ inline void LoadDataUnzip(__cb__ T* dst, __gm__ T* src);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 2201)
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-BGROUP] Sparse Mmad (arch 2201 only; 950 skip). LoadDataWithSparse Cal 仍吃 Tensor，暂不指针化 */
+template <
+    typename T = int32_t, typename U = int8_t,
+    typename Std::enable_if<Std::is_same<PrimT<T>, int32_t>::value, bool>::type = true,
+    typename Std::enable_if<Std::is_same<PrimT<U>, int8_t>::value, bool>::type = true>
+__aicore__ inline void MmadWithSparse(__cc__ T* dst, __ca__ U* fm, __cb__ U* filter, const MmadParams& mmadParams);
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
+#endif
 
 /* **************************************************************************************************
  * LoadData 3dv2                                             *
@@ -253,6 +401,17 @@ template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParams& loadDataParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] LoadDataWithTranspose V1 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParams& loadDataParams);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 /*
  * @ingroup DataLoad
  * @brief Cube data loading
@@ -270,6 +429,17 @@ template <typename T>
 __aicore__ inline void LoadDataWithTranspose(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2dTransposeParamsV2& loadDataParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] LoadDataWithTranspose V2 */
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __ca__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams);
+
+template <typename T>
+__aicore__ inline void LoadDataWithTranspose(
+    __cb__ T* dst, __cbuf__ T* src, const LoadData2dTransposeParamsV2& loadDataParams);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 /* **************************************************************************************************
  * LoadDataWithDecomp                                             *
  * ************************************************************************************************* */
@@ -308,11 +478,24 @@ template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(__cc__ T* dst, __ca__ U* fm, __cb__ S* filter, const MmadParams& mmadParams);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
     const MmadParams& mmadParams);
 
+#if !defined(ASCENDC_CPU_DEBUG) && defined(__CCE_IS_AICORE__)
+/* [CUBE-PTR-EXPAND] Mmad + bias pointer path (cmatrixSource: true=BIAS table, false=L0C) */
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(
+    __cc__ T* dst, __ca__ U* fm, __cb__ S* filter, uint64_t bias, const MmadParams& mmadParams,
+    bool cmatrixSource = false);
+
+#endif // !ASCENDC_CPU_DEBUG && __CCE_IS_AICORE__
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202))
 template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
