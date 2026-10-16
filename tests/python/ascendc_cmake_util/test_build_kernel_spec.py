@@ -23,6 +23,53 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "cmake/asc/fwk_modu
 import ascendc_build_kernel_spec as bundle
 
 
+@pytest.mark.parametrize("soc", ["Ascend910B1", "Ascend910B2", "ascend910b"])
+def test_task_directory_uses_one_chip_level(tmp_path, soc):
+    root = tmp_path / "resources with spaces"
+    task_id = "1" * 64
+    directory = bundle.task_directory(str(root), "AddCustom", soc, task_id)
+    assert directory == root / (".ascendc-" + task_id) / soc.lower() / "AddCustom"
+
+
+def test_task_directory_without_task_keeps_chip_directory(tmp_path):
+    assert bundle.task_directory(str(tmp_path), "OtherOp", "ascend950") == tmp_path / "ascend950"
+
+
+def test_reset_migrates_old_task_directories_without_removing_other_tasks(tmp_path):
+    root = tmp_path / "resources"
+    task_id = "a" * 64
+    old_root = root / "ascend910b" / (".ascendc-" + task_id) / "ascend910b"
+    previous = []
+    for op in ["AddCustom", "SubCustom"]:
+        directory = old_root / op
+        directory.mkdir(parents=True)
+        (directory / "stale_manifest.json").write_text("old resource")
+        previous.append({"op_type": op, "soc": "ascend910b", "directory": str(directory)})
+    other = root / (".ascendc-" + "b" * 64) / "ascend910b" / "AddCustom"
+    other.mkdir(parents=True)
+    (other / "keep").write_text("another task")
+    state = tmp_path / "tasks.json"
+    state.write_text(json.dumps(previous))
+    status = tmp_path / "install_status.cmake"
+    status.write_text("old success")
+    bundle.reset_tasks(
+        argparse.Namespace(
+            state=str(state),
+            install_status=str(status),
+            kernel_spec_dir=str(root),
+            kernel_spec_mode="Normal",
+            task_id=task_id,
+            task=[("AddCustom", "ascend910b")],
+        )
+    )
+    directory = root / (".ascendc-" + task_id) / "ascend910b" / "AddCustom"
+    assert directory.is_dir() and not list(directory.iterdir())
+    assert all(not Path(task["directory"]).exists() for task in previous)
+    assert (other / "keep").read_text() == "another task"
+    assert not status.exists()
+    assert json.loads(state.read_text()) == [{"op_type": "AddCustom", "soc": "ascend910b", "directory": str(directory)}]
+
+
 @pytest.fixture
 def bundle_request(tmp_path):
     source = tmp_path / "src"

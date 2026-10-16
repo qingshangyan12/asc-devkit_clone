@@ -33,6 +33,21 @@ class BundleError(RuntimeError):
     pass
 
 
+def task_directory(root, current_op_type, soc, task_id=None):
+    """Use the same resource path for reset, OPC output and the success receipt."""
+    if not root or not os.path.isabs(root):
+        raise ValueError("kernel-spec-dir must be an absolute path")
+    value = soc.lower()
+    if task_id:
+        return Path(root) / (".ascendc-" + task_id) / value / current_op_type
+
+    from opdesc_parser import SOC_TO_SHORT_SOC_MAP
+
+    mapping = {key.lower(): item.lower() for key, item in SOC_TO_SHORT_SOC_MAP.items()}
+    short_soc = value if value in mapping.values() else mapping.get(value, value)
+    return Path(root) / short_soc
+
+
 def _checked_path(value):
     path = Path(os.path.abspath(value))
     if any(parent.is_symlink() for parent in (path, *path.parents)):
@@ -397,8 +412,6 @@ def _build_locked(request, output, work, lock_key):
 
 
 def reset_tasks(request):
-    from kernel_spec_options import task_directory
-
     state = Path(request.state)
     state.parent.mkdir(parents=True, exist_ok=True)
     Path(request.install_status).unlink(missing_ok=True)

@@ -119,7 +119,7 @@ import json
 import sys
 from pathlib import Path
 sys.path.insert(0, sys.argv[1])
-from kernel_spec_options import task_directory
+from ascendc_build_kernel_spec import task_directory
 mode, root, op, soc, task_id, source, fail = sys.argv[2:]
 if mode != "None":
     directory = task_directory(root, op, soc, task_id)

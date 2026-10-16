@@ -19,7 +19,7 @@ import const_var
 import ascendc_impl_build
 import ascendc_bin_param_build
 import ascendc_op_info
-from kernel_spec_options import task_directory
+from ascendc_build_kernel_spec import task_directory
 from opdesc_parser import _trans_soc_ver_to_short
 
 
