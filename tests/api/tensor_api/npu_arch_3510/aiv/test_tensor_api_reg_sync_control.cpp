@@ -17,7 +17,7 @@ namespace {
 
 using asc::te::experimental::mem_type;
 
-#define CHECK_MEM_BAR_MAPPING(Src, Dst, Expected)                                                      \
+#define CHECK_MEM_BAR_MAPPING(Src, Dst, Expected) \
     static_assert(asc::te::experimental::detail::mem_bar_mapping<mem_type::Src, mem_type::Dst>::value == Expected)
 
 CHECK_MEM_BAR_MAPPING(vec_store, vec_load, VST_VLD);

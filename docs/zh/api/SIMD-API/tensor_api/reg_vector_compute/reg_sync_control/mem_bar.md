@@ -48,6 +48,8 @@ __simd_callee__ inline void mem_bar()
 | src | 源流水线，类型为`mem_type`。该流水线中位于本接口之前的UB访问需要先完成。 |
 | dst | 目的流水线，类型为`mem_type`。该流水线中位于本接口之后的UB访问等待源流水线。 |
 
+<a id="mem-bar-supported-combinations"></a>
+
 **表2** 支持的`src`和`dst`组合
 
 | src | dst | 含义 |
@@ -75,7 +77,7 @@ __simd_callee__ inline void mem_bar()
 
 ## 约束说明
 
-- 仅支持[表2](#表2-支持的src和dst组合)列出的模板参数组合，其他组合会产生编译期错误。
+- 仅支持[表2](#mem-bar-supported-combinations)列出的模板参数组合，其他组合会产生编译期错误。
 - 仅当源流水线和目的流水线访问的UB地址存在依赖时使用本接口；冗余同步会降低性能。
 - 当具有依赖关系的读写指令使用同一寄存器时，硬件可以保证指令顺序，无需额外调用本接口。
 - 本接口应在`__simd_vf__`函数或`__simd_callee__`函数中调用。
