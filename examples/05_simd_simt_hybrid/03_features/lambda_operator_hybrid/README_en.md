@@ -16,7 +16,7 @@ This sample is the **SIMD and SIMT hybrid programming** counterpart of the [Lamb
 
 | Product | CANN Software Version |
 |---|---|
-| Ascend 950PR/Ascend 950DT | \>= CANN 9.2.0 |
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.3.0 |
 
 ## Directory Structure
 
@@ -61,17 +61,6 @@ asc_atomic_add(neg_count, neg_local);        // thread counts atomically merged 
 **Scalar/vector data flow inside the SIMD VF**: when the scalar result of a callee-Lambda participates in vector computation, compute it before the vector loop and feed it in as an operand — in this sample, after the bounds are broadcast into vector registers via `asc_duplicate_scalar`, the clipping is completed at register level by `asc_min`/`asc_max`.
 
 **Pipeline synchronization**: before `asc_copy_ub2gm_align` moves data out of the UB written by the SIMT/SIMD VFs, the Vector compute pipeline and the MTE3 copy-out pipeline must be synchronized with `asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0)`/`asc_sync_wait(...)`.
-
-### Comparison with the Pure SIMT Version
-
-| Dimension | Pure SIMT version (00_lambda_operator_capture) | This sample (hybrid programming) |
-|---|---|---|
-| Kernel entry | `__global__ void` (4-slot launch) | `__global__ __vector__` (3-slot launch, second parameter is the dynamic UB size) |
-| Lambda marking | Neither needed nor allowed | `__simt_callee__`/`__simd_callee__`/`__aicore__` selected by location |
-| Thread-mapping framework | Template function called directly | Framework and closures both carry callee attributes, launched via `asc_vf_call` |
-| Clamp implementation | Element-wise by SIMT threads | SIMD VF vector intrinsics (`asc_min`/`asc_max`) |
-| Negative-value statistics | Each thread's count written directly to GM | Thread counts merged into the per-core count via `asc_atomic_add` |
-| CMake | `CMAKE_ASC_ENABLE_SIMT ON` | Default (no `--enable-simt`) |
 
 ## Compilation and Execution
 

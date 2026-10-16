@@ -2,7 +2,7 @@
 
 ## 概述
 
-本样例是[Lambda捕获实战样例（纯SIMT版）](../../../03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)在**SIMD与SIMT混合编程**下的对照实现：同一组算子——LeakyReLU-Affine融合算子（`y = scale * leaky_relu(x, alpha) + bias`，同遍历统计负数个数）与Clamp算子（`y = clamp(x, lo, hi)`）——在混合编程下按各执行上下文的Lambda标记规则重新组织，展示Lambda捕获在混合编程算子开发中的实际编程作用：
+本样例是[Lambda捕获实战样例（纯SIMT版）](../../../03_simt_api/02_features/02_language_features/00_lambda_operator_capture/README.md)在**SIMD与SIMT混合编程**下的对照实现：同一组算子——LeakyReLU-Affine融合算子（`y = scale * leaky_relu(x, alpha) + bias`，同遍历统计负数个数）与Clamp算子（`y = clamp(x, lo, hi)`）——在混合编程下按各执行上下文的Lambda标记规则实现，展示Lambda捕获在混合编程算子开发中的实际编程作用：
 
 1. **SIMT VF内Lambda标记`__simt_callee__`**：值捕获LeakyReLU斜率与仿射系数完成"激活→仿射"融合；引用捕获线程私有负数计数器完成同遍历统计，每线程计数经`asc_atomic_add`原子累加为本核计数。
 2. **SIMD VF内Lambda标记`__simd_callee__`**：值捕获Clamp上下界参与边界计算，标量结果在矢量循环前算好（`asc_duplicate_scalar`生成上下界矢量寄存器），再以`asc_min`/`asc_max`矢量intrinsics完成连续向量裁剪——"lambda标量逻辑 + 矢量intrinsics"的标准数据流。
@@ -10,13 +10,13 @@
 4. **策略与框架分离**：SIMT VF内的通用`elementwise_simt`框架（`__simt_callee__`模板函数）只负责线程保护与逐元素分发，融合闭包经模板形参注入——与纯SIMT版的`elementwise_transform`同构，线程映射代码只写一份。
 
 > [!IMPORTANT]
-> 混合编程场景下，各执行上下文中定义的Lambda**必须显式标记函数属性**，否则编译报错`call to __host__ function`：`__simt_vf__`函数体内标记`__simt_callee__`、`__simd_vf__`函数体内标记`__simd_callee__`、混合编程核函数体内标记`__aicore__`。标记位于Lambda参数列表之后（与`mutable`共存时标记在其之前）。完整标记选择规则见[Lambda表达式](../../../../docs/zh/guide/technical_appendix/cpp_standard_support/cpp_language_feature/lambda_expressions.md)文档。
+> 混合编程场景下，各执行上下文中定义的Lambda**必须显式标记函数属性**，否则编译报错：`__simt_vf__`函数体内标记`__simt_callee__`、`__simd_vf__`函数体内标记`__simd_callee__`、混合编程核函数体内标记`__aicore__`。标记位于Lambda参数列表之后（与`mutable`共存时标记在其之前）。完整标记选择规则见[Lambda表达式](../../../../docs/zh/guide/technical_appendix/cpp_standard_support/cpp_language_feature/lambda_expressions.md)文档。
 
 ## 本样例支持的产品及CANN软件版本
 
 | 产品 | CANN软件版本 |
 |---|---|
-| Ascend 950PR/Ascend 950DT | \>= CANN 9.2.0 |
+| Ascend 950PR/Ascend 950DT | \>= CANN 9.3.0 |
 
 ## 目录结构介绍
 
@@ -62,16 +62,6 @@ asc_atomic_add(neg_count, neg_local);        // 线程计数原子合并为本�
 
 **流水同步**：SIMT/SIMD VF写UB后`asc_copy_ub2gm_align`搬出前，需`asc_sync_notify(PIPE_V, PIPE_MTE3, EVENT_ID0)`/`asc_sync_wait(...)`同步Vector计算流水和MTE3搬出流水。
 
-### 与纯SIMT版的对照
-
-| 维度 | 纯SIMT版（00_lambda_operator_capture） | 本样例（混合编程） |
-|---|---|---|
-| 核函数入口 | `__global__ void`（4-slot launch） | `__global__ __vector__`（3-slot launch，第二参数为动态UB大小） |
-| Lambda标记 | 无需（也不能）标记 | `__simt_callee__`/`__simd_callee__`/`__aicore__`按位置选择 |
-| 线程映射框架 | 模板函数直接调用 | 框架与闭包均标记callee属性，经`asc_vf_call`启动 |
-| Clamp实现 | SIMT线程逐元素 | SIMD VF矢量intrinsics（`asc_min`/`asc_max`） |
-| 负数统计 | 每线程计数直接写GM | 线程计数经`asc_atomic_add`合并为本核计数 |
-| CMake | `CMAKE_ASC_ENABLE_SIMT ON` | 默认（不加`--enable-simt`） |
 
 ## 编译运行
 
