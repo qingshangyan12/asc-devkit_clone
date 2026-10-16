@@ -18,6 +18,7 @@ set(HCCL_MC2_CCU_ALL_TO_ALL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_to_all)
 set(HCCL_MC2_CCU_REDUCE_SCATTER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/reduce_scatter)
 set(HCCL_MC2_CCU_ALL_REDUCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_reduce)
 set(HCCL_MC2_CCU_ALL_GATHER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/all_gather)
+set(HCCL_MC2_CCU_EVENT_GROUP_TESTCASE ${CMAKE_CURRENT_SOURCE_DIR}/ccu_event_group_testcase.cpp)
 
 set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_gather/selector/all_gather_auto_selector.cc
@@ -25,6 +26,8 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/ccu_temp_kfc_all_gather_mesh_1D_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_mesh1d_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_multi_jetty_mem2mem.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/ccu_temp_kfc_all_gather_nhr_1d_mem2mem.cc
+    ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu/kernel/ccu_kernel_kfc_all_gather_nhr1d_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoall_auto_selector.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/selector/alltoallv_auto_selector.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/executor/ins_v2_all_to_all_v_sole_executor.cc
@@ -46,10 +49,12 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_mesh_1D_mem2mem_peer_only.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_nhr_1D_multi_jetty_mem2mem.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/ccu_temp_kfc_reduce_scatter_nhr_1D_2die_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_mesh1d_mem2mem_peer_only.cc
     ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_multi_jetty_mem2mem.cc
+    ${HCCL_CC_SRC_DIR}/ops/reduce_scatter/template/ccu/kernel/ccu_kernel_kfc_reduce_scatter_nhr1d_2die_mem2mem.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_kfc_all_to_all_mesh1d_multi_jetty.cc
     ${HCCL_CC_SRC_DIR}/ops/all_to_all_v/template/ccu/kernel/ccu_kernel_all_to_all_mesh1d_multi_jetty.cc
     # executor 注册项经 vtable 急切实例化引用 sliced 模板 out-of-line 虚函数符号，必须编入
@@ -73,6 +78,9 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/executor_v2_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry/coll_alg_v2_exec_registry.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/executor/registry/coll_alg_exec_registry.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg/alg_meta_registry.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg/external_alg_rules.cc
+    ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg/external_alg_resolver.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/ccu_alg_template_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/alg_v2_template_base.cc
     ${HCCL_CC_SRC_DIR}/ops/op_common/template/alg_template_base.cc
@@ -97,6 +105,7 @@ set(HCCL_SELECTOR_PRODUCT_SOURCES
     ${HCCL_CC_SRC_DIR}/ops/op_common/ccu_log.cc
     ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/ccu_res_dl.cc
     ${HCCL_CC_SRC_DIR}/common/hcomm_dlsym/hccl_ccu_res_dl.cc
+    ${UTILS_DIR}/hccl_proxy/hcomm_dlsym_stub.cc
 )
 
 add_executable(
@@ -110,9 +119,11 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all_mj_adapter.cc
     ${HCCL_MC2_CCU_ALL_TO_ALL_DIR}/ccu_all_to_all.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/reduce_scatter_testcase.cpp
+    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/peer_only_local_copy_testcase.cpp
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_mesh1d_adapter.cc
     ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_nhr_multilink_adapter.cc
+    ${HCCL_MC2_CCU_REDUCE_SCATTER_DIR}/ccu_reduce_scatter_nhr_2die_adapter.cc
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/all_reduce_testcase.cpp
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce_mesh1d_mem2mem_adapter.cc
     ${HCCL_MC2_CCU_ALL_REDUCE_DIR}/ccu_all_reduce.cc
@@ -120,6 +131,7 @@ add_executable(
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/parallel_migration_testcase.cpp
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/ccu_all_gather_kfc_server_adapter.cc
     ${HCCL_MC2_CCU_ALL_GATHER_DIR}/ccu_all_gather.cc
+    ${HCCL_MC2_CCU_EVENT_GROUP_TESTCASE}
     ${UTILS_DIR}/ccu_scenario/ccu_fixture.cc
     ${HCCL_SELECTOR_PRODUCT_SOURCES}
 )
@@ -137,6 +149,7 @@ target_include_directories(
     ${UTILS_DIR}/ccu_scenario
     ${HCCL_CC_SRC_DIR}
     ${HCCL_CC_SRC_DIR}/common
+    ${HCCL_CC_SRC_DIR}/ops/op_common/external_alg
     ${HCCL_CC_SRC_DIR}/ops/all_gather/selector
     ${HCCL_CC_SRC_DIR}/ops/all_gather/executor
     ${HCCL_CC_SRC_DIR}/ops/all_gather/template/ccu

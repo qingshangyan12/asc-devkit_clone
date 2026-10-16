@@ -98,6 +98,23 @@ enum class mask_pattern : uint8_t {
     quarter,
     none,
 };
+
+enum class histogram_half {
+    low,
+    high,
+};
+
+enum class histogram_mode {
+    frequency,
+    cumulative,
+};
+
+enum class reduce_scope : uint8_t { element, datablock, pair };
+
+enum class gather_mode {
+    element = 0, // per-element gather
+    data_block,  // datablock-width gather
+};
 } // namespace experimental
 } // namespace te
 } // namespace asc

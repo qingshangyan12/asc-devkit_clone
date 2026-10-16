@@ -28,10 +28,6 @@ is_trans_a = False
 is_trans_b = False
 is_bias = True
 
-a_format = "ND"
-b_format = "ND"
-c_format = "ND"
-
 
 def due_overflow(data):
     data = np.maximum(data, -65504)
@@ -49,10 +45,7 @@ def tf_matmul(x1_gm_fp32, x2_gm_fp32, bias_gm_fp32=None):
         res_tf = tf.add(res_tf, bias)
 
     with tf.compat.v1.Session() as sess:
-        feed_dict = {
-            x1: x1_gm_fp32,
-            x2: x2_gm_fp32,
-        }
+        feed_dict = {x1: x1_gm_fp32, x2: x2_gm_fp32}
         if is_bias:
             feed_dict[bias] = bias_gm_fp32
         res_tf = sess.run(res_tf, feed_dict=feed_dict)
@@ -82,11 +75,7 @@ def gen_golden_data(work_dir, scenario_num):
     elif scenario_num == 4:
         data_type_str = "fp8_e5m2_fp8_e4m3fn_float"
 
-    if data_type_str == "float16_float32":
-        gen_golden_data_fp16(work_dir)
-    elif data_type_str == "float16_float16":
-        gen_golden_data_fp16(work_dir, np.float16)
-    elif data_type_str == "hif8_hif8_float":
+    if data_type_str == "hif8_hif8_float":
         gen_golden_data_hif8(work_dir)
     elif "fp8" in data_type_str:
         gen_golden_data_fp8(work_dir, data_type_str)
@@ -98,7 +87,6 @@ def gen_golden_data(work_dir, scenario_num):
 
 def gen_golden_data_hif8(work_dir, dst_type=np.float32):
     src_type = np.uint8
-    c0size = 32
     if is_trans_a:
         x1_shape = [b, k, m]
     else:
@@ -120,15 +108,7 @@ def gen_golden_data_hif8(work_dir, dst_type=np.float32):
     else:
         y_gm_fp32 = tf_matmul(x1_gm_fp32, x2_gm_fp32)
 
-    if a_format == "NZ":
-        x1_gm = MatmulGenHifFp8Data.nd_to_nz(x1_gm, x1_shape, src_type, c0size)
-    if b_format == "NZ":
-        x2_gm = MatmulGenHifFp8Data.nd_to_nz(x2_gm, x2_shape, src_type, c0size)
-    if c_format == "NZ":
-        c0size = 16
-        y_gm = gen_c_data_nz_format(y_gm_fp32, dst_type, c0size)
-    else:
-        y_gm = y_gm_fp32.astype(dst_type)
+    y_gm = y_gm_fp32.astype(dst_type)
 
     x1_gm_hif8 = trans_np_float_tensor_to_hifuint8(x1_gm)
     x2_gm_hif8 = trans_np_float_tensor_to_hifuint8(x2_gm)
@@ -138,7 +118,6 @@ def gen_golden_data_hif8(work_dir, dst_type=np.float32):
 
 
 def gen_golden_data_fp8(work_dir, data_type_str, dst_type=np.float32):
-    c0size = 32
     if data_type_str == "fp8_e4m3fn_fp8_e4m3fn_float":
         srca_type = ml_dtypes.float8_e4m3fn
         srcb_type = ml_dtypes.float8_e4m3fn
@@ -173,15 +152,7 @@ def gen_golden_data_fp8(work_dir, data_type_str, dst_type=np.float32):
     else:
         y_gm_fp32 = tf_matmul(x1_gm_fp32, x2_gm_fp32)
 
-    if a_format == "NZ":
-        x1_gm = MatmulGenHifFp8Data.nd_to_nz(x1_gm, x1_shape, srca_type, c0size)
-    if b_format == "NZ":
-        x2_gm = MatmulGenHifFp8Data.nd_to_nz(x2_gm, x2_shape, srcb_type, c0size)
-    if c_format == "NZ":
-        c0size = 16
-        y_gm = gen_c_data_nz_format(y_gm_fp32, dst_type, c0size)
-    else:
-        y_gm = y_gm_fp32.astype(dst_type)
+    y_gm = y_gm_fp32.astype(dst_type)
 
     savebinfile(work_dir, x1_gm, x2_gm, y_gm, bias_gm)
     return 0
@@ -189,12 +160,6 @@ def gen_golden_data_fp8(work_dir, data_type_str, dst_type=np.float32):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-scenarioNum",
-        type=int,
-        default=0,
-        choices=[0, 1, 2, 3, 4],
-        help="Scenario number: 0 ~ 4",
-    )
+    parser.add_argument("-scenarioNum", type=int, default=0, choices=[0, 1, 2, 3, 4], help="Scenario number: 0 ~ 4")
     args = parser.parse_args()
     gen_golden_data(".", args.scenarioNum)

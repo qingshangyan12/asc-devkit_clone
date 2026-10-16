@@ -10,13 +10,13 @@
 
 #if !defined(ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS)
 #define ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC
+#define UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC_H
 #endif
 
 #ifndef INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 #define INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 
-#include "tensor_api/tensor/tensor.h"
+#include "tensor_api/tensor/tensor_interface.h"
 #include "tensor_api/experimental/arch/vector/reg_tensor.h"
 
 namespace asc {
@@ -27,6 +27,9 @@ template <typename T>
 __simd_callee__ inline reg_tensor<T> log(const reg_tensor<T>& src);
 
 template <typename T>
+__simd_callee__ inline reg_tensor<T> ln(const reg_tensor<T>& src);
+
+template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
 
 template <typename T>
@@ -34,6 +37,9 @@ __simd_callee__ inline reg_tensor<T> operator+(const reg_tensor<T>& src, const T
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator+(const T& scalar, const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> neg(const reg_tensor<T>& src);
 
 template <typename T>
 __simd_callee__ inline reg_tensor<T> operator-(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
@@ -62,6 +68,59 @@ __simd_callee__ inline reg_tensor<T> max(const reg_tensor<T>& src, const T& scal
 template <typename T>
 __simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& src);
 
+template <typename T>
+__simd_callee__ inline reg_tensor<T> abs(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> exp(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> sqrt(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> log2(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> log10(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> relu(const reg_tensor<T>& src);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> prelu(const reg_tensor<T>& src, const reg_tensor<T>& slope);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> leaky_relu(const reg_tensor<T>& src, const T& slope);
+
+template <typename T>
+__simd_callee__ inline reg_pair<T, bool> add_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_pair<T, bool> add_carry(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& carry_src);
+
+template <typename T>
+__simd_callee__ inline reg_pair<T, bool> sub_carry(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_pair<T, bool> sub_carry(
+    const reg_tensor<T>& src0, const reg_tensor<T>& src1, const reg_tensor<bool>& borrow_src);
+
+template <typename T>
+__simd_callee__ inline reg_pair<T> mull(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> operator/(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src0, const reg_tensor<T>& src1);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const reg_tensor<T>& src, const T& scalar);
+
+template <typename T>
+__simd_callee__ inline reg_tensor<T> min(const T& scalar, const reg_tensor<T>& src);
+
 } // namespace experimental
 } // namespace te
 } // namespace asc
@@ -72,7 +131,7 @@ __simd_callee__ inline reg_tensor<T> max(const T& scalar, const reg_tensor<T>& s
 
 #endif // INCLUDE_TENSOR_API_EXPERIMENTAL_ARCH_VECTOR_BASIC_ARITHMETIC_H
 
-#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC)
+#if defined(UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC_H)
 #undef ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS
-#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC
+#undef UNDEF_ASCENDC_TENSOR_API_INCLUDE_COMPILER_INTERNAL_HEADERS_BASIC_ARITHMETIC_H
 #endif

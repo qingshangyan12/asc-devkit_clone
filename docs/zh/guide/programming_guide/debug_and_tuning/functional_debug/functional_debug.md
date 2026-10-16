@@ -1,3 +1,4 @@
 # 功能调试
 
-本文件为文档发布时所需的索引文件。
+- [CPU域孪生调试](./cpu_twin_debug.md)
+- [NPU域上板调试](./npu_board_debug.md)

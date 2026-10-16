@@ -18,7 +18,7 @@ Cache（缓存）的主要作用是在搬运单元或Scalar单元与外部存储
 ![](../../../figures/atlas_a2_a3_cache_architecture_diagram.png "atlas_a2_a3_cache_architecture_diagram")
 <!-- end id2 -->
 
-**表1**  Cache类型及功能说明<a name="table_cache_type"></a>
+**表1** Cache类型及功能说明<a name="table_cache_type"></a>
 
 | Cache类型 | 说明 |
 |------------|------|
@@ -34,7 +34,7 @@ Cache（缓存）的主要作用是在搬运单元或Scalar单元与外部存储
 
 表2介绍了缓存的四种基础操作及其核心功能。
 
-**表2**  Cache操作及功能说明
+**表2** Cache操作及功能说明
 
 | 操作名称 | 功能说明 |
 |---------|---------|
@@ -95,7 +95,7 @@ Cache一致性是多核中确保数据正确性的核心机制。简单来说，
 
 表3按照Cache类型（L2 Cache、DCache、ICache、NDDMA Cache）汇总了与缓存控制相关的接口及其功能说明。
 
-**表3**  缓存控制接口汇总
+**表3** 缓存控制接口汇总
 
 | Cache类型 | 接口名称 | 功能简述 |
 |-----------|---------|---------|

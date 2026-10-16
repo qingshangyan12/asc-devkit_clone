@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -44,10 +44,12 @@ def asc_int322uint16(dst, src, mask, dst_pos):
 
 关于舍入模式和饱和/非饱和模式的详细说明，请参见[舍入模式与饱和模式](rounding_mode.md)。
 
+本接口为Reg矢量计算接口，仅在AIV上生效。
+
 ## 函数原型
 
 ```c
-// 通过引用参数输出结果
+// 通过引用参数输出结果（占位符形式）
 __simd_callee__ inline void asc_int322uint16<sat_mode>(vector_uint16_t& dst,
                                                        vector_int32_t src,
                                                        vector_bool mask,
@@ -58,17 +60,18 @@ __simd_callee__ inline void asc_int322uint16<sat_mode>(vector_uint16_t& dst,
                                                        vector_bool mask,
                                                        std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 
-// 通过函数返回值返回结果
+// 通过函数返回值返回结果（占位符形式）
 __simd_callee__ inline vector_uint16_t asc_int322uint16<sat_mode>(vector_int32_t src,
-                                                       vector_bool mask,
-                                                       std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::EVEN> dst_pos)
 
 __simd_callee__ inline vector_uint16_t asc_int322uint16<sat_mode>(vector_int32_t src,
-                                                       vector_bool mask,
-                                                       std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
+                                                                  vector_bool mask,
+                                                                  std::integral_constant<asc_position_mode, asc_position_mode::ODD> dst_pos)
 ```
 
-`<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
+**占位符说明如下：**
+- `<sat_mode>`表示饱和非饱和模式，为空时表示非饱和模式，取值为`_sat`时表示饱和模式。
 
 ### 函数原型典型示例
 
@@ -84,11 +87,11 @@ __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst,
 
 **表1** 参数说明
 
-| 参数名 | 输入/输出 | 描述                                                                                                               |
+| 参数名 | 输入/输出 | 描述 |
 | ------ | --------- | ------------------------------------------------------------------------------------------------------------------ |
-| dst    | 输出      | 目的操作数（矢量数据寄存器）。                                                                                     |
-| src    | 输入      | 源操作数（矢量数据寄存器）。                                                                                       |
-| mask   | 输入      | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
+| dst | 输出 | 目的操作数（矢量数据寄存器）。 |
+| src | 输入 | 源操作数（矢量数据寄存器）。 |
+| mask | 输入 | 掩码寄存器，用于控制各元素是否参与计算。`mask`中与元素对应的比特位为1时，该元素参与计算；为0时，该元素不参与计算。 |
 | dst_pos | 输入 | 目的操作数位置。`ASC_POSITION_EVEN`表示偶数索引，`ASC_POSITION_ODD`表示奇数索引。 |
 
 矢量数据寄存器和掩码寄存器的详细说明请参见[reg数据类型定义](../../defs/type/data_type_definition.md)。
@@ -100,8 +103,7 @@ __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst,
 
 ## 约束说明
 
-- 通过引用参数输出结果的函数原型在非AIV上调用时直接返回。
-- 通过函数返回值输出结果的函数原型在非AIV上调用时返回对应矢量类型的默认构造值。
+- Reg矢量计算C API通用约束请参见[通用约束](../overview.md#通用约束)。
 - `src`与`dst`的数据类型需要与函数原型匹配。
 - `mask`掩码位为0时，`dst`对应元素置0。
 
@@ -110,7 +112,7 @@ __simd_callee__ inline void asc_int322uint16(vector_uint16_t& dst,
 将代码保存为`example.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[__NPU_ARCH__](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

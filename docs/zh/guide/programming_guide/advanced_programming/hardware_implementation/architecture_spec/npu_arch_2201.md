@@ -3,10 +3,10 @@
 本节介绍\_\_NPU\_ARCH\_\_版本号为2201的硬件架构和其功能说明。对应的产品型号为：
 
 <!-- npu="A3" id1 -->
--   Atlas A3 训练系列产品/Atlas A3 推理系列产品
+-   Atlas A3系列产品
 <!-- end id1 -->
 <!-- npu="910b" id2 -->
--   Atlas A2 训练系列产品/Atlas A2 推理系列产品
+-   Atlas A2系列产品
 <!-- end id2 -->
 
 ## 硬件架构图<a name="section2189135013710"></a>
@@ -35,9 +35,7 @@
 
 开发者可以通过[平台信息获取](../../../../../api/Utils-API/platform_info/platform_info.md)接口查询各存储单元的内存空间大小。
 
-**各存储单元的参数规格**
-
-<a name="table12348145512210"></a>
+**各存储单元的参数规格**<a name="table12348145512210"></a>
 
 | 存储单元名称 | 存储空间大小 | 对齐要求 | 核函数（Kernel）侧常量名称及大小（单位：字节） |
 | --- | --- | --- | --- |
@@ -92,7 +90,7 @@
 
 **支持跨卡数据搬运（Hccs物理链路）**
 
-在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，在Atlas A2 训练系列产品/Atlas A2 推理系列产品设备上，仅支持Hccs物理链路，不支持其他通路；开发者开发过程中，请关注涉及卡间通信的物理通路；通过npu-smi  info -t topo指令查询Hccs 物理通路。
+在跨卡通信算子开发场景，DataCopy类接口支持跨卡数据搬运，在Atlas A2系列产品设备上，仅支持Hccs物理链路，不支持其他通路；开发者开发过程中，请关注涉及卡间通信的物理通路；通过npu-smi  info -t topo指令查询Hccs 物理通路。
 
 **支持Fixpipe硬件化加速**
 
@@ -134,7 +132,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
     ![](../../../../figures/fixpipe_f32_1.png)
 
-## 指令序列深度<a name="section1073952984666"></a>
+## 指令队列深度<a name="section1073952984666"></a>
 
 以下是计算单元和搬运单元的指令队列深度：
 
@@ -220,9 +218,7 @@ Fixpipe是NPU将典型操作进行硬化的加速模块，位于AIC内部，配�
 
         同一flagId的计数器最多可以设置15次。
 
-    <a id="cross_core_wait_flag_default_values"></a>
-
-    -   **默认值**
+    -   **默认值**<a id="cross_core_wait_flag_default_values"></a>
 
         - modeId：默认值为0。建议显式配置与CrossCoreSetFlag相同的modeId。
         - pipe：默认值为PIPE\_S。CrossCoreWaitFlag接口提供pipe模板参数，但本架构版本的硬件指令不区分等待的流水，因此pipe取值不影响实际执行效果，CrossCoreWaitFlag会阻塞全部流水的后续指令。

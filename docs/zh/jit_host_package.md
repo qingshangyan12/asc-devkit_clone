@@ -6,6 +6,8 @@
 
 需要同一版本配套的 CMake 模块、asc_opc、compile_op、asc_compile_exporter 和 ACLRTC。只替换 CMake 文件不够。SDK 原有 exporter 已支持 `.so` 和 `.o` 输出；本改动使用该能力，不增加系统工具或 Python 包依赖。
 
+升级生成器后，应重新编译动态 kernel 并生成 manifest、kernel 桩和资源库，不能只替换 ACLRTC 后继续沿用旧桩。当前生成器在 manifest 重放时为选定入口重新选择 `g_opSystemRunCfg` 的唯一定义方；SK 的等待、通知和禁用 DCCI 能力位由生成桩中的编译宏计算，debug 检查也由宏控制。旧资源中的跨 key 定义条件和固定能力位不会在加载时自动转换。此修复不需要算子添加 `static inline` 变量或修改算法代码。
+
 自定义工程沿用 `npu_op_package` 系列接口。内置仓若使用自己的 OPC 任务生成和打包脚本，需要仓级公共构建适配；升级 SDK 不会自动改写这些脚本。单算子算法代码不因资源打包新增修改。
 
 当前开启功能时只支持一个 package、一个 kernel library，要求启用原源码与 binary 交付，并使用默认 PACKAGE_PATH。关闭时沿用原构建行为。STATIC 表示 host 静态库交付，不表示在打包时把 device kernel 编译成静态实例。

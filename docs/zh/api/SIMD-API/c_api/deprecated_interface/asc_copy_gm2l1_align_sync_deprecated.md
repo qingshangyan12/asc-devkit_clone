@@ -3,38 +3,38 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
 头文件路径为：`"c_api/composite/cube_datamove_composite.h"`。
 
-**`asc_copy_gm2l1_align_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/asc_copy_gm2l1_align.md)和同步接口[asc_sync](../sync/asc_sync.md)替代。**
+**`asc_copy_gm2l1_align_sync`接口已废弃，请使用[对应的非同步接口](../cube_datamove/cube_compute_load/asc_copy_gm2l1_align.md)和同步接口[asc_sync](../sync/intra_core_sync/asc_sync.md)替代。**
 
 将数据从Global Memory搬运到L1 Buffer，提供非32B对齐搬运能力，搬运过程中对支持对数据进行padding。
 
 若搬运数据长度非32字节对齐，会将搬运数据补齐至32字节对齐。可通过配置参数`burst_dst_stride`选择Normal模式或Compact模式。非32字节对齐场景支持以下两种填充方式：
 
-- 手动填充：搬运前调用[asc_set_gm2l1_pad](../cube_datamove/asc_set_gm2l1_pad.md)设置填充值，并将`data_select_bit`设置为`true`。
+- 手动填充：搬运前调用[asc_set_gm2l1_pad](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_pad.md)设置填充值，并将`data_select_bit`设置为`true`。
 - 自动填充：将`data_select_bit`设置为`false`，由硬件自动填充dummy假数据，dummy假数据的值为数据块的第一个元素的值。
 
 数据搬运模式说明如下：
@@ -60,7 +60,7 @@
 
 当只搬运1个数据块，或`len_burst`已经32字节对齐且无左右Padding时，两种模式的搬运结果相同。
 
-循环填充模式即支持多次循环调用Normal填充模式与Compact填充模式，不支持多次循环调用左右填充模式。必须配合[asc_set_gm2l1_loop_size](../cube_datamove/asc_set_gm2l1_loop_size.md)、[asc_set_gm2l1_loop1_stride](../cube_datamove/asc_set_gm2l1_loop1_stride.md)、[asc_set_gm2l1_loop2_stride](../cube_datamove/asc_set_gm2l1_loop2_stride.md)使用，通过上述接口配置loop1/loop2的搬运次数与源/目步长。
+循环填充模式即支持多次循环调用Normal填充模式与Compact填充模式，不支持多次循环调用左右填充模式。必须配合[asc_set_gm2l1_loop_size](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop_size.md)、[asc_set_gm2l1_loop1_stride](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop1_stride.md)、[asc_set_gm2l1_loop2_stride](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_loop2_stride.md)使用，通过上述接口配置loop1/loop2的搬运次数与源/目步长。
 
 本接口仅在AIC上执行有效。
 
@@ -80,9 +80,9 @@ __aicore__ inline void asc_copy_gm2l1_align_sync(__cbuf__ <dtype>* dst,
                                                  uint32_t burst_dst_stride)
 ```
 
-### dtype支持的数据类型
+### dtype支持数据类型
 
-dtype取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
+`dtype`取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`。
 
 ## 参数说明
 
@@ -96,7 +96,7 @@ dtype取值为：`int8_t`、`uint8_t`、`hifloat8_t`、`int16_t`、`uint16_t`、
 | len_burst | 输入 | 待搬运的每个连续数据块的长度，单位字节。取值范围：[1, $2^{21}-1$]。需满足dtype字节对齐：dtype为`b16`类型时len_burst需为2的倍数，dtype为`b32`时len_burst需为4的倍数。 |
 | left_padding_count | 输入 | 左侧填充元素个数。填充字节数需满足`left_padding_count × sizeof(dtype) ≤ 32`字节，对应dtype上限：dtype为`b8`时取值范围：[0, 32]，dtype为`b16`时取值范围：[0, 16]，dtype为`b32`时取值范围：[0, 8]。 |
 | right_padding_count | 输入 | 右侧填充元素个数。填充字节数需满足`right_padding_count × sizeof(dtype) ≤ 32`字节，对应dtype上限：dtype为`b8`时取值范围：[0, 32]，dtype为`b16`时取值范围：[0, 16]，dtype为`b32`时取值范围：[0, 8]。 |
-| data_select_bit | 输入 | 填充数据来源选择。<br>&nbsp;&nbsp;&bull; `false`：首元素填充模式，填充数据取每个burst的首元素；<br>&nbsp;&nbsp;&bull; `true`：常量填充模式，填充数据取[asc_set_gm2l1_pad](../cube_datamove/asc_set_gm2l1_pad.md)预先配置的填充值。当`left_padding_count`与`right_padding_count`至少有一个非0时，硬件强制使用预先配置的常量填充值，本参数设置无效。 |
+| data_select_bit | 输入 | 填充数据来源选择。<br>&nbsp;&nbsp;&bull; `false`：首元素填充模式，填充数据取每个burst的首元素；<br>&nbsp;&nbsp;&bull; `true`：常量填充模式，填充数据取[asc_set_gm2l1_pad](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_pad.md)预先配置的填充值。当`left_padding_count`与`right_padding_count`至少有一个非0时，硬件强制使用预先配置的常量填充值，本参数设置无效。 |
 | l2_cache_ctl | 输入 | 配置数据在L2 Cache中的管理策略。取值说明请参见[表2](#l2_cache_ctl_values)。 |
 | burst_src_stride | 输入 | 相邻连续数据块在源端（Global Memory）的步长，单位字节。取值范围：[1, $2^{40}-1$]。 |
 | burst_dst_stride | 输入 | 相邻连续数据块在目的端（L1 Buffer）的步长，单位字节。取值范围：[1, $2^{21}-1$]。当`burst_dst_stride`不等于`len_burst`时（即存在padding），`burst_dst_stride`需32字节对齐，否则触发异常（即使`n_burst`为1）。 |
@@ -125,10 +125,10 @@ PIPE_MTE2
 - 本接口非AIC调用直接返回。
 - `dst`起始地址需32字节对齐（L1 Buffer对齐要求），否则触发异常。
 - `src`起始地址需1字节对齐（Global Memory对齐要求），不满足触发异常。
-- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/asc_sync_notify.md)和[asc_sync_wait](../sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
+- 如果本指令与其他指令存在目的地址重叠，需要插入同步指令（[asc_sync_notify](../sync/intra_core_sync/asc_sync_notify.md)和[asc_sync_wait](../sync/intra_core_sync/asc_sync_wait.md)），保证多个指令串行化，防止出现异常数据。
 - L1 Buffer容量上限：L1 Buffer总容量512KB，dst偏移与搬运大小之和不可越界，否则触发目的地址越界异常。
 - `len_burst`、`n_burst`、`burst_src_stride`、`burst_dst_stride`、`left_padding_count`与`right_padding_count`需满足参数说明的取值范围，否则会导致搬运结果不符合预期。
-- `data_select_bit`设置为true时，或者左右填充模式（`left_padding_count`和`right_padding_count`任意不为0）时，须先调用[asc_set_gm2l1_pad](../cube_datamove/asc_set_gm2l1_pad.md)配置填充值。
+- `data_select_bit`设置为true时，或者左右填充模式（`left_padding_count`和`right_padding_count`任意不为0）时，须先调用[asc_set_gm2l1_pad](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_pad.md)配置填充值。
 
 ### Normal填充模式约束
 
@@ -136,7 +136,7 @@ PIPE_MTE2
 
 ### 左右填充模式约束
 
-- 左右填充模式下，`left_padding_count×sizeof(dtype) + right_padding_count×sizeof(dtype) + len_burst + pad`需32字节对齐，其中`pad`为不满足32字节对齐需要填充的部分，填充值不受`data_select_bit`控制，必须先调用[asc_set_gm2l1_pad](../cube_datamove/asc_set_gm2l1_pad.md)配置填充值。
+- 左右填充模式下，`left_padding_count×sizeof(dtype) + right_padding_count×sizeof(dtype) + len_burst + pad`需32字节对齐，其中`pad`为不满足32字节对齐需要填充的部分，填充值不受`data_select_bit`控制，必须先调用[asc_set_gm2l1_pad](../cube_datamove/cube_load_aux_config/asc_set_gm2l1_pad.md)配置填充值。
 
 ### 循环填充模式约束
 
@@ -150,7 +150,7 @@ PIPE_MTE2
 将代码保存为`examples.asc`后，可通过`bisheng`命令编译运行，其中`--npu-arch`参数需根据实际产品型号指定对应的NPU架构，具体产品与NPU架构的映射关系请参考[`__NPU_ARCH__`](../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md#npu-arch)。
 
 <!-- npu="950" id8 -->
-以Ascend 950PR/Ascend 950DT产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
+以Ascend 950PR&950DT系列产品（对应NPU架构为`dav-3510`）为例，编译运行命令如下：
 
 ```bash
 bisheng example.asc -o main --npu-arch=dav-3510 && ./main

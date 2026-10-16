@@ -19,6 +19,7 @@ asc-devkit:
       - impl/**/dav_l311/*.h
       - impl/**/dav_m510/*.h
       - impl/**/dav_5161/*.h
+      - impl/**/dav_5162/*.h
       - impl/basic_api/kernel_macros.h
       - impl/basic_api/kernel_prof_trace*.h
       - impl/utils/**/*.h
