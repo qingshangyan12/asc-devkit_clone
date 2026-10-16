@@ -134,38 +134,36 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
 
 ### VF函数内支持的Lambda能力<a name="section_lambda_hybrid_list"></a>
 
-混合场景下，VF函数内支持的lambda能力有限制，如下表所示：
+混合编程场景下，VF函数内Lambda各能力项的支持情况如下表所示（约束项的展开说明见[使用约束](#section_lambda_constraints)）：
 
 **表2**  混合编程VF函数内Lambda能力列表
 
 | 能力 | 结论 | 写法/说明 |
 | --- | --- | --- |
-| 值捕获标量 | ✅ | `[scale, bias](float v) __simt_callee__ { ... }`。 |
-| 引用捕获 | ✅ | `[&counter]`可修改VF函数内局部变量；与CUDA extended device lambda"只能值捕获"不同，Ascend C允许引用捕获。 |
-| 捕获`__ubuf__`/`__gm__`指针 | ✅ | lambda体内可直接访存UB/GM；指针来源需为VF函数形参或合法局部指针。 |
-| 捕获this / `[*this]` | ✅ | `__simt_callee__`成员函数内`[this]`或C++17 `[*this]`均可用。 |
-| mutable | ✅ | 标记在`mutable`**之前**：`[m]() __simt_callee__ mutable { ... }`；写在`mutable`之后是语法错误（`expected body of lambda expression`）。 |
-| 泛型lambda（C++14） | ✅ | `[](auto x) __simt_callee__ { ... }`。 |
-| init-capture（C++14） | ✅ | `[sum = base * 2.f](float x) __simt_callee__ { ... }`。 |
-| 嵌套lambda | ✅ | 外层返回内层时，**内外层均需携带标记**。 |
-| 立即调用（IIFE） | ✅ | `[](float a) __simt_callee__ { ... }(2.f)`。 |
-| 后置返回类型 | ✅ | 标记在`-> T`之前：`[](float x) __simt_callee__ -> float { ... }`。 |
-| 作为函数模板实参 | ✅ | 可传给`__simt_callee__`/`__simd_callee__`函数模板（如`applyTwice(f, v)`）。 |
-| callee-lambda调用callee-lambda | ✅ | 捕获另一闭包对象直接调用。 |
-| `__simt_callee__`函数返回lambda | ✅ | `__simt_callee__ auto makeAdder(float bias)`返回闭包对象。 |
-| constexpr lambda（C++17） | ⚠️ | `static_assert`与结果落`constexpr`变量后使用均可用；**不要**在VF内直接运行期调用constexpr闭包。详见[约束1：constexpr lambda先落constexpr变量](#section_lambda_constraint_1)。 |
-| SIMD VF内调用矢量intrinsics | ✅ | `__simd_callee__` lambda体内可使用`asc_duplicate_scalar`/`asc_mul_scalar`/`asc_storealign`等并写UB。 |
-| 无参数列表形式 | ⚠️ | `[v] __simt_callee__ { ... }`可编译但触发C++2b扩展告警；C++17下应写显式`()`。详见[约束4：无参数列表形式写显式括号](#section_lambda_constraint_4)。 |
-| callee标记lambda转函数指针 | ❌ | 标记使闭包类型失去向函数指针的转换，报`no viable conversion`；需要函数指针形态时改用普通callee函数。详见[约束5：callee标记lambda不可转函数指针](#section_lambda_constraint_5)。 |
-| namespace-scope lambda对象 | ❌ | 不支持非`constexpr`的闭包对象（报`global variable ... is not allowed in aicore function`）；`constexpr`闭包可用。详见[约束6：namespace-scope lambda对象需constexpr](#section_lambda_constraint_6)。 |
-| callee lambda跨执行空间使用 | ❌ | 标记callee的闭包只能在对应VF函数及其callee链内消费，跨执行空间调用报`simt_callee function can only be called by simt_vf/simt_callee function`。详见[约束2：lambda的类型不可跨执行空间使用](#section_lambda_constraint_2)。 |
-| tuple模板实参携带UB限定类型 | ⚠️ | `make_tuple`/`get`等可正常使用，但模板实参携带`__ubuf__`地址空间限定类型的行为不保证。详见[约束3：tuple模板实参不携带UB限定类型](#section_lambda_constraint_3)。 |
+| 值捕获标量 | ✅ | 写法：`[scale, bias](float v) __simt_callee__ { ... }`。 |
+| 引用捕获 | ✅ | 写法：`[&counter](float v) __simt_callee__ { ... }`，可修改VF函数内的局部变量。 |
+| 捕获`__ubuf__`/`__gm__`指针 | ✅ | Lambda体内可直接访问UB/GM内存，指针来源须为VF函数形参或VF函数内的合法局部指针。 |
+| 捕获this / `[*this]` | ✅ | `__simt_callee__`成员函数内`[this]`与C++17 `[*this]`按值捕获均可用。 |
+| mutable | ✅ | 写法：`[m]() __simt_callee__ mutable { ... }`。函数属性标记须置于`mutable`**之前**，置于其后为语法错误（`expected body of lambda expression`）。 |
+| 泛型Lambda（C++14） | ✅ | 写法：`[](auto x) __simt_callee__ { ... }`。 |
+| init-capture（C++14） | ✅ | 写法：`[sum = base * 2.f](float x) __simt_callee__ { ... }`。 |
+| 嵌套Lambda | ✅ | 外层Lambda返回内层Lambda时，内层与外层均须携带函数属性标记。 |
+| 立即调用（IIFE） | ✅ | 写法：`[](float a) __simt_callee__ { ... }(2.f)`。 |
+| 后置返回类型 | ✅ | 写法：`[](float x) __simt_callee__ -> float { ... }`，标记须置于`-> T`之前。 |
+| 作为函数模板实参 | ✅ | 可作为实参传递给`__simt_callee__`/`__simd_callee__`函数模板（如`applyTwice(f, v)`）。 |
+| callee Lambda调用callee Lambda | ✅ | 捕获另一闭包对象后可直接调用。 |
+| `__simt_callee__`函数返回Lambda | ✅ | `__simt_callee__ auto makeAdder(float bias)`形式的函数可返回闭包对象。 |
+| constexpr Lambda（C++17） | ⚠️ | 须携带callee函数属性标记，否则编译通过但运行结果错误；配合`static_assert`或将结果落于`constexpr`变量后使用均可用。详见[约束1：constexpr lambda需加函数标识](#section_lambda_constraint_1)。 |
+| 无参数列表形式 | ⚠️ | `[v] __simt_callee__ { ... }`可编译，但触发C++2b扩展告警（`lambda without a parameter clause`）；C++17标准下应显式书写空参数列表`()`。详见[约束3：无参数列表形式写显式括号](#section_lambda_constraint_3)。 |
+| callee标记Lambda转函数指针 | ⚠️ | 向普通函数指针转换报`no viable conversion`；函数指针类型携带相同callee标记（如`__simt_callee__ float (*fn)(float)`）后可正常转换与调用。详见[约束4：callee标记Lambda转函数指针需同标识](#section_lambda_constraint_4)。 |
+| namespace-scope Lambda对象 | ❌ | 非constexpr闭包对象视为可写全局变量，VF函数内访问报`global variable ... is not allowed in aicore function`；constexpr闭包对象可用。详见[约束5：namespace-scope Lambda对象需constexpr](#section_lambda_constraint_5)。 |
+| callee Lambda跨执行空间使用 | ❌ | 携带callee标记的闭包仅可在对应VF函数及其callee链内使用，跨执行空间调用报`simt_callee function can only be called by simt_vf/simt_callee function`。详见[约束2：Lambda的类型不可跨执行空间使用](#section_lambda_constraint_2)。 |
 
 ### 使用约束<a name="section_lambda_constraints"></a>
 
 以下将对lambda的使用约束逐项展开说明：
 
--   **约束1：constexpr lambda先落constexpr变量**：在VF函数内使用constexpr lambda时，将结果先赋给`constexpr`局部变量再参与计算，不要在运行期路径直接调用constexpr闭包。<a name="section_lambda_constraint_1"></a>
+-   **约束1：constexpr lambda需加函数标识**：VF函数内的constexpr lambda必须携带与所在空间一致的callee函数标识，否则**编译通过但运行结果错误**；结果先落`constexpr`局部变量后使用同样可用。<a name="section_lambda_constraint_1"></a>
 
     ```cpp
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
@@ -173,12 +171,13 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
         if (threadIdx.x >= count) {
             return;
         }
+        // constexpr lambda未携带callee标识：编译通过，但运行期sq(8)返回错误值
         constexpr auto sq = [](int32_t v) constexpr { return v * v; };
-        out[threadIdx.x] = static_cast<float>(sq(8));   // 运行期直接调用constexpr闭包：不建议
+        out[threadIdx.x] = static_cast<float>(sq(8));
     }
     ```
 
-    **正确写法**：结果先落`constexpr`局部变量（配合`static_assert`固化编译期检查），再参与运行期计算：
+    **正确写法**：constexpr lambda按所在执行空间携带callee标识（SIMT VF内为`__simt_callee__`，SIMD VF内为`__simd_callee__`）：
 
     ```cpp
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
@@ -186,10 +185,9 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
         if (threadIdx.x >= count) {
             return;
         }
-        constexpr auto sq = [](int32_t v) constexpr { return v * v; };
-        static_assert(sq(8) == 64, "");
-        constexpr int32_t r64 = sq(8);                   // 先落constexpr变量：编译期求值
-        out[threadIdx.x] = static_cast<float>(r64);      // 输出64
+        // 携带__simt_callee__标识：编译运行正常，输出64
+        constexpr auto sq = [](int32_t v) __simt_callee__ constexpr { return v * v; };
+        out[threadIdx.x] = static_cast<float>(sq(8));
     }
     ```
 
@@ -223,44 +221,8 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     }
     ```
 
--   **约束3：tuple模板实参不携带UB限定类型**（对应表2"tuple模板实参携带UB限定类型 ⚠️"）：混合编程场景下，Lambda可正常操作`AscendC::Std`标准库设施，比如可在lambda体内使用tuple的`make_tuple`/`get`等，但注意tuple模板实参不要携带UB地址空间限定类型——UB限定类型参与模板实参推导的行为不保证，需先取值为普通标量局部变量再聚合，详见[混合编程Lambda捕获实战样例](../../../../../../examples/05_simd_simt_hybrid/03_features/lambda_operator_hybrid/README.md)说明。<a name="section_lambda_constraint_3"></a>
 
-    ```cpp
-    __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(
-        __ubuf__ float* in, __ubuf__ float* out, uint32_t count)
-    {
-        if (threadIdx.x >= count) {
-            return;
-        }
-        __ubuf__ float* p = in;
-        auto f = [p]() __simt_callee__ {
-            // tuple模板实参直接携带__ubuf__ float*限定类型：不建议
-            auto t = AscendC::Std::make_tuple(p, 1.f);
-            return AscendC::Std::get<1>(t);
-        };
-        out[threadIdx.x] = f();
-    }
-    ```
-
-    **正确写法**：先把UB数据取值为普通标量局部变量，再聚合进tuple：
-
-    ```cpp
-    __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(
-        __ubuf__ float* in, __ubuf__ float* out, uint32_t count)
-    {
-        if (threadIdx.x >= count) {
-            return;
-        }
-        auto f = [in]() __simt_callee__ {
-            float v = in[1];                             // 先取值为普通标量
-            auto t = AscendC::Std::make_tuple(v, 2.f);   // 标量聚合：行为有保证
-            return AscendC::Std::get<0>(t) + AscendC::Std::get<1>(t);
-        };
-        out[threadIdx.x] = f();                          // 输出in[1]+2
-    }
-    ```
-
--   **约束4：无参数列表形式写显式括号**：省略参数列表的lambda（`[v] __simt_callee__ { ... }`）是C++2b特性，可编译但触发扩展告警，C++17标准下应写显式`()`。<a name="section_lambda_constraint_4"></a>
+-   **约束3：无参数列表形式写显式括号**：省略参数列表的lambda（`[v] __simt_callee__ { ... }`）是C++2b特性，可编译但触发扩展告警，C++17标准下应写显式`()`。<a name="section_lambda_constraint_3"></a>
 
     ```cpp
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
@@ -285,7 +247,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     }
     ```
 
--   **约束5：callee标记lambda不可转函数指针**：callee标记使闭包类型带上函数属性，失去向普通函数指针的转换；需要函数指针形态时改用普通callee函数直接调用或以函数模板实参传递。<a name="section_lambda_constraint_5"></a>
+-   **约束4：callee标记lambda转函数指针需同标识**：callee标记lambda向**普通**函数指针转换会报`no viable conversion`（闭包类型带函数属性，普通函数指针类型不带）；函数指针类型本身加上对应的callee标识即可正常转换与调用。<a name="section_lambda_constraint_4"></a>
 
     ```cpp
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
@@ -297,7 +259,18 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     }
     ```
 
-    **正确写法**：闭包经函数模板实参传递（编译期单态化，无函数指针需求）：
+    **正确写法**：函数指针类型携带与lambda一致的callee标识：
+
+    ```cpp
+    __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
+    {
+        if (threadIdx.x >= count) { return; }
+        __simt_callee__ float (*fn)(float) = [](float v) __simt_callee__ { return v * 2.f; };
+        out[threadIdx.x] = fn(21.f);   // 编译运行正常，输出42
+    }
+    ```
+
+    不需要函数指针形态时，闭包经函数模板实参传递同样可用（编译期单态化）：
 
     ```cpp
     template <typename F>
@@ -311,7 +284,7 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     }
     ```
 
--   **约束6：namespace-scope lambda对象需constexpr**：非constexpr的namespace-scope闭包对象属于可写全局变量，VF函数内调用编译报错；constexpr闭包可用。<a name="section_lambda_constraint_6"></a>
+-   **约束5：namespace-scope lambda对象需constexpr**：非constexpr的namespace-scope闭包对象属于可写全局变量，VF函数内调用编译报错；constexpr闭包可用。<a name="section_lambda_constraint_5"></a>
 
     ```cpp
     float g_arr[2] = {1.f, 2.f};
@@ -333,6 +306,6 @@ __global__ __vector__ void kernel(__gm__ float* input, __gm__ float* output)
     __simt_vf__ __launch_bounds__(THREAD_COUNT) inline void vf_func(__ubuf__ float* out, uint32_t count)
     {
         if (threadIdx.x >= count) { return; }
-        out[threadIdx.x] = static_cast<float>(g_sq(6));      // 编译运行正常，输出36
+        out[threadIdx.x] = static_cast<float>(g_sq(6));      // 编译运行正常
     }
     ```
