@@ -25,7 +25,7 @@ import subprocess
 import sys
 import tempfile
 
-NUMEL = 4096
+NUMEL = 16384
 FAULT_OUTPUT_PTR = 0x100000000000
 
 
@@ -36,12 +36,12 @@ def _read_tensor(directory, stage, name):
     binary = products[0]
     meta = json.loads(binary.with_suffix(".json").read_text())
     data = binary.read_bytes()
-    if (meta["name"] != name or meta["stage"] != stage or meta["dtype"] != "torch.float32"
-            or meta["itemsize"] != 4 or meta["shape"] != [meta["numel"]]
-            or meta["numel"] <= 0 or meta["nbytes"] != meta["numel"] * 4
+    if (meta["name"] != name or meta["stage"] != stage or meta["dtype"] != "torch.float16"
+            or meta["itemsize"] != 2 or meta["shape"] != [meta["numel"]]
+            or meta["numel"] <= 0 or meta["nbytes"] != meta["numel"] * 2
             or len(data) != meta["nbytes"] or meta["bin_file"] != binary.name):
         raise ValueError(f"invalid tensor data/metadata: {binary.name}")
-    return struct.unpack(f"<{meta['numel']}f", data), int(meta["data_ptr"], 16)
+    return struct.unpack(f"<{meta['numel']}e", data), int(meta["data_ptr"], 16)
 
 
 def check_dump_products(dump_dir):
@@ -54,7 +54,7 @@ def check_dump_products(dump_dir):
         fault_x, fault_x_ptr = _read_tensor(directory, "input", "add_fault_x")
         fault_y, fault_y_ptr = _read_tensor(directory, "input", "add_fault_y")
         if (normal_x != fault_x or normal_y != fault_y
-                or normal_x != tuple(float(i) for i in range(len(normal_x)))
+                or normal_x != tuple(float(i % 1024) for i in range(len(normal_x)))
                 or normal_y != (1.0,) * len(normal_x)
                 or output != tuple(x + y for x, y in zip(normal_x, normal_y))):
             raise ValueError("normal/fault input contents or normal Add result are incorrect")
@@ -98,8 +98,8 @@ def run_worker(mode, dump_dir):
     from npuops.debug import enable_exception_dump, run_with_tensor_dump
 
     torch.npu.set_device(0)
-    x = torch.arange(NUMEL, dtype=torch.float32).npu()
-    y = torch.ones(NUMEL, dtype=torch.float32).npu()
+    x = torch.arange(NUMEL).remainder(1024).to(dtype=torch.float16, device="npu")
+    y = torch.ones(NUMEL, dtype=torch.float16).npu()
     torch.npu.synchronize()
     add = AclnnAdd()
     # Runtime kernel names differ by product/version. This isolated worker only
