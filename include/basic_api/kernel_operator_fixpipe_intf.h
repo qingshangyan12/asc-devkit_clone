@@ -106,6 +106,10 @@ template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
 __aicore__ inline void Fixpipe(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const FixpipeParamsV220& intriParams);
 
+// Pointer overload for Fixpipe (GM path - caller passes __gm__-qualified pointer)
+template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>
+__aicore__ inline void Fixpipe(T* dst, U* src, const FixpipeParamsV220& intriParams);
+
 // L0C->L1 deq tensor quant
 template <
     typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
@@ -113,6 +117,12 @@ template <
 __aicore__ inline void Fixpipe(
     const LocalTensor<T>& dst, const LocalTensor<U>& src, const LocalTensor<S>& cbufWorkspace,
     const FixpipeParamsV220& intriParams);
+
+// Pointer overload for Fixpipe deq quant (GM path)
+template <
+    typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR, typename S = uint64_t,
+    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type = true>
+__aicore__ inline void Fixpipe(T* dst, U* src, S* cbufWorkspace, const FixpipeParamsV220& intriParams);
 
 // L0C->GM
 template <typename T, typename U, const FixpipeConfig& config = CFG_ROW_MAJOR>

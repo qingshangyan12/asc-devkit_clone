@@ -478,6 +478,32 @@ __aicore__ inline void Fixpipe(
 #endif
 
 } // namespace AscendC
+
+// ============================================================================
+// Pointer overloads for Fixpipe (GM path)
+// ============================================================================
+namespace AscendC {
+
+// Pointer overload for Fixpipe L0C->GM
+template <typename T, typename U, const FixpipeConfig& config>
+__aicore__ inline void Fixpipe(T* dst, U* src, const FixpipeParamsV220& intriParams)
+{
+    FixpipeL0C2GMImpl<T, U, config>(
+        reinterpret_cast<__gm__ T*>(dst), reinterpret_cast<__cc__ U*>(src), intriParams);
+}
+
+// Pointer overload for Fixpipe L0C->GM deq tensor quant
+template <
+    typename T, typename U, const FixpipeConfig& config, typename S,
+    typename Std::enable_if<Std::is_same<PrimT<S>, uint64_t>::value, bool>::type>
+__aicore__ inline void Fixpipe(T* dst, U* src, S* cbufWorkspace, const FixpipeParamsV220& intriParams)
+{
+    FixpipeL0C2GMImpl<T, U, config>(
+        reinterpret_cast<__gm__ T*>(dst), reinterpret_cast<__cc__ U*>(src),
+        reinterpret_cast<__cbuf__ uint64_t*>(cbufWorkspace), intriParams);
+}
+
+} // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_FIXPIPE_INTERFACE_IMPL_H
 #if defined(__UNDEF_ASCENDC_INCLUDE_INTERNAL_HEADERS_KERNEL_OPERATOR_FIXPIPE_INTF_IMPL_H__)
 #undef __ASCENDC_INCLUDE_INTERNAL_HEADERS__

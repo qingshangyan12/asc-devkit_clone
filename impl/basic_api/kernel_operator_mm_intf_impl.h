@@ -58,6 +58,17 @@ __aicore__ inline void LoadData(
     LoadDataImpl(dst, src, loadDataParams);
 }
 
+// Pointer overload for LoadData 2D (L1->L0)
+template <typename T>
+__aicore__ inline void LoadData(T* dst, T* src, const LoadData2DParams& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+#if defined(ASCENDC_DEBUG) || defined(ASCENDC_CPU_DEBUG)
+    CheckLoadData2dParams<T>(loadDataParams, true);
+#endif
+    LoadData2DL12L0ACal(reinterpret_cast<__ca__ T*>(dst), src, loadDataParams);
+}
+
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams)
@@ -124,6 +135,14 @@ __aicore__ inline void LoadData(
     CheckLoadData2dLocal2Local(dst, src, "LoadData with LoadData2DParamsV2");
 #endif
     LoadDataImpl(dst, src, loadDataParams);
+}
+
+// Pointer overload for LoadData 2D V2 (L1->L0)
+template <typename T>
+__aicore__ inline void LoadData(T* dst, T* src, const LoadData2DParamsV2& loadDataParams)
+{
+    CheckLoadData2dDatatype<T>();
+    LoadData2DL12L0ACal(reinterpret_cast<__ca__ T*>(dst), src, loadDataParams);
 }
 
 #if defined(__NPU_ARCH__) && ((__NPU_ARCH__ == 3510) || (__NPU_ARCH__ == 5102) || (__NPU_ARCH__ == 5101) || \
@@ -784,6 +803,79 @@ __aicore__ inline void SetMMColumnMajor() { SetMMLayoutTransformImpl(false); }
  */
 // SetMMLayoutTransform has been updated, please use SetMMRowMajor/SetMMColumnMajor instead.
 __aicore__ inline void SetMMLayoutTransform(bool mmLayoutMode) { SetMMLayoutTransformImpl(mmLayoutMode); }
+
+// ============================================================================
+// Pointer overloads for CUBE interfaces
+// ============================================================================
+
+// Pointer overload for LoadData 3D V1 (L1->L0)
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadData(T* dst, T* src, const LoadData3DParamsV1<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    CheckLoadData3dv1Params<U>(loadDataParams);
+    CheckLoadData3dParams(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.strideW, loadDataParams.strideH);
+    LoadData3DV1L12L0ACal(reinterpret_cast<__ca__ T*>(dst), src, loadDataParams);
+}
+
+// Pointer overload for LoadData 3D V2 (L1->L0)
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig, typename U,
+    typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type>
+__aicore__ inline void LoadData(T* dst, T* src, const LoadData3DParamsV2<U>& loadDataParams)
+{
+    if constexpr (defaultConfig.isSetFMatrix) {
+        Load3DSetFMatrixCal(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.padList);
+    }
+    if constexpr (defaultConfig.isSetPadding) {
+        Load3DSetPaddingCal(loadDataParams.padValue);
+    }
+    CheckLoadData3dv2Params<U>(loadDataParams);
+    CheckLoadData3dv2ChannelSize<T>(loadDataParams.channelSize);
+    CheckLoadData3dParams(loadDataParams.l1H, loadDataParams.l1W, loadDataParams.strideW, loadDataParams.strideH);
+    CheckLoadData3dv2MatrixParams<T>(
+        loadDataParams.kExtension, loadDataParams.mExtension, loadDataParams.kStartPt, loadDataParams.mStartPt);
+    LoadData3DV2L12L0ACal(reinterpret_cast<__ca__ T*>(dst), src, loadDataParams);
+}
+
+// Pointer overload for LoadData 3D V2Pro (L1->L0)
+template <typename T>
+__aicore__ inline void LoadData(T* dst, T* src, const LoadData3DParamsV2Pro& loadDataParams)
+{
+    LoadData3DV2L12L0ACal(reinterpret_cast<__ca__ T*>(dst), src, loadDataParams);
+}
+
+// Pointer overload for Mmad
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(T* dst, U* fm, S* filter, const MmadParams& mmadParams)
+{
+    MmadCal(reinterpret_cast<__cc__ T*>(dst), reinterpret_cast<__ca__ U*>(fm),
+            reinterpret_cast<__cb__ S*>(filter), mmadParams);
+}
+
+// Pointer overload for Mmad with bias
+template <typename T, typename U, typename S, typename V>
+__aicore__ inline void Mmad(T* dst, U* fm, S* filter, V* bias, const MmadParams& mmadParams)
+{
+    uint64_t biasAddr = reinterpret_cast<uint64_t>(bias);
+    bool cmatrixSource = true;
+    MmadCal(reinterpret_cast<__cc__ T*>(dst), reinterpret_cast<__ca__ U*>(fm),
+            reinterpret_cast<__cb__ S*>(filter), biasAddr, mmadParams, cmatrixSource);
+}
+
+// Pointer overload for Fill
+template <typename T, typename U, typename Std::enable_if<Std::is_same<T, U>::value, bool>::type>
+__aicore__ inline void Fill(T* dst, const InitConstValueParams<U>& initConstValueParams)
+{
+    InitL1BufferCal(reinterpret_cast<__cbuf__ T*>(dst), initConstValueParams);
+}
 
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_MM_INTERFACE_IMPL_H

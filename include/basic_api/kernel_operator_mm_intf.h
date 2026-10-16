@@ -68,6 +68,11 @@ template <typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParams& loadDataParams);
 
+// Pointer overload: L1 buffer to L0 (caller ensures correct memory qualifier on dst)
+template <typename T>
+__aicore__ inline void LoadData(
+    T* dst, T* src, const LoadData2DParams& loadDataParams);
+
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
     const LocalTensor<T>& dst, const GlobalTensor<T>& src, const LoadData2DParams& loadDataParams);
@@ -92,6 +97,11 @@ __aicore__ inline __inout_pipe__(MTE2) void LoadData(
 template <typename T>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData2DParamsV2& loadDataParams);
+
+// Pointer overload: L1 buffer to L0 (caller ensures correct memory qualifier on dst)
+template <typename T>
+__aicore__ inline void LoadData(
+    T* dst, T* src, const LoadData2DParamsV2& loadDataParams);
 
 template <typename T>
 __aicore__ inline __inout_pipe__(MTE2) void LoadData(
@@ -184,6 +194,13 @@ template <
     typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void LoadData(
     const LocalTensor<T>& dst, const LocalTensor<T>& src, const LoadData3DParamsV2<U>& loadDataParams);
+
+// Pointer overload for LoadData 3D V2
+template <
+    typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = T,
+    typename Std::enable_if<Std::is_same<T, U>::value, bool>::type = true>
+__aicore__ inline void LoadData(
+    T* dst, T* src, const LoadData3DParamsV2<U>& loadDataParams);
 
 template <
     typename T, const IsResetLoad3dConfig& defaultConfig = IS_RESER_LOAD3D_DEFAULT_CONFIG, typename U = PrimT<T>,
@@ -308,6 +325,10 @@ template <typename T, typename U, typename S>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const MmadParams& mmadParams);
 
+// Pointer overload for Mmad
+template <typename T, typename U, typename S>
+__aicore__ inline void Mmad(T* dst, U* fm, S* filter, const MmadParams& mmadParams);
+
 template <typename T, typename U, typename S, typename V>
 __aicore__ inline void Mmad(
     const LocalTensor<T>& dst, const LocalTensor<U>& fm, const LocalTensor<S>& filter, const LocalTensor<V>& bias,
@@ -404,6 +425,11 @@ __aicore__ inline __inout_pipe__(V) void BroadCastVecToMM(
 template <
     typename T, typename U = PrimT<T>, typename Std::enable_if<Std::is_same<PrimT<T>, U>::value, bool>::type = true>
 __aicore__ inline void Fill(const LocalTensor<T>& dst, const InitConstValueParams<U>& initConstValueParams);
+
+// Pointer overload for Fill
+template <
+    typename T, typename U = T, typename Std::enable_if<Std::is_same<T, U>::value, bool>::type = true>
+__aicore__ inline void Fill(T* dst, const InitConstValueParams<U>& initConstValueParams);
 
 // InitConstValue has been updated, please use Fill instead.
 template <
