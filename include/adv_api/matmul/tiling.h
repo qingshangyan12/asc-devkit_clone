@@ -93,9 +93,9 @@ __aicore__ constexpr MatmulConfig GetNormalConfig(
         .sharedCO1BufferSize = SHARED_CO1_BUFFER_SIZE,
         .bmmOutMode = bmmOutMode,
         .enableL1BankConflictOptimise = false,
-        .preAllocationMode = preAllocationMode,
         .enableRelu = false,
-        .decompMode = DecompressionMode::DECOMP_NONE};
+        .decompMode = DecompressionMode::DECOMP_NONE,
+        .preAllocationMode = preAllocationMode};
 }
 
 /**
@@ -177,9 +177,9 @@ __aicore__ constexpr MatmulConfig GetMDLConfig(
         .sharedCO1BufferSize = SHARED_CO1_BUFFER_SIZE,
         .bmmOutMode = BatchOutMode::SINGLE_BATCH,
         .enableL1BankConflictOptimise = enableL1BankConflictOptimise,
-        .preAllocationMode = preAllocationMode,
         .enableRelu = false,
-        .decompMode = DecompressionMode::DECOMP_NONE};
+        .decompMode = DecompressionMode::DECOMP_NONE,
+        .preAllocationMode = preAllocationMode};
 }
 
 /**
@@ -251,9 +251,9 @@ __aicore__ constexpr MatmulConfig GetSpecialMDLConfig(
         .sharedCO1BufferSize = SHARED_CO1_BUFFER_SIZE,
         .bmmOutMode = BatchOutMode::SINGLE_BATCH,
         .enableL1BankConflictOptimise = false,
-        .preAllocationMode = preAllocationMode,
         .enableRelu = false,
-        .decompMode = DecompressionMode::DECOMP_NONE};
+        .decompMode = DecompressionMode::DECOMP_NONE,
+        .preAllocationMode = preAllocationMode};
 }
 
 /**
@@ -325,9 +325,9 @@ __aicore__ constexpr MatmulConfig GetBasicConfig(
         .sharedCO1BufferSize = SHARED_CO1_BUFFER_SIZE,
         .bmmOutMode = BatchOutMode::SINGLE_BATCH,
         .enableL1BankConflictOptimise = false,
-        .preAllocationMode = preAllocationMode,
         .enableRelu = false,
-        .decompMode = DecompressionMode::DECOMP_NONE};
+        .decompMode = DecompressionMode::DECOMP_NONE,
+        .preAllocationMode = preAllocationMode};
 }
 
 /**
@@ -406,9 +406,9 @@ __aicore__ constexpr MatmulConfig GetSpecialBasicConfig(
         .sharedCO1BufferSize = SHARED_CO1_BUFFER_SIZE,
         .bmmOutMode = BatchOutMode::SINGLE_BATCH,
         .enableL1BankConflictOptimise = false,
-        .preAllocationMode = preAllocationMode,
         .enableRelu = false,
-        .decompMode = DecompressionMode::DECOMP_NONE};
+        .decompMode = DecompressionMode::DECOMP_NONE,
+        .preAllocationMode = preAllocationMode};
 }
 
 /**
@@ -481,9 +481,9 @@ __aicore__ constexpr MatmulConfig GetIBShareNormConfig(
         .sharedCO1BufferSize = SHARED_CO1_BUFFER_SIZE,
         .bmmOutMode = BatchOutMode::SINGLE_BATCH,
         .enableL1BankConflictOptimise = false,
-        .preAllocationMode = preAllocationMode,
         .enableRelu = false,
-        .decompMode = DecompressionMode::DECOMP_NONE};
+        .decompMode = DecompressionMode::DECOMP_NONE,
+        .preAllocationMode = preAllocationMode};
 }
 
 constexpr MatmulConfig CFG_NORM = GetNormalConfig();
