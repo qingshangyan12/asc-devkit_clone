@@ -7,6 +7,11 @@
 # INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
+option(MC2_PERF_ACCEPTANCE "Enable buffered test-only AICPU performance probes" OFF)
+if(MC2_PERF_ACCEPTANCE)
+    add_compile_definitions(MC2_PERF_ACCEPTANCE=1)
+endif()
+
 set(OPS_BASE_DIR ${HCCL_CC_DIR})
 option(MC2_CLIENT_ENABLE_CCU "Build CCU algorithm implementations into mc2_client" ON)
 

@@ -7,6 +7,7 @@
  * INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT, MERCHANTABILITY, OR FITNESS FOR A PARTICULAR PURPOSE.
  * See LICENSE in the root of the software repository for the full text of the License.
  */
+#include "../../../../common/mc2_perf_probe.h"
 #include <cstdint>
 
 #include "aicpu_kfc/decoupler/comm_kfc_dispatcher.h"
@@ -19,6 +20,7 @@ using namespace HcclApi;
 
 extern "C" __attribute__((visibility("default"))) uint32_t Mc2ServerKernel(void* args[])
 {
+    Mc2PerfProbe::KernelScope perfScope;
     HCCL_INFO("[Mc2ServerKernel]Start Mc2ServerKernel.");
     if (args == nullptr) {
         HCCL_ERROR("args is null.");

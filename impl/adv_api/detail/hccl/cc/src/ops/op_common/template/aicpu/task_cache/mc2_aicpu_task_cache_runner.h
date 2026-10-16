@@ -10,6 +10,7 @@
 #ifndef MC2_AICPU_TASK_CACHE_RUNNER_H
 #define MC2_AICPU_TASK_CACHE_RUNNER_H
 
+#include "../../../../../common/mc2_perf_probe.h"
 #include "hcomm_primitives.h"
 #include "log.h"
 #include "mc2_aicpu_task_cache.h"
@@ -96,6 +97,7 @@ HcclResult RunWithMc2TaskCache(
     }
 
     if (isHit) {
+        Mc2PerfProbe::Cache(true);
         const HcclResult executeRet = Mc2AicpuTaskCacheExecute(plan);
         const HcclResult endRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
         HCCL_INFO(
@@ -125,6 +127,7 @@ HcclResult RunWithMc2TaskCache(
         return endRet;
     }
 
+    Mc2PerfProbe::Cache(false);
     HcclResult execRet = func();
 
     HcclResult flushRet = static_cast<HcclResult>(HcommBatchModeEnd(param.algTag));
