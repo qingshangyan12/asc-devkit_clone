@@ -81,7 +81,6 @@ function(add_kernel kernel)
   string(SHA256 kernel_spec_task_id "demo/${kernel}")
   file(WRITE "${auto_gen_path}/custom_opc_options.ini" "")
   set(kernel_spec_mode "${SPEC_MODE}")
-  set(kernel_spec_root "${KERNEL_BINARY_PATH}/kernel_spec")
   if(DISABLE_EXPORT)
     set(kernel_spec_mode None)
   endif()
@@ -91,11 +90,11 @@ function(add_kernel kernel)
   foreach(soc IN LISTS ASCEND_COMPUTE_UNIT)
     add_custom_target(${kernel}_${soc}
       COMMAND python3 "${CMAKE_CURRENT_SOURCE_DIR}/producer.py" "${ASCENDC_CMAKE_SCRIPTS_PATH}/util"
-        "${kernel_spec_mode}" "${kernel_spec_root}" Add "${soc}" "${kernel_spec_task_id}"
+        "${kernel_spec_mode}" "${CMAKE_BINARY_DIR}/demo/kernel_spec_bundle" Add "${soc}" "${kernel_spec_task_id}"
         "${KERNEL_SRC_BASE}/add.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/fail"
       VERBATIM)
     list(APPEND KERNEL_COMPILE_TARGETS ${kernel}_${soc})
-    list(APPEND kernel_spec_tasks --task Add ${soc})
+    list(APPEND kernel_spec_tasks "[\"Add\",\"${soc}\"]")
     add_custom_target(${kernel}_ascendc_bin_${soc}_gen_ops_config)
     add_dependencies(${kernel}_ascendc_bin_${soc}_gen_ops_config ${kernel}_${soc})
   endforeach()
@@ -119,11 +118,11 @@ import json
 import sys
 from pathlib import Path
 sys.path.insert(0, sys.argv[1])
-from kernel_spec_options import task_directory
+from ascendc_build_kernel_spec import task_directory, build_directory
 mode, root, op, soc, task_id, source, fail = sys.argv[2:]
 if mode != "None":
-    directory = task_directory(root, op, soc, task_id)
-    assert directory.is_dir(), 'reset must create the directory before parallel OPC variants'
+    directory = task_directory(str(build_directory(root)), op, soc, task_id)
+    assert directory.is_dir(), 'prepare must create the directory before parallel OPC variants'
     resources = directory / 'resources'
     resources.mkdir()
     (resources / 'wrapper.cpp').write_text('wrapper')
@@ -184,11 +183,16 @@ def _configure(source, build, *options):
     _run("cmake", "-S", source, "-B", build, *options)
 
 
-def test_package_build_cache_and_install_with_same_named_sources(project):
+def test_package_builds_use_fresh_directories_and_install_same_named_sources(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
-    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_resource.so"
+    work = build / "demo/kernel_spec_bundle"
+
+    def current():
+        return Path(json.loads((work / "current_build.json").read_text())["directory"])
+
+    output = current() / "op_spec/libcust_compile_resource.so"
     installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     data = json.loads(installed.read_bytes()[4:])
     assert len(data) == 4
@@ -197,12 +201,18 @@ def test_package_build_cache_and_install_with_same_named_sources(project):
         "op_impl/dynamic/kernel_a/add.cpp",
         "op_impl/dynamic/kernel_b/add.cpp",
     }
-    before = output.stat().st_mtime_ns
+    first = current()
+    assert len(list(work.glob("build-*"))) == 1
+    assert len(list(first.glob(".ascendc-*"))) == 2
     _build(build)
-    assert output.stat().st_mtime_ns == before
+    second = current()
+    assert second != first
+    assert output.is_file()
+    assert (second / "op_spec/libcust_compile_resource.so").is_file()
+    assert not list(work.glob("*.tasks.json"))
     (source / "kernel_a/add.cpp").write_text("changed source")
     _build(build)
-    assert output.stat().st_mtime_ns != before
+    assert current() not in {first, second}
     assert (build / "kernel_a/binary/dynamic/add.cpp").read_text() == "changed source"
 
 
@@ -212,10 +222,15 @@ def test_failed_producer_and_reconfigure_cannot_install_old_result(project):
     _install(build, prefix)
     installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     previous = installed.read_bytes()
+    work = build / "demo/kernel_spec_bundle"
+    previous_build = json.loads((work / "current_build.json").read_text())["directory"]
     (source / "fail").touch()
     result = _build(build, success=False)
     assert "producer did not complete" in result.stderr
-    assert not (build / "demo/kernel_spec_bundle/install_status.cmake").exists()
+    failed_build = json.loads((work / "current_build.json").read_text())["directory"]
+    assert failed_build != previous_build
+    assert not (Path(failed_build) / "op_spec/libcust_compile_resource.so").exists()
+    assert not (work / "install.cmake").exists()
     _install(build, prefix, success=False)
     assert installed.read_bytes() == previous
     (source / "fail").unlink()
@@ -229,12 +244,16 @@ def test_global_none_and_package_none_remove_stale_delivery(project):
     source, build, prefix = project
     _build(build)
     _install(build, prefix)
-    output = build / "demo/kernel_spec_bundle/op_spec/libcust_compile_resource.so"
+    work = build / "demo/kernel_spec_bundle"
+    previous_build = Path(json.loads((work / "current_build.json").read_text())["directory"])
     installed = prefix / "packages/vendors/demo/op_spec/libcust_compile_resource.so"
     _configure(source, build, "-DDISABLE_EXPORT=ON", "-D_ASC_KERNEL_SPEC_EXPORTER=missing-exporter")
     _build(build)
     _install(build, prefix)
-    assert not output.exists()
+    current = Path(json.loads((work / "current_build.json").read_text())["directory"])
+    assert current != previous_build
+    assert not (current / "op_spec/libcust_compile_resource.so").exists()
+    assert (previous_build / "op_spec/libcust_compile_resource.so").exists()
     assert not installed.exists()
     _configure(source, build, "-DDISABLE_EXPORT=OFF")
     _build(build, success=False)
