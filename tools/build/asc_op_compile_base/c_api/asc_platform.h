@@ -74,6 +74,7 @@ enum class DPLATFORM {
     MC62,
     MC32DM11A,
     ASCEND_310N, // C310
+    ASCEND_310N___VEC,
     DEFAULT_CURRENT
 };
 
