@@ -23,7 +23,7 @@ namespace mc2_ops_hccl {
 namespace {
 
 constexpr uint64_t CACHE_ADDR_COUNT = 2U;
-constexpr char CACHE_TAG_PREFIX[] = "mc2tc:v1";
+constexpr char CACHE_TAG_PREFIX[] = "mc2tc:v2";
 
 class Digest128Builder {
 public:
@@ -370,7 +370,6 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
 {
     resource.AddPointer(param.hcclComm);
     resource.AddString(param.commName, COMM_INDENTIFIER_MAX_LENGTH);
-    resource.AddString(param.algTag, ALG_TAG_LENGTH);
     resource.AddU32(resCtx.topoInfo.userRank);
     resource.AddU32(resCtx.topoInfo.userRankSize);
     resource.AddPointer(param.inputSymWindow);
@@ -397,7 +396,6 @@ bool AddResourceFields(const OpParam& param, const AlgResourceCtxSerializable& r
     resource.AddPointer(resCtx.commInfoPtr);
     resource.AddPointer(resCtx.npu2DpuShmemPtr);
     resource.AddPointer(resCtx.dpu2NpuShmemPtr);
-    resource.AddU64(static_cast<uint64_t>(param.opThread));
     AddHcclMem(resource, param.hcclBuff);
 
     const auto& topo = resCtx.topoInfo;
