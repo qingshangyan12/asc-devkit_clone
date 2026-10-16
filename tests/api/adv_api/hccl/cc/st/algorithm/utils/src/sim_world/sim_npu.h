@@ -41,6 +41,11 @@ public:
     HcclResult GetSlice(uint64_t addr, uint64_t size, DataSlice& dataSlice);
     HcclResult GetSlice(uint64_t addr, uint64_t dataCount, const HcclDataType dataType, DataSlice& dataSlice);
 
+    // AICPU ST 执行引擎使用：保证 bufferType 的后备内存 >= requiredSize，返回后备内存基址。
+    // INPUT/OUTPUT 在 AllocMemory 时已按 len 分配；CCL 块惰性生长，避免 200MB*rank 常驻。
+    // 返回指针仅在下次 GetBufferBase/AllocMemory 调用前有效，禁止跨调用持有（resize 可能重分配）。
+    u8* GetBufferBase(BufferType bufferType, uint64_t requiredSize);
+
 private:
     void InitMemLayOut();
     void InitStreamRes();
@@ -52,6 +57,7 @@ private:
     std::vector<MemBlock> memLayout_;
     std::vector<SimStream> streams_;
     std::vector<SimNotify> notifys_;
+    std::map<BufferType, std::vector<u8>> backingMems_;
 };
 } // namespace HcclSim
 #endif
