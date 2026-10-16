@@ -141,13 +141,6 @@ __aicore__ inline void SetPcieWRCtrlImpl(bool isSetPcie, uint8_t maxBurstLen)
 
 __aicore__ inline void TrapImpl() { trap(); }
 
-
-__simd_vf__ inline void ClearARImpl()
-{
-    constexpr uint8_t SPR_AR_VALUE = 74;
-    constexpr auto sprValue = std::integral_constant<::Spr, static_cast<::Spr>(SPR_AR_VALUE)>();
-    sprclr(sprValue);
-}
 } // namespace AscendC
 #endif // ASCENDC_MODULE_OPERATOR_SYS_VAR_IMPL_H
 
