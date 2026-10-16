@@ -572,6 +572,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_e2m1x22bfloat16](reg_compute/reg_convert/asc_e2m1x22bfloat16.md)|将fp4x2_e2m1_t类型转换为bfloat16_t类型，并支持指定源数据的读取位置。|`c_api/reg_compute/reg_convert.h`|
 |[asc_e4m32float](reg_compute/reg_convert/asc_e4m32float.md)|将fp8_e4m3fn_t类型转换为float类型，并支持指定源数据的读取位置。|`c_api/reg_compute/reg_convert.h`|
 |[asc_e5m22float](reg_compute/reg_convert/asc_e5m22float.md)|将fp8_e5m2_t类型转换为float类型，并支持指定源数据的读取位置。|`c_api/reg_compute/reg_convert.h`|
+|[asc_e6m22bfloat16](reg_compute/reg_convert/asc_e6m22bfloat16.md)|将fp8_e6m2_t类型转换为bfloat16_t类型，并支持指定源数据的读取位置以及asc_cast重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_e8m02bfloat16](reg_compute/reg_convert/asc_e8m02bfloat16.md)|将fp8_e8m0_t类型转换为bfloat16_t类型，并支持指定源数据的读取位置以及asc_cast重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2bfloat16](reg_compute/reg_convert/asc_float2bfloat16.md)|将float类型转换为bfloat16_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2e4m3](reg_compute/reg_convert/asc_float2e4m3.md)|将float类型转换为fp8_e4m3fn_t类型，并支持指定转换结果的写入位置。|`c_api/reg_compute/reg_convert.h`|
 |[asc_float2e5m2](reg_compute/reg_convert/asc_float2e5m2.md)|将float类型转换为fp8_e5m2_t类型，并支持指定转换结果的写入位置。|`c_api/reg_compute/reg_convert.h`|
@@ -582,6 +584,8 @@ C API文档按最细粒度公共头文件归类。除试验接口外，整体使
 |[asc_float2int64](reg_compute/reg_convert/asc_float2int64.md)|将float类型转换为int64_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_floor](reg_compute/reg_convert/asc_floor.md)|将源操作数中的浮点数元素按照FLOOR（向负无穷方向舍入）模式舍入到整数值，结果保持原浮点数据类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2bfloat16](reg_compute/reg_convert/asc_half2bfloat16.md)|将half类型数据转换为bfloat16_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
+|[asc_half2e4m3](reg_compute/reg_convert/asc_half2e4m3.md)|将half类型转换为fp8_e4m3fn_t类型，并支持RN舍入、饱和/非饱和、合并写入以及asc_cast重载。|`c_api/reg_compute/reg_convert.h`|
+|[asc_half2e5m2](reg_compute/reg_convert/asc_half2e5m2.md)|将half类型转换为fp8_e5m2_t类型，并支持RN舍入、饱和/非饱和、合并写入以及asc_cast重载。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2float](reg_compute/reg_convert/asc_half2float.md)|将half类型数据转换为float类型。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2hif8](reg_compute/reg_convert/asc_half2hif8.md)|将half类型转换为hifloat8_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
 |[asc_half2int16](reg_compute/reg_convert/asc_half2int16.md)|将half类型数据转换为int16_t类型，并支持多种舍入模式。|`c_api/reg_compute/reg_convert.h`|
