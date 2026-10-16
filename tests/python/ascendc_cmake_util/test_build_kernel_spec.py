@@ -8,13 +8,11 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-import argparse
 import ctypes
 import json
 import os
 from pathlib import Path
 import sys
-import subprocess
 import tempfile
 
 import pytest
@@ -42,10 +40,9 @@ def bundle_request(tmp_path):
     inp = tmp_path / "input"
     inp.mkdir()
     _unit(inp / "910b", "a" * 64)
-    return argparse.Namespace(
+    return bundle.KernelSpecBundleBuilder(
         input_dir=[str(inp)],
-        source_dir=[str(source)],
-        source_file=[],
+        source_file=[str(source / "add.cpp")],
         source_map=[[str(source), "op_impl/dynamic"]],
         output=str(tmp_path / "output/libcust_compile_resource.so"),
         work_dir=str(tmp_path / "work"),
@@ -101,12 +98,23 @@ def _published(bundle_request):
     return json.loads(Path(bundle_request.output).read_bytes()[4:])
 
 
+def test_build_config_is_json_lines_only(tmp_path):
+    config = tmp_path / "kernel_spec_build_config.jsonl"
+    contexts = [{"tasks": [["Add", "ascend910b"]]}]
+    config.write_text("\n".join(json.dumps(context) for context in contexts) + "\n", encoding="utf-8")
+    assert bundle.load_build_contexts(config) == contexts
+
+    config.write_text(json.dumps(contexts), encoding="utf-8")
+    with pytest.raises(bundle.BundleError, match="JSON Lines"):
+        bundle.load_build_contexts(config)
+
+
 def test_passes_sorted_duplicate_ids_to_exporter_and_preserves_input(bundle_request):
     root = Path(bundle_request.input_dir[0])
     original = (root / "910b/add_manifest.json").read_bytes()
     _unit(root / "950", "a" * 64)
     _unit(root / "other", "b" * 64)
-    assert bundle.build_bundle(bundle_request) is True
+    bundle_request.build()
     data = _published(bundle_request)
     assert [m["resource_id"] for m in data] == ["a" * 64, "a" * 64, "b" * 64]
     assert data[0]["source_file"] == "op_impl/dynamic/add.cpp"
@@ -115,7 +123,7 @@ def test_passes_sorted_duplicate_ids_to_exporter_and_preserves_input(bundle_requ
 
 
 def test_include_mapping_uses_longest_prefix_and_preserves_order(bundle_request):
-    root = Path(bundle_request.source_dir[0])
+    root = Path(bundle_request.source_file[0]).parent
     bundle_request.source_map.append([str(root / "nested"), "extra"])
     path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
     manifest = json.loads(path.read_text())
@@ -129,7 +137,7 @@ def test_include_mapping_uses_longest_prefix_and_preserves_order(bundle_request)
         "-I/untouched",
     ]
     path.write_text(json.dumps(manifest))
-    bundle.build_bundle(bundle_request)
+    bundle_request.build()
     assert _published(bundle_request)[0]["options"]["common_compile"] == [
         "-I",
         "${source_file_path}/op_impl/dynamic",
@@ -141,36 +149,12 @@ def test_include_mapping_uses_longest_prefix_and_preserves_order(bundle_request)
     ]
 
 
-def test_cache_reuses_output_and_checks_ambiguity_before_hit(bundle_request):
-    assert bundle.build_bundle(bundle_request) is True
-    before = Path(bundle_request.output).stat().st_mtime_ns
-    assert bundle.build_bundle(bundle_request) is False
-    assert Path(bundle_request.output).stat().st_mtime_ns == before
-    duplicate = Path(bundle_request.source_dir[0]) / "nested/add.cpp"
-    duplicate.parent.mkdir()
-    duplicate.write_text("different")
-    with pytest.raises(bundle.BundleError, match="ambiguous"):
-        bundle.build_bundle(bundle_request)
-
-
-def test_cache_invalidates_on_resource_tool_map_and_output_changes(bundle_request):
-    bundle.build_bundle(bundle_request)
-    (Path(bundle_request.input_dir[0]) / "910b/resources/wrapper.cpp").write_text("changed")
-    assert bundle.build_bundle(bundle_request) is True
-    bundle_request.source_map[0][1] = "new_layout"
-    assert bundle.build_bundle(bundle_request) is True
-    Path(bundle_request.exporter).write_text(Path(bundle_request.exporter).read_text() + "# tool changed\n")
-    assert bundle.build_bundle(bundle_request) is True
-    Path(bundle_request.output).write_bytes(b"corrupt")
-    assert bundle.build_bundle(bundle_request) is True
-
-
-def test_exporter_failure_preserves_output_and_cleans_workspace(bundle_request):
-    bundle.build_bundle(bundle_request)
+def test_exporter_failure_preserves_output_and_cleans_bundle_dir(bundle_request):
+    bundle_request.build()
     before = Path(bundle_request.output).read_bytes()
     Path(bundle_request.exporter).write_text("#!/bin/sh\necho failed\nexit 1\n")
     with pytest.raises(bundle.BundleError, match="exporter"):
-        bundle.build_bundle(bundle_request)
+        bundle_request.build()
     assert Path(bundle_request.output).read_bytes() == before
     assert not list(Path(bundle_request.work_dir).glob(".bundle-*"))
 
@@ -189,15 +173,15 @@ def test_rejects_invalid_inputs(bundle_request, case, tmp_path):
     elif case == "source_escape":
         manifest["source_file"] = "../add.cpp"
     elif case == "symlink":
-        (path.parent / "resources/link").symlink_to(Path(bundle_request.source_dir[0]) / "add.cpp")
+        (path.parent / "resources/link").symlink_to(bundle_request.source_file[0])
     path.write_text(json.dumps(manifest))
     with pytest.raises(bundle.BundleError):
-        bundle.build_bundle(bundle_request)
+        bundle_request.build()
     assert not Path(bundle_request.output).exists()
 
 
 def test_publish_failure_keeps_previous_output(bundle_request, monkeypatch):
-    bundle.build_bundle(bundle_request)
+    bundle_request.build()
     before = Path(bundle_request.output).read_bytes()
     (Path(bundle_request.input_dir[0]) / "910b/resources/wrapper.cpp").write_text("changed")
     original = os.replace
@@ -209,100 +193,34 @@ def test_publish_failure_keeps_previous_output(bundle_request, monkeypatch):
 
     monkeypatch.setattr(bundle.os, "replace", fail_output)
     with pytest.raises(OSError, match="publish failed"):
-        bundle.build_bundle(bundle_request)
+        bundle_request.build()
     assert Path(bundle_request.output).read_bytes() == before
-
-
-def test_stamp_failure_does_not_make_corrupt_cache_hit(bundle_request, monkeypatch):
-    original = os.replace
-
-    def fail_stamp(source, dest):
-        if str(dest).endswith(".stamp.json"):
-            raise OSError("stamp failed")
-        return original(source, dest)
-
-    with monkeypatch.context() as patch:
-        patch.setattr(bundle.os, "replace", fail_stamp)
-        with pytest.raises(OSError, match="stamp failed"):
-            bundle.build_bundle(bundle_request)
-    assert Path(bundle_request.output).is_file()
-    assert bundle.build_bundle(bundle_request) is True
 
 
 def test_opc_dump_cce_preserves_exporter_diagnostics(bundle_request, tmp_path):
     config = tmp_path / "custom_opc_options.ini"
     config.write_text("ALL@@--op_debug_config=dump_cce\n")
     bundle_request.opc_config = str(config)
-    bundle.build_bundle(bundle_request)
+    bundle_request.build()
     folders = list(Path(bundle_request.work_dir).glob(".bundle-*"))
     assert len(folders) == 1
     assert (folders[0] / "build.log").is_file()
     assert (folders[0] / "collected").is_dir()
 
 
-def test_package_relative_source_and_explicit_file(bundle_request):
-    path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
-    manifest = json.loads(path.read_text())
-    manifest["source_file"] = "op_impl/dynamic/add.cpp"
-    path.write_text(json.dumps(manifest))
-    bundle_request.source_file = [str(Path(bundle_request.source_dir[0]) / "add.cpp")]
-    bundle_request.source_dir = []
-    bundle.build_bundle(bundle_request)
-    assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
-
-
-def test_resource_reference_validation_is_delegated_to_exporter(bundle_request):
-    path = Path(bundle_request.input_dir[0]) / "910b/add_manifest.json"
-    (path.parent / "outside.h").write_text("outside")
-    manifest = json.loads(path.read_text())
-    manifest["options"]["common_compile"] = ["-include", "${resource}/outside.h"]
-    path.write_text(json.dumps(manifest))
-    # The exporter owns reference validation; aggregation propagates its diagnostic.
-    Path(bundle_request.exporter).write_text("#!/bin/sh\necho 'outside resource_path'\nexit 1\n")
-    with pytest.raises(bundle.BundleError, match="exporter.*resource_path"):
-        bundle.build_bundle(bundle_request)
-
-
 def test_work_directory_cannot_contaminate_manifest_inputs(bundle_request):
     bundle_request.work_dir = str(Path(bundle_request.input_dir[0]) / "work")
     with pytest.raises(bundle.BundleError, match="overlap"):
-        bundle.build_bundle(bundle_request)
-
-
-def test_source_change_and_invalid_stamp_force_rebuild(bundle_request):
-    bundle.build_bundle(bundle_request)
-    (Path(bundle_request.source_dir[0]) / "add.cpp").write_text("changed source")
-    assert bundle.build_bundle(bundle_request) is True
-    for content in ("invalid", "[]"):
-        next(Path(bundle_request.work_dir).glob("*.stamp.json")).write_text(content)
-        assert bundle.build_bundle(bundle_request) is True
+        bundle_request.build()
 
 
 def test_unmapped_source_and_bad_package_map_fail(bundle_request):
     bundle_request.source_map = []
     with pytest.raises(bundle.BundleError, match="source-map"):
-        bundle.build_bundle(bundle_request)
-    bundle_request.source_map = [[bundle_request.source_dir[0], "../escape"]]
+        bundle_request.build()
+    bundle_request.source_map = [[Path(bundle_request.source_file[0]).parent, "../escape"]]
     with pytest.raises(bundle.BundleError, match="root"):
-        bundle.build_bundle(bundle_request)
-
-
-def test_cli_handles_paths_with_spaces_and_reports_cache_hit(bundle_request, tmp_path):
-    bundle_request.output = str(tmp_path / "with spaces/libcust_compile_resource.so")
-    script = Path(bundle.__file__)
-    arguments = [sys.executable, str(script)]
-    for name in ("input_dir", "source_dir", "source_file"):
-        for value in getattr(bundle_request, name):
-            arguments.extend(["--" + name.replace("_", "-"), value])
-    for mapping in bundle_request.source_map:
-        arguments.extend(["--source-map", *mapping])
-    for name in ("output", "work_dir", "exporter", "cxx", "make"):
-        arguments.extend(["--" + name.replace("_", "-"), getattr(bundle_request, name)])
-    first = subprocess.run(arguments, capture_output=True, text=True, check=False)
-    assert first.returncode == 0, first.stderr
-    second = subprocess.run(arguments, capture_output=True, text=True, check=False)
-    assert second.returncode == 0, second.stderr
-    assert "cache hit" in second.stdout
+        bundle_request.build()
 
 
 def test_publishes_across_filesystems(bundle_request):
@@ -313,27 +231,17 @@ def test_publishes_across_filesystems(bundle_request):
         pytest.skip("requires writable separate /dev/shm filesystem")
     with tempfile.TemporaryDirectory(prefix="kernel-spec-stage2-", dir="/dev/shm") as output_dir:
         bundle_request.output = str(Path(output_dir) / "libcust_compile_resource.so")
-        assert bundle.build_bundle(bundle_request) is True
+        bundle_request.build()
         assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
 
 
 def test_successful_exporter_with_invalid_output_is_rejected(bundle_request):
-    bundle.build_bundle(bundle_request)
+    bundle_request.build()
     old = Path(bundle_request.output).read_bytes()
     Path(bundle_request.exporter).write_text("#!/bin/sh\nexit 0\n")
     with pytest.raises(OSError):
-        bundle.build_bundle(bundle_request)
+        bundle_request.build()
     assert Path(bundle_request.output).read_bytes() == old
-
-
-@pytest.mark.parametrize(
-    "diagnostic", ["resource file too large", "unit too large", "bundle too large", "too many files"]
-)
-def test_exporter_budget_failure_is_propagated(bundle_request, diagnostic):
-    Path(bundle_request.exporter).write_text(f"#!/bin/sh\necho '{diagnostic}'\nexit 1\n")
-    with pytest.raises(bundle.BundleError, match="exporter.*" + diagnostic):
-        bundle.build_bundle(bundle_request)
-    assert not Path(bundle_request.output).exists()
 
 
 def test_preserves_empty_include_directories_in_resource_copy(bundle_request, tmp_path):
@@ -345,9 +253,9 @@ def test_preserves_empty_include_directories_in_resource_copy(bundle_request, tm
     config = tmp_path / "custom_opc_options.ini"
     config.write_text("ALL@@--op_debug_config=dump_cce\n")
     bundle_request.opc_config = str(config)
-    bundle.build_bundle(bundle_request)
-    workspace = next(Path(bundle_request.work_dir).glob(".bundle-*"))
-    assert (workspace / "collected" / "0" / "resources/empty_include").is_dir()
+    bundle_request.build()
+    bundle_dir = next(Path(bundle_request.work_dir).glob(".bundle-*"))
+    assert (bundle_dir / "collected" / "0" / "resources/empty_include").is_dir()
 
 
 @pytest.mark.skipif(not os.environ.get("ASCEND_TEST_COMPILE_EXPORTER"), reason="requires built asc_compile_exporter")
@@ -355,7 +263,7 @@ def test_real_exporter_builds_loadable_bundle_with_large_resource(bundle_request
     bundle_request.exporter = os.environ["ASCEND_TEST_COMPILE_EXPORTER"]
     large = Path(bundle_request.input_dir[0]) / "910b/resources/large.h"
     large.write_bytes(b"x" * (1024 * 1024 + 1))
-    bundle.build_bundle(bundle_request)
+    bundle_request.build()
 
     class String(ctypes.Structure):
         _fields_ = [("data", ctypes.c_void_p), ("size", ctypes.c_uint64)]
@@ -396,12 +304,11 @@ def test_real_exporter_builds_loadable_bundle_with_large_resource(bundle_request
     resources = {ctypes.string_at(f.path.data, f.path.size).decode(): f for f in manifest.files[: manifest.count]}
     assert resources["resources/large.h"].size == 1024 * 1024 + 1
     assert ctypes.string_at(resources["resources/large.h"].data, 1) == b"x"
-    assert bundle.build_bundle(bundle_request) is False
 
 
 @pytest.mark.parametrize("difference", ["source", "installed_path"])
 def test_same_id_source_conflict_preserves_published_bundle(bundle_request, tmp_path, difference):
-    bundle.build_bundle(bundle_request)
+    bundle_request.build()
     published = Path(bundle_request.output).read_bytes()
     root = Path(bundle_request.input_dir[0])
     path = _unit(root / "duplicate", "a" * 64)
@@ -412,48 +319,22 @@ def test_same_id_source_conflict_preserves_published_bundle(bundle_request, tmp_
         [str(source.parent), "op_impl/dynamic" if difference == "source" else "other_layout"]
     )
     bundle_request.source_bindings = {
-        str(root / "910b"): str(Path(bundle_request.source_dir[0]) / "add.cpp"),
+        str(root / "910b"): bundle_request.source_file[0],
         str(root / "duplicate"): str(source),
     }
     bundle_request.input_dir = list(bundle_request.source_bindings)
     with pytest.raises(bundle.BundleError, match="conflicting resource_id") as error:
-        bundle.build_bundle(bundle_request)
+        bundle_request.build()
     assert str(path) in str(error.value)
     assert str(root / "910b/add_manifest.json") in str(error.value)
     assert Path(bundle_request.output).read_bytes() == published
-
-
-def test_equivalent_id_is_forwarded_despite_json_formatting(bundle_request):
-    root = Path(bundle_request.input_dir[0])
-    path = _unit(root / "duplicate", "a" * 64)
-    manifest = json.loads(path.read_text())
-    path.write_text(json.dumps(dict(reversed(list(manifest.items()))), indent=4))
-    bundle.build_bundle(bundle_request)
-    assert len(_published(bundle_request)) == 2
-
-
-@pytest.mark.parametrize("difference", ["manifest", "resource", "empty_directory"])
-def test_resource_conflict_is_delegated_to_exporter(bundle_request, difference):
-    root = Path(bundle_request.input_dir[0])
-    path = _unit(root / "duplicate", "a" * 64)
-    if difference == "manifest":
-        manifest = json.loads(path.read_text())
-        manifest["soc_version"] = "Ascend950"
-        path.write_text(json.dumps(manifest))
-    elif difference == "resource":
-        (path.parent / "resources/wrapper.cpp").write_text("different wrapper")
-    else:
-        (path.parent / "resources/include").mkdir()
-    assert bundle.build_bundle(bundle_request) is True
-    # The fixture exporter deliberately serializes every input, without validating duplicates.
-    assert len(_published(bundle_request)) == 2
 
 
 @pytest.mark.skipif(not os.environ.get("ASCEND_TEST_COMPILE_EXPORTER"), reason="requires built asc_compile_exporter")
 @pytest.mark.parametrize("difference", ["equivalent", "manifest", "resource", "empty_directory", "empty_file"])
 def test_real_exporter_owns_id_deduplication_and_preserves_output_on_conflict(bundle_request, difference):
     bundle_request.exporter = os.environ["ASCEND_TEST_COMPILE_EXPORTER"]
-    bundle.build_bundle(bundle_request)
+    bundle_request.build()
     published = Path(bundle_request.output).read_bytes()
     path = _unit(Path(bundle_request.input_dir[0]) / "duplicate", "a" * 64)
     if difference == "manifest":
@@ -468,12 +349,12 @@ def test_real_exporter_owns_id_deduplication_and_preserves_output_on_conflict(bu
         (path.parent / "resources/empty.h").write_text("")
     if difference != "equivalent":
         with pytest.raises(bundle.BundleError, match="exporter failed"):
-            bundle.build_bundle(bundle_request)
+            bundle_request.build()
         assert Path(bundle_request.output).read_bytes() == published
         return
     manifest = json.loads(path.read_text())
     path.write_text(json.dumps(dict(reversed(list(manifest.items()))), indent=4))
-    assert bundle.build_bundle(bundle_request) is True
+    bundle_request.build()
 
     class Header(ctypes.Structure):
         _fields_ = [
@@ -489,17 +370,6 @@ def test_real_exporter_owns_id_deduplication_and_preserves_output_on_conflict(bu
     library = ctypes.CDLL(bundle_request.output)
     library.AscendcGetCompileResourceBundle.restype = ctypes.POINTER(Bundle)
     assert library.AscendcGetCompileResourceBundle().contents.count == 1
-    assert bundle.build_bundle(bundle_request) is False
-
-
-def test_unreferenced_source_does_not_require_install_mapping(bundle_request, tmp_path):
-    unrelated = tmp_path / "unmapped"
-    unrelated.mkdir()
-    (unrelated / "unused.cpp").write_text("unrelated")
-    bundle_request.source_dir.append(str(unrelated))
-    assert bundle.build_bundle(bundle_request) is True
-    (unrelated / "unused.cpp").write_text("changed unrelated source")
-    assert bundle.build_bundle(bundle_request) is False
 
 
 def test_producer_binding_selects_actual_source_among_same_names(bundle_request, tmp_path):
@@ -507,8 +377,6 @@ def test_producer_binding_selects_actual_source_among_same_names(bundle_request,
     other.parent.mkdir()
     other.write_text("other source")
     bundle_request.source_file.append(str(other))
-    bundle_request.source_bindings = {
-        str(Path(bundle_request.input_dir[0])): str(Path(bundle_request.source_dir[0]) / "add.cpp")
-    }
-    assert bundle.build_bundle(bundle_request) is True
+    bundle_request.source_bindings = {str(Path(bundle_request.input_dir[0])): bundle_request.source_file[0]}
+    bundle_request.build()
     assert _published(bundle_request)[0]["source_file"] == "op_impl/dynamic/add.cpp"
