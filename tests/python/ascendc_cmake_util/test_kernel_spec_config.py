@@ -10,7 +10,6 @@
 # See LICENSE in the root of the software repository for the full text of the License.
 # ----------------------------------------------------------------------------------------------------------
 
-import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -22,36 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 UTIL_DIR = REPO_ROOT / "cmake/asc/fwk_modules/util"
 sys.path.insert(0, str(UTIL_DIR))
 
-import kernel_spec_options
 import ascendc_gen_options
-
-
-@pytest.mark.parametrize("mode", ["Normal", "SK"])
-def test_direct_options_and_task_directory_agree(tmp_path, mode):
-    root = tmp_path / "resources with spaces"
-    task_id = "1" * 64
-    directory = kernel_spec_options.task_directory(str(root), "AddCustom", "Ascend910B1", task_id)
-    assert directory == root / "ascend910b" / (".ascendc-" + task_id) / "ascend910b1" / "AddCustom"
-    options = shlex.split(kernel_spec_options.shell_options(mode, str(root), "AddCustom", "Ascend910B1", task_id))
-    assert options == [f"--kernel-spec={mode}", "--kernel-spec-dir=" + str(directory)]
-
-
-def test_direct_options_without_task_keep_chip_directory(tmp_path):
-    options = shlex.split(kernel_spec_options.shell_options("Normal", str(tmp_path), "OtherOp", "ascend950"))
-    assert options == ["--kernel-spec=Normal", f"--kernel-spec-dir={tmp_path}/ascend950"]
-
-
-def test_none_does_not_require_resource_directory():
-    assert kernel_spec_options.shell_options("None", None, "AddCustom", "ascend910b") == ""
-
-
-@pytest.mark.parametrize(
-    "mode,root,message",
-    [("Invalid", "/tmp/resources", "None, Normal or SK"), ("Normal", None, "absolute"), ("SK", "relative", "absolute")],
-)
-def test_direct_options_validate_mode_and_root(mode, root, message):
-    with pytest.raises(ValueError, match=message):
-        kernel_spec_options.shell_options(mode, root, "AddCustom", "ascend910b")
 
 
 @pytest.mark.parametrize("op_type,chip", [("ALL", ""), ("AddCustom", "ascend910b")])

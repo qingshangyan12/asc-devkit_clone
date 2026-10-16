@@ -96,84 +96,42 @@ def test_without_kernel_json_option_keeps_existing_path(tmp_path):
     assert (build_dir / "autogen/custom_opc_options.ini").read_text() == ""
 
 
-def _configure_kernel_spec_mode(source_dir, build_dir, mode):
-    result = subprocess.run(
-        ["cmake", "-S", str(source_dir), "-B", str(build_dir), f"-DKERNEL_SPEC_MODE={mode}"],
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        check=False,
-    )
-    assert result.returncode == 0, result.stdout
-
-
-def _write_codegen_option_project(source_dir, initialize_twice=False):
-    fake_opbuild = source_dir / "cann/tools/opbuild/op_build"
-    fake_opbuild.parent.mkdir(parents=True)
-    fake_opbuild.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
-    fake_opbuild.chmod(0o755)
-    second_codegen = (
-        """set(ASCEND_PYTHON_EXECUTABLE "/bin/true")
-npu_op_code_gen(SRC "${CMAKE_CURRENT_SOURCE_DIR}/kernel.cpp" PACKAGE demo OUT_DIR "${custom_out}")"""
-        if initialize_twice
-        else ""
-    )
-    source_dir.mkdir(exist_ok=True)
-    (source_dir / "kernel.cpp").write_text("", encoding="utf-8")
-    (source_dir / "CMakeLists.txt").write_text(
+def test_custom_codegen_options_follow_current_configuration(tmp_path):
+    opbuild = tmp_path / "cann/tools/opbuild/op_build"
+    opbuild.parent.mkdir(parents=True)
+    opbuild.write_text("#!/bin/sh\nexit 0\n")
+    opbuild.chmod(0o755)
+    (tmp_path / "CMakeLists.txt").write_text(
         f'''cmake_minimum_required(VERSION 3.16)
-project(codegen_options_test NONE)
-set(ASCENDC_CMAKE_SCRIPTS_PATH "{FWK_MODULES_DIR.as_posix()}")
-set(ASCEND_CANN_PACKAGE_PATH "{(source_dir / "cann").as_posix()}")
-set(CUSTOM_COMPILE_OPTIONS "custom_compile_options.ini")
-set(CUSTOM_OPC_OPTIONS "custom_opc_options.ini")
-include("{(FWK_MODULES_DIR / "func.cmake").as_posix()}")
-set(custom_out "${{CMAKE_BINARY_DIR}}/custom_autogen")
-set(ASCEND_PYTHON_EXECUTABLE "/bin/true")
-npu_op_code_gen(SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/kernel.cpp" PACKAGE demo OUT_DIR "${{custom_out}}")
-set(ASCEND_PYTHON_EXECUTABLE "python3")
-if(KERNEL_SPEC_MODE STREQUAL "Normal" OR KERNEL_SPEC_MODE STREQUAL "SK")
-  npu_op_kernel_options(kernel ALL OPTIONS
-    "--kernel-json-file=${{CMAKE_BINARY_DIR}}/${{KERNEL_SPEC_MODE}}.json")
+project(codegen_options NONE)
+include("{FWK_MODULES_DIR / "func.cmake"}")
+set(ASCENDC_CMAKE_SCRIPTS_PATH "{FWK_MODULES_DIR}")
+set(ASCEND_CANN_PACKAGE_PATH "{tmp_path}/cann")
+set(CUSTOM_COMPILE_OPTIONS custom_compile_options.ini)
+set(CUSTOM_OPC_OPTIONS custom_opc_options.ini)
+set(custom_out "${{CMAKE_BINARY_DIR}}/custom autogen")
+file(MAKE_DIRECTORY "${{custom_out}}")
+set(ASCEND_PYTHON_EXECUTABLE /bin/true)
+npu_op_code_gen(SRC unused.cpp PACKAGE demo OUT_DIR "${{custom_out}}")
+set(ASCEND_PYTHON_EXECUTABLE python3)
+if(OPTION_VALUE)
+  npu_op_kernel_options(kernel ALL OPTIONS "-DVALUE=${{OPTION_VALUE}}" "--kernel-json-file=${{OPTION_VALUE}}.json")
 endif()
-{second_codegen}
-''',
-        encoding="utf-8",
+set(ASCEND_PYTHON_EXECUTABLE /bin/true)
+npu_op_code_gen(SRC unused.cpp PACKAGE demo OUT_DIR "${{custom_out}}/.")
+'''
     )
-
-
-def test_custom_codegen_options_are_reset_when_options_are_removed(tmp_path):
-    source_dir = tmp_path / "source"
-    build_dir = tmp_path / "build"
-    _write_codegen_option_project(source_dir)
-
-    _configure_kernel_spec_mode(source_dir, build_dir, "Normal")
-    _configure_kernel_spec_mode(source_dir, build_dir, "None")
-
-    assert (build_dir / "custom_autogen/custom_opc_options.ini").read_text(encoding="utf-8") == ""
-
-
-def test_custom_codegen_options_replace_previous_options(tmp_path):
-    source_dir = tmp_path / "source"
-    build_dir = tmp_path / "build"
-    _write_codegen_option_project(source_dir)
-
-    _configure_kernel_spec_mode(source_dir, build_dir, "Normal")
-    _configure_kernel_spec_mode(source_dir, build_dir, "SK")
-
-    config_file = build_dir / "custom_autogen/custom_opc_options.ini"
-    assert config_file.read_text(encoding="utf-8") == (f"ALL@@--kernel-json-file={build_dir}/SK.json\n")
-
-
-def test_codegen_options_are_initialized_once_per_configure(tmp_path):
-    source_dir = tmp_path / "source"
-    build_dir = tmp_path / "build"
-    _write_codegen_option_project(source_dir, initialize_twice=True)
-
-    _configure_kernel_spec_mode(source_dir, build_dir, "Normal")
-
-    config_file = build_dir / "custom_autogen/custom_opc_options.ini"
-    assert config_file.read_text(encoding="utf-8") == (f"ALL@@--kernel-json-file={build_dir}/Normal.json\n")
+    build = tmp_path / "build"
+    for value in ("first", "second", ""):
+        result = subprocess.run(
+            ["cmake", "-S", str(tmp_path), "-B", str(build), f"-DOPTION_VALUE={value}"], text=True, capture_output=True
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        output = build / "custom autogen"
+        assert (output / "custom_compile_options.ini").read_text() == (f"ALL,,-DVALUE={value}\n" if value else "")
+        assert (output / "custom_opc_options.ini").read_text() == (
+            f"ALL@@--kernel-json-file={value}.json\n" if value else ""
+        )
 
 
 @pytest.mark.parametrize("cross_compile,skip_failed", [(False, False), (False, True), (True, False), (True, True)])
@@ -197,8 +155,7 @@ set(ASCEND_SKIP_FAILED_COMPUTE_UNIT {"ON" if skip_failed else "OFF"})
 set(HOST_NATIVE_TILING_LIB "${{CMAKE_BINARY_DIR}}/unused.so")
 set_property(GLOBAL PROPERTY _ASC_PKG_ERROR_FILE "${{CMAKE_BINARY_DIR}}/compile_error.log")
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_KERNEL_SPEC_MODE SK)
-set_property(GLOBAL PROPERTY _ASC_PKG_demo_kernel_KERNEL_SPEC_TASK "{"a" * 64}")
-set_property(GLOBAL PROPERTY _ASC_TGT_KERNEL_kernel_BINARY_DIR "{root}")
+set_property(GLOBAL PROPERTY _ASC_PKG_demo_KERNEL_SPEC_BUILD_DIR "{root}")
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_CODE_GEN_DIRS "${{CMAKE_BINARY_DIR}}/autogen")
 set_property(GLOBAL PROPERTY _ASC_PKG_demo_ENABLE_BINARY_PACKAGE ON)
 add_library(demo_ascendc_tiling SHARED stub.cpp)
@@ -216,5 +173,4 @@ simple_kernel_compile(OP_TYPE AddCustom SRC "${{CMAKE_CURRENT_SOURCE_DIR}}/add.c
         assert result.returncode == 0, result.stdout + result.stderr
     arguments = json.loads((scripts / "util/arguments.json").read_text())
     assert "--kernel-spec-mode=SK" in arguments
-    assert f"--kernel-spec-dir={root}/kernel_spec" in arguments
-    assert "--kernel-spec-task=" + "a" * 64 in arguments
+    assert f"--kernel-spec-build={root}" in arguments
