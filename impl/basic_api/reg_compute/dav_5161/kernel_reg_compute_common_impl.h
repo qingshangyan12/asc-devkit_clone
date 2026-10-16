@@ -123,83 +123,6 @@ __simd_callee__ inline void CopyMerging(RegT& dstReg, RegT& srcReg, MaskReg& mas
         vmov((RegTensor<uint32_t>&)dstReg, (RegTensor<uint32_t>&)srcReg, mask, modeValue);
     }
 }
-} // namespace Reg
-
-namespace Reg {
-template <typename T, StoreDist dist>
-__aicore__ inline constexpr StoreDist GetStoreDist()
-{
-    if constexpr (dist == StoreDist::DIST_NORM) {
-        static_assert(SupportBytes<T, 1, 2, 4>(), "StoreDist DIST_NORM only support type b8/b16/b32 on current device");
-        if constexpr (sizeof(T) == 1) {
-            return StoreDist::DIST_NORM_B8;
-        } else if constexpr (sizeof(T) == 2) {
-            return StoreDist::DIST_NORM_B16;
-        } else if constexpr (sizeof(T) == 4) {
-            return StoreDist::DIST_NORM_B32;
-        }
-    }
-    return dist;
-}
-
-template <typename RegT, const RegTrait& otherTrait = RegTraitNumOne>
-constexpr __aicore__ inline bool CheckRegTrait()
-{
-    constexpr RegTrait regTrait = RegT::trait;
-    return regTrait.REG_NUM == otherTrait.REG_NUM;
-}
-
-template <RoundMode mode>
-__aicore__ inline constexpr ::ROUND GetRound()
-{
-// To avoid naming conflicts of ROUND member variables in cpu debug,
-// the names of the returned member variables are changed to be different from those of
-// the ROUND enumeration class of the compiler.
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    if constexpr (mode == RoundMode::CAST_RINT) {
-        return ::ROUND::CAST_RINT;
-    } else if constexpr (mode == RoundMode::CAST_ROUND) {
-        return ::ROUND::CAST_ROUND;
-    } else if constexpr (mode == RoundMode::CAST_FLOOR) {
-        return ::ROUND::CAST_FLOOR;
-    } else if constexpr (mode == RoundMode::CAST_CEIL) {
-        return ::ROUND::CAST_CEIL;
-    } else if constexpr (mode == RoundMode::CAST_TRUNC) {
-        return ::ROUND::CAST_TRUNC;
-    } else if constexpr (mode == RoundMode::CAST_ODD) {
-        return ::ROUND::CAST_ODD;
-    } else {
-        return ::ROUND::CAST_HYBRID;
-    }
-#else
-    if constexpr (mode == RoundMode::CAST_RINT) {
-        return ::ROUND::R;
-    } else if constexpr (mode == RoundMode::CAST_ROUND) {
-        return ::ROUND::A;
-    } else if constexpr (mode == RoundMode::CAST_FLOOR) {
-        return ::ROUND::F;
-    } else if constexpr (mode == RoundMode::CAST_CEIL) {
-        return ::ROUND::C;
-    } else if constexpr (mode == RoundMode::CAST_TRUNC) {
-        return ::ROUND::Z;
-    } else if constexpr (mode == RoundMode::CAST_ODD) {
-        return ::ROUND::O;
-    } else {
-        return ::ROUND::H;
-    }
-#endif
-}
-
-template <MaskMergeMode mode>
-__aicore__ inline constexpr auto GetMaskMergeMode()
-{
-// To avoid naming conflicts of mode struct in cpu debug.
-#if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1
-    return std::integral_constant<::CpuMode, static_cast<::CpuMode>(mode)>();
-#else
-    return std::integral_constant<::Mode, static_cast<::Mode>(mode)>();
-#endif
-}
 
 template <typename RegT2, typename RegT1, typename ShortType>
 __simd_callee__ inline void TraitOneToTaitTwoTmpl(RegT2& dstReg, RegT1& srcReg)
@@ -219,7 +142,6 @@ __simd_callee__ inline void TraitOneToTaitTwoTmpl(RegT2& dstReg, RegT1& srcReg)
         (RegTensor<ShortType>&)dstReg.reg[0], (RegTensor<ShortType>&)dstReg.reg[1], (RegTensor<ShortType>&)srcReg,
         zeroReg);
 }
-
 template <typename RegT1, typename RegT2, typename ShortType>
 __simd_callee__ inline void TraitTwoToTaitOneTmpl(RegT1& dstReg, RegT2& srcReg)
 {
@@ -236,25 +158,21 @@ __simd_callee__ inline void TraitTwoToTaitOneTmpl(RegT1& dstReg, RegT2& srcReg)
         (RegTensor<ShortType>&)dstReg, dstRegShortFake, (RegTensor<ShortType>&)srcReg.reg[0],
         (RegTensor<ShortType>&)srcReg.reg[1]);
 }
-
 template <typename RegT2, typename RegT1>
 __simd_callee__ inline void B64TraitOneToTaitTwo(RegT2& dstReg, RegT1& srcReg)
 {
     TraitOneToTaitTwoTmpl<RegT2, RegT1, uint32_t>(dstReg, srcReg);
 }
-
 template <typename RegT1, typename RegT2>
 __simd_callee__ inline void B64TraitTwoToTaitOne(RegT1& dstReg, RegT2& srcReg)
 {
     TraitTwoToTaitOneTmpl<RegT1, RegT2, uint32_t>(dstReg, srcReg);
 }
-
 template <typename RegT2, typename RegT1>
 __simd_callee__ inline void B32TraitOneToTaitTwo(RegT2& dstReg, RegT1& srcReg)
 {
     TraitOneToTaitTwoTmpl<RegT2, RegT1, uint16_t>(dstReg, srcReg);
 }
-
 template <typename RegT1, typename RegT2>
 __simd_callee__ inline void B32TraitTwoToTaitOne(RegT1& dstReg, RegT2& srcReg)
 {
