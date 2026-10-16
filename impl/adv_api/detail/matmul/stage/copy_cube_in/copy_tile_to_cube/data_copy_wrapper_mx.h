@@ -47,8 +47,8 @@ public:
     __aicore__ inline ~DataCopyWrapper() = default;
 
     __aicore__ inline void CopyScaleNZ2NZ(
-        const LocalTensor<TransT>& dst, const GlobalTensor<TransT>& src, const int row, const int col, const int height,
-        const int width, const int gRow, const bool kAlignToC0Size = false)
+        const LocalTensor<fp8_e8m0_t>& dst, const GlobalTensor<fp8_e8m0_t>& src, const int row, const int col,
+        const int height, const int width, const int gRow, const bool kAlignToC0Size = false)
     {
         ASCENDC_ASSERT((gRow >= width), {
             KERNEL_LOG(
@@ -60,28 +60,21 @@ public:
         int64_t srcOffset = (int64_t)row * (int64_t)gRow + BLOCK_CUBE * col;
 
         // scale: 16*2 fractal
-        int blockLen = BLOCK_CUBE * width * static_cast<int>(sizeof(TransT)) / ONE_BLK_SIZE;
-        int srcStride = BLOCK_CUBE * (gRow - width) * static_cast<int>(sizeof(TransT)) / ONE_BLK_SIZE;
+        int blockLen = BLOCK_CUBE * width * static_cast<int>(sizeof(fp8_e8m0_t)) / ONE_BLK_SIZE;
+        int srcStride = BLOCK_CUBE * (gRow - width) * static_cast<int>(sizeof(fp8_e8m0_t)) / ONE_BLK_SIZE;
         if (srcStride >= UINT16_MAX) {
             for (int i = 0; i < static_cast<int>(Ceil(height, BLOCK_CUBE)); ++i) {
-                DataCopyParams params = {1, static_cast<uint16_t>(blockLen), 0, 0};
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-                DataCopy(dst[i * BLOCK_CUBE * width], src[srcOffset + i * gRow * BLOCK_CUBE], params, preAllocation);
-#else
-                DataCopy(dst[i * BLOCK_CUBE * width], src[srcOffset + i * gRow * BLOCK_CUBE], params);
-#endif
+                DataCopy(
+                    dst[i * BLOCK_CUBE * width], src[srcOffset + i * gRow * BLOCK_CUBE],
+                    {1, static_cast<uint16_t>(blockLen), 0, 0});
             }
         } else {
             uint16_t nburst = static_cast<uint16_t>(Ceil(height, BLOCK_CUBE));
             int dstStride = 0;
-            DataCopyParams params = {
-                nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),
-                static_cast<uint16_t>(dstStride)};
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-            DataCopy(dst, src[srcOffset], params, preAllocation);
-#else
-            DataCopy(dst, src[srcOffset], params);
-#endif
+            DataCopy(
+                dst, src[srcOffset],
+                {nburst, static_cast<uint16_t>(blockLen), static_cast<uint16_t>(srcStride),
+                 static_cast<uint16_t>(dstStride)});
         }
     }
 
@@ -95,52 +88,26 @@ public:
             (height > 0), { KERNEL_LOG(KERNEL_ERROR, "height is %d, which should be larger than 0.", height); });
         ASCENDC_ASSERT(
             (width > 0), { KERNEL_LOG(KERNEL_ERROR, "width is %d, which should be larger than 0.", width); });
+        auto srcOffset = ((int64_t)row * (int64_t)gScaleCol + (int64_t)col);
 
-        if constexpr (SupportType<TransT, hif4_scale>()) { // b32, need carry as b16
-            auto srcOffset = ((int64_t)row * (int64_t)gScaleCol * MM_NUM_TWO + (int64_t)col * MM_NUM_TWO);
-            GlobalTensor<half> aScaleGlobalB16;
-            aScaleGlobalB16.SetGlobalBuffer(((__gm__ half*)(src.GetPhyAddr())), height * width * MM_NUM_TWO);
-            auto workLocal = dst.template ReinterpretCast<half>();
-            Dn2NzParams dn2nzParams;
-            dn2nzParams.dnNum = 1;
-            dn2nzParams.dValue = height;
-            dn2nzParams.nValue = width * MM_NUM_TWO;
-            dn2nzParams.srcDnMatrixStride = 0;
-            dn2nzParams.srcDValue = gScaleCol * MM_NUM_TWO;
-            dn2nzParams.dstNzC0Stride = width * MM_NUM_TWO;
-            dn2nzParams.dstNzNStride = 1;
-            dn2nzParams.dstNzMatrixStride = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-            DataCopy(workLocal, aScaleGlobalB16[srcOffset], dn2nzParams, preAllocation);
-#else
-            DataCopy(workLocal, aScaleGlobalB16[srcOffset], dn2nzParams);
-#endif
-        } else {
-            auto srcOffset = ((int64_t)row * (int64_t)gScaleCol + (int64_t)col);
+        Dn2NzParams dn2nzParams;
+        dn2nzParams.dnNum = 1;
+        dn2nzParams.dValue = height;
+        dn2nzParams.nValue = Ceil(width, MM_NUM_TWO);
+        dn2nzParams.srcDnMatrixStride = 0;
+        dn2nzParams.srcDValue = gScaleCol / MM_NUM_TWO;
+        dn2nzParams.dstNzC0Stride = Ceil(width, MM_NUM_TWO);
+        dn2nzParams.dstNzNStride = 1;
+        dn2nzParams.dstNzMatrixStride = 0;
 
-            Dn2NzParams dn2nzParams;
-            dn2nzParams.dnNum = 1;
-            dn2nzParams.dValue = height;
-            dn2nzParams.nValue = Ceil(width, MM_NUM_TWO);
-            dn2nzParams.srcDnMatrixStride = 0;
-            dn2nzParams.srcDValue = gScaleCol / MM_NUM_TWO;
-            dn2nzParams.dstNzC0Stride = Ceil(width, MM_NUM_TWO);
-            dn2nzParams.dstNzNStride = 1;
-            dn2nzParams.dstNzMatrixStride = 0;
-
-            GlobalTensor<half> aScaleGlobalB16;
-            aScaleGlobalB16.SetGlobalBuffer(((__gm__ half*)(src.GetPhyAddr())), height * width / MM_NUM_TWO);
-            auto workLocal = dst.template ReinterpretCast<half>();
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-            DataCopy(workLocal, aScaleGlobalB16[srcOffset / MM_NUM_TWO], dn2nzParams, preAllocation);
-#else
-            DataCopy(workLocal, aScaleGlobalB16[srcOffset / MM_NUM_TWO], dn2nzParams);
-#endif
-        }
+        GlobalTensor<half> aScaleGlobalB16;
+        aScaleGlobalB16.SetGlobalBuffer(((__gm__ half*)(src.GetPhyAddr())), height * width / 2);
+        auto workLocal = dst.template ReinterpretCast<half>();
+        DataCopy(workLocal, aScaleGlobalB16[srcOffset / MM_NUM_TWO], dn2nzParams);
     }
 
     __aicore__ inline void CopyScaleMXND2NZ(
-        const LocalTensor<TransT>& dst, const GlobalTensor<TransT>& src, const int32_t row, const int32_t col,
+        const LocalTensor<fp8_e8m0_t>& dst, const GlobalTensor<fp8_e8m0_t>& src, const int32_t row, const int32_t col,
         const int32_t height, const int32_t width, const int32_t gRow)
     {
         ASCENDC_ASSERT((gRow >= width), {
@@ -162,11 +129,7 @@ public:
         nd2nzParams.dstNzC0Stride = Ceil(height, MM_NUM_TWO);
         nd2nzParams.dstNzNStride = 1;
         nd2nzParams.dstNzMatrixStride = 0;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-        DataCopy(dstTensor, srcTensor, nd2nzParams, preAllocation);
-#else
         DataCopy(dstTensor, srcTensor, nd2nzParams);
-#endif
     }
 
     __aicore__ inline void CopyScaleVector2A1(
@@ -185,7 +148,6 @@ public:
 
 private:
     constexpr static int32_t c0Size_ = AuxGetC0Size<SrcT>();
-    constexpr static bool preAllocation = NeedPreallocation<INPUT_TYPE, MM_CFG>();
 };
 } // namespace Detail
 } // namespace Impl

@@ -120,8 +120,6 @@ public:
                 DataCopy(dst, src[srcOffset], nd2nzParams);
             }
         }
-#elif defined(__NPU_ARCH__) && (__NPU_ARCH__ == 9201)
-        DataCopy(dst, src[srcOffset], nd2nzParams, preAllocation);
 #else
         DataCopy(dst, src[srcOffset], nd2nzParams); // stride scope has increased
 #endif
@@ -342,7 +340,6 @@ private:
 
 private:
     constexpr static int32_t c0Size_ = AuxGetC0Size<SrcT>();
-    constexpr static bool preAllocation = NeedPreallocation<INPUT_TYPE, MM_CFG>();
 };
 } // namespace Detail
 } // namespace Impl

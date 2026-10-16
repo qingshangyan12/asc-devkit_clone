@@ -62,8 +62,7 @@ class MatmulScheduler<
 
     using SrcAT = typename A_TYPE::T;
     using SrcBT = typename B_TYPE::T;
-    using SrcScaleAT = typename A_TYPE::SCALE_T;
-    using SrcScaleBT = typename B_TYPE::SCALE_T;
+    using ScaleT = fp8_e8m0_t;
     using SrcA2T = typename GetL0DataType<typename A_TYPE::T, true>::Type;
     using SrcB2T = typename GetL0DataType<typename B_TYPE::T, true>::Type;
     using L0cT = typename GetMmDstType<typename A_TYPE::T>::Type;
@@ -245,16 +244,14 @@ private:
             MATMUL_MODULE(CopyCubeInB)
                 ->LoadData(0, 0, MATMUL_MODULE(KLoop)->GetTileShapeB(), MATMUL_MODULE(NLoop)->GetTileShape());
         // scaleA/scaleB
-        LocalTensor<SrcScaleAT> scaleA1 =
-            MATMUL_MODULE(CopyCubeInScaleA)
-                ->LoadData(
-                    0, 0, MATMUL_MODULE(MLoop)->GetTileShape(),
-                    Ceil(MATMUL_MODULE(KLoop)->GetTileShapeA(), GetMxKfactor<SrcScaleAT>()));
-        LocalTensor<SrcScaleBT> scaleB1 =
-            MATMUL_MODULE(CopyCubeInScaleB)
-                ->LoadData(
-                    0, 0, Ceil(MATMUL_MODULE(KLoop)->GetTileShapeB(), GetMxKfactor<SrcScaleBT>()),
-                    MATMUL_MODULE(NLoop)->GetTileShape());
+        LocalTensor<ScaleT> scaleA1 = MATMUL_MODULE(CopyCubeInScaleA)
+                                          ->LoadData(
+                                              0, 0, MATMUL_MODULE(MLoop)->GetTileShape(),
+                                              Ceil(MATMUL_MODULE(KLoop)->GetTileShapeA(), MX_K_FACTOR));
+        LocalTensor<ScaleT> scaleB1 = MATMUL_MODULE(CopyCubeInScaleB)
+                                          ->LoadData(
+                                              0, 0, Ceil(MATMUL_MODULE(KLoop)->GetTileShapeB(), MX_K_FACTOR),
+                                              MATMUL_MODULE(NLoop)->GetTileShape());
 
         if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportUBToL1Singleshape()) {
             BASE_MODULE::PadZeroForABL1(a1, b1);
@@ -311,17 +308,16 @@ private:
                         kOuterIdx, MATMUL_MODULE(NLoop)->GetInnerIdx(), MATMUL_MODULE(KLoop)->GetTileShapeB(),
                         MATMUL_MODULE(NLoop)->GetTileShape());
             // scaleA/scaleB
-            LocalTensor<SrcScaleAT> scaleA1 =
+            LocalTensor<ScaleT> scaleA1 =
                 MATMUL_MODULE(CopyCubeInScaleA)
                     ->LoadData(
                         MATMUL_MODULE(MLoop)->GetInnerIdx(), kOuterIdx, MATMUL_MODULE(MLoop)->GetTileShape(),
-                        Ceil(MATMUL_MODULE(KLoop)->GetTileShapeA(), GetMxKfactor<SrcScaleAT>()));
-            LocalTensor<SrcScaleBT> scaleB1 =
+                        Ceil(MATMUL_MODULE(KLoop)->GetTileShapeA(), MX_K_FACTOR));
+            LocalTensor<ScaleT> scaleB1 =
                 MATMUL_MODULE(CopyCubeInScaleB)
                     ->LoadData(
                         kOuterIdx, MATMUL_MODULE(NLoop)->GetInnerIdx(),
-                        Ceil(MATMUL_MODULE(KLoop)->GetTileShapeB(), GetMxKfactor<SrcScaleBT>()),
-                        MATMUL_MODULE(NLoop)->GetTileShape());
+                        Ceil(MATMUL_MODULE(KLoop)->GetTileShapeB(), MX_K_FACTOR), MATMUL_MODULE(NLoop)->GetTileShape());
             if constexpr (MatmulFeatureTrait<MM_CFG>::IsSupportUBToL1Singleshape()) {
                 if (padCount == 0) {
                     BASE_MODULE::PadZeroForABL1(a1, b1);
@@ -377,13 +373,13 @@ private:
             aL0Params.kAxisL1Offset =
                 MATMUL_MODULE(KLoop)->GetOuterIdx() * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
         } else if constexpr (!IsStaticPaddingEnable(MM_CFG)) {
-            aL0Params.kAxisL1Len = CeilAlign(MATMUL_MODULE(KLoop)->GetTileShapeA(), GetMxKfactor<SrcScaleAT>());
+            aL0Params.kAxisL1Len = CeilAlign(MATMUL_MODULE(KLoop)->GetTileShapeA(), MX_BASEK_FACTOR);
         }
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(B_TYPE::pos)) {
             bL0Params.kAxisL1Offset =
                 MATMUL_MODULE(KLoop)->GetOuterIdx() * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK();
         } else if constexpr (!IsStaticPaddingEnable(MM_CFG)) {
-            bL0Params.kAxisL1Len = CeilAlign(MATMUL_MODULE(KLoop)->GetTileShapeB(), GetMxKfactor<SrcScaleBT>());
+            bL0Params.kAxisL1Len = CeilAlign(MATMUL_MODULE(KLoop)->GetTileShapeB(), MX_BASEK_FACTOR);
         }
     }
 
@@ -409,27 +405,16 @@ private:
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(A_TYPE::scalePosition)) {
             aL0Params.kAuxMatrixL1Offset = Ceil(
                 MATMUL_MODULE(KLoop)->GetOuterIdx() * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(),
-                GetMxKfactor<SrcScaleAT>());
+                MX_K_FACTOR);
         } else {
-            if (IsSameTypeV<SrcScaleAT, AscendC::hif4_scale>) {
-                aL0Params.kAuxMatrixL1Len = Ceil(MATMUL_MODULE(KLoop)->GetTileShapeA(), MX_BASEK_FACTOR);
-            } else {
-                aL0Params.kAuxMatrixL1Len =
-                    Ceil(MATMUL_MODULE(KLoop)->GetTileShapeA(), MX_BASEK_FACTOR) * MX_EVEN_FACTOR;
-            }
+            aL0Params.kAuxMatrixL1Len = Ceil(MATMUL_MODULE(KLoop)->GetTileShapeA(), MX_BASEK_FACTOR) * MX_EVEN_FACTOR;
         }
-
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(B_TYPE::scalePosition)) {
             bL0Params.kAuxMatrixL1Offset = Ceil(
                 MATMUL_MODULE(KLoop)->GetOuterIdx() * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseK(),
-                GetMxKfactor<SrcScaleBT>());
+                MX_K_FACTOR);
         } else {
-            if (IsSameTypeV<SrcScaleBT, AscendC::hif4_scale>) {
-                bL0Params.kAuxMatrixL1Len = Ceil(MATMUL_MODULE(KLoop)->GetTileShapeB(), MX_BASEK_FACTOR);
-            } else {
-                bL0Params.kAuxMatrixL1Len =
-                    Ceil(MATMUL_MODULE(KLoop)->GetTileShapeB(), MX_BASEK_FACTOR) * MX_EVEN_FACTOR;
-            }
+            bL0Params.kAuxMatrixL1Len = Ceil(MATMUL_MODULE(KLoop)->GetTileShapeB(), MX_BASEK_FACTOR) * MX_EVEN_FACTOR;
         }
     }
 
@@ -468,7 +453,7 @@ private:
         // for scaleA
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(A_TYPE::scalePosition)) {
             aL0Params.kAuxMatrixL1Len =
-                Ceil(CeilAlign(MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreK(), c0Size_), GetMxKfactor<SrcScaleAT>());
+                Ceil(CeilAlign(MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreK(), c0Size_), MX_K_FACTOR);
             aL0Params.auxMatrixL1Offset =
                 MATMUL_MODULE(MLoop)->GetInnerIdx() * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseM();
         } else {
@@ -511,7 +496,7 @@ private:
         // for scaleB
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(B_TYPE::scalePosition)) {
             bL0Params.kAuxMatrixL1Len =
-                Ceil(CeilAlign(MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreK(), c0Size_), GetMxKfactor<SrcScaleBT>());
+                Ceil(CeilAlign(MATMUL_MODULE(MatmulShapeInfo)->GetSingleCoreK(), c0Size_), MX_K_FACTOR);
             bL0Params.auxMatrixL1Offset =
                 MATMUL_MODULE(NLoop)->GetInnerIdx() * MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetBaseN();
         } else {
@@ -522,7 +507,7 @@ private:
     }
 
     __aicore__ inline LocalTensor<SrcA2T> SplitA(
-        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcScaleAT>& scaleA1, const MxSplitParams& aL0Params,
+        const LocalTensor<SrcAT>& a1, const LocalTensor<ScaleT>& scaleA1, const MxSplitParams& aL0Params,
         const bool isATranspose, const bool isScaleATranspose)
     {
         auto posA = MATMUL_MODULE(MLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() +
@@ -543,7 +528,7 @@ private:
     }
 
     __aicore__ inline LocalTensor<SrcB2T> SplitB(
-        const LocalTensor<SrcBT>& b1, const LocalTensor<SrcScaleBT>& scaleB1, const MxSplitParams& bL0Params,
+        const LocalTensor<SrcBT>& b1, const LocalTensor<ScaleT>& scaleB1, const MxSplitParams& bL0Params,
         const bool isBTranspose, const bool isScaleATranspose)
     {
         auto posB = MATMUL_MODULE(NLoop)->GetInnerIdx() * MATMUL_MODULE(KLoop)->GetTotalIter() +

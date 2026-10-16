@@ -57,8 +57,7 @@ class MatmulScheduler<
 
     using SrcAT = typename A_TYPE::T;
     using SrcBT = typename B_TYPE::T;
-    using SrcScaleAT = typename A_TYPE::SCALE_T;
-    using SrcScaleBT = typename B_TYPE::SCALE_T;
+    using ScaleT = fp8_e8m0_t;
     using BiasT = typename BIAS_TYPE::T;
     using SrcA2T = typename GetL0DataType<typename A_TYPE::T, true>::Type;
     using SrcB2T = typename GetL0DataType<typename B_TYPE::T, true>::Type;
@@ -122,17 +121,16 @@ private:
                 int16_t orgKa = MATMUL_MODULE(MatmulShapeInfo)->GetOrgKa() != -1 ?
                                     MATMUL_MODULE(MatmulShapeInfo)->GetOrgKa() :
                                     MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK();
-                aL0Params.kAuxMatrixL1Len =
-                    Ceil(orgKa * MATMUL_MODULE(KLoop)->GetScaleFactorKa(), GetMxKfactor<SrcScaleAT>());
+                aL0Params.kAuxMatrixL1Len = Ceil(orgKa * MATMUL_MODULE(KLoop)->GetScaleFactorKa(), MX_K_FACTOR);
             }
-            aL0Params.kAuxMatrixL1Offset = Ceil(kInnerIdx * tilingBaseK, GetMxKfactor<SrcScaleAT>());
+            aL0Params.kAuxMatrixL1Offset = Ceil(kInnerIdx * tilingBaseK, MX_K_FACTOR);
         } else {
             int32_t tilingStepKa = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepKa();
             aL0Params.kAuxMatrixL1Len = MATMUL_MODULE(KLoop)->GetTileShapeScaleKa();
             aL0Params.kAuxMatrixL1Offset =
                 (kInnerIdx - kInnerIdx / (tilingStepKa * MATMUL_MODULE(KLoop)->GetScaleFactorKa()) *
                                  (tilingStepKa * MATMUL_MODULE(KLoop)->GetScaleFactorKa())) *
-                Ceil(tilingBaseK, GetMxKfactor<SrcScaleAT>());
+                Ceil(tilingBaseK, MX_K_FACTOR);
         }
 
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(B_TYPE::pos)) {
@@ -151,23 +149,22 @@ private:
                 int16_t orgKb = MATMUL_MODULE(MatmulShapeInfo)->GetOrgKb() != -1 ?
                                     MATMUL_MODULE(MatmulShapeInfo)->GetOrgKb() :
                                     MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK();
-                bL0Params.kAuxMatrixL1Len =
-                    Ceil(orgKb * MATMUL_MODULE(KLoop)->GetScaleFactorKb(), GetMxKfactor<SrcScaleBT>());
+                bL0Params.kAuxMatrixL1Len = Ceil(orgKb * MATMUL_MODULE(KLoop)->GetScaleFactorKb(), MX_K_FACTOR);
             }
-            bL0Params.kAuxMatrixL1Offset = Ceil(kInnerIdx * tilingBaseK, GetMxKfactor<SrcScaleBT>());
+            bL0Params.kAuxMatrixL1Offset = Ceil(kInnerIdx * tilingBaseK, MX_K_FACTOR);
         } else {
             int32_t tilingStepKb = MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetStepKb();
             bL0Params.kAuxMatrixL1Len = MATMUL_MODULE(KLoop)->GetTileShapeScaleKb();
             bL0Params.kAuxMatrixL1Offset =
                 (kInnerIdx - kInnerIdx / (tilingStepKb * MATMUL_MODULE(KLoop)->GetScaleFactorKb()) *
                                  (tilingStepKb * MATMUL_MODULE(KLoop)->GetScaleFactorKb())) *
-                Ceil(tilingBaseK, GetMxKfactor<SrcScaleBT>());
+                Ceil(tilingBaseK, MX_K_FACTOR);
         }
     }
 
     __aicore__ inline void CopyIn(
-        LocalTensor<SrcAT>& a1, LocalTensor<SrcBT>& b1, LocalTensor<SrcScaleAT>& scaleA1,
-        LocalTensor<SrcScaleBT>& scaleB1, int32_t& padCount)
+        LocalTensor<SrcAT>& a1, LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleA1, LocalTensor<ScaleT>& scaleB1,
+        int32_t& padCount)
     {
         a1 = MATMUL_MODULE(CopyCubeInA)
                  ->LoadData(
@@ -264,8 +261,8 @@ private:
         // CopyIn
         LocalTensor<SrcAT> a1;
         LocalTensor<SrcBT> b1;
-        LocalTensor<SrcScaleAT> scaleA1;
-        LocalTensor<SrcScaleBT> scaleB1;
+        LocalTensor<ScaleT> scaleA1;
+        LocalTensor<ScaleT> scaleB1;
         int32_t padCount = 0;
         CopyIn(a1, b1, scaleA1, scaleB1, padCount);
         bool isATranspose = MATMUL_MODULE(MatmulShapeInfo)->IsTransposeA();
@@ -284,8 +281,7 @@ private:
         } else {
             kL1Stride = MATMUL_MODULE(KLoop)->GetBaseBlockShape() * BASE_MODULE::c0Size_;
         }
-        int32_t kAuxL1StrideA = Ceil(kL1Stride, GetMxKfactor<SrcScaleAT>());
-        int32_t kAuxL1StrideB = Ceil(kL1Stride, GetMxKfactor<SrcScaleBT>());
+        kAuxL1Stride = Ceil(kL1Stride, MX_K_FACTOR);
         // start k inner loop
         MATMUL_MODULE(KLoop)->InnerStart();
         do {
@@ -305,8 +301,8 @@ private:
             }
             aL0Params.kAxisL1Offset += kL1Stride;
             bL0Params.kAxisL1Offset += kL1Stride;
-            aL0Params.kAuxMatrixL1Offset += kAuxL1StrideA;
-            bL0Params.kAuxMatrixL1Offset += kAuxL1StrideB;
+            aL0Params.kAuxMatrixL1Offset += kAuxL1Stride;
+            bL0Params.kAuxMatrixL1Offset += kAuxL1Stride;
         } while (MATMUL_MODULE(KLoop)->InnerNext());
         if constexpr (MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB()) {
             MATMUL_MODULE(BiasScheduler)->Free(bias);
@@ -343,8 +339,8 @@ private:
             // CopyIn
             LocalTensor<SrcAT> a1;
             LocalTensor<SrcBT> b1;
-            LocalTensor<SrcScaleAT> scaleA1;
-            LocalTensor<SrcScaleBT> scaleB1;
+            LocalTensor<ScaleT> scaleA1;
+            LocalTensor<ScaleT> scaleB1;
             CopyIn(a1, b1, scaleA1, scaleB1, padCount);
             if (MATMUL_MODULE(BiasScheduler)->IsBias()) {
                 bias = BASE_MODULE::SplitBias(bL0Params.axisL0Len);
@@ -428,16 +424,15 @@ private:
     }
 
     __aicore__ inline void Compute(
-        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<SrcScaleAT>& scaleA1,
-        LocalTensor<SrcScaleBT>& scaleB1, LocalTensor<BiasT>& bias, const bool enPartialSum, const bool isATranspose,
+        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleA1,
+        LocalTensor<ScaleT>& scaleB1, LocalTensor<BiasT>& bias, const bool enPartialSum, const bool isATranspose,
         const bool isBTranspose, MxSplitParams& aL0Params, MxSplitParams& bL0Params)
     {
         bool sL0CInit = false;
         bool sL0CLast = false;
         SplitPrepare(enPartialSum, isATranspose, isBTranspose, aL0Params, bL0Params, sL0CInit, sL0CLast);
         int32_t kL1Stride = MATMUL_MODULE(KLoop)->GetBaseBlockShape() * BASE_MODULE::c0Size_;
-        int32_t kAuxL1StrideA = Ceil(kL1Stride, GetMxKfactor<SrcScaleAT>());
-        int32_t kAuxL1StrideB = Ceil(kL1Stride, GetMxKfactor<SrcScaleBT>());
+        int32_t kAuxL1Stride = Ceil(kL1Stride, MX_K_FACTOR);
         MATMUL_MODULE(KLoop)->InnerStart();
         do {
             if constexpr (MatmulFeatureTrait<MM_CFG>().IsSupportMNL0DB()) {
@@ -456,14 +451,14 @@ private:
             }
             aL0Params.kAxisL1Offset += kL1Stride;
             bL0Params.kAxisL1Offset += kL1Stride;
-            aL0Params.kAuxMatrixL1Offset += kAuxL1StrideA;
-            bL0Params.kAuxMatrixL1Offset += kAuxL1StrideB;
+            aL0Params.kAuxMatrixL1Offset += kAuxL1Stride;
+            bL0Params.kAuxMatrixL1Offset += kAuxL1Stride;
         } while (MATMUL_MODULE(KLoop)->InnerNext());
     }
 
     __aicore__ inline void ComputeMDB(
-        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<SrcScaleAT>& scaleA1,
-        LocalTensor<SrcScaleBT>& scaleB1, LocalTensor<BiasT>& bias, MxSplitParams& aL0Params, MxSplitParams& bL0Params,
+        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleA1,
+        LocalTensor<ScaleT>& scaleB1, LocalTensor<BiasT>& bias, MxSplitParams& aL0Params, MxSplitParams& bL0Params,
         const bool isATranspose, const bool isBTranspose, const bool sL0CInit, const bool sL0CLast)
     {
         uint32_t l0aDBLoop = MATMUL_MODULE(MLoop)->GetL0DBLoopNum();
@@ -490,8 +485,8 @@ private:
     }
 
     __aicore__ inline void ComputeNDB(
-        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<SrcScaleAT>& scaleA1,
-        LocalTensor<SrcScaleBT>& scaleB1, LocalTensor<BiasT>& bias, MxSplitParams& aL0Params, MxSplitParams& bL0Params,
+        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleA1,
+        LocalTensor<ScaleT>& scaleB1, LocalTensor<BiasT>& bias, MxSplitParams& aL0Params, MxSplitParams& bL0Params,
         const bool isATranspose, const bool isBTranspose, const bool sL0CInit, const bool sL0CLast)
     {
         uint32_t l0bDBLoop = MATMUL_MODULE(NLoop)->GetL0DBLoopNum();
@@ -540,14 +535,14 @@ private:
 
         if constexpr (IsStaticPaddingEnable(MM_CFG)) {
             aL0Params.kAuxMatrixL1Len =
-                Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK(), GetMxKfactor<SrcScaleAT>());
+                Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK(), MX_K_FACTOR);
         } else {
             if constexpr (PhyPosIsL1OrUB<MM_CFG>(A_TYPE::scalePosition)) {
                 aL0Params.kAuxMatrixL1Len = Ceil(
                     MATMUL_MODULE(MatmulShapeInfo)->GetOrgKa() != -1 ?
                         MATMUL_MODULE(MatmulShapeInfo)->GetOrgKa() :
                         MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK(),
-                    GetMxKfactor<SrcScaleAT>());
+                    MX_K_FACTOR);
             } else {
                 aL0Params.kAuxMatrixL1Len = MATMUL_MODULE(KLoop)->GetTileShapeScaleKa();
             }
@@ -568,13 +563,13 @@ private:
         if constexpr (PhyPosIsL1OrUB<MM_CFG>(B_TYPE::scalePosition)) {
             if constexpr (IsStaticPaddingEnable(MM_CFG)) {
                 bL0Params.kAuxMatrixL1Len =
-                    Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK(), GetMxKfactor<SrcScaleBT>());
+                    Ceil(MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK(), MX_K_FACTOR);
             } else {
                 bL0Params.kAuxMatrixL1Len = Ceil(
                     MATMUL_MODULE(MatmulShapeInfo)->GetOrgKb() != -1 ?
                         MATMUL_MODULE(MatmulShapeInfo)->GetOrgKb() :
                         MATMUL_MODULE(MatmulShapeTiling)->GetTiling().GetSingleCoreK(),
-                    GetMxKfactor<SrcScaleBT>());
+                    MX_K_FACTOR);
             }
         } else {
             bL0Params.kAuxMatrixL1Len = MATMUL_MODULE(KLoop)->GetTileShapeScaleKb();
@@ -583,21 +578,20 @@ private:
     }
 
     __aicore__ inline void PartialCompute(
-        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<SrcScaleAT>& scaleA1,
-        LocalTensor<SrcScaleBT>& scaleB1, LocalTensor<BiasT>& bias, const bool enPartialSum, const bool isATranspose,
+        const LocalTensor<SrcAT>& a1, const LocalTensor<SrcBT>& b1, LocalTensor<ScaleT>& scaleA1,
+        LocalTensor<ScaleT>& scaleB1, LocalTensor<BiasT>& bias, const bool enPartialSum, const bool isATranspose,
         const bool isBTranspose, MxSplitParams& aL0Params, MxSplitParams& bL0Params)
     {
         bool sL0CInit = false;
         bool sL0CLast = false;
         SplitPrepare(enPartialSum, isATranspose, isBTranspose, aL0Params, bL0Params, sL0CInit, sL0CLast);
         int32_t kL1Stride = MATMUL_MODULE(KLoop)->GetBaseBlockShape() * BASE_MODULE::c0Size_;
-        int32_t kAuxL1StrideA = Ceil(kL1Stride, GetMxKfactor<SrcScaleAT>());
-        int32_t kAuxL1StrideB = Ceil(kL1Stride, GetMxKfactor<SrcScaleBT>());
+        int32_t kAuxL1Stride = Ceil(kL1Stride, MX_K_FACTOR);
 
         aL0Params.kAxisL1Offset += MATMUL_MODULE(KLoop)->GetStepInnerIdx() * kL1Stride;
         bL0Params.kAxisL1Offset += MATMUL_MODULE(KLoop)->GetStepInnerIdx() * kL1Stride;
-        aL0Params.kAuxMatrixL1Offset += MATMUL_MODULE(KLoop)->GetStepInnerIdx() * kAuxL1StrideA;
-        bL0Params.kAuxMatrixL1Offset += MATMUL_MODULE(KLoop)->GetStepInnerIdx() * kAuxL1StrideB;
+        aL0Params.kAuxMatrixL1Offset += MATMUL_MODULE(KLoop)->GetStepInnerIdx() * kAuxL1Stride;
+        bL0Params.kAuxMatrixL1Offset += MATMUL_MODULE(KLoop)->GetStepInnerIdx() * kAuxL1Stride;
         BASE_MODULE::ComputeKDB(
             a1, b1, scaleA1, scaleB1, aL0Params, bL0Params, isATranspose, isBTranspose, sL0CInit, sL0CLast);
     }
@@ -617,8 +611,8 @@ private:
         // CopyIn
         LocalTensor<SrcAT> a1;
         LocalTensor<SrcBT> b1;
-        LocalTensor<SrcScaleAT> scaleA1;
-        LocalTensor<SrcScaleBT> scaleB1;
+        LocalTensor<ScaleT> scaleA1;
+        LocalTensor<ScaleT> scaleB1;
         int32_t padCount = 0;
         CopyIn(a1, b1, scaleA1, scaleB1, padCount);
         LocalTensor<BiasT> bias = BASE_MODULE::SplitBias(bL0Params.axisL0Len);
