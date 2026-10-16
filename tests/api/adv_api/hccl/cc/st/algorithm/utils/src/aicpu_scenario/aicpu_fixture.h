@@ -86,12 +86,12 @@ public:
         return static_cast<uint8_t>(17U + rank * 41U + offset);
     }
 
-    // 场景能力守卫：判定 reduce 系场景是否落入产品直算路径（ST 不支持域）。
-    // 可测返回 true；不支持返回 false 且 reason 给出人读解释（VerifyScenario 据此 FAIL）。
-    // public：框架自测（独立 TEST）直接访问，先例同 MakeInputByte。
+    // 场景能力守卫（纯判定）：reduceLike=true（原语声明为归约系）且 64bit/PROD 时拒绝并给出
+    // 人读解释；可测返回 true。public：框架自测（独立 TEST）直接访问，先例同 MakeInputByte。
+    // isReduceLikeOp 由 VerifyScenario 以 this->IsReduceLikeOp() 桥接（原语声明见下方虚函数）。
     // 判定条件与产品 LocalReduce wrapper 的直算转发条件对齐（alg_data_trans_wrapper.cc:738-744），
     // 详见 aicpu_fixture.cc 实现处的边界注释。
-    static bool CheckScenarioSupported(const AicpuStScenario& scenario, std::string& reason);
+    static bool CheckScenarioSupported(const AicpuStScenario& scenario, bool isReduceLikeOp, std::string& reason);
 
 protected:
     void VerifyScenario(const AicpuStScenario& scenario);
@@ -130,6 +130,14 @@ protected:
 
     // 非零场景的 golden 空守卫开关（默认开）：BuildExpectedOutput 意外返回空时 FAIL
     virtual bool ExpectOutputCheck() { return true; }
+
+    // 本原语的数据面是否包含元素级归约运算（SUM/PROD/MAX/MIN）——原语固有属性（opType 决定），
+    // 与场景无关。归约系原语（ReduceScatter/AllReduce/Reduce 等）数据面会调 LocalReduce，
+    // 存在产品直算路径（64bit/PROD 场景被 CheckScenarioSupported 拒绝，见上方注释）；
+    // 纯搬运原语（AllGather/AllToAll 等）永不调归约、无直算路径，保持默认 false。
+    // 覆盖式声明而非框架层 opType 清单：接入新原语必然实现本类（虚函数契约），声明漏不了——
+    // 清单式实现会随原语演化静默漂移（漏登 → 守卫失效 → 64bit/PROD 场景 SIGSEGV 崩进程）。
+    virtual bool IsReduceLikeOp() const { return false; }
 
     // ===== 框架提供的静态工具 =====
 

@@ -11,6 +11,7 @@
 #include "aicpu_reduce_scatter.h"
 
 #include "aicpu_float_convert.h"
+#include "exception_util.h"
 
 namespace HcclSim {
 namespace AicpuSt {
@@ -52,6 +53,20 @@ RankMemLayout AicpuStReduceScatter::BuildMemLayout(uint32_t rankSize, const Aicp
 std::vector<uint8_t> AicpuStReduceScatter::BuildReduceScatterExpectation(
     uint32_t rankSize, const AicpuStScenario& scenario, RankId rank)
 {
+    // reduceOp 前置校验：ApplyOp/ApplyIntOp 对非法 op 的 default 分支静默返回 b（float_convert
+    // 既有行为），golden 若不校验会把配置错误（如误设 RESERVED）伪装成数据失配（"byte
+    // mismatch"误导排查方向）。THROW 由 fixture 主线程 catch 转为带因的用例失败。
+    switch (scenario.reduceType) {
+        case HcclReduceOp::HCCL_REDUCE_SUM:
+        case HcclReduceOp::HCCL_REDUCE_PROD:
+        case HcclReduceOp::HCCL_REDUCE_MAX:
+        case HcclReduceOp::HCCL_REDUCE_MIN:
+            break;
+        default:
+            THROW<HcclSim::InvalidParamsException>(
+                "[AicpuStReduceScatter] invalid reduceType[%u] in scenario (golden refuses to guess)",
+                static_cast<uint32_t>(scenario.reduceType));
+    }
     const uint64_t sliceBytes = scenario.count * DATATYPE_SIZE_TABLE[scenario.dataType];
     const uint64_t elem = ElemSize(scenario.dataType);
     // 64bit 类型走产品 AicpuReduce（wrapper 直接计算，不经任务图 ReduceInto），

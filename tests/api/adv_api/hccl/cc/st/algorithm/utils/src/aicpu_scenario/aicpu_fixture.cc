@@ -75,16 +75,13 @@ Mc2CcTilingInner AicpuStFixture::BuildTiling(HcclCMDType opType, HcclDataType da
 // 非 reduce 系 opType（如 AllGather：无归约，64bit 拷贝走任务路径不受限）不拦。
 // 详见 2026-10-10-aicpu-st-design.md §18.2/§18.3。
 // ═══════════════════════════════════════════════════════════════════════════════════
-bool AicpuStFixture::CheckScenarioSupported(const AicpuStScenario& scenario, std::string& reason)
+bool AicpuStFixture::CheckScenarioSupported(const AicpuStScenario& scenario, bool isReduceLikeOp, std::string& reason)
 {
     const bool is64Bit = scenario.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
                          scenario.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
                          scenario.dataType == HcclDataType::HCCL_DATA_TYPE_FP64;
     const bool isProd = scenario.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
-    const bool isReduceLike = scenario.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER ||
-                              scenario.opType == HcclCMDType::HCCL_CMD_ALLREDUCE ||
-                              scenario.opType == HcclCMDType::HCCL_CMD_REDUCE;
-    if (!isReduceLike || (!is64Bit && !isProd)) {
+    if (!isReduceLikeOp || (!is64Bit && !isProd)) {
         return true;
     }
     reason = "unsupported scenario (product direct-compute path, see 2026-10-10-aicpu-st-design.md §18.2): ";
@@ -242,9 +239,10 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
 
     // 能力守卫：直算路径（64bit/PROD 归约）显式拒绝并说明原因（优于跑到一半 SIGSEGV/死锁）。
     // ADD_FAILURE（非致命）+ return：用例变红且消息完整，后续装配不再执行——
-    // 与 FAIL 等效且可被 EXPECT_NONFATAL_FAILURE 捕获测试（同 golden 空守卫先例）
+    // 与 FAIL 等效且可被 EXPECT_NONFATAL_FAILURE 捕获测试（同 golden 空守卫先例）。
+    // isReduceLikeOp 来自原语级虚函数声明（IsReduceLikeOp），非框架层清单——防原语演化漂移
     std::string unsupportedReason;
-    if (!CheckScenarioSupported(scenario, unsupportedReason)) {
+    if (!CheckScenarioSupported(scenario, IsReduceLikeOp(), unsupportedReason)) {
         ADD_FAILURE() << unsupportedReason;
         return;
     }
@@ -306,19 +304,60 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
     }
     const std::string& actualAlgName = results[0].algName;
 
-    // golden 期望：按实际选中算法键控（expectedAlgName 留空模式不影响 golden 选择）
-    std::vector<std::vector<uint8_t>> expected(rankSize);
-    for (uint32_t rank = 0; rank < rankSize; ++rank) {
-        expected[rank] = BuildExpectedOutput(rankSize, scenario, rank, actualAlgName);
-    }
-
-    // 任务图真执行 + 死锁定位
+    // golden 构造 + 任务图真执行 + 死锁定位 + DAG 冲突检测 —— 主线程异常保护：
+    // 本段内的 THROW（golden 的 op 前置校验 / Execute 的 slice mismatch、非法 op、未实现
+    // 任务类型等，多为产品 bug 或场景配置错误的表现——执行器测试 :462-481 已钉死 THROW
+    // 契约）若不捕获，Linux gtest 默认不捕异常 → std::terminate 崩掉整个测试进程，后续
+    // 用例全丢。与 RunRank 的编排期保护对称（:169-181 rank 线程侧），兑现框架
+    // "优雅报告失败"目标：异常转为用例失败 + 异常消息，而非进程崩溃。
     TaskGraphExecutor executor;
     std::string report;
-    ASSERT_EQ(executor.Execute(queues, report), ExecResult::SUCCESS) << report;
+    std::vector<DagConflict> conflicts;
+    try {
+        // golden 期望：按实际选中算法键控（expectedAlgName 留空模式不影响 golden 选择）
+        std::vector<std::vector<uint8_t>> expected(rankSize);
+        for (uint32_t rank = 0; rank < rankSize; ++rank) {
+            expected[rank] = BuildExpectedOutput(rankSize, scenario, rank, actualAlgName);
+        }
 
-    // DAG 内存冲突检测（WAW/WAR/RAW 无同步并发）；封顶输出避免刷屏
-    const std::vector<DagConflict> conflicts = AicpuDagChecker().Check(executor.ExecutionLog());
+        ASSERT_EQ(executor.Execute(queues, report), ExecResult::SUCCESS) << report;
+
+        // DAG 内存冲突检测（WAW/WAR/RAW 无同步并发）；封顶输出避免刷屏
+        conflicts = AicpuDagChecker().Check(executor.ExecutionLog());
+
+        // golden 空守卫：非零场景意外为空则 FAIL（防 adapter bug 假绿；可经 ExpectOutputCheck 豁免）
+        if (layout.outputBytes > 0 && ExpectOutputCheck()) {
+            for (uint32_t rank = 0; rank < rankSize; ++rank) {
+                if (expected[rank].empty()) {
+                    ADD_FAILURE() << "rank " << rank
+                                  << " golden unexpectedly empty for non-zero scenario (adapter bug? override "
+                                     "ExpectOutputCheck to skip by design)";
+                    break; // 只报首个，避免 N rank 刷屏
+                }
+            }
+        }
+
+        // 逐字节比对（期望为空=零长度场景或已豁免场景，跳过）
+        for (uint32_t rank = 0; rank < rankSize; ++rank) {
+            if (expected[rank].empty()) {
+                continue;
+            }
+            SimNpu& npu = SimWorld::Global()->GetSimNpuByRankId(rank);
+            const uint8_t* out = npu.GetBufferBase(BufferType::OUTPUT, layout.outputBytes);
+            ASSERT_EQ(layout.outputBytes, expected[rank].size()) << "rank " << rank << " expected output size mismatch";
+            for (uint64_t i = 0; i < layout.outputBytes; ++i) {
+                ASSERT_EQ(out[i], expected[rank][i]) << "rank " << rank << " output mismatch at byte " << i;
+            }
+        }
+    } catch (const std::exception& e) {
+        ADD_FAILURE() << "execution-stage exception (likely product bug or invalid scenario): " << e.what();
+        return;
+    } catch (...) {
+        ADD_FAILURE() << "execution-stage unknown exception (non-std exception type)";
+        return;
+    }
+
+    // DAG 冲突报告（检测在 try 内完成，报告在 try 外输出——封顶 5 条避免刷屏）
     constexpr size_t maxReported = 5;
     for (size_t i = 0; i < conflicts.size(); ++i) {
         if (i < maxReported) {
@@ -329,32 +368,6 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
     if (conflicts.size() > maxReported) {
         ADD_FAILURE() << "DAG conflicts total " << conflicts.size() << ", first " << maxReported << " reported";
     }
-
-    // golden 空守卫：非零场景意外为空则 FAIL（防 adapter bug 假绿；可经 ExpectOutputCheck 豁免）
-    if (layout.outputBytes > 0 && ExpectOutputCheck()) {
-        for (uint32_t rank = 0; rank < rankSize; ++rank) {
-            if (expected[rank].empty()) {
-                ADD_FAILURE() << "rank " << rank
-                              << " golden unexpectedly empty for non-zero scenario (adapter bug? override "
-                                 "ExpectOutputCheck to skip by design)";
-                break; // 只报首个，避免 N rank 刷屏
-            }
-        }
-    }
-
-    // 逐字节比对（期望为空=零长度场景或已豁免场景，跳过）
-    for (uint32_t rank = 0; rank < rankSize; ++rank) {
-        if (expected[rank].empty()) {
-            continue;
-        }
-        SimNpu& npu = SimWorld::Global()->GetSimNpuByRankId(rank);
-        const uint8_t* out = npu.GetBufferBase(BufferType::OUTPUT, layout.outputBytes);
-        ASSERT_EQ(layout.outputBytes, expected[rank].size()) << "rank " << rank << " expected output size mismatch";
-        for (uint64_t i = 0; i < layout.outputBytes; ++i) {
-            ASSERT_EQ(out[i], expected[rank][i]) << "rank " << rank << " output mismatch at byte " << i;
-        }
-    }
 }
-
 } // namespace AicpuSt
 } // namespace HcclSim

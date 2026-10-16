@@ -43,6 +43,9 @@ protected:
     void PrepareOpParam(
         OpParam& opParam, uint32_t rankSize, const AicpuStScenario& scenario, const RankMem& mem) override;
 
+    // 归约系声明：RS 数据面调 LocalReduce（存在产品直算路径），64bit/PROD 场景被能力守卫拒绝
+    bool IsReduceLikeOp() const override { return true; }
+
     // ReduceScatter 语义：每 rank 输出 1 个分片（count 元素），输入为 rankSize 个分片——
     // 非 AllGather 默认布局，必须 override
     RankMemLayout BuildMemLayout(uint32_t rankSize, const AicpuStScenario& scenario) override;

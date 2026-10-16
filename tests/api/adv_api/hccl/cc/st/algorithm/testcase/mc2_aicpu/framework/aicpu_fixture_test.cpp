@@ -131,8 +131,9 @@ TEST(AicpuStInputPattern, BlockTagsDistinguishAlignedBlocks)
 }
 
 // ===== 能力守卫（直算路径显式拒绝）=====
-// 判定条件与产品 LocalReduce wrapper 的直算转发条件对齐：64bit 类型（任何 op）或
-// PROD（任何类型）的 reduce 系场景被拒；非 reduce 系（AllGather 等）不受限。
+// 判定条件与产品 LocalReduce wrapper 的直算转发条件对齐：reduceLike（原语经
+// IsReduceLikeOp 虚函数声明，此处直接传参）且 64bit 类型（任何 op）或 PROD（任何类型）
+// 的场景被拒；非归约原语（传 false，如 AllGather）不受限。
 // 详见 aicpu_fixture.cc CheckScenarioSupported 实现处的边界注释与设计文档 §18.2。
 
 // 64bit 归约（产品支持但 sim 直解引用 SIGSEGV）→ 拒绝，reason 说明需真机验证
@@ -144,7 +145,7 @@ TEST(AicpuStScenarioGuard, Rejects64BitReduce)
     scenario.dataType = HCCL_DATA_TYPE_INT64;
     scenario.reduceType = HCCL_REDUCE_SUM;
     std::string reason;
-    EXPECT_FALSE(AicpuStFixture::CheckScenarioSupported(scenario, reason));
+    EXPECT_FALSE(AicpuStFixture::CheckScenarioSupported(scenario, true, reason));
     EXPECT_NE(reason.find("64bit"), std::string::npos);
     EXPECT_NE(reason.find("real-device"), std::string::npos);
 }
@@ -158,13 +159,15 @@ TEST(AicpuStScenarioGuard, RejectsProdWithRegularType)
     scenario.dataType = HCCL_DATA_TYPE_INT8;
     scenario.reduceType = HCCL_REDUCE_PROD;
     std::string reason;
-    EXPECT_FALSE(AicpuStFixture::CheckScenarioSupported(scenario, reason));
+    EXPECT_FALSE(AicpuStFixture::CheckScenarioSupported(scenario, true, reason));
     EXPECT_NE(reason.find("PROD"), std::string::npos);
     EXPECT_NE(reason.find("mismatch"), std::string::npos);
 }
 
-// 可测域不受误伤：常规 reduce 组合放行；非 reduce 系（AllGather）即使 64bit 也放行
-// （AG 无归约，64bit 数据走任务路径的纯字节搬运，不受直算边界影响）
+// 可测域不受误伤：归约系常规组合放行；非归约原语（isReduceLikeOp=false，如 AllGather）
+// 即使 64bit 也放行（纯字节搬运走任务路径，不受直算边界影响）。
+// 归约系 64bit 的端到端拦截（虚函数声明→守卫→ADD_FAILURE）由原语层用例验证
+// （reduce_scatter_testcase.cpp ScenarioGuard_*；framework 的 Smoke 不声明归约语义）
 TEST(AicpuStScenarioGuard, AllowsRegularReduceAndNonReduceOps)
 {
     using HcclSim::AicpuSt::AicpuStFixture;
@@ -173,24 +176,11 @@ TEST(AicpuStScenarioGuard, AllowsRegularReduceAndNonReduceOps)
     regular.dataType = HCCL_DATA_TYPE_FP16;
     regular.reduceType = HCCL_REDUCE_SUM;
     std::string reason = "untouched";
-    EXPECT_TRUE(AicpuStFixture::CheckScenarioSupported(regular, reason));
+    EXPECT_TRUE(AicpuStFixture::CheckScenarioSupported(regular, true, reason));
     EXPECT_EQ(reason, "untouched"); // 放行时不写 reason（调用方无需读）
 
     AicpuStScenario gather64;
     gather64.opType = HcclCMDType::HCCL_CMD_ALLGATHER;
     gather64.dataType = HCCL_DATA_TYPE_INT64;
-    EXPECT_TRUE(AicpuStFixture::CheckScenarioSupported(gather64, reason));
-}
-
-// VerifyScenario 接线：不支持场景在 rank 线程启动前即 ADD_FAILURE 并中止后续装配
-// （单表达式形式，同 golden 空守卫先例——块形式会踩 gtest 宏的局部变量限制）
-TEST_F(AicpuStSmokeFixture, ScenarioGuard_FailsEarlyWithExplanation)
-{
-    AicpuStScenario scenario;
-    scenario.topoMeta = TopoMeta{{{{0, 1}}}};
-    scenario.opType = HcclCMDType::HCCL_CMD_REDUCE_SCATTER;
-    scenario.dataType = HCCL_DATA_TYPE_INT64;
-    scenario.reduceType = HCCL_REDUCE_SUM;
-    scenario.count = 8;
-    EXPECT_NONFATAL_FAILURE(VerifyScenario(scenario), "unsupported scenario");
+    EXPECT_TRUE(AicpuStFixture::CheckScenarioSupported(gather64, false, reason));
 }

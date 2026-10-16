@@ -9,6 +9,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <gtest/gtest-spi.h> // EXPECT_NONFATAL_FAILURE（能力守卫端到端用例）
 
 #include "aicpu_reduce_scatter.h"
 
@@ -133,4 +134,30 @@ TEST_F(AicpuStReduceScatter, EmptyExpectedAlgName_SkipsAssertion_StillVerifiesDa
     AicpuStScenario scenario = MakeScenario(TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_INT8, 16);
     scenario.expectedAlgName = ""; // 框架支持的合法模式：不关心 selector 选择
     VerifyScenario(scenario);
+}
+
+// ===== 能力守卫端到端（原语声明 → 守卫 → ADD_FAILURE 全链）=====
+// 本 fixture 声明 IsReduceLikeOp()=true，Int64 场景应在 rank 线程启动前被守卫拦截
+// （framework 层的判定矩阵单测见 aicpu_fixture_test.cpp AicpuStScenarioGuard 系列）
+TEST_F(AicpuStReduceScatter, ScenarioGuard_RejectsInt64SumEarlyWithExplanation)
+{
+    AicpuStScenario scenario = MakeScenario(TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_INT64, 8);
+    EXPECT_NONFATAL_FAILURE(VerifyScenario(scenario), "unsupported scenario");
+}
+
+// PROD + 常规类型（产品错配文案分支）
+TEST_F(AicpuStReduceScatter, ScenarioGuard_RejectsProdWithMismatchExplanation)
+{
+    AicpuStScenario scenario = MakeScenario(TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_INT8, 16, HCCL_REDUCE_PROD);
+    EXPECT_NONFATAL_FAILURE(VerifyScenario(scenario), "mismatch");
+}
+
+// golden 的 reduceOp 前置校验契约钉子：非法 op（如误设 RESERVED）必须报
+// "invalid reduceType"（THROW 经 fixture 主线程 catch 转用例失败），而非静默按
+// ApplyOp default 分支生成错误期望伪装成 "byte mismatch" 误导排查方向
+TEST_F(AicpuStReduceScatter, GoldenValidation_InvalidReduceTypeFailsWithReason)
+{
+    AicpuStScenario scenario = MakeScenario(TopoMeta{{{{0, 1}}}}, HCCL_DATA_TYPE_INT8, 16);
+    scenario.reduceType = HCCL_REDUCE_RESERVED;
+    EXPECT_NONFATAL_FAILURE(VerifyScenario(scenario), "invalid reduceType");
 }

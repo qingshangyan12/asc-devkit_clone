@@ -285,7 +285,16 @@ ExecResult TaskGraphExecutor::Execute(AllRankTaskQueues& queues, std::string& de
         for (auto& serEntry : podEntry.second) {
             for (auto& phyEntry : serEntry.second) {
                 const auto key = std::make_tuple(podEntry.first, serEntry.first, phyEntry.first);
-                const RankId rank = posToRank.at(key);
+                // 防御：queues 中出现 topoMeta 外的 pos 属框架/桩不一致（正常不可达），
+                // at() 的 out_of_range 会绕过 THROW 体系直接崩进程——统一转为带现场的
+                // InvalidParamsException（由 fixture 执行期 catch 优雅报告）
+                const auto rankIt = posToRank.find(key);
+                if (rankIt == posToRank.end()) {
+                    THROW<InvalidParamsException>(
+                        "[TaskGraphExecutor] task queue pos(%u,%u,%u) not found in topoMeta", podEntry.first,
+                        serEntry.first, phyEntry.first);
+                }
+                const RankId rank = rankIt->second;
                 SingleTaskQueue& streams = phyEntry.second;
                 for (uint32_t streamId = 0; streamId < streams.size(); ++streamId) {
                     if (!streams[streamId].empty()) {
