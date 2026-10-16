@@ -22,7 +22,7 @@ This example demonstrates an NPU operator exception info auto-dump solution base
 ├── python_exception_dump
 │   ├── examples
 │   │   ├── demo_add.py                  // Add: normal call + fault injection + self-check
-│   │   └── aclnn_add.py                 // ctypes bridge to the built-in CANN aclnnAdd
+│   │   └── aclnn_add.py                 // ctypes bridge to the local AddCustom package
 │   ├── npuops_exception_dump
 │   │   ├── include
 │   │   │   └── npuops_exception_dump.h  // Public C interface of the plugin library
@@ -61,7 +61,7 @@ Configuration (environment variables):
 
 - Install prerequisites
 
-  The demo calls the ordinary built-in CANN `aclnnAdd` operator through `ctypes`. Install the CANN operator package for your device and ensure `libascendcl.so` and `libopapi.so` can be loaded.
+  The demo calls `AddCustom` built and installed from this repository's [custom operator project example](../../../../02_features/99_acl_based/00_acl_compilation/custom_op/README_en.md) through `ctypes`. The operator implementation is reused directly from the existing project.
 
 - Configure environment variables
 
@@ -78,6 +78,15 @@ Configuration (environment variables):
   In the root directory of this example, build the plugin library and run the demo.
 
   ```bash
+  # Locate the existing custom_op project from this Dump example directory
+  SAMPLE_DIR="$PWD"
+  CUSTOM_OP_DIR="$(cd ../../../../02_features/99_acl_based/00_acl_compilation/custom_op && pwd)"
+  cmake -S "$CUSTOM_OP_DIR" -B "$CUSTOM_OP_DIR/build"
+  cmake --build "$CUSTOM_OP_DIR/build" --target binary package -j8
+  bash "$CUSTOM_OP_DIR"/build/custom_opp_*.run --install-path="$SAMPLE_DIR/custom_opp"
+  source "$SAMPLE_DIR/custom_opp/vendors/customize/bin/set_env.bash"
+  export NPUOPS_ADD_LIB="$SAMPLE_DIR/custom_opp/vendors/customize/op_api/lib/libcust_opapi.so"
+
   cd npuops_exception_dump && bash build.sh && cd ..    # Build the plugin .so (output to lib/)
   python3 examples/demo_add.py                          # Run the demo
   ```
@@ -86,7 +95,7 @@ Configuration (environment variables):
 
 - Expected results
 
-  Demo flow: call `aclnnAdd` normally with two contiguous float32 ND tensors of 4096 elements (`x = arange(4096)`, `y = ones(4096)`), dump both inputs and the output, and verify `x + y`. In a separate subprocess, call the same Add operator with its output address replaced by the deliberately invalid, non-null aligned device address `0x100000000000`, triggering a device memory-access exception. Both input tensors remain valid and are dumped before the failing call. The plugin callback dumps exception info and raw kernel args; the parent validates all products on the CPU.
+  Demo flow: call `aclnnAddCustom` normally with two contiguous float16 ND tensors of 16384 elements (`x = (arange(16384) % 1024).to(float16)`, `y = ones(16384, dtype=float16)`), dump both inputs and the output, and verify `x + y`. In a separate subprocess, call the same Add operator with its output address replaced by the deliberately invalid, non-null aligned device address `0x100000000000`, triggering a device memory-access exception. Both input tensors remain valid and are dumped before the failing call. The plugin callback dumps exception info and raw kernel args; the parent validates all products on the CPU. Input x is reduced modulo1024 so the inputs and sums are exactly representable in float16.
 
   ```text
   normal Add run OK

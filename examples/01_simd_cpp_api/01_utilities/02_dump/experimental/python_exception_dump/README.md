@@ -22,7 +22,7 @@
 ├── python_exception_dump
 │   ├── examples
 │   │   ├── demo_add.py                  // Add：正常调用 + 故障注入 + 产物自检
-│   │   └── aclnn_add.py                 // ctypes调用CANN内置aclnnAdd，无需自定义算子
+│   │   └── aclnn_add.py                 // ctypes调用本地AddCustom算子包
 │   ├── npuops_exception_dump
 │   │   ├── include
 │   │   │   └── npuops_exception_dump.h  // 外挂库对外C接口
@@ -61,7 +61,7 @@
 
 - 算子依赖
 
-  样例通过`ctypes`调用CANN自带的普通`aclnnAdd`算子。CANN安装中须包含当前芯片对应的算子包，并确保`libascendcl.so`和`libopapi.so`可加载。
+  样例通过`ctypes`调用本仓库[自定义算子工程样例](../../../../02_features/99_acl_based/00_acl_compilation/custom_op/README.md)编译安装的`AddCustom`。算子源码直接复用原工程。
 
 - 配置环境变量
 
@@ -78,6 +78,15 @@
   在本样例根目录下执行如下步骤，编译外挂库并运行demo。
 
   ```bash
+  # 从当前Dump样例根目录定位已有custom_op工程
+  SAMPLE_DIR="$PWD"
+  CUSTOM_OP_DIR="$(cd ../../../../02_features/99_acl_based/00_acl_compilation/custom_op && pwd)"
+  cmake -S "$CUSTOM_OP_DIR" -B "$CUSTOM_OP_DIR/build"
+  cmake --build "$CUSTOM_OP_DIR/build" --target binary package -j8
+  bash "$CUSTOM_OP_DIR"/build/custom_opp_*.run --install-path="$SAMPLE_DIR/custom_opp"
+  source "$SAMPLE_DIR/custom_opp/vendors/customize/bin/set_env.bash"
+  export NPUOPS_ADD_LIB="$SAMPLE_DIR/custom_opp/vendors/customize/op_api/lib/libcust_opapi.so"
+
   cd npuops_exception_dump && bash build.sh && cd ..    # 编译外挂库so（产物输出到 lib/）
   python3 examples/demo_add.py                          # 执行demo
   ```
@@ -86,7 +95,7 @@
 
 - 执行结果
 
-  demo流程：正常调用`aclnnAdd`，计算两个4096元素的连续float32 ND tensor之和（`x = arange(4096)`，`y = ones(4096)`），在调用边界dump输入/输出并核对计算结果；随后在独立子进程中将同一个Add算子的输出地址替换为故意无效的非空对齐地址`0x100000000000`，触发设备端访问异常。输入tensor仍有效，故障调用前可完整dump输入。外挂库回调自动dump异常公共信息和原始args，父进程在CPU侧校验全部产物。
+  demo流程：正常调用本地`aclnnAddCustom`，计算两个16384元素的连续float16 ND tensor之和（`x = (arange(16384) % 1024).to(float16)`，`y = ones(16384, dtype=float16)`），在调用边界dump输入/输出并核对计算结果；随后在独立子进程中将同一个Add算子的输出地址替换为故意无效的非空对齐地址`0x100000000000`，触发设备端访问异常。输入tensor仍有效，故障调用前可完整dump输入。外挂库回调自动dump异常公共信息和原始args，父进程在CPU侧校验全部产物。输入x按1024取模，使输入和加法结果均可由float16精确表示。
 
   ```text
   normal Add run OK
