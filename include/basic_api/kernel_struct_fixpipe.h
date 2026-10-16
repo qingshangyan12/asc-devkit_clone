@@ -48,7 +48,8 @@ enum class CO2Layout : uint8_t {
 
 struct FixpipeConfig {
     CO2Layout format;
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
     bool isToUB;
 #endif
 #if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
@@ -57,7 +58,8 @@ struct FixpipeConfig {
 
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_)
         : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
           ,
           isToUB(false)
 #endif
@@ -68,7 +70,8 @@ struct FixpipeConfig {
     {}
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_)
         : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
           ,
           isToUB(isToUB_)
 #endif
@@ -79,7 +82,8 @@ struct FixpipeConfig {
     {}
     __aicore__ constexpr inline FixpipeConfig(CO2Layout format_, bool isToUB_, bool enableFixVal_)
         : format(format_)
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
           ,
           isToUB(isToUB_)
 #endif
@@ -90,7 +94,8 @@ struct FixpipeConfig {
     {}
 };
 
-#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
+#if defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3510 || __NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162) || \
+    (__NPU_ARCH__ == 9201) || (__NPU_ARCH__ == 9202)
 #if (__NPU_ARCH__ == 5102 || __NPU_ARCH__ == 5162)
 constexpr FixpipeConfig CFG_NZ_FIX = {CO2Layout::NZ, false, true};
 #endif
