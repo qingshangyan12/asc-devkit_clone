@@ -3,25 +3,25 @@
 ## 产品支持情况<a name="section1550532418810"></a>
 
 <!-- npu="950" id3 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id3 -->
 <!-- npu="A3" id4 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id4 -->
 <!-- npu="910b" id5 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id5 -->
 <!-- npu="310b" id6 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id6 -->
 <!-- npu="310p" id7 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id7 -->
 <!-- npu="310p" id8 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id8 -->
 <!-- npu="910" id9 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id9 -->
 
 ## 功能说明<a name="section618mcpsimp"></a>
@@ -66,7 +66,7 @@ aclError aclrtcCompileProg(aclrtcProg prog, int numOptions, const char **options
 <td class="cellrowborder" valign="top" width="15.559999999999999%" headers="mcps1.2.4.1.2 "><p id="p107431119474"><a name="p107431119474"></a><a name="p107431119474"></a>输入</p>
 </td>
 <td class="cellrowborder" valign="top" width="66.86%" headers="mcps1.2.4.1.3 "><p id="p2743311144712"><a name="p2743311144712"></a><a name="p2743311144712"></a>编译选项数组，保存具体的编译选项（默认添加-std=c++17）。</p>
-<p id="li196189152610p0"><a name="li196189152610p0"></a><a name="li196189152610p0"></a>支持的编译选项可以参考[《毕昇编译器用户指南》](https://www.hiascend.com/document/redirect/CannCommunityBiSheng)。</p>
+<p id="li196189152610p0"><a name="li196189152610p0"></a><a name="li196189152610p0"></a>支持的编译选项可以参考[《毕昇编译器》](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/latest/compiler/BishengCompiler/atlas_bisheng_10_0001.html)。</p>
 </td>
 </tr>
 </tbody>

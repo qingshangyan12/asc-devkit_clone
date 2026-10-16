@@ -109,11 +109,17 @@ HcclResult InsTempAllReduceMesh1DOneShot::RunAllReduce(
     DataSlice usrOutSlices =
         DataSlice(tempAlgParams.buffInfo.outputPtr, tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
 
-    CHK_RET(static_cast<HcclResult>(LocalCopy(threads[0], usrInSlices, usrOutSlices)));
-
+    // 特殊场景
     if (subCommRanks_[0].size() == 1) {
+        CHK_RET(static_cast<HcclResult>(LocalCopy(threads[0], usrInSlices, usrOutSlices)));
         return HCCL_SUCCESS;
     }
+
+    // 主流 - 本地拷贝
+    u64 slotMeOffset = sliceInfoVec[myRank_][0].offset + tempAlgParams.buffInfo.hcclBuffBaseOff;
+    u64 slotMeSize = sliceInfoVec[myRank_][0].size;
+    DataSlice slotMeSlices = DataSlice(tempAlgParams.buffInfo.hcclBuff.addr, slotMeOffset, slotMeSize, count_);
+    CHK_RET(static_cast<HcclResult>(LocalCopy(threads[0], usrInSlices, slotMeSlices)));
 
     for (u32 queIdx = 1; queIdx < threadNum_; queIdx++) {
         u32 nextRank = (myRank_ + queIdx) % templateRankSize_;
@@ -158,6 +164,10 @@ HcclResult InsTempAllReduceMesh1DOneShot::PostLocalReduce(
     const RankSliceInfo& sliceInfoVec)
 {
     HCCL_INFO("[InsTempAllReduceMesh1DOneShot][PostLocalReduce] reduce: rank[%d]", myRank_);
+
+    DataSlice usrOutSlices =
+        DataSlice(tempAlgParams.buffInfo.outputPtr, tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
+
     if (needAicpuReduce_) {
         CHK_RET(static_cast<HcclResult>(HcommBatchModeEnd(param.algTag)));
         CHK_RET(static_cast<HcclResult>(HcommBatchModeStart(param.algTag)));
@@ -166,22 +176,24 @@ HcclResult InsTempAllReduceMesh1DOneShot::PostLocalReduce(
         }
     }
 
-    DataSlice usrOutSlices =
-        DataSlice(tempAlgParams.buffInfo.outputPtr, tempAlgParams.buffInfo.outBuffBaseOff, processSize_, count_);
+    if (subCommRanks_[0].size() > 1) {
+        // 逐片累加到第0片，最后统一拷贝到输出
+        u64 baseDstOffset = sliceInfoVec[0][0].offset + tempAlgParams.buffInfo.hcclBuffBaseOff;
+        u64 baseDstSize = sliceInfoVec[0][0].size;
+        DataSlice baseDstSlice = DataSlice(tempAlgParams.buffInfo.hcclBuff.addr, baseDstOffset, baseDstSize, count_);
 
-    for (u32 rankIdx = 0; rankIdx < subCommRanks_[0].size(); rankIdx++) {
-        u32 curRank = rankIdx;
-        if (curRank == myRank_) {
-            continue;
+        for (u32 rankIdx = 1; rankIdx < subCommRanks_[0].size(); rankIdx++) {
+            u32 curRank = rankIdx;
+
+            // 执行本地归约
+            u64 curSrcOffset = sliceInfoVec[curRank][0].offset + tempAlgParams.buffInfo.hcclBuffBaseOff;
+            u64 curSrcSize = sliceInfoVec[curRank][0].size;
+            DataSlice curSrcSlice = DataSlice(tempAlgParams.buffInfo.hcclBuff.addr, curSrcOffset, curSrcSize, count_);
+
+            CHK_RET(static_cast<HcclResult>(LocalReduce(threads[0], curSrcSlice, baseDstSlice, dataType_, reduceOp_)));
         }
 
-        void* remotePtr = tempAlgParams.buffInfo.hcclBuff.addr;
-        u64 curSrcOffset = sliceInfoVec[curRank][0].offset + tempAlgParams.buffInfo.hcclBuffBaseOff;
-        u64 curSrcSize = sliceInfoVec[curRank][0].size;
-        DataSlice curSrcSlice = DataSlice(remotePtr, curSrcOffset, curSrcSize, count_);
-        DataSlice curDstSlice = usrOutSlices;
-
-        CHK_RET(static_cast<HcclResult>(LocalReduce(threads[0], curSrcSlice, curDstSlice, dataType_, reduceOp_)));
+        CHK_RET(static_cast<HcclResult>(LocalCopy(threads[0], baseDstSlice, usrOutSlices)));
     }
     return HCCL_SUCCESS;
 }

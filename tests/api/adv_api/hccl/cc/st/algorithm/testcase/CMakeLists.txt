@@ -110,11 +110,60 @@ add_custom_command(
     COMMENT "Run ${HCCL_AICPU_ALLOC_CTX_TARGET} with local library path priority"
 )
 
+set(HCCL_AICPU_MC2_TARGET ascendc_ut_adv_api_hccl_cc_aicpu_mc2)
+
+add_executable(${HCCL_AICPU_MC2_TARGET}
+    main.cc
+    test_aicpu_mc2.cc
+)
+
+target_include_directories(${HCCL_AICPU_MC2_TARGET} PRIVATE
+    ${HCCL_CHECKER_COMMON_INCLUDE_LIST}
+)
+
+target_compile_options(${HCCL_AICPU_MC2_TARGET} PRIVATE
+    -std=c++14
+    -Werror
+    -fno-common
+    -fno-strict-aliasing
+    -pipe
+    -O0
+    -g
+    -D_GLIBCXX_USE_CXX11_ABI=0
+)
+
+target_compile_definitions(${HCCL_AICPU_MC2_TARGET} PRIVATE
+    -DUT_TEST
+    -DAICPU_COMPILE
+)
+
+target_link_libraries(${HCCL_AICPU_MC2_TARGET} PRIVATE
+    intf_llt_pub_basic
+    mc2_client
+    -Wl,--whole-archive
+    ${HCCL_CHECKER_MODEL_PROXY_TARGET}
+    -Wl,--no-whole-archive
+    c_sec
+    pthread
+    dl
+)
+
+add_custom_command(
+    TARGET ${HCCL_AICPU_MC2_TARGET} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E env LD_LIBRARY_PATH=$<TARGET_FILE_DIR:mc2_client>:$<TARGET_FILE_DIR:mc2_compat>:$ENV{LD_LIBRARY_PATH} $<TARGET_FILE:${HCCL_AICPU_MC2_TARGET}>
+    COMMENT "Run ${HCCL_AICPU_MC2_TARGET} with local library path priority"
+)
+
 add_subdirectory(mc2_ccu)
 
 # Isolate primitive interception from the existing simulator and production libraries.
 set(MESHCHUNK_TEST_TARGET ascendc_ut_adv_api_hccl_cc_meshchunk)
-add_executable(${MESHCHUNK_TEST_TARGET} main.cc reduce_scatter_meshchunk_testcase.cc)
+set(KFC_DECOUPLER_DIR ${HCCL_CC_SRC_DIR}/aicpu_kfc/framework/device/aicpu_kfc/decoupler)
+add_executable(${MESHCHUNK_TEST_TARGET} main.cc reduce_scatter_meshchunk_testcase.cc
+    ${KFC_DECOUPLER_DIR}/comm_kfc_open_kernel_adapter.cc
+    ${KFC_DECOUPLER_DIR}/comm_kfc_open_kernel_executor.cc
+    ${KFC_DECOUPLER_DIR}/cann_dispatch_bridge.cc)
+target_include_directories(${MESHCHUNK_TEST_TARGET} PRIVATE ${KFC_DECOUPLER_DIR})
 target_include_directories(${MESHCHUNK_TEST_TARGET} PRIVATE ${HCCL_CHECKER_COMMON_INCLUDE_LIST})
 target_compile_options(${MESHCHUNK_TEST_TARGET} PRIVATE -std=c++14 -Werror -O0 -g -D_GLIBCXX_USE_CXX11_ABI=0)
 target_compile_definitions(${MESHCHUNK_TEST_TARGET} PRIVATE UT_TEST AICPU_COMPILE)

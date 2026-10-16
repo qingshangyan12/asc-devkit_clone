@@ -32,6 +32,10 @@
 #include "../../../../impl/basic_api/dav_c220/core_mng/roc/kernel_operator_cube_group_info.h"
 #elif __NPU_ARCH__ == 3510
 #include "../../../../impl/basic_api/dav_3510/core_mng/roc/kernel_operator_cube_group_info.h"
+#elif __NPU_ARCH__ == 9201
+#include "../../../../impl/basic_api/dav_9201/core_mng/roc/kernel_operator_cube_group_info.h"
+#elif __NPU_ARCH__ == 9202
+#include "../../../../impl/basic_api/dav_9202/core_mng/roc/kernel_operator_cube_group_info.h"
 #endif
 
 #if defined(ASCENDC_CPU_DEBUG) && ASCENDC_CPU_DEBUG == 1

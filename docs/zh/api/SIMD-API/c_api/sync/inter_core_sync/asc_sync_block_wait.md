@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：支持
+- Atlas A3系列产品：支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：支持
+- Atlas A2系列产品：支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -70,7 +70,7 @@ PIPE_S
     <!-- npu="950" id8 -->
     - 针对[NPU架构版本3510](../../../../../guide/programming_guide/language_extension/simd_builtin_keywords.md)，硬件支持配置核间同步模式和流水类型，输入参数`pipe`**生效**，此时`asc_sync_block_wait`会阻塞由**`pipe`指定的流水**的后续指令。AIC和AIV支持的`pipe`取值如[表2](#aic_aiv_supported_pipe_3510)所示。
 
-        **表2**  NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
+        **表2** NPU架构3510中AIC和AIV支持的`pipe`取值<a id="aic_aiv_supported_pipe_3510"></a>
 
         | 核类型 | 支持的pipe取值 |
         | :--- | :--- |

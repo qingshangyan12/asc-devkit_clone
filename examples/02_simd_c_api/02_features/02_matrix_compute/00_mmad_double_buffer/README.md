@@ -10,7 +10,7 @@
 
 | 产品 | CANN软件版本 |
 | --- | --- |
-| Ascend 950PR/Ascend 950DT | == CANN 9.2.0 |
+| Ascend 950PR&950DT系列产品 | == CANN 9.2.0 |
 
 ## 目录结构
 
@@ -211,7 +211,7 @@ python3 ../scripts/verify_result.py output/output.bin output/golden.bin
 | 编译选项 | 可选值 | 说明 |
 | --- | --- | --- |
 | `CMAKE_ASC_ARCHITECTURES` | `dav-3510` | NPU架构 |
-| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`cpu`、`sim` | 运行模式 |
+| `CMAKE_ASC_RUN_MODE` | `npu`（默认）、`sim` | 运行模式 |
 | `SCENARIO_NUM` | `0`、`1`（默认） | `0`为单缓冲基线，`1`为L1双缓冲。 |
 
 精度校验成功时输出：

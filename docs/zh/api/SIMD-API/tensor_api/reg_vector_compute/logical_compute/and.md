@@ -3,25 +3,25 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
@@ -69,6 +69,8 @@ src0、src1与返回值的数据类型保持一致。支持的数据类型为：
 
 - src0.mask需通过`with_mask`接口预先设置。未设置时，mask的内容不确定，会导致参与计算的元素位置错误。
 - 构造`reg_tensor<bool>{maskValue}`只初始化对象的mask，不会生成布尔寄存器数据。作为操作数前，reg必须已经由mask生成、加载或其他布尔计算接口写入。
+- 参与计算的元素个数由矢量长度（VL）决定：`T`不为`bool`时为`VL / sizeof(T)`，`T`为`bool`时为`VL`个bit。
+- `src0.mask`未选中的位置不参与计算，返回值对应位置置零。
 
 ## 调用示例
 

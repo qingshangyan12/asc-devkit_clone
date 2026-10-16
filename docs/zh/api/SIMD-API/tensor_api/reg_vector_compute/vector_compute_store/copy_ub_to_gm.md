@@ -6,30 +6,30 @@
 ## 产品支持情况
 
 <!-- npu="950" id1 -->
-- Ascend 950PR/Ascend 950DT：支持
+- Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
 <!-- npu="A3" id2 -->
-- Atlas A3 训练系列产品/Atlas A3 推理系列产品：不支持
+- Atlas A3系列产品：不支持
 <!-- end id2 -->
 <!-- npu="910b" id3 -->
-- Atlas A2 训练系列产品/Atlas A2 推理系列产品：不支持
+- Atlas A2系列产品：不支持
 <!-- end id3 -->
 <!-- npu="310b" id4 -->
-- Atlas 200I/500 A2 推理产品：不支持
+- Atlas 200I/500 A2推理产品：不支持
 <!-- end id4 -->
 <!-- npu="310p" id5 -->
-- Atlas 推理系列产品AI Core：不支持
+- Atlas推理系列产品AI Core：不支持
 <!-- end id5 -->
 <!-- npu="310p" id6 -->
-- Atlas 推理系列产品Vector Core：不支持
+- Atlas推理系列产品Vector Core：不支持
 <!-- end id6 -->
 <!-- npu="910" id7 -->
-- Atlas 训练系列产品：不支持
+- Atlas训练系列产品：不支持
 <!-- end id7 -->
 
 ## 功能说明
 
-头文件路径为：`tensor_api/tensor.h`，命名空间为`asc::te`。
+头文件路径为：`tensor_api/algorithm/copy.h`，命名空间为`asc::te`。
 
 该接口用于将Unified Buffer（UB）中的数据搬运到Global Memory。接口根据源、目的Tensor的存储位置自动选择`copy_ub_to_gm`通路，并根据源、目的Layout推导搬运块数、单块长度、源步长和目的步长，支持单块长度非32字节对齐的数据搬运。
 
@@ -90,7 +90,7 @@ UB到Global Memory通路使用`copy_ub_to_gm{}`作为搬运操作对象，默认
 
 | 源/目的Layout | 支持的数据类型 |
 | :--- | :--- |
-| ND、DN、NZ | `fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
+| ND、DN、NZ | `int4b_t`、`fp4x2_e1m2_t`、`fp4x2_e2m1_t`、`int8_t`、`uint8_t`、`hifloat8_t`、`fp8_e5m2_t`、`fp8_e4m3fn_t`、`int16_t`、`uint16_t`、`half`、`bfloat16_t`、`int32_t`、`uint32_t`、`float`、`int64_t` |
 
 ## 返回值说明
 

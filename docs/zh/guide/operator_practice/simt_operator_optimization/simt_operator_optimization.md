@@ -1,3 +1,18 @@
 # SIMT算子性能优化
 
-本文件为文档发布时所需的索引文件。
+- [概述](./overview.md)
+- [内存访问](./memory_access/memory_access.md)
+  - [访存合并](./memory_access/memory_access_merge.md)
+  - [避免UB的Bank冲突](./memory_access/avoid_ub_bank_conflict_simt.md)
+  - [DCache访问优化](./memory_access/dcache_access.md)
+  - [通过类型对齐提升搬运效率](./memory_access/type_alignment_transfer.md)
+  - [使用短向量类型提升效率](./memory_access/short_vector_efficiency.md)
+- [执行配置](./execution_config/execution_config.md)
+  - [线程块数量配置优化](./execution_config/thread_block_config.md)
+  - [合理配置线程数避免寄存器溢出](./execution_config/thread_count_register_overflow.md)
+- [控制流](./control_flow/control_flow.md)
+  - [同一Warp内避免分支跳转](./control_flow/avoid_warp_branch.md)
+  - [分支处理](./control_flow/branch_handing.md)
+- [指令优化](./instruction_optimization/instruction_optimization.md)
+  - [原子操作指令优化](./instruction_optimization/atomic_instruction_optimization.md)
+  - [原地加法指令优化](./instruction_optimization/inplace_add_instruction_optimization.md)
