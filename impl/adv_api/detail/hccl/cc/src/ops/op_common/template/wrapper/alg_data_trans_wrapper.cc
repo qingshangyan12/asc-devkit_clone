@@ -1085,8 +1085,7 @@ HcclResult AicpuReduce(
             break;
         case HcclDataType::HCCL_DATA_TYPE_FP32:
             ret = AicpuReduceTemplate<float>(
-                reinterpret_cast<float*>(dst), dstSlice.size_, reinterpret_cast<float*>(src), srcSlice.size_,
-                reduceOp);
+                reinterpret_cast<float*>(dst), dstSlice.size_, reinterpret_cast<float*>(src), srcSlice.size_, reduceOp);
             break;
         case HcclDataType::HCCL_DATA_TYPE_INT64:
             ret = AicpuReduceTemplate<int64_t>(
