@@ -41,7 +41,7 @@ enum class AippInputFormat : uint8_t {
     RAW8 = 27,
     RAW10 = 10,
     RAW12 = 11,
-    RAE16 = 12,
+    RAW16 = 12,
     ARG16_U16 = 13,
     XRG16_U16 = 14,
     RAW24 = 15,
