@@ -30,7 +30,6 @@
 │   │   ├── src                          // C++ 异常回调实现
 │   │   ├── build.sh                     // 一键编译脚本（产物输出到 lib/）
 │   │   └── CMakeLists.txt               // 编译工程文件
-│   ├── tests/test_demo_add.py          // 不依赖NPU的产物校验回归测试
 │   ├── README_en.md
 │   └── README.md
 ```
@@ -104,12 +103,6 @@
   每次运行在当前目录下的`./exception_dump_add/run_*/`创建独立目录，避免历史产物导致误判；也可通过`--dump-dir /path/to/dumps`指定父目录。目录包含正常/故障调用的`input_add_*`、正常调用的`output_add_normal_*`、回调的`*_info.txt`和`*_args.bin`，以及记录故意无效输出地址的`fault.json`。
 
   **故障注入说明：** Add算子源码未作修改；仅故障调用的输出tensor描述符使用无效device指针。该地址不对应可读输出tensor，故障路径不执行输出dump。异常worker结束后不复用失败的NPU上下文，父进程只读本次运行的文件。回调对全部kernel启用，校验时要求实际kernel名包含`add`、错误码非零、args大小等于同前缀`_info.txt`中的`args_bytes`，并从args中找出两个输入tensor元信息记录的device指针和故意无效的输出地址，不写死特定芯片的kernel名、错误码或args长度。
-
-  可单独运行CPU侧产物校验回归测试（无需加载PyTorch或NPU）：
-
-  ```bash
-  python3 -m unittest discover -s tests -v
-  ```
 
 ## FAQ
 
