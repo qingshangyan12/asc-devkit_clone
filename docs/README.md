@@ -12,12 +12,12 @@
 │   ├── guide                      # Ascend C 算子开发指南
 │   ├── vitepress                      # 文档构建脚本目录
 │   ├── asc_doc_design_rules.md        # Ascend C 资料设计规范
-│   ├── asc_how_to_choose_api.md       # Ascend C多层级编程接口选择参考文档
+│   ├── asc_how_to_choose_api.md       # Ascend C 多层级编程接口选择参考文档
 │   └── quick_start.md                 # 快速入门文档
 ├── en                                 # 英文文档目录
 │   ├── contributing                   # 贡献指南目录（API贡献指南、代码贡献规范等）
 │   ├── asc_doc_design_rules.md        # Ascend C 资料设计规范
-│   ├── asc_how_to_choose_api.md       # Ascend C多层级编程接口选择参考文档
+│   ├── asc_how_to_choose_api.md       # Ascend C 多层级编程接口选择参考文档
 │   └── quick_start.md                 # 快速入门文档
 ├── README_en.md
 └── README.md
