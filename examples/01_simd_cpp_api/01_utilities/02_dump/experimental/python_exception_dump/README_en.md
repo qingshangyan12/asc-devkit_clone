@@ -30,7 +30,6 @@ This example demonstrates an NPU operator exception info auto-dump solution base
 │   │   ├── src                          // C++ exception callback implementation
 │   │   ├── build.sh                     // One-shot build script (output to lib/)
 │   │   └── CMakeLists.txt               // Build project file
-│   ├── tests/test_demo_add.py          // CPU-only artifact validation regression tests
 │   ├── README_en.md
 │   └── README.md
 ```
@@ -62,7 +61,7 @@ Configuration (environment variables):
 
 - Install prerequisites
 
-  The demo calls the ordinary built-in CANN `aclnnAdd` operator through `ctypes`. No `ascend_ops` package or custom operator build is needed. Install the CANN operator package for your device and ensure `libascendcl.so` and `libopapi.so` can be loaded.
+  The demo calls the ordinary built-in CANN `aclnnAdd` operator through `ctypes`. Install the CANN operator package for your device and ensure `libascendcl.so` and `libopapi.so` can be loaded.
 
 - Configure environment variables
 
@@ -104,12 +103,6 @@ Configuration (environment variables):
   Each invocation creates a fresh `./exception_dump_add/run_*/` directory relative to the current working directory, preventing stale files from passing validation. Use `--dump-dir /path/to/dumps` to change the parent directory. Products include normal/fault `input_add_*` files, normal `output_add_normal_*` files, callback `*_info.txt` and `*_args.bin` files, and `fault.json`, which records the deliberately invalid output address.
 
   **Fault injection:** the Add kernel is unmodified. Only the output tensor descriptor in the fault call uses an invalid device pointer. This pointer does not represent a readable output tensor; output dumping is disabled for the fault call. The fault worker exits without reusing its failed NPU context, and the parent only reads files from the current run. Callbacks are enabled for all kernels; validation requires an actual kernel name containing `add`, a nonzero error code, an args size matching `args_bytes` in the paired info file, and both input pointers (from their tensor metadata) and the injected output pointer in raw args. No chip-specific kernel name, error code, or args length is hardcoded.
-
-  Run the CPU-only artifact validation regression tests without loading PyTorch or an NPU:
-
-  ```bash
-  python3 -m unittest discover -s tests -v
-  ```
 
 ## FAQ
 
