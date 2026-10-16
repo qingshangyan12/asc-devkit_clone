@@ -2,6 +2,9 @@
 
 ## 产品支持情况
 
+<!-- npu="960" id8 -->
+- Ascend 960PR&960DT系列产品：支持
+<!-- end id8 -->
 <!-- npu="950" id1 -->
 - Ascend 950PR&950DT系列产品：支持
 <!-- end id1 -->
@@ -34,7 +37,7 @@
 
 | 位宽类别 | 矢量数据寄存器类型 |
 | --- | --- |
-| b8 | vector_int8_t、vector_uint8_t、vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t、vector_hifloat8_t、vector_fp8_e4m3fn_t、vector_fp8_e5m2_t、vector_fp8_e8m0_t |
+| b8 | vector_int8_t、vector_uint8_t、vector_int4x2_t、vector_fp4x2_e2m1_t、vector_fp4x2_e1m2_t、vector_hifloat8_t、vector_fp8_e4m3fn_t、vector_fp8_e5m2_t、vector_fp8_e8m0_t、vector_fp8_e6m2_t |
 | b16 | vector_int16_t、vector_uint16_t、vector_half、vector_bfloat16_t |
 | b32 | vector_int32_t、vector_uint32_t、vector_float |
 | b64 | vector_int64_t、vector_uint64_t |

@@ -2,6 +2,7 @@
 
 - **[asc_deintlv](asc_deintlv.md)**
 - **[asc_intlv](asc_intlv.md)**
+- **[asc_pack_datablock](asc_pack_datablock.md)**
 - **[asc_pack_to_high](asc_pack_to_high.md)**
 - **[asc_pack_to_low](asc_pack_to_low.md)**
 - **[asc_select](asc_select.md)**
