@@ -564,11 +564,11 @@ __aicore__ inline void VecCopyLevel0Template(
 // Copy::Level 0 - mask bit mode
 template <typename T, bool isSetMask = true>
 __aicore__ inline void CopyImpl(
-    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTimes,
+    __ubuf__ T* dst, __ubuf__ T* src, const uint64_t mask[], const uint8_t repeatTime,
     const CopyRepeatParams& repeatParams)
 {
     static_assert(SupportBytes<T, 2, 4>(), "Copy from ubuf to ubuf only support type b16/b32 on current device");
-    VecCopyLevel0Template<isSetMask, true>(dst, src, mask, 0, repeatTimes, repeatParams);
+    VecCopyLevel0Template<isSetMask, true>(dst, src, mask, 0, repeatTime, repeatParams);
 }
 
 template <typename T, bool isSetMask = true>
