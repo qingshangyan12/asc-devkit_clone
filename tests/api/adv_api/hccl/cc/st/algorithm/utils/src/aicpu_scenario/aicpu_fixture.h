@@ -86,6 +86,13 @@ public:
         return static_cast<uint8_t>(17U + rank * 41U + offset);
     }
 
+    // 场景能力守卫：判定 reduce 系场景是否落入产品直算路径（ST 不支持域）。
+    // 可测返回 true；不支持返回 false 且 reason 给出人读解释（VerifyScenario 据此 FAIL）。
+    // public：框架自测（独立 TEST）直接访问，先例同 MakeInputByte。
+    // 判定条件与产品 LocalReduce wrapper 的直算转发条件对齐（alg_data_trans_wrapper.cc:738-744），
+    // 详见 aicpu_fixture.cc 实现处的边界注释。
+    static bool CheckScenarioSupported(const AicpuStScenario& scenario, std::string& reason);
+
 protected:
     void VerifyScenario(const AicpuStScenario& scenario);
 

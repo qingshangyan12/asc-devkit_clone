@@ -52,6 +52,57 @@ Mc2CcTilingInner AicpuStFixture::BuildTiling(HcclCMDType opType, HcclDataType da
     return tiling;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════════
+// 场景能力守卫（直算路径显式拒绝）
+//
+// 背景：产品 LocalReduce wrapper（alg_data_trans_wrapper.cc:738-744）对
+//   "64bit 类型（INT64/UINT64/FP64，任何 reduceOp）或 PROD（任何类型）"
+// 的组合不走 Hcomm 原语（任务路径），而转发 AicpuReduce——host/AICPU 上直接解引用
+// 数据指针逐元素计算的旁路。真机上 AICPU 与 HBM 统一编址、直访合法；ST 的 buffer
+// 是假设备地址（编号，需 GetSlice 解码才得到后备内存指针），直算跳过了解码层，
+// 直接解引用必 SIGSEGV。直算没有函数内拦截点（解引用是 load/store 指令，无桩可用），
+// 且该路径是产品对"底层归约引擎未实现组合"（PROD/64bit 罕见于梯度聚合负载）的
+// CPU 兜底设计，预计长期存在。
+//
+// 不支持域的两个子情形（原因不同，报错文案区分）：
+//  1) 64bit 类型：产品支持该组合，但直算越出 ST 假地址仿真边界（SIGSEGV）——需真机验证；
+//  2) PROD + 常规类型：产品 selector 与执行能力错配——selector 照选算法（如
+//     InsReduceScatterMesh1D），但 AicpuReduce 仅支持 INT64/UINT64/FP64，
+//     执行报 DataType not support（真机同样报错，属产品缺陷，需上游修）。
+//
+// 守卫在 VerifyScenario 入口（rank 线程启动前）显式拒绝并给出完整原因——优于
+// 跑到一半 SIGSEGV/死锁的事后排查。判定条件与产品转发条件严格对齐；
+// 非 reduce 系 opType（如 AllGather：无归约，64bit 拷贝走任务路径不受限）不拦。
+// 详见 2026-10-10-aicpu-st-design.md §18.2/§18.3。
+// ═══════════════════════════════════════════════════════════════════════════════════
+bool AicpuStFixture::CheckScenarioSupported(const AicpuStScenario& scenario, std::string& reason)
+{
+    const bool is64Bit = scenario.dataType == HcclDataType::HCCL_DATA_TYPE_INT64 ||
+                         scenario.dataType == HcclDataType::HCCL_DATA_TYPE_UINT64 ||
+                         scenario.dataType == HcclDataType::HCCL_DATA_TYPE_FP64;
+    const bool isProd = scenario.reduceType == HcclReduceOp::HCCL_REDUCE_PROD;
+    const bool isReduceLike = scenario.opType == HcclCMDType::HCCL_CMD_REDUCE_SCATTER ||
+                              scenario.opType == HcclCMDType::HCCL_CMD_ALLREDUCE ||
+                              scenario.opType == HcclCMDType::HCCL_CMD_REDUCE;
+    if (!isReduceLike || (!is64Bit && !isProd)) {
+        return true;
+    }
+    reason = "unsupported scenario (product direct-compute path, see 2026-10-10-aicpu-st-design.md §18.2): ";
+    if (is64Bit) {
+        reason += "64bit dataType (" + std::to_string(static_cast<uint32_t>(scenario.dataType)) +
+                  ") reduce is routed by product LocalReduce wrapper to AicpuReduce, which computes by "
+                  "dereferencing data pointers directly on the processor (valid on real device via unified "
+                  "HBM addressing, but ST buffers are encoded pseudo device addresses that only GetSlice "
+                  "can decode) -- direct dereference would SIGSEGV. Requires real-device verification.";
+    } else {
+        reason += "reduceOp PROD with non-64bit dataType (" + std::to_string(static_cast<uint32_t>(scenario.dataType)) +
+                  ") is a product-level selector/executor mismatch: selector still picks the algorithm, but "
+                  "AicpuReduce only supports INT64/UINT64/FP64 and fails at runtime with 'DataType not "
+                  "support' (fails on real device too; needs upstream fix). ST rejects it explicitly.";
+    }
+    return false;
+}
+
 // 单 rank 全链路：内存分配 → OpParam 准备 → selector → 资源 → HcclExecOp（内部 launch+Orchestrate）
 // RunRankInner 为实际执行体；RunRank 为异常保护包装（见下）——rank 线程内未捕获异常会
 // std::terminate 使整个测试进程崩溃、后续用例全丢，违背框架"优雅报告失败"的设计目标，
@@ -188,6 +239,15 @@ void AicpuStFixture::VerifyScenario(const AicpuStScenario& scenario)
     // 守卫：dataType 越界（≥ RESERVED）会使后续 DATATYPE_SIZE_TABLE 索引越界读，先检查枚举界
     ASSERT_LT(static_cast<uint32_t>(scenario.dataType), HCCL_DATA_TYPE_RESERVED)
         << "invalid dataType in scenario, value=" << static_cast<uint32_t>(scenario.dataType);
+
+    // 能力守卫：直算路径（64bit/PROD 归约）显式拒绝并说明原因（优于跑到一半 SIGSEGV/死锁）。
+    // ADD_FAILURE（非致命）+ return：用例变红且消息完整，后续装配不再执行——
+    // 与 FAIL 等效且可被 EXPECT_NONFATAL_FAILURE 捕获测试（同 golden 空守卫先例）
+    std::string unsupportedReason;
+    if (!CheckScenarioSupported(scenario, unsupportedReason)) {
+        ADD_FAILURE() << unsupportedReason;
+        return;
+    }
 
     SimTaskQueue::Global()->Clear();
 
